@@ -72,8 +72,8 @@ public class NetworkFromShape {
 			double lanes = minWidth/laneWidth/2;
 			double flowCap = lanes * flowCapPerLane;
 			
-			NodeImpl nFrom = net.getNode(Integer.toString(from));
-			NodeImpl nTo = net.getNode(Integer.toString(to));
+			NodeImpl nFrom = net.getNodes().get(new IdImpl(Integer.toString(from)));
+			NodeImpl nTo = net.getNodes().get(new IdImpl(Integer.toString(to)));
 			if (nTo == null    || nFrom == null) {
 				int i = 0;
 				i++;

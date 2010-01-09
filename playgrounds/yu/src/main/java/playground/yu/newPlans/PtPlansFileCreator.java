@@ -111,7 +111,7 @@ public class PtPlansFileCreator {
 	public List<Node> getSrcRoute(final int[] nodes) {
 		List<Node> srcRoute = new ArrayList<Node>();
 		for (int i = 0; i < nodes.length; i++)
-			srcRoute.add(this.network.getNode(new IdImpl(nodes[i])));
+			srcRoute.add(this.network.getNodes().get(new IdImpl(nodes[i])));
 		return srcRoute;
 	}
 
@@ -141,14 +141,14 @@ public class PtPlansFileCreator {
 		try {
 			PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(pl);
-			LinkImpl startLink = this.network.getLink(new IdImpl(startLinkId));
+			LinkImpl startLink = this.network.getLinks().get(new IdImpl(startLinkId));
 			ActivityImpl a = pl.createAndAddActivity("h", startLink);
 			a.setEndTime(Time.parseTime(endTime));
 			LegImpl leg = pl.createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));
 			NetworkRouteWRefs route = new NodeNetworkRouteImpl();
 			leg.setRoute(route);
-			LinkImpl endLink = this.network.getLink(new IdImpl(endLinkId));
+			LinkImpl endLink = this.network.getLinks().get(new IdImpl(endLinkId));
 			pl.createAndAddActivity("w", endLink);
 			route.setNodes(startLink, srcRoute, endLink);
 			this.pop.addPerson(p);

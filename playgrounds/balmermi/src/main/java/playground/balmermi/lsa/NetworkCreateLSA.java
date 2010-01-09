@@ -260,7 +260,7 @@ public class NetworkCreateLSA {
 					Intersection intersec = this.intersections.get(knotennr);
 					Lane l = intersec.lanes.get(lnr);
 					if (l == null) { Gbl.errorMsg("Intersec_id=" + knotennr + ": lane_nr=" + lnr + " does not exist!"); }
-					LinkImpl link = this.network.getLink(linkid);
+					LinkImpl link = this.network.getLinks().get(linkid);
 					if (link == null) { Gbl.errorMsg("Intersec_id=" + knotennr + ": link_nr=" + linkid.toString() + " does not exist!"); }
 					l.addLink(link);
 
@@ -372,7 +372,7 @@ public class NetworkCreateLSA {
 			Iterator<Id> id_it = this.lsalinklist.keySet().iterator();
 			while (id_it.hasNext()) {
 				Id id = id_it.next();
-				LinkImpl link = this.network.getLink(id);
+				LinkImpl link = this.network.getLinks().get(id);
 				HashSet<LSA> lsas = this.lsalinklist.get(id);
 				if (links_to_ignore.contains(id)){
 					System.out.println("Link id=" + id + " will be ignored. (no LSA for that link)!");

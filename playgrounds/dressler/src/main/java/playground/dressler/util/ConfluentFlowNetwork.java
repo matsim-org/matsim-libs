@@ -22,6 +22,7 @@
 package playground.dressler.util;
 
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.*;
 
 import java.io.*;
@@ -178,7 +179,7 @@ public class ConfluentFlowNetwork {
 	String inline = null;
 	while ((inline = in.readLine()) != null) {
 		String[] line = inline.split(";");
-		Node node = network.getNode(line[0].trim());
+		Node node = network.getNodes().get(new IdImpl(line[0].trim()));
 		Integer d = Integer.valueOf(line[1].trim());
 		demands.put(node, d);
 	}
@@ -208,7 +209,7 @@ public class ConfluentFlowNetwork {
 		HashMap<Node,Integer> demands = new HashMap<Node, Integer>();
 		
 		//Node sink = network.getNode("supersink");
-		Node sink = network.getNode("en1");
+		Node sink = network.getNodes().get(new IdImpl("en1"));
 		
 		if (plansfile != null) {
 			try {

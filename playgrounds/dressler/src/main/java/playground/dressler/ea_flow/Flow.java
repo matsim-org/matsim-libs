@@ -659,7 +659,7 @@ public class Flow {
 					// normal case, write the routes!
 					LinkNetworkRouteImpl route;
 					
-					Node firstnode  = _network.getLink(ids.get(0)).getFromNode();
+					Node firstnode  = _network.getLinks().get(ids.get(0)).getFromNode();
 					
 					// for each unit of flow construct a Person
 					for (int i =1 ; i<= nofpersons;i++){
@@ -684,8 +684,8 @@ public class Flow {
 						//}
 						
 //						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
-						Link startLink = _network.getLink(ids.get(0));
-						Link endLink = _network.getLink(ids.get(ids.size()-1));
+						Link startLink = _network.getLinks().get(ids.get(0));
+						Link endLink = _network.getLinks().get(ids.get(ids.size()-1));
 						route = new LinkNetworkRouteImpl(startLink, endLink);
 						
 						List<Link> routeLinks = null;
@@ -693,7 +693,7 @@ public class Flow {
 							routeLinks = new ArrayList<Link>();
 //							route.setLinkIds(ids.subList(1, ids.size()-1));
 							for (Id iid : ids.subList(1, ids.size()-1)){
-								routeLinks.add(_network.getLink(iid));
+								routeLinks.add(_network.getLinks().get(iid));
 							}
 						} 
 						route.setLinks(startLink, routeLinks, endLink);
@@ -702,10 +702,10 @@ public class Flow {
 						LegImpl leg = new LegImpl(TransportMode.car);
 						//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 						leg.setRoute(route);
-						Link fromlink =_network.getLink(ids.getFirst());
+						Link fromlink =_network.getLinks().get(ids.getFirst());
 						ActivityImpl home = new ActivityImpl("h", (LinkImpl)fromlink);
 //						home.setLinkId(fromlink.getId());
-						Link tolink =_network.getLink(ids.getLast());
+						Link tolink =_network.getLinks().get(ids.getLast());
 						ActivityImpl work = new ActivityImpl("w", (LinkImpl)tolink);
 //						work.setLinkId(tolink.getId());
 						

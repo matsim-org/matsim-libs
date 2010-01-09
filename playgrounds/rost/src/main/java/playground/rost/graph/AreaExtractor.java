@@ -128,7 +128,7 @@ public class AreaExtractor {
 		}
 		for(Node n : hull)
 		{
-			if(network.getNode(n.getId()) == null)
+			if(network.getNodes().get(n.getId()) == null)
 				throw new RuntimeException("border node is not contained in output network");
 		}
 		return network;

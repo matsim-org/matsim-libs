@@ -68,7 +68,7 @@ public class TeleatlasIvtcheuMerger {
 				// ivtchLID
 				// 0
 				Id lid = new IdImpl(entries[0].trim());
-				LinkImpl l = networkIvtcheu.getLink(lid);
+				LinkImpl l = networkIvtcheu.getLinks().get(lid);
 				if (l == null) { throw new RuntimeException(lineCnt+": link with id="+lid+" not found."); }
 				if (!networkIvtcheu.removeLink(l)) { throw new RuntimeException(lineCnt+": could not remove link with id="+lid+"."); }
 				lineCnt++;
@@ -139,8 +139,8 @@ public class TeleatlasIvtcheuMerger {
 			else { throw new RuntimeException("HEAH?"); }
 			networkTeleatlas.createAndAddLink(
 					l.getId(),
-					networkTeleatlas.getNode(fromNodeId),
-					networkTeleatlas.getNode(toNodeId),
+					networkTeleatlas.getNodes().get(fromNodeId),
+					networkTeleatlas.getNodes().get(toNodeId),
 					l.getLength(),
 					l.getFreespeed(Time.UNDEFINED_TIME),
 					l.getCapacity(Time.UNDEFINED_TIME)/10.0,

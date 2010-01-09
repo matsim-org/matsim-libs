@@ -84,7 +84,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 		log.info("  init ZoneToNodeMapping...");
 		Map<Id,Set<Id>> map = new HashMap<Id,Set<Id>>();
 		for (Id linkId : l2zMapping.keySet()) {
-			Id nodeId = network.getLink(linkId).getToNode().getId();
+			Id nodeId = network.getLinks().get(linkId).getToNode().getId();
 			Id centroidNodeId = l2zMapping.get(linkId);
 			Set<Id> nodeIds = map.get(centroidNodeId);
 			if (nodeIds == null) { nodeIds = new HashSet<Id>(); map.put(centroidNodeId,nodeIds); }
@@ -181,7 +181,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 		int nofZones = ttimeMatrix.size();
 		int cnt = 0;
 		for (Id fzone : ttimeMatrix.keySet()) {
-			st.setOrigin(network.getNode(fzone));
+			st.setOrigin(network.getNodes().get(fzone));
 			st.setDepartureTime(hour*3600);
 			st.run(network);
 			Map<Id,Tuple<Double,Integer>> tmap = ttimeMatrix.get(fzone);

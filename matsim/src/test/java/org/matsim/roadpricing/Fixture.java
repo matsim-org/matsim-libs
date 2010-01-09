@@ -143,11 +143,11 @@ import org.matsim.core.utils.misc.Time;
 	protected static PopulationImpl createPopulation1(final NetworkLayer network) {
 		PopulationImpl population = new PopulationImpl();
 
-		LinkImpl link0 = network.getLink(new IdImpl(0));
-		LinkImpl link1 = network.getLink(new IdImpl(1));
-		LinkImpl link2 = network.getLink(new IdImpl(2));
-		LinkImpl link3 = network.getLink(new IdImpl(3));
-		LinkImpl link4 = network.getLink(new IdImpl(4));
+		LinkImpl link0 = network.getLinks().get(new IdImpl(0));
+		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
+		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
+		LinkImpl link3 = network.getLinks().get(new IdImpl(3));
+		LinkImpl link4 = network.getLinks().get(new IdImpl(4));
 		Fixture.addPersonToPopulation(Fixture.createPerson1( 1, "07:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 1st time slot
 		Fixture.addPersonToPopulation(Fixture.createPerson1( 2, "11:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 2nd time slot
 		Fixture.addPersonToPopulation(Fixture.createPerson1( 3, "16:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 3rd time slot
@@ -173,7 +173,7 @@ import org.matsim.core.utils.misc.Time;
 	protected static PopulationImpl createPopulation2(final NetworkLayer network) {
 		PopulationImpl population = new PopulationImpl();
 
-		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLink("1"), network.getLink("7"), network.getLink("13")), population);
+		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLinks().get(new IdImpl("1")), network.getLinks().get(new IdImpl("7")), network.getLinks().get(new IdImpl("13"))), population);
 
 		return population;
 	}

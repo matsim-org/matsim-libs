@@ -85,9 +85,9 @@ public class NetworkAddEmmeManeuverRestrictions {
 				Id nid = new IdImpl(entries[1]);
 				Id fnid = new IdImpl(entries[2]);
 				Id tnid = new IdImpl(entries[3]);
-				Node n = network.getNode(nid);
-				Node fn = network.getNode(fnid);
-				Node tn = network.getNode(tnid);
+				Node n = network.getNodes().get(nid);
+				Node fn = network.getNodes().get(fnid);
+				Node tn = network.getNodes().get(tnid);
 				if ((n != null) && (fn != null) && (tn != null)) {
 					if (((NodeImpl) n).getInNodes().containsKey(fn.getId()) && (((NodeImpl) n).getOutNodes().containsKey(tn.getId()))) {
 						ArrayList<Tuple<Id,Id>> mns = illegalManeuvers.get(n.getId());
@@ -137,7 +137,7 @@ public class NetworkAddEmmeManeuverRestrictions {
 			ArrayList<Tuple<Id,Id>> mns = illegalManeuvers.get(nodeId);
 			ArrayList<Tuple<Id,Id>> turns = new ArrayList<Tuple<Id,Id>>();
 			
-			NodeImpl n = network.getNode(nodeId);
+			NodeImpl n = network.getNodes().get(nodeId);
 			for (Link inLink : n.getInLinks().values()) {
 				for (Link outLink : n.getOutLinks().values()) {
 					Tuple<Id,Id> tuple = new Tuple<Id, Id>(inLink.getId(),outLink.getId());

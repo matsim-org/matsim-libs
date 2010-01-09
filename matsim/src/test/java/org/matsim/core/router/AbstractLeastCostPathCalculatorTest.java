@@ -52,35 +52,35 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
-		NodeImpl node12 = network.getNode(new IdImpl("12"));
-		NodeImpl node15 = network.getNode(new IdImpl("15"));
+		NodeImpl node12 = network.getNodes().get(new IdImpl("12"));
+		NodeImpl node15 = network.getNodes().get(new IdImpl("15"));
 
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node15, 8.0*3600);
 
 		assertEquals("number of nodes wrong.", 4, path.nodes.size());
 		assertEquals("number of links wrong.", 3, path.links.size());
-		assertEquals(network.getNode(new IdImpl("12")), path.nodes.get(0));
-		assertEquals(network.getNode(new IdImpl("13")), path.nodes.get(1));
-		assertEquals(network.getNode(new IdImpl("14")), path.nodes.get(2));
-		assertEquals(network.getNode(new IdImpl("15")), path.nodes.get(3));
-		assertEquals(network.getLink(new IdImpl("20")), path.links.get(0));
-		assertEquals(network.getLink(new IdImpl("21")), path.links.get(1));
-		assertEquals(network.getLink(new IdImpl("22")), path.links.get(2));
+		assertEquals(network.getNodes().get(new IdImpl("12")), path.nodes.get(0));
+		assertEquals(network.getNodes().get(new IdImpl("13")), path.nodes.get(1));
+		assertEquals(network.getNodes().get(new IdImpl("14")), path.nodes.get(2));
+		assertEquals(network.getNodes().get(new IdImpl("15")), path.nodes.get(3));
+		assertEquals(network.getLinks().get(new IdImpl("20")), path.links.get(0));
+		assertEquals(network.getLinks().get(new IdImpl("21")), path.links.get(1));
+		assertEquals(network.getLinks().get(new IdImpl("22")), path.links.get(2));
 	}
 
 	public void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
 		loadConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
-		NodeImpl node12 = network.getNode(new IdImpl("12"));
+		NodeImpl node12 = network.getNodes().get(new IdImpl("12"));
 		
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node12, 8.0*3600);
 		
 		assertEquals("number of nodes wrong.", 1, path.nodes.size());
 		assertEquals("number of links wrong.", 0, path.links.size());
-		assertEquals(network.getNode(new IdImpl("12")), path.nodes.get(0));
+		assertEquals(network.getNodes().get(new IdImpl("12")), path.nodes.get(0));
 	}
 	
 	/**

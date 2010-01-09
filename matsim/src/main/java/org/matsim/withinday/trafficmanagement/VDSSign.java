@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.ptproject.qsim.SimulationTimer;
@@ -65,9 +64,9 @@ public class VDSSign {
 
 	private boolean benefitControl;
 
-	private LinkImpl signLink;
+	private Link signLink;
 
-	private LinkImpl directionLink;
+	private Link directionLink;
 
 	private NetworkRouteWRefs currentRoute;
 
@@ -342,7 +341,7 @@ public class VDSSign {
 	 *
 	 * @return signLinks
 	 */
-	public LinkImpl getSignLink() {
+	public Link getSignLink() {
 		return this.signLink;
 	}
 
@@ -351,7 +350,7 @@ public class VDSSign {
 	 *
 	 * @return directionLinks
 	 */
-	public LinkImpl getDirectionLinks() {
+	public Link getDirectionLinks() {
 		return this.directionLink;
 	}
 
@@ -421,15 +420,11 @@ public class VDSSign {
 	 * @param link
 	 *          the link
 	 */
-	public void setSignLink(final LinkImpl link) {
+	public void setSignLink(final Link link) {
 		this.signLink = link;
 	}
 
-	/**
-	 *
-	 * @param link
-	 */
-	public void setDirectionLink(final LinkImpl link) {
+	public void setDirectionLink(final Link link) {
 		this.directionLink = link;
 	}
 

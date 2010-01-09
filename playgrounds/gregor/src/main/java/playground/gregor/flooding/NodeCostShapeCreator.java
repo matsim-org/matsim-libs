@@ -92,7 +92,7 @@ public class NodeCostShapeCreator {
 		this.pointFeatures = new ArrayList<Feature>();
 		for (Entry<Id, LinkInfo> e : this.links.entrySet()) {
 			Id id = e.getKey();
-			LinkImpl l = this.network.getLink(id);
+			LinkImpl l = this.network.getLinks().get(id);
 			Coordinate[] coords = {
 					MGC.coord2Coordinate(l.getFromNode().getCoord()),
 					MGC.coord2Coordinate(l.getToNode().getCoord()) };

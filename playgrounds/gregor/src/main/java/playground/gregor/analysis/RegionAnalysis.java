@@ -39,6 +39,7 @@ import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
@@ -180,7 +181,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 
 	public void run() {
 
-		Coordinate superSink = MGC.coord2Coordinate(this.network.getNode("en1").getCoord());
+		Coordinate superSink = MGC.coord2Coordinate(this.network.getNodes().get(new IdImpl("en1")).getCoord());
 		
 		EventsManagerImpl events = new EventsManagerImpl();
 		DestinationDependentColorizer ddc = new DestinationDependentColorizer();
@@ -192,7 +193,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 			
 			
 			String eId = "el" + ddc.getColor(key);
-			LinkImpl link = this.network.getLink(eId);
+			LinkImpl link = this.network.getLinks().get(new IdImpl(eId));
 			
 			if (link == null) {
 				continue;
@@ -249,7 +250,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 			return;
 		}
 		String lID = event.getLinkId().toString();
-		LinkImpl l = this.network.getLink(lID);
+		LinkImpl l = this.network.getLinks().get(new IdImpl(lID));
 		Point p = this.geofac.createPoint(MGC.coord2Coordinate(l.getCoord()));
 		if (this.tree.get(p.getX(), p.getY(), 1).size() <= 0) {
 			this.dests.put(id,p);

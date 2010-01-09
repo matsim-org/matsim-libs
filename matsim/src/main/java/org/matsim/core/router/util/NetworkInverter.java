@@ -54,7 +54,7 @@ public class NetworkInverter {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
 					Link link = this.invertedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
-							this.invertedNetwork.getNode(inLink.getId()), this.invertedNetwork.getNode(outLink.getId().toString()),
+							this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(new IdImpl(outLink.getId().toString())),
 							outLink.getLength(),
 							outLink.getFreespeed(Time.UNDEFINED_TIME),
 							outLink.getCapacity(Time.UNDEFINED_TIME),

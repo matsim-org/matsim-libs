@@ -139,59 +139,59 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		plan = person.createAndAddPlan(true);
 
 		ActivityImpl act = (ActivityImpl) plan.createAndAddActivity("home", facilityHome);
-		Link link = this.network.getLink("2030");
+		Link link = this.network.getLinks().get(new IdImpl("2030"));
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		LegImpl leg = this.plan.createAndAddLeg(TransportMode.car);
-		RouteWRefs route = network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("3040"));
+		RouteWRefs route = network.getFactory().createRoute(TransportMode.car, this.network.getLinks().get(new IdImpl("2030")), this.network.getLinks().get(new IdImpl("3040")));
 		leg.setRoute(route);
 
 		act = (ActivityImpl) plan.createAndAddActivity("work_sector3", facilityWork);
-		link = this.network.getLink("3040");
+		link = this.network.getLinks().get(new IdImpl("3040"));
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createAndAddLeg(TransportMode.pt);
-		route = network.getFactory().createRoute(TransportMode.pt, this.network.getLink("3040"), this.network.getLink("4050"));
+		route = network.getFactory().createRoute(TransportMode.pt, this.network.getLinks().get(new IdImpl("3040")), this.network.getLinks().get(new IdImpl("4050")));
 		route.setDistance(100.0);
-		((GenericRoute) route).setRouteDescription(this.network.getLink("3040"), "bla", this.network.getLink("4050"));
+		((GenericRoute) route).setRouteDescription(this.network.getLinks().get(new IdImpl("3040")), "bla", this.network.getLinks().get(new IdImpl("4050")));
 		leg.setRoute(route);
 
 		act = (ActivityImpl) plan.createAndAddActivity("leisure", facilityLeisure);
-		link = this.network.getLink("4050");
+		link = this.network.getLinks().get(new IdImpl("4050"));
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createAndAddLeg(TransportMode.pt);
-		route = network.getFactory().createRoute(TransportMode.pt, this.network.getLink("4050"), this.network.getLink("3040"));
+		route = network.getFactory().createRoute(TransportMode.pt, this.network.getLinks().get(new IdImpl("4050")), this.network.getLinks().get(new IdImpl("3040")));
 		route.setDistance(100.0);
-		((GenericRoute) route).setRouteDescription(this.network.getLink("3040"), "bla", this.network.getLink("4050"));
+		((GenericRoute) route).setRouteDescription(this.network.getLinks().get(new IdImpl("3040")), "bla", this.network.getLinks().get(new IdImpl("4050")));
 		leg.setRoute(route);
 
 		act = (ActivityImpl) plan.createAndAddActivity("work_sector3", facilityWork);
-		link = this.network.getLink("3040");
+		link = this.network.getLinks().get(new IdImpl("3040"));
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createAndAddLeg(TransportMode.car);
-		route = network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("2030"));
+		route = network.getFactory().createRoute(TransportMode.car, this.network.getLinks().get(new IdImpl("3040")), this.network.getLinks().get(new IdImpl("2030")));
 		leg.setRoute(route);
 
 		act = (ActivityImpl) plan.createAndAddActivity("home", facilityHome);
-		link = this.network.getLink("2030");
+		link = this.network.getLinks().get(new IdImpl("2030"));
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createAndAddLeg(TransportMode.bike);
-		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLink("2030"), this.network.getLink("1020"));
+		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLinks().get(new IdImpl("2030")), this.network.getLinks().get(new IdImpl("1020")));
 		leg.setRoute(route);
 
 		act = (ActivityImpl) plan.createAndAddActivity("shop", facilityShop);
-		link = this.network.getLink("1020");
+		link = this.network.getLinks().get(new IdImpl("1020"));
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createAndAddLeg(TransportMode.bike);
-		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLink("1020"), this.network.getLink("2030"));
+		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLinks().get(new IdImpl("1020")), this.network.getLinks().get(new IdImpl("2030")));
 		leg.setRoute(route);
 
 		act = (ActivityImpl) plan.createAndAddActivity("home", facilityHome);
-		link = this.network.getLink("2030");
+		link = this.network.getLinks().get(new IdImpl("2030"));
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 	}

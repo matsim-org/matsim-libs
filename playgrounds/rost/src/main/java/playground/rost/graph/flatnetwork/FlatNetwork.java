@@ -343,12 +343,12 @@ public class FlatNetwork {
 			capacity = fL.link.getCapacity(1.);
 			freespeed = fL.link.getFreespeed(1.);
 			output.createAndAddLink(newId, 
-								output.getNode(fL.fromNode.getId().toString()),
-								output.getNode(fL.toNode.getId().toString()),
+								output.getNodes().get(new IdImpl(fL.fromNode.getId().toString())),
+								output.getNodes().get(new IdImpl(fL.toNode.getId().toString())),
 								length, freespeed, capacity, 1);
 			if(fL.isNewLink)
 			{
-				addSplittedLinkToMap(output.getLink(newId), fL.link);
+				addSplittedLinkToMap(output.getLinks().get(newId), fL.link);
 			}
 			if(fL.hasReverseLink)
 			{
@@ -363,12 +363,12 @@ public class FlatNetwork {
 				}
 				//log.debug("linkid: " + newId.toString());
 				output.createAndAddLink(newId, 
-						output.getNode(fL.toNode.getId().toString()),
-						output.getNode(fL.fromNode.getId().toString()),
+						output.getNodes().get(new IdImpl(fL.toNode.getId().toString())),
+						output.getNodes().get(new IdImpl(fL.fromNode.getId().toString())),
 						length, freespeed, capacity, 1);
 				if(fL.isNewLink)
 				{
-					addSplittedLinkToMap(output.getLink(newId), fL.link);
+					addSplittedLinkToMap(output.getLinks().get(newId), fL.link);
 				}
 			}
 		}

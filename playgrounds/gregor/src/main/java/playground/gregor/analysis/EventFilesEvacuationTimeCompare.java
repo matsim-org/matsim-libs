@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.LinkImpl;
@@ -247,7 +248,7 @@ public class EventFilesEvacuationTimeCompare {
 		public void handleEvent(final AgentDepartureEvent event) {
 			AgentInfo ai = new AgentInfo();
 			ai.time = 3*3600; //event.getTime();
-			LinkImpl link = EventFilesEvacuationTimeCompare.this.network.getLink(event.getLinkId().toString());
+			LinkImpl link = EventFilesEvacuationTimeCompare.this.network.getLinks().get(new IdImpl(event.getLinkId().toString()));
 			ai.c = new Coordinate(link.getCoord().getX(),link.getCoord().getY());
 			this.ttimes.put(event.getPersonId().toString(), ai);
 			

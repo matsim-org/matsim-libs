@@ -272,14 +272,6 @@ public class NetworkImpl implements Network {
 		return this.nodes;
 	}
 
-	public final NodeImpl getNode(final String id) {
-		return this.nodes.get(new IdImpl(id));
-	}
-
-	public NodeImpl getNode(final Id id) {
-		return this.nodes.get(id);
-	}
-
 	/**
 	 * Finds the (approx.) nearest link to a given point on the map.<br />
 	 * It searches first for the nearest node, and then for the nearest link
@@ -519,15 +511,6 @@ public class NetworkImpl implements Network {
 	@SuppressWarnings("unchecked")
 	public Map<Id, LinkImpl> getLinks() {
 		return (Map<Id, LinkImpl>) this.layerDelegate.getLocations();
-	}
-
-	public LinkImpl getLink(final String linkId) {
-		IdImpl i = new IdImpl(linkId);
-		return (LinkImpl) this.layerDelegate.getLocations().get(i);
-	}
-
-	public LinkImpl getLink(final Id linkId) {
-		return (LinkImpl) this.layerDelegate.getLocations().get(linkId);
 	}
 
 	public void setFactory(final NetworkFactoryImpl networkFactory) {

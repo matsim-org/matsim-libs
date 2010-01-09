@@ -22,6 +22,7 @@ package playground.yu.newNetwork;
 
 import java.util.Set;
 
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -89,7 +90,7 @@ public class OSMNetCreator {
 		OSMNetCreator osmNC = new OSMNetCreator(network);
 
 		for (String linkId : linkIdsInCircle) {
-			LinkImpl l = network.getLink(linkId);
+			LinkImpl l = network.getLinks().get(new IdImpl(linkId));
 			if (l != null)
 				osmNC.resetCapacity(l);
 		}
@@ -100,7 +101,7 @@ public class OSMNetCreator {
 		for (String linkId : osmP.getUpgradeLinks()) {
 			up++;
 			upgraded++;
-			LinkImpl l = network.getLink(linkId);
+			LinkImpl l = network.getLinks().get(new IdImpl(linkId));
 			if (l != null)
 				if (l
 						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
@@ -125,7 +126,7 @@ public class OSMNetCreator {
 		for (String linkId : osmP.getDegradeLinks()) {
 			down++;
 			degraded++;
-			LinkImpl l = network.getLink(linkId);
+			LinkImpl l = network.getLinks().get(new IdImpl(linkId));
 			if (l != null)
 				if (l
 						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)

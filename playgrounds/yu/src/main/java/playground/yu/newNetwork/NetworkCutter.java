@@ -145,7 +145,7 @@ public class NetworkCutter {
 
 	private void resetBoundary(NetworkRouteWRefs route, NetworkLayer net) {
 		for (Id linkId : route.getLinkIds()) {
-			resetBoundary(net.getLink(linkId));
+			resetBoundary(net.getLinks().get(linkId));
 		}
 		resetBoundary(route.getStartLink());
 		resetBoundary(route.getEndLink());

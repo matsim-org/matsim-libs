@@ -64,7 +64,7 @@ public class CountsIdUpdater {
 		newCounts
 				.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att, countIds also were changed according to the new OSM-network https://svn.vsp.tu-berlin.de/repos/shared-svn/studies/countries/de/berlin/network/bb_5_hermannstr.xml.gz");
 		for (Id oldCountId : oldCounts.getCounts().keySet()) {
-			LinkImpl oldLink = oldNet.getLink(oldCountId);
+			LinkImpl oldLink = oldNet.getLinks().get(oldCountId);
 			System.out.println("oldCountId :\t" + oldCountId);
 			Id newLinkId = searchLinkPerNodeIdPair(oldLink.getFromNode()
 					.getId(), oldLink.getToNode().getId(), newNet);
@@ -87,7 +87,7 @@ public class CountsIdUpdater {
 						newCount.createVolume(volume.getHour(), volume
 								.getValue());
 				}
-				newCount.setCoord(newNet.getLink(newLinkId).getCoord());
+				newCount.setCoord(newNet.getLinks().get(newLinkId).getCoord());
 			} else {
 				System.err
 						.println("ERROR : didn't find the new link with count station according to the information of the old count station on the link with Id "
@@ -99,7 +99,7 @@ public class CountsIdUpdater {
 
 	private static Id searchLinkPerNodeIdPair(final Id fromNodeId,
 			final Id toNodeId, final NetworkLayer net) {
-		NodeImpl fromNode = net.getNode(fromNodeId);
+		NodeImpl fromNode = net.getNodes().get(fromNodeId);
 		if (fromNode == null) {
 			System.err.println("Node with Id " + fromNodeId.toString()
 					+ " doesn't exist in the new network!");

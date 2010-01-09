@@ -21,6 +21,7 @@
 package org.matsim.vis.routervis;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -58,8 +59,8 @@ public class RouterVisTest extends MatsimTestCase {
 		log.info("Reference checksum snapshot = " + referenceChecksumSnapshot + " file: " + visSnapshotFile);
 
 		// run test
-		final NodeImpl fromNode = network.getNode("13");
-		final NodeImpl toNode = network.getNode("7");
+		final NodeImpl fromNode = network.getNodes().get(new IdImpl("13"));
+		final NodeImpl toNode = network.getNodes().get(new IdImpl("7"));
 
 		final TravelTime costCalc = new FreespeedTravelTimeCost();
 		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, VisDijkstra.class);
@@ -94,8 +95,8 @@ public class RouterVisTest extends MatsimTestCase {
 		log.info("Reference checksum snapshot = " + referenceChecksumSnapshot + " file: " + visSnapshotFile);
 
 		// run test
-		final NodeImpl fromNode = network.getNode("13");
-		final NodeImpl toNode = network.getNode("7");
+		final NodeImpl fromNode = network.getNodes().get(new IdImpl("13"));
+		final NodeImpl toNode = network.getNodes().get(new IdImpl("7"));
 		//run the test without any opportunity costs to produce same results as the version checked in initially
 		final TravelTime costCalc = new FreespeedTravelTimeCost(-6.0/3600, 0.0, 0.0);
 		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, CLogitRouter.class);
@@ -130,8 +131,8 @@ public class RouterVisTest extends MatsimTestCase {
 		log.info("Reference checksum snapshot = " + referenceChecksumSnapshot + " file: " + visSnapshotFile);
 
 		// run test
-		final NodeImpl fromNode = network.getNode("13");
-		final NodeImpl toNode = network.getNode("7");
+		final NodeImpl fromNode = network.getNodes().get(new IdImpl("13"));
+		final NodeImpl toNode = network.getNodes().get(new IdImpl("7"));
 		//run the test without any opportunity costs to produce same results as the version checked in initially
 		final TravelTime costCalc = new FreespeedTravelTimeCost(-6.0/3600, 0.0, 0.0);
 		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, PSLogitRouter.class);

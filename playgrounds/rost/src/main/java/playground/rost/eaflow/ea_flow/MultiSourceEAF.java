@@ -104,7 +104,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		String inline = null;
 		while ((inline = in.readLine()) != null) {
 			String[] line = inline.split(";");
-			Node node = network.getNode(line[0].trim());
+			Node node = network.getNodes().get(new IdImpl(line[0].trim()));
 			Integer d = Integer.valueOf(line[1].trim());
 			demands.put(node, d);
 		}
@@ -158,7 +158,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		Map<Node, Integer> demands = new HashMap<Node, Integer>();
 		for(String id : populationNodeMap.populationForNode.keySet())
 		{
-			Node node = network.getNode(id);
+			Node node = network.getNodes().get(new IdImpl(id));
 			if(node != null)
 			{
 				int demand = populationNodeMap.populationForNode.get(id);
@@ -168,15 +168,15 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		
 		//create sink
 		network.createAndAddNode(new IdImpl(GlobalFlowCalculationSettings.superSinkId), new CoordImpl(0,0));
-		Node sink = network.getNode(GlobalFlowCalculationSettings.superSinkId);
+		Node sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));
 		int counter = 0;
 		//create links from real sinks to supersink!
 		for(String id : evacArea.evacBorderNodeIds)
 		{
 			Id linkId = new IdImpl("borderNode->sink" + (++counter));
 			network.createAndAddLink( linkId, 
-								network.getNode(id), 
-								network.getNode(GlobalFlowCalculationSettings.superSinkId),
+								network.getNodes().get(new IdImpl(id)), 
+								network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId)),
 								0,
 								Integer.MAX_VALUE, //freespeed 
 								Integer.MAX_VALUE, //capacity
@@ -223,7 +223,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		}
 		
 		//create sink
-		Node sink = network.getNode(GlobalFlowCalculationSettings.superSinkId);
+		Node sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));
 		
 		int timeHorizon = 10000;
 		int rounds = 10000;

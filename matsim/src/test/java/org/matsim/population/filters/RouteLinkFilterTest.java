@@ -57,8 +57,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
 
-		LinkImpl link1 = network.getLink(new IdImpl(1));
-		LinkImpl link20 = network.getLink(new IdImpl(20));
+		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
+		LinkImpl link20 = network.getLinks().get(new IdImpl(20));
 
 		PopulationImpl population = new PopulationImpl();
 

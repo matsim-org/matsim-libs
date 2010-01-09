@@ -44,9 +44,9 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	public void testGetNodes_subsequentLinks_setLinks() {
 		NetworkLayer network = createTestNetwork();
-		LinkImpl link1 = network.getLink(new IdImpl("1"));
-		LinkImpl link2 = network.getLink(new IdImpl("2"));
-		NodeImpl node2 = network.getNode(new IdImpl("2"));
+		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
+		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
+		NodeImpl node2 = network.getNodes().get(new IdImpl("2"));
 
 		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1, link2);
 		route.setLinks(link1, null, link2);
@@ -57,9 +57,9 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	public void testGetNodes_subsequentLinks_setNodes() {
 		NetworkLayer network = createTestNetwork();
-		LinkImpl link1 = network.getLink(new IdImpl("1"));
-		LinkImpl link2 = network.getLink(new IdImpl("2"));
-		NodeImpl node2 = network.getNode(new IdImpl("2"));
+		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
+		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
+		NodeImpl node2 = network.getNodes().get(new IdImpl("2"));
 		List<Node> nodes = new ArrayList<Node>();
 		nodes.add(node2);
 

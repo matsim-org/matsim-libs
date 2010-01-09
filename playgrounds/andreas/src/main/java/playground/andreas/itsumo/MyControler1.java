@@ -115,8 +115,8 @@ public class MyControler1 extends Controler {
 		log.info("  generating plans... ");
 
 
-		LinkImpl link9 = this.network.getLink("9");
-		LinkImpl link15 = this.network.getLink("15");
+		LinkImpl link9 = this.network.getLinks().get(new IdImpl("9"));
+		LinkImpl link15 = this.network.getLinks().get(new IdImpl("15"));
 		for (int i=0; i<100; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i+1));
 

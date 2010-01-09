@@ -65,7 +65,7 @@ public class NetworkCalibrationWithCounts {
 			double maxval = 0.0;
 			while (c_it.hasNext()) {
 				Count c = c_it.next();
-				LinkImpl l = network.getLink(c.getLocId());
+				LinkImpl l = network.getLinks().get(c.getLocId());
 				if (l == null) { System.out.println("csid="+c.getCsId()+";locid="+c.getLocId()+": link not found"); }
 				else {
 					l.setFreespeed(360.0/3.6);

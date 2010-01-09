@@ -98,7 +98,7 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 	
 	public void testGetLinkMinimumTravelCost() {
 		
-		double actualMinimumCost = testee.getLinkMinimumTravelCost(this.network.getLink(TEST_LINK_ID));
+		double actualMinimumCost = testee.getLinkMinimumTravelCost(this.network.getLinks().get(TEST_LINK_ID));
 		assertEquals(2.74, actualMinimumCost, MatsimTestCase.EPSILON);
 	}
 	
@@ -111,13 +111,13 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 		
 		double expectedLinkTravelCost = 6.5;
 		
-		double actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLink(TEST_LINK_ID), Time.parseTime("06:10:00"));
+		double actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:10:00"));
 		assertEquals(expectedLinkTravelCost, actualLinkTravelCost, MatsimTestCase.EPSILON);
 		
-		actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLink(TEST_LINK_ID), Time.parseTime("05:55:55"));
+		actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("05:55:55"));
 		assertEquals(2.74, actualLinkTravelCost, MatsimTestCase.EPSILON);
 
-		actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLink(TEST_LINK_ID), Time.parseTime("06:31:00"));
+		actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:31:00"));
 		assertEquals(2.74, actualLinkTravelCost, MatsimTestCase.EPSILON);
 		
 	}

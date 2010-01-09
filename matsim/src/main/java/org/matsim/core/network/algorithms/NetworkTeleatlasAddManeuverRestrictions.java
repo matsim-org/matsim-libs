@@ -234,10 +234,10 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 		int virtualLinksCnt = 0;
 		for (Map.Entry<Id, ArrayList<Tuple<Id, Integer>>> entry : maneuvers.entrySet()) {
 			Id nodeId = entry.getKey();
-			if (network.getNode(nodeId) == null) { log.trace("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); nodesIgnoredCnt++; }
+			if (network.getNodes().get(nodeId) == null) { log.trace("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); nodesIgnoredCnt++; }
 			else {
 				// node found
-				NodeImpl n = network.getNode(nodeId);
+				NodeImpl n = network.getNodes().get(nodeId);
 				// init maneuver matrix
 				// TreeMap<fromLinkId,TreeMap<toLinkId,turnAllowed>>
 				TreeMap<Id,TreeMap<Id,Boolean>> mmatrix = new TreeMap<Id, TreeMap<Id,Boolean>>();

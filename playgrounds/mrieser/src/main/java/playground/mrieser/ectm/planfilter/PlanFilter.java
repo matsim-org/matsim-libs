@@ -150,7 +150,7 @@ public class PlanFilter {
 				if (!subnet.getNodes().containsKey(toNode.getId())) {
 					subnet.createAndAddNode(toNode.getId(), toNode.getCoord());
 				}
-				subnet.createAndAddLink(link.getId(), subnet.getNode(fromNode.getId()), subnet.getNode(toNode.getId()),
+				subnet.createAndAddLink(link.getId(), subnet.getNodes().get(fromNode.getId()), subnet.getNodes().get(toNode.getId()),
 						link.getLength(), link.getFreespeed(Time.UNDEFINED_TIME),
 						link.getCapacity(Time.UNDEFINED_TIME), link.getNumberOfLanes(Time.UNDEFINED_TIME));
 			}

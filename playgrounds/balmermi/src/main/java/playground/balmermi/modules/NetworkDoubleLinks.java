@@ -90,7 +90,7 @@ public class NetworkDoubleLinks {
 		}
 		log.info("  number of links to handle: "+linkIds.size());
 
-		for (Id id : linkIds) { handleDoubleLink(network.getLink(id),network); }
+		for (Id id : linkIds) { handleDoubleLink(network.getLinks().get(id),network); }
 
 		log.info("  final number of links: "+network.getLinks().size());
 		log.info("  final number of nodes: "+network.getNodes().size());

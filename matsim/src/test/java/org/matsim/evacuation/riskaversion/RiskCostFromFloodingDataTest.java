@@ -66,7 +66,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// tNodeCost = baseCost - 60 * fromNodeTime = 8817.05792581994
 		// linkLength = 318.075861755381
 		// linkCost = 8667.081123237946 * linkLength / 100 = 28044.9329790229
-		LinkImpl l0 = sc.getNetwork().getLink(new IdImpl("11288"));
+		LinkImpl l0 = sc.getNetwork().getLinks().get(new IdImpl("11288"));
 		double l0Cost = rcf.getLinkTravelCost(l0,Time.UNDEFINED_TIME);
 		assertEquals(28044.9329790229,l0Cost,delta);
 		
@@ -74,7 +74,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// fromNodeTime = 33.04903456966766666666
 		// toNodeTime = 35.54864794603423333333
 		// fromNodeTime < toNodeTime --> linkCost = 0
-		LinkImpl l0Inverse = sc.getNetwork().getLink(new IdImpl("111288"));
+		LinkImpl l0Inverse = sc.getNetwork().getLinks().get(new IdImpl("111288"));
 		double l0InverseCost = rcf.getLinkTravelCost(l0Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l0InverseCost,delta);
 		
@@ -92,7 +92,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// fromNodeCost < toNodeCost
 		// linkLength = 15.5646142300945
 		// linkCost = toNodeCost * linkLength / 100 = 124.44247096468449
-		LinkImpl l1 = sc.getNetwork().getLink(new IdImpl("9204"));
+		LinkImpl l1 = sc.getNetwork().getLinks().get(new IdImpl("9204"));
 		double l1Cost = rcf.getLinkTravelCost(l1,Time.UNDEFINED_TIME);
 		assertEquals(124.44247096468449,l1Cost,delta);
 		
@@ -102,7 +102,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// fromNodeDist = 212.985
 		// ffromNodeCost = 3 * 3600 / 2 * (1 -(223.125 /250)) --> ca. 799.5
 		// toNodeCost < fromNodeCost --> linkCost = 0
-		LinkImpl l1Inverse = sc.getNetwork().getLink(new IdImpl("109204"));
+		LinkImpl l1Inverse = sc.getNetwork().getLinks().get(new IdImpl("109204"));
 		double l1InverseCost = rcf.getLinkTravelCost(l1Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l1InverseCost,delta);
 		
@@ -113,12 +113,12 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// fromNode = null
 		// linkLength = 85.7201419982439
 		// linkCost = toNodeCost * linkLength / 100 = 497.60526643476226
-		LinkImpl l2 = sc.getNetwork().getLink(new IdImpl("6798"));
+		LinkImpl l2 = sc.getNetwork().getLinks().get(new IdImpl("6798"));
 		double l2Cost = rcf.getLinkTravelCost(l2,Time.UNDEFINED_TIME);
 		assertEquals(497.60526643476226,l2Cost,delta);
 		
 		//Link 106798 cost = 0. (opposite direction)
-		LinkImpl l2Inverse = sc.getNetwork().getLink(new IdImpl("106798"));
+		LinkImpl l2Inverse = sc.getNetwork().getLinks().get(new IdImpl("106798"));
 		double l2InverseCost = rcf.getLinkTravelCost(l2Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l2InverseCost,delta);
 		

@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -99,7 +100,7 @@ public class MultiSourceEAF {
 		String inline = null;
 		while ((inline = in.readLine()) != null) {
 			String[] line = inline.split(";");
-			Node node = network.getNode(line[0].trim());
+			Node node = network.getNodes().get(new IdImpl(line[0].trim()));
 			Integer d = Integer.valueOf(line[1].trim());
 			demands.put(node, d);
 		}
@@ -168,7 +169,7 @@ public class MultiSourceEAF {
 		}
 		
 		//create sink
-		Node sink = network.getNode(GlobalFlowCalculationSettings.superSinkId);
+		Node sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));
 		
 		int timeHorizon = 10000;
 		int rounds = 10000;
@@ -446,7 +447,7 @@ public class MultiSourceEAF {
 		NetworkLayer network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(networkfile);
-		Node sink = network.getNode(sinkid);		
+		Node sink = network.getNodes().get(new IdImpl(sinkid));		
 
 		//read demands
 		HashMap<Node, Integer> demands;

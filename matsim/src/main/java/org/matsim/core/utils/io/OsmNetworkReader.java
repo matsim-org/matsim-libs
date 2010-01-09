@@ -443,15 +443,15 @@ public class OsmNetworkReader {
 		}
 
 		// only create link, if both nodes were found, node could be null, since nodes outside a layer were dropped
-		if(network.getNode(fromNode.id) != null && network.getNode(toNode.id) != null){
+		if(network.getNodes().get(fromNode.id) != null && network.getNodes().get(toNode.id) != null){
 		
 			if (!onewayReverse) {
-				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNode(fromNode.id), network.getNode(toNode.id), length, freespeed, capacity, nofLanes);
+				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed, capacity, nofLanes);
 				((LinkImpl) l).setOrigId(origId);
 				this.id++;
 			}
 			if (!oneway) {
-				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNode(toNode.id), network.getNode(fromNode.id), length, freespeed, capacity, nofLanes);
+				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id), length, freespeed, capacity, nofLanes);
 				((LinkImpl) l).setOrigId(origId);
 				this.id++;
 			}

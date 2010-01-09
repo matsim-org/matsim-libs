@@ -89,7 +89,7 @@ public class NetworkParseETNet {
 					double freespeed = Double.parseDouble(entries[5])/3.6;
 					double capacity = Double.parseDouble(entries[6]);
 					double nofLanes = Double.parseDouble(entries[7]);
-					network.createAndAddLink(new IdImpl(entries[1]), network.getNode(new IdImpl(entries[2])), network.getNode(new IdImpl(entries[3])),
+					network.createAndAddLink(new IdImpl(entries[1]), network.getNodes().get(new IdImpl(entries[2])), network.getNodes().get(new IdImpl(entries[3])),
 					                   length, freespeed, capacity, nofLanes, entries[8], entries[9]);
 				}
 			}

@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -60,7 +61,7 @@ public class TestNodeSelection {
 	protected void testDijkstraSelector()
 	{
 		// FreespeedTravelTimeCost als Massstab
-		SelectNodesDijkstra snd = new SelectNodesDijkstra(network, network.getNode("545"), network.getNode("4058"), 1.0);
+		SelectNodesDijkstra snd = new SelectNodesDijkstra(network, network.getNodes().get(new IdImpl("545")), network.getNodes().get(new IdImpl("4058")), 1.0);
 			
 		// Fahrzeit als Massstab
 		//SelectNodesDijkstra snd = new SelectNodesDijkstra(network, network.getNode("545"), network.getNode("4058"), 10000);
@@ -79,7 +80,7 @@ public class TestNodeSelection {
 		//snc.getNodes(network.getNode("545"), 20000, selectedNodes);
 		//snc.getNodes(network.getNode("4058"), 20000, selectedNodes);
 		
-		snc.getNodes(network.getNode("9582"), 20000, selectedNodesMap);
+		snc.getNodes(network.getNodes().get(new IdImpl("9582")), 20000, selectedNodesMap);
 		System.out.println("Found ... included Nodes: " + selectedNodesMap.size());
 	}
 	

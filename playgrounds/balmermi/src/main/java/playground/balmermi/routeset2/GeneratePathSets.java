@@ -64,8 +64,8 @@ public class GeneratePathSets {
 			// IDSEGMENT  StartNode  EndNode
 			// 0          1          2
 			Id id = new IdImpl(entries[0].trim());
-			NodeImpl origin = network.getNode(entries[1].trim());
-			NodeImpl destination = network.getNode(entries[2].trim());
+			NodeImpl origin = network.getNodes().get(new IdImpl(entries[1].trim()));
+			NodeImpl destination = network.getNodes().get(new IdImpl(entries[2].trim()));
 			if ((origin == null) || (destination == null)) { throw new RuntimeException("line "+lineCnt+": O and/or D not found in the network"); }
 			ods.put(id,new Tuple<NodeImpl,NodeImpl>(origin,destination));
 			// progress report

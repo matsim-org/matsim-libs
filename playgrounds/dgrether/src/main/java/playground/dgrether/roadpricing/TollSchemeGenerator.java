@@ -236,7 +236,7 @@ public class TollSchemeGenerator {
 	private NetworkLayer applyLinkIdFilter(NetworkLayer tollNetwork,
 			List<Id> linkIdsToFilter) {
 		for (Id i : linkIdsToFilter) {
-			tollNetwork.removeLink(tollNetwork.getLink(i));
+			tollNetwork.removeLink(tollNetwork.getLinks().get(i));
 		}
 		return tollNetwork;
 	}

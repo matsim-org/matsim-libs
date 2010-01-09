@@ -145,8 +145,8 @@ public class OSM2MATConverter {
 				//erzeuge Stra�e
 				double capacity = Math.max(haMap.getWidth(highwayType) / 1.25, 1);
 				network.createAndAddLink(new IdImpl(String.valueOf(++streetId)), 
-									network.getNode(String.valueOf(startNode.getId())), 
-									network.getNode(String.valueOf(endNode.getId())), 
+									network.getNodes().get(new IdImpl(String.valueOf(startNode.getId()))), 
+									network.getNodes().get(new IdImpl(String.valueOf(endNode.getId()))), 
 									laenge, 
 									1.3, //TODO 
 									capacity,  //TODO
@@ -154,8 +154,8 @@ public class OSM2MATConverter {
 				
 
 				network.createAndAddLink(new IdImpl(String.valueOf(++streetId)), 
-									network.getNode(String.valueOf(endNode.getId())), 
-									network.getNode(String.valueOf(startNode.getId())), 
+									network.getNodes().get(new IdImpl(String.valueOf(endNode.getId()))), 
+									network.getNodes().get(new IdImpl(String.valueOf(startNode.getId()))), 
 									laenge, 
 									1.3, //TODO 
 									capacity,  //TODO

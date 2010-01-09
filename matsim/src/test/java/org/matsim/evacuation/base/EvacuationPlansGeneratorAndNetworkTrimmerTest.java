@@ -1,6 +1,7 @@
 package org.matsim.evacuation.base;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -29,7 +30,7 @@ public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCas
 		
 		new EvacuationNetGenerator(net,c).run();
 		
-		new EvacuationPlansGenerator(pop,net,net.getLink("el1")).run();
+		new EvacuationPlansGenerator(pop,net,net.getLinks().get(new IdImpl("el1"))).run();
 		
 		new PopulationWriter(pop).writeFile(c.plans().getOutputFile());
 		assertEquals("different plans-files.", CRCChecksum.getCRCFromFile(refPlans),	CRCChecksum.getCRCFromFile(c.plans().getOutputFile()));

@@ -78,7 +78,7 @@ public class CMCFNetworkConverter {
 			 //build a new edge in 
 			 Id matsimid  = new IdImpl(id);
 			 //TODO free speed is set to 1.3 find something better
-			 result.createAndAddLink(matsimid, result.getNode(from), result.getNode(to),
+			 result.createAndAddLink(matsimid, result.getNodes().get(new IdImpl(from)), result.getNodes().get(new IdImpl(to)),
 					 Double.parseDouble(length),
 					  1.3 ,
 					 Double.parseDouble(capacity),

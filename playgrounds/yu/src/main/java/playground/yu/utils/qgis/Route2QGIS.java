@@ -110,7 +110,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 	protected Coordinate[] calculateCoordinates(Coordinate[] coordinates,
 			double width, List<Id> routeLinkIds) {
 		for (int i = 0; i < routeLinkIds.size(); i++) {
-			LinkImpl l = this.network.getLink(routeLinkIds.get(i));
+			LinkImpl l = this.network.getLinks().get(routeLinkIds.get(i));
 			Coord c = l.getFromNode().getCoord();
 			Coordinate cdn = new Coordinate(c.getX(), c.getY());
 			coordinates[i] = cdn;
@@ -124,8 +124,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 					/ denominator);
 		}
 
-		Coord c = this.network.getLink(
-				routeLinkIds.get(routeLinkIds.size() - 1)).getToNode()
+		Coord c = this.network.getLinks().get(routeLinkIds.get(routeLinkIds.size() - 1)).getToNode()
 				.getCoord();
 		Coordinate cdn = new Coordinate(c.getX(), c.getY());
 		coordinates[routeLinkIds.size()] = cdn;

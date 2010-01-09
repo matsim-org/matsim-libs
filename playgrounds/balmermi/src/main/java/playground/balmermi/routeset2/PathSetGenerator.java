@@ -116,8 +116,8 @@ public class PathSetGenerator {
 		linkDensity = 0.0;
 		nodeDensity = 0.0;
 		for (Id nid : nodeIds) {
-			linkDensity += this.network.getNode(nid).getIncidentLinks().size();
-			nodeDensity += this.network.getNode(nid).getIncidentNodes().size();
+			linkDensity += this.network.getNodes().get(nid).getIncidentLinks().size();
+			nodeDensity += this.network.getNodes().get(nid).getIncidentNodes().size();
 		}
 		this.avLinkDensityPerNonePassNodeNetwork = linkDensity/nodeIds.size();
 		this.avIncidentNodeDensityPerNonePassNodeNetwork = nodeDensity/nodeIds.size();
@@ -145,10 +145,10 @@ public class PathSetGenerator {
 
 	public final boolean setODPair(NodeImpl fromNode, NodeImpl toNode) {
 		if (fromNode == null) { log.warn("Origin node must exist."); return false; }
-		if (network.getNode(fromNode.getId()) == null) { log.warn("Origin node does not exist in the network."); return false; }
+		if (network.getNodes().get(fromNode.getId()) == null) { log.warn("Origin node does not exist in the network."); return false; }
 
 		if (toNode == null) { log.warn("Destination node must exist."); return false; }
-		if (network.getNode(toNode.getId()) == null) { log.warn("Destination node does not exist in the network."); return false; }
+		if (network.getNodes().get(toNode.getId()) == null) { log.warn("Destination node does not exist in the network."); return false; }
 
 		if (fromNode.equals(toNode)) { log.warn("Origin equals to Destination not allowed."); return false; }
 		origin = fromNode;

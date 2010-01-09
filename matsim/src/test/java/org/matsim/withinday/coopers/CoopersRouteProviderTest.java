@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -76,8 +77,8 @@ public class CoopersRouteProviderTest extends MatsimTestCase {
 
 	private VDSSign createSign() {
 		VDSSign sign = new VDSSign();
-		sign.setSignLink(this.network.getLink("1"));
-		sign.setDirectionLink(this.network.getLink("7"));
+		sign.setSignLink(this.network.getLinks().get(new IdImpl("1")));
+		sign.setDirectionLink(this.network.getLinks().get(new IdImpl("7")));
 		sign.setBenefitControl(false);
 		sign.setMessageHoldTime(1);
 		sign.setControlEvents(1);
@@ -92,16 +93,16 @@ public class CoopersRouteProviderTest extends MatsimTestCase {
 
 		this.route1 = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, null, null);
 		ArrayList<Node> list = new ArrayList<Node>();
-		list.add(this.network.getNode("3"));
-		list.add(this.network.getNode("31"));
-		list.add(this.network.getNode("4"));
+		list.add(this.network.getNodes().get(new IdImpl("3")));
+		list.add(this.network.getNodes().get(new IdImpl("31")));
+		list.add(this.network.getNodes().get(new IdImpl("4")));
 		this.route1.setNodes(null, list, null);
 		controlInput.setMainRoute(this.route1);
 		this.route2 = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, null, null);
 		list = new ArrayList<Node>();
-		list.add(this.network.getNode("3"));
-		list.add(this.network.getNode("32"));
-		list.add(this.network.getNode("4"));
+		list.add(this.network.getNodes().get(new IdImpl("3")));
+		list.add(this.network.getNodes().get(new IdImpl("32")));
+		list.add(this.network.getNodes().get(new IdImpl("4")));
 		this.route2.setNodes(null, list, null);
 		controlInput.setAlternativeRoute(this.route2);
 		//set control input
@@ -127,28 +128,28 @@ public class CoopersRouteProviderTest extends MatsimTestCase {
 	  //create route which is driven by the person in the real simulated world
 		NetworkRouteWRefs agentRoute = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, null, null);
 	  ArrayList<Node> nodes = new ArrayList<Node>();
-	  nodes.add(this.network.getNode("3"));
-	  nodes.add(this.network.getNode("32"));
-	  nodes.add(this.network.getNode("4"));
-	  nodes.add(this.network.getNode("5"));
+	  nodes.add(this.network.getNodes().get(new IdImpl("3")));
+	  nodes.add(this.network.getNodes().get(new IdImpl("32")));
+	  nodes.add(this.network.getNodes().get(new IdImpl("4")));
+	  nodes.add(this.network.getNodes().get(new IdImpl("5")));
 	  agentRoute.setNodes(null, nodes, null);
 	  //test the provider
 	  //first the cases in which it should not provide a route
 	  CoopersRouteProvider provider = this.createRouteProvider();
-	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLink("2").getId(), agentRoute));
-	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLink("3").getId(), agentRoute));
-	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLink("4").getId(), agentRoute));
-	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLink("5").getId(), agentRoute));
-	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLink("6").getId(), agentRoute));
-	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLink("7").getId(), agentRoute));
-	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLink("8").getId(), agentRoute));
+	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLinks().get(new IdImpl("2")).getId(), agentRoute));
+	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLinks().get(new IdImpl("3")).getId(), agentRoute));
+	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLinks().get(new IdImpl("4")).getId(), agentRoute));
+	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLinks().get(new IdImpl("5")).getId(), agentRoute));
+	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLinks().get(new IdImpl("6")).getId(), agentRoute));
+	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLinks().get(new IdImpl("7")).getId(), agentRoute));
+	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLinks().get(new IdImpl("8")).getId(), agentRoute));
 	  //second: now a route should be provided
-	  nodes.add(0, this.network.getNode("2"));
+	  nodes.add(0, this.network.getNodes().get(new IdImpl("2")));
 	  agentRoute.setNodes(null, nodes, null);
-	  LinkImpl linkNo1 = this.network.getLink("1");
+	  LinkImpl linkNo1 = this.network.getLinks().get(new IdImpl("1"));
 	  assertTrue(provider.providesRoute(linkNo1.getId(), agentRoute));
 	  //add another node to the route
-	  nodes.add(this.network.getNode("6"));
+	  nodes.add(this.network.getNodes().get(new IdImpl("6")));
 	  agentRoute.setNodes(null, nodes, null);
 	  assertTrue(provider.providesRoute(linkNo1.getId(), agentRoute));
 	  //test a shorter route
@@ -166,33 +167,33 @@ public class CoopersRouteProviderTest extends MatsimTestCase {
 	  //create route which is driven by the person in the real simulated world
 		NetworkRouteWRefs agentRoute = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, null, null);
 	  ArrayList<Node> agentRouteNodes = new ArrayList<Node>();
-	  agentRouteNodes.add(this.network.getNode("2"));
-	  agentRouteNodes.add(this.network.getNode("3"));
-	  agentRouteNodes.add(this.network.getNode("32"));
-	  agentRouteNodes.add(this.network.getNode("4"));
+	  agentRouteNodes.add(this.network.getNodes().get(new IdImpl("2")));
+	  agentRouteNodes.add(this.network.getNodes().get(new IdImpl("3")));
+	  agentRouteNodes.add(this.network.getNodes().get(new IdImpl("32")));
+	  agentRouteNodes.add(this.network.getNodes().get(new IdImpl("4")));
 	  agentRoute.setNodes(null, agentRouteNodes, null);
 	  //create the route which should be returned by the provider
 	  NetworkRouteWRefs providerRoute = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, null, null);
 	  ArrayList<Node> providerRouteNodes = new ArrayList<Node>();
-	  providerRouteNodes.add(this.network.getNode("2"));
-	  providerRouteNodes.add(this.network.getNode("3"));
-	  providerRouteNodes.add(this.network.getNode("31"));
-	  providerRouteNodes.add(this.network.getNode("4"));
+	  providerRouteNodes.add(this.network.getNodes().get(new IdImpl("2")));
+	  providerRouteNodes.add(this.network.getNodes().get(new IdImpl("3")));
+	  providerRouteNodes.add(this.network.getNodes().get(new IdImpl("31")));
+	  providerRouteNodes.add(this.network.getNodes().get(new IdImpl("4")));
 	  providerRoute.setNodes(null, providerRouteNodes, null);
 	  //finish the setup for this test
 	  CoopersRouteProvider provider = this.createRouteProvider();
-	  LinkImpl linkNo1 = this.network.getLink("1");
+	  LinkImpl linkNo1 = this.network.getLinks().get(new IdImpl("1"));
 	  //has to be called first
 	  provider.providesRoute(linkNo1.getId(), agentRoute);
 	  //check routing
-	  NetworkRouteWRefs r = provider.requestRoute(linkNo1, this.network.getLink("7"), SimulationTimer.getTime());
+	  NetworkRouteWRefs r = provider.requestRoute(linkNo1, this.network.getLinks().get(new IdImpl("7")), SimulationTimer.getTime());
 //	  System.out.println("Route is: " + LogRouteUtils.getNodeRoute(r));
 		for (int i = 0; i < r.getNodes().size(); i++) {
 			assertEquals(providerRouteNodes.get(i), r.getNodes().get(i));
 		}
 
-	  r = provider.requestRoute(linkNo1, this.network.getLink("8"), SimulationTimer.getTime());
-	  providerRouteNodes.add(this.network.getNode("5"));
+	  r = provider.requestRoute(linkNo1, this.network.getLinks().get(new IdImpl("8")), SimulationTimer.getTime());
+	  providerRouteNodes.add(this.network.getNodes().get(new IdImpl("5")));
 //	  System.out.println("Route is: " + LogRouteUtils.getNodeRoute(r));
 		for (int i = 0; i < r.getNodes().size(); i++) {
 			assertEquals(providerRouteNodes.get(i), r.getNodes().get(i));

@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -71,8 +72,8 @@ public class VDSSignTest extends MatsimTestCase {
 
 	private VDSSign createSign() {
 		VDSSign sign = new VDSSign();
-		sign.setSignLink(this.network.getLink("2"));
-		sign.setDirectionLink(this.network.getLink("7"));
+		sign.setSignLink(this.network.getLinks().get(new IdImpl("2")));
+		sign.setDirectionLink(this.network.getLinks().get(new IdImpl("7")));
 		sign.setBenefitControl(false);
 		sign.setMessageHoldTime(1);
 		sign.setControlEvents(1);
@@ -87,16 +88,16 @@ public class VDSSignTest extends MatsimTestCase {
 
 		this.route1 = new NodeNetworkRouteImpl();
 		ArrayList<Node> list = new ArrayList<Node>();
-		list.add(this.network.getNode("3"));
-		list.add(this.network.getNode("31"));
-		list.add(this.network.getNode("4"));
+		list.add(this.network.getNodes().get(new IdImpl("3")));
+		list.add(this.network.getNodes().get(new IdImpl("31")));
+		list.add(this.network.getNodes().get(new IdImpl("4")));
 		this.route1.setNodes(list);
 		this.controlInput.setMainRoute(this.route1);
 		this.route2 = new NodeNetworkRouteImpl();
 		list = new ArrayList<Node>();
-		list.add(this.network.getNode("3"));
-		list.add(this.network.getNode("32"));
-		list.add(this.network.getNode("4"));
+		list.add(this.network.getNodes().get(new IdImpl("3")));
+		list.add(this.network.getNodes().get(new IdImpl("32")));
+		list.add(this.network.getNodes().get(new IdImpl("4")));
 		this.route2.setNodes(list);
 		this.controlInput.setAlternativeRoute(this.route2);
 		//set control input
@@ -151,8 +152,8 @@ public class VDSSignTest extends MatsimTestCase {
 		System.out.println();
 		log.debug("starting testRouteCompletion...");
 		VDSSign sign = this.createSign();
-		sign.setSignLink(this.network.getLink("1"));
-		sign.setDirectionLink(this.network.getLink("8"));
+		sign.setSignLink(this.network.getLinks().get(new IdImpl("1")));
+		sign.setDirectionLink(this.network.getLinks().get(new IdImpl("8")));
 		sign.setupIteration();
 		sign.simulationPrepared();
 		this.controlInput.setNashTime(-1);

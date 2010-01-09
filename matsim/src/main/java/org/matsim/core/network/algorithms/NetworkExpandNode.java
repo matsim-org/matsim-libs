@@ -213,7 +213,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 		if (Double.isNaN(r)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
 		if (Double.isNaN(e)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
 		if (network == null) { throw new IllegalArgumentException("network not defined."); }
-		NodeImpl node = network.getNode(nodeId);
+		NodeImpl node = network.getNodes().get(nodeId);
 		if (node == null) { throw new IllegalArgumentException("nodeid="+nodeId+": not found in the network."); }
 		if (turns == null) {throw new IllegalArgumentException("nodeid="+nodeId+": turn list not defined!"); }
 		for (int i=0; i<turns.size(); i++) {
@@ -263,8 +263,8 @@ public class NetworkExpandNode implements NetworkRunnable {
 		// add virtual links for the turn restrictions
 		for (int i=0; i<turns.size(); i++) {
 			Tuple<Id,Id> turn = turns.get(i);
-			LinkImpl fromLink = network.getLink(turn.getFirst());
-			LinkImpl toLink = network.getLink(turn.getSecond());
+			LinkImpl fromLink = network.getLinks().get(turn.getFirst());
+			LinkImpl toLink = network.getLinks().get(turn.getSecond());
 			LinkImpl l = network.createAndAddLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME),fromLink.getOrigId(),fromLink.getType());
 			newLinks.add(l);
 		}

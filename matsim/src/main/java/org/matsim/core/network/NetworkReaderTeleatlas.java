@@ -310,8 +310,8 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 			double speed = Double.parseDouble(f.getAttribute(LINK_SPEED_NAME).toString());
 			double lanes = Double.parseDouble(f.getAttribute(LINK_LANES_NAME).toString());
 			// ignore link where from node or to node is missing
-			NodeImpl fNode = network.getNode(fromJunctionId);
-			NodeImpl tNode = network.getNode(toJunctionId);
+			NodeImpl fNode = network.getNodes().get(fromJunctionId);
+			NodeImpl tNode = network.getNodes().get(toJunctionId);
 			if ((fNode == null) || (tNode == null)) { log.warn("  linkId="+id.toString()+": at least one of the two junctions do not exist. Ignoring and proceeding anyway..."); ignore = true; }
 			// ignore link that is not a 'Road Element' (4110) or a 'Ferry Connection Element' (4130)
 			// There are 'Address Area Boundary Element' (4165) links that will be ignored

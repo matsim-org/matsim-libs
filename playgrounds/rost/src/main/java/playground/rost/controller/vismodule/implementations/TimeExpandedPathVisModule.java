@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.controller.map.BasicMap;
@@ -53,7 +54,7 @@ public class TimeExpandedPathVisModule extends AbstractVisModuleImpl {
 	public TimeExpandedPathVisModule(VisModuleContainer vMContainer, NetworkLayer network, TimeControl timeControl, Flow flow)
 	{
 		super(vMContainer, "FlowLinkView");
-		sink = network.getNode(GlobalFlowCalculationSettings.superSinkId);
+		sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));
 		this.flow = flow;
 		this.tControl = timeControl;
 		this.network = network;

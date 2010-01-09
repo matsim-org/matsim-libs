@@ -175,8 +175,8 @@ public class CMCFScenarioGeneratorNoReroute {
 		this.plans = new PopulationImpl();
 		int firstHomeEndTime = 0;// 6 * 3600;
 		int homeEndTime = firstHomeEndTime;
-		LinkImpl l1 = this.network.getLink(IdFactory.get(1));
-		LinkImpl l6 = this.network.getLink(IdFactory.get(6));
+		LinkImpl l1 = this.network.getLinks().get(IdFactory.get(1));
+		LinkImpl l6 = this.network.getLinks().get(IdFactory.get(6));
 
 		for (int i = 1; i <= 7200; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));

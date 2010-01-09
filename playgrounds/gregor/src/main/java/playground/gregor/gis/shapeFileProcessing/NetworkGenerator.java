@@ -128,8 +128,8 @@ public class NetworkGenerator {
 	
 	private void processLineString(LineString ls){
 		
-		NodeImpl from = this.network.getNode(getNode(ls.getStartPoint()));
-		NodeImpl to  = this.network.getNode(getNode(ls.getEndPoint()));
+		NodeImpl from = this.network.getNodes().get(new IdImpl(getNode(ls.getStartPoint())));
+		NodeImpl to  = this.network.getNodes().get(new IdImpl(getNode(ls.getEndPoint())));
 		this.network.createAndAddLink(new IdImpl(this.linkId++), from, to, ls.getLength(), 1.66, 1.33, 1);
 		this.network.createAndAddLink(new IdImpl(this.linkId++), to, from, ls.getLength(), 1.66, 1.33, 1);
 	}

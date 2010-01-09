@@ -28,6 +28,7 @@ import java.util.Queue;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -819,7 +820,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	boolean visitNode(final Node fromNode, final Node toNode) {
 		int tmpTime = Dists.getMinTime(toNode);
 		boolean found = false;
-		Link thisLink = network.getLink("1");
+		Link thisLink = network.getLinks().get(new IdImpl("1"));
 		// try to find link from fromNode to toNode
 		boolean forward, backward, flowPossibleForward, flowPossibleBackward;
 

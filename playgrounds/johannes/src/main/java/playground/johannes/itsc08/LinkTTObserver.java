@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -54,7 +55,7 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 	private LinkImpl link;
 	
 	public LinkTTObserver(NetworkLayer network, EstimReactiveLinkTT linktt) {
-		link = network.getLink("2");
+		link = network.getLinks().get(new IdImpl("2"));
 		this.linktt = linktt;
 	}
 	

@@ -79,7 +79,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 			events.processEvent(event);
 		}
 
-		depDelay = testee.getLinkDepartureDelay(network.getLink(new IdImpl("1")), 6.00 * 3600);
+		depDelay = testee.getLinkDepartureDelay(network.getLinks().get(new IdImpl("1")), 6.00 * 3600);
 		assertEquals(depDelay, 36.0, EPSILON);
 
 		// let's add another delay of 72s, should result in an average of 54s
@@ -90,14 +90,14 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 			events.processEvent(event);
 		}
 
-		depDelay = testee.getLinkDepartureDelay(network.getLink(new IdImpl("1")), 6.00 * 3600);
+		depDelay = testee.getLinkDepartureDelay(network.getLinks().get(new IdImpl("1")), 6.00 * 3600);
 		assertEquals(depDelay, 54.0, EPSILON);
 
 		// the time interval for the previously tested events was for departure times from 6.00 to 6.25
 		// for other time intervals, we don't have event information, so estimated delay should be 0s
-		depDelay = testee.getLinkDepartureDelay(network.getLink(new IdImpl("1")), 5.9 * 3600);
+		depDelay = testee.getLinkDepartureDelay(network.getLinks().get(new IdImpl("1")), 5.9 * 3600);
 		assertEquals(depDelay, 0.0, EPSILON);
-		depDelay = testee.getLinkDepartureDelay(network.getLink(new IdImpl("1")), 6.26 * 3600);
+		depDelay = testee.getLinkDepartureDelay(network.getLinks().get(new IdImpl("1")), 6.26 * 3600);
 		assertEquals(depDelay, 0.0, EPSILON);
 
 	}

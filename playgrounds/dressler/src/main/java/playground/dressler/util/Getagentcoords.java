@@ -118,7 +118,7 @@ public class Getagentcoords {
 				if (plan == null) continue;
 
 				 Id i = ((PlanImpl) plan).getFirstActivity().getLinkId();
-				 LinkImpl l = network.getLink(i);
+				 LinkImpl l = network.getLinks().get(i);
 				 Coord c = l.getFromNode().getCoord();
 				//Coord c = plan.getFirstActivity().getCoord();
 				//if (c == null) continue; // why would this happen? but happens ...
@@ -155,7 +155,7 @@ public class Getagentcoords {
 				if (plan == null) {notfoundpeople++; continue;}
 
 				 Id i = ((PlanImpl) plan).getFirstActivity().getLinkId();
-				 Link l = network.getLink(i);
+				 Link l = network.getLinks().get(i);
 				 Coord c = l.getFromNode().getCoord();
 
 				//if (c == null) continue; // why would this happen? but happens ...

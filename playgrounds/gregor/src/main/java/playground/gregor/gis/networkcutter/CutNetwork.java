@@ -72,7 +72,7 @@ public class CutNetwork {
 		max_y = 9894780.;
 		ConcurrentLinkedQueue<Id> ealq = new ConcurrentLinkedQueue<Id>();
 		for (Entry<Id, EvacuationAreaLink> e :  eal.entrySet()) {
-			if (!isWithin(net.getLink(e.getKey()).getCoord())) {
+			if (!isWithin(net.getLinks().get(e.getKey()).getCoord())) {
 				ealq.add(e.getKey());
 			}
 		}
@@ -140,7 +140,7 @@ public class CutNetwork {
 
 			Id id = ((ActivityImpl)pers.getPlans().get(0).getPlanElements().get(0)).getLink().getId();
 
-			if (net.getLink(id) == null) {
+			if (net.getLinks().get(id) == null) {
 				it.remove();
 			}
 		}

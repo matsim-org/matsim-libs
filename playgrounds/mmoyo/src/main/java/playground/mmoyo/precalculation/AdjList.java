@@ -46,7 +46,7 @@ public class AdjList {
 				List<Node> nodeList = new ArrayList<Node>();
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()){
 					AdjMap.get(transitRouteStop.getStopFacility().getId()).add(transitRoute);
-					nodeList.add(plainNet.getNode(transitRouteStop.getStopFacility().getId()));
+					nodeList.add(plainNet.getNodes().get(transitRouteStop.getStopFacility().getId()));
 				}
 				
 		 		/**sets also route as nodes.*/ 

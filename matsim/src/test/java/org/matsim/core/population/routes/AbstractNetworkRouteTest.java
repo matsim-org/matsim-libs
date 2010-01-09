@@ -50,56 +50,56 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 	public void testSetNodes_asList() {
 		NetworkLayer network = createTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, "12 13 3 4");
-		final Link link11 = network.getLink(new IdImpl("11"));
-		final Link link4 = network.getLink(new IdImpl("4"));
+		final Link link11 = network.getLinks().get(new IdImpl("11"));
+		final Link link4 = network.getLinks().get(new IdImpl("4"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link11, link4, network);
 		route.setNodes(link11, nodes, link4);
 
 		List<Id> linkIds = route.getLinkIds();
 		assertEquals("number of links in route.", 3, linkIds.size());
-		assertEquals(network.getLink(new IdImpl("12")).getId(), linkIds.get(0));
-		assertEquals(network.getLink(new IdImpl("-23")).getId(), linkIds.get(1));
-		assertEquals(network.getLink(new IdImpl("3")).getId(), linkIds.get(2));
+		assertEquals(network.getLinks().get(new IdImpl("12")).getId(), linkIds.get(0));
+		assertEquals(network.getLinks().get(new IdImpl("-23")).getId(), linkIds.get(1));
+		assertEquals(network.getLinks().get(new IdImpl("3")).getId(), linkIds.get(2));
 	}
 
 	public void testSetLinks() {
 		NetworkLayer network = createTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, "-22 2 3 24 14");
-		final Link link11 = network.getLink(new IdImpl("11"));
-		final Link link15 = network.getLink(new IdImpl("15"));
+		final Link link11 = network.getLinks().get(new IdImpl("11"));
+		final Link link15 = network.getLinks().get(new IdImpl("15"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link11, link15, network);
 		route.setLinks(link11, links, link15);
 
 		List<Node> nodes = route.getNodes();
 		assertEquals("number of nodes in route.", 6, nodes.size());
-		assertEquals(network.getNode(new IdImpl("12")), nodes.get(0));
-		assertEquals(network.getNode(new IdImpl("2")), nodes.get(1));
-		assertEquals(network.getNode(new IdImpl("3")), nodes.get(2));
-		assertEquals(network.getNode(new IdImpl("4")), nodes.get(3));
-		assertEquals(network.getNode(new IdImpl("14")), nodes.get(4));
-		assertEquals(network.getNode(new IdImpl("15")), nodes.get(5));
+		assertEquals(network.getNodes().get(new IdImpl("12")), nodes.get(0));
+		assertEquals(network.getNodes().get(new IdImpl("2")), nodes.get(1));
+		assertEquals(network.getNodes().get(new IdImpl("3")), nodes.get(2));
+		assertEquals(network.getNodes().get(new IdImpl("4")), nodes.get(3));
+		assertEquals(network.getNodes().get(new IdImpl("14")), nodes.get(4));
+		assertEquals(network.getNodes().get(new IdImpl("15")), nodes.get(5));
 	}
 
 	public void testSetLinks_linksNull() {
 		NetworkLayer network = createTestNetwork();
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link4 = network.getLink(new IdImpl("4"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link4 = network.getLinks().get(new IdImpl("4"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 		List<Node> nodes = route.getNodes();
 		assertEquals("number of nodes in route.", 5, nodes.size());
 
-		Link link2 = network.getLink(new IdImpl("2"));
+		Link link2 = network.getLinks().get(new IdImpl("2"));
 		route.setLinks(link1, null, link2);
 		nodes = route.getNodes();
 		assertEquals("number of nodes in route.", 1, nodes.size());
-		assertEquals("wrong node in route.", network.getNode(new IdImpl("2")), nodes.get(0));
+		assertEquals("wrong node in route.", network.getNodes().get(new IdImpl("2")), nodes.get(0));
 	}
 
 	public void testSetLinks_AllNull() {
 		NetworkLayer network = createTestNetwork();
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link4 = network.getLink(new IdImpl("4"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link4 = network.getLinks().get(new IdImpl("4"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 		List<Node> nodes = route.getNodes();
@@ -116,30 +116,30 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 	 */
 	public void testSetNodesSetLinksOverwrites() {
 		NetworkLayer network = createTestNetwork();
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link4 = network.getLink(new IdImpl("4"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link4 = network.getLinks().get(new IdImpl("4"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 		assertEquals("number of nodes in route.", 5, route.getNodes().size());
 
-		route.setEndLink(network.getLink(new IdImpl("13")));
+		route.setEndLink(network.getLinks().get(new IdImpl("13")));
 		route.setNodes(NetworkUtils.getNodes(network, "2 12 13"));
 		assertEquals("setRoute(List<Node>) does likely not clear existing route.", 3, route.getNodes().size());
 
 		List<Link> links = new ArrayList<Link>();
-		links.add(network.getLink(new IdImpl("-22")));
-		links.add(network.getLink(new IdImpl("2")));
-		links.add(network.getLink(new IdImpl("3")));
-		links.add(network.getLink(new IdImpl("24")));
-		links.add(network.getLink(new IdImpl("14")));
-		route.setLinks(network.getLink(new IdImpl("11")), links, network.getLink(new IdImpl("15")));
+		links.add(network.getLinks().get(new IdImpl("-22")));
+		links.add(network.getLinks().get(new IdImpl("2")));
+		links.add(network.getLinks().get(new IdImpl("3")));
+		links.add(network.getLinks().get(new IdImpl("24")));
+		links.add(network.getLinks().get(new IdImpl("14")));
+		route.setLinks(network.getLinks().get(new IdImpl("11")), links, network.getLinks().get(new IdImpl("15")));
 		assertEquals("setLinkRoute(List<Link>) does likely not clear existing route.", 6, route.getNodes().size());
 	}
 
 	public void testGetDist() {
 		NetworkLayer network = createTestNetwork();
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link4 = network.getLink(new IdImpl("4"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link4 = network.getLinks().get(new IdImpl("4"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 
@@ -148,8 +148,8 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 
 	public void testGetLinkIds() {
 		NetworkLayer network = createTestNetwork();
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link4 = network.getLink(new IdImpl("4"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link4 = network.getLinks().get(new IdImpl("4"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 
@@ -163,119 +163,119 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 
 	public void testGetSubRoute() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link15 = network.getLink(new IdImpl("15"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link15 = network.getLinks().get(new IdImpl("15"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
-		NetworkRouteWRefs subRoute = route.getSubRoute(network.getNode(new IdImpl("12")), network.getNode(new IdImpl("4")));
+		NetworkRouteWRefs subRoute = route.getSubRoute(network.getNodes().get(new IdImpl("12")), network.getNodes().get(new IdImpl("4")));
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 4, nodes.size());
-		assertEquals(network.getNode(new IdImpl("12")), nodes.get(0));
-		assertEquals(network.getNode(new IdImpl("13")), nodes.get(1));
-		assertEquals(network.getNode(new IdImpl("3")), nodes.get(2));
-		assertEquals(network.getNode(new IdImpl("4")), nodes.get(3));
+		assertEquals(network.getNodes().get(new IdImpl("12")), nodes.get(0));
+		assertEquals(network.getNodes().get(new IdImpl("13")), nodes.get(1));
+		assertEquals(network.getNodes().get(new IdImpl("3")), nodes.get(2));
+		assertEquals(network.getNodes().get(new IdImpl("4")), nodes.get(3));
 		List<Id> linkIds = subRoute.getLinkIds();
 		assertEquals("number of links in subRoute.", 3, linkIds.size());
-		assertEquals(network.getLink(new IdImpl("12")).getId(), linkIds.get(0));
-		assertEquals(network.getLink(new IdImpl("-23")).getId(), linkIds.get(1));
-		assertEquals(network.getLink(new IdImpl("3")).getId(), linkIds.get(2));
-		assertEquals("wrong start link.", network.getLink(new IdImpl("22")).getId(), subRoute.getStartLinkId());
-		assertEquals("wrong end link.", network.getLink(new IdImpl("24")).getId(), subRoute.getEndLinkId());
+		assertEquals(network.getLinks().get(new IdImpl("12")).getId(), linkIds.get(0));
+		assertEquals(network.getLinks().get(new IdImpl("-23")).getId(), linkIds.get(1));
+		assertEquals(network.getLinks().get(new IdImpl("3")).getId(), linkIds.get(2));
+		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("22")).getId(), subRoute.getStartLinkId());
+		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("24")).getId(), subRoute.getEndLinkId());
 	}
 
 	public void testGetSubRoute_fromStart() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link15 = network.getLink(new IdImpl("15"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link15 = network.getLinks().get(new IdImpl("15"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
-		NetworkRouteWRefs subRoute = route.getSubRoute(network.getNode(new IdImpl("1")), network.getNode(new IdImpl("3")));
+		NetworkRouteWRefs subRoute = route.getSubRoute(network.getNodes().get(new IdImpl("1")), network.getNodes().get(new IdImpl("3")));
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 5, nodes.size());
-		assertEquals(network.getNode(new IdImpl("1")), nodes.get(0));
-		assertEquals(network.getNode(new IdImpl("2")), nodes.get(1));
-		assertEquals(network.getNode(new IdImpl("12")), nodes.get(2));
-		assertEquals(network.getNode(new IdImpl("13")), nodes.get(3));
-		assertEquals(network.getNode(new IdImpl("3")), nodes.get(4));
+		assertEquals(network.getNodes().get(new IdImpl("1")), nodes.get(0));
+		assertEquals(network.getNodes().get(new IdImpl("2")), nodes.get(1));
+		assertEquals(network.getNodes().get(new IdImpl("12")), nodes.get(2));
+		assertEquals(network.getNodes().get(new IdImpl("13")), nodes.get(3));
+		assertEquals(network.getNodes().get(new IdImpl("3")), nodes.get(4));
 		List<Id> linkIds = subRoute.getLinkIds();
 		assertEquals("number of links in subRoute.", 4, linkIds.size());
-		assertEquals(network.getLink(new IdImpl("1")).getId(), linkIds.get(0));
-		assertEquals(network.getLink(new IdImpl("22")).getId(), linkIds.get(1));
-		assertEquals(network.getLink(new IdImpl("12")).getId(), linkIds.get(2));
-		assertEquals(network.getLink(new IdImpl("-23")).getId(), linkIds.get(3));
-		assertEquals("wrong start link.", network.getLink(new IdImpl("0")).getId(), subRoute.getStartLinkId());
-		assertEquals("wrong end link.", network.getLink(new IdImpl("3")).getId(), subRoute.getEndLinkId());
+		assertEquals(network.getLinks().get(new IdImpl("1")).getId(), linkIds.get(0));
+		assertEquals(network.getLinks().get(new IdImpl("22")).getId(), linkIds.get(1));
+		assertEquals(network.getLinks().get(new IdImpl("12")).getId(), linkIds.get(2));
+		assertEquals(network.getLinks().get(new IdImpl("-23")).getId(), linkIds.get(3));
+		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("0")).getId(), subRoute.getStartLinkId());
+		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("3")).getId(), subRoute.getEndLinkId());
 	}
 
 	public void testGetSubRoute_toEnd() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link15 = network.getLink(new IdImpl("15"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link15 = network.getLinks().get(new IdImpl("15"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
-		NetworkRouteWRefs subRoute = route.getSubRoute(network.getNode(new IdImpl("4")), network.getNode(new IdImpl("15")));
+		NetworkRouteWRefs subRoute = route.getSubRoute(network.getNodes().get(new IdImpl("4")), network.getNodes().get(new IdImpl("15")));
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 3, nodes.size());
-		assertEquals(network.getNode(new IdImpl("4")), nodes.get(0));
-		assertEquals(network.getNode(new IdImpl("14")), nodes.get(1));
-		assertEquals(network.getNode(new IdImpl("15")), nodes.get(2));
+		assertEquals(network.getNodes().get(new IdImpl("4")), nodes.get(0));
+		assertEquals(network.getNodes().get(new IdImpl("14")), nodes.get(1));
+		assertEquals(network.getNodes().get(new IdImpl("15")), nodes.get(2));
 		List<Id> linkIds = subRoute.getLinkIds();
 		assertEquals("number of links in subRoute.", 2, linkIds.size());
-		assertEquals(network.getLink(new IdImpl("24")).getId(), linkIds.get(0));
-		assertEquals(network.getLink(new IdImpl("14")).getId(), linkIds.get(1));
-		assertEquals("wrong start link.", network.getLink(new IdImpl("3")).getId(), subRoute.getStartLinkId());
-		assertEquals("wrong end link.", network.getLink(new IdImpl("15")).getId(), subRoute.getEndLinkId());
+		assertEquals(network.getLinks().get(new IdImpl("24")).getId(), linkIds.get(0));
+		assertEquals(network.getLinks().get(new IdImpl("14")).getId(), linkIds.get(1));
+		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("3")).getId(), subRoute.getStartLinkId());
+		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("15")).getId(), subRoute.getEndLinkId());
 	}
 
 	public void testGetSubRoute_startOnly() {
 		NetworkLayer network = createTestNetwork();
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link15 = network.getLink(new IdImpl("15"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link15 = network.getLinks().get(new IdImpl("15"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link15, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4 14 15"), link15);
 
-		Node node2 = network.getNode(new IdImpl("2"));
+		Node node2 = network.getNodes().get(new IdImpl("2"));
 		NetworkRouteWRefs subRoute = route.getSubRoute(node2, node2);
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 1, nodes.size());
 		assertEquals(node2, nodes.get(0));
 		List<Id> linkIds = subRoute.getLinkIds();
 		assertEquals("number of links in subRoute.", 0, linkIds.size());
-		assertEquals("wrong start link.", network.getLink(new IdImpl("1")).getId(), subRoute.getStartLinkId());
-		assertEquals("wrong end link.", network.getLink(new IdImpl("22")).getId(), subRoute.getEndLinkId());
+		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("1")).getId(), subRoute.getStartLinkId());
+		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("22")).getId(), subRoute.getEndLinkId());
 	}
 
 	public void testGetSubRoute_endOnly() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link15 = network.getLink(new IdImpl("15"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link15 = network.getLinks().get(new IdImpl("15"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
-		Node node15 = network.getNode(new IdImpl("15"));
+		Node node15 = network.getNodes().get(new IdImpl("15"));
 		NetworkRouteWRefs subRoute = route.getSubRoute(node15, node15);
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 1, nodes.size());
 		assertEquals(node15, nodes.get(0));
 		assertEquals("number of links in subRoute.", 0, subRoute.getLinkIds().size());
-		assertEquals("wrong start link.", network.getLink(new IdImpl("14")).getId(), subRoute.getStartLinkId());
-		assertEquals("wrong end link.", network.getLink(new IdImpl("15")).getId(), subRoute.getEndLinkId());
+		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("14")).getId(), subRoute.getStartLinkId());
+		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("15")).getId(), subRoute.getEndLinkId());
 	}
 
 	public void testGetSubRoute_wrongStart() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link15 = network.getLink(new IdImpl("15"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link15 = network.getLinks().get(new IdImpl("15"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		try {
 			route.getSubRoute(
 					network.createAndAddNode(new IdImpl("99"), new CoordImpl(-100, -100)),
-					network.getNode(new IdImpl("15")));
+					network.getNodes().get(new IdImpl("15")));
 			fail("expected IllegalArgumentException, but it did not happen.");
 		} catch (IllegalArgumentException expected) {
 			log.info("catched expected exception: " + expected.getMessage());
@@ -284,14 +284,14 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 
 	public void testGetSubRoute_wrongEnd() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link15 = network.getLink(new IdImpl("15"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link15 = network.getLinks().get(new IdImpl("15"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		try {
 			route.getSubRoute(
-					network.getNode(new IdImpl("15")),
+					network.getNodes().get(new IdImpl("15")),
 					network.createAndAddNode(new IdImpl("99"), new CoordImpl(-100, -100)));
 			fail("expected IllegalArgumentException, but it did not happen.");
 		} catch (IllegalArgumentException expected) {
@@ -301,43 +301,43 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 
 	public void testGetSubRoute_sameNodes() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link15 = network.getLink(new IdImpl("15"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link15 = network.getLinks().get(new IdImpl("15"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
-		Node node = network.getNode(new IdImpl("3"));
+		Node node = network.getNodes().get(new IdImpl("3"));
 		NetworkRouteWRefs subRoute = route.getSubRoute(node, node);
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 1, nodes.size());
 		assertEquals(node, nodes.get(0));
 		List<Id> linkIds = subRoute.getLinkIds();
 		assertEquals("number of links in subRoute.", 0, linkIds.size());
-		assertEquals("wrong start link.", network.getLink(new IdImpl("-23")).getId(), subRoute.getStartLinkId());
-		assertEquals("wrong end link.", network.getLink(new IdImpl("3")).getId(), subRoute.getEndLinkId());
+		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("-23")).getId(), subRoute.getStartLinkId());
+		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("3")).getId(), subRoute.getEndLinkId());
 	}
 
 	public void testGetSubRoute_sameNodesInOneNodeRoute() {
 		NetworkLayer network = createTestNetwork();
-		Link link11 = network.getLink(new IdImpl("11"));
-		Link link12 = network.getLink(new IdImpl("12"));
+		Link link11 = network.getLinks().get(new IdImpl("11"));
+		Link link12 = network.getLinks().get(new IdImpl("12"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link11, link12, network);
 		route.setNodes(link11, NetworkUtils.getNodes(network, "12"), link12);
 
-		Node node = network.getNode(new IdImpl("12"));
+		Node node = network.getNodes().get(new IdImpl("12"));
 		NetworkRouteWRefs subRoute = route.getSubRoute(node, node);
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 1, nodes.size());
 		assertEquals(node, nodes.get(0));
 		List<Id> linkIds = subRoute.getLinkIds();
 		assertEquals("number of links in subRoute.", 0, linkIds.size());
-		assertEquals("wrong start link.", network.getLink(new IdImpl("11")).getId(), subRoute.getStartLinkId());
-		assertEquals("wrong end link.", network.getLink(new IdImpl("12")).getId(), subRoute.getEndLinkId());
+		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("11")).getId(), subRoute.getStartLinkId());
+		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("12")).getId(), subRoute.getEndLinkId());
 	}
 
 	public void testStartAndEndOnSameLinks_setNodes() {
 		NetworkLayer network = createTestNetwork();
-		Link link2 = network.getLink(new IdImpl("2"));
+		Link link2 = network.getLinks().get(new IdImpl("2"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link2, link2, network);
 		route.setNodes(link2, new ArrayList<Node>(0), link2);
 		assertEquals(0, route.getNodes().size());
@@ -346,7 +346,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 
 	public void testStartAndEndOnSameLinks_setLinks() {
 		NetworkLayer network = createTestNetwork();
-		Link link = network.getLink(new IdImpl("3"));
+		Link link = network.getLinks().get(new IdImpl("3"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link, link, network);
 		route.setLinks(link, new ArrayList<Link>(0), link);
 		assertEquals(0, route.getNodes().size());
@@ -355,8 +355,8 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 
 	public void testStartAndEndOnSubsequentLinks_setNodes() {
 		NetworkLayer network = createTestNetwork();
-		Link link12 = network.getLink(new IdImpl("12"));
-		Link link13 = network.getLink(new IdImpl("13"));
+		Link link12 = network.getLinks().get(new IdImpl("12"));
+		Link link13 = network.getLinks().get(new IdImpl("13"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link12, link13, network);
 		route.setNodes(link12, NetworkUtils.getNodes(network, "13"), link13);
 		assertEquals(1, route.getNodes().size());
@@ -365,19 +365,19 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 
 	public void testStartAndEndOnSubsequentLinks_setLinks() {
 		NetworkLayer network = createTestNetwork();
-		final Link link13 = network.getLink(new IdImpl("13"));
-		final Link link14 = network.getLink(new IdImpl("14"));
+		final Link link13 = network.getLinks().get(new IdImpl("13"));
+		final Link link14 = network.getLinks().get(new IdImpl("14"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link13, link14, network);
 		route.setLinks(link13, new ArrayList<Link>(0), link14);
 		assertEquals(1, route.getNodes().size());
 		assertEquals(0, route.getLinkIds().size());
-		assertEquals(network.getNode(new IdImpl(14)), route.getNodes().get(0));
+		assertEquals(network.getNodes().get(new IdImpl(14)), route.getNodes().get(0));
 	}
 
 	public void testVehicleId() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link15 = network.getLink(new IdImpl("15"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link15 = network.getLinks().get(new IdImpl("15"));
 		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		assertNull(route.getVehicleId());
 		Id id = new IdImpl("8134");

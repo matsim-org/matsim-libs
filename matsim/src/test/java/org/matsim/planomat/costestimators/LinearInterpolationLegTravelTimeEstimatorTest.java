@@ -79,9 +79,9 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 		testee.setDoLogging(true);
 		
 		Id dummyPersonId = new IdImpl(123456);
-		ActivityImpl homeActivity = new ActivityImpl("home", network.getLink("1002"));
+		ActivityImpl homeActivity = new ActivityImpl("home", network.getLinks().get(new IdImpl("1002")));
 		homeActivity.setCoord(new CoordImpl(5000.0, 10000.0));
-		ActivityImpl workActivity = new ActivityImpl("work", network.getLink("5006"));
+		ActivityImpl workActivity = new ActivityImpl("work", network.getLinks().get(new IdImpl("5006")));
 		workActivity.setCoord(new CoordImpl(35000.0, 10000.0));
 		
 		for (TransportMode mode : new TransportMode[]{TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk, TransportMode.car}) {
@@ -178,7 +178,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 				x = 40000.0; y = 10000.0; break;
 			}
 			network.createAndAddNode(new IdImpl(nodeId), new CoordImpl(x, y));
-			logger.info(network.getNode(new IdImpl(nodeId)).toString());
+			logger.info(network.getNodes().get(new IdImpl(nodeId)).toString());
 		}
 
 		for (int[] nodePair : new int[][]{{1, 2}, {2, 3}, {2, 4}, {3, 5}, {4, 5}, {5, 6}}) {
@@ -196,14 +196,14 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 			
 			network.createAndAddLink(
 					linkId, 
-					network.getNode(new IdImpl(nodePair[0])), 
-					network.getNode(new IdImpl(nodePair[1])), 
+					network.getNodes().get(new IdImpl(nodePair[0])), 
+					network.getNodes().get(new IdImpl(nodePair[1])), 
 					40000.0, 
 					freespeed, 
 					1000.0, 
 					1);
 			
-			logger.info(network.getLink(linkId).toString());
+			logger.info(network.getLinks().get(linkId).toString());
 		}
 
 		return network;

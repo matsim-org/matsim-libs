@@ -225,8 +225,8 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 		LinkInfo ret = this.linkInfos.get(id);
 		if (ret == null) {
 			ret = new LinkInfo();
-			ret.t_free = Math.ceil(this.network.getLink(id).getFreespeedTravelTime(Time.UNDEFINED_TIME)); //TODO make this dynamic, since we have time variant networks
-			LinkImpl link = this.network.getLink(id);
+			ret.t_free = Math.ceil(this.network.getLinks().get(new IdImpl(id)).getFreespeedTravelTime(Time.UNDEFINED_TIME)); //TODO make this dynamic, since we have time variant networks
+			LinkImpl link = this.network.getLinks().get(new IdImpl(id));
 			ret.storageCap = calcCapacity(link);
 			ret.id = id;
 			this.linkInfos.put(id, ret);

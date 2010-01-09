@@ -104,10 +104,10 @@ public class PathSetGenerator {
 
 	public final boolean setODPair(NodeImpl fromNode, NodeImpl toNode) {
 		if (fromNode == null) { log.warn("Origin node must exist."); return false; }
-		if (network.getNode(fromNode.getId()) == null) { log.warn("Origin node does not exist in the network."); return false; }
+		if (network.getNodes().get(fromNode.getId()) == null) { log.warn("Origin node does not exist in the network."); return false; }
 
 		if (toNode == null) { log.warn("Destination node must exist."); return false; }
-		if (network.getNode(toNode.getId()) == null) { log.warn("Destination node does not exist in the network."); return false; }
+		if (network.getNodes().get(toNode.getId()) == null) { log.warn("Destination node does not exist in the network."); return false; }
 
 		if (fromNode.equals(toNode)) { log.warn("Origin equals to Destination not allowed."); return false; }
 		origin = fromNode;

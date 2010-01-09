@@ -273,7 +273,7 @@ public class ReadFromUrbansimParcelModel {
 //			log.info( "act location changed" ) ;
 			return true ;
 		}
-		if ( oldAct.getLinkId()==null || network.getLink( oldAct.getLinkId() ) == null ) { // careful: only the old activity has a link
+		if ( oldAct.getLinkId()==null || network.getLinks().get(oldAct.getLinkId()) == null ) { // careful: only the old activity has a link
 //			log.info( "act link does not exist any more" ) ;
 			return true ;
 		}

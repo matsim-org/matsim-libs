@@ -186,8 +186,8 @@ public class Plansgenerator {
 	 */
 	private int addCommodity(final String HOME_LINK, final String TARGET_LINK, final int START_TIME, final int DURATION, final int CARS_PER_HOUR, final String ROUTE, int CURRENT_ID){
 		int homeEndtime = 0;
-		final LinkImpl start = network.getLink(new IdImpl(HOME_LINK));
-		final LinkImpl target = network.getLink(new IdImpl(TARGET_LINK));
+		final LinkImpl start = network.getLinks().get(new IdImpl(HOME_LINK));
+		final LinkImpl target = network.getLinks().get(new IdImpl(TARGET_LINK));
 		final Coord homeCoord = new CoordImpl(-25000, 0);
 		final Coord workCoord = new CoordImpl(10000, 0);
 		

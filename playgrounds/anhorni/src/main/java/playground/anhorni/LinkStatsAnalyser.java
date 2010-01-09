@@ -166,8 +166,8 @@ public class LinkStatsAnalyser {
 
 			for (int i=0; i<24; i++) {
 				count.createVolume(i+1, linkVolumes[i] );
-				count.setCoord(new CoordImpl(this.network.getLink(linkId).getCoord().getX(),
-						this.network.getLink(linkId).getCoord().getY()));
+				count.setCoord(new CoordImpl(this.network.getLinks().get(linkId).getCoord().getX(),
+						this.network.getLinks().get(linkId).getCoord().getY()));
 			}
 		}
 

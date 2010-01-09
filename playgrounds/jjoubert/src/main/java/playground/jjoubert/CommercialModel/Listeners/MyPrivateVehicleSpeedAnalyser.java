@@ -118,7 +118,7 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 	private void addSpeedToZone(LinkLeaveEvent event){
 		if(eventMap.containsKey(event.getPersonId())){
 			int hour = (int) Math.floor((event.getTime()) / 3600);
-			Double speed = (this.networkLayer.getLink(event.getLinkId()).getLength() / 	// in meters 
+			Double speed = (this.networkLayer.getLinks().get(event.getLinkId()).getLength() / 	// in meters 
 					(event.getTime() - eventMap.get(event.getPersonId()))) *			// in seconds
 					(3600/1000);														// convert m/s -> km/h 
 			
@@ -134,7 +134,7 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 	public void addSpeedToLink(LinkLeaveEvent event) {
 		if(eventMap.containsKey(event.getPersonId())){
 			int hour = (int) Math.floor((event.getTime()) / 3600);
-			Double speed = (this.networkLayer.getLink(event.getLinkId()).getLength() / 	// in meters 
+			Double speed = (this.networkLayer.getLinks().get(event.getLinkId()).getLength() / 	// in meters 
 					(event.getTime() - eventMap.get(event.getPersonId()))) *			// in seconds
 					(3600/1000);														// convert m/s -> km/h 
 			
@@ -169,7 +169,7 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 						}
 						avgSpeed = total / speeds.size();
 					} else{			
-						avgSpeed = this.networkLayer.getLink(linkKey).getFreespeed(System.currentTimeMillis()) * (3600/1000);
+						avgSpeed = this.networkLayer.getLinks().get(linkKey).getFreespeed(System.currentTimeMillis()) * (3600/1000);
 					}
 					theZone.addToSpeedDetail(hour, avgSpeed);
 					theZone.incrementSpeedCount(hour);

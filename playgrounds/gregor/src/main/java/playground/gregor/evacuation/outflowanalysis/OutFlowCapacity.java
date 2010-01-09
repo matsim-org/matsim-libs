@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -48,7 +49,7 @@ public class OutFlowCapacity {
 	}
 	
 	private void parseOutNodes() {
-		Node node = this.network.getNode("en1");
+		Node node = this.network.getNodes().get(new IdImpl("en1"));
 		double cap = 0;
 		ArrayList<Node> outNode = new ArrayList<Node>();
 		for (Link l : node.getInLinks().values()) {

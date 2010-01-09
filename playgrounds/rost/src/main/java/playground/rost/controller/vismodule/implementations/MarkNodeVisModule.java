@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.controller.map.BasicMap;
@@ -58,7 +59,7 @@ public class MarkNodeVisModule extends AbstractVisModuleImpl {
 		{
 			if(ids[i].length() == 0)
 				continue;
-			Node node = network.getNode(ids[i]);
+			Node node = network.getNodes().get(new IdImpl(ids[i]));
 			if(!map.isVisible(node))
 				continue;
 			

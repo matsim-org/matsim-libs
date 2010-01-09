@@ -26,7 +26,6 @@ import java.io.File;
 import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -72,13 +71,13 @@ public class CreateTransimsNetwork {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(this.networkFileName);
 
-		if (network.getNode(new IdImpl("0")) != null) {
+		if (network.getNodes().get(new IdImpl("0")) != null) {
 			Logger.getLogger(CreateTransimsNetwork.class).error("The network contains a node with id 0. Transims is likely to have problems with that!");
 		}
-		if (network.getLink(new IdImpl(0)) != null) {
+		if (network.getLinks().get(new IdImpl(0)) != null) {
 			Logger.getLogger(CreateTransimsNetwork.class).error("The network contains a link with id 0. Transims is likely to have problems with that!");
-			if (network.getLink(new IdImpl(999999)) == null) {
-				network.getLink(new IdImpl(0)).setId(new IdImpl("999999"));
+			if (network.getLinks().get(new IdImpl(999999)) == null) {
+				network.getLinks().get(new IdImpl(0)).setId(new IdImpl("999999"));
 				Logger.getLogger(CreateTransimsNetwork.class).error("Changed link 0 to link 999999.");
 			}
 		}

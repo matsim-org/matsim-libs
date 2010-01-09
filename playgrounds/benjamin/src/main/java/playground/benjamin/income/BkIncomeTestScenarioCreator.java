@@ -90,16 +90,16 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act1);
 			
 			Leg leg1Car = builder.createLeg(TransportMode.car);
-			NodeNetworkRouteImpl routeCar = new NodeNetworkRouteImpl(this.uselessNetwork.getLink(id1), this.uselessNetwork.getLink(id4));
+			NodeNetworkRouteImpl routeCar = new NodeNetworkRouteImpl(this.uselessNetwork.getLinks().get(id1), this.uselessNetwork.getLinks().get(id4));
 			//this would be so nice
 			List<Id> linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id2);
 			linkidsCar.add(id3);
 //			routeCar.setLinkIds(linkidsCar);
 			// but this is reality
-			routeCar.setNodes(ListUtils.<Node>makeList(this.uselessNetwork.getNode(new IdImpl("2")), 
-					this.uselessNetwork.getNode(new IdImpl("3")), 
-					this.uselessNetwork.getNode(new IdImpl("4"))));
+			routeCar.setNodes(ListUtils.<Node>makeList(this.uselessNetwork.getNodes().get(new IdImpl("2")), 
+					this.uselessNetwork.getNodes().get(new IdImpl("3")), 
+					this.uselessNetwork.getNodes().get(new IdImpl("4"))));
 			leg1Car.setRoute(routeCar);
 			plan.addLeg(leg1Car);
 			
@@ -110,7 +110,7 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act2);
 			
 			Leg leg2Car = builder.createLeg(TransportMode.car);
-			routeCar = new NodeNetworkRouteImpl(this.uselessNetwork.getLink(id4), this.uselessNetwork.getLink(id1));
+			routeCar = new NodeNetworkRouteImpl(this.uselessNetwork.getLinks().get(id4), this.uselessNetwork.getLinks().get(id1));
 			//in a beautiful world we would do...
 			linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id5);
@@ -120,11 +120,11 @@ public class BkIncomeTestScenarioCreator {
 			//but not with mankind
 			
 			
-			routeCar.setNodes(ListUtils.<Node>makeList(this.uselessNetwork.getNode(new IdImpl("5")),
-					this.uselessNetwork.getNode(new IdImpl("6")),
-					this.uselessNetwork.getNode(new IdImpl("7")),
-					this.uselessNetwork.getNode(new IdImpl("8")),
-					this.uselessNetwork.getNode(new IdImpl("1"))));
+			routeCar.setNodes(ListUtils.<Node>makeList(this.uselessNetwork.getNodes().get(new IdImpl("5")),
+					this.uselessNetwork.getNodes().get(new IdImpl("6")),
+					this.uselessNetwork.getNodes().get(new IdImpl("7")),
+					this.uselessNetwork.getNodes().get(new IdImpl("8")),
+					this.uselessNetwork.getNodes().get(new IdImpl("1"))));
 			leg2Car.setRoute(routeCar);
 			plan.addLeg(leg2Car);
 			

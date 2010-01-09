@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReader;
@@ -128,9 +129,9 @@ public abstract class CMCFRouter implements NetworkReader{
 				List<Link> path = new LinkedList<Link>();
 				StringTokenizer st = new StringTokenizer(pathString);
 				while(st.hasMoreTokens()){
-					path.add(this.network.getLink(st.nextToken()));
+					path.add(this.network.getLinks().get(new IdImpl(st.nextToken())));
 				}
-				this.pathFlow.add(this.network.getNode(fromID), this.network.getNode(toID), path, flow);
+				this.pathFlow.add(this.network.getNodes().get(new IdImpl(fromID)), this.network.getNodes().get(new IdImpl(toID)), path, flow);
 			}
 		}
 	}

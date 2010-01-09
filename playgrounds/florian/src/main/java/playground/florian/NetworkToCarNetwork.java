@@ -69,8 +69,8 @@ public class NetworkToCarNetwork {
 			}
 			LinkImpl link = links.get(id1);
 			Id id2 = link.getId();
-			NodeImpl startNode = net3.getNode(link.getFromNode().getId());
-			NodeImpl endNode = net3.getNode(link.getToNode().getId());
+			NodeImpl startNode = net3.getNodes().get(link.getFromNode().getId());
+			NodeImpl endNode = net3.getNodes().get(link.getToNode().getId());
 			double length = link.getLength();
 			
 			//Bestimmung der Spuranzahl

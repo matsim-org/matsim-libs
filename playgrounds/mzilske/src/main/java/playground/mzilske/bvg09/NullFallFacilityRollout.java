@@ -300,7 +300,7 @@ public class NullFallFacilityRollout {
 		}
 		Collection<TransitStopFacility> allFacilities = new ArrayList<TransitStopFacility>(outScenario.getTransitSchedule().getFacilities().values());
 		for (TransitStopFacility transitStopFacility : allFacilities) {
-			Link link = outScenario.getNetwork().getLink(transitStopFacility.getLinkId());
+			Link link = outScenario.getNetwork().getLinks().get(transitStopFacility.getLinkId());
 			if (link == null) {
 				outScenario.getTransitSchedule().getFacilities().remove(transitStopFacility.getId());
 				log.warn("Removed facility "+transitStopFacility.getId());

@@ -110,14 +110,14 @@ public class ShortestDistanceFromSupersource {
 	{
 		for(String s : evacArea.evacBorderNodeIds)
 		{
-			NodeImpl node = (NodeImpl)network.getNode(s);
+			NodeImpl node = (NodeImpl)network.getNodes().get(new IdImpl(s));
 			NodeCost nd = new NodeCost(node, 0);
 			costMap.put(node, nd);
 			queue.add(nd);
 		}
 		for(String s : evacArea.evacAreaNodeIds)
 		{
-			NodeImpl node = (NodeImpl)network.getNode(s);
+			NodeImpl node = (NodeImpl)network.getNodes().get(new IdImpl(s));
 			NodeCost nd = new NodeCost(node, Double.MAX_VALUE);
 			costMap.put(node, nd);
 			queue.add(nd);
@@ -128,14 +128,14 @@ public class ShortestDistanceFromSupersource {
 	{
 		long i = 0;
 		network.createAndAddNode(sSID, new CoordImpl(0,0));
-		Node sink = network.getNode(sSID);
+		Node sink = network.getNodes().get(sSID);
 		
 		for(String s : evacArea.evacBorderNodeIds)
 		{
-			NodeImpl node = (NodeImpl)network.getNode(s);
+			NodeImpl node = (NodeImpl)network.getNodes().get(new IdImpl(s));
 			Id linkId = new IdImpl("superlink" + ++i);
 			network.createAndAddLink(linkId, 
-								network.getNode(sSID),
+								network.getNodes().get(sSID),
 								node,
 								0,
 								0,
@@ -149,9 +149,9 @@ public class ShortestDistanceFromSupersource {
 	{
 		for(Id id : superSinkLinks)
 		{
-			network.removeLink(network.getLink(id));
+			network.removeLink(network.getLinks().get(id));
 		}
-		network.removeNode(network.getNode(sSID));
+		network.removeNode(network.getNodes().get(sSID));
 	}
 	
 	public Set<Node> getNodes(double cost)

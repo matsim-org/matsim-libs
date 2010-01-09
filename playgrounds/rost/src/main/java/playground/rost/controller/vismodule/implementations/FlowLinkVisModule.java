@@ -26,6 +26,7 @@ import java.awt.Graphics;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.controller.map.BasicMap;
@@ -52,7 +53,7 @@ public class FlowLinkVisModule extends AbstractVisModuleImpl {
 		this.tControl = timeControl;
 		this.network = network;
 		this.oWVN = oWVN;
-		sink = network.getNode(GlobalFlowCalculationSettings.superSinkId);
+		sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));
 		this.attributes.put("show", "true");
 		this.attributes.put("ids", "false");
 		this.attributes.put("length", "false");

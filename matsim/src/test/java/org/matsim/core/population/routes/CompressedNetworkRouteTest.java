@@ -55,12 +55,12 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 */
 	public void testGetLinks_setLinks() {
 		NetworkLayer network = createTestNetwork();
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link22 = network.getLink(new IdImpl("22"));
-		Link link12 = network.getLink(new IdImpl("12"));
-		Link link13 = network.getLink(new IdImpl("13"));
-		Link linkM24 = network.getLink(new IdImpl("-24"));
-		Link link4 = network.getLink(new IdImpl("4"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link22 = network.getLinks().get(new IdImpl("22"));
+		Link link12 = network.getLinks().get(new IdImpl("12"));
+		Link link13 = network.getLinks().get(new IdImpl("13"));
+		Link linkM24 = network.getLinks().get(new IdImpl("-24"));
+		Link link4 = network.getLinks().get(new IdImpl("4"));
 
 		List<Link> links = new ArrayList<Link>(5);
 		links.add(link22);
@@ -79,11 +79,11 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	public void testGetLinks_onlySubsequentLinks() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link2 = network.getLink(new IdImpl("2"));
-		Link link3 = network.getLink(new IdImpl("3"));
-		Link link4 = network.getLink(new IdImpl("4"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link2 = network.getLinks().get(new IdImpl("2"));
+		Link link3 = network.getLinks().get(new IdImpl("3"));
+		Link link4 = network.getLinks().get(new IdImpl("4"));
 
 		List<Link> links = new ArrayList<Link>(4);
 		links.add(link1);
@@ -112,11 +112,11 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 */
 	public void testGetLinkIds_incompleteInitialization() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link2 = network.getLink(new IdImpl("2"));
-		Link link3 = network.getLink(new IdImpl("3"));
-		Link link4 = network.getLink(new IdImpl("4"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link2 = network.getLinks().get(new IdImpl("2"));
+		Link link3 = network.getLinks().get(new IdImpl("3"));
+		Link link4 = network.getLinks().get(new IdImpl("4"));
 
 		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
 		subsequentLinks.put(link0, link1);
@@ -137,11 +137,11 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 */
 	public void testGetNodes_incompleteInitialization() {
 		NetworkLayer network = createTestNetwork();
-		Link link0 = network.getLink(new IdImpl("0"));
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link2 = network.getLink(new IdImpl("2"));
-		Link link3 = network.getLink(new IdImpl("3"));
-		Link link4 = network.getLink(new IdImpl("4"));
+		Link link0 = network.getLinks().get(new IdImpl("0"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link2 = network.getLinks().get(new IdImpl("2"));
+		Link link3 = network.getLinks().get(new IdImpl("3"));
+		Link link4 = network.getLinks().get(new IdImpl("4"));
 
 		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
 		subsequentLinks.put(link0, link1);

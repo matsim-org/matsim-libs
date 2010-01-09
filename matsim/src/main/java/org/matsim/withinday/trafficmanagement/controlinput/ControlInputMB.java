@@ -30,16 +30,16 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.SimulationTimer;
 
 /**
  * @author abergsten and dzetterberg
@@ -68,7 +68,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 	// User parameters:
 
-	private final NetworkImpl network;
+	private final Network network;
 	
 	private int numberofeventsdetection = 10;
 
@@ -112,7 +112,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 	private final SimulationConfigGroup simulationConfig;
 
-	public ControlInputMB(final SimulationConfigGroup simulationConfigGroup, final NetworkImpl network) {
+	public ControlInputMB(final SimulationConfigGroup simulationConfigGroup, final Network network) {
 		this.simulationConfig = simulationConfigGroup;
 		this.network = network;
 	}

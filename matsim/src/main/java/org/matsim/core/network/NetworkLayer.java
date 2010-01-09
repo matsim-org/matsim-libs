@@ -95,6 +95,7 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 	
 	// things below here are originally automatically generated.  kai, jul09
 	
+	@Deprecated
 	public MappingRule getDownRule() {
 		return layerDelegate.getDownRule();
 	}
@@ -103,6 +104,7 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		return layerDelegate.getLocation(location_id);
 	}
 
+	@Deprecated
 	public Location getLocation(String location_id) {
 		return layerDelegate.getLocation(location_id);
 	}
@@ -123,10 +125,12 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		return layerDelegate.getNearestLocations(coord);
 	}
 
+	@Deprecated
 	public Id getType() {
 		return layerDelegate.getType();
 	}
 
+	@Deprecated
 	public MappingRule getUpRule() {
 		return layerDelegate.getUpRule();
 	}
@@ -135,26 +139,32 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		layerDelegate.setName(name);
 	}
 
+	@Deprecated
 	public final boolean removeUpRule() {
 		return layerDelegate.removeUpRule();
 	}
 
+	@Deprecated
 	public final boolean removeDownRule() {
 		return layerDelegate.removeDownRule();
 	}
 
+	@Deprecated
 	public final void setUpRule(final MappingRule up_rule) {
 		layerDelegate.setUpRule( up_rule ) ;
 	}
 
+	@Deprecated
 	public final void setDownRule(final MappingRule down_rule) {
 		layerDelegate.setDownRule( down_rule ) ;
 	}
 
+	@Deprecated
 	public void forceDownRuleToNull() {
 		layerDelegate.forceDownRuleToNull();
 	}
 
+	@Deprecated
 	public void forceUpRuleToNull() {
 		layerDelegate.forceUpRuleToNull() ;
 	}

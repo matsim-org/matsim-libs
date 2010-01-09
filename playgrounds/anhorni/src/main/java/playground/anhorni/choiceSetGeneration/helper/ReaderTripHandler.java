@@ -33,7 +33,7 @@ public class ReaderTripHandler {
 		Id chosenFacilityId = new IdImpl(entries[2].trim());
 	
 		ZHFacility chosenFacility = facilities.getZhFacilities().get(chosenFacilityId);
-		LinkImpl link = network.getLink(chosenFacility.getLinkId());
+		LinkImpl link = network.getLinks().get(chosenFacility.getLinkId());
 
 		ActivityImpl shoppingAct = new org.matsim.core.population.ActivityImpl("shop", link);
 		shoppingAct.setCoord(link.getCoord());

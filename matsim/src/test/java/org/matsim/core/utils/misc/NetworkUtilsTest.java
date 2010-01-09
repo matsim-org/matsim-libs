@@ -59,11 +59,11 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		NetworkLayer network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, " 1\t\t2 \n4\t \t5      3 ");
 		assertEquals(5, nodes.size());
-		assertEquals(network.getNode(new IdImpl(1)), nodes.get(0));
-		assertEquals(network.getNode(new IdImpl(2)), nodes.get(1));
-		assertEquals(network.getNode(new IdImpl(4)), nodes.get(2));
-		assertEquals(network.getNode(new IdImpl(5)), nodes.get(3));
-		assertEquals(network.getNode(new IdImpl(3)), nodes.get(4));
+		assertEquals(network.getNodes().get(new IdImpl(1)), nodes.get(0));
+		assertEquals(network.getNodes().get(new IdImpl(2)), nodes.get(1));
+		assertEquals(network.getNodes().get(new IdImpl(4)), nodes.get(2));
+		assertEquals(network.getNodes().get(new IdImpl(5)), nodes.get(3));
+		assertEquals(network.getNodes().get(new IdImpl(3)), nodes.get(4));
 	}
 
 	public void testGetNodes_NonExistant() {
@@ -98,10 +98,10 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		NetworkLayer network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, " 1\t\t2 \n4\t \t      3 ");
 		assertEquals(4, links.size());
-		assertEquals(network.getLink(new IdImpl(1)), links.get(0));
-		assertEquals(network.getLink(new IdImpl(2)), links.get(1));
-		assertEquals(network.getLink(new IdImpl(4)), links.get(2));
-		assertEquals(network.getLink(new IdImpl(3)), links.get(3));
+		assertEquals(network.getLinks().get(new IdImpl(1)), links.get(0));
+		assertEquals(network.getLinks().get(new IdImpl(2)), links.get(1));
+		assertEquals(network.getLinks().get(new IdImpl(4)), links.get(2));
+		assertEquals(network.getLinks().get(new IdImpl(3)), links.get(3));
 	}
 	
 	public void testGetLinks_NonExistant() {

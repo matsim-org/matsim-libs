@@ -330,7 +330,7 @@ public class KMLPersonWriter {
 				for (PlanElement pe : selectedPlan.getPlanElements()) {
 					if (pe instanceof Activity) {
 						Activity act = (Activity) pe;
-						activityLinks.add(network.getLink(act.getLinkId()));
+						activityLinks.add(network.getLinks().get(act.getLinkId()));
 					}
 				}
 								

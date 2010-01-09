@@ -60,7 +60,7 @@ public class CountsSimCompareDayTest {
 							+ "X\tY\tcountValue\tsimValue\tdeviation((sim-count)/count)\n");
 			for (Id linkId : counts.getCounts().keySet()) {
 				Count count = counts.getCount(linkId);
-				LinkImpl link = network.getLink(linkId);
+				LinkImpl link = network.getLinks().get(linkId);
 				if (link != null) {
 					Coord toCoord = link.getToNode().getCoord();
 					Coord fromCoord = link.getFromNode().getCoord();

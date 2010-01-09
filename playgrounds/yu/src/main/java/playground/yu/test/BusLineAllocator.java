@@ -694,7 +694,7 @@ public class BusLineAllocator {
 			if (path != null) {
 				if (path.size() > 0)
 					/*------with carNet-----*/
-					stop.setLink(carNet.getLink(path.get(path.size() - 1)));
+					stop.setLink(carNet.getLinks().get(path.get(path.size() - 1)));
 				else
 					stop.setLink(null);
 			} else {
@@ -735,7 +735,7 @@ public class BusLineAllocator {
 					path = idPathPair.getSecond();
 
 				for (Id linkId : path) {
-					carNet.getLink(linkId).setAllowedModes(modes);
+					carNet.getLinks().get(linkId).setAllowedModes(modes);
 				}
 
 				ptLinkIdPathMap.put(id, path /* path */);
@@ -766,8 +766,8 @@ public class BusLineAllocator {
 
 			}
 			/*-----with carNetwork-----*/
-			endLink = carNet.getLink(routeLinks.removeLast());
-			startLink = carNet.getLink(routeLinks.remove(0));
+			endLink = carNet.getLinks().get(routeLinks.removeLast());
+			startLink = carNet.getLinks().get(routeLinks.remove(0));
 			NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink,
 					endLink);
 			route.setLinks(startLink, ids2links(routeLinks), endLink);
@@ -780,7 +780,7 @@ public class BusLineAllocator {
 		List<Link> links = new ArrayList<Link>();
 		for (Id id : ids) {
 			/*-----with carNetwork-----*/
-			links.add(carNet.getLink(id));
+			links.add(carNet.getLinks().get(id));
 		}
 		return links;
 	}
@@ -797,7 +797,7 @@ public class BusLineAllocator {
 					Id linkId = act.getLinkId();
 					if (act.getType().equals("pt interaction")
 							&& linkId.toString().startsWith("tr_")) {
-						Link actLink = carNet.getLink(linkId);
+						Link actLink = carNet.getLinks().get(linkId);
 						if (actLink == null)
 							act.setLink(carNet.getNearestLink(multiModalNetwork
 									.getLinks().get(linkId).getCoord()));

@@ -62,8 +62,8 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 		expectedDistances.put(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 6000.0);
 		
 		NetworkLayer network = createTestNetwork();
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link4 = network.getLink(new IdImpl("4"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link4 = network.getLinks().get(new IdImpl("4"));
 		link4.setLength(2000.0);
 
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : expectedDistances.keySet()) {

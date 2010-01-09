@@ -211,7 +211,7 @@ public class ScenarioCut {
 			if (tc.getY() > max.getY()) { toRemove.add(l.getId()); continue; }
 		}
 		System.out.println("=> "+toRemove.size()+" links to remove.");
-		for (Id id : toRemove) { network.removeLink(network.getLink(id)); }
+		for (Id id : toRemove) { network.removeLink(network.getLinks().get(id)); }
 		System.out.println("=> "+network.getLinks().size()+" links left.");
 		System.out.println("done. " + (new Date()));
 		

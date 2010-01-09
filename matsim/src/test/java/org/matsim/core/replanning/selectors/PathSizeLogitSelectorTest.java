@@ -66,13 +66,13 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		NetworkLayer network = createNetwork();
 		PlanSelector selector = getPlanSelector();
 
-		LinkImpl l6 = network.getLink("6");
-		LinkImpl l7 = network.getLink("7");
+		LinkImpl l6 = network.getLinks().get(new IdImpl("6"));
+		LinkImpl l7 = network.getLinks().get(new IdImpl("7"));
 
-		NodeImpl n1 = network.getNode("1");
-		NodeImpl n2 = network.getNode("2");
-		NodeImpl n3 = network.getNode("3");
-		NodeImpl n4 = network.getNode("4");
+		NodeImpl n1 = network.getNodes().get(new IdImpl("1"));
+		NodeImpl n2 = network.getNodes().get(new IdImpl("2"));
+		NodeImpl n3 = network.getNodes().get(new IdImpl("3"));
+		NodeImpl n4 = network.getNodes().get(new IdImpl("4"));
 
 		// test with only one plan...
 		PersonImpl person = new PersonImpl(new IdImpl(1));
@@ -173,11 +173,11 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	public void testZeroScore() {
 		NetworkLayer network = createNetwork();
 		PlanSelector selector = getPlanSelector();
-		LinkImpl l6 = network.getLink("6");
-		LinkImpl l7 = network.getLink("7");
+		LinkImpl l6 = network.getLinks().get(new IdImpl("6"));
+		LinkImpl l7 = network.getLinks().get(new IdImpl("7"));
 		
-		NodeImpl n1 = network.getNode("1");
-		NodeImpl n3 = network.getNode("3");
+		NodeImpl n1 = network.getNodes().get(new IdImpl("1"));
+		NodeImpl n3 = network.getNodes().get(new IdImpl("3"));
 		
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
@@ -206,13 +206,13 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	public void testPathSizeLogitSelector() {
 		NetworkLayer network = createNetwork();
 
-		LinkImpl l6 = network.getLink("6");
-		LinkImpl l7 = network.getLink("7");
+		LinkImpl l6 = network.getLinks().get(new IdImpl("6"));
+		LinkImpl l7 = network.getLinks().get(new IdImpl("7"));
 		
-		NodeImpl n1 = network.getNode("1");
-		NodeImpl n2 = network.getNode("2");
-		NodeImpl n3 = network.getNode("3");
-		NodeImpl n4 = network.getNode("4");
+		NodeImpl n1 = network.getNodes().get(new IdImpl("1"));
+		NodeImpl n2 = network.getNodes().get(new IdImpl("2"));
+		NodeImpl n3 = network.getNodes().get(new IdImpl("3"));
+		NodeImpl n4 = network.getNodes().get(new IdImpl("4"));
 
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);

@@ -127,7 +127,7 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 	private Id getNewLinkId() {
 		Random r = new Random();
 		Id id = new IdImpl(r.nextInt(Integer.MAX_VALUE));
-		while (this.network.getLink(id) != null) {
+		while (this.network.getLinks().get(id) != null) {
 			id = new IdImpl(r.nextInt(Integer.MAX_VALUE));
 		}
 		return id;
@@ -136,7 +136,7 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 	private Id getNewNodeId() {
 		Random r = new Random();
 		Id id = new IdImpl(r.nextInt(Integer.MAX_VALUE));
-		while (this.network.getNode(id) != null) {
+		while (this.network.getNodes().get(id) != null) {
 			id = new IdImpl(r.nextInt(Integer.MAX_VALUE));
 		}
 		return id;

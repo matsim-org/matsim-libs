@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -30,7 +31,7 @@ public class CountsCutter {
 	private static double distanceFilter;
 
 	public static boolean isInRange(final Id linkid, final NetworkLayer net) {
-		Link l = net.getLink(linkid);
+		Link l = net.getLinks().get(linkid);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "
 					+ linkid.toString());
@@ -55,7 +56,7 @@ public class CountsCutter {
 
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(networkFilename);
-		distanceFilterCenterNodeCoord = net.getNode(distanceFilterCenterNodeId)
+		distanceFilterCenterNodeCoord = net.getNodes().get(new IdImpl(distanceFilterCenterNodeId))
 				.getCoord();
 
 		Counts originalCounts = new Counts();
@@ -93,7 +94,7 @@ public class CountsCutter {
 			Count count = countsArray[idx].createCount(linkId, originalCount
 					.getCsId());
 			countsCounter[idx]++;
-			count.setCoord(net.getLink(linkId).getCoord());
+			count.setCoord(net.getLinks().get(linkId).getCoord());
 			for (Volume vol : originalCount.getVolumes().values())
 				count.createVolume(vol.getHour(), vol.getValue());
 			validCountsstationNo++;

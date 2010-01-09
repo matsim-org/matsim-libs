@@ -101,7 +101,7 @@ public class BlockCreator {
 		List<Node> hull = new LinkedList<Node>();
 		for(String s : evacArea.evacBorderOrderIds)
 		{
-			hull.add(network.getNode(s));
+			hull.add(network.getNodes().get(new IdImpl(s)));
 		}
 		
 		//update information about newly created nodes
@@ -133,13 +133,13 @@ public class BlockCreator {
 		//first: add the nodes on the border
 		for(String id : evacArea.evacBorderOrderIds)
 		{
-			noStartSet.add(network.getNode(id));
+			noStartSet.add(network.getNodes().get(new IdImpl(id)));
 		}
 		
 		//second: add the nodes outside the border
 		for(String id : evacArea.evacBorderNodeIds)
 		{
-			noStartSet.add(network.getNode(id));
+			noStartSet.add(network.getNodes().get(new IdImpl(id)));
 		}
 	}
 	
@@ -150,7 +150,7 @@ public class BlockCreator {
 		List<String> newBorderOrder = new LinkedList();
 		
 		String startString = evacArea.evacBorderOrderIds.get(0);
-		Node start = network.getNode(startString);
+		Node start = network.getNodes().get(new IdImpl(startString));
 		newBorderOrder.add(startString);
 		
 		Node current = start;
@@ -162,7 +162,7 @@ public class BlockCreator {
 			//search for a link starting with this node
 			for(Id id : borderLinkIds)
 			{
-				Link l = network.getLink(id);
+				Link l = network.getLinks().get(id);
 				if(l == null)
 					continue;
 				Node tmp = l.getToNode();
@@ -238,7 +238,7 @@ public class BlockCreator {
 		Set<Node> toRemove = sd.getNodes(Double.MAX_VALUE);
 		for(Node n : toRemove)
 		{
-			network.removeNode(network.getNode(n.getId()));
+			network.removeNode(network.getNodes().get(n.getId()));
 		}
 		
 	}
@@ -259,7 +259,7 @@ public class BlockCreator {
 			borderNodes.clear();
 			for(String s : evacArea.evacBorderOrderIds)
 			{
-				Node current = network.getNode(s);
+				Node current = network.getNodes().get(new IdImpl(s));
 				if(current != null)
 				{
 					borderNodes.add(current);

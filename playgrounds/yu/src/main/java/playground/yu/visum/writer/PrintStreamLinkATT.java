@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
@@ -33,7 +34,7 @@ public class PrintStreamLinkATT extends PrintStreamATTA {
 	@Override
 	public void printRow(String linkID) throws IOException {
 		try {
-			LinkImpl link = network.getLink(linkID);
+			LinkImpl link = network.getLinks().get(new IdImpl(linkID));
 			if (link == null)
 				return;
 			out.writeBytes(link.getOrigId() + SPRT + link.getFromNode().getId()

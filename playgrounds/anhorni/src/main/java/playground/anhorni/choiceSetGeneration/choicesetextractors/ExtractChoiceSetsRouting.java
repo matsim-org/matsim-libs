@@ -100,12 +100,12 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		 * Link linkBefore = choiceSet.getTrip().getBeforeShoppingAct().getLink(); ...
 		 */
 		//Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
-		LinkImpl linkBefore = network.getLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getId());
+		LinkImpl linkBefore = network.getLinks().get(choiceSet.getTrip().getBeforeShoppingAct().getLink().getId());
 		ActivityImpl fromAct0 = new org.matsim.core.population.ActivityImpl("beforeShop", linkBefore);
 		fromAct0.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
 		fromAct0.setCoord(linkBefore.getCoord());
 					
-		LinkImpl link = network.getLink(linkId);
+		LinkImpl link = network.getLinks().get(linkId);
 		ActivityImpl toAct0 = new org.matsim.core.population.ActivityImpl("shop", link);
 		toAct0.setCoord(link.getCoord());
 					
@@ -121,7 +121,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		fromAct1.setCoord(toAct0.getCoord());
 					
 		//Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
-		LinkImpl linkAfter = network.getLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getId());
+		LinkImpl linkAfter = network.getLinks().get(choiceSet.getTrip().getAfterShoppingAct().getLink().getId());
 		ActivityImpl toAct1 = new org.matsim.core.population.ActivityImpl("afterShop", linkAfter);
 		toAct1.setCoord(linkAfter.getCoord());
 					
@@ -139,13 +139,13 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		Iterator<Id> routeLinkBefore_it = ((NetworkRouteWRefs) legBefore.getRoute()).getLinkIds().iterator();
 		while (routeLinkBefore_it.hasNext()) {		
 			Id lId = routeLinkBefore_it.next();
-			totalTravelDist += network.getLink(lId).getLength();
+			totalTravelDist += network.getLinks().get(lId).getLength();
 		}
 		
 		Iterator<Id> routeLinkAfter_it = ((NetworkRouteWRefs) legAfter.getRoute()).getLinkIds().iterator();
 		while (routeLinkAfter_it.hasNext()) {		
 			Id lId = routeLinkAfter_it.next();
-			totalTravelDist += network.getLink(lId).getLength();
+			totalTravelDist += network.getLinks().get(lId).getLength();
 		}
 		
 		// chosen facility

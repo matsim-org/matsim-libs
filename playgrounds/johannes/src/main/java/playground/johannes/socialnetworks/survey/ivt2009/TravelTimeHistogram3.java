@@ -20,6 +20,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -61,7 +62,7 @@ public class TravelTimeHistogram3 {
 		String[] tokens = line.split("\t");
 		for(int i = 1; i < tokens.length; i++) {
 			String id = tokens[i];
-			Node node = network.getNode(id);
+			Node node = network.getNodes().get(new IdImpl(id));
 			node2Idx.put(node, i-1);
 		}
 		
@@ -70,7 +71,7 @@ public class TravelTimeHistogram3 {
 		while((line = matrixReader.readLine()) != null) {
 			tokens = line.split("\t");
 			String id = tokens[0];
-			Node node = network.getNode(id);
+			Node node = network.getNodes().get(new IdImpl(id));
 			nodes.add(node);
 			int i = node2Idx.get(node);
 			for(int k = 1; k < tokens.length; k++) {

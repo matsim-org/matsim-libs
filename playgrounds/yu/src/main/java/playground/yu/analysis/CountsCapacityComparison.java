@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -51,13 +52,13 @@ public class CountsCapacityComparison {
 		SimpleWriter sw = new SimpleWriter(outputFilename);
 		sw.writeln("linkId\tx\ty\tCapacity [veh/h]\tmax Value of Counts");
 
-		Coord center = network.getNode("2531").getCoord();
+		Coord center = network.getNodes().get(new IdImpl("2531")).getCoord();
 		double capPeriod = ((double) network.getCapacityPeriod()) / 3600.0 * 0.97;
 		int n_countStations = 0;
 
 		for (Id linkId : counts.getCounts().keySet()) {
 
-			LinkImpl link = network.getLink(linkId);
+			LinkImpl link = network.getLinks().get(linkId);
 			if (link != null) {
 				if (isInRange(link, center, 30000.0)) {
 					n_countStations++;

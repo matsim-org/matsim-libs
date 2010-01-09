@@ -48,7 +48,7 @@ public class TransitTravelTimeCalculator{
 				/**iterates in each stop to calculate departures travel times*/
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) { 
 					TransitStopFacility transitStopFacility = transitRouteStop.getStopFacility(); 
-					NodeImpl node = logicNetwork.getNode(transitStopFacility.getId());
+					NodeImpl node = logicNetwork.getNodes().get(transitStopFacility.getId());
 					
 					/**Save node departures in the DeparturesMap*/
 					double[] nodeDeparturesArray =new double[numDepartures];

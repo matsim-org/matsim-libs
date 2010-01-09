@@ -442,7 +442,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		assertEquals(linkEndTime, Time.parseTime("06:02:48"), EPSILON);
 
 		// for start times outside the time bin, the free speed travel time is returned
-		double freeSpeedTravelTime = ((NetworkLayer)this.scenario.getNetwork()).getLink(linkId.toString()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
+		double freeSpeedTravelTime = ((NetworkLayer)this.scenario.getNetwork()).getLinks().get(new IdImpl(linkId.toString())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 
 		startTime = Time.parseTime("05:59:00");
 		linkEndTime = testee.processLink(this.scenario.getNetwork().getLinks().get(linkId), startTime);

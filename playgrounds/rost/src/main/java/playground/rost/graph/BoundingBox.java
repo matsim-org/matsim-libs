@@ -24,6 +24,7 @@ package playground.rost.graph;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings;
@@ -66,7 +67,7 @@ public class BoundingBox {
 	public void run(NetworkLayer network)
 	{
 		this.clear();
-		Node sink = network.getNode(GlobalFlowCalculationSettings.superSinkId);
+		Node sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));
 		for (Node n : network.getNodes().values())
 		{
 			if(n == sink)

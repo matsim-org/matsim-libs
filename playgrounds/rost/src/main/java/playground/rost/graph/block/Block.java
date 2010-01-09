@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.graph.GraphAlgorithms;
@@ -69,7 +70,7 @@ public class Block {
 		Node node;
 		for(String s : borderIds)
 		{
-			node = network.getNode(s);
+			node = network.getNodes().get(new IdImpl(s));
 			if(node == null)
 				return null;
 			borderNodes.add(node);

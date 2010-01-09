@@ -81,7 +81,7 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 			defaultFeatureTypeFactory.addType(attrTypes.get(i));
 		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 		for (Id linkId : linkIds) {
-			LinkImpl link = network.getLink(linkId);
+			LinkImpl link = network.getLinks().get(linkId);
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);

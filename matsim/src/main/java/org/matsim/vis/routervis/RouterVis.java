@@ -204,8 +204,8 @@ public class RouterVis {
 		log.info("  done.");
 
 		log.info("  running RouterVis.");
-		final NodeImpl fromNode = network.getNode(fromNodeId.toString());
-		final NodeImpl toNode = network.getNode(toNodeId.toString());
+		final NodeImpl fromNode = network.getNodes().get(new IdImpl(fromNodeId.toString()));
+		final NodeImpl toNode = network.getNodes().get(new IdImpl(toNodeId.toString()));
 		vis.runRouter(fromNode, toNode,0.0);
 		log.info("  done.");
 

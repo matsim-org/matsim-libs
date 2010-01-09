@@ -187,7 +187,7 @@ public class LogicFactory{
 		Node plainNode = null;
 		Id id = transitStopFacility.getId();
 		if (this.plainNet.getNodes().containsKey(id)){
-			plainNode = plainNet.getNode(id);
+			plainNode = plainNet.getNodes().get(id);
 		}else{
 			plainNode = plainNet.createAndAddNode(id, transitStopFacility.getCoord());
 		}

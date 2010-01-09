@@ -67,7 +67,7 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 	 * TODO how to set other attributes of link consistently without invalidating time variant attributes
 	 */
 	public LinkImpl createLink(final Id id, final Id fromNodeId, final Id toNodeId) {
-		return this.linkFactory.createLink(id, this.network.getNode(fromNodeId), this.network.getNode(toNodeId), this.network, 1.0, 1.0, 1.0, 1.0);
+		return this.linkFactory.createLink(id, this.network.getNodes().get(fromNodeId), this.network.getNodes().get(toNodeId), this.network, 1.0, 1.0, 1.0, 1.0);
 	}
 
 	public LinkImpl createLink(final Id id, final Node from, final Node to,

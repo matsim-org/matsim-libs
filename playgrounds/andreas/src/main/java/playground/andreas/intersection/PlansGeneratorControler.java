@@ -64,55 +64,55 @@ public class PlansGeneratorControler extends Controler {
 		log.info("  generating plans... ");
 
 		for (int i = 0; i < 314; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("20"), this.network.getLink("9"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("20")), this.network.getLinks().get(new IdImpl("9")), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 948; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("20"), this.network.getLink("7"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("20")), this.network.getLinks().get(new IdImpl("7")), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 196; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("20"), this.network.getLink("5"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("20")), this.network.getLinks().get(new IdImpl("5")), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 56; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("40"), this.network.getLink("3"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("40")), this.network.getLinks().get(new IdImpl("3")), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 192; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("40"), this.network.getLink("9"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("40")), this.network.getLinks().get(new IdImpl("9")), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 185; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("40"), this.network.getLink("7"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("40")), this.network.getLinks().get(new IdImpl("7")), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 170; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("60"), this.network.getLink("5"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("60")), this.network.getLinks().get(new IdImpl("5")), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 799; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("60"), this.network.getLink("3"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("60")), this.network.getLinks().get(new IdImpl("3")), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 147; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("60"), this.network.getLink("9"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("60")), this.network.getLinks().get(new IdImpl("9")), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 150; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("80"), this.network.getLink("7"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("80")), this.network.getLinks().get(new IdImpl("7")), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 166; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("80"), this.network.getLink("5"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("80")), this.network.getLinks().get(new IdImpl("5")), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 341; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("80"), this.network.getLink("3"), pop);
+			generatePerson(numberOfPlans, this.network.getLinks().get(new IdImpl("80")), this.network.getLinks().get(new IdImpl("3")), pop);
 			numberOfPlans++;
 		}
 
@@ -130,10 +130,10 @@ public class PlansGeneratorControler extends Controler {
 		LinkedList <LinkImpl> fromLinks = new LinkedList<LinkImpl>();
 		LinkedList <LinkImpl> toLinks = new LinkedList<LinkImpl>();
 
-		fromLinks.add(this.network.getLink("1"));
-		fromLinks.add(this.network.getLink("2"));
+		fromLinks.add(this.network.getLinks().get(new IdImpl("1")));
+		fromLinks.add(this.network.getLinks().get(new IdImpl("2")));
 
-		toLinks.add(this.network.getLink("6"));
+		toLinks.add(this.network.getLinks().get(new IdImpl("6")));
 
 
 		for(int i=0; i < 1000; i++){

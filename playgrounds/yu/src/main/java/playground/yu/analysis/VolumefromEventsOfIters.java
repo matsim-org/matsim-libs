@@ -75,7 +75,7 @@ public class VolumefromEventsOfIters {
 		}
 
 		for (Id linkId : counts.getCounts().keySet()) {
-			if (linksInCircle.contains(network.getLink(linkId))) {
+			if (linksInCircle.contains(network.getLinks().get(linkId))) {
 				XYLineChart chart = new XYLineChart("link " + linkId.toString()
 						+ " traffic volume", "time", "traffic volume");
 				double[] x = new double[97];

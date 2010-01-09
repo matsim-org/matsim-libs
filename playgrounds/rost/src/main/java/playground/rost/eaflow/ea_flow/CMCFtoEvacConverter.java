@@ -63,7 +63,7 @@ public class CMCFtoEvacConverter {
 		Id matsimid3  = new IdImpl("el1");
 		network.createAndAddNode(matsimid1, coord1);
 		network.createAndAddNode(matsimid2, coord2);
-		network.createAndAddLink(matsimid3, network.getNode("en1"), network.getNode("en2"),
+		network.createAndAddLink(matsimid3, network.getNodes().get(new IdImpl("en1")), network.getNodes().get(new IdImpl("en2")),
 				 10.,100000. ,100000000000000000000.,1.);
 		
 		//Add links to en1
@@ -84,7 +84,7 @@ public class CMCFtoEvacConverter {
 		 Integer counter = 10;
 		 for(String id : evacnodes){
 			 Id matsimid  = new IdImpl("el"+counter.toString());
-			 network.createAndAddLink(matsimid, network.getNode(id), network.getNode("en1"), 1.,100000. ,100000000000000000000.,1.);
+			 network.createAndAddLink(matsimid, network.getNodes().get(new IdImpl(id)), network.getNodes().get(new IdImpl("en1")), 1.,100000. ,100000000000000000000.,1.);
 			 counter++;
 		 }
 		return network;
@@ -108,8 +108,8 @@ public class CMCFtoEvacConverter {
 			 String demand = commodity.getChildText("demand");
 			 //build  new Plans in the Population
 			 int dem = (int) Math.round(Double.parseDouble(demand));
-			 NodeImpl tonode = network.getNode(to);
-			 NodeImpl fromnode = network.getNode(from);
+			 NodeImpl tonode = network.getNodes().get(new IdImpl(to));
+			 NodeImpl fromnode = network.getNodes().get(new IdImpl(from));
 			 Coord coordfrom = fromnode.getCoord();
 			 Coord coordto = tonode.getCoord();
 			 Link fromlink = null;

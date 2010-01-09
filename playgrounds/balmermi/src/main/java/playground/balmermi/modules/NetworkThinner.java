@@ -102,7 +102,7 @@ public class NetworkThinner {
 		List<List<Link>> mergeGroups = new ArrayList<List<Link>>();
 		for (Id lid : lids) {
 			List<Link> linksToMerge = new ArrayList<Link>();
-			Link currLink = network.getLink(lid);
+			Link currLink = network.getLinks().get(lid);
 			linksToMerge.add(currLink);
 			Node toNode = currLink.getToNode();
 			while ((((NodeImpl) toNode).getIncidentNodes().size() == 2) &&

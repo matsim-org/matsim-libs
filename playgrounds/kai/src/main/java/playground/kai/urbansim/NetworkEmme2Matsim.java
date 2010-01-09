@@ -74,8 +74,8 @@ public class NetworkEmme2Matsim {
 						}
 //						checkMax( xxStr, yyStr ) ;
 					} else {
-						NodeImpl fromNode = network.getNode(parts[1]) ;
-						NodeImpl   toNode = network.getNode(parts[2]);
+						NodeImpl fromNode = network.getNodes().get(new IdImpl(parts[1])) ;
+						NodeImpl   toNode = network.getNodes().get(new IdImpl(parts[2]));
 						if ( fromNode==null || toNode==null ) {
 //							log.info("fromNode or toNode ==null; probably connector link; skipping it ...") ;
 							continue ;

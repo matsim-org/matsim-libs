@@ -39,6 +39,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
@@ -128,7 +129,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 			doSnapshot();
 		}
 		String agentId = event.getPersonId().toString();
-		LinkImpl link = this.network.getLink(event.getLinkId().toString());
+		LinkImpl link = this.network.getLinks().get(new IdImpl(event.getLinkId().toString()));
 		this.agentsOnLink.put(agentId, link);
 		
 	}

@@ -149,17 +149,17 @@ public class NetworkAnalyseRouteSet {
 				// index:   0       1          2        3     4  ...
 
 				ArrayList<Node> node_routes = new ArrayList<Node>();
-				Node node = network.getNode(new IdImpl(entries[1].trim()));
+				Node node = network.getNodes().get(new IdImpl(entries[1].trim()));
 				if (node == null) { Gbl.errorMsg("Node id=" + entries[1].trim() + " does not exist!"); }
 				node_routes.add(node);
 
 				int idx = 3;
 				while (!entries[idx].trim().equals("-1")) {
-					node = network.getLink(new IdImpl(entries[idx].trim())).getToNode();
+					node = network.getLinks().get(new IdImpl(entries[idx].trim())).getToNode();
 					node_routes.add(node);
 					idx++;
 				}
-				NodeImpl last = network.getNode(new IdImpl(entries[2].trim()));
+				NodeImpl last = network.getNodes().get(new IdImpl(entries[2].trim()));
 				if (last == null) { Gbl.errorMsg("Node id=" + entries[1].trim() + " does not exist!"); }
 				if (!last.getId().equals(node_routes.get(node_routes.size()-1).getId())) {
 					Gbl.errorMsg("Last node does not fit!");

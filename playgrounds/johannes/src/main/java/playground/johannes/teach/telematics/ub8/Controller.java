@@ -186,11 +186,11 @@ public class Controller extends Controler {
 			Random random = new Random(config.global().getRandomSeed());
 			
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-			LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) factory.createRoute(network.getLink("1"), network.getLink("6"));
+			LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) factory.createRoute(network.getLinks().get(new IdImpl("1")), network.getLinks().get(new IdImpl("6")));
 			List<Link> links = new ArrayList<Link>();
-			links.add(network.getLink("1.2"));
-			links.add(network.getLink("3"));
-			links.add(network.getLink("5"));
+			links.add(network.getLinks().get(new IdImpl("1.2")));
+			links.add(network.getLinks().get(new IdImpl("3")));
+			links.add(network.getLinks().get(new IdImpl("5")));
 			route.setLinks(route.getStartLink(), links, route.getEndLink());
 			
 			for(Person p : event.getControler().getPopulation().getPersons().values()) {

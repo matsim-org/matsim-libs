@@ -138,7 +138,7 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		LinkImpl link = this.network.getLink(event.getLinkId());
+		LinkImpl link = this.network.getLinks().get(event.getLinkId());
 		PolygonFeature pf = this.quad.get(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 		if (!pf.p.contains(MGC.coord2Point(link.getToNode().getCoord()))) {
 			log.warn("got wrong polygon! check the quad tree! Performing linear search! this will slow done the programm significant!");

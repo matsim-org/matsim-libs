@@ -38,7 +38,7 @@ public class NetworkWrapper {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
 					Link link = wrappedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
-							wrappedNetwork.getNode(inLink.getId()), wrappedNetwork.getNode(outLink.getId().toString()),
+							wrappedNetwork.getNodes().get(inLink.getId()), wrappedNetwork.getNodes().get(new IdImpl(outLink.getId().toString())),
 							outLink.getLength(),
 							outLink.getFreespeed(Time.UNDEFINED_TIME),
 							outLink.getCapacity(Time.UNDEFINED_TIME),

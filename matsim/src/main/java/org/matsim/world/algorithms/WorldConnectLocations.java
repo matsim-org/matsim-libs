@@ -116,11 +116,11 @@ public class WorldConnectLocations {
 		// add nodes and links to the subNetwork
 		for (LinkImpl l : remainingLinks) {
 			Node fn = l.getFromNode();
-			Node nfn = subNetwork.getNode(fn.getId());
+			Node nfn = subNetwork.getNodes().get(fn.getId());
 			if (nfn == null) { nfn = subNetwork.createAndAddNode(fn.getId(),fn.getCoord()); }
 
 			Node tn = l.getToNode();
-			Node ntn = subNetwork.getNode(tn.getId());
+			Node ntn = subNetwork.getNodes().get(tn.getId());
 			if (ntn == null) { ntn = subNetwork.createAndAddNode(tn.getId(),tn.getCoord()); }
 
 			subNetwork.createAndAddLink(l.getId(),nfn,ntn,l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME));
@@ -146,7 +146,7 @@ public class WorldConnectLocations {
 				Id fid = new IdImpl(entries[0].trim());
 				Id lid = new IdImpl(entries[1].trim());
 				ActivityFacilityImpl f = facilities.getFacilities().get(fid);
-				MappedLocation l = network.getLink(lid);
+				MappedLocation l = network.getLinks().get(lid);
 				if ((f != null) && (l != null)) {
 					// add the nearest right entry link mapping to the facility f
 					// note: network could be a temporal copy of the one in the world. Therefore, get the original one.

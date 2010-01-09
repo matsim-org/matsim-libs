@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -259,7 +259,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.vdsSign.setDeadZoneSystemOutput(Double.parseDouble(content2));
 		}
 		else if (name.equalsIgnoreCase(SIGNLINK)) {
-			LinkImpl l = this.network.getLink(content2);
+			Link l = this.network.getLinks().get(new IdImpl(content2));
 			if (l != null) {
 				this.vdsSign.setSignLink(l);
 			}
@@ -268,7 +268,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			}
 		}
 		else if (name.equalsIgnoreCase(DIRECTIONLINKS)) {
-			LinkImpl l = this.network.getLink(content2);
+			Link l = this.network.getLinks().get(new IdImpl(content2));
 			if (l != null) {
 				this.vdsSign.setDirectionLink(l);
 			}

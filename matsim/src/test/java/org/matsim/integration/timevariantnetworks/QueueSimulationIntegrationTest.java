@@ -62,9 +62,9 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		loadConfig(null);
 
 		NetworkLayer network = createNetwork();
-		LinkImpl link1 = network.getLink("1");
-		LinkImpl link2 = network.getLink("2");
-		LinkImpl link3 = network.getLink("3");
+		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
+		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
+		LinkImpl link3 = network.getLinks().get(new IdImpl("3"));
 
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
@@ -104,9 +104,9 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		loadConfig(null);
 
 		NetworkLayer network = createNetwork();
-		LinkImpl link1 = network.getLink("1");
-		LinkImpl link2 = network.getLink("2");
-		LinkImpl link3 = network.getLink("3");
+		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
+		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
+		LinkImpl link3 = network.getLinks().get(new IdImpl("3"));
 		/*
 		 * Create a network change event that reduces the capacity.
 		 */

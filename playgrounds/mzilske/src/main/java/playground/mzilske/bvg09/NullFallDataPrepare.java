@@ -97,7 +97,7 @@ public class NullFallDataPrepare {
 			network.createAndAddNode(visumNode.id, visumNode.coord);
 		}
 		for (VisumNetwork.Edge visumEdge : vNetwork.edges.values()) {
-			network.createAndAddLink(visumEdge.id, network.getNode(visumEdge.fromNode), network.getNode(visumEdge.toNode), visumEdge.length * 1000, 14, 2000, 1);
+			network.createAndAddLink(visumEdge.id, network.getNodes().get(visumEdge.fromNode), network.getNodes().get(visumEdge.toNode), visumEdge.length * 1000, 14, 2000, 1);
 		}
 	}
 
@@ -215,7 +215,7 @@ public class NullFallDataPrepare {
 	private Link findLink(LineRouteItem previousLineRouteItem,
 			LineRouteItem nextLineRouteItem) {
 		NetworkLayer network = scenario.getNetwork();
-		return findLink(network.getNode(previousLineRouteItem.nodeId), network.getNode(nextLineRouteItem.nodeId));
+		return findLink(network.getNodes().get(previousLineRouteItem.nodeId), network.getNodes().get(nextLineRouteItem.nodeId));
 	}
 
 	private Link findLink(Node prevNode, Node node) {
@@ -234,7 +234,7 @@ public class NullFallDataPrepare {
 	
 	private Link createOrFindInitialLink(LineRouteItem initialLineRouteItem) {
 		NetworkLayer network = scenario.getNetwork();
-		Node node = network.getNode(initialLineRouteItem.nodeId);
+		Node node = network.getNodes().get(initialLineRouteItem.nodeId);
 		Link initialLink = initialLinks.get(node);
 		if (initialLink == null) {
 			Id id = new IdImpl("initial_" + node.getId());

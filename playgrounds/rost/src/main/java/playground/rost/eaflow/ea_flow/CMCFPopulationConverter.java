@@ -71,8 +71,8 @@ public class CMCFPopulationConverter {
 			 String demand = commodity.getChildText("demand");
 			 //build  new Plans in the Population
 			 int dem = (int) Math.round(Double.parseDouble(demand));
-			 NodeImpl tonode = network.getNode(to);
-			 NodeImpl fromnode = network.getNode(from);
+			 NodeImpl tonode = network.getNodes().get(new IdImpl(to));
+			 NodeImpl fromnode = network.getNodes().get(new IdImpl(from));
 			 Coord coordfrom = fromnode.getCoord();
 			 Coord coordto = tonode.getCoord();
 			 Link fromlink = null;
