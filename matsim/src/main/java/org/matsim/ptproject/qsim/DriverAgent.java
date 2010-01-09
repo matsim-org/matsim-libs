@@ -21,7 +21,6 @@
 package org.matsim.ptproject.qsim;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 public interface DriverAgent extends PersonAgentI {
 
@@ -33,13 +32,12 @@ public interface DriverAgent extends PersonAgentI {
 	 *
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
-	public Link chooseNextLink();
+	public Id chooseNextLinkId();
 
 	public void teleportToLink(final Id linkId);
 
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 
 	public void moveOverNode();
-
 
 }

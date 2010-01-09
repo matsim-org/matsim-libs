@@ -258,19 +258,19 @@ public class WithindayAgent extends PersonAgent {
 	}
 
 	@Override
-	public Link chooseNextLink() {
+	public Id chooseNextLinkId() {
 		if (this.getCurrentLinkId() != this.getDestinationLinkId()) {
 			this.replan();
 		}
 //		this.cachedNextLink = null;
-		Link l = super.chooseNextLink();
+		Id linkId = super.chooseNextLinkId();
 		if (log.isTraceEnabled())
-			log.trace("vehicle : " + this.getPerson().getId() + " next choosen link:" + l.getId().toString());
-		return l;
+			log.trace("vehicle : " + this.getPerson().getId() + " next choosen link:" + linkId.toString());
+		return linkId;
 	}
 
 	public void exchangeCurrentLeg(final LegImpl newLeg) {
-		this.cachedNextLink = null;
+		this.cachedNextLinkId = null;
 		this.setCurrentLeg(newLeg);
 	}
 

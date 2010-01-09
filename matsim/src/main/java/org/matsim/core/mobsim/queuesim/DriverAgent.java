@@ -21,7 +21,6 @@
 package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 public interface DriverAgent extends PersonAgentI {
 
@@ -33,7 +32,7 @@ public interface DriverAgent extends PersonAgentI {
 	 *
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
-	public Link chooseNextLink();
+	public Id chooseNextLinkId();
 
 	public void teleportToLink(final Id linkId);
 

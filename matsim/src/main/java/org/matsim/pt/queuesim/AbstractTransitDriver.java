@@ -60,20 +60,23 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 		this.nextLinkIndex = 0;
 	}
 	
-	public Link chooseNextLink() {
+	@Override
+	public Id chooseNextLinkId() {
 		if (this.nextLinkIndex < getCarRoute().getLinkIds().size()) {
-			return getCarRoute().getLinks().get(this.nextLinkIndex);
+			return getCarRoute().getLinkIds().get(this.nextLinkIndex);
 		}
 		if (this.nextLinkIndex == getCarRoute().getLinkIds().size()) {
-			return getCarRoute().getEndLink();
+			return getCarRoute().getEndLinkId();
 		}
 		return null;
 	}
 
+	@Override
 	public void moveOverNode() {
 		this.nextLinkIndex++;
 	}
 
+	@Override
 	public TransitStopFacility getNextTransitStop() {
 		if (this.nextStop == null) {
 			return null;
@@ -81,6 +84,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 		return this.nextStop.getStopFacility();
 	}
 
+	@Override
 	public double handleTransitStop(final TransitStopFacility stop, final double now) {
 		assertExpectedStop(stop);
 		processEventVehicleArrives(stop, now);
@@ -95,6 +99,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 		return stopTime;
 	}
 
+	@Override
 	public void activityEnds(final double now) {
 		this.sim.agentDeparts(now, this, this.getCurrentLeg().getRoute().getStartLinkId());
 	}
@@ -107,6 +112,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 		return this.sim;
 	}
 	
+	@Override
 	public Person getPerson() {
 		return this.dummyPerson;
 	}

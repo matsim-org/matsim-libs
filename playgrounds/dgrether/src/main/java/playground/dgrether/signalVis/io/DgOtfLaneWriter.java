@@ -25,8 +25,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.Time;
@@ -132,8 +134,9 @@ public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWrit
 				out.putDouble(laneEndPointY);
 				
 				if (DRAW_LINK_TO_LINK_LINES){
-					out.putInt(l.getDestinationLinks().size());
-					for (Link toLink :  l.getDestinationLinks()){
+					out.putInt(l.getDestinationLinkIds().size());
+					for (Id toLinkId :  l.getDestinationLinkIds()){
+						Link toLink = ((NetworkLayer) this.src.getLink().getLayer()).getLinks().get(toLinkId);
 						Double mscaledToLinkStart = this.calculateMiddleOfToLink(toLink, cellWidth);
 						out.putDouble(mscaledToLinkStart.x);
 						out.putDouble(mscaledToLinkStart.y);

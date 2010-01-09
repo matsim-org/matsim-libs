@@ -20,7 +20,6 @@
 package playground.christoph.mobsim;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.population.PersonImpl;
@@ -44,6 +43,6 @@ public class WithinDayPersonAgent extends PersonAgent{
 	 */
 	public void ResetCachedNextLink()
 	{
-		super.cachedNextLink = null;
+		super.cachedNextLinkId = null;
 	}
 }

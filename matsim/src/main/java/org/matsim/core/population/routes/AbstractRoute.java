@@ -52,26 +52,32 @@ public abstract class AbstractRoute implements RouteWRefs {
 		this.endLink = endLink;
 	}
 
+	@Override
 	public double getDistance() {
 		return dist;
 	}
 
+	@Override
 	public final void setDistance(final double dist) {
 		this.dist = dist;
 	}
 
+	@Override
 	public final double getTravelTime() {
 		return this.travTime;
 	}
 	
+	@Override
 	public final void setTravelTime(final double travTime) {
 		this.travTime = travTime;
 	}
 	
+	@Deprecated // use getEndLinkId()
 	public Link getEndLink() {
 		return this.endLink;
 	}
 
+	@Deprecated // use getStartLinkId()
 	public Link getStartLink() {
 		return this.startLink;
 	}

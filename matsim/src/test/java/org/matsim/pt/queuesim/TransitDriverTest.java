@@ -108,15 +108,15 @@ public class TransitDriverTest extends TestCase {
 		}
 
 		assertEquals(link5.getId(), driver.getDestinationLinkId());
-		assertEquals(link2, driver.chooseNextLink());
+		assertEquals(link2.getId(), driver.chooseNextLinkId());
 		driver.moveOverNode();
-		assertEquals(link3, driver.chooseNextLink());
+		assertEquals(link3.getId(), driver.chooseNextLinkId());
 		driver.moveOverNode();
-		assertEquals(link4, driver.chooseNextLink());
+		assertEquals(link4.getId(), driver.chooseNextLinkId());
 		driver.moveOverNode();
-		assertEquals(link5, driver.chooseNextLink());
+		assertEquals(link5.getId(), driver.chooseNextLinkId());
 		driver.moveOverNode();
-		assertEquals(null, driver.chooseNextLink());
+		assertEquals(null, driver.chooseNextLinkId());
 	}
 
 	public void testInitializationDeparture() {

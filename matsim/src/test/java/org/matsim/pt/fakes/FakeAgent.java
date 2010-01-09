@@ -23,7 +23,6 @@ package org.matsim.pt.fakes;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRoute;
@@ -66,7 +65,7 @@ public class FakeAgent implements DriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public LinkImpl chooseNextLink() {
+	public Id chooseNextLinkId() {
 		return null;
 	}
 

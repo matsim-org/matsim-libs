@@ -147,7 +147,7 @@ public class QueueLane {
 	/**
 	 * Contains all Link instances which are reachable from this lane
 	 */
-	private final Set<Link> destinationLinks = new LinkedHashSet<Link>();
+	private final Set<Id> destinationLinkIds = new LinkedHashSet<Id>();
 
 	private SortedMap<Id, BasicSignalGroupDefinition> signalGroups;
 
@@ -380,7 +380,7 @@ public class QueueLane {
 			
 			if (!handled) {
 				// Check if veh has reached destination:
-				if ((driver.getDestinationLinkId() == this.queueLink.getLink().getId()) && (driver.chooseNextLink() == null)) {
+				if ((driver.getDestinationLinkId() == this.queueLink.getLink().getId()) && (driver.chooseNextLinkId() == null)) {
 					driver.legEnds(now);
 					this.queueLink.processVehicleArrival(now, veh);
 					// remove _after_ processing the arrival to keep link active
@@ -449,10 +449,10 @@ public class QueueLane {
 		boolean moveOn = true;
 		while (moveOn && !this.bufferIsEmpty() && (this.toLanes != null)) {
 			QueueVehicle veh = this.buffer.peek();
-			Link nextLink = veh.getDriver().chooseNextLink();
+			Id nextLinkId = veh.getDriver().chooseNextLinkId();
 			QueueLane toQueueLane = null;
 			for (QueueLane l : this.toLanes) {
-				if (l.getDestinationLinks().contains(nextLink)) {
+				if (l.getDestinationLinkIds().contains(nextLinkId)) {
 					toQueueLane = l;
 				}
 			}
@@ -476,7 +476,7 @@ public class QueueLane {
 				b.append(" on Link Id ");
 				b.append(this.queueLink.getLink().getId());
 				b.append(" and wants to go on to Link Id ");
-				b.append(nextLink.getId());
+				b.append(nextLinkId);
 				b.append(" but there is no Lane leading to that Link!");
 				log.error(b.toString());
 				throw new IllegalStateException(b.toString());
@@ -987,12 +987,12 @@ public class QueueLane {
 		this.toLanes.add(lane);
 	}
 
-	protected void addDestinationLink(final Link l) {
-		this.destinationLinks.add(l);
+	protected void addDestinationLink(final Id linkId) {
+		this.destinationLinkIds.add(linkId);
 	}
 
-	public Set<Link> getDestinationLinks(){
-		return this.destinationLinks;
+	public Set<Id> getDestinationLinkIds(){
+		return this.destinationLinkIds;
 	}
 
 	public int getVisualizerLane() {

@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
@@ -95,20 +96,21 @@ public class QueueNode {
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
 	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
-		Link nextLink = veh.getDriver().chooseNextLink();
+		Id nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = currentLane.getQueueLink().getLink();
 
 		// veh has to move over node
-		if (nextLink != null) {
+		if (nextLinkId != null) {
+			Link nextLink = this.queueNetwork.getNetworkLayer().getLinks().get(nextLinkId);
 
 			if (currentLink.getToNode() != nextLink.getFromNode()) {
 				throw new RuntimeException("Cannot move vehicle " + veh.getId() +
-						" from link " + currentLink.getId() + " to link " + nextLink.getId());
+						" from link " + currentLink.getId() + " to link " + nextLinkId);
 			}
-			if ((!currentLane.isOriginalLane()) && (!currentLane.getDestinationLinks().contains(nextLink))) {
+			if ((!currentLane.isOriginalLane()) && (!currentLane.getDestinationLinkIds().contains(nextLinkId))) {
 				StringBuilder b = new StringBuilder();
 				b.append("Link Id ");
-				b.append(nextLink.getId());
+				b.append(nextLinkId);
 				b.append(" is not accessible from lane id ");
 				b.append(currentLane.getLaneId());
 				b.append(" on Link Id " );
@@ -118,7 +120,7 @@ public class QueueNode {
 				throw new IllegalStateException(b.toString());
 			}
 			
-			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLink.getId());
+			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
 
 			if (nextQueueLink.hasSpace()) {
 				currentLane.popFirstFromBuffer();

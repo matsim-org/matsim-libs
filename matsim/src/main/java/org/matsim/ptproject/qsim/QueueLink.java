@@ -234,8 +234,8 @@ public class QueueLink {
 				log.error(message);
 				throw new IllegalStateException(message);
 			}
-			lane.addDestinationLink(link.getLink());
-			this.originalLane.addDestinationLink(link.getLink());
+			lane.addDestinationLink(link.getLink().getId());
+			this.originalLane.addDestinationLink(link.getLink().getId());
 		}
 	}
 	
@@ -244,7 +244,7 @@ public class QueueLink {
 		for (QueueLane lane : this.queueLanes) {
 			int laneNumber = 1;
 			for (Link l : result.values()) {
-				if (lane.getDestinationLinks().contains(l)){
+				if (lane.getDestinationLinkIds().contains(l.getId())){
 					lane.setVisualizerLane(laneNumber);
 					break;
 				}
@@ -258,8 +258,8 @@ public class QueueLink {
 			if ((outLink.getToNode().equals(this.getLink().getFromNode()))) {
 				for (QueueLane l : this.toNodeQueueLanes) {
 					if ((l.getVisualizerLane() == 1) && (l.getMeterFromLinkEnd() == 0)){
-						l.addDestinationLink(outLink);
-						this.originalLane.addDestinationLink(outLink);
+						l.addDestinationLink(outLink.getId());
+						this.originalLane.addDestinationLink(outLink.getId());
 					}
 				}
 			}

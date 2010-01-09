@@ -46,7 +46,7 @@ public class PersonAgent implements DriverAgent {
 
 	private final Person person;
 	private QueueVehicle vehicle;
-	protected Link cachedNextLink = null;
+	protected Id cachedNextLinkId = null;
 
 	private final QueueSimulation simulation;
 
@@ -161,7 +161,7 @@ public class PersonAgent implements DriverAgent {
 		this.currentLeg = leg;
 		this.cacheRouteNodes = null;
 		this.currentNodeIndex = 1;
-		this.cachedNextLink = null;
+		this.cachedNextLinkId = null;
 		this.nextActivity += 2;
 
 		this.simulation.agentDeparts(now, this, this.currentLinkId);
@@ -266,9 +266,9 @@ public class PersonAgent implements DriverAgent {
 	}
 
 	public void moveOverNode() {
-		this.currentLinkId = this.cachedNextLink.getId();
+		this.currentLinkId = this.cachedNextLinkId;
 		this.currentNodeIndex++;
-		this.cachedNextLink = null; //reset cached nextLink
+		this.cachedNextLinkId = null; //reset cached nextLink
 	}
 
 	/**
@@ -276,9 +276,9 @@ public class PersonAgent implements DriverAgent {
 	 *
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
-	public Link chooseNextLink() {
-		if (this.cachedNextLink != null) {
-			return this.cachedNextLink;
+	public Id chooseNextLinkId() {
+		if (this.cachedNextLinkId != null) {
+			return this.cachedNextLinkId;
 		}
 		if (this.cacheRouteNodes == null) {
 			this.cacheRouteNodes = ((NetworkRouteWRefs) this.currentLeg.getRoute()).getNodes();
@@ -289,8 +289,8 @@ public class PersonAgent implements DriverAgent {
 			Link currentLink = this.simulation.networkLayer.getLinks().get(this.currentLinkId);
 			Link destinationLink = this.simulation.networkLayer.getLinks().get(this.destinationLinkId);
 			if (currentLink.getToNode().equals(destinationLink.getFromNode())) {
-				this.cachedNextLink = destinationLink;
-				return this.cachedNextLink;
+				this.cachedNextLinkId = destinationLink.getId();
+				return this.cachedNextLinkId;
 			}
 			if (this.currentLinkId != this.destinationLinkId) {
 				// there must be something wrong. Maybe the route is too short, or something else, we don't know...
@@ -305,8 +305,8 @@ public class PersonAgent implements DriverAgent {
 		Link currentLink = this.simulation.networkLayer.getLinks().get(this.currentLinkId);
 		for (Link link :  currentLink.getToNode().getOutLinks().values()) {
 			if (link.getToNode() == destNode) {
-				this.cachedNextLink = link; //save time in later calls, if link is congested
-				return this.cachedNextLink;
+				this.cachedNextLinkId = link.getId(); //save time in later calls, if link is congested
+				return this.cachedNextLinkId;
 			}
 		}
 		log.warn(this + " [no link to next routenode found: routeindex= " + this.currentNodeIndex + " ]");
