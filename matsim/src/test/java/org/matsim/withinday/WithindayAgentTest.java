@@ -31,9 +31,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueSimulation;
-import org.matsim.ptproject.qsim.QueueVehicleImpl;
-import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -41,6 +38,9 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QueueVehicleImpl;
+import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
@@ -178,7 +178,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		pa.activityEnds(7.0*3600);
 		LinkImpl link2 = this.network.getLink("2");
 		v.setCurrentLink(link2);
-		pa.teleportToLink(link2);
+		pa.teleportToLink(link2.getId());
 
 	  return pa;
 	}

@@ -23,7 +23,7 @@ package org.matsim.withinday.coopers.routeprovider;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -54,15 +54,10 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 		this.signs = signs;
 	}
 
-	/**
-	 *
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.core.network.LinkImpl,
-	 *      org.matsim.core.population.routes.NetworkRouteWRefs)
-	 */
-	public boolean providesRoute(final Link currentLink, final NetworkRouteWRefs subRoute) {
+	public boolean providesRoute(final Id currentLinkId, final NetworkRouteWRefs subRoute) {
 		for (VDSSign s : this.signs) {
-			log.trace("signLink: " + s.getSignLink().getId() + " currentLInk: " + currentLink.getId());
-			if (s.getSignLink().equals(currentLink) && containsLink(subRoute, s.getDirectionLinks())) {
+			log.trace("signLink: " + s.getSignLink().getId() + " currentLInk: " + currentLinkId);
+			if (s.getSignLink().getId().equals(currentLinkId) && containsLink(subRoute, s.getDirectionLinks())) {
 				this.currentRoute = s.requestRoute();
 				if (this.currentRoute == null) {
 					log.trace("Sign is currently switched off!");
@@ -78,8 +73,8 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 
 	private boolean containsLink(final NetworkRouteWRefs subRoute, final Link directionLink) {
 		// this should be the natural way of testing if a route contains a link
-		for (Link l : subRoute.getLinks()) {
-			if (l.equals(directionLink)) {
+		for (Id linkId : subRoute.getLinkIds()) {
+			if (linkId.equals(directionLink.getId())) {
 				return true;
 			}
 		}
@@ -88,12 +83,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 		// we have to check if the last node of the subRoute has an outgoing link
 		// which is equal to the direction link
 		List<Node> route = subRoute.getNodes();
-		for (Link link : route.get(route.size() - 1).getOutLinks().values()) {
-			if (link.equals(directionLink)) {
-				return true;
-			}
-		}
-		return false;
+		return route.get(route.size() - 1) == directionLink.getFromNode();
 	}
 
 	@Override
@@ -118,19 +108,23 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 			this.route = route;
 		}
 
+		@Override
 		public int getPriority() {
 			return 10;
 		}
 
-		public boolean providesRoute(final Link currentLink, final NetworkRouteWRefs subRoute) {
+		@Override
+		public boolean providesRoute(final Id currentLinkId, final NetworkRouteWRefs subRoute) {
 			return true;
 		}
 
+		@Override
 		public NetworkRouteWRefs requestRoute(final Link departureLink,
 				final Link destinationLink, final double time) {
 			return this.route;
 		}
 
+		@Override
 		public void setPriority(final int p) {
 		}
 	}

@@ -92,7 +92,7 @@ public class OTFVisQueueSimFeature implements QueueSimulationFeature {
 	
 	public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
 		if (this.doVisualizeTeleportedAgents) {
-			this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link));
+			this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId())));
 		}
 	}
 

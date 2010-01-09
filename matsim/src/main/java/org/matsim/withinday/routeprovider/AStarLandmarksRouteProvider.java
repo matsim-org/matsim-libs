@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.routeprovider;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -68,7 +69,7 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 		return route;
 	}
 
-	public boolean providesRoute(final Link currentLink, final NetworkRouteWRefs subRoute) {
+	public boolean providesRoute(final Id currentLinkId, final NetworkRouteWRefs subRoute) {
 		return true;
 	}
 }

@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkLayer;
@@ -190,11 +189,12 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 		this.teleportationWriter.setTime(time);
 	}
 
+	@Override
 	public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
 		if (this.otfServer != null) {
-			TeleportationVisData telData = new TeleportationVisData(now, agent, link);
+			TeleportationVisData telData = new TeleportationVisData(now, agent, link, this.queueSimulation.getNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId()));
 			if (telData.getLength() != 0.0){
-				this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link));
+				this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId())));
 			}
 			else {
 				log.warn("Not able to visualize teleport agent " + agent.getPerson().getId() + " because the teleportation coordinates are equal!");
@@ -202,11 +202,13 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 		}
 	}
 
+	@Override
 	public void afterPrepareSim() {
 	
 	}
 
-	public void handleDeparture(double now, DriverAgent agent, Link link, Leg leg) {
+	@Override
+	public void handleDeparture(double now, DriverAgent agent, Id linkId, Leg leg) {
 		if (leg.getMode() == TransportMode.pt) {
 			handlePTDeparture(agent, leg);
 		} 

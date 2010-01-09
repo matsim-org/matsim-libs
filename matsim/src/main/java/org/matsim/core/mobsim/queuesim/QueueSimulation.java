@@ -241,7 +241,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 			agent.setVehicle(veh);
 
 			if (agent.initialize()) {
-				QueueLink qlink = this.network.getQueueLink(agent.getCurrentLink().getId());
+				QueueLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
 				qlink.addParkedVehicle(veh);
 			}
 		}
@@ -376,12 +376,12 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
 			DriverAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLink().getId(), agent.getCurrentLeg().getMode()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLink().getId(), agent.getCurrentLeg().getMode()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.activityEndsList.clear();
 
@@ -479,8 +479,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
 				DriverAgent driver = entry.getSecond();
-				Link destinationLink = driver.getDestinationLink();
-				driver.teleportToLink(destinationLink);
+				driver.teleportToLink(driver.getDestinationLinkId());
 				driver.legEnds(now);
 //				this.handleAgentArrival(now, driver);
 //				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
@@ -497,7 +496,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 */
 	protected void handleAgentArrival(final double now, DriverAgent agent){
 		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
-				agent.getDestinationLink().getId(), agent.getCurrentLeg().getMode()));
+				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 	}
 
 	private void handleNetworkChangeEvents(final double time) {
@@ -541,19 +540,19 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	protected void agentDeparts(double now, final DriverAgent agent, final Link link) {
+	protected void agentDeparts(double now, final DriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
-		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), link.getId(), leg.getMode()));
+		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, leg.getMode()));
 		if (this.notTeleportedModes.contains(mode)){
-			this.handleKnownLegModeDeparture(now, agent, link, mode);
+			this.handleKnownLegModeDeparture(now, agent, linkId, mode);
 		}
 		else {
 			this.handleUnknownLegMode(now, agent);
 		}
 	}
 
-	protected void handleKnownLegModeDeparture(double now, DriverAgent agent, Link link, TransportMode mode) {
+	protected void handleKnownLegModeDeparture(double now, DriverAgent agent, Id linkId, TransportMode mode) {
 		Leg leg = agent.getCurrentLeg();
 		if (mode.equals(TransportMode.car)) {
 			NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
@@ -561,7 +560,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 			if (vehicleId == null) {
 				vehicleId = agent.getPerson().getId(); // backwards-compatibility
 			}
-			QueueLink qlink = this.network.getQueueLink(link.getId());
+			QueueLink qlink = this.network.getQueueLink(linkId);
 			QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
 				// try to fix it somehow
@@ -571,7 +570,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 						if (vehicle.getCurrentLink() != null) {
 							if (this.cntTeleportVehicle < 9) {
 								this.cntTeleportVehicle++;
-								log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + link.getId());
+								log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
 								if (this.cntTeleportVehicle == 9) {
 									log.info("No more occurrences of teleported vehicles will be reported.");
 								}
@@ -583,10 +582,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 				}
 			}
 			if (vehicle == null) {
-				throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + link.getId());
+				throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + linkId);
 			}
 			vehicle.setDriver(agent);
-			if ((route.getEndLink() == link) && (agent.chooseNextLink() == null)) {
+			if ((route.getEndLinkId() == linkId) && (agent.chooseNextLink() == null)) {
 				agent.legEnds(now);
 				qlink.processVehicleArrival(now, vehicle);
 			} else {

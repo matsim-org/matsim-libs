@@ -24,15 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.AgentReplanEventImpl;
-import org.matsim.ptproject.qsim.PersonAgent;
-import org.matsim.ptproject.qsim.QueueSimulation;
-import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -43,6 +42,9 @@ import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.ptproject.qsim.PersonAgent;
+import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.withinday.beliefs.AgentBeliefs;
 import org.matsim.withinday.contentment.AgentContentment;
 import org.matsim.withinday.percepts.AgentPercepts;
@@ -76,9 +78,12 @@ public class WithindayAgent extends PersonAgent {
 	private double replanningThreshold;
 
 	private final List<AgentPercepts> percepts;
+	
+	private final Network network;
 
 	public WithindayAgent(final Person person, final QueueSimulation simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
 		super(person, simulation);
+		this.network = simulation.getNetwork().getNetworkLayer();
 //		this.person = person;
 //		this.vehicle = v;
 //		this.setVehicle(v);
@@ -100,7 +105,7 @@ public class WithindayAgent extends PersonAgent {
 
 	private void revisePercepts() {
 		for (AgentPercepts p : this.percepts) {
-			p.updatedPercepts(this.getCurrentLink().getToNode());
+			p.updatedPercepts(this.network.getLinks().get(this.getCurrentLinkId()).getToNode());
 		}
 	}
 
@@ -115,14 +120,14 @@ public class WithindayAgent extends PersonAgent {
 			this.revisePercepts();
 			double replanningNeed = this.getReplanningNeed();
 			if (replanningNeed >= this.replanningThreshold) {
-				Link currentLink = this.getCurrentLink();
-				Node currentToNode = currentLink.getToNode();
-				Node currentDestinationNode = this.getDestinationLink().getFromNode();
+				Id currentLinkId = this.getCurrentLinkId();
+				Node currentToNode = this.network.getLinks().get(currentLinkId).getToNode();
+				Node currentDestinationNode = this.network.getLinks().get(this.getDestinationLinkId()).getFromNode();
 				//as replanning is rerouting agents will only replan if they are on the road and not on the link of the next activity
 				if (isEnRoute()) {
 					//only reroute if the RouteProvider provides a route
 					NetworkRouteWRefs subRoute = ((NetworkRouteWRefs) this.getCurrentLeg().getRoute()).getSubRoute(currentToNode, currentDestinationNode);
-					if (this.desireGenerationFunction.providesRoute(currentLink, subRoute)) {
+					if (this.desireGenerationFunction.providesRoute(currentLinkId, subRoute)) {
 						this.reroute();
 					}
 					else if (log.isTraceEnabled()) {
@@ -141,12 +146,12 @@ public class WithindayAgent extends PersonAgent {
 			log.trace("");
 			log.trace("Starting agent's rerouting...");
 			log.trace("agent nr.: " + this.getPerson().getId());
-			log.trace("agentposition link: " + this.getCurrentLink());
+			log.trace("agentposition link: " + this.getCurrentLinkId());
 			int hours = (int)SimulationTimer.getTime() / 3600;
 			int min = (int) ((SimulationTimer.getTime() - (hours * 60)) / 60);
 			log.trace("time: " + hours + ":" + min);
 		}
-		Link currentLink = this.getCurrentLink();
+		Link currentLink = this.network.getLinks().get(this.getCurrentLinkId());
 		ActivityImpl nextAct = ((PlanImpl) this.getPerson().getSelectedPlan()).getNextActivity(this.getCurrentLeg());
 		Link destinationLink = nextAct.getLink();
 		NetworkRouteWRefs alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
@@ -254,7 +259,7 @@ public class WithindayAgent extends PersonAgent {
 
 	@Override
 	public Link chooseNextLink() {
-		if (this.getCurrentLink() != this.getDestinationLink()) {
+		if (this.getCurrentLinkId() != this.getDestinationLinkId()) {
 			this.replan();
 		}
 //		this.cachedNextLink = null;

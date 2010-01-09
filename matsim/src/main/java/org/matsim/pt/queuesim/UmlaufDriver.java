@@ -2,8 +2,8 @@ package org.matsim.pt.queuesim;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.population.LegImpl;
@@ -82,8 +82,9 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		return this.currentLeg;
 	}
 
-	public Link getDestinationLink() {
-		return this.currentLeg.getRoute().getEndLink();
+	@Override
+	public Id getDestinationLinkId() {
+		return this.currentLeg.getRoute().getEndLinkId();
 	}
 
 	public void legEnds(final double now) {

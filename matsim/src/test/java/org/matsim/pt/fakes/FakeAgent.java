@@ -20,8 +20,8 @@
 
 package org.matsim.pt.fakes;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
@@ -61,42 +61,53 @@ public class FakeAgent implements DriverAgent, PassengerAgent {
 		}
 	}
 
+	@Override
 	public void activityEnds(final double now) {
 	}
 
+	@Override
 	public LinkImpl chooseNextLink() {
 		return null;
 	}
 
+	@Override
 	public LegImpl getCurrentLeg() {
 		return this.dummyLeg;
 	}
 
+	@Override
 	public double getDepartureTime() {
 		return 0;
 	}
 
-	public LinkImpl getDestinationLink() {
+	@Override
+	public Id getDestinationLinkId() {
 		return null;
 	}
 
+	@Override
 	public PersonImpl getPerson() {
 		return this.dummyPerson;
 	}
 
+	@Override
 	public void legEnds(final double now) {
 	}
 
+	@Override
 	public void moveOverNode() {
 	}
 
-	public void teleportToLink(final Link link) {
+	@Override
+	public void teleportToLink(final Id linkId) {
 	}
 
+	@Override
 	public boolean getExitAtStop(final TransitStopFacility stop) {
 		return stop == this.exitStop;
 	}
 
+	@Override
 	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute route) {
 		return true;
 	}

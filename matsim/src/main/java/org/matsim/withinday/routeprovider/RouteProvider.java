@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.routeprovider;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
@@ -58,7 +59,7 @@ public interface RouteProvider {
 	 */
 	public void setPriority(int p);
 
-	public boolean providesRoute(Link currentLink, NetworkRouteWRefs subRoute);
+	public boolean providesRoute(Id currentLinkId, NetworkRouteWRefs subRoute);
 
 
 }

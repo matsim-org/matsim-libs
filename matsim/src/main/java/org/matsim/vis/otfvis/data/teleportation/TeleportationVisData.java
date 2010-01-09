@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.data.teleportation;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.ptproject.qsim.DriverAgent;
@@ -31,7 +30,7 @@ import org.matsim.ptproject.qsim.DriverAgent;
  */
 public class TeleportationVisData {
 	
-	private static final Logger log = Logger.getLogger(TeleportationVisData.class);
+//	private static final Logger log = Logger.getLogger(TeleportationVisData.class);
 	
 	private double stepsize;
 	private double startX;
@@ -45,14 +44,14 @@ public class TeleportationVisData {
 
 	private double length;
 	
-	public TeleportationVisData(double now, DriverAgent agent, Link link) {
+	public TeleportationVisData(double now, DriverAgent agent, Link fromLink, Link toLink) {
 		this.starttime = now;
 		this.id = agent.getPerson().getId();
-		this.startX = link.getToNode().getCoord().getX();
-		this.startY = link.getToNode().getCoord().getY();
+		this.startX = fromLink.getToNode().getCoord().getX();
+		this.startY = fromLink.getToNode().getCoord().getY();
 		double traveltime = agent.getCurrentLeg().getTravelTime();
-		double endX = agent.getDestinationLink().getToNode().getCoord().getX();
-		double endY = agent.getDestinationLink().getToNode().getCoord().getY();
+		double endX = toLink.getToNode().getCoord().getX();
+		double endY = toLink.getToNode().getCoord().getY();
 		double dX = endX - startX;
 		double dY = endY - startY;
 		length = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));

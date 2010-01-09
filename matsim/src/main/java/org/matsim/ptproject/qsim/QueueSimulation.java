@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -230,7 +231,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.IOSimulation, Obs
 			agent.setVehicle(veh);
 
 			if (agent.initialize()) {
-				QueueLink qlink = this.network.getQueueLink(agent.getCurrentLink().getId());
+				QueueLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
 				qlink.addParkedVehicle(veh);
 			}
 		}
@@ -391,12 +392,12 @@ public class QueueSimulation implements org.matsim.core.mobsim.IOSimulation, Obs
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
 			DriverAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLink().getId(), agent.getCurrentLeg().getMode()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLink().getId(), agent.getCurrentLeg().getMode()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.activityEndsList.clear();
 
@@ -486,9 +487,9 @@ public class QueueSimulation implements org.matsim.core.mobsim.IOSimulation, Obs
 		QueueSimulation.events = events;
 	}
 
-	protected void handleUnknownLegMode(double now, final DriverAgent agent, Link link) {
+	protected void handleUnknownLegMode(double now, final DriverAgent agent, Id linkId) {
 		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
-			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, link);
+			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.networkLayer.getLinks().get(linkId));
 		}
 		double arrivalTime = SimulationTimer.getTime() + agent.getCurrentLeg().getTravelTime();
 		this.teleportationList.add(new Tuple<Double, DriverAgent>(arrivalTime, agent));
@@ -500,8 +501,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.IOSimulation, Obs
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
 				DriverAgent driver = entry.getSecond();
-				Link destinationLink = driver.getDestinationLink();
-				driver.teleportToLink(destinationLink);
+				driver.teleportToLink(driver.getDestinationLinkId());
 				driver.legEnds(now);
 //				this.handleAgentArrival(now, driver);
 //				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
@@ -521,7 +521,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.IOSimulation, Obs
 			queueSimulationFeature.beforeHandleAgentArrival(agent);
 		}
 		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
-				agent.getDestinationLink().getId(), agent.getCurrentLeg().getMode()));
+				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 	}
 
 	private void handleNetworkChangeEvents(final double time) {
@@ -565,25 +565,25 @@ public class QueueSimulation implements org.matsim.core.mobsim.IOSimulation, Obs
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	public void agentDeparts(double now, final DriverAgent agent, final Link link) {
+	public void agentDeparts(double now, final DriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
 		EventsManager e = events;
-		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), link.getId(), mode));
+		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, mode));
 		if (this.notTeleportedModes.contains(mode)){
-			this.handleKnownLegModeDeparture(now, agent, link, leg);
+			this.handleKnownLegModeDeparture(now, agent, linkId, leg);
 		} else {
-			visAndHandleUnknownLegMode(now, agent, link);
+			visAndHandleUnknownLegMode(now, agent, linkId);
 		}
 	}
 
-	protected void visAndHandleUnknownLegMode(double now, DriverAgent agent, Link link) {
-		this.handleUnknownLegMode(now, agent, link);
+	protected void visAndHandleUnknownLegMode(double now, DriverAgent agent, Id linkId) {
+		this.handleUnknownLegMode(now, agent, linkId);
 	}
 
-	private void handleKnownLegModeDeparture(double now, DriverAgent agent, Link link, Leg leg) {
+	private void handleKnownLegModeDeparture(double now, DriverAgent agent, Id linkId, Leg leg) {
 		for (DepartureHandler departureHandler : departureHandlers) {
-			departureHandler.handleDeparture(now, agent, link, leg);
+			departureHandler.handleDeparture(now, agent, linkId, leg);
 		}
 	}
 

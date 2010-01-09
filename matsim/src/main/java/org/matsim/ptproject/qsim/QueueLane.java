@@ -380,7 +380,7 @@ public class QueueLane {
 			
 			if (!handled) {
 				// Check if veh has reached destination:
-				if ((driver.getDestinationLink() == this.queueLink.getLink()) && (driver.chooseNextLink() == null)) {
+				if ((driver.getDestinationLinkId() == this.queueLink.getLink().getId()) && (driver.chooseNextLink() == null)) {
 					driver.legEnds(now);
 					this.queueLink.processVehicleArrival(now, veh);
 					// remove _after_ processing the arrival to keep link active

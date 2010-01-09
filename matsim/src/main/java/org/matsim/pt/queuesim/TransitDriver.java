@@ -20,8 +20,8 @@
 
 package org.matsim.pt.queuesim;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -83,12 +83,14 @@ public class TransitDriver extends AbstractTransitDriver {
 		return departureTime;
 	}
 	
+	@Override
 	public LegImpl getCurrentLeg() {
 		return this.currentLeg;
 	}
 
-	public Link getDestinationLink() {
-		return this.currentLeg.getRoute().getEndLink();
+	@Override
+	public Id getDestinationLinkId() {
+		return this.currentLeg.getRoute().getEndLinkId();
 	}
 
 }

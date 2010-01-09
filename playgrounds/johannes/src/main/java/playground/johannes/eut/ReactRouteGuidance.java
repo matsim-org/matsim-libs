@@ -23,6 +23,7 @@
  */
 package playground.johannes.eut;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -50,17 +51,17 @@ public class ReactRouteGuidance implements RouteProvider {
 		this.algorithm = new Dijkstra(network, this.linkcost, this.linkcost);
 	}
 
+	@Override
 	public int getPriority() {
 		return 10;
 	}
 
-	public boolean providesRoute(Link currentLink, NetworkRouteWRefs subRoute) {
-		if(currentLink.getId().toString().equals("1"))
-			return true;
-		else
-			return false;
+	@Override
+	public boolean providesRoute(Id currentLinkId, NetworkRouteWRefs subRoute) {
+		return (currentLinkId.toString().equals("1"));
 	}
 
+	@Override
 	public synchronized NetworkRouteWRefs requestRoute(Link departureLink, Link destinationLink,
 			double time) {
 		if(linkcost.traveltimes instanceof EventBasedTTProvider) {

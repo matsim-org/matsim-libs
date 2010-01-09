@@ -107,7 +107,7 @@ public class TransitDriverTest extends TestCase {
 			assertEquals(expectedLinkIds.get(i), actualLinkIds.get(i));
 		}
 
-		assertEquals(link5, driver.getDestinationLink());
+		assertEquals(link5.getId(), driver.getDestinationLinkId());
 		assertEquals(link2, driver.chooseNextLink());
 		driver.moveOverNode();
 		assertEquals(link3, driver.chooseNextLink());

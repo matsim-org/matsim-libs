@@ -3,7 +3,6 @@ package org.matsim.ptproject.qsim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
@@ -21,10 +20,11 @@ public class CarDepartureHandler implements DepartureHandler {
 		this.queueSimulation = queueSimulation;
 	}
 
-	public void handleDeparture(double now, DriverAgent agent, Link link,
+	@Override
+	public void handleDeparture(double now, DriverAgent agent, Id linkId,
 			Leg leg) {
 		if (leg.getMode().equals(TransportMode.car)) {
-			handleCarDeparture(now, agent, link.getId(), leg);
+			handleCarDeparture(now, agent, linkId, leg);
 		}
 	}
 

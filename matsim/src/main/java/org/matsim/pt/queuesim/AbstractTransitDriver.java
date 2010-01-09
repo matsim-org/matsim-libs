@@ -14,7 +14,6 @@ import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.DriverAgent;
@@ -97,10 +96,11 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	}
 
 	public void activityEnds(final double now) {
-		this.sim.agentDeparts(now, this, ((LegImpl) this.getCurrentLeg()).getRoute().getStartLink());
+		this.sim.agentDeparts(now, this, this.getCurrentLeg().getRoute().getStartLinkId());
 	}
 	
-	public void teleportToLink(final Link link) {
+	@Override
+	public void teleportToLink(final Id linkId) {
 	}
 	
 	QueueSimulation getSimulation(){
@@ -203,7 +203,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 			this.vehicle.removePassenger(passenger);
 			DriverAgent agent = (DriverAgent) passenger;
 			events.processEvent(new PersonLeavesVehicleEventImpl(now, agent.getPerson().getId(), this.vehicle.getBasicVehicle().getId(), this.getTransitRoute().getId()));
-			agent.teleportToLink(stop.getLink());
+			agent.teleportToLink(stop.getLinkId());
 //			events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
 //					stop.getLink(), agent.getCurrentLeg()));
 			agent.legEnds(now);
