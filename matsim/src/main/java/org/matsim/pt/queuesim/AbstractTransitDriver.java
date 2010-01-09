@@ -265,91 +265,113 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 			this.delegate = route;
 		}
 
+		@Override
 		public List<Id> getLinkIds() {
 			return this.delegate.getLinkIds();
 		}
 
 		@Deprecated
+		@Override
 		public List<Link> getLinks() {
 			return this.delegate.getLinks();
 		}
 
+		@Deprecated
+		@Override
 		public List<Node> getNodes() {
 			return this.delegate.getNodes();
 		}
 
 		@Deprecated
+		@Override
 		public Link getStartLink() {
 			return this.delegate.getStartLink();
 		}
 
+		@Override
 		public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 			return this.delegate.getSubRoute(fromNode, toNode);
 		}
 
+		@Override
 		public double getTravelCost() {
 			return this.delegate.getTravelCost();
 		}
 
+		@Override
 		public Id getVehicleId() {
 			return AbstractTransitDriver.this.vehicle.getBasicVehicle().getId();
 		}
 
+		@Override
 		public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
 		@Deprecated
+		@Override
 		public void setNodes(final List<Node> srcRoute) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
+		@Override
 		public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
+		@Override
 		public void setTravelCost(final double travelCost) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
+		@Override
 		public void setVehicleId(final Id vehicleId) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
 		@Deprecated
+		@Override
 		public Link getEndLink() {
 			return this.delegate.getEndLink();
 		}
 
+		@Override
 		public void setEndLink(final Link link) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
+		@Override
 		public void setStartLink(final Link link) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
+		@Override
 		public double getDistance() {
 			return this.delegate.getDistance();
 		}
 
+		@Override
 		public Id getEndLinkId() {
 			return this.delegate.getEndLinkId();
 		}
 
+		@Override
 		public Id getStartLinkId() {
 			return this.delegate.getStartLinkId();
 		}
 
 		@Deprecated
+		@Override
 		public double getTravelTime() {
 			return this.delegate.getTravelTime();
 		}
 
+		@Override
 		public void setDistance(final double distance) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
+		@Override
 		public void setTravelTime(final double travelTime) {
 			throw new UnsupportedOperationException("read only route.");
 		}
