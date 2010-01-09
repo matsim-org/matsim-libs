@@ -67,17 +67,6 @@
             <include>org/matsim/**/*.java</include>
             <include>tutorial/**/*.java</include>
           </includes>
-<!--          <excludes>-->
-<!--            <exclude></exclude>-->
-<!--          </excludes>-->
-          <!-- Uncommenting the following lines can be used to in- or exclude
-          TEST sources from compilation -->
-<!--          <testExcludes>-->
-<!--            <exclude>org/matsim/testcases/TestDepth.java</exclude>-->
-<!--          </testExcludes>-->
-<!--          <testIncludes>-->
-<!--            <include>org/matsim/testcases/TestDepth</include>-->
-<!--          </testIncludes>-->
         </configuration>
       </plugin>
       <plugin>
@@ -88,13 +77,11 @@
           <excludes>
             <exclude>**/*$*</exclude> <!-- exclude all inner classes -->
             <exclude>org/matsim/testcases/TestDepth.java</exclude>
-            <exclude>org/matsim/**/*AllTests*.java</exclude>
-            <exclude>org/matsim/SimpleTests.java</exclude>
             <exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
           </excludes>
           <forkMode>once</forkMode>
           <!-- avoid out of memory errors: -->
-          <argLine>-Xmx600m</argLine>
+          <argLine>-Xmx600m -Djava.endorsed.dirs="${basedir}/libs/endorsed" -Djava.awt.headless=true</argLine>
           <enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't work otherwise... -->
         </configuration>
       </plugin>
@@ -154,132 +141,75 @@
   </repositories>
   
   <profiles>
-    <profile>
-      <id>jdk16profile</id>
-      <activation>
-        <jdk>1.6</jdk>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-              <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-          <showWarnings>false</showWarnings>
-          <showDeprecation>false</showDeprecation>
-          <!-- configure initial and maximal memory for compiling -->
-          <fork>true</fork>
-          <meminitial>128m</meminitial>
-          <maxmem>512m</maxmem>
-          <compilerArguments>
-            <Xmaxwarns>4000</Xmaxwarns>
-            <Xmaxerrs>100</Xmaxerrs>
-          </compilerArguments>
-          <!--<compilerArgument>-Djava.endorsed.dirs=${basedir}/libs/endorsed -Djava.awt.headless=true</compilerArgument>-->
-          <!-- Uncommenting the following lines can be used to in- or exclude
-          sources from compilation -->
-          <includes>
-            <include>org/matsim/**/*.java</include>
-            <include>tutorial/**/*.java</include>
-             <include>playground/**/*.java</include>
-<!--             <include>de/schlichtherle/**/*.java</include>-->
-          </includes>    
-        </configuration>
-            </configuration>
-          </plugin>
-          <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-           <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.4</version>
-              <configuration>
-                <excludes>
-                  <exclude>**/*$*</exclude> <!-- exclude all inner classes -->
-                  <exclude>org/matsim/testcases/TestDepth.java</exclude>
-                  <exclude>org/matsim/**/*AllTests*.java</exclude>
-                  <exclude>org/matsim/**/*SimpleTests.java</exclude>
-                  <exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
-          </excludes>
-          <forkMode>once</forkMode>
-          <!-- avoid out of memory errors: -->
-          <argLine>-Xmx600m -Djava.endorsed.dirs="${basedir}/libs/endorsed" -Djava.awt.headless=true</argLine>
-          <enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't work otherwise... -->
-        </configuration>
-          </plugin>
-        </plugins>      
-      </build>
-    </profile>
-
-	<profile>
-		<!-- special settings for some plugins only used on the hudson build server -->
-		<!-- must be manually activated with "mvn -Phudson ..." and the corresponding goals -->
-		<id>hudson</id>
-		<build>
-			<pluginManagement>
+		<profile>
+			<!-- special settings for some plugins only used on the hudson build server -->
+			<!-- must be manually activated with "mvn -Phudson ..." and the corresponding goals -->
+			<id>hudson</id>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>cobertura-maven-plugin</artifactId>
+							<version>2.3</version>
+							<configuration>
+								<formats>
+									<format>xml</format>
+								</formats>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+			<reporting>
 				<plugins>
 					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>cobertura-maven-plugin</artifactId>
-						<version>2.3</version>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-pmd-plugin</artifactId>
+						<version>2.4</version>
 						<configuration>
-							<formats>
-								<format>xml</format>
-							</formats>
+							<targetJdk>1.6</targetJdk>
 						</configuration>
 					</plugin>
-				</plugins>
-			</pluginManagement>
-		</build>
-		<reporting>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-pmd-plugin</artifactId>
-					<version>2.4</version>
-					<configuration>
-						<targetJdk>1.6</targetJdk>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>javancss-maven-plugin</artifactId>
-					<version>2.0</version>
-				</plugin>
-      	<plugin>
-        	<groupId>org.codehaus.mojo</groupId>
-        	<artifactId>findbugs-maven-plugin</artifactId>
-        	<configuration>
-          	<effort>Max</effort>
-          	<threshold>Low</threshold>
-        	</configuration>
-      	</plugin>
-    	</plugins>
-		</reporting>
-	</profile>
-	<profile>
-		<id>nightly</id>
-		<!-- special settings for building a jar as nightly-build -->
-		<!-- that can be used without maven -->
-		<build>
-			<pluginManagement>
-				<plugins>
 					<plugin>
-      	   	<artifactId>maven-jar-plugin</artifactId>
-        	 	<configuration>
-          		<archive>
-            		<manifest>
-              		<addClasspath>true</addClasspath>
-              		<classpathPrefix>libs/</classpathPrefix>
-	              	<mainClass>org.matsim.run.ReleaseInfo</mainClass>
-  	          	</manifest>
-    	      	</archive>
-      	  	</configuration>
-     			</plugin>
-				</plugins>
-			</pluginManagement>
-		</build>
-	</profile>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>javancss-maven-plugin</artifactId>
+						<version>2.0</version>
+					</plugin>
+	      	<plugin>
+	        	<groupId>org.codehaus.mojo</groupId>
+	        	<artifactId>findbugs-maven-plugin</artifactId>
+	        	<configuration>
+	          	<effort>Max</effort>
+	          	<threshold>Low</threshold>
+	        	</configuration>
+	      	</plugin>
+	    	</plugins>
+			</reporting>
+		</profile>
+		<profile>
+			<id>nightly</id>
+			<!-- special settings for building a jar as nightly-build -->
+			<!-- that can be used without maven -->
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+	      	   	<artifactId>maven-jar-plugin</artifactId>
+	        	 	<configuration>
+	          		<archive>
+	            		<manifest>
+	              		<addClasspath>true</addClasspath>
+	              		<classpathPrefix>libs/</classpathPrefix>
+		              	<mainClass>org.matsim.run.ReleaseInfo</mainClass>
+	  	          	</manifest>
+	    	      	</archive>
+	      	  	</configuration>
+	     			</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
 
   </profiles>
 
