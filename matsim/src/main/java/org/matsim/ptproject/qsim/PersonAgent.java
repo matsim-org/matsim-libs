@@ -54,12 +54,6 @@ public class PersonAgent implements DriverAgent {
 
 	private Id currentLinkId = null;
 
-	/**
-	 * specifies the position of the next activity in the acts legs list
-	 */
-	@Deprecated
-	private int nextActivity;
-
 	private int currentPlanElementIndex = 0;
 
 	private transient Id destinationLinkId;
@@ -119,18 +113,12 @@ public class PersonAgent implements DriverAgent {
 		return this.currentNodeIndex;
 	}
 
-	@Deprecated
-	public int getNextActivity() {
-		return this.nextActivity;
-	}
-
 	@Override
 	public Id getDestinationLinkId() {
 		return this.destinationLinkId;
 	}
 
 	public boolean initialize() {
-		this.nextActivity = 0;
 		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
 		ActivityImpl firstAct = (ActivityImpl) planElements.get(0);
@@ -162,7 +150,6 @@ public class PersonAgent implements DriverAgent {
 		this.cacheRouteNodes = null;
 		this.currentNodeIndex = 1;
 		this.cachedNextLinkId = null;
-		this.nextActivity += 2;
 
 		this.simulation.agentDeparts(now, this, this.currentLinkId);
 	}
