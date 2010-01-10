@@ -101,9 +101,6 @@ public abstract class AbstractLocation implements MappedLocation {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#addDownMapping(org.matsim.world.Location)
-	 */
 	@Deprecated
 	public final void addDownMapping(final MappedLocation other) {
 		if (this.layer.getDownRule() == null) {
@@ -140,9 +137,6 @@ public abstract class AbstractLocation implements MappedLocation {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#removeAllUpMappings()
-	 */
 	@Deprecated
 	public final boolean removeAllUpMappings() {
 		ArrayList<Id> other_ids = new ArrayList<Id>(this.up_mapping.keySet());
@@ -150,9 +144,6 @@ public abstract class AbstractLocation implements MappedLocation {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#removeAllDownMappings()
-	 */
 	@Deprecated
 	public final boolean removeAllDownMappings() {
 		ArrayList<Id> other_ids = new ArrayList<Id>(this.down_mapping.keySet());
@@ -165,9 +156,6 @@ public abstract class AbstractLocation implements MappedLocation {
 	//////////////////////////////////////////////////////////////////////
 
 	// TODO [balmermi] I do not like that (see above why)
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#setId(org.matsim.utils.identifiers.IdI)
-	 */
 	public final void setId(final Id id) {
 		this.id = id;
 	}
@@ -180,16 +168,10 @@ public abstract class AbstractLocation implements MappedLocation {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#getId()
-	 */
 	public final Id getId() {
 		return this.id;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#getLayer()
-	 */
 	public Layer getLayer() {
 		return this.layer;
 	}
@@ -197,35 +179,12 @@ public abstract class AbstractLocation implements MappedLocation {
 	public final Coord getCoord() {
 		return this.center;
 	}
-	
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#getUpLocation(org.matsim.utils.identifiers.IdI)
-	 */
-	@Deprecated
-	public final MappedLocation getUpLocation(final Id id) {
-		return this.up_mapping.get(id);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#downLocation(org.matsim.utils.identifiers.IdI)
-	 */
-	@Deprecated
-	public final MappedLocation downLocation(final Id id) {
-		return this.down_mapping.get(id);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#getUpMapping()
-	 */
 	@Deprecated
 	public final TreeMap<Id,MappedLocation> getUpMapping() {
 		return this.up_mapping;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#getDownMapping()
-	 */
 	@Deprecated
 	public final TreeMap<Id, MappedLocation> getDownMapping() {
 		return this.down_mapping;
@@ -235,9 +194,6 @@ public abstract class AbstractLocation implements MappedLocation {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#toString()
-	 */
 	@Override
 	public String toString() {
 		return "[id=" + this.getId() + "]" +

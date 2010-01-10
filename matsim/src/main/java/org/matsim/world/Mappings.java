@@ -55,17 +55,9 @@ public interface Mappings {
 	public abstract boolean removeAllDownMappings();
 
 	@Deprecated
-	public abstract MappedLocation getUpLocation(Id id);
-
-	@Deprecated
-	public abstract MappedLocation downLocation(Id id);
-
-	@Deprecated
 	public abstract TreeMap<Id, MappedLocation> getUpMapping();
 
 	@Deprecated
 	public abstract TreeMap<Id, MappedLocation> getDownMapping();
-
-
 
 }
