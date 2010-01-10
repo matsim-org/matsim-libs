@@ -310,10 +310,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		return true;
 	}
 
-	public void setQuad(String id, OTFQSimServerQuad quad) {
-		quads.put(id, new QuadStorage(id, quad, null, null));
-	}
-	
 	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) throws RemoteException {
 
 		if (quads.containsKey(id)) return quads.get(id).quad;
