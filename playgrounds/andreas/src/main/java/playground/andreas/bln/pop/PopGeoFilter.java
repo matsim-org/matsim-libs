@@ -135,12 +135,12 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 		new MatsimNetworkReader(wholeBigNet).readFile(wholeBigNetworkFile);
 
 		System.out.println("Reading routed population: " + wholeRoutedPlansFile);
-		PopulationImpl wholeRoutedPop = new PopulationImpl();
+		PopulationImpl wholeRoutedPop = new ScenarioImpl().getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigScenario, wholeRoutedPop));
 		popReader.readFile(wholeRoutedPlansFile);
 		
 		System.out.println("Reading unrouted population: " + unroutedWholePlansFile);
-		PopulationImpl unroutedWholePop = new PopulationImpl();
+		PopulationImpl unroutedWholePop = new ScenarioImpl().getPopulation();
 		PopulationReader origPopReader = new MatsimPopulationReader(new SharedNetScenario(bigScenario, unroutedWholePop));
 		origPopReader.readFile(unroutedWholePlansFile);
 

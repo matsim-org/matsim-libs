@@ -70,7 +70,9 @@ public class ScenarioImpl implements Scenario {
 	private Households households;
   private BasicVehicles vehicles;
   
-  private Knowledges knowledges; 
+  private Knowledges knowledges;
+  
+  private World world;
 	
 	public ScenarioImpl(){
 		this.config = new Config();
@@ -84,13 +86,14 @@ public class ScenarioImpl implements Scenario {
 		initContainers();
 	}
 	
-	private void initContainers(){
+	private void initContainers() {
+		this.world = new World();
 		this.network = new NetworkLayer();
-		this.getWorld().setNetworkLayer((NetworkLayer) this.network);
-		this.getWorld().complete();
+		this.world.setNetworkLayer((NetworkLayer) this.network);
+		this.world.complete();
 		this.population = new PopulationImpl(this);
 		this.facilities = new ActivityFacilitiesImpl();
-		this.getWorld().setFacilityLayer((ActivityFacilitiesImpl) this.facilities);
+		this.world.setFacilityLayer((ActivityFacilitiesImpl) this.facilities);
 	
 		if (this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();
@@ -146,7 +149,7 @@ public class ScenarioImpl implements Scenario {
 	
 	@Deprecated
 	public World getWorld(){
-		return Gbl.getWorld();
+		return this.world;
 	}
 	
 	public ActivityFacilitiesImpl getActivityFacilities() {

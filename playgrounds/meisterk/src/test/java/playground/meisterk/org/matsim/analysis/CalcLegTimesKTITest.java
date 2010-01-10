@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -66,7 +67,8 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 
 	public void testGenerateDistribution() {
 		
-		PopulationImpl pop = new PopulationImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
+		PopulationImpl pop = scenario.getPopulation();
 		PersonImpl testPerson = new PersonImpl(new IdImpl("1"));
 		pop.addPerson(testPerson);
 		Id personId = testPerson.getId();
@@ -83,7 +85,7 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(testee);
 
-		NetworkLayer testNetwork = new NetworkLayer();
+		NetworkLayer testNetwork = scenario.getNetwork();
 		Node node1 = testNetwork.createAndAddNode(new IdImpl("1"), new CoordImpl(0.0, 0.0));
 		Node node2 = testNetwork.createAndAddNode(new IdImpl("2"), new CoordImpl(100.0, 100.0));
 		Link link = testNetwork.createAndAddLink(new IdImpl("200"), node1, node2, 0, 0, 0, 0);
@@ -133,7 +135,6 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + "expectedOutput.txt");
 		final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + "actualOutput.txt");
 		assertEquals(expectedChecksum, actualChecksum);
-
 
 	}
 	

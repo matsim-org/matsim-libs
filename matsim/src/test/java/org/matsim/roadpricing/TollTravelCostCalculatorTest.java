@@ -20,6 +20,7 @@
 
 package org.matsim.roadpricing;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -48,14 +49,14 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 	public void testDistanceTollRouter() {
 		Config config = loadConfig(null);
-
-		NetworkLayer network = Fixture.createNetwork2();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = Fixture.createNetwork2(scenario);
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);
 		toll.setType("distance");
 		toll.addLink("5");
 		toll.addLink("11");
-		PopulationImpl population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(scenario);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
@@ -100,14 +101,14 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 	public void testCordonTollRouter() {
 		Config config = loadConfig(null);
-
-		NetworkLayer network = Fixture.createNetwork2();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = Fixture.createNetwork2(scenario);
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);
 		toll.setType("cordon");
 		toll.addLink("5");
 		toll.addLink("11");
-		PopulationImpl population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(scenario);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 

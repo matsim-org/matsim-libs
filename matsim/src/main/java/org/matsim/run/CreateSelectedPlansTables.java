@@ -106,8 +106,8 @@ public class CreateSelectedPlansTables {
 	private void init(final String networkPath) {
 		this.scenario = new ScenarioImpl();
 		
-		this.plans0=new PopulationImpl();
-		this.plans1=new PopulationImpl();
+		this.plans0=new ScenarioImpl().getPopulation();
+		this.plans1=new ScenarioImpl().getPopulation();
 
 		System.out.println("  reading the network...");
 		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkPath);

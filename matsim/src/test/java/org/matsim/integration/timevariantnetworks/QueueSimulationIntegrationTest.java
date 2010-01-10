@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -59,9 +60,9 @@ import org.matsim.testcases.MatsimTestCase;
 public class QueueSimulationIntegrationTest extends MatsimTestCase {
 
 	public void testFreespeed() {
-		loadConfig(null);
+		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
 
-		NetworkLayer network = createNetwork();
+		NetworkLayer network = createNetwork(scenario);
 		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
 		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
 		LinkImpl link3 = network.getLinks().get(new IdImpl("3"));
@@ -73,7 +74,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		network.addNetworkChangeEvent(change);
 
 		// create a population
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		PersonImpl person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
 		PersonImpl person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
 		plans.addPerson(person1);
@@ -101,9 +102,9 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
 
-		loadConfig(null);
+		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
 
-		NetworkLayer network = createNetwork();
+		NetworkLayer network = createNetwork(scenario);
 		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
 		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
 		LinkImpl link3 = network.getLinks().get(new IdImpl("3"));
@@ -124,7 +125,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		List<PersonImpl> persons1 = createPersons(0, link1, link3, network, personsPerWave);
 		for(PersonImpl p : persons1) {
 			plans.addPerson(p);
@@ -163,11 +164,11 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @return a network.
 	 * @author illenberger
 	 */
-	private NetworkLayer createNetwork() {
+	private NetworkLayer createNetwork(ScenarioImpl scenario) {
 		// create a network
-		NetworkFactoryImpl nf = new NetworkFactoryImpl();
+		NetworkFactoryImpl nf = scenario.getNetwork().getFactory();
 		nf.setLinkFactory(new TimeVariantLinkFactory());
-		final NetworkLayer network = new NetworkLayer(nf);
+		final NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 
 		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0

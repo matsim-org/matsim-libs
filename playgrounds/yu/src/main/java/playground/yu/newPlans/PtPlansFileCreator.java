@@ -6,6 +6,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -169,13 +170,15 @@ public class PtPlansFileCreator {
 		String newPlansFilename = "output/bvg/245.xml.gz";
 		String netFilename = "test/scenarios/berlin/network.xml.gz";
 
+		ScenarioImpl scenario = new ScenarioImpl();
+		
 		PtPlansFileCreator pfc = new PtPlansFileCreator();
-		pfc.setNetwork(new NetworkLayer());
-		new MatsimNetworkReader(pfc.getNetwork()).readFile(netFilename);
+		pfc.setNetwork(scenario.getNetwork());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 
-		pfc.setPop(new PopulationImpl());
+		pfc.setPop(scenario.getPopulation());
 		pfc.createPersons();
-		new PopulationWriter(pfc.getPop()).writeFile(newPlansFilename);
+		new PopulationWriter(scenario.getPopulation()).writeFile(newPlansFilename);
 		System.out.println("done.");
 	}
 }

@@ -21,10 +21,10 @@ import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
@@ -152,25 +152,27 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 		// ------------------------RouteSummaryA--------------------------------
-		PopulationImpl populationA = new PopulationImpl();
+		ScenarioImpl scenarioA = new ScenarioImpl();
+		scenarioA.setNetwork(network);
+		PopulationImpl populationA = scenarioA.getPopulation();
 
 		RouteSummary rsA = new RouteSummary(outputDir + "/routeCompareA.txt.gz");
 
 		System.out.println("-->reading plansfile: " + populationFilenameA);
-		new MatsimPopulationReader(populationA, network)
-				.readFile(populationFilenameA);
+		new MatsimPopulationReader(scenarioA).readFile(populationFilenameA);
 
 		rsA.run(populationA);
 		rsA.write();
 		rsA.end();
 		// ------------------------RouteSummaryB---------------------------------
-		PopulationImpl populationB = new PopulationImpl();
+		ScenarioImpl scenarioB = new ScenarioImpl();
+		scenarioB.setNetwork(network);
+		PopulationImpl populationB = scenarioB.getPopulation();
 
 		RouteSummary rsB = new RouteSummary(outputDir + "/routeCompareB.txt.gz");
 
 		System.out.println("-->reading plansfile: " + populationFilenameB);
-		new MatsimPopulationReader(populationB, network)
-				.readFile(populationFilenameB);
+		new MatsimPopulationReader(scenarioB).readFile(populationFilenameB);
 
 		rsB.run(populationB);
 		rsB.write();

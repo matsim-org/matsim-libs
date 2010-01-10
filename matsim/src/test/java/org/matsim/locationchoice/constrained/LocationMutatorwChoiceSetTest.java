@@ -31,7 +31,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 		super.tearDown();
 	}
 
-	private void initialize() {		
+	private void initialize() {
 		this.locationmutator = new LocationMutatorwChoiceSet(this.initializer.getControler().getNetwork(),
 				this.initializer.getControler(), ((ScenarioImpl)this.initializer.getControler().getScenario()).getKnowledges());
 	}

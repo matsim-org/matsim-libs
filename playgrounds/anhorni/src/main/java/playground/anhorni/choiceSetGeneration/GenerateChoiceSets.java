@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -40,7 +41,7 @@ public class GenerateChoiceSets {
 
 	//private static int idOffset = 20000000;
 	//private final static double epsilon = 0.01;
-	private PopulationImpl choiceSetPopulation = new PopulationImpl();
+	private PopulationImpl choiceSetPopulation = new ScenarioImpl().getPopulation();
 
 	private final NetworkLayer network = new NetworkLayer();
 	//private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
@@ -268,7 +269,7 @@ public class GenerateChoiceSets {
 
 	private PopulationImpl createChoiceSetPopulationFromMZ() {
 
-		PopulationImpl temporaryPopulation = new PopulationImpl();
+		PopulationImpl temporaryPopulation = new ScenarioImpl().getPopulation();
 
 		try {
 			new PlansCreateFromMZ(this.choiceSetPopulationFile,this.outdir+"/output_wegeketten.dat",1,7).run(temporaryPopulation);

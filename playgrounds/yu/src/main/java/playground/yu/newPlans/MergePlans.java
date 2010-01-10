@@ -20,6 +20,7 @@
 
 package playground.yu.newPlans;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -90,16 +91,20 @@ public class MergePlans {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl plansA = new PopulationImpl();
+		ScenarioImpl scenarioA = new ScenarioImpl();
+		scenarioA.setNetwork(network);
+		PopulationImpl plansA = scenarioA.getPopulation();
 		plansA.setIsStreaming(true);
 		PopulationWriter pw = new PopulationWriter(plansA);
 		pw.startStreaming(config.plans().getOutputFile());
-		new MatsimPopulationReader(plansA, network).readFile(plansFilenameA);
+		new MatsimPopulationReader(scenarioA).readFile(plansFilenameA);
 		new CopyPlans(pw).run(plansA);
 
-		PopulationImpl plansB = new PopulationImpl();
+		ScenarioImpl scenarioB = new ScenarioImpl();
+		scenarioB.setNetwork(network);
+		PopulationImpl plansB = scenarioB.getPopulation();
 		plansB.setIsStreaming(true);
-		new MatsimPopulationReader(plansB, network).readFile(plansFilenameB);
+		new MatsimPopulationReader(scenarioB).readFile(plansFilenameB);
 		new PersonIdCopyPlans(pw, lower_limit).run(plansB);
 		pw.closeStreaming();
 	}

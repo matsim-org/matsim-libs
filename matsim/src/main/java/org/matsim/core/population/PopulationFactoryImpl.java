@@ -25,15 +25,13 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
@@ -44,20 +42,10 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 //	private static final Logger log = Logger.getLogger(PopulationBuilderImpl.class);
 
-	private final Network network;
-	private final ActivityFacilitiesImpl facilities;
-
-	@Deprecated
-	public PopulationFactoryImpl(final NetworkLayer network, final PopulationImpl population, final ActivityFacilitiesImpl facilities) {
-		this.network = network;
-		this.facilities = facilities;
-	}
+	private final Scenario scenario;
 
 	public PopulationFactoryImpl(final Scenario scenario) {
-//		this.scenario = scenario;
-		this.network = scenario.getNetwork();
-//		this.population = scenario.getPopulation();
-		this.facilities = null; // TODO [MR]
+		this.scenario = scenario;
 	}
 
 	public PersonImpl createPerson(final Id id) {
@@ -75,12 +63,12 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	public ActivityImpl createActivityFromFacilityId(final String actType, final Id facilityId) {
-		ActivityImpl act = new ActivityImpl(actType, this.facilities.getFacilities().get(facilityId));
+		ActivityImpl act = new ActivityImpl(actType, ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(facilityId));
 		return act;
 	}
 
 	public ActivityImpl createActivityFromLinkId(final String actType, final Id linkId) {
-		ActivityImpl act = new ActivityImpl(actType, (LinkImpl) this.network.getLinks().get(linkId));
+		ActivityImpl act = new ActivityImpl(actType, (LinkImpl) this.scenario.getNetwork().getLinks().get(linkId));
 		return act;
 	}
 
@@ -89,8 +77,8 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	public Route createRoute(final Id startLinkId, final Id endLinkId, final List<Id> currentRouteLinkIds) {
-		Link start = this.network.getLinks().get(startLinkId);
-		Link end = this.network.getLinks().get(endLinkId);
+		Link start = this.scenario.getNetwork().getLinks().get(startLinkId);
+		Link end = this.scenario.getNetwork().getLinks().get(endLinkId);
 		if (start == null) {
 			throw new IllegalStateException("Can't create Route with StartLink Id " + startLinkId + " because the Link cannot be found in the loaded Network.");
 		}
@@ -101,11 +89,11 @@ public class PopulationFactoryImpl implements PopulationFactory {
 		List<Link> links = new ArrayList<Link>();
 		Link link;
 		for (Id id : currentRouteLinkIds) {
-			link = this.network.getLinks().get(id);
+			link = this.scenario.getNetwork().getLinks().get(id);
 			if (link == null) {
 				throw new IllegalStateException("Can't create Route over Link with Id " + id + " because the Link cannot be found in the loaded Network.");
 			}
-			links.add(this.network.getLinks().get(id));
+			links.add(this.scenario.getNetwork().getLinks().get(id));
 		}
 		route.setLinks(start, links, end);
 		return route;

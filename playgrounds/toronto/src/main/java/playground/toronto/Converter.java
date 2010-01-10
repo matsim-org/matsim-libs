@@ -9,11 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -207,8 +209,9 @@ public class Converter {
 
 		Converter c = new Converter();
 
-		Gbl.createConfig(null);
-		c.setZones((ZoneLayer) Gbl.createWorld().createLayer(new IdImpl("zones"),
+		Config config = Gbl.createConfig(null);
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		c.setZones((ZoneLayer) scenario.getWorld().createLayer(new IdImpl("zones"),
 				"toronto_test"));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
@@ -246,7 +249,7 @@ public class Converter {
 		c.createZones();
 
 		//
-		c.setPop(new PopulationImpl());
+		c.setPop(new ScenarioImpl().getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
 			PopulationWriter writer = new PopulationWriter(c.pop);

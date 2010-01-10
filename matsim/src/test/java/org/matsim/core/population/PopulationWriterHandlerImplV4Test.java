@@ -42,7 +42,9 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
 		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
 		
-		PopulationImpl pop = new PopulationImpl();
+		ScenarioImpl tmpScenario = new ScenarioImpl();
+		tmpScenario.setNetwork(network);
+		PopulationImpl pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		PersonImpl person = (PersonImpl) pb.createPerson(new IdImpl(1));
 		PlanImpl plan = (PlanImpl) pb.createPlan();

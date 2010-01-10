@@ -20,6 +20,7 @@
 
 package playground.balmermi.census2000v2;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -28,7 +29,6 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.facilities.algorithms.FacilitiesCombine;
 import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 
 import playground.balmermi.census2000.data.Municipalities;
@@ -46,7 +46,7 @@ public class FacilitiesCreation {
 
 		System.out.println("MATSim-DB: create Facilites based on census2000 data.");
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		
 		//////////////////////////////////////////////////////////////////////
 
@@ -59,21 +59,21 @@ public class FacilitiesCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading world xml file...");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario.getWorld());
 		worldReader.readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
-		world.complete();
+		scenario.getWorld().complete();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running facilities modules...");
 		new FacilitiesRenameAndRemoveNOGAActTypes().run(facilities);
-		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers.tab",world.getLayer(Municipalities.MUNICIPALITY)).run(facilities);
+		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers.tab",scenario.getWorld().getLayer(Municipalities.MUNICIPALITY)).run(facilities);
 		new FacilitiesDistributeCenter().run(facilities);
 		new FacilitiesCombine().run(facilities); // to check for coord uniqueness
 		System.out.println("  done.");
@@ -86,7 +86,7 @@ public class FacilitiesCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(world);
+		WorldWriter world_writer = new WorldWriter(scenario.getWorld());
 		world_writer.writeFile(config.world().getOutputFile());
 		System.out.println("  done.");
 

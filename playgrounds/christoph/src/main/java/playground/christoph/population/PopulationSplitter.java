@@ -78,7 +78,7 @@ public class PopulationSplitter {
 		log.info("Network size: " + network.getLinks().size());
 		log.info("Population size: " + population.getPersons().size());
 		
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		
 		int i = 0;
 		for (Person p : this.population.getPersons().values())

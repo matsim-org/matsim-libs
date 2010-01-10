@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -189,7 +190,8 @@ public class CalcPaidTollTest extends MatsimTestCase {
 	}
 
 	private PopulationImpl runTollSimulation(final String tollFile, final String tollType, final CharyparNagelScoringConfigGroup config) {
-		NetworkLayer network = Fixture.createNetwork1();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = Fixture.createNetwork1(scenario);
 
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(network);
 		try {
@@ -204,7 +206,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		RoadPricingScheme scheme = reader.getScheme();
 		assertEquals(tollType, scheme.getType());
 
-		PopulationImpl population = Fixture.createPopulation1(network);
+		PopulationImpl population = Fixture.createPopulation1(scenario);
 		runTollSimulation(network, population, scheme, config);
 		return population;
 	}

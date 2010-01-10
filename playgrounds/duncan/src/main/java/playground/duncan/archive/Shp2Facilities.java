@@ -10,11 +10,11 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -25,10 +25,11 @@ import com.vividsolutions.jts.geom.Polygon;
 public class Shp2Facilities {
 	private static final Logger log = Logger.getLogger(Shp2Facilities.class);
 	
-	private static Collection<Feature> getPolygons(final FeatureSource n) {
+	private static Collection<Feature> getPolygons(final FeatureSource n, final ScenarioImpl scenario) {
 		final Collection<Feature> polygons = new ArrayList<Feature>(); // not needed
 
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("workplaces");
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		facilities.setName("workplaces");
 		long cnt = 0 ;
 		
 		FeatureIterator it = null;
@@ -77,11 +78,10 @@ public class Shp2Facilities {
 	public static void main(final String [] args) {
 		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/metro-vancouver/facilities/shp/landuse.shp";
 		
-		Gbl.createWorld();
-		Gbl.createConfig(null);
+		ScenarioImpl scenario = new ScenarioImpl();
 		Collection<Feature> zones = null;
 		try {
-			zones = getPolygons(ShapeFileReader.readDataFile(shpFile));
+			zones = getPolygons(ShapeFileReader.readDataFile(shpFile), scenario);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

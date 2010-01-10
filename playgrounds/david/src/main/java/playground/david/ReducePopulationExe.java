@@ -192,7 +192,7 @@ public class ReducePopulationExe {
 		network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
-		relevantPopulation = new PopulationImpl();
+		relevantPopulation = new ScenarioImpl().getPopulation();
 		relevantPopulation.setIsStreaming(true);
 		plansWriter1 = new PopulationWriter(relevantPopulation);
 		plansWriter10 = new PopulationWriter(relevantPopulation);

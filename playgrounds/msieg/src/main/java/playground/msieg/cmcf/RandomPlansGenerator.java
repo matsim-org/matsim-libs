@@ -27,8 +27,10 @@ import java.util.Random;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -114,11 +116,7 @@ public class RandomPlansGenerator {
 	private void initDijkstra(){
 		PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 		preProcessData.run(this.network);
-		if(Gbl.getConfig() == null){
-			Gbl.createWorld();
-			Gbl.createConfig(new String[] {});
-		}
-		final FreespeedTravelTimeCost costFunction = new FreespeedTravelTimeCost();
+		final FreespeedTravelTimeCost costFunction = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
 		this.routingAlgo = new Dijkstra(this.network, costFunction, costFunction, preProcessData);
 	}
 
@@ -127,7 +125,7 @@ public class RandomPlansGenerator {
 	}
 
 	public PopulationImpl createPlans(final int numberOfAgents, final int startTime, final int endTime){
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		this.initDijkstra();
 
 		for(int i=1; i <= numberOfAgents; i++){

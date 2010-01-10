@@ -31,11 +31,8 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -57,25 +54,12 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final ActivityFacilities facilities;
 	private MatsimXmlParser delegate = null;
 	private Knowledges knowledges;
+	private final Scenario scenario;
 
 	private static final Logger log = Logger.getLogger(MatsimPopulationReader.class);
-
-	/**
-	 * Creates a new reader for MATSim plans (population) files.
-	 *
-	 * @param plans The data structure where to store the persons with their plans.
-	 * @param network The network the plans are linked to, e.g. for routes, locations, ...
-	 * @deprecated use {@link #MatsimPopulationReader(ScenarioImpl)}
-	 */
-	@Deprecated // use MatsimPopulationReader(Scenario)
-	public MatsimPopulationReader(final Population plans, final Network network) {
-		this.plans = plans;
-		this.network = network;
-		this.facilities = (ActivityFacilitiesImpl) Gbl.getWorld().getLayer(ActivityFacilitiesImpl.LAYER_TYPE);
-		this.knowledges = new KnowledgesImpl();
-	}
 	
 	public MatsimPopulationReader(final Scenario scenario) {
+		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
 		if (scenario instanceof ScenarioImpl) {
@@ -119,7 +103,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
 		if (PLANS_V4.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV4(this.plans, this.network, this.facilities, this.knowledges);
+			this.delegate = new PopulationReaderMatsimV4(this.scenario);
 			log.info("using plans_v4-reader.");
 		} 
 		else if (PLANS_V1.equals(doctype)) {

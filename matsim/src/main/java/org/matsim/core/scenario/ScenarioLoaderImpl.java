@@ -232,7 +232,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		if (worldFileName != null) {
 			log.info("loading world from " + worldFileName);
 			try {
-				new MatsimWorldReader(Gbl.getWorld()).parse(worldFileName);
+				new MatsimWorldReader(getScenario().getWorld()).parse(worldFileName);
 			} catch (SAXException e) {
 				throw new RuntimeException(e);
 			} catch (ParserConfigurationException e) {

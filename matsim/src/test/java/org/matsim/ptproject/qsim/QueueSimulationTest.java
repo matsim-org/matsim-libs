@@ -1071,12 +1071,13 @@ public class QueueSimulationTest extends TestCase {
 
 		public Fixture() {
 			Gbl.reset();
-			this.config = Gbl.createConfig(null);
+			ScenarioImpl scenario = new ScenarioImpl();
+			this.config = scenario.getConfig();
 			this.config.simulation().setFlowCapFactor(1.0);
 			this.config.simulation().setStorageCapFactor(1.0);
 
 			/* build network */
-			this.network = new NetworkLayer();
+			this.network = scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 			this.node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 			this.node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
@@ -1087,7 +1088,7 @@ public class QueueSimulationTest extends TestCase {
 			this.link3 = this.network.createAndAddLink(new IdImpl("3"), this.node3, this.node4, 100, 100, 60000, 9);
 
 			/* build plans */
-			this.plans = new PopulationImpl();
+			this.plans = scenario.getPopulation();
 
 			this.nodes3 = new ArrayList<Node>();
 			this.nodes3.add(this.node3);

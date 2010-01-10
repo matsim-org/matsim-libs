@@ -90,7 +90,7 @@ public class PlansPrepare {
 		log.info("creating diluted dpopulation:");
 		log.info("  input-file:  " + fromFile);
 		log.info("  output-file: " + toFile);
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
 
 		PopulationWriter writer = new PopulationWriter(pop);
@@ -109,7 +109,7 @@ public class PlansPrepare {
 	}
 
 	public void createSamplePopulation(final String fromFile, final String toFile, final double percentage) {
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(pop, percentage);
 		plansWriter.startStreaming(toFile);
@@ -127,7 +127,7 @@ public class PlansPrepare {
 
 	public void filterMode(final String fromFile, final String toFile, final TransportMode mode) {
 
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = new ScenarioImpl().getPopulation();
 
 		log.info("reading plans from file: " + fromFile);
 		new MatsimPopulationReader(new PseudoScenario(this.scenario, pop)).readFile(fromFile);

@@ -37,6 +37,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -44,7 +45,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -115,7 +115,7 @@ public class IVT2009ToGraphML {
 		/*
 		 * create an empty population and social network
 		 */
-		Population population = new PopulationImpl();
+		Population population = new ScenarioImpl().getPopulation();
 		SocialNetwork<Person> socialnet = new SocialNetwork<Person>();
 		SocialNetworkBuilder<Person> builder = new SocialNetworkBuilder<Person>();
 		

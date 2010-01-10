@@ -27,7 +27,9 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -44,7 +46,6 @@ import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.snapshots.writers.PositionInfo;
-import org.matsim.world.World;
 
 /**
  * OTFTVehServer is a Server that reads from the T.veh file format.
@@ -70,15 +71,16 @@ public class OTFTVehServer implements OTFServerRemote {
 	public OTFTVehServer(String netFileName, String vehFileName) {
 		this.vehFileName = vehFileName;
 
-		if (Gbl.getConfig() == null) Gbl.createConfig(null);
+		Config config = Gbl.getConfig();
+		if (config == null) {
+			config = Gbl.createConfig(null);
+		}
 
 		Gbl.startMeasurement();
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		NetworkLayer net = new NetworkLayer();
+		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(net).readFile(netFileName);
-		world.setNetworkLayer(net);
-		world.complete();
 		QueueNetwork qnet = new QueueNetwork(net);
 
 		OTFConnectionManager connect = new OTFConnectionManager();

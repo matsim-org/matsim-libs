@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -50,9 +51,9 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		final String tmpFile1 = getOutputDirectory() + "roadpricing1.xml";
 		final String tmpFile2 = getOutputDirectory() + "roadpricing2.xml";
 
-		loadConfig(null);
+		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
 
-		NetworkLayer network = Fixture.createNetwork1();
+		NetworkLayer network = Fixture.createNetwork1(scenario);
 		// first, read the scheme from file
 		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(network);
 		reader1.parse(origFile);

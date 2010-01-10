@@ -65,12 +65,12 @@ public class DeriveSmallScenarioFromBigOne {
 		new MatsimNetworkReader(smallNet).readFile(smallNetworkFile);
 
 		log.info("Reading routed population: " + wholeRoutedPlansFile);
-		PopulationImpl wholeRoutedPop = new PopulationImpl();
+		PopulationImpl wholeRoutedPop = new ScenarioImpl().getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, wholeRoutedPop));
 		popReader.readFile(wholeRoutedPlansFile);
 		
 		log.info("Reading unrouted population: " + unroutedWholePlansFile);
-		PopulationImpl unroutedWholePop = new PopulationImpl();
+		PopulationImpl unroutedWholePop = new ScenarioImpl().getPopulation();
 		PopulationReader origPopReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, unroutedWholePop));
 		origPopReader.readFile(unroutedWholePlansFile);
 

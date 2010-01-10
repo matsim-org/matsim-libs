@@ -20,6 +20,7 @@
 
 package playground.balmermi.datapuls;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
@@ -78,7 +79,7 @@ public class PopulationCreation {
 		System.out.println("done. (loading datapuls facilities).");
 
 		System.out.println("creating datapuls population...");
-		PopulationImpl datapulsPopulation = new PopulationImpl();
+		PopulationImpl datapulsPopulation = new ScenarioImpl().getPopulation();
 		Knowledges datapulsKnowledges = new KnowledgesImpl();
 		Gbl.printMemoryUsage();
 		System.out.println("done. (creating datapuls population)");

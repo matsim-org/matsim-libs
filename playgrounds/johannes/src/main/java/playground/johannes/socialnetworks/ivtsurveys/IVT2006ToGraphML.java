@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,7 +40,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -78,7 +78,7 @@ public class IVT2006ToGraphML {
 
 		SocialNetwork<Person> socialnet = new SocialNetwork<Person>();
 		SocialNetworkBuilder<Person> builder = new SocialNetworkBuilder<Person>();
-		Population population = new PopulationImpl();
+		Population population = new ScenarioImpl().getPopulation();
 		HashMap<String, Ego<Person>> egos = new HashMap<String, Ego<Person>>();
 		
 		int maxId = 0;

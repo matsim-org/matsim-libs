@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -134,7 +135,7 @@ public class ReadFromUrbansimParcelModel {
 		String filename = this.PATH_TO_OPUS_MATSIM+"tmp/person__dataset_table__exported_indicators__" + this.year + ".tab" ;
 		log.info( "Starting to read persons from " + filename ) ;
 
-		PopulationImpl backupPop = new PopulationImpl() ;
+		PopulationImpl backupPop = new ScenarioImpl().getPopulation() ;
 		long NUrbansimPersons=0 ;
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );

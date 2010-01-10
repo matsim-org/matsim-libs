@@ -23,14 +23,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -71,7 +70,7 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 	public PopulationAsciiFileReader(final ZoneLayer zoneLayer) {
 		this.zoneLayer = zoneLayer;
 		this.tabFileParserConfig = new TabularFileParserConfig();
-		this.plans = new PopulationImpl();
+		this.plans = new ScenarioImpl().getPopulation();
 	}
 
 	public void startRow(final String[] row) throws IllegalArgumentException {

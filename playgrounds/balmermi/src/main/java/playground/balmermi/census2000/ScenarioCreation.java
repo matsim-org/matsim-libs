@@ -20,6 +20,7 @@
 
 package playground.balmermi.census2000;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -30,7 +31,6 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
 import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.ZoneLayer;
 
@@ -47,21 +47,21 @@ public class ScenarioCreation {
 
 		System.out.println("MATSim-FUSION: Consolidate World, Facilities and Matrices.");
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario.getWorld());
 		worldReader.readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");
 		Matrices matrices = new Matrices();
-		MatsimMatricesReader reader = new MatsimMatricesReader(matrices, world);
+		MatsimMatricesReader reader = new MatsimMatricesReader(matrices, scenario.getWorld());
 		reader.readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 
@@ -74,14 +74,14 @@ public class ScenarioCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running matrices modules... ");
-		new MatricesCompleteBasedOnFacilities(facilities, (ZoneLayer)world.getLayer("municipality")).run(matrices);
+		new MatricesCompleteBasedOnFacilities(facilities, (ZoneLayer)scenario.getWorld().getLayer("municipality")).run(matrices);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing matrices xml file... ");
 		MatricesWriter mat_writer = new MatricesWriter(matrices);
-		mat_writer.writeFile(Gbl.getConfig().matrices().getOutputFile());
+		mat_writer.writeFile(config.matrices().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
@@ -89,7 +89,7 @@ public class ScenarioCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(world);
+		WorldWriter world_writer = new WorldWriter(scenario.getWorld());
 		world_writer.writeFile(config.world().getOutputFile());
 		System.out.println("  done.");
 

@@ -100,7 +100,7 @@ public class ExternalModule implements PlanStrategyModule {
 
 	public void prepareReplanning() {
 		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
 		this.plansWriter = new PopulationWriter(pop);
 		
@@ -196,7 +196,7 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	private void reReadPlans() {
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = new ScenarioImpl().getPopulation();
 		PopulationReader plansReader = getPlansReader(plans);
 		plansReader.readFile(this.outFileRoot + this.moduleId + ExternalOutFileName);
 		new PersonCalcTimes().run(plans);

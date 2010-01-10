@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//matsim imports
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -44,7 +44,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
-//playground imports
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
@@ -642,7 +641,7 @@ public class Flow {
 		}*/
 		
 		//construct Population
-		PopulationImpl result =new PopulationImpl();
+		PopulationImpl result = new ScenarioImpl().getPopulation();
 		int id =1;
 		for (TimeExpandedPath path : this._TimeExpandedPaths){
 			if(path.isforward()){

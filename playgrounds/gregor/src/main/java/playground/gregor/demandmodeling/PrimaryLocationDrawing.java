@@ -31,8 +31,10 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
@@ -197,7 +199,7 @@ public class PrimaryLocationDrawing {
 
 
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = new ScenarioImpl().getPopulation();
 		int count = 0;
 		for (Entry<String, Feature> e : ftDist.entrySet()) {
 			Feature ft = e.getValue();
@@ -344,22 +346,16 @@ public class PrimaryLocationDrawing {
 
 
 
-		Gbl.createConfig(null);
-		World world = Gbl.createWorld();
-		NetworkLayer network = new NetworkLayer();
+		Config config = Gbl.createConfig(null);
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		World world = scenario.getWorld();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-		world.setNetworkLayer(network);
 		world.complete();
-
-
 
 		new PrimaryLocationDrawing(network,zonesFilename,demandFilename,districts).run();
 
-
-
 	}
-
-
 
 
 	private static class Zone {

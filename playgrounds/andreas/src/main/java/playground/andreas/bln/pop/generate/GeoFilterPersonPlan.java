@@ -100,11 +100,11 @@ public class GeoFilterPersonPlan extends NewPopulation {
 		NetworkLayer targetNet = new NetworkLayer();
 		new MatsimNetworkReader(targetNet).readFile(targetNetworkFile);
 
-		PopulationImpl inPop = new PopulationImpl();
+		PopulationImpl inPop = new ScenarioImpl().getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, inPop));
 		popReader.readFile(inPlansFile);
 		
-		PopulationImpl origPop = new PopulationImpl();
+		PopulationImpl origPop = new ScenarioImpl().getPopulation();
 		PopulationReader origPopReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, origPop));
 		origPopReader.readFile(origPlansFile);
 

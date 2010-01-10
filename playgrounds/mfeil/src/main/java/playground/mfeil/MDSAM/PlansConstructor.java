@@ -102,7 +102,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
 		this.outputFileMod = "./plans/model.mod";
-	*/	this.population = new PopulationImpl();
+	*/	this.population = (PopulationImpl) controler.getPopulation(); // new PopulationImpl();
 		this.sims = null;
 		this.network = controler.getNetwork();
 		this.init(network);	

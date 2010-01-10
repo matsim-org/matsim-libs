@@ -21,6 +21,7 @@
 package org.matsim.core.population;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -36,7 +37,7 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetRandomUnscoredPlan() {
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = new ScenarioImpl().getPopulation();
 		PersonImpl person = null;
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans

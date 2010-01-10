@@ -185,7 +185,7 @@ public class DgAnalysisPopulationReader {
    * @return the Plans object containing the population
    */
 	protected PopulationImpl loadPopulationFile(final String filename, ScenarioImpl sc) {
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = sc.getPopulation();
 
 		log.info("  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(sc);

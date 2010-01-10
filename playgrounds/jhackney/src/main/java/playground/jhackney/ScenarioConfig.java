@@ -281,7 +281,7 @@ public abstract class ScenarioConfig {
 	
 	public static final PopulationImpl readPlansAndKnowledges(final NetworkLayer network, Knowledges kn) {
 		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		String filename=input_directory +popFileName;
 		System.out.println(filename);
 		new MatsimPopulationReader(scenario).readFile(filename);

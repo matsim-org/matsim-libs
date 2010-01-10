@@ -21,6 +21,7 @@
 package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -160,7 +161,7 @@ public class CMCFScenarioGenerator {
 	}
 
 	private void createPlans() throws Exception {
-		this.plans = new PopulationImpl();
+		this.plans = new ScenarioImpl().getPopulation();
 		int firstHomeEndTime = 0;//6 * 3600;
 		int homeEndTime = firstHomeEndTime;
 		LinkImpl l1 = this.network.getLinks().get(IdFactory.get(1));
@@ -193,10 +194,6 @@ public class CMCFScenarioGenerator {
 			this.plans.addPerson(p);
 		}
 	}
-
-
-
-
 
 
 

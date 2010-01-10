@@ -46,7 +46,7 @@ public class PlanExpander {
 		System.out.println("Dublicating plans finished");
 		Gbl.printElapsedTime();
 		
-		inPop = new PopulationImpl();
+		inPop = new ScenarioImpl().getPopulation();
 		popReader = new MatsimPopulationReader(new SharedNetScenario(sc, inPop));
 		popReader.readFile("tmp.xml.gz");
 

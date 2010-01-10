@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -64,8 +65,10 @@ public class PTActWriter {
 		Config config = new Config();
 		config = Gbl.createConfig(new String[]{ configFile, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
 		
-		this.population = new PopulationImpl();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population, this.plainNet);
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.setNetwork(this.plainNet);
+		this.population = scenario.getPopulation();
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFile);
 	}
 	
@@ -112,7 +115,7 @@ public class PTActWriter {
 	}
 	
 	public void findRouteForActivities(){
-		PopulationImpl newPopulation = new PopulationImpl();
+		PopulationImpl newPopulation = new ScenarioImpl().getPopulation();
 		
 		int numPlans=0;
 		int found =0;

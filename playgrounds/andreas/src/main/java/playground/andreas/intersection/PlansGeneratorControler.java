@@ -23,6 +23,7 @@ package playground.andreas.intersection;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -60,7 +61,7 @@ public class PlansGeneratorControler extends Controler {
 	private Population generate4wPersons(){
 
 		int numberOfPlans = 1;
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		log.info("  generating plans... ");
 
 		for (int i = 0; i < 314; i++) {
@@ -124,7 +125,7 @@ public class PlansGeneratorControler extends Controler {
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		log.info("  generating plans... ");
 
 		LinkedList <LinkImpl> fromLinks = new LinkedList<LinkImpl>();

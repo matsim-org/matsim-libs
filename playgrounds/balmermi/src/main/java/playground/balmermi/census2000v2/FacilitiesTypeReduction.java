@@ -20,12 +20,12 @@
 
 package playground.balmermi.census2000v2;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.world.World;
 
 import playground.balmermi.census2000v2.modules.FacilitiesReduceTypes;
 
@@ -39,10 +39,10 @@ public class FacilitiesTypeReduction {
 
 		System.out.println("TEST RUN 01:");
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl();
 		
 		System.out.println("  reading facilities xml file... ");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 

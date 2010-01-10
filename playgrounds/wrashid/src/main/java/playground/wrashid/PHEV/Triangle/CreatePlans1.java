@@ -3,6 +3,7 @@ package playground.wrashid.PHEV.Triangle;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -14,14 +15,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.World;
 
 public class CreatePlans1 {
@@ -31,17 +29,19 @@ public class CreatePlans1 {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		PopulationImpl plans = new PopulationImpl();
-		Knowledges knowledges = new KnowledgesImpl();
 		Gbl.reset();
 		args=new String[1];
 		args[0]="C:/data/SandboxCVS/ivt/studies/triangle/config/config.xml";
 		Config config = Gbl.createConfig(args);
 		config.plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/triangle/plans/100Kplans/plans_hwsh.xml");
-		final World world = Gbl.createWorld();
+
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		PopulationImpl plans = scenario.getPopulation();
+		Knowledges knowledges = scenario.getKnowledges();
+		final World world = scenario.getWorld();
 
 		// read facilities
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile("C:/data/SandboxCVS/ivt/studies/triangle/facilities/facilities.xml");
 
 

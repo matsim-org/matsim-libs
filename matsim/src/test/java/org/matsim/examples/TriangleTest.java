@@ -21,6 +21,7 @@
 package org.matsim.examples;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -106,21 +107,22 @@ public class TriangleTest extends MatsimTestCase {
 
 	public void testInitDemand() {
 
-		log.info("running testParserWriter1()...");
+		log.info("running testInitDemand()...");
 
-		final World world = new World();
+		final ScenarioImpl scenario = new ScenarioImpl();
+		final World world = scenario.getWorld();
 
 		log.info("  reading world xml file... ");
 		new MatsimWorldReader(world).readFile(this.config.world().getInputFile());
 		log.info("  done.");
 
 		log.info("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		log.info("  done.");
 
 		log.info("  reading network xml file... ");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 		world.complete();
 		log.info("  done.");
@@ -149,7 +151,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  creating plans object... ");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		log.info("  done.");
 
 		log.info("  running plans modules... ");

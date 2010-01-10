@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -91,14 +92,18 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		this.ktiConfigGroup = new KtiConfigGroup();
 		this.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
+		// Scenario
+		
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		
 		// generate person
-		this.population = new PopulationImpl();
+		this.population = scenario.getPopulation();
 //		Id personId = new IdImpl("123");
 		PersonImpl person = new PersonImpl(TEST_PERSON_ID);
 		this.population.addPerson(person);
 
 		// generate facilities
-		this.facilities = new ActivityFacilitiesImpl();
+		this.facilities = scenario.getActivityFacilities();
 		ActivityFacilityImpl facilityHome = this.facilities.createFacility(new IdImpl(1), new CoordImpl(0.0, 0.0));
 		facilityHome.createActivityOption("home");
 		ActivityFacilityImpl facilityWork = this.facilities.createFacility(new IdImpl(3), new CoordImpl(1000.0, 1000.0));
@@ -109,7 +114,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		facilityShop.createActivityOption("shop");
 
 		// generate network
-		this.network = new NetworkLayer();
+		this.network = scenario.getNetwork();
 
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));

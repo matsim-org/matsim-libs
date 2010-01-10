@@ -21,17 +21,15 @@
 package playground.balmermi;
 
 import org.matsim.analysis.LegHistogram;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 
 public class EventsHandling {
 
-	//////////////////////////////////////////////////////////////////////
-	// test run 01
-	//////////////////////////////////////////////////////////////////////
-
-	public static void handlingEvents(final int binSize) {
+	public static void handlingEvents(final int binSize, final Config config) {
 
 		System.out.println("MATSim-ANALYSIS: handling events....");
 
@@ -39,7 +37,7 @@ public class EventsHandling {
 		final EventsManagerImpl events = new EventsManagerImpl();
 		final LegHistogram analysis = new LegHistogram(binSize);
 		events.addHandler(analysis);
-		new MatsimEventsReader(events).readFile(Gbl.getConfig().events().getInputFile());
+		new MatsimEventsReader(events).readFile(config.events().getInputFile());
 		System.out.println("  done.");
 
 		analysis.write(System.out);
@@ -53,10 +51,9 @@ public class EventsHandling {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
 
-		Gbl.createConfig(args);
-		Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl();
 
-		handlingEvents(300);
+		handlingEvents(300, scenario.getConfig());
 
 		Gbl.printElapsedTime();
 	}

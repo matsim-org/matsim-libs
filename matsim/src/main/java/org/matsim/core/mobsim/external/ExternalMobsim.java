@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -122,7 +123,7 @@ public class ExternalMobsim {
 
 	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
 		log.info("writing plans for external mobsim");
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(pop);
 		PopulationWriterHandler handler = plansWriter.getHandler();

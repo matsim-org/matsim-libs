@@ -28,7 +28,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -175,7 +174,7 @@ public abstract class Scenario {
 
 	public static final NetworkLayer readNetwork() {
 		System.out.println("  reading the network xml file...");
-		System.out.println(Gbl.getConfig().network().getInputFile());
+		System.out.println(scenario.getConfig().network().getInputFile());
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(scenario.getConfig().network().getInputFile());
 		System.out.println("  done.");
@@ -210,7 +209,7 @@ public abstract class Scenario {
 	
 	public static final PopulationImpl readPlans(final int i) {
 		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
 		String filename=input_directory +scenario.getConfig().plans().getInputFile();
 		System.out.println(filename);
@@ -222,7 +221,7 @@ public abstract class Scenario {
 
 	public static final PopulationImpl readPlansAndKnowledges() {
 		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		System.out.println(scenario.getConfig().plans().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 		System.out.println("  done.");

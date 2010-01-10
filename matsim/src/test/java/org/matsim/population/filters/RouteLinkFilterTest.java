@@ -20,6 +20,7 @@
 
 package org.matsim.population.filters;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -54,13 +55,14 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 	}
 
 	private PopulationImpl getTestPopulation() {
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
 
 		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
 		LinkImpl link20 = network.getLinks().get(new IdImpl(20));
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 
 		PersonImpl person;
 		PlanImpl plan;
@@ -111,6 +113,5 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		}
 
 	}
-
 
 }

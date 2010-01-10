@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
@@ -81,8 +82,10 @@ public class PTRouterTest extends MatsimTestCase {
 	
 		/**tests TransitRouteFinder class*/
 		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
-		PopulationImpl population = new PopulationImpl();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, plainNetwork);
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.setNetwork(plainNetwork);
+		PopulationImpl population = scenario.getPopulation();
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(PLANFILE);
 		Person person = population.getPersons().get(new IdImpl("1")); 
 		Plan plan = person.getPlans().get(0);

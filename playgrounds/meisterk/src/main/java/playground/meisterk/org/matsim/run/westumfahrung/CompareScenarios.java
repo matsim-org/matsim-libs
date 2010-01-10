@@ -20,7 +20,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -138,8 +137,8 @@ public class CompareScenarios {
 
 	private void run(final String[] args) {
 
-		Config config = Gbl.createConfig(new String[]{});
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl();
+		Config config = scenario.getConfig();
 		config.global().setLocalDtdBase("dtd/");
 		System.out.println(config.global().getLocalDtdBase());
 
@@ -152,7 +151,7 @@ public class CompareScenarios {
 		log.info("Init...done.");
 		System.out.flush();
 		log.info("Performing analyses...");
-		this.doAnalyses(world);
+		this.doAnalyses(scenario.getWorld());
 		log.info("Performing analyses...done.");
 		System.out.flush();
 		log.info("Writing out results...");
@@ -406,7 +405,9 @@ public class CompareScenarios {
 				// choose right network
 				world.setNetworkLayer(scenarioNetworks.get(scenarioName));
 
-				PopulationImpl plansSubPop = new PopulationImpl();
+				ScenarioImpl subScenario = new ScenarioImpl();
+				subScenario.setNetwork(scenarioNetworks.get(scenarioName));
+				PopulationImpl plansSubPop = subScenario.getPopulation();
 				switch(analysis.intValue()) {
 				case TRANSIT_AGENTS_ANALYSIS_NAME:
 					personIterator = transitAgentsIds.iterator();

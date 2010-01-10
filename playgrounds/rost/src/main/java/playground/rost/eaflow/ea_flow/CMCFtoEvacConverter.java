@@ -29,6 +29,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -92,7 +93,9 @@ public class CMCFtoEvacConverter {
 	
 	@SuppressWarnings("unchecked")
 	public static PopulationImpl readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
-		PopulationImpl result = new PopulationImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.setNetwork(network);
+		PopulationImpl result = scenario.getPopulation();
 		PopulationFactory pb = result.getFactory() ;
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(filename);

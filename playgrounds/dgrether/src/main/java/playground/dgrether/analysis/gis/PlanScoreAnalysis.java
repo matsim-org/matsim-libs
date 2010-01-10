@@ -40,6 +40,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.referencing.factory.GeotoolsFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -144,14 +145,16 @@ public class PlanScoreAnalysis {
 //		Gbl.getWorld().setNetworkLayer(net);
 //		Gbl.getWorld().complete();
 
-		PopulationImpl plans = new PopulationImpl();
-		MatsimPopulationReader reader = new MatsimPopulationReader(plans, net);
-		reader.readFile(PLANS);
+		ScenarioImpl scenario1 = new ScenarioImpl();
+		scenario1.setNetwork(net);
+		PopulationImpl plans = scenario1.getPopulation();
+		new MatsimPopulationReader(scenario1).readFile(PLANS);
 
 
-		PopulationImpl plans2 = new PopulationImpl();
-		reader = new MatsimPopulationReader(plans2, net);
-		reader.readFile(PLANS2);
+		ScenarioImpl scenario2 = new ScenarioImpl();
+		scenario2.setNetwork(net);
+		PopulationImpl plans2 = scenario2.getPopulation();
+		new MatsimPopulationReader(scenario2).readFile(PLANS2);
 
 
 		Logger.getLogger(PlanScoreAnalysis.class).info("plans read");

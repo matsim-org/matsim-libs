@@ -20,17 +20,13 @@
 
 package playground.david.otfvis;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.world.World;
+import org.matsim.ptproject.qsim.QueueSimulation;
 
 
 /**
@@ -41,8 +37,6 @@ public class OnTheFlyQueueSimSWISS {
 
 	public static void main(final String[] args) {
 		QueueSimulation sim;
-		NetworkLayer net;
-		PopulationImpl population;
 		EventsManagerImpl events;
 
 		String netFileName = "../../tmp/network.xml.gz";
@@ -50,15 +44,11 @@ public class OnTheFlyQueueSimSWISS {
 		Config config = Gbl.createConfig(args);
 		Gbl.startMeasurement();
 		config.setParam("global", "localDTDBase", "dtd/");
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		World world = Gbl.createWorld();
-
-		net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(netFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
 		Gbl.printElapsedTime();
-
-		population = new PopulationImpl();
 
 		events = new EventsManagerImpl();
 
@@ -67,9 +57,7 @@ public class OnTheFlyQueueSimSWISS {
 		config.simulation().setSnapshotFile("output/OTFQuadfileSCHWEIZ2.mvi");
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		config.simulation().setEndTime(Time.parseTime("00:00:11"));
-		QueueNetwork qnet = new QueueNetwork(net);
-		sim = new QueueSimulation(net, population, events);
-
+		sim = new QueueSimulation(scenario, events);
 
 		sim.run();
 

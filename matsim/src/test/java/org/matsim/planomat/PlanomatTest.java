@@ -29,6 +29,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -181,7 +182,7 @@ public class PlanomatTest extends MatsimTestCase {
 		testee.run(testPlan);
 
 		// write out the test person and the modified plan into a file
-		PopulationImpl outputPopulation = new PopulationImpl();
+		PopulationImpl outputPopulation = new ScenarioImpl().getPopulation();
 		outputPopulation.addPerson(testPerson);
 
 		log.info("Writing plans file...");
@@ -307,7 +308,7 @@ public class PlanomatTest extends MatsimTestCase {
 		
 		
 		// write out the test person and the modified plan into a file
-		PopulationImpl outputPopulation = new PopulationImpl();
+		PopulationImpl outputPopulation = new ScenarioImpl().getPopulation();
 		outputPopulation.addPerson(testPerson);
 
 		System.out.println("Writing plans file...");

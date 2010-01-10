@@ -22,19 +22,21 @@ package org.matsim.population.algorithms;
 
 import java.util.ArrayList;
 
+import junit.framework.TestCase;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Tests the class {@link ParallelPersonAlgorithmRunner}.
  *
  * @author mrieser
  */
-public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
+public class ParallelPersonAlgorithmRunnerTest extends TestCase {
 
 	/**
 	 * Tests that the specified number of threads is allocated.
@@ -42,8 +44,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testNumberOfThreads() {
-		loadConfig(null);
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = new ScenarioImpl().getPopulation();
 		PersonAlgorithmTester algo = new PersonAlgorithmTester();
 		PersonAlgoProviderTester tester = new PersonAlgoProviderTester(algo);
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);
@@ -60,8 +61,8 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testNofPersons() {
-		loadConfig(null);
-		PopulationImpl population = new PopulationImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
+		PopulationImpl population = scenario.getPopulation();
 		for (int i = 0; i < 100; i++) {
 			PersonImpl person = new PersonImpl(new IdImpl(i));
 			population.addPerson(person);

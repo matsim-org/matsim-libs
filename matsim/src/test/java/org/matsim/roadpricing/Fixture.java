@@ -25,6 +25,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -59,7 +60,7 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	/** @return a simple network consisting of 5 equal links in a row. */
-	protected static NetworkLayer createNetwork1() {
+	protected static NetworkLayer createNetwork1(final ScenarioImpl scenario) {
 		/* This creates the following network:
 		 *
 		 * (1)-------(2)-------(3)-------(4)-------(5)-------(6)
@@ -67,7 +68,7 @@ import org.matsim.core.utils.misc.Time;
 		 */
 		/* The vehicles can travel with 18km/h = 5m/s, so it should take them 20 seconds
 		 * to travel along one link.		 */
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(100, 0));
@@ -85,7 +86,7 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	/** @return a simple network with route alternatives in 2 places. */
-	protected static NetworkLayer createNetwork2() {
+	protected static NetworkLayer createNetwork2(final ScenarioImpl scenario) {
 		/* This creates the following network:
 		 *
 		 *            3 /----(3)----\ 4
@@ -106,7 +107,7 @@ import org.matsim.core.utils.misc.Time;
 		 *
 		 * each link is 100m long and can be traveled along with 18km/h = 5m/s = 20s for 100m
 		 */
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node0 = network.createAndAddNode(new IdImpl( "0"), new CoordImpl(  0,   10));
 		Node node1 = network.createAndAddNode(new IdImpl( "1"), new CoordImpl(  0,  100));
@@ -140,8 +141,9 @@ import org.matsim.core.utils.misc.Time;
 	 * @param network the network returned by {@link #createNetwork1()}
 	 * @return a population for network1
 	 **/
-	protected static PopulationImpl createPopulation1(final NetworkLayer network) {
-		PopulationImpl population = new PopulationImpl();
+	protected static PopulationImpl createPopulation1(final ScenarioImpl scenario) {
+		PopulationImpl population = scenario.getPopulation();
+		NetworkLayer network = scenario.getNetwork();
 
 		LinkImpl link0 = network.getLinks().get(new IdImpl(0));
 		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
@@ -170,8 +172,9 @@ import org.matsim.core.utils.misc.Time;
 	 * @param network the network returned by {@link #createNetwork2()}
 	 * @return a population for network2
 	 **/
-	protected static PopulationImpl createPopulation2(final NetworkLayer network) {
-		PopulationImpl population = new PopulationImpl();
+	protected static PopulationImpl createPopulation2(final ScenarioImpl scenario) {
+		PopulationImpl population = scenario.getPopulation();
+		NetworkLayer network = scenario.getNetwork();
 
 		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLinks().get(new IdImpl("1")), network.getLinks().get(new IdImpl("7")), network.getLinks().get(new IdImpl("13"))), population);
 
@@ -182,12 +185,12 @@ import org.matsim.core.utils.misc.Time;
 		PersonImpl person = new PersonImpl(new IdImpl(personId));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
-		plan.createAndAddActivity("h", (LinkImpl)homeLink).setEndTime(Time.parseTime(startTime));
+		plan.createAndAddActivity("h", homeLink).setEndTime(Time.parseTime(startTime));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);//"car", startTime, "00:01", null);
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(homeLink, workLink);
 		route.setNodes(homeLink, routeNodes, workLink);
 		leg.setRoute(route);
-		plan.createAndAddActivity("w", (LinkImpl)workLink);//, null, "24:00", null, "yes");
+		plan.createAndAddActivity("w", workLink);//, null, "24:00", null, "yes");
 		return person;
 	}
 
@@ -210,12 +213,13 @@ import org.matsim.core.utils.misc.Time;
 
 	protected static PopulationImpl createReferencePopulation1(final CharyparNagelScoringConfigGroup config) {
 		// run mobsim once without toll and get score for network1/population1
-		NetworkLayer network = createNetwork1();
-		PopulationImpl referencePopulation = Fixture.createPopulation1(network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		Fixture.createNetwork1(scenario);
+		PopulationImpl referencePopulation = Fixture.createPopulation1(scenario);
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory(config));
 		events.addHandler(scoring);
-		QueueSimulation sim = new QueueSimulation(network, referencePopulation, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.run();
 		scoring.finish();
 

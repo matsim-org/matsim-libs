@@ -148,10 +148,10 @@ public class SameActLocTest {
 		Gbl.startMeasurement();
 		ScenarioImpl scenario = new ScenarioImpl();
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 
 		SameActLoc alt = new SameActLoc(outFilename);
 

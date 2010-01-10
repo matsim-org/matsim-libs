@@ -1,7 +1,7 @@
 package org.matsim.locationchoice;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class Initializer {
@@ -15,8 +15,8 @@ public class Initializer {
 		// TODO: Avoid copying of config 3 times 
 		// lnk does not work. get path to locationchcoice
 		String	path = testCase.getPackageInputDirectory() + "config.xml";		
-		testCase.loadConfig(path);
-		this.controler = new Controler(Gbl.getConfig());
+		Config config = testCase.loadConfig(path);
+		this.controler = new Controler(config);
 		this.controler.setCreateGraphs(false);
 		this.controler.run();
 	}

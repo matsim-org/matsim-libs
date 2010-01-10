@@ -62,7 +62,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).parse(NETWORK_FILE);
 
 		// create one person with missing link in act
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = new ScenarioImpl().getPopulation();
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);

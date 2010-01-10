@@ -29,12 +29,12 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -69,7 +69,7 @@ public class GraphBuilder {
 			Map<String, String[]> userData = csvReader.readUserData(userDataFile);
 			Map<String, Map<String, String>> snowballData = csvReader.readSnowballData(snowballDataFile);
 			
-			population = new PopulationImpl();
+			population = new ScenarioImpl().getPopulation();
 			keyGenerator = new KeyGenerator();
 			builder = new SampledSocialNetBuilder<Person>();
 			socialnet = builder.createGraph();

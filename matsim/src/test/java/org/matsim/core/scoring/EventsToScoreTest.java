@@ -20,6 +20,7 @@
 
 package org.matsim.core.scoring;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,7 +40,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	 * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring function.
 	 */
 	public void testAddMoney() {
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = new ScenarioImpl().getPopulation();
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();

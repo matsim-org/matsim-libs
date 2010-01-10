@@ -20,6 +20,7 @@
 
 package playground.ciarif.modechoice_old;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -50,18 +51,18 @@ public class Mode_choice_main {
 
 	public static void testRun01(Config config) {
 
-		World world = Gbl.createWorld();
-		
 		System.out.println("TEST RUN 01:");
 
-		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
+		World world = scenario.getWorld();
+		final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = scenario.getNetwork();
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
@@ -92,7 +93,7 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  creating plans object... ");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		Knowledges knowledges = new KnowledgesImpl();
 		System.out.println("  done.");
 

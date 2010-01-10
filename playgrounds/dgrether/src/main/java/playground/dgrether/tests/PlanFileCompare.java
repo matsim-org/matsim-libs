@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.dgrether.tests;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 
 
 /**
@@ -33,16 +33,20 @@ import org.matsim.core.population.PopulationImpl;
 public class PlanFileCompare {
 
 	public void comparePlans(String networkFile, String plansFile1, String plansFile2) {
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario1 = new ScenarioImpl();
+		
+		NetworkLayer network = scenario1.getNetwork();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(network);
 		netReader.readFile(networkFile);
 
-		Population pop1 = new PopulationImpl();
-		MatsimPopulationReader reader1 = new MatsimPopulationReader(pop1, network);
+		Population pop1 = scenario1.getPopulation();
+		MatsimPopulationReader reader1 = new MatsimPopulationReader(scenario1);
 		reader1.readFile(plansFile1);
 		
-		Population pop2 = new PopulationImpl();
-		MatsimPopulationReader reader2 = new MatsimPopulationReader(pop2, network);
+		ScenarioImpl scenario2 = new ScenarioImpl();
+		scenario2.setNetwork(scenario1.getNetwork());
+		Population pop2 = scenario2.getPopulation();
+		MatsimPopulationReader reader2 = new MatsimPopulationReader(scenario2);
 		reader2.readFile(plansFile2);
 		
 		

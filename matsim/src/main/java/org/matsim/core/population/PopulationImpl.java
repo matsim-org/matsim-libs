@@ -30,9 +30,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
@@ -40,8 +37,6 @@ import org.matsim.population.algorithms.PersonAlgorithm;
  * Root class of the population description (previously also called "plans file")
  */
 public class PopulationImpl implements Population {
-	// probably should extend BasicPopulation??
-	// top-level containers do not extend the basic stuff
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -60,17 +55,10 @@ public class PopulationImpl implements Population {
 
 	private final PopulationFactory pb ;
 	
-	private final ScenarioImpl sc ;
 
 	// constructors:
 	
-	public PopulationImpl() { 
-		this.sc = null ;
-		this.pb = new PopulationFactoryImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (ActivityFacilitiesImpl) Gbl.getWorld().getLayer(ActivityFacilitiesImpl.LAYER_TYPE));
-	}
-	
 	public PopulationImpl(ScenarioImpl sc) {
-		this.sc = sc ;
 		this.pb = new PopulationFactoryImpl( sc ) ;
 	}
 

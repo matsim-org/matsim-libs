@@ -21,6 +21,7 @@
 package org.matsim.roadpricing;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -45,10 +46,11 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	 */
 	public void testBestAlternatives() {
 		Config config = loadConfig(null);
-		NetworkLayer network = Fixture.createNetwork2();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		NetworkLayer network = Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme(network);
+		RoadPricingScheme toll = new RoadPricingScheme(scenario.getNetwork());
 		toll.setType("area");
 		toll.addLink("5");
 		toll.addLink("11");
@@ -58,7 +60,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		 * is: 20s * (-6 EUR / h) = 20 * (-6) / 3600 = 0.03333
 		 */
 
-		PopulationImpl population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(scenario);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
@@ -101,7 +103,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	 */
 	public void testTolledActLink() {
 		Config config = loadConfig(null);
-		NetworkLayer network = Fixture.createNetwork2();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		NetworkLayer network = Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);
@@ -109,7 +112,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addLink("7");
 		toll.addCost(6*3600, 10*3600, 0.06);
 
-		PopulationImpl population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(scenario);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
@@ -129,7 +132,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	 */
 	public void testAllAlternativesTolled() {
 		Config config = loadConfig(null);
-		NetworkLayer network = Fixture.createNetwork2();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		NetworkLayer network = Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);
@@ -138,7 +142,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addLink("5");
 		toll.addCost(6*3600, 10*3600, 0.06);
 
-		PopulationImpl population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(scenario);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
@@ -154,7 +158,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
 	public void testOutsideTollTime() {
 		Config config = loadConfig(null);
-		NetworkLayer network = Fixture.createNetwork2();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		NetworkLayer network = Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);
@@ -163,7 +168,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addLink("11");
 		toll.addCost(8*3600, 10*3600, 1.0); // high costs!
 
-		PopulationImpl population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(scenario);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);

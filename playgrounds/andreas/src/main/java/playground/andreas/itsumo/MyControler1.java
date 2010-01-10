@@ -23,6 +23,7 @@ package playground.andreas.itsumo;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -110,7 +111,7 @@ public class MyControler1 extends Controler {
 	protected Population loadPopulation() {
 
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = new ScenarioImpl().getPopulation();
 
 		log.info("  generating plans... ");
 

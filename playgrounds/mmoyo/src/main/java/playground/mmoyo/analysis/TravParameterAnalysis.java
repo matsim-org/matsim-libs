@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,8 +33,10 @@ public class TravParameterAnalysis {
 	public TravParameterAnalysis(final String plansFile, final LogicFactory logicFactory){
 		NetworkLayer logicNet = logicFactory.getLogicNet();
 		
-		this.population = new PopulationImpl();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population, logicFactory.getLogicNet());
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.setNetwork(logicNet);
+		this.population = scenario.getPopulation();
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFile);
 	
 	

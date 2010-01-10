@@ -34,7 +34,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
-import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 /* The usage of Gbl.getConfig() all throughout the code makes it very hard
@@ -52,12 +51,6 @@ public abstract class Gbl {
 	 */
 	@Deprecated
 	private static Config config = null;
-	/**
-	 * @deprecated The ScenarioData should hold the config instance without any
-	 * static reference to the object.
-	 */
-	@Deprecated
-	private static World world = null;
 
 	private static final Logger log = Logger.getLogger(Gbl.class);
 
@@ -121,28 +114,6 @@ public abstract class Gbl {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// world creation
-	//////////////////////////////////////////////////////////////////////
-
-	@Deprecated
-	public static final World createWorld() {
-		if (Gbl.world != null) {
-			Gbl.errorMsg("world exists already! Cannot create a 2nd global world.");
-		}
-
-		Gbl.world = new World();
-		return Gbl.world;
-	}
-
-	@Deprecated
-	public static final World getWorld() {
-		if (Gbl.world == null) {
-			Gbl.createWorld();
-		}
-		return Gbl.world;
-	}
-
-	//////////////////////////////////////////////////////////////////////
 	// reset scenario
 	//////////////////////////////////////////////////////////////////////
 
@@ -150,7 +121,6 @@ public abstract class Gbl {
 	public static final void reset() {
 		log.info("Gbl.reset() -- reset config, world");
 		Gbl.config = null;
-		Gbl.world = null;
 		MatsimRandom.reset();
 		SimulationTimer.reset();
 		org.matsim.ptproject.qsim.SimulationTimer.reset();

@@ -37,9 +37,11 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
@@ -271,17 +273,15 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 
 		if (args.length != 1) {
 			throw new RuntimeException("wrong number of arguments! Pleas run DistanceAnalysis config.xml shapefile.shp" );
-		} else {
-			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
-
 		}
+		Config config = Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		World world = scenario.getWorld();
 
-		log.info("loading network from " + Gbl.getConfig().network().getInputFile());
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		world.setNetworkLayer(network);
+		log.info("loading network from " + config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		world.complete();
 		log.info("done.");
 
@@ -301,7 +301,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 //		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 //		log.info("done.");
 
-		String eventsfile = Gbl.getConfig().events().getInputFile();
+		String eventsfile = config.events().getInputFile();
 
 		final CoordinateReferenceSystem targetCRS = CRS.parseWKT( WGS84_UTM47S);
 

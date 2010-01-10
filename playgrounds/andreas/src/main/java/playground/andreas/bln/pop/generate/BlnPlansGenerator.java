@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -366,7 +367,7 @@ public class BlnPlansGenerator {
 	}
 
 	private void writePopulationToFile(Collection<PersonImpl> personList, String filename){
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		int numberOfPersonWithPlans = 0;
 		for (PersonImpl person : personList) {
 			pop.addPerson(person);

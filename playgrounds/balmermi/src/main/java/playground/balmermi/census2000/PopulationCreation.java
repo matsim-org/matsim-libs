@@ -20,6 +20,7 @@
 
 package playground.balmermi.census2000;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -51,7 +52,8 @@ public class PopulationCreation {
 
 		System.out.println("MATSim-POP: create Population based on census2000 data.");
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl();
+		World world = scenario.getWorld();
 		
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
@@ -59,7 +61,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
@@ -89,7 +91,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

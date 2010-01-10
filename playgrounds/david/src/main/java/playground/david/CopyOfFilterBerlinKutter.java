@@ -89,7 +89,7 @@ public class CopyOfFilterBerlinKutter {
 		network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
-		relevantPopulation = new PopulationImpl();
+		relevantPopulation = new ScenarioImpl().getPopulation();
 //		PopulationImpl population = scenario.getPopulation();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
 //		population.addAlgorithm(new FilterPersonsNonCarMode());

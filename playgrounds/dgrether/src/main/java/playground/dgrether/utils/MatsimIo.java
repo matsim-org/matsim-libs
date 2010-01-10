@@ -23,6 +23,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -73,9 +74,11 @@ public class MatsimIo {
 
 
 	public static PopulationImpl loadPlans(final String filename, final NetworkLayer network) {
-		PopulationImpl plans = new PopulationImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.setNetwork(network);
+		PopulationImpl plans = scenario.getPopulation();
 		log.info("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(filename);
 		log.info("  done");
 		return plans;

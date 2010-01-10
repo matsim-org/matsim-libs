@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -100,30 +101,21 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 	private int warnPlanTypeCount = 0;
 
-	/**
-	 * @param pop
-	 * @param network
-	 * @param facilities
-	 * @deprecated use PoopulationReaderMatsimV4(Scenario)
-	 */
-	@Deprecated
-	public PopulationReaderMatsimV4(final Population pop, final Network network, final ActivityFacilities facilities, final Knowledges knowledges) {
-		this.plans = pop;
-		this.network = network;
-		this.facilities = facilities;
-		this.knowledges = knowledges;
-	}
-
-	public PopulationReaderMatsimV4(final ScenarioImpl scenario) {
+	public PopulationReaderMatsimV4(final Scenario scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
-		this.facilities = (scenario).getActivityFacilities();
-		this.knowledges = new KnowledgesImpl();
-	}
-
-	public PopulationReaderMatsimV4(final ScenarioImpl sc, final Knowledges knowledges){
-		this(sc);
-		this.knowledges = knowledges;
+		if (scenario instanceof ScenarioImpl) {
+			this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+			Knowledges k = ((ScenarioImpl) scenario).getKnowledges();
+			if (k == null) {
+				this.knowledges = new KnowledgesImpl(); // we need knowledges to read in a file				
+			} else {
+				this.knowledges = k;
+			}
+		} else {
+			this.facilities = null;
+			this.knowledges = new KnowledgesImpl();
+		}
 	}
 
 	@Override

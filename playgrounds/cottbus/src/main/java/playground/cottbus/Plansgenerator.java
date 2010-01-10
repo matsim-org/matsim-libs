@@ -21,6 +21,7 @@
 package playground.cottbus;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -63,7 +64,7 @@ public class Plansgenerator {
 
 	private void createPlans() throws Exception {
 		init();
-		this.plans = new PopulationImpl();
+		this.plans = new ScenarioImpl().getPopulation();
 		final int HOME_END_TIME = 6 * 3600; // time to start
 		
 		createDenverStraight(HOME_END_TIME);

@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -29,7 +30,7 @@ public class PlanRouteCalculator {
 	private Map <Id, List<StaticConnection>> connectionMap = new TreeMap <Id, List<StaticConnection>>();;
 	private TransitSchedule transitSchedule;
 	private NetworkLayer net;
-	private PopulationImpl population = new PopulationImpl();
+	private PopulationImpl population;
 	private KroutesCalculator kRoutesCalculator;
 	PlainTimeTable plainTimeTable;
 	
@@ -85,7 +86,7 @@ public class PlanRouteCalculator {
 	
 	/** sets the most appropriate route for plans from the precalculated static routes*/
 	public void findRoutes(){
-		PopulationImpl newPopulation = new PopulationImpl();
+		PopulationImpl newPopulation = new ScenarioImpl().getPopulation();
 		
 		for (Person person: population.getPersons().values()) {
 				//if ( true ) {
@@ -147,7 +148,6 @@ public class PlanRouteCalculator {
 		leg.setTravelTime(ptTrip.getTravelTime());
 		return leg;
 	}
-	
 	
 	
 

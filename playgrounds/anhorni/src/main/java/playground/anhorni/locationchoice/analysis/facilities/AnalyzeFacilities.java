@@ -28,12 +28,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.world.World;
 
 public class AnalyzeFacilities {
 
@@ -44,19 +43,18 @@ public class AnalyzeFacilities {
 	public static void main(final String[] args) {
 
 		Gbl.startMeasurement();
-		final AnalyzeFacilities analyzer = new AnalyzeFacilities();
+		ScenarioImpl scenario = new ScenarioImpl();
+
 		
-		World world = Gbl.createWorld();
 		log.info("reading the facilities ...");
-		ActivityFacilitiesImpl facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new FacilitiesReaderMatsimV1(facilities).readFile("input/facilities/facilities_KTIYear2.xml.gz");
 				
+		final AnalyzeFacilities analyzer = new AnalyzeFacilities();
 		analyzer.run(facilities);
 		Gbl.printElapsedTime();
 	}
 	
-	
-		
 	public void run(ActivityFacilitiesImpl facilities) {
 		this.facilities = facilities;
 		this.write("./output/facilities/");
