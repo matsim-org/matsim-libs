@@ -23,6 +23,7 @@
  */
 package playground.johannes.itsc08;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -58,7 +59,7 @@ public class ReactRouteGuidance implements RouteProvider {
 	}
 
 	@Override
-	public boolean providesRoute(Link currentLinkId, NetworkRouteWRefs subRoute) {
+	public boolean providesRoute(Id currentLinkId, NetworkRouteWRefs subRoute) {
 		return true;
 	}
 
