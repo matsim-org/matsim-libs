@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SNGraphMLReader.java
+ * SampledSpatialGraphMLReader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,77 +17,77 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
-package org.matsim.contrib.sna.graph.spatial.io;
+package org.matsim.contrib.sna.snowball.spatial.io;
 
 import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphML;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.sna.snowball.io.SampledGraphML;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraphBuilder;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseEdge;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseGraph;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseVertex;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.Attributes;
 
+
 /**
- * An extension to {@link AbstractGraphMLReader} that includes reading spatial
- * information from spatial graphs
+ * Extension to {@link AbstractGraphMLReader} that accounts for spatial
+ * information such as the {@link SpatialGraphMLReader} and snowball sampling
+ * information. Parses the {@link SampledGraphML#DETECTED_ATTR} attribute and
+ * {@link SampledGraphML#SAMPLED_ATTR} attribute.
  * 
  * @author illenberger
  * 
  */
-public class SpatialGraphMLReader
-		extends
-		AbstractGraphMLReader<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> {
+public class SampledSpatialGraphMLReader extends AbstractGraphMLReader<SampledSpatialSparseGraph, SampledSpatialSparseVertex, SampledSpatialSparseEdge> {
 
-	private SpatialSparseGraphBuilder builder;
-
+	private SampledSpatialGraphBuilder builder;
+	
 	/**
 	 * @see {@link AbstractGraphMLReader#readGraph(String)}
 	 */
 	@Override
-	public SpatialSparseGraph readGraph(String file) {
-		return (SpatialSparseGraph) super.readGraph(file);
+	public SampledSpatialSparseGraph readGraph(String file) {
+		return (SampledSpatialSparseGraph) super.readGraph(file);
 	}
-
+	
 	/**
 	 * @see {@link SampledSpatialGraphBuilder#addEdge(SampledSpatialSparseGraph, SampledSpatialSparseVertex, SampledSpatialSparseVertex)}
 	 */
 	@Override
-	protected SpatialSparseEdge addEdge(SpatialSparseVertex v1,
-			SpatialSparseVertex v2, Attributes attrs) {
-		return builder.addEdge(getGraph(), v1, v2);
+	protected SampledSpatialSparseEdge addEdge(SampledSpatialSparseVertex v1, SampledSpatialSparseVertex v2,
+			Attributes attrs) {
+		return builder.addEdge((SampledSpatialSparseGraph)getGraph(), (SampledSpatialSparseVertex)v1, (SampledSpatialSparseVertex)v2);
 	}
 
 	/**
-	 * Parses the attributes data and adds a new vertex with spatial information
-	 * to the graph.
+	 * Parses the attributes data and adds a new vertex with spatial and sampled
+	 * information to the graph.
 	 * 
-	 * @param attrs
-	 *            the attributes data.
+	 * @param attrs the attributes data.
 	 */
 	@Override
-	protected SpatialSparseVertex addVertex(Attributes attrs) {
-		return builder.addVertex((SpatialSparseGraph) getGraph(),
-				SpatialGraphML.newPoint(attrs));
+	protected SampledSpatialSparseVertex addVertex(Attributes attrs) {
+		SampledSpatialSparseVertex v = builder.addVertex((SampledSpatialSparseGraph)getGraph(), SpatialGraphML.newPoint(attrs));
+		
+		SampledGraphML.applyDetectedState(v, attrs);
+		SampledGraphML.applySampledState(v, attrs);
+		
+		return v;
 	}
 
 	/**
-	 * Creates and returns a new spatial sparse graph with its coordinate
-	 * reference system set to the SRID in the attributes data.
+	 * Creates and returns a new sampled spatial sparse graph with its
+	 * coordinate reference system set to the SRID in the attributes data.
 	 * 
-	 * @param attrs
-	 *            the attributes data.
+	 * @param attrs the attributes data.
 	 */
 	@Override
-	protected SpatialSparseGraph newGraph(Attributes attrs) {
-		CoordinateReferenceSystem crs = SpatialGraphML.newCRS(attrs);
-		builder = new SpatialSparseGraphBuilder(crs);
+	protected SampledSpatialSparseGraph newGraph(Attributes attrs) {
+		CoordinateReferenceSystem crs = SpatialGraphML.newCRS(attrs); 
+		builder = new SampledSpatialGraphBuilder(crs);
 		return builder.createGraph();
 	}
+
 }

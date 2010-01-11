@@ -37,6 +37,13 @@ public class SpatialSparseGraph extends SparseGraph implements SpatialGraph {
 
 	private final CoordinateReferenceSystem crs;
 	
+	/**
+	 * Creates a new spatial sparse graph with the given coordinate reference
+	 * system.
+	 * 
+	 * @param crs
+	 *            a coordinate reference system.
+	 */
 	public SpatialSparseGraph(CoordinateReferenceSystem crs) {
 		this.crs = crs;
 	}
