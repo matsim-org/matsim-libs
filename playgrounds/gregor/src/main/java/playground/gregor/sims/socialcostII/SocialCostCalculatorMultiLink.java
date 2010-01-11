@@ -23,8 +23,8 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationBeforeCleanupEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationBeforeCleanupListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -34,7 +34,7 @@ import org.matsim.core.utils.misc.IntegerCache;
 
 import playground.gregor.sims.run.MarginalCostControlerMultiLink;
 
-public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimListener, QueueSimulationBeforeCleanupListener, LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler{
+public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimListener, SimulationBeforeCleanupListener, LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler{
 
 	private static final Logger  log = Logger.getLogger(SocialCostCalculatorMultiLink.class);
 	
@@ -82,7 +82,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 
 	
 	public void notifySimulationBeforeCleanup(
-			QueueSimulationBeforeCleanupEvent e) {
+			SimulationBeforeCleanupEvent e) {
 		
 		recalculateSocialCosts();
 //		this.linkInfos.clear();

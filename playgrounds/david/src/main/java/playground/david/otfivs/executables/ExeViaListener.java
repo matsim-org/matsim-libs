@@ -40,10 +40,10 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.vis.otfvis.OTFClientFile;
@@ -137,8 +137,8 @@ public static class OTFControlerListener implements
 StartupListener,
 BeforeMobsimListener, 
 AfterMobsimListener, 
-QueueSimulationInitializedListener<QueueSimulation>,
-QueueSimulationAfterSimStepListener<QueueSimulation> {
+SimulationInitializedListener<QueueSimulation>,
+SimulationAfterSimStepListener<QueueSimulation> {
 
 	private QueueNetwork queueNetwork;
 	protected OnTheFlyServer otfserver;
@@ -155,7 +155,7 @@ QueueSimulationAfterSimStepListener<QueueSimulation> {
 		otfserver.setControllerStatus(OTFVisController.REPLANNING + cont.getIteration()+1);
 	}
 
-	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent<QueueSimulation> e) {
+	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent<QueueSimulation> e) {
 		int status = otfserver.updateStatus(e.getSimulationTime());
 		if(otfserver.getRequestStatus() == OTFVisController.CANCEL) {
 //			try {
@@ -171,7 +171,7 @@ QueueSimulationAfterSimStepListener<QueueSimulation> {
 		}
 	}
 
-	public void notifySimulationInitialized(QueueSimulationInitializedEvent<QueueSimulation> e) {
+	public void notifySimulationInitialized(SimulationInitializedEvent<QueueSimulation> e) {
 		QueueSimulation q = e.getQueueSimulation();
 		otfserver.events = QueueSimulation.getEvents();
 		otfserver.replaceQueueNetwork(q.getQueueNetwork());
@@ -213,8 +213,8 @@ public static class OTFPopShowListener extends OTFControlerListener implements
 StartupListener,
 BeforeMobsimListener, 
 AfterMobsimListener, 
-QueueSimulationInitializedListener<QueueSimulation>,
-QueueSimulationAfterSimStepListener<QueueSimulation> {
+SimulationInitializedListener<QueueSimulation>,
+SimulationAfterSimStepListener<QueueSimulation> {
 	@Override
 	protected void startupClient(String url)  {
 		OTFVisConfig visconf = new OTFVisConfig();

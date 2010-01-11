@@ -30,10 +30,10 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationBeforeCleanupEvent;
+import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationBeforeCleanupListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.run.OTFVis;
 
@@ -78,17 +78,17 @@ public class DaganzoRunner {
 	}
 	
 	private void addQueueSimListener(final Controler controler) {
-		controler.getQueueSimulationListener().add(new QueueSimulationInitializedListener<QueueSimulation>() {
+		controler.getQueueSimulationListener().add(new SimulationInitializedListener<QueueSimulation>() {
 			//add the adaptive controller as events listener
-			public void notifySimulationInitialized(QueueSimulationInitializedEvent<QueueSimulation> e) {
+			public void notifySimulationInitialized(SimulationInitializedEvent<QueueSimulation> e) {
 				QueueSimulation qs = e.getQueueSimulation();
 				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				controler.getEvents().addHandler(adaptiveController);
 			}
 		});
 		//remove the adaptive controller
-		controler.getQueueSimulationListener().add(new QueueSimulationBeforeCleanupListener<QueueSimulation>() {
-			public void notifySimulationBeforeCleanup(QueueSimulationBeforeCleanupEvent<QueueSimulation> e) {
+		controler.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QueueSimulation>() {
+			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QueueSimulation> e) {
 				QueueSimulation qs = e.getQueueSimulation();
 				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				controler.getEvents().removeHandler(adaptiveController);

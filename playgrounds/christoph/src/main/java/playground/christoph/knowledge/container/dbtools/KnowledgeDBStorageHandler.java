@@ -11,8 +11,8 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationBeforeSimStepListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
@@ -25,7 +25,7 @@ import playground.christoph.router.util.KnowledgeTools;
  * This Class takes care of the Data Exchange between the Persons 
  * and the Database that contains their Knowledge. 
  */
-public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEventHandler, QueueSimulationBeforeSimStepListener{
+public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEventHandler, SimulationBeforeSimStepListener{
 
 	private ArrayList<PersonImpl> newPersons = new ArrayList<PersonImpl>();
 	private LinkedList<PersonImpl> personsToProcess = new LinkedList<PersonImpl>();
@@ -172,7 +172,7 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 		offsetActivityEndsList.add(agent);
 	}
 	
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent e) 
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) 
 	{
 		handleOffsetActivityEnds(e.getSimulationTime());
 	}

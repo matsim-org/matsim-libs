@@ -26,13 +26,13 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.mobsim.Simulation;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationInitializedListener;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;
@@ -61,8 +61,8 @@ public class TravelTimeEstimatorHandlerAndListener implements
 		ExtendedAgentReplanEventHandler, AgentStuckEventHandler,
 		LinkLeaveEventHandler,
 		// IterationStartsListener,
-		QueueSimulationInitializedListener,
-		QueueSimulationBeforeSimStepListener {
+		SimulationInitializedListener,
+		SimulationBeforeSimStepListener {
 
 	private static final Logger log = Logger.getLogger(TravelTimeEstimatorHandlerAndListener.class);
 
@@ -177,7 +177,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 	 * n-TimeSteps to update the Arrays.
 	 */
 	// public void notifyIterationStarts(IterationStartsEvent event)
-	public void notifySimulationInitialized(QueueSimulationInitializedEvent event)
+	public void notifySimulationInitialized(SimulationInitializedEvent event)
 	{
 		Simulation sim = event.getQueueSimulation();
 		if (sim instanceof QueueSimulation)
@@ -250,7 +250,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 	 * - Finally add new Routes
 	 */
 	// implements QueueSimulationBeforeSimStepHandler
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent event)
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent event)
 	{	
 		Iterator<NetworkRouteWRefs> iter;
 		Iterator<ReplaceRouteContainer> iter2;

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationInitializedListener;
 
 import playground.christoph.router.util.LookupTable;
 
@@ -24,7 +24,7 @@ import playground.christoph.router.util.LookupTable;
  * LookupTable. All clones should use the same instance of
  * the Data Structure that is used to implement the LookupTable.
  */
-public class LookupTableUpdater implements QueueSimulationAfterSimStepListener, QueueSimulationInitializedListener{
+public class LookupTableUpdater implements SimulationAfterSimStepListener, SimulationInitializedListener{
 	
 	/*
 	 * We can handle different Replanner Arrays.
@@ -60,7 +60,7 @@ public class LookupTableUpdater implements QueueSimulationAfterSimStepListener, 
 	}
 	
 
-	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e)
+	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e)
 	{
 //		System.out.println("LookupTableUpdater QueueSimulationAfterSimStepEvent " + e.getSimulationTime() + "-------------------------------------------------------------------------------");
 		/*
@@ -71,7 +71,7 @@ public class LookupTableUpdater implements QueueSimulationAfterSimStepListener, 
 		updateLinkLookupTables(e.getSimulationTime() + SimulationTimer.getSimTickTime());
 	}
 
-	public void notifySimulationInitialized(QueueSimulationInitializedEvent e)
+	public void notifySimulationInitialized(SimulationInitializedEvent e)
 	{
 //		System.out.println("LookupTableUpdater QueueSimulationInitializedEvent-------------------------------------------------------------------------------");
 		/*

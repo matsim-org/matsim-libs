@@ -23,10 +23,10 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationInitializedListener;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.christoph.network.MyLinkImpl;
@@ -34,8 +34,8 @@ import playground.christoph.network.MyLinkImpl;
 public class LinkVehiclesCounter implements LinkEnterEventHandler,
 		LinkLeaveEventHandler, AgentArrivalEventHandler,
 		AgentDepartureEventHandler, AgentWait2LinkEventHandler,
-		AgentStuckEventHandler, QueueSimulationAfterSimStepListener,
-		QueueSimulationInitializedListener {
+		AgentStuckEventHandler, SimulationAfterSimStepListener,
+		SimulationInitializedListener {
 
 	/*
 	 * Counts the number of Vehicles on the QueueLinks of a given QueueNetwork.
@@ -275,7 +275,7 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 	 * To use this method, some getters have to be added to the QueueLink Class!
 	 */
 	
-	private synchronized void checkVehicleCount(QueueSimulationAfterSimStepEvent e)
+	private synchronized void checkVehicleCount(SimulationAfterSimStepEvent e)
 	{  
 //		log.info("checking Vehicle Count");
 //		if (e.getSimulationTime() >= infoTime) 
@@ -446,7 +446,7 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 		return count;
 	}
 
-	public synchronized void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
+	public synchronized void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
 //		log.info("SimStep done..." + e.getSimulationTime());
 //		System.out.println("LinkVehiclesCounter QueueSimulationAfterSimStepEvent " + e.getSimulationTime() + "-------------------------------------------------------------------------------");
 		// Check the vehicle count every Hour
@@ -456,7 +456,7 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 		updateLinkVehicleCounts();
 	}
 
-	public void notifySimulationInitialized(QueueSimulationInitializedEvent e)
+	public void notifySimulationInitialized(SimulationInitializedEvent e)
 	{	
 //		System.out.println("LinkVehiclesCounter QueueSimulationInitializedEvent-------------------------------------------------------------------------------");
 		createInitialCounts();

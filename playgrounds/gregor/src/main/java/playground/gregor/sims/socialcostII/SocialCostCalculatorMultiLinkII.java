@@ -18,8 +18,8 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationBeforeCleanupEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationBeforeCleanupListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
@@ -29,7 +29,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
 
-public class SocialCostCalculatorMultiLinkII implements TravelCost, QueueSimulationBeforeCleanupListener, BeforeMobsimListener, LinkEnterEventHandler, AgentStuckEventHandler{
+public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBeforeCleanupListener, BeforeMobsimListener, LinkEnterEventHandler, AgentStuckEventHandler{
 
 	
 	private final NetworkLayer network;
@@ -73,7 +73,7 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, QueueSimulat
 
 	
 	public void notifySimulationBeforeCleanup(
-			QueueSimulationBeforeCleanupEvent e) {
+			SimulationBeforeCleanupEvent e) {
 		recalculateSocialCosts();
 
 	}

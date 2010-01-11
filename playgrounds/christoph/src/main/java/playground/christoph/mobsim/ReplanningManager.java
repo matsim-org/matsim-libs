@@ -2,8 +2,8 @@ package playground.christoph.mobsim;
 
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationBeforeSimStepListener;
 
 /*
  * This Class implements a QueueSimulationBeforeSimStepListener.
@@ -12,7 +12,7 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeSimStepList
  * whether a WithinDayReplanning of the Agents Plans should
  * be done and / or is necessary.
  */
-public class ReplanningManager implements QueueSimulationBeforeSimStepListener{
+public class ReplanningManager implements SimulationBeforeSimStepListener{
 
 	protected boolean actEndReplanning = false;
 	protected boolean leaveLinkReplanning = false;
@@ -71,7 +71,7 @@ public class ReplanningManager implements QueueSimulationBeforeSimStepListener{
 	{
 		return this.actEndReplanningModule;
 	}
-		
+	
 	public void doLeaveLinkReplanning(boolean value)
 	{
 		leaveLinkReplanning = value;
@@ -92,7 +92,7 @@ public class ReplanningManager implements QueueSimulationBeforeSimStepListener{
 		return this.leaveLinkReplanningModule;
 	}
 	
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent e)
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e)
 	{
 		if (isActEndReplanning())
 		{

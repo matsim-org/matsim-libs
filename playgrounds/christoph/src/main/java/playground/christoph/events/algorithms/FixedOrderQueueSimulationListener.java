@@ -3,12 +3,12 @@ package playground.christoph.events.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationInitializedListener;
 
 /*
  * To avoid problems with the order of some
@@ -17,69 +17,69 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListen
  * something like ParallelListenerHandling
  * should not able to break the order. 
  */
-public class FixedOrderQueueSimulationListener implements QueueSimulationAfterSimStepListener, 
-		QueueSimulationInitializedListener, QueueSimulationBeforeSimStepListener {
+public class FixedOrderQueueSimulationListener implements SimulationAfterSimStepListener, 
+		SimulationInitializedListener, SimulationBeforeSimStepListener {
 
-	List<QueueSimulationBeforeSimStepListener> queueSimulationBeforeSimStepListener;
-	List<QueueSimulationAfterSimStepListener> queueSimulationAfterSimStepListener;
-	List<QueueSimulationInitializedListener> queueSimulationInitializedListener;
+	List<SimulationBeforeSimStepListener> simulationBeforeSimStepListener;
+	List<SimulationAfterSimStepListener> simulationAfterSimStepListener;
+	List<SimulationInitializedListener> simulationInitializedListener;
 	
 	public FixedOrderQueueSimulationListener()
 	{
-		queueSimulationBeforeSimStepListener = new ArrayList<QueueSimulationBeforeSimStepListener>();
-		queueSimulationAfterSimStepListener = new ArrayList<QueueSimulationAfterSimStepListener>();
-		queueSimulationInitializedListener = new ArrayList<QueueSimulationInitializedListener>();
+		simulationBeforeSimStepListener = new ArrayList<SimulationBeforeSimStepListener>();
+		simulationAfterSimStepListener = new ArrayList<SimulationAfterSimStepListener>();
+		simulationInitializedListener = new ArrayList<SimulationInitializedListener>();
 	}
 	
-	public void addQueueSimulationBeforeSimStepListener(QueueSimulationBeforeSimStepListener listener)
+	public void addQueueSimulationBeforeSimStepListener(SimulationBeforeSimStepListener listener)
 	{
-		queueSimulationBeforeSimStepListener.add(listener);
+		simulationBeforeSimStepListener.add(listener);
 	}
 	
-	public void removeQueueSimulationBeforeSimStepListener(QueueSimulationBeforeSimStepListener listener)
+	public void removeQueueSimulationBeforeSimStepListener(SimulationBeforeSimStepListener listener)
 	{
-		queueSimulationBeforeSimStepListener.remove(listener);
+		simulationBeforeSimStepListener.remove(listener);
 	}
 	
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent e)
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e)
 	{
-		for(QueueSimulationBeforeSimStepListener listener : queueSimulationBeforeSimStepListener)
+		for(SimulationBeforeSimStepListener listener : simulationBeforeSimStepListener)
 		{
 			listener.notifySimulationBeforeSimStep(e);
 		}
 	}
 	
-	public void addQueueSimulationAfterSimStepListener(QueueSimulationAfterSimStepListener listener)
+	public void addQueueSimulationAfterSimStepListener(SimulationAfterSimStepListener listener)
 	{
-		queueSimulationAfterSimStepListener.add(listener);
+		simulationAfterSimStepListener.add(listener);
 	}
 	
-	public void removeQueueSimulationAfterSimStepListener(QueueSimulationAfterSimStepListener listener)
+	public void removeQueueSimulationAfterSimStepListener(SimulationAfterSimStepListener listener)
 	{
-		queueSimulationAfterSimStepListener.remove(listener);
+		simulationAfterSimStepListener.remove(listener);
 	}
 
-	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e)
+	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e)
 	{
-		for(QueueSimulationAfterSimStepListener listener : queueSimulationAfterSimStepListener)
+		for(SimulationAfterSimStepListener listener : simulationAfterSimStepListener)
 		{
 			listener.notifySimulationAfterSimStep(e);
 		}
 	}
 	
-	public void addQueueSimulationInitializedListener(QueueSimulationInitializedListener listener)
+	public void addQueueSimulationInitializedListener(SimulationInitializedListener listener)
 	{
-		queueSimulationInitializedListener.add(listener);
+		simulationInitializedListener.add(listener);
 	}
 	
-	public void removeQueueSimulationInitializedListener(QueueSimulationInitializedListener listener)
+	public void removeQueueSimulationInitializedListener(SimulationInitializedListener listener)
 	{
-		queueSimulationInitializedListener.remove(listener);
+		simulationInitializedListener.remove(listener);
 	}
 
-	public void notifySimulationInitialized(QueueSimulationInitializedEvent e)
+	public void notifySimulationInitialized(SimulationInitializedEvent e)
 	{
-		for(QueueSimulationInitializedListener listener : queueSimulationInitializedListener)
+		for(SimulationInitializedListener listener : simulationInitializedListener)
 		{
 			listener.notifySimulationInitialized(e);
 		}
