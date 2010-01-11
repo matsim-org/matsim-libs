@@ -84,7 +84,7 @@ public class OTFSnapshotGenerator {
 		SheltersColorizer s = new SheltersColorizer(this.scenario.getConfig().evacuation().getBuildingsFile(),this.scenario.getConfig().simulation().getSnapshotPeriod(), this.scenario.getConfig().evacuation().getSampleSize());
 		ev.addHandler(s);
 		
-		OTFBackgroundTexturesDrawer sbg = new OTFBackgroundTexturesDrawer("./res/arrow.png");
+		OTFBackgroundTexturesDrawer sbg = new OTFBackgroundTexturesDrawer("arrow.png");
 		ConfluenceArrowsFromEvents c = new ConfluenceArrowsFromEvents(sbg,this.scenario.getNetwork());
 		
 //		SimpleBackgroundTextureDrawer sbgII = new SimpleBackgroundTextureDrawer("./res/arrow.png");
