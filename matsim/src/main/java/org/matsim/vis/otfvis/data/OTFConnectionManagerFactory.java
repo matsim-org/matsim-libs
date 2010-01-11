@@ -18,7 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 package org.matsim.vis.otfvis.data;
-
+/**
+ * Create a OTFConnectionManager by an implementation of this interface.
+ * @author dgrether
+ */
 public interface OTFConnectionManagerFactory {
 
 	public OTFConnectionManager createConnectionManager();
