@@ -30,10 +30,10 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.queuesim.events.SimulationBeforeCleanupEvent;
-import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.queuesim.listener.SimulationBeforeCleanupListener;
-import org.matsim.core.mobsim.queuesim.listener.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.run.OTFVis;
 
