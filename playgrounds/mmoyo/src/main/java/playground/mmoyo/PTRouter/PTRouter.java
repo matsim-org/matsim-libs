@@ -68,9 +68,14 @@ public class PTRouter{
 	
 	/**Calculates pt route between acts*/
 	public List<Leg> calcRoute(final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+
+		if ( fromAct.getLinkId()==null ||  toAct.getLinkId()== null){
+			return calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
+		}
 		if (!fromAct.getLinkId().equals(toAct.getLinkId())){
 			return calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
 		}
+		
 		//if the two activities are located in the same link, create an undefined transport mode leg between them
 		//System.out.println(fromAct.getType() + " " + toAct.getType() + " " + fromAct.getLinkId() + " " + toAct.getLinkId());
 		GenericRouteImpl undefinedRoute = new GenericRouteImpl(fromAct.getLink(),toAct.getLink());
