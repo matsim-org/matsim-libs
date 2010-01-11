@@ -51,6 +51,18 @@ public class PhDControlerTest extends MatsimTestCase {
 		
 	}
 	
+	public void testTAMRouterScoreAveraging() {
+
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), 52.370311668515555);
+		expectedPlanScores.put(new IdImpl(1033), 39.675732344558334);
+		expectedPlanScores.put(new IdImpl(1072), 45.48907135849646);
+		expectedPlanScores.put(new IdImpl(947), 103.69025623928374);
+		
+		this.runATest(expectedPlanScores);
+
+	}
+	
 	public void testPlanomatOnly() {
 
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
