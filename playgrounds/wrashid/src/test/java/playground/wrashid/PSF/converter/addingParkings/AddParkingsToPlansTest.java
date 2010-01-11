@@ -47,9 +47,6 @@ public class AddParkingsToPlansTest extends MatsimTestCase {
 		assertEquals("13816", ((Activity) person.getSelectedPlan().getPlanElements().get(4)).getLinkId().toString());
 		// TODO: the facility Ids seem to be missing...
 		
-		
-		//assertEquals(true, false);
-		
 		// check, that the agent with walk legs did not convert them to additional legs with parkings...
 		person=population.getPersons().get(new IdImpl("1"));
 		assertEquals(9, person.getSelectedPlan().getPlanElements().size());
