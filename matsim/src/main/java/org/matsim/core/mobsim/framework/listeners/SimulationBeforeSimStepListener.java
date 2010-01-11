@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationListener
+ * QueueSimulationBeforeSimStepListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,18 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
-
-import java.util.EventListener;
+package org.matsim.core.mobsim.framework.listeners;
 
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 
 
 /**
- * A tagging interface that all QueueSimulationListeners must extend.
+ *  Listeners of QueueSimulation should implement this if they want to be 
+ *  notified after QueueSimulation.beforeSimStep() was invoked.
  * @author dgrether
  *
  */
-public interface SimulationListener<T extends Simulation> extends EventListener {
+public interface SimulationBeforeSimStepListener<T extends Simulation> extends SimulationListener<T> {
 
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent<T> e);
+	
 }

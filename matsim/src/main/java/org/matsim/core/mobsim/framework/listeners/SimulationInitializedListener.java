@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepEvent
+ * QueueSimulationInitializedListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,17 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.events;
+package org.matsim.core.mobsim.framework.listeners;
 
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 
 
 /**
- * Is thrown by QueueSimulation after QueueSimulation.beforeSimStep() was invoked.
+ * Implement this listener interface if you want to be notified when the QueueSimulation's
+ * setup process is completed.
  * @author dgrether
+ *
  */
-public interface SimulationBeforeSimStepEvent<T extends Simulation> extends SimulationEvent<T> {
+public interface SimulationInitializedListener<T extends Simulation> extends SimulationListener<T> {
 
-	public double getSimulationTime();
-
+	public void notifySimulationInitialized(SimulationInitializedEvent<T> e);
+	
 }

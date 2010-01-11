@@ -21,10 +21,10 @@ package org.matsim.signalsystems.control;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.events.SignalGroupStateChangedEventImpl;
-import org.matsim.core.mobsim.queuesim.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.queuesim.listener.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.queuesim.listener.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.SignalGroupSettings;

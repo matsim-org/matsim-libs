@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepEventImpl
+ * QueueSimulationBeforeCleanupEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.events;
+package org.matsim.core.mobsim.framework.events;
 
 import org.matsim.core.mobsim.framework.Simulation;
 
 
 /**
- * @author dgrether
+ * Default implementation of {@link SimulationAfterSimStepEvent}.
+ * 
+ * @author mrieser
  */
-public class SimulationBeforeSimStepEventImpl<T extends Simulation> extends AbstractSimulationEvent<T>  
-	implements SimulationBeforeSimStepEvent<T> {
+public class SimulationAfterSimStepEventImpl<T extends Simulation> 
+		extends AbstractSimulationEvent<T> implements SimulationAfterSimStepEvent<T> {
 
-	private double time;
-
-	public SimulationBeforeSimStepEventImpl(T queuesim, double time) {
+	private final double simTime;
+	
+	public SimulationAfterSimStepEventImpl(final T queuesim, final double simTime) {
 		super(queuesim);
-		this.time = time;
+		this.simTime = simTime;
 	}
 
-	/**
-	 * @see org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEvent#getSimulationTime()
-	 */
 	public double getSimulationTime() {
-		return this.time;
+		return this.simTime;
 	}
+
 }

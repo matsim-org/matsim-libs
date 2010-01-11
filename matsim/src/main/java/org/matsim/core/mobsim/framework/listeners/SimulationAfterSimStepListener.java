@@ -18,10 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim.listener;
+package org.matsim.core.mobsim.framework.listeners;
 
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.mobsim.queuesim.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 
 /**
  * This interface can be implemented when a notification is needed after the

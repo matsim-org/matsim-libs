@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework;
 
-import org.matsim.core.mobsim.queuesim.listener.SimulationListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 
 
 /**

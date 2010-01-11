@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeCleanupEventImpl
+ * QueueSimulationListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.events;
+package org.matsim.core.mobsim.framework.listeners;
+
+import java.util.EventListener;
 
 import org.matsim.core.mobsim.framework.Simulation;
 
 
 /**
- * Default implementation of {@link SimulationAfterSimStepEvent}.
- * 
- * @author mrieser
+ * A tagging interface that all QueueSimulationListeners must extend.
+ * @author dgrether
+ *
  */
-public class SimulationAfterSimStepEventImpl<T extends Simulation> 
-		extends AbstractSimulationEvent<T> implements SimulationAfterSimStepEvent<T> {
-
-	private final double simTime;
-	
-	public SimulationAfterSimStepEventImpl(final T queuesim, final double simTime) {
-		super(queuesim);
-		this.simTime = simTime;
-	}
-
-	public double getSimulationTime() {
-		return this.simTime;
-	}
+public interface SimulationListener<T extends Simulation> extends EventListener {
 
 }

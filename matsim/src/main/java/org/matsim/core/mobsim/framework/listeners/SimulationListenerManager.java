@@ -18,19 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim.listener;
+package org.matsim.core.mobsim.framework.listeners;
 
 import javax.swing.event.EventListenerList;
 
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.mobsim.queuesim.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.queuesim.events.SimulationAfterSimStepEventImpl;
-import org.matsim.core.mobsim.queuesim.events.SimulationBeforeCleanupEvent;
-import org.matsim.core.mobsim.queuesim.events.SimulationBeforeCleanupEventImpl;
-import org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEventImpl;
-import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEventImpl;
+import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEventImpl;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEventImpl;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEventImpl;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEventImpl;
 
 /**
  * Helper for the QueueSimulation to manage their listeners and fire

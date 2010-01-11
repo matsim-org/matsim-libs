@@ -17,20 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.events;
+package org.matsim.core.mobsim.framework.events;
 
 import org.matsim.core.mobsim.framework.Simulation;
 
 
 /**
- * A simple tagging interface to mark all QueueSimulationEvents that are fired
- * before the QueueSimulation instance starts to shut down.
+ * A simple interface for QueueSimulationEvents that are fired for every time step.
  * 
- * @author dgrether
- *
+ * @author mrieser
  */
-public interface SimulationBeforeCleanupEvent
-<T extends Simulation> extends SimulationEvent<T>
-{
+public interface SimulationAfterSimStepEvent<T extends Simulation> 
+	extends SimulationEvent<T>{
+
+	public double getSimulationTime();
 
 }

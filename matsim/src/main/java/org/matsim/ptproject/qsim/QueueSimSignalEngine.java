@@ -29,7 +29,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.queuesim.listener.SimulationListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
 import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;

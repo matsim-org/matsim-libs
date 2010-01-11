@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeCleanupListener
+ * QueueSimulationBeforeCleanupEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,21 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
+package org.matsim.core.mobsim.framework.events;
 
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.mobsim.queuesim.events.SimulationBeforeCleanupEvent;
 
 
 /**
- * This interface can be implemented when a notification is needed before the
- * QueueSimulation instance starts it's shutdown process.
  * @author dgrether
- *
+ * @see SimulationBeforeCleanupEvent
  */
-public interface SimulationBeforeCleanupListener<T extends Simulation> extends
-		SimulationListener<T> {
+public class SimulationBeforeCleanupEventImpl<T extends Simulation> extends
+		AbstractSimulationEvent<T> implements SimulationBeforeCleanupEvent<T> {
 
-	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<T> e);
-	
+	public SimulationBeforeCleanupEventImpl(T queuesim) {
+		super(queuesim);
+	}
+
 }

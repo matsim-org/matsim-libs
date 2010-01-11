@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepListener
+ * AbstractQueueSimulationEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
+package org.matsim.core.mobsim.framework.events;
 
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEvent;
 
 
 /**
- *  Listeners of QueueSimulation should implement this if they want to be 
- *  notified after QueueSimulation.beforeSimStep() was invoked.
+ * An abstract superclass for all classes implementing the
+ * QueueSimulationEvent interface.
  * @author dgrether
  *
  */
-public interface SimulationBeforeSimStepListener<T extends Simulation> extends SimulationListener<T> {
-
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent<T> e);
+public abstract class AbstractSimulationEvent<T extends Simulation> implements
+		SimulationEvent<T> {
 	
+	private T queuesim;
+
+	public AbstractSimulationEvent(T queuesim){
+		this.queuesim = queuesim;
+	}
+	
+	/**
+	 * @see org.matsim.core.mobsim.framework.events.SimulationEvent#getQueueSimulation()
+	 */
+	public T getQueueSimulation() {
+		return this.queuesim;
+	}
+
 }

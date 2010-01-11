@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationInitializedEvent
+ * QueueSimulationBeforeSimStepEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,17 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.events;
+package org.matsim.core.mobsim.framework.events;
 
 import org.matsim.core.mobsim.framework.Simulation;
 
 
 /**
- * Just a tagging interface for QueueSimulationEvents that are fired
- * when the simulation is initialized.
+ * Is thrown by QueueSimulation after QueueSimulation.beforeSimStep() was invoked.
  * @author dgrether
- *
  */
-public interface SimulationInitializedEvent<T extends Simulation> 
-extends SimulationEvent<T>{
+public interface SimulationBeforeSimStepEvent<T extends Simulation> extends SimulationEvent<T> {
+
+	public double getSimulationTime();
+
 }
