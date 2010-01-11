@@ -45,19 +45,13 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	private final static Logger log = Logger.getLogger(ReplanningQueueSimulation.class);
 	
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
-		
+	
 	public ReplanningQueueSimulation(final Network network, final Population population, final EventsManager events)
 	{
 		super(network, population, events);
 		
 		// use WithinDayAgentFactory that creates WithinDayPersonAgents who can reset their chachedNextLink
 		super.setAgentFactory(new WithinDayAgentFactory(this));
-
-		// New QueueSimeEngines that do some parts of the simulation parallel
-//		this.simEngine = new ParallelQueueSimEngine(this.getQueueNetwork(), MatsimRandom.getRandom());
-//		this.simEngine = new ParallelQueueSimEngine2(this.getQueueNetwork(), MatsimRandom.getRandom());
-//		this.simEngine = new ParallelQueueSimEngine3(this.getQueueNetwork(), MatsimRandom.getRandom());
-//		this.simEngine = new ParallelQueueSimEngine4(this.getQueueNetwork(), MatsimRandom.getRandom());
 	}
 	
 	/*
@@ -92,10 +86,10 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	 * for the Knowledge Modules
 	 */
 	@Override
-	protected void scheduleActivityEnd(final DriverAgent agent)
+	protected void scheduleActivityEnd(final DriverAgent driverAgent)
 	{	
-		if (knowledgeDBStorageHandler != null) knowledgeDBStorageHandler.scheduleActivityEnd(agent);
+		if (knowledgeDBStorageHandler != null) knowledgeDBStorageHandler.scheduleActivityEnd(driverAgent);
 //		offsetActivityEndsList.add(agent);
-		super.scheduleActivityEnd(agent);
+		super.scheduleActivityEnd(driverAgent);
 	}
 }

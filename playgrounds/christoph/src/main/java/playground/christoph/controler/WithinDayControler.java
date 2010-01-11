@@ -46,6 +46,7 @@ import playground.christoph.mobsim.ReplanningManager;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
+import playground.christoph.replanning.TravelTimeCollector;
 import playground.christoph.replanning.TravelTimeEstimator;
 import playground.christoph.replanning.TravelTimeEstimatorHandlerAndListener;
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -143,13 +144,24 @@ public class WithinDayControler extends Controler {
 		 * Calculate the TravelTime based on the actual load of the links. Use only 
 		 * the TravelTime to find the LeastCostPath.
 		 */
-		travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
+//		travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
+		// fully initialize & add LinkVehiclesCounter
+//		linkVehiclesCounter.setQueueNetwork(sim.getQueueNetwork());	// for KnowledgeTravelTimeCalculator
+//		foqsl.addQueueSimulationInitializedListener(linkVehiclesCounter);	// for KnowledgeTravelTimeCalculator
+//		foqsl.addQueueSimulationAfterSimStepListener(linkVehiclesCounter);	// for KnowledgeTravelTimeCalculator
+//		this.events.addHandler(linkVehiclesCounter);	// for KnowledgeTravelTimeCalculator
+		
 //		TravelTimeEstimatorHandlerAndListener handlerAndListener = new TravelTimeEstimatorHandlerAndListener(population, network, 60, 86400 * 2);
 //		travelTime = new TravelTimeEstimator(handlerAndListener);
 //		foqsl.addQueueSimulationInitializedListener((TravelTimeEstimatorHandlerAndListener)handlerAndListener); // for TravelTimeEstimator
 //		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeEstimatorHandlerAndListener)handlerAndListener);	// for TravelTimeEstimator
 //		this.events.addHandler((TravelTimeEstimatorHandlerAndListener)handlerAndListener);	// for TravelTimeEstimator
-				
+		
+		travelTime = new TravelTimeCollector(network);
+		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 //		SystemOptimalTravelCostCalculator travelCost = new SystemOptimalTravelCostCalculator(travelTime);
 			
@@ -200,22 +212,14 @@ public class WithinDayControler extends Controler {
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 		
 		createHandlersAndListeners();
-
-		// fully initialize & add LinkVehiclesCounter
-		linkVehiclesCounter.setQueueNetwork(sim.getQueueNetwork());
-		
+				
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
 		 */	
-		foqsl.addQueueSimulationInitializedListener(linkVehiclesCounter);
-		foqsl.addQueueSimulationAfterSimStepListener(linkVehiclesCounter);
-
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
 		
 		sim.addQueueSimulationListeners(foqsl);
-				
-		this.events.addHandler(linkVehiclesCounter);
 		
 		// fully initialize & add LinkReplanningMap
 		linkReplanningMap.setQueueNetwork(sim.getQueueNetwork());

@@ -19,16 +19,25 @@
  * *********************************************************************** */
 package playground.christoph.events.algorithms;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -43,7 +52,9 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 	private CyclicBarrier timeStepStartBarrier;
 	private CyclicBarrier timeStepEndBarrier;
 	
-	private static ReplannerThread[] replannerThreads;
+	private int roundRobin = 0;
+	
+	private ReplannerThread[] replannerThreads;
 	
 	public void run(List<ActivityImpl> fromActs, List<QueueVehicle> vehicles, double time)
 	{	
@@ -78,6 +89,27 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		}
 	}
     
+	public void run(double time)
+	{	
+		try
+		{
+			// set current Time
+			ReplannerThread.setTime(time);
+				
+			this.timeStepStartBarrier.await();
+				
+			this.timeStepEndBarrier.await();		
+		}
+		catch (InterruptedException e)
+		{
+			Gbl.errorMsg(e);
+		}
+		catch (BrokenBarrierException e)
+		{
+	      	Gbl.errorMsg(e);
+		}
+	}
+	
 	@Override
 	public void init()
 	{	
@@ -119,7 +151,13 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		}
 	}
 
-	/**
+	public void addScheduledActivityEnd(DriverAgent driverAgent)
+	{
+		this.replannerThreads[this.roundRobin % this.numOfThreads].addScheduledActivityEnd(driverAgent);
+		this.roundRobin++;
+	}
+	
+	/*
 	 * The thread class that really handles the persons.
 	 */
 	private static class ReplannerThread extends Thread
@@ -132,7 +170,8 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		private final PlanAlgorithm[][] replannerArray;
 		private final LinkedList<QueueVehicle> vehicles = new LinkedList<QueueVehicle>();
 		private final LinkedList<ActivityImpl> fromActs = new LinkedList<ActivityImpl>();
-
+		private final LinkedList<DriverAgent> endingActivities = new LinkedList<DriverAgent>();
+		
 		private CyclicBarrier timeStepStartBarrier;
 		private CyclicBarrier timeStepEndBarrier;
 		
@@ -164,6 +203,60 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 			this.fromActs.add(fromAct);
 		}
 
+		public void addScheduledActivityEnd(DriverAgent driverAgent)
+		{			
+			endingActivities.add(driverAgent);
+		}
+		
+		/*
+		 * Collects the Vehicles and the current Activities of
+		 * the Agents in the EndingActivities List.
+		 */
+		private void getReplanningData()
+		{
+			DriverAgent driverAgent;
+			while ((driverAgent = endingActivities.poll()) != null)
+			{
+				// Skip Agent if Replanning Flag is not set
+				boolean replanning = (Boolean)driverAgent.getPerson().getCustomAttributes().get("endActivityReplanning");
+				if (!replanning) continue;
+					
+				PersonImpl person = (PersonImpl) driverAgent.getPerson();				
+				PersonAgent pa = (PersonAgent) driverAgent;					
+						
+				// New approach using non deprecated Methods
+				// The Person is currently at an Activity and is going to leave it.
+				// The Person's CurrentLeg should point to the leg that leads to that Activity...
+				List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+				
+				Leg leg = pa.getCurrentLeg();
+				
+				ActivityImpl fromAct = null;
+				
+				// first Activity is running - there is no previous Leg
+				if (leg == null)
+				{
+					fromAct = (ActivityImpl)planElements.get(0);
+				}
+				else
+				{
+					int index = planElements.indexOf(leg);
+					// If the leg is part of the Person's plan
+					if (index >= 0)
+					{
+						fromAct = (ActivityImpl)planElements.get(index + 1);
+					}
+				}
+				
+				if (fromAct == null)
+				{
+					log.error("Found fromAct that is null!");
+				}
+				
+				this.handleVehicle(pa.getVehicle(), fromAct);
+			}
+		}
+		
 		@Override
 		public void run()
 		{
@@ -185,6 +278,8 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 					timeStepStartBarrier.await();
 
 //					int numRuns = 0;
+					
+					getReplanningData();
 					
 					while(vehicles.peek() != null)
 					{

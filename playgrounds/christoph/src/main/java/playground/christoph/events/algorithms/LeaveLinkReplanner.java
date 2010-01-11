@@ -23,6 +23,7 @@ package playground.christoph.events.algorithms;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
@@ -130,6 +131,9 @@ public class LeaveLinkReplanner {
 	 */
 	protected void routing()
 	{	
+		// If it is not a car Leg we don't replan it.
+		if (!leg.getMode().equals(TransportMode.car)) return;
+		
 		/*
 		 * Get the index and the currently next Node on the route.
 		 * Entries with a lower index have already been visited!

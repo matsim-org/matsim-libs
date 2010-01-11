@@ -21,6 +21,7 @@
 package playground.christoph.events.algorithms;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -79,7 +80,7 @@ public class ActEndReplanner {
 		else 
 		{
 			toAct = null;
-			log.error("An agents next activity is null - this should not happen!");
+			log.error("An agents next activity is null - this should not happen! AgentId: " + this.person.getId());
 		}
 		
 		// calculate new Route
@@ -89,34 +90,6 @@ public class ActEndReplanner {
 		}
 	}
 	
-//	// used when starting the Replanner "by hand"
-//	public ActEndReplanner(ActivityImpl fromAct, PersonImpl person, double time, PlanAlgorithm replanner)
-//	{
-//		this.fromAct = fromAct;
-//		this.person = person;
-//		this.time = time;
-//		this.replanner = replanner;
-//
-//		Plan plan = person.getSelectedPlan();
-//		this.betweenLeg = ((PlanImpl) plan).getNextLeg(fromAct);
-//	
-//		if(betweenLeg != null)
-//		{
-//			toAct = ((PlanImpl) plan).getNextActivity(betweenLeg);
-//		}
-//		else 
-//		{
-//			toAct = null;
-//			log.error("An agents next activity is null - this should not happen!");
-//		}
-//		
-//		// calculate new Route
-//		if(toAct != null && replanner != null)
-//		{	
-//			doReplanning();
-//		}
-//	}
-
 	/*
 	 * Idea:
 	 * MATSim Routers create Routes for complete plans.
@@ -137,6 +110,9 @@ public class ActEndReplanner {
 //	protected void Routing(Act fromAct, Leg nextLeg)
 	protected void doReplanning()
 	{	
+		// If it is not a car Leg we don't replan it.
+		if (!betweenLeg.getMode().equals(TransportMode.car)) return;
+		
 		// Replace the EndTime with the current time - do we really need this?
 //		fromAct.setEndTime(time);
 		
@@ -154,47 +130,13 @@ public class ActEndReplanner {
 		newPlan.addActivity(fromAct);
 		
 		Route originalRoute = betweenLeg.getRoute();
-		
+			
 		// Current Route between fromAct and toAct - this Route shall be replanned.
 		newPlan.addLeg(betweenLeg);
 		
 		// We still want to go there...
 		newPlan.addActivity(toAct);
-					
-//		NodeImpl startNode = fromAct.getLink().getToNode();	// start at the end of the "current" link
-//		NodeImpl endNode = toAct.getLink().getFromNode(); // the target is the start of the link
-//		
-//		SubNetwork subNetwork = new SubNetworkTools().getSubNetwork(person);
-//		
-//		if(subNetwork.person.getId() != person.getId())
-//		{
-//			log.error("Wrong SubNetwork!");
-//		}
-//		if(!subNetwork.getNodes().containsKey(startNode.getId()))
-//		{
-//			log.error("Key not Contained!");
-//		}
-//		if(!subNetwork.getNodes().containsKey(startNode.getId()))
-//		{
-//			log.error("Key not Contained!");
-//		}
-//		
-//		if(!new KnowledgeTools().getNodeKnowledge(person).getKnownNodes().containsKey(startNode.getId()))
-//		{
-//			log.error("Key never was Contained! " + person.getId() + " " + startNode.getId());
-//			log.error("Size: " + new KnowledgeTools().getNodeKnowledge(person).getKnownNodes().size());
-//
-//			for(NodeImpl node : new KnowledgeTools().getNodeKnowledge(person).getKnownNodes().values())
-//			{
-//				log.info(node.getId());
-//			}
-//		}
-//		NodeKnowledge nodeKnowledge = new KnowledgeTools().getNodeKnowledge(person);
-//		if(!new KnowledgeTools().getNodeKnowledge(person).getKnownNodes().containsKey(endNode.getId()))
-//		{
-//			log.error("Key never was Contained! " + person.getId() + " " + startNode.getId());
-//		}
-		
+							
 		// By doing the replanning the "betweenLeg" is replanned, so the changes are
 		// included in the previously selected plan, too!
 		replanner.run(newPlan);
@@ -206,13 +148,12 @@ public class ActEndReplanner {
 		
 		// remove previously added new Plan
 		person.removePlan(newPlan);
-//		System.out.println("Do Replanning...");
 		
-		double tt = betweenLeg.getTravelTime();
-		if(tt > 2147483640)
-		{
-			log.warn("To long TravelTime??? " + ((long)tt));
-		}
+//		double tt = betweenLeg.getTravelTime();
+//		if(tt > 2147483640)
+//		{
+//			log.warn("To long TravelTime??? " + ((long)tt));
+//		}
 
 		Route alternativeRoute = betweenLeg.getRoute();
 
