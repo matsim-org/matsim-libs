@@ -135,10 +135,12 @@ public class ActivityImpl implements Activity {
 		this.link = link;
 	}
 	
+	@Deprecated // use getLinkId
 	public Link getLink() {
 		return this.link;
 	}
 
+	@Deprecated // use getFacilityId
 	public ActivityFacility getFacility() {
 		return this.facility;
 	}
