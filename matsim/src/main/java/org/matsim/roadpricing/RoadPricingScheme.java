@@ -107,6 +107,7 @@ public class RoadPricingScheme {
 		return this.costs.remove(cost);
 	}
 
+	@Deprecated // use getLinkIds()
 	public Collection<Link> getLinks() {
 		return this.links.values();
 	}
