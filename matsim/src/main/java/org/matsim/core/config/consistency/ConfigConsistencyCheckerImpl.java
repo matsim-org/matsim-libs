@@ -60,6 +60,10 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 			throw new IllegalStateException("Cannot use the signal systems framework without" +
 			"using lanes. Please enable lanes in scenario config group");
 		}
+		if (scg.isUseSignalSystems() && c.getQSimConfigGroup() == null){
+		  log.warn("The signal system implementation is only supported by the org.matsim.ptproject.qsim mobility simulation that is not activated. Please make sure you are using the correct" +
+		  		"mobility simulation. This warning can be ingored if a customized mobility simulation developed outside of org.matsim is used and set correctly.");
+		}
 	}
 
 	private void checkSignalSystemConfiguration(Config config) {
