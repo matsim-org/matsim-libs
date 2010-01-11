@@ -41,9 +41,9 @@ import org.matsim.jaxb.lightsignalsystems10.XMLMatsimTimeAttributeType;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
+import org.matsim.signalsystems.systems.SignalSystems;
 
 
 /**
@@ -57,13 +57,13 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 	private static final Logger log = Logger
 			.getLogger(LightSignalSystemsWriter10.class);
 	
-	private BasicSignalSystems blss;
+	private SignalSystems blss;
 
 	private XMLLightSignalSystems xmlLightSignalSystems;
 
 	private LaneDefinitions lanes;
 
-	public LightSignalSystemsWriter10(LaneDefinitions lanes, BasicSignalSystems basiclss) {
+	public LightSignalSystemsWriter10(LaneDefinitions lanes, SignalSystems basiclss) {
 		this.lanes = lanes;
 		this.blss = basiclss;
 		this.xmlLightSignalSystems = convertBasicToXml();
@@ -120,7 +120,7 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 		} //end writing lanesToLinkAssignments
 		
 		//writing lightSignalSystemDefinitions
-		for (BasicSignalSystemDefinition lssd : this.blss.getSignalSystemDefinitionsList()) {
+		for (SignalSystemDefinition lssd : this.blss.getSignalSystemDefinitionsList()) {
 			XMLLightSignalSystemDefinitionType xmllssd = fac.createXMLLightSignalSystemDefinitionType();
 			xmllssd.setId(lssd.getId().toString());
 			
@@ -140,7 +140,7 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 		}
 		
 		//writing lightSignalGroupDefinitions
-		for (BasicSignalGroupDefinition lsgd : this.blss.getSignalGroupDefinitionsList()) {
+		for (SignalGroupDefinition lsgd : this.blss.getSignalGroupDefinitionsList()) {
 			XMLLightSignalGroupDefinitionType xmllsgd = fac.createXMLLightSignalGroupDefinitionType();
 			xmllsgd.setLinkIdRef(lsgd.getLinkRefId().toString());
 			xmllsgd.setId(lsgd.getId().toString());

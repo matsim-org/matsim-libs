@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.lanes.LaneDefinitions;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.signalsystems.systems.SignalSystems;
 
 import org.xml.sax.SAXException;
 
@@ -48,14 +48,14 @@ public class MatsimSignalSystemsReader {
 	public static final String SIGNALSYSTEMS11 = "http://www.matsim.org/files/dtd/signalSystems_v1.1.xsd";
 
 	
-	private BasicSignalSystems lightSignalSystems;
+	private SignalSystems lightSignalSystems;
 	@Deprecated 
 	private LaneDefinitions laneDefinitions;
 	
 	/**
 	 * @param signalSystems
 	 */
-	public MatsimSignalSystemsReader(BasicSignalSystems signalSystems) {
+	public MatsimSignalSystemsReader(SignalSystems signalSystems) {
 		this.lightSignalSystems = signalSystems;
 	}
 	
@@ -66,7 +66,7 @@ public class MatsimSignalSystemsReader {
 	 * @param signalSystems
 	 */
 	@Deprecated 
-	public MatsimSignalSystemsReader(LaneDefinitions laneDefs, BasicSignalSystems signalSystems) {
+	public MatsimSignalSystemsReader(LaneDefinitions laneDefs, SignalSystems signalSystems) {
 		this.laneDefinitions = laneDefs;
 		this.lightSignalSystems = signalSystems;
 	}

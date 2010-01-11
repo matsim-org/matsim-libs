@@ -31,9 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicAdaptivePlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
@@ -44,6 +41,9 @@ import org.matsim.signalsystems.control.AdaptiveSignalSystemControler;
 import org.matsim.signalsystems.control.DefaultPlanBasedSignalSystemController;
 import org.matsim.signalsystems.control.PlanBasedSignalSystemController;
 import org.matsim.signalsystems.control.SignalSystemController;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
+import org.matsim.signalsystems.systems.SignalSystems;
 
 
 public class QueueSimSignalEngine implements SignalEngine {
@@ -54,19 +54,19 @@ public class QueueSimSignalEngine implements SignalEngine {
 	/**
 	 * The SignalSystemDefinitions accessible by their Id
 	 */
-	private SortedMap<Id, BasicSignalSystemDefinition> signalSystemDefinitions;
+	private SortedMap<Id, SignalSystemDefinition> signalSystemDefinitions;
 	/**
 	 * The SignalGroupDefinitions accessible by the Id of the SignalSystem they belong
 	 * to.
 	 */
-	private SortedMap<Id, List<BasicSignalGroupDefinition>> signalGroupDefinitionsBySystemId;
+	private SortedMap<Id, List<SignalGroupDefinition>> signalGroupDefinitionsBySystemId;
 	/**
 	 * Contains the SignalSystemControler instances which can be accessed by the
 	 * Id of the SignalSystemDefinition
 	 */
 	private SortedMap<Id, SignalSystemController> signalSystemControlerBySystemId;
 
-	private BasicSignalSystems signalSystems;
+	private SignalSystems signalSystems;
 
 	private BasicSignalSystemConfigurations signalSystemsConfig;
 
@@ -82,7 +82,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 		this.events = QueueSimulation.getEvents();
 	}
 
-	public void setSignalSystems(final BasicSignalSystems signalSystems, final BasicSignalSystemConfigurations basicSignalSystemConfigurations){
+	public void setSignalSystems(final SignalSystems signalSystems, final BasicSignalSystemConfigurations basicSignalSystemConfigurations){
 		this.signalSystems = signalSystems;
 		this.signalSystemsConfig = basicSignalSystemConfigurations;
 	}
@@ -110,18 +110,18 @@ public class QueueSimSignalEngine implements SignalEngine {
 	/**
 	 * @see org.matsim.core.mobsim.queuesim.SignalEngine#getSignalSystemDefinitions()
 	 */
-	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions() {
+	public SortedMap<Id, SignalSystemDefinition> getSignalSystemDefinitions() {
 		return this.signalSystemDefinitions;
 	}
 	
 
-	private void initSignalSystems(final BasicSignalSystems signalSystems) {
+	private void initSignalSystems(final SignalSystems signalSystems) {
 		//store the signalSystemDefinitions in a Map
-		this.signalSystemDefinitions = new TreeMap<Id, BasicSignalSystemDefinition>();
+		this.signalSystemDefinitions = new TreeMap<Id, SignalSystemDefinition>();
 		this.signalSystemDefinitions.putAll(signalSystems.getSignalSystemDefinitions());
 		//init the signalGroupDefinitions
-		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
-		for (BasicSignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions().values()) {
+		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<SignalGroupDefinition>>();
+		for (SignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions().values()) {
 			QueueLink queueLink = this.network.getQueueLink(signalGroupDefinition.getLinkRefId());
 			if (queueLink == null) {
 				throw new IllegalStateException("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is set to non existing Link with Id: " + signalGroupDefinition.getLinkRefId());
@@ -134,9 +134,9 @@ public class QueueSimSignalEngine implements SignalEngine {
 				log.warn("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is not attached to a lane. SignalGroup will not be used!");
 				continue;
 			}
-			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(signalGroupDefinition.getSignalSystemDefinitionId());
+			List<SignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(signalGroupDefinition.getSignalSystemDefinitionId());
 			if (list == null) {
-				list = new ArrayList<BasicSignalGroupDefinition>();
+				list = new ArrayList<SignalGroupDefinition>();
 				this.signalGroupDefinitionsBySystemId.put(signalGroupDefinition.getSignalSystemDefinitionId(), list);
 			}
 			list.add(signalGroupDefinition);
@@ -179,13 +179,13 @@ public class QueueSimSignalEngine implements SignalEngine {
 					this.simulation.addQueueSimulationListeners((QueueSimulationListener)systemControler);
 				}
 				//add controller to signal groups
-				List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
+				List<SignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
 				if ((groups == null) || groups.isEmpty()) {
 					String message = "SignalSystemControler for SignalSystem Id: " + config.getSignalSystemId() + " without any SignalGroups defined in SignalSystemConfiguration!";
 					log.warn(message);
 				}
 				else {
-					for (BasicSignalGroupDefinition group : groups){
+					for (SignalGroupDefinition group : groups){
 						systemControler.getSignalGroups().put(group.getId(), group);
 						group.setResponsibleLSAControler(systemControler);
 					}
@@ -247,7 +247,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 
 
 	private void initSignalSystemControlerDefaults(final SignalSystemController controler, final BasicSignalSystemConfiguration config){
-		BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
+		SignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
 		controler.setDefaultCycleTime(systemDef.getDefaultCycleTime());
 		controler.setDefaultInterGreenTime(systemDef.getDefaultInterGreenTime());
 		controler.setDefaultSynchronizationOffset(systemDef.getDefaultSynchronizationOffset());

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.basic;
+package org.matsim.signalsystems.systems;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,18 +31,18 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
-public class BasicSignalSystemsImpl implements BasicSignalSystems {
+public class SignalSystemsImpl implements SignalSystems {
 
-	private final BasicSignalSystemsFactory builder = new BasicSignalSystemsFactory();
+	private final SignalSystemsFactory builder = new SignalSystemsFactory();
 	
-	private final SortedMap<Id, BasicSignalSystemDefinition> signalSystemDefinitions = new TreeMap<Id, BasicSignalSystemDefinition>();
-	private final SortedMap<Id, BasicSignalGroupDefinition> signalGroupDefinitions = new TreeMap<Id, BasicSignalGroupDefinition>();;
+	private final SortedMap<Id, SignalSystemDefinition> signalSystemDefinitions = new TreeMap<Id, SignalSystemDefinition>();
+	private final SortedMap<Id, SignalGroupDefinition> signalGroupDefinitions = new TreeMap<Id, SignalGroupDefinition>();;
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getSignalSystemDefinitionsList()
+	 * @see org.matsim.signalsystems.systems.SignalSystems#getSignalSystemDefinitionsList()
 	 */
-	public List<BasicSignalSystemDefinition> getSignalSystemDefinitionsList() {
-		List<BasicSignalSystemDefinition> r = new ArrayList<BasicSignalSystemDefinition>();
+	public List<SignalSystemDefinition> getSignalSystemDefinitionsList() {
+		List<SignalSystemDefinition> r = new ArrayList<SignalSystemDefinition>();
 		r.addAll(this.signalSystemDefinitions.values());
 		Collections.unmodifiableList(r);
 		return Collections.unmodifiableList(r);
@@ -50,42 +50,42 @@ public class BasicSignalSystemsImpl implements BasicSignalSystems {
 
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getSignalGroupDefinitionsList()
+	 * @see org.matsim.signalsystems.systems.SignalSystems#getSignalGroupDefinitionsList()
 	 */
-	public List<BasicSignalGroupDefinition> getSignalGroupDefinitionsList() {
-		List<BasicSignalGroupDefinition> r = new ArrayList<BasicSignalGroupDefinition>();
+	public List<SignalGroupDefinition> getSignalGroupDefinitionsList() {
+		List<SignalGroupDefinition> r = new ArrayList<SignalGroupDefinition>();
 		r.addAll(this.signalGroupDefinitions.values());
 		Collections.unmodifiableList(r);
 		return Collections.unmodifiableList(r);
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#addSignalSystemDefinition(org.matsim.signalsystems.basic.BasicSignalSystemDefinition)
+	 * @see org.matsim.signalsystems.systems.SignalSystems#addSignalSystemDefinition(org.matsim.signalsystems.systems.SignalSystemDefinition)
 	 */
 	public void addSignalSystemDefinition(
-			BasicSignalSystemDefinition lssdef) {
+			SignalSystemDefinition lssdef) {
 		this.signalSystemDefinitions.put(lssdef.getId(), lssdef);
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#addSignalGroupDefinition(org.matsim.signalsystems.basic.BasicSignalGroupDefinition)
+	 * @see org.matsim.signalsystems.systems.SignalSystems#addSignalGroupDefinition(org.matsim.signalsystems.systems.SignalGroupDefinition)
 	 */
-	public void addSignalGroupDefinition(BasicSignalGroupDefinition lsgdef) {
+	public void addSignalGroupDefinition(SignalGroupDefinition lsgdef) {
 		this.signalGroupDefinitions.put(lsgdef.getId(), lsgdef);
 	}
 
 
-	public BasicSignalSystemsFactory getFactory() {
+	public SignalSystemsFactory getFactory() {
 		return this.builder;
 	}
 
 
-	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions() {
+	public SortedMap<Id, SignalSystemDefinition> getSignalSystemDefinitions() {
 		return this.signalSystemDefinitions;
 	}
 
 
-	public SortedMap<Id, BasicSignalGroupDefinition> getSignalGroupDefinitions() {
+	public SortedMap<Id, SignalGroupDefinition> getSignalGroupDefinitions() {
 		return this.signalGroupDefinitions;
 	}
 

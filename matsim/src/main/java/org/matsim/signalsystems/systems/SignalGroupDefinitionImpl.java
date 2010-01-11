@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.signalsystems.basic;
+package org.matsim.signalsystems.systems;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import org.matsim.signalsystems.control.SignalSystemController;
 /**
  * @author dgrether
  */
-public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinition {
+public class SignalGroupDefinitionImpl implements SignalGroupDefinition {
   
 	private final Id id;
 	private Id lightSignalSystemDefinitionId;
@@ -38,20 +38,20 @@ public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinitio
 	
 	private org.matsim.signalsystems.control.SignalSystemController signalSystemControler = null;
 
-	public BasicSignalGroupDefinitionImpl(Id linkRefId, Id id) {
+	public SignalGroupDefinitionImpl(Id linkRefId, Id id) {
 		this.linkRefId = linkRefId;
 		this.id = id;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#setSignalSystemDefinitionId(org.matsim.core.basic.v01.IdImpl)
+	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#setSignalSystemDefinitionId(org.matsim.core.basic.v01.IdImpl)
 	 */
 	public void setSignalSystemDefinitionId(Id id) {
 		this.lightSignalSystemDefinitionId = id;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#addLaneId(org.matsim.api.core.v01.Id)
+	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#addLaneId(org.matsim.api.core.v01.Id)
 	 */
 	public void addLaneId(Id laneId) {
 		if (this.laneIds == null)
@@ -60,14 +60,14 @@ public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinitio
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#getLinkRefId()
+	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#getLinkRefId()
 	 */
 	public Id getLinkRefId() {
 		return linkRefId;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#addToLinkId(org.matsim.api.core.v01.Id)
+	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#addToLinkId(org.matsim.api.core.v01.Id)
 	 */
 	public void addToLinkId(Id linkId) {
 		if (this.toLinkIds == null)
@@ -76,42 +76,42 @@ public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinitio
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#getId()
+	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#getId()
 	 */
 	public Id getId() {
 		return id;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#getSignalSystemDefinitionId()
+	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#getSignalSystemDefinitionId()
 	 */
 	public Id getSignalSystemDefinitionId() {
 		return lightSignalSystemDefinitionId;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#getLaneIds()
+	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#getLaneIds()
 	 */
 	public List<Id> getLaneIds() {
 		return laneIds;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#getToLinkIds()
+	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#getToLinkIds()
 	 */
 	public List<Id> getToLinkIds() {
 		return toLinkIds;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#setResponsibleLSAControler(org.matsim.signalsystems.control.SignalSystemController)
+	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#setResponsibleLSAControler(org.matsim.signalsystems.control.SignalSystemController)
 	 */
 	public void setResponsibleLSAControler(SignalSystemController signalSystemControler) {
 		this.signalSystemControler = signalSystemControler;		
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#isGreen()
+	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#isGreen()
 	 */
 	public boolean isGreen(double time){
 		return this.signalSystemControler.givenSignalGroupIsGreen(time, this);

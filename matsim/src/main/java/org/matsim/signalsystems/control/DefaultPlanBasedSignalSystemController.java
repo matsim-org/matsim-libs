@@ -26,11 +26,11 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
 import org.matsim.ptproject.qsim.SimulationTimer;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalGroupSettings;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
 /**
@@ -64,10 +64,10 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.control.SignalSystemController#givenSignalGroupIsGreen(org.matsim.signalsystems.basic.BasicSignalGroupDefinition)
+	 * @see org.matsim.signalsystems.control.SignalSystemController#givenSignalGroupIsGreen(org.matsim.signalsystems.systems.SignalGroupDefinition)
 	 */
 	public boolean givenSignalGroupIsGreen(double time, 
-			BasicSignalGroupDefinition signalGroup) {
+			SignalGroupDefinition signalGroup) {
 		SignalGroupState state = this.getSignalGroupStates().get(signalGroup);
 		if (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.REDYELLOW)){
 			return true;
@@ -97,7 +97,7 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 
 		int roughcast, dropping, endIntergreenRc, endIntergreenDrop;
 		SignalGroupState currentState, newState;
-		for (BasicSignalGroupDefinition g : this.getSignalGroups().values()){
+		for (SignalGroupDefinition g : this.getSignalGroups().values()){
 			BasicSignalGroupSettings sgc = activePlan.getGroupConfigs().get(g.getId());
 			currentState = this.getSignalGroupStates().get(g);
 			roughcast = sgc.getRoughCast();

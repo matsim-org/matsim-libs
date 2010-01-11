@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.control;
 
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
 /**
@@ -36,6 +36,6 @@ public abstract class AdaptivePlanBasedSignalSystemControler extends
 	}
 
 	@Override
-	public abstract boolean givenSignalGroupIsGreen(double time, BasicSignalGroupDefinition signalGroup);
+	public abstract boolean givenSignalGroupIsGreen(double time, SignalGroupDefinition signalGroup);
 	
 }

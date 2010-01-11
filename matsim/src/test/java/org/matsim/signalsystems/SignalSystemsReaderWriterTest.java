@@ -24,10 +24,10 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
+import org.matsim.signalsystems.systems.SignalSystems;
+import org.matsim.signalsystems.systems.SignalSystemsImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -53,7 +53,7 @@ public class SignalSystemsReaderWriterTest extends MatsimTestCase {
   private Id id42 = new IdImpl("42");
   
   public void testParser() throws IOException {
-  	BasicSignalSystems lss = new BasicSignalSystemsImpl();
+  	SignalSystems lss = new SignalSystemsImpl();
   	MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(lss);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   	
@@ -64,7 +64,7 @@ public class SignalSystemsReaderWriterTest extends MatsimTestCase {
   	String testoutput = this.getOutputDirectory()  + "testLssOutput.xml";
   	log.debug("reading file...");
   	//read the test file
-  	BasicSignalSystems lss = new BasicSignalSystemsImpl();
+  	SignalSystems lss = new SignalSystemsImpl();
   	MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(lss);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   	
@@ -75,14 +75,14 @@ public class SignalSystemsReaderWriterTest extends MatsimTestCase {
   	writer.writeFile(testoutput);
   	
   	log.debug("and read it again");
-  	lss = new BasicSignalSystemsImpl();
+  	lss = new SignalSystemsImpl();
   	reader = new MatsimSignalSystemsReader(lss);
   	reader.readFile(testoutput);
   	checkContent(lss);
   }
 
-  private void checkContent(BasicSignalSystems lss) {
-  	BasicSignalSystemDefinition lssd;
+  private void checkContent(SignalSystems lss) {
+  	SignalSystemDefinition lssd;
   	lssd = lss.getSignalSystemDefinitionsList().get(0);
   	assertNotNull(lssd);
   	assertEquals(id23, lssd.getId());
@@ -90,7 +90,7 @@ public class SignalSystemsReaderWriterTest extends MatsimTestCase {
   	assertEquals(5.0, lssd.getDefaultSynchronizationOffset(), EPSILON);
   	assertEquals(3.0, lssd.getDefaultInterGreenTime(), EPSILON);
   	
-  	BasicSignalGroupDefinition lsgd;
+  	SignalGroupDefinition lsgd;
   	lsgd = lss.getSignalGroupDefinitionsList().get(1);
   	assertNotNull(lsgd);
   	assertEquals(id42, lsgd.getLinkRefId());

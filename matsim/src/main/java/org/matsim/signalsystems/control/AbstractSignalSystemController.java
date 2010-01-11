@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.queuesim.SignalEngine;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
 
@@ -45,12 +45,12 @@ public  abstract class AbstractSignalSystemController implements SignalSystemCon
 	private Double defaultSynchronizationOffset = null;
 
 	private SignalEngine signalEngine;
-	private Map<BasicSignalGroupDefinition, SignalGroupState> state;
-	private SortedMap<Id, BasicSignalGroupDefinition> groups;
+	private Map<SignalGroupDefinition, SignalGroupState> state;
+	private SortedMap<Id, SignalGroupDefinition> groups;
 
 	protected AbstractSignalSystemController() {
-		this.groups = new TreeMap<Id, BasicSignalGroupDefinition> ();
-		this.state = new LinkedHashMap<BasicSignalGroupDefinition, SignalGroupState>();
+		this.groups = new TreeMap<Id, SignalGroupDefinition> ();
+		this.state = new LinkedHashMap<SignalGroupDefinition, SignalGroupState>();
 	}
 
 	public Double getDefaultCycleTime() {
@@ -77,11 +77,11 @@ public  abstract class AbstractSignalSystemController implements SignalSystemCon
 		this.defaultSynchronizationOffset = defaultSynchronizationOffset;
 	}
 
-	public SortedMap<Id, BasicSignalGroupDefinition> getSignalGroups(){
+	public SortedMap<Id, SignalGroupDefinition> getSignalGroups(){
 		return this.groups;
 	}
 
-	public Map<BasicSignalGroupDefinition, SignalGroupState> getSignalGroupStates() {
+	public Map<SignalGroupDefinition, SignalGroupState> getSignalGroupStates() {
 		return this.state;
 	}
 

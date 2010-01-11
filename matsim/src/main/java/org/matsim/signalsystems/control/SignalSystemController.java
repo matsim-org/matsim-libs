@@ -23,7 +23,7 @@ import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.queuesim.SignalEngine;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
 /**
@@ -32,7 +32,7 @@ import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
  */
 public interface SignalSystemController {
 
-	public boolean givenSignalGroupIsGreen(double time, BasicSignalGroupDefinition signalGroup);
+	public boolean givenSignalGroupIsGreen(double time, SignalGroupDefinition signalGroup);
 	
 	public void setDefaultCycleTime(Double seconds);
 	
@@ -40,7 +40,7 @@ public interface SignalSystemController {
 	
 	public void setDefaultInterGreenTime(Double seconds);
 	
-	public SortedMap<Id, BasicSignalGroupDefinition> getSignalGroups();
+	public SortedMap<Id, SignalGroupDefinition> getSignalGroups();
 
 	public SignalEngine getSignalEngine();
 	

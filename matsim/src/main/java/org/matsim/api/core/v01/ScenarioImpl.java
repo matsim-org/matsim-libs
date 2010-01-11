@@ -34,10 +34,10 @@ import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.systems.SignalSystems;
+import org.matsim.signalsystems.systems.SignalSystemsImpl;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.BasicVehicles;
@@ -62,7 +62,7 @@ public class ScenarioImpl implements Scenario {
 	
 	//non-mandatory attributes
 	private LaneDefinitions laneDefinitions;
-	private BasicSignalSystems signalSystems;
+	private SignalSystems signalSystems;
 	private BasicSignalSystemConfigurations signalSystemConfigurations;
 	private RoadPricingScheme roadPricingScheme;
 	private TransitSchedule transitSchedule = null;
@@ -139,7 +139,7 @@ public class ScenarioImpl implements Scenario {
 	}
 	
 	protected void createSignalSystemsContainers() {
-		this.signalSystems = new BasicSignalSystemsImpl();
+		this.signalSystems = new SignalSystemsImpl();
 		this.signalSystemConfigurations = new BasicSignalSystemConfigurationsImpl();
 	}
 	
@@ -188,7 +188,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	
-	public BasicSignalSystems getSignalSystems() {
+	public SignalSystems getSignalSystems() {
 		if ((this.signalSystems == null) && this.config.scenario().isUseSignalSystems()){
 			this.createSignalSystemsContainers();
 		}

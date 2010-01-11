@@ -23,14 +23,14 @@ import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.control.SignalSystemController;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
 
 public interface SignalEngine {
 
 	public SortedMap<Id, SignalSystemController> getSignalSystemControlerBySystemId();
 
-	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions();
+	public SortedMap<Id, SignalSystemDefinition> getSignalSystemDefinitions();
 
 	public EventsManager getEvents();
 	

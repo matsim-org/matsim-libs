@@ -48,7 +48,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.pt.queuesim.TransitQueueLaneFeature;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -149,7 +149,7 @@ public class QueueLane {
 	 */
 	private final Set<Id> destinationLinkIds = new LinkedHashSet<Id>();
 
-	private SortedMap<Id, BasicSignalGroupDefinition> signalGroups;
+	private SortedMap<Id, SignalGroupDefinition> signalGroups;
 
 	private Lane laneData;
 	/**
@@ -197,11 +197,11 @@ public class QueueLane {
 		}
 	}
 
-	protected void addSignalGroupDefinition(final BasicSignalGroupDefinition signalGroupDefinition) {
+	protected void addSignalGroupDefinition(final SignalGroupDefinition signalGroupDefinition) {
 		for (Id laneId : signalGroupDefinition.getLaneIds()) {
 			if (this.laneData.getId().equals(laneId)) {
 				if (this.signalGroups == null) {
-					this.signalGroups = new TreeMap<Id, BasicSignalGroupDefinition>();
+					this.signalGroups = new TreeMap<Id, SignalGroupDefinition>();
 				}
 				this.signalGroups.put(signalGroupDefinition.getId(), signalGroupDefinition);
 			}
@@ -310,7 +310,7 @@ public class QueueLane {
 			return;
 		}
 		//else everything normal...
-		for (BasicSignalGroupDefinition signalGroup : this.signalGroups.values()) {
+		for (SignalGroupDefinition signalGroup : this.signalGroups.values()) {
 			this.setThisTimeStepGreen(signalGroup.isGreen(time));
 		}
 	}
@@ -1016,7 +1016,7 @@ public class QueueLane {
 		}
 	}
 	
-	protected SortedMap<Id, BasicSignalGroupDefinition> getSignalGroups() {
+	protected SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
 		return signalGroups;
 	}
 

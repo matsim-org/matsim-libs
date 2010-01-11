@@ -17,68 +17,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.signalsystems.basic;
+package org.matsim.signalsystems.systems;
 
 import org.matsim.api.core.v01.Id;
 
 /**
  * @author dgrether
  */
-public class BasicSignalSystemDefinitionImpl implements BasicSignalSystemDefinition {
+public class SignalSystemDefinitionImpl implements SignalSystemDefinition {
 
   private Id id;
   private Double defaultCirculationTime = null;
   private Double syncronizationOffset = null;
   private Double defaultInterimTime = null;
 	
-  public BasicSignalSystemDefinitionImpl(Id id) {
+  public SignalSystemDefinitionImpl(Id id) {
   	this.id = id;
   }
   
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#getId()
+	 * @see org.matsim.signalsystems.systems.SignalSystemDefinition#getId()
 	 */
 	public Id getId() {
 		return id;
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#getDefaultCycleTime()
+	 * @see org.matsim.signalsystems.systems.SignalSystemDefinition#getDefaultCycleTime()
 	 */
 	public Double getDefaultCycleTime() {
 		return defaultCirculationTime;
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#setDefaultCycleTime(double)
+	 * @see org.matsim.signalsystems.systems.SignalSystemDefinition#setDefaultCycleTime(double)
 	 */
 	public void setDefaultCycleTime(Double defaultCirculationTime) {
 		this.defaultCirculationTime = defaultCirculationTime;
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#getDefaultSynchronizationOffset()
+	 * @see org.matsim.signalsystems.systems.SignalSystemDefinition#getDefaultSynchronizationOffset()
 	 */
 	public Double getDefaultSynchronizationOffset() {
 		return syncronizationOffset;
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#setDefaultSynchronizationOffset(double)
+	 * @see org.matsim.signalsystems.systems.SignalSystemDefinition#setDefaultSynchronizationOffset(double)
 	 */
 	public void setDefaultSynchronizationOffset(Double syncronizationOffset) {
 		this.syncronizationOffset = syncronizationOffset;
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#getDefaultInterGreenTime()
+	 * @see org.matsim.signalsystems.systems.SignalSystemDefinition#getDefaultInterGreenTime()
 	 */
 	public Double getDefaultInterGreenTime() {
 		return defaultInterimTime;
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#setDefaultInterGreenTime(double)
+	 * @see org.matsim.signalsystems.systems.SignalSystemDefinition#setDefaultInterGreenTime(double)
 	 */
 	public void setDefaultInterGreenTime(Double defaultInterimTime) {
 		this.defaultInterimTime = defaultInterimTime;

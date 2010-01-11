@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.basic;
+package org.matsim.signalsystems.systems;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ import org.matsim.signalsystems.control.SignalSystemController;
  * @author dgrether
  *
  */
-public interface BasicSignalGroupDefinition {
+public interface SignalGroupDefinition {
 
 	public void setSignalSystemDefinitionId(Id id);
 

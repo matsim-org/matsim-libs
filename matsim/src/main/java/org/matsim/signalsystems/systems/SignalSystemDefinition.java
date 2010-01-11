@@ -17,34 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.signalsystems.basic;
+package org.matsim.signalsystems.systems;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
-
 /**
- * Builder for Objects to be used within BasicSignalSystems container
- * Even if more a Factory this class is called builder to be consistent with other
- * MATSim container content builders which are in fact builder due to their more
- * complex build behavior. 
+ * 
  * @author dgrether
+ *
  */
-public class BasicSignalSystemsFactory implements MatsimFactory {
-	/**
-	 * The constructor is only visible in the package because instances should 
-	 * be retrieved from the container, i.e. an instance of BasicSignalSystems
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getFactory()
-	 */
-	BasicSignalSystemsFactory(){}
-	
-	public BasicSignalSystemDefinition createSignalSystemDefinition(
-			Id signalSystemId) {
-		return new BasicSignalSystemDefinitionImpl(signalSystemId);
-	}
+public interface SignalSystemDefinition {
 
-	public BasicSignalGroupDefinition createSignalGroupDefinition(
-			Id linkRefId, Id signalGroupId) {
-		return new BasicSignalGroupDefinitionImpl(linkRefId, signalGroupId);
-	}
-	
+	public Id getId();
+
+	public Double getDefaultCycleTime();
+
+	public void setDefaultCycleTime(Double defaultCirculationTime);
+
+	public Double getDefaultSynchronizationOffset();
+
+	public void setDefaultSynchronizationOffset(Double synchronizationOffset);
+
+	public Double getDefaultInterGreenTime();
+
+	public void setDefaultInterGreenTime(Double defaultInterimTime);
+
 }

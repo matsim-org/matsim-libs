@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.																																* 
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,40 +16,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.basic;
 
-import java.util.List;
-import java.util.SortedMap;
+package org.matsim.signalsystems.systems;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.core.api.internal.MatsimFactory;
 
-public interface BasicSignalSystems extends MatsimToplevelContainer {
+/**
+ * Builder for Objects to be used within BasicSignalSystems container
+ * Even if more a Factory this class is called builder to be consistent with other
+ * MATSim container content builders which are in fact builder due to their more
+ * complex build behavior. 
+ * @author dgrether
+ */
+public class SignalSystemsFactory implements MatsimFactory {
+	/**
+	 * The constructor is only visible in the package because instances should 
+	 * be retrieved from the container, i.e. an instance of BasicSignalSystems
+	 * @see org.matsim.signalsystems.systems.SignalSystems#getFactory()
+	 */
+	SignalSystemsFactory(){}
 	
-	public BasicSignalSystemsFactory getFactory();
+	public SignalSystemDefinition createSignalSystemDefinition(
+			Id signalSystemId) {
+		return new SignalSystemDefinitionImpl(signalSystemId);
+	}
 
-	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions();
-
-	public SortedMap<Id, BasicSignalGroupDefinition> getSignalGroupDefinitions();
-
-	/**
-	 * 
-	 * @deprecated use getSignalSystemDefinitions()
-	 */
-	@Deprecated
-	public List<BasicSignalSystemDefinition> getSignalSystemDefinitionsList();
-	/**
-	 * 
-	 * @deprecated use getSignalGroupDefinitions()
-	 */
-	@Deprecated
-	public List<BasicSignalGroupDefinition> getSignalGroupDefinitionsList();
-
-	/**
-	 * @param lssdef
-	 */
-	public void addSignalSystemDefinition(BasicSignalSystemDefinition lssdef);
-
-	public void addSignalGroupDefinition(BasicSignalGroupDefinition lsgdef);
-
+	public SignalGroupDefinition createSignalGroupDefinition(
+			Id linkRefId, Id signalGroupId) {
+		return new SignalGroupDefinitionImpl(linkRefId, signalGroupId);
+	}
+	
 }

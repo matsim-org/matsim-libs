@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.																																* 
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,29 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.signalsystems.systems;
 
-package org.matsim.signalsystems.basic;
+import java.util.List;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
-/**
- * 
- * @author dgrether
- *
- */
-public interface BasicSignalSystemDefinition {
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
-	public Id getId();
+public interface SignalSystems extends MatsimToplevelContainer {
+	
+	public SignalSystemsFactory getFactory();
 
-	public Double getDefaultCycleTime();
+	public SortedMap<Id, SignalSystemDefinition> getSignalSystemDefinitions();
 
-	public void setDefaultCycleTime(Double defaultCirculationTime);
+	public SortedMap<Id, SignalGroupDefinition> getSignalGroupDefinitions();
 
-	public Double getDefaultSynchronizationOffset();
+	/**
+	 * 
+	 * @deprecated use getSignalSystemDefinitions()
+	 */
+	@Deprecated
+	public List<SignalSystemDefinition> getSignalSystemDefinitionsList();
+	/**
+	 * 
+	 * @deprecated use getSignalGroupDefinitions()
+	 */
+	@Deprecated
+	public List<SignalGroupDefinition> getSignalGroupDefinitionsList();
 
-	public void setDefaultSynchronizationOffset(Double synchronizationOffset);
+	/**
+	 * @param lssdef
+	 */
+	public void addSignalSystemDefinition(SignalSystemDefinition lssdef);
 
-	public Double getDefaultInterGreenTime();
-
-	public void setDefaultInterGreenTime(Double defaultInterimTime);
+	public void addSignalGroupDefinition(SignalGroupDefinition lsgdef);
 
 }

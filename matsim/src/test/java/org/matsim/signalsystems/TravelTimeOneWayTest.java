@@ -30,12 +30,12 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.LaneDefinitions;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalGroupSettings;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -74,7 +74,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 
 		int circulationTime = 60;
 
-		BasicSignalSystems lssDefs = data.getSignalSystems();
+		SignalSystems lssDefs = data.getSignalSystems();
 		BasicSignalSystemConfigurations lssConfigs = data.getSignalSystemConfigurations();
 		
 		Id id2 = new IdImpl(2);

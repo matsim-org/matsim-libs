@@ -34,10 +34,10 @@ import org.matsim.jaxb.signalsystems11.XMLIdRefType;
 import org.matsim.jaxb.signalsystems11.XMLSignalGroupDefinitionType;
 import org.matsim.jaxb.signalsystems11.XMLSignalSystemDefinitionType;
 import org.matsim.jaxb.signalsystems11.XMLSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsFactory;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
+import org.matsim.signalsystems.systems.SignalSystems;
+import org.matsim.signalsystems.systems.SignalSystemsFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -49,11 +49,11 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 	private static final Logger log = Logger
 			.getLogger(SignalSystemsReader11.class);
 
-	private BasicSignalSystems lightSignalSystems;
+	private SignalSystems lightSignalSystems;
 
-	private BasicSignalSystemsFactory builder;
+	private SignalSystemsFactory builder;
 
-	public SignalSystemsReader11(BasicSignalSystems lightSignalSystems, String schemaLocation) {
+	public SignalSystemsReader11(SignalSystems lightSignalSystems, String schemaLocation) {
 		super(schemaLocation);
 		this.lightSignalSystems = lightSignalSystems;
 		this.builder = this.lightSignalSystems.getFactory();
@@ -74,7 +74,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 		xmlLssDefinition = (XMLSignalSystems) u.unmarshal(new FileInputStream(
 				filename));
 
-		BasicSignalSystemDefinition lssdef;
+		SignalSystemDefinition lssdef;
 		for (XMLSignalSystemDefinitionType xmllssDef : xmlLssDefinition
 				.getSignalSystemDefinition()) {
 			lssdef = builder.createSignalSystemDefinition(new IdImpl(xmllssDef
@@ -94,7 +94,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 			lightSignalSystems.addSignalSystemDefinition(lssdef);
 		}
 		// parsing lightSignalGroupDefinitions
-		BasicSignalGroupDefinition lsgdef;
+		SignalGroupDefinition lsgdef;
 		for (XMLSignalGroupDefinitionType xmllsgdef : xmlLssDefinition
 				.getSignalGroupDefinition()) {
 			lsgdef = builder.createSignalGroupDefinition(new IdImpl(xmllsgdef

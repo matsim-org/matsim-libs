@@ -26,10 +26,10 @@ import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.systems.SignalSystems;
+import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
 /**
  * This class provides helper methods to convert the
@@ -54,7 +54,7 @@ public class MatsimXMLFormatConverter {
 	public static void convertSignalSystemsV10ToV11(String signalsv10, String signalsv11, String lanesv11){
 		//create containers
 		LaneDefinitions lanedefs = new LaneDefinitionsImpl();
-		BasicSignalSystems signalSystems = new BasicSignalSystemsImpl();
+		SignalSystems signalSystems = new SignalSystemsImpl();
 		//read old format
 		MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(lanedefs, signalSystems);
 		reader.readFile(signalsv10);

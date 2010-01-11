@@ -50,16 +50,16 @@ import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsFactory;
 import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalGroupSettings;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsFactory;
 import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
+import org.matsim.signalsystems.systems.SignalSystems;
+import org.matsim.signalsystems.systems.SignalSystemsFactory;
 
 
 /**
@@ -147,14 +147,14 @@ public class MixedLaneTest extends TestCase {
 		lanes.addLanesToLinkAssignment(l2l);
 		
 		//create signalsystems
-		BasicSignalSystems signals = this.sc.getSignalSystems();
-		BasicSignalSystemsFactory signalb = signals.getFactory();
-		BasicSignalSystemDefinition signalSystem = signalb.createSignalSystemDefinition(id1);
-		BasicSignalGroupDefinition signalGroup2Link2 = signalb.createSignalGroupDefinition(id1, id2);
+		SignalSystems signals = this.sc.getSignalSystems();
+		SignalSystemsFactory signalb = signals.getFactory();
+		SignalSystemDefinition signalSystem = signalb.createSignalSystemDefinition(id1);
+		SignalGroupDefinition signalGroup2Link2 = signalb.createSignalGroupDefinition(id1, id2);
 		signalGroup2Link2.setSignalSystemDefinitionId(id1);
 		signalGroup2Link2.addLaneId(id1);
 		signalGroup2Link2.addToLinkId(id2);
-		BasicSignalGroupDefinition signalGroup2Link3 = signalb.createSignalGroupDefinition(id1, id3);
+		SignalGroupDefinition signalGroup2Link3 = signalb.createSignalGroupDefinition(id1, id3);
 		signalGroup2Link3.setSignalSystemDefinitionId(id1);
 		signalGroup2Link3.addLaneId(id1);
 		signalGroup2Link3.addToLinkId(id3);

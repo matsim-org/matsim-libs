@@ -36,9 +36,9 @@ import org.matsim.jaxb.signalsystems11.XMLMatsimTimeAttributeType;
 import org.matsim.jaxb.signalsystems11.XMLSignalGroupDefinitionType;
 import org.matsim.jaxb.signalsystems11.XMLSignalSystemDefinitionType;
 import org.matsim.jaxb.signalsystems11.XMLSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
+import org.matsim.signalsystems.systems.SignalSystems;
 
 
 /**
@@ -50,12 +50,12 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 	private static final Logger log = Logger
 			.getLogger(SignalSystemsWriter11.class);
 	
-	private BasicSignalSystems blss;
+	private SignalSystems blss;
 
 	private XMLSignalSystems xmlLightSignalSystems;
 
 
-	public SignalSystemsWriter11(BasicSignalSystems basiclss) {
+	public SignalSystemsWriter11(SignalSystems basiclss) {
 		this.blss = basiclss;
 		this.xmlLightSignalSystems = convertBasicToXml();
 	}	
@@ -84,7 +84,7 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 		XMLSignalSystems xmllss = fac.createXMLSignalSystems();
 		
 		//writing lightSignalSystemDefinitions
-		for (BasicSignalSystemDefinition lssd : this.blss.getSignalSystemDefinitionsList()) {
+		for (SignalSystemDefinition lssd : this.blss.getSignalSystemDefinitionsList()) {
 			XMLSignalSystemDefinitionType xmllssd = fac.createXMLSignalSystemDefinitionType();
 			xmllssd.setId(lssd.getId().toString());
 			
@@ -110,7 +110,7 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 		}
 		
 		//writing lightSignalGroupDefinitions
-		for (BasicSignalGroupDefinition lsgd : this.blss.getSignalGroupDefinitionsList()) {
+		for (SignalGroupDefinition lsgd : this.blss.getSignalGroupDefinitionsList()) {
 			XMLSignalGroupDefinitionType xmllsgd = fac.createXMLSignalGroupDefinitionType();
 			xmllsgd.setLinkIdRef(lsgd.getLinkRefId().toString());
 			xmllsgd.setId(lsgd.getId().toString());
