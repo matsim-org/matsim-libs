@@ -163,7 +163,7 @@ public class Floor {
 				force.setFx(0.);
 				force.setFy(0.);
 			}
-			else if  (agent.getState() == AgentState.MOVING) {
+			else {
 				if (agent.departed()) {
 					agentDepart(agent);
 				}
@@ -171,8 +171,14 @@ public class Floor {
 				//				updateAgentForce(agent);
 				updateAgentInteractionForce(agent,force);
 				updateAgentEnvForce(agent,force);
-				updateDrivingForce(agent,force);
-				updatePathForce(agent,force);
+				if  (agent.getState() == AgentState.MOVING)  {
+					if (updateDrivingForce(agent,force)) {
+						updatePathForce(agent,force);
+					}
+				}
+				if (agent.getState() == AgentState.ARRIVING) {
+					updateDriveToActForce(agent,force);
+				}
 				
 				validateForce(agent,force);
 			}
@@ -194,6 +200,7 @@ public class Floor {
 
 
 
+
 	private void validateForce(Agent2D agent, Force force) {
 		double norm= Math.sqrt(Math.pow(force.getFx(),2)  + Math.pow(force.getFy(),2));
 		if (norm > agent.getDisiredVelocity()*Sim2DConfig.TIME_STEP_SIZE) {
@@ -202,6 +209,31 @@ public class Floor {
 		}
 	}
 
+	private void updateDriveToActForce(Agent2D agent, Force force) {
+		if (agent.checkForActivityReached()){
+			agentArrival(agent,agent.getAct().getLinkId());
+			force.driveX = 0;
+			force.driveY = 0;
+		} else {
+			Coordinate dest = MGC.coord2Coordinate(agent.getAct().getCoord());
+			double dist = dest.distance(agent.getPosition());
+			double driveX = (dest.x - agent.getPosition().x)/dist;
+			double driveY = (dest.y - agent.getPosition().y)/dist;
+			
+			if (dist < Sim2DConfig.TIME_STEP_SIZE*agent.getDisiredVelocity()) {
+				
+			}
+			double scale = dist < Sim2DConfig.TIME_STEP_SIZE*agent.getDisiredVelocity() ? dist :  Sim2DConfig.TIME_STEP_SIZE*agent.getDisiredVelocity() ; 
+			
+			driveX *= scale;
+			driveY *= scale;
+			force.setFx(force.getFx() + ((driveX-force.getOldFx())/Sim2DConfig.tau));
+			force.setFy(force.getFy() + ((driveY-force.getOldFy())/Sim2DConfig.tau));
+			force.driveX = (driveX-force.getOldFx() )/Sim2DConfig.tau;
+			force.driveY = (driveY-force.getOldFy())/Sim2DConfig.tau;
+		}
+		
+	}
 	private void updatePathForce(Agent2D agent, Force force) {
 		
 		
@@ -233,7 +265,7 @@ public class Floor {
 		force.pathX = Sim2DConfig.Apath * deltaX/agent.getWeight();
 		force.pathY = Sim2DConfig.Apath * deltaY/agent.getWeight();
 	}
-	private void updateDrivingForce(Agent2D agent, Force force) {
+	private boolean updateDrivingForce(Agent2D agent, Force force) {
 		Link link = agent.getCurrentLink();
 		Id oldLink = link.getId();
 		LineString ls = this.finishLines.get(link);
@@ -251,9 +283,7 @@ public class Floor {
 			}
 		}
 		if (link == null) {
-			agentArrival(agent,oldLink);
-			force.driveX = 0;
-			force.driveY = 0;
+			return false;
 		} else {
 			
 			
@@ -285,6 +315,7 @@ public class Floor {
 			force.driveY = (driveY-force.getOldFy())/Sim2DConfig.tau;
 
 		}		
+		return true;
 
 	}
 
@@ -301,11 +332,13 @@ public class Floor {
 		Event e1 = new AgentArrivalEventImpl(SimulationTimer.getTime(), agent.getId(), linkId, TransportMode.car);
 		Event e2 = new ActivityStartEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), agent.getAct());
 		Sim2D.getEvents().processEvent(e1);
+		Sim2D.getEvents().processEvent(e2);
 	}
 	
 	private void agentDepart(Agent2D agent) {
 		Event e1 = new AgentDepartureEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), TransportMode.car);
 		Event e2 = new ActivityEndEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), agent.getOldAct());
+		Sim2D.getEvents().processEvent(e2);
 		Sim2D.getEvents().processEvent(e1);
 		
 	}

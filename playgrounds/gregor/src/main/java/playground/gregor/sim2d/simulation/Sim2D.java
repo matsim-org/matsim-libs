@@ -210,8 +210,10 @@ public class Sim2D {
 
 
 	protected void afterSimStep(final double time) {
-		visualizeAgents(time);
-		this.myOTFServer.updateStatus(time);
+		if (this.myOTFServer != null) {
+			visualizeAgents(time);
+			this.myOTFServer.updateStatus(time);
+		}
 	}
 	
 	

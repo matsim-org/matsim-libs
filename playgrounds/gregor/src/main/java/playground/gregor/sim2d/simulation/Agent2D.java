@@ -21,9 +21,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class Agent2D  {
 
-	public enum AgentState {MOVING,ACTING };
+	public enum AgentState {MOVING,ACTING, ARRIVING};
 	
 	private static final Logger log = Logger.getLogger(Agent2D.class);
+
+	private static final double ACTIVITY_DIST = 1.0;
 
 	private final Person person;
 	private final Plan currentPlan;
@@ -107,14 +109,10 @@ public class Agent2D  {
 		}
 		if (this.currentNodeIndex >= this.cacheRouteNodes.size() ) {
 			this.actLegPointer++;
-			this.state = AgentState.ACTING;
+			this.state = AgentState.ARRIVING;
 			this.currentLeg = null;
 			this.currentAct = (Activity) this.currentPlan.getPlanElements().get(this.actLegPointer);
-			if (this.actLegPointer < this.currentPlan.getPlanElements().size()-1) {
-				this.simulation.scheduleActivityEnd(this);
-			} else {
-				this.simulation.scheduleAgentRemove(this);
-			}
+
 			for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
 				if (link.getId().equals(this.currentAct.getLinkId())) {
 					this.currentLink = link;
@@ -136,6 +134,18 @@ public class Agent2D  {
 		return null;
 	}
 
+	public boolean checkForActivityReached() {
+		if (this.position.distance(MGC.coord2Coordinate(this.currentAct.getCoord())) < ACTIVITY_DIST){
+			this.state = AgentState.ACTING;
+			if (this.actLegPointer < this.currentPlan.getPlanElements().size()-1) {
+				this.simulation.scheduleActivityEnd(this);
+			} else {
+				this.simulation.scheduleAgentRemove(this);
+			}
+			return true;
+		}
+		return false;
+	}
 
 	public double getNextDepartureTime() {
 		return this.currentAct.getEndTime();
@@ -145,8 +155,8 @@ public class Agent2D  {
 		ActivityImpl firstAct = ((ActivityImpl)this.currentPlan.getPlanElements().get(this.actLegPointer));
 		double departureTime = firstAct.getEndTime();
 		this.currentLink = firstAct.getLink();
-		this.position = new Coordinate(this.currentLink.getToNode().getCoord().getX(),this.currentLink.getToNode().getCoord().getY());
-//		this.position = MGC.coord2Coordinate(firstAct.getCoord());
+//		this.position = new Coordinate(this.currentLink.getToNode().getCoord().getX(),this.currentLink.getToNode().getCoord().getY());
+		this.position = MGC.coord2Coordinate(firstAct.getCoord());
 		if ((departureTime != Time.UNDEFINED_TIME) && (this.currentPlan.getPlanElements().size() > 1)) {
 			this.currentAct = (Activity) this.currentPlan.getPlanElements().get(this.actLegPointer);
 			this.simulation.scheduleActivityEnd(this);
