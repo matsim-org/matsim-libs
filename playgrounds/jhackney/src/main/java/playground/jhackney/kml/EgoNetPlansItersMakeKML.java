@@ -255,7 +255,7 @@ public class EgoNetPlansItersMakeKML {
 	}
 
 
-	public static void loadData(Person myPerson, int iter, Knowledges kn){
+	public static void loadData(Person myPerson, int iter, Knowledges kn, Network network){
 
 		ego=myPerson;
 		knowledges = kn;
@@ -271,7 +271,7 @@ public class EgoNetPlansItersMakeKML {
 		// more colors than in current egonet to allow for adding agents to egonet without repeating colors
 //		nColors=persons.size()*2;
 
-		loadData(ego, 0, iter);
+		loadData(ego, 0, iter, network);
 
 		Iterator<Person> altersIt= persons.iterator();
 
@@ -279,7 +279,7 @@ public class EgoNetPlansItersMakeKML {
 			Person p = altersIt.next();
 			i++;
 			log.info("CALLING KML FOR EGONET PERSON "+p.getId());
-			loadData(p,i, iter);
+			loadData(p,i, iter, network);
 
 			// Two persons in EgoNet are compared, agent i and agent j>i, to see if they know each other
 			// Update ai each iteration
@@ -290,7 +290,7 @@ public class EgoNetPlansItersMakeKML {
 	}
 
 
-	public static void loadData(Person alter, int i, int iter) {
+	public static void loadData(Person alter, int i, int iter, Network network) {
 
 		log.info("    loading Plan data. Processing person ...");
 //		TODO make one file per agent and put in the routes and acts each iteration
@@ -411,7 +411,8 @@ public class EgoNetPlansItersMakeKML {
 			if (o instanceof LegImpl) {
 				LegImpl leg = (LegImpl) o;
 
-				for (Link routeLink : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
+				for (Id routeLinkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+					Link routeLink = network.getLinks().get(routeLinkId);
 					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo, iter);
 					
 					featureExists = false;

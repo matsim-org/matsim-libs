@@ -3,8 +3,8 @@ package org.matsim.core.mobsim.jdeqsim.parallel;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.jdeqsim.DeadlockPreventionMessage;
 import org.matsim.core.mobsim.jdeqsim.EndLegMessage;
 import org.matsim.core.mobsim.jdeqsim.EndRoadMessage;
@@ -14,7 +14,6 @@ import org.matsim.core.mobsim.jdeqsim.LeaveRoadMessage;
 import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.jdeqsim.Road;
-import org.matsim.core.mobsim.jdeqsim.Scheduler;
 import org.matsim.core.mobsim.jdeqsim.StartingLegMessage;
 
 public class PMessageQueue extends MessageQueue {
@@ -87,16 +86,15 @@ public class PMessageQueue extends MessageQueue {
 
 		ExtendedRoad currentRoad = receivingRoad;
 		ExtendedRoad nextRoad = receivingRoad;
-		Link tempLink = null;
+		Id tempLinkId = null;
 
 		// the ordering of this sequence is according to the
 		// frequency of the messages
 		if (m instanceof EnterRoadMessage) {
 
-			tempLink = vehicle.getCurrentLink();
-			if (tempLink != null) {
-				currentRoad = (ExtendedRoad) Road.getRoad(tempLink.getId()
-						.toString());
+			tempLinkId = vehicle.getCurrentLinkId();
+			if (tempLinkId != null) {
+				currentRoad = (ExtendedRoad) Road.getRoad(tempLinkId);
 			}
 
 			messageTargetRoad = currentRoad;
@@ -107,10 +105,9 @@ public class PMessageQueue extends MessageQueue {
 
 		} else if (m instanceof EndRoadMessage) {
 
-			tempLink = vehicle.getNextLinkInLeg();
-			if (tempLink != null) {
-				nextRoad = (ExtendedRoad) Road.getRoad(tempLink.getId()
-						.toString());
+			tempLinkId = vehicle.getNextLinkInLeg();
+			if (tempLinkId != null) {
+				nextRoad = (ExtendedRoad) Road.getRoad(tempLinkId);
 			}
 
 			messageTargetRoad = nextRoad;
@@ -119,10 +116,9 @@ public class PMessageQueue extends MessageQueue {
 		} else if (m instanceof StartingLegMessage) {
 
 			if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car)) {
-				tempLink = vehicle.getCurrentLink();
-				if (tempLink != null) {
-					currentRoad = (ExtendedRoad) Road.getRoad(tempLink.getId()
-							.toString());
+				tempLinkId = vehicle.getCurrentLinkId();
+				if (tempLinkId != null) {
+					currentRoad = (ExtendedRoad) Road.getRoad(tempLinkId);
 				}
 
 				messageTargetRoad = currentRoad;
@@ -130,10 +126,9 @@ public class PMessageQueue extends MessageQueue {
 				// TODO: we need the first link in the next leg. if this does
 				// not function
 				// then we need to do this manually.
-				tempLink = vehicle.getNextLinkInLeg();
-				if (tempLink != null) {
-					nextRoad = (ExtendedRoad) Road.getRoad(tempLink.getId()
-							.toString());
+				tempLinkId = vehicle.getNextLinkInLeg();
+				if (tempLinkId != null) {
+					nextRoad = (ExtendedRoad) Road.getRoad(tempLinkId);
 				}
 				messageTargetRoad = nextRoad;
 			}

@@ -264,7 +264,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
 				Person testP=this.controler.getPopulation().getPersons().get(new IdImpl("21924270"));//1pct
 //				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
-				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration(), this.knowledges);
+				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration(), this.knowledges, event.getControler().getNetwork());
 				this.log.info(" ... done");
 			}
 		}

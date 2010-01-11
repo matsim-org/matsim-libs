@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -79,7 +80,7 @@ public class EgressAnalysis {
 	private final PopulationImpl population;
 	private final Envelope envelope = null;
 	private QuadTree<PersonImpl> personTree;
-	private final NetworkLayer network;
+	private final Network network;
 	private final PlansCalcRoute router;
 	private FeatureType ftDistrictShape;
 	private ArrayList<Feature> features;
@@ -91,7 +92,7 @@ public class EgressAnalysis {
 
 
 	public EgressAnalysis(final FeatureSource features, final PopulationImpl population,
-			final NetworkLayer network) throws Exception {
+			final Network network) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
 		this.network = network;

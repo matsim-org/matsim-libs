@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -314,7 +315,7 @@ public class Road extends SimUnit {
 		assert (interestedInEnteringRoad.size()==deadlockPreventionMessages.size());
 	}
 
-	public static Road getRoad(String linkId) {
+	public static Road getRoad(Id linkId) {
 		return SimulationParameters.getAllRoads().get(linkId);
 	}
 

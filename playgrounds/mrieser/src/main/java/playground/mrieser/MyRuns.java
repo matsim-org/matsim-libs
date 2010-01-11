@@ -464,17 +464,16 @@ public class MyRuns {
 							final int hour = (int)time / 3600;
 							if ((hour > 30) || (hour < 0)) return;
 
-							for (final Link link : route.getLinks()) {
-								final Id id = link.getId();
+							for (final Id linkId : route.getLinkIds()) {
 								TreeMap<Id, Integer> hourValues = linkValues.get(hour);
 								if (hourValues == null) {
 									hourValues = new TreeMap<Id, Integer>();
 									linkValues.put(hour, hourValues);
 								}
-								Integer counter = hourValues.get(id);
+								Integer counter = hourValues.get(linkId);
 								if (counter == null) counter = 0;
 								counter++;
-								hourValues.put(id, counter);
+								hourValues.put(linkId, counter);
 							}
 						}
 					}

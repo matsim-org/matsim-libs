@@ -40,9 +40,10 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -110,7 +111,7 @@ public class DistanceAnalysis {
 	private final PopulationImpl population;
 	private Envelope envelope = null;
 	private QuadTree<Person> personTree;
-	private final NetworkLayer network;
+	private final Network network;
 	private final PlansCalcRoute router;
 	private FeatureType ftDistrictShape;
 	private ArrayList<Feature> features;
@@ -119,9 +120,7 @@ public class DistanceAnalysis {
 	private static double CATCH_RADIUS;
 //	private TreeMap<Double, Feature> ft_tree;
 
-
-
-	public DistanceAnalysis(final FeatureSource features, final PopulationImpl population, final NetworkLayer network) throws Exception {
+	public DistanceAnalysis(final FeatureSource features, final PopulationImpl population, final Network network) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
 		this.network = network;
@@ -225,9 +224,9 @@ public class DistanceAnalysis {
 		for (Person person : persons) {
 			LegImpl leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
 			double l1 = leg.getRoute().getDistance();
-			List<Link> ls = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
-			Link l = ls.get(ls.size()-1);
-			String destS  = l.getId().toString().replace("el", "");
+			List<Id> ls = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
+			Id lId = ls.get(ls.size()-1);
+			String destS  = lId.toString().replace("el", "");
 			int dest = Integer.parseInt(destS);
 			dests[dest]++;
 

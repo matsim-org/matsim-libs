@@ -22,11 +22,10 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -42,9 +41,9 @@ public class Vehicle extends SimUnit {
 	private Person ownerPerson = null;
 	private LegImpl currentLeg = null;
 	private int legIndex;
-	private Link currentLink = null;
+	private Id currentLinkId = null;
 	private int linkIndex;
-	private LinkImpl[] currentLinkRoute = null;
+	private Id[] currentLinkRoute = null;
 
 	public Vehicle(Scheduler scheduler, Person ownerPerson) {
 		super(scheduler);
@@ -91,9 +90,9 @@ public class Vehicle extends SimUnit {
 		double departureTime = firstAct.getEndTime();
 
 		// this is the link, where the first activity took place
-		setCurrentLink(firstAct.getLink());
+		setCurrentLinkId(firstAct.getLinkId());
 
-		Road road = Road.getRoad(getCurrentLink().getId().toString());
+		Road road = Road.getRoad(getCurrentLinkId());
 		// schedule start leg message
 		scheduleStartingLegMessage(departureTime, road);
 	}
@@ -137,14 +136,14 @@ public class Vehicle extends SimUnit {
 	public void setCurrentLeg(LegImpl currentLeg) {
 		this.currentLeg = currentLeg;
 		if (currentLeg.getRoute() instanceof NetworkRouteWRefs) {
-			List<Link> links = ((NetworkRouteWRefs) currentLeg.getRoute()).getLinks();
-			currentLinkRoute = links.toArray(new LinkImpl[links.size()]);
+			List<Id> linkIds = ((NetworkRouteWRefs) currentLeg.getRoute()).getLinkIds();
+			currentLinkRoute = linkIds.toArray(new Id[linkIds.size()]);
 		} else {
 			currentLinkRoute = null;
 		}
 	}
 
-	protected LinkImpl[] getCurrentLinkRoute() {
+	protected Id[] getCurrentLinkRoute() {
 		return currentLinkRoute;
 	}
 
@@ -164,16 +163,16 @@ public class Vehicle extends SimUnit {
 		return legIndex;
 	}
 
-	public Link getCurrentLink() {
-		return currentLink;
+	public Id getCurrentLinkId() {
+		return currentLinkId;
 	}
 
 	public int getLinkIndex() {
 		return linkIndex;
 	}
 
-	public void setCurrentLink(Link currentLink) {
-		this.currentLink = currentLink;
+	public void setCurrentLinkId(Id currentLinkId) {
+		this.currentLinkId = currentLinkId;
 	}
 
 	public void setLinkIndex(int linkIndex) {
@@ -191,14 +190,14 @@ public class Vehicle extends SimUnit {
 	 */
 	public void moveToNextLinkInLeg() {
 		setLinkIndex(getLinkIndex() + 1);
-		setCurrentLink(getCurrentLinkRoute()[getLinkIndex()]);
+		setCurrentLinkId(getCurrentLinkRoute()[getLinkIndex()]);
 	}
 
 	// note: does not affect the link index
 	public void moveToFirstLinkInNextLeg() {
 		Plan plan = getOwnerPerson().getSelectedPlan();
 		List<? extends PlanElement> actsLegs = plan.getPlanElements();
-		setCurrentLink(((ActivityImpl) actsLegs.get(getLegIndex() + 1)).getLink());
+		setCurrentLinkId(((ActivityImpl) actsLegs.get(getLegIndex() + 1)).getLinkId());
 	}
 
 	/**
@@ -243,7 +242,7 @@ public class Vehicle extends SimUnit {
 
 	public void scheduleLeavePreviousRoadMessage(double scheduleTime) {
 		Road previousRoad = null;
-		Link previousLink = null;
+		Id previousLinkId = null;
 		/*
 		 * we need to handle the first road in a leg specially, because the load
 		 * to be left is accessed over the last act performed instead of the leg
@@ -251,11 +250,11 @@ public class Vehicle extends SimUnit {
 		if (this.getLinkIndex() == 0) {
 			Plan plan = ownerPerson.getSelectedPlan();
 			List<? extends PlanElement> actsLegs = plan.getPlanElements();
-			previousLink = ((ActivityImpl) actsLegs.get(legIndex - 1)).getLink();
-			previousRoad = Road.getRoad(previousLink.getId().toString());
+			previousLinkId = ((ActivityImpl) actsLegs.get(legIndex - 1)).getLinkId();
+			previousRoad = Road.getRoad(previousLinkId);
 		} else if (this.getLinkIndex() >= 1) {
-			previousLink = this.getCurrentLinkRoute()[this.getLinkIndex() - 1];
-			previousRoad = Road.getRoad(previousLink.getId().toString());
+			previousLinkId = this.getCurrentLinkRoute()[this.getLinkIndex() - 1];
+			previousRoad = Road.getRoad(previousLinkId);
 		} else {
 			log.error("Some thing is wrong with the simulation: Why is this.getLinkIndex() negative");
 		}

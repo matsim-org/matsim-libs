@@ -35,6 +35,9 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -44,9 +47,7 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -70,7 +71,7 @@ public class EventFilesEvacuationTimeCompare {
 //	private static final String INPUT_BASE="../outputs/";
 	
 	private final CoordinateReferenceSystem crs;
-	final NetworkLayer network;
+	final Network network;
 	private ArrayList<Polygon> polygons;
 	private final GeometryFactory geofac;
 	private final String eventsFile1;
@@ -90,7 +91,7 @@ public class EventFilesEvacuationTimeCompare {
 	
 	
 	public EventFilesEvacuationTimeCompare(final String eventsFile1, final String eventsFile2,
-			final CoordinateReferenceSystem crs, final NetworkLayer network, final String outfile) {
+			final CoordinateReferenceSystem crs, final Network network, final String outfile) {
 		
 		this.eventsFile1 = eventsFile1;
 		this.eventsFile2 = eventsFile2;
@@ -211,11 +212,11 @@ public class EventFilesEvacuationTimeCompare {
 		String eventsFile2 = MY_STATIC_STUFF.RUNS_SVN + "run319/stage2/output/ITERS/it.0/0.events.txt.gz";
 		String network = "../../inputs/networks/padang_net_evac_v20080618.xml";
 		String outfile = MY_STATIC_STUFF.RUNS_SVN + "run320/analysis/etimcomp.shp";
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(network);
 		
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
-		new EventFilesEvacuationTimeCompare(eventsFile1, eventsFile2, crs, net, outfile).run();
+		new EventFilesEvacuationTimeCompare(eventsFile1, eventsFile2, crs, scenario.getNetwork(), outfile).run();
 	}
 
 	
@@ -248,7 +249,7 @@ public class EventFilesEvacuationTimeCompare {
 		public void handleEvent(final AgentDepartureEvent event) {
 			AgentInfo ai = new AgentInfo();
 			ai.time = 3*3600; //event.getTime();
-			LinkImpl link = EventFilesEvacuationTimeCompare.this.network.getLinks().get(new IdImpl(event.getLinkId().toString()));
+			Link link = EventFilesEvacuationTimeCompare.this.network.getLinks().get(new IdImpl(event.getLinkId().toString()));
 			ai.c = new Coordinate(link.getCoord().getX(),link.getCoord().getY());
 			this.ttimes.put(event.getPersonId().toString(), ai);
 			

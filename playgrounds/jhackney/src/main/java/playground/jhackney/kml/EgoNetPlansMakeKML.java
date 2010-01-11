@@ -48,8 +48,11 @@ import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.StyleType;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -282,7 +285,7 @@ public class EgoNetPlansMakeKML {
 	}
 
 
-	public static void loadData(PersonImpl myPerson){
+	public static void loadData(PersonImpl myPerson, Network network){
 
 		if(config.getModule(KML21_MODULE)==null) return;
 
@@ -290,7 +293,7 @@ public class EgoNetPlansMakeKML {
 
 		// load Data into KML folders for myPerson
 		int i=0;
-		loadData(myPerson, 0, 1);
+		loadData(myPerson, 0, 1, network);
 
 		// Proceed to the EgoNet of myPerson
 		ArrayList<Person> persons = ((EgoNet)myPerson.getCustomAttributes().get(EgoNet.NAME)).getAlters();
@@ -299,12 +302,12 @@ public class EgoNetPlansMakeKML {
 		while(altersIt.hasNext()){
 			Person p = altersIt.next();
 			i++;
-			loadData(p,i,persons.size());
+			loadData(p,i,persons.size(), network);
 		}
 
 		System.out.println(" ... done.");
 	}
-	public static void loadData(Person myPerson, int i, int nColors) {
+	public static void loadData(Person myPerson, int i, int nColors, Network network) {
 
 		System.out.println("    loading Plan data. Processing person ...");
 
@@ -331,15 +334,16 @@ public class EgoNetPlansMakeKML {
 		facilitiesFolder.setVisibility(false);
 		myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(facilitiesFolder));
 
-		Iterator actLegIter = myPlan.getPlanElements().iterator();
-		ActivityImpl act0 = (ActivityImpl) actLegIter.next(); // assumes first plan element is always an Activity
-		makeActKML(myPerson, act0, agentFolder, agentLinkStyle);
+		Iterator<PlanElement> actLegIter = myPlan.getPlanElements().iterator();
+		Activity act0 = (Activity) actLegIter.next(); // assumes first plan element is always an Activity
+		makeActKML(myPerson, act0, agentFolder, agentLinkStyle, network);
 		while(actLegIter.hasNext()){//alternates Act-Leg-Act-Leg and ends with Act
 			Object o = actLegIter.next();
 			if (o instanceof LegImpl) {
 				LegImpl leg = (LegImpl) o;
 	
-				for (Link routeLink : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
+				for (Id routeLinkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+					Link routeLink = network.getLinks().get(routeLinkId);
 					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
 	
 					boolean linkExists = false;
@@ -356,9 +360,9 @@ public class EgoNetPlansMakeKML {
 						agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
 					}
 				}
-			} else if (o instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) o;
-				makeActKML(myPerson, act, agentFolder,agentLinkStyle);
+			} else if (o instanceof Activity) {
+				Activity act = (Activity) o;
+				makeActKML(myPerson, act, agentFolder,agentLinkStyle, network);
 			}
 		}
 
@@ -473,7 +477,7 @@ public class EgoNetPlansMakeKML {
 
 	}
 
-	private static void makeActKML(Person myPerson, ActivityImpl act, FolderType agentFolder, StyleType agentLinkStyle) {
+	private static void makeActKML(Person myPerson, Activity act, FolderType agentFolder, StyleType agentLinkStyle, Network network) {
 		// TODO Auto-generated method stub
 
 		String styleUrl = null;
@@ -526,7 +530,7 @@ public class EgoNetPlansMakeKML {
 		agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(pl));
 
 //		if (!fullActName.equals("evening home")) {
-		Link actLink = act.getLink();
+		Link actLink = network.getLinks().get(act.getLinkId());
 
 		PlacemarkType agentLink = generateLinkPlacemark(actLink, agentLinkStyle, trafo);
 

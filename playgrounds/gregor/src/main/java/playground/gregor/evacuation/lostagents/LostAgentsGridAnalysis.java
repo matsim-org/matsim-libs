@@ -8,14 +8,14 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
+import playground.gregor.MY_STATIC_STUFF;
+import playground.gregor.gis.helper.GTH;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
-
-import playground.gregor.MY_STATIC_STUFF;
-import playground.gregor.gis.helper.GTH;
 
 public class LostAgentsGridAnalysis {
 

@@ -41,6 +41,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -78,8 +80,8 @@ import com.sun.opengl.util.BufferUtil;
 public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
 	private static final long serialVersionUID = -749787121253826794L;
-	protected Id linkId;
-	private transient Map<Link,Integer> drivenLinks = null;
+	protected Id queryLinkId;
+	private transient Map<Id, Integer> drivenLinks = null;
 	private float[] vertex = null;
 	private int[] count = null;
 	private boolean calcOffset = true;
@@ -116,15 +118,15 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		return com;
 	}
 	
-	private void addLink(Link driven) {
-		Integer count = this.drivenLinks.get(driven);
-		if (count == null) this.drivenLinks.put(driven, 1);
-		else  this.drivenLinks.put(driven, count + 1);
+	private void addLink(Id linkId) {
+		Integer count = this.drivenLinks.get(linkId);
+		if (count == null) this.drivenLinks.put(linkId, 1);
+		else  this.drivenLinks.put(linkId, count + 1);
 	}
 
 	protected List<Plan> getPersonsNOW(Population plans, QueueNetwork net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
-		QueueLink link = net.getLinks().get(linkId);
+		QueueLink link = net.getLinks().get(this.queryLinkId);
 		Collection<QueueVehicle> vehs = link.getAllVehicles();
 		for( QueueVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
 		
@@ -136,23 +138,23 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
 		for (Person person : plans.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
-			List actslegs = plan.getPlanElements();
-			for (int i= 0; i< actslegs.size(); i++) {
-				if( i%2 == 0) {
+			List<PlanElement> actslegs = plan.getPlanElements();
+			for (PlanElement pe : actslegs) {
+				if (pe instanceof Activity) {
 					// handle act
-					ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
+					Activity act = (Activity) pe;
 					Id id2 = act.getLinkId();
-					if(id2.equals(this.linkId)) {
+					if(id2.equals(this.queryLinkId)) {
 						actPersons.add(plan);
 						break;
 					}
-				} else {
+				} else if (pe instanceof Leg) {
 					// handle leg
-					LegImpl leg = (LegImpl)actslegs.get(i);
+					Leg leg = (Leg) pe;
 					// just look at car routes right now
 					if(leg.getMode() != TransportMode.car) continue;
 					for (Id id2 : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
-						if(id2.equals(this.linkId) ) {
+						if(id2.equals(this.queryLinkId) ) {
 							actPersons.add(plan);
 							break;
 						}
@@ -184,15 +186,15 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					LegImpl leg = (LegImpl) pe ;
 					RouteWRefs route = leg.getRoute();
 					if ( route instanceof NetworkRouteWRefs ) { // added in jun09, see below in "collectLinks". kai, jun09
-						List<Link> links = new ArrayList<Link>();
-						for (Link link : ((NetworkRouteWRefs) route).getLinks() ) {
-							links.add(link);
-							if(link.getId().equals(this.linkId) ) {
+						List<Id> linkIds = new ArrayList<Id>();
+						for (Id linkId : ((NetworkRouteWRefs) route).getLinkIds() ) {
+							linkIds.add(linkId);
+							if(linkId.equals(this.queryLinkId) ) {
 								// only if this specific route includes link, add the route
 								addthis = true;
 							}
 						}
-						if(addthis) for (Link link : links) addLink(link);
+						if(addthis) for (Id linkId : linkIds) addLink(linkId);
 						addthis = false;
 					}
 				}
@@ -207,7 +209,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
-					addLink(act.getLink());
+					addLink(act.getLinkId());
 				} else if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
 
@@ -223,8 +225,8 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					RouteWRefs route = leg.getRoute() ;
 					if ( route instanceof NetworkRouteWRefs ) {
 						NetworkRouteWRefs nr = (NetworkRouteWRefs) route ;
-						for (Link link : nr.getLinks() ) {
-							addLink(link);
+						for (Id linkId : nr.getLinkIds() ) {
+							addLink(linkId);
 						}
 					}
 				}
@@ -232,8 +234,9 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		}
 	}
 	
+	@Override
 	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
-		this.drivenLinks = new HashMap<Link,Integer> ();
+		this.drivenLinks = new HashMap<Id, Integer>();
 //		QueueLink link = net.getQueueLink(this.linkId);
 //		String start = link.getLink().getFromNode().getId().toString();
 //		String end = link.getLink().getToNode().getId().toString();
@@ -249,18 +252,20 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		this.vertex = new float[this.drivenLinks.size()*4];
 		this.count = new int[this.drivenLinks.size()];
 		int pos = 0;
-		for(Link qlink : this.drivenLinks.keySet()) {
-			this.count[pos/4] = this.drivenLinks.get(qlink);
-			Node node = qlink.getFromNode();
+		for(Id linkId : this.drivenLinks.keySet()) {
+			Link link = net.getNetworkLayer().getLinks().get(linkId);
+			this.count[pos/4] = this.drivenLinks.get(link);
+			Node node = link.getFromNode();
 			this.vertex[pos++] = (float)node.getCoord().getX();
 			this.vertex[pos++] = (float)node.getCoord().getY();
-			node = qlink.getToNode();
+			node = link.getToNode();
 			this.vertex[pos++] = (float)node.getCoord().getX();
 			this.vertex[pos++] = (float)node.getCoord().getY();
 		}
 		return this;
 	}
 
+	@Override
 	public void draw(OTFDrawer drawer) {
 		if(drawer instanceof OTFOGLDrawer) {
 			draw((OTFOGLDrawer)drawer);
@@ -304,8 +309,8 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 			}
 
 			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
-			this.agentText = InfoTextContainer.showTextPermanent(this.linkId.toString(), this.vertex[0], this.vertex[1], -0.0005f );
-	}
+			this.agentText = InfoTextContainer.showTextPermanent(this.queryLinkId.toString(), this.vertex[0], this.vertex[1], -0.0005f );
+		}
 
 		this.vert.position(0);
 		this.colors.position(0);
@@ -372,21 +377,25 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
 		InfoTextContainer.showTextOnce ("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
 	}
+	
+	@Override
 	public void remove() {
 		if (this.agentText != null) InfoTextContainer.removeTextPermanent(this.agentText);
 	}
 	
+	@Override
 	public boolean isAlive() {
 		return false;
 	}
+	
+	@Override
 	public Type getType() {
 		return OTFQuery.Type.LINK;
 	}
 
+	@Override
 	public void setId(String id) {
-		this.linkId = new IdImpl(id);
+		this.queryLinkId = new IdImpl(id);
 	}
-
-
 
 }

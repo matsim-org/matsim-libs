@@ -30,8 +30,8 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -91,11 +91,11 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 		for (int planId = 0; planId < nofPlans; planId++) {
 			Plan plan = person.getPlans().get(planId);
 			List actsLegs = plan.getPlanElements();
-			Stack<Link> newLinks = new Stack<Link>();
+			Stack<Id> newLinkIds = new Stack<Id>();
 			for (int legId = 1; legId < actsLegs.size(); legId += 2) {
 				LegImpl leg = (LegImpl) actsLegs.get(legId);
-				List<Link> links = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
-				int linksLength = links.size();
+				List<Id> linkIds = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
+				int linksLength = linkIds.size();
 				this.oldLinksNr += linksLength;
 				try {
 					this.out.writeBytes("[");
@@ -104,7 +104,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 				}
 				for (int i = 0; i < linksLength; i++)
 					try {
-						this.out.writeBytes(links.get(i).getId().toString());
+						this.out.writeBytes(linkIds.get(i).toString());
 						if (i < linksLength - 1)
 							this.out.writeBytes("-");
 					} catch (IOException e) {
@@ -115,17 +115,16 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				newLinks.clear();
+				newLinkIds.clear();
 				for (int i = linksLength - 1; i > 0; i--) {
-					Link ssl = links.get(i);
-					String sslId = ssl.getId().toString();
+					Id sslId = linkIds.get(i);
 					if (this.ssLinks.containsKey(sslId)) {
-						if (!links.get(i - 1).getId().toString().equals(
+						if (!linkIds.get(i - 1).toString().equals(
 								this.ssLinks.get(sslId))) {
-							newLinks.push(ssl);
+							newLinkIds.push(sslId);
 						}
 					} else {
-						newLinks.push(ssl);
+						newLinkIds.push(sslId);
 					}
 				}
 				try {
@@ -133,15 +132,14 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				this.newLinksNr += newLinks.size();
-				while (!newLinks.empty()) {
+				this.newLinksNr += newLinkIds.size();
+				while (!newLinkIds.empty()) {
 					try {
-						this.out.writeBytes(((newLinks.pop())).getId()
-								.toString());
+						this.out.writeBytes(((newLinkIds.pop())).toString());
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					if (!newLinks.empty()) {
+					if (!newLinkIds.empty()) {
 						try {
 							this.out.writeBytes("-");
 						} catch (IOException e) {

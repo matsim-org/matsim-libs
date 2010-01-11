@@ -139,7 +139,7 @@ public class CreateKMZFromOutput {
 //			System.out.println(" Writing out KMZ activity spaces and day plans for agent's egoNet");
 			Person testP=plans.getPersons().get(new IdImpl("21924270"));//1pct
 //			Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
-			EgoNetPlansItersMakeKML.loadData(testP,i, Scenario.getKnowledges());
+			EgoNetPlansItersMakeKML.loadData(testP,i, Scenario.getKnowledges(), network);
 			System.out.println(" ... done");
 
 

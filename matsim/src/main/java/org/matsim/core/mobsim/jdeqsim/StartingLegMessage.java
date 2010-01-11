@@ -50,7 +50,7 @@ public class StartingLegMessage extends EventMessage {
 
 			} else {
 				// start the new leg
-				Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
+				Road road = Road.getRoad(vehicle.getCurrentLinkId());
 				road.enterRequest(vehicle, getMessageArrivalTime());
 			}
 
@@ -62,7 +62,7 @@ public class StartingLegMessage extends EventMessage {
 	private void scheduleEndLegMessage(double time) {
 		// move to first link in next leg and schedule an end leg message
 		vehicle.moveToFirstLinkInNextLeg();
-		Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
+		Road road = Road.getRoad(vehicle.getCurrentLinkId());
 		vehicle.scheduleEndLegMessage(time, road);
 	}
 
@@ -71,12 +71,12 @@ public class StartingLegMessage extends EventMessage {
 		EventImpl event = null;
 
 		// schedule ActEndEvent
-		event = new ActivityEndEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLink().getId(), vehicle
+		event = new ActivityEndEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), vehicle
 				.getPreviousActivity());
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 		// schedule AgentDepartureEvent
-		event = new AgentDepartureEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLink().getId(),
+		event = new AgentDepartureEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(),
 				vehicle.getCurrentLeg().getMode());
 
 		SimulationParameters.getProcessEventThread().processEvent(event);

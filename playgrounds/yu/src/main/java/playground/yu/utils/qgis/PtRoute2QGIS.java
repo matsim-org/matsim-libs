@@ -139,10 +139,12 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 			NetworkRouteWRefs route = ptRoute.getRoute();
 
 			List<Link> links = new ArrayList<Link>();
-			Link startLink = route.getStartLink();
+			Link startLink = this.network.getLinks().get(route.getStartLinkId());
 			links.add(startLink);
-			links.addAll(route.getLinks());
-			links.add(route.getEndLink());
+			for (Id linkId : route.getLinkIds()) {
+				links.add(this.network.getLinks().get(linkId));
+			}
+			links.add(this.network.getLinks().get(route.getEndLinkId()));
 
 			List<Link> links2remove = new ArrayList<Link>();
 			for (Link link : links)
@@ -252,22 +254,22 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 
 		private double getPtRouteWidth(TransitRoute ptRoute) {
 			NetworkRouteWRefs route = ptRoute.getRoute();
-			List<Link> links = route.getLinks();
-			int size = links.size();
+			List<Id> linkIds = route.getLinkIds();
+			int size = linkIds.size();
 
 			double[] widths = new double[size + 2], lengths = new double[size + 2];
 
-			Link startLink = route.getStartLink();
+			Link startLink = this.network.getLinks().get(route.getStartLinkId());
 			widths[0] = 20;
 			lengths[0] = startLink.getLength();
 
 			int n = 0;
-			for (Link link : links) {
+			for (Id linkId : linkIds) {
 				widths[++n] = 20;
-				lengths[n] = link.getLength();
+				lengths[n] = this.network.getLinks().get(linkId).getLength();
 			}
 
-			Link endLink = route.getEndLink();
+			Link endLink = this.network.getLinks().get(route.getEndLinkId());
 			widths[widths.length - 1] = 20;
 			lengths[lengths.length - 1] = endLink.getLength();
 

@@ -22,7 +22,9 @@ package playground.gregor.gis.helper;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -39,13 +41,9 @@ public class GTH {
 		this.geofac = geofac;
 	}
 	
-	
 	public Polygon getCircle(Coordinate center, double radius) {
-		
-		
 		return null;
 	}
-	
 	
 	public Polygon getSquare(Coordinate center, double length) {
 		
@@ -60,25 +58,27 @@ public class GTH {
 		return this.geofac.createPolygon(lr,null);
 	}
 	
-	public Polygon getPolygonFromRoute(NetworkRouteWRefs r) {
-		
-		List<Link> linkRoute = r.getLinks();
-		Coordinate [] edges = new Coordinate [linkRoute.size() * 4] ;
-		
+	public Polygon getPolygonFromRoute(NetworkRouteWRefs r, Network network) {
+
+		List<Id> linkRoute = r.getLinkIds();
+		Coordinate [] edges = new Coordinate [linkRoute.size() * 4];
+
 		int pos = 0;
 		for (int i = 0; i < linkRoute.size(); i++) {
-			edges[pos++] = MGC.coord2Coordinate(linkRoute.get(i).getFromNode().getCoord());
-			edges[pos++] = MGC.coord2Coordinate(linkRoute.get(i).getToNode().getCoord());
+			Link link = network.getLinks().get(linkRoute.get(i));
+			edges[pos++] = MGC.coord2Coordinate(link.getFromNode().getCoord());
+			edges[pos++] = MGC.coord2Coordinate(link.getToNode().getCoord());
 		}
 		for (int i = linkRoute.size() -1 ; i >= 0; i--) {
-			edges[pos++] = MGC.coord2Coordinate(linkRoute.get(i).getToNode().getCoord());
-			edges[pos++] = MGC.coord2Coordinate(linkRoute.get(i).getFromNode().getCoord());
-		}		
-		
+			Link link = network.getLinks().get(linkRoute.get(i));
+			edges[pos++] = MGC.coord2Coordinate(link.getToNode().getCoord());
+			edges[pos++] = MGC.coord2Coordinate(link.getFromNode().getCoord());
+		}
+
 		LinearRing lr = this.geofac.createLinearRing(edges);
 		return this.geofac.createPolygon(lr,null);		
-		
 	}
+
 	public Polygon getPolygonFromLink(Link l) {
 		Coordinate [] edges = new Coordinate [4];
 		edges[0] = MGC.coord2Coordinate(l.getFromNode().getCoord());

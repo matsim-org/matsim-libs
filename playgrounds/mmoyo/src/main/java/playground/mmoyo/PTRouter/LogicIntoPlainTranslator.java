@@ -117,7 +117,7 @@ public class LogicIntoPlainTranslator {
 			NetworkRouteWRefs logicNetworkRoute= (NetworkRouteWRefs)logicLeg.getRoute();
 			List<Link> plainLinkList = new ArrayList<Link>();
 			
-			for (Link link: logicNetworkRoute.getLinks()){
+			for (Link link: logicNetworkRoute.getLinks()) {
 				//if (link.getType().equals(ptValues.STANDARD))
 					plainLinkList.add(link);
 			}

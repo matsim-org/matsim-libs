@@ -22,7 +22,7 @@ public class QuerySpinneNOW extends QuerySpinne {
 	@Override
 	protected List<Plan> getPersons(Population plans, QueueNetwork net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
-		QueueLink link = net.getLinks().get(linkId);
+		QueueLink link = net.getLinks().get(queryLinkId);
 		Collection<QueueVehicle> vehs = link.getAllVehicles();
 		for( QueueVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
 		
