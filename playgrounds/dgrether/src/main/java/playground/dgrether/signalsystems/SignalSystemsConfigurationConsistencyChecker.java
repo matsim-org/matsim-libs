@@ -31,12 +31,12 @@ import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalGroupSettings;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
-import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
@@ -58,9 +58,9 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 
 	private SignalSystems signals;
 
-	private BasicSignalSystemConfigurations signalConfig;
+	private SignalSystemConfigurations signalConfig;
 	
-	public SignalSystemsConfigurationConsistencyChecker(Network net, LaneDefinitions laneDefs, SignalSystems signals, BasicSignalSystemConfigurations signalConfig) {
+	public SignalSystemsConfigurationConsistencyChecker(Network net, LaneDefinitions laneDefs, SignalSystems signals, SignalSystemConfigurations signalConfig) {
 		this.network = net;
 		this.lanes = laneDefs;
 		this.signals = signals;
@@ -69,19 +69,19 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 	
 	public void checkConsistency() {
 		log.info("checking consistency...");
-		Set<BasicSignalSystemConfiguration> malformedGroups = new HashSet<BasicSignalSystemConfiguration>();
+		Set<SignalSystemConfiguration> malformedGroups = new HashSet<SignalSystemConfiguration>();
 
-		for (BasicSignalSystemConfiguration ssc : this.signalConfig.getSignalSystemConfigurations().values()){
+		for (SignalSystemConfiguration ssc : this.signalConfig.getSignalSystemConfigurations().values()){
 			//check signal system reference
 			if (!this.signals.getSignalSystemDefinitions().containsKey(ssc.getSignalSystemId())){
 				log.error("No signal system found with id " + ssc.getSignalSystemId() + " signal system configuration not valid");
 				malformedGroups.add(ssc);
 			}
 			//check signal groups of plan based control
-			if (ssc.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo){
-				BasicPlanBasedSignalSystemControlInfo pbci = (BasicPlanBasedSignalSystemControlInfo) ssc.getControlInfo();
-				for (BasicSignalSystemPlan plan : pbci.getPlans().values()){
-					for (BasicSignalGroupSettings settings : plan.getGroupConfigs().values()){
+			if (ssc.getControlInfo() instanceof PlanBasedSignalSystemControlInfo){
+				PlanBasedSignalSystemControlInfo pbci = (PlanBasedSignalSystemControlInfo) ssc.getControlInfo();
+				for (SignalSystemPlan plan : pbci.getPlans().values()){
+					for (SignalGroupSettings settings : plan.getGroupConfigs().values()){
 						if (!this.signals.getSignalGroupDefinitions().containsKey(settings.getReferencedSignalGroupId())){
 							log.error("Plan id " + plan.getId() + " of signalSystemConfiguration for signal system id " + ssc.getSignalSystemId() +
 									" references signalGroup id " + settings.getReferencedSignalGroupId() + " that is not defined.");
@@ -93,7 +93,7 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 		} //end for
 		
 		if (this.removeMalformed){
-			for (BasicSignalSystemConfiguration id : malformedGroups) {
+			for (SignalSystemConfiguration id : malformedGroups) {
 				this.signalConfig.getSignalSystemConfigurations().remove(id.getSignalSystemId());
 			}
 		}
@@ -134,7 +134,7 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 	  MatsimSignalSystemsReader signalReader = new MatsimSignalSystemsReader(signals);
 	  signalReader.readFile(signalSystemsFile);
 	  
-	  BasicSignalSystemConfigurations signalConfig = new BasicSignalSystemConfigurationsImpl();
+	  SignalSystemConfigurations signalConfig = new SignalSystemConfigurationsImpl();
 	  MatsimSignalSystemConfigurationsReader signalConfigReader = new MatsimSignalSystemConfigurationsReader(signalConfig);
 	  signalConfigReader.readFile(signalSystemsConfigFile);
 	  

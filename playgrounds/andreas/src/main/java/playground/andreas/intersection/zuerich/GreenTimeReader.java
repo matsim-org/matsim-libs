@@ -8,12 +8,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalGroupSettings;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
-import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 
 
 public class GreenTimeReader implements TabularFileHandler {
@@ -26,9 +26,9 @@ public class GreenTimeReader implements TabularFileHandler {
 		
 //	private boolean isFirstLine = true;
 	
-	private HashMap<Integer, BasicSignalSystemConfiguration> lsaConfigMap = new HashMap<Integer, BasicSignalSystemConfiguration>();
+	private HashMap<Integer, SignalSystemConfiguration> lsaConfigMap = new HashMap<Integer, SignalSystemConfiguration>();
 
-	private BasicSignalSystemConfigurations lsaConfigs = new BasicSignalSystemConfigurationsImpl();
+	private SignalSystemConfigurations lsaConfigs = new SignalSystemConfigurationsImpl();
 	
 	public void startRow(String[] row) throws IllegalArgumentException {
 				
@@ -37,12 +37,12 @@ public class GreenTimeReader implements TabularFileHandler {
 		} else {
 //			log.info("Added: " + row.toString());
 			
-			BasicSignalSystemConfiguration lsa = this.lsaConfigMap.get(Integer.valueOf(row[0]));
+			SignalSystemConfiguration lsa = this.lsaConfigMap.get(Integer.valueOf(row[0]));
 			
 			if(lsa == null){
 				lsa = lsaConfigs.getFactory().createSignalSystemConfiguration(new IdImpl(Integer.parseInt(row[0])));
-				BasicPlanBasedSignalSystemControlInfo controlInfo = lsaConfigs.getFactory().createPlanBasedSignalSystemControlInfo();
-				BasicSignalSystemPlan plan = lsaConfigs.getFactory().createSignalSystemPlan(new IdImpl("1"));
+				PlanBasedSignalSystemControlInfo controlInfo = lsaConfigs.getFactory().createPlanBasedSignalSystemControlInfo();
+				SignalSystemPlan plan = lsaConfigs.getFactory().createSignalSystemPlan(new IdImpl("1"));
 				plan.setCycleTime(new Integer(99));
 				plan.setStartTime(0);
 				plan.setEndTime(86399);
@@ -53,19 +53,19 @@ public class GreenTimeReader implements TabularFileHandler {
 				this.lsaConfigMap.put(Integer.valueOf(row[0]), lsa);
 			}
 			
-			BasicSignalGroupSettings sgConfig = this.lsaConfigs.getFactory().createSignalGroupSettings(new IdImpl(row[1]));
+			SignalGroupSettings sgConfig = this.lsaConfigs.getFactory().createSignalGroupSettings(new IdImpl(row[1]));
 			sgConfig.setRoughCast(0);
 			sgConfig.setDropping(Integer.parseInt(row[2]));
 			sgConfig.setInterGreenTimeRoughcast(new Integer(2));
 			sgConfig.setInterGreenTimeDropping(new Integer(3));
-			((BasicPlanBasedSignalSystemControlInfo) lsa.getControlInfo()).getPlans().get(new IdImpl(1)).addLightSignalGroupConfiguration(sgConfig);
+			((PlanBasedSignalSystemControlInfo) lsa.getControlInfo()).getPlans().get(new IdImpl(1)).addLightSignalGroupConfiguration(sgConfig);
 
 		} 
 		
 	}
 	
 	
-	public HashMap<Integer, BasicSignalSystemConfiguration> readFile(String filename) throws IOException {
+	public HashMap<Integer, SignalSystemConfiguration> readFile(String filename) throws IOException {
 		this.tabFileParserConfig = new TabularFileParserConfig();
 		this.tabFileParserConfig.setFileName(filename);
 		this.tabFileParserConfig.setDelimiterTags(new String[] {" ", "\t"}); // \t
@@ -74,7 +74,7 @@ public class GreenTimeReader implements TabularFileHandler {
 		return this.lsaConfigMap;
 	}
 	
-	public static HashMap<Integer, BasicSignalSystemConfiguration> readBasicLightSignalSystemDefinition(String filename){
+	public static HashMap<Integer, SignalSystemConfiguration> readBasicLightSignalSystemDefinition(String filename){
 		
 		GreenTimeReader myLSAFileParser = new GreenTimeReader();
 		try {			

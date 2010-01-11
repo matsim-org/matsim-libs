@@ -13,9 +13,9 @@ import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
@@ -109,7 +109,7 @@ public class GenerateZuerrichOutput {
 
 		if (generateSignalSystemsConfig){
 			// signal system configs
-			BasicSignalSystemConfigurations signalSystemConfig = processSignalSystemConfigurations(sgGreentime);
+			SignalSystemConfigurations signalSystemConfig = processSignalSystemConfigurations(sgGreentime);
 			MatsimSignalSystemConfigurationsWriter matsimLightSignalSystemConfigurationWriter 
 			= new MatsimSignalSystemConfigurationsWriter(signalSystemConfig);
 			matsimLightSignalSystemConfigurationWriter.writeFile(signalConfigOutputFile);
@@ -126,10 +126,10 @@ public class GenerateZuerrichOutput {
 	
 
 	
-	private BasicSignalSystemConfigurations processSignalSystemConfigurations(String sgGreentime) {
-		Map<Integer, BasicSignalSystemConfiguration> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition(sgGreentime);
-		BasicSignalSystemConfigurations bssc = new BasicSignalSystemConfigurationsImpl();
-		for (BasicSignalSystemConfiguration ssc : basicLightSignalSystemConfiguration.values()){
+	private SignalSystemConfigurations processSignalSystemConfigurations(String sgGreentime) {
+		Map<Integer, SignalSystemConfiguration> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition(sgGreentime);
+		SignalSystemConfigurations bssc = new SignalSystemConfigurationsImpl();
+		for (SignalSystemConfiguration ssc : basicLightSignalSystemConfiguration.values()){
 			bssc.getSignalSystemConfigurations().put(ssc.getSignalSystemId(), ssc);
 		}
 		return bssc;

@@ -28,7 +28,7 @@ import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.vis.otfvis.OTFVisQueueSim;
 
@@ -75,7 +75,7 @@ public class ZurichSignalVis {
 		SignalSystems signalDefs = scenario.getSignalSystems();
 		new MatsimSignalSystemsReader(signalDefs).readFile(signalDefsFile);
 		
-		BasicSignalSystemConfigurations signalConfigs = scenario.getSignalSystemConfigurations();
+		SignalSystemConfigurations signalConfigs = scenario.getSignalSystemConfigurations();
 		new MatsimSignalSystemConfigurationsReader(signalConfigs).readFile(signalConfigsFile);
 		
 		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);

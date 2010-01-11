@@ -47,10 +47,10 @@ import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
-import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsFactory;
+import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsFactory;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.signalsystems.systems.SignalSystemDefinition;
 import org.matsim.signalsystems.systems.SignalSystems;
@@ -176,7 +176,7 @@ public class DaganzoScenarioGenerator {
 			MatsimSignalSystemsWriter ssWriter = new MatsimSignalSystemsWriter(signalSystems);
 			ssWriter.writeFile(SIGNALSYSTEMSOUTPUTFILE);
 			//create the signal system's configurations and write them
-			BasicSignalSystemConfigurations ssConfigs = createSignalSystemsConfig(scenario);
+			SignalSystemConfigurations ssConfigs = createSignalSystemsConfig(scenario);
 			MatsimSignalSystemConfigurationsWriter ssConfigsWriter = new MatsimSignalSystemConfigurationsWriter(ssConfigs);	
 			ssConfigsWriter.writeFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 		}
@@ -329,13 +329,13 @@ public class DaganzoScenarioGenerator {
 		return systems;
 	}
 
-	private BasicSignalSystemConfigurations createSignalSystemsConfig(
+	private SignalSystemConfigurations createSignalSystemsConfig(
 			ScenarioImpl scenario) {
-		BasicSignalSystemConfigurations configs = scenario.getSignalSystemConfigurations();
-		BasicSignalSystemConfigurationsFactory factory = configs.getFactory();
+		SignalSystemConfigurations configs = scenario.getSignalSystemConfigurations();
+		SignalSystemConfigurationsFactory factory = configs.getFactory();
 		
-		BasicSignalSystemConfiguration systemConfig = factory.createSignalSystemConfiguration(id1);
-		BasicAdaptiveSignalSystemControlInfo controlInfo = factory.createAdaptiveSignalSystemControlInfo();
+		SignalSystemConfiguration systemConfig = factory.createSignalSystemConfiguration(id1);
+		AdaptiveSignalSystemControlInfo controlInfo = factory.createAdaptiveSignalSystemControlInfo();
 		controlInfo.addSignalGroupId(id1);
 		controlInfo.addSignalGroupId(id2);
 		controlInfo.setAdaptiveControlerClass(controllerClass);

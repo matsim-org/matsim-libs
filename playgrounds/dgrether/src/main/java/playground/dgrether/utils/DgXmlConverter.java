@@ -34,8 +34,8 @@ import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 import org.matsim.signalsystems.SignalSystemConfigurationsWriter11;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
@@ -99,7 +99,7 @@ public class DgXmlConverter {
 			log.info("new file: " + filename);
 		}
 		else if (MatsimSignalSystemConfigurationsReader.SIGNALSYSTEMSCONFIG10.compareTo(guesser.getSystemId()) == 0){
-			BasicSignalSystemConfigurations configs = new BasicSignalSystemConfigurationsImpl();
+			SignalSystemConfigurations configs = new SignalSystemConfigurationsImpl();
 			MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(configs);
 			reader.readFile(file.getAbsolutePath());
 			MatsimSignalSystemConfigurationsWriter writer = new MatsimSignalSystemConfigurationsWriter(new SignalSystemConfigurationsWriter11(configs));

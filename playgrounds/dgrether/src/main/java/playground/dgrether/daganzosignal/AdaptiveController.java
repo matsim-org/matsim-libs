@@ -26,7 +26,7 @@ import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
-import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
@@ -45,7 +45,7 @@ public class AdaptiveController extends
 	private final Id id5 = new IdImpl("5");
 	private int vehOnLink5Lane1 = 0;
 	
-	public AdaptiveController(BasicAdaptiveSignalSystemControlInfo controlInfo) {
+	public AdaptiveController(AdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);
 	}
 
