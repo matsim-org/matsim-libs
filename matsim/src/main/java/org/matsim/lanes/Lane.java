@@ -1,7 +1,6 @@
-/* **********************************import java.util.List;
-
-import org.matsim.interfaces.basic.v01.Id;
-                                                                         *
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2008 by the members listed in the COPYING,        *
@@ -17,11 +16,9 @@ import org.matsim.interfaces.basic.v01.Id;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.lanes.basic;
+package org.matsim.lanes;
 
 import java.util.List;
-import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 /**
@@ -29,22 +26,23 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
-public interface BasicLanesToLinkAssignment {
-
-	public SortedMap<Id, BasicLane> getLanes();
+public interface Lane {
 
 	/**
-	 * 
-	 * @deprecated use getLanes()
+	 * @param number
 	 */
-	@Deprecated
-	public List<BasicLane> getLanesList();
+	public void setNumberOfRepresentedLanes(int number);
 
-	/**
-	 * @param lane
-	 */
-	public void addLane(BasicLane lane);
+	public void setLength(double meter);
 
-	public Id getLinkId();
+	public Id getId();
+
+	public int getNumberOfRepresentedLanes();
+
+	public double getLength();
+
+	public void addToLinkId(Id id);
+
+	public List<Id> getToLinkIds();
 
 }

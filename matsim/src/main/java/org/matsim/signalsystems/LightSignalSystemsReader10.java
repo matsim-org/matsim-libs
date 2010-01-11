@@ -37,10 +37,10 @@ import org.matsim.jaxb.lightsignalsystems10.XMLLanesToLinkAssignmentType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalGroupDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystemDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystems;
-import org.matsim.lanes.basic.BasicLane;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsFactory;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsFactory;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
@@ -58,14 +58,14 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 			.getLogger(LightSignalSystemsReader10.class);
 	
 	private BasicSignalSystems lightSignalSystems;
-	private BasicLaneDefinitions laneDefinitions;
+	private LaneDefinitions laneDefinitions;
 
 	private BasicSignalSystemsFactory builder;
 
-	private BasicLaneDefinitionsFactory laneBuilder;
+	private LaneDefinitionsFactory laneBuilder;
 
 
-	public LightSignalSystemsReader10(BasicLaneDefinitions laneDefs,
+	public LightSignalSystemsReader10(LaneDefinitions laneDefs,
 			BasicSignalSystems lightSignalSystems, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
@@ -90,8 +90,8 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 					.unmarshal(new FileInputStream(filename));
 
 			//convert the parsed xml-instances to basic instances
-			BasicLanesToLinkAssignment l2lAssignment;
-			BasicLane lane = null;
+			LanesToLinkAssignment l2lAssignment;
+			Lane lane = null;
 			for (XMLLanesToLinkAssignmentType lldef : xmlLssDefinition
 					.getLanesToLinkAssignment()) {
 				l2lAssignment = laneBuilder.createLanesToLinkAssignment(new IdImpl(lldef

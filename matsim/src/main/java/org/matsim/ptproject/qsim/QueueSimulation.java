@@ -60,8 +60,8 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.vehicles.BasicVehicleImpl;
@@ -114,7 +114,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.IOSimulation, Obs
 	private QueueSimListenerManager<QueueSimulation> listenerManager;
 	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 	protected Scenario scenario = null;
-	private BasicLaneDefinitions laneDefintions;
+	private LaneDefinitions laneDefintions;
 	private boolean useActivityDurations = true;
 	private QueueSimSignalEngine signalEngine = null;
 	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
@@ -180,7 +180,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.IOSimulation, Obs
 	 * Set the lanes used in the simulation
 	 * @param laneDefs
 	 */
-	public void setLaneDefinitions(final BasicLaneDefinitions laneDefs){
+	public void setLaneDefinitions(final LaneDefinitions laneDefs){
 		this.laneDefintions = laneDefs;
 	}
 
@@ -368,7 +368,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.IOSimulation, Obs
 	protected void prepareLanes(){
 		if (this.laneDefintions != null){
 			log.info("Lanes enabled...");
-			for (BasicLanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignments().values()){
+			for (LanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignments().values()){
 				QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
 				if (link == null) {
 					String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";

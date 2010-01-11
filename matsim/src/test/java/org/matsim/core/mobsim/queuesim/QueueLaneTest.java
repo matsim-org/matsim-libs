@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.lanes.basic.BasicLane;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsFactory;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsFactory;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -64,13 +64,13 @@ public class QueueLaneTest extends MatsimTestCase {
 		return network;
   }
   
-	private BasicLaneDefinitions createOneLane(ScenarioImpl scenario, int numberOfRepresentedLanes) {
+	private LaneDefinitions createOneLane(ScenarioImpl scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().scenario().setUseLanes(true);
-		BasicLaneDefinitions lanes = scenario.getLaneDefinitions();
-		BasicLaneDefinitionsFactory builder = lanes.getFactory();
+		LaneDefinitions lanes = scenario.getLaneDefinitions();
+		LaneDefinitionsFactory builder = lanes.getFactory();
 		//lanes for link 1
-		BasicLanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(id1);
-		BasicLane link1lane1 = builder.createLane(id1);
+		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(id1);
+		Lane link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
 		link1lane1.setLength(105.0);
 		link1lane1.setNumberOfRepresentedLanes(numberOfRepresentedLanes);
@@ -79,24 +79,24 @@ public class QueueLaneTest extends MatsimTestCase {
 		return lanes;
 	}
   
-	private BasicLaneDefinitions createLanes(ScenarioImpl scenario) {
+	private LaneDefinitions createLanes(ScenarioImpl scenario) {
 		scenario.getConfig().scenario().setUseLanes(true);
-		BasicLaneDefinitions lanes = scenario.getLaneDefinitions();
-		BasicLaneDefinitionsFactory builder = lanes.getFactory();
+		LaneDefinitions lanes = scenario.getLaneDefinitions();
+		LaneDefinitionsFactory builder = lanes.getFactory();
 		//lanes for link 1
-		BasicLanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(id1);
-		BasicLane link1lane1 = builder.createLane(id1);
+		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(id1);
+		Lane link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
 		link1lane1.setLength(105.0);
 		lanesForLink1.addLane(link1lane1);
 		
-		BasicLane link1lane2 = builder.createLane(id2);
+		Lane link1lane2 = builder.createLane(id2);
 		link1lane2.addToLinkId(id2);
 		link1lane2.setNumberOfRepresentedLanes(2);
 		link1lane2.setLength(105.0);
 		lanesForLink1.addLane(link1lane2);
 
-		BasicLane link1lane3 = builder.createLane(id3);
+		Lane link1lane3 = builder.createLane(id3);
 		link1lane3.addToLinkId(id2);
 		link1lane3.setLength(105.0);
 		lanesForLink1.addLane(link1lane3);
@@ -121,7 +121,7 @@ public class QueueLaneTest extends MatsimTestCase {
 	public void testCapacityWithOneLaneOneLane() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Network network = this.initNetwork(scenario.getNetwork());
-		BasicLaneDefinitions lanes = this.createOneLane(scenario, 1);
+		LaneDefinitions lanes = this.createOneLane(scenario, 1);
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
@@ -152,7 +152,7 @@ public class QueueLaneTest extends MatsimTestCase {
 	public void testCapacityWithOneLaneOneLaneTwoLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Network network = this.initNetwork(scenario.getNetwork());
-		BasicLaneDefinitions lanes = this.createOneLane(scenario, 2);
+		LaneDefinitions lanes = this.createOneLane(scenario, 2);
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
@@ -185,7 +185,7 @@ public class QueueLaneTest extends MatsimTestCase {
 	public void testCapacityWithLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Network network = this.initNetwork(scenario.getNetwork());
-		BasicLaneDefinitions lanes = this.createLanes(scenario);
+		LaneDefinitions lanes = this.createLanes(scenario);
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();

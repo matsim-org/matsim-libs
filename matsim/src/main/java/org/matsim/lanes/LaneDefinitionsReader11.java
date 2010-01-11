@@ -35,10 +35,6 @@ import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
-import org.matsim.lanes.basic.BasicLane;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsFactory;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 
 import org.xml.sax.SAXException;
 
@@ -54,13 +50,13 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader11.class);
 	
-	private BasicLaneDefinitions laneDefinitions;
+	private LaneDefinitions laneDefinitions;
 	
-	private BasicLaneDefinitionsFactory builder;
+	private LaneDefinitionsFactory builder;
 	/**
 	 * @param schemaLocation
 	 */
-	public LaneDefinitionsReader11(BasicLaneDefinitions laneDefs, String schemaLocation) {
+	public LaneDefinitionsReader11(LaneDefinitions laneDefs, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
 		builder = this.laneDefinitions.getFactory();
@@ -86,8 +82,8 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 					.unmarshal(new FileInputStream(filename));
 
 			//convert the parsed xml-instances to basic instances
-			BasicLanesToLinkAssignment l2lAssignment;
-			BasicLane lane = null;
+			LanesToLinkAssignment l2lAssignment;
+			Lane lane = null;
 			for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions
 					.getLanesToLinkAssignment()) {
 				l2lAssignment = builder.createLanesToLinkAssignment(new IdImpl(lldef

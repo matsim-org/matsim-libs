@@ -20,7 +20,7 @@
 package org.matsim.signalsystems;
 
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.lanes.LaneDefinitions;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 
 /**
@@ -41,7 +41,7 @@ public class MatsimSignalSystemsWriter {
 	 * @deprecated lanedefinitions can be written separately 
 	 */
 	@Deprecated 
-	public MatsimSignalSystemsWriter(BasicLaneDefinitions lanedefs, BasicSignalSystems basiclss) {
+	public MatsimSignalSystemsWriter(LaneDefinitions lanedefs, BasicSignalSystems basiclss) {
 		this(new LightSignalSystemsWriter10(lanedefs, basiclss));
 	}
 	

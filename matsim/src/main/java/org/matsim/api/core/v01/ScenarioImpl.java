@@ -31,8 +31,8 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
@@ -61,7 +61,7 @@ public class ScenarioImpl implements Scenario {
 	private ActivityFacilitiesImpl facilities;
 	
 	//non-mandatory attributes
-	private BasicLaneDefinitions laneDefinitions;
+	private LaneDefinitions laneDefinitions;
 	private BasicSignalSystems signalSystems;
 	private BasicSignalSystemConfigurations signalSystemConfigurations;
 	private RoadPricingScheme roadPricingScheme;
@@ -135,7 +135,7 @@ public class ScenarioImpl implements Scenario {
 	}
 	
 	protected void createLaneDefinitionsContainer() {
-		this.laneDefinitions = new BasicLaneDefinitionsImpl();
+		this.laneDefinitions = new LaneDefinitionsImpl();
 	}
 	
 	protected void createSignalSystemsContainers() {
@@ -177,7 +177,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	
-	public BasicLaneDefinitions getLaneDefinitions() {
+	public LaneDefinitions getLaneDefinitions() {
 		if ((this.laneDefinitions == null) && this.config.scenario().isUseLanes()){
 			this.createLaneDefinitionsContainer();
 		}

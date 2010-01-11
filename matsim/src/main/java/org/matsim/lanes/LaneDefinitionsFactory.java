@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.basic;
+package org.matsim.lanes;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
@@ -27,18 +27,18 @@ import org.matsim.core.api.internal.MatsimFactory;
  * Builder for the content of BasicLaneDefinitions
  * @author dgrether
  */
-public interface BasicLaneDefinitionsFactory extends MatsimFactory {
+public interface LaneDefinitionsFactory extends MatsimFactory {
 
 	/**
 	 * 
 	 * @param linkIdReference id of the links the lanes of the created object belong to
 	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
 	 */
-	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference);
+	public LanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference);
 	/**
 	 * Creates an instance of BasicLane with the id given as parameter.
 	 * @param laneId
 	 * @return
 	 */
-	public BasicLane createLane(Id laneId);
+	public Lane createLane(Id laneId);
 }

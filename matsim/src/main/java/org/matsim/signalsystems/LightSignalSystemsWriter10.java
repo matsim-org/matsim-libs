@@ -38,9 +38,9 @@ import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalGroupDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystemDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystems;
 import org.matsim.jaxb.lightsignalsystems10.XMLMatsimTimeAttributeType;
-import org.matsim.lanes.basic.BasicLane;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
@@ -61,9 +61,9 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 
 	private XMLLightSignalSystems xmlLightSignalSystems;
 
-	private BasicLaneDefinitions lanes;
+	private LaneDefinitions lanes;
 
-	public LightSignalSystemsWriter10(BasicLaneDefinitions lanes, BasicSignalSystems basiclss) {
+	public LightSignalSystemsWriter10(LaneDefinitions lanes, BasicSignalSystems basiclss) {
 		this.lanes = lanes;
 		this.blss = basiclss;
 		this.xmlLightSignalSystems = convertBasicToXml();
@@ -92,11 +92,11 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 		ObjectFactory fac = new ObjectFactory();
 		XMLLightSignalSystems xmllss = fac.createXMLLightSignalSystems();
 		
-		for (BasicLanesToLinkAssignment ltla : this.lanes.getLanesToLinkAssignmentsList()) {
+		for (LanesToLinkAssignment ltla : this.lanes.getLanesToLinkAssignmentsList()) {
 			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
 			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
 			
-			for (BasicLane bl : ltla.getLanesList()) {
+			for (Lane bl : ltla.getLanesList()) {
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
 				

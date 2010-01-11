@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitions
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,7 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.basic;
+
+package org.matsim.lanes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,47 +27,47 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
-
 /**
  * @author dgrether
- *
  */
-public class BasicLaneDefinitionsImpl implements BasicLaneDefinitions {
-	
-	private SortedMap<Id, BasicLanesToLinkAssignment> lanesToLinkAssignments =  new TreeMap<Id, BasicLanesToLinkAssignment>();
+public class LanesToLinkAssignmentImpl implements LanesToLinkAssignment {
 
-	private final BasicLaneDefinitionsFactory builder = new BasicLaneDefinitionsFactoryImpl();
+	private final Id linkId;
+
+	private final SortedMap<Id, Lane> lanes = new TreeMap<Id, Lane>();
 	
 	/**
-	 * @see org.matsim.lanes.basic.BasicLaneDefinitions#getLanesToLinkAssignmentsList()
+	 * @param linkId
 	 */
-	public List<BasicLanesToLinkAssignment> getLanesToLinkAssignmentsList() {
-		List<BasicLanesToLinkAssignment> ret = new ArrayList<BasicLanesToLinkAssignment>();
-		ret.addAll(this.lanesToLinkAssignments.values());
-		return Collections.unmodifiableList(ret);
-	}
-	
-	public SortedMap<Id, BasicLanesToLinkAssignment> getLanesToLinkAssignments() {
-		return this.lanesToLinkAssignments;
+	public LanesToLinkAssignmentImpl(Id linkId) {
+		this.linkId = linkId;
 	}
 
 	/**
-	 * @see org.matsim.lanes.basic.BasicLaneDefinitions#addLanesToLinkAssignment(org.matsim.lanes.basic.BasicLanesToLinkAssignment)
+	 * @see org.matsim.lanes.LanesToLinkAssignment#getLanesList()
 	 */
-	public void addLanesToLinkAssignment(BasicLanesToLinkAssignment assignment) {
-		if (this.lanesToLinkAssignments == null) {
-			this.lanesToLinkAssignments = new TreeMap<Id, BasicLanesToLinkAssignment>();
-		}
-		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
+	public List<Lane> getLanesList() {
+		List<Lane> r = new ArrayList<Lane>();
+		r.addAll(this.lanes.values());
+		return Collections.unmodifiableList(r);
 	}
 	
 	/**
-	 * @see org.matsim.lanes.basic.BasicLaneDefinitions#getFactory()
+	 * @see org.matsim.lanes.LanesToLinkAssignment#addLane(org.matsim.lanes.Lane)
 	 */
-	public BasicLaneDefinitionsFactory getFactory(){
-		return this.builder;
+	public void addLane(Lane lane) {
+		this.lanes.put(lane.getId(), lane); 
+	}
+	
+	/**
+	 * @see org.matsim.lanes.LanesToLinkAssignment#getLinkId()
+	 */
+	public Id getLinkId() {
+		return linkId;
 	}
 
+	public SortedMap<Id, Lane> getLanes() {
+		return this.lanes;
+	}
 
-	
 }

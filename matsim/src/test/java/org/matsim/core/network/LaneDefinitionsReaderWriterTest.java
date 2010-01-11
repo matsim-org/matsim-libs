@@ -24,12 +24,12 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsImpl;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.basic.BasicLane;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 import org.matsim.signalsystems.SignalSystemsReaderWriterTest;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -55,7 +55,7 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 	private Id id42 = new IdImpl("42");
 
 	public void testParser() throws IOException {
-		BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
+		LaneDefinitions laneDefs = new LaneDefinitionsImpl();
 		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(
 				laneDefs);
 		reader.readFile(this.getClassInputDirectory() + TESTXML);
@@ -67,7 +67,7 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		String testoutput = this.getOutputDirectory() + "testLssOutput.xml";
 		log.debug("reading file...");
 		// read the test file
-		BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
+		LaneDefinitions laneDefs = new LaneDefinitionsImpl();
 		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(
 				laneDefs);
 		reader.readFile(this.getClassInputDirectory() + TESTXML);
@@ -78,20 +78,20 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		writer.writeFile(testoutput);
 
 		log.debug("and read it again");
-		laneDefs = new BasicLaneDefinitionsImpl();
+		laneDefs = new LaneDefinitionsImpl();
 		reader = new MatsimLaneDefinitionsReader(
 				laneDefs);
 		reader.readFile(this.getClassInputDirectory() + TESTXML);
 		checkContent(laneDefs);
 	}
 
-	private void checkContent(BasicLaneDefinitions lanedefs) {
+	private void checkContent(LaneDefinitions lanedefs) {
 		assertEquals(2, lanedefs.getLanesToLinkAssignmentsList().size());
-		BasicLanesToLinkAssignment l2la;
+		LanesToLinkAssignment l2la;
 		l2la = lanedefs.getLanesToLinkAssignmentsList().get(0);
 		assertNotNull(l2la);
 		assertEquals(id23, l2la.getLinkId());
-		BasicLane lane = l2la.getLanesList().get(0);
+		Lane lane = l2la.getLanesList().get(0);
 		assertEquals(id3, lane.getId());
 		assertEquals(id1, lane.getToLinkIds().get(0));
 		assertEquals(45.0, lane.getLength(), EPSILON);

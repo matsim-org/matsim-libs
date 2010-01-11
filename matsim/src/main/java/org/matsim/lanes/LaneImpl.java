@@ -16,33 +16,71 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.basic;
 
+package org.matsim.lanes;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+
 /**
- * 
  * @author dgrether
- *
  */
-public interface BasicLane {
+public class LaneImpl implements Lane {
+
+	private Id id;
+	/**
+	 * the default according to the xml schema, never change the value if schema is not changed
+	 */
+	private int numberOfRepresentedLanes = 1;
+	/**
+	 * the default according to the xml schema, never change the value if schema is not changed
+	 */
+	private double length = 45.0;
+	private List<Id> toLinkIds;
+
+	/**
+	 * @param id
+	 */
+	public LaneImpl(Id id) {
+		this.id = id;
+	}
 
 	/**
 	 * @param number
 	 */
-	public void setNumberOfRepresentedLanes(int number);
+	public void setNumberOfRepresentedLanes(int number) {
+		this.numberOfRepresentedLanes = number;
+	}
 
-	public void setLength(double meter);
+	public void setLength(double meter) {
+		this.length = meter;
+	}
 
-	public Id getId();
+	public Id getId() {
+		return id;
+	}
 
-	public int getNumberOfRepresentedLanes();
+	
+	public int getNumberOfRepresentedLanes() {
+		return numberOfRepresentedLanes;
+	}
 
-	public double getLength();
+	
+	public double getLength() {
+		return length;
+	}
 
-	public void addToLinkId(Id id);
-
-	public List<Id> getToLinkIds();
-
+	public void addToLinkId(Id id) {
+		if (this.toLinkIds == null) {
+			this.toLinkIds = new ArrayList<Id>();
+		}
+		this.toLinkIds.add(id);
+	}
+	
+	public List<Id> getToLinkIds() {
+		return this.toLinkIds;
+	}
+	
 }

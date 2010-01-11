@@ -47,7 +47,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.basic.BasicLane;
+import org.matsim.lanes.Lane;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.netvis.DrawableAgentI;
@@ -160,7 +160,7 @@ public class QueueLane {
 
 	private SortedMap<Id, BasicSignalGroupDefinition> signalGroups;
 
-	private BasicLane laneData;
+	private Lane laneData;
 	/**
 	 * This id is only set, if there is no laneData for the Lane, i.e. it is the original lane
 	 */
@@ -173,7 +173,7 @@ public class QueueLane {
 	 */
 	private boolean fireLaneEvents = false;
 
-	/*package*/ QueueLane(final QueueLink ql, BasicLane laneData) {
+	/*package*/ QueueLane(final QueueLink ql, Lane laneData) {
 		this.queueLink = ql;
 		this.originalLane = (laneData == null) ? true : false;
 		this.laneData = laneData;

@@ -1,4 +1,4 @@
-package org.matsim.lanes.basic;
+package org.matsim.lanes;
 
 import java.util.List;
 import java.util.SortedMap;
@@ -11,28 +11,28 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  * @author dgrether
  *
  */
-public interface BasicLaneDefinitions extends MatsimToplevelContainer {
+public interface LaneDefinitions extends MatsimToplevelContainer {
 
 	/**
 	 * @deprecated use the map instead 
 	 */
 	@Deprecated
-	public List<BasicLanesToLinkAssignment> getLanesToLinkAssignmentsList();
+	public List<LanesToLinkAssignment> getLanesToLinkAssignmentsList();
 
 	/**
 	 * 
 	 * @return Map with Link Ids as keys and assignments as values
 	 */
-	public SortedMap<Id, BasicLanesToLinkAssignment> getLanesToLinkAssignments();
+	public SortedMap<Id, LanesToLinkAssignment> getLanesToLinkAssignments();
 	
 	/**
 	 * Adds a LanesToLinkAssignment to the container.
 	 * @param assignment
 	 */
-	public void addLanesToLinkAssignment(BasicLanesToLinkAssignment assignment);
+	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment);
 	/**
 	 * Get the factory to create container content. 
 	 */
-	public BasicLaneDefinitionsFactory getFactory();
+	public LaneDefinitionsFactory getFactory();
 
 }

@@ -36,7 +36,7 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.basic.BasicLane;
+import org.matsim.lanes.Lane;
 import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -167,11 +167,11 @@ public class QueueLink {
 	 * Initialize the QueueLink with more than one QueueLane
 	 * @param map
 	 */
-	/*package*/ void createLanes(Map<Id, BasicLane> map) {
+	/*package*/ void createLanes(Map<Id, Lane> map) {
 		this.hasLanes = true;
 		boolean firstNodeLinkInitialized = false;
 		
-		for (BasicLane signalLane : map.values()) {
+		for (Lane signalLane : map.values()) {
 			if (signalLane.getLength() > this.link.getLength()) {
 				throw new IllegalStateException("Link Id " + this.link.getId() + " is shorter than Lane Id " + signalLane.getId() + " on this link!");
 			}

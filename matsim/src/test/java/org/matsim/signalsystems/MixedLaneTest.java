@@ -46,10 +46,10 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.lanes.basic.BasicLane;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsFactory;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsFactory;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
@@ -136,13 +136,13 @@ public class MixedLaneTest extends TestCase {
 		link3.setNumberOfLanes(2.0);
 		n.addLink(link3);
 		//create lanes
-		BasicLaneDefinitions lanes = this.sc.getLaneDefinitions();
-		BasicLaneDefinitionsFactory lb = lanes.getFactory();
-		BasicLane lane = lb.createLane(id1);
+		LaneDefinitions lanes = this.sc.getLaneDefinitions();
+		LaneDefinitionsFactory lb = lanes.getFactory();
+		Lane lane = lb.createLane(id1);
 		lane.setLength(50.0);
 		lane.addToLinkId(id2);
 		lane.addToLinkId(id3);
-		BasicLanesToLinkAssignment l2l = lb.createLanesToLinkAssignment(id1);
+		LanesToLinkAssignment l2l = lb.createLanesToLinkAssignment(id1);
 		l2l.addLane(lane);
 		lanes.addLanesToLinkAssignment(l2l);
 		

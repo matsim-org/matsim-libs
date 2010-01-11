@@ -1,10 +1,10 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * BasicLaneDefinitionsBuilderImpl
- *                                                                         *
+/* **********************************import java.util.List;
+
+import org.matsim.interfaces.basic.v01.Id;
+                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,27 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.basic;
+
+package org.matsim.lanes;
+
+import java.util.List;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
-
-
 /**
  * 
  * @author dgrether
- * @see org.matsim.lanes.basic.BasicLaneDefinitionsFactory
+ *
  */
-public class BasicLaneDefinitionsFactoryImpl implements BasicLaneDefinitionsFactory {
+public interface LanesToLinkAssignment {
+
+	public SortedMap<Id, Lane> getLanes();
+
 	/**
-	 * @see org.matsim.lanes.basic.BasicLaneDefinitionsFactory#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
+	 * 
+	 * @deprecated use getLanes()
 	 */
-	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference) {
-		return new BasicLanesToLinkAssignmentImpl(linkIdReference);
-	}
+	@Deprecated
+	public List<Lane> getLanesList();
+
 	/**
-	 * @see org.matsim.lanes.basic.BasicLaneDefinitionsFactory#createLane(org.matsim.api.core.v01.Id)
+	 * @param lane
 	 */
-	public BasicLane createLane(Id id) {
-		return new BasicLaneImpl(id);
-	}
+	public void addLane(Lane lane);
+
+	public Id getLinkId();
+
 }

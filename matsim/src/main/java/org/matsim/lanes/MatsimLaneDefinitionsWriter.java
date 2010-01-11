@@ -20,7 +20,6 @@
 package org.matsim.lanes;
 
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
 
 
 /**
@@ -39,7 +38,7 @@ public class MatsimLaneDefinitionsWriter {
 	 * LaneDefinitions within MATSim.
 	 * @param lanedefs
 	 */
-	public MatsimLaneDefinitionsWriter(BasicLaneDefinitions lanedefs){
+	public MatsimLaneDefinitionsWriter(LaneDefinitions lanedefs){
 		this.writerDelegate = new LaneDefinitionsWriter11(lanedefs);
 	}
 	

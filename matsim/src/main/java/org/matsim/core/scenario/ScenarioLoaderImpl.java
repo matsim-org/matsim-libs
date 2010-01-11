@@ -39,8 +39,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.households.HouseholdsReaderV10;
+import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
@@ -211,7 +211,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 	}
 
 	private void loadLanes() {
-			BasicLaneDefinitions laneDefinitions;
+			LaneDefinitions laneDefinitions;
 			if ((this.getScenario().getLaneDefinitions() != null)
 					&& (this.config.network().getLaneDefinitionsFile() != null)) {
 				laneDefinitions = this.getScenario().getLaneDefinitions();

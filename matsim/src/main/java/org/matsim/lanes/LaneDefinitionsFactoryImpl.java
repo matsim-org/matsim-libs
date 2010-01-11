@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicLaneDefinitionsBuilderImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,71 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.lanes.basic;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.matsim.lanes;
 
 import org.matsim.api.core.v01.Id;
 
+
 /**
+ * 
  * @author dgrether
+ * @see org.matsim.lanes.LaneDefinitionsFactory
  */
-public class BasicLaneImpl implements BasicLane {
-
-	private Id id;
+public class LaneDefinitionsFactoryImpl implements LaneDefinitionsFactory {
 	/**
-	 * the default according to the xml schema, never change the value if schema is not changed
+	 * @see org.matsim.lanes.LaneDefinitionsFactory#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
 	 */
-	private int numberOfRepresentedLanes = 1;
+	public LanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference) {
+		return new LanesToLinkAssignmentImpl(linkIdReference);
+	}
 	/**
-	 * the default according to the xml schema, never change the value if schema is not changed
+	 * @see org.matsim.lanes.LaneDefinitionsFactory#createLane(org.matsim.api.core.v01.Id)
 	 */
-	private double length = 45.0;
-	private List<Id> toLinkIds;
-
-	/**
-	 * @param id
-	 */
-	public BasicLaneImpl(Id id) {
-		this.id = id;
+	public Lane createLane(Id id) {
+		return new LaneImpl(id);
 	}
-
-	/**
-	 * @param number
-	 */
-	public void setNumberOfRepresentedLanes(int number) {
-		this.numberOfRepresentedLanes = number;
-	}
-
-	public void setLength(double meter) {
-		this.length = meter;
-	}
-
-	public Id getId() {
-		return id;
-	}
-
-	
-	public int getNumberOfRepresentedLanes() {
-		return numberOfRepresentedLanes;
-	}
-
-	
-	public double getLength() {
-		return length;
-	}
-
-	public void addToLinkId(Id id) {
-		if (this.toLinkIds == null) {
-			this.toLinkIds = new ArrayList<Id>();
-		}
-		this.toLinkIds.add(id);
-	}
-	
-	public List<Id> getToLinkIds() {
-		return this.toLinkIds;
-	}
-	
 }

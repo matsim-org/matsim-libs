@@ -61,8 +61,8 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.vehicles.BasicVehicleImpl;
@@ -128,7 +128,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	protected Scenario scenario = null;
 
-	private BasicLaneDefinitions laneDefintions;
+	private LaneDefinitions laneDefintions;
 
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
@@ -190,7 +190,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * Set the lanes used in the simulation
 	 * @param laneDefs
 	 */
-	public void setLaneDefinitions(final BasicLaneDefinitions laneDefs){
+	public void setLaneDefinitions(final LaneDefinitions laneDefs){
 		this.laneDefintions = laneDefs;
 	}
 
@@ -356,7 +356,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	protected void prepareLanes(){
 		if (this.laneDefintions != null){
 			log.info("Lanes enabled...");
-			for (BasicLanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignmentsList()){
+			for (LanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignmentsList()){
 				QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
 				if (link == null) {
 					String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";

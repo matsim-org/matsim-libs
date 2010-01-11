@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
@@ -53,7 +53,7 @@ public class MatsimXMLFormatConverter {
 	 */
 	public static void convertSignalSystemsV10ToV11(String signalsv10, String signalsv11, String lanesv11){
 		//create containers
-		BasicLaneDefinitions lanedefs = new BasicLaneDefinitionsImpl();
+		LaneDefinitions lanedefs = new LaneDefinitionsImpl();
 		BasicSignalSystems signalSystems = new BasicSignalSystemsImpl();
 		//read old format
 		MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(lanedefs, signalSystems);

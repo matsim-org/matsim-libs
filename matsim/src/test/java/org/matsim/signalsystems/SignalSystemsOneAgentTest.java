@@ -29,7 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.lanes.LaneDefinitions;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalGroupSettings;
@@ -81,7 +81,7 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
 		
-		BasicLaneDefinitions lanedefs = data.getLaneDefinitions();
+		LaneDefinitions lanedefs = data.getLaneDefinitions();
 		BasicSignalSystems signalSystems = data.getSignalSystems();
 
 		EventsManagerImpl events = new EventsManagerImpl();
