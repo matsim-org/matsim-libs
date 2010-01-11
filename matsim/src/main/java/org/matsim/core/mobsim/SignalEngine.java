@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.core.mobsim;
 
 import java.util.SortedMap;
 

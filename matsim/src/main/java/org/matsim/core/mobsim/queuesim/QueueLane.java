@@ -30,8 +30,6 @@ import java.util.ListIterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -48,7 +46,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -158,15 +155,12 @@ public class QueueLane {
 	 */
 	private final Set<Id> destinationLinkIds = new LinkedHashSet<Id>();
 
-	private SortedMap<Id, SignalGroupDefinition> signalGroups;
-
 	private Lane laneData;
 	/**
 	 * This id is only set, if there is no laneData for the Lane, i.e. it is the original lane
 	 */
 	private Id laneId = null;
 
-	private boolean thisTimeStepGreen = true;
 	/**
 	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
 	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
@@ -201,17 +195,6 @@ public class QueueLane {
 		}
 		else {
 			throw new IllegalStateException("Currently a lane must have a LaneData instance or be the original lane");
-		}
-	}
-
-	protected void addSignalGroupDefinition(final SignalGroupDefinition signalGroupDefinition) {
-		for (Id laneId : signalGroupDefinition.getLaneIds()) {
-			if (this.laneData.getId().equals(laneId)) {
-				if (this.signalGroups == null) {
-					this.signalGroups = new TreeMap<Id, SignalGroupDefinition>();
-				}
-				this.signalGroups.put(signalGroupDefinition.getId(), signalGroupDefinition);
-			}
 		}
 	}
 
@@ -305,33 +288,8 @@ public class QueueLane {
 		return this.meterFromLinkEnd;
 	}
 
-	/**
-	 * updated the status of the QueueLane's signal system
-	 */
-	protected void updateGreenState(double time){
-		if (this.signalGroups == null) {
-			log.fatal("This should never happen, since every lane link at a signalized intersection" +
-					" should have at least one signal(group). Please check integrity of traffic light data on link " +
-					this.queueLink.getLink().getId() + " lane " + this.laneData.getId() + ". Allowing to move anyway.");
-			this.setThisTimeStepGreen(true);
-			return;
-		}
-		//else everything normal...
-		for (SignalGroupDefinition signalGroup : this.signalGroups.values()) {
-			this.setThisTimeStepGreen(signalGroup.isGreen(time));
-		}
-	}
-
 	protected boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
-	}
-
-	public boolean isThisTimeStepGreen(){
-		return this.thisTimeStepGreen ;
-	}
-
-	protected void setThisTimeStepGreen(final boolean b) {
-		this.thisTimeStepGreen = b;
 	}
 
 	/**
@@ -546,7 +504,7 @@ public class QueueLane {
 
 	private void updateBufferCapacity() {
 		this.bufferCap = this.simulatedFlowCapacity;
-		if (this.thisTimeStepGreen  && (this.buffercap_accumulate < 1.0)) {
+		if (this.buffercap_accumulate < 1.0) {
 			this.buffercap_accumulate += this.flowCapFraction;
 		}
 	}
@@ -899,9 +857,6 @@ public class QueueLane {
 
 		private double getInitialQueueEnd() {
 			double queueEnd = QueueLane.this.queueLink.getLink().getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
-			if ((QueueLane.this.signalGroups != null) ){ 
-				queueEnd -= 35.0;
-			}
 			return queueEnd;
 		}
 
@@ -1066,7 +1021,4 @@ public class QueueLane {
 		}
 	}
 	
-	protected SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
-		return signalGroups;
-	}
 }

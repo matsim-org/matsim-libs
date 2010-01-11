@@ -51,7 +51,7 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.ObservableSimulation;
-import org.matsim.core.mobsim.queuesim.SignalEngine;
+import org.matsim.core.mobsim.SignalEngine;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;

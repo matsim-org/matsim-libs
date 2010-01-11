@@ -49,10 +49,6 @@ public class QueueNode {
 	private final Node node;
 
 	public QueueNetwork queueNetwork;
-	/**
-	 * Indicates whether this node is signalized or not
-	 */
-	private boolean signalized = false;
 
 	public QueueNode(final Node n, final QueueNetwork queueNetwork) {
 		this.node = n;
@@ -187,56 +183,43 @@ public class QueueNode {
 	 * @param random the random number generator to be used
 	 */
 	public void moveNode(final double now, final Random random) {
-		/* called by the framework, do all necessary action for node movement here */
-		if (this.signalized) {
-			for (QueueLink link : this.inLinksArrayCache){
-				for (QueueLane lane : link.getToNodeQueueLanes()) {
-					lane.updateGreenState(now);
-					if (lane.isThisTimeStepGreen()){
-						this.clearLaneBuffer(lane, now);
-					}
-				}
-			}
-		}
-		else { // Node is not signal controlled -> inLink selection randomized based on capacity
-			int inLinksCounter = 0;
-			double inLinksCapSum = 0.0;
-			// Check all incoming links for buffered agents
-			for (QueueLink link : this.inLinksArrayCache) {
-				if (!link.bufferIsEmpty()) {
-					this.tempLinks[inLinksCounter] = link;
-					inLinksCounter++;
-					inLinksCapSum += link.getLink().getCapacity(now);
-				}
-			}
+	  int inLinksCounter = 0;
+	  double inLinksCapSum = 0.0;
+	  // Check all incoming links for buffered agents
+	  for (QueueLink link : this.inLinksArrayCache) {
+	    if (!link.bufferIsEmpty()) {
+	      this.tempLinks[inLinksCounter] = link;
+	      inLinksCounter++;
+	      inLinksCapSum += link.getLink().getCapacity(now);
+	    }
+	  }
 
-			if (inLinksCounter == 0) {
-				this.active = false;
-				return; // Nothing to do
-			}
+	  if (inLinksCounter == 0) {
+	    this.active = false;
+	    return; // Nothing to do
+	  }
 
-			int auxCounter = 0;
-			// randomize based on capacity
-			while (auxCounter < inLinksCounter) {
-				double rndNum = random.nextDouble() * inLinksCapSum;
-				double selCap = 0.0;
-				for (int i = 0; i < inLinksCounter; i++) {
-					QueueLink link = this.tempLinks[i];
-					if (link == null)
-						continue;
-					selCap += link.getLink().getCapacity(now);
-					if (selCap >= rndNum) {
-						auxCounter++;
-						inLinksCapSum -= link.getLink().getCapacity(now);
-						this.tempLinks[i] = null;
-						//move the link
-						for (QueueLane lane : link.getToNodeQueueLanes()) {
-							this.clearLaneBuffer(lane, now);
-						}
-						break;
-					}
-				}
-			}
+	  int auxCounter = 0;
+	  // randomize based on capacity
+	  while (auxCounter < inLinksCounter) {
+	    double rndNum = random.nextDouble() * inLinksCapSum;
+	    double selCap = 0.0;
+	    for (int i = 0; i < inLinksCounter; i++) {
+	      QueueLink link = this.tempLinks[i];
+	      if (link == null)
+	        continue;
+	      selCap += link.getLink().getCapacity(now);
+	      if (selCap >= rndNum) {
+	        auxCounter++;
+	        inLinksCapSum -= link.getLink().getCapacity(now);
+	        this.tempLinks[i] = null;
+	        //move the link
+	        for (QueueLane lane : link.getToNodeQueueLanes()) {
+	          this.clearLaneBuffer(lane, now);
+	        }
+	        break;
+	      }
+	    }
 		}
 	}
 
@@ -247,14 +230,6 @@ public class QueueNode {
 				break;
 			}
 		}
-	}
-
-	public void setSignalized(final boolean b) {
-		this.signalized = b;
-	}
-
-	public boolean isSignalized(){
-		return this.signalized;
 	}
 
 	protected static class QueueLinkIdComparator implements Comparator<QueueLink>, Serializable {

@@ -38,7 +38,6 @@ import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.signalsystems.CalculateAngle;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -215,13 +214,6 @@ public class QueueLink {
 		return this.toNodeQueueLanes;
 	}
 	
-	protected void addSignalGroupDefinition(SignalGroupDefinition signalGroupDefinition) {
-		for (QueueLane lane : this.toNodeQueueLanes) {
-			lane.addSignalGroupDefinition(signalGroupDefinition);
-		}				
-	}
-	
-
 	/**
 	 * Helper setting the Ids of the toLinks for the QueueLane given as parameter.
 	 * @param lane

@@ -63,8 +63,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.signalsystems.config.SignalSystemConfigurations;
-import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
@@ -136,8 +134,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	private boolean useActivityDurations = true;
 
-	private QueueSimSignalEngine signalEngine = null;
-
 	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
 	
 	private Integer iterationNumber = null;
@@ -192,16 +188,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 */
 	public void setLaneDefinitions(final LaneDefinitions laneDefs){
 		this.laneDefintions = laneDefs;
-	}
-
-	/**
-	 * Set the signal systems to be used in simulation
-	 * @param signalSystems
-	 * @param signalSystemConfigurations
-	 */
-	public void setSignalSystems(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
-		this.signalEngine  = new QueueSimSignalEngine(this);
-		this.signalEngine.setSignalSystems(signalSystems, signalSystemConfigurations);
 	}
 
 	public final void run() {
@@ -315,10 +301,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		}
 
 		prepareLanes();
-
-		if (this.signalEngine != null) {
-			this.signalEngine.prepareSignalSystems();
-		}
 
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) this.config.simulation().getSnapshotPeriod();
@@ -648,10 +630,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	public void setUseActivityDurations(final boolean useActivityDurations) {
 		this.useActivityDurations = useActivityDurations;
 		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
-	}
-
-	public SignalEngine getQueueSimSignalEngine() {
-		return this.signalEngine;
 	}
 
 	public Set<TransportMode> getNotTeleportedModes() {
