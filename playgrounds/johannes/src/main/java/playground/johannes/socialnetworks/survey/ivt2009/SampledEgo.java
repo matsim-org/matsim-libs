@@ -22,10 +22,10 @@ package playground.johannes.socialnetworks.survey.ivt2009;
 import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.SnowballAttributes;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
-import playground.johannes.socialnetworks.snowball2.SampledVertex;
-import playground.johannes.socialnetworks.snowball2.SnowballAttributes;
 
 /**
  * @author illenberger

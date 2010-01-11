@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
+import org.matsim.contrib.sna.snowball.SampledEdge;
+
 import playground.johannes.socialnetworks.graph.social.SocialTie;
-import playground.johannes.socialnetworks.snowball2.SampledEdge;
 
 /**
  * @author illenberger

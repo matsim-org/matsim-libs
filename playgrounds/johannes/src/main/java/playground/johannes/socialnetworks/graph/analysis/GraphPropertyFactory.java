@@ -12,4 +12,6 @@ public interface GraphPropertyFactory {
 
 	public Degree getDegree();
 	
+	public Transitivity getTransitivity();
+	
 }

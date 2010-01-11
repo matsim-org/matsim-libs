@@ -34,6 +34,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseGraph;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseVertex;
+import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
@@ -49,13 +53,9 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
-import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -94,7 +94,7 @@ public class TravelTimeHistogram2 {
 		/*
 		 * read graph
 		 */
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader(21781);
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
 		SampledSpatialSparseGraph graph = reader.readGraph(config.getParam("tthistogram", "graph"));
 		
 		

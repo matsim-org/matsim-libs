@@ -30,10 +30,10 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.GraphProjection;
 import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.GraphStatistics.GraphDistance;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger

@@ -45,11 +45,11 @@ import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
 import org.matsim.contrib.sna.graph.GraphProjectionFactory;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.graph.analysis.Degree;
-import playground.johannes.socialnetworks.graph.analysis.Triangles;
+import playground.johannes.socialnetworks.graph.analysis.Transitivity;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * A collection of function to calculate statistical properties of graphs.
@@ -65,7 +65,7 @@ public class GraphStatistics {
 	
 	private static final Degree degree = new Degree();
 
-	private static final Triangles triangles = new Triangles();
+	private static final Transitivity triangles = new Transitivity();
 	
 	/**
 	 * Sets the number of allowed threads for calculation. Set <tt>num > 1</tt>

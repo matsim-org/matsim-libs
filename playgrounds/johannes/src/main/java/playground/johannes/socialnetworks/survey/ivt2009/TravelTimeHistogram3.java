@@ -21,6 +21,10 @@ import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseGraph;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseVertex;
+import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -29,11 +33,7 @@ import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
-import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 public class TravelTimeHistogram3 {
 	
@@ -82,7 +82,7 @@ public class TravelTimeHistogram3 {
 		/*
 		 * read graph
 		 */
-		SampledSpatialGraphMLReader graphReader = new SampledSpatialGraphMLReader(21781);
+		SampledSpatialGraphMLReader graphReader = new SampledSpatialGraphMLReader();
 		SampledSpatialSparseGraph graph = graphReader.readGraph("/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/graph/graph.graphml");
 		/*
 		 * read swiss boundary

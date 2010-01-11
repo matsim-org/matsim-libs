@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.core.utils.collections.Tuple;
 
 /**

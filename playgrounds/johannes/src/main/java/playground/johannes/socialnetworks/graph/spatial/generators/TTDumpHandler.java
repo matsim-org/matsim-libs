@@ -23,12 +23,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 
 

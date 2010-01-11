@@ -32,12 +32,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 import com.vividsolutions.jts.geom.Point;
 

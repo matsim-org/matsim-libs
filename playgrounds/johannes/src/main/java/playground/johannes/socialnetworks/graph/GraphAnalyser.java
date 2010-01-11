@@ -32,10 +32,10 @@ import java.util.SortedSet;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.socialnetworks.graph.GraphStatistics.GraphDistance;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger

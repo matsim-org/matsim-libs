@@ -34,21 +34,21 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseGraph;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseVertex;
+import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
 
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
-import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.spatial.Reachability;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -64,7 +64,7 @@ public class GraphAnalyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader(21781);
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
 		SampledSpatialSparseGraph graph = reader.readGraph(args[0]);
 		
 		ZoneLayer zones = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");

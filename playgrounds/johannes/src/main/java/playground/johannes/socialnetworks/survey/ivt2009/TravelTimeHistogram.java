@@ -29,18 +29,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseGraph;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseVertex;
+import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
-import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -79,7 +79,7 @@ public class TravelTimeHistogram {
 		/*
 		 * read graph
 		 */
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader(21781);
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
 		SampledSpatialSparseGraph graph = reader.readGraph("/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/graph/graph.graphml");
 		/*
 		 * read zones

@@ -27,8 +27,8 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger

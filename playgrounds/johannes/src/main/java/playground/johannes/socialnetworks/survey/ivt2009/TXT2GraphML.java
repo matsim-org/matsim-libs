@@ -30,6 +30,10 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraphBuilder;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseGraph;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseVertex;
+import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -37,10 +41,6 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraphBuilder;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
-import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

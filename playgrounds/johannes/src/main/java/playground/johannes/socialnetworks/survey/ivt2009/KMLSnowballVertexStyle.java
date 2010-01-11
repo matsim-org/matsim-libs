@@ -19,11 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+
 import gnu.trove.TDoubleObjectHashMap;
 import net.opengis.kml._2.LinkType;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle;
-import playground.johannes.socialnetworks.snowball2.SampledGraph;
-import playground.johannes.socialnetworks.snowball2.SampledVertex;
 
 /**
  * @author illenberger

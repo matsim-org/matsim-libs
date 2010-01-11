@@ -29,7 +29,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 
-import playground.johannes.socialnetworks.statistics.Distribution;
+import org.matsim.contrib.sna.math.Distribution;
+
 
 /**
  * @author illenberger

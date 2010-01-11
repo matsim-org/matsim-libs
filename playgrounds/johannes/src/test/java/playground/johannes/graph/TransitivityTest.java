@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DegreeTest.java
+ * TrianglesTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,7 +20,6 @@
 package playground.johannes.graph;
 
 import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
 import junit.framework.TestCase;
 
 import org.matsim.contrib.sna.graph.SparseGraph;
@@ -29,14 +28,15 @@ import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.analysis.Degree;
+import playground.johannes.socialnetworks.graph.analysis.Transitivity;
 
 /**
  * @author illenberger
  *
  */
-public class DegreeTest extends TestCase {
+public class TransitivityTest extends TestCase {
 
+	@SuppressWarnings("unchecked")
 	public void test() {
 		SparseGraphBuilder builder = new SparseGraphBuilder();
 		SparseGraph graph = builder.createGraph();
@@ -54,31 +54,27 @@ public class DegreeTest extends TestCase {
 		builder.addEdge(graph, v4, v5);
 		builder.addEdge(graph, v5, v6);
 		builder.addEdge(graph, v6, v1);
+		
 		builder.addEdge(graph, v2, v5);
+		builder.addEdge(graph, v3, v5);
+		builder.addEdge(graph, v1, v5);
 		
-		Degree degree = new Degree();
+		Transitivity triangles = new Transitivity();
 		
-		Distribution distr = degree.distribution(graph.getVertices());
-		assertEquals(2.33, distr.mean(), 0.01);
-		assertEquals(2.0, distr.min());
-		assertEquals(3.0, distr.max());
+		Distribution distr = triangles.localClusteringDistribution(graph.getVertices());
+		assertEquals(0.733, distr.mean(), 0.001);
+		assertEquals(0.4, distr.min());
+		assertEquals(1.0, distr.max());
 		
-		TObjectDoubleHashMap<? extends Vertex> values = degree.values(graph.getVertices());
-		TObjectDoubleIterator<? extends Vertex> it = values.iterator();
+		assertEquals(0.5714, triangles.globalClusteringCoefficient(graph), 0.0001);
 		
-		int count2 = 0;
-		int count3 = 0;
-		for(int i = 0; i < values.size(); i++) {
-			it.advance();
-			if(it.value() == 2)
-				count2++;
-			else if (it.value() == 3)
-				count3++;
-		}
+		TObjectDoubleHashMap<Vertex> values = (TObjectDoubleHashMap<Vertex>) triangles.localClusteringCoefficients(graph.getVertices());
+		assertEquals(2.0/3.0, values.get(v1));
+		assertEquals(2.0/3.0, values.get(v2));
+		assertEquals(2.0/3.0, values.get(v3));
+		assertEquals(1.0, values.get(v4));
+		assertEquals(0.4, values.get(v5));
+		assertEquals(1.0, values.get(v6));
 		
-		assertEquals(4, count2);
-		assertEquals(2, count3);
-		
-		assertEquals(-0.166, degree.assortativity(graph), 0.001);
 	}
 }

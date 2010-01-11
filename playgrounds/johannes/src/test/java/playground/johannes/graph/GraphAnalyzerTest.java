@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TrianglesTest.java
+ * GraphAnalyzerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,51 +19,40 @@
  * *********************************************************************** */
 package playground.johannes.graph;
 
+import java.util.Map;
+
 import junit.framework.TestCase;
 
-import org.matsim.contrib.sna.graph.SparseGraph;
-import org.matsim.contrib.sna.graph.SparseGraphBuilder;
-import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 
-import playground.johannes.socialnetworks.graph.analysis.Triangles;
-import playground.johannes.socialnetworks.statistics.Distribution;
+import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
+import playground.johannes.socialnetworks.graph.analysis.SimpleGraphPropertyFactory;
 
 /**
  * @author illenberger
  *
  */
-public class TrianglesTest extends TestCase {
+public class GraphAnalyzerTest extends TestCase {
 
+	private static final String INPUT_FILE = "../contrib/sna/test/input/org/matsim/contrib/sna/graph/spatial/io/SpatialGraph.k7.graphml.gz";
+	
 	public void test() {
-		SparseGraphBuilder builder = new SparseGraphBuilder();
-		SparseGraph graph = builder.createGraph();
+		SparseGraphMLReader reader = new SparseGraphMLReader();
+		Graph graph = reader.readGraph(INPUT_FILE);
 		
-		SparseVertex v1 = builder.addVertex(graph);
-		SparseVertex v2 = builder.addVertex(graph);
-		SparseVertex v3 = builder.addVertex(graph);
-		SparseVertex v4 = builder.addVertex(graph);
-		SparseVertex v5 = builder.addVertex(graph);
-		SparseVertex v6 = builder.addVertex(graph);
+		GraphAnalyzer analyzer = new GraphAnalyzer();
+		Map<String, Double> stats = analyzer.analyze(graph, new SimpleGraphPropertyFactory());
 		
-		builder.addEdge(graph, v1, v2);
-		builder.addEdge(graph, v2, v3);
-		builder.addEdge(graph, v3, v4);
-		builder.addEdge(graph, v4, v5);
-		builder.addEdge(graph, v5, v6);
-		builder.addEdge(graph, v6, v1);
+		assertEquals(7.1462, stats.get(GraphAnalyzer.MEAN_DEGREE), 0.0001);
+		assertEquals(19.0, stats.get(GraphAnalyzer.MAX_DEGREE));
+		assertEquals(0.0, stats.get(GraphAnalyzer.MIN_DEGREE));
 		
-		builder.addEdge(graph, v2, v5);
-		builder.addEdge(graph, v3, v5);
-		builder.addEdge(graph, v1, v5);
+		assertEquals(0.0018, stats.get(GraphAnalyzer.DEGREE_CORRELATION), 0.0001);
 		
-		Triangles triangles = new Triangles();
-		
-		Distribution distr = triangles.localClusteringDistribution(graph.getVertices());
-		assertEquals(0.733, distr.mean(), 0.001);
-		assertEquals(0.4, distr.min());
-		assertEquals(1.0, distr.max());
-		
-		assertEquals(0.416, triangles.globalClusteringCoefficient(graph));
-		
+		assertEquals(0.0008, stats.get(GraphAnalyzer.MEAN_LOCAL_CLUSTERING), 0.0001);
+		assertEquals(1.0, stats.get(GraphAnalyzer.MAX_LOCAL_CLUSTERING));
+		assertEquals(0.0, stats.get(GraphAnalyzer.MIN_LOCAL_CLUSTERING));
+		assertEquals(0.0008, stats.get(GraphAnalyzer.GLOBAL_CLUSTERING_COEFFICIENT), 0.0001);
 	}
 }

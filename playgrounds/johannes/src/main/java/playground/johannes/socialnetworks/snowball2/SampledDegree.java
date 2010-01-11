@@ -25,10 +25,12 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseGraph;
 
 import playground.johannes.socialnetworks.graph.analysis.Degree;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger

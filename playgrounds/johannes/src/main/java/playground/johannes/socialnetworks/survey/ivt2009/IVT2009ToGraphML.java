@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
+import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -62,7 +63,6 @@ import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.ivtsurveys.SNKMLEgoAlterSytle;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger

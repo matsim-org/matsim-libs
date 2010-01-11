@@ -21,9 +21,11 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 
 import java.util.Collection;
 
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
+
 import playground.johannes.socialnetworks.graph.spatial.Distance;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger

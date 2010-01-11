@@ -35,9 +35,9 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.core.gbl.Gbl;
 
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger

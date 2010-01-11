@@ -31,9 +31,9 @@ import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.GraphProjection;
 import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.statistics.Distribution;
 import playground.johannes.socialnetworks.statistics.PowerLawFit;
 
 /**

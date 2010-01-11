@@ -23,9 +23,9 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.snowball.SampledGraph;
 
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.snowball2.SampledGraph;
 
 /**
  * @author illenberger

@@ -30,6 +30,7 @@ import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
+import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
@@ -47,7 +48,6 @@ import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorize
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -172,10 +172,10 @@ public class DumpHandler implements SampleHandler {
 		distance.add(SpatialGraphStatistics.edgeLengthDistribution(net).mean());
 		
 		logger.info(String.format("VarK(m)=%1$.4f, VarK(<k>)=%2$.4f, VarK(<c_local>)=%3$.4f, VarK(<d>)=%4$.4f",
-				edges.varianceCoefficient(),
-				degree.varianceCoefficient(),
-				clustering.varianceCoefficient(),
-				distance.varianceCoefficient()));
+				edges.coefficientOfVariance(),
+				degree.coefficientOfVariance(),
+				clustering.coefficientOfVariance(),
+				distance.coefficientOfVariance()));
 		
 		try {
 			/*

@@ -42,9 +42,9 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.GraphProjection;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 
 /**

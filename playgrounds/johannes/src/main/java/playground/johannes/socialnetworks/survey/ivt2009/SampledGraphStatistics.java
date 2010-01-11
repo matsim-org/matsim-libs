@@ -27,14 +27,14 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.snowball2.SampledGraph;
-import playground.johannes.socialnetworks.snowball2.SampledVertex;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
