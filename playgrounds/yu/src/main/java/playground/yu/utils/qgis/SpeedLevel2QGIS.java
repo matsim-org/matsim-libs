@@ -43,7 +43,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -115,14 +115,12 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	}
 
 	public static List<Map<Id, Double>> createSpeedLevels(
-			Collection<? extends Link> links, CalcLinksAvgSpeed clas) {
+			Collection<Id> linkIds, CalcLinksAvgSpeed clas, Network network) {
 		List<Map<Id, Double>> speeds = new ArrayList<Map<Id, Double>>(24);
 		for (int i = 0; i < 24; i++)
 			speeds.add(i, null);
 
-		for (Link link : links) {
-			Id linkId = link.getId();
-
+		for (Id linkId : linkIds) {
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Double> m = speeds.get(i);
 				if (m == null) {
@@ -130,7 +128,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 					speeds.add(i, m);
 				}
 				double speed = clas.getAvgSpeed(linkId, (i * 3600)) / 3.6
-						/ link.getFreespeed(i * 3600.0);
+						/ network.getLinks().get(linkId).getFreespeed(i * 3600.0);
 				m.put(linkId, speed);
 			}
 		}
@@ -161,7 +159,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		mn2q.readEvents("../matsimTests/Calibration/e5_700/700.events.txt.gz",
 				new EventHandler[] { clas, va });
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(net);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		try {
 			tollReader
 					.parse("../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml");
@@ -174,9 +172,9 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		}
 		RoadPricingScheme rps = tollReader.getScheme();
 
-		Collection<? extends Link> links = (rps != null) ? rps.getLinks() : net
-				.getLinks().values();
-		List<Map<Id, Double>> sls = createSpeedLevels(links, clas);
+		Collection<Id> links = (rps != null) ? rps.getLinkIds() : net
+				.getLinks().keySet();
+		List<Map<Id, Double>> sls = createSpeedLevels(links, clas, net);
 
 		Set<Id> linkIds = (rps != null) ? rps.getLinkIds() : net.getLinks()
 				.keySet();

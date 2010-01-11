@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
@@ -33,7 +33,7 @@ public class SpatialInteractorEvents {
 
 //	LinkedHashMap<Activity,ArrayList<Person>> activityMap;
 //	LinkedHashMap<Act,ArrayList<Person>> actMap=new LinkedHashMap<Act,ArrayList<Person>>();
-	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap;
+	LinkedHashMap<Id,ArrayList<TimeWindow>> timeWindowMap;
 //	TrackEventsOverlap teo;
 	MakeTimeWindowsFromEvents teo;
 	private final Logger log = Logger.getLogger(SpatialInteractorEvents.class);
@@ -46,7 +46,7 @@ public class SpatialInteractorEvents {
 	}
 
 	public void interact(Population plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration,
-			LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm) {
+			LinkedHashMap<Id,ArrayList<TimeWindow>> twm) {
 
 		this.log.info(" Looking through plans and tracking which Persons could interact "+iteration);
 
@@ -143,8 +143,8 @@ public class SpatialInteractorEvents {
 	 * @param iteration
 	 */
 	private void makeSocialLinkToAll(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
-		for (ActivityFacility fac : timeWindowMap.keySet()) {
-			Object[] visits= timeWindowMap.get(fac).toArray();
+		for (Id facId : timeWindowMap.keySet()) {
+			Object[] visits= timeWindowMap.get(facId).toArray();
 			// Go through the list of Persons and for each one pick one friend randomly
 			for(int ii=0;ii<visits.length;ii++){
 				PersonImpl p1 = ((TimeWindow) visits[ii]).person;
@@ -202,8 +202,8 @@ public class SpatialInteractorEvents {
 	 * @param iteration
 	 */
 	private void encounterOnePersonRandomlyPerActivity(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
-		for (ActivityFacility fac : timeWindowMap.keySet()) {
-			Object[] visits= timeWindowMap.get(fac).toArray();
+		for (Id facId : timeWindowMap.keySet()) {
+			Object[] visits= timeWindowMap.get(facId).toArray();
 			// Go through the list of Persons and for each one pick one friend randomly
 			for(int ii=0;ii<visits.length;ii++){
 				PersonImpl p1 = ((TimeWindow) visits[ii]).person;
@@ -249,8 +249,8 @@ public class SpatialInteractorEvents {
 	private void encounterOnePersonRandomlyFaceToFaceInTimeWindow(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
 
 		// First identify the overlapping Acts and the Persons involved
-		for (ActivityFacility fac : timeWindowMap.keySet()) {
-			Object[] visits= timeWindowMap.get(fac).toArray();
+		for (Id facId : timeWindowMap.keySet()) {
+			Object[] visits= timeWindowMap.get(facId).toArray();
 			for(int ii=0;ii<visits.length;ii++){
 				LinkedHashMap<String,ArrayList<PersonImpl>> othersMap = new LinkedHashMap<String,ArrayList<PersonImpl>>();
 				TimeWindow tw1 = (TimeWindow) visits[ii];
@@ -324,8 +324,8 @@ public class SpatialInteractorEvents {
 	private void encounterAllPersonsFaceToFaceInTimeWindow(LinkedHashMap<String, Double> rndEncounterProbability,
 			int iteration) {
 
-		for (ActivityFacility fac : timeWindowMap.keySet()) {
-			Object[] visits= timeWindowMap.get(fac).toArray();
+		for (Id facId : timeWindowMap.keySet()) {
+			Object[] visits= timeWindowMap.get(facId).toArray();
 			// Go through the list of Persons and for each one pick one friend randomly
 			for(int ii=0;ii<visits.length;ii++){
 				TimeWindow tw1 = (TimeWindow) visits[ii];

@@ -21,14 +21,10 @@
 package org.matsim.roadpricing;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * A road pricing scheme (sometimes also called toll scheme) contains the type of the toll, a list of the
@@ -47,8 +43,7 @@ public class RoadPricingScheme {
 	/** The type to be used for area tolls. */
 	public static final String TOLL_TYPE_AREA = "area";
 
-	private Network network = null;
-	private TreeMap<Id, Link> links = null;
+	private TreeSet<Id> linkIds = null;
 
 	private String name = null;
 	private String type = null;
@@ -58,18 +53,13 @@ public class RoadPricingScheme {
 	private boolean cacheIsInvalid = true;
 	private Cost[] costCache = null;
 
-	public RoadPricingScheme(final Network network) {
-		this.network = network;
-		this.links = new TreeMap<Id, Link>();
+	public RoadPricingScheme() {
+		this.linkIds = new TreeSet<Id>();
 		this.costs = new ArrayList<Cost>();
 	}
 
-	public void addLink(final String linkId) {
-		Link link = this.network.getLinks().get(new IdImpl(linkId));
-		if (link == null) {
-			throw new RuntimeException("Link " + linkId + " for road pricing scheme cannot be found in associated network.");
-		}
-		this.links.put(link.getId(), link);
+	public void addLink(final Id linkId) {
+		this.linkIds.add(linkId);
 	}
 
 	public void setName(final String name) {
@@ -107,13 +97,8 @@ public class RoadPricingScheme {
 		return this.costs.remove(cost);
 	}
 
-	@Deprecated // use getLinkIds()
-	public Collection<Link> getLinks() {
-		return this.links.values();
-	}
-
 	public Set<Id> getLinkIds() {
-		return this.links.keySet();
+		return this.linkIds;
 	}
 
 	public Iterable<Cost> getCosts() {
@@ -138,7 +123,7 @@ public class RoadPricingScheme {
 	 */
 	public Cost getLinkCost(final Id linkId, final double time) {
 		if (this.cacheIsInvalid) buildCache();
-		if (this.links.keySet().contains(linkId)) {
+		if (this.linkIds.contains(linkId)) {
 			for (Cost cost : this.costCache) {
 				if ((time >= cost.startTime) && (time < cost.endTime)) {
 					return cost;

@@ -141,7 +141,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 				if( i%2 == 0) {
 					// handle act
 					ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
-					Id id2 = act.getLink().getId();
+					Id id2 = act.getLinkId();
 					if(id2.equals(this.linkId)) {
 						actPersons.add(plan);
 						break;
@@ -151,8 +151,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					LegImpl leg = (LegImpl)actslegs.get(i);
 					// just look at car routes right now
 					if(leg.getMode() != TransportMode.car) continue;
-					for (Link link : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
-						Id id2 = link.getId();
+					for (Id id2 : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
 						if(id2.equals(this.linkId) ) {
 							actPersons.add(plan);
 							break;

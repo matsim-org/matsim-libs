@@ -86,25 +86,25 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 					}
 				}
 				else if (leg.getRoute() instanceof NetworkRouteWRefs) {
-					List<Link> links = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
-					if (links.size() == 0) {
+					List<Id> linkIds = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
+					if (linkIds.size() == 0) {
 						if (judgeByBeeline((ActivityImpl) plan.getPlanElements().get(i-1), (ActivityImpl) plan.getPlanElements().get(i+1))) {
 							return true;
 						}
 					}
 					else {
-						for (Link link : links) {
-							if (this.areaOfInterest.containsKey(link.getId())) return true;
+						for (Id link : linkIds) {
+							if (this.areaOfInterest.containsKey(link)) return true;
 						}
 						// test departure link
-						Link link = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLink();
-						if (link != null) {
-							if (this.areaOfInterest.containsKey(link.getId())) return true;
+						Id linkId = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLinkId();
+						if (linkId != null) {
+							if (this.areaOfInterest.containsKey(linkId)) return true;
 						}
 						// test arrival link
-						link = ((ActivityImpl) plan.getPlanElements().get(i+1)).getLink();
-						if (link != null) {
-							if (this.areaOfInterest.containsKey(link.getId())) return true;
+						linkId = ((ActivityImpl) plan.getPlanElements().get(i+1)).getLinkId();
+						if (linkId != null) {
+							if (this.areaOfInterest.containsKey(linkId)) return true;
 						}
 					}
 				}

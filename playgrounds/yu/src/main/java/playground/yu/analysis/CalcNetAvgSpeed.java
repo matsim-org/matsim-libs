@@ -75,11 +75,9 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 			this.enterTimes
 					.put(enter.getPersonId().toString(), enter.getTime());
 		else {
-			Link link = network.getLinks().get(enter.getLinkId());
-			if (link != null)
-				if (TollTools.isInRange(link, toll))
-					this.enterTimes.put(enter.getPersonId().toString(), enter
-							.getTime());
+			if (TollTools.isInRange(enter.getLinkId(), toll))
+				this.enterTimes.put(enter.getPersonId().toString(), enter
+						.getTime());
 		}
 	}
 

@@ -129,8 +129,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 		// toll
 		RoadPricingScheme toll = null;
 		if (scenario.equals(KANTON_ZURICH)) {
-			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-					network);
+			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 			try {
 				tollReader.parse(tollFilename);
 			} catch (SAXException e) {

@@ -25,9 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -72,7 +72,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 	int count = 0;
 	public static int ptCount = 0;
 	
-	public Set<Link> usedlinkList = new HashSet<Link>();
+	public Set<Id> usedlinkList = new HashSet<Id>();
 
 	
 	public FilterPersons2() {
@@ -85,15 +85,15 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 				if (i % 2 == 0) {
 					// activity
 					ActivityImpl a = (ActivityImpl)actl.get(i);
-					this.usedlinkList.add(a.getLink());
+					this.usedlinkList.add(a.getLinkId());
 				} else {
 					// Leg
 					LegImpl l = (LegImpl) actl.get(i);
 					if(l.getMode().equals(TransportMode.car) && l.getRoute() != null){
 						
-						List<Link> ll = ((NetworkRouteWRefs) l.getRoute()).getLinks();
-						for(Link link : ll) {
-							usedlinkList.add(link);
+						List<Id> ll = ((NetworkRouteWRefs) l.getRoute()).getLinkIds();
+						for(Id linkId : ll) {
+							usedlinkList.add(linkId);
 						}
 					}
 				}
@@ -223,7 +223,7 @@ public class ReducePopulationExe {
 		plansWriter100.writeEndPlans();
 
 		List<LinkImpl> nolinkList = new LinkedList<LinkImpl>();
-		for(LinkImpl link : network.getLinks().values()) if(!filter.usedlinkList.contains(link)) nolinkList.add(link);
+		for(LinkImpl link : network.getLinks().values()) if(!filter.usedlinkList.contains(link.getId())) nolinkList.add(link);
 
 		for(LinkImpl link : nolinkList)network.removeLink(link);
 		

@@ -1107,9 +1107,9 @@ public class TollSchemeGenerator {
 
 	private RoadPricingScheme createRoadPricingScheme(
 			final NetworkLayer tollNetwork) {
-		RoadPricingScheme scheme = new RoadPricingScheme(network);
+		RoadPricingScheme scheme = new RoadPricingScheme();
 		for (LinkImpl l : tollNetwork.getLinks().values())
-			scheme.addLink(l.getId().toString());
+			scheme.addLink(l.getId());
 		scheme.addCost(usedStart, usedStop, usedAmount);
 		return scheme;
 	}

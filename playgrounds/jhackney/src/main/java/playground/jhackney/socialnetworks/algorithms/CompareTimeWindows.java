@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -31,15 +31,15 @@ public class CompareTimeWindows {
 	 * @param plan
 	 * @return
 	 */
-	public static LinkedHashMap<Activity,ArrayList<Double>> calculateTimeWindowEventActStats(LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap) {
+	public static LinkedHashMap<Activity,ArrayList<Double>> calculateTimeWindowEventActStats(LinkedHashMap<Id,ArrayList<TimeWindow>> timeWindowMap) {
 
 		LinkedHashMap<Activity,ArrayList<Double>> actStats = new LinkedHashMap<Activity,ArrayList<Double>>();
 		int count=0;
 		// stats(0)=friendFoeRatio
 		// stats(1)=nFriends
 		// stats(2)=totalTimeWithFriends
-		Iterator<ActivityFacility> fit=timeWindowMap.keySet().iterator();
-		while(fit.hasNext()){
+		Iterator<Id> fidit=timeWindowMap.keySet().iterator();
+		while(fidit.hasNext()){
 			double friend=0.;
 			double foe=0.;
 			double totalTimeWithFriends=0;
@@ -48,9 +48,9 @@ public class CompareTimeWindows {
 			PersonImpl p1 = null;
 			PersonImpl p2 = null;
 
-			ActivityFacilityImpl myFacility=(ActivityFacilityImpl) fit.next();
-			ArrayList<TimeWindow> visits=timeWindowMap.get(myFacility);
-			if(!timeWindowMap.keySet().contains(myFacility)){
+			Id myFacilityId = fidit.next();
+			ArrayList<TimeWindow> visits=timeWindowMap.get(myFacilityId);
+			if(!timeWindowMap.keySet().contains(myFacilityId)){
 				log.error(" activityMap does not contain myActivity");
 			}
 			if(!(visits.size()>0)){
@@ -108,10 +108,10 @@ public class CompareTimeWindows {
 	public static boolean overlapTimePlaceType(TimeWindow tw1, TimeWindow tw2){
 //		System.out.println("Checking overlap "+act1.getType()+" "+act1.getFacility().getId()+": "+act2.getType()+" "+act2.getFacility().getId());
 		if(((ActivityFacilityImpl) tw1.act.getFacility()).getActivityOptions().get(tw2.act.getType())==null){
-			System.out.println("It's act2 "+tw2.act.getType()+" "+tw1.act.getFacility().getId()+": "+tw2.act.getType()+" "+tw2.act.getFacility().getId());
+			System.out.println("It's act2 "+tw2.act.getType()+" "+tw1.act.getFacilityId()+": "+tw2.act.getType()+" "+tw2.act.getFacilityId());
 		}
 		if(((ActivityFacilityImpl) tw1.act.getFacility()).getActivityOptions().get(tw1.act.getType())==null){
-			System.out.println("It's act1 "+tw1.act.getType()+" "+tw1.act.getFacility().getId()+": "+tw2.act.getType()+" "+tw2.act.getFacility().getId());
+			System.out.println("It's act1 "+tw1.act.getType()+" "+tw1.act.getFacilityId()+": "+tw2.act.getType()+" "+tw2.act.getFacilityId());
 		}
 		ActivityImpl act1=tw1.act;
 		ActivityImpl act2=tw2.act;
@@ -126,10 +126,10 @@ public class CompareTimeWindows {
 	public static boolean overlapTimePlaceTypeFriend(TimeWindow tw1, TimeWindow tw2){
 //		System.out.println("Checking overlap "+act1.getType()+" "+act1.getFacility().getId()+": "+act2.getType()+" "+act2.getFacility().getId());
 		if(((ActivityFacilityImpl) tw1.act.getFacility()).getActivityOptions().get(tw2.act.getType())==null){
-			System.out.println("It's act2 "+tw2.act.getType()+" "+tw1.act.getFacility().getId()+": "+tw2.act.getType()+" "+tw2.act.getFacility().getId());
+			System.out.println("It's act2 "+tw2.act.getType()+" "+tw1.act.getFacilityId()+": "+tw2.act.getType()+" "+tw2.act.getFacilityId());
 		}
 		if(((ActivityFacilityImpl) tw1.act.getFacility()).getActivityOptions().get(tw1.act.getType())==null){
-			System.out.println("It's act1 "+tw1.act.getType()+" "+tw1.act.getFacility().getId()+": "+tw2.act.getType()+" "+tw2.act.getFacility().getId());
+			System.out.println("It's act1 "+tw1.act.getType()+" "+tw1.act.getFacilityId()+": "+tw2.act.getType()+" "+tw2.act.getFacilityId());
 		}
 		ActivityImpl act1=tw1.act;
 		ActivityImpl act2=tw2.act;

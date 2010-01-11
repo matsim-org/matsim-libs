@@ -140,7 +140,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		Plan selectedPlan = plans.getPersons().get(ae.getPersonId())
 				.getSelectedPlan();
 		if (toll != null) {
-			if (TollTools.isInRange(((PlanImpl) selectedPlan).getFirstActivity().getLink(),
+			if (TollTools.isInRange(((PlanImpl) selectedPlan).getFirstActivity().getLinkId(),
 					toll)) {
 				this.internalCompute(binIdx, ae, selectedPlan, allCount,
 						carCount, ptCount, wlkCount, throughCount);

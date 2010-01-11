@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -100,7 +100,7 @@ public class SNSimpleControllerListener implements StartupListener, BeforeMobsim
 	private EventsMapStartEndTimes epp=null;//static? I just need one
 	private MakeTimeWindowsFromEvents teo=null;// static? I just need one
 	private LinkedHashMap<Activity,ArrayList<Double>> actStats=null;// static? I just need one
-	private LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm=null;// static? I just need one
+	private LinkedHashMap<Id,ArrayList<TimeWindow>> twm=null;// static? I just need one
 	//
 	private LinkedHashMap<String,Double> rndEncounterProbs= new LinkedHashMap<String,Double>();// static? I just need one
 	//

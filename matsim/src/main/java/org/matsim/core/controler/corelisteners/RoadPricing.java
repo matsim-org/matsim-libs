@@ -53,7 +53,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
 		// read the road pricing scheme from file
-		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(controler.getNetwork());
+		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1();
 		try {
 			rpReader.parse(controler.getConfig().roadpricing().getTollLinksFile());
 		} catch (Exception e) {

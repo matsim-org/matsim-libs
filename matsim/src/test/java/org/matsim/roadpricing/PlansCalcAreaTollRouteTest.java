@@ -50,10 +50,10 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		NetworkLayer network = Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme(scenario.getNetwork());
+		RoadPricingScheme toll = new RoadPricingScheme();
 		toll.setType("area");
-		toll.addLink("5");
-		toll.addLink("11");
+		toll.addLink(scenario.createId("5"));
+		toll.addLink(scenario.createId("11"));
 		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.12);
 		/* Start with a rather low toll. The toll is also so low, because we only
 		 * have small network with short links: the cost to travel across one link
@@ -107,9 +107,9 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		NetworkLayer network = Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme(network);
+		RoadPricingScheme toll = new RoadPricingScheme();
 		toll.setType("area");
-		toll.addLink("7");
+		toll.addLink(scenario.createId("7"));
 		toll.addCost(6*3600, 10*3600, 0.06);
 
 		PopulationImpl population = Fixture.createPopulation2(scenario);
@@ -136,10 +136,10 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		NetworkLayer network = Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme(network);
+		RoadPricingScheme toll = new RoadPricingScheme();
 		toll.setType("area");
-		toll.addLink("3");
-		toll.addLink("5");
+		toll.addLink(scenario.createId("3"));
+		toll.addLink(scenario.createId("5"));
 		toll.addCost(6*3600, 10*3600, 0.06);
 
 		PopulationImpl population = Fixture.createPopulation2(scenario);
@@ -162,10 +162,10 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		NetworkLayer network = Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme(network);
+		RoadPricingScheme toll = new RoadPricingScheme();
 		toll.setType("area");
-		toll.addLink("5");
-		toll.addLink("11");
+		toll.addLink(scenario.createId("5"));
+		toll.addLink(scenario.createId("11"));
 		toll.addCost(8*3600, 10*3600, 1.0); // high costs!
 
 		PopulationImpl population = Fixture.createPopulation2(scenario);

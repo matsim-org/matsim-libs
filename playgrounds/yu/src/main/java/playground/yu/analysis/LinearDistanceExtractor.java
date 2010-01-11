@@ -53,7 +53,7 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 		if (toll == null) {
 			personCnt++;
 			run(plan);
-		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLink(), toll)) {
+		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLinkId(), toll)) {
 			personCnt++;
 			run(plan);
 		}
@@ -107,7 +107,7 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {

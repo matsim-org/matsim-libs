@@ -156,7 +156,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 						if (pe2 instanceof ActivityImpl) {
 							ActivityImpl act = (ActivityImpl) pe2;
 							
-							if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
+							if (act.getType().equals("shop") && act.getFacilityId().equals(f.getId())) {
 								if (first_shop && this.retailerFacilities.containsKey(f.getId())) {
 									Consumer consumer = new Consumer (consumer_count, p, rz.getId());
 									consumer.setShoppingFacility(f);

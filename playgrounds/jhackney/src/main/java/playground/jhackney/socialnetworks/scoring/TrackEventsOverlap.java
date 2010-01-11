@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
@@ -44,7 +44,7 @@ import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
  */
 public class TrackEventsOverlap implements DeprecatedActivityStartEventHandler, DeprecatedActivityEndEventHandler {
 
-	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>>();
+	LinkedHashMap<Id,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<Id,ArrayList<TimeWindow>>();
 	LinkedHashMap<Activity,Double> startMap = new LinkedHashMap<Activity,Double>();
 	LinkedHashMap<Activity,Double> endMap = new LinkedHashMap<Activity,Double>();
 	
@@ -73,16 +73,16 @@ public class TrackEventsOverlap implements DeprecatedActivityStartEventHandler, 
 		if(eventStartTime>0){// if a valid start event is found, make a timeWindow and add to Map
 			PersonImpl agent = (PersonImpl) this.population.getPersons().get(event.getPersonId());
 
-			ActivityFacility facility = event.getAct().getFacility();
-			if(this.timeWindowMap.containsKey(facility)){
-				ArrayList<TimeWindow> windowList=timeWindowMap.get(facility);
+			Id facilityId = event.getAct().getFacilityId();
+			if(this.timeWindowMap.containsKey(facilityId)){
+				ArrayList<TimeWindow> windowList=timeWindowMap.get(facilityId);
 				windowList.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.getAct()));
-				timeWindowMap.remove(facility);
-				timeWindowMap.put(facility, windowList);
+				timeWindowMap.remove(facilityId);
+				timeWindowMap.put(facilityId, windowList);
 			}else{
 				ArrayList<TimeWindow> windowList= new ArrayList<TimeWindow>();
 				windowList.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.getAct()));
-				timeWindowMap.put(facility, windowList);
+				timeWindowMap.put(facilityId, windowList);
 			}
 		}else{
 			//do nothing immediately if there is no start event, just save this end event for later
@@ -102,16 +102,16 @@ public class TrackEventsOverlap implements DeprecatedActivityStartEventHandler, 
 		if(eventEndTime>0){// if a valid end time is found, make a timeWindow and add to Map
 			PersonImpl agent = (PersonImpl) this.population.getPersons().get(event.getPersonId());
 
-			ActivityFacility facility = event.getAct().getFacility();
-			if(this.timeWindowMap.containsKey(facility)){
-				ArrayList<TimeWindow> windowList=timeWindowMap.get(facility);
+			Id facilityId = event.getAct().getFacilityId();
+			if(this.timeWindowMap.containsKey(facilityId)){
+				ArrayList<TimeWindow> windowList=timeWindowMap.get(facilityId);
 				windowList.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.getAct()));
-				timeWindowMap.remove(facility);
-				timeWindowMap.put(facility, windowList);
+				timeWindowMap.remove(facilityId);
+				timeWindowMap.put(facilityId, windowList);
 			}else{
 				ArrayList<TimeWindow> windowList= new ArrayList<TimeWindow>();
 				windowList.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.getAct()));
-				timeWindowMap.put(facility, windowList);
+				timeWindowMap.put(facilityId, windowList);
 			}
 		}else{
 			// if the event is not complete, save the start information for later
@@ -127,7 +127,7 @@ public class TrackEventsOverlap implements DeprecatedActivityStartEventHandler, 
 		this.timeWindowMap.clear();
 	}
 
-	public LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> getTimeWindowMap(){
+	public LinkedHashMap<Id,ArrayList<TimeWindow>> getTimeWindowMap(){
 		return this.timeWindowMap;
 	}
 

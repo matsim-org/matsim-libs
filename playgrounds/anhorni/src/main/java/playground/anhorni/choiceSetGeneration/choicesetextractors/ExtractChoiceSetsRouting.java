@@ -100,7 +100,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		 * Link linkBefore = choiceSet.getTrip().getBeforeShoppingAct().getLink(); ...
 		 */
 		//Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
-		LinkImpl linkBefore = network.getLinks().get(choiceSet.getTrip().getBeforeShoppingAct().getLink().getId());
+		LinkImpl linkBefore = network.getLinks().get(choiceSet.getTrip().getBeforeShoppingAct().getLinkId());
 		ActivityImpl fromAct0 = new org.matsim.core.population.ActivityImpl("beforeShop", linkBefore);
 		fromAct0.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
 		fromAct0.setCoord(linkBefore.getCoord());
@@ -121,7 +121,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		fromAct1.setCoord(toAct0.getCoord());
 					
 		//Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
-		LinkImpl linkAfter = network.getLinks().get(choiceSet.getTrip().getAfterShoppingAct().getLink().getId());
+		LinkImpl linkAfter = network.getLinks().get(choiceSet.getTrip().getAfterShoppingAct().getLinkId());
 		ActivityImpl toAct1 = new org.matsim.core.population.ActivityImpl("afterShop", linkAfter);
 		toAct1.setCoord(linkAfter.getCoord());
 					

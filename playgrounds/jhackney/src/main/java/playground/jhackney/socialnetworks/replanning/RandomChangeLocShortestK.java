@@ -139,14 +139,14 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 			if(newAct.getLinkId()!=fFromKnowledge.getLink().getId()){
 				// If the first activity was chosen, make sure the last activity is also changed
-				if((newAct.getType() == ((PlanImpl) plan).getFirstActivity().getType()) && (newAct.getLink() == ((PlanImpl) plan).getFirstActivity().getLink())){
+				if((newAct.getType() == ((PlanImpl) plan).getFirstActivity().getType()) && (newAct.getLinkId() == ((PlanImpl) plan).getFirstActivity().getLinkId())){
 					ActivityImpl lastAct = (ActivityImpl) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 					lastAct.setLink(fFromKnowledge.getLink());
 					lastAct.setCoord(fFromKnowledge.getCoord());
 					lastAct.setFacility(fFromKnowledge);
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
-				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLink() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink())){
+				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLinkId() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId())){
 					ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
 					firstAct.setLink(fFromKnowledge.getLink());
 					firstAct.setCoord(fFromKnowledge.getCoord());

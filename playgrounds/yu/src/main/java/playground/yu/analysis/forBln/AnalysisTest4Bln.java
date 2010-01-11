@@ -104,8 +104,7 @@ public class AnalysisTest4Bln {
 		// toll
 		RoadPricingScheme toll = null;
 		if (withToll) {
-			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-					network);
+			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 			try {
 				tollReader.parse(tollFilename);
 			} catch (SAXException e) {

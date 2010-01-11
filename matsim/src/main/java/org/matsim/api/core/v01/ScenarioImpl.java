@@ -130,15 +130,15 @@ public class ScenarioImpl implements Scenario {
 		this.knowledges = new KnowledgesImpl();
 	}
 
-	protected void createRoadPricingScheme(){
-		this.roadPricingScheme = new RoadPricingScheme(this.getNetwork());		
+	protected void createRoadPricingScheme() {
+		this.roadPricingScheme = new RoadPricingScheme();		
 	}
 	
-	protected void createLaneDefinitionsContainer(){
+	protected void createLaneDefinitionsContainer() {
 		this.laneDefinitions = new BasicLaneDefinitionsImpl();
 	}
 	
-	protected void createSignalSystemsContainers(){
+	protected void createSignalSystemsContainers() {
 		this.signalSystems = new BasicSignalSystemsImpl();
 		this.signalSystemConfigurations = new BasicSignalSystemConfigurationsImpl();
 	}
@@ -148,7 +148,7 @@ public class ScenarioImpl implements Scenario {
 	}
 	
 	@Deprecated
-	public World getWorld(){
+	public World getWorld() {
 		return this.world;
 	}
 	

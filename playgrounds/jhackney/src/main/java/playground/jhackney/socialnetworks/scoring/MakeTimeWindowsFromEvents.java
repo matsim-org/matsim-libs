@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -42,7 +42,7 @@ import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 
 public class MakeTimeWindowsFromEvents {
 
-	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>>();
+	LinkedHashMap<Id,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<Id,ArrayList<TimeWindow>>();
 	static final private Logger log = Logger.getLogger(MakeTimeWindowsFromEvents.class);
 	
 	public MakeTimeWindowsFromEvents(){
@@ -80,14 +80,14 @@ public class MakeTimeWindowsFromEvents {
 				
 				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(j*2);
 				TimeWindow tw=new TimeWindow(startTime, endTime, person, act);
-				if(!(timeWindowMap.containsKey(act.getFacility()))){
+				if(!(timeWindowMap.containsKey(act.getFacilityId()))){
 					twList=new ArrayList<TimeWindow>();
 				}else{
-					twList=timeWindowMap.get(act.getFacility());
+					twList=timeWindowMap.get(act.getFacilityId());
 				}
 				twList.add(tw);
-				timeWindowMap.remove(act.getFacility());
-				timeWindowMap.put(act.getFacility(),twList);
+				timeWindowMap.remove(act.getFacilityId());
+				timeWindowMap.put(act.getFacilityId(),twList);
 			}
 		}
 	}
@@ -96,7 +96,7 @@ public class MakeTimeWindowsFromEvents {
 		this.timeWindowMap.clear();
 	}
 
-	public LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> getTimeWindowMap(){
+	public LinkedHashMap<Id,ArrayList<TimeWindow>> getTimeWindowMap() {
 		return this.timeWindowMap;
 	}
 }

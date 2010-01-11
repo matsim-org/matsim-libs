@@ -167,7 +167,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			AgentDepartureEventImpl depEvent = new AgentDepartureEventImpl(
 					departureTime,
 					TEST_PERSON_ID,
-					originAct.getLink().getId(),
+					originAct.getLinkId(),
 					TransportMode.car);
 			LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(departureTime + depDelay, testPerson.getId(), originAct.getLinkId());
 

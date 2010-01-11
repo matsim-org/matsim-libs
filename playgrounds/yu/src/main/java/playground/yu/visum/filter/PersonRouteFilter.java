@@ -3,7 +3,6 @@ package playground.yu.visum.filter;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -64,11 +63,10 @@ public class PersonRouteFilter extends PersonFilterA {
 						LegImpl leg = (LegImpl) obj;
 						NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
 						if (route != null) {
-							List<Link> links = route.getLinks();
-							if (links != null)
-								for (Link link : links) {
-									if (this.criterionLinkIds.contains(link
-											.getId()))
+							List<Id> linkIds = route.getLinkIds();
+							if (linkIds != null)
+								for (Id linkId : linkIds) {
+									if (this.criterionLinkIds.contains(linkId))
 										return false;
 								}
 							List<Node> nodes = route.getNodes();
@@ -81,8 +79,7 @@ public class PersonRouteFilter extends PersonFilterA {
 						}
 					} else {
 						ActivityImpl act = (ActivityImpl) obj;
-						if (this.criterionLinkIds.contains(act.getLink()
-								.getId()))
+						if (this.criterionLinkIds.contains(act.getLinkId()))
 							return false;
 					}
 					even = !even;

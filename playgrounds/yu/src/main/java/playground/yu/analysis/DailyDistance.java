@@ -137,7 +137,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		if (toll == null) {
 			count++;
 			run(plan);
-		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLink(), toll)) {
+		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLinkId(), toll)) {
 			count++;
 			run(plan);
 		}
@@ -533,7 +533,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {

@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -78,15 +77,14 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 			saturationLevels.add(i, null);
 		}
 		double capPeriod = net.getCapacityPeriod() / 3600.0;
-		for (Link link : rps.getLinks()) {
-			Id linkId = link.getId();
+		for (Id linkId : rps.getLinkIds()) {
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Double> m = saturationLevels.get(i);
 				if (m == null)
 					m = new HashMap<Id, Double>();
 				m.put(linkId, Double.valueOf(((v != null) ? v[i] : 0)
-						/ flowCapFactor / link.getCapacity(Time.UNDEFINED_TIME)
+						/ flowCapFactor / net.getLinks().get(linkId).getCapacity(Time.UNDEFINED_TIME)
 						* capPeriod));
 				saturationLevels.set(i, m);
 			}

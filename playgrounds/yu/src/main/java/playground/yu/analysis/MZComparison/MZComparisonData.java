@@ -3,7 +3,7 @@
  */
 package playground.yu.analysis.MZComparison;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -23,8 +23,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
  */
 public class MZComparisonData extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
-	public static boolean isInRange(Link loc, RoadPricingScheme toll) {
-		return toll.getLinks().contains(loc);
+	public static boolean isInRange(Id linkId, RoadPricingScheme toll) {
+		return toll.getLinkIds().contains(linkId);
 	}
 
 	private double carDist, ptDist, wlkDist,
@@ -49,7 +49,7 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 	public void run(Person person) {
 		// count++;
 		Plan pl = person.getSelectedPlan();
-		inTollRange = isInRange(((PlanImpl) pl).getFirstActivity().getLink(), toll);
+		inTollRange = isInRange(((PlanImpl) pl).getFirstActivity().getLinkId(), toll);
 		if (inTollRange)
 			count_toll++;
 		run(pl);

@@ -54,7 +54,7 @@ public class CalcTrafficPerformance implements LinkEnterEventHandler {
 		if (l != null) {
 			if (toll == null)
 				this.lengthSum += l.getLength() / 1000.0;
-			else if (TollTools.isInRange(l, toll))
+			else if (TollTools.isInRange(l.getId(), toll))
 				this.lengthSum += l.getLength() / 1000.0;
 		}
 	}

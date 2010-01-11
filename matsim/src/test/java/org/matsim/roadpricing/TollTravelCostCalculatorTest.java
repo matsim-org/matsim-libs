@@ -52,10 +52,10 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = Fixture.createNetwork2(scenario);
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme(network);
+		RoadPricingScheme toll = new RoadPricingScheme();
 		toll.setType("distance");
-		toll.addLink("5");
-		toll.addLink("11");
+		toll.addLink(scenario.createId("5"));
+		toll.addLink(scenario.createId("11"));
 		PopulationImpl population = Fixture.createPopulation2(scenario);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
@@ -104,10 +104,10 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = Fixture.createNetwork2(scenario);
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme(network);
+		RoadPricingScheme toll = new RoadPricingScheme();
 		toll.setType("cordon");
-		toll.addLink("5");
-		toll.addLink("11");
+		toll.addLink(scenario.createId("5"));
+		toll.addLink(scenario.createId("11"));
 		PopulationImpl population = Fixture.createPopulation2(scenario);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs

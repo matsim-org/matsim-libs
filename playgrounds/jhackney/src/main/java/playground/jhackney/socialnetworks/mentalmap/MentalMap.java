@@ -220,7 +220,7 @@ public class MentalMap {
 				for (PlanElement pe : myPlan.getPlanElements()) {
 					if (pe instanceof ActivityImpl) {
 						ActivityImpl act = (ActivityImpl) pe;
-						currentActivities.add(act.getFacility().getId());
+						currentActivities.add(act.getFacilityId());
 					}
 				}
 			}
@@ -247,7 +247,7 @@ public class MentalMap {
 				Set<ActivityOptionImpl> myActivities=sortedScores.keySet();
 				Iterator<ActivityOptionImpl> ait= myActivities.iterator();
 				while(ait.hasNext()) {
-					ActivityOptionImpl myactivity=(ActivityOptionImpl) ait.next();
+					ActivityOptionImpl myactivity=ait.next();
 //				double score=(Double) sortedScores.get(myactivity);
 				// note which activity to forget
 
@@ -295,7 +295,7 @@ public class MentalMap {
 			for (PlanElement pe : myPlan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
-					if(act.getFacility()==myActivity.getFacility()){
+					if(act.getFacilityId()==myActivity.getFacility().getId()){
 						myAct=act;
 					}
 				}

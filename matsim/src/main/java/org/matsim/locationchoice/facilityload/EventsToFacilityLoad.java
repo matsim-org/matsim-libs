@@ -69,8 +69,8 @@ public class EventsToFacilityLoad implements DeprecatedActivityStartEventHandler
 	 */
 	public void handleEvent(final ActivityStartEventImpl event) {
 		if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
-			ActivityFacility facility = event.getAct().getFacility();
-			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.getTime());
+			Id facilityId = event.getAct().getFacilityId();
+			this.facilityPenalties.get(facilityId).getFacilityLoad().addArrival(event.getTime());
 		}
 	}
 
@@ -80,8 +80,8 @@ public class EventsToFacilityLoad implements DeprecatedActivityStartEventHandler
 	 */
 	public void handleEvent(final ActivityEndEventImpl event) {
 		if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
-			ActivityFacility facility = event.getAct().getFacility();
-			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.getTime());
+			Id facilityId = event.getAct().getFacilityId();
+			this.facilityPenalties.get(facilityId).getFacilityLoad().addDeparture(event.getTime());
 		}
 	}
 

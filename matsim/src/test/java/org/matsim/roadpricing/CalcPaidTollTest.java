@@ -193,7 +193,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = Fixture.createNetwork1(scenario);
 
-		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(network);
+		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1();
 		try {
 			reader.parse(tollFile);
 		} catch (SAXException e) {

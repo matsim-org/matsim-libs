@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -57,7 +57,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		((PersonImpl) person).setSelectedPlan(newPlan);
 	}
 	private double getAvgFriendArrTime(ActivityImpl act) {
-		LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm = controler.getTwm();
+		LinkedHashMap<Id,ArrayList<TimeWindow>> twm = controler.getTwm();
 		int count=0;
 		double avgStartTime=0;
 		TimeWindow tw1 = null;
@@ -65,12 +65,10 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		PersonImpl p1 = null;
 		PersonImpl p2 = null;
 
-		ActivityFacility actFacility=act.getFacility();
-
-		if(!twm.keySet().contains(actFacility)){
+		if(!twm.keySet().contains(act.getFacilityId())){
 			log.error(" activityMap does not contain myActivity");
 		}
-		ArrayList<TimeWindow> visits=twm.get(actFacility);
+		ArrayList<TimeWindow> visits=twm.get(act.getFacilityId());
 		if(!(visits.size()>0)){
 			log.error(" number of visitors not >0");
 		}

@@ -465,7 +465,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {

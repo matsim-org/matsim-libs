@@ -107,7 +107,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 			 */
 			if (!act.getType().startsWith("h")) {
 				this.penalty.add(new ScoringPenalty(activityStart, activityEnd, 
-						this.facilityPenalties.get(act.getFacility().getId()), tmpScore));
+						this.facilityPenalties.get(act.getFacilityId()), tmpScore));
 			}
 			//---------------------------------------------------------------------------
 				

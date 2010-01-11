@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -42,7 +43,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  *
  */
 public class NetworkLinksInCircle {
-	final private HashSet<Link> areaOfInterest = new HashSet<Link>();
+	final private HashSet<Id> areaOfInterest = new HashSet<Id>();
 	final private Network network;
 
 	public NetworkLinksInCircle(Network network) {
@@ -50,7 +51,7 @@ public class NetworkLinksInCircle {
 		this.network = network;
 	}
 
-	public Set<Link> getLinks(double x, double y, double radius) {
+	public Set<Id> getLinks(double x, double y, double radius) {
 		CoordImpl center = new CoordImpl(x, y);
 		System.out.println("--> extracting area of interest... at "
 				+ (new Date()));
@@ -60,7 +61,7 @@ public class NetworkLinksInCircle {
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius)
 					|| (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 				System.out.println("    link " + link.getId().toString());
-				this.areaOfInterest.add(link);
+				this.areaOfInterest.add(link.getId());
 			}
 		}
 		System.out.println("--> area of interest contains: "

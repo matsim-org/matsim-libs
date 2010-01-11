@@ -166,7 +166,7 @@ public class PlanAgent implements MobsimAgent {
 	 * The first activity's start time is set to 00:00:00. If the end time is
 	 * undefined, it is set to {@link ActivityImpl#getDuration()}. If both, duration and end
 	 * time are defined, the end time is set to min[end time, duration].<br>
-	 * The current link is set to {@link ActivityImpl#getLink()}.
+	 * The current link is set to {@link ActivityImpl#getLinkId()}.
 	 */
 	public void beforeSim() {
 		currentRouteIndex = -1;

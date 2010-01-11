@@ -32,10 +32,10 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -98,8 +98,7 @@ public class AnalysisTest {
 		// toll
 		RoadPricingScheme toll = null;
 		if (withToll) {
-			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-					scenario2.getNetwork());
+			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 			try {
 				tollReader.parse(tollFilename);
 			} catch (SAXException e) {

@@ -184,7 +184,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		Plan selectedPlan = plans.getPersons().get(ae.getPersonId())
 				.getSelectedPlan();
 		if (toll != null) {
-			if (TollTools.isInRange(((PlanImpl) selectedPlan).getFirstActivity().getLink(),
+			if (TollTools.isInRange(((PlanImpl) selectedPlan).getFirstActivity().getLinkId(),
 					toll)) {
 				internalCompute(binIdx, ae, selectedPlan, allCount, carCount,
 						ptCount, wlkCount, bikeCount, othersCount);

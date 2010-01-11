@@ -62,7 +62,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	 *            - a SpeedCounter object
 	 */
 	private final HashMap<String, SpeedCounter> speedCounters = new HashMap<String, SpeedCounter>();
-	private Set<Link> interestLinks = null;
+	private Set<Id> interestLinks = null;
 	private final int binSize, nofBins;
 	private final double[] speeds;
 	private final int[] speedsCount;
@@ -122,7 +122,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		this(network);
 		this.toll = toll;
 		if (toll != null)
-			interestLinks = new HashSet<Link>(toll.getLinks());
+			interestLinks = new HashSet<Id>(toll.getLinkIds());
 	}
 
 	public static class SpeedCounter {
@@ -255,12 +255,10 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			out.write(head.toString());
 			out.flush();
 
-			for (Link l : interestLinks == null ? network.getLinks().values()
-					: interestLinks) {
-				Id linkId = l.getId();
+			for (Id linkId : interestLinks == null ? network.getLinks().keySet() : interestLinks) {
 				StringBuffer line = new StringBuffer(linkId.toString());
 				line.append('\t');
-				line.append(l.getCapacity(Time.UNDEFINED_TIME));
+				line.append(this.network.getLinks().get(linkId).getCapacity(Time.UNDEFINED_TIME));
 
 				for (int j = 0; j < nofBins - 1; j++) {
 					double speed = getAvgSpeed(linkId, (double) j * binSize);
@@ -301,9 +299,9 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 	public Set<Id> getInterestLinkIds() {
 		Set<Id> interestLinkIds = new HashSet<Id>();
-		for (Link link : interestLinks == null ? network.getLinks().values()
+		for (Id linkId : interestLinks == null ? network.getLinks().keySet()
 				: interestLinks) {
-			interestLinkIds.add(link.getId());
+			interestLinkIds.add(linkId);
 		}
 		return interestLinkIds;
 	}
@@ -372,7 +370,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 		EventsManagerImpl events = new EventsManagerImpl();
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		tollReader.parse(roadPricingFilename);
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, tollReader
 				.getScheme());

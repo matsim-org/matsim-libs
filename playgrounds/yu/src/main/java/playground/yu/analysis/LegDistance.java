@@ -138,7 +138,7 @@ public class LegDistance implements LinkEnterEventHandler,
 			this.distances.put(agentId, distance);
 		else {
 			if (TollTools.isInRange(((PlanImpl) ppl.getPersons().get(event.getPersonId())
-					.getSelectedPlan()).getFirstActivity().getLink(), toll)) {
+					.getSelectedPlan()).getFirstActivity().getLinkId(), toll)) {
 				this.distances.put(agentId, distance);
 			}
 		}

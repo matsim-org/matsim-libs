@@ -55,14 +55,14 @@ public class RoadPricingIOTest extends MatsimTestCase {
 
 		NetworkLayer network = Fixture.createNetwork1(scenario);
 		// first, read the scheme from file
-		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(network);
+		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1();
 		reader1.parse(origFile);
 		RoadPricingScheme scheme1 = reader1.getScheme();
 
 		// compare it with what's expected
 		assertEquals("distance-toll-1", scheme1.getName());
 		assertEquals("distance toll for org.matsim.roadpricing.Fixture.createNetwork1().", scheme1.getDescription());
-		assertEquals(3, scheme1.getLinks().size());
+		assertEquals(3, scheme1.getLinkIds().size());
 		assertTrue(scheme1.getLinkIds().contains(new IdImpl(1)));
 		assertTrue(scheme1.getLinkIds().contains(new IdImpl(2)));
 		assertTrue(scheme1.getLinkIds().contains(new IdImpl(3)));
@@ -93,7 +93,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		 * compare them.
 		 */
 
-		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(network);
+		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1();
 		reader2.parse(tmpFile1);
 		RoadPricingScheme scheme2 = reader2.getScheme();
 

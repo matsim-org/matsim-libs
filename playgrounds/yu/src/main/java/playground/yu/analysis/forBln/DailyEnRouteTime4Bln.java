@@ -601,7 +601,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {

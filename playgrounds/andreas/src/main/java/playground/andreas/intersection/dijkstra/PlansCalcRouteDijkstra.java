@@ -2,7 +2,7 @@ package playground.andreas.intersection.dijkstra;
 
 import java.util.ArrayList;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.ActivityImpl;
@@ -51,16 +51,16 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	@Override
 	protected double handleCarLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		double travTime = 0;
-		Link fromLink = fromAct.getLink();
-		Link toLink = toAct.getLink();
-		if (fromLink == null) throw new RuntimeException("fromLink missing.");
-		if (toLink == null) throw new RuntimeException("toLink missing.");
+		Id fromLinkId = fromAct.getLinkId();
+		Id toLinkId = toAct.getLinkId();
+		if (fromLinkId == null) throw new RuntimeException("fromLink missing.");
+		if (toLinkId == null) throw new RuntimeException("toLink missing.");
 
-		Node startNode = this.wrappedNetwork.getNodes().get(fromLink.getId());	// start at the end of the "current" link
-		Node endNode = this.wrappedNetwork.getNodes().get(toLink.getId()); // the target is the start of the link
+		Node startNode = this.wrappedNetwork.getNodes().get(fromLinkId);	// start at the end of the "current" link
+		Node endNode = this.wrappedNetwork.getNodes().get(toLinkId); // the target is the start of the link
 
-		Path path = null;
-		if (toLink != fromLink) {
+		if (toLinkId != fromLinkId) {
+			Path path = null;
 			// do not drive/walk around, if we stay on the same link
 			path = this.getLeastCostPathCalculator().calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");

@@ -128,7 +128,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		if (toll != null) {
 			// only inhabitant from Kanton
 			if (TollTools.isInRange(((PlanImpl) plans.getPersons().get(event.getPersonId())
-					.getSelectedPlan()).getFirstActivity().getLink(), toll))
+					.getSelectedPlan()).getFirstActivity().getLinkId(), toll))
 				this.tmpDptTimes.put(event.getPersonId().toString(), event
 						.getTime());
 		} else
@@ -147,7 +147,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			internalCompute(agentId, arrTime);
 		else if (TollTools.isInRange(((PlanImpl) plans.getPersons()
 				.get(event.getPersonId()).getSelectedPlan()).getFirstActivity()
-				.getLink(), toll))
+				.getLinkId(), toll))
 			internalCompute(agentId, arrTime);
 	}
 
@@ -345,7 +345,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {

@@ -46,7 +46,7 @@ public abstract class TextLayer4QGIS extends AbstractPersonAlgorithm implements
 		if (toll == null)
 			run(plan);
 		else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity()
-				.getLink(), toll)) {
+				.getLinkId(), toll)) {
 			run(plan);
 		}
 	}

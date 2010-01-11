@@ -22,7 +22,7 @@ package org.matsim.roadpricing;
 
 import java.util.Stack;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -46,12 +46,9 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 	private final static String ATTR_END_TIME = "end_time";
 	private final static String ATTR_AMOUNT = "amount";
 
-	private Network network = null;
-
 	private RoadPricingScheme scheme = null;
 
-	public RoadPricingReaderXMLv1(final Network network) {
-		this.network = network;
+	public RoadPricingReaderXMLv1() {
 	}
 
 	public RoadPricingScheme getScheme() {
@@ -61,11 +58,11 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if (TAG_ROADPRICING.equals(name)) {
-			this.scheme = new RoadPricingScheme(this.network);
+			this.scheme = new RoadPricingScheme();
 			this.scheme.setName(atts.getValue(ATTR_NAME));
 			this.scheme.setType(atts.getValue(ATTR_TYPE));
 		} else if (TAG_LINK.equals(name)) {
-			this.scheme.addLink(atts.getValue(ATTR_ID));
+			this.scheme.addLink(new IdImpl(atts.getValue(ATTR_ID)));
 		} else if (TAG_COST.equals(name)) {
 			this.scheme.addCost(Time.parseTime(atts.getValue(ATTR_START_TIME)),
 					Time.parseTime(atts.getValue(ATTR_END_TIME)), Double.parseDouble(atts.getValue(ATTR_AMOUNT)));

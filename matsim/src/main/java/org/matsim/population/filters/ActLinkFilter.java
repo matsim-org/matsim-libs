@@ -57,7 +57,7 @@ public class ActLinkFilter extends AbstractPlanFilter {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
 				if (Pattern.matches(actTypePattern, act.getType())) {
-					if (this.linkIds.contains(act.getLink().getId())) {
+					if (this.linkIds.contains(act.getLinkId())) {
 						return true;
 					}
 				}

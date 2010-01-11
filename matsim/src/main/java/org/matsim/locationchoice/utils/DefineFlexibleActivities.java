@@ -84,7 +84,7 @@ public class DefineFlexibleActivities {
 		Iterator<ActivityImpl> it = primaryActivities.iterator();
 		while (it.hasNext()) {
 			ActivityImpl a = it.next();		
-			String key = a.getType()+a.getFacility().getId().toString();
+			String key = a.getType()+a.getFacilityId().toString();
 			if (fixPrimaries.containsKey(key)) {
 				// there is already one activity performed of the specific type at this location
 				movablePrimaryActivities.add(a);

@@ -35,7 +35,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -53,12 +52,11 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 	}
 
 	public static List<Map<Id, Integer>> createVolumes(
-			Collection<? extends Link> links, final VolumesAnalyzer va) {
+			Collection<Id> linkIds, final VolumesAnalyzer va) {
 		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
 		for (int i = 0; i < 24; i++)
 			volumes.add(i, null);
-		for (Link link : links) {
-			Id linkId = link.getId();
+		for (Id linkId : linkIds) {
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Integer> m = volumes.get(i);
@@ -106,7 +104,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 		mn2q.readEvents("../runs-svn/run669/it.1000/1000.events.txt.gz",
 				new EventHandler[] { va });
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(net);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -118,9 +116,9 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		}
 		RoadPricingScheme rps = tollReader.getScheme();
 
-		Collection<? extends Link> links = (rps != null) ? rps.getLinks() : net
-				.getLinks().values();
-		List<Map<Id, Integer>> vols = createVolumes(links, va);
+		Collection<Id> linkIds = (rps != null) ? rps.getLinkIds() : net
+				.getLinks().keySet();
+		List<Map<Id, Integer>> vols = createVolumes(linkIds, va);
 		List<Map<Id, Double>> sls = SaturationLevel2QGIS
 				.createSaturationLevels(net, rps, va);
 

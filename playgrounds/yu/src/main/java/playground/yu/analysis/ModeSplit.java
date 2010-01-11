@@ -9,7 +9,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -50,10 +49,9 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	}
 
 	public void run(final Plan plan) {
-		Link homeLoc = ((PlanImpl) plan).getFirstActivity().getLink();
 		boolean inRange = false;
 		if (toll != null)
-			inRange = TollTools.isInRange(homeLoc, toll);
+			inRange = TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLinkId(), toll);
 		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof LegImpl) {
 				TransportMode m = ((LegImpl) pe).getMode();
@@ -162,7 +160,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
