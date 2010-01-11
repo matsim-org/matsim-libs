@@ -195,7 +195,6 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 
 	    public void prepareLinkId(Map<Coord, String> linkIds) {
 	      double alpha = 0.4;
-	      log.error("quad0: " + this.quad[0] + " quad3: " + this.quad[3]);
 	      double middleX = alpha*this.quad[0].x + (1.0-alpha)*this.quad[3].x;
 	      double middleY = alpha*this.quad[0].y + (1.0-alpha)*this.quad[3].y;
 	      //Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);
