@@ -21,10 +21,10 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.queuesim.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.queuesim.listener.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationBeforeSimStepListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
@@ -33,7 +33,7 @@ import playground.christoph.network.MyLinkImpl;
 public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	LinkEnterEventHandler, LinkLeaveEventHandler,
 	AgentArrivalEventHandler, AgentDepartureEventHandler,
-	QueueSimulationBeforeSimStepListener, QueueSimulationAfterSimStepListener{
+	SimulationBeforeSimStepListener, SimulationAfterSimStepListener{
 
 	private Network network;
 	
@@ -144,7 +144,7 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	}
 
 	// Add Link TravelTimes
-	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e)
+	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e)
 	{
 		Iterator<TripBin> iter = this.finishedTrips.iterator();
 		
@@ -162,7 +162,7 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	}
 	
 	// Update Link TravelTimes
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent e)
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e)
 	{
 //		for (Link link : this.network.getLinks().values())
 //		{
