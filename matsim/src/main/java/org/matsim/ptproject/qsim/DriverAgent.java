@@ -34,9 +34,9 @@ public interface DriverAgent extends PersonAgentI {
 	 */
 	public Id chooseNextLinkId();
 
-	public void teleportToLink(final Id linkId);
 
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
+	public void teleportToLink(final Id linkId);
 
 	public void moveOverNode();
 
