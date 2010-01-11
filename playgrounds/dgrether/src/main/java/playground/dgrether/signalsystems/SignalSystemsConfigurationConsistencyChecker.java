@@ -26,19 +26,19 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalGroupSettings;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.systems.SignalSystems;
+import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.consistency.ConsistencyChecker;
@@ -53,14 +53,14 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 	private static final Logger log = Logger.getLogger(SignalSystemsConfigurationConsistencyChecker.class);
 	
 	private Network network;
-	private BasicLaneDefinitions lanes;
+	private LaneDefinitions lanes;
 	private boolean removeMalformed = false;
 
-	private BasicSignalSystems signals;
+	private SignalSystems signals;
 
 	private BasicSignalSystemConfigurations signalConfig;
 	
-	public SignalSystemsConfigurationConsistencyChecker(Network net, BasicLaneDefinitions laneDefs, BasicSignalSystems signals, BasicSignalSystemConfigurations signalConfig) {
+	public SignalSystemsConfigurationConsistencyChecker(Network net, LaneDefinitions laneDefs, SignalSystems signals, BasicSignalSystemConfigurations signalConfig) {
 		this.network = net;
 		this.lanes = laneDefs;
 		this.signals = signals;
@@ -126,11 +126,11 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 	  log.info("read network");
 	  
 	  
-	  BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
+	  LaneDefinitions laneDefs = new LaneDefinitionsImpl();
 		MatsimLaneDefinitionsReader laneReader = new MatsimLaneDefinitionsReader(laneDefs );
 	  laneReader.readFile(lanesFile);
 	  
-	  BasicSignalSystems signals = new BasicSignalSystemsImpl();
+	  SignalSystems signals = new SignalSystemsImpl();
 	  MatsimSignalSystemsReader signalReader = new MatsimSignalSystemsReader(signals);
 	  signalReader.readFile(signalSystemsFile);
 	  

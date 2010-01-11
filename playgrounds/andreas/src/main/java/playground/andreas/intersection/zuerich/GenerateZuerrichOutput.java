@@ -7,17 +7,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.systems.SignalSystems;
+import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.lanes.LanesConsistencyChecker;
@@ -58,7 +58,7 @@ public class GenerateZuerrichOutput {
 		
 		Map<Integer, Map<Integer,  List<Integer>>> knotenVonSpurNachSpurMap = null;
 		Map<Integer, Map<Integer, String>> knotenSpurLinkMap = null;
-		BasicLaneDefinitions laneDefs = null;
+		LaneDefinitions laneDefs = null;
 		
 		//lane generation
 		if (generateLanes){
@@ -78,14 +78,14 @@ public class GenerateZuerrichOutput {
 			laneWriter.writeFile(lanesOutputFile);
 		}
 		else {
-			laneDefs = new BasicLaneDefinitionsImpl();
+			laneDefs = new LaneDefinitionsImpl();
 			MatsimLaneDefinitionsReader laneReader = new MatsimLaneDefinitionsReader(laneDefs);
 			laneReader.readFile(lanesOutputFile);
 		}
 
 		if (generateSignalSystems){
 			//first generate the signal systems itself 
-			BasicSignalSystems signalSystems = new BasicSignalSystemsImpl();
+			SignalSystems signalSystems = new SignalSystemsImpl();
 			//read the mappings
 			//read the system id <-> cycle time mapping
 			new LSASystemsReader(signalSystems).readBasicLightSignalSystemDefinition(lsaTu);

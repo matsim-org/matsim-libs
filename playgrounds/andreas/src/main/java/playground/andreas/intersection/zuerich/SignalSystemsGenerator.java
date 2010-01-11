@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalSystems;
 
 
 /**
@@ -42,10 +42,10 @@ public class SignalSystemsGenerator {
 	private static final Logger log = Logger.getLogger(SignalSystemsGenerator.class);
 
 	private Network network;
-	private BasicLaneDefinitions laneDefinitions;
-	private BasicSignalSystems signalSystems;
+	private LaneDefinitions laneDefinitions;
+	private SignalSystems signalSystems;
 
-	public SignalSystemsGenerator(Network net, BasicLaneDefinitions laneDefs, BasicSignalSystems signalSystems) {
+	public SignalSystemsGenerator(Network net, LaneDefinitions laneDefs, SignalSystems signalSystems) {
 		this.network = net;
 		this.laneDefinitions = laneDefs;
 		this.signalSystems = signalSystems;
@@ -144,7 +144,7 @@ public class SignalSystemsGenerator {
 					Id linkId = new IdImpl(linkIdString);
 					//check if there is already a SignalGroupDefinition
 					if (!this.signalSystems.getSignalGroupDefinitions().containsKey(signalGroupId)){
-						BasicSignalGroupDefinition sg	= signalSystems.getFactory().createSignalGroupDefinition(linkId, signalGroupId);
+						SignalGroupDefinition sg	= signalSystems.getFactory().createSignalGroupDefinition(linkId, signalGroupId);
 						sg.setSignalSystemDefinitionId(signalSystemId);
 						
 						//add lanes and toLinks
@@ -152,7 +152,7 @@ public class SignalSystemsGenerator {
 						for (Integer spurIdInteger : spuren) {
 							//lanes 
 							Id spurId = new IdImpl(spurIdInteger);
-							BasicLanesToLinkAssignment l2lAssignment = this.laneDefinitions.getLanesToLinkAssignments().get(linkId);
+							LanesToLinkAssignment l2lAssignment = this.laneDefinitions.getLanesToLinkAssignments().get(linkId);
 							if ((l2lAssignment != null) 
 									&& l2lAssignment.getLanes().containsKey(spurId)){
 								if((sg.getLaneIds() == null) || !sg.getLaneIds().contains(spurId)){

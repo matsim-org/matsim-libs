@@ -9,19 +9,19 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
+import org.matsim.signalsystems.systems.SignalSystems;
 
 public class LSASystemsReader implements TabularFileHandler {
 
 	private static final Logger log = Logger.getLogger(LSASystemsReader.class);
 
 	private TabularFileParserConfig tabFileParserConfig;
-	private HashMap<Integer, BasicSignalSystemDefinition> lsaMap = new HashMap<Integer, BasicSignalSystemDefinition>();
+	private HashMap<Integer, SignalSystemDefinition> lsaMap = new HashMap<Integer, SignalSystemDefinition>();
 
-	private BasicSignalSystems signals;
+	private SignalSystems signals;
 
-	public LSASystemsReader(BasicSignalSystems lightSignalSystems) {
+	public LSASystemsReader(SignalSystems lightSignalSystems) {
 		this.signals = lightSignalSystems;
 	}
 
@@ -37,7 +37,7 @@ public class LSASystemsReader implements TabularFileHandler {
 			if (this.signals.getSignalSystemDefinitions().containsKey(signalSystemId)) {
 				log.error("Cannot create signal system definition id " + signalSystemId + " twice!");
 			}
-			BasicSignalSystemDefinition lsa = this.signals.getFactory().createSignalSystemDefinition(signalSystemId);
+			SignalSystemDefinition lsa = this.signals.getFactory().createSignalSystemDefinition(signalSystemId);
 			lsa.setDefaultCycleTime(Double.parseDouble(row[1]));
 			lsa.setDefaultInterGreenTime(3.0);
 			lsa.setDefaultSynchronizationOffset(0.0);
@@ -47,7 +47,7 @@ public class LSASystemsReader implements TabularFileHandler {
 
 	}
 
-	private HashMap<Integer, BasicSignalSystemDefinition> readFile(String filename) throws IOException {
+	private HashMap<Integer, SignalSystemDefinition> readFile(String filename) throws IOException {
 		this.tabFileParserConfig = new TabularFileParserConfig();
 		this.tabFileParserConfig.setFileName(filename);
 		this.tabFileParserConfig.setDelimiterTags(new String[] { " ", "\t" }); // \t

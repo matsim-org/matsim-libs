@@ -24,12 +24,12 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.vis.otfvis.OTFVisQueueSim;
 
 import playground.dgrether.DgPaths;
@@ -67,12 +67,12 @@ public class ZurichSignalVis {
 		EventsManagerImpl events = new EventsManagerImpl();
 		
 		scenario.getConfig().scenario().setUseLanes(true);
-		BasicLaneDefinitions laneDefs = scenario.getLaneDefinitions();
+		LaneDefinitions laneDefs = scenario.getLaneDefinitions();
 		MatsimLaneDefinitionsReader lanesReader = new MatsimLaneDefinitionsReader(laneDefs);
 		lanesReader.readFile(lanesFile);
 		
 		scenario.getConfig().scenario().setUseSignalSystems(true);
-		BasicSignalSystems signalDefs = scenario.getSignalSystems();
+		SignalSystems signalDefs = scenario.getSignalSystems();
 		new MatsimSignalSystemsReader(signalDefs).readFile(signalDefsFile);
 		
 		BasicSignalSystemConfigurations signalConfigs = scenario.getSignalSystemConfigurations();

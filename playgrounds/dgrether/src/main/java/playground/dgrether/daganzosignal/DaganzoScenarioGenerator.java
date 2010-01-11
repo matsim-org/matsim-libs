@@ -40,21 +40,21 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsFactory;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.basic.BasicLane;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsFactory;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsFactory;
 import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsFactory;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
+import org.matsim.signalsystems.systems.SignalSystems;
+import org.matsim.signalsystems.systems.SignalSystemsFactory;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.IdFactory;
@@ -162,7 +162,7 @@ public class DaganzoScenarioGenerator {
 			config.scenario().setUseLanes(true);
 			config.network().setLaneDefinitionsFile(LANESOUTPUTFILE);
 			//create the lanes and write them
-			BasicLaneDefinitions lanes = createLanes(scenario);
+			LaneDefinitions lanes = createLanes(scenario);
 			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(lanes);
 			laneWriter.writeFile(LANESOUTPUTFILE);
 		}
@@ -172,7 +172,7 @@ public class DaganzoScenarioGenerator {
 			config.signalSystems().setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
 			config.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 			//create the signal systems and write them
-			BasicSignalSystems signalSystems = createSignalSystems(scenario);
+			SignalSystems signalSystems = createSignalSystems(scenario);
 			MatsimSignalSystemsWriter ssWriter = new MatsimSignalSystemsWriter(signalSystems);
 			ssWriter.writeFile(SIGNALSYSTEMSOUTPUTFILE);
 			//create the signal system's configurations and write them
@@ -279,19 +279,19 @@ public class DaganzoScenarioGenerator {
 	}
 	
 
-	private BasicLaneDefinitions createLanes(ScenarioImpl scenario) {
-		BasicLaneDefinitions lanes = scenario.getLaneDefinitions();
-		BasicLaneDefinitionsFactory factory = lanes.getFactory();
+	private LaneDefinitions createLanes(ScenarioImpl scenario) {
+		LaneDefinitions lanes = scenario.getLaneDefinitions();
+		LaneDefinitionsFactory factory = lanes.getFactory();
 		//lanes for link 4
-		BasicLanesToLinkAssignment lanesForLink4 = factory.createLanesToLinkAssignment(id4);
-		BasicLane link4lane1 = factory.createLane(id1);
+		LanesToLinkAssignment lanesForLink4 = factory.createLanesToLinkAssignment(id4);
+		Lane link4lane1 = factory.createLane(id1);
 		link4lane1.addToLinkId(id6);
 		link4lane1.setNumberOfRepresentedLanes(3);
 		lanesForLink4.addLane(link4lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink4);
 		//lanes for link 5
-		BasicLanesToLinkAssignment lanesForLink5 = factory.createLanesToLinkAssignment(id5);
-		BasicLane link5lane1 = factory.createLane(id1);
+		LanesToLinkAssignment lanesForLink5 = factory.createLanesToLinkAssignment(id5);
+		Lane link5lane1 = factory.createLane(id1);
 		link5lane1.setNumberOfRepresentedLanes(3);
 		link5lane1.addToLinkId(id6);
 		lanesForLink5.addLane(link5lane1);
@@ -300,15 +300,15 @@ public class DaganzoScenarioGenerator {
 	}
 
 	
-	private BasicSignalSystems createSignalSystems(ScenarioImpl scenario) {
-		BasicSignalSystems systems = scenario.getSignalSystems();
-		BasicSignalSystemsFactory factory = systems.getFactory();
+	private SignalSystems createSignalSystems(ScenarioImpl scenario) {
+		SignalSystems systems = scenario.getSignalSystems();
+		SignalSystemsFactory factory = systems.getFactory();
 		//create the signal system no 1
-		BasicSignalSystemDefinition definition = factory.createSignalSystemDefinition(id1);
+		SignalSystemDefinition definition = factory.createSignalSystemDefinition(id1);
 		systems.addSignalSystemDefinition(definition);
 		
 		//create signal group for traffic on link 4 on lane 1 with toLink 6
-		BasicSignalGroupDefinition groupLink4 = factory.createSignalGroupDefinition(id4, id1);
+		SignalGroupDefinition groupLink4 = factory.createSignalGroupDefinition(id4, id1);
 		groupLink4.addLaneId(id1);
 		groupLink4.addToLinkId(id6);
 		//assing the group to the system
@@ -317,7 +317,7 @@ public class DaganzoScenarioGenerator {
 		systems.addSignalGroupDefinition(groupLink4);
 		
 		//create signal group  with id no 2 for traffic on link 5 on lane 1 with toLink 6
-		BasicSignalGroupDefinition groupLink5 = factory.createSignalGroupDefinition(id5, id2);
+		SignalGroupDefinition groupLink5 = factory.createSignalGroupDefinition(id5, id2);
 		groupLink5.addLaneId(id1);
 		groupLink5.addToLinkId(id6);
 		//assing the group to the system

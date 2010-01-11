@@ -26,9 +26,9 @@ import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
+import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
 /**
@@ -49,7 +49,7 @@ public class AdaptiveController extends
 		super(controlInfo);
 	}
 
-	public boolean givenSignalGroupIsGreen(double time, BasicSignalGroupDefinition signalGroup) {
+	public boolean givenSignalGroupIsGreen(double time, SignalGroupDefinition signalGroup) {
 		if (signalGroup.getLinkRefId().equals(id5)){
 			if (vehOnLink5Lane1 > 0) {
 				return true;

@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.vis.otfvis.OTFVisQueueSim;
 
 
@@ -53,7 +53,7 @@ public class FourWaysVisNetworkOnly {
 		EventsManagerImpl events = new EventsManagerImpl();
 		
 		scenario.getConfig().scenario().setUseLanes(true);
-		BasicLaneDefinitions laneDefs = scenario.getLaneDefinitions();
+		LaneDefinitions laneDefs = scenario.getLaneDefinitions();
 		
 		MatsimLaneDefinitionsReader lanesReader = new MatsimLaneDefinitionsReader(laneDefs);
 		lanesReader.readFile(lanesFile);

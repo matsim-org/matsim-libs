@@ -26,18 +26,18 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 import org.matsim.signalsystems.SignalSystemConfigurationsWriter11;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.systems.SignalSystems;
+import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
 import playground.dgrether.DgPaths;
 
@@ -85,8 +85,8 @@ public class DgXmlConverter {
 		MatsimFileTypeGuesser guesser = new MatsimFileTypeGuesser(file.getAbsolutePath());
 		String filename;
 		if (MatsimSignalSystemsReader.SIGNALSYSTEMS10.compareTo(guesser.getSystemId()) == 0){
-			BasicLaneDefinitions lanes = new BasicLaneDefinitionsImpl();
-			BasicSignalSystems sigSys = new BasicSignalSystemsImpl();
+			LaneDefinitions lanes = new LaneDefinitionsImpl();
+			SignalSystems sigSys = new SignalSystemsImpl();
 			MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(lanes, sigSys);
 			reader.readFile(file.getAbsolutePath());
 			MatsimLaneDefinitionsWriter lanewriter = new MatsimLaneDefinitionsWriter(lanes);

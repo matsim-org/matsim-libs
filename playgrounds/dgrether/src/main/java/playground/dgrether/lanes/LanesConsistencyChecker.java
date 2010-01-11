@@ -30,12 +30,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsImpl;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.basic.BasicLane;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.consistency.ConsistencyChecker;
@@ -49,10 +49,10 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
   
 	private static final Logger log = Logger.getLogger(LanesConsistencyChecker.class);
 	private Network network;
-	private BasicLaneDefinitions lanes;
+	private LaneDefinitions lanes;
 	private boolean removeMalformed = false;
 	
-	public LanesConsistencyChecker(Network net, BasicLaneDefinitions laneDefs) {
+	public LanesConsistencyChecker(Network net, LaneDefinitions laneDefs) {
 		this.network = net;
 		this.lanes = laneDefs;
 	}
@@ -60,7 +60,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 	public void checkConsistency() {
 		log.info("checking consistency...");
 		List<Id> malformedLinkIds = new ArrayList<Id>();
-		for (BasicLanesToLinkAssignment l2l : this.lanes.getLanesToLinkAssignments().values()){
+		for (LanesToLinkAssignment l2l : this.lanes.getLanesToLinkAssignments().values()){
 			//check link
 			if (this.network.getLinks().get(l2l.getLinkId()) == null) {
 				log.error("No link found for lanesToLinkAssignment with id "  + l2l.getLinkId());
@@ -69,7 +69,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 			//check length
 			else {
 				Link link = this.network.getLinks().get(l2l.getLinkId());
-				for (BasicLane l : l2l.getLanes().values()){
+				for (Lane l : l2l.getLanes().values()){
 					if (link.getLength() < l.getLength()) {
 						log.error("Link Id " + link.getId() + " is shorter than an assigned lane with id " + l.getId());
 						malformedLinkIds.add(l2l.getLinkId());
@@ -78,8 +78,8 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 			}
 			
 			//check toLinks
-			for (BasicLane lane : l2l.getLanesList()) {
-				Map<Id, BasicLane> toLinkIdToLaneMap = new HashMap<Id, BasicLane>();
+			for (Lane lane : l2l.getLanesList()) {
+				Map<Id, Lane> toLinkIdToLaneMap = new HashMap<Id, Lane>();
 				//check availability of toLink in network
 				for (Id toLinkId : lane.getToLinkIds()) {
 					if (this.network.getLinks().get(toLinkId) == null){
@@ -132,7 +132,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 	  log.info("read network");
 	  
 	  
-	  BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
+	  LaneDefinitions laneDefs = new LaneDefinitionsImpl();
 		MatsimLaneDefinitionsReader laneReader = new MatsimLaneDefinitionsReader(laneDefs );
 	  laneReader.readFile(lanesFile);
 	  
