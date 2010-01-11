@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim.listener;
 
-import org.matsim.core.mobsim.Simulation;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 
 /**

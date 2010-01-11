@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.SignalEngine;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
 import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
@@ -42,6 +41,7 @@ import org.matsim.signalsystems.control.AdaptiveSignalSystemControler;
 import org.matsim.signalsystems.control.DefaultPlanBasedSignalSystemController;
 import org.matsim.signalsystems.control.PlanBasedSignalSystemController;
 import org.matsim.signalsystems.control.SignalSystemController;
+import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.signalsystems.systems.SignalSystemDefinition;
 import org.matsim.signalsystems.systems.SignalSystems;
@@ -101,7 +101,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 	}
 	
 	/**
-	 * @see org.matsim.core.mobsim.SignalEngine#getSignalSystemControlerBySystemId()
+	 * @see org.matsim.signalsystems.mobsim.SignalEngine#getSignalSystemControlerBySystemId()
 	 */
 	public SortedMap<Id, SignalSystemController> getSignalSystemControlerBySystemId() {
 		return this.signalSystemControlerBySystemId;
@@ -109,7 +109,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 
 
 	/**
-	 * @see org.matsim.core.mobsim.SignalEngine#getSignalSystemDefinitions()
+	 * @see org.matsim.signalsystems.mobsim.SignalEngine#getSignalSystemDefinitions()
 	 */
 	public SortedMap<Id, SignalSystemDefinition> getSignalSystemDefinitions() {
 		return this.signalSystemDefinitions;

@@ -21,7 +21,7 @@ package org.matsim.core.mobsim.queuesim.listener;
 
 import java.util.EventListener;
 
-import org.matsim.core.mobsim.Simulation;
+import org.matsim.core.mobsim.framework.Simulation;
 
 
 /**

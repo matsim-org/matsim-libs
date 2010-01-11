@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.IOSimulation;
-import org.matsim.core.mobsim.MobsimFactory;
+import org.matsim.core.mobsim.framework.IOSimulation;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 
 
 /**

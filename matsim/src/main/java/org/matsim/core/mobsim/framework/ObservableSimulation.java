@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim;
+package org.matsim.core.mobsim.framework;
 
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 

@@ -50,8 +50,7 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.ObservableSimulation;
-import org.matsim.core.mobsim.SignalEngine;
+import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -63,6 +62,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
@@ -85,7 +85,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements org.matsim.core.mobsim.IOSimulation, ObservableSimulation{
+public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation{
 
 	private int snapshotPeriod = 0;
 	private double snapshotTime = 0.0;

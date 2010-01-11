@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,19 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim;
+package org.matsim.core.mobsim.framework;
+
+import org.matsim.core.controler.ControlerIO;
+
 
 /**
- * Interface to make a simulation work together with
- * simulation events and a Control(l)er
+ * Must be implemented by simulations using the default matsim io.
  * @author dgrether
  *
  */
-public interface Simulation {
-
-  /**
-   * Start the simulation
-   */
-  public void run();
+public interface IOSimulation extends Simulation {
+  
+  public void setControlerIO(ControlerIO cio);
+  
+  public void setIterationNumber(Integer iterationNumber);
 
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalEngine
+ * Simulation
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim;
+package org.matsim.core.mobsim.framework;
 
-import java.util.SortedMap;
+/**
+ * Interface to make a simulation work together with
+ * simulation events and a Control(l)er
+ * @author dgrether
+ *
+ */
+public interface Simulation {
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.signalsystems.control.SignalSystemController;
-import org.matsim.signalsystems.systems.SignalSystemDefinition;
+  /**
+   * Start the simulation
+   */
+  public void run();
 
-public interface SignalEngine {
-
-	public SortedMap<Id, SignalSystemController> getSignalSystemControlerBySystemId();
-
-	public SortedMap<Id, SignalSystemDefinition> getSignalSystemDefinitions();
-
-	public EventsManager getEvents();
-	
 }

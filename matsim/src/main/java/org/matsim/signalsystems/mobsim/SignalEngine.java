@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Simulation
+ * SignalEngine
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim;
+package org.matsim.signalsystems.mobsim;
 
-import org.matsim.core.controler.ControlerIO;
+import java.util.SortedMap;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.signalsystems.control.SignalSystemController;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
 
-/**
- * Must be implemented by simulations using the default matsim io.
- * @author dgrether
- *
- */
-public interface IOSimulation extends Simulation {
-  
-  public void setControlerIO(ControlerIO cio);
-  
-  public void setIterationNumber(Integer iterationNumber);
+public interface SignalEngine {
 
+	public SortedMap<Id, SignalSystemController> getSignalSystemControlerBySystemId();
+
+	public SortedMap<Id, SignalSystemDefinition> getSignalSystemDefinitions();
+
+	public EventsManager getEvents();
+	
 }
