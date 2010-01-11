@@ -112,77 +112,73 @@ public class Converter {
 		String[] tabs = line.split("\t");
 		String personId = tabs[0] + "-" + tabs[1];
 		double endTime;
-		try {
-			if (this.tmpPersonId.equals(personId)) {
-				// this line is about the same person as the line before.
-				// "extend" the plan of that person with a Leg and an Act
+		if (this.tmpPersonId.equals(personId)) {
+			// this line is about the same person as the line before.
+			// "extend" the plan of that person with a Leg and an Act
 
-				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
-				Plan pl = this.pop.getPersons().get(new IdImpl(personId)).getSelectedPlan();
-				endTime = convertTime(tabs[3]);
-				double dur = endTime - this.tmpEndTime;
+			// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
+			Plan pl = this.pop.getPersons().get(new IdImpl(personId)).getSelectedPlan();
+			endTime = convertTime(tabs[3]);
+			double dur = endTime - this.tmpEndTime;
 
-				LegImpl leg = ((PlanImpl) pl).createAndAddLeg(TransportMode.car);
-				leg.setDepartureTime(convertTime(this.tmpTabs[3]));
+			LegImpl leg = ((PlanImpl) pl).createAndAddLeg(TransportMode.car);
+			leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
-				Coord tmpCoord = getRandomCoordInZone(tabs[9]);
-				if (tabs[7].equals("H")) {
-					tmpCoord = this.tmpHome;
-				}
-
-				ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[7], tmpCoord);
-				act.setEndTime(convertTime(tabs[3]));
-				act.setDuration(dur);
-
-			} else {
-				// it is a new person
-				// finish the person from the line before, add final trip back to home
-				// then start the new person
-
-				if (!this.pop.getPersons().isEmpty()) {
-					Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
-					Plan tmpPl = p.getSelectedPlan();
-
-					LegImpl leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
-					leg.setDepartureTime(convertTime(this.tmpTabs[3]));
-					// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
-
-					Coord tmpCoord2 = getRandomCoordInZone(tabs[12]);
-					if (this.tmpTabs[10].equals("H")) {
-						tmpCoord2 = this.tmpHome;
-					}
-					ActivityImpl lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[10], tmpCoord2);
-
-					// make a copy of the just finished plan and set it to use public transit mode
-					PlanImpl nonCarPlan = new org.matsim.core.population.PlanImpl(p);
-					nonCarPlan.copyPlan(tmpPl);
-					for (PlanElement pe : nonCarPlan.getPlanElements()) {
-						if (pe instanceof LegImpl) {
-							((LegImpl) pe).setMode(TransportMode.pt);
-						}
-					}
-					p.addPlan(nonCarPlan);
-				}
-
-				PersonImpl p = new PersonImpl(new IdImpl(personId));
-				PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
-				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
-				endTime = convertTime(tabs[3]);
-
-				this.tmpHome = getRandomCoordInZone(tabs[9]);
-				ActivityImpl homeAct = pl.createAndAddActivity(tabs[7], this.tmpHome);
-				homeAct.setEndTime(convertTime(tabs[3]));
-				p.addPlan(pl);
-				this.pop.addPerson(p);
+			Coord tmpCoord = getRandomCoordInZone(tabs[9]);
+			if (tabs[7].equals("H")) {
+				tmpCoord = this.tmpHome;
 			}
 
-			// remember the current data for comparison with next line
-			this.tmpPersonId = personId;
-			this.tmpEndTime = endTime;
-			this.tmpTabs = tabs;
-		} catch (Exception e) {
-			e.printStackTrace();
+			ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[7], tmpCoord);
+			act.setEndTime(convertTime(tabs[3]));
+			act.setDuration(dur);
+
+		} else {
+			// it is a new person
+			// finish the person from the line before, add final trip back to home
+			// then start the new person
+
+			if (!this.pop.getPersons().isEmpty()) {
+				Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
+				Plan tmpPl = p.getSelectedPlan();
+
+				LegImpl leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
+				leg.setDepartureTime(convertTime(this.tmpTabs[3]));
+				// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
+
+				Coord tmpCoord2 = getRandomCoordInZone(tabs[12]);
+				if (this.tmpTabs[10].equals("H")) {
+					tmpCoord2 = this.tmpHome;
+				}
+				ActivityImpl lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[10], tmpCoord2);
+
+				// make a copy of the just finished plan and set it to use public transit mode
+				PlanImpl nonCarPlan = new org.matsim.core.population.PlanImpl(p);
+				nonCarPlan.copyPlan(tmpPl);
+				for (PlanElement pe : nonCarPlan.getPlanElements()) {
+					if (pe instanceof LegImpl) {
+						((LegImpl) pe).setMode(TransportMode.pt);
+					}
+				}
+				p.addPlan(nonCarPlan);
+			}
+
+			PersonImpl p = new PersonImpl(new IdImpl(personId));
+			PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
+			// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
+			endTime = convertTime(tabs[3]);
+
+			this.tmpHome = getRandomCoordInZone(tabs[9]);
+			ActivityImpl homeAct = pl.createAndAddActivity(tabs[7], this.tmpHome);
+			homeAct.setEndTime(convertTime(tabs[3]));
+			p.addPlan(pl);
+			this.pop.addPerson(p);
 		}
+
+		// remember the current data for comparison with next line
+		this.tmpPersonId = personId;
+		this.tmpEndTime = endTime;
+		this.tmpTabs = tabs;
 	}
 
 	private Coord getRandomCoordInZone(final String zoneId) {

@@ -99,7 +99,7 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 				c++;
 				String personId = personEntry.getKey().toString();
 				String actChainA = personEntry.getValue();
-				String actChainB = actsB.get(personEntry);
+				String actChainB = actsB.get(personEntry.getKey());
 				if (!actChainA.equals(actChainB)) {
 					writer.writeln(personId + "\t" + actChainA + "\t"
 							+ actChainB);
