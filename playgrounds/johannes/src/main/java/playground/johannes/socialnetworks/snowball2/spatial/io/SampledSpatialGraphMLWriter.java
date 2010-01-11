@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.socialnetworks.snowball2.SampledGraph;
 import playground.johannes.socialnetworks.snowball2.SampledVertex;
 

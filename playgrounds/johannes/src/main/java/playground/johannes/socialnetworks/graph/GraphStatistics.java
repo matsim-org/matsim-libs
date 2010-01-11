@@ -46,6 +46,8 @@ import org.matsim.contrib.sna.graph.GraphProjectionFactory;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
 
+import playground.johannes.socialnetworks.graph.analysis.Degree;
+import playground.johannes.socialnetworks.graph.analysis.Triangles;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -60,7 +62,11 @@ public class GraphStatistics {
 	private static final Logger logger = Logger.getLogger(GraphStatistics.class);
 	
 	private static int maxNumThreads = Runtime.getRuntime().availableProcessors();
+	
+	private static final Degree degree = new Degree();
 
+	private static final Triangles triangles = new Triangles();
+	
 	/**
 	 * Sets the number of allowed threads for calculation. Set <tt>num > 1</tt>
 	 * if you have multiple cpus available.
@@ -81,7 +87,8 @@ public class GraphStatistics {
 	 * @return the degree distribution.
 	 */
 	public static Distribution degreeDistribution(Graph g) {
-		return degreeDistribution(g.getVertices());
+		return degree.distribution(g.getVertices());
+//		return degreeDistribution(g.getVertices());
 	}
 	
 	/**
@@ -94,10 +101,11 @@ public class GraphStatistics {
 	 * @return the degree distribution.
 	 */
 	public static Distribution degreeDistribution(Collection<? extends Vertex> vertices) {
-		Distribution stats = new Distribution();
-		for(Vertex v : vertices)
-			stats.add(v.getEdges().size());
-		return stats;
+		return degree.distribution((Set<? extends Vertex>) vertices); //Should be ok for now.
+//		Distribution stats = new Distribution();
+//		for(Vertex v : vertices)
+//			stats.add(v.getEdges().size());
+//		return stats;
 	}
 	
 	/**
@@ -112,7 +120,8 @@ public class GraphStatistics {
 	 *         clustering coefficient as value.
 	 */
 	public static TObjectDoubleHashMap<? extends Vertex> localClusteringCoefficients(Graph g) {
-		return localClusteringCoefficients(g.getVertices());
+		return triangles.localClusteringCoefficients(g.getVertices());
+//		return localClusteringCoefficients(g.getVertices());
 	}
 	
 	/**
@@ -130,33 +139,35 @@ public class GraphStatistics {
 	 * @return an object-double map containing the vertex as key and the
 	 *         clustering coefficient as value.
 	 */
+	@SuppressWarnings("unchecked")
 	public static <V extends Vertex> TObjectDoubleHashMap<V> localClusteringCoefficients(Collection<V> vertices) {
-		TObjectDoubleHashMap<V> cc = new TObjectDoubleHashMap<V>();
-		for(V v : vertices) {
-			int k = v.getEdges().size();
-			if(k == 0 || k == 1) {
-				cc.put(v, 0.0);
-			} else {
-				int edgecount = 0;
-				Set<Vertex> n1s = new HashSet<Vertex>(v.getNeighbours());
-				int n_Neighbours1 = v.getNeighbours().size();
-				for(int i1 = 0; i1 < n_Neighbours1; i1++) {
-					Vertex n1 = v.getNeighbours().get(i1);
-					int n_Neighbours2 = n1.getNeighbours().size();
-					for(int i2 = 0; i2 < n_Neighbours2; i2++) {
-						Vertex n2 = n1.getNeighbours().get(i2);
-						if (n2 != v) {
-							if (n1s.contains(n2))
-								edgecount++;
-						}
-					}
-					n1s.remove(n1);
-				}
-				cc.put(v, 2 * edgecount / (double)(k*(k-1)));
-			}
-		}
-		
-		return cc;
+		return (TObjectDoubleHashMap<V>) triangles.localClusteringCoefficients(vertices);
+//		TObjectDoubleHashMap<V> cc = new TObjectDoubleHashMap<V>();
+//		for(V v : vertices) {
+//			int k = v.getEdges().size();
+//			if(k == 0 || k == 1) {
+//				cc.put(v, 0.0);
+//			} else {
+//				int edgecount = 0;
+//				Set<Vertex> n1s = new HashSet<Vertex>(v.getNeighbours());
+//				int n_Neighbours1 = v.getNeighbours().size();
+//				for(int i1 = 0; i1 < n_Neighbours1; i1++) {
+//					Vertex n1 = v.getNeighbours().get(i1);
+//					int n_Neighbours2 = n1.getNeighbours().size();
+//					for(int i2 = 0; i2 < n_Neighbours2; i2++) {
+//						Vertex n2 = n1.getNeighbours().get(i2);
+//						if (n2 != v) {
+//							if (n1s.contains(n2))
+//								edgecount++;
+//						}
+//					}
+//					n1s.remove(n1);
+//				}
+//				cc.put(v, 2 * edgecount / (double)(k*(k-1)));
+//			}
+//		}
+//		
+//		return cc;
 	}
 	
 	/**
@@ -168,7 +179,8 @@ public class GraphStatistics {
 	 * @return the distribution of local clustering coefficients.
 	 */
 	public static Distribution localClusteringDistribution(Graph g) {
-		return localClusteringDistribution(g.getVertices());
+		return triangles.localClusteringDistribution(g.getVertices());
+//		return localClusteringDistribution(g.getVertices());
 	}
 	
 	/**
@@ -180,9 +192,10 @@ public class GraphStatistics {
 	 * @return the distribution of local clustering coefficients.
 	 */
 	public static Distribution localClusteringDistribution(Collection<? extends Vertex> vertices) {
-		Distribution stats = new Distribution();
-		stats.addAll(localClusteringCoefficients(vertices).getValues());
-		return stats;
+		return triangles.localClusteringDistribution((Set<? extends Vertex>) vertices); //Should be ok for now.
+//		Distribution stats = new Distribution();
+//		stats.addAll(localClusteringCoefficients(vertices).getValues());
+//		return stats;
 	}
 	
 	/**
@@ -195,23 +208,24 @@ public class GraphStatistics {
 	 * @return the global clustering coefficient.
 	 */
 	public static double globalClusteringCoefficient(Graph g) {
-		int n_tripples = 0;
-		int n_triangles = 0;
-		for(Vertex v : g.getVertices()) {
-			List<? extends Vertex> n1s = v.getNeighbours();
-			for(int i = 0; i < n1s.size(); i++) {
-				List<? extends Vertex> n2s = n1s.get(i).getNeighbours();
-				for(int k = 0; k < n2s.size(); k++) {
-					if(!n2s.get(k).equals(v)) {
-					n_tripples++;
-					if(n2s.get(k).getNeighbours().contains(v))
-						n_triangles++;
-					}
-				}
-			}
-		}
-		
-		return n_triangles / (double)n_tripples;
+		return triangles.globalClusteringCoefficient(g);
+//		int n_tripples = 0;
+//		int n_triangles = 0;
+//		for(Vertex v : g.getVertices()) {
+//			List<? extends Vertex> n1s = v.getNeighbours();
+//			for(int i = 0; i < n1s.size(); i++) {
+//				List<? extends Vertex> n2s = n1s.get(i).getNeighbours();
+//				for(int k = 0; k < n2s.size(); k++) {
+//					if(!n2s.get(k).equals(v)) {
+//					n_tripples++;
+//					if(n2s.get(k).getNeighbours().contains(v))
+//						n_triangles++;
+//					}
+//				}
+//			}
+//		}
+//		
+//		return n_triangles / (double)n_tripples;
 	}
 	
 	/**
@@ -278,23 +292,24 @@ public class GraphStatistics {
 	 * @return the degree correlation.
 	 */
 	public static double degreeDegreeCorrelation(Graph g) {
-		double product = 0;
-		double sum = 0;
-		double squareSum = 0;
-
-		for (Edge e : g.getEdges()) {
-			Vertex v1 = e.getVertices().getFirst();
-			Vertex v2 = e.getVertices().getSecond();
-			int d_v1 = v1.getEdges().size();
-			int d_v2 = v2.getEdges().size();
-
-			sum += 0.5 * (d_v1 + d_v2);
-			squareSum += 0.5 * (Math.pow(d_v1, 2) + Math.pow(d_v2, 2));
-			product += d_v1 * d_v2;			
-		}
-		
-		double norm = 1 / (double)g.getEdges().size();
-		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
+		return degree.assortativity(g);
+//		double product = 0;
+//		double sum = 0;
+//		double squareSum = 0;
+//
+//		for (Edge e : g.getEdges()) {
+//			Vertex v1 = e.getVertices().getFirst();
+//			Vertex v2 = e.getVertices().getSecond();
+//			int d_v1 = v1.getEdges().size();
+//			int d_v2 = v2.getEdges().size();
+//
+//			sum += 0.5 * (d_v1 + d_v2);
+//			squareSum += 0.5 * (Math.pow(d_v1, 2) + Math.pow(d_v2, 2));
+//			product += d_v1 * d_v2;			
+//		}
+//		
+//		double norm = 1 / (double)g.getEdges().size();
+//		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
 	}
 	
 	/**

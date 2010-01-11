@@ -40,7 +40,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -49,7 +51,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.statistics.Distribution;
 

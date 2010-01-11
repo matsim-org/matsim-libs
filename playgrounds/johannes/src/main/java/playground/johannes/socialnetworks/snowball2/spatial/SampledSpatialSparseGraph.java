@@ -22,9 +22,9 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.SampledGraph;
 
 /**

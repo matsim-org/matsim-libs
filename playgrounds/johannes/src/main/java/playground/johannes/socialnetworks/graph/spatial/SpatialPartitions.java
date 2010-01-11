@@ -22,6 +22,8 @@ package playground.johannes.socialnetworks.graph.spatial;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;

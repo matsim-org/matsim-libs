@@ -20,10 +20,10 @@
 package playground.johannes.socialnetworks.snowball2.spatial.io;
 
 import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphML;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.Attributes;
 
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphML;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraphBuilder;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseEdge;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;

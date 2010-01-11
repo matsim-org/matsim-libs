@@ -22,24 +22,36 @@ package playground.johannes.socialnetworks.snowball2;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Collection;
+import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.Degree;
+import org.matsim.contrib.sna.graph.Vertex;
+
+import playground.johannes.socialnetworks.graph.analysis.Degree;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDegree<V extends SampledVertex> extends Degree<V> {
+public class SampledDegree extends Degree {
 
 	@Override
-	public Distribution distribution(Collection<V> vertices) {
-		return super.distribution(SnowballPartitions.createSampledPartition(vertices));
+	public Distribution distribution(Set<? extends Vertex> vertices) {
+		Set<SampledVertex> set = SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>)vertices);
+		return super.distribution(set);
 	}
 
 	@Override
-	public TObjectDoubleHashMap<V> values(Collection<V> vertices) {
-		return super.values(SnowballPartitions.createSampledPartition(vertices));
+	public TObjectDoubleHashMap<? extends SampledVertex> values(Collection<? extends Vertex> vertices) {
+		return (TObjectDoubleHashMap<? extends SampledVertex>) super.values(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>) vertices));
+	}
+	
+	public static void test() {
+		SampledGraph graph = new SampledSpatialSparseGraph(null);
+		
+		SampledDegree degree = new SampledDegree();
+		double k_mean = degree.distribution(graph.getVertices()).mean();
 	}
 
 }

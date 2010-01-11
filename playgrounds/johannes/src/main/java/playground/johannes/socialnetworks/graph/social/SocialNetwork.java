@@ -28,10 +28,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 /**
  * @author illenberger

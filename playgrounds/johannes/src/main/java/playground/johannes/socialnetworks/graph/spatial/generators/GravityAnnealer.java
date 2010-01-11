@@ -29,6 +29,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.xml.sax.SAXException;
@@ -40,8 +42,6 @@ import playground.johannes.socialnetworks.graph.mcmc.ErgmTriangles;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitch;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 
 /**
  * @author illenberger

@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
@@ -31,7 +32,6 @@ import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
-import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.statistics.Distribution;
 

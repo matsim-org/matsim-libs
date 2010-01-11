@@ -27,16 +27,16 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.ConditionalDistribution;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 /**
  * @author illenberger

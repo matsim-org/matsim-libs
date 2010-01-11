@@ -26,6 +26,10 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
@@ -34,16 +38,12 @@ import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixStatistics;
 import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorizer;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;

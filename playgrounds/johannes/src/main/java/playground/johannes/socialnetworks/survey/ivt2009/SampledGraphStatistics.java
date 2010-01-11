@@ -21,6 +21,7 @@ package playground.johannes.socialnetworks.survey.ivt2009;
 
 import gnu.trove.TDoubleDoubleHashMap;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Graph;
@@ -50,15 +51,15 @@ public class SampledGraphStatistics {
 	}
 	
 	public static <V extends SampledVertex & SpatialVertex, G extends SpatialGraph & SampledGraph> Distribution edgeLenghtDistribution(Graph g) {
-		return SpatialGraphStatistics.edgeLengthDistribution(SnowballPartitions.createSampledPartition((Set<V>)(g.getVertices())));
+		return SpatialGraphStatistics.edgeLengthDistribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Collection<? extends SampledVertex>) (g.getVertices())));
 	}
 	
 	public static <V extends SampledVertex & SpatialVertex> Distribution edgeLenghtDistribution(Graph g, ZoneLayer zones) {
-		return SpatialGraphStatistics.edgeLengthDistribution(SnowballPartitions.createSampledPartition((Set<V>)g.getVertices()), zones);
+		return SpatialGraphStatistics.edgeLengthDistribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<V>)g.getVertices()), zones);
 	}
 	
 	public static <V extends SampledVertex & SpatialVertex> TDoubleDoubleHashMap edgeLengthDegreeCorrelation(Set<V> vertices) {
-		return SpatialGraphStatistics.edgeLengthDegreeCorrelation(SnowballPartitions.createSampledPartition(vertices));
+		return SpatialGraphStatistics.edgeLengthDegreeCorrelation((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition(vertices));
 	}
 	
 //	public static Distribution normalizedEdgeLengthDistribution(SampledSocialNet<?> g, SpatialGraph g2, double descretization) {

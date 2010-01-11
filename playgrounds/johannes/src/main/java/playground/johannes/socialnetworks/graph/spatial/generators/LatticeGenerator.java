@@ -19,15 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
+import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
+
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmDensity;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
-import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

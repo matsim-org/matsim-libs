@@ -37,9 +37,9 @@ import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.io.GraphMLWriter;
 
 import playground.johannes.socialnetworks.graph.Partitions;
-import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
 
 /**
  * @author illenberger

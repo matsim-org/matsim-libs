@@ -24,15 +24,15 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
-import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**

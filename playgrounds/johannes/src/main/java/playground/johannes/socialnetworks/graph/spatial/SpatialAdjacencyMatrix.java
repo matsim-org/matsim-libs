@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import gnu.trove.TIntArrayList;

@@ -32,9 +32,9 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.io.GraphMLWriter;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 import playground.johannes.socialnetworks.graph.social.SocialTie;

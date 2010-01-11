@@ -27,11 +27,11 @@ import gnu.trove.TIntIntHashMap;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**

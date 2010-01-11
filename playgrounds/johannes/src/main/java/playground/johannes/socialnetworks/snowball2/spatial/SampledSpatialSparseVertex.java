@@ -21,7 +21,8 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 
 import java.util.List;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+
 import playground.johannes.socialnetworks.snowball2.SampledVertex;
 import playground.johannes.socialnetworks.snowball2.SnowballAttributes;
 

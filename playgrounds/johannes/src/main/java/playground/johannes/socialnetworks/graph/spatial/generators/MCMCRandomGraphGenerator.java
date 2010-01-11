@@ -31,6 +31,9 @@ import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.xml.sax.SAXException;
@@ -41,11 +44,8 @@ import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
-import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 /**
  * @author illenberger

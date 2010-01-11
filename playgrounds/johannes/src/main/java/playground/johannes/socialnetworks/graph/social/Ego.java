@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

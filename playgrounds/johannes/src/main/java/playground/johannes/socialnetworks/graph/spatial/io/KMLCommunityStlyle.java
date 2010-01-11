@@ -25,9 +25,9 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 
 import net.opengis.kml._2.LinkType;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger

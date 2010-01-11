@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
+
 import playground.johannes.socialnetworks.snowball2.SampledEdge;
 
 /**

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Degree.java
+ * GraphAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph;
-
-import gnu.trove.TObjectDoubleHashMap;
+package playground.johannes.socialnetworks.graph.analysis;
 
 import java.util.Collection;
+import java.util.Map;
 
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
-
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
  *
  */
-public class Degree<V extends Vertex> {
+public class GraphAnalyzer {
 
-	public Distribution distribution(Collection<V> vertices) {
-		Distribution distribution = new Distribution();
-		for(V v : vertices)
-			distribution.add(v.getEdges().size());
+	public Map<String, String> analyze(Graph graph, GraphPropertyFactory factory) {
 		
-		return distribution;
-	}
-	
-	public TObjectDoubleHashMap<V> values(Collection<V> vertices) {
-		TObjectDoubleHashMap<V> values = new TObjectDoubleHashMap<V>();
-		for(V v : vertices)
-			values.put(v, v.getEdges().size());
-		
-		return values;
+		Degree degree = factory.getDegree();
+		double k_mean = degree.distribution(graph.getVertices()).mean();
+		return null;
 	}
 }

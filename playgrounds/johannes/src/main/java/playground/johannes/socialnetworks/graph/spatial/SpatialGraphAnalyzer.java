@@ -35,13 +35,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
 import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.Partitions;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
-import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;

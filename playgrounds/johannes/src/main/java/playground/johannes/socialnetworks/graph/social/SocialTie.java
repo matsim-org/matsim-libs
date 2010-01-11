@@ -25,9 +25,9 @@ package playground.johannes.socialnetworks.graph.social;
 
 import gnu.trove.TIntArrayList;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
 
 /**
  * @author illenberger

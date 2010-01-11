@@ -23,10 +23,10 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 
 /**
  * @author illenberger

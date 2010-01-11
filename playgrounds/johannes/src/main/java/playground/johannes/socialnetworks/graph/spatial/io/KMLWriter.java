@@ -44,13 +44,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.kml.KMZWriter;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger

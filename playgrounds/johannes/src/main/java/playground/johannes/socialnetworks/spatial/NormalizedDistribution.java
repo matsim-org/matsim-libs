@@ -21,9 +21,10 @@ package playground.johannes.socialnetworks.spatial;
 
 import java.io.IOException;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**

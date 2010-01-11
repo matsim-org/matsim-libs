@@ -19,11 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.io;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+
 import gnu.trove.TObjectDoubleHashMap;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger

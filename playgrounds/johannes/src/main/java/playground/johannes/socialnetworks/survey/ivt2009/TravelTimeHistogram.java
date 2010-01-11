@@ -28,13 +28,14 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
@@ -98,7 +99,7 @@ public class TravelTimeHistogram {
 		/*
 		 * get sampled partition
 		 */
-		Set<? extends SampledSpatialSparseVertex> sbPartition = SnowballPartitions.createSampledPartition(graph.getVertices());
+		Set<? extends SampledSpatialVertex> sbPartition = (Set<? extends SampledSpatialVertex>) SnowballPartitions.createSampledPartition(graph.getVertices());
 //		TDoubleObjectHashMap<?> partitions = SpatialGraphStatistics.createDensityPartitions(sbPartition, densityZones, 2000);
 		
 		new File(output + "rhoPartitions").mkdirs();

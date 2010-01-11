@@ -33,12 +33,12 @@ import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.StyleType;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.kml.KMZWriter;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger

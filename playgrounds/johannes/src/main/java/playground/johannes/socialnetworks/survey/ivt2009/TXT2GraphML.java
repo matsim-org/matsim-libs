@@ -29,6 +29,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -40,7 +41,6 @@ import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraphB
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
-import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
