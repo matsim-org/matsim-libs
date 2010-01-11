@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeCleanupEvent
+ * QueueSimulationBeforeSimStepListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,19 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.events;
+package org.matsim.core.mobsim.queuesim.listener;
 
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEvent;
 
 
 /**
- * A simple interface for QueueSimulationEvents that are fired for every time step.
- * 
- * @author mrieser
+ *  Listeners of QueueSimulation should implement this if they want to be 
+ *  notified after QueueSimulation.beforeSimStep() was invoked.
+ * @author dgrether
+ *
  */
-public interface QueueSimulationAfterSimStepEvent<T extends Simulation> 
-	extends QueueSimulationEvent<T>{
+public interface SimulationBeforeSimStepListener<T extends Simulation> extends SimulationListener<T> {
 
-	public double getSimulationTime();
-
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent<T> e);
+	
 }

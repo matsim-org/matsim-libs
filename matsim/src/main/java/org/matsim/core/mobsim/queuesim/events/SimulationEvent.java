@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeCleanupListener
+ * QueueSimulationEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,21 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.core.mobsim.queuesim.listener;
+package org.matsim.core.mobsim.queuesim.events;
 
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
+
 
 /**
- * This interface can be implemented when a notification is needed after the
- * QueueSimulation has performed a simulation step.
+ * A common type definition for all QueueSimulationEvents that
+ * provides a backpointer to the QueueSimulation object.
+ * @author dgrether
  *
- * @author mrieser
  */
-public interface QueueSimulationAfterSimStepListener<T extends Simulation> extends
-		QueueSimulationListener<T> {
-
-	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent<T> e);
+public interface SimulationEvent<T extends Simulation> {
+	/**
+	 * 
+	 * @return the QueueSimulaiton instance by which the event
+	 * is fired.
+	 */
+	public T getQueueSimulation();
 	
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationInitializedListener
+ * QueueSimulationInitializedEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
+package org.matsim.core.mobsim.queuesim.events;
 
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 
 
 /**
- * Implement this listener interface if you want to be notified when the QueueSimulation's
- * setup process is completed.
+ * Just a tagging interface for QueueSimulationEvents that are fired
+ * when the simulation is initialized.
  * @author dgrether
  *
  */
-public interface QueueSimulationInitializedListener<T extends Simulation> extends QueueSimulationListener<T> {
-
-	public void notifySimulationInitialized(QueueSimulationInitializedEvent<T> e);
-	
+public interface SimulationInitializedEvent<T extends Simulation> 
+extends SimulationEvent<T>{
 }

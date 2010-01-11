@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationListener
+ * QueueSimulationBeforeSimStepEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,18 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
-
-import java.util.EventListener;
+package org.matsim.core.mobsim.queuesim.events;
 
 import org.matsim.core.mobsim.framework.Simulation;
 
 
 /**
- * A tagging interface that all QueueSimulationListeners must extend.
  * @author dgrether
- *
  */
-public interface QueueSimulationListener<T extends Simulation> extends EventListener {
+public class SimulationBeforeSimStepEventImpl<T extends Simulation> extends AbstractSimulationEvent<T>  
+	implements SimulationBeforeSimStepEvent<T> {
 
+	private double time;
+
+	public SimulationBeforeSimStepEventImpl(T queuesim, double time) {
+		super(queuesim);
+		this.time = time;
+	}
+
+	/**
+	 * @see org.matsim.core.mobsim.queuesim.events.SimulationBeforeSimStepEvent#getSimulationTime()
+	 */
+	public double getSimulationTime() {
+		return this.time;
+	}
 }

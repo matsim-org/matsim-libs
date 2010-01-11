@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractQueueSimulationEvent
+ * QueueSimulationBeforeCleanupEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,25 +23,14 @@ import org.matsim.core.mobsim.framework.Simulation;
 
 
 /**
- * An abstract superclass for all classes implementing the
- * QueueSimulationEvent interface.
  * @author dgrether
- *
+ * @see SimulationBeforeCleanupEvent
  */
-public abstract class AbstractQueueSimulationEvent<T extends Simulation> implements
-		QueueSimulationEvent<T> {
-	
-	private T queuesim;
+public class SimulationBeforeCleanupEventImpl<T extends Simulation> extends
+		AbstractSimulationEvent<T> implements SimulationBeforeCleanupEvent<T> {
 
-	public AbstractQueueSimulationEvent(T queuesim){
-		this.queuesim = queuesim;
-	}
-	
-	/**
-	 * @see org.matsim.core.mobsim.queuesim.events.QueueSimulationEvent#getQueueSimulation()
-	 */
-	public T getQueueSimulation() {
-		return this.queuesim;
+	public SimulationBeforeCleanupEventImpl(T queuesim) {
+		super(queuesim);
 	}
 
 }

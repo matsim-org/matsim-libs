@@ -88,7 +88,7 @@ import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.parallel.PJDEQSimulation;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationListener;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -214,7 +214,7 @@ public class Controler {
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
-	private final List<QueueSimulationListener> queueSimulationListener = new ArrayList<QueueSimulationListener>();
+	private final List<SimulationListener> simulationListener = new ArrayList<SimulationListener>();
 
 	private final Thread shutdownHook = new Thread() {
 		@Override
@@ -813,7 +813,7 @@ public class Controler {
 			    ((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
 			  }
 			  if (simulation instanceof ObservableSimulation){
-          for (QueueSimulationListener l : this.getQueueSimulationListener()) {
+          for (SimulationListener l : this.getQueueSimulationListener()) {
             ((ObservableSimulation)simulation).addQueueSimulationListeners(l);
           }
 			  }
@@ -1333,8 +1333,8 @@ public class Controler {
 		System.exit(0);
 	}
 
-	public List<QueueSimulationListener> getQueueSimulationListener() {
-		return this.queueSimulationListener;
+	public List<SimulationListener> getQueueSimulationListener() {
+		return this.simulationListener;
 	}
 
 	public PlansScoring getPlansScoring() {

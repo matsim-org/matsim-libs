@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationEvent
+ * QueueSimulationInitializedListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.events;
+package org.matsim.core.mobsim.queuesim.listener;
 
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.queuesim.events.SimulationInitializedEvent;
 
 
 /**
- * A common type definition for all QueueSimulationEvents that
- * provides a backpointer to the QueueSimulation object.
+ * Implement this listener interface if you want to be notified when the QueueSimulation's
+ * setup process is completed.
  * @author dgrether
  *
  */
-public interface QueueSimulationEvent<T extends Simulation> {
-	/**
-	 * 
-	 * @return the QueueSimulaiton instance by which the event
-	 * is fired.
-	 */
-	public T getQueueSimulation();
+public interface SimulationInitializedListener<T extends Simulation> extends SimulationListener<T> {
+
+	public void notifySimulationInitialized(SimulationInitializedEvent<T> e);
 	
 }

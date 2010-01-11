@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.SimulationAfterSimStepEvent;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -63,7 +63,7 @@ public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCas
 		assertEquals("wrong number of invocations.", 6, beforeStepMockListener.getCount());
 	}
 	
-	public static class MockBeforeQueueSimStepListener implements QueueSimulationAfterSimStepListener {
+	public static class MockBeforeQueueSimStepListener implements SimulationAfterSimStepListener {
 
 		
 		private static final Logger log = Logger
@@ -77,7 +77,7 @@ public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCas
 			this.expectedTimeDiff = expectedTimeDifference;
 		}
 		
-		public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
+		public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
 			if (this.previousTime >= 0.0) {
 				assertEquals("wrong time difference between two BeforeSimStepEvents.", 
 						this.expectedTimeDiff, e.getSimulationTime() - this.previousTime, EPSILON);
@@ -92,7 +92,7 @@ public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCas
 		}
 	}
 	
-	public static class MockQueueSimStepListener implements QueueSimulationAfterSimStepListener {
+	public static class MockQueueSimStepListener implements SimulationAfterSimStepListener {
 
 		private static final Logger log = Logger
 				.getLogger(QueueSimulationBeforeAfterSimStepListenerTest.MockQueueSimStepListener.class);
@@ -105,7 +105,7 @@ public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCas
 			this.expectedTimeDiff = expectedTimeDifference;
 		}
 		
-		public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
+		public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
 			if (this.previousTime >= 0.0) {
 				assertEquals("wrong time difference between two AfterSimStepEvents.", 
 						this.expectedTimeDiff, e.getSimulationTime() - this.previousTime, EPSILON);

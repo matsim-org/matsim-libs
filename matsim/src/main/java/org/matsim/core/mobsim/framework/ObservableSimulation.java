@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework;
 
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationListener;
 
 
 /**
@@ -30,5 +30,5 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
  */
 public interface ObservableSimulation extends Simulation {
 
-  public void addQueueSimulationListeners(final QueueSimulationListener listener);
+  public void addQueueSimulationListeners(final SimulationListener listener);
 }

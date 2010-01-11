@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationInitializedEvent
+ * QueueSimulationListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,17 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.events;
+package org.matsim.core.mobsim.queuesim.listener;
+
+import java.util.EventListener;
 
 import org.matsim.core.mobsim.framework.Simulation;
 
 
 /**
- * Just a tagging interface for QueueSimulationEvents that are fired
- * when the simulation is initialized.
+ * A tagging interface that all QueueSimulationListeners must extend.
  * @author dgrether
  *
  */
-public interface QueueSimulationInitializedEvent<T extends Simulation> 
-extends QueueSimulationEvent<T>{
+public interface SimulationListener<T extends Simulation> extends EventListener {
+
 }

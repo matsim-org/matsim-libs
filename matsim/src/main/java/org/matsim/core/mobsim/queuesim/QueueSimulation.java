@@ -52,8 +52,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationListenerManager;
+import org.matsim.core.mobsim.queuesim.listener.SimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -120,7 +120,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	private AgentFactory agentFactory;
 
-	private QueueSimListenerManager<QueueSimulation> listenerManager;
+	private SimulationListenerManager<QueueSimulation> listenerManager;
 
 	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
@@ -147,7 +147,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 */
 	public QueueSimulation(final Network network, final Population plans, final EventsManager events) {
 		// In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
-		this.listenerManager = new QueueSimListenerManager(this);
+		this.listenerManager = new SimulationListenerManager(this);
 		AbstractSimulation.reset();
 		this.config = Gbl.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
@@ -178,7 +178,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * listener to this QueueSimulation instance.
 	 * @param listeners
 	 */
-	public void addQueueSimulationListeners(final QueueSimulationListener listener){
+	public void addQueueSimulationListeners(final SimulationListener listener){
 				this.listenerManager.addQueueSimulationListener(listener);
 	}
 

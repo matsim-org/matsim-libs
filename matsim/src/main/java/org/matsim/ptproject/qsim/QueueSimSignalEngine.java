@@ -29,7 +29,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
+import org.matsim.core.mobsim.queuesim.listener.SimulationListener;
 import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
 import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
@@ -176,8 +176,8 @@ public class QueueSimSignalEngine implements SignalEngine {
 				this.initSignalSystemControlerDefaults(systemControler, config);
 				this.signalSystemControlerBySystemId.put(config.getSignalSystemId(), systemControler);
 				systemControler.setSignalEngine(this);
-				if (systemControler instanceof QueueSimulationListener) {
-					this.simulation.addQueueSimulationListeners((QueueSimulationListener)systemControler);
+				if (systemControler instanceof SimulationListener) {
+					this.simulation.addQueueSimulationListeners((SimulationListener)systemControler);
 				}
 				//add controller to signal groups
 				List<SignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
