@@ -21,7 +21,14 @@ package playground.kai.plansToPlans;
 
 import java.io.PrintWriter;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
@@ -30,7 +37,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.population.algorithms.PlansFilterByLegMode;
 
 /**
  * @author kn after mrieser
@@ -40,30 +47,43 @@ public class MyPlansToPlans {
 	private Config config;
 
 	public void run(final String[] args) {
-		this.config = Gbl.createConfig(new String[]{"../padang/dlr-network/pconfig.xml"});
-		new ConfigWriter(this.config).writeStream(new PrintWriter(System.out));
-		ScenarioImpl scenario = new ScenarioImpl(this.config);
+//		this.config = Gbl.createConfig(new String[]{"../padang/dlr-network/pconfig.xml"});
+//		new ConfigWriter(this.config).writeStream(new PrintWriter(System.out));
 
-//		final World world = Gbl.getWorld();
+//		ScenarioImpl scenario = new ScenarioImpl(this.config);
 //
-//		if (this.config.world().getInputFile() != null) {
-//			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-//			worldReader.readFile(this.config.world().getInputFile());
-//		}
-
-		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-
-		final PopulationImpl plans = scenario.getPopulation();
-		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plansWriter.startStreaming(this.config.plans().getOutputFile());
-//		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
-		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
-		plansReader.readFile(this.config.plans().getInputFile());
-		plans.printPlansCount();
-		plansWriter.closeStreaming();
+////		final World world = Gbl.getWorld();
+////
+////		if (this.config.world().getInputFile() != null) {
+////			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+////			worldReader.readFile(this.config.world().getInputFile());
+////		}
+//
+//		NetworkLayer network = scenario.getNetwork();
+//		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+//
+//		final PopulationImpl plans = scenario.getPopulation();
+//		plans.setIsStreaming(true);
+//		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
+//		final PopulationWriter plansWriter = new PopulationWriter(plans);
+//		plansWriter.startStreaming(this.config.plans().getOutputFile());
+////		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
+//		plans.addAlgorithm(new org.matsim.population.algorithms.PlansFilterByLegMode(TransportMode.pt,false));
+//		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
+//		plansReader.readFile(this.config.plans().getInputFile());
+//		plans.printPlansCount();
+//		plansWriter.closeStreaming();
+		
+		ScenarioLoader sl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader(
+				"../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/vis_configs/otfvis_config_900s_small_moyo_parameterized.xml") ;
+		Scenario sc = sl.loadScenario() ;
+		Population pop = sc.getPopulation();
+		
+		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.pt, false ) ;
+		pf.run(pop) ;
+		
+		PopulationWriter popwriter = new PopulationWriter(pop) ;
+		popwriter.write("./output/pop.xml") ;
 
 		System.out.println("done.");
 	}
