@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAdaptivePlanbasedSignalSystemControlInfoImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,37 +18,44 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.config;
 
-import java.util.List;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
+/**
+ * 
+ * @author dgrether
+ *
+ */
+public interface SignalSystemPlan {
 
+	public void setStartTime(double seconds);
 
+	public void setEndTime(double seconds);
 
-public class BasicAdaptivePlanbasedSignalSystemControlInfoImpl extends BasicPlanBasedSignalSystemControlInfoImpl implements
-BasicAdaptivePlanBasedSignalSystemControlInfo {
+	public Id getId();
 
-	BasicAdaptiveSignalSystemControlInfo delegate;
+	public void addLightSignalGroupConfiguration(
+			SignalGroupSettings groupConfig);
 
-	BasicAdaptivePlanbasedSignalSystemControlInfoImpl(){
-		this.delegate = new BasicAdaptiveSignalSystemControlInfoImpl();
-	}
+	public double getStartTime();
 
-	public void addSignalGroupId(Id id) {
-		delegate.addSignalGroupId(id);
-	}
+	public double getEndTime();
 
-	public String getAdaptiveControlerClass() {
-		return delegate.getAdaptiveControlerClass();
-	}
+	public SortedMap<Id, SignalGroupSettings> getGroupConfigs();
 
-	public List<Id> getSignalGroupIds() {
-		return delegate.getSignalGroupIds();
-	}
+	public void setCycleTime(Integer circulationTimeSec);
 
-	public void setAdaptiveControlerClass(String adaptiveControler) {
-		delegate.setAdaptiveControlerClass(adaptiveControler);
-	}
+	public void setSynchronizationOffset(Integer seconds);
+
+	public Integer getSynchronizationOffset();
+
+	public Integer getCycleTime();
 	
+	public Integer getPowerOnTime();
 	
+	public void setPowerOnTime(Integer powerOnTime);
 	
+	public Integer getPowerOffTime();
+	
+	public void setPowerOffTime(Integer powerOffTime);
 }

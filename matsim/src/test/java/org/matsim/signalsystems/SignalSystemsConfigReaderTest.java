@@ -21,14 +21,14 @@ package org.matsim.signalsystems;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.signalsystems.config.BasicAdaptivePlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalGroupSettings;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
-import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -53,7 +53,7 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
   
   
   public void testParser() {
-  	BasicSignalSystemConfigurations lssConfigs = new BasicSignalSystemConfigurationsImpl();
+  	SignalSystemConfigurations lssConfigs = new SignalSystemConfigurationsImpl();
   	MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(lssConfigs);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   }
@@ -61,7 +61,7 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
   public void testWriter() {
   	String testoutput = this.getOutputDirectory()  + "testLssConfigOutput.xml";
   	//read the test file
-  	BasicSignalSystemConfigurations lssConfigs = new BasicSignalSystemConfigurationsImpl();
+  	SignalSystemConfigurations lssConfigs = new SignalSystemConfigurationsImpl();
   	MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(lssConfigs);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
 
@@ -69,21 +69,21 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
   	MatsimSignalSystemConfigurationsWriter writer = new MatsimSignalSystemConfigurationsWriter(lssConfigs);
   	writer.writeFile(testoutput);
   	
-  	lssConfigs = new BasicSignalSystemConfigurationsImpl();
+  	lssConfigs = new SignalSystemConfigurationsImpl();
   	reader = new MatsimSignalSystemConfigurationsReader(lssConfigs);
   	reader.readFile(testoutput);
   	checkContent(lssConfigs);
   }
 
-	private void checkContent(BasicSignalSystemConfigurations lssConfigs) {
+	private void checkContent(SignalSystemConfigurations lssConfigs) {
 		assertEquals(4, lssConfigs.getSignalSystemConfigurations().size());
 		//test first
-		BasicSignalSystemConfiguration lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id23);
+		SignalSystemConfiguration lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id23);
 		assertNotNull(lssConfiguration);
 		assertEquals(id23, lssConfiguration.getSignalSystemId());
-		BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
+		PlanBasedSignalSystemControlInfo controlInfo = (PlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
 		assertNotNull(controlInfo);
-		BasicSignalSystemPlan plan =   controlInfo.getPlans().get(id5);
+		SignalSystemPlan plan =   controlInfo.getPlans().get(id5);
 		assertNotNull(plan);
 		assertEquals(id5, plan.getId());
 		assertEquals(0.0, plan.getStartTime(), EPSILON);
@@ -92,7 +92,7 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(Integer.valueOf(3), plan.getSynchronizationOffset());
 		
 		assertEquals(1, plan.getGroupConfigs().size());
-		BasicSignalGroupSettings groupConfig = plan.getGroupConfigs().get(id23);
+		SignalGroupSettings groupConfig = plan.getGroupConfigs().get(id23);
 		assertNotNull(groupConfig);
 		assertEquals(0.0, groupConfig.getRoughCast(), EPSILON);
 		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
@@ -103,7 +103,7 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 		lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id42);
 		assertNotNull(lssConfiguration);
 		assertEquals(id42, lssConfiguration.getSignalSystemId());
-		controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
+		controlInfo = (PlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
 		assertNotNull(controlInfo);
 		plan =   controlInfo.getPlans().get(id8);
 		assertNotNull(plan);
@@ -124,7 +124,7 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 		lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id43);
 		assertNotNull(lssConfiguration);
 		assertEquals(id43, lssConfiguration.getSignalSystemId());
-		BasicAdaptiveSignalSystemControlInfo adaptiveControlInfo = (BasicAdaptiveSignalSystemControlInfo) lssConfiguration.getControlInfo();
+		AdaptiveSignalSystemControlInfo adaptiveControlInfo = (AdaptiveSignalSystemControlInfo) lssConfiguration.getControlInfo();
 		assertNotNull(adaptiveControlInfo);
 		assertEquals("org.matism.nonexistingpackage.Nonexistingcontroler", adaptiveControlInfo.getAdaptiveControlerClass());
 		assertEquals(2, adaptiveControlInfo.getSignalGroupIds().size());
@@ -136,7 +136,7 @@ public class SignalSystemsConfigReaderTest extends MatsimTestCase {
 		lssConfiguration = lssConfigs.getSignalSystemConfigurations().get(id24);
 		assertNotNull(lssConfiguration);
 		assertEquals(id24, lssConfiguration.getSignalSystemId());
-		BasicAdaptivePlanBasedSignalSystemControlInfo adaptivePbControlInfo = (BasicAdaptivePlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
+		AdaptivePlanBasedSignalSystemControlInfo adaptivePbControlInfo = (AdaptivePlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
 		assertNotNull(adaptivePbControlInfo);
 		assertEquals("org.matism.nonexistingpackage.Nonexistingcontroler", adaptiveControlInfo.getAdaptiveControlerClass());
 		assertEquals(2, adaptivePbControlInfo.getSignalGroupIds().size());

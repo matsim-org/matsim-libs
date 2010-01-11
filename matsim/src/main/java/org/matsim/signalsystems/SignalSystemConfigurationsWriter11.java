@@ -49,23 +49,23 @@ import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLPowerOnT
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStart;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStop;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLSynchronizationOffset;
-import org.matsim.signalsystems.config.BasicAdaptivePlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalGroupSettings;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 
 
 public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
 
 	
-	private BasicSignalSystemConfigurations blssconfs;
+	private SignalSystemConfigurations blssconfs;
 	private XMLSignalSystemConfig xmllssconfig;
 
-	public SignalSystemConfigurationsWriter11(BasicSignalSystemConfigurations basiclssconfigs) {
+	public SignalSystemConfigurationsWriter11(SignalSystemConfigurations basiclssconfigs) {
 		this.blssconfs = basiclssconfigs;
 		try {
 			this.xmllssconfig = convertBasicToXml();
@@ -97,7 +97,7 @@ public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
 		ObjectFactory fac = new ObjectFactory();
 		XMLSignalSystemConfig xmllssconf = fac.createXMLSignalSystemConfig();
 		
-		for (BasicSignalSystemConfiguration lssconf : this.blssconfs.getSignalSystemConfigurations().values()) {
+		for (SignalSystemConfiguration lssconf : this.blssconfs.getSignalSystemConfigurations().values()) {
 			XMLSignalSystemConfigurationType xmllssconfiguration = fac.createXMLSignalSystemConfigurationType();
 			xmllssconfiguration.setRefId(lssconf.getSignalSystemId().toString());
 			
@@ -109,36 +109,36 @@ public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
 		return xmllssconf;
 	}
 
-	private XMLSignalSystemControlInfoType convertBasicControlInfoToXml(BasicSignalSystemControlInfo controlInfo, ObjectFactory fac) throws DatatypeConfigurationException {
+	private XMLSignalSystemControlInfoType convertBasicControlInfoToXml(SignalSystemControlInfo controlInfo, ObjectFactory fac) throws DatatypeConfigurationException {
 		XMLSignalSystemControlInfoType control = null;
-		if (controlInfo instanceof BasicAdaptivePlanBasedSignalSystemControlInfo){
+		if (controlInfo instanceof AdaptivePlanBasedSignalSystemControlInfo){
 			XMLAdaptivePlanbasedSignalSystemControlInfoType xmladaptivepbcontrolinfo = fac.createXMLAdaptivePlanbasedSignalSystemControlInfoType();
 			control = xmladaptivepbcontrolinfo;
-			BasicAdaptivePlanBasedSignalSystemControlInfo adaptivepbcontrolinfo = (BasicAdaptivePlanBasedSignalSystemControlInfo) controlInfo ;
+			AdaptivePlanBasedSignalSystemControlInfo adaptivepbcontrolinfo = (AdaptivePlanBasedSignalSystemControlInfo) controlInfo ;
 			xmladaptivepbcontrolinfo.setAdaptiveControler(adaptivepbcontrolinfo.getAdaptiveControlerClass());
 			for (Id id :  adaptivepbcontrolinfo.getSignalGroupIds()){
 				XMLIdRefType xmlid = new XMLIdRefType();
 				xmlid.setRefId(id.toString());
 				xmladaptivepbcontrolinfo.getSignalGroup().add(xmlid);
 			}
-			for (BasicSignalSystemPlan plan : adaptivepbcontrolinfo.getPlans().values()) {
+			for (SignalSystemPlan plan : adaptivepbcontrolinfo.getPlans().values()) {
 				XMLSignalSystemPlanType xmlplan = this.convertBasicPlanToXmlPlan(plan, fac);
 				xmladaptivepbcontrolinfo.getSignalSystemPlan().add(xmlplan);
 			}
 		}
-		else if (controlInfo instanceof BasicPlanBasedSignalSystemControlInfo) {
+		else if (controlInfo instanceof PlanBasedSignalSystemControlInfo) {
 			XMLPlanbasedSignalSystemControlInfoType xmlplanlsscontrolinfo = fac.createXMLPlanbasedSignalSystemControlInfoType();
 			control = xmlplanlsscontrolinfo;
-			BasicPlanBasedSignalSystemControlInfo pbcontrolinfo = (BasicPlanBasedSignalSystemControlInfo) controlInfo;
-			for (BasicSignalSystemPlan plan : pbcontrolinfo.getPlans().values()) {
+			PlanBasedSignalSystemControlInfo pbcontrolinfo = (PlanBasedSignalSystemControlInfo) controlInfo;
+			for (SignalSystemPlan plan : pbcontrolinfo.getPlans().values()) {
 				XMLSignalSystemPlanType xmlplan = this.convertBasicPlanToXmlPlan(plan, fac);
 				xmlplanlsscontrolinfo.getSignalSystemPlan().add(xmlplan);
 			}
 		}
-		else if (controlInfo instanceof BasicAdaptiveSignalSystemControlInfo){
+		else if (controlInfo instanceof AdaptiveSignalSystemControlInfo){
 			XMLAdaptiveSignalSystemControlInfoType xmladaptivecontrolinfo = fac.createXMLAdaptiveSignalSystemControlInfoType();
 			control = xmladaptivecontrolinfo;
-			BasicAdaptiveSignalSystemControlInfo adaptivecontrolinfo = (BasicAdaptiveSignalSystemControlInfo) controlInfo ;
+			AdaptiveSignalSystemControlInfo adaptivecontrolinfo = (AdaptiveSignalSystemControlInfo) controlInfo ;
 			xmladaptivecontrolinfo.setAdaptiveControler(adaptivecontrolinfo.getAdaptiveControlerClass());
 			for (Id id :  adaptivecontrolinfo.getSignalGroupIds()){
 				XMLIdRefType xmlid = new XMLIdRefType();
@@ -153,7 +153,7 @@ public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
 	
 
 	private XMLSignalSystemPlanType convertBasicPlanToXmlPlan(
-			BasicSignalSystemPlan plan, ObjectFactory fac) throws DatatypeConfigurationException {
+			SignalSystemPlan plan, ObjectFactory fac) throws DatatypeConfigurationException {
 		XMLSignalSystemPlanType xmlplan = fac.createXMLSignalSystemPlanType();
 		xmlplan.setId(plan.getId().toString());
 		XMLStart start = new XMLStart();
@@ -184,7 +184,7 @@ public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
 		}
 		
 		//marshal SignalGroupConfigurations
-		for (BasicSignalGroupSettings lsgc : plan.getGroupConfigs().values()) {
+		for (SignalGroupSettings lsgc : plan.getGroupConfigs().values()) {
 			XMLSignalGroupSettingsType xmllsgc = fac.createXMLSignalGroupSettingsType();
 			xmllsgc.setRefId(lsgc.getReferencedSignalGroupId().toString());
 			XMLSignalGroupSettingsType.XMLRoughcast xmlrc = new XMLSignalGroupSettingsType.XMLRoughcast();

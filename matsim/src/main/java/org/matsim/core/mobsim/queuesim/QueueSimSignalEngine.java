@@ -31,11 +31,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
-import org.matsim.signalsystems.config.BasicAdaptivePlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.control.AdaptivePlanBasedSignalSystemControler;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControler;
 import org.matsim.signalsystems.control.DefaultPlanBasedSignalSystemController;
@@ -68,7 +68,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 
 	private SignalSystems signalSystems;
 
-	private BasicSignalSystemConfigurations signalSystemsConfig;
+	private SignalSystemConfigurations signalSystemsConfig;
 
 	private QueueNetwork network;
 
@@ -82,9 +82,9 @@ public class QueueSimSignalEngine implements SignalEngine {
 		this.events = QueueSimulation.getEvents();
 	}
 
-	public void setSignalSystems(final SignalSystems signalSystems, final BasicSignalSystemConfigurations basicSignalSystemConfigurations){
+	public void setSignalSystems(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
 		this.signalSystems = signalSystems;
-		this.signalSystemsConfig = basicSignalSystemConfigurations;
+		this.signalSystemsConfig = signalSystemConfigurations;
 	}
 	
 	/**
@@ -145,29 +145,29 @@ public class QueueSimSignalEngine implements SignalEngine {
 		}
 	}
 
-	private void initSignalSystemController(final BasicSignalSystemConfigurations basicSignalSystemConfigurations) {
+	private void initSignalSystemController(final SignalSystemConfigurations signalSystemConfigurations) {
 		this.signalSystemControlerBySystemId = new TreeMap<Id, SignalSystemController>();
-		for (BasicSignalSystemConfiguration config :
-			basicSignalSystemConfigurations.getSignalSystemConfigurations().values()) {
+		for (SignalSystemConfiguration config :
+			signalSystemConfigurations.getSignalSystemConfigurations().values()) {
 			SignalSystemController systemControler = null;
 			if (this.signalSystemControlerBySystemId.containsKey(config.getSignalSystemId())){
 				throw new IllegalStateException("SignalSystemControler for SignalSystem with id: " + config.getSignalSystemId() +
 						" already exists. Cannot add second SignalSystemControler for same system. Check your" +
 						" signal system's configuration file.");
 			}
-			if (config.getControlInfo() instanceof BasicAdaptivePlanBasedSignalSystemControlInfo) {
-				AdaptiveSignalSystemControler c = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config.getControlInfo());
+			if (config.getControlInfo() instanceof AdaptivePlanBasedSignalSystemControlInfo) {
+				AdaptiveSignalSystemControler c = createAdaptiveControler((AdaptiveSignalSystemControlInfo)config.getControlInfo());
 				if (!(c instanceof PlanBasedSignalSystemController)){
 					throw new IllegalArgumentException("Class " + c.getClass().getName() + "is no PlanBasedSignalSystemController instance. Check your configuration of the signal system control!");
 				}
 				AdaptivePlanBasedSignalSystemControler controler = (AdaptivePlanBasedSignalSystemControler) c;
 				systemControler = controler;
 			}
-			else if (config.getControlInfo() instanceof BasicAdaptiveSignalSystemControlInfo) {
-				AdaptiveSignalSystemControler controler = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config.getControlInfo());
+			else if (config.getControlInfo() instanceof AdaptiveSignalSystemControlInfo) {
+				AdaptiveSignalSystemControler controler = createAdaptiveControler((AdaptiveSignalSystemControlInfo)config.getControlInfo());
 				systemControler = controler;
 			}
-			else if (config.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo){
+			else if (config.getControlInfo() instanceof PlanBasedSignalSystemControlInfo){
 				DefaultPlanBasedSignalSystemController controler = new DefaultPlanBasedSignalSystemController(config);
 				systemControler = controler;
 			}
@@ -201,7 +201,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 	}
 
 	private AdaptiveSignalSystemControler createAdaptiveControler(
-			final BasicAdaptiveSignalSystemControlInfo config) {
+			final AdaptiveSignalSystemControlInfo config) {
 		String controllerName = config.getAdaptiveControlerClass();
 		AdaptiveSignalSystemControler controler = null;
 		if (controllerName == null){
@@ -219,7 +219,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 			try {
 				Class<? extends AdaptiveSignalSystemControler> klas = (Class<? extends AdaptiveSignalSystemControler>) Class.forName(config.getAdaptiveControlerClass());
 				Class[] args = new Class[1];
-				args[0] = BasicAdaptiveSignalSystemControlInfo.class;
+				args[0] = AdaptiveSignalSystemControlInfo.class;
 				Constructor<? extends AdaptiveSignalSystemControler> c = klas.getConstructor(args);
 				controler = c.newInstance(config);
 			} catch (ClassNotFoundException e) {
@@ -246,7 +246,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 
 
 
-	private void initSignalSystemControlerDefaults(final SignalSystemController controler, final BasicSignalSystemConfiguration config){
+	private void initSignalSystemControlerDefaults(final SignalSystemController controler, final SignalSystemConfiguration config){
 		SignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
 		controler.setDefaultCycleTime(systemDef.getDefaultCycleTime());
 		controler.setDefaultInterGreenTime(systemDef.getDefaultInterGreenTime());

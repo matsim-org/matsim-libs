@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,36 +16,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.signalsystems.config;
 
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-
 /**
+ * 
  * @author dgrether
+ *
  */
-public class BasicPlanBasedSignalSystemControlInfoImpl implements  BasicPlanBasedSignalSystemControlInfo {
+public interface PlanBasedSignalSystemControlInfo extends SignalSystemControlInfo {
 
-	private SortedMap<Id, BasicSignalSystemPlan> plans;
-	
-	/**
-	 * @see org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo#getPlans()
-	 */
-	public SortedMap<Id, BasicSignalSystemPlan> getPlans() {
-		return plans;
-	}
+	public SortedMap<Id, SignalSystemPlan> getPlans();
 
-	/**
-	 * @see org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo#addPlan(org.matsim.signalsystems.config.BasicSignalSystemPlan)
-	 */
-	public void addPlan(BasicSignalSystemPlan plan) {
-		if (this.plans == null) {
-			this.plans = new TreeMap<Id, BasicSignalSystemPlan>();
-		}
-		this.plans.put(plan.getId(), plan);
-	}
+	public void addPlan(SignalSystemPlan plan);
 
 }

@@ -20,7 +20,7 @@
 package org.matsim.signalsystems;
 
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
 
 
 /**
@@ -35,7 +35,7 @@ public class MatsimSignalSystemConfigurationsWriter {
 	 * Use this constructor to write the default xml format.
 	 * @param basiclss
 	 */
-	public MatsimSignalSystemConfigurationsWriter(BasicSignalSystemConfigurations basiclss) {
+	public MatsimSignalSystemConfigurationsWriter(SignalSystemConfigurations basiclss) {
 		this(new SignalSystemConfigurationsWriter11(basiclss));
 	}
 	

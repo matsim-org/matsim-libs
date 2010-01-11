@@ -26,8 +26,8 @@ import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.signalsystems.systems.SignalSystemsImpl;
 
@@ -71,7 +71,7 @@ public class MatsimXMLFormatConverter {
 	 */
 	public static void convertSignalSystemsV10ToV11(String signalsystemconfigsv10, String signalsystemconfigsv11){
 		//create containers
-		BasicSignalSystemConfigurations signalSystemConfigs = new BasicSignalSystemConfigurationsImpl();
+		SignalSystemConfigurations signalSystemConfigs = new SignalSystemConfigurationsImpl();
 		//read old format
 		MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(signalSystemConfigs);
 		reader.readFile(signalsystemconfigsv10);

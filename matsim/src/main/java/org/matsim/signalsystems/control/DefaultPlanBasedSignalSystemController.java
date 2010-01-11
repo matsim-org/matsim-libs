@@ -26,10 +26,10 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
 import org.matsim.ptproject.qsim.SimulationTimer;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalGroupSettings;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
@@ -48,19 +48,19 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 	private static final Logger log = Logger
 			.getLogger(DefaultPlanBasedSignalSystemController.class);
 	
-	private BasicSignalSystemConfiguration config;
+	private SignalSystemConfiguration config;
 
-	private BasicPlanBasedSignalSystemControlInfo plans;
+	private PlanBasedSignalSystemControlInfo plans;
 
 
-	public DefaultPlanBasedSignalSystemController(BasicSignalSystemConfiguration config) {
-		if (!(config.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo)) {
+	public DefaultPlanBasedSignalSystemController(SignalSystemConfiguration config) {
+		if (!(config.getControlInfo() instanceof PlanBasedSignalSystemControlInfo)) {
 			String message = "Cannot create a PlanBasedSignalSystemControler without a PlanBasedLightSignalSystemControlInfo instance!";
 			log.error(message);
 			throw new IllegalArgumentException(message);
 		}
 		this.config = config;
-		this.plans = (BasicPlanBasedSignalSystemControlInfo)config.getControlInfo();
+		this.plans = (PlanBasedSignalSystemControlInfo)config.getControlInfo();
 	}
 	
 	/**
@@ -77,7 +77,7 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 	
 	
 	private void updateSignalGroupStates(double time) {
-		BasicSignalSystemPlan activePlan = this.plans.getPlans().values().iterator().next();
+		SignalSystemPlan activePlan = this.plans.getPlans().values().iterator().next();
 		if (activePlan == null) {
 			String message = "No active plan for signalsystem id " + config.getSignalSystemId();
 			log.error(message);
@@ -98,7 +98,7 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 		int roughcast, dropping, endIntergreenRc, endIntergreenDrop;
 		SignalGroupState currentState, newState;
 		for (SignalGroupDefinition g : this.getSignalGroups().values()){
-			BasicSignalGroupSettings sgc = activePlan.getGroupConfigs().get(g.getId());
+			SignalGroupSettings sgc = activePlan.getGroupConfigs().get(g.getId());
 			currentState = this.getSignalGroupStates().get(g);
 			roughcast = sgc.getRoughCast();
 			dropping = sgc.getDropping();

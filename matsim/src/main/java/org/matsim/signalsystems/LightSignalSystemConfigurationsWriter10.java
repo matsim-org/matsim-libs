@@ -41,11 +41,11 @@ import org.matsim.jaxb.lightsignalsystemsconfig10.XMLPlanbasedlightSignalSystemC
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalGroupConfigurationType.XMLInterimTimeDropping;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType.XMLStart;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType.XMLStop;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalGroupSettings;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 
 
 /**
@@ -57,10 +57,10 @@ import org.matsim.signalsystems.config.BasicSignalSystemPlan;
 public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter{
 
 	
-	private BasicSignalSystemConfigurations blssconfs;
+	private SignalSystemConfigurations blssconfs;
 	private XMLLightSignalSystemConfig xmllssconfig;
 
-	public LightSignalSystemConfigurationsWriter10(BasicSignalSystemConfigurations basiclssconfigs) {
+	public LightSignalSystemConfigurationsWriter10(SignalSystemConfigurations basiclssconfigs) {
 		this.blssconfs = basiclssconfigs;
 		try {
 			this.xmllssconfig = convertBasicToXml();
@@ -92,14 +92,14 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 		ObjectFactory fac = new ObjectFactory();
 		XMLLightSignalSystemConfig xmllssconf = fac.createXMLLightSignalSystemConfig();
 		
-		for (BasicSignalSystemConfiguration lssconf : this.blssconfs.getSignalSystemConfigurations().values()) {
+		for (SignalSystemConfiguration lssconf : this.blssconfs.getSignalSystemConfigurations().values()) {
 			XMLLightSignalSystemConfigurationType xmllssconfiguration = fac.createXMLLightSignalSystemConfigurationType();
 			xmllssconfiguration.setRefId(lssconf.getSignalSystemId().toString());
 			
-			if (lssconf.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo) {
+			if (lssconf.getControlInfo() instanceof PlanBasedSignalSystemControlInfo) {
 				XMLPlanbasedlightSignalSystemControlInfoType xmlplanlsscontrolinfo = fac.createXMLPlanbasedlightSignalSystemControlInfoType();
-				BasicPlanBasedSignalSystemControlInfo pbcontrolinfo = (BasicPlanBasedSignalSystemControlInfo) lssconf.getControlInfo();
-				for (BasicSignalSystemPlan plan : pbcontrolinfo.getPlans().values()) {
+				PlanBasedSignalSystemControlInfo pbcontrolinfo = (PlanBasedSignalSystemControlInfo) lssconf.getControlInfo();
+				for (SignalSystemPlan plan : pbcontrolinfo.getPlans().values()) {
 					XMLLightSignalSystemPlanType xmlplan = fac.createXMLLightSignalSystemPlanType();
 					xmlplan.setId(plan.getId().toString());
 					XMLStart start = new XMLStart();
@@ -124,7 +124,7 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 					
 
 					//write lightSignalGroupConfigurations
-					for (BasicSignalGroupSettings lsgc : plan.getGroupConfigs().values()) {
+					for (SignalGroupSettings lsgc : plan.getGroupConfigs().values()) {
 						XMLLightSignalGroupConfigurationType xmllsgc = fac.createXMLLightSignalGroupConfigurationType();
 						xmllsgc.setRefId(lsgc.getReferencedSignalGroupId().toString());
 						XMLLightSignalGroupConfigurationType.XMLRoughcast xmlrc = new XMLLightSignalGroupConfigurationType.XMLRoughcast();

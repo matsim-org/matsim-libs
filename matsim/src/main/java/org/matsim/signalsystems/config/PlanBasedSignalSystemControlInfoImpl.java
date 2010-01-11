@@ -19,43 +19,33 @@
 
 package org.matsim.signalsystems.config;
 
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
 
 /**
  * @author dgrether
  */
-public class BasicSignalSystemConfigurationImpl implements BasicSignalSystemConfiguration {
+public class PlanBasedSignalSystemControlInfoImpl implements  PlanBasedSignalSystemControlInfo {
 
-	private final Id lightSignalSystemId;
-
-	private BasicSignalSystemControlInfo controlInfo;
-
-	public BasicSignalSystemConfigurationImpl(final Id lightSignalSystemId) {
-		this.lightSignalSystemId = lightSignalSystemId;
+	private SortedMap<Id, SignalSystemPlan> plans;
+	
+	/**
+	 * @see org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo#getPlans()
+	 */
+	public SortedMap<Id, SignalSystemPlan> getPlans() {
+		return plans;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemConfiguration#setSignalSystemControlInfo(org.matsim.signalsystems.config.BasicSignalSystemControlInfo)
+	 * @see org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo#addPlan(org.matsim.signalsystems.config.SignalSystemPlan)
 	 */
-	public void setSignalSystemControlInfo(
-			final BasicSignalSystemControlInfo controlInfo) {
-		this.controlInfo = controlInfo;
+	public void addPlan(SignalSystemPlan plan) {
+		if (this.plans == null) {
+			this.plans = new TreeMap<Id, SignalSystemPlan>();
+		}
+		this.plans.put(plan.getId(), plan);
 	}
-
-	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemConfiguration#getSignalSystemId()
-	 */
-	public Id getSignalSystemId() {
-		return this.lightSignalSystemId;
-	}
-
-	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemConfiguration#getControlInfo()
-	 */
-	public BasicSignalSystemControlInfo getControlInfo() {
-		return this.controlInfo;
-	}
-
-
 
 }

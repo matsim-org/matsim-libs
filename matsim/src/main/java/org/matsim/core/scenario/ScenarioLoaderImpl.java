@@ -43,7 +43,7 @@ import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.world.MatsimWorldReader;
 import org.xml.sax.SAXException;
@@ -185,7 +185,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 	private void loadSignalSystemConfigurations() {
 			if ((this.getScenario().getSignalSystemConfigurations() != null)
 					&& (this.config.signalSystems().getSignalSystemConfigFile() != null)) {
-				BasicSignalSystemConfigurations signalSystemConfigurations = this.getScenario()
+				SignalSystemConfigurations signalSystemConfigurations = this.getScenario()
 						.getSignalSystemConfigurations();
 				MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(
 						signalSystemConfigurations);

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicSignalSystemConfigurationsImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,14 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.signalsystems.config;
 
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
+
+
 /**
- * Currently just a marker interface for all ControlInfo subtypes
- * 
  * @author dgrether
+ *
  */
-public interface BasicSignalSystemControlInfo {
+public class SignalSystemConfigurationsImpl implements
+		SignalSystemConfigurations {
+
+	private final SignalSystemConfigurationsFactory factory = new SignalSystemConfigurationsFactory();
+	
+	private final SortedMap<Id, SignalSystemConfiguration> signalSystemConfigs = new TreeMap<Id, SignalSystemConfiguration>();
+
+	public SignalSystemConfigurationsImpl(){
+	}
+	
+	/**
+	 * @see org.matsim.signalsystems.config.SignalSystemConfigurations#getSignalSystemConfigurations()
+	 */
+	public SortedMap<Id, SignalSystemConfiguration> getSignalSystemConfigurations() {
+		return this.signalSystemConfigs;
+	}
+
+	public SignalSystemConfigurationsFactory getFactory() {
+		return this.factory;
+	}
+
+	public void addSignalSystemConfiguration(SignalSystemConfiguration systemConfig) {
+		this.signalSystemConfigs.put(systemConfig.getSignalSystemId(), systemConfig);
+	}
 
 }

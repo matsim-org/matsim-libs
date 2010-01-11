@@ -25,34 +25,34 @@ import org.matsim.core.api.internal.MatsimFactory;
 /**
  * @author dgrether
  */
-public class BasicSignalSystemConfigurationsFactory implements MatsimFactory {
+public class SignalSystemConfigurationsFactory implements MatsimFactory {
 
-	public BasicSignalSystemConfigurationsFactory(){}
+	public SignalSystemConfigurationsFactory(){}
 	
-	public BasicSignalSystemConfiguration createSignalSystemConfiguration(
+	public SignalSystemConfiguration createSignalSystemConfiguration(
 			Id refId) {
-		return new BasicSignalSystemConfigurationImpl(refId);
+		return new SignalSystemConfigurationImpl(refId);
 	}
 
-	public BasicPlanBasedSignalSystemControlInfo createPlanBasedSignalSystemControlInfo() {
-		return new BasicPlanBasedSignalSystemControlInfoImpl();
+	public PlanBasedSignalSystemControlInfo createPlanBasedSignalSystemControlInfo() {
+		return new PlanBasedSignalSystemControlInfoImpl();
 	}
 
-	public BasicSignalSystemPlan createSignalSystemPlan(Id id) {
-		return new BasicSignalSystemPlanImpl(id);
+	public SignalSystemPlan createSignalSystemPlan(Id id) {
+		return new SignalSystemPlanImpl(id);
 	}
 
-	public BasicSignalGroupSettings createSignalGroupSettings(
+	public SignalGroupSettings createSignalGroupSettings(
 			Id refid) {
-		return new BasicSignalGroupSettingsImpl(refid);
+		return new SignalGroupSettingsImpl(refid);
 	}
 
-	public BasicAdaptiveSignalSystemControlInfo createAdaptiveSignalSystemControlInfo() {
-		return new BasicAdaptiveSignalSystemControlInfoImpl();
+	public AdaptiveSignalSystemControlInfo createAdaptiveSignalSystemControlInfo() {
+		return new AdaptiveSignalSystemControlInfoImpl();
 	}
 
-	public BasicAdaptivePlanbasedSignalSystemControlInfoImpl createAdaptivePlanbasedSignalSystemControlInfo() {
-		return new BasicAdaptivePlanbasedSignalSystemControlInfoImpl();
+	public AdaptivePlanbasedSignalSystemControlInfoImpl createAdaptivePlanbasedSignalSystemControlInfo() {
+		return new AdaptivePlanbasedSignalSystemControlInfoImpl();
 	}
 
 }

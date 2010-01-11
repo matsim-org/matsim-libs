@@ -30,12 +30,12 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.LaneDefinitions;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalGroupSettings;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
-import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -87,16 +87,16 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(this);
 
-		BasicSignalSystemConfigurations lssConfigs = new BasicSignalSystemConfigurationsImpl();
+		SignalSystemConfigurations lssConfigs = new SignalSystemConfigurationsImpl();
   	MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(lssConfigs);
 		reader.readFile(lsaConfig);
-		for (BasicSignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
-			BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfig
+		for (SignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
+			PlanBasedSignalSystemControlInfo controlInfo = (PlanBasedSignalSystemControlInfo) lssConfig
 					.getControlInfo();
-			BasicSignalSystemPlan p = controlInfo.getPlans()
+			SignalSystemPlan p = controlInfo.getPlans()
 					.get(new IdImpl("2"));
 			p.setCycleTime(60);
-			BasicSignalGroupSettings group = p.getGroupConfigs().get(
+			SignalGroupSettings group = p.getGroupConfigs().get(
 					new IdImpl("100"));
 			group.setDropping(60);
 		}

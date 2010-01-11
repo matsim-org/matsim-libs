@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.control;
 
-import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 
 
 /**
@@ -30,13 +30,13 @@ import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
  */
 public abstract class AdaptiveSignalSystemControlerImpl extends AbstractSignalSystemController implements AdaptiveSignalSystemControler {
 
-	private BasicAdaptiveSignalSystemControlInfo controlInfo;
+	private AdaptiveSignalSystemControlInfo controlInfo;
 
-	public AdaptiveSignalSystemControlerImpl(BasicAdaptiveSignalSystemControlInfo controlInfo) {
+	public AdaptiveSignalSystemControlerImpl(AdaptiveSignalSystemControlInfo controlInfo) {
 		this.controlInfo = controlInfo;
 	}
 	
-	public BasicAdaptiveSignalSystemControlInfo getControlInfo(){
+	public AdaptiveSignalSystemControlInfo getControlInfo(){
 		return this.controlInfo;
 	}
 }

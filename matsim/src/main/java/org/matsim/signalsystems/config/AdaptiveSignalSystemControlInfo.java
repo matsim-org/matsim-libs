@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicAdaptiveSignalSystemControlInfo
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,30 +19,24 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.config;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
+
+
 /**
- * 
  * @author dgrether
  *
  */
-public interface BasicSignalGroupSettings {
+public interface AdaptiveSignalSystemControlInfo extends SignalSystemControlInfo{
 
-	public Integer getRoughCast();
+	void setAdaptiveControlerClass(String adaptiveControler);
 
-	public void setRoughCast(Integer roughCast);
+	void addSignalGroupId(Id id);
+	
+	List<Id> getSignalGroupIds();
 
-	public Integer getDropping();
-
-	public void setDropping(Integer dropping);
-
-	public Integer getInterimGreenTimeRoughcast();
-
-	public void setInterGreenTimeRoughcast(Integer interimTimeRoughcast);
-
-	public Integer getInterGreenTimeDropping();
-
-	public void setInterGreenTimeDropping(Integer interimTimeDropping);
-
-	public Id getReferencedSignalGroupId();
-
+	String getAdaptiveControlerClass();
+	
+	
 }

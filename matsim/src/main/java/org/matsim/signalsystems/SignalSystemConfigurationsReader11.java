@@ -39,15 +39,15 @@ import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfig;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfigurationType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType;
-import org.matsim.signalsystems.config.BasicAdaptivePlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalGroupSettings;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsFactory;
-import org.matsim.signalsystems.config.BasicSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsFactory;
+import org.matsim.signalsystems.config.SignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 import org.xml.sax.SAXException;
 
 
@@ -59,11 +59,11 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 
   private XMLSignalSystemConfig xmlLssConfig;
 	
-  private BasicSignalSystemConfigurationsFactory builder;
+  private SignalSystemConfigurationsFactory builder;
 
-	private BasicSignalSystemConfigurations lssConfigurations;
+	private SignalSystemConfigurations lssConfigurations;
   
-	public SignalSystemConfigurationsReader11(BasicSignalSystemConfigurations lssConfigs, String schemaLocation) {
+	public SignalSystemConfigurationsReader11(SignalSystemConfigurations lssConfigs, String schemaLocation) {
 		super(schemaLocation);
 		this.lssConfigurations = lssConfigs;
 		this.builder = this.lssConfigurations.getFactory();
@@ -83,10 +83,10 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 
 		//convert the parsed xml-instances to basic instances
 			for (XMLSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getSignalSystemConfiguration()){
-				BasicSignalSystemConfiguration blssc = builder.createSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
+				SignalSystemConfiguration blssc = builder.createSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
 				
 				XMLSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getSignalSystemControlInfo();
-				BasicSignalSystemControlInfo controlInfo;
+				SignalSystemControlInfo controlInfo;
 				controlInfo = convertXmlControlInfoToBasic(xmlcit);
 				blssc.setSignalSystemControlInfo(controlInfo);
 				
@@ -94,13 +94,13 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 			} // end outer for
 	}
 
-	private BasicSignalSystemControlInfo convertXmlControlInfoToBasic(
+	private SignalSystemControlInfo convertXmlControlInfoToBasic(
 			XMLSignalSystemControlInfoType xmlcit) {
-		BasicSignalSystemControlInfo controlInfo = null;
+		SignalSystemControlInfo controlInfo = null;
 		if (xmlcit instanceof XMLPlanbasedSignalSystemControlInfoType) {
 			XMLPlanbasedSignalSystemControlInfoType xmlpcit = (XMLPlanbasedSignalSystemControlInfoType) xmlcit;
 			
-			BasicPlanBasedSignalSystemControlInfo pcontrolInfo = builder.createPlanBasedSignalSystemControlInfo();
+			PlanBasedSignalSystemControlInfo pcontrolInfo = builder.createPlanBasedSignalSystemControlInfo();
 			controlInfo = pcontrolInfo;
 			
 			for (XMLSignalSystemPlanType xmlplan : xmlpcit.getSignalSystemPlan()) {
@@ -109,7 +109,7 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 		}
 		else if (xmlcit instanceof XMLAdaptivePlanbasedSignalSystemControlInfoType){
 			XMLAdaptivePlanbasedSignalSystemControlInfoType sscit = (XMLAdaptivePlanbasedSignalSystemControlInfoType)xmlcit;
-			BasicAdaptivePlanBasedSignalSystemControlInfo aci = builder.createAdaptivePlanbasedSignalSystemControlInfo();
+			AdaptivePlanBasedSignalSystemControlInfo aci = builder.createAdaptivePlanbasedSignalSystemControlInfo();
 			controlInfo = aci;
 			aci.setAdaptiveControlerClass(sscit.getAdaptiveControler());
 			for (XMLIdRefType idref : sscit.getSignalGroup()){
@@ -121,7 +121,7 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 		}
 		else if (xmlcit instanceof XMLAdaptiveSignalSystemControlInfoType) {
 			XMLAdaptiveSignalSystemControlInfoType sscit = (XMLAdaptiveSignalSystemControlInfoType)xmlcit;
-			BasicAdaptiveSignalSystemControlInfo aci = builder.createAdaptiveSignalSystemControlInfo();
+			AdaptiveSignalSystemControlInfo aci = builder.createAdaptiveSignalSystemControlInfo();
 			controlInfo = aci;
 			aci.setAdaptiveControlerClass(sscit.getAdaptiveControler());
 			for (XMLIdRefType idref : sscit.getSignalGroup()){
@@ -132,8 +132,8 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 
 	}
 	
-	private BasicSignalSystemPlan convertXmlPlanToBasic(XMLSignalSystemPlanType xmlplan){
-		BasicSignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));					
+	private SignalSystemPlan convertXmlPlanToBasic(XMLSignalSystemPlanType xmlplan){
+		SignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));					
 		plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
 		plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
 		if (xmlplan.getCycleTime() != null) {
@@ -149,7 +149,7 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 			plan.setPowerOffTime(xmlplan.getPowerOffTime().getSec());
 		}
 		for (XMLSignalGroupSettingsType xmlgroupconfig : xmlplan.getSignalGroupSettings()) {
-			BasicSignalGroupSettings groupConfig = builder.createSignalGroupSettings(new IdImpl(xmlgroupconfig.getRefId()));
+			SignalGroupSettings groupConfig = builder.createSignalGroupSettings(new IdImpl(xmlgroupconfig.getRefId()));
 			groupConfig.setRoughCast(xmlgroupconfig.getRoughcast().getSec());
 			groupConfig.setDropping(xmlgroupconfig.getDropping().getSec());
 			if (xmlgroupconfig.getInterGreenTimeRoughcast() != null)

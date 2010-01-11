@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicSignalSystemConfigurationsImpl
+ * BasicAdaptiveSignalSystemControlInfoImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.config;
 
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 
@@ -29,29 +29,29 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
-public class BasicSignalSystemConfigurationsImpl implements
-		BasicSignalSystemConfigurations {
+public class AdaptiveSignalSystemControlInfoImpl implements
+		AdaptiveSignalSystemControlInfo {
 
-	private final BasicSignalSystemConfigurationsFactory factory = new BasicSignalSystemConfigurationsFactory();
+	private List<Id> signalGroupIds;
+	private String adaptiveControlerClass;
 	
-	private final SortedMap<Id, BasicSignalSystemConfiguration> signalSystemConfigs = new TreeMap<Id, BasicSignalSystemConfiguration>();
-
-	public BasicSignalSystemConfigurationsImpl(){
-	}
-	
-	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemConfigurations#getSignalSystemConfigurations()
-	 */
-	public SortedMap<Id, BasicSignalSystemConfiguration> getSignalSystemConfigurations() {
-		return this.signalSystemConfigs;
+	public void addSignalGroupId(Id id) {
+		if (this.signalGroupIds == null){
+			this.signalGroupIds = new ArrayList<Id>();
+		}
+		this.signalGroupIds.add(id);
 	}
 
-	public BasicSignalSystemConfigurationsFactory getFactory() {
-		return this.factory;
+	public String getAdaptiveControlerClass() {
+		return this.adaptiveControlerClass;
 	}
 
-	public void addSignalSystemConfiguration(BasicSignalSystemConfiguration systemConfig) {
-		this.signalSystemConfigs.put(systemConfig.getSignalSystemId(), systemConfig);
+	public List<Id> getSignalGroupIds() {
+		return this.signalGroupIds;
+	}
+
+	public void setAdaptiveControlerClass(String adaptiveControler) {
+		this.adaptiveControlerClass = adaptiveControler;
 	}
 
 }

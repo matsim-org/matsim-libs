@@ -27,97 +27,97 @@ import org.matsim.api.core.v01.Id;
 /**
  * @author dgrether
  */
-public class BasicSignalSystemPlanImpl implements BasicSignalSystemPlan {
+public class SignalSystemPlanImpl implements SignalSystemPlan {
 
 	private final Id id;
 	private double startTime;
 	private double endTime;
-	private SortedMap<Id, BasicSignalGroupSettings> groupConfigs;
+	private SortedMap<Id, SignalGroupSettings> groupConfigs;
 	private Integer syncronizationOffset = 0;
 	private Integer circulationTime = null;
 	private Integer powerOnTime = null;
   private Integer powerOffTime = null;
 	
-	public BasicSignalSystemPlanImpl(Id id) {
+	public SignalSystemPlanImpl(Id id) {
 		this.id = id;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#setStartTime(double)
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#setStartTime(double)
 	 */
 	public void setStartTime(double seconds) {
 		this.startTime = seconds;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#setEndTime(double)
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#setEndTime(double)
 	 */
 	public void setEndTime(double seconds) {
 		this.endTime = seconds;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#getId()
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#getId()
 	 */
 	public Id getId() {
 		return id;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#addLightSignalGroupConfiguration(org.matsim.signalsystems.config.BasicSignalGroupSettings)
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#addLightSignalGroupConfiguration(org.matsim.signalsystems.config.SignalGroupSettings)
 	 */
 	public void addLightSignalGroupConfiguration(
-			BasicSignalGroupSettings groupConfig) {
+			SignalGroupSettings groupConfig) {
 		if (this.groupConfigs == null) {
-			this.groupConfigs = new TreeMap<Id, BasicSignalGroupSettings>();
+			this.groupConfigs = new TreeMap<Id, SignalGroupSettings>();
 		}
 		this.groupConfigs.put(groupConfig.getReferencedSignalGroupId(), groupConfig);
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#getStartTime()
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#getStartTime()
 	 */
 	public double getStartTime() {
 		return startTime;
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#getEndTime()
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#getEndTime()
 	 */
 	public double getEndTime() {
 		return endTime;
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#getGroupConfigs()
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#getGroupConfigs()
 	 */
-	public SortedMap<Id, BasicSignalGroupSettings> getGroupConfigs() {
+	public SortedMap<Id, SignalGroupSettings> getGroupConfigs() {
 		return groupConfigs;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#setCycleTime(java.lang.Integer)
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#setCycleTime(java.lang.Integer)
 	 */
 	public void setCycleTime(Integer circulationTimeSec) {
 		this.circulationTime = circulationTimeSec;
 	}
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#setSynchronizationOffset(java.lang.Integer)
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#setSynchronizationOffset(java.lang.Integer)
 	 */
 	public void setSynchronizationOffset(Integer seconds) {
 		this.syncronizationOffset = seconds;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#getSynchronizationOffset()
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#getSynchronizationOffset()
 	 */
 	public Integer getSynchronizationOffset() {
 		return syncronizationOffset;
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#getCycleTime()
+	 * @see org.matsim.signalsystems.config.SignalSystemPlan#getCycleTime()
 	 */
 	public Integer getCycleTime() {
 		return circulationTime;

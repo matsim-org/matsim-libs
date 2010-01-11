@@ -24,13 +24,24 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
-public interface BasicSignalSystemConfiguration {
+public interface SignalGroupSettings {
 
-	public void setSignalSystemControlInfo(
-			final BasicSignalSystemControlInfo controlInfo);
+	public Integer getRoughCast();
 
-	public Id getSignalSystemId();
+	public void setRoughCast(Integer roughCast);
 
-	public BasicSignalSystemControlInfo getControlInfo();
+	public Integer getDropping();
+
+	public void setDropping(Integer dropping);
+
+	public Integer getInterimGreenTimeRoughcast();
+
+	public void setInterGreenTimeRoughcast(Integer interimTimeRoughcast);
+
+	public Integer getInterGreenTimeDropping();
+
+	public void setInterGreenTimeDropping(Integer interimTimeDropping);
+
+	public Id getReferencedSignalGroupId();
 
 }

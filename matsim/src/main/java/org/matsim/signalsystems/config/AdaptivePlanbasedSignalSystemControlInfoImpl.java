@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicAdaptivePlanbasedSignalSystemControlInfoImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,18 +19,37 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.config;
 
-import java.util.SortedMap;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-/**
- * 
- * @author dgrether
- *
- */
-public interface BasicPlanBasedSignalSystemControlInfo extends BasicSignalSystemControlInfo {
 
-	public SortedMap<Id, BasicSignalSystemPlan> getPlans();
 
-	public void addPlan(BasicSignalSystemPlan plan);
 
+public class AdaptivePlanbasedSignalSystemControlInfoImpl extends PlanBasedSignalSystemControlInfoImpl implements
+AdaptivePlanBasedSignalSystemControlInfo {
+
+	AdaptiveSignalSystemControlInfo delegate;
+
+	AdaptivePlanbasedSignalSystemControlInfoImpl(){
+		this.delegate = new AdaptiveSignalSystemControlInfoImpl();
+	}
+
+	public void addSignalGroupId(Id id) {
+		delegate.addSignalGroupId(id);
+	}
+
+	public String getAdaptiveControlerClass() {
+		return delegate.getAdaptiveControlerClass();
+	}
+
+	public List<Id> getSignalGroupIds() {
+		return delegate.getSignalGroupIds();
+	}
+
+	public void setAdaptiveControlerClass(String adaptiveControler) {
+		delegate.setAdaptiveControlerClass(adaptiveControler);
+	}
+	
+	
+	
 }

@@ -63,7 +63,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
@@ -197,11 +197,11 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	/**
 	 * Set the signal systems to be used in simulation
 	 * @param signalSystems
-	 * @param basicSignalSystemConfigurations
+	 * @param signalSystemConfigurations
 	 */
-	public void setSignalSystems(final SignalSystems signalSystems, final BasicSignalSystemConfigurations basicSignalSystemConfigurations){
+	public void setSignalSystems(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
 		this.signalEngine  = new QueueSimSignalEngine(this);
-		this.signalEngine.setSignalSystems(signalSystems, basicSignalSystemConfigurations);
+		this.signalEngine.setSignalSystems(signalSystems, signalSystemConfigurations);
 	}
 
 	public final void run() {

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.control;
 
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
@@ -31,7 +31,7 @@ public abstract class AdaptivePlanBasedSignalSystemControler extends
 		DefaultPlanBasedSignalSystemController implements AdaptiveSignalSystemControler {
 
 	public AdaptivePlanBasedSignalSystemControler(
-			BasicSignalSystemConfiguration config) {
+			SignalSystemConfiguration config) {
 		super(config);
 	}
 

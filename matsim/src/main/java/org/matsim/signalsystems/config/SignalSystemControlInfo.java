@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicSignalSystemConfigurations
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.signalsystems.config;
 
-import java.util.SortedMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
-
 /**
- * @author dgrether
+ * Currently just a marker interface for all ControlInfo subtypes
  * 
+ * @author dgrether
  */
-public interface BasicSignalSystemConfigurations extends MatsimToplevelContainer {
+public interface SignalSystemControlInfo {
 
-	public BasicSignalSystemConfigurationsFactory getFactory();
-
-	/**
-	 * 
-	 * @return a map containing all signal system configurations organized by the
-	 *         Id of the SignalSystem
-	 */
-	public SortedMap<Id, BasicSignalSystemConfiguration> getSignalSystemConfigurations();
-
-	/**
-	 * adds the given SignalSystemConfiguration to the map of this container.
-	 * @param systemConfig
-	 */
-	public void addSignalSystemConfiguration(BasicSignalSystemConfiguration systemConfig);
 }

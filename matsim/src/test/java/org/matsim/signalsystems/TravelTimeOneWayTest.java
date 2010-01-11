@@ -30,11 +30,11 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.LaneDefinitions;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalGroupSettings;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -75,7 +75,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		int circulationTime = 60;
 
 		SignalSystems lssDefs = data.getSignalSystems();
-		BasicSignalSystemConfigurations lssConfigs = data.getSignalSystemConfigurations();
+		SignalSystemConfigurations lssConfigs = data.getSignalSystemConfigurations();
 		
 		Id id2 = new IdImpl(2);
 		Id id100 = new IdImpl(100);
@@ -83,12 +83,12 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		for (int dropping = 1; dropping <= circulationTime; dropping++) {
 			eventHandler.reset(1);
 			
-			for (BasicSignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
-				BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfig
+			for (SignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
+				PlanBasedSignalSystemControlInfo controlInfo = (PlanBasedSignalSystemControlInfo) lssConfig
 						.getControlInfo();
-				BasicSignalSystemPlan p = controlInfo.getPlans().get(id2);
+				SignalSystemPlan p = controlInfo.getPlans().get(id2);
 				p.setCycleTime(circulationTime);
-				BasicSignalGroupSettings group = p.getGroupConfigs().get(id100);
+				SignalGroupSettings group = p.getGroupConfigs().get(id100);
 				group.setDropping(dropping);
 			}
 			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);

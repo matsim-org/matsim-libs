@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicSignalSystemConfigurations
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,41 +22,26 @@ package org.matsim.signalsystems.config;
 import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
+
 /**
- * 
  * @author dgrether
- *
+ * 
  */
-public interface BasicSignalSystemPlan {
+public interface SignalSystemConfigurations extends MatsimToplevelContainer {
 
-	public void setStartTime(double seconds);
+	public SignalSystemConfigurationsFactory getFactory();
 
-	public void setEndTime(double seconds);
+	/**
+	 * 
+	 * @return a map containing all signal system configurations organized by the
+	 *         Id of the SignalSystem
+	 */
+	public SortedMap<Id, SignalSystemConfiguration> getSignalSystemConfigurations();
 
-	public Id getId();
-
-	public void addLightSignalGroupConfiguration(
-			BasicSignalGroupSettings groupConfig);
-
-	public double getStartTime();
-
-	public double getEndTime();
-
-	public SortedMap<Id, BasicSignalGroupSettings> getGroupConfigs();
-
-	public void setCycleTime(Integer circulationTimeSec);
-
-	public void setSynchronizationOffset(Integer seconds);
-
-	public Integer getSynchronizationOffset();
-
-	public Integer getCycleTime();
-	
-	public Integer getPowerOnTime();
-	
-	public void setPowerOnTime(Integer powerOnTime);
-	
-	public Integer getPowerOffTime();
-	
-	public void setPowerOffTime(Integer powerOffTime);
+	/**
+	 * adds the given SignalSystemConfiguration to the map of this container.
+	 * @param systemConfig
+	 */
+	public void addSignalSystemConfiguration(SignalSystemConfiguration systemConfig);
 }

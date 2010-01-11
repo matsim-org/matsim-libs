@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 /**
  * @author dgrether
  */
-public class BasicSignalGroupSettingsImpl implements BasicSignalGroupSettings {
+public class SignalGroupSettingsImpl implements SignalGroupSettings {
 
 	private Id referencedSignalGroupId;
 
@@ -41,14 +41,14 @@ public class BasicSignalGroupSettingsImpl implements BasicSignalGroupSettings {
 	private Integer interGreenTimeDropping = 0;
 	
 	
-	public BasicSignalGroupSettingsImpl(Id referencedSignalGroupId) {
+	public SignalGroupSettingsImpl(Id referencedSignalGroupId) {
 		this.referencedSignalGroupId = referencedSignalGroupId;
 	}
 
 
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalGroupSettings#getRoughCast()
+	 * @see org.matsim.signalsystems.config.SignalGroupSettings#getRoughCast()
 	 */
 	public Integer getRoughCast() {
 		return roughCast;
@@ -57,7 +57,7 @@ public class BasicSignalGroupSettingsImpl implements BasicSignalGroupSettings {
 
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalGroupSettings#setRoughCast(java.lang.Integer)
+	 * @see org.matsim.signalsystems.config.SignalGroupSettings#setRoughCast(java.lang.Integer)
 	 */
 	public void setRoughCast(Integer roughCast) {
 		this.roughCast = roughCast;
@@ -66,7 +66,7 @@ public class BasicSignalGroupSettingsImpl implements BasicSignalGroupSettings {
 
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalGroupSettings#getDropping()
+	 * @see org.matsim.signalsystems.config.SignalGroupSettings#getDropping()
 	 */
 	public Integer getDropping() {
 		return dropping;
@@ -75,7 +75,7 @@ public class BasicSignalGroupSettingsImpl implements BasicSignalGroupSettings {
 
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalGroupSettings#setDropping(java.lang.Integer)
+	 * @see org.matsim.signalsystems.config.SignalGroupSettings#setDropping(java.lang.Integer)
 	 */
 	public void setDropping(Integer dropping) {
 		this.dropping = dropping;
@@ -84,7 +84,7 @@ public class BasicSignalGroupSettingsImpl implements BasicSignalGroupSettings {
 
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalGroupSettings#getInterimGreenTimeRoughcast()
+	 * @see org.matsim.signalsystems.config.SignalGroupSettings#getInterimGreenTimeRoughcast()
 	 */
 	public Integer getInterimGreenTimeRoughcast() {
 		return interGreenTimeRoughcast;
@@ -93,7 +93,7 @@ public class BasicSignalGroupSettingsImpl implements BasicSignalGroupSettings {
 
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalGroupSettings#setInterGreenTimeRoughcast(java.lang.Integer)
+	 * @see org.matsim.signalsystems.config.SignalGroupSettings#setInterGreenTimeRoughcast(java.lang.Integer)
 	 */
 	public void setInterGreenTimeRoughcast(Integer interimTimeRoughcast) {
 		this.interGreenTimeRoughcast = interimTimeRoughcast;
@@ -102,7 +102,7 @@ public class BasicSignalGroupSettingsImpl implements BasicSignalGroupSettings {
 
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalGroupSettings#getInterGreenTimeDropping()
+	 * @see org.matsim.signalsystems.config.SignalGroupSettings#getInterGreenTimeDropping()
 	 */
 	public Integer getInterGreenTimeDropping() {
 		return interGreenTimeDropping;
@@ -111,7 +111,7 @@ public class BasicSignalGroupSettingsImpl implements BasicSignalGroupSettings {
 
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalGroupSettings#setInterGreenTimeDropping(java.lang.Integer)
+	 * @see org.matsim.signalsystems.config.SignalGroupSettings#setInterGreenTimeDropping(java.lang.Integer)
 	 */
 	public void setInterGreenTimeDropping(Integer interimTimeDropping) {
 		this.interGreenTimeDropping = interimTimeDropping;
@@ -120,7 +120,7 @@ public class BasicSignalGroupSettingsImpl implements BasicSignalGroupSettings {
 
 	
 	/**
-	 * @see org.matsim.signalsystems.config.BasicSignalGroupSettings#getReferencedSignalGroupId()
+	 * @see org.matsim.signalsystems.config.SignalGroupSettings#getReferencedSignalGroupId()
 	 */
 	public Id getReferencedSignalGroupId() {
 		return referencedSignalGroupId;

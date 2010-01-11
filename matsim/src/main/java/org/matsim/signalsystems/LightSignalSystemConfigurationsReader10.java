@@ -37,12 +37,12 @@ import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfigurat
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemControlInfoType;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLPlanbasedlightSignalSystemControlInfoType;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalGroupSettings;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsFactory;
-import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.SignalGroupSettings;
+import org.matsim.signalsystems.config.SignalSystemConfiguration;
+import org.matsim.signalsystems.config.SignalSystemConfigurations;
+import org.matsim.signalsystems.config.SignalSystemConfigurationsFactory;
+import org.matsim.signalsystems.config.SignalSystemPlan;
 
 import org.xml.sax.SAXException;
 
@@ -56,11 +56,11 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 
   private XMLLightSignalSystemConfig xmlLssConfig;
 	
-  private BasicSignalSystemConfigurationsFactory builder;
+  private SignalSystemConfigurationsFactory builder;
 
-	private BasicSignalSystemConfigurations lssConfigurations;
+	private SignalSystemConfigurations lssConfigurations;
   
-	public LightSignalSystemConfigurationsReader10(BasicSignalSystemConfigurations lssConfigs, String schemaLocation) {
+	public LightSignalSystemConfigurationsReader10(SignalSystemConfigurations lssConfigs, String schemaLocation) {
 		super(schemaLocation);
 		this.lssConfigurations = lssConfigs;
 		this.builder = lssConfigs.getFactory();
@@ -80,16 +80,16 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 
 		//convert the parsed xml-instances to basic instances
 			for (XMLLightSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getLightSignalSystemConfiguration()){
-				BasicSignalSystemConfiguration blssc = builder.createSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
+				SignalSystemConfiguration blssc = builder.createSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
 				
 				XMLLightSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getLightSignalSystemControlInfo();
 				if (xmlcit instanceof XMLPlanbasedlightSignalSystemControlInfoType) {
 					XMLPlanbasedlightSignalSystemControlInfoType xmlpcit = (XMLPlanbasedlightSignalSystemControlInfoType) xmlcit;
 					
-					BasicPlanBasedSignalSystemControlInfo controlInfo = builder.createPlanBasedSignalSystemControlInfo();
+					PlanBasedSignalSystemControlInfo controlInfo = builder.createPlanBasedSignalSystemControlInfo();
 					
 					for (XMLLightSignalSystemPlanType xmlplan : xmlpcit.getLightSignalSystemPlan()) {
-						BasicSignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));					
+						SignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));					
 						plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
 						plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
 						if (xmlplan.getCirculationTime() != null) {
@@ -99,7 +99,7 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 							plan.setSynchronizationOffset((int)xmlplan.getSyncronizationOffset().getSeconds());
 						}
 						for (XMLLightSignalGroupConfigurationType xmlgroupconfig : xmlplan.getLightSignalGroupConfiguration()) {
-							BasicSignalGroupSettings groupConfig = builder.createSignalGroupSettings(new IdImpl(xmlgroupconfig.getRefId()));
+							SignalGroupSettings groupConfig = builder.createSignalGroupSettings(new IdImpl(xmlgroupconfig.getRefId()));
 							groupConfig.setRoughCast(xmlgroupconfig.getRoughcast().getSec());
 							groupConfig.setDropping(xmlgroupconfig.getDropping().getSec());
 							if (xmlgroupconfig.getInterimTimeRoughcast() != null)

@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAdaptiveSignalSystemControlInfo
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,24 +18,19 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.config;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
-
-
 /**
+ * 
  * @author dgrether
  *
  */
-public interface BasicAdaptiveSignalSystemControlInfo extends BasicSignalSystemControlInfo{
+public interface SignalSystemConfiguration {
 
-	void setAdaptiveControlerClass(String adaptiveControler);
+	public void setSignalSystemControlInfo(
+			final SignalSystemControlInfo controlInfo);
 
-	void addSignalGroupId(Id id);
-	
-	List<Id> getSignalGroupIds();
+	public Id getSignalSystemId();
 
-	String getAdaptiveControlerClass();
-	
-	
+	public SignalSystemControlInfo getControlInfo();
+
 }
