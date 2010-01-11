@@ -116,6 +116,12 @@ public abstract class OTFClient extends Thread {
 
 		log.info("Getting Quad id " + id);
 		OTFServerQuadI servQ = hostControl.getOTFServer().getQuad(id, connect);
+//    log.error("");
+//    log.error("connection manager used...");
+//    log.error("");
+//    for (Entry e : connect.getEntries()){
+//      log.error("entry from: " + e.getFrom() + " to " + e.getTo());
+//    }
 		log.info("Converting Quad");
 		OTFClientQuad clientQ = servQ.convertToClient(id, hostControl.getOTFServer(), connect);
 		log.info("Creating receivers...");

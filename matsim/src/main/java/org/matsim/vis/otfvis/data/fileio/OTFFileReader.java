@@ -219,7 +219,7 @@ public class OTFFileReader implements OTFServerRemote {
 				name = name.replaceFirst("org.matsim.evacuation.otfvis.readerwriter.InundationData",
 				"org.matsim.evacuation.otfvis.legacy.readerwriter.InundationData");
 				return Class.forName(name);
-			}
+			} 			
 			return super.resolveClass(desc);
 		}
 	}
@@ -260,6 +260,13 @@ public class OTFFileReader implements OTFServerRemote {
 				try {
 					OTFConnectionManager connect2 = (OTFConnectionManager) new OTFObjectInputStream(
 							is).readObject();
+					
+//					log.error("");
+//					log.error("connection manager from file...");
+//					log.error("");
+//					for (Entry e : connect2.getEntries()){
+//			      log.error("entry from: " + e.getFrom() + " to " + e.getTo());
+//			    }
 					connect.updateEntries(connect2);
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();

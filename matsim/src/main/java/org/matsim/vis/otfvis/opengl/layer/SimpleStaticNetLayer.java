@@ -28,6 +28,8 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -54,98 +56,7 @@ import com.sun.opengl.util.texture.TextureCoords;
  *
  */
 public class SimpleStaticNetLayer  extends SimpleSceneLayer{
-
-	public static class SimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQuadReceiver{
-
-		protected final Point2D.Float[] quad = new Point2D.Float[4];
-		protected float coloridx = 0;
-		protected char[] id;
-		protected int nrLanes;
-
-		public void onDraw2( GL gl) {
-			final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes*SimpleStaticNetLayer.cellWidth_m);
-			this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
-			this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
-			//Draw quad
-			gl.glBegin(GL.GL_QUADS);
-			gl.glVertex3f(quad[0].x, quad[0].y, 0);
-			gl.glVertex3f(quad[1].x, quad[1].y, 0);
-			gl.glVertex3f(quad[3].x, quad[3].y, 0);
-			gl.glVertex3f(quad[2].x, quad[2].y, 0);
-			gl.glEnd();
-		}
-		
-		public void onDraw( GL gl) {
-			final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes*SimpleStaticNetLayer.cellWidth_m);
-			this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
-			this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
-			//Draw quad
-			TextureCoords co = new TextureCoords(0,0,1,1);
-			if(marktex != null) co =  marktex.getImageTexCoords();
-			gl.glBegin(GL.GL_QUADS);
-			gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(quad[0].x, quad[0].y, 0);
-			gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(quad[1].x, quad[1].y, 0);
-			gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(quad[3].x, quad[3].y, 0);
-			gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(quad[2].x, quad[2].y, 0);
-			gl.glEnd();
-		}
-
-		public void prepareLinkId(Map<CoordImpl, String> linkIds) {
-			double alpha = 0.4;
-			double middleX = alpha*this.quad[0].x + (1.0-alpha)*this.quad[3].x;
-			double middleY = alpha*this.quad[0].y + (1.0-alpha)*this.quad[3].y;
-			//Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);
-			String idstr = new String(id);
-			linkIds.put(new CoordImpl(middleX , middleY ), idstr);
-		}
-
-		public static Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end){
-			return calcOrtho(start.x, start.y, end.x, end.y, SimpleStaticNetLayer.cellWidth_m);
-		}
-
-		public static Point2D.Float calcOrtho(double startx, double starty, double endx, double endy, double len){
-			double dx = endy - starty;
-			double dy = endx -startx;
-			double sqr1 = Math.sqrt(dx*dx +dy*dy);
-
-			dx = dx*len/sqr1;
-			dy = -dy*len/sqr1;
-
-			return new Point2D.Float((float)dx,(float)dy);
-		}
-
-		public void setQuad(float startX, float startY, float endX, float endY) {
-			setQuad(startX, startY,endX, endY, 1);
-		}
-
-		public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
-			this.quad[0] = new Point2D.Float(startX, startY);
-			this.quad[1] = new Point2D.Float(endX, endY);
-			this.nrLanes = nrLanes;
-		}
-
-		public void setColor(float coloridx) {
-			this.coloridx = coloridx;
-		}
-
-		public void setId(char[] id) {
-			this.id = id;
-		}
-	}
-
-	public static class NoQuadDrawer extends SimpleQuadDrawer {
-		@Override
-		public void setQuad(float startX, float startY, float endX, float endY) {
-		}
-
-		@Override
-		public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
-		}
-
-		@Override
-		public void onDraw(GL gl) {
-		}
-}
+  
 	protected OGLProvider myDrawer;
 	private static final Map<OGLProvider, Integer> netDisplListMap = new HashMap<OGLProvider, Integer>(); // not yet defined
 	private static final Map<OGLProvider, List<OTFDrawable>> itemsListMap = new HashMap<OGLProvider, List<OTFDrawable>>(); // not yet defined
@@ -153,6 +64,9 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	protected int netDisplList = -1;
 	public static float cellWidth_m = 30.f;
 
+  public static Texture marktex = null;
+
+	
 	@Override
 	public void addItem(OTFDataReceiver item) {
 		// only add items in initial run
@@ -192,7 +106,6 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 		}
 	}
 
-	public static Texture marktex = null;
 
 	private void checkTexture(GL gl) {
 		if(marktex == null)marktex = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("mark.png"));
@@ -241,5 +154,113 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	public int getDrawOrder() {
 		return 1;
 	}
+	
+	 public static class SimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQuadReceiver{
+
+    private static final Logger log = Logger
+        .getLogger(SimpleStaticNetLayer.SimpleQuadDrawer.class);
+	   
+	    protected final Point2D.Float[] quad = new Point2D.Float[4];
+	    protected float coloridx = 0;
+	    protected char[] id;
+	    protected int nrLanes;
+
+	    public void onDraw2( GL gl) {
+	      final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes*SimpleStaticNetLayer.cellWidth_m);
+	      this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
+	      this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
+	      //Draw quad
+	      gl.glBegin(GL.GL_QUADS);
+	      gl.glVertex3f(quad[0].x, quad[0].y, 0);
+	      gl.glVertex3f(quad[1].x, quad[1].y, 0);
+	      gl.glVertex3f(quad[3].x, quad[3].y, 0);
+	      gl.glVertex3f(quad[2].x, quad[2].y, 0);
+	      gl.glEnd();
+	    }
+	    
+	    public void onDraw( GL gl) {
+	      final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes*SimpleStaticNetLayer.cellWidth_m);
+	      this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
+	      this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
+	      //Draw quad
+	      TextureCoords co = new TextureCoords(0,0,1,1);
+	      if(marktex != null) co =  marktex.getImageTexCoords();
+	      gl.glBegin(GL.GL_QUADS);
+	      gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(quad[0].x, quad[0].y, 0);
+	      gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(quad[1].x, quad[1].y, 0);
+	      gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(quad[3].x, quad[3].y, 0);
+	      gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(quad[2].x, quad[2].y, 0);
+	      gl.glEnd();
+	    }
+
+	    public void prepareLinkId(Map<Coord, String> linkIds) {
+	      double alpha = 0.4;
+	      log.error("quad0: " + this.quad[0] + " quad3: " + this.quad[3]);
+	      double middleX = alpha*this.quad[0].x + (1.0-alpha)*this.quad[3].x;
+	      double middleY = alpha*this.quad[0].y + (1.0-alpha)*this.quad[3].y;
+	      //Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);
+	      String idstr = new String(id);
+	      linkIds.put(new CoordImpl(middleX , middleY ), idstr);
+	    }
+
+	    public static Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end){
+	      return calcOrtho(start.x, start.y, end.x, end.y, SimpleStaticNetLayer.cellWidth_m);
+	    }
+
+	    public static Point2D.Float calcOrtho(double startx, double starty, double endx, double endy, double len){
+	      double dx = endy - starty;
+	      double dy = endx -startx;
+	      double sqr1 = Math.sqrt(dx*dx +dy*dy);
+
+	      dx = dx*len/sqr1;
+	      dy = -dy*len/sqr1;
+
+	      return new Point2D.Float((float)dx,(float)dy);
+	    }
+
+	    public void setQuad(float startX, float startY, float endX, float endY) {
+	      setQuad(startX, startY,endX, endY, 1);
+	    }
+
+	    public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
+//	      log.error("setQuad...");
+	      this.quad[0] = new Point2D.Float(startX, startY);
+	      this.quad[1] = new Point2D.Float(endX, endY);
+	      this.nrLanes = nrLanes;
+	    }
+
+	    public void setColor(float coloridx) {
+	      this.coloridx = coloridx;
+	    }
+
+	    public void setId(char[] id) {
+	      this.id = id;
+	    }
+	  }
+
+	  public static class NoQuadDrawer implements OTFDataQuadReceiver {
+	    @Override
+	    public void setQuad(float startX, float startY, float endX, float endY) {
+	    }
+
+	    @Override
+	    public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
+	    }
+
+	    public void onDraw(GL gl) {
+	    }
+
+      @Override
+      public void setColor(float coloridx) {
+      }
+
+      @Override
+      public void setId(char[] idBuffer) {
+      }
+
+      @Override
+      public void invalidate(SceneGraph graph) {
+      }
+	  }
 
 }

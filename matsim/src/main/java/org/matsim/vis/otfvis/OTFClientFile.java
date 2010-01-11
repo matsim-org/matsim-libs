@@ -29,7 +29,6 @@ import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
@@ -92,6 +91,7 @@ public class OTFClientFile extends OTFClient {
 		//those lines are from my point of view not really needed dg dez 09
 		connectR.remove(OTFLinkAgentsHandler.class);
 		connectR.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connectR.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		connectR.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
 		connectR.add(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
 		connectR.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
@@ -104,11 +104,7 @@ public class OTFClientFile extends OTFClient {
 	@Override
 	protected void createDrawer(){
 		try {
-			if(!hostControlBar.getOTFHostControl().isLiveHost()) {
-				frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
-			} else  {
-				throw new IllegalStateException("Server in live mode!");
-			}
+			frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
 			mainDrawer = 	new OTFOGLDrawer(this.visconf, frame, this.getRightDrawerComponent());
 
 		}catch (RemoteException e) {
@@ -121,7 +117,7 @@ public class OTFClientFile extends OTFClient {
 	@Override
 	protected void getOTFVisConfig() {
 		if (Gbl.getConfig() != null) {
-			visconf = (OTFVisConfig) Gbl.getConfig().otfVis();
+			visconf = Gbl.getConfig().otfVis();
 		}
 		else {
 			Gbl.createConfig(null);

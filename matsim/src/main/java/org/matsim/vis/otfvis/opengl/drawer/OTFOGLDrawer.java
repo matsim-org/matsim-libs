@@ -43,7 +43,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -76,6 +75,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.collections.QuadTree;
@@ -521,12 +521,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.gl.glEndList();
 	}
 
-	private void displayLinkIds(Map<CoordImpl, String> linkIds) {
+	private void displayLinkIds(Map<Coord, String> linkIds) {
 		String testText = "0000000";
 		Rectangle2D test = InfoText.getBoundsOf(testText);
-		Map<CoordImpl, Boolean> xymap = new HashMap<CoordImpl, Boolean>(); // Why is here a Map used, and not a Set?
+		Map<Coord, Boolean> xymap = new HashMap<Coord, Boolean>(); // Why is here a Map used, and not a Set?
 		double xRaster = test.getWidth(), yRaster = test.getHeight();
-		for( CoordImpl coord : linkIds.keySet()) {
+		for( Coord coord : linkIds.keySet()) {
 			float east = (float)coord.getX() ;
 			float north = (float)coord.getY() ;
 			float textX = (float) (((int)(east / xRaster) +1)*xRaster);
@@ -558,13 +558,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		return (size.getX()*pixelsizeStreet < cellWidth) && (size.getX()*pixelsizeStreet < cellWidth);
 	}
 
-	private Map<CoordImpl, String> findVisibleLinks() {
+	private Map<Coord, String> findVisibleLinks() {
 		if (isZoomBigEnoughForLabels()) {
 			Rect rect = this.mouseMan.getBounds();
 			Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX , rect.minY , rect.maxX - rect.minX, rect.maxY - rect.minY);
 			CollectDrawLinkId linkIdQuery = new CollectDrawLinkId(dest);
 			linkIdQuery.prepare(this.clientQ);
-			Map<CoordImpl, String> linkIds = linkIdQuery.linkIds;
+			Map<Coord, String> linkIds = linkIdQuery.getLinkIds();
 			return linkIds;
 		} else {
 			return Collections.emptyMap();
@@ -588,7 +588,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		if (this.queryHandler != null) {
 			this.queryHandler.drawQueries(this);
 		}
-		Map<CoordImpl, String> coordStringPairs = findVisibleLinks();
+		Map<Coord, String> coordStringPairs = findVisibleLinks();
 		if (this.config.drawLinkIds()) {
 			displayLinkIds(coordStringPairs);
 		}
@@ -870,8 +870,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	static public Texture createTexture(String filename) {
 		Texture t = null;
+		if (filename.startsWith("./res/")){
+		  filename = filename.substring(6);
+		}
 		try {
-			t = TextureIO.newTexture(new FileInputStream(filename),
+			t = TextureIO.newTexture(MatsimResource.getAsInputStream(filename),
 					true, null);
 			t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);

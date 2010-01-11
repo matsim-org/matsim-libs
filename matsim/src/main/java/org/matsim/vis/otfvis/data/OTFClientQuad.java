@@ -93,6 +93,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 //			log.error("Creating Receivers for reader class: " + reader.getClass());
 			for (OTFDataReceiver drawer : drawers) {
 				reader.connect(drawer);
+//				log.error("  connected drawer for reader: " + drawer.getClass());
 			}
 		}
 	}

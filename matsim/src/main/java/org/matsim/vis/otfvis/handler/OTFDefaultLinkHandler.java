@@ -25,8 +25,8 @@ import java.awt.geom.Point2D.Double;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
@@ -45,6 +45,7 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  *
  */
 public class OTFDefaultLinkHandler extends OTFDataReader {
+  
 	static {
 		OTFDataReader.setPreviousVersion(OTFDefaultLinkHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
 	}
@@ -56,8 +57,6 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 	public OTFDataQuadReceiver getQuadReceiver() {
 		return quadReceiver;
 	}
-
-	
 
 	static public class Writer extends  OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink> {
 

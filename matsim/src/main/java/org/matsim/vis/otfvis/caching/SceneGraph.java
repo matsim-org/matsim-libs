@@ -118,7 +118,9 @@ public class SceneGraph {
 	
 	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException {
 		SceneLayer layer = layers.get(clazz);
-		if (layer == null)layer = layers.get(Object.class); //DS must exist: default handling
+		if (layer == null){
+		  layer = layers.get(Object.class); //DS must exist: default handling
+		}
 		return layer.newInstance(clazz);
 	}
 

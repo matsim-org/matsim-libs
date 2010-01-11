@@ -23,9 +23,10 @@ package org.matsim.vis.otfvis.handler;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.ptproject.qsim.QueueLink;
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
@@ -38,7 +39,11 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
  *
  */
 public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
-	static {
+	
+  private static final Logger log = Logger
+      .getLogger(OTFLinkLanesAgentsNoParkingHandler.class);
+  
+  static {
 		OTFDataReader.setPreviousVersion(OTFLinkLanesAgentsNoParkingHandler.class.getCanonicalName() + "V1.3", ReaderV1_3.class);
 	}
 	
@@ -65,9 +70,9 @@ public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		String id = ByteBufferUtils.getString(in);
-
-		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
-		this.quadReceiver.setId(id.toCharArray());
+//		log.error("reading const data for receiver: " + this.quadReceiver.getClass().getName());
+		  this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
+		  this.quadReceiver.setId(id.toCharArray());
 	}
 	/***
 	 * PREVIOUS VERSION of the reader
