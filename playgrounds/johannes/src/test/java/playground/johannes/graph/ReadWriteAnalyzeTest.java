@@ -26,6 +26,7 @@ package playground.johannes.graph;
 import java.io.IOException;
 
 import org.matsim.contrib.sna.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.io.GraphMLWriter;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
@@ -33,7 +34,6 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.graph.GraphStatistics.GraphDistance;
-import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
 
 /**
  * @author illenberger
