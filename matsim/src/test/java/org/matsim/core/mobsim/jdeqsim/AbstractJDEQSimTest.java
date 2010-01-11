@@ -23,7 +23,7 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
+import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.core.population.ActivityImpl;
@@ -55,7 +55,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 			population = populationModifier.modifyPopulation(population);
 		}
 	*/
-		EventsManagerImpl events = new ParallelEvents(1);
+		EventsManagerImpl events = new ParallelEventsManagerImpl(1);
 		events.addHandler(new PersonEventCollector(this.eventsByPerson, this.allEvents));
 		events.initProcessing();
 		new JDEQSimulation(scenario.getNetwork(), scenario.getPopulation(), events).run();

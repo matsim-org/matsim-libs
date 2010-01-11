@@ -74,7 +74,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
+import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
@@ -356,9 +356,9 @@ public class Controler {
 			// the user wants to user parallel events handling
 			if (estimatedNumberOfEvents != null) {
 				int estNumberOfEvents = Integer.parseInt(estimatedNumberOfEvents);
-				this.events = new ParallelEvents(numOfThreads, estNumberOfEvents);
+				this.events = new ParallelEventsManagerImpl(numOfThreads, estNumberOfEvents);
 			} else {
-				this.events = new ParallelEvents(numOfThreads);
+				this.events = new ParallelEventsManagerImpl(numOfThreads);
 			}
 		} else {
 			this.events = new EventsManagerImpl();

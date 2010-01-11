@@ -20,12 +20,16 @@
 
 package org.matsim.pt.queuesim;
 
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.PersonAgent;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 
@@ -43,9 +47,23 @@ public class TransitAgent extends PersonAgent implements PassengerAgent {
 		return route.getEgressStopId().equals(stop.getId());
 	}
 
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute) {
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
-		return line.getId().equals(route.getLineId()) && transitRoute.getId().equals(route.getRouteId());
+		if (line.getId().equals(route.getLineId()) && transitRoute.getId().equals(route.getRouteId())) {
+			return containsId(stopsToCome, route.getEgressStopId());
+		} else {
+			return false;
+		}
+	}
+
+	private boolean containsId(List<TransitRouteStop> stopsToCome,
+			Id egressStopId) {
+		for (TransitRouteStop stop : stopsToCome) {
+			if (egressStopId.equals(stop.getStopFacility().getId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

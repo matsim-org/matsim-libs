@@ -16,23 +16,23 @@ public class ParallelEventsTest extends MatsimTestCase {
 	 * for different number of threads, events, handlers and different
 	 * constructors */
 	public void testEventCount() {
-		processEvents(new ParallelEvents(1), 100, 1, 1);
-		processEvents(new ParallelEvents(2), 100, 10, 2);
-		processEvents(new ParallelEvents(4), 100, 1, 10);
-		processEvents(new ParallelEvents(2), 150000, 2, 1);
-		processEvents(new ParallelEvents(2), 300000, 3, 1);
-		processEvents(new ParallelEvents(1, 100), 100, 1, 1);
-		processEvents(new ParallelEvents(1, 100), 1000, 1, 1);
-		processEvents(new ParallelEvents(1, 1000), 100, 1, 1);
-		processEvents(new ParallelEvents(2, 100), 100, 1, 1);
-		processEvents(new ParallelEvents(2, 100), 1000, 2, 1);
-		processEvents(new ParallelEvents(2, 1000), 1000, 2, 1);
-		processEvents(new ParallelEvents(2, 5000), 100, 3, 1);
+		processEvents(new ParallelEventsManagerImpl(1), 100, 1, 1);
+		processEvents(new ParallelEventsManagerImpl(2), 100, 10, 2);
+		processEvents(new ParallelEventsManagerImpl(4), 100, 1, 10);
+		processEvents(new ParallelEventsManagerImpl(2), 150000, 2, 1);
+		processEvents(new ParallelEventsManagerImpl(2), 300000, 3, 1);
+		processEvents(new ParallelEventsManagerImpl(1, 100), 100, 1, 1);
+		processEvents(new ParallelEventsManagerImpl(1, 100), 1000, 1, 1);
+		processEvents(new ParallelEventsManagerImpl(1, 1000), 100, 1, 1);
+		processEvents(new ParallelEventsManagerImpl(2, 100), 100, 1, 1);
+		processEvents(new ParallelEventsManagerImpl(2, 100), 1000, 2, 1);
+		processEvents(new ParallelEventsManagerImpl(2, 1000), 1000, 2, 1);
+		processEvents(new ParallelEventsManagerImpl(2, 5000), 100, 3, 1);
 	}
 
 	/** test, if adding and removing a handler works */
 	public void testAddAndRemoveHandler() {
-		EventsManagerImpl events = new ParallelEvents(2);
+		EventsManagerImpl events = new ParallelEventsManagerImpl(2);
 
 		// start iteration
 		events.initProcessing();

@@ -108,8 +108,9 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
 		for (Umlauf umlauf : umlaeufe) {
 			BasicVehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
-			createAndScheduleVehicleAndDriver(umlauf, basicVehicle,
-					thisAgentTracker);
+			if (!umlauf.getUmlaufStuecke().isEmpty()) {
+				createAndScheduleVehicleAndDriver(umlauf, basicVehicle, thisAgentTracker);
+			}
 		}
 	}
 

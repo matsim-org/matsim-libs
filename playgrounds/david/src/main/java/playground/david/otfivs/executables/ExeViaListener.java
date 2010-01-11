@@ -60,7 +60,7 @@ public class ExeViaListener {
 	public static class ResetableMobsimControler extends Controler{
 		protected boolean useResetable = true;
 		
-		public static class MyEvents extends EventsManagerImpl{
+		public static class MyEventsManagerImpl extends EventsManagerImpl {
 			public List<Event> events = new ArrayList<Event>();
 
 			@Override
@@ -99,7 +99,7 @@ public class ExeViaListener {
 			
 			boolean simIsFinished = false;
 			EventsManagerImpl events = this.events;
-			this.events = new MyEvents();
+			this.events = new MyEventsManagerImpl();
 
 			Gbl.startMeasurement();
 			
@@ -116,7 +116,7 @@ public class ExeViaListener {
 			Gbl.printElapsedTime();
 			Gbl.startMeasurement();
 			System.out.println("Event handling");
-			List<Event> myEvents = ((MyEvents)this.events).events;
+			List<Event> myEvents = ((MyEventsManagerImpl)this.events).events;
 			for(Event event : myEvents) events.processEvent(event);
 			this.events = events;
 			Gbl.printElapsedTime();

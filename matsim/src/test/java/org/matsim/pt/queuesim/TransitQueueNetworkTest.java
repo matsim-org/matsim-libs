@@ -22,6 +22,7 @@ package org.matsim.pt.queuesim;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -85,7 +86,8 @@ public class TransitQueueNetworkTest extends TestCase {
 
 		f.simEngine.simStep(101);
 		f.simEngine.simStep(102);
-		assertEquals(1, f.qlink2.getAllVehicles().size());
+		Collection<QueueVehicle> allVehicles = f.qlink2.getAllVehicles();
+		assertEquals(1, allVehicles.size());
 		assertEquals(f.normalVehicle, f.qlink2.getAllVehicles().toArray(new QueueVehicle[1])[0]); // first the normal vehicle
 
 		f.simEngine.simStep(103);

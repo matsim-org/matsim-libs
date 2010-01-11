@@ -80,6 +80,7 @@ public class VisumNetworkReader {
 	private final String[] ATTRIBUTE_STOPPT_STOPAREANO = {"STOPAREANO", "HSTBERNR"};
 	private final String[] ATTRIBUTE_STOPPT_NAME =  {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_STOPPT_RLNO = {"LINKNO", "STRNR"};
+	private final String[] ATTRIBUTE_STOPPT_NODE = {ATTRIBUTE_UNKNOWN, "KNOTNR"};
 
 	private final String[] ATTRIBUTE_LR_NAME = {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_LR_LINENAME = {"LINENAME", "LINNAME"};
@@ -316,11 +317,11 @@ public class VisumNetworkReader {
 		final int idxStopAreaNo = getAttributeIndex(this.ATTRIBUTE_STOPPT_STOPAREANO[this.language], attributes);
 		final int idxName = getAttributeIndex(this.ATTRIBUTE_STOPPT_NAME[this.language], attributes);
 		final int idxRLNo = getAttributeIndex(this.ATTRIBUTE_STOPPT_RLNO[this.language], attributes);
-
+		final int idxNode = getAttributeIndex(this.ATTRIBUTE_STOPPT_NODE[this.language], attributes);
 		String line = reader.readLine();
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
-			VisumNetwork.StopPoint stopPt = new VisumNetwork.StopPoint(new IdImpl(parts[idxNo]), new IdImpl(parts[idxStopAreaNo]),parts[idxName],new IdImpl(parts[idxRLNo]));
+			VisumNetwork.StopPoint stopPt = new VisumNetwork.StopPoint(new IdImpl(parts[idxNo]), new IdImpl(parts[idxStopAreaNo]),parts[idxName], new IdImpl(parts[idxRLNo]), new IdImpl(parts[idxNode]));
 			this.network.addStopPoint(stopPt);
 			// proceed to next line
 			line = reader.readLine();

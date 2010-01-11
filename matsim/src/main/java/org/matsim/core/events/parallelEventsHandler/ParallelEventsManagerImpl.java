@@ -46,7 +46,7 @@ import org.matsim.core.events.handler.EventHandler;
  * @author rashid_waraich
  * 
  */
-public class ParallelEvents extends EventsManagerImpl {
+public class ParallelEventsManagerImpl extends EventsManagerImpl {
 
 	private int numberOfThreads;
 	private EventsManagerImpl[] events = null;
@@ -67,7 +67,7 @@ public class ParallelEvents extends EventsManagerImpl {
 	 * @param numberOfThreads -
 	 *            specify the number of threads used for the events handler
 	 */
-	public ParallelEvents(int numberOfThreads) {
+	public ParallelEventsManagerImpl(int numberOfThreads) {
 		init(numberOfThreads);
 	}
 
@@ -77,7 +77,7 @@ public class ParallelEvents extends EventsManagerImpl {
 	 * @param estimatedNumberOfEvents
 	 * Only use this constructor for larger simulations (20M+ events).
 	 */
-	public ParallelEvents(int numberOfThreads, int estimatedNumberOfEvents) {
+	public ParallelEventsManagerImpl(int numberOfThreads, int estimatedNumberOfEvents) {
 		preInputBufferMaxLength = estimatedNumberOfEvents / 10;
 		init(numberOfThreads);
 	}

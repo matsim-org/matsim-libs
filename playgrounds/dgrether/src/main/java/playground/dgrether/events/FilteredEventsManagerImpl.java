@@ -33,7 +33,7 @@ import playground.dgrether.events.filters.EventFilter;
  * @author dgrether
  *
  */
-public class FilteredEvents extends EventsManagerImpl {
+public class FilteredEventsManagerImpl extends EventsManagerImpl {
 
 	private List<EventFilter> filters = new ArrayList<EventFilter>();
 

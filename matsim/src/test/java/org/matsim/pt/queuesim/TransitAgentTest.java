@@ -20,6 +20,7 @@
 
 package org.matsim.pt.queuesim;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import junit.framework.TestCase;
@@ -69,14 +70,16 @@ public class TransitAgentTest extends TestCase {
 		person.addPlan(plan);
 		Activity homeAct = pb.createActivityFromLinkId("home", scenario.createId("1"));
 		Leg leg = pb.createLeg(TransportMode.pt);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(100, 100), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(900, 100), false);
+		TransitStopFacility stopFacility1 = builder.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(100, 100), false);
+		TransitStopFacility stopFacility2 = builder.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(900, 100), false);
+		TransitRouteStop stop1 = builder.createTransitRouteStop(stopFacility1, 50, 60);
+		TransitRouteStop stop2 = builder.createTransitRouteStop(stopFacility2, 100, 110);
 		TransitLine line1 = builder.createTransitLine(scenario.createId("L1"));
 		TransitLine line2 = builder.createTransitLine(scenario.createId("L2"));
-		TransitRoute route1a = builder.createTransitRoute(scenario.createId("1a"), null, Collections.<TransitRouteStop>emptyList(), TransportMode.pt);
+		TransitRoute route1a = builder.createTransitRoute(scenario.createId("1a"), null, Arrays.asList(stop1, stop2), TransportMode.pt);
 		TransitRoute route1b = builder.createTransitRoute(scenario.createId("1b"), null, Collections.<TransitRouteStop>emptyList(), TransportMode.pt);
 		TransitRoute route2a = builder.createTransitRoute(scenario.createId("2a"), null, Collections.<TransitRouteStop>emptyList(), TransportMode.pt);
-		leg.setRoute(new ExperimentalTransitRoute(stop1, line1, route1a, stop2));
+		leg.setRoute(new ExperimentalTransitRoute(stopFacility1, line1, route1a, stopFacility2));
 		Activity workAct = pb.createActivityFromLinkId("work", scenario.createId("2"));
 		plan.addActivity(homeAct);
 		plan.addLeg(leg);
@@ -86,10 +89,10 @@ public class TransitAgentTest extends TestCase {
 		TransitAgent agent = new TransitAgent((PersonImpl) person, sim);
 		agent.initialize();
 		agent.activityEnds(10);
-		assertTrue(agent.getEnterTransitRoute(line1, route1a));
-		assertFalse(agent.getEnterTransitRoute(line1, route1b));
-		assertFalse(agent.getEnterTransitRoute(line2, route2a));
-		assertTrue(agent.getEnterTransitRoute(line1, route1a)); // offering the same line again should yield "true"
+		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops()));
+		assertFalse(agent.getEnterTransitRoute(line1, route1b, route1b.getStops()));
+		assertFalse(agent.getEnterTransitRoute(line2, route2a, route2a.getStops()));
+		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops())); // offering the same line again should yield "true"
 	}
 
 	public void testArriveAtStop() {

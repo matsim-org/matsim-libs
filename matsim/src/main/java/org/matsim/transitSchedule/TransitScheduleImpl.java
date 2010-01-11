@@ -20,7 +20,6 @@
 
 package org.matsim.transitSchedule;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -65,11 +64,11 @@ public class TransitScheduleImpl implements TransitSchedule {
 	}
 
 	public Map<Id, TransitLine> getTransitLines() {
-		return Collections.unmodifiableMap(this.transitLines);
+		return this.transitLines;
 	}
 	
 	public Map<Id, TransitStopFacility> getFacilities() {
-		return Collections.unmodifiableMap(this.stopFacilities);
+		return this.stopFacilities;
 	}
 	
 	public TransitScheduleFactory getFactory() {

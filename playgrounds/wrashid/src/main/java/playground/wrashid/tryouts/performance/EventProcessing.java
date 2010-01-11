@@ -7,7 +7,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
+import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 
 // this events processing relies on creating artifical events, intead of reading them
 /*
@@ -37,7 +37,7 @@ public class EventProcessing {
 		double timer=System.currentTimeMillis();
 		EventProcessing ep=new EventProcessing();
 		
-		EventsManagerImpl events = new ParallelEvents(numberOfThreads);
+		EventsManagerImpl events = new ParallelEventsManagerImpl(numberOfThreads);
 		//Events events = new Events();
 		
 		// start iteration

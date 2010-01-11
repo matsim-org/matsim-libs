@@ -12,6 +12,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufStueckI;
 import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;

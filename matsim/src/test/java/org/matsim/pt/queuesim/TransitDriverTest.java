@@ -300,7 +300,9 @@ public class TransitDriverTest extends TestCase {
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(1000, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
+		stops.add(builder.createTransitRouteStop(stop2, 100, 110));
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
@@ -430,8 +432,10 @@ public class TransitDriverTest extends TestCase {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean getEnterTransitRoute(final TransitLine tLine, final TransitRoute route) {
-			this.offeredLine = tLine;
+		@Override
+		public boolean getEnterTransitRoute(TransitLine line,
+				TransitRoute transitRoute, List<TransitRouteStop> stopsToCome) {
+			this.offeredLine = line;
 			return false;
 		}
 	}

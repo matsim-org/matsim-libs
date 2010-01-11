@@ -70,20 +70,22 @@ public class FacilityDrawer {
 			out.putInt(this.schedule.getFacilities().size());
 			for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
 				ByteBufferUtils.putString(out, facility.getId().toString());
-				ByteBufferUtils.putString(out, facility.getLinkId().toString());
-
-				// yyyy would most probably make sense to have something that generates coordinates for facilities
-				Link link = this.network.getLinks().get( facility.getLinkId() ) ;
-				if ( link==null ) {
-					log.warn( " link not found; linkId: " + facility.getLinkId() ) ;
+				if (facility.getLinkId() != null) {
+					ByteBufferUtils.putString(out, facility.getLinkId().toString());
+	
+					// yyyy would most probably make sense to have something that generates coordinates for facilities
+					Link link = this.network.getLinks().get( facility.getLinkId() ) ;
+					if ( link==null ) {
+						log.warn( " link not found; linkId: " + facility.getLinkId() ) ;
+					}
+					PositionInfo ps = new PositionInfo(facility.getId(),link) ;
+					
+					out.putDouble( ps.getEasting() - OTFServerQuad2.offsetEast ) ;
+					out.putDouble( ps.getNorthing() - OTFServerQuad2.offsetNorth ) ;
+				} else {
+					out.putDouble(facility.getCoord().getX() - OTFServerQuad2.offsetEast);
+					out.putDouble(facility.getCoord().getY() - OTFServerQuad2.offsetNorth);
 				}
-				PositionInfo ps = new PositionInfo(facility.getId(),link) ;
-				
-				out.putDouble( ps.getEasting() - OTFServerQuad2.offsetEast ) ;
-				out.putDouble( ps.getNorthing() - OTFServerQuad2.offsetNorth ) ;
-				
-//				out.putDouble(facility.getCoord().getX() - OTFServerQuad2.offsetEast);
-//				out.putDouble(facility.getCoord().getY() - OTFServerQuad2.offsetNorth);
 			}
 
 		}
@@ -121,7 +123,10 @@ public class FacilityDrawer {
 			for (int i = 0; i < numberOfEntries; i++) {
 				VisBusStop stop = new VisBusStop();
 				stop.id = ByteBufferUtils.getString(in);
-				stop.linkId = ByteBufferUtils.getString(in);
+				String linkIdString = ByteBufferUtils.getString(in);
+				if (!linkIdString.isEmpty()) {
+					stop.linkId = linkIdString;
+				}
 				stop.x = in.getDouble();
 				stop.y = in.getDouble();
 				if (this.drawer != null) {

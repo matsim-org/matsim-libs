@@ -220,16 +220,18 @@ public class VisumNetwork {
 		}
 	}
 	public static class StopPoint {
-		public final Id id,stopAreaId;
-
+		public final Id id;
+		public final Id stopAreaId;
 		public final String name;
 		public final Id refLinkNo;
+		public final Id nodeId;
 
-		public StopPoint(final Id id, final Id stopAreaId, final String name, final Id refLinkNo) {
+		public StopPoint(final Id id, final Id stopAreaId, final String name, final Id refLinkNo, final Id nodeId) {
 			this.id = id;
 			this.stopAreaId = stopAreaId;
 			this.name = name;
 			this.refLinkNo = refLinkNo;
+			this.nodeId = nodeId;
 		}
 	}
 	public static class TransitLineRoute {

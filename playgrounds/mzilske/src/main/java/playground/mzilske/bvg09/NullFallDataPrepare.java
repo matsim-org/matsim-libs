@@ -62,9 +62,9 @@ public class NullFallDataPrepare {
 
 	private static final Logger log = Logger.getLogger(NullFallDataPrepare.class);
 
-	private static String OutPath = "../berlin-bvg09/pt/nullfall_alles/";
+	private static String OutPath = "../berlin-bvg09/pt/nullfall_U8/";
 	private static String InVisumNetFile = "../berlin-bvg09/urdaten/nullfall2009-05-25.net";
-	private static List<String> transitLineFilter = /* Arrays.asList("B-M44","B-344"); */ null;
+	private static List<String> transitLineFilter = Arrays.asList("U-8"); 
 
 	// OUTPUT FILES
 	private static String OutNetworkFile = OutPath + "intermediateNetwork.xml";
@@ -124,6 +124,7 @@ public class NullFallDataPrepare {
 
 	private void convertRoutes() {
 		Iterator<TransitLine> transitLineI = this.scenario.getTransitSchedule().getTransitLines().values().iterator();
+		int linesSkipped = 0;
 		while (transitLineI.hasNext()) {
 			TransitLine transitLine = transitLineI.next();
 			try {
@@ -131,8 +132,10 @@ public class NullFallDataPrepare {
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 				transitLineI.remove();
+				++linesSkipped;
 			}
 		}
+		log.info("Skipped " + linesSkipped + " lines.");
 	}
 
 	private void convertLine(TransitLine transitLine) {

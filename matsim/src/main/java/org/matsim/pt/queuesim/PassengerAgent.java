@@ -20,8 +20,11 @@
 
 package org.matsim.pt.queuesim;
 
+import java.util.List;
+
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 
@@ -36,10 +39,11 @@ public interface PassengerAgent {
 	 *
 	 * @param line the transit line that is available
 	 * @param route the route being served
+	 * @param stopsToCome the remaining stops on the route to be served by this vehicle before the trip ends
 	 *
 	 * @return <code>true<code> if the passenger wants to board the line, <code>false</code> otherwise
 	 */
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute route);
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome);
 
 	/**
 	 * Informs a passenger in a transit vehicle that the vehicle has

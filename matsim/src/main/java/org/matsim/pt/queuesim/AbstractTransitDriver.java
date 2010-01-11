@@ -1,8 +1,9 @@
 package org.matsim.pt.queuesim;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,7 +36,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	private final QueueSimulation sim;
 	private TransitRouteStop nextStop;
 	private TransitStopFacility lastHandledStop = null;
-	private Iterator<TransitRouteStop> stopIterator;
+	private ListIterator<TransitRouteStop> stopIterator;
 
 	public abstract void legEnds(final double now);
 	public abstract NetworkRouteWRefs getCarRoute();
@@ -52,7 +53,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 
 	protected void init() {
 		if (getTransitRoute() != null) {
-			this.stopIterator = getTransitRoute().getStops().iterator();
+			this.stopIterator = getTransitRoute().getStops().listIterator();
 			this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
 		} else {
 			this.nextStop = null;
@@ -90,7 +91,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 		processEventVehicleArrives(stop, now);
 		ArrayList<PassengerAgent> passengersLeaving = findPassengersLeaving(stop);	
 		int freeCapacity = this.vehicle.getPassengerCapacity() - this.vehicle.getPassengers().size() + passengersLeaving.size();
-		ArrayList<PassengerAgent> passengersEntering = findPassengersEntering(stop, freeCapacity);
+		List<PassengerAgent> passengersEntering = findPassengersEntering(stop, freeCapacity);
 		double stopTime = handlePassengersAndCalculateStopTime(stop, now, passengersLeaving, passengersEntering);
 		stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
 		if (stopTime == 0.0) {
@@ -175,7 +176,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	private double handlePassengersAndCalculateStopTime(
 			final TransitStopFacility stop, final double now,
 			ArrayList<PassengerAgent> passengersLeaving,
-			ArrayList<PassengerAgent> passengersEntering) {
+			List<PassengerAgent> passengersEntering) {
 		double stopTime = 0.0;
 		int cntEgress = passengersLeaving.size();
 		int cntAccess = passengersEntering.size();
@@ -192,7 +193,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	}
 
 	private void handlePassengersEntering(final TransitStopFacility stop,
-			final double now, ArrayList<PassengerAgent> passengersEntering) {
+			final double now, List<PassengerAgent> passengersEntering) {
 		EventsManager events = QueueSimulation.getEvents();
 		for (PassengerAgent passenger : passengersEntering) {
 			this.agentTracker.removeAgentFromStop(passenger, stop);
@@ -216,17 +217,17 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 		}
 	}
 
-	private ArrayList<PassengerAgent> findPassengersEntering(
+	private List<PassengerAgent> findPassengersEntering(
 			final TransitStopFacility stop, int freeCapacity) {
 		ArrayList<PassengerAgent> passengersEntering = new ArrayList<PassengerAgent>();
-		
 		for (PassengerAgent agent : this.agentTracker.getAgentsAtStop(stop)) {
 			if (freeCapacity == 0) {
 				break;
 			}
-			PassengerAgent passenger = agent;
-			if (passenger.getEnterTransitRoute(getTransitLine(), getTransitRoute())) {
-				passengersEntering.add(passenger);
+			List<TransitRouteStop> stops = getTransitRoute().getStops();
+			List<TransitRouteStop> stopsToCome = stops.subList(stopIterator.nextIndex(), stops.size());
+			if (agent.getEnterTransitRoute(getTransitLine(), getTransitRoute(), stopsToCome)) {
+				passengersEntering.add(agent);
 				freeCapacity--;
 			}
 		}

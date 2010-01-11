@@ -59,11 +59,20 @@ import org.matsim.vehicles.BasicVehicleCapacityImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.visum.VisumNetwork;
+import org.matsim.visum.VisumNetworkReader;
+import org.matsim.visum.VisumNetwork.StopPoint;
 import org.xml.sax.SAXException;
 
 import playground.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
 
 public class NullFallFacilityRollout {
+
+	public class InvalidLineException extends Exception {
+
+		private static final long serialVersionUID = 1L;
+
+	}
 
 	private static final Logger log = Logger.getLogger(NullFallFacilityRollout.class);
 
@@ -71,15 +80,18 @@ public class NullFallFacilityRollout {
 	
 	private static String InNetworkFile = path + "intermediateNetwork.xml";
 	private static String InTransitScheduleFile = path + "intermediateTransitSchedule.xml";
+	private static String InVisumNetFile = "../berlin-bvg09/urdaten/nullfall2009-05-25.net";
 	private static String OutNetworkFile = path + "network.xml";
 	private static String OutTransitScheduleFile = path + "transitSchedule.xml";
 	private static String OutVehicleFile = path + "vehicles.xml";
+	
 	private final ScenarioImpl inScenario;
 	private final Config inConfig;
 	private final ScenarioImpl outScenario;
 	private final Config outConfig;
 	private Map<TransitStopFacility, Map<Link, TransitStopFacility>> transitStopInLinks = new HashMap<TransitStopFacility, Map<Link, TransitStopFacility>>();
-
+	private VisumNetwork vNetwork;
+	
 	private Collection<Umlauf> umlaeufe;
 
 	
@@ -138,6 +150,19 @@ public class NullFallFacilityRollout {
 		}
 		ScenarioLoaderImpl outLoader = new ScenarioLoaderImpl(outScenario);
 		outLoader.loadScenario();
+		readVisumNetwork();
+	}
+	
+	private void readVisumNetwork()  {
+		vNetwork = new VisumNetwork();
+		log.info("reading visum network.");
+		try {
+			new VisumNetworkReader(vNetwork).read(InVisumNetFile);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void copyRoutes() {
@@ -153,20 +178,22 @@ public class NullFallFacilityRollout {
 		TransitSchedule outTransitSchedule = this.outScenario.getTransitSchedule();
 		Map<Id, TransitStopFacility> facilityTemplates = new HashMap<Id, TransitStopFacility>(inTransitSchedule.getFacilities());
 		Iterator<TransitLine> transitLineI = outTransitSchedule.getTransitLines().values().iterator();
+		int linesSkipped = 0;
 		while (transitLineI.hasNext()) {
 			TransitLine transitLine = transitLineI.next();
 			try {
 				enterFacilitiesForLine(facilityTemplates, transitLine);
-			} catch (RuntimeException e) {
-				e.printStackTrace();
+			} catch (InvalidLineException e) {
 				transitLineI.remove();
+				++linesSkipped;
 			}
 		}
+		log.info("Skipped " + linesSkipped + " lines.");
 	}
 
 	private void enterFacilitiesForLine(
 			Map<Id, TransitStopFacility> facilityTemplates,
-			TransitLine transitLine) {
+			TransitLine transitLine) throws InvalidLineException {
 		for (TransitRoute transitRouteI: transitLine.getRoutes().values()) {
 			NetworkRouteWRefs linkNetworkRoute = transitRouteI.getRoute();
 			Collection<Link> links = getAllLink(linkNetworkRoute);
@@ -174,11 +201,50 @@ public class NullFallFacilityRollout {
 			for (TransitRouteStop stop : transitRouteI.getStops()) {
 				Link link = linkIterator.next();
 				Id stopPointNo = stop.getStopFacility().getId();
-				while (!stopPointNo.equals(link.getToNode().getId())) {
-					link = linkIterator.next();
+				StopPoint stopPoint = findStopPoint(stopPointNo);
+				if (stopPoint == null) {
+					log.error("Stops: ");
+					dumpStops(transitRouteI.getStops());
+					log.error("Route: ");
+					dumpRoute(linkNetworkRoute);
+					log.error("Stop point " + stopPointNo + " doesn't appear to be in the visum network.");
 				}
-				enterNewFacilityIfNecessary(transitRouteI, stopPointNo, link, facilityTemplates);
+				Id stopPointNodeNo = stopPoint.nodeId;
+				while (!stopPointNodeNo.equals(link.getToNode().getId())) {
+					if (linkIterator.hasNext()) {
+						link = linkIterator.next();
+					} else {
+						log.error("Stops: ");
+						dumpStops(transitRouteI.getStops());
+						log.error("Route: ");
+						dumpRoute(linkNetworkRoute);
+						throw new InvalidLineException();
+					}
+				}
+				enterNewFacilityIfNecessary(stop, stopPointNo, link, facilityTemplates);
 			}
+		}
+	}
+
+	private StopPoint findStopPoint(Id stopPointNo) {
+		for (StopPoint stopPoint : vNetwork.stopPoints.values()) {
+			if (stopPointNo.toString().equals(stopPoint.id.toString())) {
+				return stopPoint;
+			}
+		}
+		return null;
+	}
+
+	private void dumpRoute(NetworkRouteWRefs linkNetworkRoute) {
+		Collection<Link> links = getAllLink(linkNetworkRoute);
+		for (Link link : links) {
+			log.error(link.getFromNode().getId() + " ---> " + link.getToNode().getId());
+		}
+	}
+
+	private void dumpStops(List<TransitRouteStop> stops) {
+		for (TransitRouteStop stop : stops) {
+			log.error("Stop: " + stop.getStopFacility().getId());
 		}
 	}
 
@@ -190,20 +256,19 @@ public class NullFallFacilityRollout {
 		return links;
 	}
 
-	private void enterNewFacilityIfNecessary(TransitRoute transitRoute,
+	private void enterNewFacilityIfNecessary(TransitRouteStop stop,
 			Id stopPointNo, Link link, Map<Id, TransitStopFacility> facilityTemplates) {
 		if (stopPointNo != null) {
 			TransitStopFacility facility = checkFacility(stopPointNo, link, facilityTemplates);
-			enterFacility(stopPointNo, facility, transitRoute.getStops());
+			enterFacility(stopPointNo, facility, stop);
 		}
 	}
 
-	private void enterFacility(Id stopPointNo, TransitStopFacility facility,
-			List<TransitRouteStop> stops) {
-		for (TransitRouteStop stop : stops) {
-			if (stopPointNo.equals(stop.getStopFacility().getId())) {
-				stop.setStopFacility(facility);
-			}
+	private void enterFacility(Id stopPointNo, TransitStopFacility facility, TransitRouteStop stop) {
+		if (stopPointNo.equals(stop.getStopFacility().getId())) {
+			stop.setStopFacility(facility);
+		} else {
+			throw new RuntimeException();
 		}
 	}
 

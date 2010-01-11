@@ -38,7 +38,7 @@ import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
 
-import playground.dgrether.events.FilteredEvents;
+import playground.dgrether.events.FilteredEventsManagerImpl;
 import playground.dgrether.events.filters.PersonEventFilter;
 
 
@@ -68,7 +68,7 @@ public class SubPopScorer {
   private void calculateScore(Set<Id> idSet) {
   	Config config = Gbl.getConfig();
   	String eventsFilePath = config.events().getInputFile();
-  	FilteredEvents events = new FilteredEvents();
+  	FilteredEventsManagerImpl events = new FilteredEventsManagerImpl();
   	MatsimEventsReader reader = new MatsimEventsReader(events);
   	//set the filter
   	PersonEventFilter filter = new PersonEventFilter(idSet);

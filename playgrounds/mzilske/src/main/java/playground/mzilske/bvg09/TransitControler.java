@@ -106,7 +106,6 @@ public class TransitControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		this.events.addHandler(new LogOutputEventHandler());
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
 		sim.setUseUmlaeufe(true);
 		sim.startOTFServer("livesim");

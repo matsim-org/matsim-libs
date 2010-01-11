@@ -20,6 +20,9 @@
 
 package org.matsim.pt.fakes;
 
+
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
@@ -31,6 +34,7 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 
@@ -107,7 +111,7 @@ public class FakeAgent implements DriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute route) {
+	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome) {
 		return true;
 	}
 
