@@ -40,8 +40,9 @@ public class PTTravelCost implements TravelCost{
 		if (type.equals( PTValues.DETTRANSFER_STR ) || type.equals( PTValues.TRANSFER_STR )){
 			cost += transferPenalty;
 		}else if (type.equals( PTValues.STANDARD_STR )){
-			if(PTValues.routerCalculator==2){	
-				cost = (cost * timeCoefficient) + (link.getLength() * distanceCoefficient);}
+			if(PTValues.routerCalculator==3){	
+				cost = (cost * timeCoefficient) + (link.getLength() * distanceCoefficient);
+			}
 		}else if (type.equals( PTValues.ACCESS_STR ) || type.equals( PTValues.EGRESS_STR )){
 				//cost = cost * walkCoefficient;  //add a walk coefficient 
 		}else{

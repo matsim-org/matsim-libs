@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.mmoyo.TransitSimulation;
 
+/*
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -29,39 +30,29 @@ import org.matsim.pt.queuesim.TransitQueueSimulation;
 //import org.matsim.run.OTFVis;
 import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.config.TransitConfigGroup;
+import playground.mrieser.pt.controler.TransitControler;
+
+//import org.matsim.ptproject.controller.PtController;
+*/
+import org.matsim.api.core.v01.ScenarioImpl;
+
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import playground.mrieser.pt.config.TransitConfigGroup;
 import playground.mzilske.bvg09.TransitControler;
 
 
-//import org.matsim.ptproject.controller.PtController;
-
-
-public class MMoyoTransitControler extends TransitControler {
-	boolean launchOTFDemo=false;
+public class MMoyoTransitControler2 extends TransitControler {
+	boolean launchOTFDemo=true;
 	
-	public MMoyoTransitControler(final String[] args) {
+	public MMoyoTransitControler2(final String[] args) {
 		super(args);
 	}
 	 
-	public MMoyoTransitControler(final ScenarioImpl scenario, boolean launchOTFDemo){
+	public MMoyoTransitControler2(final ScenarioImpl scenario, boolean launchOTFDemo){
 		super(scenario);
 		this.launchOTFDemo = launchOTFDemo;
-	}
-	
-	@Override
-	protected void runMobSim() {
-		if (launchOTFDemo){
-			TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
-			sim.startOTFServer("livesim");
-			OTFDemo.ptConnect("livesim");
-			sim.run();
-
-			/*
-			TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
-			sim.startOTFServer("livesim");
-			new OnTheFlyClientQuad("rmi:127.0.0.1:4019:" + "livesim").start();
-			sim.run();
-			*/
-		}
 	}
 
 	@Override

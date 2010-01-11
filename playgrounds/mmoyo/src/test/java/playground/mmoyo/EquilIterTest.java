@@ -21,8 +21,8 @@ public class EquilIterTest extends MatsimTestCase {
 	
 	public void testEquil() throws IOException, JAXBException, SAXException, ParserConfigurationException{
 		
-		//test\input\playground\mmoyo\EquilIterTest\testEquil\output_plans.xml.gz
-		String inputDirectory = getInputDirectory(); 
+		///playgrounds/mmoyo/test/input/playground/mmoyo/EquilIterTest/testEquil/output_plans.xml.gz
+		String inputDirectory = "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilIterTest/testEquil/";//getInputDirectory(); 
 		String outputDirectory = getOutputDirectory() + "transitEquil2";
 		String expectedFile =  inputDirectory + OUT_PLANS_FILE;
 		String outputFile = outputDirectory + "/" + OUT_PLANS_FILE;

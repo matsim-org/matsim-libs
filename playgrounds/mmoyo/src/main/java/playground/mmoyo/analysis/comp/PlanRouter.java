@@ -36,17 +36,19 @@ public class PlanRouter {
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		System.out.println( PTValues.routerCalculator );
 		switch (PTValues.routerCalculator){
-			case 1:  //moyo time
+			case 1:  //rieser 
+				router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
+				routedPlansFile += "/routedPlans.xml" ;
+				break;
+			case 2:	 //moyo time
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
 				routedPlansFile += "/moyo_routedPlans_time.xml" ;
-				 break;
-			case 2:	 //moyo parameterized
+				break;
+			case 3:	 //moyo parameterized
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
 				routedPlansFile += "/moyo_routedPlans_parameterized.xml" ;
 				 break;
 			default:
-				router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += "/routedPlans.xml" ;
 		}
 		router.run(scenario.getPopulation());	
 
@@ -58,7 +60,7 @@ public class PlanRouter {
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		double startTime = System.currentTimeMillis();
 		
-		String configFile;
+		String configFile = null;
 	
 		if (args.length>0){
 			configFile = args[0]; 
@@ -66,7 +68,7 @@ public class PlanRouter {
 			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_10x_900s_big.xml";
 			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_big.xml";
 			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_small.xml";
-			configFile = "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/config.xml";
+			//configFile = "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/config.xml";
 		}
  
 		/**load scenario */
