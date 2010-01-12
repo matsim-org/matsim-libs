@@ -129,7 +129,7 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
     String command = e.getActionCommand();
     if("id_changed".equals(command)) {
       String id = ((JTextField)e.getSource()).getText();
-      log.error("action performed on textfield with text " + id);
+      log.debug("action performed on textfield with text " + id);
       if (!cfg.isMultipleSelect()){
         this.queryControl.removeQueries();
       }
