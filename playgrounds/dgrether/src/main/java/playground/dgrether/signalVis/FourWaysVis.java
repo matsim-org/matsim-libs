@@ -27,7 +27,7 @@ import org.matsim.vis.otfvis.OTFVisQueueSim;
 
 public class FourWaysVis {
 
-	public static final String TESTINPUTDIR = "test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
+	public static final String TESTINPUTDIR = "../matsim/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
 	
 	/**
 	 * @param args

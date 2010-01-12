@@ -19,20 +19,20 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis;
 
+import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
+import org.matsim.lanes.otfvis.io.OTFLaneReader;
+import org.matsim.lanes.otfvis.io.OTFLaneWriter;
+import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
+import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
+import org.matsim.signalsystems.otfvis.layer.OTFSignalLayer;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
-import playground.dgrether.signalVis.drawer.DgLaneSignalDrawer;
-import playground.dgrether.signalVis.io.DgOtfLaneReader;
-import playground.dgrether.signalVis.io.DgOtfLaneWriter;
-import playground.dgrether.signalVis.io.DgOtfSignalWriter;
-import playground.dgrether.signalVis.io.DgSignalReader;
-import playground.dgrether.signalVis.layer.DgOtfLaneLayer;
-import playground.dgrether.signalVis.layer.DgOtfSignalLayer;
 
 
 /**
@@ -48,25 +48,25 @@ public class DgConnectionManagerFactory {
 		
 		if (drawLanes){
 			// data source to writer
-			connectionManager.add(QueueLink.class, DgOtfLaneWriter.class);
+			connectionManager.add(QueueLink.class, OTFLaneWriter.class);
 			// writer -> reader: from server to client
 			connectionManager
-			.add(DgOtfLaneWriter.class, DgOtfLaneReader.class);
+			.add(OTFLaneWriter.class, OTFLaneReader.class);
 			// reader to drawer (or provider to receiver)
-			connectionManager.add(DgOtfLaneReader.class, DgLaneSignalDrawer.class);
+			connectionManager.add(OTFLaneReader.class, OTFLaneSignalDrawer.class);
 			// drawer -> layer
-			connectionManager.add(DgLaneSignalDrawer.class, DgOtfLaneLayer.class);
+			connectionManager.add(OTFLaneSignalDrawer.class, OTFLaneLayer.class);
 		}
 		else if (drawSignals) {
 			// data source to writer
-			connectionManager.add(QueueLink.class, DgOtfSignalWriter.class);
+			connectionManager.add(QueueLink.class, OTFSignalWriter.class);
 			// writer -> reader: from server to client
 			connectionManager
-			.add(DgOtfSignalWriter.class, DgSignalReader.class);
+			.add(OTFSignalWriter.class, OTFSignalReader.class);
 			// reader to drawer (or provider to receiver)
-			connectionManager.add(DgSignalReader.class, DgLaneSignalDrawer.class);
+			connectionManager.add(OTFSignalReader.class, OTFLaneSignalDrawer.class);
 			// drawer -> layer
-			connectionManager.add(DgLaneSignalDrawer.class, DgOtfSignalLayer.class);
+			connectionManager.add(OTFLaneSignalDrawer.class, OTFSignalLayer.class);
 		}
 
 		//agent code
