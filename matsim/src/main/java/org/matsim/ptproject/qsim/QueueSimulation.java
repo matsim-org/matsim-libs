@@ -478,11 +478,18 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 			}
 		}
 	}
-
-	public static final EventsManager getEvents() {
+	/**
+	 * @deprecated try to use non static method getEventsManager()
+	 */
+	@Deprecated
+  public static final EventsManager getEvents() {
 		return events;
 	}
 
+	public final EventsManager getEventsManager(){
+	  return events;
+	}
+	
 	private static final void setEvents(final EventsManager events) {
 		QueueSimulation.events = events;
 	}
