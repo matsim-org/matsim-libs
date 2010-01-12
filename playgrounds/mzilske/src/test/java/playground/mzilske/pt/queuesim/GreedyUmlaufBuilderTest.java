@@ -3,6 +3,7 @@ package playground.mzilske.pt.queuesim;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,6 +36,7 @@ public class GreedyUmlaufBuilderTest {
 		}
 	}
 	
+	@Test
 	public void testGreedyUmlaufBuilder() {
 		createIds();
 		Config config = this.scenario.getConfig();
