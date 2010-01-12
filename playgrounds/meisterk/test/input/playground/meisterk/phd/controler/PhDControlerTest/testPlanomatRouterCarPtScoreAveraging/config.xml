@@ -21,7 +21,7 @@
 	</module>
 
 	<module name="planCalcScore">
-		<param name="learningRate" value="1.0" />
+		<param name="learningRate" value="0.1" />
 		<param name="BrainExpBeta" value="2.0" />
 
 		<param name="lateArrival" value="-18" />
@@ -48,15 +48,20 @@
 	<module name="planomat">
 		<param name="jgapMaxGenerations" value="10" />
 		<param name="tripStructureAnalysisLayer" value="link" />
+		<param name="possibleModes" value="car,pt" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz" />
+		<param name="inputPlansFile" value="test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarPt/expected_plans.xml.gz" />
+	</module>
+	
+	<module name="planscalcroute">
+		<param name="ptSpeedFactor" value="1.5" />
 	</module>
 
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="3" /> <!-- 0 means unlimited -->
-		<param name="ModuleProbability_1" value="0.8" />
+		<param name="ModuleProbability_1" value="0.9" />
 		<param name="Module_1" value="SelectExpBeta" />
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="Planomat" />

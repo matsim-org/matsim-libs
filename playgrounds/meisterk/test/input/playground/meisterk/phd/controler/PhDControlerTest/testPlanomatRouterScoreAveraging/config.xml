@@ -21,7 +21,7 @@
 	</module>
 
 	<module name="planCalcScore">
-		<param name="learningRate" value="1.0" />
+		<param name="learningRate" value="0.1" />
 		<param name="BrainExpBeta" value="2.0" />
 
 		<param name="lateArrival" value="-18" />

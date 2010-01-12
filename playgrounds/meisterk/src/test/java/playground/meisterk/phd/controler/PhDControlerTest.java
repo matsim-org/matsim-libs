@@ -74,7 +74,30 @@ public class PhDControlerTest extends MatsimTestCase {
 		this.runATest(expectedPlanScores);
 	}
 	
+	public void testPlanomatOnlyScoreAveraging() {
+
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), 106.30178164049529);
+		expectedPlanScores.put(new IdImpl(1033), -22.113775783571786);
+		expectedPlanScores.put(new IdImpl(1072), 105.25710448730098);
+		expectedPlanScores.put(new IdImpl(947), 106.85200830143964);
+
+		this.runATest(expectedPlanScores);
+	}
+	
 	public void testPlanomatRouter() {
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 99.5184077860448);
+		expectedPlanScores.put(new IdImpl(1072), 103.6855356436988);
+		expectedPlanScores.put(new IdImpl(947), 107.41882610816248);
+
+		this.runATest(expectedPlanScores);
+		
+	}
+	
+	public void testPlanomatRouterScoreAveraging() {
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
@@ -93,6 +116,17 @@ public class PhDControlerTest extends MatsimTestCase {
 		expectedPlanScores.put(new IdImpl(1033), 106.53017916647772);
 		expectedPlanScores.put(new IdImpl(1072), null);
 		expectedPlanScores.put(new IdImpl(947), 103.45836480987339);
+
+		this.runATest(expectedPlanScores);
+	}
+	
+	public void testPlanomatRouterCarPtScoreAveraging() {
+
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 106.70849583314438);
+		expectedPlanScores.put(new IdImpl(1072), null);
+		expectedPlanScores.put(new IdImpl(947), 103.6860690389314);
 
 		this.runATest(expectedPlanScores);
 	}
@@ -154,7 +188,11 @@ public class PhDControlerTest extends MatsimTestCase {
 					if (expectedScore == null) {
 						assertNull(actualScore);
 					} else {
-						assertEquals("Unexpected score for selected plan of agent with id " + personId.toString() + ".", expectedScore, actualScore, MatsimTestCase.EPSILON);
+						assertEquals(
+								"Unexpected score for selected plan of agent with id " + personId.toString() + ".", 
+								expectedScore, 
+								actualScore, 
+								MatsimTestCase.EPSILON);
 					}
 				}
 				
