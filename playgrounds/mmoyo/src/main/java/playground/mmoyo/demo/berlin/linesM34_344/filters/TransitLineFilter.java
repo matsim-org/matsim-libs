@@ -24,7 +24,7 @@ public class TransitLineFilter {
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException  {
 		final String SCHEDULEFILE = "../shared-svn/studies/countries/de/berlin-bvg09/pt/baseplan_10x_900s_bignetwork/transitSchedule.networkOevModellBln.xml.gz";
 		final String NETWORKFILE  = "../shared-svn/studies/countries/de/berlin-bvg09/pt/baseplan_10x_900s_bignetwork/network.multimodal.xml.gz";
-		final String FILTERED_SCHEDULE_FILE = "./output/filteredSchedule.xml";
+		final String FILTERED_SCHEDULE_FILE = "../playgrounds/mmoyo/output/filteredSchedule.xml";
 		//final String[] linesArray = {"BVB----M44", "BVB----344"};
 		final String[] linesArray = {"S45", "S46", "S47", "BVU----U7", "BVU----U8", "BVB----M11", "BVB----M29", "BVB----M41", "BVB----M44", "BVB----M46", "BVB----X11", "BVB----104",  "BVB----167", "BVB----170",  "BVB----171", "BVB----172", "BVB----181", "BVB----194", "BVB----246", "BVB----277", "BVB----344", "735", "736",  "BVB----N8"};
 		
@@ -59,7 +59,6 @@ public class TransitLineFilter {
 			filteredTransitSchedule.addTransitLine(line);
 		}
 		
-		//write the filtered schedule
 		new TransitScheduleWriterV1(filteredTransitSchedule).write(FILTERED_SCHEDULE_FILE);
 	}
 	

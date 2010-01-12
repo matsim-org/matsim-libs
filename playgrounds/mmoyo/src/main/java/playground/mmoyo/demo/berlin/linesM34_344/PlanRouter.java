@@ -27,7 +27,7 @@ import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.config.TransitConfigGroup;
 import playground.mrieser.pt.router.PlansCalcTransitRoute;
 
-/**read a config file, routes the transit plans and plays OFTDemo*/ 
+@Deprecated
 public class PlanRouter {
 
 	private static final String SERVERNAME = "ScenarioPlayer";
@@ -78,7 +78,7 @@ public class PlanRouter {
 		if (args.length==1){
 			configFile = args[0];} 
 		else {
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/config_baseplan_900s_bignetwork.xml";
+			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_small.xml";
 		}
  
 		/**load scenario */

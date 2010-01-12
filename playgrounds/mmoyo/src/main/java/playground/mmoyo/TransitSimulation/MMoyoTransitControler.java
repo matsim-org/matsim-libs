@@ -30,10 +30,7 @@ import org.matsim.pt.queuesim.TransitQueueSimulation;
 import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.config.TransitConfigGroup;
 import playground.mzilske.bvg09.TransitControler;
-
-
 //import org.matsim.ptproject.controller.PtController;
-
 
 public class MMoyoTransitControler extends TransitControler {
 	boolean launchOTFDemo=false;
@@ -49,19 +46,18 @@ public class MMoyoTransitControler extends TransitControler {
 	
 	@Override
 	protected void runMobSim() {
+		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
 		if (launchOTFDemo){
-			TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
 			sim.startOTFServer("livesim");
 			OTFDemo.ptConnect("livesim");
-			sim.run();
-
-			/*
-			TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
-			sim.startOTFServer("livesim");
-			new OnTheFlyClientQuad("rmi:127.0.0.1:4019:" + "livesim").start();
-			sim.run();
-			*/
 		}
+		sim.run();
+		/*
+		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
+		sim.startOTFServer("livesim");
+		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:" + "livesim").start();
+		sim.run();
+		*/
 	}
 
 	@Override

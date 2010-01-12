@@ -12,13 +12,14 @@ public class OccupancyCounts_900s_small {
 		String transitRouteStrId1 = "BVB----344.3.BVB----344.H";
 		String transitRouteStrId2 = "BVB----344.5.BVB----344.R";
 		
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/config_900s_small_rieser.xml";
-		OccupancyCounts.main(new String[]{configFile,transitLineStrId, transitRouteStrId1, transitRouteStrId2});
-	
-		String configFile2 = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/config_900s_small_moyo_time.xml";
-		OccupancyCounts.main(new String[]{configFile2,transitLineStrId, transitRouteStrId1, transitRouteStrId2});
+		String[] configs= new String[3];
+		configs[0]= "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/routed_configs/config_900s_small_rieser.xml";
+		configs[1]= "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/routed_configs/config_900s_small_moyo_time.xml";
+		configs[2]= "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/routed_configs/config_900s_small_moyo_parameterized.xml";
 		
-		String configFile3 = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/config_900s_small_moyo_parameterized.xml";
-		OccupancyCounts.main(new String[]{configFile3,transitLineStrId, transitRouteStrId1, transitRouteStrId2});
+		for (byte i=0; i<3; i++){
+			OccupancyCounts.main(new String[]{configs[i], transitLineStrId, transitRouteStrId1, transitRouteStrId2});
+		}
+	
 	}
 }

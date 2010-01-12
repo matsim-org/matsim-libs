@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.xml.sax.SAXException;
@@ -23,8 +24,6 @@ import playground.mrieser.pt.router.PlansCalcTransitRoute;
 /**reads a config file, routes the transit plans and writes a routed plans file*/ 
 public class PlanRouter {
 
-	///private static boolean useMoyoRouter  = true;     //true= MmoyoPtRouter)   false= transitRouter
-	
 	public PlanRouter(ScenarioImpl scenario) {
 		
 		PlansCalcRoute router= null;
@@ -38,23 +37,28 @@ public class PlanRouter {
 		switch (PTValues.routerCalculator){
 			case 1:  //rieser 
 				router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += "/routedPlans.xml" ;
+				routedPlansFile += "/routedPlans" ;
 				break;
 			case 2:	 //moyo time
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += "/moyo_routedPlans_time.xml" ;
+				routedPlansFile += "/moyo_routedPlans_time" ;
 				break;
 			case 3:	 //moyo parameterized
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += "/moyo_routedPlans_parameterized.xml" ;
+				routedPlansFile += "/moyo_routedPlans_parameterized" ;
 				 break;
 			default:
 		}
 		router.run(scenario.getPopulation());	
 
+		//Get rid of only car plans
+		PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.pt, false ) ;
+		plansFilter.run(scenario.getPopulation()) ;
+		
 		System.out.println("writing output plan file..." + routedPlansFile);
-		new PopulationWriter(scenario.getPopulation()).write(routedPlansFile);  //Writes routed plans file
-		System.out.println("done");	
+		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation()) ;
+		popwriter.write(routedPlansFile) ;
+		System.out.println("done");		
 	}
 	
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
@@ -65,9 +69,6 @@ public class PlanRouter {
 		if (args.length>0){
 			configFile = args[0]; 
 		}else {
-			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_10x_900s_big.xml";
-			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_big.xml";
-			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_small.xml";
 			//configFile = "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/config.xml";
 		}
  

@@ -8,7 +8,7 @@ import playground.mzilske.bvg09.TransitControler;
 public class Controler_launcher_20plans {
 	
 	public static void main(String[] args) {
-		//in order to run this the call to the OTFserver must be commented at controler.runMobSim
+		//in order to run this, the call to the OTFserver must be commented at controler.runMobSim
 		//          //sim.startOTFServer("livesim");
 		//          //OTFDemo.ptConnect("livesim", this.config);
 		
@@ -24,6 +24,6 @@ public class Controler_launcher_20plans {
 		
 		//This works without problems
 		//String config2 = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/nullFall/config_20plansNull.xml";
-		//TransitControler.main(new String[]{config});
+		//TransitControler.main(new String[]{config2});
 		}
 }

@@ -44,7 +44,7 @@ public class PtVehiclePlayer {
 		if (args.length==1){
 			configFile = args[0];} 
 		else {
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/config_baseplan_900s_bignetwork.xml";
+			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_small.xml";
 		}
  
 		/**load scenario */

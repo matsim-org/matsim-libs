@@ -62,10 +62,6 @@ public class OccupancyCounts {
 		String transitRouteStrId1 = args[2];
 		String transitRouteStrId2 = args[3];
 		
-		//private static String transitLineStrId = "BVB----344";
-		//private static String transitRouteStrId1 = "BVB----344.3.BVB----344.H";
-		//private static String transitRouteStrId2 = "BVB----344.5.BVB----344.R";
-		
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl scenario = sl.getScenario();
 
@@ -118,8 +114,6 @@ public class OccupancyCounts {
 			inVehicle = inVehicle + enter - leave;
 			System.out.println(stopId + "\t" + leave + "\t" + enter + "\t" + inVehicle);
 		}
-		
-	
 	}
 
 }

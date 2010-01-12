@@ -11,14 +11,10 @@ public class Router_900sbig {
 
 		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_big.xml";
 		
-		PTValues.routerCalculator = 1;
-		PlanRouter.main(new String[]{configFile});
-		
-		PTValues.routerCalculator = 2;
-		PlanRouter.main(new String[]{configFile});
-
-		PTValues.routerCalculator = 3;
-		PlanRouter.main(new String[]{configFile});
+		for (byte i=1; i<=3; i++){
+			PTValues.routerCalculator = i;
+			PlanRouter.main(new String[]{configFile});
+		}
 
 	}
 }
