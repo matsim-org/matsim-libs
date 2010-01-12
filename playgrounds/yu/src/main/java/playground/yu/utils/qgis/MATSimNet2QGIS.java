@@ -86,6 +86,9 @@ public class MATSimNet2QGIS implements X2QGIS {
 	protected CoordinateReferenceSystem crs = null;
 	protected X2GraphImpl n2g = null;
 
+	protected MATSimNet2QGIS() {
+	}
+
 	public MATSimNet2QGIS(String netFilename, String coordRefSys) {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 		crs = MGC.getCRS(coordRefSys);
@@ -161,9 +164,9 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public static void main(final String[] args) {
-		String netFilename = "../berlin-bvg09/net/miv_small/m44_344_small_ba.xml.gz";
+		String netFilename = "../berlin-bvg09/pt/nullfall_alles/network.xml";
 
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(netFilename, gk4);
-		mn2q.writeShapeFile("../berlin-bvg09/net/miv_small/m44_344_small_ba.shp");
+		mn2q.writeShapeFile("../berlin-bvg09/pt/nullfall_alles/ptNet.shp");
 	}
 }

@@ -127,8 +127,6 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 
 					features.add(ftRoad.create(o, "pt-route-net"));
 				}
-			for (Feature feature : features)
-				System.out.println("feature:\t" + feature.toString());
 			return features;
 		}
 
@@ -326,10 +324,10 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String netFilename = "../berlin-bvg09/pt/nullfall_M44_344/network.xml";
-		String scheduleFilename = "../berlin-bvg09/pt/nullfall_M44_344/transitSchedule.xml";
+		String netFilename = "../berlin-bvg09/pt/nullfall_alles/network.xml";
+		String scheduleFilename = "../berlin-bvg09/pt/nullfall_alles/transitSchedule.xml";
 
 		PtRoute2QGIS pr2q = new PtRoute2QGIS(netFilename, gk4, scheduleFilename);
-		pr2q.writeShapeFile("../berlin-bvg09/pt/nullfall_M44_344/schedule.shp");
+		pr2q.writeShapeFile("../berlin-bvg09/pt/nullfall_alles/schedule.shp");
 	}
 }

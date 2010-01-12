@@ -40,12 +40,10 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * @author yu
@@ -87,28 +85,7 @@ public class Network2PolygonGraph extends X2GraphImpl {
 				fromNode, toNode, length, cap, type, freespeed, transMode });
 	}
 
-	protected LinearRing getLinearRing(Link link) {
-		// //////////////////////////////////////////////////////////////
-		double width = getLinkWidth(link);
-		// //////////////////////////////////////////////////////////////
-		Coordinate from = new Coordinate(link.getFromNode().getCoord().getX(),
-				link.getFromNode().getCoord().getY());
 
-		Coordinate to = new Coordinate(link.getToNode().getCoord().getX(), link
-				.getToNode().getCoord().getY());
-
-		double xdiff = to.x - from.x;
-		double ydiff = to.y - from.y;
-		double denominator = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
-		double xwidth = width * ydiff / denominator;
-		double ywidth = -width * xdiff / denominator;
-
-		Coordinate fromB = new Coordinate(from.x + xwidth, from.y + ywidth, 0);
-		Coordinate toB = new Coordinate(to.x + xwidth, to.y + ywidth, 0);
-		// ////////////////////////////////////////////////////////////////////////
-		return new LinearRing(new CoordinateArraySequence(new Coordinate[] {
-				from, to, toB, fromB, from }), this.geofac);
-	}
 
 	protected double getLinkWidth(Link link) {
 		return link.getCapacity(Time.UNDEFINED_TIME)

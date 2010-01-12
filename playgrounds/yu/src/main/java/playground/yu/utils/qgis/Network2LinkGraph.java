@@ -46,8 +46,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * 
  * @author ychen
  */
-public class Network2LinkGraph extends X2GraphImpl implements
-		X2Graph {
+public class Network2LinkGraph extends X2GraphImpl implements X2Graph {
 
 	public Network2LinkGraph(NetworkLayer network,
 			CoordinateReferenceSystem coordinateReferenceSystem) {
