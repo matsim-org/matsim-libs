@@ -77,10 +77,10 @@ public class QueueNetwork {
 	 * Called whenever this object should dump a snapshot
 	 * @return A collection with the current positions of all vehicles.
 	 */
-	public Collection<PositionInfo> getVehiclePositions() {
+	public Collection<PositionInfo> getVehiclePositions(double time) {
 		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 		for (QueueLink link : this.links.values()) {
-			link.getVisData().getVehiclePositions(positions);
+			link.getVisData().getVehiclePositions(time, positions);
 		}
 		return positions;
 	}

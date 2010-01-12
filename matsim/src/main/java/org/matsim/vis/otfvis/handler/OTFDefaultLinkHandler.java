@@ -27,6 +27,7 @@ import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
@@ -84,7 +85,7 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue());
+			out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(SimulationTimer.getTime()));
 		}
 
 		public OTFDataWriter<QueueLink> getWriter() {

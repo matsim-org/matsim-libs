@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -76,7 +77,7 @@ public class QueryAgentId implements OTFQuery {
 		double dist = 0;
 		for( QueueLink qlink : net.getLinks().values()) {
 			List<PositionInfo> positions = new LinkedList<PositionInfo>();
-			qlink.getVisData().getVehiclePositions(positions);
+			qlink.getVisData().getVehiclePositions(SimulationTimer.getTime(), positions);
 			for(PositionInfo info : positions) {
 				
 				if ((info.getVehicleState()== VehicleState.Parking) && !OTFLinkAgentsHandler.showParked) continue;

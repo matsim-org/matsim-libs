@@ -460,7 +460,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 
 	private void doSnapshot(final double time) {
 		if (!this.snapshotWriters.isEmpty()) {
-			Collection<PositionInfo> positions = this.network.getVehiclePositions();
+			Collection<PositionInfo> positions = this.network.getVehiclePositions(time);
 			for (SnapshotWriter writer : this.snapshotWriters) {
 				writer.beginSnapshot(time);
 				for (PositionInfo position : positions) {

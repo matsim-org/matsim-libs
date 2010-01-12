@@ -484,13 +484,13 @@ public class QueueLink {
 			return originalLane.visdata.getDisplayableSpaceCapValue();
 		}
 
-		public double getDisplayableTimeCapValue() {
-			return originalLane.visdata.getDisplayableTimeCapValue();
+		public double getDisplayableTimeCapValue(double time) {
+			return originalLane.visdata.getDisplayableTimeCapValue(time);
 		}
 
-		public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
+		public Collection<PositionInfo> getVehiclePositions(double time, final Collection<PositionInfo> positions) {
 			for (QueueLane lane : QueueLink.this.getQueueLanes()) {
-				lane.visdata.getVehiclePositions(positions);
+				lane.visdata.getVehiclePositions(time, positions);
 			}
 //			originalLane.visdata.getVehiclePositions(positions);
 

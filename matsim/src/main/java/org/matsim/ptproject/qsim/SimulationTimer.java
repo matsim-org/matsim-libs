@@ -20,6 +20,10 @@
 
 package org.matsim.ptproject.qsim;
 
+/**
+ * @deprecated use this class only if the time is not available elsewhere.
+ */
+@Deprecated
 public class SimulationTimer {
 	static private double simStartTime = 24*3600;
 	static private double time = 0;

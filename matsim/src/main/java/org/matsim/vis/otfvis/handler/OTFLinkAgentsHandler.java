@@ -30,10 +30,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.QueueVehicle;
-import org.matsim.core.utils.misc.ByteBufferUtils;
+import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
@@ -106,7 +107,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			// Write additional agent data
 
 			positions.clear();
-			src.getVisData().getVehiclePositions(positions);
+			src.getVisData().getVehiclePositions(SimulationTimer.getTime(), positions);
 
 			if (showParked) {
 				out.putInt(positions.size());

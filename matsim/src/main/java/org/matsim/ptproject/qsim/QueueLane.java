@@ -700,12 +700,11 @@ public class QueueLane {
 		 *
 		 * @return A measure for the number of vehicles being delayed on this link.
 		 */
-		public double getDisplayableTimeCapValue() {
+		public double getDisplayableTimeCapValue(double time) {
 			int count = QueueLane.this.buffer.size();
-			double now = SimulationTimer.getTime();
 			for (QueueVehicle veh : QueueLane.this.vehQueue) {
 				// Check if veh has reached destination
-				if (veh.getEarliestLinkExitTime() <= now) {
+				if (veh.getEarliestLinkExitTime() <= time) {
 					count++;
 				}
 			}
@@ -714,9 +713,9 @@ public class QueueLane {
 
 
 
-		public Collection<AgentOnLink> getDrawableCollection() {
+		public Collection<AgentOnLink> getDrawableCollection(double time) {
 			Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
-			getVehiclePositions(positions);
+			getVehiclePositions(time, positions);
 
 			List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
 			for (PositionInfo pos : positions) {
@@ -730,7 +729,7 @@ public class QueueLane {
 			return vehs;
 		}
 
-		public Collection<PositionInfo> getVehiclePositions(
+		public Collection<PositionInfo> getVehiclePositions(double time, 
 				final Collection<PositionInfo> positions) {
 			String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
 			if ("queue".equals(snapshotStyle)) {
