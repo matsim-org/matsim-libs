@@ -26,9 +26,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -61,6 +63,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	private final TransitRouter transitRouter;
 	private final TransitConfigGroup transitConfig;
 	private final TransitSchedule schedule;
+	private final Network network;
 
 	private Plan currentPlan = null;
 	private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
@@ -83,6 +86,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 		this.schedule = schedule;
 		this.transitConfig = transitConfig;
 		this.transitRouter = new TransitRouter(schedule, this.routerConfig);
+		this.network = network;
 		
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
 		if (routeAlgo instanceof Dijkstra) {
@@ -142,20 +146,24 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 					if (currentTuple.getSecond() != null) {
 						// first and last leg do not have the route set, as the start or end  link is unknown.
 						Leg firstLeg = currentTuple.getSecond().get(0);
-						Link fromLink = ((ActivityImpl) planElements.get(i-1)).getLink();
-						Link toLink = null;
+						Id fromLinkId = ((Activity) planElements.get(i-1)).getLinkId();
+						Id toLinkId = null;
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							toLink = ((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLink();
+							toLinkId = currentTuple.getSecond().get(1).getRoute().getStartLinkId();
 						} else {
-							toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
+							toLinkId = ((Activity) planElements.get(i+1)).getLinkId();
 						}
+						Link fromLink = network.getLinks().get(fromLinkId);
+						Link toLink = network.getLinks().get(toLinkId);
 						firstLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
 
 						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
-						toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
+						toLinkId = ((Activity) planElements.get(i+1)).getLinkId();
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							fromLink = ((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLink();
+							fromLinkId = currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute().getEndLinkId();
 						}
+						fromLink = network.getLinks().get(fromLinkId);
+						toLink = network.getLinks().get(toLinkId);
 						lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
 
 						boolean isFirstLeg = true;
