@@ -1244,6 +1244,10 @@ public class Controler {
 		      event.getControler().setMobsimFactory(new QSimFactory());
 		    }
 		  }
+		  else if (c.getModule("JDEQSim") == null) {
+		    log.warn("There might be no configuration for a mobility simulation in the config. The Controler " +
+		        " uses the default QueueSimulation that might not have all features implemented.");
+		  }
     }
 		
 		public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
