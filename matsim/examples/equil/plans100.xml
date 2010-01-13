@@ -8,7 +8,7 @@
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:10" />
-		<leg mode="pt">
+		<leg mode="car">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -32,11 +32,11 @@
 <person id="3">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="05:58:30" />
-		<leg mode="walk">
+		<leg mode="car">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="01:30" />
-		<leg mode="pt">
+		<leg mode="car">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
