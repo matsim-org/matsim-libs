@@ -86,7 +86,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
-	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, employed, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn, beta, gamma, beta_travel; 
+	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, income, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn, beta, gamma, beta_travel; 
 	protected double travelCostCar, costPtNothing, costPtHalbtax, costPtGA;
 	
 	                      
@@ -118,7 +118,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.incomeBoxCox 		= "no";
 		this.age 				= "no";
 		this.gender 			= "no";
-		this.employed 			= "no";
+		this.income 			= "no";
 		this.license 			= "no";
 		this.carAvail 			= "no";
 		this.seasonTicket 		= "no";
@@ -192,7 +192,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
 		//		this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
 		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile, 
-				this.beta, this.gamma, this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.beta_travel, this.bikeIn);	
+				this.beta, this.gamma, this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.income, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.beta_travel, this.bikeIn);	
 		
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
@@ -1067,7 +1067,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			String incomeBoxCox,
 			String age,
 			String gender,
-			String employed,
+			String income,
 			String license,
 			String carAvail,
 			String seasonTicket,
@@ -1090,7 +1090,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.incomeBoxCox=incomeBoxCox;
 		this.age=age; 
 		this.gender=gender; 
-		this.employed=employed; 
+		this.income=income; 
 		this.license=license; 
 		this.carAvail=carAvail; 
 		this.seasonTicket=seasonTicket; 
@@ -1108,7 +1108,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		int noOfNothing = 0;
 		
 		// Run external classes if required
-		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes") || travelCost.equals("yes")){
+		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes") || travelCost.equals("yes") || income.equals("yes")){
 			aaa.runMZ(attributesInputFile);
 		}
 		if (similarity.equals("yes")){
@@ -1160,8 +1160,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print("Female\t"); 
 			counterFirst++;
 		}
-		if (employed.equals("yes")) {
-			stream.print("Employed\t"); 
+		if (income.equals("yes")) {
+			stream.print("Income\t"); 
 			counterFirst++;
 		}
 		if (license.equals("yes")) {
@@ -1340,8 +1340,8 @@ public class PlansConstructor implements PlanStrategyModule{
 				else log.warn("Person "+person.getId()+" has no valid gender.");
 				counterRow++;
 			}
-			if (employed.equals("yes")) {   // No info on this available!
-				stream.print(0+"\t"); 
+			if (income.equals("yes")) {   
+				stream.print((aaa.getIncome().get(person.getId())/30)+"\t"); 
 				counterRow++;
 			}
 			if (license.equals("yes")) {
@@ -1850,7 +1850,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				this.incomeBoxCox,
 				this.age,
 				this.gender,
-				this.employed,
+				this.income,
 				this.license,
 				this.carAvail,
 				this.seasonTicket,
