@@ -36,6 +36,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
@@ -85,9 +86,9 @@ public class SelectedPlans2ESRIShapeChanged extends
 	// this.geofac = null;
 	// }
 
-	public SelectedPlans2ESRIShapeChanged(PopulationImpl population,
+	public SelectedPlans2ESRIShapeChanged(PopulationImpl population, Network network,
 			CoordinateReferenceSystem crs, String outputDir) {
-		super(population, crs, outputDir);
+		super(population, network, crs, outputDir);
 		this.outputDir = outputDir;
 		this.geofac = new GeometryFactory();
 		initFeatureType();

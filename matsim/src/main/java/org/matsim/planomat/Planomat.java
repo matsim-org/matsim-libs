@@ -30,6 +30,7 @@ import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -74,6 +75,7 @@ public class Planomat implements PlanAlgorithm {
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final PlansCalcRoute router;
+	private final Network network;
 
 	private final Random seedGenerator;
 
@@ -84,12 +86,14 @@ public class Planomat implements PlanAlgorithm {
 			final LegTravelTimeEstimatorFactory legTravelTimeEstimatorfactory, 
 			final ScoringFunctionFactory scoringFunctionFactory, 
 			final PlanomatConfigGroup config,
-			final PlansCalcRoute router) {
+			final PlansCalcRoute router,
+			final Network network) {
 
 		this.legTravelTimeEstimatorFactory = legTravelTimeEstimatorfactory;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.planomatConfigGroup = config;
 		this.router = router;
+		this.network = network;
 		
 		this.numTimeIntervals = (int) Math.pow(2, this.planomatConfigGroup.getLevelOfTimeResolution());
 		this.timeIntervalSize = Planomat.SCENARIO_DURATION / numTimeIntervals;
@@ -108,7 +112,8 @@ public class Planomat implements PlanAlgorithm {
 				(PlanImpl) plan,
 				this.planomatConfigGroup.getSimLegInterpretation(), 
 				this.planomatConfigGroup.getRoutingCapability(), 
-				this.router);
+				this.router,
+				this.network);
 		
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)

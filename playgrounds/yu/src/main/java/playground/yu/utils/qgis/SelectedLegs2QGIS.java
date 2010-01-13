@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.geotools.feature.Feature;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -31,9 +32,9 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 	 * @param crs
 	 * @param outputDir
 	 */
-	public SelectedLegs2QGIS(PopulationImpl population,
+	public SelectedLegs2QGIS(PopulationImpl population, Network network,
 			CoordinateReferenceSystem crs, String outputDir) {
-		super(population, crs, outputDir);
+		super(population, network, crs, outputDir);
 	}
 
 	@Override
@@ -74,7 +75,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShapeChanged sp = new SelectedPlans2ESRIShapeChanged(
-				population, crs, outputDir);
+				population, network, crs, outputDir);
 		sp.setOutputSample(1);
 		sp.setActBlurFactor(100);
 		sp.setLegBlurFactor(100);

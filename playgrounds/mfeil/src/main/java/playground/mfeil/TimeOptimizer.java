@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
@@ -45,6 +46,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	protected int						MAX_ITERATIONS, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
 	protected int						OFFSET;
 	protected final static Logger 		log = Logger.getLogger(TimeOptimizer.class);
+	private final Network network;
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -60,6 +62,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		this.NEIGHBOURHOOD_SIZE		= 10;
 		
 		//TODO @MF: constants to be configured externally
+		this.network = controler.getNetwork();
 	}
 	
 	public TimeOptimizer (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc){
@@ -72,6 +75,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		this.NEIGHBOURHOOD_SIZE		= 10;
 		
 		//TODO @MF: constants to be configured externally
+		this.network = controler.getNetwork();
 	}
 	
 		
@@ -87,7 +91,8 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 				basePlan,
 				this.config.getSimLegInterpretation(),
 				this.config.getRoutingCapability(),
-				this.router);
+				this.router,
+				this.network);
 		
 		if (basePlan.getPlanElements().size()==1) return;
 		

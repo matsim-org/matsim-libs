@@ -21,7 +21,6 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.io.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -104,7 +103,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			this.timer				= new TimeModeChoicer1(controler, legTravelTimeEstimatorFactory, this.scorer);
 		}
 		else if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
-			this.timer				= new Planomat (legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router); 
+			this.timer				= new Planomat (legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router, controler.getNetwork()); 
 		}
 		else this.timer				= new TimeOptimizer(controler, this.legTravelTimeEstimatorFactory, this.scorer);
 		
@@ -112,7 +111,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			this.finalTimer			= new TimeModeChoicer1(controler, legTravelTimeEstimatorFactory, this.scorer);
 		}
 		else if (this.finalOpt.equals("Planomat")){
-			this.finalTimer			= new Planomat(legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router); 
+			this.finalTimer			= new Planomat(legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router, controler.getNetwork()); 
 		}
 		else this.finalTimer		= new TimeOptimizerWIGIC(controler, legTravelTimeEstimatorFactory, this.scorer);		
 		

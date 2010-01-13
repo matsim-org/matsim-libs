@@ -33,6 +33,7 @@ import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -102,7 +103,7 @@ public class QueryAgentPlan implements OTFQuery {
 			} else if (o instanceof LegImpl) {
 				LegImpl leg = (LegImpl)o;
 				if (leg.getMode().equals(TransportMode.car)) {
-					List<Link> route = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
+					List<Id> route = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
 					count += route.size();
 					if(route.size() != 0) count++; //add last position if there is a path
 				}
@@ -156,7 +157,8 @@ public class QueryAgentPlan implements OTFQuery {
 				Leg leg = (Leg) o;
 				if (leg.getMode().equals(TransportMode.car)) {
 					Node last = null;
-					for (Link driven : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
+					for (Id linkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+						Link driven = this.net.getLinks().get(linkId);
 						Node node = driven.getFromNode();
 						last = driven.getToNode();
 						setCoord(pos++, node.getCoord(), carColor);

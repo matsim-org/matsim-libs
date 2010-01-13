@@ -124,7 +124,7 @@ public class KMLPersonPlanWriter {
 		KMZWriter writer = new KMZWriter(outputFile);
 
 		this.styleFactory = new MyKmlStyleFactory(writer, mainDoc);
-		this.networkFeatureFactory = new MyFeatureFactory(this.coordinateTransform);
+		this.networkFeatureFactory = new MyFeatureFactory(this.coordinateTransform, this.network);
 
 		try {
 

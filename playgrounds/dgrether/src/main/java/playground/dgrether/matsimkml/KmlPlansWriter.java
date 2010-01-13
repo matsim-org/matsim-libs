@@ -63,7 +63,7 @@ public class KmlPlansWriter {
 	public KmlPlansWriter(final NetworkLayer network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
 		this.network = network;
 		this.styleFactory = new MatsimKmlStyleFactory(writer, doc);
-		this.featureFactory = new NetworkFeatureFactory(coordTransform);
+		this.featureFactory = new NetworkFeatureFactory(coordTransform, network);
 	}
 
 	public FolderType getPlansFolder(Set<Plan> planSet) throws IOException {

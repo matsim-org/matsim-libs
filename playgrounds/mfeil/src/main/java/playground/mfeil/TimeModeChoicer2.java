@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
@@ -51,6 +52,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 	private final int						MAX_ITERATIONS, STOP_CRITERION;
 	private static final Logger 			log = Logger.getLogger(TimeModeChoicer2.class);
 
+	private final Network network;
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -61,7 +63,8 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		super (controler, estimatorFactory, scorer);
 		
 		this.MAX_ITERATIONS 		= 30;
-		this.STOP_CRITERION			= 5;	
+		this.STOP_CRITERION			= 5;
+		this.network = controler.getNetwork();
 	}
 
 	
@@ -104,7 +107,8 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 				plan, 
 				this.config.getSimLegInterpretation(), 
 				this.config.getRoutingCapability(), 
-				this.router);
+				this.router,
+				this.network);
 		
 		/* Replace delivered plan by copy since delivered plan must not be changed until valid solution has been found */
 		//PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());

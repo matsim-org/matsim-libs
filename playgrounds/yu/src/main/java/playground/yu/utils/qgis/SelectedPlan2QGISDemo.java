@@ -49,7 +49,7 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 		 * ----------------------------------------------------------------------
 		 */
 		CoordinateReferenceSystem crs = CRS.parseWKT(ch1903);
-		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population,
+		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, network,
 				crs, outputDir);
 		sp.setOutputSample(
 		// 0.05

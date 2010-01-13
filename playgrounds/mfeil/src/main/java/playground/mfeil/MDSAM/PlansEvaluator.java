@@ -103,7 +103,8 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 						plan,
 						PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
 						PlanomatConfigGroup.RoutingCapability.fixedRoute,
-						this.router);
+						this.router,
+						this.network);
 				
 				// Start from first leg
 				for (int i=1;i<plan.getPlanElements().size();i++){

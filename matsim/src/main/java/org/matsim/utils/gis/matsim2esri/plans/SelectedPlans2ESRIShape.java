@@ -35,9 +35,11 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -80,9 +82,11 @@ public class SelectedPlans2ESRIShape {
 	private FeatureType featureTypeAct;
 	private FeatureType featureTypeLeg;
 	private final GeometryFactory geofac;
+	private final Network network;
 
-	public SelectedPlans2ESRIShape(final PopulationImpl population, final CoordinateReferenceSystem crs, final String outputDir) {
+	public SelectedPlans2ESRIShape(final PopulationImpl population, final Network network, final CoordinateReferenceSystem crs, final String outputDir) {
 		this.population = population;
+		this.network = network;
 		this.crs = crs;
 		this.outputDir = outputDir;
 		this.geofac = new GeometryFactory();
@@ -190,21 +194,23 @@ public class SelectedPlans2ESRIShape {
 		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDistance();
 
-		List<Link> links = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
-		Coordinate [] coords = new Coordinate[links.size() + 1];
-		for (int i = 0; i < links.size(); i++) {
-			Coord c = links.get(i).getFromNode().getCoord();
+		List<Id> linkIds = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
+		Coordinate [] coords = new Coordinate[linkIds.size() + 1];
+		for (int i = 0; i < linkIds.size(); i++) {
+			Link link = this.network.getLinks().get(linkIds.get(i));
+			Coord c = link.getFromNode().getCoord();
 			double rx = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
 			double ry = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
 			Coordinate cc = new Coordinate(c.getX()+rx,c.getY()+ry);
 			coords[i] = cc;
 		}
 
-		Coord c = links.get(links.size()-1).getToNode().getCoord();
+		Link link = this.network.getLinks().get(linkIds.get(linkIds.size() - 1));
+		Coord c = link.getToNode().getCoord();
 		double rx = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
 		double ry = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
 		Coordinate cc = new Coordinate(c.getX()+rx,c.getY()+ry);
-		coords[links.size()] = cc;
+		coords[linkIds.size()] = cc;
 
 		LineString ls = this.geofac.createLineString(coords);
 
@@ -216,7 +222,6 @@ public class SelectedPlans2ESRIShape {
 
 		return null;
 	}
-
 
 
 	private void initFeatureType() {
@@ -262,7 +267,7 @@ public class SelectedPlans2ESRIShape {
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(scenario.getPopulation(), crs, outputDir);
+		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(scenario.getPopulation(), scenario.getNetwork(), crs, outputDir);
 		sp.setOutputSample(0.05);
 		sp.setActBlurFactor(100);
 		sp.setLegBlurFactor(100);

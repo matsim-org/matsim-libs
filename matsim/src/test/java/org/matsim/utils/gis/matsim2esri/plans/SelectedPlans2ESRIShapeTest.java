@@ -55,7 +55,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, crs, outputDir);
+		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, network, crs, outputDir);
 		sp.setOutputSample(0.9);
 		sp.setActBlurFactor(100);
 		sp.setWriteActs(true);
@@ -92,7 +92,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, crs, outputDir);
+		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, network, crs, outputDir);
 		sp.setOutputSample(0.05);
 		sp.setLegBlurFactor(100);
 		sp.setWriteActs(false);

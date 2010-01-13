@@ -20,6 +20,7 @@
 
 package org.matsim.planomat.costestimators;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.router.PlansCalcRoute;
@@ -40,7 +41,8 @@ public class LegTravelTimeEstimatorFactory {
 			Plan plan,
 			PlanomatConfigGroup.SimLegInterpretation simLegInterpretation,
 			PlanomatConfigGroup.RoutingCapability routingCapability,
-			PlansCalcRoute routingAlgorithm) {
+			PlansCalcRoute routingAlgorithm,
+			Network network) {
 		
 		LegTravelTimeEstimator legTravelTimeEstimator = null;
 		if (routingCapability.equals(PlanomatConfigGroup.RoutingCapability.fixedRoute)) {
@@ -49,7 +51,8 @@ public class LegTravelTimeEstimatorFactory {
 					this.travelTime, 
 					this.tDepDelayCalc, 
 					routingAlgorithm,
-					simLegInterpretation);
+					simLegInterpretation,
+					network);
 			
 		} else if (routingCapability.equals(PlanomatConfigGroup.RoutingCapability.linearInterpolation)) {
 			

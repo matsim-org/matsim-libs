@@ -74,7 +74,8 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 				null,
 				config.planomat().getSimLegInterpretation(),
 				PlanomatConfigGroup.RoutingCapability.linearInterpolation,
-				plansCalcRoute);
+				plansCalcRoute,
+				network);
 
 		testee.setDoLogging(true);
 		

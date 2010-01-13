@@ -27,16 +27,19 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -74,6 +77,8 @@ public class QueryAgentPTBus implements OTFQuery {
 
 	private String agentId;
 	private final List<String> allIds = new LinkedList<String>();
+
+	private Network net = null;
 	
 	private float[] vertex = null;
 	private transient FloatBuffer vert;
@@ -86,23 +91,21 @@ public class QueryAgentPTBus implements OTFQuery {
 		this.agentId = id;
 	}
 
-	private static float[] buildRoute(Plan plan) {
-		float[] vertex = null;
-		List<Link> drivenLinks = new LinkedList<Link> ();
+	private float[] buildRoute(Plan plan) {
+		List<Id> drivenLinks = new LinkedList<Id> ();
 		
-		List actslegs = plan.getPlanElements();
-		for (int i= 0; i< actslegs.size(); i++) {
-			if(i%2==0) {
+		List<PlanElement> actslegs = plan.getPlanElements();
+		for (PlanElement pe : actslegs) {
+			if (pe instanceof Activity) {
 				// handle act
-				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
-				drivenLinks.add(act.getLink());
-			} else {
+				Activity act = (Activity)pe;
+				drivenLinks.add(act.getLinkId());
+			} else if (pe instanceof Leg) {
 				// handle leg
-				LegImpl leg = (LegImpl)actslegs.get(i);
-				
+				Leg leg = (Leg) pe;
 				//if (!leg.getMode().equals("car")) continue;
-				for (Link driven : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
-					drivenLinks.add(driven);
+				for (Id linkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+					drivenLinks.add(linkId);
 				}
 			}
 		}
@@ -110,10 +113,12 @@ public class QueryAgentPTBus implements OTFQuery {
 		if(drivenLinks.size() == 0) return null;
 
 		// convert this to drawable info
+		float[] vertex = null;
 		vertex = new float[drivenLinks.size()*2];
 		int pos = 0;
-		for(Link qlink : drivenLinks) {
-			Node node = qlink.getFromNode();
+		for(Id linkId : drivenLinks) {
+			Link link = this.net.getLinks().get(linkId);
+			Node node = link.getFromNode();
 			vertex[pos++] = (float)node.getCoord().getX();
 			vertex[pos++] = (float)node.getCoord().getY();
 		}
@@ -122,6 +127,7 @@ public class QueryAgentPTBus implements OTFQuery {
 	
 	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
 		//Person person = plans.getPerson(this.agentID);
+		this.net = net.getNetworkLayer();
 		String prefix = agentId + "-";
 		
 		for(Person person : plans.getPersons().values()) {

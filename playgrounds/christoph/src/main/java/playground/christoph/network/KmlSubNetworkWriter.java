@@ -60,7 +60,7 @@ public class KmlSubNetworkWriter {
 	public KmlSubNetworkWriter(final Network network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
 		this.network = network;
 		this.styleFactory = new MatsimKmlStyleFactory(writer, doc);
-		this.networkFeatureFactory = new NetworkFeatureFactory(coordTransform);
+		this.networkFeatureFactory = new NetworkFeatureFactory(coordTransform, network);
 	}
 
 	public FolderType getNetworkFolder() throws IOException {

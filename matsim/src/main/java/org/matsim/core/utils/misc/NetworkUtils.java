@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -114,11 +115,23 @@ public class NetworkUtils {
 		for (String id : parts) {
 			Link link = network.getLinks().get(new IdImpl(id));
 			if (link == null) {
-				throw new IllegalArgumentException("no node with id " + id);
+				throw new IllegalArgumentException("no link with id " + id);
 			}
 			linksList.add(link);
 		}
 		return linksList;
+	}
+	
+	public static List<Link> getLinks(final Network network, final List<Id> linkIds) {
+		List<Link> links = new ArrayList<Link>();
+		for (Id linkId : linkIds) {
+			Link link = network.getLinks().get(linkId);
+			if (link == null) {
+				throw new IllegalArgumentException("no link with id " + linkId);
+			}
+			links.add(link);
+		}
+		return links;
 	}
 	
 	/**

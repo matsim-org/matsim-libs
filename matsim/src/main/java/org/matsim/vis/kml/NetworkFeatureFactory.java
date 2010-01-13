@@ -29,7 +29,9 @@ import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -61,9 +63,11 @@ public class NetworkFeatureFactory {
 	private static final String ENDLI = "</li>";
 
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
+	private final Network network;
 	
-	public NetworkFeatureFactory(CoordinateTransformation coordTransform) {
+	public NetworkFeatureFactory(CoordinateTransformation coordTransform, final Network network) {
 		this.coordTransform = coordTransform;
+		this.network = network;
 	}
 
 	public AbstractFeatureType createLinkFeature(final Link l, StyleType networkStyle) {
@@ -130,7 +134,8 @@ public class NetworkFeatureFactory {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		folder.setName(leg.getMode().toString() + "_" + Time.writeTime(leg.getDepartureTime()));
 
-		for (Link l : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
+		for (Id linkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+			Link l = this.network.getLinks().get(linkId);
 
 			AbstractFeatureType abstractFeature = this.createLinkFeature(l, style);
 			if (abstractFeature.getClass().equals(FolderType.class)) {

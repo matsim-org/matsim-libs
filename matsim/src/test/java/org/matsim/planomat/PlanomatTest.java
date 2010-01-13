@@ -156,7 +156,7 @@ public class PlanomatTest extends MatsimTestCase {
 		log.info("Testing " + testRun.toString() + "...");
 
 		// init Planomat
-		Planomat testee = new Planomat(legTravelTimeEstimatorFactory, scoringFunctionFactory, this.scenario.getConfig().planomat(), plansCalcRoute);
+		Planomat testee = new Planomat(legTravelTimeEstimatorFactory, scoringFunctionFactory, this.scenario.getConfig().planomat(), plansCalcRoute, this.scenario.getNetwork());
 		testee.getSeedGenerator().setSeed(this.scenario.getConfig().global().getRandomSeed());
 
 		tTravelEstimator.reset(1);
@@ -208,7 +208,7 @@ public class PlanomatTest extends MatsimTestCase {
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
-		Planomat testee = new Planomat(null, null, planomatConfigGroup, null);
+		Planomat testee = new Planomat(null, null, planomatConfigGroup, null, this.scenario.getNetwork());
 
 		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
 		
@@ -298,10 +298,11 @@ public class PlanomatTest extends MatsimTestCase {
 				testPlan,
 				PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, 
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
-				plansCalcRoute);
+				plansCalcRoute, 
+				this.scenario.getNetwork());
 		
 		// run the method
-		Planomat testee = new Planomat(legTravelTimeEstimatorFactory, null, this.scenario.getConfig().planomat(), plansCalcRoute);
+		Planomat testee = new Planomat(legTravelTimeEstimatorFactory, null, this.scenario.getConfig().planomat(), plansCalcRoute, this.scenario.getNetwork());
 
 		double score = testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null, ltte, null);
 		assertEquals(0.0, score, MatsimTestCase.EPSILON);

@@ -47,6 +47,7 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 	private final Controler controler;
 	private final PlanomatConfigGroup config;
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
+	private final Network network;
 	
 	private DepartureDelayAverageCalculator tDepDelayCalc = null;
 
@@ -62,6 +63,7 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.travelCost = travelCost;
 		this.travelTime = travelTime;
+		this.network = network;
 
 		this.config = controler.getConfig().planomat();
 		
@@ -86,7 +88,8 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 				this.legTravelTimeEstimatorFactory,
 				this.scoringFunctionFactory, 
 				this.config,
-				routingAlgorithm);
+				routingAlgorithm,
+				this.network);
 
 		return planomatInstance;
 

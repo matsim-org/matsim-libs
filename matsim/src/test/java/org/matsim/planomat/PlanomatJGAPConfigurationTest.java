@@ -94,7 +94,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
-		Planomat testee = new Planomat(null, null, planomatConfigGroup, null);
+		Planomat testee = new Planomat(null, null, planomatConfigGroup, null, this.scenario.getNetwork());
 
 		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
 		

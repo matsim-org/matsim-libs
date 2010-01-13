@@ -61,7 +61,7 @@ public class WithindayAgentLogicFactory {
 	}
 
 	public AgentContentment createAgentContentment(final WithindayAgent agent) {
-		return new PlanScore(agent, this.scoringConfig.getPerforming(), this.scoringConfig.getLateArrival());
+		return new PlanScore(agent, this.network, this.scoringConfig.getPerforming(), this.scoringConfig.getLateArrival());
 	}
 	
 	public ScoringFunctionFactory createScoringFunctionFactory() {

@@ -23,16 +23,18 @@ package org.matsim.withinday.contentment;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.withinday.WithindayAgent;
 
 /**
@@ -63,12 +65,15 @@ public class PlanScore implements AgentContentment {
 
 	private static final int priority = 1;
 
+	private final Network network;
+	
 	// =====================================================================
 	// constructor
 	// =====================================================================
 
-	public PlanScore(final WithindayAgent agent, final double gammaAct, final double gammaLate) {
+	public PlanScore(final WithindayAgent agent, final Network network, final double gammaAct, final double gammaLate) {
 		this.agent = agent;
+		this.network = network;
 		//from builder
 		setGamma_act(gammaAct);
 		setGamma_late(gammaLate);
@@ -135,21 +140,22 @@ public class PlanScore implements AgentContentment {
 		double totalDistance = 0;
 		double length = 0;
 
-		List<Link> route = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
+		List<Id> linkIds = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
 		int posInRoute = 0;
 		//determine the actual position in the route
-		for (int j = 0; j < route.size(); j++) {
-			if (route.get(j).equals(currentLink)) {
+		for (int j = 0; j < linkIds.size(); j++) {
+			if (linkIds.get(j).equals(currentLink.getId())) {
 				posInRoute = j;
 			}
 		}
 		//determine remaining time
-		for (int i = 0; i < route.size(); i++) {
-			length = route.get(i).getLength();
+		for (int i = 0; i < linkIds.size(); i++) {
+			Link link = this.network.getLinks().get(linkIds.get(i));
+			length = link.getLength();
 			totalDistance += length;
 			//do this only for links on which we are or will be in the future
 			if (i >= posInRoute) {
-				duration += travelTime.getLinkTravelTime(route.get(i), time);
+				duration += travelTime.getLinkTravelTime(link, time);
 				distance += length;
 			}
 		}

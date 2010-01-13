@@ -53,7 +53,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 			final CoordinateReferenceSystem crs, final String outputDir,
 			final NetworkLayer network,
 			final Map<List<Id>, Integer> routeCounters) {
-		super(population, crs, outputDir);
+		super(population, network, crs, outputDir);
 		this.network = network;
 		this.routeCounters = routeCounters;
 	}

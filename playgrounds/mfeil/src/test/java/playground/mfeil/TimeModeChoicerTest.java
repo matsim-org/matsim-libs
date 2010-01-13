@@ -20,37 +20,37 @@
 
 package playground.mfeil;
 
-import org.matsim.testcases.MatsimTestCase;
-import org.matsim.core.population.PersonImpl;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.planomat.costestimators.*;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-import org.matsim.core.scoring.PlanScorer;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.PlanElement;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
+import org.matsim.testcases.MatsimTestCase;
 
 import playground.mfeil.FilesForTests.Initializer;
 import playground.mfeil.FilesForTests.JohScoringTestFunctionFactory;
@@ -100,9 +100,10 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 				((PersonImpl)(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)))).getSelectedPlan(),
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
-				this.router);
+				this.router,
+				this.scenario_input.getNetwork());
 		
-		this.testee = new TimeModeChoicer1 (legTravelTimeEstimatorFactory, this.estimator, new PlanScorer(new JohScoringTestFunctionFactory()), this.router);
+		this.testee = new TimeModeChoicer1 (legTravelTimeEstimatorFactory, this.estimator, new PlanScorer(new JohScoringTestFunctionFactory()), this.router, this.scenario_input.getNetwork());
 	}
 	
 	

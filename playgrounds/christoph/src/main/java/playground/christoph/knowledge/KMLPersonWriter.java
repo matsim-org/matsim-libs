@@ -124,7 +124,7 @@ public class KMLPersonWriter {
 		KMZWriter writer = new KMZWriter(outputFile);
 		
 		this.styleFactory = new MatsimKmlStyleFactory(writer, mainDoc);
-		this.networkFeatureFactory = new NetworkFeatureFactory(coordinateTransform);
+		this.networkFeatureFactory = new NetworkFeatureFactory(coordinateTransform, network);
 		
 		try
 		{

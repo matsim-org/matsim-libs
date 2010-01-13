@@ -24,7 +24,6 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -64,8 +63,8 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	 * @param departureTime
 	 * @return departure delay estimation
 	 */
-	public double getLinkDepartureDelay(Link link, double departureTime) {
-		DepartureDelayData ddd = this.getDepartureDelayRole(link.getId());
+	public double getLinkDepartureDelay(Id linkId, double departureTime) {
+		DepartureDelayData ddd = this.getDepartureDelayRole(linkId);
 		if (ddd == null) {
 			return 0.0;
 		}

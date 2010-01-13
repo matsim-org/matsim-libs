@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -71,6 +72,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	protected final String					modeChoice;
 	protected final TransportMode[]			possibleModes;
 	protected List<LinkNetworkRouteImpl> 	routes;
+	private final Network network;
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -105,7 +107,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
 		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
 		this.routes					= null;
-
+		this.network        = controler.getNetwork();
+		
 		// meisterk
 		this.legTravelTimeEstimatorFactory = estimatorFactory;
 		this.config					= controler.getConfig().planomat();
@@ -143,6 +146,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
 		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
 		this.routes					= null;
+		this.network        = controler.getNetwork();
 		
 		//meisterk
 		this.config 				= controler.getConfig().planomat();
@@ -150,7 +154,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	}
 	
 	// Constructor for test case
-	public TimeModeChoicer1 (LegTravelTimeEstimatorFactory estimatorFactory, LegTravelTimeEstimator	estimator, PlanScorer scorer, PlansCalcRoute router){
+	public TimeModeChoicer1 (LegTravelTimeEstimatorFactory estimatorFactory, LegTravelTimeEstimator	estimator, PlanScorer scorer, PlansCalcRoute router, Network network){
 		
 		this.router 				= router;
 		this.scorer 				= scorer;
@@ -179,6 +183,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
 		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
 		this.routes					= null;
+		this.network        = network;
 
 		// meisterk
 		this.legTravelTimeEstimatorFactory = estimatorFactory;
@@ -229,7 +234,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				plan,
 				this.config.getSimLegInterpretation(),
 				this.config.getRoutingCapability(),
-				this.router);
+				this.router,
+				this.network);
 		
 		/* Analysis of subtours */
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(config);

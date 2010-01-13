@@ -88,9 +88,9 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		assertEquals(0, links3.size());
 	}
 	
-	public void testGetLinks_Null() {
+	public void testGetLinks_StringNull() {
 		NetworkLayer network = getTestNetwork();
-		List<Link> links = NetworkUtils.getLinks(network, null);
+		List<Link> links = NetworkUtils.getLinks(network, (String)null);
 		assertEquals(0, links.size());
 	}
 	
