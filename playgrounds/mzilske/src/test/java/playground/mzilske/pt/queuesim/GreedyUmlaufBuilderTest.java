@@ -42,8 +42,8 @@ public class GreedyUmlaufBuilderTest {
 		Config config = this.scenario.getConfig();
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.simulation().setSnapshotStyle("queue");
-		config.simulation().setEndTime(24.0*3600);
+		config.getQSimConfigGroup().setSnapshotStyle("queue");
+		config.getQSimConfigGroup().setEndTime(24.0*3600);
 		createNetwork();
 		setupSchedule();
 		Collection<TransitLine> transitLines = scenario.getTransitSchedule().getTransitLines().values();
