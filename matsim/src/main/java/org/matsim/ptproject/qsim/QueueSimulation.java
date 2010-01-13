@@ -134,7 +134,8 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 	 * @param events
 	 */
 	public QueueSimulation(final Network network, final Population plans, final EventsManager events) {
-		// In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
+		log.info("Using QSim...");
+	  // In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
 		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
 		Simulation.reset();
 		this.config = Gbl.getConfig();
