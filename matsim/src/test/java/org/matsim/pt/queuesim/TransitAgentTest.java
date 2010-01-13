@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.QueueSimulation;
@@ -55,7 +55,8 @@ public class TransitAgentTest extends TestCase {
 
 	public void testAcceptLineRoute() {
 		ScenarioImpl scenario = new ScenarioImpl();
-
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		
 		NetworkLayer network = scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
@@ -86,7 +87,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addActivity(workAct);
 
 		QueueSimulation sim = new QueueSimulation(scenario, new EventsManagerImpl());
-		TransitAgent agent = new TransitAgent((PersonImpl) person, sim);
+		TransitAgent agent = new TransitAgent(person, sim);
 		agent.initialize();
 		agent.activityEnds(10);
 		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops()));
@@ -97,7 +98,8 @@ public class TransitAgentTest extends TestCase {
 
 	public void testArriveAtStop() {
 		ScenarioImpl scenario = new ScenarioImpl();
-
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		
 		NetworkLayer network = scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
@@ -123,7 +125,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addActivity(workAct);
 
 		QueueSimulation sim = new QueueSimulation(scenario, new EventsManagerImpl());
-		TransitAgent agent = new TransitAgent((PersonImpl) person, sim);
+		TransitAgent agent = new TransitAgent(person, sim);
 		agent.initialize();
 		agent.activityEnds(10);
 		assertFalse(agent.getExitAtStop(stop1));
