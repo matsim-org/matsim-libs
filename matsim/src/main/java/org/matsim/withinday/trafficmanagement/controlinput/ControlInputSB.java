@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -114,11 +114,11 @@ public class ControlInputSB extends AbstractControlInputImpl {
 
 	private Collection<NetworkChangeEvent> accidents;
 
-	private final SimulationConfigGroup simulationConfig;
+	private final QSimConfigGroup simulationConfig;
 
-	public ControlInputSB(final SimulationConfigGroup simulationConfigGroup, final Network network) {
+	public ControlInputSB(final QSimConfigGroup simulationConfig2, final Network network) {
 		super(network);
-		this.simulationConfig = simulationConfigGroup;
+		this.simulationConfig = simulationConfig2;
 	}
 
 	@Override

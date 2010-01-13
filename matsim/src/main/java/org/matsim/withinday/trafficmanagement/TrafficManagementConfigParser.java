@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -128,14 +128,14 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private VDSSignOutput vdsSignOutput;
 
-	private SimulationConfigGroup simulationConfig;
+	private QSimConfigGroup simulationConfig;
 
 
 	public TrafficManagementConfigParser(final NetworkImpl network,
-			final EventsManager events, SimulationConfigGroup simulationConfigGroup) {
+			final EventsManager events, QSimConfigGroup qSimConfigGroup) {
 		this.network = network;
 		this.events = events;
-		this.simulationConfig = simulationConfigGroup;
+		this.simulationConfig = qSimConfigGroup;
 	}
 
 	@Override

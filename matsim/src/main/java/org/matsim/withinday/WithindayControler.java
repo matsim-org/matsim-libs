@@ -78,7 +78,7 @@ public class WithindayControler extends Controler {
 	//initialize the traffic management
 		String trafficManagementConfig = this.config.withinday().getTrafficManagementConfiguration();
 		if (trafficManagementConfig != null) {
-			this.trafficManagementConfigurator = new TrafficManagementConfigParser(this.network, this.events, this.config.simulation());
+			this.trafficManagementConfigurator = new TrafficManagementConfigParser(this.network, this.events, this.config.getQSimConfigGroup());
 			try {
 				this.trafficManagementConfigurator.parse(trafficManagementConfig);
 			} catch (SAXException e) {
