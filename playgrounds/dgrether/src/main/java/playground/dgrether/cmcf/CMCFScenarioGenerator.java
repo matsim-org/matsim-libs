@@ -120,9 +120,9 @@ public class CMCFScenarioGenerator {
 			this.config.controler().setOutputDirectory(DgPaths.WSBASE + "testData/output/cmcf");
 
 		//configure simulation and snapshot writing
-		this.config.simulation().setSnapshotFormat("otfvis");
-		this.config.simulation().setSnapshotFile("cmcf.mvi");
-		this.config.simulation().setSnapshotPeriod(60.0);
+		this.config.getQSimConfigGroup().setSnapshotFormat("otfvis");
+		this.config.getQSimConfigGroup().setSnapshotFile("cmcf.mvi");
+		this.config.getQSimConfigGroup().setSnapshotPeriod(60.0);
 		//configure strategies for replanning
 		this.config.strategy().setMaxAgentPlanMemorySize(4);
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));

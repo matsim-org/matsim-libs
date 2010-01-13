@@ -20,6 +20,7 @@
 package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.vis.otfvis.OTFVisQueueSim;
@@ -62,10 +63,10 @@ public class FourWaysVis {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 		
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = new EventsManagerImpl();
 		
 		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
-		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
+//		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 		client.setLaneDefinitions(scenario.getLaneDefinitions());
 		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
 		client.run();

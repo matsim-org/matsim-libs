@@ -31,7 +31,7 @@ public interface DgPaths {
 
 	final String SCMWORKSPACE = WORKBASE + "repos/";
 	
-	final String WSBASE = WORKBASE + "svnWorkspace/";
+	final String WSBASE = WORKBASE + "matsimHeadWorkspace/";
 	
 	final String VSPCVSBASE = WORKBASE + "cvsRep/vsp-cvs/";
 	
@@ -52,4 +52,6 @@ public interface DgPaths {
 	final String STUDIESDG = SHAREDSVN + "studies/dgrether/";
 
   final String EXAMPLEBASE = STUDIESDG + "examples/";
+  
+  final String OUTDIR = WORKBASE + "matsimOutput/";
 }

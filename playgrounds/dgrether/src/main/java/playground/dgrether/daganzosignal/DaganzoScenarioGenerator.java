@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.population.ActivityImpl;
@@ -258,10 +259,11 @@ public class DaganzoScenarioGenerator {
 
 		
 		// configure simulation and snapshot writing
-		config.simulation().setSnapshotFormat("otfvis");
-		config.simulation().setSnapshotFile("cmcf.mvi");
-		config.simulation().setSnapshotPeriod(60.0);
-		config.simulation().setSnapshotStyle("queue");
+		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
+		config.getQSimConfigGroup().setSnapshotFile("cmcf.mvi");
+		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
+		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		// configure strategies for replanning
 		config.strategy().setMaxAgentPlanMemorySize(4);
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(

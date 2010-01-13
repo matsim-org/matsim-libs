@@ -42,6 +42,7 @@ public class DenverStarter {
 		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(configFile);
 		Scenario sc = scl.loadScenario();
 		EventsManagerImpl e = new EventsManagerImpl();
+		
 		DgOnTheFlyQueueSimQuad sim = new DgOnTheFlyQueueSimQuad(sc, e);
 		sim.setLaneDefinitions(((ScenarioImpl) sc).getLaneDefinitions());
 		sim.setSignalSystems(((ScenarioImpl) sc).getSignalSystems(), ((ScenarioImpl) sc).getSignalSystemConfigurations());
