@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand;
+package playground.jjoubert.CommercialDemandGenerator;
 
 import java.io.File;
 import java.util.ArrayList;

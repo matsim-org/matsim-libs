@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand;
+package playground.jjoubert.CommercialDemandGenerator;
 
 public class RunMyCommercialDemandGenerator01 {
 

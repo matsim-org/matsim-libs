@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand.ThroughTraffic;
+package playground.jjoubert.CommercialDemandGenerator.ThroughTraffic;
 
 import org.apache.log4j.Logger;
 

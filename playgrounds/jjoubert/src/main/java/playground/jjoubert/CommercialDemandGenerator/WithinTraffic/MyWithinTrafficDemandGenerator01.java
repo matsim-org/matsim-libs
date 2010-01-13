@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand.WithinTraffic;
+package playground.jjoubert.CommercialDemandGenerator.WithinTraffic;
 
 import java.io.BufferedReader;
 import java.io.File;

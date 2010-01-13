@@ -22,6 +22,8 @@ package playground.jjoubert.CommercialDemand;
 
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.jjoubert.CommercialDemandGenerator.MyCommercialDemandGenerator01;
+
 
 public class MyCommercialDemandGenerator01Test extends MatsimTestCase{
 	
