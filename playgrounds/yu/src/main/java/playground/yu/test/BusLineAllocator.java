@@ -74,7 +74,7 @@ import org.xml.sax.SAXException;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
- * tries to allocate bus stop coordinations to links in MATSim "car" network
+ * tries to allocate bus stop coordinates to links in MATSim "car" network
  * 
  * @author yu
  * 
@@ -134,8 +134,8 @@ public class BusLineAllocator {
 
 	/**
 	 * @param netWithoutBus
-	 *            a nomral MATsim <code>NetworkImpl</code>, in which there
-	 *            aren't "pt" links
+	 *            a normal MATsim <code>NetworkImpl</code>, in which there
+	 *            are no "pt" links
 	 * @param stopCoords
 	 *            a Collection of
 	 *            <ptRouteId,<ptLinkId<fromNodeCoord,toNodeCoord>>>
@@ -481,19 +481,21 @@ public class BusLineAllocator {
 	 *         pahtB also is that at the end
 	 */
 	private boolean isSubList(List<Id> pathA, List<Id> pathB, List<Id> rtfPath) {
-		if (pathA.isEmpty() || pathB.isEmpty())
+		if (pathA.isEmpty() || pathB.isEmpty()) {
 			return false;
-		else {
-			int sizeA = pathA.size();
-			for (int i = 0; i < sizeA; i++)
-				if (!pathA.get(i).equals(rtfPath.get(i)))
-					return false;
-			int sizeB = pathB.size();
-			int sizeRtf = rtfPath.size();
-			for (int i = sizeB - 1; i >= 0; i--)
-				if (!pathB.get(i).equals(rtfPath.get(i + sizeRtf - sizeB)))
-					return false;
 		}
+		
+		int sizeA = pathA.size();
+		for (int i = 0; i < sizeA; i++)
+			if (!pathA.get(i).equals(rtfPath.get(i)))
+				return false;
+
+		int sizeB = pathB.size();
+		int sizeRtf = rtfPath.size();
+		for (int i = sizeB - 1; i >= 0; i--)
+			if (!pathB.get(i).equals(rtfPath.get(i + sizeRtf - sizeB)))
+				return false;
+		
 		return true;
 	}
 
@@ -551,10 +553,10 @@ public class BusLineAllocator {
 
 	private List<Id>/* path */allocateRouteLink(Tuple<Coord, Coord> coordPair) {
 		Coord coordA = coordPair.getFirst(), coordB = coordPair.getSecond();
-		Node nodeA = carNet.getNearestNode(coordA), nodeB = carNet
-				.getNearestNode(coordB);
-		boolean AoutOfRange = CoordUtils.calcDistance(coordA, nodeA.getCoord()) > 100, BoutOfRange = CoordUtils
-				.calcDistance(coordB, nodeB.getCoord()) > 100;
+		Node nodeA = carNet.getNearestNode(coordA);
+		Node nodeB = carNet.getNearestNode(coordB);
+		boolean AoutOfRange = CoordUtils.calcDistance(coordA, nodeA.getCoord()) > 100;
+		boolean BoutOfRange = CoordUtils.calcDistance(coordB, nodeB.getCoord()) > 100;
 
 		List<Id> pathLinks = new ArrayList<Id>();
 
@@ -786,7 +788,7 @@ public class BusLineAllocator {
 	}
 
 	private void generateNewPlans(PopulationImpl pop, String newPopFile) {
-		Map<Id, List<Id>/* path */> linkIdPahs = convertResult();
+		Map<Id, List<Id>/* path */> linkIdPaths = convertResult();
 
 		for (Person person : pop.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {

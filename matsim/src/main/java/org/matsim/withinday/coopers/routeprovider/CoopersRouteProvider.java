@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
@@ -48,9 +49,9 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 
 	private HierarchicalRouteProvider hierarchicalProvider;
 
-	public CoopersRouteProvider(final AStarLandmarksRouteProvider aStarProvider,
+	public CoopersRouteProvider(final AStarLandmarksRouteProvider aStarProvider, Network network,
 			final List<VDSSign> signs) {
-		this.hierarchicalProvider = new HierarchicalRouteProvider(aStarProvider);
+		this.hierarchicalProvider = new HierarchicalRouteProvider(aStarProvider, network);
 		this.signs = signs;
 	}
 

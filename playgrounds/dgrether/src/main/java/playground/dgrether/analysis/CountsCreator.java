@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -87,17 +87,17 @@ public class CountsCreator {
 		routes.add(r3);
 		routes.add(r4);
 
-		Set<Link> links = new HashSet<Link>(r2.getNodes().size() + r1.getNodes().size());
+		Set<Id> linkIds = new HashSet<Id>(r2.getLinkIds().size() + r1.getLinkIds().size());
 		for (NetworkRouteWRefs r : routes) {
-			for (Link l : r.getLinks()) {
-				if (!links.contains(l))
-					links.add(l);
+			for (Id linkId : r.getLinkIds()) {
+				if (!linkIds.contains(linkIds))
+					linkIds.add(linkId);
 			}
 		}
-		createCounts(links);
+		createCounts(linkIds);
 	}
 
-	public void createCounts(Set<Link> links) {
+	public void createCounts(Set<Id> linkIds) {
 		Counts counts = new Counts();
 		Count c;
 		counts.setLayer("superLayer");

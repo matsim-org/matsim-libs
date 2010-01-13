@@ -6,9 +6,11 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -26,7 +28,7 @@ public class NewMultiModalNetworkWithoutBusLink {
 			TransitSchedule schedule) {
 		for (TransitLine tl : schedule.getTransitLines().values()) {
 			for (TransitRoute tr : tl.getRoutes().values()) {
-				handleRoute(tr);
+				handleRoute(tr, mmNet);
 			}
 		}
 		checkLinks2delete();
@@ -59,22 +61,24 @@ public class NewMultiModalNetworkWithoutBusLink {
 		}
 	}
 
-	private static void handleRoute(TransitRoute route) {
+	private static void handleRoute(TransitRoute route, Network network) {
 		TransportMode tm = route.getTransportMode();
 		NetworkRouteWRefs nrwr = route.getRoute();
 		if (tm.equals(TransportMode.bus)) {
-			handleBusLink(nrwr.getStartLink());
-			for (Link link : nrwr.getLinks()) {
+			handleBusLink(network.getLinks().get(nrwr.getStartLinkId()));
+			for (Id linkId : nrwr.getLinkIds()) {
+				Link link = network.getLinks().get(linkId);
 				handleBusLink(link);
 			}
-			handleBusLink(nrwr.getEndLink());
+			handleBusLink(network.getLinks().get(nrwr.getEndLinkId()));
 		} else {
 			System.out.println(tm);
-			handleOtherPtLink(nrwr.getStartLink(), tm);
-			for (Link link : nrwr.getLinks()) {
+			handleOtherPtLink(network.getLinks().get(nrwr.getStartLinkId()), tm);
+			for (Id linkId : nrwr.getLinkIds()) {
+				Link link = network.getLinks().get(linkId);
 				handleOtherPtLink(link, tm);
 			}
-			handleOtherPtLink(nrwr.getEndLink(), tm);
+			handleOtherPtLink(network.getLinks().get(nrwr.getEndLinkId()), tm);
 		}
 	}
 

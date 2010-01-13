@@ -29,11 +29,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -73,14 +74,16 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 	private BufferedWriter writer;
 	
 	private SummaryWriter summaryWriter;
-	
 
-	public BenefitAnalyzer(TripAndScoreStats tripStats, EUTRouterAnalyzer routerAnalyzer, TwoStateTTKnowledge ttKnowledge, ArrowPrattRiskAversionI utilFunc, SummaryWriter summaryWriter) {
+	private final Network network;
+
+	public BenefitAnalyzer(TripAndScoreStats tripStats, EUTRouterAnalyzer routerAnalyzer, TwoStateTTKnowledge ttKnowledge, ArrowPrattRiskAversionI utilFunc, SummaryWriter summaryWriter, Network network) {
 		this.tripStats = tripStats;
 //		this.routerAnalyzer = routerAnalyzer;
 		this.ttKnowledge = ttKnowledge;
 		this.utilFunc = utilFunc;
 		this.summaryWriter = summaryWriter;
+		this.network = network;
 	}
 	/*
 	 * This is ugly, but there is no event between initialization and actual run
@@ -187,7 +190,8 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 	private double calcTravTime(TravelTime traveltimes, NetworkRouteWRefs route,
 			double starttime) {
 		double totaltt = 0;
-		for (Link link : route.getLinks()) {
+		for (Id linkId : route.getLinkIds()) {
+			Link link = this.network.getLinks().get(linkId);
 			totaltt += traveltimes.getLinkTravelTime(link, starttime + totaltt);
 		}
 		return totaltt;
@@ -200,7 +204,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 
 	public void notifyStartup(StartupEvent event) {
 		try {
-			writer = IOUtils.getBufferedWriter(Controler.getOutputFilename("benefits.txt"));
+			writer = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("benefits.txt"));
 			writer.write("Iteration\tbenefitsCE\tbenefitsExpTT");
 			writer.newLine();
 		} catch (Exception e) {

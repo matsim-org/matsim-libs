@@ -88,7 +88,7 @@ public class CoopersRouteProviderTest extends MatsimTestCase {
 		sign.setControler(new ConstantControler(1.0));
 		sign.setCompliance(1.0);
 		//create control input
-		EmptyControlInputImpl controlInput = new EmptyControlInputImpl();
+		EmptyControlInputImpl controlInput = new EmptyControlInputImpl(network);
 		controlInput.setNashTime(0);
 
 		this.route1 = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, null, null);
@@ -117,7 +117,7 @@ public class CoopersRouteProviderTest extends MatsimTestCase {
 		AStarLandmarksRouteProvider aStarProvider = new AStarLandmarksRouteProvider(this.network);
 		List<VDSSign> signs = new LinkedList<VDSSign>();
 		signs.add(createSign());
-		return new CoopersRouteProvider(aStarProvider, signs);
+		return new CoopersRouteProvider(aStarProvider, this.network, signs);
 	}
 
 

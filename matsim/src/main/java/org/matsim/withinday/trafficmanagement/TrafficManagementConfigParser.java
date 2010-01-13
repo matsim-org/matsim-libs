@@ -308,12 +308,12 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private ControlInput createControlInput(final String content) {
 		if (content.trim().compareTo(CONTROLINPUT1) == 0) {
-			ControlInputImpl1 cI = new ControlInputImpl1();
+			ControlInputImpl1 cI = new ControlInputImpl1(this.network);
 			this.events.addHandler(cI);
 			return cI;
 		}
 		else if (content.trim().compareTo(CONTROLINPUTSB) == 0) {
-			ControlInputSB cI = new ControlInputSB(this.simulationConfig);
+			ControlInputSB cI = new ControlInputSB(this.simulationConfig, this.network);
 			cI.setNetworkChangeEvents(this.network.getNetworkChangeEvents());
 			this.events.addHandler(cI);
 			return cI;

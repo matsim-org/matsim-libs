@@ -57,7 +57,7 @@ public class WithindayAgentLogicFactory {
 	
 	
 	public RouteProvider createRouteProvider() {
-		return new HierarchicalRouteProvider(this.aStarRouteProvider);
+		return new HierarchicalRouteProvider(this.aStarRouteProvider, this.network);
 	}
 
 	public AgentContentment createAgentContentment(final WithindayAgent agent) {

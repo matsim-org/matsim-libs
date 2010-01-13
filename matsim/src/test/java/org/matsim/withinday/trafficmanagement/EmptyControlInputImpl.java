@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.trafficmanagement;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.withinday.trafficmanagement.controlinput.AbstractControlInputImpl;
 
@@ -30,6 +31,10 @@ public class EmptyControlInputImpl extends AbstractControlInputImpl {
 
 	private double nashTime;
 
+	public EmptyControlInputImpl(final Network network) {
+		super(network);
+	}
+	
 	@Override
 	public double getNashTime() {
 		return this.nashTime;

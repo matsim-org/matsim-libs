@@ -188,7 +188,7 @@ public class EUTController extends WithindayControler {
 		/*
 		 * Analyze benefits...
 		 */
-		this.bAnalyzer = new BenefitAnalyzer(stats, this.routerAnalyzer, this.ttmemory, this.eutReRoute.getUtilFunction(), this.summaryWriter);
+		this.bAnalyzer = new BenefitAnalyzer(stats, this.routerAnalyzer, this.ttmemory, this.eutReRoute.getUtilFunction(), this.summaryWriter, this.network);
 		addControlerListener(this.bAnalyzer);
 		/*
 		 *

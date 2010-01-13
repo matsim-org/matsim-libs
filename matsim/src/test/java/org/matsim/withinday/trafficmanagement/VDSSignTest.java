@@ -27,11 +27,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
@@ -83,7 +83,7 @@ public class VDSSignTest extends MatsimTestCase {
 		sign.setControler(new BangBangControler());
 		sign.setCompliance(1.0);
 		//create control input
-		this.controlInput = new EmptyControlInputImpl();
+		this.controlInput = new EmptyControlInputImpl(this.network);
 		this.controlInput.setNashTime(0);
 
 		this.route1 = new NodeNetworkRouteImpl();

@@ -29,9 +29,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 
 /**
@@ -45,11 +47,14 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	private List<RouteProvider> providers;
 
 	private RouteProviderComparator comparator;
+	
+	private final Network network;
 
-	public HierarchicalRouteProvider(final AStarLandmarksRouteProvider aStarProvider) {
+	public HierarchicalRouteProvider(final AStarLandmarksRouteProvider aStarProvider, final Network network) {
 		this.comparator = new RouteProviderComparator();
 		this.providers = new Vector<RouteProvider>();
 		this.providers.add(aStarProvider);
+		this.network = network;
 	}
 
 	@Override
@@ -74,7 +79,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 			if (isCompleteRoute(returnRoute, destinationLink)) {
 				return returnRoute;
 			}
-			List<Link> returnRouteLinks = returnRoute.getLinks();
+			List<Link> returnRouteLinks = NetworkUtils.getLinks(this.network, returnRoute.getLinkIds());
 			departureLink = returnRouteLinks.get(returnRouteLinks.size()-1);
 		}
 		return null;

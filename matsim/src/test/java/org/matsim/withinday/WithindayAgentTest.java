@@ -124,7 +124,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		sign.setControler(new ConstantControler(1.0));
 		sign.setCompliance(1.0);
 		// create control input
-		EmptyControlInputImpl controlInput = new EmptyControlInputImpl();
+		EmptyControlInputImpl controlInput = new EmptyControlInputImpl(this.network);
 		controlInput.setNashTime(0);
 		controlInput.setMainRoute(this.route1);
 		controlInput.setAlternativeRoute(this.route2);

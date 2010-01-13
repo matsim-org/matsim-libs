@@ -33,11 +33,11 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.functors.OrPredicate;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -139,8 +139,8 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
-					for(Link link : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
-						if(link.equals(predicateLink))
+					for(Id linkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+						if(linkId.equals(predicateLink.getId()))
 							return true;
 					}
 					return false; // doesn't make sense, only first Leg will ever be evaluated
@@ -153,7 +153,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 
 	public void notifyStartup(StartupEvent event) {
 		try {
-			writer = IOUtils.getBufferedWriter(Controler.getOutputFilename("traversedRiskyLink.txt"));
+			writer = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("traversedRiskyLink.txt"));
 			writer.write("Iteration\tcount");
 			writer.newLine();
 		} catch (IOException e) {

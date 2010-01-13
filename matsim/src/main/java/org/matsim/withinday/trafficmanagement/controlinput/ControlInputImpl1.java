@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.trafficmanagement.controlinput;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
@@ -30,6 +31,10 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
  */
 public class ControlInputImpl1 extends AbstractControlInputImpl {
 
+	public ControlInputImpl1(final Network network) {
+		super(network);
+	}
+	
 	@Override
 	public double getPredictedNashTime(NetworkRouteWRefs route) {
 		if (route.equals(this.mainRoute)) {

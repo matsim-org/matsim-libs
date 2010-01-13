@@ -34,6 +34,7 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -77,7 +78,8 @@ public class SelectedPlans2ESRIShapeChanged extends
 	private FeatureType featureTypeAct;
 	private FeatureType featureTypeLeg;
 	protected GeometryFactory geofac;
-
+	private Network network;
+	
 	//
 	// public SelectedPlans2ESRIShape() {
 	// this.crs = null;
@@ -91,6 +93,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 		super(population, network, crs, outputDir);
 		this.outputDir = outputDir;
 		this.geofac = new GeometryFactory();
+		this.network = network;
 		initFeatureType();
 	}
 
@@ -163,10 +166,11 @@ public class SelectedPlans2ESRIShapeChanged extends
 		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDistance();
 
-		List<Link> links = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
-		Coordinate[] coords = new Coordinate[links.size() + 1];
-		for (int i = 0; i < links.size(); i++) {
-			Coord c = links.get(i).getFromNode().getCoord();
+		List<Id> linkIds = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
+		Coordinate[] coords = new Coordinate[linkIds.size() + 1];
+		for (int i = 0; i < linkIds.size(); i++) {
+			Link link = this.network.getLinks().get(linkIds.get(i));
+			Coord c = link.getFromNode().getCoord();
 			double rx = MatsimRandom.getRandom().nextDouble()
 					* this.legBlurFactor;
 			double ry = MatsimRandom.getRandom().nextDouble()
@@ -175,11 +179,11 @@ public class SelectedPlans2ESRIShapeChanged extends
 			coords[i] = cc;
 		}
 
-		Coord c = links.get(links.size() - 1).getToNode().getCoord();
+		Coord c = this.network.getLinks().get(linkIds.get(linkIds.size() - 1)).getToNode().getCoord();
 		double rx = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
 		double ry = MatsimRandom.getRandom().nextDouble() * this.legBlurFactor;
 		Coordinate cc = new Coordinate(c.getX() + rx, c.getY() + ry);
-		coords[links.size()] = cc;
+		coords[linkIds.size()] = cc;
 
 		LineString ls = this.getGeofac().createLineString(coords);
 

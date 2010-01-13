@@ -39,7 +39,6 @@ import org.matsim.withinday.trafficmanagement.VDSSign;
 
 /**
  * @author dgrether
- *
  */
 public class CoopersAgentLogicFactory extends WithindayAgentLogicFactory {
 
@@ -51,20 +50,14 @@ public class CoopersAgentLogicFactory extends WithindayAgentLogicFactory {
 		this.signs = signs;
 	}
 
-	/**
-	 * @see org.matsim.withinday.WithindayAgentLogicFactory#createAgentContentment(org.matsim.withinday.WithindayAgent)
-	 */
 	@Override
 	public AgentContentment createAgentContentment(final WithindayAgent agent) {
 		return new CoopersContentment();
 	}
 
-	/**
-	 * @see org.matsim.withinday.WithindayAgentLogicFactory#createRouteProvider()
-	 */
 	@Override
 	public RouteProvider createRouteProvider() {
-		return new CoopersRouteProvider(super.aStarRouteProvider, this.signs);
+		return new CoopersRouteProvider(super.aStarRouteProvider, this.network, this.signs);
 	}
 
 	

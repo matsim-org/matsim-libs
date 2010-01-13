@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -46,12 +47,15 @@ public class PathSizeLogitSelector implements PlanSelector {
 
 	private final double beta;
 	private final double tau;
+	private final Network network;
 
-	public PathSizeLogitSelector(){
+	public PathSizeLogitSelector(final Network network) {
 		this.beta = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "PathSizeLogitBeta"));
 
 		//in PSL tau is  the equivalent to BrainExpBeta in the multinomial logit model
 		this.tau = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
+		
+		this.network = network;
 	}
 
 	public Plan selectPlan(final Person person) {
@@ -105,11 +109,11 @@ public class PathSizeLogitSelector implements PlanSelector {
 					currentEndTime = leg.getDepartureTime();
 					NetworkRouteWRefs r = (NetworkRouteWRefs) leg.getRoute();
 					pathSize += r.getDistance();
-					for (Link link : r.getLinks()){
-						ArrayList<Double> lit = linksInTime.get(link.getId());
+					for (Id linkId : r.getLinkIds()){
+						ArrayList<Double> lit = linksInTime.get(linkId);
 						if (lit == null){
 							lit = new ArrayList<Double>();
-							linksInTime.put(link.getId(), lit);
+							linksInTime.put(linkId, lit);
 						}
 						lit.add(currentEndTime);
 					}
@@ -128,14 +132,15 @@ public class PathSizeLogitSelector implements PlanSelector {
 					LegImpl leg = (LegImpl) pe;
 					double currentTime = leg.getDepartureTime();
 					NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
-					for (Link link : route.getLinks()){
+					for (Id linkId : route.getLinkIds()){
 						double denominator = 0;
-						for (double dbl : linksInTime.get(link.getId())){
+						for (double dbl : linksInTime.get(linkId)){
 							//TODO this is just for testing (those legs where the depature time differs more then 3600 seconds will not compared to each other) - need a
 							//little bit to brood on it - gl
 							if (Math.abs(dbl - currentTime) <= 3600)
 								denominator++;
 						}
+						Link link = this.network.getLinks().get(linkId);
 						tmp += link.getLength() / denominator;
 					}
 				}

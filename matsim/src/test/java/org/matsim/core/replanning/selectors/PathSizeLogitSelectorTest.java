@@ -24,13 +24,13 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -48,31 +48,40 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
 
+	private Network network = null;
+	
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		Config config = loadConfig(null); // required for planCalcScore.beta to be defined
 		config.charyparNagelScoring().setBrainExpBeta(2.0);
 		config.charyparNagelScoring().setPathSizeLogitBeta(2.0);
+		this.network = null;
+	}
+	
+	@Override
+	protected void tearDown() throws Exception {
+		this.network = null;
+		super.tearDown();
 	}
 
 	@Override
 	protected PlanSelector getPlanSelector() {
-		return new PathSizeLogitSelector();
+		return new PathSizeLogitSelector(this.network);
 	}
 
 	@Override
 	public void testNegativeScore() {
-		NetworkLayer network = createNetwork();
+		this.network = createNetwork();
 		PlanSelector selector = getPlanSelector();
 
-		LinkImpl l6 = network.getLinks().get(new IdImpl("6"));
-		LinkImpl l7 = network.getLinks().get(new IdImpl("7"));
+		Link l6 = network.getLinks().get(new IdImpl("6"));
+		Link l7 = network.getLinks().get(new IdImpl("7"));
 
-		NodeImpl n1 = network.getNodes().get(new IdImpl("1"));
-		NodeImpl n2 = network.getNodes().get(new IdImpl("2"));
-		NodeImpl n3 = network.getNodes().get(new IdImpl("3"));
-		NodeImpl n4 = network.getNodes().get(new IdImpl("4"));
+		Node n1 = network.getNodes().get(new IdImpl("1"));
+		Node n2 = network.getNodes().get(new IdImpl("2"));
+		Node n3 = network.getNodes().get(new IdImpl("3"));
+		Node n4 = network.getNodes().get(new IdImpl("4"));
 
 		// test with only one plan...
 		PersonImpl person = new PersonImpl(new IdImpl(1));
@@ -171,13 +180,13 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
 	public void testZeroScore() {
-		NetworkLayer network = createNetwork();
+		this.network = createNetwork();
 		PlanSelector selector = getPlanSelector();
-		LinkImpl l6 = network.getLinks().get(new IdImpl("6"));
-		LinkImpl l7 = network.getLinks().get(new IdImpl("7"));
+		Link l6 = network.getLinks().get(new IdImpl("6"));
+		Link l7 = network.getLinks().get(new IdImpl("7"));
 		
-		NodeImpl n1 = network.getNodes().get(new IdImpl("1"));
-		NodeImpl n3 = network.getNodes().get(new IdImpl("3"));
+		Node n1 = network.getNodes().get(new IdImpl("1"));
+		Node n3 = network.getNodes().get(new IdImpl("3"));
 		
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
@@ -204,15 +213,15 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	public void testPathSizeLogitSelector() {
-		NetworkLayer network = createNetwork();
+		this.network = createNetwork();
 
-		LinkImpl l6 = network.getLinks().get(new IdImpl("6"));
-		LinkImpl l7 = network.getLinks().get(new IdImpl("7"));
+		Link l6 = network.getLinks().get(new IdImpl("6"));
+		Link l7 = network.getLinks().get(new IdImpl("7"));
 		
-		NodeImpl n1 = network.getNodes().get(new IdImpl("1"));
-		NodeImpl n2 = network.getNodes().get(new IdImpl("2"));
-		NodeImpl n3 = network.getNodes().get(new IdImpl("3"));
-		NodeImpl n4 = network.getNodes().get(new IdImpl("4"));
+		Node n1 = network.getNodes().get(new IdImpl("1"));
+		Node n2 = network.getNodes().get(new IdImpl("2"));
+		Node n3 = network.getNodes().get(new IdImpl("3"));
+		Node n4 = network.getNodes().get(new IdImpl("4"));
 
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
@@ -275,7 +284,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p3.setScore(-10.0);
 		person.addPlan(p3);
 
-		PathSizeLogitSelector selector = new PathSizeLogitSelector();
+		PathSizeLogitSelector selector = new PathSizeLogitSelector(network);
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

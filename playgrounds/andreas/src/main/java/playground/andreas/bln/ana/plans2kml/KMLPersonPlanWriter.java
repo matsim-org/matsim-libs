@@ -35,14 +35,15 @@ import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -64,7 +65,7 @@ public class KMLPersonPlanWriter {
 
 	private ArrayList<Link> activityLinks;
 
-	private NetworkLayer network;
+	private Network network;
 
 	private boolean writeActivityLinks = true;
 	private boolean writeFullPlan = true;
@@ -80,8 +81,7 @@ public class KMLPersonPlanWriter {
 	private Plan personsPlan;
 
 
-
-	public KMLPersonPlanWriter(NetworkLayer network, Person person) {
+	public KMLPersonPlanWriter(Network network, Person person) {
 		this.network = network;
 		this.person = person;
 
@@ -170,8 +170,8 @@ public class KMLPersonPlanWriter {
 
 		Coord fromCoords = null;
 
-		for (Iterator iterator = this.personsPlan.getPlanElements().iterator(); iterator.hasNext();) {
-			PlanElement planElement = (PlanElement) iterator.next();
+		for (Iterator<PlanElement> iterator = this.personsPlan.getPlanElements().iterator(); iterator.hasNext();) {
+			PlanElement planElement = iterator.next();
 
 			if (planElement instanceof Activity) {
 
@@ -188,14 +188,15 @@ public class KMLPersonPlanWriter {
 
 				if (leg.getMode() == TransportMode.car) {
 
-					ArrayList<Link> tempLinkList = getLinksOfCarLeg(leg);
+					ArrayList<Id> tempLinkList = getLinkIdsOfCarLeg(leg);
 
 					FolderType routeLinksFolder = this.kmlObjectFactory.createFolderType();
 					routeLinksFolder.setName(leg.getMode().toString() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + leg.getRoute().getDistance());
 					
 					if(tempLinkList.size() != 0){
 						routeLinksFolder.setDescription("see attached route");
-						for (Link link : tempLinkList) {
+						for (Id linkId : tempLinkList) {
+							Link link = this.network.getLinks().get(linkId);
 							AbstractFeatureType abstractFeature = this.networkFeatureFactory.createCarLinkFeature(link,	this.styleFactory.createCarNetworkLinkStyle());
 							routeLinksFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 						}
@@ -211,8 +212,8 @@ public class KMLPersonPlanWriter {
 
 						Coord toCoords = null;
 
-						for (Iterator tempIterator = this.personsPlan.getPlanElements().iterator(); tempIterator.hasNext();) {
-							PlanElement tempPlanElement = (PlanElement) tempIterator.next();
+						for (Iterator<PlanElement> tempIterator = this.personsPlan.getPlanElements().iterator(); tempIterator.hasNext();) {
+							PlanElement tempPlanElement = tempIterator.next();
 							if (tempPlanElement == planElement) {
 								toCoords = ((ActivityImpl) tempIterator.next()).getCoord();
 							}
@@ -248,8 +249,8 @@ public class KMLPersonPlanWriter {
 
 							Coord toCoords = null;
 
-							for (Iterator tempIterator = this.personsPlan.getPlanElements().iterator(); tempIterator.hasNext();) {
-								PlanElement tempPlanElement = (PlanElement) tempIterator.next();
+							for (Iterator<PlanElement> tempIterator = this.personsPlan.getPlanElements().iterator(); tempIterator.hasNext();) {
+								PlanElement tempPlanElement = tempIterator.next();
 								if (tempPlanElement == planElement) {
 									toCoords = ((ActivityImpl) tempIterator.next()).getCoord();
 								}
@@ -301,20 +302,20 @@ public class KMLPersonPlanWriter {
 		}
 	}
 
-	private ArrayList<Link> getLinksOfCarLeg(LegImpl leg) {
+	private ArrayList<Id> getLinkIdsOfCarLeg(LegImpl leg) {
 
-		ArrayList<Link> links = new ArrayList<Link>();
+		ArrayList<Id> linkIds = new ArrayList<Id>();
 			if (leg.getMode() == TransportMode.car) {
 
 				if (leg.getRoute() != null) {
 					NodeNetworkRouteImpl tempRoute = (NodeNetworkRouteImpl) leg.getRoute();
-					for (Link link : tempRoute.getLinks()) {
-						links.add(link);
+					for (Id linkId : tempRoute.getLinkIds()) {
+						linkIds.add(linkId);
 					}
 				}
 
 			} else { log.error("You gave me a non car leg. Can't handle this one."); }
-		return links;
+		return linkIds;
 	}
 
 	/*

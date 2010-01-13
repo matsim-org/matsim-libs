@@ -25,7 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -139,9 +139,9 @@ public class ItsumoSim extends ExternalMobsim {
 							continue ;
 						}
 						NetworkRouteWRefs rr = (NetworkRouteWRefs) leg.getRoute();
-						for (Link link : rr.getLinks()) {
+						for (Id linkId : rr.getLinkIds()) {
 							out.write("    <route>"); out.newLine();
-							out.write("     <laneset>" + link.getId() + "</laneset>"); out.newLine();
+							out.write("     <laneset>" + linkId + "</laneset>"); out.newLine();
 							out.write("    </route>"); out.newLine();
 						}
 					}
