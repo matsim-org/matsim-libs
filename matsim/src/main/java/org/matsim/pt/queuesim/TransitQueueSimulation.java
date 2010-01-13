@@ -23,9 +23,8 @@ package org.matsim.pt.queuesim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.ptproject.qsim.QueueSimulation;
 
 
@@ -36,15 +35,13 @@ public class TransitQueueSimulation extends QueueSimulation {
 	
 	private TransitQueueSimulationFeature queueSimulationFeature;
 
-	public TransitQueueSimulation(Network network, Population plans,
-			EventsManager events) {
-		super(network, plans, events);
-		installFeature();
-	}
-
 	public TransitQueueSimulation(Scenario scenario, EventsManager events) {
 		super(scenario, events);
+		if (scenario.getConfig().getQSimConfigGroup() == null){
+		  scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		}
 		installFeature();
+		
 	}
 
 	private void installFeature() {

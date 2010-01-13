@@ -14,7 +14,7 @@
 		<param name="lastIteration" value="0" />
 	</module>
 
-	<module name="simulation">
+	<module name="qsim">
 		<param name="flowCapacityFactor" value="0.13" />
 		<param name="storageCapacityFactor" value="0.13" />
 	</module>

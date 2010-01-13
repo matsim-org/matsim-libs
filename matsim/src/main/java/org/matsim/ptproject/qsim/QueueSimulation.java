@@ -138,7 +138,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
 		Simulation.reset();
 		this.config = Gbl.getConfig();
-		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
+		SimulationTimer.reset(this.config.getQSimConfigGroup().getTimeStepSize());
 		setEvents(events);
 		this.population = (PopulationImpl) plans;
 		this.networkLayer = network;
@@ -330,8 +330,8 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) this.config.getQSimConfigGroup().getSnapshotPeriod();
 
-		double startTime = this.config.simulation().getStartTime();
-		this.stopTime = this.config.simulation().getEndTime();
+		double startTime = this.config.getQSimConfigGroup().getStartTime();
+		this.stopTime = this.config.getQSimConfigGroup().getEndTime();
 
 		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
 		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;

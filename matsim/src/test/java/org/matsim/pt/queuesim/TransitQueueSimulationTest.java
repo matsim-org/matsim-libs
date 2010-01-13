@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
@@ -107,7 +108,8 @@ public class TransitQueueSimulationTest extends TestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseVehicles(true);
 		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().simulation().setEndTime(8.0*3600);
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().getQSimConfigGroup().setEndTime(8.0*3600);
 
 		// setup: network
 		Network network = scenario.getNetwork();
@@ -235,7 +237,8 @@ public class TransitQueueSimulationTest extends TestCase {
 		// setup: config
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
-
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		
 		// setup: network
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
@@ -266,7 +269,7 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		homeAct.setEndTime(7.0*3600 - 10.0);
 		// as no transit line runs, make sure to stop the simulation manually.
-		scenario.getConfig().simulation().setEndTime(7.0*3600);
+		scenario.getConfig().getQSimConfigGroup().setEndTime(7.0*3600);
 
 		Leg leg = pb.createLeg(TransportMode.pt);
 		leg.setRoute(new ExperimentalTransitRoute(stop1, line, null, stop2));
@@ -295,7 +298,8 @@ public class TransitQueueSimulationTest extends TestCase {
 		// setup: config
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().simulation().setEndTime(8.0*3600);
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().getQSimConfigGroup().setEndTime(8.0*3600);
 
 		// setup: network
 		Network network = scenario.getNetwork();
@@ -521,20 +525,21 @@ public class TransitQueueSimulationTest extends TestCase {
 	public void testStartAndEndTime() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
+    config.setQSimConfigGroup(new QSimConfigGroup());
 
 		// build simple network with 2 links
 		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = (NodeImpl) network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = (NodeImpl) network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
-		NodeImpl node3 = (NodeImpl) network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
+		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
+		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
+		NodeImpl node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
 		network.getNodes().put(node3.getId(), node3);
-		LinkImpl link1 = (LinkImpl) network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		LinkImpl link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link1.setFreespeed(10.0);
 		link1.setCapacity(2000.0);
 		link1.setLength(1000.0);
-		LinkImpl link2 = (LinkImpl) network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		LinkImpl link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
 		link2.setFreespeed(10.0);
 		link2.setCapacity(2000.0);
 		link2.setLength(1000.0);
@@ -582,8 +587,8 @@ public class TransitQueueSimulationTest extends TestCase {
 		collector.reset(0);
 		
 		// second test with special start/end times
-		config.simulation().setStartTime(depTime + 20.0);
-		config.simulation().setEndTime(depTime + 90.0);
+		config.getQSimConfigGroup().setStartTime(depTime + 20.0);
+		config.getQSimConfigGroup().setEndTime(depTime + 90.0);
 		sim = new TransitQueueSimulation(scenario, events);
 		sim.run();
 		assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
@@ -610,20 +615,21 @@ public class TransitQueueSimulationTest extends TestCase {
 	public void testEvents() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
-
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		
 		// build simple network with 2 links
 		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = (NodeImpl) network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = (NodeImpl) network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
-		NodeImpl node3 = (NodeImpl) network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
+		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
+		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
+		NodeImpl node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
 		network.getNodes().put(node3.getId(), node3);
-		LinkImpl link1 = (LinkImpl) network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		LinkImpl link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link1.setFreespeed(10.0);
 		link1.setCapacity(2000.0);
 		link1.setLength(1000.0);
-		LinkImpl link2 = (LinkImpl) network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		LinkImpl link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
 		link2.setFreespeed(10.0);
 		link2.setCapacity(2000.0);
 		link2.setLength(1000.0);

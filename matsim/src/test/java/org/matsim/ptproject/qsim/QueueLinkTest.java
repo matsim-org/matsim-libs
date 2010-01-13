@@ -27,7 +27,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -52,7 +55,6 @@ public class QueueLinkTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		loadConfig(null);
 	}
 
 	public void testInit() {
@@ -233,6 +235,9 @@ public class QueueLinkTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testBuffer() {
+	  Config conf = Gbl.createConfig(null);
+	  conf.setQSimConfigGroup(new QSimConfigGroup());
+	  
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(1.0);
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
@@ -312,7 +317,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
 		PersonImpl p = new PersonImpl(new IdImpl(5));
-		QueueSimulation qsim = new QueueSimulation(new ScenarioImpl(), new EventsManagerImpl());
+		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsManagerImpl());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QueueVehicle veh1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(1), vehType));
@@ -367,7 +372,8 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		/*package*/ Fixture() {
 			this.scenario = new ScenarioImpl();
-			NetworkLayer network = (NetworkLayer) this.scenario.getNetwork();
+			this.scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+			NetworkLayer network = this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
 			Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 			Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1, 0));

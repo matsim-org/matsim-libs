@@ -53,7 +53,7 @@ public abstract class Simulation {
 	public static void reset() {
 		setLiving(0);
 		resetLost();
-		setStuckTime(Gbl.getConfig().simulation().getStuckTime());
+		setStuckTime(Gbl.getConfig().getQSimConfigGroup().getStuckTime());
 	}
 
 	public static final double getStuckTime() {return stuckTime;	}

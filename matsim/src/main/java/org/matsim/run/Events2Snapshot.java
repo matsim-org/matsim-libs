@@ -193,7 +193,9 @@ public class Events2Snapshot {
 
 	private void loadSnapshotWriters(final String outputDir) {
 
-		if (this.writer != null) this.visualizer.addSnapshotWriter(this.writer);
+		if (this.writer != null) {
+		  this.visualizer.addSnapshotWriter(this.writer);
+		}
 
 		String snapshotFormat = this.config.simulation().getSnapshotFormat();
 

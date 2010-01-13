@@ -28,7 +28,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -68,7 +70,8 @@ public class WithindayAgentTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		super.loadConfig(null);
+		Config c = super.loadConfig(null);
+		c.setQSimConfigGroup(new QSimConfigGroup());
 		this.network = new NetworkLayer();
 		MatsimNetworkReader parser = new MatsimNetworkReader(this.network);
 		parser.readFile(networkFile);

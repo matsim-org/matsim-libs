@@ -22,11 +22,12 @@ package org.matsim.signalsystems;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -51,6 +52,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
+		conf.setQSimConfigGroup(new QSimConfigGroup());
 		ScenarioImpl data = new ScenarioImpl(conf);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
@@ -81,6 +83,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		conf.plans().setInputFile(this.getClassInputDirectory() + "plans_uturn.xml.gz");
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
+		conf.setQSimConfigGroup(new QSimConfigGroup());
 		ScenarioImpl data = new ScenarioImpl(conf);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();

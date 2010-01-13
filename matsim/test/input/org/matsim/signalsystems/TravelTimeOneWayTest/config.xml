@@ -17,7 +17,7 @@
 		<param name="inputPlansFile" value="&INPUTBASE;/plans.xml.gz" />
 	</module>
 
-	<module name="simulation">
+	<module name="qsim">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
     	<param name="stuckTime" value="1000" />

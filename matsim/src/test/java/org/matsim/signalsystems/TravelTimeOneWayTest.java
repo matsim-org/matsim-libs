@@ -26,10 +26,11 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.LaneDefinitions;
+import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.SignalGroupSettings;
 import org.matsim.signalsystems.config.SignalSystemConfiguration;
@@ -113,7 +114,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		conf.network().setLaneDefinitionsFile(laneDefinitions);
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
-
+		conf.setQSimConfigGroup(new QSimConfigGroup());
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
 		ScenarioImpl data = new ScenarioImpl(conf);

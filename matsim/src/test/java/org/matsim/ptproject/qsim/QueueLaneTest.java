@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.lanes.Lane;
@@ -108,6 +109,8 @@ public class QueueLaneTest extends MatsimTestCase {
   
 	public void testCapacityWoLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		
 		Network network = this.initNetwork(scenario.getNetwork());
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
@@ -120,6 +123,7 @@ public class QueueLaneTest extends MatsimTestCase {
 	
 	public void testCapacityWithOneLaneOneLane() {
 		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		Network network = this.initNetwork(scenario.getNetwork());
 		LaneDefinitions lanes = this.createOneLane(scenario, 1);
 		
@@ -151,6 +155,7 @@ public class QueueLaneTest extends MatsimTestCase {
 
 	public void testCapacityWithOneLaneOneLaneTwoLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		Network network = this.initNetwork(scenario.getNetwork());
 		LaneDefinitions lanes = this.createOneLane(scenario, 2);
 		
@@ -184,6 +189,7 @@ public class QueueLaneTest extends MatsimTestCase {
 	
 	public void testCapacityWithLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		Network network = this.initNetwork(scenario.getNetwork());
 		LaneDefinitions lanes = this.createLanes(scenario);
 		

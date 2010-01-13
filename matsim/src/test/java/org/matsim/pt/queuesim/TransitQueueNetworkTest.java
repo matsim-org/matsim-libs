@@ -40,9 +40,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.pt.fakes.FakeAgent;
@@ -981,7 +981,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			// setup: config
 			ScenarioImpl scenario = new ScenarioImpl();
 			scenario.getConfig().scenario().setUseTransit(true);
-
+			scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 			Id id1 = scenario.createId("1");
 			Id id2 = scenario.createId("2");
 			Id id3 = scenario.createId("3");
@@ -1071,7 +1071,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			this.normalVehicle = new QueueVehicleImpl(new BasicVehicleImpl(id2, vehicleType));
 			this.qlink1.addParkedVehicle(this.normalVehicle);
 
-			PersonAgent nDriver = new PersonAgent((PersonImpl) person, qsim);
+			PersonAgent nDriver = new PersonAgent(person, qsim);
 			this.normalVehicle.setDriver(nDriver);
 			nDriver.setVehicle(this.normalVehicle);
 			nDriver.initialize();
@@ -1097,7 +1097,7 @@ public class TransitQueueNetworkTest extends TestCase {
 				plan2.addActivity(pb.createActivityFromLinkId("work", id2));
 				population.addPerson(person2);
 
-				PersonAgent nDriver2 = new PersonAgent((PersonImpl) person2, qsim);
+				PersonAgent nDriver2 = new PersonAgent(person2, qsim);
 				this.normalVehicle2.setDriver(nDriver2);
 				nDriver2.setVehicle(this.normalVehicle);
 				nDriver2.initialize();

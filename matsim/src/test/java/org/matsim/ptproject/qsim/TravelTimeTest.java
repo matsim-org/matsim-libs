@@ -30,6 +30,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -54,7 +55,8 @@ public class TravelTimeTest extends MatsimTestCase implements
 		String popFileName = "test/scenarios/equil/plans1.xml";
 
 		conf.plans().setInputFile(popFileName);
-
+		conf.setQSimConfigGroup(new QSimConfigGroup());
+		
 		ScenarioImpl data = new ScenarioImpl(conf);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
@@ -77,7 +79,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		this.agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
 		Config conf = loadConfig("test/scenarios/equil/config.xml");
 		String popFileName = "test/scenarios/equil/plans2.xml";
-
+		conf.setQSimConfigGroup(new QSimConfigGroup());
 		conf.plans().setInputFile(popFileName);
 		
 		ScenarioImpl data = new ScenarioImpl(conf);

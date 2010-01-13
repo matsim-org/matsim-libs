@@ -48,6 +48,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
@@ -927,7 +928,8 @@ public class QueueSimulationTest extends TestCase {
 	public void testStartAndEndTime() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
-		
+    config.setQSimConfigGroup(new QSimConfigGroup());
+
 		// build simple network with 1 link
 		NetworkImpl network = scenario.getNetwork();
 		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
@@ -969,8 +971,8 @@ public class QueueSimulationTest extends TestCase {
 		collector.reset(0);
 		
 		// second test with special start/end times
-		config.simulation().setStartTime(8.0*3600);
-		config.simulation().setEndTime(11.0*3600);
+		config.getQSimConfigGroup().setStartTime(8.0*3600);
+		config.getQSimConfigGroup().setEndTime(11.0*3600);
 		sim = new QueueSimulation(scenario, events);
 		sim.run();
 		assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
@@ -1073,6 +1075,7 @@ public class QueueSimulationTest extends TestCase {
 			Gbl.reset();
 			ScenarioImpl scenario = new ScenarioImpl();
 			this.config = scenario.getConfig();
+			this.config.setQSimConfigGroup(new QSimConfigGroup());
 			this.config.getQSimConfigGroup().setFlowCapFactor(1.0);
 			this.config.getQSimConfigGroup().setStorageCapFactor(1.0);
 
