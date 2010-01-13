@@ -61,6 +61,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.lanes.otfvis.OTFLanesConnectionManagerFactory;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.systems.SignalSystems;
@@ -68,6 +69,7 @@ import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
+import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
@@ -242,7 +244,12 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 	}
 
 
-	public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
+	/**
+	 * 
+	 * @deprecated Netvis is no longer supported by this QueueSimulation
+	 */
+	@Deprecated
+  public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
 		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
 		 * In my eyes, the configuration should usually be a read-only object in general, but
 		 * that's hard to be implemented...
@@ -256,7 +263,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 	private void createSnapshotwriter() {
 		// A snapshot period of 0 or less indicates that there should be NO snapshot written
 		if (this.snapshotPeriod > 0 ) {
-			String snapshotFormat =  this.config.simulation().getSnapshotFormat();
+			String snapshotFormat =  this.config.getQSimConfigGroup().getSnapshotFormat();
 			Integer itNumber = this.iterationNumber;
 			if (this.controlerIO == null) {
 			  log.error("Not able to create io path via ControlerIO in mobility simulation, not able to write visualizer output!");
@@ -287,20 +294,12 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 			if (snapshotFormat.contains("otfvis")) {
 				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "otfvis.mvi");
 				OTFFileWriter writer = null;
-				writer = new OTFFileWriter(this.snapshotPeriod, new OTFQSimServerQuadBuilder(this.network), snapshotFile, new OTFFileWriterQSimConnectionManagerFactory());
-//				if (this.config.scenario().isUseLanes() && ! this.config.scenario().isUseSignalSystems()) {
-//					OTFConnectionManager connect = writer.getConnectionManager();
-//					// data source to writer
-//					connect.add(QueueLink.class, DgOtfLaneWriter.class);
-//					// writer -> reader: from server to client
-//					connect
-//					.add(DgOtfLaneWriter.class, DgOtfLaneReader.class);
-//					// reader to drawer (or provider to receiver)
-//					connect.add(DgOtfLaneReader.class, DgLaneSignalDrawer.class);
-//					// drawer -> layer
-//					connect.add(DgLaneSignalDrawer.class, DgOtfLaneLayer.class);
-//
-//				}
+				
+				OTFConnectionManagerFactory connectionManagerFactory = new OTFFileWriterQSimConnectionManagerFactory();
+				if (this.config.scenario().isUseLanes() && ! this.config.scenario().isUseSignalSystems()) {
+				  connectionManagerFactory = new OTFLanesConnectionManagerFactory(connectionManagerFactory);
+				}
+				writer = new OTFFileWriter(this.snapshotPeriod, new OTFQSimServerQuadBuilder(this.network), snapshotFile, connectionManagerFactory);
 				this.snapshotWriters.add(writer);
 			}
 		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
@@ -329,7 +328,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		}
 
 		// Initialize Snapshot file
-		this.snapshotPeriod = (int) this.config.simulation().getSnapshotPeriod();
+		this.snapshotPeriod = (int) this.config.getQSimConfigGroup().getSnapshotPeriod();
 
 		double startTime = this.config.simulation().getStartTime();
 		this.stopTime = this.config.simulation().getEndTime();

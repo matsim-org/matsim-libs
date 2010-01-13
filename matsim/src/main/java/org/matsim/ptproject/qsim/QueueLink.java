@@ -496,7 +496,7 @@ public class QueueLink {
 
 			int cnt = parkedVehicles.size();
 			if (cnt > 0) {
-				String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
+				String snapshotStyle = Gbl.getConfig().getQSimConfigGroup().getSnapshotStyle();
 				int nLanes = Math.round((float)Math.max(getLink().getNumberOfLanes(Time.UNDEFINED_TIME),1.0d));
 				int lane = nLanes + 4;
 	

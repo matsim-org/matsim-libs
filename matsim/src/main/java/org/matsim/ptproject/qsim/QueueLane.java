@@ -226,14 +226,14 @@ public class QueueLane {
 				* this.laneData.getNumberOfRepresentedLanes();
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * SimulationTimer.getSimTickTime() * Gbl.getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
 
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
+		double storageCapFactor = Gbl.getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 
 		double numberOfLanes = this.queueLink.getLink().getNumberOfLanes(time);
@@ -731,7 +731,7 @@ public class QueueLane {
 
 		public Collection<PositionInfo> getVehiclePositions(double time, 
 				final Collection<PositionInfo> positions) {
-			String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
+			String snapshotStyle = Gbl.getConfig().getQSimConfigGroup().getSnapshotStyle();
 			if ("queue".equals(snapshotStyle)) {
 				getVehiclePositionsQueue(positions);
 			} else if ("equiDist".equals(snapshotStyle)) {
@@ -825,7 +825,7 @@ public class QueueLane {
 			double now = SimulationTimer.getTime();
 			Link link = QueueLane.this.queueLink.getLink();
 			double queueEnd = getInitialQueueEnd();
-			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
+			double storageCapFactor = Gbl.getConfig().getQSimConfigGroup().getStorageCapFactor();
 			double cellSize = ((NetworkImpl)QueueLane.this.queueLink.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
 			double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
 			queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);

@@ -1073,8 +1073,8 @@ public class QueueSimulationTest extends TestCase {
 			Gbl.reset();
 			ScenarioImpl scenario = new ScenarioImpl();
 			this.config = scenario.getConfig();
-			this.config.simulation().setFlowCapFactor(1.0);
-			this.config.simulation().setStorageCapFactor(1.0);
+			this.config.getQSimConfigGroup().setFlowCapFactor(1.0);
+			this.config.getQSimConfigGroup().setStorageCapFactor(1.0);
 
 			/* build network */
 			this.network = scenario.getNetwork();
