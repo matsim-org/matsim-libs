@@ -8,7 +8,7 @@ import playground.mmoyo.PTRouter.PTValues;
 public class Router_900sbig {
 
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
-
+		PTValues.scenario = "big";
 		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_big.xml";
 		
 		for (byte i=1; i<=3; i++){

@@ -20,6 +20,9 @@
 
 package playground.mmoyo.analysis.counts;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -73,6 +76,11 @@ public class OccupancyCounts {
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
+		
+		//File outputFile = new File( scenario.getConfig().plans().getInputFile() );
+		//new File( scenario.getConfig().plans().getInputFile() ).getName()
+		//System.out.println( + f.getName() );
+		
 
 		//TransitSchedule schedule = scenario.getTransitSchedule();
 		//new TransitScheduleReaderV1(schedule, network).parse(scheduleFile);
@@ -95,25 +103,48 @@ public class OccupancyCounts {
 
 		sim.run();
 
-		System.out.println("stop\t#exitleaving\t#enter\t#inVehicle");
+		String[] data = new String[route1.getStops().size() + 1];
+		data[0]= "stop\t#exitleaving\t#enter\t#inVehicle \n"; 
+		System.out.println(data[0]);
 		int inVehicle = 0;
+		int i=0;
 		for (TransitRouteStop stop : route1.getStops()) {
 			Id stopId = stop.getStopFacility().getId();
 			int enter = analysis1.getNumberOfEnteringPassengers(stopId);
 			int leave = analysis1.getNumberOfLeavingPassengers(stopId);
 			inVehicle = inVehicle + enter - leave;
-			System.out.println(stopId + "\t" + leave + "\t" + enter + "\t" + inVehicle);
+			data[++i] = stopId + "\t" + leave + "\t" + enter + "\t" + inVehicle + "\n";
+			System.out.print( data[i]);
 		}
 
-		System.out.println("stop\t#exitleaving\t#enter\t#inVehicle");
+		String [] data2 = new String[route2.getStops().size() + 1];
+		data2[0]= data[0];
+		System.out.println(data2[0]);
 		inVehicle = 0;
+		i=0;
 		for (TransitRouteStop stop : route2.getStops()) {
 			Id stopId = stop.getStopFacility().getId();
 			int enter = analysis2.getNumberOfEnteringPassengers(stopId);
 			int leave = analysis2.getNumberOfLeavingPassengers(stopId);
 			inVehicle = inVehicle + enter - leave;
-			System.out.println(stopId + "\t" + leave + "\t" + enter + "\t" + inVehicle);
+			data2[++i] = stopId + "\t" + leave + "\t" + enter + "\t" + inVehicle + "\n";
+			System.out.print( data2[i]);
 		}
+	
+		try { 
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("../playgrounds/mmoyo/output/" + new File( scenario.getConfig().plans().getInputFile() ).getName() + "_counts.txt")); 
+			 for(i = 0; i < data.length; i++) {
+	              bufferedWriter.write(data[i]);
+	        }    
+			 bufferedWriter.write("\n");
+			 for(i = 0; i < data2.length; i++) {
+	              bufferedWriter.write(data2[i]);
+	        }    
+			bufferedWriter.close(); 
+		} catch (IOException e) {
+			
+		} 
+		
 	}
 
 }

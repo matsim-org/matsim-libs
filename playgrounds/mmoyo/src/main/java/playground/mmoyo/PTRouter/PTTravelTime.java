@@ -30,7 +30,7 @@ public class PTTravelTime implements TravelTime {
 			travelTime= getTransferTime((Station)link.getToNode(),time); //2 minutes to allow the passenger walk between ptv's!!!!! 
 			break;
 		case 2: //  "Standard"
-			travelTime = ptLink.getTravelTime() * 60; // stored in minutes, returned in seconds
+			travelTime = ptLink.getTravelTime(); // it is stored in seconds
 			break;
 		case 1:   //access
 			waitingTime= getTransferTime((Station)link.getToNode(), time + ptLink.getWalkTime());

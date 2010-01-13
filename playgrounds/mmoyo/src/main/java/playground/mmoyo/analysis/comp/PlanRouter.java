@@ -37,15 +37,15 @@ public class PlanRouter {
 		switch (PTValues.routerCalculator){
 			case 1:  //rieser 
 				router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += "/routedPlans" ;
+				routedPlansFile += ("/routedPlans_" + PTValues.scenario);
 				break;
 			case 2:	 //moyo time
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += "/moyo_routedPlans_time" ;
+				routedPlansFile += ("/moyo_routedPlans_time_" + PTValues.scenario);
 				break;
 			case 3:	 //moyo parameterized
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += "/moyo_routedPlans_parameterized" ;
+				routedPlansFile += ("/moyo_routedPlans_parameterized_" + PTValues.scenario);
 				 break;
 			default:
 		}
