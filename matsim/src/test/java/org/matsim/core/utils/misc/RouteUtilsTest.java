@@ -85,6 +85,34 @@ public class RouteUtilsTest {
 		Assert.assertEquals(f.scenario.createId("4"), nodes.get(0).getId());
 	}
 
+	@Test
+	public void testGetNodes_CircularRoute() {
+		Fixture f = new Fixture();
+		f.network.addLink(f.network.getFactory().createLink(f.scenario.createId("99"), f.scenario.createId("6"), f.scenario.createId("0")));
+		Link startLink = f.network.getLinks().get(f.scenario.createId("3"));
+		Link endLink = f.network.getLinks().get(f.scenario.createId("3"));
+		List<Link> links = new ArrayList<Link>(6);
+		links.add(f.network.getLinks().get(f.scenario.createId("4")));
+		links.add(f.network.getLinks().get(f.scenario.createId("5")));
+		links.add(f.network.getLinks().get(f.scenario.createId("99")));
+		links.add(f.network.getLinks().get(f.scenario.createId("0")));
+		links.add(f.network.getLinks().get(f.scenario.createId("1")));
+		links.add(f.network.getLinks().get(f.scenario.createId("2")));
+
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink, endLink);
+		route.setLinks(startLink, links, endLink);
+
+		List<Node> nodes = RouteUtils.getNodes(route, f.network);
+		Assert.assertEquals(7, nodes.size());
+		Assert.assertEquals(f.scenario.createId("4"), nodes.get(0).getId());
+		Assert.assertEquals(f.scenario.createId("5"), nodes.get(1).getId());
+		Assert.assertEquals(f.scenario.createId("6"), nodes.get(2).getId());
+		Assert.assertEquals(f.scenario.createId("0"), nodes.get(3).getId());
+		Assert.assertEquals(f.scenario.createId("1"), nodes.get(4).getId());
+		Assert.assertEquals(f.scenario.createId("2"), nodes.get(5).getId());
+		Assert.assertEquals(f.scenario.createId("3"), nodes.get(6).getId());
+	}
+
 	private static class Fixture {
 		protected final Scenario scenario;
 		protected final Network network;

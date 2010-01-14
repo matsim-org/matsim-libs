@@ -44,7 +44,7 @@ public class RouteUtils {
 	 */
 	public static List<Node> getNodes(final NetworkRouteWRefs route, final Network network) {
 		List<Node> nodes = new ArrayList<Node>(route.getLinkIds().size() + 1);
-		if (route.getStartLinkId() != route.getEndLinkId()) {
+		if ((route.getLinkIds().size() > 0) || (route.getStartLinkId() != route.getEndLinkId())) {
 			nodes.add(network.getLinks().get(route.getStartLinkId()).getToNode());
 			for (Id linkId : route.getLinkIds()) {
 				Link link = network.getLinks().get(linkId);
