@@ -7,6 +7,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
 
 //import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
@@ -14,7 +15,8 @@ import org.matsim.pt.queuesim.TransitQueueSimulation;
 //import playground.mrieser.OTFDemo;
 //import playground.mrieser.pt.config.TransitConfigGroup;
 //import playground.mrieser.pt.controler.TransitControler;
-import playground.mrieser.pt.config.TransitConfigGroup;
+
+
 import playground.mzilske.bvg09.OTFDemo;
 import playground.mzilske.bvg09.TransitControler;
 
