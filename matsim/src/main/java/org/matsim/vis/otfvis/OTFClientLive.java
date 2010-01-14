@@ -63,7 +63,7 @@ public class OTFClientLive extends OTFClient {
 	protected OTFDrawer createDrawer(){
 		try {		
 			OTFClientQuad clientQ = createNewView(this.url, connect, this.hostControlBar.getOTFHostControl());
-			mainDrawer = new OTFOGLDrawer(this.visconf, this.frame, clientQ);
+			mainDrawer = new OTFOGLDrawer(this.frame, clientQ);
 			
 			if (hostControlBar.getOTFHostControl().isLiveHost()) {
 				OTFQueryControl queryControl = new OTFQueryControl(hostControlBar, visconf);

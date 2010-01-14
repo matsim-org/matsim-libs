@@ -83,6 +83,7 @@ import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.renderers.ValueColorizer;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
@@ -274,7 +275,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	private StatusTextDrawer statusDrawer = null;
 
-	private OTFVisConfig config = null;
 	private OTFQueryHandler queryHandler = null;
 
 	private Component canvas = null;
@@ -465,14 +465,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		return canvas;
 	}
 	
-	public OTFOGLDrawer(OTFVisConfig visconf, JFrame frame, OTFClientQuad clientQ) {
+	public OTFOGLDrawer(JFrame frame, OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
 		GLCapabilities caps = new GLCapabilities();
-		this.config = visconf;
 		this.canvas = createGLCanvas(this, caps, motherContext);
 		this.mouseMan = new VisGUIMouseHandler(this);
 		this.mouseMan.setBounds((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing(), 100);
-		Point3f initialZoom = this.config.getZoomValue("*Initial*");
+		Point3f initialZoom = OTFClientControl.getInstance().getOTFVisConfig().getZoomValue("*Initial*");
 		if (initialZoom != null) {
 			this.mouseMan.setToNewPos(initialZoom);
 		}
@@ -553,7 +552,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	private boolean isZoomBigEnoughForLabels() {
 		CoordImpl size  = this.mouseMan.getPixelsize();
-		final double cellWidth = this.config.getLinkWidth();
+		final double cellWidth = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
 		final double pixelsizeStreet = 5;
 		return (size.getX()*pixelsizeStreet < cellWidth) && (size.getX()*pixelsizeStreet < cellWidth);
 	}
@@ -572,7 +571,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	}
 
 	synchronized public void display(GLAutoDrawable drawable) {
-		float[] components = this.config.getBackgroundColor().getColorComponents(new float[4]);
+		float[] components = OTFClientControl.getInstance().getOTFVisConfig().getBackgroundColor().getColorComponents(new float[4]);
 		this.gl = drawable.getGL();
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -580,7 +579,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.gl.glEnable(GL.GL_BLEND);
 		this.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		this.mouseMan.setFrustrum(this.gl);
-		components = this.config.getNetworkColor().getColorComponents(components);
+		components = OTFClientControl.getInstance().getOTFVisConfig().getNetworkColor().getColorComponents(components);
 		this.gl.glColor4d(components[0], components[1], components[2], components[3]);
 		if (this.actGraph != null) {
 			this.actGraph.draw();
@@ -589,7 +588,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			this.queryHandler.drawQueries(this);
 		}
 		Map<Coord, String> coordStringPairs = findVisibleLinks();
-		if (this.config.drawLinkIds()) {
+		if (OTFClientControl.getInstance().getOTFVisConfig().drawLinkIds()) {
 			displayLinkIds(coordStringPairs);
 		}
 		this.gl.glDisable(GL.GL_BLEND);
@@ -601,23 +600,23 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		Collection<String> visibleLinkIds = coordStringPairs.values();
 		InfoTextContainer.drawInfoTexts(drawable, visibleLinkIds);
 		
-		if (this.config.drawTime()) {
+		if (OTFClientControl.getInstance().getOTFVisConfig().drawTime()) {
 			this.statusDrawer.displayStatusText(this.lastTime);
 		}
 
 		this.mouseMan.drawElements(this.gl);
 
-		if(this.config.drawOverlays()) {
+		if(OTFClientControl.getInstance().getOTFVisConfig().drawOverlays()) {
 			for (OTFGLDrawable item : this.overlayItems) {
 				item.draw();
 			}
 		}
 		
-		if (this.config.drawScaleBar()) {
+		if (OTFClientControl.getInstance().getOTFVisConfig().drawScaleBar()) {
 			this.scaleBar.draw();
 		}
 		
-		if (this.config.renderImages() && (this.lastShot < this.now)){
+		if (OTFClientControl.getInstance().getOTFVisConfig().renderImages() && (this.lastShot < this.now)){
 			this.lastShot = this.now;
 			String nr = String.format("%07d", this.now);
 			try {
@@ -643,7 +642,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		
 		this.gl = drawable.getGL();
 		this.gl.setSwapInterval(0);
-		float[] components = this.config.getBackgroundColor().getColorComponents(new float[4]);
+		float[] components = OTFClientControl.getInstance().getOTFVisConfig().getBackgroundColor().getColorComponents(new float[4]);
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this.mouseMan.init(this.gl);
@@ -677,8 +676,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		GridLayout gbl = new GridLayout(3,3); 
 		this.zoomD.getContentPane().setLayout( gbl ); 
 		ArrayList<JButton> buttons = new ArrayList<JButton>();
-		final List<ZoomEntry> zooms = this.config.getZooms();
-
+		final List<ZoomEntry> zooms = OTFClientControl.getInstance().getOTFVisConfig().getZooms();
+		log.error("zooms: " + OTFClientControl.getInstance().getOTFVisConfig().getZooms().size());
 		for(int i=0; i<zooms.size();i++) {
 			ZoomEntry z = zooms.get(i);
 			JButton b = new JButton(z.getName());//icon);
@@ -736,7 +735,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.canvas.repaint();
 		
 		BufferedImage image = ImageUtil.createThumbnail(this.current, 300);
-		this.config.addZoom(new ZoomEntry(image,zoomstore, name));
+		OTFClientControl.getInstance().getOTFVisConfig().addZoom(new ZoomEntry(image,zoomstore, name));
 
 	}
 
@@ -779,7 +778,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				private static final long serialVersionUID = 1L;
 				public void actionPerformed( ActionEvent e ) { 
 					if(OTFOGLDrawer.this.lastZoom != null) {
-						OTFOGLDrawer.this.config.deleteZoom(OTFOGLDrawer.this.lastZoom);
+						OTFClientControl.getInstance().getOTFVisConfig().deleteZoom(OTFOGLDrawer.this.lastZoom);
 						OTFOGLDrawer.this.lastZoom = null;
 					}
 				} 
