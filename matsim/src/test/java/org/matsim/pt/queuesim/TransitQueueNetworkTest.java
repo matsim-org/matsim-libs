@@ -1118,7 +1118,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
 		public FakeTransitDriver(final TransitLine line, final TransitRoute route, final Departure departure,
 				final TransitStopAgentTracker agentTracker, final TransitQueueSimulation sim) {
-			super(line, route, departure, agentTracker, sim);
+			super(line, route, departure, agentTracker, sim, new SimpleTransitStopHandler());
 		}
 
 		@Override

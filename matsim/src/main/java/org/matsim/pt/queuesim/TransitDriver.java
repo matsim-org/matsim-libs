@@ -40,15 +40,15 @@ public class TransitDriver extends AbstractTransitDriver {
 		PersonImpl dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 		return dummyPerson;
 	}
-	
+
 	final NetworkRouteWRefs carRoute;
 	final TransitLine transitLine;
 	final TransitRoute transitRoute;
 	final double departureTime;
 	private final LegImpl currentLeg = new LegImpl(TransportMode.car);
 
-	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final QueueSimulation sim) {
-		super(createDummyPerson(line, route, departure), sim, agentTracker);
+	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final QueueSimulation sim, final TransitStopHandler stopHandler) {
+		super(createDummyPerson(line, route, departure), sim, stopHandler, agentTracker);
 		this.departureTime = departure.getDepartureTime();
 		this.transitLine = line;
 		this.transitRoute = route;
@@ -82,7 +82,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	public double getDepartureTime() {
 		return departureTime;
 	}
-	
+
 	@Override
 	public LegImpl getCurrentLeg() {
 		return this.currentLeg;

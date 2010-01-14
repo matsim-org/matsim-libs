@@ -34,7 +34,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
@@ -68,11 +67,10 @@ public class TransitDriverTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		Gbl.reset(); // reset world
 		Config c = super.loadConfig(null);
 		c.setQSimConfigGroup(new QSimConfigGroup());
 	}
-	
+
 	public void testInitializationNetworkRoute() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
@@ -98,7 +96,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = null;
 		TransitQueueSimulation tqsim = null;
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim, new SimpleTransitStopHandler());
 
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRouteWRefs);
 		NetworkRouteWRefs netRoute = (NetworkRouteWRefs) driver.getCurrentLeg().getRoute();
@@ -130,7 +128,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), depTime);
 		TransitStopAgentTracker tracker = null;
 		TransitQueueSimulation tqsim = null;
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim, new SimpleTransitStopHandler());
 		assertEquals(depTime, driver.getDepartureTime(), MatsimTestCase.EPSILON);
 	}
 
@@ -153,7 +151,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		TransitQueueSimulation tqsim = null;
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim, new SimpleTransitStopHandler());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
@@ -193,15 +191,15 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		ScenarioImpl sc = new ScenarioImpl();
     sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-    TransitQueueSimulation tqsim = new TransitQueueSimulation(sc, new EventsManagerImpl()); 
-    
+    TransitQueueSimulation tqsim = new TransitQueueSimulation(sc, new EventsManagerImpl());
+
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim, new SimpleTransitStopHandler());
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 
@@ -261,16 +259,16 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
     ScenarioImpl sc = new ScenarioImpl();
     sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-    TransitQueueSimulation tqsim = new TransitQueueSimulation(sc, new EventsManagerImpl()); 
+    TransitQueueSimulation tqsim = new TransitQueueSimulation(sc, new EventsManagerImpl());
 
-		
+
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim, new SimpleTransitStopHandler());
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 
@@ -317,7 +315,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
     ScenarioImpl sc = new ScenarioImpl();
     sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-    TransitQueueSimulation tqsim = new TransitQueueSimulation(sc, new EventsManagerImpl()); 
+    TransitQueueSimulation tqsim = new TransitQueueSimulation(sc, new EventsManagerImpl());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
@@ -325,7 +323,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim, new SimpleTransitStopHandler());
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 
@@ -362,7 +360,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
     ScenarioImpl sc = new ScenarioImpl();
     sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-    TransitQueueSimulation tqsim = new TransitQueueSimulation(sc, new EventsManagerImpl()); 
+    TransitQueueSimulation tqsim = new TransitQueueSimulation(sc, new EventsManagerImpl());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
@@ -370,7 +368,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim, new SimpleTransitStopHandler());
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 
@@ -406,7 +404,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
     ScenarioImpl sc = new ScenarioImpl();
     sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-    TransitQueueSimulation tqsim = new TransitQueueSimulation(sc, new EventsManagerImpl()); 
+    TransitQueueSimulation tqsim = new TransitQueueSimulation(sc, new EventsManagerImpl());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
@@ -414,7 +412,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim, new SimpleTransitStopHandler());
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 

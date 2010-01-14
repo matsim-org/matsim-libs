@@ -56,7 +56,6 @@ import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -94,12 +93,6 @@ import org.matsim.vehicles.VehiclesFactory;
  */
 public class TransitQueueSimulationTest extends TestCase {
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		Gbl.reset();
-	}
-	
 	/**
 	 * Ensure that for each departure an agent is created and departs
 	 */
@@ -238,7 +231,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		
+
 		// setup: network
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
@@ -440,7 +433,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		assertEquals(0.0, data.returnedDelay, MatsimTestCase.EPSILON);
 		assertEquals(lastTime + lastDelay, data.time, MatsimTestCase.EPSILON);
 	}
-	
+
 	private void setDefaultLinkAttributes(final Link link) {
 		link.setLength(1000.0);
 		link.setFreespeed(10.0);
@@ -495,7 +488,7 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		public SpyDriver(final TransitLine line, final TransitRoute route, final Departure departure,
 				final TransitStopAgentTracker agentTracker, final TransitQueueSimulation sim) {
-			super(line, route, departure, agentTracker, sim);
+			super(line, route, departure, agentTracker, sim, new SimpleTransitStopHandler());
 		}
 
 		@Override
@@ -578,14 +571,14 @@ public class TransitQueueSimulationTest extends TestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		events.addHandler(collector);
-		
+
 		// first test without special settings
 		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
 		sim.run();
 		assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		collector.reset(0);
-		
+
 		// second test with special start/end times
 		config.getQSimConfigGroup().setStartTime(depTime + 20.0);
 		config.getQSimConfigGroup().setEndTime(depTime + 90.0);
@@ -594,11 +587,11 @@ public class TransitQueueSimulationTest extends TestCase {
 		assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 	}
-	
+
 	/*package*/ final static class FirstLastEventCollector implements BasicEventHandler {
 		public Event firstEvent = null;
 		public Event lastEvent = null;
-		
+
 		public void handleEvent(final Event event) {
 			if (firstEvent == null) {
 				firstEvent = event;
@@ -611,12 +604,12 @@ public class TransitQueueSimulationTest extends TestCase {
 			lastEvent = null;
 		}
 	}
-	
+
 	public void testEvents() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		
+
 		// build simple network with 2 links
 		NetworkImpl network = scenario.getNetwork();
 		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
@@ -663,7 +656,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		tLine.addRoute(tRoute);
 		schedule.addTransitLine(tLine);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
-		
+
 		// build population with 1 person
 		Population population = scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
@@ -688,7 +681,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		route3.setTravelTime(10.0);
 		leg3.setRoute(route3);
 		Activity act4 = pb.createActivityFromLinkId("w", link2.getId());
-		
+
 		plan.addActivity(act1);
 		plan.addLeg(leg1);
 		plan.addActivity(act2);
@@ -698,20 +691,20 @@ public class TransitQueueSimulationTest extends TestCase {
 		plan.addActivity(act4);
 		person.addPlan(plan);
 		population.addPerson(person);
-		
+
 		// run sim
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		new TransitQueueSimulation(scenario, events).run();
 		List<Event> allEvents = collector.getEvents();
-		
+
 		for (Event event : allEvents) {
 			System.out.println(event.toString());
 		}
 
 		assertEquals(23, allEvents.size());
-		
+
 		assertTrue(allEvents.get(0) instanceof ActivityEndEventImpl);
 		assertEquals("h", ((ActivityEndEventImpl) allEvents.get(0)).getActType());
 		assertTrue(allEvents.get(1) instanceof AgentDepartureEventImpl);
@@ -721,31 +714,31 @@ public class TransitQueueSimulationTest extends TestCase {
 		assertTrue(allEvents.get(4) instanceof ActivityEndEventImpl); // zero activity duration, waiting at stop is considered as leg
 		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(4)).getActType());
 		assertTrue(allEvents.get(5) instanceof AgentDepartureEventImpl);
-		
+
 		assertTrue(allEvents.get(6) instanceof AgentDepartureEventImpl); // pt-driver
 		assertTrue(allEvents.get(7) instanceof AgentWait2LinkEventImpl); // pt-vehicle
-		
+
 		assertTrue(allEvents.get(8) instanceof VehicleArrivesAtFacilityEvent);
 		assertTrue(allEvents.get(9) instanceof PersonEntersVehicleEventImpl);
 		assertTrue(allEvents.get(10) instanceof VehicleDepartsAtFacilityEvent);
-		
+
 		assertTrue(allEvents.get(11) instanceof LinkLeaveEventImpl); // pt-vehicle
 		assertTrue(allEvents.get(12) instanceof LinkEnterEventImpl); // pt-vehicle
-		
+
 		assertTrue(allEvents.get(13) instanceof VehicleArrivesAtFacilityEvent); // pt-vehicle
 		assertTrue(allEvents.get(14) instanceof PersonLeavesVehicleEventImpl);
-		
+
 		assertTrue(allEvents.get(15) instanceof AgentArrivalEventImpl);
 		assertTrue(allEvents.get(16) instanceof ActivityStartEventImpl);
 		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(16)).getActType());
 		assertTrue(allEvents.get(17) instanceof ActivityEndEventImpl); // zero activity duration, waiting at stop is considered as leg
 		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(17)).getActType());
-		
+
 		assertTrue(allEvents.get(18) instanceof AgentDepartureEventImpl); // walk
 		assertTrue(allEvents.get(19) instanceof AgentArrivalEventImpl);
 		assertTrue(allEvents.get(20) instanceof ActivityStartEventImpl);
 		assertEquals("w", ((ActivityStartEventImpl) allEvents.get(20)).getActType());
-		
+
 		assertTrue(allEvents.get(21) instanceof VehicleDepartsAtFacilityEvent);
 		assertTrue(allEvents.get(22) instanceof AgentArrivalEventImpl); // pt-driver
 	}

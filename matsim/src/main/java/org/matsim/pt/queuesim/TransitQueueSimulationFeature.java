@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
@@ -40,9 +39,9 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
  * @author mrieser
  */
 public class TransitQueueSimulationFeature implements QueueSimulationFeature, DepartureHandler {
-  
+
 	private static final Logger log = Logger.getLogger(TransitQueueSimulationFeature.class);
-	
+
 	private OnTheFlyServer otfServer = null;
 	private QueueSimulation queueSimulation;
 	private TransitSchedule schedule = null;
@@ -53,6 +52,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 	private OTFTeleportAgentsDataWriter teleportationWriter;
 	private LinkedHashMap<Id, TeleportationVisData> visTeleportationData;
 	private boolean useUmlaeufe = false;
+	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 
 	public TransitQueueSimulationFeature(QueueSimulation queueSimulation) {
 		this.queueSimulation = queueSimulation;
@@ -105,7 +105,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 	private void createVehiclesAndDriversWithUmlaeufe(TransitSchedule thisSchedule,
 			TransitStopAgentTracker thisAgentTracker) {
 		BasicVehicles vehicles = ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles();
-		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder((NetworkLayer) this.queueSimulation.getScenario().getNetwork(),((ScenarioImpl) this.queueSimulation.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles());
+		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.queueSimulation.getScenario().getNetwork(),((ScenarioImpl) this.queueSimulation.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles());
 		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
 		for (Umlauf umlauf : umlaeufe) {
 			BasicVehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
@@ -117,7 +117,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 
 	private void createAndScheduleVehicleAndDriver(Umlauf umlauf,
 			BasicVehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
-		UmlaufDriver driver = new UmlaufDriver(umlauf, thisAgentTracker, this.queueSimulation);
+		UmlaufDriver driver = new UmlaufDriver(umlauf, thisAgentTracker, this.queueSimulation, this.stopHandlerFactory.createTransitStopHandler());
 		TransitQueueVehicle veh = new TransitQueueVehicle(vehicle, 5);
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
@@ -136,7 +136,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
-					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this.queueSimulation);
+					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this.queueSimulation, this.stopHandlerFactory.createTransitStopHandler());
 					if (departure.getVehicleId() == null) {
 						throw new NullPointerException("no vehicle id set for departure " + departure.getId() + " in route " + route.getId() + " from line " + line.getId());
 					}
@@ -152,7 +152,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 			}
 		}
 	}
-	
+
 	public void beforeHandleAgentArrival(DriverAgent agent) {
 		if (this.otfServer != null) {
 			this.visTeleportationData.remove(agent.getPerson().getId());
@@ -211,22 +211,25 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 
 	@Override
 	public void afterPrepareSim() {
-	
+
 	}
 
 	@Override
 	public void handleDeparture(double now, DriverAgent agent, Id linkId, Leg leg) {
 		if (leg.getMode() == TransportMode.pt) {
 			handlePTDeparture(agent, leg);
-		} 
+		}
 	}
 
 	public TransitStopAgentTracker getAgentTracker() {
 		return agentTracker;
 	}
-	
+
 	public void setUseUmlaeufe(boolean useUmlaeufe) {
 		this.useUmlaeufe = useUmlaeufe;
 	}
-	
+
+	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
+		this.stopHandlerFactory = stopHandlerFactory;
+	}
 }

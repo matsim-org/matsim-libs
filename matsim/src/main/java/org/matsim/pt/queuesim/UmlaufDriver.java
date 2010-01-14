@@ -12,7 +12,6 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufStueckI;
 import org.matsim.ptproject.qsim.QueueSimulation;
-import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -32,14 +31,15 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 	public UmlaufDriver(Umlauf umlauf,
 			TransitStopAgentTracker thisAgentTracker,
-			QueueSimulation transitQueueSimulation) {
-		super(createDummyPerson(umlauf), transitQueueSimulation, thisAgentTracker);
+			QueueSimulation transitQueueSimulation,
+			TransitStopHandler stopHandler) {
+		super(createDummyPerson(umlauf), transitQueueSimulation, stopHandler, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.sim = transitQueueSimulation;
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
 		setNextLeg();
 	}
-	
+
 	private static PersonImpl createDummyPerson(Umlauf umlauf) {
 		PersonImpl dummyPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId()));
 		return dummyPerson;
@@ -55,7 +55,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		this.currentLeg.setRoute(getWrappedCarRoute()); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		init();
 	}
-	
+
 	private void setWenden(NetworkRouteWRefs carRoute) {
 		this.transitLine = null;
 		this.transitRoute = null;
@@ -75,6 +75,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		this.currentLeg.setRoute(new NetworkRouteWrapper(this.carRoute)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 	}
 
+	@Override
 	public double getDepartureTime() {
 		return this.departureTime;
 	}
@@ -88,6 +89,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		return this.currentLeg.getRoute().getEndLinkId();
 	}
 
+	@Override
 	public void legEnds(final double now) {
 		if (this.iUmlaufStueck.hasNext()) {
 			this.setNextLeg();
@@ -96,7 +98,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 			}
 			this.sim.scheduleActivityEnd(this);
 		} else {
-			AbstractSimulation.decLiving();	
+			AbstractSimulation.decLiving();
 		}
 	}
 
