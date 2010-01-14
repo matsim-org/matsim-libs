@@ -37,7 +37,6 @@ public class MyCommercialDemandGenerator01 {
 	private final Logger log;
 	private final String root;
 	private final String studyArea;
-	private final int numberOfSamples;
 	private final double activityThreshold;
 	private ArrayList<Integer> withinList;
 	private ArrayList<Integer> throughList;
@@ -48,11 +47,10 @@ public class MyCommercialDemandGenerator01 {
 
 	
 
-	public MyCommercialDemandGenerator01(String root, String studyArea, int numberOfSamples, double activitythreshold) {
+	public MyCommercialDemandGenerator01(String root, String studyArea, double activitythreshold) {
 		log = Logger.getLogger(MyCommercialDemandGenerator01.class);
 		this.root = root;
 		this.studyArea = studyArea;
-		this.numberOfSamples = numberOfSamples;
 		this.activityThreshold = activitythreshold;
 		withinList = null;
 		throughList = null;
@@ -60,32 +58,22 @@ public class MyCommercialDemandGenerator01 {
 	
 	/**
 	 * 
-	 * @param vehicleStatistics
 	 * @throws RuntimeException when not being able to create <i>within</i> or 
 	 * 		<i>through</i> vehicle lists using the <tt>MyVehicleIdentifier</tt> class.
 	 */
 	public void createPlans(){
 		log.info("Start creating plans.");
-		for(int sample = 0; sample < numberOfSamples; sample++){
-			log.info("---------------------------------------------------------------------------");
-			log.info("Creating plans for sample " + (sample+1) + " of " + numberOfSamples);
-			log.info("---------------------------------------------------------------------------");
-			if(withinList==null || throughList==null){
-				log.warn("Can not create plans if 'within' and 'through' vehicles have not been defined!");
-				throw new RuntimeException("First run method `buildVehicleLists(String vehicleStatisticsFilename)'");
-			}
-			
-			ArrayList<DenseDoubleMatrix3D> matrices = extractMatrices();
-			DenseDoubleMatrix3D withinMatrix = matrices.get(0);
-			DenseDoubleMatrix3D throughMatrix = matrices.get(1);
-			//TODO Build CDFs for chain characteristics
-			
-			//TODO Build CDFs for 'major' and 'minor' locations (based on clusters).
-			
-			
-			
-
+		if(withinList==null || throughList==null){
+			log.warn("Can not create plans if 'within' and 'through' vehicles have not been defined!");
+			throw new RuntimeException("First run method `buildVehicleLists(String vehicleStatisticsFilename)'");
 		}
+
+		ArrayList<DenseDoubleMatrix3D> matrices = extractMatrices();
+		DenseDoubleMatrix3D withinMatrix = matrices.get(0);
+		DenseDoubleMatrix3D throughMatrix = matrices.get(1);
+		//TODO Build CDFs for chain characteristics
+
+		//TODO Build CDFs for 'major' and 'minor' locations (based on clusters).
 		log.info("Plans completed successfully.");
 	}
 	
@@ -218,6 +206,8 @@ public class MyCommercialDemandGenerator01 {
 					withinMatrix = extractWithinChains(withinMatrix, xmlSource, file);
 				} else if(throughList.contains(vehicleNumber)){
 					throughMatrix = extractThroughChains(throughMatrix, xmlSource, file);
+				} else{
+					log.warn("Vehicle is neither 'within' nor 'through'!!");
 				}
 				// Update progress
 				if(++fileCounter == fileMultiplier){
@@ -268,10 +258,6 @@ public class MyCommercialDemandGenerator01 {
 		return withinMatrix;
 	}
 
-	public int getNumberOfSamples() {
-		return numberOfSamples;
-	}
-	
 	public double getActivityThreshold() {
 		return activityThreshold;
 	}

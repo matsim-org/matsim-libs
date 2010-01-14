@@ -29,17 +29,13 @@ public class MyCommercialDemandGenerator01Test extends MatsimTestCase{
 	
 	public void testMyCommercialDemandGeneratorConstructor(){
 		
-		/*
-		 * Test the constructor.
-		 */
 		String root = "ABC";
 		String area = "DEF";
 		Integer numberOfPlans = Integer.valueOf(2);
 		Double threshold = 0.9;
-		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(root, area, numberOfPlans, threshold);
+		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(root, area, threshold);
 		assertEquals("Root name not correct.", root, mcdg.getRoot());
 		assertEquals("Study area name not correct.", area, mcdg.getStudyArea());
-		assertEquals("Number of plans files to create not correct", numberOfPlans, Integer.valueOf(mcdg.getNumberOfSamples()));
 		assertEquals("Threshold not correct.", threshold, mcdg.getActivityThreshold());
 				
 		/*

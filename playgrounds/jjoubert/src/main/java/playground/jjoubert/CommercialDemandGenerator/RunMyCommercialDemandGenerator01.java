@@ -23,6 +23,8 @@ package playground.jjoubert.CommercialDemandGenerator;
 public class RunMyCommercialDemandGenerator01 {
 
 	/**
+	 * This is the old approach (first run at ETH). It will be replaced to run separate 
+	 * demand generators for 'within' and 'through' traffic.
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -32,15 +34,19 @@ public class RunMyCommercialDemandGenerator01 {
 		String studyArea = "Temp";
 		String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 
-		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(root, studyArea, 1, 0.9);
+		/*
+		 * This is where multiple sa,ples must be 'driven'.
+		 */
+		
+		
+		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(root, studyArea, 0.9);
 		mcdg.buildVehicleLists();
 		
 		
 		mcdg.createPlans();
-		
-		
-		
-		
+
 	}
+	
+	
 
 }
