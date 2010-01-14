@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -72,18 +73,11 @@ public class OccupancyCounts {
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 		sl.loadScenario();
-
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
-		
-		//File outputFile = new File( scenario.getConfig().plans().getInputFile() );
-		//new File( scenario.getConfig().plans().getInputFile() ).getName()
-		//System.out.println( + f.getName() );
-		
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 
-		//TransitSchedule schedule = scenario.getTransitSchedule();
-		//new TransitScheduleReaderV1(schedule, network).parse(scheduleFile);
 		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
 		new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getVehicles()).run();
 
@@ -100,9 +94,9 @@ public class OccupancyCounts {
 		events.addHandler(analysis2);
 
 		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
-
 		sim.run();
 
+		///////////show and save results/////////////////////
 		String[] data = new String[route1.getStops().size() + 1];
 		data[0]= "stop\t#exitleaving\t#enter\t#inVehicle \n"; 
 		System.out.println(data[0]);
@@ -122,6 +116,7 @@ public class OccupancyCounts {
 		System.out.println(data2[0]);
 		inVehicle = 0;
 		i=0;
+		
 		for (TransitRouteStop stop : route2.getStops()) {
 			Id stopId = stop.getStopFacility().getId();
 			int enter = analysis2.getNumberOfEnteringPassengers(stopId);
