@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -117,8 +118,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 				.getLinks(x, y, radius);
 	}
 
-	public CalcLinksAvgSpeed(final Network network,
-			final RoadPricingScheme toll) {
+	public CalcLinksAvgSpeed(final Network network, final RoadPricingScheme toll) {
 		this(network);
 		this.toll = toll;
 		if (toll != null)
@@ -182,8 +182,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 	public double getAvgSpeed(final Id linkId, final double time) {
 		SpeedCounter sc = speedCounters.get(linkId.toString());
-		return sc != null ? sc.getSpeed(getBinIdx(time)) : network.getLinks().get(
-				linkId).getFreespeed(time) * 3.6;
+		return sc != null ? sc.getSpeed(getBinIdx(time)) : network.getLinks()
+				.get(linkId).getFreespeed(time) * 3.6;
 	}
 
 	@Override
@@ -200,8 +200,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		if (sc == null) {
 			double[] freeSpeeds = new double[nofBins];
 			for (int i = 0; i < nofBins - 1; i++)
-				freeSpeeds[i] = network.getLinks().get(linkId).getFreespeed(
-						i * 86400.0 / nofBins);
+				freeSpeeds[i] = network.getLinks().get(new IdImpl(linkId))
+						.getFreespeed(i * 86400.0 / nofBins);
 			sc = new SpeedCounter(freeSpeeds);
 		}
 		sc.setTmpEnterTime(enter.getPersonId().toString(), enter.getTime());
@@ -255,10 +255,12 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			out.write(head.toString());
 			out.flush();
 
-			for (Id linkId : interestLinks == null ? network.getLinks().keySet() : interestLinks) {
+			for (Id linkId : interestLinks == null ? network.getLinks()
+					.keySet() : interestLinks) {
 				StringBuffer line = new StringBuffer(linkId.toString());
 				line.append('\t');
-				line.append(this.network.getLinks().get(linkId).getCapacity(Time.UNDEFINED_TIME));
+				line.append(this.network.getLinks().get(linkId).getCapacity(
+						Time.UNDEFINED_TIME));
 
 				for (int j = 0; j < nofBins - 1; j++) {
 					double speed = getAvgSpeed(linkId, (double) j * binSize);

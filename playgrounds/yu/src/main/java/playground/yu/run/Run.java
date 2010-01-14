@@ -33,6 +33,7 @@ public class Run {
 		Controler controler = new Controler(args[0]);
 		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
 		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
+		controler.setOverwriteFiles(true);
 		controler.run();
 	}
 

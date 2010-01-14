@@ -233,31 +233,31 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 		if (ms != null)
 			ms.write(outputBase4analysis);
 		// otfvis
-		if (toll == null) {
-			SimpleReader sr = new SimpleReader(eventsFilename);
-			SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
-
-			String line = sr.readLine();
-			sw2.writeln(line);
-			// after filehead
-			double time = 0;
-			while (line != null && time < 108000.0) {
-				line = sr.readLine();
-				if (line != null) {
-					sw2.writeln(line);
-					time = Double.parseDouble(line.split("\t")[0]);
-				}
-			}
-			sr.close();
-			sw2.close();
-
-			new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
-					outputBase
-							+ (scenario.equals("normal") ? "" : scenario + ".")
-							+ "otfvis.mvi", Integer.parseInt(args[5])// time
-			// interval
-			).convert();
-		}
+//		if (toll == null) {
+//			SimpleReader sr = new SimpleReader(eventsFilename);
+//			SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
+//
+//			String line = sr.readLine();
+//			sw2.writeln(line);
+//			// after filehead
+//			double time = 0;
+//			while (line != null && time < 108000.0) {
+//				line = sr.readLine();
+//				if (line != null) {
+//					sw2.writeln(line);
+//					time = Double.parseDouble(line.split("\t")[0]);
+//				}
+//			}
+//			sr.close();
+//			sw2.close();
+//
+////			new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
+////					outputBase
+////							+ (scenario.equals("normal") ? "" : scenario + ".")
+////							+ "otfvis.mvi", Integer.parseInt(args[5])// time
+////			// interval
+////			).convert();
+//		}
 		System.out.println("done.");
 	}
 
