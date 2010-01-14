@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.EventsManagerFactoryImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -79,7 +80,9 @@ public class ScenarioPlayer {
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
-
+		
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+			
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).parse(scheduleFile);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();

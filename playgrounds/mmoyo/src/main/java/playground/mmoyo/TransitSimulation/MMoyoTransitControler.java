@@ -20,8 +20,10 @@
 package playground.mmoyo.TransitSimulation;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
 
@@ -29,18 +31,16 @@ import org.matsim.pt.queuesim.TransitQueueSimulation;
 //import org.matsim.run.OTFVis;
 import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.config.TransitConfigGroup;
-import playground.mzilske.bvg09.TransitControler;
-//import org.matsim.ptproject.controller.PtController;
+import playground.mrieser.pt.controler.TransitControler;
+//import playground.mzilske.bvg09.TransitControler;
 
 public class MMoyoTransitControler extends TransitControler {
 	boolean launchOTFDemo=false;
 	
-	public MMoyoTransitControler(final String[] args) {
-		super(args);
-	}
-	 
 	public MMoyoTransitControler(final ScenarioImpl scenario, boolean launchOTFDemo){
 		super(scenario);
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		this.setOverwriteFiles(true);   
 		this.launchOTFDemo = launchOTFDemo;
 	}
 	
@@ -68,10 +68,11 @@ public class MMoyoTransitControler extends TransitControler {
 	
 	public static void main(final String[] args) {
 		if (args.length > 0) {
-			new MMoyoTransitControler(args).run();
-		} else {
-			new MMoyoTransitControler(new String[] {"src/playground/mmoyo/demo/Berlin/BerlinConfig.xml"}).run();
-		}
+			ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(args[0]); //load from configFile
+			ScenarioImpl scenario = scenarioLoader.getScenario();
+			scenarioLoader.loadScenario();
+			new MMoyoTransitControler(scenario, true).run();
+		} 
 	}
 	
 }

@@ -18,6 +18,7 @@ import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
+import playground.mmoyo.analysis.PTLegIntoPlanConverter;
 import playground.mrieser.pt.config.TransitConfigGroup;
 import playground.mrieser.pt.router.PlansCalcTransitRoute;
 
@@ -26,6 +27,13 @@ public class PlanRouter {
 
 	public PlanRouter(ScenarioImpl scenario) {
 
+		//Get rid of only car plans
+		PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.pt, false ) ;
+		plansFilter.run(scenario.getPopulation()) ;
+
+		//split pt connections into plans
+		new PTLegIntoPlanConverter().run(scenario);
+		
 		PlansCalcRoute router= null;
 		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory();
 
@@ -33,27 +41,24 @@ public class PlanRouter {
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
+
 		System.out.println( PTValues.routerCalculator );
 		switch (PTValues.routerCalculator){
 			case 1:  //rieser
 				router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += ("/routedPlans_" + PTValues.scenario);
+				routedPlansFile += ("/routedPlans_" + PTValues.scenario + ".xml");
 				break;
 			case 2:	 //moyo time
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += ("/moyo_routedPlans_time_" + PTValues.scenario);
+				routedPlansFile += ("/moyo_routedPlans_time_" + PTValues.scenario + ".xml" );
 				break;
 			case 3:	 //moyo parameterized
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += ("/moyo_routedPlans_parameterized_" + PTValues.scenario);
+				routedPlansFile += ("/moyo_routedPlans_parameterized_" + PTValues.scenario + ".xml");
 				 break;
 			default:
 		}
 		router.run(scenario.getPopulation());
-
-		//Get rid of only car plans
-		PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.pt, false ) ;
-		plansFilter.run(scenario.getPopulation()) ;
 
 		System.out.println("writing output plan file..." + routedPlansFile);
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()) ;

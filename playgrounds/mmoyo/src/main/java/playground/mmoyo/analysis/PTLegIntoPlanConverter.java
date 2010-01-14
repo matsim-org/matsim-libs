@@ -7,8 +7,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -19,8 +17,12 @@ import org.matsim.pt.PtConstants;
 /**Reads a plan with pt-plans and convert each pt-connection into a plan, each new plan has a index suffix*/
 public class PTLegIntoPlanConverter {
 
-	public PTLegIntoPlanConverter(ScenarioImpl scenario) {
-		Population newPopulation = new PopulationImpl(new ScenarioImpl());
+	public PTLegIntoPlanConverter() {
+	}
+	
+	public void run(ScenarioImpl scenario){
+		ScenarioImpl tempScenario =new ScenarioImpl();
+		PopulationImpl newPopulation = new PopulationImpl(tempScenario);
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			char suffix = 'a';
@@ -60,11 +62,8 @@ public class PTLegIntoPlanConverter {
 			}
 		}
 
-		String outputFile = "../playgrounds/mmoyo/output/splittedPlan.xml";
-		System.out.println("writing output plan file..." + outputFile);
-		PopulationWriter popwriter = new PopulationWriter(newPopulation, scenario.getNetwork()) ;
-		popwriter.write(outputFile) ;
-		System.out.println("done");
+		scenario.setPopulation(newPopulation);
+		tempScenario= null;
 	}
 
 	public static void main(String[] args) {
@@ -74,7 +73,7 @@ public class PTLegIntoPlanConverter {
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
-		new PTLegIntoPlanConverter(scenario);
+		new PTLegIntoPlanConverter().run(scenario);
 	}
 
 }

@@ -25,9 +25,11 @@ import java.util.EnumSet;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import playground.mmoyo.TransitSimulation.MMoyoTransitControler;
+//import playground.mzilske.bvg09.TransitControler;
 
 /**copy of marcel.pt.demo.equilNet.EquilnetDemo.java to test the ptRouter in the simulation*/
 public class ScenarioDemo {
@@ -74,11 +76,16 @@ public class ScenarioDemo {
 		transitModule.addParam("transitScheduleFile", transitScheduleFile);
 		transitModule.addParam("vehiclesFile", vehiclesFile);
 		transitModule.addParam("transitModes", "pt");
+	
+		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setEndTime(88400.0);
+		
 	}
 
 	private void runControler() {
 		new ScenarioLoaderImpl(this.scenario).loadScenario();
 		MMoyoTransitControler c = new MMoyoTransitControler(this.scenario, launchOTFDemo);
+		//TransitControler c = new TransitControler(this.scenario);
 		c.setOverwriteFiles(true);
 		c.run();
 	}

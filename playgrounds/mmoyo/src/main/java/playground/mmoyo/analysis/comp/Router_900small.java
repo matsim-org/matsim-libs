@@ -15,7 +15,5 @@ public class Router_900small {
 			PTValues.routerCalculator = i;
 			PlanRouter.main(new String[]{configFile});
 		}
-		
-		//configFile ="../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_null_alles.xml";
 	}
 }
