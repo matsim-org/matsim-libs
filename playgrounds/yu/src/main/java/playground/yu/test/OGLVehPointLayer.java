@@ -26,6 +26,7 @@ package playground.yu.test;
 import java.awt.Color;
 
 import org.matsim.core.gbl.MatsimResource;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 
@@ -74,7 +75,7 @@ public class OGLVehPointLayer extends OGLAgentPointLayer {
 					Color.YELLOW, Color.GREEN });
 
 	@Override
-	public Object newInstance(Class clazz) throws InstantiationException,
+	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) throws InstantiationException,
 			IllegalAccessException {
 		return vehdrawer;
 	}
