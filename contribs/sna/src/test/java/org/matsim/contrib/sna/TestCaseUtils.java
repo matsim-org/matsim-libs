@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialGraphMLIoTest.java
+ * TestCaseUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.graph.spatial.io;
-
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
-import org.matsim.contrib.sna.TestCaseUtils;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.core.utils.misc.CRCChecksum;
-
+package org.matsim.contrib.sna;
 
 /**
- * @author illenberger
+ * Utility methods for test cases.
+ * 
+ * @author jillenberger
  *
  */
-public class SpatialGraphMLIoTest extends TestCase {
+public class TestCaseUtils {
 
-	private static final String INPUT_FILE = TestCaseUtils.getPackageInputDirecoty(SpatialGraphMLIoTest.class) + "SpatialGraph.k7.graphml.gz";
+	private static final String OUTPUT_DIR = "test/output/";
 	
-	private static final String OUTPUT_FILE = TestCaseUtils.getOutputDirectory() + "tmpgraph.graphml";
+	private static final String INPUT_DIR = "test/input/";
+
+	/**
+	 * Returns the input directory path to the package containing the class
+	 * <tt>aClass</tt>, e.g. for a calls <tt>org.myself.myclass</tt> the
+	 * returned path is <tt>test/input/org/myself/</tt>.
+	 * 
+	 * @param aClass
+	 *            a class in the package of interest.
+	 * @return the input directory path to the package.
+	 */
+	public static String getPackageInputDirecoty(Class<?> aClass) {
+		String classPath = aClass.getCanonicalName().replace(".", "/");
+		String packagePath = classPath.substring(0, classPath.lastIndexOf("/") + 1);
+		StringBuilder builder = new StringBuilder(INPUT_DIR.length() + packagePath.length() + 1);
+		builder.append(INPUT_DIR);
+		builder.append(packagePath);
+		return builder.toString();
+	}
 	
-	public void test() {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		
-		SpatialGraph graph = reader.readGraph(INPUT_FILE);
-		
-		assertEquals(7187, graph.getVertices().size());
-		assertEquals(25680, graph.getEdges().size());
-		
-		SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
-		try {
-			writer.write(graph, OUTPUT_FILE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		double reference = CRCChecksum.getCRCFromFile(INPUT_FILE);
-		double actual = CRCChecksum.getCRCFromFile(OUTPUT_FILE);
-		
-		assertEquals(reference, actual);
+	/**
+	 * Returns the output directory.
+	 * 
+	 * @return the output directory.
+	 */
+	public static String getOutputDirectory() {
+		return OUTPUT_DIR;
 	}
 }

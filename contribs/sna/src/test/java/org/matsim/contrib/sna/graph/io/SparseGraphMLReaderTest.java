@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph.io;
 
+import org.matsim.contrib.sna.TestCaseUtils;
 import org.matsim.contrib.sna.graph.SparseGraph;
 
 import junit.framework.TestCase;
@@ -29,10 +30,7 @@ import junit.framework.TestCase;
  */
 public class SparseGraphMLReaderTest extends TestCase {
 
-	/*
-	 * Not sure if this the way to access input files?
-	 */
-	private static final String GRPAH_FILE = "sna/test/input/org/matsim/contrib/sna/graph/io/test.graphml.gz";
+	private static final String GRPAH_FILE = TestCaseUtils.getPackageInputDirecoty(SparseGraphMLReaderTest.class) + "test.graphml.gz";
 	
 	public void test() {
 		SparseGraphMLReader reader = new SparseGraphMLReader();

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialGraphMLIoTest.java
+ * SampledSpatialGraphIOTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,41 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.graph.spatial.io;
+package org.matsim.contrib.sna.snowball.spatial.io;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.matsim.contrib.sna.TestCaseUtils;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
 import org.matsim.core.utils.misc.CRCChecksum;
 
+import junit.framework.TestCase;
 
 /**
- * @author illenberger
+ * @author jillenberger
  *
  */
-public class SpatialGraphMLIoTest extends TestCase {
+public class SampledSpatialGraphIOTest extends TestCase {
 
-	private static final String INPUT_FILE = TestCaseUtils.getPackageInputDirecoty(SpatialGraphMLIoTest.class) + "SpatialGraph.k7.graphml.gz";
+	private static final String INPUT_FILE = TestCaseUtils.getPackageInputDirecoty(SampledSpatialGraphIOTest.class) + "sampledgraph.graphml.gz";
 	
 	private static final String OUTPUT_FILE = TestCaseUtils.getOutputDirectory() + "tmpgraph.graphml";
-	
-	public void test() {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+
+	public void test() throws IOException {
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
+		SampledSpatialGraph graph = reader.readGraph(INPUT_FILE);
 		
-		SpatialGraph graph = reader.readGraph(INPUT_FILE);
-		
-		assertEquals(7187, graph.getVertices().size());
-		assertEquals(25680, graph.getEdges().size());
-		
-		SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
-		try {
-			writer.write(graph, OUTPUT_FILE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
+		writer.write(graph, OUTPUT_FILE);
 		
 		double reference = CRCChecksum.getCRCFromFile(INPUT_FILE);
 		double actual = CRCChecksum.getCRCFromFile(OUTPUT_FILE);
