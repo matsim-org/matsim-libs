@@ -30,7 +30,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("All tests for playground.jjoubert");
 		
 		suite.addTest(playground.jjoubert.CommercialClusters.AllTests.suite());
-		suite.addTest(playground.jjoubert.CommercialDemand.AllTests.suite());
+		suite.addTest(playground.jjoubert.CommercialDemandGeneration.AllTests.suite());
 		suite.addTest(playground.jjoubert.CommercialTraffic.AllTests.suite());
 		suite.addTest(playground.jjoubert.Utilities.AllTests.suite());
 		

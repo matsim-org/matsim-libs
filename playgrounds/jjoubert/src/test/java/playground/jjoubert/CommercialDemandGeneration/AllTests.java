@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand;
+package playground.jjoubert.CommercialDemandGeneration;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
