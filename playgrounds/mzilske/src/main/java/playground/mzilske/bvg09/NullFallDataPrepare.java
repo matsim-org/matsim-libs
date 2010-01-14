@@ -62,9 +62,9 @@ public class NullFallDataPrepare {
 
 	private static final Logger log = Logger.getLogger(NullFallDataPrepare.class);
 
-	private static String OutPath = "../berlin-bvg09/pt/nullfall_U8/";
+	private static String OutPath = "../berlin-bvg09/pt/nullfall_M44_344_U8/";
 	private static String InVisumNetFile = "../berlin-bvg09/urdaten/nullfall2009-05-25.net";
-	private static List<String> transitLineFilter = Arrays.asList("U-8"); 
+	private static List<String> transitLineFilter = Arrays.asList("U-8","B-M44","B-344"); 
 
 	// OUTPUT FILES
 	private static String OutNetworkFile = OutPath + "intermediateNetwork.xml";

@@ -13,6 +13,7 @@ import java.util.Scanner;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.Departure;
@@ -27,8 +28,8 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 public class HafasReader {
 	
 	private static String PATH_PREFIX = "../berlin-bvg09/urdaten/BVG-Fahrplan_2008/Daten/1_Mo-Do/";
-	private static String FILENAME = "../berlin-bvg09/pt/nullfall_U8/alldat";
-	private static String OUT_FILENAME = "../berlin-bvg09/pt/nullfall_U8/transitSchedule-HAFAS.xml";
+	private static String FILENAME = "../berlin-bvg09/pt/nullfall_M44_344_U8/alldat";
+	private static String OUT_FILENAME = "../berlin-bvg09/pt/nullfall_M44_344_U8/transitSchedule-HAFAS.xml";
 	private String filename;
 	private Collection<TransitRoute> routes = new ArrayList<TransitRoute>();
 	private List<TransitRouteStop> currentStops = new ArrayList<TransitRouteStop>();
@@ -36,8 +37,8 @@ public class HafasReader {
 	private Id currentDepartureId;
 	private Double currentDepartureTime;
 	private TransitScheduleFactory transitScheduleFactory = new TransitScheduleFactoryImpl();;
-	private Map<Id, TransitStopFacility> facilities = new HashMap<Id, TransitStopFacility>();
 	private TransitSchedule transitSchedule = transitScheduleFactory.createTransitSchedule();
+	private Map<Id, TransitStopFacility> facilities = new HashMap<Id, TransitStopFacility>();
 	
 	public static void main(String[] args) {
 		HafasReader hafasReader = new HafasReader();
@@ -59,6 +60,9 @@ public class HafasReader {
 	}
 
 	private void writeSchedule() {
+		for (TransitStopFacility facility : facilities.values()) {
+			transitSchedule.addStopFacility(facility);
+		}
 		TransitScheduleWriter transitScheduleWriter = new TransitScheduleWriter(transitSchedule);
 		try {
 			transitScheduleWriter.writeFile(OUT_FILENAME);
@@ -162,7 +166,7 @@ public class HafasReader {
 	private TransitStopFacility getOrCreateTransitStopFacility(IdImpl idImpl) {
 		TransitStopFacility facility = facilities.get(idImpl);
 		if (facility == null) {
-			facility = transitScheduleFactory.createTransitStopFacility(idImpl, null, false);
+			facility = transitScheduleFactory.createTransitStopFacility(idImpl, new CoordImpl(0.0, 0.0), false);
 			facilities.put(idImpl, facility);
 		}
 		return facility;

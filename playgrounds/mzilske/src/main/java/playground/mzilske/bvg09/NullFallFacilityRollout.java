@@ -76,10 +76,10 @@ public class NullFallFacilityRollout {
 
 	private static final Logger log = Logger.getLogger(NullFallFacilityRollout.class);
 
-	private static String path = "../berlin-bvg09/pt/nullfall_alles/";
+	private static String path = "../berlin-bvg09/pt/nullfall_M44_344_U8/";
 	
 	private static String InNetworkFile = path + "intermediateNetwork.xml";
-	private static String InTransitScheduleFile = path + "intermediateTransitSchedule.xml";
+	private static String InTransitScheduleFile = path + "mergedTransitSchedule.xml";
 	private static String InVisumNetFile = "../berlin-bvg09/urdaten/nullfall2009-05-25.net";
 	private static String OutNetworkFile = path + "network.xml";
 	private static String OutTransitScheduleFile = path + "transitSchedule.xml";
@@ -214,6 +214,7 @@ public class NullFallFacilityRollout {
 					if (linkIterator.hasNext()) {
 						link = linkIterator.next();
 					} else {
+						log.error("On route " + transitRouteI.getId());
 						log.error("Stops: ");
 						dumpStops(transitRouteI.getStops());
 						log.error("Route: ");
