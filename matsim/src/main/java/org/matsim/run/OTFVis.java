@@ -179,6 +179,11 @@ public class OTFVis {
 		new ConfigWriter(loader.getScenario().getConfig()).writeStream(new PrintWriter(writer));
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
+		if (loader.getScenario().getConfig().getQSimConfigGroup() == null){
+		  log.error("Cannot play live config without configuration for QSim. Please add" +
+		  		"a module qsim (in java QSimConfigGroup) to the config and run OTFVis again.");
+		  return;
+		}
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
 		EventsManagerImpl events = new EventsManagerImpl();
