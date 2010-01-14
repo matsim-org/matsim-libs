@@ -39,7 +39,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class PopulationCut {
 
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private static void reduceScenario(String[] args) {
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		Coord min = new CoordImpl(args[1],args[2]);
@@ -66,9 +66,9 @@ public class PopulationCut {
 		for (Id id : toRemove) { scenario.getPopulation().getPersons().remove(id); }
 		System.out.println("=> "+scenario.getPopulation().getPersons().size()+" persons left.");
 		System.out.println("done. " + (new Date()));
-		new PopulationWriter(scenario.getPopulation(),((ScenarioImpl) scenario).getKnowledges()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), ((ScenarioImpl) scenario).getKnowledges()).writeFile(scenario.getConfig().plans().getOutputFile());
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////

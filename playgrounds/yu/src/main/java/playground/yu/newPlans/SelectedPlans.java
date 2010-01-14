@@ -21,31 +21,32 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class SelectedPlans extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public SelectedPlans(PopulationImpl plans) {
-		super(plans);
+	public SelectedPlans(final Network network, Population plans) {
+		super(network, plans);
 	}
 
 	@Override
@@ -63,11 +64,11 @@ public class SelectedPlans extends NewPopulation {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
-		
-		SelectedPlans sp = new SelectedPlans(population);
+
+		SelectedPlans sp = new SelectedPlans(network, population);
 		sp.run(population);
 		sp.writeEndPlans();
 	}

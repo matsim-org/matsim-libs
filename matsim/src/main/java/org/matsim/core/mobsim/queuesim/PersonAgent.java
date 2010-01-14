@@ -35,6 +35,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -125,7 +126,7 @@ public class PersonAgent implements DriverAgent {
 		this.currentPlanElementIndex = 0;
 		ActivityImpl firstAct = (ActivityImpl) planElements.get(0);
 		double departureTime = firstAct.getEndTime();
-		
+
 		this.currentLinkId = firstAct.getLinkId();
 		if ((departureTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
 			setDepartureTime(departureTime);
@@ -272,7 +273,7 @@ public class PersonAgent implements DriverAgent {
 			return this.cachedNextLinkId;
 		}
 		if (this.cacheRouteNodes == null) {
-			this.cacheRouteNodes = ((NetworkRouteWRefs) this.currentLeg.getRoute()).getNodes();
+			this.cacheRouteNodes = RouteUtils.getNodes((NetworkRouteWRefs) this.currentLeg.getRoute(), this.simulation.networkLayer); // TODO [MR] change to links
 		}
 
 		if (this.currentNodeIndex >= this.cacheRouteNodes.size() ) {

@@ -188,7 +188,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  writing plans xml file... ");
-		new PopulationWriter(plans, kn).writeFile(this.config.plans().getOutputFile());
+		new PopulationWriter(plans, network, kn).writeFile(this.config.plans().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing network xml file... ");

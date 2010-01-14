@@ -45,7 +45,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 /**
- * 
+ *
  * @author Manuel Schneider
  *
  */
@@ -53,7 +53,7 @@ public class CMCFtoEvacConverter {
 
 	private NetworkLayer network;
 	private PopulationImpl population;
-	
+
 	public static NetworkLayer constructNetwork(String networkfile, String demandfile) throws JDOMException, IOException{
 		// read networ and add en1 and en2 and el1
 		NetworkLayer network = CMCFNetworkConverter.readCMCFNetwork(networkfile);
@@ -66,7 +66,7 @@ public class CMCFtoEvacConverter {
 		network.createAndAddNode(matsimid2, coord2);
 		network.createAndAddLink(matsimid3, network.getNodes().get(new IdImpl("en1")), network.getNodes().get(new IdImpl("en2")),
 				 10.,100000. ,100000000000000000000.,1.);
-		
+
 		//Add links to en1
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(demandfile);
@@ -90,7 +90,7 @@ public class CMCFtoEvacConverter {
 		 }
 		return network;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static PopulationImpl readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
 		PopulationImpl result = new ScenarioImpl().getPopulation();
@@ -129,7 +129,7 @@ public class CMCFtoEvacConverter {
 					throw new IllegalArgumentException(tonode.getOrigId()+ " has no outgoing edges!!!");
 				}
 				fromlink = fromlinks.getFirst();
-				 
+
 			 }
 			 for (int i = 1 ; i<= dem ;i++) {
 				 Id matsimid  = new IdImpl(id+"."+i);
@@ -157,26 +157,26 @@ public class CMCFtoEvacConverter {
 				 plan.addActivity(work);
 				 p.addPlan(plan);
 				 result.addPerson(p);
-			 
+
 			 }
 		 }
-		 
+
 		return result;
 	}
-	
-	
+
+
 	public static void main(String[] args) {
 		String networkfile = "~/skywalker/testcases/swiss_old/org/swissold.xml";
 		String demandfile = "~/skywalker/testcases/swiss_old/org/demandsswissold.xml";
 		String networkfileout = "~/skywalker/testcases/swiss_old/matsimevac/swiss_old_network_evac.xml";
 		String plansfileout = "~/skywalker/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
-		
+
 		try {
 			NetworkLayer network = constructNetwork(networkfile, demandfile);
 			new NetworkWriter(network).writeFile(networkfileout);
 			System.out.println(networkfile+"  converted successfully \n"+"output written in: "+networkfileout);
 			PopulationImpl population = readCMCFDemands(demandfile, network, false);
-			new PopulationWriter(population).writeFile(plansfileout);
+			new PopulationWriter(population, network).writeFile(plansfileout);
 			System.out.println(demandfile+"converted succssfully \n"+"output written in :\n"+plansfileout);
 		} catch (JDOMException e) {
 			e.printStackTrace();

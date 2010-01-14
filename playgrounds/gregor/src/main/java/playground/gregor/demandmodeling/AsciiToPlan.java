@@ -33,7 +33,7 @@ public class AsciiToPlan {
 		final String OUTPUT_FILE="./tmp/population.xml.gz";
 		final int MAX_SIZE = 13;
 		final char TRENNER = ' ';
-		
+
 		BufferedReader in = null;
 		String spalten_v[] = new String[MAX_SIZE*2];
 		String spalten[] = new String[MAX_SIZE];
@@ -42,15 +42,15 @@ public class AsciiToPlan {
 		char zeichen;
 		int wert=0;
 		StringBuffer kette = new StringBuffer();
-		
-		
+
+
 		//ffne ASCII Input File
 		try {
 			in = new BufferedReader(new FileReader(new File(INPUT_FILE)));
 		} catch (FileNotFoundException e) {
 			System.out.println("Fehler beim Einlesen");
 			e.printStackTrace();
-			
+
 		}
 		System.out.println("ffnen der Datei erfolgreich!");
 		//lese 1. Zeile ein
@@ -61,18 +61,18 @@ public class AsciiToPlan {
 			System.out.println("Fehler beim Einlesen der 1. Zeile");
 			e.printStackTrace();
 		}
-		
+
 		//ffnen des Szenarios
 		ScenarioImpl sc = new ScenarioImpl();
 		new MatsimNetworkReader(sc.getNetwork()).readFile(NET_FILE);
 		org.matsim.core.population.PopulationImpl pop = sc.getPopulation();
 		PopulationFactory pb = pop.getFactory();
-		
+
 		//Starte die Verarbeitung
 		do{
 			int j=0;
 			zaehler++;
-			Id id =new IdImpl(zaehler); 
+			Id id =new IdImpl(zaehler);
 			PersonImpl person = (PersonImpl) pb.createPerson(id);
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			person.addPlan(plan);
@@ -96,9 +96,9 @@ public class AsciiToPlan {
 			}
 			if (Double.parseDouble(spalten[7])<0) spalten[7]="0";
 //			for (int i = 0; i<MAX_SIZE;i++){
-//				System.out.println(spalten[i]);	
+//				System.out.println(spalten[i]);
 //			}
-			
+
 //			for (int i = 0; i<(MAX_SIZE*2+1); i++){
 //				if ((i % 2 == 0) && (i>0))
 //					spalten[(i/2)-1]=spalten_v[i];
@@ -112,18 +112,18 @@ public class AsciiToPlan {
 			homey=Double.parseDouble(spalten[10]);
 			awayx=Double.parseDouble(spalten[11]);
 			awayy=Double.parseDouble(spalten[12]);
-			
+
 			//Erzeuge Homeactivity
 			Coord coord1 = new CoordImpl(homex,homey);
 			String type = "h";
 			Activity home1 = plan.createAndAddActivity(type, coord1);
 			home1.setEndTime(start);
-			
+
 			plan.addLeg(pb.createLeg(TransportMode.car));
-			
+
 			//Erzeuge Workactivity
 			Coord coord2 = new CoordImpl(awayx,awayy);
-			
+
 			if (actType == 1) {
 				type = "w";
 			} else	if (actType == 2) {
@@ -136,14 +136,14 @@ public class AsciiToPlan {
 			Activity work = plan.createAndAddActivity(type, coord2);
 			work.setStartTime(start);
 			work.setEndTime(start + dur);
-			
+
 			plan.addLeg(pb.createLeg(TransportMode.car));
-			
+
 			//Erzeuge 2. Homeactivity
 			type = "h";
 			Activity home2 = plan.createAndAddActivity(type, coord1);
 			home2.setStartTime(start + dur);
-			
+
 			try {
 				zeile=in.readLine();
 			} catch (IOException e) {
@@ -153,12 +153,12 @@ public class AsciiToPlan {
 //			System.out.println(zaehler +". Person eingelesen");
 			pop.addPerson(person);
 		} while(zeile!=null);
-		
+
 		//Alles fertig --- Ergebnis ausgeben.
-		new PopulationWriter(pop).writeFile(OUTPUT_FILE);
+		new PopulationWriter(pop, sc.getNetwork()).writeFile(OUTPUT_FILE);
 		System.out.println("Ausgabe erzeugt");
-		
-		
+
+
 	}
 
 }

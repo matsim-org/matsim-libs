@@ -67,7 +67,7 @@ public class IIDMGenerationPart2 {
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		World world = scenario.getWorld();
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  extracting input directory... ");
@@ -128,7 +128,7 @@ public class IIDMGenerationPart2 {
 		PopulationImpl pop = scenario.getPopulation();
 		Knowledges knowledges =  scenario.getKnowledges();
 		pop.setIsStreaming(true);
-		PopulationWriter pop_writer = new PopulationWriter(pop, knowledges);
+		PopulationWriter pop_writer = new PopulationWriter(pop, scenario.getNetwork(), knowledges);
 		pop_writer.startStreaming(config.plans().getOutputFile());
 		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.locationChoice;
 
@@ -50,9 +50,9 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * create facilities to the zrh-demand
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class NewDemandWithFacilities4Zrh {
 	public static class CreateActFacility extends AbstractPersonAlgorithm
@@ -132,12 +132,12 @@ public class NewDemandWithFacilities4Zrh {
 		// String outputFacilitiesFilename = args[3];
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		
+
 		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(net).readFile(netFilename);
 
 		Knowledges knowledges = scenario.getKnowledges();
-		
+
 		PopulationImpl pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(inputPopFilename);
 
@@ -145,7 +145,7 @@ public class NewDemandWithFacilities4Zrh {
 
 		new CreateActFacility(afs, knowledges).run(pop);
 
-		new PopulationWriter(pop, knowledges).writeFile(outputPopFilename);
+		new PopulationWriter(pop, net, knowledges).writeFile(outputPopFilename);
 		new FacilitiesWriter(afs).writeFile(outputFacilitiesFilename);
 
 		System.out.println("----->done.");

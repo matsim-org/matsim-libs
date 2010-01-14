@@ -1,7 +1,9 @@
 package playground.wrashid.template;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -31,13 +33,13 @@ public class ProcessPlansFile extends NewPopulation {
 		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inputPlansFile);
 
-		ProcessPlansFile dp = new ProcessPlansFile(inPop, outputPlansFile);
+		ProcessPlansFile dp = new ProcessPlansFile(net, inPop, outputPlansFile);
 		dp.run(inPop);
 		dp.writeEndPlans();
 	}
 
-	public ProcessPlansFile(PopulationImpl plans, String filename) {
-		super(plans, filename);
+	public ProcessPlansFile(Network network, Population plans, String filename) {
+		super(network, plans, filename);
 	}
 
 	@Override

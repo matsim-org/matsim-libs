@@ -64,11 +64,11 @@ public class PlanomatTest extends MatsimTestCase {
 	private enum PlanomatTestRun {NOEVENTS_CAR, WITHEVENTS_CAR, NOEVENTS_CAR_PT, WITHEVENTS_CAR_PT;}
 
 	private final static Id TEST_PERSON_ID = new IdImpl("100");
-	
+
 	private static final Logger log = Logger.getLogger(PlanomatTest.class);
 
 	private Scenario scenario;
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -88,7 +88,7 @@ public class PlanomatTest extends MatsimTestCase {
 		new MatsimEventsReader(events).readFile(this.getClassInputDirectory() + "equil-times-only-1000.events.txt.gz");
 		//now overwrite the testee person in the scenario
 //		scenario.getPopulation().addPerson(p);// not necessary, as the reference stayed the same!
-		
+
 	}
 
 	@Override
@@ -125,14 +125,14 @@ public class PlanomatTest extends MatsimTestCase {
 		((PersonImpl) p).setCarAvail("always");
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
 	}
-	
+
 	public void testCarAvailabilityNever() {
 		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
 		Person p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		((PersonImpl) p).setCarAvail("never");
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
 	}
-	
+
 	private void runATestRun(final PlanomatTestRun testRun) {
 
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.scenario.getConfig().travelTimeCalculator());
@@ -170,7 +170,7 @@ public class PlanomatTest extends MatsimTestCase {
 		}
 
 		// init test Plan
-		
+
 		final int TEST_PLAN_NR = 0;
 
 		// first person
@@ -186,7 +186,7 @@ public class PlanomatTest extends MatsimTestCase {
 		outputPopulation.addPerson(testPerson);
 
 		log.info("Writing plans file...");
-		new PopulationWriter(outputPopulation).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		new PopulationWriter(outputPopulation, this.scenario.getNetwork()).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");
 		log.info("Writing plans file...DONE.");
 
 		// actual test: compare checksums of the files
@@ -211,7 +211,7 @@ public class PlanomatTest extends MatsimTestCase {
 		Planomat testee = new Planomat(null, null, planomatConfigGroup, null, this.scenario.getNetwork());
 
 		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
-		
+
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (possibleModes.length > 0) {
 			planAnalyzeSubtours = new PlanAnalyzeSubtours(scenario.getConfig().planomat());
@@ -219,13 +219,13 @@ public class PlanomatTest extends MatsimTestCase {
 		}
 
 		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(
-				testPlan, 
-				planAnalyzeSubtours, 
+				testPlan,
+				planAnalyzeSubtours,
 				4711,
 				128,
 				possibleModes,
 				planomatConfigGroup);
-		
+
 		IChromosome testChromosome = jgapConfiguration.getSampleChromosome();
 		assertEquals(3, testChromosome.getGenes().length);
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[0].getClass());
@@ -261,7 +261,7 @@ public class PlanomatTest extends MatsimTestCase {
 		Integer workDur = Integer.valueOf(40);
 		Integer homeDur = Integer.valueOf(88);
 		Integer modeIndex = Integer.valueOf(0);
-		
+
 		for (int ii=0; ii < testGenes.length; ii++) {
 			switch(ii) {
 			case 0:
@@ -290,30 +290,30 @@ public class PlanomatTest extends MatsimTestCase {
 		TravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(this.scenario.getNetwork(), 900);
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
-		
+
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
 		ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				testPlan,
-				PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, 
+				PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible,
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
-				plansCalcRoute, 
+				plansCalcRoute,
 				this.scenario.getNetwork());
-		
+
 		// run the method
 		Planomat testee = new Planomat(legTravelTimeEstimatorFactory, null, this.scenario.getConfig().planomat(), plansCalcRoute, this.scenario.getNetwork());
 
 		double score = testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null, ltte, null);
 		assertEquals(0.0, score, MatsimTestCase.EPSILON);
-		
-		
+
+
 		// write out the test person and the modified plan into a file
 		PopulationImpl outputPopulation = new ScenarioImpl().getPopulation();
 		outputPopulation.addPerson(testPerson);
 
 		System.out.println("Writing plans file...");
-		new PopulationWriter(outputPopulation).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		new PopulationWriter(outputPopulation, this.scenario.getNetwork()).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");
 		System.out.println("Writing plans file...DONE.");
 
 		// actual test: compare checksums of the files
@@ -339,9 +339,9 @@ public class PlanomatTest extends MatsimTestCase {
 		}
 
 		public void reset(int iteration) {
-			
+
 		}
-		
+
 	}
-	
+
 }

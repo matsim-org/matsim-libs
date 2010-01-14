@@ -120,13 +120,13 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 	private boolean useActivityDurations = true;
 	private QueueSimSignalEngine signalEngine = null;
 	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
-	
+
 	private final List<QueueSimulationFeature> queueSimulationFeatures = new ArrayList<QueueSimulationFeature>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
-	
+
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
-	
+
 	/**
 	 * Initialize the QueueSimulation without signal systems
 	 * @param network
@@ -145,7 +145,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		this.networkLayer = network;
 		this.network = new QueueNetwork(this.networkLayer);
 		this.agentFactory = new AgentFactory(this);
-		this.notTeleportedModes.add(TransportMode.car);	
+		this.notTeleportedModes.add(TransportMode.car);
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
 		installCarDepartureHandler();
 	}
@@ -169,7 +169,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		departureHandlers.add(departureHandler);
 	}
 
-	
+
 	/**
 	 * Adds the QueueSimulationListener instance  given as parameters as
 	 * listener to this QueueSimulation instance.
@@ -227,7 +227,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 
 		for (Person p : this.population.getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
-			
+
 			QueueVehicle veh = new QueueVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
@@ -238,7 +238,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 				qlink.addParkedVehicle(veh);
 			}
 		}
-		
+
 		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
 			queueSimulationFeature.afterCreateAgents();
 		}
@@ -246,7 +246,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 
 
 	/**
-	 * 
+	 *
 	 * @deprecated Netvis is no longer supported by this QueueSimulation
 	 */
 	@Deprecated
@@ -277,7 +277,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 			if (snapshotFormat.contains("plansfile")) {
 				String snapshotFilePrefix = this.controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
 				String snapshotFileSuffix = "xml";
-				this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix));
+				this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, this.networkLayer));
 			}
 			if (snapshotFormat.contains("transims")) {
 				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh");
@@ -295,7 +295,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 			if (snapshotFormat.contains("otfvis")) {
 				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "otfvis.mvi");
 				OTFFileWriter writer = null;
-				
+
 				OTFConnectionManagerFactory connectionManagerFactory = new OTFFileWriterQSimConnectionManagerFactory();
 				if (this.config.scenario().isUseLanes() && ! this.config.scenario().isUseSignalSystems()) {
 				  connectionManagerFactory = new OTFLanesConnectionManagerFactory(connectionManagerFactory);
@@ -359,7 +359,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		createSnapshotwriter();
 
 		prepareNetworkChangeEventsQueue();
-		
+
 		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
 			queueSimulationFeature.afterPrepareSim();
 		}
@@ -387,7 +387,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
 			queueSimulationFeature.beforeCleanupSim();
 		}
-		
+
 		this.simEngine.afterSim();
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
@@ -493,7 +493,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 	public final EventsManager getEventsManager(){
 	  return events;
 	}
-	
+
 	private static final void setEvents(final EventsManager events) {
 		QueueSimulation.events = events;
 	}
@@ -521,7 +521,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 			} else break;
 		}
 	}
-	
+
 	/**
 	 * Should be a PersonAgentI as argument, but is needed because the old events form is still used also for tests
 	 * @param now
@@ -571,7 +571,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 	/**
 	 * Informs the simulation that the specified agent wants to depart from its current activity.
 	 * The simulation can then put the agent onto its vehicle on a link or teleport it to its destination.
-	 * @param now 
+	 * @param now
 	 *
 	 * @param agent
 	 * @param link the link where the agent departs
@@ -661,7 +661,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 	public Set<TransportMode> getNotTeleportedModes() {
 		return notTeleportedModes;
 	}
-	
+
 	public void setQueueNetwork(QueueNetwork net) {
 		this.network = net;
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
@@ -679,12 +679,12 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		queueSimulationFeatures.add(queueSimulationFeature);
 	}
 
-	
+
 	public Integer getIterationNumber() {
 		return iterationNumber;
 	}
 
-	
+
 	public void setIterationNumber(Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
 	}

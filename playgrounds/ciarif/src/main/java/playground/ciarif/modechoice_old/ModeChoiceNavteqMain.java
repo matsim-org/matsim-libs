@@ -44,7 +44,7 @@ public class ModeChoiceNavteqMain {
 	public static void testRun01(Config config) {
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		World world = scenario.getWorld();
-		
+
 //		System.out.println("TEST RUN 01:");
 //		System.out.println("  reading world xml file... ");
 //		WorldParser world_parser = new WorldParser(Gbl.getWorld());
@@ -89,7 +89,7 @@ public class ModeChoiceNavteqMain {
 //		System.out.println("  done.");
 
 //		PlansParser plansParser = new MatsimPopulationReader(plans);
-		PopulationWriter plansWriter = new PopulationWriter(plans);
+		PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");

@@ -56,7 +56,7 @@ public class ConnectHomesAndWorkplaces {
 			configFile = args[0] ;
 		}
 		ScenarioImpl scenario = new ScenarioLoaderImpl(configFile).getScenario();
-		
+
 		this.config = scenario.getConfig();
 		ConfigWriter configwriter = new ConfigWriter(this.config);
 		configwriter.writeStream(new PrintWriter(System.out));
@@ -90,7 +90,7 @@ public class ConnectHomesAndWorkplaces {
 		final PopulationImpl plans = scenario.getPopulation() ;
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		final PopulationWriter plansWriter = new PopulationWriter(plans, knowledges);
+		final PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork(), knowledges);
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		plans.addAlgorithm(locachoice);
 		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added

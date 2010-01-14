@@ -70,7 +70,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		a1.setEndTime(3600);
 
 		// write person to file
-		new PopulationWriter(population).writeFile(PLANS_FILE_TESTINPUT);
+		new PopulationWriter(population, network).writeFile(PLANS_FILE_TESTINPUT);
 
 		// prepare config for test
 		config.network().setInputFile(NETWORK_FILE);

@@ -39,17 +39,17 @@ import playground.dgrether.utils.MatsimIo;
 public class CMCFPlansMerger {
 
 	private static final Logger log = Logger.getLogger(CMCFPlansMerger.class);
-	
+
 	private static final String plansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_10pct.xml.gz";
-	
+
 //	private static final String cmcfPlansFile = DgPaths.VSPSVNBASE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_one_act_cmcf.xml";
 
 //	private static final String outPlansFile = DgPaths.VSPSVNBASE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_all_acts_cmcf.xml.gz";
-	
+
   //new paths nov 08
-	
+
 	private static final String cmcfPlansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_one_act_newcmcf.xml.gz";
-	
+
 	private static final String outPlansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_all_acts_newcmcf.xml.gz";
 
 	/**
@@ -59,7 +59,7 @@ public class CMCFPlansMerger {
 		NetworkLayer net = MatsimIo.loadNetwork(DgPaths.IVTCHNET);
 		PopulationImpl plansCmcf = MatsimIo.loadPlans(cmcfPlansFile, net);
 		PopulationImpl plans = MatsimIo.loadPlans(plansFile, net);
-		
+
 		for (Person person : plansCmcf.getPersons().values()) {
 			String idstring = person.getId().toString();
 			String[] idLegNumber = idstring.split("leg");
@@ -71,10 +71,10 @@ public class CMCFPlansMerger {
 			LegImpl leg = (LegImpl) plan.getPlanElements().get(legNumber);
 			leg.setRoute(((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity()).getRoute());
 		}
-		
-		MatsimIo.writePlans(plans, outPlansFile);
+
+		MatsimIo.writePlans(plans, net, outPlansFile);
 		log.info("done");
-		
+
 	}
 
 }

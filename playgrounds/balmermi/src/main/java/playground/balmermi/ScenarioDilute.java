@@ -107,7 +107,7 @@ public class ScenarioDilute {
 		sc.getWorld().complete(exTxpes);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
-		
+
 		System.out.println("calculate area of interest and extract its links...");
 
 		// dilZrh
@@ -132,7 +132,7 @@ public class ScenarioDilute {
 		final PopulationImpl population = sl.getScenario().getPopulation();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
-		PopulationWriter plansWriter = new PopulationWriter(population,sl.getScenario().getKnowledges());
+		PopulationWriter plansWriter = new PopulationWriter(population,network, sl.getScenario().getKnowledges());
 		plansWriter.startStreaming(sl.getScenario().getConfig().plans().getOutputFile());
 
 		System.out.println("adding algorithms...");

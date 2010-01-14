@@ -143,7 +143,7 @@ public class MyControler2 {
 		}
 
 		// write the population for debugging purposes
-		new PopulationWriter(scenarioData.getPopulation()).writeFile("pop.xml.gz") ;
+		new PopulationWriter(scenarioData.getPopulation(), scenarioData.getNetwork()).writeFile("pop.xml.gz") ;
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 

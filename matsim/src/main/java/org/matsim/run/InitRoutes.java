@@ -118,7 +118,7 @@ public class InitRoutes {
 		final PopulationImpl plans = sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc)));

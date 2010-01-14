@@ -50,7 +50,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 	private final double workEndTime = 19*3600.0;
 	private List<Id> ids = new ArrayList<Id>();
 	private Scenario sc = null;
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -66,13 +66,13 @@ public class DemandGenerationTest extends MatsimTestCase {
 		this.ids = null;
 		super.tearDown();
 	}
-	
+
 	public void testDemandGeneration(){
 		Config conf = sc.getConfig();
 		assertNotNull(conf);
-		
+
 		this.createFakeNetwork(sc, sc.getNetwork());
-		
+
 		Population pop = sc.getPopulation();
 		PopulationFactory builder = pop.getFactory();
 		Person person;
@@ -80,7 +80,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 		Activity activity;
 		Leg leg;
 		Route route;
-		
+
 		for (int i = 0; i < ids.size(); i++){
 			//create the person and add it to the population
 			person = builder.createPerson(ids.get(i));
@@ -106,20 +106,20 @@ public class DemandGenerationTest extends MatsimTestCase {
 			plan.addActivity(activity);
 			assertEquals(1, plan.getPlanElements().size());
 			activity.setEndTime(homeEndTime);
-			
+
 			leg = builder.createLeg(TransportMode.car);
 			assertNotNull(leg);
 			assertEquals(1, plan.getPlanElements().size());
 			plan.addLeg(leg);
 			assertEquals(2, plan.getPlanElements().size());
-			
+
 			activity = builder.createActivityFromLinkId("w", ids.get(2));
 			assertNotNull(activity);
 			activity.setEndTime(workEndTime);
 			assertEquals(2, plan.getPlanElements().size());
 			plan.addActivity(activity);
 			assertEquals(3, plan.getPlanElements().size());
-			
+
 			leg = builder.createLeg(TransportMode.car);
 			assertNotNull(leg);
 			assertEquals(3, plan.getPlanElements().size());
@@ -130,22 +130,22 @@ public class DemandGenerationTest extends MatsimTestCase {
 //			assertNull(leg.getRoute());
 			//we cannot add routes to legs as they cann't be written by the writers
 //			leg.setRoute(route);
-			
+
 			activity = builder.createActivityFromLinkId("h", ids.get(0));
 			assertNotNull(activity);
 			assertEquals(4, plan.getPlanElements().size());
 			plan.addActivity(activity);
 			assertEquals(5, plan.getPlanElements().size());
-			
+
 		}
-		
+
 		//write created population
-		PopulationWriter writer = new PopulationWriter(pop);
+		PopulationWriter writer = new PopulationWriter(pop, sc.getNetwork());
 		writer.write(this.getOutputDirectory() + populationFile);
 		File outfile = new File(this.getOutputDirectory() + populationFile);
 		assertTrue(outfile.exists());
-		
-		
+
+
 		//read population again, now the code gets really ugly, dirty and worth to refactor...
 		Scenario scenario = new ScenarioImpl();
 		Population population  = scenario.getPopulation();
@@ -157,7 +157,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 		reader.readFile(outfile.getAbsolutePath());
 		checkContent(population);
 	}
-	
+
 	private void createFakeNetwork(Scenario scenario, Network network){
 		Coord coord = scenario.createCoord(0,0 ) ;
 
@@ -172,7 +172,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 			network.addLink( l ) ;
 		}
 	}
-	
+
 	private void checkContent(Population population) {
 		assertNotNull(population);
 		assertEquals(ids.size(), population.getPersons().size());
@@ -195,7 +195,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 			assertEquals(ids.get(2), ((Activity)p.getPlanElements().get(2)).getLinkId());
 			assertEquals(Time.UNDEFINED_TIME, ((Activity)p.getPlanElements().get(4)).getEndTime(), EPSILON);
 			assertEquals(ids.get(0), ((Activity)p.getPlanElements().get(4)).getLinkId());
-			
+
 			assertEquals(TransportMode.car, ((Leg)p.getPlanElements().get(1)).getMode());
 			assertNull(((Leg)p.getPlanElements().get(1)).getRoute());
 			assertEquals(TransportMode.car, ((Leg)p.getPlanElements().get(3)).getMode());

@@ -21,21 +21,21 @@ public class PTLegIntoPlanConverter {
 
 	public PTLegIntoPlanConverter(ScenarioImpl scenario) {
 		Population newPopulation = new PopulationImpl(new ScenarioImpl());
-		
+
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			char suffix = 'a';
-			Person clonPerson=null; 
+			Person clonPerson=null;
 			Plan newPlan=null;
 			Leg leg = null;
 			int numOfLegs=0;
-			
+
 			for (Plan plan: person.getPlans()){
 				for (PlanElement pe : plan.getPlanElements()){
-					if (pe instanceof Activity) {																
+					if (pe instanceof Activity) {
 						Activity act = (Activity) pe;
 
 						if (!PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
-							if (newPlan!=null){ 
+							if (newPlan!=null){
 
 								//add the last clonPerson, but only if he/she has a pt-connection
 								newPlan.addActivity(act);
@@ -50,7 +50,7 @@ public class PTLegIntoPlanConverter {
 							newPlan = new PlanImpl(clonPerson);
 							clonPerson.addPlan(newPlan);
 						}
-						newPlan.addActivity(act); 						
+						newPlan.addActivity(act);
 					}else{
 						leg = (Leg)pe;
 						newPlan.addLeg(leg);
@@ -59,10 +59,10 @@ public class PTLegIntoPlanConverter {
 				}
 			}
 		}
-		
+
 		String outputFile = "../playgrounds/mmoyo/output/splittedPlan.xml";
 		System.out.println("writing output plan file..." + outputFile);
-		PopulationWriter popwriter = new PopulationWriter(newPopulation) ;
+		PopulationWriter popwriter = new PopulationWriter(newPopulation, scenario.getNetwork()) ;
 		popwriter.write(outputFile) ;
 		System.out.println("done");
 	}

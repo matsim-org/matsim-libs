@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -39,9 +40,9 @@ import playground.yu.analysis.PlanModeJudger;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 	private Person person = null;
@@ -49,12 +50,13 @@ public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
+	 * @param network
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentCarPlan(final PopulationImpl plans, final String filename) {
-		super(plans, filename);
+	public NewAgentCarPlan(final Network network, final PopulationImpl plans, final String filename) {
+		super(network, plans, filename);
 	}
 
 	@Override
@@ -84,8 +86,8 @@ public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
-		
-		NewAgentCarPlan nac = new NewAgentCarPlan(population,
+
+		NewAgentCarPlan nac = new NewAgentCarPlan(network, population,
 				outputPlansFilename);
 		nac.run(population);
 		nac.writeEndPlans();

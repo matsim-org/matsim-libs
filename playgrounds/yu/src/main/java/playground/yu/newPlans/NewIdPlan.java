@@ -24,18 +24,19 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
  * @author yu
- * 
+ *
  */
 public class NewIdPlan extends NewPopulation {
 
-	public NewIdPlan(final Population plans) {
-		super(plans);
+	public NewIdPlan(final Network network, final Population plans) {
+		super(network, plans);
 	}
 
 	@Override
@@ -47,7 +48,7 @@ public class NewIdPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 
-		NewIdPlan nip = new NewIdPlan(scenario.getPopulation());
+		NewIdPlan nip = new NewIdPlan(scenario.getNetwork(), scenario.getPopulation());
 		nip.run(scenario.getPopulation());
 		nip.writeEndPlans();
 	}

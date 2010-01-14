@@ -22,31 +22,32 @@ package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewSmallPlan extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewSmallPlan(PopulationImpl plans) {
-		super(plans);
+	public NewSmallPlan(final Network network, Population plans) {
+		super(network, plans);
 	}
 
 	@Override
@@ -71,7 +72,7 @@ public class NewSmallPlan extends NewPopulation {
 		NetworkLayer network = (NetworkLayer) s.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = (PopulationImpl) s.getPopulation();
+		Population population = s.getPopulation();
 		Config c = s.getConfig();
 		PlansConfigGroup pcg = c.plans();
 		pcg.setOutputFile(outputPopFilename);
@@ -79,7 +80,7 @@ public class NewSmallPlan extends NewPopulation {
 
 		new MatsimPopulationReader(s).readFile(inputPopFilename);
 
-		NewSmallPlan nsp = new NewSmallPlan(population);
+		NewSmallPlan nsp = new NewSmallPlan(network, population);
 		nsp.run(population);
 		nsp.writeEndPlans();
 	}

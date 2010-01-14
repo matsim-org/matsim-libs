@@ -20,6 +20,7 @@
 
 package org.matsim.api.core.v01.population;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimWriter;
 
 /**
@@ -29,26 +30,27 @@ import org.matsim.core.api.internal.MatsimWriter;
 public class PopulationWriter implements MatsimWriter {
 
 	private final Population population;
+	private final Network network;
 
-	public PopulationWriter(Population population) {
+	public PopulationWriter(Population population, Network network) {
 		this.population = population;
+		this.network = network;
 	}
-	
+
 	/**
-	 * Writes the population in the most current format (currently plans_v4.dtd). 
+	 * Writes the population in the most current format (currently plans_v4.dtd).
 	 */
 	public void write(final String filename) {
 		writeV4(filename);
 	}
-		
+
 	/**
 	 * Writes the population in the format of plans_v4.dtd
-	 * 
+	 *
 	 * @param filename
 	 */
 	public void writeV4(final String filename) {
-		new org.matsim.core.population.PopulationWriter(population).writeFileV4(filename);
+		new org.matsim.core.population.PopulationWriter(this.population, this.network).writeFileV4(filename);
 	}
-
 
 }

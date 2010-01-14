@@ -39,9 +39,9 @@ import org.matsim.world.WorldWriter;
 
 /**
  * Test case that uses the "primloc" module in a matsim setting.
- * 
+ *
  * Note that it uses a "zone" layer, which is defined in "world.xml".
- * 
+ *
  * @author fabrice and wisinee
  *
  */
@@ -85,7 +85,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		this.config = null;
 		super.tearDown();
 	}
-	
+
 	public void testModule() {
 
 		System.out.println("TEST MODULE PRIMLOC:");
@@ -133,7 +133,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		// writing all available input
 
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(population).writeFile(config.plans().getOutputFile());
+		new PopulationWriter(population, scenario.getNetwork()).writeFile(config.plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");

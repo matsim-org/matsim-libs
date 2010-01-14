@@ -17,24 +17,24 @@ import playground.andreas.bln.pop.NewPopulation;
 
 
 public class PersonPlan2Kml extends NewPopulation{
-	
+
 	private static final Logger log = Logger.getLogger(PersonPlan2Kml.class);
-	
+
 	boolean warningPrinted = false;
 	String outputDir;
 	NetworkLayer network;
 	TreeSet<String> agentIds;
-	
+
 	/**
 	 * Converts the selected plan of an agent to a kml-file.
-	 * 
+	 *
 	 * @param network The corresponding network file
 	 * @param population The population to be read
 	 * @param outputDir Directory for kml output
 	 * @param agentIds Ids of agents to be converted. Be careful: If <code>null</code> every agent will be converted.
 	 */
 	public PersonPlan2Kml(NetworkLayer network, PopulationImpl population, String outputDir, TreeSet<String> agentIds) {
-		super(population, "nofile.xml");
+		super(network, population, "nofile.xml");
 		this.outputDir = outputDir;
 		this.network = network;
 		this.agentIds = agentIds;
@@ -50,7 +50,7 @@ public class PersonPlan2Kml extends NewPopulation{
 		String plansFilename = null;
 		String outputDirectory = null;
 		TreeSet<String> agentIds = null;
-		
+
 		if(args.length < 3){
 			System.err.println("Need at least three arguments: networkfile, plansfile, outputdirectory");
 			System.exit(1);
@@ -59,12 +59,12 @@ public class PersonPlan2Kml extends NewPopulation{
 			networkFilename = args[0];
 			plansFilename = args[1];
 			outputDirectory = args[2];
-			
+
 			if(args.length > 3){
 				agentIds = new TreeSet<String>();
 				for (int i = 3; i < args.length; i++) {
-					agentIds.add(args[i]);					
-				}				
+					agentIds.add(args[i]);
+				}
 			}
 		}
 
@@ -92,7 +92,7 @@ public class PersonPlan2Kml extends NewPopulation{
 		test.setCoordinateTransformation(new GK4toWGS84());
 //		test.setCoordinateTransformation(new AtlantisToWGS84());
 //		test.setCoordinateTransformation(new CH1903LV03toWGS84());
-		
+
 //		String coordSys = this.config.global().getCoordinateSystem();
 //		if (coordSys.equalsIgnoreCase("GK4")) test.setCoordinateTransformation(new GK4toWGS84());
 //		if (coordSys.equalsIgnoreCase("Atlantis")) test.setCoordinateTransformation(new AtlantisToWGS84());
@@ -125,5 +125,5 @@ public class PersonPlan2Kml extends NewPopulation{
 			log.info(" " + person.getId() + " written to kml");
 		}
 	}
-	
+
 }

@@ -62,7 +62,7 @@ import playground.dgrether.utils.IdFactory;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class DaganzoScenarioGenerator {
 
@@ -70,7 +70,7 @@ public class DaganzoScenarioGenerator {
 			.getLogger(DaganzoScenarioGenerator.class);
 
 	private static final String DAGANZOBASEDIR = DgPaths.SHAREDSVN + "studies/dgrether/daganzo/";
-	
+
 	public static final String DAGANZONETWORKFILE = DAGANZOBASEDIR
 			+ "daganzoNetwork.xml";
 
@@ -94,23 +94,23 @@ public class DaganzoScenarioGenerator {
 
 	public static final String SIGNALSYSTEMSOUTPUTFILE = DAGANZOBASEDIR
 		+ "daganzoSignalSystems.xml";
-	
-	public static final String SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE = DAGANZOBASEDIR 
+
+	public static final String SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE = DAGANZOBASEDIR
 		+ "daganzoSignalSystemsConfigs.xml";
-	
+
 	private static final String OUTPUTDIRECTORYNORMALROUTE = DAGANZOBASEDIR
 		+ "output/normalRoute/";
-	
+
 	private static final String OUTPUTDIRECTORYALTERNATIVEROUTE = DAGANZOBASEDIR
 		+ "output/alternativeRoute/";
-	
-	
+
+
 	public String configOut, plansOut, outputDirectory;
 
 	private static final boolean isAlternativeRouteEnabled = true;
-	
+
 	private static final boolean isUseLanes = true;
-	
+
 	private static final boolean isUseSignalSystems = true;
 
 	private static final int iterations = 1000;
@@ -119,7 +119,7 @@ public class DaganzoScenarioGenerator {
 	private static final String controllerClass = AdaptiveController.class.getCanonicalName();
 
 	private Id id1, id2, id4, id5, id6;
-	
+
 	public DaganzoScenarioGenerator() {
 		init();
 	}
@@ -136,7 +136,7 @@ public class DaganzoScenarioGenerator {
 			outputDirectory = OUTPUTDIRECTORYNORMALROUTE;
 		}
 	}
-	
+
 	private void createIds(ScenarioImpl sc){
 		id1 = sc.createId("1");
 		id2 = sc.createId("2");
@@ -158,7 +158,7 @@ public class DaganzoScenarioGenerator {
 		createIds(scenario);
 		//create the plans and write them
 		createPlans(scenario);
-		new PopulationWriter(scenario.getPopulation()).writeFile(plansOut);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(plansOut);
 		if (isUseLanes) {
 			config.scenario().setUseLanes(true);
 			config.network().setLaneDefinitionsFile(LANESOUTPUTFILE);
@@ -178,10 +178,10 @@ public class DaganzoScenarioGenerator {
 			ssWriter.writeFile(SIGNALSYSTEMSOUTPUTFILE);
 			//create the signal system's configurations and write them
 			SignalSystemConfigurations ssConfigs = createSignalSystemsConfig(scenario);
-			MatsimSignalSystemConfigurationsWriter ssConfigsWriter = new MatsimSignalSystemConfigurationsWriter(ssConfigs);	
+			MatsimSignalSystemConfigurationsWriter ssConfigsWriter = new MatsimSignalSystemConfigurationsWriter(ssConfigs);
 			ssConfigsWriter.writeFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 		}
-		
+
 		//create and write the config with the correct paths to the files created above
 		createConfig(config);
 		new ConfigWriter(config).writeFile(configOut);
@@ -227,19 +227,19 @@ public class DaganzoScenarioGenerator {
 			leg.setRoute(route);
 
 			plan.addLeg(leg);
-			
+
 			ActivityImpl act2 = (ActivityImpl) factory.createActivityFromLinkId("h", l7.getId());
 			act2.setLink(l7);
 			plan.addActivity(act2);
 			population.addPerson(p);
 		}
 	}
-	
+
 	private void createConfig(Config config) {
 	// set scenario
 		config.network().setInputFile(NETWORKFILE);
 		config.plans().setInputFile(plansOut);
-		
+
 		// configure scoring for plans
 		config.charyparNagelScoring().setLateArrival(0.0);
 		config.charyparNagelScoring().setPerforming(6.0);
@@ -257,7 +257,7 @@ public class DaganzoScenarioGenerator {
 		config.controler().setLastIteration(iterations + iterations2);
 		config.controler().setOutputDirectory(outputDirectory);
 
-		
+
 		// configure simulation and snapshot writing
 		config.setQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
@@ -279,7 +279,7 @@ public class DaganzoScenarioGenerator {
 		reRoute.setDisableAfter(iterations);
 		config.strategy().addStrategySettings(reRoute);
 	}
-	
+
 
 	private LaneDefinitions createLanes(ScenarioImpl scenario) {
 		LaneDefinitions lanes = scenario.getLaneDefinitions();
@@ -301,14 +301,14 @@ public class DaganzoScenarioGenerator {
 		return lanes;
 	}
 
-	
+
 	private SignalSystems createSignalSystems(ScenarioImpl scenario) {
 		SignalSystems systems = scenario.getSignalSystems();
 		SignalSystemsFactory factory = systems.getFactory();
 		//create the signal system no 1
 		SignalSystemDefinition definition = factory.createSignalSystemDefinition(id1);
 		systems.addSignalSystemDefinition(definition);
-		
+
 		//create signal group for traffic on link 4 on lane 1 with toLink 6
 		SignalGroupDefinition groupLink4 = factory.createSignalGroupDefinition(id4, id1);
 		groupLink4.addLaneId(id1);
@@ -317,17 +317,17 @@ public class DaganzoScenarioGenerator {
 		groupLink4.setSignalSystemDefinitionId(id1);
 		//add the signalGroupDefinition to the container
 		systems.addSignalGroupDefinition(groupLink4);
-		
+
 		//create signal group  with id no 2 for traffic on link 5 on lane 1 with toLink 6
 		SignalGroupDefinition groupLink5 = factory.createSignalGroupDefinition(id5, id2);
 		groupLink5.addLaneId(id1);
 		groupLink5.addToLinkId(id6);
 		//assing the group to the system
 		groupLink5.setSignalSystemDefinitionId(id1);
-		
+
 		//add the signalGroupDefinition to the container
 		systems.addSignalGroupDefinition(groupLink5);
-		
+
 		return systems;
 	}
 
@@ -335,16 +335,16 @@ public class DaganzoScenarioGenerator {
 			ScenarioImpl scenario) {
 		SignalSystemConfigurations configs = scenario.getSignalSystemConfigurations();
 		SignalSystemConfigurationsFactory factory = configs.getFactory();
-		
+
 		SignalSystemConfiguration systemConfig = factory.createSignalSystemConfiguration(id1);
 		AdaptiveSignalSystemControlInfo controlInfo = factory.createAdaptiveSignalSystemControlInfo();
 		controlInfo.addSignalGroupId(id1);
 		controlInfo.addSignalGroupId(id2);
 		controlInfo.setAdaptiveControlerClass(controllerClass);
 		systemConfig.setSignalSystemControlInfo(controlInfo);
-		
+
 		configs.getSignalSystemConfigurations().put(systemConfig.getSignalSystemId(), systemConfig);
-		
+
 		return configs;
 	}
 

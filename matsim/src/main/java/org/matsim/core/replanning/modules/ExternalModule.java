@@ -86,7 +86,7 @@ public class ExternalModule implements PlanStrategyModule {
 	protected String exePath = "";
 	protected String moduleId = "";
 	protected String outFileRoot = "";
-	
+
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
 
@@ -102,8 +102,8 @@ public class ExternalModule implements PlanStrategyModule {
 		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
 		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
-		this.plansWriter = new PopulationWriter(pop);
-		
+		this.plansWriter = new PopulationWriter(pop, scenario.getNetwork());
+
 		this.persons.clear();
 		this.plansWriter.writeStartPlans(filename);
 		this.handler = this.plansWriter.getHandler();
@@ -231,7 +231,7 @@ public class ExternalModule implements PlanStrategyModule {
 	public Integer getIterationNumber() {
 		return iterationNumber;
 	}
-	
+
 	public void setIterationNumber(Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
 	}
@@ -243,14 +243,14 @@ public class ExternalModule implements PlanStrategyModule {
 	/**
 	 * Provides a real scenario, but exchanges the population.
 	 * Still, network and facilities can be reused that way.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	private static class PseudoScenario implements Scenario {
-		
+
 		private final ScenarioImpl scenario;
 		private Population myPopulation;
-		
+
 		public PseudoScenario(final ScenarioImpl scenario, final PopulationImpl population) {
 			this.scenario = scenario;
 			this.myPopulation = population;
@@ -280,7 +280,7 @@ public class ExternalModule implements PlanStrategyModule {
 		public Network getNetwork() {
 			return this.scenario.getNetwork();
 		}
-		
+
 	}
-	
+
 }

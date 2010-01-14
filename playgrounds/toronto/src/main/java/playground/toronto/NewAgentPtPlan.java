@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
@@ -48,12 +49,12 @@ public class NewAgentPtPlan extends NewPopulation {
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentPtPlan(final PopulationImpl plans) {
-		super(plans);
+	public NewAgentPtPlan(final Network network, final PopulationImpl plans) {
+		super(network, plans);
 	}
 
-	public NewAgentPtPlan(final PopulationImpl population, final String filename) {
-		super(population, filename);
+	public NewAgentPtPlan(final Network network, final PopulationImpl population, final String filename) {
+		super(network, population, filename);
 	}
 
 	@SuppressWarnings("unchecked")

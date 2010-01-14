@@ -118,7 +118,7 @@ public class ScenarioStreaming {
 		sc.getWorld().complete(exTxpes);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
-		
+
 		System.out.println("writing facilities...");
 		new FacilitiesWriter(af).writeFile(config.facilities().getOutputFile());
 		System.out.println("done. (writing facilities)");
@@ -130,7 +130,7 @@ public class ScenarioStreaming {
 		final PopulationImpl population = sl.getScenario().getPopulation();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
-		PopulationWriter plansWriter = new PopulationWriter(population,sl.getScenario().getKnowledges());
+		PopulationWriter plansWriter = new PopulationWriter(population,network, sl.getScenario().getKnowledges());
 		plansWriter.startStreaming(sl.getScenario().getConfig().plans().getOutputFile());
 
 		System.out.println("adding algorithms...");

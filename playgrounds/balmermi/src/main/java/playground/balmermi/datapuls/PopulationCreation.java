@@ -59,19 +59,19 @@ public class PopulationCreation {
 
 	public static void main(String[] args) {
 		if (args.length != 4) { printUsage(); return; }
-		
+
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 
 		System.out.println("loading census facilities...");
 		sl.loadActivityFacilities();
 		Gbl.printMemoryUsage();
 		System.out.println("done. (census facilities)");
-		
+
 		System.out.println("loading census population...");
 		sl.loadPopulation();
 		Gbl.printMemoryUsage();
 		System.out.println("done. (census population)");
-		
+
 		System.out.println("loading datapuls facilities...");
 		ActivityFacilitiesImpl datapulsFacilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(datapulsFacilities).readFile(args[1]);
@@ -90,7 +90,7 @@ public class PopulationCreation {
 		System.out.println("done. (running modules)");
 
 		System.out.println("writing population...");
-		new PopulationWriter(datapulsPopulation,datapulsKnowledges).writeFile(args[3]);
+		new PopulationWriter(datapulsPopulation,sl.getScenario().getNetwork(), datapulsKnowledges).writeFile(args[3]);
 		System.out.println("done. (writing population)");
 	}
 }

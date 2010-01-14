@@ -108,7 +108,7 @@ public class MyRuns {
 		final PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		plans.addAlgorithm(new PersonFilterSelectedPlan());
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork());
 		plansWriter.startStreaming(scenario.getConfig().plans().getOutputFile());
 		plans.addAlgorithm(plansWriter);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
@@ -166,7 +166,7 @@ public class MyRuns {
 		new PlansFilterByLegMode(TransportMode.car, false).run(scenario.getPopulation());
 
 		System.out.println("  writing plans...");
-		new PopulationWriter(scenario.getPopulation()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(scenario.getConfig().plans().getOutputFile());
 
 		System.out.println("RUN: filterCars finished.");
 		System.out.println();
@@ -189,7 +189,7 @@ public class MyRuns {
 		new PlansFilterByLegMode(TransportMode.pt, true).run(plans);
 
 		System.out.println("  writing plans...");
-		new PopulationWriter(plans).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(plans, scenario.getNetwork()).writeFile(scenario.getConfig().plans().getOutputFile());
 
 		System.out.println("RUN: filterPt finished.");
 		System.out.println();
@@ -211,7 +211,7 @@ public class MyRuns {
 		new PersonRemovePlansWithoutLegs().run(scenario.getPopulation());
 		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
 
-		new PopulationWriter(scenario.getPopulation()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterWork finished.");
@@ -227,7 +227,7 @@ public class MyRuns {
 		new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}).run(scenario.getPopulation());
 		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
 
-		new PopulationWriter(scenario.getPopulation()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterWorkEdu finished.");
@@ -249,7 +249,7 @@ public class MyRuns {
 		System.out.println("  setting up plans objects...");
 		final PopulationImpl plans = sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationWriter plansWriter = new PopulationWriter(plans, sl.getScenario().getNetwork());
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		System.out.println("  done.");
@@ -275,7 +275,7 @@ public class MyRuns {
 
 		final PopulationImpl plans = sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationWriter plansWriter = new PopulationWriter(plans, sl.getScenario().getNetwork());
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 
@@ -376,7 +376,7 @@ public class MyRuns {
 		System.out.println("  processing plans...");
 		final PopulationImpl population = scenario.getPopulation();
 		population.setIsStreaming(true);
-		final PopulationWriter plansWriter = new PopulationWriter(population);
+		final PopulationWriter plansWriter = new PopulationWriter(population, network);
 		plansWriter.startStreaming(scenario.getConfig().plans().getOutputFile());
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		population.addAlgorithm(new ActLocationFalsifier(200));
@@ -637,7 +637,7 @@ public class MyRuns {
 			new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch10pct.dilZh30km.xml.gz");
 			scenario.getPopulation().printPlansCount();
 			log.info("writing plans");
-			new PopulationWriter(scenario.getPopulation()).writeFile("testplans.xml.gz");
+			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile("testplans.xml.gz");
 			log.info("done");
 		} catch (SAXException e) {
 			e.printStackTrace();
@@ -747,9 +747,9 @@ public class MyRuns {
 //		someTest(args);
 
 		Gbl.printSystemInfo();
-		
+
 		System.out.println(new File("/Users/mrieser/Desktop/Umlautä.txt").exists());
-		
+
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();
 	}

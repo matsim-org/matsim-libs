@@ -42,7 +42,7 @@ public class InitRouteCreation {
 		System.out.println("MATSim-IIDM: create initial routes.");
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading network xml file...");
@@ -55,7 +55,7 @@ public class InitRouteCreation {
 		System.out.println("  setting up plans objects...");
 		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(plans);
+		PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");

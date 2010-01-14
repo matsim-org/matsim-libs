@@ -199,7 +199,7 @@ public class GenerateChoiceSets {
 		}
 		else {
 			this.choiceSetPopulation = this.createChoiceSetPopulationFromMZ();
-			new PopulationWriter(this.choiceSetPopulation).writeFile(this.outdir+"/MZPopulation.txt");
+			new PopulationWriter(this.choiceSetPopulation, this.network).writeFile(this.outdir+"/MZPopulation.txt");
 
 			// TODO: maybe also optimize area?
 			this.choiceSets.setCarChoiceSets(this.filter.apply(this.choiceSetPopulation, "car"));
@@ -214,7 +214,7 @@ public class GenerateChoiceSets {
 		else {
 			this.controler = new Controler(this.matsimRunConfigFile);
 		}
-		
+
 		int tt;
 		if (this.reported.equals("reported")) {
 			tt = 1;

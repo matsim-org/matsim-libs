@@ -33,21 +33,21 @@ public class PlanRouteCalculator {
 	private PopulationImpl population;
 	private KroutesCalculator kRoutesCalculator;
 	PlainTimeTable plainTimeTable;
-	
+
 	public PlanRouteCalculator(final TransitSchedule transitSchedule, final NetworkLayer net, Map <Id, List<StaticConnection>> connectionMap, PopulationImpl population, KroutesCalculator kRoutesCalculator){
 		this.transitSchedule = transitSchedule;
 		this.net = net;
 		this.connectionMap = connectionMap;
 		this.population = population;
-		this.kRoutesCalculator =kRoutesCalculator; 
-	
+		this.kRoutesCalculator =kRoutesCalculator;
+
 		plainTimeTable = new PlainTimeTable(transitSchedule);
 		///connectionRate = new ConnectionRate (connectionMap, nearStopMap);
 	}
-	
+
 	/**Precalculates all routes for all plans*/
 	public void PreCalRoutes(){
-	
+
 		long startTime = System.currentTimeMillis();
 		int found=0;
 		for (Person person: population.getPersons().values()) {
@@ -55,15 +55,15 @@ public class PlanRouteCalculator {
 
 			int foundConns=0;
 			boolean first =true;
-			
-			ActivityImpl lastAct = null;       
-			ActivityImpl thisAct= null;		 
-				
+
+			ActivityImpl lastAct = null;
+			ActivityImpl thisAct= null;
+
 			for (PlanElement pe : plan.getPlanElements()) {   		//temporarily commented in order to find only the first leg
-				
-				if (pe instanceof ActivityImpl) {  				
-					thisAct= (ActivityImpl) pe;					
-					if (!first) {								
+
+				if (pe instanceof ActivityImpl) {
+					thisAct= (ActivityImpl) pe;
+					if (!first) {
 						Coord lastActCoord = lastAct.getCoord();
 			    		Coord actCoord = thisAct.getCoord();
 			    		foundConns = kRoutesCalculator.findPTPath(lastActCoord, actCoord, 400);
@@ -82,52 +82,52 @@ public class PlanRouteCalculator {
 		System.out.println("agents: " + population.getPersons().values().size());
 		System.out.println ("found:" + found);
 	}
-	
-	
+
+
 	/** sets the most appropriate route for plans from the precalculated static routes*/
 	public void findRoutes(){
 		PopulationImpl newPopulation = new ScenarioImpl().getPopulation();
-		
+
 		for (Person person: population.getPersons().values()) {
 				//if ( true ) {
-				//PersonImpl person = population.getPersons().get(new IdImpl("35420")); // 5636428  2949483 
+				//PersonImpl person = population.getPersons().get(new IdImpl("35420")); // 5636428  2949483
 			PlanImpl newPlan = new PlanImpl(person);
 			Plan plan = person.getPlans().get(0);
 			boolean first =true;
-			ActivityImpl lastAct = null;       
-			ActivityImpl thisAct= null;		 
-					
+			ActivityImpl lastAct = null;
+			ActivityImpl thisAct= null;
+
 			//for (PlanElement pe : plan.getPlanElements()) {   		//temporarily commented in order to find only the first leg
-			for	(int elemIndex=0; elemIndex<3; elemIndex++){          
-				PlanElement pe= plan.getPlanElements().get(elemIndex); 
-					
-				if (pe instanceof ActivityImpl) {  				
-					thisAct= (ActivityImpl) pe;					
-					if (!first) {								
+			for	(int elemIndex=0; elemIndex<3; elemIndex++){
+				PlanElement pe= plan.getPlanElements().get(elemIndex);
+
+				if (pe instanceof ActivityImpl) {
+					thisAct= (ActivityImpl) pe;
+					if (!first) {
 			    		//StaticConnection bestStatConnection  = dynamicConnection.getBestConnection(lastAct, thisAct);
-			    		
-			    		
+
+
 			    		//Create a set of legs and links to insert the PT legs and trnasfer activities
-			    		
-			    		
-			    		
-			    		
+
+
+
+
 					}
 					lastAct= thisAct;
 				}
 			}
-			
-	
+
+
 			((PersonImpl) person).exchangeSelectedPlan(newPlan, true);
 			((PersonImpl) person).removeUnselectedPlans();
 			newPopulation.addPerson(person);
 
 			System.out.println("writing output plan file...");
-			new PopulationWriter(newPopulation).writeFile(outputFile);
+			new PopulationWriter(newPopulation, net).writeFile(outputFile);
 			System.out.println("Done");
 		}
 	}
-	
+
 	/*
 	private void calculateWalkDistances(StaticConnection staticConnection, Coord coord1, Coord coord2){
 		walkDistance1 = CoordUtils.calcDistance(coord1, staticConnection.getFromNode().getCoord());
@@ -136,21 +136,21 @@ public class PlanRouteCalculator {
 		walkTime2 = walkDistance2 * avgWalkSpeed;
 	}
 	*/
-	
+
 	private Leg createLeg(double fromTime, PTtrip ptTrip){
 		TransitStopFacility boardFacility = transitSchedule.getFacilities().get(ptTrip.getBoardFacilityId());
 		TransitRoute trRoute = ptTrip.getTransitRoute();
 		double nextDep = plainTimeTable.getNextDeparture(trRoute, boardFacility, fromTime);
-		
+
 		Leg leg = new LegImpl(ptTrip.getTransitRoute().getTransportMode());
 		leg.setDepartureTime(nextDep);
 		leg.setRoute(ptTrip.getRoute());
 		leg.setTravelTime(ptTrip.getTravelTime());
 		return leg;
 	}
-	
-	
 
 
-	
+
+
+
 }

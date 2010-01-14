@@ -29,7 +29,7 @@ import org.matsim.core.population.PopulationWriter;
 
 
 public class BlurPlanTimes {
-	
+
 	private static void blurTAM(final String inputPlansFile, final String inputNetworkFile, final String outputPlansFile, int mutationRange) {
 		System.out.println("running blurTAM...");
 		System.out.println("  inputPlansFile:   "+inputPlansFile);
@@ -43,7 +43,7 @@ public class BlurPlanTimes {
 		population.setIsStreaming(true);
 		PersonBlurTimes pbt = new PersonBlurTimes(scenario.getConfig(), mutationRange);
 		population.addAlgorithm(pbt);
-		PopulationWriter pw = new PopulationWriter(population);
+		PopulationWriter pw = new PopulationWriter(population, network);
 		pw.startStreaming(outputPlansFile);
 		population.addAlgorithm(pw);
 		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
@@ -51,7 +51,7 @@ public class BlurPlanTimes {
 		pw.closeStreaming();
 		System.out.println("done.");
 	}
-	
+
 	public static void blurUniformlyInTimeBin(final String inputPlansFile, final String inputNetworkFile, final String outputPlansFile, int binSize) {
 		System.out.println("running blurUniformlyInTimeBin...");
 		System.out.println("  inputPlansFile:   "+inputPlansFile);
@@ -65,7 +65,7 @@ public class BlurPlanTimes {
 		population.setIsStreaming(true);
 		PersonUniformBlurTimesPerTimeBin pubtptb = new PersonUniformBlurTimesPerTimeBin(binSize);
 		population.addAlgorithm(pubtptb);
-		PopulationWriter pw = new PopulationWriter(population);
+		PopulationWriter pw = new PopulationWriter(population, network);
 		pw.startStreaming(outputPlansFile);
 		population.addAlgorithm(pw);
 		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
@@ -88,7 +88,7 @@ public class BlurPlanTimes {
 		population.setIsStreaming(true);
 		PersonBlurTimesPerTimeBin pbtptb = new PersonBlurTimesPerTimeBin(mutationRange,binSize);
 		population.addAlgorithm(pbtptb);
-		PopulationWriter pw = new PopulationWriter(population);
+		PopulationWriter pw = new PopulationWriter(population, network);
 		pw.startStreaming(outputPlansFile);
 		population.addAlgorithm(pw);
 		new MatsimPopulationReader(scenario).readFile(inputPlansFile);

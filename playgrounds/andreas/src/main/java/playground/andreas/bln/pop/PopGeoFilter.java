@@ -56,7 +56,7 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 	private final Network network;
 
 	public PopGeoFilter(PopulationImpl wholeRoutedPop, String outPlansFile, PopulationImpl unroutedWholePop, Network network, Coord xyMin, Coord xyMax) {
-		super(wholeRoutedPop, outPlansFile);
+		super(network, wholeRoutedPop, outPlansFile);
 		this.unRoutedPlans = unroutedWholePop;
 		this.xyMin = xyMin;
 		this.xyMax = xyMax;

@@ -69,11 +69,11 @@ public class Matsim4Urbansim {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		ScenarioImpl scenarioData = loader.getScenario();
-		
-		
+
+
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
-		NetworkLayer network = (NetworkLayer) scenarioData.getNetwork() ;
+		NetworkLayer network = scenarioData.getNetwork() ;
 
 		log.info("") ;
 		log.info("cleaning network ...");
@@ -110,7 +110,7 @@ public class Matsim4Urbansim {
 		oldPop=null ;
 		System.gc() ;
 
-		new PopulationWriter(newPop).writeFile(PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz");
+		new PopulationWriter(newPop, network).writeFile(PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz");
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 

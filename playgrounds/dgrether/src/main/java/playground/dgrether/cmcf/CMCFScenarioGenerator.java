@@ -94,7 +94,7 @@ public class CMCFScenarioGenerator {
 	public CMCFScenarioGenerator() throws Exception {
 		init();
 		createPlans();
-		MatsimIo.writePlans(this.plans, plansOut);
+		MatsimIo.writePlans(this.plans, this.network, plansOut);
 		//set scenario
 		this.config.network().setInputFile(networkFile);
 		this.config.plans().setInputFile(plansOut);

@@ -55,7 +55,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  writing population file...");
-		new PopulationWriter(pop).writeFile(super.getOutputDirectory()+"plans.xml");
+		new PopulationWriter(pop, scenario.getNetwork()).writeFile(super.getOutputDirectory()+"plans.xml");
 		log.info("  done.");
 
 		log.info("  clean up population...");
@@ -68,7 +68,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  writing population file again...");
-		new PopulationWriter(pop).writeFile(super.getOutputDirectory()+"plans.equal.xml");
+		new PopulationWriter(pop, scenario.getNetwork()).writeFile(super.getOutputDirectory()+"plans.equal.xml");
 		log.info("  done.");
 
 		log.info("  check for identity ofthe two population...");

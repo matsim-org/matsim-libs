@@ -202,7 +202,7 @@ public class Events2Snapshot {
 		if (snapshotFormat.contains("plansfile")) {
 			String snapshotFilePrefix = outputDir + "/positionInfoPlansFile";
 			String snapshotFileSuffix = "xml";
-			this.visualizer.addSnapshotWriter(new PlansFileSnapshotWriter(snapshotFilePrefix, snapshotFileSuffix));
+			this.visualizer.addSnapshotWriter(new PlansFileSnapshotWriter(snapshotFilePrefix, snapshotFileSuffix, this.network));
 		}
 		if (snapshotFormat.contains("transims")) {
 			String snapshotFile = outputDir + "T.veh";

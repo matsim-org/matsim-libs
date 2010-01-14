@@ -35,7 +35,7 @@ import org.matsim.world.ZoneLayer;
  * 							- much more robust: still works when trip chain does not start or end at home
  *											    (output statistics at the end)
  *							- shifted TASHA time by -4 hours in order to correspond with MATSim simulation time [0-23 hour]
- *							
+ *
  */
 public class ModdedConverter {
 	public static class ZoneXY {
@@ -94,7 +94,7 @@ public class ModdedConverter {
 	private boolean tmpGotH = false;
 	private double count1 = 0;
 	private double count2 = 0;
-	
+
 	private String[] tmpTabs = null;
 
 	private Coord tmpHome = null;
@@ -130,7 +130,7 @@ public class ModdedConverter {
 			}
 
 			String tripId = tabs[0] + "-" + tabs[1] + "-" + tabs[2];
-			String mode = tabs[16]; 
+			String mode = tabs[16];
 			if(!this.tmpTripId.equals(tripId)&&mode.equals("0")){
 				String personId = tabs[0] + "-" + tabs[1];
 				String hhldId = tabs[0];
@@ -155,7 +155,7 @@ public class ModdedConverter {
 							this.tmpHome = tmpCoord;
 							this.tmpGotH = true;
 						}
-						else{ //if the trip starts away from home 
+						else{ //if the trip starts away from home
 							tmpCoord = getRandomCoordInZone(tabs[6]);
 						}
 						this.tmpType = tabs[7];
@@ -164,7 +164,7 @@ public class ModdedConverter {
 						act.setDuration(dur);
 					} else {
 						// it is a new person
-						// finish the person from the line before, add final trip 
+						// finish the person from the line before, add final trip
 						// then start the new person
 
 						if (!this.pop.getPersons().isEmpty()) {
@@ -282,9 +282,9 @@ public class ModdedConverter {
 		String oldPlansFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\fout_modechoices_good.txt";
 		String newPlansFilename = "C:\\Thesis_HJY\\matsim\\output\\ConvertPlan\\plans.xml.gz";
 		String zoneFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\centroids.txt";
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
-		
+
 		ModdedConverter c = new ModdedConverter();
 
 		c.setZones((ZoneLayer) scenario.getWorld().createLayer(new IdImpl("zones"), "toronto_test"));
@@ -330,7 +330,7 @@ public class ModdedConverter {
 		c.setPop(scenario.getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
-			PopulationWriter writer = new PopulationWriter(c.pop);
+			PopulationWriter writer = new PopulationWriter(c.pop, scenario.getNetwork());
 			writer.writeStartPlans(newPlansFilename);
 			String line;
 			do {
@@ -341,7 +341,7 @@ public class ModdedConverter {
 			} while (line != null);
 			c.readLine(line);
 			//c.readLine(line);
-			
+
 			reader.close();
 			writer.writePersons();
 			writer.writeEndPlans();

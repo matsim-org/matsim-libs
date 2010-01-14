@@ -21,7 +21,7 @@
 package org.matsim.vis.snapshots.writers;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -46,10 +46,12 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 	private double currenttime = -1;
 
 	private PopulationImpl plans = null;
+	private final Network network;
 
-	public PlansFileSnapshotWriter(final String snapshotFilePrefix, final String snapshotFileSuffix){
+	public PlansFileSnapshotWriter(final String snapshotFilePrefix, final String snapshotFileSuffix, Network network) {
 		this.filePrefix = snapshotFilePrefix;
 		this.fileSuffix = snapshotFileSuffix;
+		this.network = network;
 	}
 
 	public void beginSnapshot(final double time) {
@@ -69,7 +71,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 	 * {@link org.matsim.core.population.PopulationWriter}
 	 */
 	private void writePlans() {
-		new PopulationWriter(this.plans).writeFile(this.filename);
+		new PopulationWriter(this.plans, this.network).writeFile(this.filename);
 	}
 
 	public void addAgent(final PositionInfo position) {
@@ -77,7 +79,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 
 		PlanImpl plan = new PlanImpl(pers);
 		ActivityImpl actA = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(position.getEasting(), position.getNorthing()),
-				(LinkImpl)position.getLink());
+				position.getLink());
 		actA.setEndTime(this.currenttime);
 		plan.addActivity(actA);
 		pers.addPlan(plan);

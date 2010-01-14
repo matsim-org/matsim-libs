@@ -103,7 +103,7 @@ public class XY2Links {
 
 		final PopulationImpl plans = sl.getScenario().getPopulation();		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(this.config.plans().getOutputFile());
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
 		plans.addAlgorithm(plansWriter);

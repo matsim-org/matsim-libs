@@ -122,7 +122,7 @@ public class NewPlansTest {
 		nodeIDs.add(new IdImpl(990217));
 
 		PersonRouteFilter prf = new PersonRouteFilter(linkIDs, nodeIDs, network);
-		NewPlansWriter npw = new NewPlansWriter(plans);
+		NewPlansWriter npw = new NewPlansWriter(plans, network);
 		pfa.setNextFilter(prf);
 		prf.setNextFilter(npw);
 		System.out.println("  done.");

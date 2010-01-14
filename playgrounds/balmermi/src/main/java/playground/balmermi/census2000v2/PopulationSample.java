@@ -55,7 +55,7 @@ public class PopulationSample {
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		World world = scenario.getWorld();
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  extracting input directory... ");
@@ -93,7 +93,7 @@ public class PopulationSample {
 		System.out.println("  setting up population objects...");
 		PopulationImpl pop = scenario.getPopulation();
 		pop.setIsStreaming(true);
-		PopulationWriter pop_writer = new PopulationWriter(pop);
+		PopulationWriter pop_writer = new PopulationWriter(pop, scenario.getNetwork());
 		pop_writer.startStreaming(config.plans().getOutputFile());
 		pop.addAlgorithm(pop_writer);
 		PopulationReader pop_reader = new MatsimPopulationReader(scenario);

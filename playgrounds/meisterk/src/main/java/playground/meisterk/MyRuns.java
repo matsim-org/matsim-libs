@@ -85,7 +85,7 @@ public class MyRuns {
 	protected static double distanceCost = Double.NaN;
 	protected static double abortedPlanScore = Double.NaN;
 	protected static double learningRate = Double.NaN;
-	
+
 	private static Logger logger = Logger.getLogger(MyRuns.class);
 
 	//////////////////////////////////////////////////////////////////////
@@ -100,10 +100,10 @@ public class MyRuns {
 //		MyRuns.produceSTRC2007KML();
 
 //		MyRuns.setPlansToSameDepTime(config);
-	
+
 //		this.analyzeModeChainFeasibility(config);
 		this.analyzeLegDistanceDistribution(config);
-		
+
 		System.out.println();
 
 	}
@@ -123,7 +123,7 @@ public class MyRuns {
 
 	/**
 	 * @param config
-	 * 
+	 *
 	 * TODO this analysis doesnt work for big kti scenario plans files
 	 * it crashes with a "GC overhead limit exceeded" exception
 	 * there is probably a memory leak when streaming populations:
@@ -132,10 +132,10 @@ public class MyRuns {
 	public void analyzeLegDistanceDistribution(Config config) {
 
 //		double[] distanceClasses = new double[]{
-//			0, 
-//			100, 200, 500, 
-//			1000, 2000, 5000, 
-//			10000, 20000, 50000, 
+//			0,
+//			100, 200, 500,
+//			1000, 2000, 5000,
+//			10000, 20000, 50000,
 //			100000, 200000, 500000,
 //			1000000};
 //
@@ -146,13 +146,13 @@ public class MyRuns {
 //		sc.getPopulation().addAlgorithm(pa);
 //
 //		loader.loadScenario();
-		
+
 //		// - network
 //		logger.info("Reading network xml file...");
 //		NetworkLayer network = new NetworkLayer();
 //		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 //		logger.info("Reading network xml file...done.");
-//		
+//
 //		// - facilities
 //		logger.info("Reading facilities xml file...");
 //		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
@@ -167,7 +167,7 @@ public class MyRuns {
 //		}
 //		Gbl.getWorld().setFacilityLayer(facilities);
 //		logger.info("Reading facilities xml file...");
-		
+
 		// - population
 //		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 //		plansAlgos.add(pa);
@@ -183,11 +183,11 @@ public class MyRuns {
 //				pa.printClasses(crosstabFormat, isCumulative, distanceClasses);
 //			}
 //		}
-//		
+//
 //		pa.printDeciles(true);
-		
+
 	}
-	
+
 	public void analyzeModeChainFeasibility(Config config) {
 
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -198,7 +198,7 @@ public class MyRuns {
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		logger.info("Reading network xml file...done.");
-		
+
 		// - facilities
 		logger.info("Reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
@@ -212,7 +212,7 @@ public class MyRuns {
 			e.printStackTrace();
 		}
 		logger.info("Reading facilities xml file...");
-		
+
 		// - population
 		PersonAnalyzeModeChainFeasibility pa = new PersonAnalyzeModeChainFeasibility();
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
@@ -223,22 +223,22 @@ public class MyRuns {
 		matsimAgentPopulation.addAlgorithm(pa);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(config.plans().getInputFile());
-		
+
 		logger.info("Number of selected plans which are infeasible: " + pa.getNumInfeasiblePlans());
 	}
-	
+
 	private class PersonAnalyzeModeChainFeasibility implements PersonAlgorithm {
 
 		private int numInfeasiblePlans = 0;
-		
+
 		public PersonAnalyzeModeChainFeasibility() {
 			super();
 		}
 
 		public void run(Person person) {
-			
+
 			Plan selectedPlan = person.getSelectedPlan();
-			
+
 			ArrayList<TransportMode> modeChain = new ArrayList<TransportMode>();
 			for (PlanElement pe : selectedPlan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
@@ -248,59 +248,59 @@ public class MyRuns {
 			}
 			TransportMode[] candidate = new TransportMode[modeChain.size()];
 			candidate = modeChain.toArray(candidate);
-			
+
 			MeisterkConfigGroup meisterkConfigGroup = new MeisterkConfigGroup();
-			
+
 			boolean isFeasible = PlanAnalyzeTourModeChoiceSet.isModeChainFeasible(
-					selectedPlan, 
-					candidate, 
-					meisterkConfigGroup.getChainBasedModes(), 
+					selectedPlan,
+					candidate,
+					meisterkConfigGroup.getChainBasedModes(),
 					PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility);
-			
+
 			if (!isFeasible) {
 
 				logger.info("Agent id: " + person.getId());
-				
+
 				for (PlanElement pe : selectedPlan.getPlanElements()) {
-					
+
 					if (pe instanceof ActivityImpl) {
 						ActivityImpl act = (ActivityImpl) pe;
 						logger.info("\t" + act.getFacilityId());
 					}
-					
+
 					if (pe instanceof LegImpl) {
 						LegImpl leg = (LegImpl) pe;
 						modeChain.add(leg.getMode());
 						logger.info("\t" + leg.getMode());
 					}
-					
+
 				}
 				this.numInfeasiblePlans++;
 			}
-			
+
 		}
 
 		public int getNumInfeasiblePlans() {
 			return numInfeasiblePlans;
 		}
-		
+
 	}
-	
+
 	public static void setPlansToSameDepTime(Config config) {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
-		
+
 		ScenarioImpl scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();
 
 		PersonSetFirstActEndTime psfaet = new PersonSetFirstActEndTime(24.0 * 3600);
 		psfaet.run(population);
-		
+
 		logger.info("Writing plans file...");
-		new PopulationWriter(population).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(population, scenario.getNetwork()).writeFile(scenario.getConfig().plans().getOutputFile());
 		logger.info("Writing plans file...DONE.");
 	}
-	
+
 	public static PopulationImpl initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, ScenarioImpl scenario) {
 
 		PopulationImpl population = scenario.getPopulation();

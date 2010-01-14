@@ -57,7 +57,7 @@ public class MyControler2 {
 	@SuppressWarnings("unchecked")
 	private static Population createPlansFromShp(final FeatureSource n) {
 		Scenario sc = new ScenarioImpl() ;
-		
+
 		Population population = sc.getPopulation() ;
 		PopulationFactory pb = population.getFactory() ;
 
@@ -70,7 +70,7 @@ public class MyControler2 {
 
 		long popCnt = 0 ;
 		List<Coord> workPlaces = new ArrayList<Coord>() ;
-		
+
 		// iterate through the features:
 		while (it.hasNext()) {
 			final Feature feature = it.next();
@@ -98,12 +98,12 @@ public class MyControler2 {
 			for ( int ii=0 ; ii<nPersons ; ii++ ) {
 				Id id = sc.createId( Long.toString( popCnt ) ); popCnt++ ;
 
-				Person person = pb.createPerson(id); 
+				Person person = pb.createPerson(id);
 				population.addPerson(person);
-				
+
 				Plan plan = pb.createPlan() ;
 				person.addPlan(plan) ;
-				
+
 				plan.setSelected(true) ; // will also work without
 
 				Activity act = pb.createActivityFromCoord("home",coord) ;
@@ -118,27 +118,27 @@ public class MyControler2 {
 
 		for ( Person pp : population.getPersons().values() ) {
 			Plan plan = pp.getPlans().get(0) ;
-			
+
 			int idx = (int)( Math.random()*workPlaces.size() ) ; // TODO: replace by matsim rnd generator
 			Coord workCoord = workPlaces.get( idx ) ;
 //			workPlaces.remove( idx ) ;
 			// (with replacement.  W/o replacement, make sure that there are enough workplaces!)
-			
+
 			Leg legH2W = pb.createLeg(TransportMode.car) ;
 			plan.getPlanElements().add(legH2W) ;
-			
+
 			Activity workAct = pb.createActivityFromCoord("work", workCoord ) ;
 			plan.getPlanElements().add(workAct) ;
-			
+
 			Leg legW2H = pb.createLeg(TransportMode.bike) ;
 			plan.getPlanElements().add(legW2H) ;
-			
+
 			Activity homeAct1 = (Activity) plan.getPlanElements().get(0) ;
 			Coord homeCoord = homeAct1.getCoord() ;
 
 			Activity homeAct2 = pb.createActivityFromCoord("home", homeCoord ) ;
 			plan.getPlanElements().add(homeAct2) ;
-			
+
 		}
 
 		return population ;
@@ -154,12 +154,12 @@ public class MyControler2 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		// BasicPopulationWriter.write needs a parameter from the config that I don't know how else to create. :-(  Kai
 		//dg yes but the used constructor from PopulationWriter doesn't need the config parameter
-		// so we don't need any Gbl or config 
+		// so we don't need any Gbl or config
 		// write the population for debugging purposes
-		PopulationWriter popWriter = new PopulationWriter(plans) ;
+		PopulationWriter popWriter = new PopulationWriter(plans, null) ;
 		popWriter.write("pop.xml.gz") ;
 
 		log.info("### DONE with demand generation  ### at " + new File("pop.xml.gz").getAbsolutePath()) ;

@@ -37,19 +37,16 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	protected PopulationWriter pw;
 	protected Network net;
 
-	public NewPopulation(final Population plans) {
-		this.pw = new PopulationWriter(plans);
+	public NewPopulation(final Network network, final Population plans) {
+		this.net = network;
+		this.pw = new PopulationWriter(plans, network);
 		this.pw.writeStartPlans(Gbl.getConfig().plans().getOutputFile());
 	}
 
-	public NewPopulation(final Population population, final String filename) {
-		this.pw = new PopulationWriter(population);
-		this.pw.writeStartPlans(filename);
-	}
-
-	public NewPopulation(final Network network, final Population plans) {
-		this(plans);
+	public NewPopulation(final Network network, final Population population, final String filename) {
 		this.net = network;
+		this.pw = new PopulationWriter(population, network);
+		this.pw.writeStartPlans(filename);
 	}
 
 	public void writeEndPlans() {

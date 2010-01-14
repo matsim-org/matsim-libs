@@ -51,7 +51,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 
 		this.scenario = new ScenarioImpl(config);
 	}
-	
+
 	public void testGenerateRandomDemand() {
 
 		Config config = scenario.getConfig();
@@ -75,37 +75,37 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.charyparNagelScoring());
-		
+
 		Controler dummyControler = new Controler(this.scenario);
 		dummyControler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
-		
+
 		PlanomatModule testee = new PlanomatModule(
-				dummyControler, 
-				emptyEvents, 
-				this.scenario.getNetwork(), 
-				scoringFunctionFactory, 
-				travelCostEstimator, 
+				dummyControler,
+				emptyEvents,
+				this.scenario.getNetwork(),
+				scoringFunctionFactory,
+				travelCostEstimator,
 				tTravelEstimator);
-		
+
 		testee.prepareReplanning();
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 
 			Plan plan = person.getPlans().get(TEST_PLAN_NR);
 			testee.handlePlan(plan);
-			
+
 		}
 		testee.finishReplanning();
-		
-		new PopulationWriter(this.scenario.getPopulation()).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");
+
+		new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork()).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");
 
 		// actual test: compare checksums of the files
 		final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + "plans.xml.gz");
 		final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + "output_plans.xml.gz");
 		assertEquals("different plans files.", expectedChecksum, actualChecksum);
 	}
-	
-	
-	
+
+
+
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();

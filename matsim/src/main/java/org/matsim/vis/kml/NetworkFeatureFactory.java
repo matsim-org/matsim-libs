@@ -37,6 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -64,7 +65,7 @@ public class NetworkFeatureFactory {
 
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	private final Network network;
-	
+
 	public NetworkFeatureFactory(CoordinateTransformation coordTransform, final Network network) {
 		this.coordTransform = coordTransform;
 		this.network = network;
@@ -86,7 +87,7 @@ public class NetworkFeatureFactory {
 		p.setAbstractGeometryGroup(this.kmlObjectFactory.createLineString(line));
 		p.setStyleUrl(networkStyle.getId());
 		p.setDescription(description);
-		
+
 		PlacemarkType pointPlacemark = this.kmlObjectFactory.createPlacemarkType();
 		Coord centerCoord = this.coordTransform.transform(l.getCoord());
 		PointType point = this.kmlObjectFactory.createPointType();
@@ -97,7 +98,7 @@ public class NetworkFeatureFactory {
 
 		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(pointPlacemark));
 		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(p));
-		
+
 		return folder;
 	}
 
@@ -109,13 +110,13 @@ public class NetworkFeatureFactory {
 		PointType point = this.kmlObjectFactory.createPointType();
 		point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
 		p.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
-		
+
 		p.setStyleUrl(networkStyle.getId());
 		p.setDescription(this.createNodeDescription(n));
-		
+
 		return p;
 	}
-	
+
 	public AbstractFeatureType createActFeature(ActivityImpl act, StyleType style) {
 
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
@@ -144,8 +145,8 @@ public class NetworkFeatureFactory {
 				log.warn("Not yet implemented: Adding link KML features of type" + abstractFeature.getClass());
 			}
 		}
-		for (Node n : ((NetworkRouteWRefs) leg.getRoute()).getNodes()) {
-			
+		for (Node n : RouteUtils.getNodes((NetworkRouteWRefs) leg.getRoute(), network)) {
+
 			AbstractFeatureType abstractFeature = this.createNodeFeature(n, style);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
 				folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
@@ -153,7 +154,7 @@ public class NetworkFeatureFactory {
 				log.warn("Not yet implemented: Adding node KML features of type" + abstractFeature.getClass());
 			}
 		}
-		
+
 		return folder;
 	}
 

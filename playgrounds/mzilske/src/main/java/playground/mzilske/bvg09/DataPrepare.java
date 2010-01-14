@@ -187,7 +187,7 @@ public class DataPrepare {
 		log.info("start pt-router");
 		router.run(pop);
 		log.info("write routed plans out.");
-		new PopulationWriter(pop).write(OutRoutedPlanFile);
+		new PopulationWriter(pop, this.scenario.getNetwork()).write(OutRoutedPlanFile);
 	}
 
 	protected void visualizeRouterNetwork() {
@@ -218,12 +218,12 @@ public class DataPrepare {
 		OTFVisQueueSim client = new org.matsim.vis.otfvis.OTFVisQueueSim(visScenario, events);
 		client.run();
 	}
-	
+
 	private void buildUmlaeufe() {
 		Collection<TransitLine> transitLines = scenario.getTransitSchedule().getTransitLines().values();
 		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(scenario.getNetwork()), transitLines);
 		Collection<Umlauf> umlaeufe = greedyUmlaufBuilder.build();
-		
+
 		VehiclesFactory vb = this.scenario.getVehicles().getFactory();
 		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl(
 				"defaultTransitVehicleType"));
@@ -246,32 +246,32 @@ public class DataPrepare {
 	private void emptyVehicles() {
 		this.scenario.getVehicles().getVehicles().clear();
 	}
-	
+
 
 	public static void run(String inVisumFile, String inNetworkFile, String inInputPlansFile,
 			String interTransitNetworkFile, String interTransitScheduleWithoutNetworkFile,
-			String outTransitScheduleWithNetworkFile, String outVehicleFile, String outMultimodalNetworkFile, 
+			String outTransitScheduleWithNetworkFile, String outVehicleFile, String outMultimodalNetworkFile,
 			String outRoutedPlansFile){
-		
+
 		DataPrepare.InVisumNetFile = inVisumFile;
 		DataPrepare.InNetworkFile = inNetworkFile;
 		DataPrepare.InInputPlansFileWithXY2Links = inInputPlansFile;
-		
+
 		DataPrepare.IntermediateTransitNetworkFile = interTransitNetworkFile;
 		DataPrepare.IntermediateTransitScheduleWithoutNetworkFile = interTransitScheduleWithoutNetworkFile;
-		
+
 		DataPrepare.OutTransitScheduleWithNetworkFile = outTransitScheduleWithNetworkFile;
 		DataPrepare.OutVehicleFile = outVehicleFile;
 		DataPrepare.OutMultimodalNetworkFile = outMultimodalNetworkFile;
 		DataPrepare.OutRoutedPlanFile = outRoutedPlansFile;
-				
+
 		DataPrepare app = new DataPrepare();
 		app.prepareConfig();
 		app.convertSchedule();
 		app.createNetworkFromSchedule();
 		app.emptyVehicles();
 		app.buildUmlaeufe();
-		
+
 		try {
 			app.writeScheduleAndVehicles();
 		} catch (FileNotFoundException e) {
@@ -281,8 +281,8 @@ public class DataPrepare {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 		app.mergeNetworks();
 		app.routePopulation();
 //		app.visualizeRouterNetwork();
@@ -297,7 +297,7 @@ public class DataPrepare {
 		app.createNetworkFromSchedule();
 		app.emptyVehicles();
 		app.buildUmlaeufe();
-		
+
 		try {
 			app.writeScheduleAndVehicles();
 		} catch (FileNotFoundException e) {
@@ -307,8 +307,8 @@ public class DataPrepare {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 //		app.mergeNetworks();
 //		app.routePopulation();
 //		app.visualizeRouterNetwork();

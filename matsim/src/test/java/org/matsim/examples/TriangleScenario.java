@@ -20,6 +20,8 @@
 
 package org.matsim.examples;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -27,7 +29,6 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
@@ -47,7 +48,7 @@ public abstract class TriangleScenario {
 	//////////////////////////////////////////////////////////////////////
 
 	private static final String studyfolder = "test/scenarios/triangle/";
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -61,19 +62,19 @@ public abstract class TriangleScenario {
 
 	public static final void setUpScenarioConfig(final Config config, final String outputDirectory) {
 		config.config().setOutputFile(outputDirectory + "output_config.xml");
-		
+
 		config.world().setInputFile(studyfolder + "world.xml");
 		config.world().setOutputFile(outputDirectory + "output_world.xml");
-		
+
 		config.network().setInputFile(studyfolder + "network.xml");
 		config.network().setOutputFile(outputDirectory + "output_network.xml");
-		
+
 		config.facilities().setInputFile(studyfolder + "facilities.xml");
 		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
-		
+
 		config.matrices().setInputFile(studyfolder + "matrices.xml");
 		config.matrices().setOutputFile(outputDirectory + "output_matrices.xml");
-		
+
 		config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
@@ -83,9 +84,9 @@ public abstract class TriangleScenario {
 	// write output
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void writePlans(PopulationImpl plans) {
+	public static final void writePlans(Population plans, Network network) {
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans).writeFile(Gbl.getConfig().plans().getOutputFile());
+		new PopulationWriter(plans, network).writeFile(Gbl.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 	}
 

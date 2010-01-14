@@ -1,7 +1,9 @@
 package playground.andreas.bln.pop;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -12,25 +14,25 @@ import org.matsim.core.population.PopulationReader;
 
 /**
  * Reset all "personal" attributes of a person
- * 
+ *
  * @author aneumann
- * 
+ *
  */
 public class StripPersonPlan extends NewPopulation {
 	private int planswritten = 0;
 	private int personshandled = 0;
 
-	public StripPersonPlan(PopulationImpl plans, String filename) {
-		super(plans, filename);
+	public StripPersonPlan(Network network, Population plans, String filename) {
+		super(network, plans, filename);
 	}
 
 	@Override
 	public void run(Person pp) {
-		
+
 		PersonImpl person = (PersonImpl) pp;
-		
+
 		this.personshandled++;
-		
+
 		person.setAge(Integer.MIN_VALUE);
 		person.setCarAvail(null);
 		person.setEmployed(null);
@@ -39,10 +41,10 @@ public class StripPersonPlan extends NewPopulation {
 
 		this.popWriter.writePerson(person);
 	}
-	
+
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
-		
+
 		ScenarioImpl sc = new ScenarioImpl();
 
 		String networkFile = "./bb_cl.xml.gz";
@@ -56,7 +58,7 @@ public class StripPersonPlan extends NewPopulation {
 		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
-		StripPersonPlan dp = new StripPersonPlan(inPop, outPlansFile);
+		StripPersonPlan dp = new StripPersonPlan(net, inPop, outPlansFile);
 		dp.run(inPop);
 		System.out.println(dp.personshandled + " persons handled; " + dp.planswritten + " plans written to file");
 		dp.writeEndPlans();

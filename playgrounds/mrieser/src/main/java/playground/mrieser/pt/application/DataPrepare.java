@@ -181,7 +181,7 @@ public class DataPrepare {
 		log.info("start pt-router");
 		router.run(pop);
 		log.info("write routed plans out.");
-		new PopulationWriter(pop).write(ROUTED_PLANS_FILE);
+		new PopulationWriter(pop, this.scenario.getNetwork()).write(ROUTED_PLANS_FILE);
 	}
 
 	protected void visualizeRouterNetwork() {

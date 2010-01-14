@@ -54,7 +54,7 @@ public class PopulationCreation {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		World world = scenario.getWorld();
-		
+
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(config.world().getInputFile());
@@ -103,7 +103,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans).writeFile(config.plans().getOutputFile());
+		new PopulationWriter(plans, null).writeFile(config.plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing matrices xml file... ");

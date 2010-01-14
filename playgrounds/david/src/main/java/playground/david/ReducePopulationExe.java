@@ -71,10 +71,10 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 	int modulo = 1;
 	int count = 0;
 	public static int ptCount = 0;
-	
+
 	public Set<Id> usedlinkList = new HashSet<Id>();
 
-	
+
 	public FilterPersons2() {
 		super();
 	}
@@ -90,7 +90,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					// Leg
 					LegImpl l = (LegImpl) actl.get(i);
 					if(l.getMode().equals(TransportMode.car) && l.getRoute() != null){
-						
+
 						List<Id> ll = ((NetworkRouteWRefs) l.getRoute()).getLinkIds();
 						for(Id linkId : ll) {
 							usedlinkList.add(linkId);
@@ -101,7 +101,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 
 	}
 	PlanImpl copyPlanToPT(final Plan in) {
-		PlanImpl erg = new PlanImpl((Person) in.getPerson());
+		PlanImpl erg = new PlanImpl(in.getPerson());
 		List ergPEs = erg.getPlanElements();
 		List<?> actl = in.getPlanElements();
 		for (int i= 0; i< actl.size() ; i++) {
@@ -143,7 +143,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 		}
 		((PersonImpl) person).removeUnselectedPlans();
 		if(count > 1000000) return; //just write 1 mio plans and the ignore the rest for now
-		
+
 		try {
 			if ((count % 100) == 0) ReducePopulationExe.plansWriter1.writePerson(person);
 			if ((count % 10) == 0) ReducePopulationExe.plansWriter10.writePerson(person);
@@ -194,11 +194,11 @@ public class ReducePopulationExe {
 
 		relevantPopulation = new ScenarioImpl().getPopulation();
 		relevantPopulation.setIsStreaming(true);
-		plansWriter1 = new PopulationWriter(relevantPopulation);
-		plansWriter10 = new PopulationWriter(relevantPopulation);
-		plansWriter25 = new PopulationWriter(relevantPopulation);
-		plansWriter50 = new PopulationWriter(relevantPopulation);
-		plansWriter100 = new PopulationWriter(relevantPopulation);
+		plansWriter1 = new PopulationWriter(relevantPopulation, network);
+		plansWriter10 = new PopulationWriter(relevantPopulation, network);
+		plansWriter25 = new PopulationWriter(relevantPopulation, network);
+		plansWriter50 = new PopulationWriter(relevantPopulation, network);
+		plansWriter100 = new PopulationWriter(relevantPopulation, network);
 		plansWriter1.startStreaming(outpopFileName + "1p.xml");
 		plansWriter10.startStreaming(outpopFileName + "10p.xml");
 		plansWriter25.startStreaming(outpopFileName + "25p.xml");
@@ -226,9 +226,9 @@ public class ReducePopulationExe {
 		for(LinkImpl link : network.getLinks().values()) if(!filter.usedlinkList.contains(link.getId())) nolinkList.add(link);
 
 		for(LinkImpl link : nolinkList)network.removeLink(link);
-		
+
 		new NetworkWriter(network).writeFile(outnetFileName);
-		
+
 	}
 
 }

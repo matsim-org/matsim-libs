@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -66,8 +65,8 @@ public class MultiSourceEAF {
 	private static boolean vertexAlgo = true;
 	private int lastArrival;
 	private EdgeTypeEnum edgeTypeToUse = EdgeTypeEnum.SIMPLE;
-	
-	
+
+
 	public static void debug(final boolean debug){
 		_debug=debug;
 	}
@@ -79,8 +78,8 @@ public class MultiSourceEAF {
 	public void setEdgeTypeToUse(EdgeTypeEnum edgeTypeToUse) {
 		this.edgeTypeToUse = edgeTypeToUse;
 	}
-	
-	
+
+
 	public MultiSourceEAF()
 	{
 		this.setupStatusInfo();
@@ -141,7 +140,7 @@ public class MultiSourceEAF {
 	/**
 	 * THE ONLY FUNCTION WHICH REALLY CALCULATES A FLOW
 	 * and provides status info
-	 * 
+	 *
 	 * @param network
 	 * @param demands
 	 * @return
@@ -156,21 +155,21 @@ public class MultiSourceEAF {
 		}
 		for(Link link : toRemove)
 		{
-			network.removeLink((LinkImpl)link);
+			network.removeLink(link);
 		}
 		if(_debug){
 			System.out.println("starting to read input");
 		}
-		
+
 		int totaldemands = 0;
 		for(Integer count : demands.values())
 		{
 			totaldemands += count;
 		}
-		
+
 		//create sink
 		Node sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));
-		
+
 		int timeHorizon = 10000;
 		int rounds = 10000;
 		String tempstr = "";
@@ -215,7 +214,7 @@ public class MultiSourceEAF {
 				int gammaSum = 0;
 				int currentArrival = -1;
 				System.out.println("new paths!");
-				
+
 				for(TimeExpandedPath tEPath : result)
 				{
 					int arrive = tEPath.getArrival();
@@ -237,7 +236,7 @@ public class MultiSourceEAF {
 				lastArrival = currentArrival;
 				if(gammaSum == 0)
 					throw new RuntimeException("no flow could be transported over any augmenting path!");
-				
+
 				timer3 = System.currentTimeMillis();
 				gain += fluss.cleanUp();
 
@@ -257,11 +256,11 @@ public class MultiSourceEAF {
 				this.setProgressInfo("Total Flow", fluss.getTotalFlow() + " / " + totaldemands);
 				this.setProgressInfo("Found Paths", "" + fluss.getPaths().size());
 				this.setProgressInfo("Paths / Iteration", ""+ (fluss.getPaths().size() / (double)i));
-				
+
 			}
 			if (true) {
 				long timeStop = System.currentTimeMillis();
-				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
+				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 				System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
 				System.out.println("last " + tempstr);
 			}
@@ -285,7 +284,7 @@ public class MultiSourceEAF {
 		calculateTotalHoldover(fluss);
 		return fluss;
 	}
-	
+
 	protected void calculateTotalHoldover(Flow fluss)
 	{
 		int time = 0;
@@ -317,17 +316,17 @@ public class MultiSourceEAF {
 		System.out.println("flow:" + flow);
 		System.out.println("multi: " + multiSum);
 	}
-	
+
 
 	protected List<String> progressTitles;
-	
+
 	/**
 	 * 	must not (!) get accessed unsychronized
 	 */
 	protected Map<String, String> progressInfos;
-	
+
 	protected boolean isFinished;
-	
+
 	protected void setupStatusInfo()
 	{
 		isFinished = false;
@@ -344,7 +343,7 @@ public class MultiSourceEAF {
 			progressInfos.put(key, "");
 		}
 	}
-	
+
 	protected void setProgressInfo(String key, String value)
 	{
 		synchronized(progressInfos)
@@ -371,7 +370,7 @@ public class MultiSourceEAF {
 	public boolean isFinished() {
 		return isFinished;
 	}
-	
+
 
 	/**
 	 * main method to run an EAF algorithm on the specified cenario
@@ -408,15 +407,15 @@ public class MultiSourceEAF {
 		//networkfile = "/Users/manuel/testdata/simple/line_net.xml";
 		//networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
 		//networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
-		
-		String plansfile = null;		
+
+		String plansfile = null;
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
 		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
 		//plansfile = "/Users/manuel/testdata/simple/elfen_1_plan.xml";
 		//plansfile = "/Users/manuel/testdata/padangcomplete/plans/padang_plans_10p.xml";
-		
+
 
 		String demandsfile = null;
 		//demandsfile = "/Users/manuel/Documents/meine_EA/manu/manu2.dem";
@@ -431,7 +430,7 @@ public class MultiSourceEAF {
 		//outputplansfile = "/homes/combi/dressler/stuff/testplans.xml";
 		//outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
 		outputplansfile = "/Users/manuel/tester/ws3_testoutput.xml";
-		
+
 		int uniformDemands = 5;
 
 		//set parameters
@@ -440,19 +439,19 @@ public class MultiSourceEAF {
 		//String sinkid = "supersink";
 		//String sinkid = "en2";  //padang sink , line sink
 		String sinkid ="supersink"; //siouxsink
-		//boolean emptylegs = false; // really bad! use EmptyPlans.class instead 		
+		//boolean emptylegs = false; // really bad! use EmptyPlans.class instead
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
 		NetworkLayer network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(networkfile);
-		Node sink = network.getNodes().get(new IdImpl(sinkid));		
+		Node sink = network.getNodes().get(new IdImpl(sinkid));
 
 		//read demands
 		HashMap<Node, Integer> demands;
 		if(plansfile!=null){
-			demands = readPopulation(scenario, plansfile);			
+			demands = readPopulation(scenario, plansfile);
 		}else if (demandsfile != null){
 			try {
 				demands = readDemands(network,demandsfile);
@@ -474,7 +473,7 @@ public class MultiSourceEAF {
 		for (int i : demands.values()) {
 			totaldemands += i;
 		}
-		System.out.println("Total demand is " + totaldemands);		
+		System.out.println("Total demand is " + totaldemands);
 
 		//check if demands and sink are set
 		if (demands.isEmpty() ) {
@@ -519,12 +518,12 @@ public class MultiSourceEAF {
 					timeMBF += timer2 - timer1;
 					if (result.isEmpty()){
 						break;
-					}				
+					}
 					tempstr = "";
 					for(TimeExpandedPath path : result){
 						fluss.augment(path);
 						if(_debug){
-							tempstr += path + "\n";							
+							tempstr += path + "\n";
 						}
 					}
 					if (_debug) {
@@ -546,14 +545,14 @@ public class MultiSourceEAF {
 				}
 				if (_debug) {
 					long timeStop = System.currentTimeMillis();
-					System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
+					System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 					System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
 					System.out.println("last " + tempstr);
 				}
 				System.out.println("Removed " + routingAlgo.gain + " intervals.");
 				System.out.println("removed on the fly:" + VertexIntervalls.rem);
 			}
-			
+
 			if(_debug){
 				System.out.println(fluss.arrivalsToString());
 				System.out.println(fluss.arrivalPatternToString());
@@ -583,7 +582,7 @@ public class MultiSourceEAF {
 //						router.run(plan);
 //					}
 //				}
-				new PopulationWriter(output).writeFile(outputplansfile);
+				new PopulationWriter(output, network).writeFile(outputplansfile);
 			}
 		}
 		if(_debug){

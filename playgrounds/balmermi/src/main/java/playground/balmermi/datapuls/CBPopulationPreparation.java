@@ -59,9 +59,9 @@ public class CBPopulationPreparation {
 		final PopulationImpl population = scenario.getPopulation();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		PopulationWriter plansWriter = new PopulationWriter(population);
+		PopulationWriter plansWriter = new PopulationWriter(population, scenario.getNetwork());
 		plansWriter.startStreaming(args[1].trim());
-		
+
 		ActivityFacilitiesImpl afs = scenario.getActivityFacilities();
 
 		System.out.println("adding algorithms...");

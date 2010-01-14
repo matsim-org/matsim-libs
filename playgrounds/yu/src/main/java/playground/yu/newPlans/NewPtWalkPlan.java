@@ -25,9 +25,11 @@ import java.util.List;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -35,16 +37,15 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 	private Person person;
@@ -53,16 +54,16 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 	// copyPlans: the copy of the plans.
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewPtWalkPlan(final PopulationImpl plans) {
-		super(plans);
+	public NewPtWalkPlan(final Network network, final Population plans) {
+		super(network, plans);
 	}
 
-	public NewPtWalkPlan(final PopulationImpl population, final String filename) {
-		super(population, filename);
+	public NewPtWalkPlan(final Network network, final Population population, final String filename) {
+		super(network, population, filename);
 	}
 
 	@Override
@@ -125,10 +126,10 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		NewPtWalkPlan npwp = new NewPtWalkPlan(population, outputFilename);
+		NewPtWalkPlan npwp = new NewPtWalkPlan(network, population, outputFilename);
 		npwp.run(population);
 		npwp.writeEndPlans();
 

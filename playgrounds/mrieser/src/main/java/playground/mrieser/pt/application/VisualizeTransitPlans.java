@@ -154,7 +154,7 @@ public class VisualizeTransitPlans {
 			visPop.addPerson(visPerson);
 		}
 
-		new PopulationWriter(visPop).write("vis.plans.xml");
+		new PopulationWriter(visPop, this.visScenario.getNetwork()).write("vis.plans.xml");
 		new NetworkWriter(this.visScenario.getNetwork()).writeFile("vis.network.xml");
 		Config visConfig = new Config();
 		visConfig.addCoreModules();
@@ -186,7 +186,7 @@ public class VisualizeTransitPlans {
 		TransitStopFacility accessStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getAccessStopId());
 		TransitStopFacility egressStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getEgressStopId());
 
-		NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.realScenario.getNetwork().getLinks().get(accessStop.getLinkId()), 
+		NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.realScenario.getNetwork().getLinks().get(accessStop.getLinkId()),
 				this.realScenario.getNetwork().getLinks().get(egressStop.getLinkId()));
 		List<Link> links = new ArrayList<Link>();
 		boolean include = false;

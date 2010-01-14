@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.socialnetworks.ivtsurveys;
 
@@ -52,10 +52,10 @@ import playground.johannes.socialnetworks.graph.social.io.SNGraphMLWriter;
 
 /**
  * @author illenberger
- * 
+ *
  */
 public class IVT2006ToGraphML {
-	
+
 	private static final Logger logger = Logger.getLogger(IVT2006ToGraphML.class);
 
 	private static final String TAB = "\t";
@@ -80,7 +80,7 @@ public class IVT2006ToGraphML {
 		SocialNetworkBuilder<Person> builder = new SocialNetworkBuilder<Person>();
 		Population population = new ScenarioImpl().getPopulation();
 		HashMap<String, Ego<Person>> egos = new HashMap<String, Ego<Person>>();
-		
+
 		int maxId = 0;
 		/*
 		 * Load egos...
@@ -129,8 +129,8 @@ public class IVT2006ToGraphML {
 		 * Write population and social network...
 		 */
 		logger.info("Writing population to " + popfilename);
-		new PopulationWriter(population).writeFile(popfilename);
-		
+		new PopulationWriter(population, null).writeFile(popfilename);
+
 		logger.info("Writing social network to " + graphfile);
 		SNGraphMLWriter graphWriter = new SNGraphMLWriter();
 		graphWriter.write(socialnet, graphfile);
@@ -150,11 +150,11 @@ public class IVT2006ToGraphML {
 //		BasicActivityImpl act = new BasicActivityImpl(HOME_ACT_TYPE);
 //		act.setCoord(transform.transform(new CoordImpl(Double.parseDouble(x),
 //				Double.parseDouble(y))));
-		
+
 		PopulationFactory pb = population.getFactory() ;
 		Activity act = pb.createActivityFromCoord(HOME_ACT_TYPE,new CoordImpl(Double.parseDouble(x),
 				Double.parseDouble(y))) ;
-		
+
 		plan.addActivity(act);
 
 		return person;

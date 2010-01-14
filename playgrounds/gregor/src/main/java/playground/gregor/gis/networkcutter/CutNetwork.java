@@ -64,10 +64,10 @@ public class CutNetwork {
 	private static double max_y = 9894785.;
 	private final static double MIN_X = 650473.;
 	private final static double MIN_Y = 9892816.;
-	
+
 	private static void cutIt(final NetworkLayer net,
 			final List<NetworkChangeEvent> events, final PopulationImpl pop, final HashMap<Id,EvacuationAreaLink> eal) {
-		
+
 		max_x = 652000.;
 		max_y = 9894780.;
 		ConcurrentLinkedQueue<Id> ealq = new ConcurrentLinkedQueue<Id>();
@@ -84,7 +84,7 @@ public class CutNetwork {
 		System.out.println("EAL:" + eal.size());
 		max_x = 652088.;
 		max_y = 9894785.;
-		
+
 		ConcurrentLinkedQueue<Plan> q = new ConcurrentLinkedQueue<Plan>();
 		for (Person pers : pop.getPersons().values()) {
 			Plan p = pers.getSelectedPlan();
@@ -100,7 +100,7 @@ public class CutNetwork {
 		}
 		System.out.println(pop.getPersons().size());
 
-		
+
 		//CHANGE EVENTS
 		ConcurrentLinkedQueue<NetworkChangeEvent> eq = new ConcurrentLinkedQueue<NetworkChangeEvent>();
 		for (NetworkChangeEvent e : events) {
@@ -133,7 +133,7 @@ public class CutNetwork {
 			net.removeLink(l);
 		}
 		new NetworkCleaner().run(net);
-		
+
 		Iterator<? extends Person> it = pop.getPersons().values().iterator();
 		while (it.hasNext()) {
 			Person pers = it.next();
@@ -145,9 +145,9 @@ public class CutNetwork {
 			}
 		}
 		System.out.println(pop.getPersons().size());
-		
+
 	}
-	
+
 	private static boolean isWithin(final Coord c) {
 
 		if (c.getX() < MIN_X || c.getX() > max_x || c.getY() < MIN_Y || c.getY() > max_y) {
@@ -155,7 +155,7 @@ public class CutNetwork {
 		}
 		return true;
 	}
-	
+
 	public static void main(final String [] args) {
 		Config c = Gbl.createConfig(args);
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -174,8 +174,8 @@ public class CutNetwork {
 			e1.printStackTrace();
 		}
 		net.setNetworkChangeEvents(parser.getEvents());
-		
-		
+
+
 		PopulationImpl pop = scenario.getPopulation();
 		try {
 			new MatsimPopulationReader(scenario).parse(c.plans().getInputFile());
@@ -189,7 +189,7 @@ public class CutNetwork {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		HashMap<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
 		String evacuationAreaLinksFile = c.evacuation().getEvacuationAreaFile();
 		try {
@@ -204,14 +204,14 @@ public class CutNetwork {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.out.println(evacuationAreaLinks.size());
 		cutIt(net,parser.getEvents(),pop,evacuationAreaLinks);
 		System.out.println(evacuationAreaLinks.size());
-		
+
 		new NetworkWriter(net).writeFile("tmp2/network.xml");
 		new NetworkChangeEventsWriter().write("tmp2/changeEvents.xml", parser.getEvents());
-		new PopulationWriter(pop).writeFile("tmp2/population.xml");
+		new PopulationWriter(pop, net).writeFile("tmp2/population.xml");
 		try {
 			new EvacuationAreaFileWriter(evacuationAreaLinks).writeFile("tmp2/evacuationArea.xml");
 		} catch (IOException e) {

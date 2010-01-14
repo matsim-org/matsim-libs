@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -36,7 +37,7 @@ import playground.yu.analysis.PlanModeJudger;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ModeChoicePlan extends NewPopulation {
 	private boolean addNewPlan = false;
@@ -44,8 +45,8 @@ public class ModeChoicePlan extends NewPopulation {
 	/**
 	 * @param plans
 	 */
-	public ModeChoicePlan(final Population plans) {
-		super(plans);
+	public ModeChoicePlan(final Network network, final Population plans) {
+		super(network, plans);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -109,8 +110,8 @@ public class ModeChoicePlan extends NewPopulation {
 	 */
 	public static void main(final String[] args) {
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
-		
-		ModeChoicePlan mcp = new ModeChoicePlan(scenario.getPopulation());
+
+		ModeChoicePlan mcp = new ModeChoicePlan(scenario.getNetwork(), scenario.getPopulation());
 		mcp.run(scenario.getPopulation());
 		mcp.writeEndPlans();
 	}

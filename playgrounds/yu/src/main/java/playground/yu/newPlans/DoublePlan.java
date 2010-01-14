@@ -21,6 +21,7 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -33,9 +34,9 @@ import org.matsim.core.population.PopulationReader;
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old
  * agents in the file and change only the Ids.
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class DoublePlan extends NewPopulation {
 	// private String newPersonId;
@@ -44,12 +45,12 @@ public class DoublePlan extends NewPopulation {
 
 	/**
 	 * Construcktor
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public DoublePlan(PopulationImpl plans, String filename) {
-		super(plans, filename);
+	public DoublePlan(Network network, PopulationImpl plans, String filename) {
+		super(network, plans, filename);
 	}
 
 	/**
@@ -99,7 +100,7 @@ public class DoublePlan extends NewPopulation {
 		PopulationReader plansReader = new MatsimPopulationReader(s);
 		plansReader.readFile(plansFilename);
 
-		DoublePlan dp = new DoublePlan(population, outputPlansFilename);
+		DoublePlan dp = new DoublePlan(network, population, outputPlansFilename);
 		dp.run(population);
 		dp.writeEndPlans();
 

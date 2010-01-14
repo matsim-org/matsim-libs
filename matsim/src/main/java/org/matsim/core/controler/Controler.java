@@ -223,15 +223,15 @@ public class Controler {
 		}
 	};
 	protected ScenarioLoaderImpl loader;
-	
+
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 
 	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 	private ControlerIO controlerIO;
-	
+
   private MobsimFactory mobsimFactory = new QueueSimulationFactory();
 
-	
+
 	/** initializes Log4J */
 	static {
 		final String logProperties = "log4j.xml";
@@ -373,7 +373,7 @@ public class Controler {
 				return new PersonPrepareForSim(getRoutingAlgorithm(), Controler.this.network);
 			}
 		});
-		
+
 		int firstIteration = this.config.controler().getFirstIteration();
 		int lastIteration = this.config.controler().getLastIteration();
 		this.state = ControlerState.Running;
@@ -421,7 +421,7 @@ public class Controler {
 			}
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 			// dump plans
-			new PopulationWriter(this.population, (this.getScenario()).getKnowledges()).writeFile(this
+			new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).writeFile(this
 							.getNameForOutputFilename("output_plans.xml.gz"));
 			// dump network
 			new NetworkWriter(this.network).writeFile(this.getNameForOutputFilename("output_network.xml.gz"));
@@ -556,7 +556,7 @@ public class Controler {
     else {
     	this.controlerIO =  new ControlerIO(outputPath);
     }
-		
+
 		// make the tmp directory
 		File outputDir = new File(outputPath);
 		if (outputDir.exists()) {
@@ -820,7 +820,7 @@ public class Controler {
 				simulation.run();
 			}
 		} else {
-			ExternalMobsim sim = new ExternalMobsim(this.population, this.events);
+			ExternalMobsim sim = new ExternalMobsim(this.population, this.network, this.events);
 			sim.setControlerIO(controlerIO);
 			sim.setIterationNumber(this.getIteration());
 			sim.run();
@@ -1078,7 +1078,7 @@ public class Controler {
 		return this.events;
 	}
 
-	public final ScenarioImpl getScenario() { 
+	public final ScenarioImpl getScenario() {
 		return this.scenarioData;
 	}
 
@@ -1249,7 +1249,7 @@ public class Controler {
 		        " uses the default QueueSimulation that might not have all features implemented.");
 		  }
     }
-		
+
 		public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 			Controler controler = event.getControler();
 			controler.events.resetHandlers(event.getIteration());
@@ -1345,27 +1345,27 @@ public class Controler {
 		return this.plansScoring;
 	}
 
-	
+
 	public TravelTimeCalculatorFactory getTravelTimeCalculatorFactory() {
 		return this.travelTimeCalculatorFactory;
 	}
 
-	
+
 	public void setTravelTimeCalculatorFactory(TravelTimeCalculatorFactory travelTimeCalculatorFactory) {
 		this.travelTimeCalculatorFactory = travelTimeCalculatorFactory;
 	}
 
-	
+
 	public TravelCostCalculatorFactory getTravelCostCalculatorFactory() {
 		return this.travelCostCalculatorFactory;
 	}
 
-	
+
 	public void setTravelCostCalculatorFactory(TravelCostCalculatorFactory travelCostCalculatorFactory) {
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 	}
 
-	
+
 	public ControlerIO getControlerIO() {
 		return controlerIO;
 	}
@@ -1377,9 +1377,9 @@ public class Controler {
   public MobsimFactory getMobsimFactory() {
     return mobsimFactory;
   }
-  
+
   public void setMobsimFactory(MobsimFactory mobsimFactory) {
     this.mobsimFactory = mobsimFactory;
   }
-	
+
 }

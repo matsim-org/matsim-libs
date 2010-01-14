@@ -56,7 +56,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private static void calcExtent(Scenario scenario) {
 		Coord min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		Coord max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
@@ -127,7 +127,7 @@ public class ScenarioCut {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private static void reduceFacilities(ActivityFacilitiesImpl facilities, Network network) {
 		System.out.println("removing facilities that refer to removed links of the network... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
@@ -139,7 +139,7 @@ public class ScenarioCut {
 		System.out.println("=> "+facilities.getFacilities().size()+" facilities left.");
 		System.out.println("done. " + (new Date()));
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private static void reduceFacilities(ActivityFacilitiesImpl facilities, Coord center, double radius) {
@@ -153,7 +153,7 @@ public class ScenarioCut {
 		System.out.println("=> "+facilities.getFacilities().size()+" facilities left.");
 		System.out.println("done. " + (new Date()));
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private static void reduceFacilities(ActivityFacilitiesImpl facilities, Coord min, Coord max) {
@@ -171,7 +171,7 @@ public class ScenarioCut {
 		System.out.println("=> "+facilities.getFacilities().size()+" facilities left.");
 		System.out.println("done. " + (new Date()));
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private static void reduceNetwork(NetworkImpl network, Coord center, double radius) {
@@ -187,12 +187,12 @@ public class ScenarioCut {
 		for (Id id : toRemove) { network.removeLink(network.getLinks().get(id)); }
 		System.out.println("=> "+network.getLinks().size()+" links left.");
 		System.out.println("done. " + (new Date()));
-		
+
 		System.out.println("cleaning network... " + (new Date()));
 		new NetworkCleaner().run(network);
 		System.out.println("done. " + (new Date()));
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private static void reduceNetwork(NetworkImpl network, Coord min, Coord max) {
@@ -214,12 +214,12 @@ public class ScenarioCut {
 		for (Id id : toRemove) { network.removeLink(network.getLinks().get(id)); }
 		System.out.println("=> "+network.getLinks().size()+" links left.");
 		System.out.println("done. " + (new Date()));
-		
+
 		System.out.println("cleaning network... " + (new Date()));
 		new NetworkCleaner().run(network);
 		System.out.println("done. " + (new Date()));
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private static void reducePopulation(ScenarioImpl scenario) {
@@ -269,16 +269,16 @@ public class ScenarioCut {
 		Gbl.printMemoryUsage();
 		System.out.println("done. (re-initializing initial routes)");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private static void reduceScenario(String[] args) {
 		ScenarioImpl scenario = (ScenarioImpl) new ScenarioLoaderImpl(args[0]).loadScenario();
 		calcExtent(scenario);
 		if (args.length == 4) {
 			Coord center = new CoordImpl(args[1],args[2]);
 			double radius = Double.parseDouble(args[3]);
-			
+
 			reduceNetwork(scenario.getNetwork(),center,radius);
 			reduceFacilities(scenario.getActivityFacilities(),scenario.getNetwork());
 			reduceFacilities(scenario.getActivityFacilities(),center,radius);
@@ -287,7 +287,7 @@ public class ScenarioCut {
 		else { // args.length == 5
 			Coord min = new CoordImpl(args[1],args[2]);
 			Coord max = new CoordImpl(args[3],args[4]);
-			
+
 			reduceNetwork(scenario.getNetwork(),min,max);
 			reduceFacilities(scenario.getActivityFacilities(),scenario.getNetwork());
 			reduceFacilities(scenario.getActivityFacilities(),min,max);
@@ -296,9 +296,9 @@ public class ScenarioCut {
 		calcExtent(scenario);
 		new NetworkWriter(scenario.getNetwork()).writeFile(scenario.getConfig().network().getOutputFile());
 		new FacilitiesWriter(scenario.getActivityFacilities()).writeFile(scenario.getConfig().facilities().getOutputFile());
-		new PopulationWriter(scenario.getPopulation(),scenario.getKnowledges()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(),scenario.getNetwork(), scenario.getKnowledges()).writeFile(scenario.getConfig().plans().getOutputFile());
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private static void printUsage() {

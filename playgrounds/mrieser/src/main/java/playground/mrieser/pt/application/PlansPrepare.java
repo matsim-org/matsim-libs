@@ -93,7 +93,7 @@ public class PlansPrepare {
 		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
 
-		PopulationWriter writer = new PopulationWriter(pop);
+		PopulationWriter writer = new PopulationWriter(pop, this.scenario.getNetwork());
 		writer.startStreaming(toFile);
 
 		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(writer, areaOfInterest);
@@ -111,7 +111,7 @@ public class PlansPrepare {
 	public void createSamplePopulation(final String fromFile, final String toFile, final double percentage) {
 		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
-		final PopulationWriter plansWriter = new PopulationWriter(pop, percentage);
+		final PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork(), percentage);
 		plansWriter.startStreaming(toFile);
 		pop.addAlgorithm(plansWriter);
 		PopulationReader plansReader = new MatsimPopulationReader(new PseudoScenario(this.scenario, pop));
@@ -138,7 +138,7 @@ public class PlansPrepare {
 		log.info("# persons remaining: " + pop.getPersons().size());
 
 		log.info("writing plans to file: " + toFile);
-		new PopulationWriter(pop).writeFile(toFile);
+		new PopulationWriter(pop, this.scenario.getNetwork()).writeFile(toFile);
 	}
 
 	public static void main(final String[] args) {

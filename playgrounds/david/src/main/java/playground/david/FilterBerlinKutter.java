@@ -110,14 +110,14 @@ public class FilterBerlinKutter {
 
 		network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
-		
+
 		relevantPopulation = new ScenarioImpl().getPopulation();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
 //		population.addAlgorithm(new FilterPersons());
 		plansReader.readFile(popFileName);
 //		population.runAlgorithms();
 
-		new PopulationWriter(relevantPopulation).writeFile(outpopFileName);
+		new PopulationWriter(relevantPopulation, network).writeFile(outpopFileName);
 	}
 
 }

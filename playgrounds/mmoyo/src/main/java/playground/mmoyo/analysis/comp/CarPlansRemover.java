@@ -10,7 +10,7 @@ import org.matsim.population.algorithms.PlansFilterByLegMode;
 
 public class CarPlansRemover {
 
-	public void run(Population population) {		
+	public void run(Population population) {
 		PlansFilterByLegMode plansFilter = new PlansFilterByLegMode(TransportMode.pt, false);
 		plansFilter.run(population) ;
 	}
@@ -25,18 +25,18 @@ public class CarPlansRemover {
 			configs[1]="../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/routed_configs/config_900s_big_moyo_time.xml";
 			configs[2]="../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/routed_configs/config_900s_big_moyo_parameterized.xml";
 		}
-		
+
 		CarPlansRemover carPlansRemover = new CarPlansRemover();
 		for (byte i=0; i<configs.length; i++ ){
 			ScenarioLoader sl = new ScenarioLoaderFactoryImpl().createScenarioLoader(configs[i]);
 			Scenario scenario = sl.loadScenario();
 			carPlansRemover.run(scenario.getPopulation());
-			
+
 			String outputFile = scenario.getConfig().plans().getInputFile() + ".NoCarPlans.xml";
 			System.out.println("writing output plan file..." + outputFile);
-			PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation()) ;
+			PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 			popwriter.write(outputFile) ;
-			System.out.println("done");		
+			System.out.println("done");
 		}
 	}
 }

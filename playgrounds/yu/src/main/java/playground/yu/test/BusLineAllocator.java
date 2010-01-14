@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.test;
 
@@ -75,9 +75,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * tries to allocate bus stop coordinates to links in MATSim "car" network
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class BusLineAllocator {
 	private class TravelCostFunctionDistance implements TravelCost {
@@ -116,7 +116,7 @@ public class BusLineAllocator {
 	// * Path.
 	// * links
 	// */>>>();
-	// 
+	//
 	private String outputFile;
 	private Dijkstra dijkstra;
 	private Link tmpPtLink = null;
@@ -484,7 +484,7 @@ public class BusLineAllocator {
 		if (pathA.isEmpty() || pathB.isEmpty()) {
 			return false;
 		}
-		
+
 		int sizeA = pathA.size();
 		for (int i = 0; i < sizeA; i++)
 			if (!pathA.get(i).equals(rtfPath.get(i)))
@@ -495,12 +495,12 @@ public class BusLineAllocator {
 		for (int i = sizeB - 1; i >= 0; i--)
 			if (!pathB.get(i).equals(rtfPath.get(i + sizeRtf - sizeB)))
 				return false;
-		
+
 		return true;
 	}
 
 	/**
-	 * @return 
+	 * @return
 	 *         Map<TransitRouteId,List<Tuple<TransitLinkId,Tuple<fromCoord,toCoord
 	 *         >>>>
 	 */
@@ -807,7 +807,7 @@ public class BusLineAllocator {
 				}
 			}
 		}
-		new PopulationWriter(pop).writeFile(newPopFile);
+		new PopulationWriter(pop, carNet).writeFile(newPopFile);
 	}
 
 	private void generateNewNetwork(String newNetFilename) {

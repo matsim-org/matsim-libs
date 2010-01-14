@@ -35,7 +35,7 @@ public class CreatePlans {
 		args[0]="C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/config.xml";
 		Config config = Gbl.createConfig(args);
 		config.plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/5000plan/plans.xml");
-		
+
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		final World world = scenario.getWorld();
 
@@ -113,7 +113,7 @@ public class CreatePlans {
 
 
 
-		new PopulationWriter(plans).writeFile(config.plans().getOutputFile());
+		new PopulationWriter(plans, scenario.getNetwork()).writeFile(config.plans().getOutputFile());
 	}
 
 }

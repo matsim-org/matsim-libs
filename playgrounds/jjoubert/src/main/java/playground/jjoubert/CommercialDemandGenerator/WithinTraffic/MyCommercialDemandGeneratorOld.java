@@ -59,7 +59,7 @@ public class MyCommercialDemandGeneratorOld {
 	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
 //	final static String ROOT = "~/";
-	
+
 	private static final int populationSize = 5000;
 	private static final int firstIndex = 100000;
 	private static double WITHIN_THRESHOLD = 0.90;
@@ -90,7 +90,7 @@ public class MyCommercialDemandGeneratorOld {
 			matrix = extractChainProperties();
 			xmlConverter.writeObjectToFile(matrix, matrixFileName);
 		}
-		// Build CDF for chain start times		
+		// Build CDF for chain start times
 		CumulativeDistribution cdfStartTime = convertMatrixToStartTimeCDF(matrix);
 		// Build empty CDF for number of activities
 		ArrayList<CumulativeDistribution> cdfNumberOfActivities = new ArrayList<CumulativeDistribution>();
@@ -106,18 +106,18 @@ public class MyCommercialDemandGeneratorOld {
 			}
 			cdfDuration.add(cdfDurationn);
 		}
-		
+
 		/**
-		 * TODO Currently I create points in ArcGIS based on the Kernel Density Estimation (KDE). To 
+		 * TODO Currently I create points in ArcGIS based on the Kernel Density Estimation (KDE). To
 		 * pick a location, I simply draw a random point from the sample. In future, it might be better
 		 * to read the KDE raster into MATSim, and sample directly from it.
 		 */
-		
+
 		// Read major locations
 		ArrayList<Point> majorPoints = readLocations(ROOT + "Commercial/Input/CommercialMajor100000.shp");
 		// Read minor locations
 		ArrayList<Point> minorPoints = readLocations(ROOT + "Commercial/Input/CommercialMinor100000.shp");
-				
+
 		for(int sampleNumber = 1; sampleNumber <= numberOfSamples; sampleNumber++){
 			// Initiate the population builder
 			ScenarioImpl sc = new ScenarioImpl();
@@ -153,7 +153,7 @@ public class MyCommercialDemandGeneratorOld {
 					// Build new CDF
 					CumulativeDistribution cdfNew = convertMatrixToNumberOfActivitiesCDF(matrix, startTimeBin);
 					cdfNumberOfActivities.set(startTimeBin, cdfNew);
-				} 
+				}
 				// Sample from cdfNumberOfActivities
 				int numberOfActivitiesBin = (int) cdfNumberOfActivities.get(startTimeBin).sampleFromCDF();
 				activitiesPerChain = numberOfActivitiesBin;
@@ -177,14 +177,14 @@ public class MyCommercialDemandGeneratorOld {
 				for(int activity = 0; activity < activitiesPerChain; activity++){
 					// Sample minor point
 					Point minor = minorPoints.get(MatsimRandom.getRandom().nextInt(minorPoints.size()));
-					
+
 					Activity minorActivity = new ActivityImpl("minor", sc.createCoord(minor.getCoordinate().x, minor.getCoordinate().y));
 					minorActivity.setEndTime(activityEndTime);
 
-					plan.getPlanElements().add(minorActivity);	
-					activityEndTime += gap;	
+					plan.getPlanElements().add(minorActivity);
+					activityEndTime += gap;
 
-					plan.addLeg(leg);				
+					plan.addLeg(leg);
 				}
 				Activity majorActivityEnd = new ActivityImpl("major", majorActivityStart.getCoord());
 				majorActivityEnd.setStartTime(endTime);
@@ -204,7 +204,7 @@ public class MyCommercialDemandGeneratorOld {
 					//TODO This is where I may want to include a ++populationComplete command if I only want a total of
 					// populationSize commercial vehicle agents.
 				}
-				
+
 				// Report progress
 				if(++populationComplete == populationLimit){
 					log.info("   ... Agents built: " + populationComplete);
@@ -215,7 +215,7 @@ public class MyCommercialDemandGeneratorOld {
 
 			// Write plans.xml file
 			log.info("Writing plans to XML file... ");
-			new PopulationWriter(population).writeFile(ROOT + "Commercial/plans" + 
+			new PopulationWriter(population, sc.getNetwork()).writeFile(ROOT + "Commercial/plans" +
 					PROVINCE + populationSize + "_Sample" + sampleNumber + ".xml");
 			log.info("Done writing plans to XML file.");
 			log.info("Plans generation: Completed for sample " + sampleNumber + " of " + numberOfSamples);
@@ -230,7 +230,7 @@ public class MyCommercialDemandGeneratorOld {
 		ArrayList<Integer> observations = new ArrayList<Integer>(dimensionDuration);
 		ArrayList<Double> probs = new ArrayList<Double>(dimensionDuration);
 		for(int a = 0; a < matrix.get(bin1).get(bin2).size(); a++){
-			int points = (int) matrix.get(bin1).get(bin2).get(a);
+			int points = matrix.get(bin1).get(bin2).get(a);
 			total += points;
 			observations.add(points);
 		}
@@ -249,9 +249,9 @@ public class MyCommercialDemandGeneratorOld {
 			ys[b] = ys[b-1] + probs.get(b-1);
 		}
 		ys[ys.length-1] = 1;
-		
-		result = new CumulativeDistribution(xs,ys);		
-		
+
+		result = new CumulativeDistribution(xs,ys);
+
 		return result;
 	}
 
@@ -265,7 +265,7 @@ public class MyCommercialDemandGeneratorOld {
 		for(int a = 0; a < matrix.get(bin).size(); a++){
 			int points = 0;
 			for(int b = 0; b < dimensionDuration; b++){
-				points += matrix.get(bin).get(a).get(b);				
+				points += matrix.get(bin).get(a).get(b);
 			}
 			total += points;
 			observations.add(points);
@@ -285,16 +285,16 @@ public class MyCommercialDemandGeneratorOld {
 			ys[b] = ys[b-1] + probs.get(b-1);
 		}
 		ys[ys.length-1] = 1;
-		
-		result = new CumulativeDistribution(xs,ys);		
-		
+
+		result = new CumulativeDistribution(xs,ys);
+
 		return result;
 	}
 
 
 	private static CumulativeDistribution convertMatrixToStartTimeCDF(
 			ArrayList<ArrayList<ArrayList<Integer>>> matrix) {
-		
+
 		CumulativeDistribution result = null;
 		int total = 0;
 		ArrayList<Integer> observations = new ArrayList<Integer>(dimensionStart);
@@ -324,19 +324,19 @@ public class MyCommercialDemandGeneratorOld {
 			ys[b] = ys[b-1] + probs.get(b-1);
 		}
 		ys[ys.length-1] = 1;
-		
-		result = new CumulativeDistribution(xs,ys);		
-		
+
+		result = new CumulativeDistribution(xs,ys);
+
 		return result;
 	}
 
 
 	private static ArrayList<Point> readLocations( String source ) {
-		
+
 		FeatureSource fs = null;
 		ArrayList<Point> points = new ArrayList<Point>();
 		Point p = null;
-		try {	
+		try {
 			fs = ShapeFileReader.readDataFile( source );
 			for(Object o: fs.getFeatures() ){
 				Geometry geo = ((Feature)o).getDefaultGeometry();
@@ -352,19 +352,19 @@ public class MyCommercialDemandGeneratorOld {
 		}
 		return points;
 	}
-	
+
 	/**
 	 * The class processes commercial vehicle chains and classifies each so as to
 	 * establish a multi-dimensional probability matrix. The matrix can then be
 	 * used to generate a synthetic sample of commercial vehicle agents.
-	 * 
+	 *
 	 * The characteristics extracted are:
 	 * 	<ul>
 	 * 	<li> Activity chain start time (00h00m00 : 01h00m00 : 23h00m00)
 	 * 	<li> Number of activities per chain (1 : 1 : 20)
 	 * 	<li> Chain duration (01h00m00 : 01h00m00 : 48h00m00)
 	 * 	</ul>
-	 * 
+	 *
 	 * @param args
 	 */
 	private static ArrayList<ArrayList<ArrayList<Integer>>> extractChainProperties() {
@@ -388,14 +388,14 @@ public class MyCommercialDemandGeneratorOld {
 				matrixx.add(matrixxx);
 			}
 			matrix.add(matrixx);
-		}		
-		
+		}
+
 		// Process XML files
 		String xmlSource = ROOT + PROVINCE + "/XML/";
 //		String xmlSource = ROOT + "Temp/XML/";
 		File xmlFolder = new File(xmlSource);
 		assert( xmlFolder.isDirectory() ) : "The XML source is not a valid folder!";
-		
+
 		System.out.println("Processing XML files...");
 		int filesProcessed = 0;
 		int processLimit = 1;
@@ -419,21 +419,21 @@ public class MyCommercialDemandGeneratorOld {
 						// Chain start time
 						GregorianCalendar chainStart = chain.getActivities().get(0).getEndTime();
 						Integer index1 = chainStart.get(Calendar.HOUR_OF_DAY);
-						
+
 						// Number of activities
 						Integer index2 = null;
 						index2 = Math.min(20, chain.getActivities().size() - 2); // Do not count the two major activities at either end of the chain.
-						
+
 						// Chain duration
 						Integer index3 = null;
 						GregorianCalendar chainEnd = chain.getActivities().get(chain.getActivities().size() - 1).getStartTime();
 						Long durationMilliseconds = chainEnd.getTimeInMillis() - chainStart.getTimeInMillis();
 						Integer durationHours = (int) (durationMilliseconds / (1000 * 60 * 60) );
-						index3 = Math.min(47, durationHours);						
-						
+						index3 = Math.min(47, durationHours);
+
 						assert( (index1 != null) && (index2 != null) && (index3 != null) ) : "One of the indices are null!!";
 						int dummy = matrix.get(index1).get(index2).get(index3) + 1;
-						matrix.get(index1).get(index2).set(index3, dummy);						
+						matrix.get(index1).get(index2).set(index3, dummy);
 					}
 				}
 				// Update progress

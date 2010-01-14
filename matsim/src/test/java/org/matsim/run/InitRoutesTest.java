@@ -74,7 +74,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		plan.createAndAddActivity("w", network.getLinks().get(new IdImpl("20")));
 
 		// write person to file
-		new PopulationWriter(population).writeFile(PLANS_FILE_TESTINPUT);
+		new PopulationWriter(population, network).writeFile(PLANS_FILE_TESTINPUT);
 
 		// prepare config for test
 		config.network().setInputFile(NETWORK_FILE);

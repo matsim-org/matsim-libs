@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -45,7 +46,7 @@ public class MatsimIo {
 
 
 	private static final Logger log = Logger.getLogger(MatsimIo.class);
-	
+
 	public static Config loadConfig(final Config conf, final String filename) {
 		MatsimConfigReader reader = new MatsimConfigReader(conf);
 		try {
@@ -85,8 +86,8 @@ public class MatsimIo {
 	}
 
 
-	public static void writePlans(final Population plans, final String filename) {
-		new PopulationWriter(plans).writeFile(filename);
+	public static void writePlans(final Population plans, final Network network, final String filename) {
+		new PopulationWriter(plans, network).writeFile(filename);
 //		pwriter.setWriterHandler(new PlansWriterHandlerImplV4());
 	}
 

@@ -157,7 +157,7 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans).writeFile(config.plans().getOutputFile());
+		new PopulationWriter(plans, network).writeFile(config.plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing network xml file... ");

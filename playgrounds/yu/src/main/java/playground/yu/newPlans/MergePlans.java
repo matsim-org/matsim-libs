@@ -33,7 +33,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class MergePlans {
 	public static class CopyPlans extends AbstractPersonAlgorithm {
@@ -95,7 +95,7 @@ public class MergePlans {
 		scenarioA.setNetwork(network);
 		PopulationImpl plansA = scenarioA.getPopulation();
 		plansA.setIsStreaming(true);
-		PopulationWriter pw = new PopulationWriter(plansA);
+		PopulationWriter pw = new PopulationWriter(plansA, network);
 		pw.startStreaming(config.plans().getOutputFile());
 		new MatsimPopulationReader(scenarioA).readFile(plansFilenameA);
 		new CopyPlans(pw).run(plansA);

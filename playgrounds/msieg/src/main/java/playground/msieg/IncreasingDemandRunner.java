@@ -47,18 +47,18 @@ public class IncreasingDemandRunner {
 	 * 4) CMCF is used for solving the resulting flow problem
 	 * 5) This solution is used to adopt the generated Plansfile
 	 * 6) A new config file based on the old one is created
-	 * 
+	 *
 	 * _____The last step is not executed, since it just mean to call the created config files:
-	 * 7) CMCF is started with the old and new config file, output directories are mutual 
+	 * 7) CMCF is started with the old and new config file, output directories are mutual
 	 */
 
 	static String cmcfCommand = "/homes/combi/msieg/cmcf/cmcf";
 	static String[] cmcfOptions = { "nopt", "-C", "-K", /*"-T",*/ "-i", "1000", "-G", "0.001"};
-	
+
 	//just to force the whole class deterministic behaviour for debugging
 	static long seed = 31081983L;
-	
-	
+
+
 	/**
 	 * @param args
 	 */
@@ -100,23 +100,23 @@ public class IncreasingDemandRunner {
 			//Controler.main(args);
 		}
 	}
-	
+
 	private static void createAllConfigs(String cfgFile) {
 		String topDir = cfgFile.lastIndexOf(File.separatorChar) == -1 ?
 						"." : cfgFile.substring(0, cfgFile.lastIndexOf(File.separatorChar));
-		
+
 		Gbl.createConfig(new String[] { cfgFile, "config_v1.dtd" });
-		
+
 		String  //cfgFile = args[0],
 				netFile = new File(Gbl.getConfig().network().getInputFile()).getAbsolutePath(),
 				popFile = null;
-		
+
 		String 	cmcfNetwork = new File(netFile).getAbsolutePath(),
 				cmcfNetName = cmcfNetwork.substring(
 						cmcfNetwork.lastIndexOf(File.separatorChar),
-						cmcfNetwork.lastIndexOf('.')), 
+						cmcfNetwork.lastIndexOf('.')),
 				cmcfDemand;
-		
+
 		//Step 1:
 		cmcfNetwork = cmcfNetwork.substring(0, cmcfNetwork.lastIndexOf('.'))+"_cmcf.xml";
 		try{
@@ -124,12 +124,12 @@ public class IncreasingDemandRunner {
 			cnw.read();
 			Writer netOut = new FileWriter(cmcfNetwork);
 			cnw.setNetName(cmcfNetName);
-			cnw.convert(netOut);			
+			cnw.convert(netOut);
 		}catch (IOException ioe) {
 			System.out.println("Could not read network file as specified in config file, aborting.");
 			System.exit(3);
 		}
-		
+
 		int minAgents = 1000, maxAgents = 10000, step = 1000, timeSteps = 6;
 		//for each amount of agents perform steps 2-7:
 		for(int agents = minAgents; agents <= maxAgents; agents += step)
@@ -140,11 +140,11 @@ public class IncreasingDemandRunner {
 			PopulationImpl randPop = rpg.createPlans(agents);
 			popFile = topDir+File.separatorChar+"plans"+agents+"random.xml";
 			rpg.writePlans(randPop, popFile);
-			
+
 			Gbl.getConfig().controler().setOutputDirectory(topDir+File.separatorChar+"out"+agents+"random");
 			Gbl.getConfig().plans().setInputFile(popFile);
 			new ConfigWriter(Gbl.getConfig()).writeFile(topDir+File.separatorChar+"config"+agents+"rand.xml");
-			
+
 			//Step 3: create demand file for cmcf
 			CMCFDemandWriter cdw = new CMCFDemandWriter(netFile, popFile);
 			cmcfDemand = popFile.substring(0, popFile.lastIndexOf('.'))+"_cmcf.xml";
@@ -155,7 +155,7 @@ public class IncreasingDemandRunner {
 				e.printStackTrace();
 				continue;
 			}
-			
+
 			//Step 4: run cmcf now with javas exec()-method
 			String cmcfSolution = popFile.substring(0, popFile.lastIndexOf('.'))+".cmcf";
 			String cmd = cmcfCommand;
@@ -184,7 +184,7 @@ public class IncreasingDemandRunner {
 				System.out.println("Process of CMCF run has been interrupted, skipping this iteration...");
 				continue;
 			}
-			
+
 			//Step 5: rerouting agents according to cmcf Solution;
 			BestFitTimeRouter bft = new BestFitTimeRouter(netFile, popFile, cmcfSolution, timeSteps);
 			try{
@@ -197,7 +197,7 @@ public class IncreasingDemandRunner {
 			bft.route();
 			popFile = topDir+File.separatorChar+"plans"+agents+"routed.xml";
 			bft.writePlans(popFile);
-			
+
 			//Step 6: create new config File
 			Gbl.getConfig().controler().setOutputDirectory(topDir+File.separatorChar+"out"+agents+"routed");
 			Gbl.getConfig().plans().setInputFile(popFile);

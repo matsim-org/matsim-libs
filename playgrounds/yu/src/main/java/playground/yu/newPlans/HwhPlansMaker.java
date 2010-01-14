@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newPlans;
 
@@ -39,16 +39,13 @@ import org.matsim.population.algorithms.PlanSimplifyForDebug;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class HwhPlansMaker extends PlanSimplifyForDebug {
 
 	protected PopulationWriter pw;
 	private Config config;
 
-	/**
-	 * @param network
-	 */
 	public HwhPlansMaker(NetworkLayer network, Config config, PopulationImpl plans) {
 		super(network);
 		this.config = config;
@@ -61,7 +58,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 		for (int i = 46; i <= 66; i++) {
 			loadActType(eduActs, i);
 		}
-		pw = new PopulationWriter(plans);
+		pw = new PopulationWriter(plans, network);
 		pw.writeStartPlans(config.plans().getOutputFile());
 	}
 

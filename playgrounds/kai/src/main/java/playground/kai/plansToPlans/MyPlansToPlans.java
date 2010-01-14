@@ -19,24 +19,13 @@
 
 package playground.kai.plansToPlans;
 
-import java.io.PrintWriter;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
-import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 
 /**
@@ -73,16 +62,16 @@ public class MyPlansToPlans {
 //		plansReader.readFile(this.config.plans().getInputFile());
 //		plans.printPlansCount();
 //		plansWriter.closeStreaming();
-		
+
 		ScenarioLoader sl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader(
 				"../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/vis_configs/otfvis_config_900s_small_moyo_parameterized.xml") ;
 		Scenario sc = sl.loadScenario() ;
 		Population pop = sc.getPopulation();
-		
+
 		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.pt, false ) ;
 		pf.run(pop) ;
-		
-		PopulationWriter popwriter = new PopulationWriter(pop) ;
+
+		PopulationWriter popwriter = new PopulationWriter(pop, sc.getNetwork()) ;
 		popwriter.write("./output/pop.xml") ;
 
 		System.out.println("done.");

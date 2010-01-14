@@ -25,9 +25,11 @@ import java.util.List;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -35,7 +37,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PlanImpl.Type;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -45,9 +46,9 @@ import playground.yu.analysis.PlanModeJudger;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "car" and the other with type "pt", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 	private Person person;
@@ -56,16 +57,16 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 	// copyPlans: the copy of the plans.
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewPtPlans(final PopulationImpl plans) {
-		super(plans);
+	public NewPtPlans(final Network network, final Population plans) {
+		super(network, plans);
 	}
 
-	public NewPtPlans(final PopulationImpl population, final String filename) {
-		super(population, filename);
+	public NewPtPlans(final Network network, final Population population, final String filename) {
+		super(network, population, filename);
 	}
 
 	@Override
@@ -131,10 +132,10 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		NewPtPlans npwp = new NewPtPlans(population, outputFilename);
+		NewPtPlans npwp = new NewPtPlans(network, population, outputFilename);
 		npwp.run(population);
 		npwp.writeEndPlans();
 

@@ -41,7 +41,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
 		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
 		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
-		
+
 		ScenarioImpl tmpScenario = new ScenarioImpl();
 		tmpScenario.setNetwork(network);
 		PopulationImpl pop = tmpScenario.getPopulation();
@@ -59,10 +59,10 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		plan.addActivity(pb.createActivityFromLinkId("h", new IdImpl(1)));
 		person.addPlan(plan);
 		pop.addPerson(person);
-		
+
 		String filename = getOutputDirectory() + "population.xml";
-		new PopulationWriter(pop).writeV4(filename);
-		
+		new PopulationWriter(pop, network).writeV4(filename);
+
 		PopulationImpl pop2 = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(filename);
 		Person person2 = pop2.getPersons().get(new IdImpl(1));
@@ -71,5 +71,5 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		assertEquals(123, route2.getTravelTime(), EPSILON); // if this succeeds, we know that writing/reading the data works
 		assertEquals(9876.54, route2.getDistance(), EPSILON);
 	}
-	
+
 }

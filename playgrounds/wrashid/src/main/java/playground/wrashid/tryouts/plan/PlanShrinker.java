@@ -37,7 +37,7 @@ public class PlanShrinker {
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 
-		new PopulationWriter(population,0.1).writeFile(outputPath+"plans1.xml");
+		new PopulationWriter(population,network,0.1).writeFile(outputPath+"plans1.xml");
 
 	}
 

@@ -47,7 +47,7 @@ public class MakeScenario {
 		System.out.println("Make Scenario SAMPLE OF FACILITIES:");
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		
+
 		System.out.println("Uses output of a CUT. Samples 100x\"pct\"% of the facilities and moves Acts to take place at these");
 
 //		System.out.println("  reading world xml file... ");
@@ -133,7 +133,7 @@ public class MakeScenario {
 
 		//////////////////////////////////////////////////////////////////////
 
-		Scenario.writePlans(plans);
+		Scenario.writePlans(plans, network);
 		Scenario.writeNetwork(network);
 		Scenario.writeFacilities(facilities);
 		Scenario.writeWorld(scenario.getWorld());

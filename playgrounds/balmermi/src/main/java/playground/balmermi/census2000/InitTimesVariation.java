@@ -54,7 +54,7 @@ public class InitTimesVariation {
 		System.out.println("  setting up plans objects...");
 		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(plans);
+		PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");

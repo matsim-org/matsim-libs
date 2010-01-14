@@ -47,12 +47,12 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.xml.sax.SAXException;
 /**
- * 
+ *
  * @author Manuel Schneider
  *
  */
 public class CMCFPopulationConverter {
-	
+
 
 	@SuppressWarnings("unchecked")
 	public static PopulationImpl readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
@@ -94,7 +94,7 @@ public class CMCFPopulationConverter {
 					throw new IllegalArgumentException(tonode.getOrigId()+ " has no outgoing edges!!!");
 				}
 				fromlink = fromlinks.getFirst();
-				 
+
 			 }
 			 for (int i = 1 ; i<= dem ;i++) {
 				 Id matsimid  = new IdImpl(id+"."+i);
@@ -123,17 +123,17 @@ public class CMCFPopulationConverter {
 				 plan.addActivity(work);
 				 p.addPlan(plan);
 				 result.addPerson(p);
-			 
+
 			 }
 		 }
-		 
+
 		return result;
 	}
-	
+
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) { 
+	public static void main(String[] args) {
 		if((args.length<3) || (args.length > 4)){
 			System.out.println("usage:1. c ore e for coordinates or edges in plans 2. argument network file 3. argument inputfile 4. argument outfile (optional)");
 			return;
@@ -153,8 +153,8 @@ public class CMCFPopulationConverter {
 			NetworkLayer network = new NetworkLayer();
 			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(network);
 			netreader.parse(netfile);
-			PopulationImpl population = readCMCFDemands(inputfile,network,coordinates); 
-			new PopulationWriter(population).writeFile(outfile);
+			PopulationImpl population = readCMCFDemands(inputfile,network,coordinates);
+			new PopulationWriter(population, network).writeFile(outfile);
 //			PopulationWriterV5 writer = new PopulationWriterV5( population);
 			System.out.println(inputfile+"conveted "+"output written in :"+outfile);
 		} catch (JDOMException e) {
@@ -166,7 +166,7 @@ public class CMCFPopulationConverter {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
-		
+
 
 	}
 }

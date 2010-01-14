@@ -96,7 +96,7 @@ public class CopyOfFilterBerlinKutter {
 		plansReader.readFile(popFileName);
 //		population.runAlgorithms();
 
-		new PopulationWriter(relevantPopulation).writeFile(outpopFileName);
+		new PopulationWriter(relevantPopulation, network).writeFile(outpopFileName);
 	}
 
 }

@@ -32,19 +32,19 @@ import org.matsim.testcases.MatsimTestCase;
 public class GenerateEquilPopulationsTest extends MatsimTestCase {
 
 	private ScenarioImpl scenario = null;
-	
+
 	private enum InitialDemand {
 		/**
 		 * perform random initial demand generation wrt modes and times with planomat
 		 */
-		RANDOM, 
+		RANDOM,
 		/**
 		 * generate initial demand as in Bryan Raneys Ph.D. Thesis, equil test
 		 */
 		ALL6AM};
-		
+
 	private static final Logger logger = Logger.getLogger(GenerateEquilPopulationsTest.class);
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -64,18 +64,18 @@ public class GenerateEquilPopulationsTest extends MatsimTestCase {
 		scenario.getConfig().planomat().setPossibleModes("car");
 		this.runATest(InitialDemand.RANDOM);
 	}
-	
+
 	public void testGenerateRandomCarPt() {
 		scenario.getConfig().planomat().setPossibleModes("car,pt");
 		this.runATest(InitialDemand.RANDOM);
 	}
-	
+
 	public void testGenerateAll6AM() {
-		
+
 		this.runATest(InitialDemand.ALL6AM);
-		
+
 	}
-	
+
 	private void runATest(InitialDemand initialDemand) {
 
 		GenerateEquilPopulations testee = new GenerateEquilPopulations();
@@ -88,10 +88,10 @@ public class GenerateEquilPopulationsTest extends MatsimTestCase {
 			testee.generateAll6AMInitialDemand(scenario);
 			break;
 		}
-		
+
 		// write population out
 		logger.info("Writing plans file...");
-		new PopulationWriter(scenario.getPopulation()).writeFile(this.getOutputDirectory() + "actual_plans.xml.gz");
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(this.getOutputDirectory() + "actual_plans.xml.gz");
 		logger.info("Writing plans file...DONE.");
 
 		// compare to expected population
@@ -102,5 +102,5 @@ public class GenerateEquilPopulationsTest extends MatsimTestCase {
 		assertEquals(expectedChecksum, actualChecksum);
 
 	}
-	
+
 }

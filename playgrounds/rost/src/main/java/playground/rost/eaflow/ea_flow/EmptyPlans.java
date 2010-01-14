@@ -20,7 +20,7 @@
 
 
 /**
- * 
+ *
  */
 package playground.rost.eaflow.ea_flow;
 
@@ -41,64 +41,64 @@ import org.matsim.core.router.PlansCalcRoute;
  *
  */
 public class EmptyPlans {
-	
+
 	/**
 	 * debug flag
 	 */
 	private static boolean _debug = true;
-		
-	
+
+
 	public static void debug(boolean debug){
 		_debug=debug;
 	}
-	
-	
+
+
 
 	/**
 	 * main method to create shortest path plans from arbitrary plans
 	 * @param args b
-	 * 
+	 *
 	 */
 	public static void main(String[] args) {
-							
+
 		if(_debug){
 			System.out.println("starting to read input");
 		}
-		
+
 		String networkfile = null;
 		networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "./examples/meine_EA/swissold_network_5s.xml";
 		//networkfile = "./examples/meine_EA/siouxfalls_network_5s_euclid.xml";
-		
-		
+
+
 		String plansfile = null;
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
 		plansfile = "./examples/meine_EA/padang_plans_100p_flow_2s.xml";
 		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans_simple.xml";
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
-		
-		
+
+
 		String outputplansfile = null;
 		//outputplansfile = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans_10p_5s.xml";
 		//outputplansfile = "./examples/meine_EA/swissold_plans_5s_demands_100.xml";
 		//outputplansfile = "./examples/meine_EA/padang_plans_100p_flow_2s.xml";
 		outputplansfile = "./examples/meine_EA/padang_plans_100p_flow_2s_empty.xml";
-		
+
 		//String sinkid = "supersink";
-				
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
 		NetworkLayer network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(networkfile);
 	//	Node sink = network.getNode(sinkid);
-		
+
 		PopulationImpl population = scenario.getPopulation();
-			
+
 		new MatsimPopulationReader(scenario).readFile(plansfile);
 		network.connect();
-		
+
 
 		if(_debug){
 			System.out.println("reading input done");
@@ -121,7 +121,7 @@ public class EmptyPlans {
 			router.run(plan);
 		}
 
-		new PopulationWriter(population).writeFile(outputplansfile);
+		new PopulationWriter(population, network).writeFile(outputplansfile);
 
 		if(_debug){
 			System.out.println("done");

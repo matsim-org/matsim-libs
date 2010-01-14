@@ -25,43 +25,43 @@ public class PlansDumping {
 	private static String populationFile = "mysimulations/kt-zurich/input/plans.xml.gz";
 	private static String populationOutFile = "mysimulations/kt-zurich/input/out_plans.xml.gz";
 	private static final String dtdFileName = null;
-	
+
 	private static final String separator = System.getProperty("file.separator");
-	
+
 	public static void main(String[] args)
 	{
 		configFileName = configFileName.replace("/", separator);
 		networkFile = networkFile.replace("/", separator);
 		populationFile = populationFile.replace("/", separator);
-		
+
 		Config config = new Config();
 		config.addCoreModules();
-		try 
+		try
 		{
 			new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
-		} 
-		catch (IOException e) 
+		}
+		catch (IOException e)
 		{
 			System.out.println("Problem loading the configuration file from " + configFileName);
 			throw new RuntimeException(e);
 		}
 		Gbl.setConfig(config);
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		
+
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
-		
+
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(populationFile);
-		
+
 		for (Person person : population.getPersons().values())
 		{
 			((PersonImpl) person).removeUnselectedPlans();
 			person.getSelectedPlan().setScore(null);
 		}
-		
-		new PopulationWriter(population).writeFile(populationOutFile);
+
+		new PopulationWriter(population, network).writeFile(populationOutFile);
 		System.out.println("Done");
 	}
-	
+
 }

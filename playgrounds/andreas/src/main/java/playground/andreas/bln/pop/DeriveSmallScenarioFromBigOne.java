@@ -91,7 +91,7 @@ public class DeriveSmallScenarioFromBigOne {
 		popReader = new MatsimPopulationReader(smallNetScenario);
 		popReader.readFile(popGeoFilterOut);
 
-		SetPersonCoordsToBoundingBox setPersonCoordsToBoundingBox = new SetPersonCoordsToBoundingBox(inPop, setBoundingBoxOut, minXY, maxXY);
+		SetPersonCoordsToBoundingBox setPersonCoordsToBoundingBox = new SetPersonCoordsToBoundingBox(smallNetScenario.getNetwork(), inPop, setBoundingBoxOut, minXY, maxXY);
 		setPersonCoordsToBoundingBox.run(inPop);
 		setPersonCoordsToBoundingBox.printStatistics();
 		log.info("Finished... plans written to " + setBoundingBoxOut);
@@ -113,7 +113,7 @@ public class DeriveSmallScenarioFromBigOne {
 		final PopulationImpl plans = sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links((NetworkLayer) network));
 		plans.addAlgorithm(plansWriter);

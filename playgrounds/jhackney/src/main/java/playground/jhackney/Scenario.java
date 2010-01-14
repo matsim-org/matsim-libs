@@ -21,6 +21,7 @@
 package playground.jhackney;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsManagerImpl;
@@ -206,7 +207,7 @@ public abstract class Scenario {
 	}
 
 
-	
+
 	public static final PopulationImpl readPlans(final int i) {
 		System.out.println("  reading plans xml file... ");
 		PopulationImpl plans = scenario.getPopulation();
@@ -259,9 +260,9 @@ public abstract class Scenario {
 	// write output
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void writePlans(final PopulationImpl plans) {
+	public static final void writePlans(final PopulationImpl plans, final Network network) {
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(plans, network).writeFile(scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 	}
 //

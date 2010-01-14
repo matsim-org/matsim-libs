@@ -115,11 +115,11 @@ public class ScenarioIO {
 //		exTxpes.add("90"); exTxpes.add("91"); exTxpes.add("92"); exTxpes.add("93");
 //		exTxpes.add("94"); exTxpes.add("95"); exTxpes.add("96"); exTxpes.add("97");
 //		exTxpes.add("98"); exTxpes.add("99");
-		
+
 		sc.getWorld().complete(exTxpes);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
-		
+
 		System.out.println("writing facilities...");
 		new FacilitiesWriter(af).writeFile(config.facilities().getOutputFile());
 		System.out.println("done. (writing facilities)");
@@ -130,11 +130,11 @@ public class ScenarioIO {
 
 		System.out.println("loading population...");
 		sl.loadPopulation();
-		PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
+		PopulationImpl population = sl.getScenario().getPopulation();
 		population.setIsStreaming(false);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading population)");
-		
+
 		System.out.println("running algorithms...");
 		new PersonFacility2Link().run(population);
 		Gbl.printMemoryUsage();
@@ -153,7 +153,7 @@ public class ScenarioIO {
 		System.out.println("done. (running algorithms)");
 
 		System.out.println("writing population...");
-		new PopulationWriter(population,sl.getScenario().getKnowledges()).writeFile(config.plans().getOutputFile());
+		new PopulationWriter(population,network, sl.getScenario().getKnowledges()).writeFile(config.plans().getOutputFile());
 		System.out.println("done. (writing population)");
 
 //		System.out.println("running algorithms...");

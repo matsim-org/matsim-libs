@@ -138,7 +138,7 @@ public abstract class CMCFRouter implements NetworkReader{
 
 	public void writePlans(final String outPlansFile){
 		//MatsimIo.writePlans(this.population, outPlansFile);
-		new PopulationWriter(this.population).writeFile(outPlansFile);
+		new PopulationWriter(this.population, this.network).writeFile(outPlansFile);
 	}
 
 	abstract public void route();

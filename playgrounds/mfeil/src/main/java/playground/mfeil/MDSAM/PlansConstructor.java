@@ -73,7 +73,7 @@ import playground.mfeil.attributes.AgentsAttributesAdder;
 
 
 public class PlansConstructor implements PlanStrategyModule{
-		
+
 	protected Controler controler;
 	protected String inputFile, outputFile, outputFileBiogeme, attributesInputFile, outputFileMod, outputFileSims;
 	protected PopulationImpl population;
@@ -86,26 +86,26 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
-	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, income, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn, beta, gamma, beta_travel; 
+	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, income, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn, beta, gamma, beta_travel;
 	protected double travelCostCar, costPtNothing, costPtHalbtax, costPtGA;
-	
-	                      
+
+
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
-		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz06.xml.gz";	
+		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
+		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz06.xml.gz";
 		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans06.dat";
 		this.attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model06.mod";
 		this.outputFileSims = "/home/baug/mfeil/data/choiceSet/it0/sims06.xls";
-	/*	this.inputFile = "./plans/input_plans2.xml";	
-		this.outputFile = "./plans/output_plans.xml.gz";	
+	/*	this.inputFile = "./plans/input_plans2.xml";
+		this.outputFile = "./plans/output_plans.xml.gz";
 		this.outputFileBiogeme = "./plans/output_plans.dat";
 		this.outputFileMod = "./plans/model.mod";
 	*/	this.population = (PopulationImpl) controler.getPopulation(); // new PopulationImpl();
 		this.sims = null;
 		this.network = controler.getNetwork();
-		this.init(network);	
+		this.init(network);
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, controler.getScenario().getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
@@ -133,79 +133,79 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.costPtHalbtax		= 0.15;	// CHF/km
 		this.costPtGA			= 0.08;	// CHF/km
 	}
-	
+
 	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
 		this.population = population;
-		this.sims = sims;	
+		this.sims = sims;
 		this.noOfAlternatives 	= 20;
 		this.travelCostCar		= 0.5;	// CHF/km
 		this.costPtNothing		= 0.28;	// CHF/km
 		this.costPtHalbtax		= 0.15;	// CHF/km
 		this.costPtGA			= 0.08;	// CHF/km
 	}
-	
+
 	private void init(final NetworkImpl network) {
 		this.network.connect();
 	}
-	
+
 	public void prepareReplanning() {
 		// Read the external plans file.
-		new MatsimPopulationReader(this.controler.getScenario()).readFile(this.inputFile);		
+		new MatsimPopulationReader(this.controler.getScenario()).readFile(this.inputFile);
 		log.info("Reading population done.");
 	}
 
-	public void handlePlan(final Plan plan) {			
+	public void handlePlan(final Plan plan) {
 		// Do nothing here. We work only on the external plans.
 	}
 
 	public void finishReplanning(){
-		
+
 	//	Once-off task to filter Zurich people from overall census people
 		//	this.selectZurich10MZPlans();
-		
+
 	// Can be always switch on
 		this.rectifyActTypes();
-		
+
 	// Select type of population you want to work with
 		this.keepPersons();
 		//	this.reducePersonsMostFrequentStructures();
 		//	this.reducePersonsRandomly();
 		//	this.reducePersonsIntelligently();
-		
+
 	// Needs to always run
 		this.linkRouteOrigPlans();
-		
+
 	// Type of enlarging plans set
 		//	this.enlargePlansSet();
 		this.enlargePlansSetWithRandomSelection("Random");
-		
+
 	// Needs to always run
 		this.writePlans(this.outputFile);
-		
+
 	// Only if similarity attribute is desired
 		//	this.mdsam = new MDSAM(this.population);
 		//	this.sims = this.mdsam.runPopulation();
 		//	this.writeSims(this.outputFileSims);
-		
+
 	// Type of writing the Biogeme file
 		//	this.writePlansForBiogeme(this.outputFileBiogeme);
-		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
-		//		this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
-		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile, 
-				this.beta, this.gamma, this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.income, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.beta_travel, this.bikeIn);	
-		
+		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile,
+		//		this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);
+		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile,
+				this.beta, this.gamma, this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.income, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.beta_travel, this.bikeIn);
+
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
 		//	this.writeModFileWithSequence(this.outputFileMod);
 		this.writeModFileWithRandomSelection(this.outputFileMod);
 	}
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////
-	// Methods running always 
+	// Methods running always
 	//////////////////////////////////////////////////////////////////////
-	
-	
+
+
 	protected void rectifyActTypes (){
 		log.info("Rectifying act types...");
 		for (Person person : this.population.getPersons().values()) {
@@ -223,8 +223,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		log.info("done... ");
 	}
-	
-	
+
+
 	private void linkRouteOrigPlans (){
 		log.info("Adding links and routes to original plans...");
 		for (Person person : this.population.getPersons().values()) {
@@ -245,19 +245,19 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		log.info("done.");
 	}
-	
-	
+
+
 	protected void writePlans(String outputFile){
 		log.info("Writing plans...");
-		new PopulationWriter(this.population).writeFile(outputFile);
+		new PopulationWriter(this.population, this.network).writeFile(outputFile);
 		log.info("done.");
 	}
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////
-	// Methods reducing/refactoring the population  
+	// Methods reducing/refactoring the population
 	//////////////////////////////////////////////////////////////////////
-	
+
 	protected void reducePersonsMostFrequentStructures (){
 		// Drop those persons whose plans do not belong to x most frequent activity chains.
 		log.info("Analyzing activitiy chains...");
@@ -292,7 +292,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		log.info("done... Size of population is "+this.population.getPersons().size()+".");
 	}
-	
+
 	protected void reducePersonsRandomly (){
 		// Select randomly actchainsmodes accumulated.
 		log.info("Analyzing activitiy chains...");
@@ -301,11 +301,11 @@ public class PlansConstructor implements PlanStrategyModule{
 		ArrayList<List<PlanElement>> ac = analyzer.getActivityChains();
 		ArrayList<ArrayList<Plan>> pl = analyzer.getPlans();
 		log.info("done.");
-		
+
 		this.actChains = new ArrayList<List<PlanElement>>();
-		List<Id> agents = new LinkedList<Id>();		
+		List<Id> agents = new LinkedList<Id>();
 		ArrayList<Integer> randomField = new ArrayList<Integer>();
-		
+
 		for (int i=0;i<this.noOfAlternatives;i++){
 			int random = ((int) (MatsimRandom.getRandom().nextDouble()*ac.size()));
 			while (randomField.contains(random)){
@@ -318,7 +318,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				agents.add(plan.getPerson().getId());
 			}
 		}
-			
+
 		log.info("Dropping persons from population...");
 		// Quite strange coding but throws ConcurrentModificationException otherwise...
 		Object [] a = this.population.getPersons().values().toArray();
@@ -328,7 +328,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		log.info("done... Size of population is "+this.population.getPersons().size()+".");
 	}
-	
+
 	protected void reducePersonsIntelligently (){
 		// Take 20 most frequent actchainmodes accumulated plus 40 longest ones.
 		log.info("Analyzing activitiy chains...");
@@ -337,9 +337,9 @@ public class PlansConstructor implements PlanStrategyModule{
 		ArrayList<List<PlanElement>> ac = analyzer.getActivityChains();
 		ArrayList<ArrayList<Plan>> pl = analyzer.getPlans();
 		log.info("done.");
-		
+
 		List<Integer> ranking = new ArrayList<Integer>();
-		
+
 		// most frequent chains
 		for (int i=0;i<pl.size();i++){
 			ranking.add(pl.get(i).size());
@@ -348,7 +348,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = new ArrayList<List<PlanElement>>();
 		List<Id> agents = new LinkedList<Id>();
 		for (int i=0;i<pl.size();i++){
-			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-20,0))){ 
+			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-20,0))){
 				this.actChains.add(ac.get(i));
 				for (Iterator<Plan> iterator = pl.get(i).iterator(); iterator.hasNext();){
 					Plan plan = iterator.next();
@@ -357,7 +357,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 		}
 		ranking.clear();
-		
+
 		// longest chains
 		for (int i=0;i<ac.size();i++){
 			ranking.add(ac.get(i).size());
@@ -365,16 +365,16 @@ public class PlansConstructor implements PlanStrategyModule{
 		java.util.Collections.sort(ranking);
 		for (int i=0;i<ac.size();i++){
 			if ((ac.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-40,0)))  &&
-				!this.actChains.contains(ac.get(i))	){ 
+				!this.actChains.contains(ac.get(i))	){
 				this.actChains.add(ac.get(i));
 				for (Iterator<Plan> iterator = pl.get(i).iterator(); iterator.hasNext();){
 					Plan plan = iterator.next();
 					agents.add(plan.getPerson().getId());
 				}
 			}
-		}		
-	
-			
+		}
+
+
 		log.info("Dropping persons from population...");
 		// Quite strange coding but throws ConcurrentModificationException otherwise...
 		Object [] a = this.population.getPersons().values().toArray();
@@ -384,8 +384,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		log.info("done... Size of population is "+this.population.getPersons().size()+".");
 	}
-	
-	
+
+
 	protected void keepPersons (){
 		// Keep all persons of Zurich10, reduce choice set later on.
 		log.info("Analyzing activitiy chains...");
@@ -394,13 +394,13 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = analyzer.getActivityChains();
 		log.info("done... Size of population is "+this.population.getPersons().size()+".");
 	}
-	
-	
-	
+
+
+
 	//////////////////////////////////////////////////////////////////////
-	// Methods enlarging the choice set  
+	// Methods enlarging the choice set
 	//////////////////////////////////////////////////////////////////////
-	
+
 	protected void enlargePlansSet (){
 		log.info("Adding alternative plans...");
 		int counter=0;
@@ -412,12 +412,12 @@ public class PlansConstructor implements PlanStrategyModule{
 				Gbl.printMemoryUsage();
 			}
 			for (int i=0;i<this.actChains.size();i++){
-				
+
 				// Add all plans with activity chains different to the one of person's current plan
 				if (!acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
 				//if (!acCheck.checkEqualActChainsModes(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
 					PlanImpl plan = new PlanImpl (person);
-			
+
 					for (int j=0;j<this.actChains.get(i).size();j++){
 						if (j%2==0) {
 							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(i).get(j));
@@ -437,13 +437,13 @@ public class PlansConstructor implements PlanStrategyModule{
 							plan.addLeg(leg);
 						}
 					}
-					
+
 					plan.getFirstActivity().setCoord(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord());
 					plan.getLastActivity().setCoord(((PlanImpl) person.getSelectedPlan()).getLastActivity().getCoord());
-					
+
 					this.linker.run(plan);
-					
-					/* Analysis of subtours and random allocation of modes to subtours 
+
+					/* Analysis of subtours and random allocation of modes to subtours
 					PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 					planAnalyzeSubtours.run(plan);
 					for (int j=0;j<planAnalyzeSubtours.getNumSubtours();j++){
@@ -455,7 +455,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							}
 						}
 					}*/
-	
+
 					for (int j=1;j<plan.getPlanElements().size();j++){
 						if (j%2==1){
 							this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
@@ -478,13 +478,13 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		log.info("done.");
 	}
-	
+
 	protected void enlargePlansSetWithRandomSelection (String locationChoice){
-		
+
 		log.info("Adding alternative plans...");
 		int counter=0;
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
-		
+
 		for (Person person : this.population.getPersons().values()) {
 			counter++;
 			if (counter%10==0) {
@@ -492,10 +492,10 @@ public class PlansConstructor implements PlanStrategyModule{
 				Gbl.printMemoryUsage();
 			}
 			ArrayList<Integer> taken = new ArrayList<Integer>();
-			
+
 			for (int i=0;i<this.noOfAlternatives-1;i++){
-				
-				// Randomly select an act/mode chain different to the chosen one. 
+
+				// Randomly select an act/mode chain different to the chosen one.
 				int position = 0;
 				boolean isValidPlan = true;
 				PlanImpl plan = new PlanImpl (person);
@@ -505,8 +505,8 @@ public class PlansConstructor implements PlanStrategyModule{
 						position = (int)(MatsimRandom.getRandom().nextDouble()*this.actChains.size());
 					} while(taken.contains(position) || acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(position)));
 					taken.add(position);
-					
-					plan = new PlanImpl (person);		
+
+					plan = new PlanImpl (person);
 					for (int j=0;j<this.actChains.get(position).size();j++){
 						if (j%2==0) {
 							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(position).get(j));
@@ -536,12 +536,12 @@ public class PlansConstructor implements PlanStrategyModule{
 							plan.addLeg(leg);
 						}
 					}
-					
+
 					// Adopting PlanomatX for secondary location choice
 					if (locationChoice.equalsIgnoreCase("PlanomatX")){
-						this.locator.handleSubChains(plan, this.getSubChains(plan));	
+						this.locator.handleSubChains(plan, this.getSubChains(plan));
 					}
-					
+
 					// Adopting random location choice
 					else {
 						List<SubChain> subChains = this.getSubChains(plan);
@@ -551,9 +551,9 @@ public class PlansConstructor implements PlanStrategyModule{
 							}
 						}
 					}
-					
+
 					this.linker.run(plan);
-	
+
 					for (int j=0;j<plan.getPlanElements().size();j++){
 						if (j%2==1){
 							this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
@@ -573,28 +573,28 @@ public class PlansConstructor implements PlanStrategyModule{
 					}
 				} while (!isValidPlan);
 				person.addPlan(plan);
-				
+
 			}
 		}
 		log.info("done.");
 	}
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////
-	// Location help methods 
+	// Location help methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	protected void modifyLocation (ActivityImpl act){
 		log.info("Start modify.");
 		ActivityFacilitiesImpl afImpl = (ActivityFacilitiesImpl) this.controler.getFacilities();
-		
+
 		String actType = null;
 		if (act.getType().equalsIgnoreCase("w")) actType = "work_sector2";
 		else if (act.getType().equalsIgnoreCase("e")) actType = "education_higher";
 		else if (act.getType().equalsIgnoreCase("s")) actType = "shop";
 		else if (act.getType().equalsIgnoreCase("l")) actType = "leisure";
 		else log.warn("Unerkannter act type: "+act.getType());
-		
+
 		List <ActivityFacilityImpl> facs = new ArrayList<ActivityFacilityImpl>(afImpl.getFacilitiesForActivityType(actType).values());
 		ActivityFacilityImpl fac;
 		do {
@@ -603,14 +603,14 @@ public class PlansConstructor implements PlanStrategyModule{
 		} while (CoordUtils.calcDistance(fac.getCoord(), new CoordImpl(683518.0,246836.0))>30000);
 		act.setCoord(fac.getCoord());
 	}
-	
+
 	protected void modifyLocationCoord (ActivityImpl act){
 		// circle around Zurich centre
 		double X = 683518.0 - 30000 + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*60000);
 		double Y = 246836.0 - Math.sqrt(Math.abs(30000*30000-(683518-X)*(683518-X))) + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*Math.sqrt(Math.abs(30000*30000-(683518-X)*(683518-X)))*2);
 		act.setCoord(new CoordImpl(X, Y));
 	}
-	
+
 	protected List<SubChain> getSubChains (PlanImpl plan){
 		ManageSubchains manager = new ManageSubchains();
 		for (int i=0;i<plan.getPlanElements().size()-4;i+=2){
@@ -630,12 +630,12 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		return manager.getSubChains();
 	}
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////
 	// Writing output plans methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public void writePlansForBiogeme(String outputFile){
 		log.info("Writing plans for Biogeme...");
 		PrintStream stream;
@@ -645,7 +645,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			e.printStackTrace();
 			return;
 		}
-		
+
 		// First row
 		stream.print("Id\tChoice\t");
 		Person p = this.population.getPersons().values().iterator().next();
@@ -660,7 +660,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print("av"+(i+1)+"\t");
 		}
 		stream.println();
-		
+
 		// Filling plans
 		int counterPerson = -1;
 		boolean firstPersonFound = true;
@@ -684,14 +684,14 @@ public class PlansConstructor implements PlanStrategyModule{
 			for (Plan plan : person.getPlans()){
 				counterPlan++;
 				Plan planFirstPerson = this.population.getPersons().get(firstPersonId).getPlans().get(counterPlan);
-				
+
 				// Plan has only one act
 				if (plan.getPlanElements().size()==1) stream.print("24\t");
-				
+
 				else {
 					// First and last home act
-					stream.print((((ActivityImpl)(((PlanImpl) plan).getFirstActivity())).getEndTime()+86400-((ActivityImpl)(((PlanImpl) plan).getLastActivity())).getStartTime())/3600+"\t");
-				
+					stream.print((((((PlanImpl) plan).getFirstActivity())).getEndTime()+86400-((((PlanImpl) plan).getLastActivity())).getStartTime())/3600+"\t");
+
 					// All inner acts
 					/*// Old version with fixed act/mode chain
 					for (int i=1;i<plan.getPlanElements().size()-1;i++){
@@ -715,7 +715,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							for (int j=1;j<plan.getPlanElements().size()-1;j+=2){
 								if (((LegImpl)(planFirstPerson.getPlanElements().get(i))).getMode().equals(((LegImpl)(plan.getPlanElements().get(j))).getMode()) &&
 										!takenPositions.contains(j)){
-									stream.print(((LegImpl)(plan.getPlanElements().get(j))).getTravelTime()/3600+"\t");	
+									stream.print(((LegImpl)(plan.getPlanElements().get(j))).getTravelTime()/3600+"\t");
 									takenPositions.add(j);
 									break;
 								}
@@ -723,15 +723,15 @@ public class PlansConstructor implements PlanStrategyModule{
 						}
 					}
 				}
-				
+
 				// Similarity attribute
 				stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 			}
 			for (Plan plan : person.getPlans()){
-				
+
 				// Plan not executable, drop from choice set
 				if ((plan.getScore()!=null) && (plan.getScore()==-100000.0))	stream.print(0+"\t");
-				
+
 				// Plan executable
 				else stream.print(1+"\t");
 			}
@@ -740,11 +740,11 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.close();
 		log.info("done.");
 	}
-	
+
 	/*
 	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
 	public void writePlansForBiogemeWithRandomSelection (String outputFile, String attributesInputFile,
-			String similarity, 
+			String similarity,
 			String incomeConstant,
 			String incomeDivided,
 			String incomeDividedLN,
@@ -759,34 +759,34 @@ public class PlansConstructor implements PlanStrategyModule{
 			String travelCost,
 			String travelConstant,
 			String bikeIn){
-		
+
 		log.info("Writing plans for Biogeme...");
-		
-		// Writing the variables back to head of class due to MDSAM call possibility. 
+
+		// Writing the variables back to head of class due to MDSAM call possibility.
 		// Like this, they are also available for modMaker class.
-		this.similarity=similarity; 
-		this.incomeConstant=incomeConstant; 
-		this.incomeDivided=incomeDivided; 
-		this.incomeDividedLN=incomeDividedLN; 
+		this.similarity=similarity;
+		this.incomeConstant=incomeConstant;
+		this.incomeDivided=incomeDivided;
+		this.incomeDividedLN=incomeDividedLN;
 		this.incomeBoxCox=incomeBoxCox;
-		this.age=age; 
-		this.gender=gender; 
-		this.employed=employed; 
-		this.license=license; 
-		this.carAvail=carAvail; 
-		this.seasonTicket=seasonTicket; 
+		this.age=age;
+		this.gender=gender;
+		this.employed=employed;
+		this.license=license;
+		this.carAvail=carAvail;
+		this.seasonTicket=seasonTicket;
 		this.travelDistance=travelDistance;
-		this.travelCost=travelCost; 
-		this.travelConstant=travelConstant; 
+		this.travelCost=travelCost;
+		this.travelConstant=travelConstant;
 		this.bikeIn=bikeIn;
-		
+
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
 		int incomeAverage=0;
 		int noOfGA = 0;
 		int noOfHalbtax = 0;
 		int noOfNothing = 0;
-		
+
 		// Run external classes if required
 		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes") || travelCost.equals("yes")){
 			aaa.run(attributesInputFile);
@@ -796,7 +796,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			this.sims = this.mdsam.runPopulation();
 			this.writeSims(this.outputFileSims);
 		}
-		
+
 		PrintStream stream;
 		try {
 			stream = new PrintStream (new File(outputFile));
@@ -804,20 +804,20 @@ public class PlansConstructor implements PlanStrategyModule{
 			e.printStackTrace();
 			return;
 		}
-		
+
 		// First row
 		int counterFirst=0;
 		stream.print("Id\tChoice\t");
 		counterFirst+=2;
-		
+
 		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
-			stream.print("Income\t"); 
+			stream.print("Income\t");
 			counterFirst++;
 		}
 		if (incomeBoxCox.equals("yes")) {
-			stream.print("Income_IncomeAverage\t"); 
+			stream.print("Income_IncomeAverage\t");
 			counterFirst++;
-			
+
 			// Calculate average income
 			int counterIncome=0;
 			for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
@@ -831,30 +831,30 @@ public class PlansConstructor implements PlanStrategyModule{
 			incomeAverage=incomeAverage/counterIncome;
 		}
 		if (age.equals("yes")) {
-			stream.print("Age\t"); 
+			stream.print("Age\t");
 			counterFirst++;
 		}
 		if (gender.equals("yes")) {
-			stream.print("Gender\t"); 
+			stream.print("Gender\t");
 			counterFirst++;
 		}
 		if (employed.equals("yes")) {
-			stream.print("Employed\t"); 
+			stream.print("Employed\t");
 			counterFirst++;
 		}
 		if (license.equals("yes")) {
-			stream.print("License\t"); 
+			stream.print("License\t");
 			counterFirst++;
 		}
 		if (carAvail.equals("yes")) {
-			stream.print("CarAlways\tCarSometimes\tCarNever\t"); 
+			stream.print("CarAlways\tCarSometimes\tCarNever\t");
 			counterFirst+=3;
 		}
 		if (seasonTicket.equals("yes")) {
-			stream.print("SeasonTicket\t"); 
+			stream.print("SeasonTicket\t");
 			counterFirst++;
 		}
-		
+
 		for (int i = 0;i<this.actChains.size();i++){
 			int j=0;
 			for (j =0;j<java.lang.Math.max(this.actChains.get(i).size()-1,1);j++){
@@ -872,7 +872,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				}
 			}
 			if (similarity.equals("yes")) {
-				stream.print("x"+(i+1)+""+(j+1)+"\t"); 
+				stream.print("x"+(i+1)+""+(j+1)+"\t");
 				counterFirst++;
 			}
 		}
@@ -881,7 +881,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			counterFirst++;
 		}
 		stream.println();
-		
+
 		// Filling plans
 		int counter=0;
 		int valid=0;
@@ -893,7 +893,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				log.info("Handling person "+counter);
 				Gbl.printMemoryUsage();
 			}
-			
+
 			// Check whether all info is available for this person. Drop the person, otherwise
 			if ((incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) && !aaa.getIncome().containsKey(person.getId())){
 				log.warn("No income available for person "+person.getId()+". Dropping the person.");
@@ -906,35 +906,35 @@ public class PlansConstructor implements PlanStrategyModule{
 			if (seasonTicket.equals("yes") && !aaa.getSeasonTicket().containsKey(person.getId())){
 				log.warn("No season ticket info available for person "+person.getId()+". Dropping the person.");
 				continue;
-			}			
-			
+			}
+
 			// Check whether the selected plan of the person is valid. Drop the person, otherwise
 			if (person.getSelectedPlan().getScore()!=null && person.getSelectedPlan().getScore()==-100000.0){
 				log.warn("Person's "+person.getId()+" selected plan is not valid. Dropping the person.");
 				continue;
 			}
-			
+
 			// Calculate travelCostPt for the person
 			double travelCostPt = 0;
 			if (aaa.getSeasonTicket().get(person.getId())==11) { // No season ticket
-				travelCostPt = this.costPtNothing; 
+				travelCostPt = this.costPtNothing;
 				noOfNothing++;
 			}
 			else if (aaa.getSeasonTicket().get(person.getId())==2 || aaa.getSeasonTicket().get(person.getId())==3) { // GA
-				travelCostPt = this.costPtGA; 
+				travelCostPt = this.costPtGA;
 				noOfGA++;
 			}
 			else { // all other cases
 				travelCostPt = this.costPtHalbtax;
 				noOfHalbtax++;
 			}
-			
+
 			int counterRow=0;
-			
+
 			// Person ID
 			stream.print(person.getId()+"\t");
 			counterRow++;
-			
+
 			// Choice
 			int position = -1;
 			for (int i=0;i<this.actChains.size();i++){
@@ -945,7 +945,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			stream.print(position+"\t");
 			counterRow++;
-			
+
 			if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
 				stream.print((aaa.getIncome().get(person.getId())/30)+"\t");
 				counterRow++;
@@ -955,21 +955,21 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterRow++;
 			}
 			if (age.equals("yes")) {
-				stream.print(person.getAge()+"\t"); 
+				stream.print(person.getAge()+"\t");
 				counterRow++;
 			}
 			if (gender.equals("yes")) {
-				if (person.getSex().equals("f")) stream.print(0+"\t"); 
+				if (person.getSex().equals("f")) stream.print(0+"\t");
 				else stream.print(1+"\t");
 				counterRow++;
 			}
 			if (employed.equals("yes")) {   // No info on this available!
-				stream.print(0+"\t"); 
+				stream.print(0+"\t");
 				counterRow++;
 			}
 			if (license.equals("yes")) {
-				if (person.getLicense().equals("no")) stream.print(0+"\t"); 
-				else stream.print(1+"\t"); 
+				if (person.getLicense().equals("no")) stream.print(0+"\t");
+				else stream.print(1+"\t");
 				counterRow++;
 			}
 			if (carAvail.equals("yes")) {
@@ -981,11 +981,11 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterRow+=3;
 			}
 			if (seasonTicket.equals("yes")) {
-				stream.print(aaa.getSeasonTicket().get(person.getId())+"\t"); 
+				stream.print(aaa.getSeasonTicket().get(person.getId())+"\t");
 				counterRow++;
 			}
-			
-			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
+
+			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise
 			int counterFound = 0;
 			for (int i=0;i<this.actChains.size();i++){
 				boolean found = false;
@@ -1022,7 +1022,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				}
 			}
 			if (counterFound!=this.noOfAlternatives) log.warn("For person "+person+", size of choice set is not "+this.noOfAlternatives+" but only "+counterFound);
-			
+
 			for (int i=0;i<this.actChains.size();i++){
 				boolean found = false;
 				for (int j=0;j<person.getPlans().size();j++){
@@ -1054,13 +1054,13 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("Number of GA = "+noOfGA+", number of Halbtax = "+noOfHalbtax+", and number of nothing = "+noOfNothing);
 		log.info("done.");
 	}*/
-	
-	
+
+
 	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
 	public void writePlansForBiogemeWithRandomSelectionAccumulated (String outputFile, String attributesInputFile,
 			String beta,
 			String gamma,
-			String similarity, 
+			String similarity,
 			String incomeConstant,
 			String incomeDivided,
 			String incomeDividedLN,
@@ -1076,37 +1076,37 @@ public class PlansConstructor implements PlanStrategyModule{
 			String travelConstant,
 			String beta_travel,
 			String bikeIn){
-		
+
 		log.info("Writing plans for Biogeme...");
-		
-		// Writing the variables back to head of class due to MDSAM call possibility. 
+
+		// Writing the variables back to head of class due to MDSAM call possibility.
 		// Like this, they are also available for modMaker class.
 		this.beta=beta;
 		this.gamma=gamma;
-		this.similarity=similarity; 
-		this.incomeConstant=incomeConstant; 
-		this.incomeDivided=incomeDivided; 
-		this.incomeDividedLN=incomeDividedLN; 
+		this.similarity=similarity;
+		this.incomeConstant=incomeConstant;
+		this.incomeDivided=incomeDivided;
+		this.incomeDividedLN=incomeDividedLN;
 		this.incomeBoxCox=incomeBoxCox;
-		this.age=age; 
-		this.gender=gender; 
-		this.income=income; 
-		this.license=license; 
-		this.carAvail=carAvail; 
-		this.seasonTicket=seasonTicket; 
+		this.age=age;
+		this.gender=gender;
+		this.income=income;
+		this.license=license;
+		this.carAvail=carAvail;
+		this.seasonTicket=seasonTicket;
 		this.travelDistance=travelDistance;
-		this.travelCost=travelCost; 
-		this.travelConstant=travelConstant; 
+		this.travelCost=travelCost;
+		this.travelConstant=travelConstant;
 		this.beta_travel=beta_travel;
 		this.bikeIn=bikeIn;
-		
+
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
 		int incomeAverage=0;
 		int noOfGA = 0;
 		int noOfHalbtax = 0;
 		int noOfNothing = 0;
-		
+
 		// Run external classes if required
 		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes") || travelCost.equals("yes") || income.equals("yes")){
 			aaa.runMZ(attributesInputFile);
@@ -1116,7 +1116,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			this.sims = this.mdsam.runPopulation();
 			this.writeSims(this.outputFileSims);
 		}
-		
+
 		PrintStream stream;
 		try {
 			stream = new PrintStream (new File(outputFile));
@@ -1124,20 +1124,20 @@ public class PlansConstructor implements PlanStrategyModule{
 			e.printStackTrace();
 			return;
 		}
-		
+
 		// First row
 		int counterFirst=0;
 		stream.print("Id\tChoice\t");
 		counterFirst+=2;
-		
+
 		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
-			stream.print("Income\t"); 
+			stream.print("Income\t");
 			counterFirst++;
 		}
 		if (incomeBoxCox.equals("yes")) {
-			stream.print("Income_IncomeAverage\t"); 
+			stream.print("Income_IncomeAverage\t");
 			counterFirst++;
-			
+
 			// Calculate average income
 			int counterIncome=0;
 			for (Person person : this.population.getPersons().values()) {
@@ -1150,33 +1150,33 @@ public class PlansConstructor implements PlanStrategyModule{
 			incomeAverage=incomeAverage/counterIncome;
 		}
 		if (age.equals("yes")) {
-			stream.print("Age_0_15\t"); 
-			stream.print("Age_16_30\t"); 
-			stream.print("Age_31_60\t"); 
-			stream.print("Age_61\t"); 
+			stream.print("Age_0_15\t");
+			stream.print("Age_16_30\t");
+			stream.print("Age_31_60\t");
+			stream.print("Age_61\t");
 			counterFirst+=4;
 		}
 		if (gender.equals("yes")) {
-			stream.print("Female\t"); 
+			stream.print("Female\t");
 			counterFirst++;
 		}
 		if (income.equals("yes")) {
-			stream.print("Income\t"); 
+			stream.print("Income\t");
 			counterFirst++;
 		}
 		if (license.equals("yes")) {
-			stream.print("License\t"); 
+			stream.print("License\t");
 			counterFirst++;
 		}
 		if (carAvail.equals("yes")) {
-			stream.print("CarAlways\tCarSometimes\tCarNever\t"); 
+			stream.print("CarAlways\tCarSometimes\tCarNever\t");
 			counterFirst+=3;
 		}
 		if (seasonTicket.equals("yes")) {
-			stream.print("SeasonTicket\t"); 
+			stream.print("SeasonTicket\t");
 			counterFirst++;
 		}
-		
+
 		for (int i = 0;i<this.actChains.size();i++){
 			boolean car = false;
 			boolean pt = false;
@@ -1243,7 +1243,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterFirst++;
 			}
 			if (similarity.equals("yes")) {
-				stream.print("x"+(i+1)+"_sim\t"); 
+				stream.print("x"+(i+1)+"_sim\t");
 				counterFirst++;
 			}
 		}
@@ -1252,7 +1252,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			counterFirst++;
 		}
 		stream.println();
-		
+
 		// Filling plans
 		int counter=0;
 		int valid=0;
@@ -1264,7 +1264,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				log.info("Handling person "+counter);
 				Gbl.printMemoryUsage();
 			}
-			
+
 			// Check whether all info is available for this person. Drop the person, otherwise
 			if ((incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) && !aaa.getIncome().containsKey(person.getId())){
 				log.warn("No income available for person "+person.getId()+". Dropping the person.");
@@ -1277,23 +1277,23 @@ public class PlansConstructor implements PlanStrategyModule{
 			if ((seasonTicket.equals("yes") || travelCost.equals("yes")) && !aaa.getSeasonTicket().containsKey(person.getId())){
 				log.warn("No season ticket info available for person "+person.getId()+". Dropping the person.");
 				continue;
-			}			
-			
+			}
+
 			// Check whether the selected plan of the person is valid. Drop the person, otherwise
 			if ((person.getSelectedPlan().getScore()!=null) && (person.getSelectedPlan().getScore()==-100000.0)){
 				log.warn("Person's "+person.getId()+" selected plan is not valid. Dropping the person.");
 				continue;
 			}
-			
+
 			// Calculate travelCostPt for the person
 			double travelCostPt = 0;
 			if (travelCost.equals("yes")){
 				if (aaa.getSeasonTicket().get(person.getId())==11) { // No season ticket
-					travelCostPt = this.costPtNothing; 
+					travelCostPt = this.costPtNothing;
 					noOfNothing++;
 				}
 				else if ((aaa.getSeasonTicket().get(person.getId())==2) || (aaa.getSeasonTicket().get(person.getId())==3)) { // GA
-					travelCostPt = this.costPtGA; 
+					travelCostPt = this.costPtGA;
 					noOfGA++;
 				}
 				else { // all other cases
@@ -1301,13 +1301,13 @@ public class PlansConstructor implements PlanStrategyModule{
 					noOfHalbtax++;
 				}
 			}
-			
+
 			int counterRow=0;
-			
+
 			// Person ID
 			stream.print(person.getId()+"\t");
 			counterRow++;
-			
+
 			// Choice
 			int position = -1;
 			for (int i=0;i<this.actChains.size();i++){
@@ -1318,7 +1318,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			stream.print(position+"\t");
 			counterRow++;
-			
+
 			if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
 				stream.print((aaa.getIncome().get(person.getId())/30)+"\t");
 				counterRow++;
@@ -1328,25 +1328,25 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterRow++;
 			}
 			if (age.equals("yes")) {
-				if (person.getAge()<=15) stream.print(1+"\t"+0+"\t"+0+"\t"+0+"\t"); 
-				else if (person.getAge()<=30) stream.print(0+"\t"+1+"\t"+0+"\t"+0+"\t"); 
-				else if (person.getAge()<=60) stream.print(0+"\t"+0+"\t"+1+"\t"+0+"\t"); 
-				else stream.print(0+"\t"+0+"\t"+0+"\t"+1+"\t"); 
+				if (person.getAge()<=15) stream.print(1+"\t"+0+"\t"+0+"\t"+0+"\t");
+				else if (person.getAge()<=30) stream.print(0+"\t"+1+"\t"+0+"\t"+0+"\t");
+				else if (person.getAge()<=60) stream.print(0+"\t"+0+"\t"+1+"\t"+0+"\t");
+				else stream.print(0+"\t"+0+"\t"+0+"\t"+1+"\t");
 				counterRow+=4;
 			}
 			if (gender.equals("yes")) {
-				if (person.getSex().equals("f")) stream.print(1+"\t"); 
+				if (person.getSex().equals("f")) stream.print(1+"\t");
 				else if (person.getSex().equals("m")) stream.print(0+"\t");
 				else log.warn("Person "+person.getId()+" has no valid gender.");
 				counterRow++;
 			}
-			if (income.equals("yes")) {   
-				stream.print((aaa.getIncome().get(person.getId())/30)+"\t"); 
+			if (income.equals("yes")) {
+				stream.print((aaa.getIncome().get(person.getId())/30)+"\t");
 				counterRow++;
 			}
 			if (license.equals("yes")) {
-				if (person.getLicense().equals("no")) stream.print(0+"\t"); 
-				else stream.print(1+"\t"); 
+				if (person.getLicense().equals("no")) stream.print(0+"\t");
+				else stream.print(1+"\t");
 				counterRow++;
 			}
 			if (carAvail.equals("yes")) {
@@ -1358,11 +1358,11 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterRow+=3;
 			}
 			if (seasonTicket.equals("yes")) {
-				stream.print(aaa.getSeasonTicket().get(person.getId())+"\t"); 
+				stream.print(aaa.getSeasonTicket().get(person.getId())+"\t");
 				counterRow++;
 			}
-			
-			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
+
+			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise
 			int counterFound = 0;
 			for (int i=0;i<this.actChains.size();i++){
 				boolean found = false;
@@ -1451,8 +1451,8 @@ public class PlansConstructor implements PlanStrategyModule{
 						}
 						stream.print("0\t");
 						counterRow++;
-					}					
-					
+					}
+
 					if (similarity.equals("yes")) {
 						stream.print(0+"\t");
 						counterRow++;
@@ -1460,7 +1460,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				}
 			}
 			if (counterFound!=this.noOfAlternatives) log.warn("For person "+person+", size of choice set is not "+this.noOfAlternatives+" but only "+counterFound);
-			
+
 			for (int i=0;i<this.actChains.size();i++){
 				boolean found = false;
 				for (int j=0;j<person.getPlans().size();j++){
@@ -1492,10 +1492,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("Number of GA = "+noOfGA+", number of Halbtax = "+noOfHalbtax+", and number of nothing = "+noOfNothing);
 		log.info("done.");
 	}
-	
-	
-	
-	
+
+
+
+
 	// for "repeat" attribute
 	public void writePlansForBiogemeWithSequence(String outputFile){
 		log.info("Writing plans for Biogeme...");
@@ -1506,7 +1506,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			e.printStackTrace();
 			return;
 		}
-		
+
 		// First row
 		stream.print("Id\tChoice\t");
 		Person p = this.population.getPersons().values().iterator().next();
@@ -1522,7 +1522,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print("av"+(i+1)+"\t");
 		}
 		stream.println();
-		
+
 		// Filling plans
 		int counterPerson = -1;
 		boolean firstPersonFound = true;
@@ -1546,14 +1546,14 @@ public class PlansConstructor implements PlanStrategyModule{
 			for (Plan plan : person.getPlans()) {
 				counterPlan++;
 				Plan planFirstPerson = this.population.getPersons().get(firstPersonId).getPlans().get(counterPlan);
-				
+
 				// Plan has only one act
 				if (plan.getPlanElements().size()==1) stream.print("24\t");
-				
+
 				else {
 					// First and last home act
-					stream.print((((ActivityImpl)(((PlanImpl) plan).getFirstActivity())).getEndTime()+86400-((ActivityImpl)(((PlanImpl) plan).getLastActivity())).getStartTime())/3600+"\t");
-				
+					stream.print((((((PlanImpl) plan).getFirstActivity())).getEndTime()+86400-((((PlanImpl) plan).getLastActivity())).getStartTime())/3600+"\t");
+
 					// All inner acts
 					// Old version with fixed act/mode chain
 					for (int i=1;i<plan.getPlanElements().size()-1;i++){
@@ -1582,7 +1582,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							for (int j=1;j<plan.getPlanElements().size()-1;j+=2){
 								if (((LegImpl)(planFirstPerson.getPlanElements().get(i))).getMode().equals(((LegImpl)(plan.getPlanElements().get(j))).getMode()) &&
 										!takenPositions.contains(j)){
-									stream.print(((LegImpl)(plan.getPlanElements().get(j))).getTravelTime()/3600+"\t");	
+									stream.print(((LegImpl)(plan.getPlanElements().get(j))).getTravelTime()/3600+"\t");
 									takenPositions.add(j);
 									break;
 								}
@@ -1590,15 +1590,15 @@ public class PlansConstructor implements PlanStrategyModule{
 						}
 					}*/
 				}
-				
+
 				// Similarity attribute
 				stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 			}
 			for (Plan plan : person.getPlans()) {
-				
+
 				// Plan not executable, drop from choice set
 				if ((plan.getScore()!=null) && (plan.getScore()==-100000.0))	stream.print(0+"\t");
-				
+
 				// Plan executable
 				else stream.print(1+"\t");
 			}
@@ -1609,13 +1609,13 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	/*
 	private int writeAccumulatedPlanIntoFile (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan, double travelCostPt){
-		
+
 		if (planToBeWritten.size()!=referencePlan.size()){
 			log.warn("Plans do not have same size; planToBeWritten: "+planToBeWritten+", referencePlan: "+referencePlan);
 		}
-		
+
 		int counter=0;
-		
+
 		// Plan has only one act
 		if (planToBeWritten.size()==1) {
 			stream.print(24+"\t");
@@ -1624,7 +1624,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		else {
 			// First and last home act
 			stream.print((((ActivityImpl)(planToBeWritten.get(0))).getEndTime()+86400-((ActivityImpl)(planToBeWritten.get(planToBeWritten.size()-1))).getStartTime())/3600+"\t");
-			counter++;	
+			counter++;
 			LinkedList<Integer> takenPositions = new LinkedList<Integer>();
 			for (int i=1;i<referencePlan.size()-1;i++){
 				if (i%2==0){ // Activities
@@ -1676,16 +1676,16 @@ public class PlansConstructor implements PlanStrategyModule{
 		return counter;
 	}
 	*/
-	
-	
+
+
 	private int writeAccumulatedPlanIntoFileAccumulated (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan, double travelCostPt){
-		
+
 		if (planToBeWritten.size()!=referencePlan.size()){
 			log.warn("Plans do not have same size; planToBeWritten: "+planToBeWritten+", referencePlan: "+referencePlan);
 		}
-		
+
 		int counter=0;
-		
+
 		// Plan has only one act
 		if (planToBeWritten.size()==1) {
 			stream.print(24+"\t");
@@ -1694,8 +1694,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		else {
 			// First and last home act
 			stream.print((((ActivityImpl)(planToBeWritten.get(0))).getEndTime()+86400-((ActivityImpl)(planToBeWritten.get(planToBeWritten.size()-1))).getStartTime())/3600+"\t");
-			counter++;	
-			
+			counter++;
+
 			LinkedList<Integer> takenPositions = new LinkedList<Integer>();
 			int car = 0;
 			int pt = 0;
@@ -1711,7 +1711,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			double bike_distance = 0;
 			double walk_time = 0;
 			double walk_distance = 0;
-			for (int i=1;i<referencePlan.size()-1;i++){ 
+			for (int i=1;i<referencePlan.size()-1;i++){
 				if (i%2==0){ // Activities
 					boolean found = false;
 					for (int j=2;j<planToBeWritten.size()-2;j+=2){
@@ -1735,13 +1735,13 @@ public class PlansConstructor implements PlanStrategyModule{
 					else log.warn("Leg mode "+leg.getMode()+" in act chain "+i+" could not be identified!");
 				}
 			}
-			
+
 			// Now go through planToBeWritten, check whether everything correct and write legs into file
 			int carCheck = 0;
 			int ptCheck = 0;
 			int bikeCheck = 0;
 			int walkCheck = 0;
-			for (int i=1;i<planToBeWritten.size()-1;i+=2){ 
+			for (int i=1;i<planToBeWritten.size()-1;i+=2){
 				LegImpl leg = ((LegImpl)(planToBeWritten.get(i)));
 				if (leg.getMode().equals(TransportMode.car)) {
 					carCheck++;
@@ -1771,7 +1771,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			if (pt!=ptCheck) log.warn("Number of "+pt+" pt legs in referencePlan is different from number of "+ptCheck+" pt legs in planToBeWritten!");
 			if (bike!=bikeCheck) log.warn("Number of "+bike+" bike legs in referencePlan is different from number of "+bikeCheck+" bike legs in planToBeWritten!");
 			if (walk!=walkCheck) log.warn("Number of "+walk+" walk legs in referencePlan is different from number of "+walkCheck+" walk legs in planToBeWritten!");
-			
+
 			if (car>0){
 				stream.print(car_time+"\t");
 				counter++;
@@ -1799,7 +1799,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				}
 				stream.print(pt+"\t");
 				counter++;
-				
+
 			}
 			if ((bike>0) && this.bikeIn.equals("yes")){
 				stream.print(bike_time+"\t");
@@ -1824,26 +1824,26 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		return counter;
 	}
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////
-	// Writing mod file methods 
+	// Writing mod file methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	/*public void writeModFile(String outputFile){
 		new ModFileMaker (this.population, this.actChains).write(outputFile);
 	}
-	
+
 	public void writeModFileWithSequence(String outputFile){
 		new ModFileMaker (this.population, this.actChains).writeWithSequence(outputFile);
 	}*/
-	
+
 	public void writeModFileWithRandomSelection (String outputFile){
 		//new ModFileMaker (this.population, this.actChains).writeWithRandomSelection(outputFile,
 		new ModFileMaker (this.population, this.actChains).writeWithRandomSelectionAccumulated(outputFile,
 				this.beta,
 				this.gamma,
-				this.similarity, 
+				this.similarity,
 				this.incomeConstant,
 				this.incomeDivided,
 				this.incomeDividedLN,
@@ -1857,24 +1857,24 @@ public class PlansConstructor implements PlanStrategyModule{
 				this.travelDistance,
 				this.travelCost,
 				this.travelConstant,
-				this.beta_travel, 
+				this.beta_travel,
 				this.bikeIn);
 	}
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////
-	// Writing sim file  
+	// Writing sim file
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public void writeSims (String outputFile){
 		log.info("Writing sims file...");
-		
+
 		int [] stats = new int [50];
 
 		for (int i=0;i<stats.length;i++){
 			stats[i]=0;
 		}
-		
+
 		PrintStream stream;
 		try {
 			stream = new PrintStream (new File(outputFile));
@@ -1882,34 +1882,34 @@ public class PlansConstructor implements PlanStrategyModule{
 			e.printStackTrace();
 			return;
 		}
-		
+
 		for (int i=0;i<this.sims.get(0).size();i++){
 			stream.print("alt"+(i+1)+"\t");
-		}		
+		}
 		stream.println();
-		
+
 		for (int i=0;i<this.sims.size();i++){
 			for (int j=0;j<this.sims.get(i).size();j++){
 				stream.print(this.sims.get(i).get(j)+"\t");
-				stats [this.sims.get(i).get(j).intValue()]++;				
+				stats [this.sims.get(i).get(j).intValue()]++;
 			}
 			stream.println();
 		}
 		stream.println();
-		
+
 		for (int i=0;i<stats.length;i++){
 			stream.println(i+"\t"+stats[i]);
-		} 
-		
+		}
+
 		stream.close();
 		log.info("done.");
-	}		
-	
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// Once-off method
 	//////////////////////////////////////////////////////////////////////
-	
-	
+
+
 	// Method that filters only Zurich10% plans
 	protected void selectZurich10MZPlans (){
 		log.info("Creating Zurich10% population...");

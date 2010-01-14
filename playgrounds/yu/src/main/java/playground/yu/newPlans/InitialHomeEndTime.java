@@ -4,6 +4,7 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -16,7 +17,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author yu
- * 
+ *
  */
 public class InitialHomeEndTime extends NewPopulation implements PlanAlgorithm {
 
@@ -24,8 +25,8 @@ public class InitialHomeEndTime extends NewPopulation implements PlanAlgorithm {
 	 * @param population
 	 * @param filename
 	 */
-	public InitialHomeEndTime(final PopulationImpl population, final String filename) {
-		super(population, filename);
+	public InitialHomeEndTime(final Network network, final PopulationImpl population, final String filename) {
+		super(network, population, filename);
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class InitialHomeEndTime extends NewPopulation implements PlanAlgorithm {
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 
-		InitialHomeEndTime ihet = new InitialHomeEndTime(population, outputPlansFilename);
+		InitialHomeEndTime ihet = new InitialHomeEndTime(network, population, outputPlansFilename);
 		ihet.run(population);
 		ihet.writeEndPlans();
 	}

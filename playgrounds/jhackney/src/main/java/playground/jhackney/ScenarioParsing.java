@@ -41,7 +41,7 @@ public class ScenarioParsing {
 		Scenario.readWorld();
 		NetworkLayer network = Scenario.readNetwork();
 		PopulationImpl plans = Scenario.readPlans();
-		
+
 //		System.out.println("  reading world xml file... ");
 //		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
 //		worldReader.readFile(Gbl.getConfig().world().getInputFile());
@@ -130,7 +130,7 @@ public class ScenarioParsing {
 
 		//////////////////////////////////////////////////////////////////////
 
-		Scenario.writePlans(plans);
+		Scenario.writePlans(plans, network);
 //		Scenario.writeNetwork(network);
 //		Scenario.writeFacilities(facilities);
 //		Scenario.writeWorld(Gbl.getWorld());

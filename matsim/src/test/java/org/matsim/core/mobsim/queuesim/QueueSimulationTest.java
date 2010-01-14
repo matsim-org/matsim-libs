@@ -69,6 +69,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -903,7 +904,7 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1);
 		a1.setEndTime(8*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link1, link5);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(f.link1, link5);
 		route.setLinks(f.network.getLinks().get(new IdImpl(startLinkId)), NetworkUtils.getLinks(f.network, linkIds), f.network.getLinks().get(new IdImpl(endLinkId)));
 		leg.setRoute(route);
 		ActivityImpl a2 = plan.createAndAddActivity("w", link5);
@@ -927,7 +928,7 @@ public class QueueSimulationTest extends TestCase {
 	public void testStartAndEndTime() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
-		
+
 		// build simple network with 1 link
 		NetworkImpl network = scenario.getNetwork();
 		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
@@ -960,14 +961,14 @@ public class QueueSimulationTest extends TestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		events.addHandler(collector);
-		
+
 		// first test without special settings
 		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.run();
 		assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(act1.getEndTime() + leg.getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		collector.reset(0);
-		
+
 		// second test with special start/end times
 		config.simulation().setStartTime(8.0*3600);
 		config.simulation().setEndTime(11.0*3600);
@@ -1006,7 +1007,7 @@ public class QueueSimulationTest extends TestCase {
 	/*package*/ final static class FirstLastEventCollector implements BasicEventHandler {
 		public Event firstEvent = null;
 		public Event lastEvent = null;
-		
+
 		public void handleEvent(final Event event) {
 			if (firstEvent == null) {
 				firstEvent = event;

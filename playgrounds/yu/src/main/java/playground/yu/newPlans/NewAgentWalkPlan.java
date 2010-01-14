@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -42,23 +43,23 @@ import playground.yu.analysis.PlanModeJudger;
  * writes new Plansfile, in which every person will has 3 plans, with type
  * "car", "pt" and "walk", whose leg mode will be "pt" or "walk" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewAgentWalkPlan extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentWalkPlan(final Population plans) {
-		super(plans);
+	public NewAgentWalkPlan(final Network network, final Population plans) {
+		super(network, plans);
 	}
 
-	public NewAgentWalkPlan(final PopulationImpl population, final String filename) {
-		super(population, filename);
+	public NewAgentWalkPlan(final Network network, final PopulationImpl population, final String filename) {
+		super(network, population, filename);
 	}
 
 	@SuppressWarnings( { "deprecation", "unchecked" })
@@ -124,7 +125,7 @@ public class NewAgentWalkPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 
-		NewAgentWalkPlan nawp = new NewAgentWalkPlan(scenario.getPopulation());
+		NewAgentWalkPlan nawp = new NewAgentWalkPlan(scenario.getNetwork(), scenario.getPopulation());
 		nawp.run(scenario.getPopulation());
 		nawp.writeEndPlans();
 	}

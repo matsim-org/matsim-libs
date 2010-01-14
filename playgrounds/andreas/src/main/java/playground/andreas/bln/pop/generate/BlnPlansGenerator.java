@@ -24,7 +24,7 @@ import org.matsim.core.utils.misc.Time;
 
 
 /**
- * 
+ *
  * @author aneumann
  *
  */
@@ -56,7 +56,7 @@ public class BlnPlansGenerator {
 
 			// Print statistics for raw data
 			myBlnPlanGenerator.countPersonsPlans(personMap, tripMap);
-			// If a person has only one trip, delete that trip 
+			// If a person has only one trip, delete that trip
 			tripMap = myBlnPlanGenerator.filterPersonsWithOneTrip(tripMap);
 
 			// Some trips have invalid coordinates. Most of them are situated outside the survey area and weren't localized
@@ -100,7 +100,7 @@ public class BlnPlansGenerator {
 			PersonImpl person = new PersonImpl(new IdImpl(data[0]));
 			personList.put(person.getId(), person);
 
-			// approximation: yearOfSurvey - yearOfBirth 
+			// approximation: yearOfSurvey - yearOfBirth
 			person.setAge(98 - Integer.parseInt(data[2]));
 
 			// 1 = no, 2 occasionally, 3 yes
@@ -131,7 +131,7 @@ public class BlnPlansGenerator {
 				person.setSex("f");
 			} else if (Integer.parseInt(data[3]) == 1){
 				person.setSex("m");
-			}				
+			}
 
 		}
 		log.info("...finished generating " + personList.size() + " persons.");
@@ -156,7 +156,7 @@ public class BlnPlansGenerator {
 				newArrayList.add(tripDataString);
 				tripData.put(personId, newArrayList);
 			}
-		}		
+		}
 
 		return tripData;
 	}
@@ -181,7 +181,7 @@ public class BlnPlansGenerator {
 		}
 
 		log.info(numberOfPersonsWithoutTrip + " persons have no trip");
-		log.info(numberOfTripsWithoutPerson + " trips have no correspnding person in raw data.");		
+		log.info(numberOfTripsWithoutPerson + " trips have no correspnding person in raw data.");
 	}
 
 	private HashMap<Id,ArrayList<String[]>> filterPersonsWithOneTrip(HashMap<Id,ArrayList<String[]>> unfilteredTripData){
@@ -216,7 +216,7 @@ public class BlnPlansGenerator {
 					numberOfTripsWithInvalidCoord++;
 				}
 			}
-			filteredTripData.put(personsId, filteredArrayList);			
+			filteredTripData.put(personsId, filteredArrayList);
 		}
 
 		log.info("Filtered " + numberOfTripsWithInvalidCoord + " trips, cause coords weren't specified.");
@@ -242,7 +242,7 @@ public class BlnPlansGenerator {
 				newArrayList.add(coordMapEntry);
 				sortedCoordMapData.put(personId, newArrayList);
 			}
-		}		
+		}
 
 		for (Id personsId : unfilteredTripData.keySet()) {
 			ArrayList<String[]> filteredArrayList = new ArrayList<String[]>();
@@ -265,14 +265,14 @@ public class BlnPlansGenerator {
 								numberOfReplacedCoords++;
 							} else {
 								numberOfTripsWithInvalidCoord++;
-							}							
+							}
 						}
-					} else {				
+					} else {
 						numberOfTripsWithInvalidCoord++;
 					}
 				}
 			}
-			filteredTripData.put(personsId, filteredArrayList);			
+			filteredTripData.put(personsId, filteredArrayList);
 		}
 
 		log.info("Filtered " + numberOfTripsWithInvalidCoord + " trips, cause coords weren't specified.");
@@ -282,7 +282,7 @@ public class BlnPlansGenerator {
 	private void addPlansToPersons(HashMap<Id,PersonImpl> personList, HashMap<Id,ArrayList<String[]>> tripData) {
 
 		double numberOfPlansFound = 0;
-		
+
 		log.info("Adding Plans to Person, spreading time is " + BlnPlansGenerator.spreadingTime + "s");
 		for (Id personId : tripData.keySet()) {
 
@@ -307,16 +307,16 @@ public class BlnPlansGenerator {
 				Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
 
 				double startTime = Time.parseTime(tripEntry[5]);
-				
+
 				if(startTime == 60.0){
 					numberOfPlansFound++;
 					if(lastAct != null){
 						startTime = lastAct.getEndTime();
 					} else {
 						log.error("LastAct is null - Shouldn't be possible - " + curPerson.getId());
-					}										
-				}				
-				
+					}
+				}
+
 				// Since data is from survey, it is more likely to get x:00, x:15, x:30, x:45 as answer,
 				// and therefore arbitrary peaks in departure and arrival time histogram -> spread it
 				if (startTime % (15*60) == 0){
@@ -327,14 +327,14 @@ public class BlnPlansGenerator {
 					newAct.setStartTime(startTime);
 				}
 
-				if(lastAct != null){				
+				if(lastAct != null){
 					// Since data is from survey, it is more likely to get x:00, x:15, x:30, x:45 as answer,
 					// and therefore arbitrary peaks in departure and arrival time histogram -> spread it
 					double endTime = Time.parseTime(tripEntry[0]);
 					if(endTime == 60.0){
 						endTime = lastAct.getStartTime();
 					}
-					
+
 					if (endTime % (15*60) == 0){
 						endTime = (endTime - (spreadingTime / 2)) + Math.random() * spreadingTime;
 						endTime = Math.max(0.0, endTime);
@@ -344,23 +344,23 @@ public class BlnPlansGenerator {
 					}
 
 					curPlan.addLeg(this.createLeg(tripEntry));
-					
+
 					if(!iterator.hasNext()){
 						newAct.setEndTime(86400.0);
 					}
 				}
-			
-				curPlan.addActivity(newAct);	
-				lastAct = newAct;				 
+
+				curPlan.addActivity(newAct);
+				lastAct = newAct;
 			}
-		}				
+		}
 	}
 
 	private HashMap<Id, PersonImpl> removePersonsWithoutPlan(HashMap<Id, PersonImpl> personMap, HashMap<Id, ArrayList<String[]>> tripMap) {
 
 		HashMap<Id, PersonImpl> filteredPersonMap = new HashMap<Id, PersonImpl>();
 		for (Id personId : tripMap.keySet()) {
-			filteredPersonMap.put(personId, personMap.get(personId));			
+			filteredPersonMap.put(personId, personMap.get(personId));
 		}
 
 		return filteredPersonMap;
@@ -372,8 +372,8 @@ public class BlnPlansGenerator {
 		for (PersonImpl person : personList) {
 			pop.addPerson(person);
 			numberOfPersonWithPlans++;
-		}		
-		new PopulationWriter(pop).writeFile(filename);
+		}
+		new PopulationWriter(pop, null).writeFile(filename);
 		log.info(numberOfPersonWithPlans + " persons were written to " + filename);
 	}
 
@@ -469,7 +469,7 @@ public class BlnPlansGenerator {
 			leg = new LegImpl(TransportMode.car);
 			this.modalSplit[3]++;
 
-		} else {		
+		} else {
 
 			switch (Integer.parseInt(tripData[48])) {
 			case 0:
@@ -521,7 +521,7 @@ public class BlnPlansGenerator {
 			this.modalSplit[8]++;
 			}
 
-			// Read travel trip time from survey (min) 
+			// Read travel trip time from survey (min)
 			if (!tripData[50].equalsIgnoreCase("")){
 				leg.setTravelTime(Double.parseDouble(tripData[50]) * 60);
 			} else {
@@ -537,9 +537,9 @@ public class BlnPlansGenerator {
 		for (int i = 0; i < this.actTypes.length; i++) {
 			totalNumActs = totalNumActs + this.actTypes[i];
 		}
-		log.info("Number of Acts: " + totalNumActs + "\nActivity Split:" + (this.actTypes[0] + this.actTypes[8]) + " home | " 
-				+ this.actTypes[1] + " work | " + this.actTypes[2] + " education | " 
-				+ this.actTypes[3] + " business | " + (this.actTypes[4] + this.actTypes[5]) + " shopping | " 
+		log.info("Number of Acts: " + totalNumActs + "\nActivity Split:" + (this.actTypes[0] + this.actTypes[8]) + " home | "
+				+ this.actTypes[1] + " work | " + this.actTypes[2] + " education | "
+				+ this.actTypes[3] + " business | " + (this.actTypes[4] + this.actTypes[5]) + " shopping | "
 				+ (this.actTypes[6] + this.actTypes[7]) + " leisure | "
 				+ this.actTypes[9] + " see a doctor | " + this.actTypes[10] + " holiday | "
 				+ (this.actTypes[11] + this.actTypes[12] + this.actTypes[13]) + " other, multiple or not defined");
@@ -548,10 +548,10 @@ public class BlnPlansGenerator {
 		for (int i = 0; i < this.modalSplit.length; i++) {
 			totalNumLegs = totalNumLegs + this.modalSplit[i];
 		}
-		log.info("Number of Legs: " + totalNumLegs + "\nModal Split: " + this.modalSplit[3] + " car | " 
+		log.info("Number of Legs: " + totalNumLegs + "\nModal Split: " + this.modalSplit[3] + " car | "
 				+ (this.modalSplit[4] + this.modalSplit[5] + this.modalSplit[6]) + " public transport | "
-				+ this.modalSplit[2] +	" bike | " + this.modalSplit[1] + " walk | " 
-				+ (this.modalSplit[0] + this.modalSplit[7]) + " not definied | " 
+				+ this.modalSplit[2] +	" bike | " + this.modalSplit[1] + " walk | "
+				+ (this.modalSplit[0] + this.modalSplit[7]) + " not definied | "
 				+ this.modalSplit[8] + " no data");
 	}
 

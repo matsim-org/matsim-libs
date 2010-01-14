@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -46,10 +47,11 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 	private final double write_person_fraction;
 	private boolean fileOpened = false;
 
-	private PopulationWriterHandler handler = new PopulationWriterHandlerImplV4();
+	private PopulationWriterHandler handler = null;
 	private final Population population;
 	private Knowledges knowledges = null;
-	
+	private final Network network;
+
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
 
 	/**
@@ -60,8 +62,8 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 	 *
 	 * @param population the population to write to file
 	 */
-	public PopulationWriter(final Population population) {
-		this(population, (Gbl.getConfig() == null ? 1.0 : Gbl.getConfig().plans().getOutputSample()));
+	public PopulationWriter(final Population population, final Network network) {
+		this(population, network, (Gbl.getConfig() == null ? 1.0 : Gbl.getConfig().plans().getOutputSample()));
 	}
 
 	/**
@@ -73,17 +75,19 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 	 * @param population the population to write to file
 	 * @param fraction of persons to write to the plans file
 	 */
-	public PopulationWriter(final Population population, final double fraction) {
+	public PopulationWriter(final Population population, final Network network, final double fraction) {
 		super();
 		this.population = population;
+		this.network = network;
 		this.write_person_fraction = fraction;
+		this.handler = new PopulationWriterHandlerImplV4(this.network);
 	}
 
-	public PopulationWriter(final Population pop, final Knowledges knowledges2) {
-		this(pop);
+	public PopulationWriter(final Population pop, final Network network, final Knowledges knowledges2) {
+		this(pop, network);
 		this.knowledges = knowledges2;
 	}
-	
+
 	public void startStreaming(final String filename) {
 		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
 			// write the file head if it is used with streaming.
@@ -92,7 +96,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 			log.error("Cannot start streaming. Streaming must be activated in the Population.");
 		}
 	}
-	
+
 	public void closeStreaming() {
 		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
 			if (this.fileOpened) {
@@ -264,18 +268,18 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 	}
 
 	public void writeFileV0(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV0();
+		this.handler = new PopulationWriterHandlerImplV0(this.network);
 		write(filename);
 	}
-	
+
 	public void writeFileV4(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV4();
+		this.handler = new PopulationWriterHandlerImplV4(this.network);
 		write(filename);
 	}
 
 	/**
 	 * Writes all plans to the file.
-	 * 
+	 *
 	 * @param filename path to the file.
 	 */
 	public void writeFile(final String filename){
@@ -290,7 +294,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 	public BufferedWriter getWriter() {
 		return this.writer;
 	}
-	
+
 	// implementation of PersonAlgorithm
 	// this is primarily to use the PlansWriter with filters and other algorithms.
 	public void run(final Person person) {

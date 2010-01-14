@@ -37,8 +37,8 @@ import playground.dgrether.DgPaths;
 public class Trb09Preprocessing {
 
 	private static final Logger log = Logger.getLogger(Trb09Preprocessing.class);
-	
-	
+
+
 	/**
 	 * @param args
 	 */
@@ -46,11 +46,11 @@ public class Trb09Preprocessing {
 			String runNumber1 = "879";
 //			String runNumber1 = "732";
 //			String runNumber2 = "733";
-		
+
 			String runid1 = "run" + runNumber1;
-			
+
 			String runiddot1 = runid1 + ".";
-			
+
 			String netfile = DgPaths.RUNBASE + runid1 + "/" + runNumber1 + ".output_network.xml.gz";
 			String plans1file = DgPaths.RUNBASE + runid1 + "/" + runNumber1 + ".output_plans.xml.gz";
 			String plans1fileOut = DgPaths.RUNBASE + runid1 + "/" + runNumber1 + ".output_plans_wo_routes.xml.gz";
@@ -72,15 +72,11 @@ public class Trb09Preprocessing {
 					}
 				}
 			}
-			
-			PopulationWriter writer = new PopulationWriter(pop);
+
+			PopulationWriter writer = new PopulationWriter(pop, sc.getNetwork());
 			writer.write(plans1fileOut);
 			log.debug("ya esta ;-)");
-			
-			
-			
-			
+
 	}
-	
 
 }

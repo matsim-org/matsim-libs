@@ -248,7 +248,7 @@ public class Converter {
 		c.setPop(new ScenarioImpl().getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
-			PopulationWriter writer = new PopulationWriter(c.pop);
+			PopulationWriter writer = new PopulationWriter(c.pop, null);
 			writer.writeStartPlans(newPlansFilename);
 			String line = reader.readLine();
 			do {

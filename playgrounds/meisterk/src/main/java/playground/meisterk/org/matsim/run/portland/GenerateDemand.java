@@ -69,7 +69,7 @@ public class GenerateDemand {
 		System.out.println("Setting up plans objects...");
 		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(plans);
+		PopulationWriter plansWriter = new PopulationWriter(plans, networkLayer);
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("Setting up plans objects...done.");

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.socialnetworks.ivtsurveys;
 
@@ -47,7 +47,7 @@ public class ShrinkPopulation {
 //		loader.loadPopulation();
 		PopulationImpl population = data.getPopulation();
 		double sample = Double.parseDouble(args[2]);
-		PopulationWriter writer = new PopulationWriter(population, sample);
+		PopulationWriter writer = new PopulationWriter(population, data.getNetwork(), sample);
 		writer.writeFile(args[1]);
 
 	}

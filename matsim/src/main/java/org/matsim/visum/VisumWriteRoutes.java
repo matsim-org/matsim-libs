@@ -26,11 +26,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.MappedLocation;
@@ -47,9 +49,11 @@ public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlg
 
 	private BufferedWriter out = null;
 	private ZoneLayer tvzLayer = null;
+	private final Network network;
 
-	public VisumWriteRoutes(String filename, ZoneLayer tvzLayer) {
+	public VisumWriteRoutes(String filename, ZoneLayer tvzLayer, Network network) {
 		this.tvzLayer = tvzLayer;
+		this.network = network;
 		try {
 			this.out = new BufferedWriter(new FileWriter(filename));
 			this.out.write("$VISION\n$ROUTENIMPORT\n$VERSION 1\n");
@@ -71,7 +75,7 @@ public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlg
 		for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
 			LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 			StringBuilder visum = new StringBuilder();
-			List<Node> route = ((NetworkRouteWRefs) leg.getRoute()).getNodes();
+			List<Node> route = RouteUtils.getNodes((NetworkRouteWRefs) leg.getRoute(), this.network);
 
 			if (route.size() > 0) {
 				ArrayList<MappedLocation> locs = this.tvzLayer.getNearestLocations(route.get(0).getCoord(), null);

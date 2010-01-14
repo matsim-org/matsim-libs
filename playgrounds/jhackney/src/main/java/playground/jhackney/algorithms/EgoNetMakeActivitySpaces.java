@@ -39,7 +39,7 @@ import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
 public class EgoNetMakeActivitySpaces {
 
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
@@ -53,20 +53,20 @@ public class EgoNetMakeActivitySpaces {
 		World world = Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
-		
+
 		System.out.println("  reading plans xml file... ");
 		System.out.println(config.plans().getInputFile());
 		new MatsimPopulationReader(Scenario.getScenarioImpl()).readFile(config.plans().getInputFile());
 		PopulationImpl plans = Scenario.getScenarioImpl().getPopulation();
 		Knowledges knowledges = Scenario.getScenarioImpl().getKnowledges();
 		System.out.println("  done.");
-		
+
 		ActivityFacilitiesImpl facilities = Scenario.readFacilities();
 		//read in social network
 		System.out.println(" Initializing the social network ...");
 		new SocialNetwork(plans);
 		System.out.println("... done");
-		
+
 		//read in facilities knowledge
 		new InitializeKnowledge(plans, facilities,  knowledges);
 		new WorldConnectLocations().run(world);
@@ -135,15 +135,15 @@ public class EgoNetMakeActivitySpaces {
 		socialPlans.addAlgorithm(new PersonDrawActivitySpace(knowledges));
 		System.out.println("  done.");
 
-		
+
 		System.out.println("  Initializing the KML output");
 //		this.kmlOut=new EgoNetPlansMakeKML(this.controler.getConfig());
 //		EgoNetPlansMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
 //		EgoNetPlansMakeKML.generateStyles();
 
 		System.out.println("... done");
-		
-		
+
+
 		//////////////////////////////////////////////////////////////////////
 
 //		System.out.println("  running matrices algos... ");
@@ -155,8 +155,8 @@ public class EgoNetMakeActivitySpaces {
 		socialPlans.runAlgorithms();
 		pwast.close();
 		System.out.println("  done.");
-		
-		Scenario.writePlans(socialPlans);
+
+		Scenario.writePlans(socialPlans, network);
 //		Scenario.writeNetwork(network);
 //		Scenario.writeFacilities(facilities);
 //		Scenario.writeWorld(Gbl.getWorld());

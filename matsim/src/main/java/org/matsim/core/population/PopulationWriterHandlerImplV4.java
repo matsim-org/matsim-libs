@@ -23,6 +23,7 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,12 +35,18 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.population.Desires;
 
 public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 
+	private final Network network;
+
+	public PopulationWriterHandlerImplV4(final Network network) {
+		this.network = network;
+	}
 
 	public void writeHeaderAndStartElement(final BufferedWriter out) throws IOException {
 		out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
@@ -344,7 +351,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 
 		out.write("\t\t\t\t\t");
 		if (route instanceof NetworkRouteWRefs) {
-			for (Node n : ((NetworkRouteWRefs) route).getNodes()) {
+			for (Node n : RouteUtils.getNodes((NetworkRouteWRefs) route, this.network)) {
 				out.write(n.getId().toString());
 				out.write(" ");
 			}

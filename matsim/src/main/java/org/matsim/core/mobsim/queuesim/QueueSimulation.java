@@ -135,10 +135,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	private boolean useActivityDurations = true;
 
 	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
-	
+
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
-	
+
 	/**
 	 * Initialize the QueueSimulation without signal systems
 	 * @param network
@@ -159,7 +159,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		this.agentFactory = new AgentFactory(this);
 
 		this.notTeleportedModes.add(TransportMode.car);
-		
+
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
 	}
 
@@ -220,7 +220,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 		for (Person p : this.population.getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
-			
+
 			QueueVehicle veh = new QueueVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
@@ -261,7 +261,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
       if (snapshotFormat.contains("plansfile")) {
         String snapshotFilePrefix = this.controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
         String snapshotFileSuffix = "xml";
-        this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix));
+        this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, this.networkLayer));
       }
       if (snapshotFormat.contains("transims")) {
         String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh");
@@ -470,7 +470,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 			} else break;
 		}
 	}
-	
+
 	/**
 	 * Should be a PersonAgentI as argument, but is needed because the old events form is still used also for tests
 	 * @param now
@@ -517,7 +517,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	/**
 	 * Informs the simulation that the specified agent wants to depart from its current activity.
 	 * The simulation can then put the agent onto its vehicle on a link or teleport it to its destination.
-	 * @param now 
+	 * @param now
 	 *
 	 * @param agent
 	 * @param link the link where the agent departs
@@ -636,11 +636,11 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		return notTeleportedModes;
 	}
 
-	
+
 	public Integer getIterationNumber() {
 		return iterationNumber;
 	}
-	
+
 	public void setIterationNumber(Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
 	}
@@ -649,5 +649,5 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		this.controlerIO = controlerIO;
 	}
 
-	
+
 }

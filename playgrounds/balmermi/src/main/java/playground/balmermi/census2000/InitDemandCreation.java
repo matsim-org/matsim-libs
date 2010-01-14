@@ -72,7 +72,7 @@ public class InitDemandCreation {
 		ScenarioImpl scenario = sl.getScenario();
 		Config config = scenario.getConfig();
 		World world = scenario.getWorld();
-		
+
 		System.out.println("  reading world xml file... ");
 		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
@@ -117,7 +117,7 @@ public class InitDemandCreation {
 		System.out.println("  setting up plans objects...");
 		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(plans);
+		PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork());
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");

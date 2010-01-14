@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -48,8 +49,9 @@ public class ExternalMobsim {
 
 	private static final String CONFIG_MODULE = "simulation";
 
-	protected EventsManager events;
-	protected Population population;
+	protected final EventsManager events;
+	protected final Population population;
+	protected final Network network;
 
 	protected String plansFileName = null;
 	protected String eventsFileName = null;
@@ -62,9 +64,10 @@ public class ExternalMobsim {
 	private Integer iterationNumber = null;
 	protected ControlerIO controlerIO;
 
-	
-	public ExternalMobsim(final Population population, final EventsManager events) {
+
+	public ExternalMobsim(final Population population, final Network network, final EventsManager events) {
 		this.population = population;
+		this.network = network;
 		this.events = events;
 		init();
 	}
@@ -125,7 +128,7 @@ public class ExternalMobsim {
 		log.info("writing plans for external mobsim");
 		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(pop);
+		PopulationWriter plansWriter = new PopulationWriter(pop, this.network);
 		PopulationWriterHandler handler = plansWriter.getHandler();
 		plansWriter.writeStartPlans(iterationPlansFile);
 		BufferedWriter writer = plansWriter.getWriter();
@@ -187,11 +190,11 @@ public class ExternalMobsim {
 		log.info("reading events from external mobsim");
 		new MatsimEventsReader(this.events).readFile(iterationEventsFile);
 	}
-	
+
 	public Integer getIterationNumber() {
 		return iterationNumber;
 	}
-	
+
 	public void setIterationNumber(Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
 	}

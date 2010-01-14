@@ -11,7 +11,9 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.internal.MatsimWriter;
@@ -29,10 +31,10 @@ public class GeneralLib {
 
 	/*
 	 * Reads the population from the plans file.
-	 * 
+	 *
 	 * Note: use the other method with the same name, if this poses problems.
 	 */
-	public static Population readPopulation(String plansFile, String networkFile) {
+	public static Scenario readPopulation(String plansFile, String networkFile) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Population population = scenario.getPopulation();
 
@@ -42,7 +44,7 @@ public class GeneralLib {
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(plansFile);
 
-		return population;
+		return scenario;
 	}
 
 	/*
@@ -65,8 +67,8 @@ public class GeneralLib {
 	/*
 	 * Write the population to the specified file.
 	 */
-	public static void writePopulation(Population population, String plansFile) {
-		MatsimWriter populationWriter = new PopulationWriter(population);
+	public static void writePopulation(Population population, Network network, String plansFile) {
+		MatsimWriter populationWriter = new PopulationWriter(population, network);
 
 		populationWriter.write(plansFile);
 	}
@@ -86,9 +88,9 @@ public class GeneralLib {
 
 	/**
 	 * Write out a list of Strings
-	 * 
+	 *
 	 * after each String in the list a "\n" is added.
-	 * 
+	 *
 	 * @param list
 	 * @param fileName
 	 */
@@ -112,9 +114,9 @@ public class GeneralLib {
 	/**
 	 * if headerLine=null, then add no line at top of file. "\n" is added at end
 	 * of first line by this method.
-	 * 
+	 *
 	 * matrix[numberOfRows][numberOfColumns]
-	 * 
+	 *
 	 * @param matrix
 	 * @param fileName
 	 * @param headerLine
@@ -141,8 +143,8 @@ public class GeneralLib {
 
 	/**
 	 * reads in data from a file.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param numberOfRows
 	 * @param numberOfColumns
 	 * @param ignoreFirstLine
@@ -216,7 +218,7 @@ public class GeneralLib {
 
 	/**
 	 * TODO This method
-	 * 
+	 *
 	 * @param fileName
 	 * @return
 	 */
@@ -280,7 +282,7 @@ public class GeneralLib {
 	public static void main(String[] args) {
 		copyDirectory("C:\\tmp\\abcd", "C:\\tmp\\aaab");
 	}
-	
+
 	public static double[][] initializeMatrix(double[][] matrix){
 		for (int i=0;i<matrix.length;i++){
 			for (int j=0;j<matrix[0].length;j++){
@@ -289,11 +291,11 @@ public class GeneralLib {
 		}
 		return matrix;
 	}
-	
+
 	/**
 	 * energyUsageStatistics[number of values][number of functions]
-	 * 
-	 * 
+	 *
+	 *
 	 * @param fileName
 	 * @param energyUsageStatistics
 	 * @param title
@@ -305,7 +307,7 @@ public class GeneralLib {
 
 		int numberOfXValues=energyUsageStatistics.length;
 		int numberOfFunctions=energyUsageStatistics[0].length;
-		
+
 		double[] time = new double[numberOfXValues];
 
 		for (int i = 0; i < numberOfXValues; i++) {
@@ -323,25 +325,25 @@ public class GeneralLib {
 		// chart.addMatsimLogo();
 		chart.saveAsPng(fileName, 800, 600);
 	}
-	
+
 	public static double[][] scaleMatrix(double[][] matrix, double scalingFactor){
 		int numberOfRows=matrix.length;
 		int numberOfColumns=matrix[0].length;
-		
+
 		double[][] resultMatrix=new double[numberOfRows][numberOfColumns];
-		
+
 		for (int i=0;i<numberOfRows;i++){
 			for (int j=0;j<numberOfColumns;j++){
 				resultMatrix[i][j]=matrix[i][j]*scalingFactor;
 			}
 		}
-		
+
 		return resultMatrix;
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 
 }

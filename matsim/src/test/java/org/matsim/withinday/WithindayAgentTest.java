@@ -40,6 +40,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.ptproject.qsim.QueueVehicleImpl;
 import org.matsim.ptproject.qsim.SimulationTimer;
@@ -200,21 +201,21 @@ public class WithindayAgentTest extends MatsimTestCase {
 		//going into the details
 	  // first testing the plan of the person
 		LegImpl newPlansLeg = (LegImpl) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
-		List<Node> newPlansRoute = ((NetworkRouteWRefs) newPlansLeg.getRoute()).getNodes();
-		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
+		List<Node> newPlansRoute = RouteUtils.getNodes((NetworkRouteWRefs) newPlansLeg.getRoute(), this.network);
+		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getLinkIds().size() + 1, newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNodes().get(new IdImpl("31")), newPlansRoute.get(1));
 		assertEquals("check the last node of rerouting!", this.network.getNodes().get(new IdImpl("4")), newPlansRoute.get(newPlansRoute.size()-1));
 		//second testing the vehicle
 		assertNotSame("The current leg should be exchanged by a new one", this.leg, agent.getCurrentLeg());
-		List<Node> newLegsRoute = ((NetworkRouteWRefs) agent.getCurrentLeg().getRoute()).getNodes();
-		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newLegsRoute.size());
+		List<Node> newLegsRoute = RouteUtils.getNodes((NetworkRouteWRefs) agent.getCurrentLeg().getRoute(), this.network);
+		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getLinkIds().size() + 1, newLegsRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNodes().get(new IdImpl("31")), newLegsRoute.get(1));
 		assertEquals("check the last node of rerouting!", this.network.getNodes().get(new IdImpl("4")), newLegsRoute.get(newLegsRoute.size()-1));
 
 		//enlarge scenario
 		List<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNodes().get(new IdImpl("2")));
-		list.addAll(this.agentRoute.getNodes());
+		list.addAll(RouteUtils.getNodes(this.agentRoute, this.network));
 		this.agentRoute.setNodes(link1, list, link7);
 		agent = createAgent(link1, link7);
 		agent.replan();
@@ -222,21 +223,21 @@ public class WithindayAgentTest extends MatsimTestCase {
 		//going into the details
 	  // first testing the plan of the person
 		newPlansLeg = (LegImpl) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
-		newPlansRoute = ((NetworkRouteWRefs) newPlansLeg.getRoute()).getNodes();
-		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
+		newPlansRoute = RouteUtils.getNodes((NetworkRouteWRefs) newPlansLeg.getRoute(), this.network);
+		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getLinkIds().size() + 1, newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNodes().get(new IdImpl("31")), newPlansRoute.get(2));
 		assertEquals("check the last node of rerouting!", this.network.getNodes().get(new IdImpl("4")), newPlansRoute.get(newPlansRoute.size()-1));
 		//second testing the vehicle
 		assertNotSame("The current leg should be exchanged by a new one", this.leg, agent.getCurrentLeg());
-		newLegsRoute = ((NetworkRouteWRefs) agent.getCurrentLeg().getRoute()).getNodes();
-		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newLegsRoute.size());
+		newLegsRoute = RouteUtils.getNodes((NetworkRouteWRefs) agent.getCurrentLeg().getRoute(), this.network);
+		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getLinkIds().size() + 1, newLegsRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNodes().get(new IdImpl("31")), newLegsRoute.get(2));
 		assertEquals("check the last node of rerouting!", this.network.getNodes().get(new IdImpl("4")), newLegsRoute.get(newLegsRoute.size()-1));
 
 		//again enlarge scenario
 		LinkImpl link8 = this.network.getLinks().get(new IdImpl("8"));
 		list = new ArrayList<Node>();
-		list.addAll(this.agentRoute.getNodes());
+		list.addAll(RouteUtils.getNodes(this.agentRoute, this.network));
 		list.add(this.network.getNodes().get(new IdImpl("5")));
 		this.agentRoute.setNodes(link1, list, link8);
 		agent = createAgent(link1, link8);
@@ -245,14 +246,14 @@ public class WithindayAgentTest extends MatsimTestCase {
 		//going into the details
 	  // first testing the plan of the person
 		newPlansLeg = (LegImpl) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
-		newPlansRoute = ((NetworkRouteWRefs) newPlansLeg.getRoute()).getNodes();
-		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
+		newPlansRoute = RouteUtils.getNodes((NetworkRouteWRefs) newPlansLeg.getRoute(), this.network);
+		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getLinkIds().size() + 1, newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNodes().get(new IdImpl("31")), newPlansRoute.get(2));
 		assertEquals("check the last node of rerouting!", this.network.getNodes().get(new IdImpl("5")), newPlansRoute.get(newPlansRoute.size()-1));
 		//second testing the vehicle
 		assertNotSame("The current leg should be exchanged by a new one", this.leg, agent.getCurrentLeg());
-		newLegsRoute = ((NetworkRouteWRefs) agent.getCurrentLeg().getRoute()).getNodes();
-		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newLegsRoute.size());
+		newLegsRoute = RouteUtils.getNodes((NetworkRouteWRefs) agent.getCurrentLeg().getRoute(), this.network);
+		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getLinkIds().size() + 1, newLegsRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNodes().get(new IdImpl("31")), newLegsRoute.get(2));
 		assertEquals("check the last node of rerouting!", this.network.getNodes().get(new IdImpl("5")), newLegsRoute.get(newLegsRoute.size()-1));
 		Logger.getLogger(WithindayAgentTest.class).info("WithindayAgentTest ran successfully.");

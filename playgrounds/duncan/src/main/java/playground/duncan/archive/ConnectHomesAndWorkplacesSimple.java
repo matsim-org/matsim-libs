@@ -34,7 +34,7 @@ public class ConnectHomesAndWorkplacesSimple {
 	public void run(final String[] args) {
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		
+
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities() ;
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader( facilities ) ;
 		fr.readFile( "lsfd" ) ;
@@ -45,7 +45,7 @@ public class ConnectHomesAndWorkplacesSimple {
 
 		// program locachoice here
 
-		new PopulationWriter(population).writeFile("newfilename");
+		new PopulationWriter(population, scenario.getNetwork()).writeFile("newfilename");
 
 	}
 

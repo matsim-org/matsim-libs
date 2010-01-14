@@ -66,12 +66,12 @@ public class Plansgenerator {
 		init();
 		this.plans = new ScenarioImpl().getPopulation();
 		final int HOME_END_TIME = 6 * 3600; // time to start
-		
+
 		createDenverStraight(HOME_END_TIME);
 
-		new PopulationWriter(this.plans).writeFile(plansOut);
+		new PopulationWriter(this.plans, this.network).writeFile(plansOut);
 	}
-	
+
 	/**
 	 * only for testing used, only to see how it looks like
 	 * @param HOME_END_TIME
@@ -81,7 +81,7 @@ public class Plansgenerator {
 	private void createDenverTest(final int HOME_END_TIME) {
 		int currentId = 1;
 		int duration = 1 * 3600;
-		
+
 		currentId = addCommodity(
 				"11","122",HOME_END_TIME,duration,2000,
 				"8 9 10 11 12 6 5 4 3 2 1",currentId);
@@ -90,7 +90,7 @@ public class Plansgenerator {
 				"133","158",HOME_END_TIME,duration,2000,
 				"19 20 21 27 28 22 16 10 11 12 6 5 4",currentId);
 	}
-	
+
 	/**
 	 * generates agents for denver (straight) scenario
 	 * @param HOME_END_TIME
@@ -99,7 +99,7 @@ public class Plansgenerator {
 		int currentId = 1;
 		int duration = (int)(0.5 * 3600); // seconds
 		final int DEFAULT_CARS_PER_HOUR_PER_LANE = 500;
-		
+
 		// horizontal (east-west)
 		currentId = addCommodity(
 				"125","127",HOME_END_TIME,duration,4*DEFAULT_CARS_PER_HOUR_PER_LANE,
@@ -108,19 +108,19 @@ public class Plansgenerator {
 		currentId = addCommodity(
 				"133","135",HOME_END_TIME,duration,4*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"19 20 21 22 23 24",currentId);
-		
+
 		currentId = addCommodity(
 				"124","122",HOME_END_TIME,duration,2*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"6 5 4 3 2 1",currentId);
-		
+
 		currentId = addCommodity(
 				"132","130",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"18 17 16 15 14 13",currentId);
-		
+
 		currentId = addCommodity(
 				"144","142",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"36 35 34 33 32 31",currentId);
-		
+
 		// bus lane (east-west)
 		currentId = addCommodity(
 				"137","139",HOME_END_TIME,duration,1*DEFAULT_CARS_PER_HOUR_PER_LANE,
@@ -128,34 +128,34 @@ public class Plansgenerator {
 		currentId = addCommodity(
 				"140","138",HOME_END_TIME,duration,1*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"30 29 28 27 26 25",currentId);
-		
+
 		// vertical (north-south)
 		currentId = addCommodity(
 				"145","147",HOME_END_TIME,duration,2*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"1 7 13 19 25 31",currentId);
-		
+
 		currentId = addCommodity(
 				"153","155",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"3 9 15 21 27 33",currentId);
-		
+
 		currentId = addCommodity(
 				"161","163",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"5 11 17 23 29 35",currentId);
-		
+
 		currentId = addCommodity(
 				"152","150",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"32 26 20 14 8 2",currentId);
-		
+
 		currentId = addCommodity(
 				"160","158",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"34 28 22 16 10 4",currentId);
-		
+
 		currentId = addCommodity(
 				"168","166",HOME_END_TIME,duration,2*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"36 30 24 18 12 6",currentId);
-		
+
 	}
-	
+
 	/**
 	 * only for first testing used, probably used later
 	 * @param HOME_END_TIME
@@ -166,16 +166,16 @@ public class Plansgenerator {
 		int currentId = 1;
 		int duration = (int)(0.5 * 3600);
 		final int DEFAULT_CARS_PER_HOUR_PER_LANE = 500;
-		
+
 		currentId = addCommodity(
 				"168","166",HOME_END_TIME,duration,4*DEFAULT_CARS_PER_HOUR_PER_LANE,
 				"36 30 24 18 12 6",currentId);
-			
+
 	}
-	
+
 	/**
 	 * customized algorithm: automatically fills routes with agents, main parts by dgrether
-	 * start time of each agent is randomized, but between start_time and (start_time + duration) 
+	 * start time of each agent is randomized, but between start_time and (start_time + duration)
 	 * @param HOME_LINK
 	 * @param TARGET_LINK
 	 * @param START_TIME
@@ -191,13 +191,13 @@ public class Plansgenerator {
 		final LinkImpl target = network.getLinks().get(new IdImpl(TARGET_LINK));
 		final Coord homeCoord = new CoordImpl(-25000, 0);
 		final Coord workCoord = new CoordImpl(10000, 0);
-		
+
 		final int AMOUNT_OF_CARS = CARS_PER_HOUR * DURATION / 3600;
-		final int MAX_ID = CURRENT_ID+1 + AMOUNT_OF_CARS; 
-		
+		final int MAX_ID = CURRENT_ID+1 + AMOUNT_OF_CARS;
+
 		for (int i = CURRENT_ID+1; i <= MAX_ID; i++) {
 			homeEndtime = START_TIME;
-			
+
 			PersonImpl p = new PersonImpl(new IdImpl(i));
 			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
@@ -216,12 +216,12 @@ public class Plansgenerator {
 			a.setLink(target);
 
 			this.plans.addPerson(p);
-			
+
 		}
-		
+
 		return MAX_ID;
 	}
-	
+
 
 	protected NetworkLayer loadNetwork(final String filename) {
 		// - read network: which buildertype??

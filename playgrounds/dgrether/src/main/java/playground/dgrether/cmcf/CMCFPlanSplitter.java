@@ -63,17 +63,17 @@ public class CMCFPlanSplitter {
 		  		StringBuffer idStringBuffer = new StringBuffer(p.getId().toString());
 		  		idStringBuffer.append("leg");
 		  		idStringBuffer.append(Integer.toString(i));
-		  		
+
 		  		PersonImpl pNew = new PersonImpl(new IdImpl(idStringBuffer.toString()));
 		  		PlanImpl planNew = new PlanImpl(pNew);
 		  		LegImpl leg = (LegImpl) pe;
-		  		
+
 		  		planNew.addActivity(((PlanImpl) pl).getPreviousActivity(leg));
 		  		planNew.addLeg(leg);
 		  		planNew.addActivity(((PlanImpl) pl).getNextActivity(leg));
-		  		
+
 		  		pNew.addPlan(planNew);
-		  		
+
 		  		try {
 		  			plansOne.addPerson(pNew);
 		  		} catch (Exception e) {
@@ -87,7 +87,7 @@ public class CMCFPlanSplitter {
 //			Leg lcmcf = plcmcf.getNextLeg(plcmcf.getFirstActivity());
 //			l.setRoute(lcmcf.getRoute());
 		}
-		MatsimIo.writePlans(plansOne, outPlansFile);
+		MatsimIo.writePlans(plansOne, net, outPlansFile);
 
 		log.info("done");
 	}

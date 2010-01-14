@@ -72,7 +72,7 @@ public class IIDMGeneration {
 		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
 		Config config = scenario.getConfig();
 		World world = scenario.getWorld();
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  extracting input directory... ");
@@ -205,7 +205,7 @@ public class IIDMGeneration {
 		log.info("  done.");
 
 		log.info("  writing plans xml file... ");
-		new PopulationWriter(pop).writeFile(config.plans().getOutputFile());
+		new PopulationWriter(pop, scenario.getNetwork()).writeFile(config.plans().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing f2z_mapping... ");

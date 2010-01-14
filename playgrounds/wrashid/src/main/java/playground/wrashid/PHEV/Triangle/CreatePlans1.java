@@ -134,7 +134,7 @@ public class CreatePlans1 {
 
 
 
-		new PopulationWriter(plans).writeFile(config.plans().getOutputFile());
+		new PopulationWriter(plans, scenario.getNetwork()).writeFile(config.plans().getOutputFile());
 	}
 
 }

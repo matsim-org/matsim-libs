@@ -25,7 +25,7 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PtPlansFileCreator {
 	private int personCount = 0;
@@ -171,14 +171,14 @@ public class PtPlansFileCreator {
 		String netFilename = "test/scenarios/berlin/network.xml.gz";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		
+
 		PtPlansFileCreator pfc = new PtPlansFileCreator();
 		pfc.setNetwork(scenario.getNetwork());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 
 		pfc.setPop(scenario.getPopulation());
 		pfc.createPersons();
-		new PopulationWriter(scenario.getPopulation()).writeFile(newPlansFilename);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(newPlansFilename);
 		System.out.println("done.");
 	}
 }

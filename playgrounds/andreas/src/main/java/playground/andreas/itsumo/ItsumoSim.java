@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -45,8 +46,8 @@ public class ItsumoSim extends ExternalMobsim {
 	private ControlerIO controlerio;
 	private Integer iteration;
 
-	public ItsumoSim(final Population population, final EventsManager events) {
-		super(population, events);
+	public ItsumoSim(final Population population, final Network network, final EventsManager events) {
+		super(population, network, events);
 		System.out.println("\n##################################################################################################\n" +
 				"#   REMINDER - Header in writeItsumoConfig has to be changed\n" +
 				"#              according to the itsumo scenario description file." +

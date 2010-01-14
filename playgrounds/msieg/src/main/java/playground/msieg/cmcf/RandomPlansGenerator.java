@@ -29,6 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -181,12 +182,12 @@ public class RandomPlansGenerator {
 		return randomLink;
 	}
 
-	public void writePlans(final PopulationImpl plans){
-		new PopulationWriter(plans).writeFile(Gbl.getConfig().plans().getOutputFile());
+	public void writePlans(final Population plans) {
+		new PopulationWriter(plans, this.network).writeFile(Gbl.getConfig().plans().getOutputFile());
 	}
 
-	public void writePlans(final PopulationImpl plans, final String file) {
-		new PopulationWriter(plans).writeFile(file);
+	public void writePlans(final Population plans, final String file) {
+		new PopulationWriter(plans, this.network).writeFile(file);
 	}
 
 	public static void main(final String[] args) {

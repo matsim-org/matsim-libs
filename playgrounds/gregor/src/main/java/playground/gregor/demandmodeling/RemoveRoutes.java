@@ -12,15 +12,15 @@ import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 public class RemoveRoutes {
-	
-	
+
+
 	public static void main(String [] args) {
-		
+
 		String cf = "../../inputs/configs/eafEvac.xml";
 		ScenarioImpl sc = new ScenarioLoaderImpl(cf).getScenario();
 		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(sc.getConfig().network().getInputFile());
-		
+
 		new PopulationReaderMatsimV4(sc).readFile(sc.getConfig().plans().getInputFile());
 		PopulationImpl pop = sc.getPopulation();
 		for (Person pers : pop.getPersons().values()) {
@@ -28,9 +28,9 @@ public class RemoveRoutes {
 			((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).setRoute(null);
 			((PlanImpl) plan).getNextActivity(((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity())).setType("h");
 		}
-		
-		new PopulationWriter(pop).write(sc.getConfig().plans().getOutputFile());
-		
+
+		new PopulationWriter(pop, net).write(sc.getConfig().plans().getOutputFile());
+
 	}
 
 }

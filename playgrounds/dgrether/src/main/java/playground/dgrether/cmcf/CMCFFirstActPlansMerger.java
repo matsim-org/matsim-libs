@@ -36,15 +36,15 @@ import playground.dgrether.utils.MatsimIo;
  */
 public class CMCFFirstActPlansMerger {
 
-	
+
 	private static final Logger log = Logger.getLogger(CMCFFirstActPlansMerger.class);
-	
+
   private static final String cmcfPlansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_simplified_acts_types_reduced_cmcf.xml";
-	
+
   private static final String plansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_10pct.xml.gz";
-  
+
   private static final String outPlansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_cmcf_first_act.xml.gz";
-  
+
 	/**
 	 * @param args
 	 */
@@ -59,8 +59,8 @@ public class CMCFFirstActPlansMerger {
 			LegImpl lcmcf = ((PlanImpl) plcmcf).getNextLeg(((PlanImpl) plcmcf).getFirstActivity());
 			l.setRoute(lcmcf.getRoute());
 		}
-		MatsimIo.writePlans(plans, outPlansFile);
-		
+		MatsimIo.writePlans(plans, net, outPlansFile);
+
 		log.info("done");
 	}
 

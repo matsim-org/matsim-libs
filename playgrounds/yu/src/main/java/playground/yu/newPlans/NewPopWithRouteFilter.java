@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.newPlans;
 
@@ -8,31 +8,31 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
 /**
  * @author yu
- * 
+ *
  */
 public class NewPopWithRouteFilter extends NewPopulation {
 	private String criterion;
 	private boolean hasCriterion = false;
 	private PersonImpl pi = null;
 
-	public NewPopWithRouteFilter(PopulationImpl population, String filename,
+	public NewPopWithRouteFilter(Network network, Population population, String filename,
 			String criterion) {
-		super(population, filename);
+		super(network, population, filename);
 		this.criterion = criterion;
 	}
 
@@ -41,7 +41,7 @@ public class NewPopWithRouteFilter extends NewPopulation {
 		pi = new PersonImpl(person.getId());
 		hasCriterion = false;
 		for (Plan plan : person.getPlans()) {
-			boolean retain = run((PlanImpl) plan);
+			boolean retain = run(plan);
 			if (retain)
 				pi.addPlan(plan);
 			hasCriterion |= retain;
@@ -80,10 +80,10 @@ public class NewPopWithRouteFilter extends NewPopulation {
 		NetworkLayer network = (NetworkLayer) s.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = (PopulationImpl) s.getPopulation();
+		Population population = s.getPopulation();
 		new MatsimPopulationReader(s).readFile(plansFilename);
 
-		NewPopWithRouteFilter npwp = new NewPopWithRouteFilter(population,
+		NewPopWithRouteFilter npwp = new NewPopWithRouteFilter(network, population,
 				outputFilename, "BVB----344");
 		npwp.run(population);
 		npwp.writeEndPlans();

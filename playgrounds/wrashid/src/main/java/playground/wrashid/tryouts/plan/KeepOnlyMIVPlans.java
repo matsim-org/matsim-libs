@@ -2,9 +2,11 @@ package playground.wrashid.tryouts.plan;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -13,7 +15,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.world.World;
 
 /*
  * removes non miv plans from input file...
@@ -25,23 +26,21 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 	public static void main(String[] args) {
 
 		ScenarioImpl sc = new ScenarioImpl();
-		World world = sc.getWorld();
 
 		String inputPlansFile = "/data/matsim/wrashid/input/plans/teleatlas/census2000v2_dilZh30km_miv_only/plans.xml.gz";
 		String outputPlansFile = "/data/matsim/wrashid/input/plans/teleatlas/census2000v2_dilZh30km_miv_only/plans1.xml.gz";
 		String networkFile = "/data/matsim/switzerland/ivt/studies/switzerland/networks/teleatlas/network.xml.gz";
 		String facilitiesPath = "/data/matsim/switzerland/ivt/studies/switzerland/facilities/facilities.xml.gz";
-		
+
 		//String inputPlansFile = "./test/scenarios/chessboard/plans.xml";
 		//String outputPlansFile = "./plans1.xml";
 		//String networkFile = "./test/scenarios/chessboard/network.xml";
 		//String facilitiesPath = "./test/scenarios/chessboard/facilities.xml";
-		
-		
+
+
 		ActivityFacilitiesImpl facilities = sc.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesPath);
-		world.complete();
-		
+
 		PopulationImpl inPop = sc.getPopulation();
 
 		NetworkLayer net = sc.getNetwork();
@@ -50,25 +49,25 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inputPlansFile);
 
-		KeepOnlyMIVPlans dp = new KeepOnlyMIVPlans(inPop, outputPlansFile);
+		KeepOnlyMIVPlans dp = new KeepOnlyMIVPlans(net, inPop, outputPlansFile);
 		dp.run(inPop);
 		dp.writeEndPlans();
 	}
 
-	public KeepOnlyMIVPlans(PopulationImpl plans, String filename) {
-		super(plans, filename);
+	public KeepOnlyMIVPlans(Network network, Population plans, String filename) {
+		super(network, plans, filename);
 	}
 
 	@Override
 	public void run(Person person) {
-		
+
 		if(person.getPlans().size() != 1){
 			System.err.println("Person got more than one plan");
 		} else {
-			
+
 			Plan plan = person.getPlans().get(0);
 			boolean keepPlan = true;
-			
+
 			// only keep person if every leg is a car leg
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if(planElement instanceof LegImpl){
@@ -77,12 +76,12 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 					}
 				}
 			}
-			
+
 			if(keepPlan){
 				this.popWriter.writePerson(person);
 			}
-			
+
 		}
-	
+
 	}
 }
