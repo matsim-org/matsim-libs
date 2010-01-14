@@ -191,7 +191,7 @@ public class QueueNode {
 		/* called by the framework, do all necessary action for node movement here */
 		if (this.signalized) {
 			for (QueueLink link : this.inLinksArrayCache){
-				for (QueueLane lane : link.getToNodeQueueLanes()) {
+				for (QueueLane lane : ((QueueLinkImpl)link).getToNodeQueueLanes()) {
 					lane.updateGreenState(now);
 					if (lane.isThisTimeStepGreen()){
 						this.clearLaneBuffer(lane, now);
@@ -231,7 +231,7 @@ public class QueueNode {
 						inLinksCapSum -= link.getLink().getCapacity(now);
 						this.tempLinks[i] = null;
 						//move the link
-						for (QueueLane lane : link.getToNodeQueueLanes()) {
+						for (QueueLane lane : ((QueueLinkImpl)link).getToNodeQueueLanes()) {
 							this.clearLaneBuffer(lane, now);
 						}
 						break;

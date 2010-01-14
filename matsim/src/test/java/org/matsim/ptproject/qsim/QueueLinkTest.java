@@ -247,7 +247,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Link link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
 		QueueNetwork queueNetwork = new QueueNetwork(network);
 		QueueSimEngine simEngine = new QueueSimEngine(queueNetwork, MatsimRandom.getRandom());
-		QueueLink qlink = queueNetwork.getQueueLink(new IdImpl("1"));
+		QueueLinkImpl qlink = (QueueLinkImpl) queueNetwork.getQueueLink(new IdImpl("1"));
 		qlink.setSimEngine(simEngine);
 		qlink.finishInit();
 
@@ -366,8 +366,8 @@ public class QueueLinkTest extends MatsimTestCase {
 		/*package*/ final Link link1;
 		/*package*/ final Link link2;
 		/*package*/ final QueueNetwork queueNetwork;
-		/*package*/ final QueueLink qlink1;
-		/*package*/ final QueueLink qlink2;
+		/*package*/ final QueueLinkImpl qlink1;
+		/*package*/ final QueueLinkImpl qlink2;
 		/*package*/ final BasicVehicle basicVehicle;
 
 		/*package*/ Fixture() {
@@ -382,10 +382,10 @@ public class QueueLinkTest extends MatsimTestCase {
 			this.link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
 			this.queueNetwork = new QueueNetwork(network);
 			QueueSimEngine engine = new QueueSimEngine(this.queueNetwork, MatsimRandom.getRandom());
-			this.qlink1 = this.queueNetwork.getQueueLink(new IdImpl("1"));
+			this.qlink1 = (QueueLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("1"));
 			this.qlink1.setSimEngine(engine);
 			this.qlink1.finishInit();
-			this.qlink2 = this.queueNetwork.getQueueLink(new IdImpl("2"));
+			this.qlink2 = (QueueLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("2"));
 			this.qlink2.setSimEngine(engine);
 			this.qlink2.finishInit();
 			

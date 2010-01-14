@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Node;
 /*package*/ final class DefaultQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
 
 	public QueueLink newQueueLink(final Link link, final QueueNetwork queueNetwork, final QueueNode toQueueNode) {
-		return new QueueLink(link, queueNetwork, toQueueNode);
+		return new QueueLinkImpl(link, queueNetwork, toQueueNode);
 	}
 
 	/**

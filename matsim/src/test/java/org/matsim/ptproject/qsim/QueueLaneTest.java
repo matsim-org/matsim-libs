@@ -129,7 +129,7 @@ public class QueueLaneTest extends MatsimTestCase {
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
-		QueueLink ql = queueNetwork.getQueueLink(id1);
+		QueueLinkImpl ql = (QueueLinkImpl) queueNetwork.getQueueLink(id1);
 
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();
@@ -161,7 +161,7 @@ public class QueueLaneTest extends MatsimTestCase {
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
-		QueueLink ql = queueNetwork.getQueueLink(id1);
+		QueueLinkImpl ql = (QueueLinkImpl) queueNetwork.getQueueLink(id1);
 
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();
@@ -195,7 +195,7 @@ public class QueueLaneTest extends MatsimTestCase {
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
-		QueueLink ql = queueNetwork.getQueueLink(id1);
+		QueueLinkImpl ql = (QueueLinkImpl) queueNetwork.getQueueLink(id1);
 
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();

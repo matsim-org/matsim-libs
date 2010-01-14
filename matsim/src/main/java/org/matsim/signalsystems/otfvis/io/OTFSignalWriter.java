@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.ptproject.qsim.QueueLane;
-import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QueueLinkImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 
 
@@ -62,7 +62,7 @@ public class OTFSignalWriter extends OTFLaneWriter {
 	}
 	
 	@Override
-	public OTFDataWriter<QueueLink> getWriter() {
+	public OTFDataWriter<QueueLinkImpl> getWriter() {
 		return new OTFSignalWriter();
 	}
 	

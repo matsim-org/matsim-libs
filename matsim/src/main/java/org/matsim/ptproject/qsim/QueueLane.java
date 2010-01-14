@@ -242,7 +242,7 @@ public class QueueLane {
 		}
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * numberOfLanes)
-				/ ((NetworkImpl) this.queueLink.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize() * storageCapFactor;
+				/ ((NetworkImpl) ((QueueLinkImpl)this.queueLink).getQueueNetwork().getNetworkLayer()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -382,7 +382,7 @@ public class QueueLane {
 				// Check if veh has reached destination:
 				if ((driver.getDestinationLinkId() == this.queueLink.getLink().getId()) && (driver.chooseNextLinkId() == null)) {
 					driver.legEnds(now);
-					this.queueLink.processVehicleArrival(now, veh);
+					((QueueLinkImpl)this.queueLink).processVehicleArrival(now, veh);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
 					this.usedStorageCapacity -= veh.getSizeInEquivalents();

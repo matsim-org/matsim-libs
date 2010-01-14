@@ -375,7 +375,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 					log.error(message);
 					throw new IllegalStateException(message);
 				}
-				link.createLanes(laneToLink.getLanes());
+				((QueueLinkImpl)link).createLanes(laneToLink.getLanes());
 			}
 		}
 	}

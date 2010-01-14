@@ -48,6 +48,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.ptproject.qsim.PersonAgent;
 import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QueueLinkImpl;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.ptproject.qsim.QueueSimEngine;
 import org.matsim.ptproject.qsim.QueueVehicle;
@@ -961,7 +962,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
 	protected static class Fixture {
 		public final TestSimEngine simEngine;
-		public final QueueLink qlink1, qlink2, qlink3;
+		public final QueueLinkImpl qlink1, qlink2, qlink3;
 		public final TransitQueueVehicle transitVehicle;
 		public final QueueVehicle normalVehicle, normalVehicle2;
 
@@ -1042,9 +1043,9 @@ public class TransitQueueNetworkTest extends TestCase {
 			// setup: simulation
 			TransitQueueSimulation qsim = new TransitQueueSimulation(scenario, new EventsManagerImpl());
 			QueueNetwork qnet = qsim.getQueueNetwork();
-			this.qlink1 = qnet.getQueueLink(id1);
-			this.qlink2 = qnet.getQueueLink(id2);
-			this.qlink3 = qnet.getQueueLink(id3);
+			this.qlink1 = (QueueLinkImpl) qnet.getQueueLink(id1);
+			this.qlink2 = (QueueLinkImpl) qnet.getQueueLink(id2);
+			this.qlink3 = (QueueLinkImpl) qnet.getQueueLink(id3);
 			this.simEngine = new TestSimEngine(qnet);
 			TransitStopAgentTracker tracker = qsim.getAgentTracker();
 			tracker.addAgentToStop(new FakeAgent(null, null), stop1); // just add some agent so the transit vehicle has to stop
