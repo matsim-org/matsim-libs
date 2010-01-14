@@ -22,7 +22,8 @@ package org.matsim.ptproject.qsim;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
@@ -38,50 +39,45 @@ public class ParallelMoveNodes {
 	
 	private ExtendedQueueNode[][] parallelArrays;
 	
-	private static AtomicInteger threadLock;
-	
+	private CyclicBarrier startBarrier;
+	private CyclicBarrier endBarrier;
+		
 	public ParallelMoveNodes(boolean simulateAllNodes)
 	{
 		this.simulateAllNodes = simulateAllNodes;
 	}
 
 	/*
-	 * The Threads are waiting at the TimeStepStartBarrier.
+	 * The Threads are waiting at the startBarrier.
 	 * We trigger them by reaching this Barrier. Now the
-	 * Threads will start moving the Nodes. We wait until
-	 * all of them reach the TimeStepEndBarrier to move on.
-	 * We should not have any Problems with Race Conditions
+	 * Threads will start moving the Nodes. We wait 
+	 * until all of them reach the endBarrier to move
+	 * on. We should not have any Problems with Race Conditions
 	 * because even if the Threads would be faster than this
-	 * Thread, means the reach the TimeStepEndBarrier before
+	 * Thread, means the reach the endBarrier before
 	 * this Method does, it should work anyway.
 	 */
 	public void run(double time)
 	{	
 		try
 		{
-			// lock threadLocker until wait() statement listens for the notifies
-			synchronized(threadLock) 
+			// set current Time
+			for (MoveNodesThread moveNodesThread : moveNodesThreads) 
 			{
-				threadLock.set(this.numOfThreads);
-							
-				for (MoveNodesThread moveNodesThread : moveNodesThreads) 
-				{
-					moveNodesThread.setTime(time);
-					synchronized(moveNodesThread)
-					{
-						moveNodesThread.notify();
-					}
-				}
-//				synchronized(MoveNodesThread.waiter)
-//				{
-//					MoveNodesThread.waiter.notifyAll();
-//				}
-				threadLock.wait();
-			}		
-		} 
+				moveNodesThread.setTime(time);
+			}
+			
+			this.startBarrier.await();
+				
+			this.endBarrier.await();		
+		}
 		catch (InterruptedException e)
 		{
 			Gbl.errorMsg(e);
+		}
+		catch (BrokenBarrierException e)
+		{
+	      	Gbl.errorMsg(e);
 		}
 	}
 	
@@ -123,7 +119,8 @@ public class ParallelMoveNodes {
 	{
 		this.numOfThreads = numOfThreads;
 		
-		threadLock = new AtomicInteger(0);
+		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
+		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
 
 		createArrays(simNodesArray);
 		
@@ -134,11 +131,32 @@ public class ParallelMoveNodes {
 		{
 			MoveNodesThread moveNodesThread = new MoveNodesThread(simulateAllNodes);
 			moveNodesThread.setName("MoveNodes" + i);
+			moveNodesThread.setStartBarrier(this.startBarrier);
+			moveNodesThread.setEndBarrier(this.endBarrier);
 			moveNodesThread.setExtendedQueueNodeArray(this.parallelArrays[i]);			
 			moveNodesThread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			moveNodesThreads[i] = moveNodesThread;
 			
 			moveNodesThread.start();
+		}
+		
+		/*
+		 * After initialization the Threads are waiting at the
+		 * endBarrier. We trigger this Barrier once so 
+		 * they wait at the startBarrier what has to be
+		 * their state if the run() method is called.
+		 */
+		try
+		{
+			this.endBarrier.await();
+		} 
+		catch (InterruptedException e) 
+		{
+			Gbl.errorMsg(e);
+		} 
+		catch (BrokenBarrierException e)
+		{
+			Gbl.errorMsg(e);
 		}
 	}
 	
@@ -179,13 +197,24 @@ public class ParallelMoveNodes {
 		private boolean simulateAllNodes = false;
 		private ExtendedQueueNode[] queueNodes;
 		
-		private static Object waiter = new Object();
+		private CyclicBarrier startBarrier;
+		private CyclicBarrier endBarrier;
 		
 		public MoveNodesThread(boolean simulateAllNodes)
 		{
 			this.simulateAllNodes = simulateAllNodes;
 		}
-
+		
+		public void setStartBarrier(CyclicBarrier cyclicBarrier)
+		{
+			this.startBarrier = cyclicBarrier;
+		}
+		
+		public void setEndBarrier(CyclicBarrier cyclicBarrier)
+		{
+			this.endBarrier = cyclicBarrier;
+		}
+		
 		public void setExtendedQueueNodeArray(ExtendedQueueNode[] queueNodes)
 		{
 			this.queueNodes = queueNodes;
@@ -204,26 +233,17 @@ public class ParallelMoveNodes {
 				try
 				{
 					/*
-					 * threadLocker.decCounter() and wait() have to be
-					 * executed in a synchronized block! Otherwise it could
-					 * happen, that the replanning ends and the replanning of
-					 * the next SimStep executes the notify command before
-					 * wait() is called -> we have a DeadLock!
+					 * The End of the Moving is synchronized with 
+					 * the endBarrier. If all Threads reach this Barrier
+					 * the main run() Thread can go on.
+					 * 
+					 * The Threads wait now at the startBarrier until
+					 * they are triggered again in the next TimeStep by the main run()
+					 * method.
 					 */
-					synchronized(this)
-//					synchronized(waiter)
-					{
-						int activeThreads = threadLock.decrementAndGet();
-						if (activeThreads == 0)
-						{
-							synchronized(threadLock)
-							{
-								threadLock.notify();
-							}
-						}
-						wait();
-//						waiter.wait();
-					}
+					endBarrier.await();
+						
+					startBarrier.await();
 					
 					for (ExtendedQueueNode extendedQueueNode : queueNodes)
 					{							
@@ -238,6 +258,10 @@ public class ParallelMoveNodes {
 				{
 					Gbl.errorMsg(e);
 				}
+	            catch (BrokenBarrierException e)
+	            {
+	            	Gbl.errorMsg(e);
+	            }
 			}
 		}	// run()
 		

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParallelMoveNodes.java
+ * ParallelMoveNodesAndLinks.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.ptproject.qsim;
 
 import java.util.ArrayList;
@@ -25,10 +26,6 @@ import java.util.ListIterator;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
@@ -46,14 +43,10 @@ public class ParallelMoveNodesAndLinks {
 	private ExtendedQueueNode[][] parallelNodesArrays;
 	private List<List<QueueLink>> parallelSimLinksLists;
 	
-	private CyclicBarrier cyclicBarrier;
-	
-	private static AtomicInteger threadLock;
-	private static AtomicInteger barrier;
-//	private static Lock globalLock;
-//	private static Condition runCondition;
-//	private static Condition waitCondition;
-	
+	private CyclicBarrier separationBarrier;	// separates moveNodes and moveLinks
+	private CyclicBarrier startBarrier;
+	private CyclicBarrier endBarrier;
+		
 	public ParallelMoveNodesAndLinks(boolean simulateAllNodes, boolean simulateAllLinks)
 	{
 		this.simulateAllNodes = simulateAllNodes;
@@ -61,80 +54,52 @@ public class ParallelMoveNodesAndLinks {
 	}
 
 	/*
-	 * The Threads are waiting at the TimeStepStartBarrier.
+	 * The Threads are waiting at the startBarrier.
 	 * We trigger them by reaching this Barrier. Now the
-	 * Threads will start moving the Nodes. We wait until
-	 * all of them reach the TimeStepEndBarrier to move on.
-	 * We should not have any Problems with Race Conditions
+	 * Threads will start moving the Nodes and Links. We wait 
+	 * until all of them reach the endBarrier to move
+	 * on. We should not have any Problems with Race Conditions
 	 * because even if the Threads would be faster than this
-	 * Thread, means the reach the TimeStepEndBarrier before
+	 * Thread, means the reach the endBarrier before
 	 * this Method does, it should work anyway.
 	 */
 	public void run(double time)
 	{	
 		try
 		{
-		
-			// lock threadLocker until wait() statement listens for the notifies
-			synchronized(threadLock) 
-			{
-				threadLock.set(this.numOfThreads);
-				barrier.set(this.numOfThreads);
+			// set current Time
+			for (MoveThread moveThread : moveThreads) 
+			{				
+				moveThread.setTime(time);
+			}
+			
+			this.startBarrier.await();
 				
-				for (MoveThread moveNodesThread : moveThreads) 
-				{
-					moveNodesThread.setTime(time);
-					synchronized(moveNodesThread)
-					{
-						moveNodesThread.notify();
-					}
-				}
-//				synchronized(MoveNodesThread.waiter)
-//				{
-//					MoveNodesThread.waiter.notifyAll();
-//				}
-				threadLock.wait();
-			}	
-/*		
-
-			for (MoveThread moveNodesThread : moveThreads) 
-			{
-				moveNodesThread.setTime(time);
-			}			
-			globalLock.lock();
-			threadLock.set(this.numOfThreads);
-			barrier.set(this.numOfThreads);
-//			log.info("signalizing...");
-			waitCondition.signalAll();
-//			log.info("awaiting...");
-			runCondition.await();
-			globalLock.unlock();
-//			log.info("unlocked...");
-*/
-		} 
+			this.endBarrier.await();		
+		}
 		catch (InterruptedException e)
 		{
 			Gbl.errorMsg(e);
+		}
+		catch (BrokenBarrierException e)
+		{
+	      	Gbl.errorMsg(e);
 		}
 	}
 		
 	public void initNodesAndLinks(QueueNode[] simNodesArray, List<QueueLink> allLinks, List<QueueLink> simActivateThis, int numOfThreads)
 	{	
 		this.numOfThreads = numOfThreads;
-		
-		threadLock = new AtomicInteger(0);
-		barrier = new AtomicInteger(0);
-//		globalLock = new ReentrantLock();
-//		runCondition = globalLock.newCondition();
-//		waitCondition = globalLock.newCondition();
-				
+
 		createNodesArrays(simNodesArray);
 		createLinkLists(allLinks);
 		
 		LinkReActivator linkReActivator = new LinkReActivator(simActivateThis, parallelSimLinksLists, numOfThreads);
 		
-		this.cyclicBarrier = new CyclicBarrier(numOfThreads, linkReActivator);
-				
+		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
+		this.separationBarrier = new CyclicBarrier(numOfThreads, linkReActivator);
+		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
+		
 		moveThreads = new MoveThread[numOfThreads];
 						
 		// setup threads
@@ -142,14 +107,36 @@ public class ParallelMoveNodesAndLinks {
 		{
 			MoveThread moveThread = new MoveThread(simulateAllNodes);
 			moveThread.setName("MoveNodesAndLinks" + i);
-			moveThread.setCyclicBarrier(this.cyclicBarrier);
-//			moveThread.setRunnable(linkReActivator);
+			
+			moveThread.setStartBarrier(this.startBarrier);
+			moveThread.setSeparationBarrier(this.separationBarrier);
+			moveThread.setEndBarrier(this.endBarrier);
+			
 			moveThread.setExtendedQueueNodeArray(this.parallelNodesArrays[i]);
 			moveThread.handleLinks(parallelSimLinksLists.get(i));
 			moveThread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			moveThreads[i] = moveThread;
 			
 			moveThread.start();
+		}
+		
+		/*
+		 * After initialization the Threads are waiting at the
+		 * endBarrier. We trigger this Barrier once so 
+		 * they wait at the startBarrier what has to be
+		 * their state if the run() method is called.
+		 */
+		try
+		{
+			this.endBarrier.await();
+		} 
+		catch (InterruptedException e) 
+		{
+			Gbl.errorMsg(e);
+		} 
+		catch (BrokenBarrierException e)
+		{
+			Gbl.errorMsg(e);
 		}
 	}
 		
@@ -246,7 +233,6 @@ public class ParallelMoveNodesAndLinks {
 		private int numOfThreads;
 		private int distributor = 0;
 		
-		
 		public LinkReActivator(List<QueueLink> simActivateThis, List<List<QueueLink>> parallelSimLinksLists, int numOfThreads)
 		{
 			this.simActivateThis = simActivateThis;
@@ -305,31 +291,34 @@ public class ParallelMoveNodesAndLinks {
 		private double time = 0.0;
 		private boolean simulateAllNodes = false;
 		private boolean simulateAllLinks = false;
-		private CyclicBarrier cyclicBarrier;
-//		private Runnable runnable;
-//		private static Lock lock = new ReentrantLock();
-//		private static Condition condition = lock.newCondition();
 		
+		private CyclicBarrier startBarrier;
+		private CyclicBarrier separationBarrier;
+		private CyclicBarrier endBarrier;
+				
 		private ExtendedQueueNode[] queueNodes;
 		private List<QueueLink> links = new ArrayList<QueueLink>();
-		
-//		private static Object waiter = new Object();
-				
+					
 		public MoveThread(boolean simulateAllNodes)
 		{
 			this.simulateAllNodes = simulateAllNodes;
 		}
 
-		public void setCyclicBarrier(CyclicBarrier cyclicBarrier)
+		public void setStartBarrier(CyclicBarrier cyclicBarrier)
 		{
-			this.cyclicBarrier = cyclicBarrier;
+			this.startBarrier = cyclicBarrier;
 		}
 		
-//		public void setRunnable(Runnable runnable)
-//		{
-//			this.runnable = runnable;
-//		}
+		public void setSeparationBarrier(CyclicBarrier cyclicBarrier)
+		{
+			this.separationBarrier = cyclicBarrier;
+		}
 		
+		public void setEndBarrier(CyclicBarrier cyclicBarrier)
+		{
+			this.endBarrier = cyclicBarrier;
+		}
+				
 		public void setExtendedQueueNodeArray(ExtendedQueueNode[] queueNodes)
 		{
 			this.queueNodes = queueNodes;
@@ -353,43 +342,18 @@ public class ParallelMoveNodesAndLinks {
 				try
 				{
 					/*
-					 * threadLocker.decCounter() and wait() have to be
-					 * executed in a synchronized block! Otherwise it could
-					 * happen, that the replanning ends and the replanning of
-					 * the next SimStep executes the notify command before
-					 * wait() is called -> we have a DeadLock!
-					 */		
-					synchronized(this)
-//					synchronized(waiter)
-					{
-						int activeThreads = threadLock.decrementAndGet();
-						if (activeThreads == 0)
-						{
-							synchronized(threadLock)
-							{
-								threadLock.notify();
-							}
-						}
-						wait();
-//						waiter.wait();
-					}
-					
-/*
-//					log.info("trying to get Lock..." + Thread.currentThread().getName());
-					globalLock.lock();
-					int activeThreads2 = threadLock.decrementAndGet();
-					
-					if (activeThreads2 == 0)
-					{
-//						log.info("signalizing..." + Thread.currentThread().getName());
-						runCondition.signal();
-					}
-//					log.info("awaiting..." + Thread.currentThread().getName() + " " + activeThreads2);
-					waitCondition.await();
-					globalLock.unlock();
-//					log.info("unlocked..." + Thread.currentThread().getName());
-*/
-					
+					 * The End of the Moving is synchronized with 
+					 * the endBarrier. If all Threads reach this Barrier
+					 * the main run() Thread can go on.
+					 * 
+					 * The Threads wait now at the startBarrier until
+					 * they are triggered again in the next TimeStep by the main run()
+					 * method.
+					 */
+					endBarrier.await();
+						
+					startBarrier.await();
+										
 					/*
 					 * Move Nodes
 					 */
@@ -410,43 +374,7 @@ public class ParallelMoveNodesAndLinks {
 					 * the Threads. By using a Runnable within the Barrier we activate
 					 * some Links. 
 					 */
-					this.cyclicBarrier.await();
-					
-//					lock.lock();
-//					int activeThreads = barrier.decrementAndGet();
-//					
-//					if (activeThreads > 0)
-//					{
-//						synchronized(barrier)
-//						{
-//							lock.unlock();
-//							barrier.wait();
-//						}
-//					}
-//					else
-//					{
-//						runnable.run();
-//						synchronized(barrier)
-//						{
-//							barrier.notifyAll();
-//						}
-//						lock.unlock();
-//					}
-
-//					lock.lock();
-//					int activeThreads = barrier.decrementAndGet();
-//					
-//					if (activeThreads > 0)
-//					{
-//						condition.await();
-//						lock.unlock();
-//					}
-//					else
-//					{
-//						runnable.run();
-//						condition.signal();
-//						lock.unlock();
-//					}
+					this.separationBarrier.await();
 					
 					/*
 					 * Move Links
