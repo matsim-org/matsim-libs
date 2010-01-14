@@ -157,12 +157,12 @@ public class FacilityDrawer {
 		}
 
 		public void initTexts() {
-//			for (VisBusStop stop : this.stops) {
-//				if ( stop.linkId!=null ) {
-//					stop.stopText = InfoTextContainer.showTextPermanent(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f, 2.0f);
-//					stop.stopText.setLinkId(new IdImpl(stop.linkId));
-//				}
-//			}
+			for (VisBusStop stop : this.stops) {
+				if ( stop.linkId!=null ) {
+					stop.stopText = InfoTextContainer.showTextPermanent(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f, 2.0f);
+					stop.stopText.setLinkId(new IdImpl(stop.linkId));
+				}
+			}
 		}
 
 	}
@@ -184,7 +184,7 @@ public class FacilityDrawer {
 		}
 		
 		private void updateText() {
-//			stopText.setText(buildText());
+			stopText.setText(buildText());
 		}
 
 		private String buildText() {
