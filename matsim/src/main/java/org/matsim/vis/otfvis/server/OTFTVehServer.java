@@ -85,7 +85,7 @@ public class OTFTVehServer implements OTFServerRemote {
 
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
+//		connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
 
 		 OTFQSimServerQuadBuilder quadBuilder = new OTFQSimServerQuadBuilder(qnet);
 		
