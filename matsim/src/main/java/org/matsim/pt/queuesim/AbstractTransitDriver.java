@@ -1,7 +1,6 @@
 package org.matsim.pt.queuesim;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -37,6 +36,13 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	private TransitRouteStop nextStop;
 	private TransitStopFacility lastHandledStop = null;
 	private ListIterator<TransitRouteStop> stopIterator;
+	
+	private final double personEntersTime = 4.0;
+	private final double personLeavesTime = 2.0;
+	
+	private boolean doorsOpen = false;
+	private double passengersLeavingTimeFraction = 0.0;
+	private double passengersEnteringTimeFraction = 0.0;
 
 	public abstract void legEnds(final double now);
 	public abstract NetworkRouteWRefs getCarRoute();
@@ -93,7 +99,9 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 		int freeCapacity = this.vehicle.getPassengerCapacity() - this.vehicle.getPassengers().size() + passengersLeaving.size();
 		List<PassengerAgent> passengersEntering = findPassengersEntering(stop, freeCapacity);
 		double stopTime = handlePassengersAndCalculateStopTime(stop, now, passengersLeaving, passengersEntering);
-		stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
+		if(stopTime == 0.0){
+			stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
+		}
 		if (stopTime == 0.0) {
 			depart(now);
 		}
@@ -178,17 +186,124 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 			ArrayList<PassengerAgent> passengersLeaving,
 			List<PassengerAgent> passengersEntering) {
 		double stopTime = 0.0;
+
 		int cntEgress = passengersLeaving.size();
 		int cntAccess = passengersEntering.size();
-		if ((cntAccess > 0) || (cntEgress > 0)) {
-			stopTime = cntAccess * 4 + cntEgress * 2;
-			if (this.lastHandledStop != stop) {
-				stopTime += 15.0; // add fixed amount of time for door-operations and similar stuff
+
+		if (!this.doorsOpen) {
+			// doors are closed
+
+			if ((cntAccess > 0) || (cntEgress > 0)) {
+				// case doors are shut, but passengers want to leave or enter
+				// the veh
+				this.doorsOpen = true;
+				stopTime = 5.0; // Time to open doors
+			} else {
+				// case nobody wants to leave or enter the veh
+				stopTime = 0.0;
+				this.lastHandledStop = stop;
 			}
-			handlePassengersLeaving(stop, now, passengersLeaving);
-			handlePassengersEntering(stop, now, passengersEntering);
+
+		} else {
+			// doors are already open
+
+			if ((cntAccess > 0) || (cntEgress > 0)) {
+				// somebody wants to leave or enter the veh
+
+				if (cntAccess > 0) {
+
+					if (this.passengersEnteringTimeFraction < 1.0) {
+
+						// next passenger can enter the veh
+
+						ArrayList<PassengerAgent> entering = new ArrayList<PassengerAgent>();
+
+						while (this.passengersEnteringTimeFraction < 1.0) {
+							if (passengersEntering.size() == 0) {
+								break;
+							}
+
+							entering.add(passengersEntering.get(0));
+							passengersEntering.remove(0);
+							this.passengersEnteringTimeFraction += this.personEntersTime;
+						}
+
+						handlePassengersEntering(stop, now, entering);
+						this.passengersEnteringTimeFraction -= 1.0;
+						stopTime = 1.0;
+
+					} else {
+						// still time needed to allow next passenger to enter
+						this.passengersEnteringTimeFraction -= 1.0;
+						stopTime = 1.0;
+					}
+					
+				} else {
+					this.passengersEnteringTimeFraction -= 1.0;
+					this.passengersEnteringTimeFraction = Math.max(0, this.passengersEnteringTimeFraction);
+				}
+
+				if (cntEgress > 0) {
+
+					if (this.passengersLeavingTimeFraction < 1.0) {
+						// next passenger can leave the veh
+
+						ArrayList<PassengerAgent> leaving = new ArrayList<PassengerAgent>();
+
+						while (this.passengersLeavingTimeFraction < 1.0) {
+							if (passengersLeaving.size() == 0) {
+								break;
+							}
+							leaving.add(passengersLeaving.get(0));
+							passengersLeaving.remove(0);
+							this.passengersLeavingTimeFraction += this.personLeavesTime;
+						}
+
+						handlePassengersLeaving(stop, now, leaving);
+						this.passengersLeavingTimeFraction -= 1.0;
+						stopTime = 1.0;
+
+					} else {
+						// still time needed to allow next passenger to leave
+						this.passengersLeavingTimeFraction -= 1.0;
+						stopTime = 1.0;
+					}
+					
+				} else {
+					this.passengersLeavingTimeFraction -= 1.0;
+					this.passengersLeavingTimeFraction = Math.max(0, this.passengersLeavingTimeFraction);
+				}
+
+			} else {
+				
+				// nobody left to handle
+
+				if (this.passengersEnteringTimeFraction < 1.0 && this.passengersLeavingTimeFraction < 1.0) {
+					// every passenger entered or left the veh so close and
+					// leave
+
+					this.doorsOpen = false;
+					this.passengersEnteringTimeFraction = 0.0;
+					this.passengersLeavingTimeFraction = 0.0;
+					stopTime = 10.0; // Time to shut the doors
+				}
+
+				// somebody is still leaving or entering the veh so wait again
+
+				if (this.passengersEnteringTimeFraction >= 1) {
+					this.passengersEnteringTimeFraction -= 1.0;
+					stopTime = 1.0;
+				}
+
+				if (this.passengersLeavingTimeFraction >= 1) {
+					this.passengersLeavingTimeFraction -= 1.0;
+					stopTime = 1.0;
+				}
+
+			}
+
 		}
-		this.lastHandledStop = stop;
+
 		return stopTime;
 	}
 
