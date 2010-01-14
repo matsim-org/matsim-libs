@@ -61,7 +61,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 
 	public OTFServerQuad2(Network network) {
 		super(0,0,0,0);
-		this.updateBoundingBox(network);
+		this.setBoundingBoxFromNetwork(network);
 	}
 	
 	/**
@@ -71,7 +71,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	public abstract void initQuadTree(final OTFConnectionManager connect);
 
 	
-	protected void updateBoundingBox(Network n){
+	protected void setBoundingBoxFromNetwork(Network n){
 		this.minEasting = Double.POSITIVE_INFINITY;
 		this.maxEasting = Double.NEGATIVE_INFINITY;
 		this.minNorthing = Double.POSITIVE_INFINITY;
@@ -129,9 +129,9 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	}
 
 	public void writeConstData(ByteBuffer out) {
-		//int colls = 
-		this.execute(0.,0.,this.easting, this.northing,
-				new WriteDataExecutor(out,true));
+
+		this.execute(0.,0.,this.easting, this.northing, new WriteDataExecutor(out,true));
+		// "this" is a quad tree; thus this command somehow marks the relevant leaves
 
 		for(OTFDataWriter element : this.additionalElements) {
 			try {
@@ -143,9 +143,9 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	}
 
 	public void writeDynData(QuadTree.Rect bounds, ByteBuffer out) {
-		//int colls = 
+
 		this.execute(bounds, new WriteDataExecutor(out,false));
-		//System.out.print("# of Writes: " + colls + " -> ");
+		// "this" is a quad tree; thus this command somehow marks the relevant leaves
 
 		for(OTFDataWriter element : this.additionalElements) {
 			try {

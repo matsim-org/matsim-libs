@@ -32,7 +32,15 @@ import org.matsim.vis.otfvis.gui.OTFDrawable;
  * @author dstrippgen
  *
  */
-public interface OTFGLDrawable extends OTFDrawable , OTFDataReceiver{
+public interface OTFGLDrawable extends OTFDrawable {
+
+	/**Presumably, the machinery calls "draw".  For the OpenGL implementation, 
+	 * "draw" always calls "onDraw" and then exits.  So for the OpenGL
+	 * implementation, "onDraw" needs to be implemented in order to obtain
+	 * "draw" functionality. ???
+	 * 
+	 * @param gl
+	 */
 	public void onDraw(GL gl);
 }
 

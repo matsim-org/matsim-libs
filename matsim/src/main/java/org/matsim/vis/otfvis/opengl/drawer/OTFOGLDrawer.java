@@ -214,8 +214,8 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		gl.glLoadIdentity();
 		//drawQuad
 		if(!this.opaque) {
-			this.gl.glEnable(GL.GL_BLEND);
-			this.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+			this.getGl().glEnable(GL.GL_BLEND);
+			this.getGl().glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		}
 
 		this.t.enable();
@@ -229,7 +229,7 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		//restore old mode
 		this.t.disable();
 		if(!this.opaque) {
-			this.gl.glDisable(GL.GL_BLEND);
+			this.getGl().glDisable(GL.GL_BLEND);
 		}
 		gl.glMatrixMode( GL.GL_MODELVIEW);
 		gl.glPopMatrix();
@@ -379,15 +379,22 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 	}
 
-	public static class AgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver {
-		//Anything above 50km/h should be yellow!
-		private final static FastColorizer colorizer = new FastColorizer(
-				new double[] { 0.0, 25, 50, 75}, new Color[] {
-						Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE});
-
-		protected char[] id;
-		protected float startX, startY, color;
-		protected int state;
+	/**I think that this class is used nowhere except that some static fields are used from somewhere else.  
+	 * (But, as usual, it might be needed in some old mvi files.)  Kai, jan'10
+	 * 
+	 */
+	public static class AgentDrawer 
+//	extends OTFGLDrawableImpl 
+//	implements OTFDataSimpleAgentReceiver 
+	{
+//		//Anything above 50km/h should be yellow!
+//		private final static FastColorizer colorizer = new FastColorizer(
+//				new double[] { 0.0, 25, 50, 75}, new Color[] {
+//						Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE});
+//
+//		protected char[] id;
+//		protected float startX, startY, color;
+//		protected int state;
 
 		public static  Texture  carjpg = null;
 		
@@ -398,36 +405,41 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		@Deprecated 
 		public static  Texture  pedpng = null;
 
-		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			this.id = id;
-			this.startX = startX;
-			this.startY = startY;
-			this.color = color;
-			this.state = state;
-		}
-
-		public void displayPS(GL gl) {
-			gl.glEnable(GL.GL_POINT_SPRITE_NV);
-			gl.glPointSize(agentSize/10);
-			gl.glBegin(GL.GL_POINTS);
-			gl.glVertex3f(this.startX,this.startY, 0);
-			gl.glEnd();
-			gl.glDisable(GL.GL_POINT_SPRITE_NV);
-		}
-
-		protected void setColor(GL gl) {
-			Color color = colorizer.getColor(0.1 + 0.9*this.color);
-			if ((this.state & 1) != 0) {
-				color = Color.lightGray;
-			}
-			gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.8);
-
-		}
-
-		public void onDraw(GL gl) {
-			setColor(gl);
-			displayPS(gl);
-		}
+//		private static int cnt = 0 ;
+//		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
+//			if ( cnt < 1 ) {
+//				cnt++ ;
+//				log.warn("calling setAgent") ;
+//			}
+//			this.id = id;
+//			this.startX = startX;
+//			this.startY = startY;
+//			this.color = color;
+//			this.state = state;
+//		}
+//
+//		public void displayPS(GL gl) {
+//			gl.glEnable(GL.GL_POINT_SPRITE_NV);
+//			gl.glPointSize(agentSize/10);
+//			gl.glBegin(GL.GL_POINTS);
+//			gl.glVertex3f(this.startX,this.startY, 0);
+//			gl.glEnd();
+//			gl.glDisable(GL.GL_POINT_SPRITE_NV);
+//		}
+//
+//		protected void setColor(GL gl) {
+//			Color color = colorizer.getColor(0.1 + 0.9*this.color);
+//			if ((this.state & 1) != 0) {
+//				color = Color.lightGray;
+//			}
+//			gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.8);
+//
+//		}
+//
+//		public void onDraw(GL gl) {
+//			setColor(gl);
+//			displayPS(gl);
+//		}
 	}
 
 	private static class MyGLCanvas2 extends GLCanvas {
@@ -511,7 +523,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		// make quad filled to hit every pixel/texel
 		this.gl.glNewList(this.netDisplList, GL.GL_COMPILE);
 		log.info("DRAWING NET ONCE: objects count: " + this.netItems.size() );
-		OTFGLDrawableImpl.gl = this.gl;
+		OTFGLDrawableImpl.setGl(this.gl);
 		for (OTFGLDrawable item : this.netItems) {
 			item.draw();
 		}

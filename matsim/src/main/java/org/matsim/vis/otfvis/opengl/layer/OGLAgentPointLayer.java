@@ -32,10 +32,14 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
+import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
+import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
@@ -53,28 +57,17 @@ import com.sun.opengl.util.texture.Texture;
  *
  */
 public class OGLAgentPointLayer extends DefaultSceneLayer {
+	
+	private final static Logger log = Logger.getLogger(OGLAgentPointLayer.class);
+	
 	private final static int BUFFERSIZE = 10000;
 	
+	private static int agentPointDrawerSetAgentCnt = 0 ;
+
 	private static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 50.}, new Color[] {
 					Color.RED, Color.YELLOW, Color.GREEN});
 
-	
-	//for backward compatibility only
-	@Deprecated 
-	// for Padang time-based agents
-	/*package*/ final static RandomColorizer colorizer2 = new RandomColorizer(257);
-	
-	//for backward compatibility only
-	@Deprecated 
-	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
-			new double[] { 0.0, 30., 120., 255. ,256.}, new Color[] {	Color.GREEN, Color.YELLOW, Color.RED, Color.RED, Color.BLUE});
-	
-	//for backward compatibility only
-	@Deprecated 
-	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer4 = new OTFOGLDrawer.FastColorizer(
-			 new double[] { 0.0, 20.,255.}, new Color[] {	new Color(0,255,128,0), Color.CYAN, Color.BLUE});
-	
 	public static class AgentArrayDrawer extends OTFGLDrawableImpl {
 
 		private int count = 0;
@@ -101,19 +94,19 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		
 		protected void setAgentSize() {
 			float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
-			if (gl.isFunctionAvailable("glPointParameterf")) {
+			if (getGl().isFunctionAvailable("glPointParameterf")) {
 				// Query for the max point size supported by the hardware
 				float [] maxSize = {0.0f};
-				gl.glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
+				getGl().glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
 				float quadratic[] =  { 0.0f, 0.0001f, 0.000000f };
-				gl.glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
+				getGl().glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
 
-				gl.glPointSize(agentSize/10.f);
-				gl.glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 1.f);
-				gl.glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, agentSize*30.f);
+				getGl().glPointSize(agentSize/10.f);
+				getGl().glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 1.f);
+				getGl().glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, agentSize*30.f);
 
 			} else {
-				gl.glPointSize(agentSize/10);
+				getGl().glPointSize(agentSize/10);
 			}
 		}
 		
@@ -225,9 +218,12 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	}
 	
 	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver {
-	
-		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			if (user != 2) {
+		public void setAgent(char[] id, float startX, float startY, int state, int userdefined, float color) {
+			if ( agentPointDrawerSetAgentCnt < 1 ) {
+				agentPointDrawerSetAgentCnt++ ;
+				log.warn("calling setAgent") ;
+			}
+			if (userdefined != 2) {
 				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, colorizer.getColor(color), true);
 			} else {
 				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, new Color(0.0f, 0.7f, 1.0f), true);
@@ -258,57 +254,13 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 	}
 
-	//for backward compatibility only
-	@Deprecated 
-	public class AgentPadangDrawer  extends AgentPointDrawer {
-
-		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
-			@Override
-			protected void setAgentSize(){gl.glPointSize(10);}
-			@Override
-			protected void setTexture(){this.texture = null;}
-		};
-		
-		public final AgentArrayDrawer drawerEvacuees = new AgentArrayDrawer(){
-			@Override
-			protected void setTexture(){this.texture = AgentDrawer.pedpng;}
-		};		
-
-		public void drawAll() {
-			this.drawerWave.draw();
-			this.drawerEvacuees.draw();
-		}
-	}
-
-	public static class NoAgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver  {
+	public /*static*/ class NoAgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver  {
 		
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color){
 		}
 
 		public void onDraw(GL gl) {
 
-		}
-	}
-
-	//for backward compatibility only
-	@Deprecated 
-	public class AgentPadangRegionDrawer extends AgentPadangDrawer {
-		
-		@Override
-		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			if (user !=-1) this.drawerEvacuees.addAgent(id, startX, startY, colorizer2.getColor(user), false);
-			else this.drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
-		}
-	}
-	
-	//for backward compatibility only
-	@Deprecated 
-	public class AgentPadangTimeDrawer extends AgentPadangDrawer {
-		
-		@Override
-		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			if (user != -1) this.drawerEvacuees.addAgent(id, startX, startY, colorizer3.getColor(state),false);
-			else this.drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
 		}
 	}
 
@@ -336,7 +288,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	}
 
 	@Override
-	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException {
+	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) throws InstantiationException, IllegalAccessException {
 		if (clazz == AgentPadangTimeDrawer.class) return this.timedrawer;
 		else if (clazz == AgentPadangRegionDrawer.class) return this.regiondrawer;
 		else if (clazz == AgentPointDrawerByID.class) return this.pointIDdrawer;
@@ -364,5 +316,69 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		return null;
 		
 	}
+	
+	// #################################################################
+	// #################################################################
+	// below here is for backwards compatibility only
+	
+	//for backward compatibility only
+	@Deprecated 
+	// for Padang time-based agents
+	/*package*/ final static RandomColorizer colorizer2 = new RandomColorizer(257);
+	
+	//for backward compatibility only
+	@Deprecated 
+	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
+			new double[] { 0.0, 30., 120., 255. ,256.}, new Color[] {	Color.GREEN, Color.YELLOW, Color.RED, Color.RED, Color.BLUE});
+	
+	//for backward compatibility only
+	@Deprecated 
+	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer4 = new OTFOGLDrawer.FastColorizer(
+			 new double[] { 0.0, 20.,255.}, new Color[] {	new Color(0,255,128,0), Color.CYAN, Color.BLUE});
+	
+	//for backward compatibility only
+	@Deprecated 
+	public class AgentPadangDrawer  extends AgentPointDrawer {
+
+		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
+			@Override
+			protected void setAgentSize(){getGl().glPointSize(10);}
+			@Override
+			protected void setTexture(){this.texture = null;}
+		};
+		
+		public final AgentArrayDrawer drawerEvacuees = new AgentArrayDrawer(){
+			@Override
+			protected void setTexture(){this.texture = AgentDrawer.pedpng;}
+		};		
+
+		public void drawAll() {
+			this.drawerWave.draw();
+			this.drawerEvacuees.draw();
+		}
+	}
+
+	//for backward compatibility only
+	@Deprecated 
+	public class AgentPadangRegionDrawer extends AgentPadangDrawer {
+		
+		@Override
+		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
+			if (user !=-1) this.drawerEvacuees.addAgent(id, startX, startY, colorizer2.getColor(user), false);
+			else this.drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
+		}
+	}
+	
+	//for backward compatibility only
+	@Deprecated 
+	public class AgentPadangTimeDrawer extends AgentPadangDrawer {
+		
+		@Override
+		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
+			if (user != -1) this.drawerEvacuees.addAgent(id, startX, startY, colorizer3.getColor(state),false);
+			else this.drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
+		}
+	}
+
 	
 }

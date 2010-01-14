@@ -116,15 +116,15 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		String id = ByteBufferUtils.getString(in);
 		float x = in.getFloat();
 		float y = in.getFloat();
-		int type = in.getInt();
-		int user = in.getInt();
+		int state = in.getInt();
+		int userdefined = in.getInt();
 		// Convert to km/h
 		float speed = in.getFloat()*3.6f;
 
 			OTFDataSimpleAgentReceiver drawer = null;
 			try {
 				drawer = (OTFDataSimpleAgentReceiver) graph.newInstance(this.agentReceiverClass);
-				drawer.setAgent(id.toCharArray(), x, y, type, user, speed);
+				drawer.setAgent(id.toCharArray(), x, y, state, userdefined, speed);
 				this.agents.add(drawer);
 			} catch (InstantiationException e) {
 				e.printStackTrace();
@@ -178,14 +178,14 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			String id = ByteBufferUtils.getString(in);
 			float x = in.getFloat();
 			float y = in.getFloat();
-			int state = in.getInt();
+			int userdefined = in.getInt();
 			// Convert to km/h
 			float color = in.getFloat()*3.6f;
 
 				OTFDataSimpleAgentReceiver drawer = null;
 				try {
 					drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(this.agentReceiverClass);
-					drawer.setAgent(id.toCharArray(), x, y, 0, state, color);
+					drawer.setAgent(id.toCharArray(), x, y, 0, userdefined, color);
 					this.agents.add(drawer);
 				} catch (InstantiationException e) {
 					e.printStackTrace();

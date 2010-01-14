@@ -156,7 +156,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 //		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
 		float x = in.getFloat();
 		float y = in.getFloat();
-		int state = in.getInt();
+		int userdefined = in.getInt();
 		// Convert to km/h 
 		float color = in.getFloat()*3.6f;
 		// No agent receiver given, then we are finished
@@ -165,7 +165,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		OTFDataSimpleAgentReceiver drawer = null;
 		try {
 			drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(agentReceiverClass);
-			drawer.setAgent(id.toCharArray(), x, y, 0, state, color);
+			drawer.setAgent(id.toCharArray(), x, y, 0, userdefined, color);
 			agents.add(drawer);
 		} catch (InstantiationException e) {
 			log.warn("Agent drawer could not be instanciated");

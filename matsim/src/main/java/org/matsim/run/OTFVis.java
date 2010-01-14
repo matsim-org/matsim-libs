@@ -155,7 +155,10 @@ public class OTFVis {
 		new OTFClientFile(args[0]).start();
 	}
 
+	/* @deprecated this currently does not work; may be fixed if needed.  kai, jan'10 */
+	@Deprecated // this currently does not work; may be fixed if needed.  kai, jan'10
 	public static final void playVEH(final String[] args) {
+		log.error("this currently does not work; may be fixed if needed.  kai, jan'10" ) ;
 		// we should have the network as second argument
 		String vehFileName = args[0];
 		if (args.length < 2) {
@@ -164,8 +167,12 @@ public class OTFVis {
 		}
 		if (args[1].toLowerCase().endsWith(".xml") || args[1].toLowerCase().endsWith(".xml.gz")) {
 			String netFileName = args[1];
-			if (Gbl.getConfig() == null) Gbl.createConfig(null); // is this really required?
-			new OTFClientLive("tveh:"+vehFileName + "@" + netFileName, new DefaultConnectionManagerFactory().createConnectionManager()).run();
+			if (Gbl.getConfig() == null) {
+				Gbl.createConfig(null); // is this really required?
+			}
+			Gbl.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+			OTFClientLive client = new OTFClientLive("tveh:"+vehFileName + "@" + netFileName, new DefaultConnectionManagerFactory().createConnectionManager());
+			client.run();
 		}
 	}
 	

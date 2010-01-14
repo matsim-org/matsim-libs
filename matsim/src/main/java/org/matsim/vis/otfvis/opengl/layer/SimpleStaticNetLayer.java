@@ -63,7 +63,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	protected int netDisplList = -1;
 	public static float cellWidth_m = 30.f;
 
-  public static Texture marktex = null;
+	public static Texture marktex = null;
 
 	
 	@Override

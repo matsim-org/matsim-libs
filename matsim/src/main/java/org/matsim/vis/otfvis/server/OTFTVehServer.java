@@ -52,7 +52,9 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * 
  * @author dstrippgen
  *
+ * @deprecated this currently does not work; may be fixed if needed.  kai, jan'10
  */
+@Deprecated
 public class OTFTVehServer implements OTFServerRemote {
 	private  String vehFileName = "";
 	private static final int BUFFERSIZE = 100000000;

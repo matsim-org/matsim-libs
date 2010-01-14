@@ -23,8 +23,8 @@ package org.matsim.vis.otfvis.caching;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 
 /**
- * The DefaultSceneLayer is an empty SceneLayer that implements all interface methods as empty methods.
- * It is there solely for the programmer's convenience.
+ * The DefaultSceneLayer is an empty SceneLayer that implements most of the interface methods as empty methods.
+ * It is there for the programmer's convenience.
  * 
  * @author dstrippgen
  *
@@ -43,7 +43,8 @@ public abstract class DefaultSceneLayer implements SceneLayer {
 	public void init(SceneGraph graph, boolean initConstData) {
 	}
 
-	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException {
+	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) throws InstantiationException, IllegalAccessException {
 		return clazz.newInstance();
 	}
+
 }

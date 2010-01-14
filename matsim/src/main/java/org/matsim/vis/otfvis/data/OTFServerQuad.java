@@ -86,7 +86,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 			this.out = out;
 			this.writeConst = writeConst;
 		}
-		public void execute(double x, double y, OTFDataWriter writer)  {
+		public void execute(double xx, double yy, OTFDataWriter writer)  {
 			try {
 				if (this.writeConst) writer.writeConstData(this.out);
 				else writer.writeDynData(this.out);
@@ -143,7 +143,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 	}
 
 	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#updateBoundingBox(org.matsim.core.mobsim.queuesim.QueueNetwork)
+	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#setBoundingBoxFromNetwork(org.matsim.core.mobsim.queuesim.QueueNetwork)
 	 */
 	public void updateBoundingBox(QueueNetwork net){
 		this.minEasting = Double.POSITIVE_INFINITY;

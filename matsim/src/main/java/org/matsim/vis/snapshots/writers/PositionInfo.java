@@ -37,7 +37,7 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  * @author mrieser
  */
 public class PositionInfo {
-	public enum VehicleState {Driving, Parking};
+	public enum VehicleState {Driving, Parking, DrivingTransitVehicle, ParkingTransitVehicle };
 
 	private static final double LANE_WIDTH = 3.75;//TODO lane width is no longer static but it is defined in network. The question is,
 	//how to get this information here? One possibility is to use Gbl ... but I suppose not everyone

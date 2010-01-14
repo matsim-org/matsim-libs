@@ -34,7 +34,7 @@ public interface SceneLayer {
 	public void finish();
 	public void addItem(OTFDataReceiver item);
 	public void draw();
-	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException;
+	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) throws InstantiationException, IllegalAccessException;
 	public int getDrawOrder();
 	
 }
