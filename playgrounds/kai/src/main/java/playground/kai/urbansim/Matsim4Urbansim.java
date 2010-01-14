@@ -110,7 +110,7 @@ public class Matsim4Urbansim {
 		oldPop=null ;
 		System.gc() ;
 
-		new PopulationWriter(newPop, network).writeFile(PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz");
+		new PopulationWriter(newPop).writeFile(PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz");
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 

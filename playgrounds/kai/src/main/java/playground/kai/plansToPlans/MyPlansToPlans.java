@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
 import org.matsim.core.config.Config;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
+import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 
 /**
  * @author kn after mrieser
@@ -64,15 +65,15 @@ public class MyPlansToPlans {
 //		plansWriter.closeStreaming();
 
 		ScenarioLoader sl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader(
-				"../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/vis_configs/otfvis_config_900s_small_moyo_parameterized.xml") ;
+				"../berlin-bvg09/pt/nullfall_alles/kai-config.xml") ;
 		Scenario sc = sl.loadScenario() ;
 		Population pop = sc.getPopulation();
 
-		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.pt, false ) ;
+		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.car, FilterType.removeAllPlansWithMode ) ;
 		pf.run(pop) ;
 
-		PopulationWriter popwriter = new PopulationWriter(pop, sc.getNetwork()) ;
-		popwriter.write("./output/pop.xml") ;
+		PopulationWriter popwriter = new PopulationWriter(pop) ;
+		popwriter.write("./output/pop.xml.gz") ;
 
 		System.out.println("done.");
 	}
