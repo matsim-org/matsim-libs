@@ -397,7 +397,11 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
+			TransportMode currentLegMode = null;
+			if (agent.getCurrentLeg() != null) {
+				currentLegMode = agent.getCurrentLeg().getMode();
+			}
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), currentLegMode));
 		}
 		this.activityEndsList.clear();
 
