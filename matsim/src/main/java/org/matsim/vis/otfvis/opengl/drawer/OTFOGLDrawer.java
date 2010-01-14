@@ -675,7 +675,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.zoomD.getContentPane().setLayout( gbl ); 
 		ArrayList<JButton> buttons = new ArrayList<JButton>();
 		final List<ZoomEntry> zooms = OTFClientControl.getInstance().getOTFVisConfig().getZooms();
-		log.error("zooms: " + OTFClientControl.getInstance().getOTFVisConfig().getZooms().size());
+		log.debug("Number of zooms: " + OTFClientControl.getInstance().getOTFVisConfig().getZooms().size());
 		for(int i=0; i<zooms.size();i++) {
 			ZoomEntry z = zooms.get(i);
 			JButton b = new JButton(z.getName());//icon);
