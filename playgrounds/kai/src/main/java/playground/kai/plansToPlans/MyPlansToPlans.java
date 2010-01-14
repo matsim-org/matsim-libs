@@ -72,7 +72,7 @@ public class MyPlansToPlans {
 		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.car, FilterType.removeAllPlansWithMode ) ;
 		pf.run(pop) ;
 
-		PopulationWriter popwriter = new PopulationWriter(pop) ;
+		PopulationWriter popwriter = new PopulationWriter(pop,sc.getNetwork()) ;
 		popwriter.write("./output/pop.xml.gz") ;
 
 		System.out.println("done.");

@@ -159,7 +159,7 @@ public class MyControler2 {
 		//dg yes but the used constructor from PopulationWriter doesn't need the config parameter
 		// so we don't need any Gbl or config
 		// write the population for debugging purposes
-		PopulationWriter popWriter = new PopulationWriter(plans) ;
+		PopulationWriter popWriter = new PopulationWriter(plans,null) ;
 		popWriter.write("pop.xml.gz") ;
 
 		log.info("### DONE with demand generation  ### at " + new File("pop.xml.gz").getAbsolutePath()) ;
