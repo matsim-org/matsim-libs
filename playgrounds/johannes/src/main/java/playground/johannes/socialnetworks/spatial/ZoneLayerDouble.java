@@ -29,6 +29,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
 
+import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -36,37 +37,37 @@ import org.matsim.core.basic.v01.IdImpl;
  * @author illenberger
  *
  */
-public class ZoneLayerDouble extends ZoneLayer {
+public class ZoneLayerDouble extends ZoneLayerLegacy {
 
-	private TObjectDoubleHashMap<Zone> values;
+	private TObjectDoubleHashMap<ZoneLegacy> values;
 	/**
 	 * @param zones
 	 */
-	public ZoneLayerDouble(Set<Zone> zones) {
+	public ZoneLayerDouble(Set<ZoneLegacy> zones) {
 		super(zones);
-		values = new TObjectDoubleHashMap<Zone>();
+		values = new TObjectDoubleHashMap<ZoneLegacy>();
 	}
 	
 	public double getValue(Coord c) {
-		Zone zone = getZone(c);
+		ZoneLegacy zone = getZone(c);
 		if(zone == null)
 			return Double.NaN;
 		else
 			return values.get(zone);
 	}
 	
-	public double getValue(Zone zone) {
+	public double getValue(ZoneLegacy zone) {
 		return values.get(zone);
 	}
 	
-	public void setValue(Zone zone, double value) {
+	public void setValue(ZoneLegacy zone, double value) {
 		values.put(zone, value);
 	}
 
 	public void toFile(String filename) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
 		writer.write("zone_id\tvalue");
-		TObjectDoubleIterator<Zone> it = values.iterator();
+		TObjectDoubleIterator<ZoneLegacy> it = values.iterator();
 		for(int i = 0; i < values.size(); i++) {
 			it.advance();
 			writer.write(it.key().getId().toString());
@@ -77,7 +78,7 @@ public class ZoneLayerDouble extends ZoneLayer {
 		writer.close();
 	}
 	
-	public static ZoneLayerDouble createFromFile(Set<Zone> zones, String filename) throws IOException {
+	public static ZoneLayerDouble createFromFile(Set<ZoneLegacy> zones, String filename) throws IOException {
 		ZoneLayerDouble layer = new ZoneLayerDouble(zones);
 		
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -86,7 +87,14 @@ public class ZoneLayerDouble extends ZoneLayer {
 			String[] tokens = line.split("\t");
 			String id = tokens[0];
 			double val = Double.parseDouble(tokens[1]);
-			layer.setValue(layer.getZone(new IdImpl(id)), val);
+			ZoneLegacy z = layer.getZone(new IdImpl(id));
+			layer.setValue(z, val);
+			try {
+				z.getFeature().setAttribute("inhabitant", new Integer((int) val));
+			} catch (IllegalAttributeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return layer;
 	}

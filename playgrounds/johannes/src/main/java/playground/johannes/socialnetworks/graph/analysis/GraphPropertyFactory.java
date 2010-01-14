@@ -10,8 +10,8 @@ package playground.johannes.socialnetworks.graph.analysis;
  */
 public interface GraphPropertyFactory {
 
-	public Degree getDegree();
+	public Degree newDegree();
 	
-	public Transitivity getTransitivity();
+	public Transitivity newTransitivity();
 	
 }

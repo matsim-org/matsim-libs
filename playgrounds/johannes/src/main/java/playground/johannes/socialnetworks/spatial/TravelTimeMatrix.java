@@ -43,15 +43,15 @@ public class TravelTimeMatrix {
 
 	private double[][] matrix;
 	
-	private TObjectIntHashMap<Zone> zoneIndices;
+	private TObjectIntHashMap<ZoneLegacy> zoneIndices;
 	
-	private Set<Zone> zones;
+	private Set<ZoneLegacy> zones;
 	
-	public TravelTimeMatrix(Set<Zone> zones) {
+	public TravelTimeMatrix(Set<ZoneLegacy> zones) {
 		this.zones = zones;
-		zoneIndices = new TObjectIntHashMap<Zone>();
+		zoneIndices = new TObjectIntHashMap<ZoneLegacy>();
 		int idx = 0;
-		for(Zone zone : zones) {
+		for(ZoneLegacy zone : zones) {
 			zoneIndices.put(zone, idx);
 			idx++;
 		}
@@ -64,39 +64,39 @@ public class TravelTimeMatrix {
 		
 	}
 	
-	public Set<Zone> getZones() {
+	public Set<ZoneLegacy> getZones() {
 		return zones;
 	}
 	
-	public double getTravelTime(Zone origin, Zone destination) {
+	public double getTravelTime(ZoneLegacy origin, ZoneLegacy destination) {
 		int i = getIndex(origin);
 		int j = getIndex(destination);
 		return matrix[i][j];
 	}
 	
-	public void setTravelTime(Zone origin, Zone destination, double tt) {
+	public void setTravelTime(ZoneLegacy origin, ZoneLegacy destination, double tt) {
 		int i = getIndex(origin);
 		int j = getIndex(destination);
 		matrix[i][j] = tt;
 	}
 	
-	private int getIndex(Zone zone) {
+	private int getIndex(ZoneLegacy zone) {
 		return zoneIndices.get(zone);
 	}
 	
 	public static void toFile(TravelTimeMatrix matrix, String filename) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
 		
-		List<Zone> zones = new ArrayList<Zone>(matrix.getZones());
+		List<ZoneLegacy> zones = new ArrayList<ZoneLegacy>(matrix.getZones());
 	
-		for(Zone z_i : zones) {
+		for(ZoneLegacy z_i : zones) {
 			writer.write("\t");
 			writer.write(z_i.getId().toString());
 		}
 		writer.newLine();
-		for(Zone z_i : zones) {
+		for(ZoneLegacy z_i : zones) {
 			writer.write(z_i.getId().toString());
-			for(Zone z_j : zones) {
+			for(ZoneLegacy z_j : zones) {
 				writer.write("\t");
 				writer.write(Double.toString(matrix.getTravelTime(z_i, z_j)));
 			}
@@ -105,11 +105,11 @@ public class TravelTimeMatrix {
 		writer.close();
 	}
 	
-	public static TravelTimeMatrix createFromFile(Set<Zone> zones, String filename) throws IOException {
+	public static TravelTimeMatrix createFromFile(Set<ZoneLegacy> zones, String filename) throws IOException {
 		TravelTimeMatrix matrix = new TravelTimeMatrix(zones);
 		
-		Map<Id, Zone> mapping = new HashMap<Id, Zone>();
-		for(Zone zone : zones)
+		Map<Id, ZoneLegacy> mapping = new HashMap<Id, ZoneLegacy>();
+		for(ZoneLegacy zone : zones)
 			mapping.put(zone.getId(), zone);
 		
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -118,10 +118,10 @@ public class TravelTimeMatrix {
 		while((line = reader.readLine()) != null) {
 			String[] row = line.split("\t");
 			Id origId = new IdImpl(row[0]);
-			Zone z_i = mapping.get(origId);
+			ZoneLegacy z_i = mapping.get(origId);
 			for(int i = 1; i < row.length; i++) {
 				Id destId = new IdImpl(ids[i]);
-				Zone z_j = mapping.get(destId);
+				ZoneLegacy z_j = mapping.get(destId);
 				double tt = Double.parseDouble(row[i]);
 				matrix.setTravelTime(z_i, z_j, tt);
 			}

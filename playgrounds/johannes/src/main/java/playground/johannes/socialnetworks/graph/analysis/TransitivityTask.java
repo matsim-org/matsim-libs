@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphAnalyzer.java
+ * TransitivityTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,43 +19,44 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.math.Distribution;
 
 /**
  * @author illenberger
  *
  */
-public class GraphAnalyzer {
+public class TransitivityTask implements GraphAnalyzerTask {
 	
-	public static final Logger logger = Logger.getLogger(GraphAnalyzer.class);
+	public static final Logger logger = Logger.getLogger(TransitivityTask.class);
 
-	public static Map<String, Double> analyze(Graph graph, GraphPropertyFactory factory, GraphAnalyzerTask task) {
-		Map<String, Double> stats = new HashMap<String, Double>();
-		
-		task.analyze(graph, factory, stats);
-		
-		return stats;
-	}
+	public static final String MEAN_LOCAL_CLUSTERING = "c_local_mean";
 	
-	public static void writeStats(Map<String, Double> stats, String filename) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+	public static final String MIN_LOCAL_CLUSTERING = "c_local_min";
+	
+	public static final String MAX_LOCAL_CLUSTERING = "c_local_max";
+	
+	public static final String GLOBAL_CLUSTERING_COEFFICIENT = "c_global";
+	
+	@Override
+	public void analyze(Graph graph, GraphPropertyFactory factory,
+			Map<String, Double> stats) {
+		Transitivity transitivity = factory.newTransitivity();
+		Distribution distr = transitivity.localClusteringDistribution(graph.getVertices());
+		double c_mean = distr.mean();
+		double c_max = distr.max();
+		double c_min = distr.min();
+		stats.put(MEAN_LOCAL_CLUSTERING, c_mean);
+		stats.put(MAX_LOCAL_CLUSTERING, c_max);
+		stats.put(MIN_LOCAL_CLUSTERING, c_min);
 		
-		writer.write("property\tvalue");
-		writer.newLine();
-		for(Entry<String, Double> entry : stats.entrySet()) {
-			writer.write(entry.getKey());
-			writer.write("\t");
-			writer.write(entry.getValue().toString());
-			writer.newLine();
-		}
-		writer.close();
+		double c_global = transitivity.globalClusteringCoefficient(graph);
+		stats.put(GLOBAL_CLUSTERING_COEFFICIENT, c_global);
+		
+		logger.info(String.format("c_local_mean = %1$.4f, c_local_max = %2$.4f, c_local_min = %3$.4f, c_global = %4$.4f.", c_mean, c_max, c_min, c_global));
 	}
+
 }

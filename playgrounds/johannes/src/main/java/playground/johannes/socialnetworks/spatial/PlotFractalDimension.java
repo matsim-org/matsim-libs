@@ -164,8 +164,8 @@ public class PlotFractalDimension {
 		/*
 		 * analyze density partitions
 		 */
-		ZoneLayer layer = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
-		ZoneLayerDouble  zones = ZoneLayerDouble.createFromFile(new HashSet<Zone>(layer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
+		ZoneLayerLegacy layer = ZoneLayerLegacy.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayerDouble  zones = ZoneLayerDouble.createFromFile(new HashSet<ZoneLegacy>(layer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
 		
 		TDoubleObjectHashMap values = SpatialGraphStatistics.createDensityPartitions(graph.getVertices(), zones, 1000);
 		TDoubleObjectIterator it = values.iterator();

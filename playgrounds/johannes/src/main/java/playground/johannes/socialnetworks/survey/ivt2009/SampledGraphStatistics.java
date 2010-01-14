@@ -34,7 +34,7 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
-import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 
 /**
  * @author illenberger
@@ -54,7 +54,7 @@ public class SampledGraphStatistics {
 		return SpatialGraphStatistics.edgeLengthDistribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Collection<? extends SampledVertex>) (g.getVertices())));
 	}
 	
-	public static <V extends SampledVertex & SpatialVertex> Distribution edgeLenghtDistribution(Graph g, ZoneLayer zones) {
+	public static <V extends SampledVertex & SpatialVertex> Distribution edgeLenghtDistribution(Graph g, ZoneLayerLegacy zones) {
 		return SpatialGraphStatistics.edgeLengthDistribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<V>)g.getVertices()), zones);
 	}
 	

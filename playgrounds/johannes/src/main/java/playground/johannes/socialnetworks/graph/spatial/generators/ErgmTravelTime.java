@@ -28,8 +28,8 @@ import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
-import playground.johannes.socialnetworks.spatial.Zone;
-import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLegacy;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 
 /**
  * @author illenberger
@@ -45,17 +45,17 @@ public class ErgmTravelTime extends ErgmTerm {
 	
 //	private ZoneLayer zones;
 	
-	private TIntObjectHashMap<Zone> zoneMapping;
+	private TIntObjectHashMap<ZoneLegacy> zoneMapping;
 	
-	public ErgmTravelTime(SpatialAdjacencyMatrix y, ZoneLayer zones, TravelTimeMatrix matrix) {
+	public ErgmTravelTime(SpatialAdjacencyMatrix y, ZoneLayerLegacy zones, TravelTimeMatrix matrix) {
 //		this.zones = zones;
 		this.matrix = matrix;
 	
 		logger.info("Precaching zones...");
-		zoneMapping = new TIntObjectHashMap<Zone>();
+		zoneMapping = new TIntObjectHashMap<ZoneLegacy>();
 		for(int i = 0; i < y.getVertexCount(); i++) {
 			Coord c_i = ((SpatialAdjacencyMatrix)y).getVertex(i).getCoordinate();
-			Zone z_i = zones.getZone(c_i);
+			ZoneLegacy z_i = zones.getZone(c_i);
 			if(z_i != null)
 				zoneMapping.put(i, z_i);
 		}
@@ -69,8 +69,8 @@ public class ErgmTravelTime extends ErgmTerm {
 //		Zone z_i = zones.getZone(c_i);
 //		Zone z_j = zones.getZone(c_j);
 		
-		Zone z_i = zoneMapping.get(i);
-		Zone z_j = zoneMapping.get(j);
+		ZoneLegacy z_i = zoneMapping.get(i);
+		ZoneLegacy z_j = zoneMapping.get(j);
 		
 		if(z_i != null && z_j != null) {
 			double tt = matrix.getTravelTime(z_i, z_j);

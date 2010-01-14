@@ -53,6 +53,13 @@ public class Degree {
 		return distribution;
 	}
 	
+	/**
+	 * Returns a Vertex-double-map containing the degree of each vertex.
+	 * 
+	 * @param vertices
+	 *            a set of vertices
+	 * @return a Vertex-double-map containing the degree of each vertex.
+	 */
 	public TObjectDoubleHashMap<? extends Vertex> values(Collection<? extends Vertex> vertices) {
 		TObjectDoubleHashMap<Vertex> values = new TObjectDoubleHashMap<Vertex>();
 		for(Vertex v : vertices)

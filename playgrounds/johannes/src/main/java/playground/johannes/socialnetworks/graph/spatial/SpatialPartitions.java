@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-import playground.johannes.socialnetworks.spatial.Zone;
+import playground.johannes.socialnetworks.spatial.ZoneLegacy;
 
 /**
  * @author illenberger
@@ -36,7 +36,7 @@ import playground.johannes.socialnetworks.spatial.Zone;
  */
 public class SpatialPartitions {
 
-	public static <V extends SpatialSparseVertex> Set<V> createSpatialPartition(Set<V> vertices, Zone zone) {
+	public static <V extends SpatialSparseVertex> Set<V> createSpatialPartition(Set<V> vertices, ZoneLegacy zone) {
 		Set<V> partition = new HashSet<V>();
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geometry = zone.getBorder();

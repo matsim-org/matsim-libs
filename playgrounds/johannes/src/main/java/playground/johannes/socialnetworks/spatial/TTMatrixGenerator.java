@@ -92,12 +92,12 @@ public class TTMatrixGenerator {
 		/*
 		 * load zones
 		 */
-		ZoneLayer zoneLayer = ZoneLayer.createFromShapeFile(args[2]);
-		Queue<Zone> zones = new ConcurrentLinkedQueue<Zone>(zoneLayer.getZones());
+		ZoneLayerLegacy zoneLayer = ZoneLayerLegacy.createFromShapeFile(args[2]);
+		Queue<ZoneLegacy> zones = new ConcurrentLinkedQueue<ZoneLegacy>(zoneLayer.getZones());
 		/*
 		 * fill travel time matrix
 		 */
-		TravelTimeMatrix matrix = new TravelTimeMatrix(new HashSet<Zone>(zoneLayer.getZones()));
+		TravelTimeMatrix matrix = new TravelTimeMatrix(new HashSet<ZoneLegacy>(zoneLayer.getZones()));
 		logger.info("Calculating fastest paths...");
 		
 		int threads = Runtime.getRuntime().availableProcessors();
@@ -119,7 +119,7 @@ public class TTMatrixGenerator {
 		
 		private NetworkLayer network;
 		
-		private Queue<Zone> zones;
+		private Queue<ZoneLegacy> zones;
 		
 		private TravelTimeMatrix matrix;
 		
@@ -129,9 +129,9 @@ public class TTMatrixGenerator {
 		
 		private static int total;
 		
-		private Map<Zone, Set<Node>> nodeMapping;
+		private Map<ZoneLegacy, Set<Node>> nodeMapping;
 		
-		public RunThread(NetworkLayer network, Queue<Zone> zones, ZoneLayer zoneLayer, TravelTimeMatrix matrix, final TravelTimeCalculator ttCalculator) {
+		public RunThread(NetworkLayer network, Queue<ZoneLegacy> zones, ZoneLayerLegacy zoneLayer, TravelTimeMatrix matrix, final TravelTimeCalculator ttCalculator) {
 			total = zones.size() * zones.size();
 			this.network = network;
 			this.zones = zones;
@@ -143,9 +143,9 @@ public class TTMatrixGenerator {
 				}
 			}, ttCalculator);
 		
-			nodeMapping = new HashMap<Zone, Set<Node>>();
+			nodeMapping = new HashMap<ZoneLegacy, Set<Node>>();
 			for(Node node : network.getNodes().values()) {
-				Zone zone = zoneLayer.getZone(node.getCoord());
+				ZoneLegacy zone = zoneLayer.getZone(node.getCoord());
 				if(zone != null) {
 					Set<Node> nodes = nodeMapping.get(zone);
 					if (nodes == null) {
@@ -161,12 +161,12 @@ public class TTMatrixGenerator {
 		
 		@Override
 		public void run() {
-			Zone z_i = null;
+			ZoneLegacy z_i = null;
 			while((z_i = zones.poll()) != null) {
 //			for(Zone z_i : matrix.getZones()) {
 				Point p_i = z_i.getBorder().getCentroid();
 				Node l_i = network.getNearestNode(new CoordImpl(p_i.getX(), p_i.getY()));
-				for(Zone z_j : matrix.getZones()) {
+				for(ZoneLegacy z_j : matrix.getZones()) {
 					if(z_i == z_j) {
 						double ttSum = 0;
 						int i = 0;
@@ -207,7 +207,7 @@ public class TTMatrixGenerator {
 			}
 		}
 		
-		private double calcInterCellTT(Zone z_j, Node l_i) {
+		private double calcInterCellTT(ZoneLegacy z_j, Node l_i) {
 			Point p_j = z_j.getBorder().getCentroid();
 			Node l_j = network.getNearestNode(new CoordImpl(p_j
 					.getX(), p_j.getY()));

@@ -53,8 +53,8 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
-import playground.johannes.socialnetworks.spatial.Zone;
-import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLegacy;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 
 /**
@@ -105,8 +105,8 @@ public class TravelTimeHistogram2 {
 		 * read grid
 		 */
 		SpatialGrid<Double> grid = SpatialGrid.readFromFile(config.getParam("tthistogram", "densityfile"));
-		ZoneLayer zoneLayer = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
-		ZoneLayerDouble densityZones = ZoneLayerDouble.createFromFile(new HashSet<Zone>(zoneLayer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
+		ZoneLayerLegacy zoneLayer = ZoneLayerLegacy.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayerDouble densityZones = ZoneLayerDouble.createFromFile(new HashSet<ZoneLegacy>(zoneLayer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
 		/*
 		 * get sampled partition
 		 */

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDistance.java
+ * AnalyzerExe.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial;
+package playground.johannes.socialnetworks.snowball2.analysis;
 
-import java.util.Set;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
-
-import playground.johannes.socialnetworks.graph.spatial.Distance;
-import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
+import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
+import playground.johannes.socialnetworks.graph.analysis.SimpleGraphPropertyFactory;
+import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
+public class AnalyzerExe {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		/*
-		 * I think it makes no difference to directly calling super(vertices)
-		 * since each edge is only counted once. joh13/1/10
-		 */
-		return super.distribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
-	}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
+		SampledGraph graph = reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/graph/graph.graphml");
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+//		GraphAnalyzer.analyze(graph, new SampledGraphPropertyFactory(), new StandardAnalyzerTask());
+		GraphAnalyzer.analyze(graph, new SimpleGraphPropertyFactory(), new StandardAnalyzerTask());
 	}
 
 }

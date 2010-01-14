@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
-import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 
 public class TravelTimeHistogram3 {
 	
@@ -88,7 +88,7 @@ public class TravelTimeHistogram3 {
 		 * read swiss boundary
 		 */
 		logger.info("Reading boundaries...");
-		ZoneLayer boundaries = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/gemeindegrenzen2008.zip Folder/g1g08_shp_080606.zip Folder/G1L08.shp");
+		ZoneLayerLegacy boundaries = ZoneLayerLegacy.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/gemeindegrenzen2008.zip Folder/g1g08_shp_080606.zip Folder/G1L08.shp");
 		/*
 		 * create partition
 		 */

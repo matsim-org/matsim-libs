@@ -40,6 +40,7 @@ public class SnowballPartitions {
 		}
 		return partition;
 	}
+	
 	public static Set<SampledVertex> createSampledPartition(SampledGraph g, int itertation) {
 		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
 		for(Object vertex : g.getVertices()) {

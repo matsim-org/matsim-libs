@@ -51,10 +51,10 @@ public class Reachability {
 	public static ZoneLayerDouble createReachablityTable(TravelTimeMatrix matrix, ZoneLayerDouble densityLayer) {
 		ZoneLayerDouble reachablityLayer = new ZoneLayerDouble(matrix.getZones());
 		
-		for(Zone z_i : matrix.getZones()) {
+		for(ZoneLegacy z_i : matrix.getZones()) {
 			double sum = 0;
 			double total = 0;
-			for(Zone z_j : matrix.getZones()) {
+			for(ZoneLegacy z_j : matrix.getZones()) {
 				double tt = matrix.getTravelTime(z_i, z_j);
 				double inhabitants = densityLayer.getValue(z_j) * z_j.getBorder().getArea()/(1000*1000);
 				sum += tt * inhabitants;
@@ -68,14 +68,14 @@ public class Reachability {
 	}
 	
 	public static ZoneLayerDouble createDistanceReachabilityTable(ZoneLayerDouble densityLayer) {
-		ZoneLayerDouble reachablityLayer = new ZoneLayerDouble(new HashSet<Zone>(densityLayer.getZones()));
+		ZoneLayerDouble reachablityLayer = new ZoneLayerDouble(new HashSet<ZoneLegacy>(densityLayer.getZones()));
 		
-		for(Zone z_i : densityLayer.getZones()) {
+		for(ZoneLegacy z_i : densityLayer.getZones()) {
 			Point p_i = z_i.getBorder().getCentroid();
 			Coord c_i = new CoordImpl(p_i.getX(), p_i.getY());
 			double sum = 0;
 			double total = 0;
-			for(Zone z_j : densityLayer.getZones()) {
+			for(ZoneLegacy z_j : densityLayer.getZones()) {
 				if(z_i != z_j) {
 					Point p_j = z_j.getBorder().getCentroid();
 					Coord c_j = new CoordImpl(p_j.getX(), p_j.getY());
@@ -127,7 +127,7 @@ public class Reachability {
 		}
 		
 		for(V v_i : vertices) {
-			Zone z = SpatialGraphStatistics.zoneCache.get(v_i);
+			ZoneLegacy z = SpatialGraphStatistics.zoneCache.get(v_i);
 			if(z != null) {
 			double r = reachability.getValue(z);//FIXME
 //			double r = reachability.getValue(v_i.getCoordinate());
@@ -158,12 +158,12 @@ public class Reachability {
 		double binsize = 300;
 		Distribution distr = new Distribution();
 		for (SpatialSparseVertex v : vertices) {
-			Zone z_i = densityLayer.getZone(v.getCoordinate());
+			ZoneLegacy z_i = densityLayer.getZone(v.getCoordinate());
 			if (z_i != null) {
 
 				TIntDoubleHashMap areas = new TIntDoubleHashMap();
 				TIntIntHashMap n_i = new TIntIntHashMap();
-				for (Zone z_j : densityLayer.getZones()) {
+				for (ZoneLegacy z_j : densityLayer.getZones()) {
 					double tt = matrix.getTravelTime(z_i, z_j);
 					double a = z_j.getBorder().getArea() / (1000 * 1000);
 					int bin = (int)Math.ceil(tt/binsize);
@@ -176,7 +176,7 @@ public class Reachability {
 				}
 
 				for (SpatialSparseVertex v2 : v.getNeighbours()) {
-					Zone z_j = densityLayer.getZone(v2.getCoordinate());
+					ZoneLegacy z_j = densityLayer.getZone(v2.getCoordinate());
 					if (z_j != null) {
 						double tt = matrix.getTravelTime(z_i, z_j);
 						int bin = (int)Math.ceil(tt/binsize);

@@ -29,7 +29,7 @@ import playground.johannes.socialnetworks.graph.matrix.EdgeWeight;
 import playground.johannes.socialnetworks.graph.matrix.SparseMatrix;
 import playground.johannes.socialnetworks.graph.matrix.WeightedDijkstra;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
-import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 
 public class TTMatrixGenerator {
 
@@ -47,7 +47,7 @@ public class TTMatrixGenerator {
 		 * load swiss boundary
 		 */
 		logger.info("Loading system boundaries...");
-		ZoneLayer boundary = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/gemeindegrenzen2008.zip Folder/g1g08_shp_080606.zip Folder/G1L08.shp");
+		ZoneLayerLegacy boundary = ZoneLayerLegacy.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/gemeindegrenzen2008.zip Folder/g1g08_shp_080606.zip Folder/G1L08.shp");
 		/*
 		 * create adjacency matrix
 		 */

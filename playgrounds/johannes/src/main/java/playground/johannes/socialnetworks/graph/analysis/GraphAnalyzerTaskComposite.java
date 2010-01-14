@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDistance.java
+ * StandardAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial;
+package playground.johannes.socialnetworks.graph.analysis;
 
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
-
-import playground.johannes.socialnetworks.graph.spatial.Distance;
-import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
+import org.matsim.contrib.sna.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
+public abstract class GraphAnalyzerTaskComposite implements GraphAnalyzerTask {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		/*
-		 * I think it makes no difference to directly calling super(vertices)
-		 * since each edge is only counted once. joh13/1/10
-		 */
-		return super.distribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	private Set<GraphAnalyzerTask> tasks;
+	
+	public GraphAnalyzerTaskComposite() {
+		tasks = new LinkedHashSet<GraphAnalyzerTask>();
+		addTasks(tasks);
 	}
-
-	@SuppressWarnings("unchecked")
+	
+	abstract protected void addTasks(Set<GraphAnalyzerTask> taskSet);
+		
 	@Override
-	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	public void analyze(Graph graph, GraphPropertyFactory factory, Map<String, Double> stats) {
+		for(GraphAnalyzerTask task : tasks)
+			task.analyze(graph, factory, stats);
 	}
 
 }

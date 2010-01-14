@@ -26,8 +26,6 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
 
@@ -35,17 +33,17 @@ import org.matsim.contrib.sna.math.Distribution;
  * @author illenberger
  *
  */
-public class Distance<V extends SpatialVertex> {
+public class Distance {
 
-	public Distribution distribution(Collection<V> vertices) {
+	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
 		Distribution distribution = new Distribution();
 		
-		Set<V> pending = new HashSet<V>(vertices);
-		for(V v : vertices) {
+		Set<SpatialVertex> pending = new HashSet<SpatialVertex>(vertices);
+		for(SpatialVertex v : vertices) {
 			for(int i = 0; i < v.getEdges().size(); i++) {
 				SpatialVertex v_j = v.getNeighbours().get(i);
 				if(pending.contains(v_j))
-					distribution.add(((SpatialEdge) v.getEdges().get(i)).length());
+					distribution.add(v.getEdges().get(i).length());
 			}
 			
 			pending.remove(v);
@@ -54,13 +52,13 @@ public class Distance<V extends SpatialVertex> {
 		return distribution;
 	}
 	
-	public Distribution vertexAccumulatedDistribution(Collection<? extends V> vertices) {
+	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
 		Distribution distribution = new Distribution();
 		
-		for(V v_i : vertices) {
+		for(SpatialVertex v_i : vertices) {
 			double sum = 0;
-			for(Edge e : v_i.getEdges()) {
-				sum += ((SpatialEdge) e).length();
+			for(SpatialEdge e : v_i.getEdges()) {
+				sum += e.length();
 			}
 			distribution.add(sum);
 		}
@@ -68,10 +66,10 @@ public class Distance<V extends SpatialVertex> {
 		return distribution;
 	}
 	
-	public Distribution vertexAccumulatedCostDistribution(Collection<? extends V> vertices) {
+	public Distribution vertexAccumulatedCostDistribution(Collection<? extends SpatialVertex> vertices) {
 		Distribution distribution = new Distribution();
 		
-		for(V v_i : vertices) {
+		for(SpatialVertex v_i : vertices) {
 			double sum = 0;
 			for(Edge e : v_i.getEdges()) {
 				double d = ((SpatialEdge) e).length();

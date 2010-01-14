@@ -37,13 +37,13 @@ public class Shape2KML {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		ZoneLayer layer = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
-		ZoneLayerDouble densityLayer = ZoneLayerDouble.createFromFile(new HashSet<Zone>(layer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
+		ZoneLayerLegacy layer = ZoneLayerLegacy.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayerDouble densityLayer = ZoneLayerDouble.createFromFile(new HashSet<ZoneLegacy>(layer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
 		ZoneLayerKMLWriter writer = new ZoneLayerKMLWriter();
 		
 		TObjectDoubleHashMap<Geometry> geoValues = new TObjectDoubleHashMap<Geometry>();
 		
-		for(Zone z_j : densityLayer.getZones()) {
+		for(ZoneLegacy z_j : densityLayer.getZones()) {
 			double tt = densityLayer.getValue(z_j);
 			geoValues.put(z_j.getBorder(), tt);
 		}

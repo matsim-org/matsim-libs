@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KMLWriter.java
+ * AnalyzerExe.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.spatial;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import java.io.IOException;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.geotools.feature.Feature;
+import org.matsim.contrib.sna.gis.io.FeatureSHP;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
-import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
+import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraphProjectionBuilder;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger
  *
  */
-public class NormalizedDistribution {
+public class AnalyzerExe {
 
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SpatialSparseGraph graph;
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		graph = reader.readGraph(args[0]);
+		SpatialGraph graph = reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/graph/graph.graphml");
 		
-		ZoneLayerLegacy zones = ZoneLayerLegacy.createFromShapeFile(args[1]);
 		
-		String output = args[2];
+		GraphAnalyzer.analyze(graph, new SpatialGraphPropertyFactory(), new SpatialAnalyzerTask());
+
+		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/gemeindegrenzen2008.zip Folder/g1g08_shp_080606.zip Folder/G1L08.shp").iterator().next();
+		Geometry geometry = feature.getDefaultGeometry();
 		
-		Distribution distr = SpatialGraphStatistics.normalizedEdgeLengthDistribution(graph.getVertices(), graph, 1000, zones);
-		Distribution.writeHistogram(distr.absoluteDistribution(1000), output + "distance.norm.txt");
-		Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistribution(1000)), output + "distance.norm.norm.txt");
-		Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog2(1000)), output + "distance.norm.log2.norm.txt");
+		SpatialGraphProjectionBuilder<SpatialGraph, SpatialVertex, SpatialEdge> builder = new SpatialGraphProjectionBuilder<SpatialGraph, SpatialVertex, SpatialEdge>();
+		
+		SpatialGraph graphPrj = builder.decorate(graph, geometry);
+		
+		GraphAnalyzer.analyze(graphPrj, new SpatialGraphPropertyFactory(), new SpatialAnalyzerTask());
 	}
 
 }

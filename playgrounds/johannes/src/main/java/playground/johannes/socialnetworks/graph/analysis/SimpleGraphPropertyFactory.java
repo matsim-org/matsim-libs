@@ -26,12 +26,12 @@ package playground.johannes.socialnetworks.graph.analysis;
 public class SimpleGraphPropertyFactory implements GraphPropertyFactory {
 
 	@Override
-	public Degree getDegree() {
+	public Degree newDegree() {
 		return new Degree();
 	}
 
 	@Override
-	public Transitivity getTransitivity() {
+	public Transitivity newTransitivity() {
 		return new Transitivity();
 	}
 

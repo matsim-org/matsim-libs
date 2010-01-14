@@ -51,10 +51,10 @@ public class DensityZoneLayer {
 //		Config config = data.getConfig();
 		PopulationImpl population = (PopulationImpl) data.getPopulation();
 		
-		ZoneLayer zoneLayer = ZoneLayer.createFromShapeFile(args[1]);
-		ZoneLayerDouble zoneLayerDouble = new ZoneLayerDouble(new HashSet<Zone>(zoneLayer.getZones()));
+		ZoneLayerLegacy zoneLayer = ZoneLayerLegacy.createFromShapeFile(args[1]);
+		ZoneLayerDouble zoneLayerDouble = new ZoneLayerDouble(new HashSet<ZoneLegacy>(zoneLayer.getZones()));
 		
-		TObjectIntHashMap<Zone> inhabitants = new TObjectIntHashMap<Zone>();
+		TObjectIntHashMap<ZoneLegacy> inhabitants = new TObjectIntHashMap<ZoneLegacy>();
 		
 		logger.info("Counting persons...");
 		int n = 0;
@@ -62,7 +62,7 @@ public class DensityZoneLayer {
 		for(Person person : population.getPersons().values()) {
 			Coord homeLoc = ((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord();
 			
-			Zone zone = zoneLayerDouble.getZone(homeLoc);
+			ZoneLegacy zone = zoneLayerDouble.getZone(homeLoc);
 			if(zone == null)
 				logger.warn(String.format("No zone for coordingate %1$s,%2$s found.", homeLoc.getX(), homeLoc.getY()));
 			else
@@ -75,10 +75,10 @@ public class DensityZoneLayer {
 		
 		logger.info("Calculating density...");
 		
-		TObjectIntIterator<Zone> it = inhabitants.iterator();
+		TObjectIntIterator<ZoneLegacy> it = inhabitants.iterator();
 		for(int i = 0; i < inhabitants.size(); i++) {
 			it.advance();
-			Zone zone = it.key();
+			ZoneLegacy zone = it.key();
 			int count = it.value();
 			double a = zone.getBorder().getArea();
 			a = a / (1000 * 1000);

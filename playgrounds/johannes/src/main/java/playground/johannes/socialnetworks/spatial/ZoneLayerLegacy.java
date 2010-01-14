@@ -41,18 +41,18 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author illenberger
  *
  */
-public class ZoneLayer {
+public class ZoneLayerLegacy {
 
-	private Map<Geometry, Zone> zones;
+	private Map<Geometry, ZoneLegacy> zones;
 	
-	private Map<Id, Zone> ids;
+	private Map<Id, ZoneLegacy> ids;
 	
 	private GeometryLayer geoLayer;
 	
-	public ZoneLayer(Set<Zone> zones) {
-		this.zones = new LinkedHashMap<Geometry, Zone>();
-		ids = new HashMap<Id, Zone>();
-		for(Zone zone : zones) {
+	public ZoneLayerLegacy(Set<ZoneLegacy> zones) {
+		this.zones = new LinkedHashMap<Geometry, ZoneLegacy>();
+		ids = new HashMap<Id, ZoneLegacy>();
+		for(ZoneLegacy zone : zones) {
 			this.zones.put(zone.getBorder(), zone);
 			ids.put(zone.getId(), zone);
 		}
@@ -64,40 +64,40 @@ public class ZoneLayer {
 		return geoLayer;
 	}
 	
-	public Zone getZone(Coord c) {
+	public ZoneLegacy getZone(Coord c) {
 		Geometry g = geoLayer.getZone(c);
 		return zones.get(g);
 	}
 	
-	public Zone getZone(Id id) {
+	public ZoneLegacy getZone(Id id) {
 		return ids.get(id);
 	}
 	
-	public Collection<Zone> getZones() {
+	public Collection<ZoneLegacy> getZones() {
 		return zones.values();
 	}
 	
-	public static ZoneLayer createFromShapeFile(String filename) throws IOException {
+	public static ZoneLayerLegacy createFromShapeFile(String filename) throws IOException {
 		FeatureSource source = ShapeFileReader.readDataFile(filename);
 		
-		Set<Zone> zones = new LinkedHashSet<Zone>();
+		Set<ZoneLegacy> zones = new LinkedHashSet<ZoneLegacy>();
 		
 		Iterator<Feature> it = source.getFeatures().iterator();
 		while(it.hasNext()) {
 			Feature feature = it.next();
-			Zone zone = new Zone(feature.getDefaultGeometry(), new IdImpl(feature.getID()));
+			ZoneLegacy zone = new ZoneLegacy(feature.getDefaultGeometry(), new IdImpl(feature.getID()));
 			zones.add(zone);
 		}
 		
-		ZoneLayer zoneLayer = new ZoneLayer(zones);
+		ZoneLayerLegacy zoneLayer = new ZoneLayerLegacy(zones);
 		
 		return zoneLayer;
 	}
 	
 	public static void main(String args[]) throws IOException {
-		ZoneLayer layer = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayerLegacy layer = ZoneLayerLegacy.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
 		
-		for(Zone zone : layer.getZones()) {
+		for(ZoneLegacy zone : layer.getZones()) {
 			System.out.println(zone.getId());
 		}
 		

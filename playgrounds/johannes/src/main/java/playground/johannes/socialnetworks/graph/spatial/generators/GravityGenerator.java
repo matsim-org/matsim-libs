@@ -48,8 +48,8 @@ import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
-import playground.johannes.socialnetworks.spatial.Zone;
-import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLegacy;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 
 /**
@@ -103,13 +103,13 @@ public class GravityGenerator {
 		String ttmatrixFile = config.findParam(MODULE_NAME, "ttmatrixFile");
 		
 		ZoneLayerDouble zones = null;
-		ZoneLayer layer = null;
+		ZoneLayerLegacy layer = null;
 		TravelTimeMatrix ttmatrix = null;
 		if(zonesFile != null && densityFile != null) {
-			layer = ZoneLayer.createFromShapeFile(zonesFile);
-			zones = ZoneLayerDouble.createFromFile(new HashSet<Zone>(layer.getZones()), densityFile);
+			layer = ZoneLayerLegacy.createFromShapeFile(zonesFile);
+			zones = ZoneLayerDouble.createFromFile(new HashSet<ZoneLegacy>(layer.getZones()), densityFile);
 			
-			ttmatrix = TravelTimeMatrix.createFromFile(new HashSet<Zone>(layer.getZones()), ttmatrixFile);
+			ttmatrix = TravelTimeMatrix.createFromFile(new HashSet<ZoneLegacy>(layer.getZones()), ttmatrixFile);
 		}
 	
 		generator.ttmatrix = ttmatrix;

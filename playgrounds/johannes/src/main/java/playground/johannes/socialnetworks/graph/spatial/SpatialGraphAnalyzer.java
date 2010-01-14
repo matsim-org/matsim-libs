@@ -46,8 +46,8 @@ import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
-import playground.johannes.socialnetworks.spatial.Zone;
-import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLegacy;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -99,8 +99,8 @@ public class SpatialGraphAnalyzer {
 //		ZoneLayer boundary = ZoneLayer.createFromShapeFile("");
 //		Geometry geo = boundary.getZones().iterator().next().getBorder();
 		Geometry geo = null;
-		ZoneLayer zones = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
-		ZoneLayerDouble density = ZoneLayerDouble.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
+		ZoneLayerLegacy zones = ZoneLayerLegacy.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayerDouble density = ZoneLayerDouble.createFromFile(new HashSet<ZoneLegacy>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
 		TravelTimeMatrix matrix = null;//TravelTimeMatrix.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
 //		if(gridfile != null)
 //			grid = SpatialGrid.readFromFile(gridfile);
@@ -134,8 +134,8 @@ public class SpatialGraphAnalyzer {
 				Distribution.writeHistogram(edgeLengthDistr.normalizedDistribution(edgeLengthDistr.absoluteDistribution(binsize)), output + "distance.normalized.txt");
 				Distribution.writeHistogram(edgeLengthDistr.normalizedDistribution(edgeLengthDistr.absoluteDistributionLog2(1000)), output + "distance.log2.norm.txt");
 				
-				Distribution.writeHistogram(new Distance<SpatialVertex>().vertexAccumulatedDistribution(graph.getVertices()).absoluteDistribution(1000), output + "accDistance.txt");
-				Distribution.writeHistogram(new Distance<SpatialVertex>().vertexAccumulatedCostDistribution(graph.getVertices()).absoluteDistribution(1), output + "accCost.txt");
+				Distribution.writeHistogram(new Distance().vertexAccumulatedDistribution(graph.getVertices()).absoluteDistribution(1000), output + "accDistance.txt");
+				Distribution.writeHistogram(new Distance().vertexAccumulatedCostDistribution(graph.getVertices()).absoluteDistribution(1), output + "accCost.txt");
 				/*
 				 * degree correlation
 				 */

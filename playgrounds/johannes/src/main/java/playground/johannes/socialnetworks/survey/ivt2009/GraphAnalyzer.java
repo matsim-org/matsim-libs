@@ -45,8 +45,8 @@ import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGra
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 import playground.johannes.socialnetworks.spatial.Reachability;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
-import playground.johannes.socialnetworks.spatial.Zone;
-import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLegacy;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -67,11 +67,11 @@ public class GraphAnalyzer {
 		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
 		SampledSpatialSparseGraph graph = reader.readGraph(args[0]);
 		
-		ZoneLayer zones = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
-		ZoneLayerDouble density = ZoneLayerDouble.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
-		TravelTimeMatrix matrix = TravelTimeMatrix.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
+		ZoneLayerLegacy zones = ZoneLayerLegacy.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayerDouble density = ZoneLayerDouble.createFromFile(new HashSet<ZoneLegacy>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
+		TravelTimeMatrix matrix = TravelTimeMatrix.createFromFile(new HashSet<ZoneLegacy>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
 		
-		ZoneLayer zonesCH = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/g1g08_shp_080606/G1L08.shp");
+		ZoneLayerLegacy zonesCH = ZoneLayerLegacy.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/g1g08_shp_080606/G1L08.shp");
 		analyze(graph, args[1], zonesCH);
 
 		
@@ -85,7 +85,7 @@ public class GraphAnalyzer {
 		analyze(graph, g2, args[1], zones);
 	}
 
-	public static <V extends SampledSpatialSparseGraph> void analyze(SampledSpatialSparseGraph graph, String output, ZoneLayer zones) throws IOException {
+	public static <V extends SampledSpatialSparseGraph> void analyze(SampledSpatialSparseGraph graph, String output, ZoneLayerLegacy zones) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(output + "summary.txt"));
 		/*
 		 * degree
@@ -168,7 +168,7 @@ public class GraphAnalyzer {
 				SpatialGraphStatistics.meanEdgeLength(partition, zones), zones, 1000), output + "distance_rho.txt", "rho", "<d>");
 	}
 	
-	public static <V extends SampledSpatialSparseGraph> void analyze(SampledSpatialSparseGraph graph, SpatialSparseGraph normGraph, String output, ZoneLayer zones) throws IOException {
+	public static <V extends SampledSpatialSparseGraph> void analyze(SampledSpatialSparseGraph graph, SpatialSparseGraph normGraph, String output, ZoneLayerLegacy zones) throws IOException {
 		Set egos = SnowballPartitions.createSampledPartition(graph.getVertices());
 		Distribution distr = SpatialGraphStatistics.normalizedEdgeLengthDistribution(egos, normGraph, 1000, zones);
 		Distribution.writeHistogram(distr.absoluteDistribution(1000), output + "distance.norm.txt");

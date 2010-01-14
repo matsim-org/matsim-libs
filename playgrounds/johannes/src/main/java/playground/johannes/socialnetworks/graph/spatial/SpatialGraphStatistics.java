@@ -49,8 +49,8 @@ import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.spatial.Geometries;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
-import playground.johannes.socialnetworks.spatial.Zone;
-import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLegacy;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -81,17 +81,17 @@ public class SpatialGraphStatistics {
 		return stats;
 	}
 	
-	public static Distribution edgeLengthDistribution(Set<? extends SpatialVertex> vertices, ZoneLayer zones) {
+	public static Distribution edgeLengthDistribution(Set<? extends SpatialVertex> vertices, ZoneLayerLegacy zones) {
 		Distribution stats = new Distribution();
 //		if(zoneCache == null)
 //			precacheZones(vertices, zones);
 		
 		int count = 0;
 		for(SpatialVertex v1 : vertices) {
-			Zone z_i = zones.getZone(v1.getCoordinate());
+			ZoneLegacy z_i = zones.getZone(v1.getCoordinate());
 			for(Edge e : v1.getEdges()) {
 				SpatialSparseVertex v2 = (SpatialSparseVertex) e.getOpposite(v1);
-				Zone z_j = zones.getZone(v2.getCoordinate());
+				ZoneLegacy z_j = zones.getZone(v2.getCoordinate());
 				if(z_i != null && z_j != null)
 					stats.add(((SpatialSparseEdge)e).length());
 				else
@@ -187,13 +187,13 @@ public class SpatialGraphStatistics {
 	}
 	
 
-	public static Distribution normalizedEdgeLengthDistribution(Set<? extends SpatialSparseVertex> vertices, SpatialSparseGraph vertices2, double descretization, ZoneLayer zones) {
+	public static Distribution normalizedEdgeLengthDistribution(Set<? extends SpatialSparseVertex> vertices, SpatialSparseGraph vertices2, double descretization, ZoneLayerLegacy zones) {
 //		double bounds[] = vertices2.getBounds();
 
 		HashMap<SpatialSparseVertex, TDoubleDoubleHashMap> normConstants = new HashMap<SpatialSparseVertex, TDoubleDoubleHashMap>();
 		for(SpatialSparseVertex v_i : vertices) {
 			Coord c_i = v_i.getCoordinate();
-			Zone z_i = zones.getZone(c_i);
+			ZoneLegacy z_i = zones.getZone(c_i);
 			if(z_i != null) {
 				/*
 				 * count vertices per distance bin
@@ -261,7 +261,7 @@ public class SpatialGraphStatistics {
 		Distribution stats = new Distribution();
 		for(SpatialSparseVertex v1 : vertices) {
 			Coord c_i = v1.getCoordinate();
-			Zone z_i = zones.getZone(c_i);
+			ZoneLegacy z_i = zones.getZone(c_i);
 			if(z_i != null) {
 				for (SparseEdge e : v1.getEdges()) {
 					double d = ((SpatialSparseEdge) e).length();
@@ -363,7 +363,7 @@ public class SpatialGraphStatistics {
 		return values;
 	}
 	
-	public static <V extends SpatialSparseVertex> TObjectDoubleHashMap<V> meanEdgeLength(Set<V> vertices, ZoneLayer zones) {
+	public static <V extends SpatialSparseVertex> TObjectDoubleHashMap<V> meanEdgeLength(Set<V> vertices, ZoneLayerLegacy zones) {
 		TObjectDoubleHashMap<V> values = new TObjectDoubleHashMap<V>();
 		for (V i : vertices) {
 			if(zones.getZone(i.getCoordinate()) != null) {
@@ -574,7 +574,7 @@ public class SpatialGraphStatistics {
 		return Partitions.createPartitions(vertexValues, binsize);
 	}
 
-	public static Distribution travelTimeDistribution(Set<? extends SpatialSparseVertex> vertices, ZoneLayer zones, TravelTimeMatrix matrix) {
+	public static Distribution travelTimeDistribution(Set<? extends SpatialSparseVertex> vertices, ZoneLayerLegacy zones, TravelTimeMatrix matrix) {
 		Distribution distr = new Distribution();
 		
 		if(zoneCache == null) {
@@ -583,10 +583,10 @@ public class SpatialGraphStatistics {
 		
 		for(SpatialSparseVertex v_i : vertices) {
 //			Zone z_i = zones.getZone(v_i.getCoordinate());
-			Zone z_i = zoneCache.get(v_i);
+			ZoneLegacy z_i = zoneCache.get(v_i);
 			if(z_i != null) {
 				for(SpatialSparseVertex v_j : v_i.getNeighbours()) {
-					Zone z_j = zones.getZone(v_j.getCoordinate());
+					ZoneLegacy z_j = zones.getZone(v_j.getCoordinate());
 					if(z_j != null) {
 						double tt = matrix.getTravelTime(z_i, z_j);
 						distr.add(tt);
@@ -602,9 +602,9 @@ public class SpatialGraphStatistics {
 		return distr;
 	}
 	
-	public static Map<Vertex, Zone> zoneCache; //FIXME!
+	public static Map<Vertex, ZoneLegacy> zoneCache; //FIXME!
 	
-	public static <V extends SpatialSparseVertex> TObjectDoubleHashMap<V> meanTravelTime(Set<V> vertices, ZoneLayer zones, TravelTimeMatrix matrix) {
+	public static <V extends SpatialSparseVertex> TObjectDoubleHashMap<V> meanTravelTime(Set<V> vertices, ZoneLayerLegacy zones, TravelTimeMatrix matrix) {
 		TObjectDoubleHashMap<V> values = new TObjectDoubleHashMap<V>();
 		
 		if(zoneCache == null) {
@@ -613,12 +613,12 @@ public class SpatialGraphStatistics {
 		
 		for(V v_i : vertices) {
 //			Zone z_i = zones.getZone(v_i.getCoordinate());
-			Zone z_i = zoneCache.get(v_i);
+			ZoneLegacy z_i = zoneCache.get(v_i);
 			if(z_i != null) {
 				double sum = 0;
 				int count = 0;
 				for(SpatialSparseVertex v_j : v_i.getNeighbours()) {
-					Zone z_j = zones.getZone(v_j.getCoordinate());
+					ZoneLegacy z_j = zones.getZone(v_j.getCoordinate());
 					if(z_j != null) {
 						sum += matrix.getTravelTime(z_i, z_j);
 						count++;
@@ -631,11 +631,11 @@ public class SpatialGraphStatistics {
 		return values;
 	}
 	
-	public static void precacheZones(Set<? extends SpatialSparseVertex> vertices, ZoneLayer zones) { // FIXME!
+	public static void precacheZones(Set<? extends SpatialSparseVertex> vertices, ZoneLayerLegacy zones) { // FIXME!
 		System.out.println("Precaching zones...");
-		zoneCache = new HashMap<Vertex, Zone>();
+		zoneCache = new HashMap<Vertex, ZoneLegacy>();
 		for(SpatialSparseVertex v_i : vertices) {
-			Zone z_i = zones.getZone(v_i.getCoordinate());
+			ZoneLegacy z_i = zones.getZone(v_i.getCoordinate());
 			zoneCache.put(v_i, z_i);
 		}
 	}

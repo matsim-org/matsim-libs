@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Zone.java
+ * SpatialGraphPropertyFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.spatial;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import org.matsim.api.core.v01.Id;
-
-import com.vividsolutions.jts.geom.Geometry;
+import playground.johannes.socialnetworks.graph.analysis.SimpleGraphPropertyFactory;
+import playground.johannes.socialnetworks.graph.spatial.Distance;
 
 /**
  * @author illenberger
  *
  */
-public class Zone {
+public class SpatialGraphPropertyFactory extends SimpleGraphPropertyFactory {
 
-	private Id id;
-	
-	private Geometry border;
-	
-	public Zone(Geometry polygon, Id id) {
-		this.border = polygon;
-		this.id = id;
-	}
-	
-	public Geometry getBorder() {
-		return border;
-	}
-	
-	public Id getId() {
-		return id;
+	public Distance newDistance() {
+		return new Distance();
 	}
 }

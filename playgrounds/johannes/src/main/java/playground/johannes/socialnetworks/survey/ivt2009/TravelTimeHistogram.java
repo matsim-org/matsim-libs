@@ -38,8 +38,8 @@ import org.matsim.core.gbl.Gbl;
 
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
-import playground.johannes.socialnetworks.spatial.Zone;
-import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLegacy;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 
 /**
@@ -84,8 +84,8 @@ public class TravelTimeHistogram {
 		/*
 		 * read zones
 		 */
-		ZoneLayer zoneLayer = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
-		TravelTimeMatrix matrix = TravelTimeMatrix.createFromFile(new HashSet<Zone>(zoneLayer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
+		ZoneLayerLegacy zoneLayer = ZoneLayerLegacy.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		TravelTimeMatrix matrix = TravelTimeMatrix.createFromFile(new HashSet<ZoneLegacy>(zoneLayer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
 //		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
 //		SpatialGraph graph2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.02.xml");
 //		double bounds[] = graph2.getBounds();
@@ -94,7 +94,7 @@ public class TravelTimeHistogram {
 		 */
 //		SpatialGrid<Double> grid = SpatialGrid.readFromFile(config.getParam("tthistogram", "densityfile"));
 //		ZoneLayer zones = ZoneLayer.createFromShapeFile("");
-		ZoneLayerDouble densityZones = ZoneLayerDouble.createFromFile(new HashSet<Zone>(zoneLayer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
+		ZoneLayerDouble densityZones = ZoneLayerDouble.createFromFile(new HashSet<ZoneLegacy>(zoneLayer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
 		/*
 		 * get sampled partition
 		 */
@@ -118,12 +118,12 @@ public class TravelTimeHistogram {
 		
 		double binsize = 300;
 		for (SpatialSparseVertex v : sbPartition) {
-			Zone z_i = zoneLayer.getZone(v.getCoordinate());
+			ZoneLegacy z_i = zoneLayer.getZone(v.getCoordinate());
 			if (z_i != null) {
 
 				TIntDoubleHashMap areas = new TIntDoubleHashMap();
 				TIntIntHashMap n_i = new TIntIntHashMap();
-				for (Zone z_j : densityZones.getZones()) {
+				for (ZoneLegacy z_j : densityZones.getZones()) {
 					double tt = matrix.getTravelTime(z_i, z_j);
 					double a = z_j.getBorder().getArea() / (1000 * 1000);
 					int bin = (int)Math.ceil(tt/binsize);
@@ -146,7 +146,7 @@ public class TravelTimeHistogram {
 //				}
 
 				for (SpatialSparseVertex v2 : v.getNeighbours()) {
-					Zone z_j = zoneLayer.getZone(v2.getCoordinate());
+					ZoneLegacy z_j = zoneLayer.getZone(v2.getCoordinate());
 					if (z_j == null)
 						System.err.println("Zone is null");
 					else {

@@ -26,8 +26,11 @@ import junit.framework.TestCase;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 
+import playground.johannes.socialnetworks.graph.analysis.DegreeTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.analysis.SimpleGraphPropertyFactory;
+import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
+import playground.johannes.socialnetworks.graph.analysis.TransitivityTask;
 
 /**
  * @author illenberger
@@ -35,24 +38,24 @@ import playground.johannes.socialnetworks.graph.analysis.SimpleGraphPropertyFact
  */
 public class GraphAnalyzerTest extends TestCase {
 
-	private static final String INPUT_FILE = "../contrib/sna/test/input/org/matsim/contrib/sna/graph/spatial/io/SpatialGraph.k7.graphml.gz";
+	private static final String INPUT_FILE = "../../contrib/sna/test/input/org/matsim/contrib/sna/graph/spatial/io/SpatialGraph.k7.graphml.gz";
 	
 	public void test() {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(INPUT_FILE);
 		
-		GraphAnalyzer analyzer = new GraphAnalyzer();
-		Map<String, Double> stats = analyzer.analyze(graph, new SimpleGraphPropertyFactory());
+//		GraphAnalyzer analyzer = new GraphAnalyzer();
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, new SimpleGraphPropertyFactory(), new StandardAnalyzerTask());
 		
-		assertEquals(7.1462, stats.get(GraphAnalyzer.MEAN_DEGREE), 0.0001);
-		assertEquals(19.0, stats.get(GraphAnalyzer.MAX_DEGREE));
-		assertEquals(0.0, stats.get(GraphAnalyzer.MIN_DEGREE));
+		assertEquals(7.1462, stats.get(DegreeTask.MEAN_DEGREE), 0.0001);
+		assertEquals(19.0, stats.get(DegreeTask.MAX_DEGREE));
+		assertEquals(0.0, stats.get(DegreeTask.MIN_DEGREE));
 		
-		assertEquals(0.0018, stats.get(GraphAnalyzer.DEGREE_CORRELATION), 0.0001);
+		assertEquals(0.0018, stats.get(DegreeTask.DEGREE_CORRELATION), 0.0001);
 		
-		assertEquals(0.0008, stats.get(GraphAnalyzer.MEAN_LOCAL_CLUSTERING), 0.0001);
-		assertEquals(1.0, stats.get(GraphAnalyzer.MAX_LOCAL_CLUSTERING));
-		assertEquals(0.0, stats.get(GraphAnalyzer.MIN_LOCAL_CLUSTERING));
-		assertEquals(0.0008, stats.get(GraphAnalyzer.GLOBAL_CLUSTERING_COEFFICIENT), 0.0001);
+		assertEquals(0.0008, stats.get(TransitivityTask.MEAN_LOCAL_CLUSTERING), 0.0001);
+		assertEquals(1.0, stats.get(TransitivityTask.MAX_LOCAL_CLUSTERING));
+		assertEquals(0.0, stats.get(TransitivityTask.MIN_LOCAL_CLUSTERING));
+		assertEquals(0.0008, stats.get(TransitivityTask.GLOBAL_CLUSTERING_COEFFICIENT), 0.0001);
 	}
 }

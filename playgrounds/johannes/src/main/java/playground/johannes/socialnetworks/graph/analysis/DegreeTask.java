@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDistance.java
+ * DegreeTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial;
+package playground.johannes.socialnetworks.graph.analysis;
 
-import java.util.Set;
+import java.util.Map;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
-
-import playground.johannes.socialnetworks.graph.spatial.Distance;
-import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
+public class DegreeTask implements GraphAnalyzerTask {
+	
+	public static final Logger logger = Logger.getLogger(DegreeTask.class);
 
-	@SuppressWarnings("unchecked")
+	public static final String MEAN_DEGREE = "k_mean";
+	
+	public static final String MIN_DEGREE = "k_min";
+	
+	public static final String MAX_DEGREE = "k_max";
+	
+	public static final String DEGREE_CORRELATION = "r_k";
+	
 	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		/*
-		 * I think it makes no difference to directly calling super(vertices)
-		 * since each edge is only counted once. joh13/1/10
-		 */
-		return super.distribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	public void analyze(Graph graph, GraphPropertyFactory factory, Map<String, Double> stats) {
+		Degree degree = factory.newDegree();
+		Distribution distr = degree.distribution(graph.getVertices()); 
+		double k_mean = distr.mean();
+		double k_min = distr.min();
+		double k_max = distr.max();
+		stats.put(MEAN_DEGREE, k_mean);
+		stats.put(MAX_DEGREE, k_max);
+		stats.put(MIN_DEGREE, k_min);
+		logger.info(String.format("k_mean = %1$.4f, k_max = %2$s, k_min = %3$s.", k_mean, k_max, k_min));
+		
+		double r_k = degree.assortativity(graph);
+		stats.put(DEGREE_CORRELATION, r_k);
+		logger.info(String.format("r_k = %1$.4f", r_k));
 	}
 
 }
