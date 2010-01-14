@@ -23,30 +23,33 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
 /**
  * This algorithm filters out all persons having plans with legs with a certain leg mode.
- * There are two modes how the filter works: If <em>exclusive filtering</em> is used,
- * only plans are kept where persons travel exclusively with the specified leg mode. If
- * the <em>non-exclusive filtering</em> is used, all plans with at least one leg of the
- * specified leg mode are kept.<br/>
- * Plans which do not fulfill the filter criteria are removed from a person, Persons with
+ * There is (since Jan'10) an enum FilterType which is (hopefully) self-explanatory.  
+ * 
+* Plans which do not fulfill the filter criteria are removed from a person, Persons with
  * no plans are removed from the population.
  */
 public class PlansFilterByLegMode {
+	private static final Logger log = Logger.getLogger(PlansFilterByLegMode.class);
+
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 	private TransportMode legMode;
-	private boolean exclusiveFilter;
+//	private boolean exclusiveFilter;
 
 	// optimization: instead of doing a String.equals() every time, we do it once and store the result
 	private boolean legModeIsCar;
@@ -55,10 +58,39 @@ public class PlansFilterByLegMode {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * There are two modes how this constructor works: 
+	 * 
+	 * <li> If <em>exclusive filtering</em> is used,
+	 * only plans are kept where persons travel exclusively with the specified leg mode. </li>
+	 * 
+	 * <li> If
+	 * the <em>non-exclusive filtering</em> is used, all plans with at least one leg of the
+	 * specified leg mode are kept. </li>
+	 * 
+	 * @param legMode
+	 * @param exclusiveFilter
+	 * 
+	 * @deprecated use other constructor instead (in my view).  kai, jan'10
+	 */
+	@Deprecated // use other constructor instead (in my view).  kai, jan'10
 	public PlansFilterByLegMode(final TransportMode legMode, final boolean exclusiveFilter) {
 		super();
 		this.legMode = legMode;
-		this.exclusiveFilter = exclusiveFilter;
+//		this.exclusiveFilter = exclusiveFilter;
+		this.filterType = FilterType.keepAllPlansWithMode ;
+		if ( exclusiveFilter ) {
+			this.filterType = FilterType.keepPlansWithOnlyThisMode ;
+		}
+		this.legModeIsCar = legMode.equals(TransportMode.car);
+	}
+	
+	public FilterType filterType ;
+	public enum FilterType { keepAllPlansWithMode, removeAllPlansWithMode, keepPlansWithOnlyThisMode } ;
+	public PlansFilterByLegMode( final TransportMode legMode, final FilterType filterType ) {
+		super() ;
+		this.legMode = legMode ;
+		this.filterType = filterType ;
 		this.legModeIsCar = legMode.equals(TransportMode.car);
 	}
 
@@ -66,6 +98,7 @@ public class PlansFilterByLegMode {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	private static int cnt = 0 ;
 	public void run(Population plans) {
 		int planCount = 0;
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
@@ -93,12 +126,29 @@ public class PlansFilterByLegMode {
 				if (this.legModeIsCar && never.equals(((PersonImpl) person).getCarAvail())) {
 					// person cannot drive car if she has no car. this means, the person was given a lift by someone else
 					// --> do not include this person, as we're only interested in the driver
+					if ( cnt < 1 ) {
+						cnt ++ ;
+						log.warn("This method assumes that mode=car without car availability means `in car as passenger'.  Note that this is different "
+								+ "from what is often done in transport planning, where `in car as passenger' is a separate mode.");
+						log.warn(Gbl.ONLYONCE) ;
+					}
 					hasSearchedLegMode = false;
 				}
-				if ((!hasSearchedLegMode) || (hasOtherLegMode && this.exclusiveFilter)) {
-					person.getPlans().remove(i);
-					i--;	//otherwise, we would skip one plan
-					planCount++;
+				if ( filterType==FilterType.keepAllPlansWithMode || filterType==FilterType.keepPlansWithOnlyThisMode ) {
+					if ((!hasSearchedLegMode) || (hasOtherLegMode && this.filterType==FilterType.keepPlansWithOnlyThisMode )) {
+						person.getPlans().remove(i);
+						i--;	//otherwise, we would skip one plan
+						planCount++;
+					} 
+				} else if ( filterType==FilterType.removeAllPlansWithMode ) {
+					if ( hasSearchedLegMode ) {
+						person.getPlans().remove(i);
+						i--;	//otherwise, we would skip one plan
+						planCount++;
+					}
+				} else {
+					log.error("should not happen; aborting ...") ;
+					System.exit(-1) ;
 				}
 			}
 			if (person.getPlans().isEmpty()) {
