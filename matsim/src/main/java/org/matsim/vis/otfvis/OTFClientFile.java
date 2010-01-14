@@ -29,14 +29,17 @@ import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
+import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
+import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
@@ -56,6 +59,8 @@ public class OTFClientFile extends OTFClient {
 	private static final Logger log = Logger.getLogger(OTFClientFile.class);
 	
 	protected OTFConnectionManager connect = new OTFConnectionManager();
+
+  private OTFFileSettingsSaver fileSettingsSaver;
 
 	public OTFClientFile( String filename) {
 		super("file:" + filename);
@@ -102,7 +107,7 @@ public class OTFClientFile extends OTFClient {
 	}
 
 	@Override
-	protected void createDrawer(){
+	protected OTFDrawer createDrawer(){
 		try {
 			frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
 			mainDrawer = 	new OTFOGLDrawer(this.visconf, frame, this.getRightDrawerComponent());
@@ -112,23 +117,30 @@ public class OTFClientFile extends OTFClient {
 			throw new RuntimeException();
 		}
 		hostControlBar.finishedInitialisition();
+		return mainDrawer;
 	}
 	
 	@Override
-	protected void getOTFVisConfig() {
+	protected OTFVisConfig createOTFVisConfig() {
+	  boolean gblConfigGiven = false;
 		if (Gbl.getConfig() != null) {
 			visconf = Gbl.getConfig().otfVis();
+			gblConfigGiven = true;
 		}
 		else {
 			Gbl.createConfig(null);
+			visconf = Gbl.getConfig().otfVis();
 		}
-		saver = new OTFFileSettingsSaver(visconf, this.url);
-		if (visconf == null) {
-			visconf = ((OTFFileSettingsSaver)saver).openAndReadConfig();
+		fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);
+		
+		if (!gblConfigGiven) {
+			visconf = fileSettingsSaver.openAndReadConfig();
 		} 
 		else {
 			log.warn("OTFVisConfig already defined, cant read settings from file");
 		}
+		saver = new OTFLiveSettingsSaver(visconf, this.url);
+		return visconf;
 	}
 
 

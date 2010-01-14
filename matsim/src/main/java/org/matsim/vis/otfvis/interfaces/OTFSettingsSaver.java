@@ -1,5 +1,7 @@
 package org.matsim.vis.otfvis.interfaces;
 
+import org.matsim.vis.otfvis.gui.OTFVisConfig;
+
 /**
  * OTFSettingsSaver is a minimal interface for storing 
  * the global settings.
@@ -13,6 +15,6 @@ public interface OTFSettingsSaver {
 
 	public void saveSettingsAs();
 
-	public void readSettings();
+	public OTFVisConfig readSettings();
 	
 }

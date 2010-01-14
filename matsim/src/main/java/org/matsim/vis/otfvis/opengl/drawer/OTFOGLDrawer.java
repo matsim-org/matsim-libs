@@ -88,7 +88,7 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFClientQuad.ClassCountExecutor;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
-import org.matsim.vis.otfvis.gui.OTFVisConfig.ZoomEntry;
+import org.matsim.vis.otfvis.gui.ZoomEntry;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
@@ -465,7 +465,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		return canvas;
 	}
 	
-	public OTFOGLDrawer (OTFVisConfig visconf, JFrame frame, OTFClientQuad clientQ) {
+	public OTFOGLDrawer(OTFVisConfig visconf, JFrame frame, OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
 		GLCapabilities caps = new GLCapabilities();
 		this.config = visconf;

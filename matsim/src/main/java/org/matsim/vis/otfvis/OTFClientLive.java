@@ -30,6 +30,7 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
 
@@ -46,19 +47,20 @@ public class OTFClientLive extends OTFClient {
 	}
 
 	@Override
-	protected void getOTFVisConfig() {
+	protected OTFVisConfig createOTFVisConfig() {
 		if (this.visconf == null) {
 			log.warn("No otfvis config set, using defaults");
 			this.visconf = new OTFVisConfig();
 		}
 		String netName = Gbl.getConfig().network().getInputFile();
 		saver = new OTFLiveSettingsSaver(this.visconf, netName);
-		((OTFLiveSettingsSaver)saver).readDefaultSettings();
+		(saver).readDefaultSettings();
 		visconf.setCachingAllowed(false); // no use to cache in live mode
+		return visconf;
 	}
 	
 	@Override
-	protected void createDrawer(){
+	protected OTFDrawer createDrawer(){
 		try {		
 			OTFClientQuad clientQ = createNewView(this.url, connect, this.hostControlBar.getOTFHostControl());
 			mainDrawer = new OTFOGLDrawer(this.visconf, this.frame, clientQ);
@@ -78,6 +80,7 @@ public class OTFClientLive extends OTFClient {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+		return mainDrawer;
 	}
 
 	public void setConfig(OTFVisConfig otfVisConfig) {

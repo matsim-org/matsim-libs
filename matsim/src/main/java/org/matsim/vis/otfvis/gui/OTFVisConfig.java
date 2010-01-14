@@ -21,15 +21,10 @@
 package org.matsim.vis.otfvis.gui;
 
 import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.imageio.ImageIO;
 
 import org.matsim.core.config.Module;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
@@ -47,49 +42,49 @@ public class OTFVisConfig extends Module {
 
 	public static final String GROUP_NAME = "otfvis";
 
-	public static class ZoomEntry  implements Serializable{
-		private static final long serialVersionUID = 1L;
-		
-		public Point3f getZoomstart() {
-			return this.zoomstart;
-		}
-		public BufferedImage getSnap() {
-			return this.snap;
-		}
-		public String getName() {
-			return this.name;
-		}
-		
-		Point3f zoomstart;
-		BufferedImage snap;
-		String name;
-		
-		public ZoomEntry() {
-			
-		}
-		
-		public ZoomEntry(BufferedImage snap, Point3f zoomstart, String name) {
-			super();
-			this.snap = snap;
-			this.zoomstart = zoomstart;
-			this.name = name;
-		}
+  public static final String AGENT_SIZE = "agentSize";
+  public static final String MIDDLE_MOUSE_FUNC = "middleMouseFunc";
+  public static final String LEFT_MOUSE_FUNC = "leftMouseFunc";
+  public static final String RIGHT_MOUSE_FUNC = "rightMouseFunc";
 
-		private void writeObject( java.io.ObjectOutputStream s ) throws IOException {
-			s.writeUTF(this.name);
-			s.writeFloat(this.zoomstart.x);
-			s.writeFloat(this.zoomstart.y);
-			s.writeFloat(this.zoomstart.z);
-			ImageIO.write(this.snap, "jpg", s);
-		}
+  public static final String FILE_VERSION = "fileVersion";
+  public static final String FILE_MINOR_VERSION = "fileMinorVersion";
 
+  public static final String BIG_TIME_STEP = "bigTimeStep";
+  public static final String SHOW_TELEPORTATION = "showTeleportation";
+//  public static final String TIME_STEP = "timeStep";
 
-		private void readObject( java.io.ObjectInputStream s ) throws IOException {
-			this.name = s.readUTF();
-			this.zoomstart = new Point3f(s.readFloat(),s.readFloat(),s.readFloat());
-			this.snap = ImageIO.read(s);
-		}
-	}
+  private  float agentSize = 120.f;
+  private  String middleMouseFunc = "Pan";
+  private  String leftMouseFunc = "Zoom";
+  private  String rightMouseFunc = "Select";
+  private int fileVersion = OTFFileWriter.VERSION;
+  private int fileMinorVersion = OTFFileWriter.MINORVERSION;
+
+  private int bigTimeStep = 600;
+//  private final int timeStep = 1;
+  private String queryType = "agentPlan";
+  private boolean multipleSelect = false;
+  private boolean showParking = false;
+  private Color backgroundColor = new Color(255, 255, 255, 0);
+  private Color networkColor = new Color(128, 128, 128, 200);
+  private float linkWidth = 30;
+  private boolean drawLinkIds = false;
+  private boolean drawTime = false;
+  private boolean drawOverlays = true;
+  private boolean renderImages = false;
+  private boolean modified = false;
+  private boolean cachingAllowed = true;
+  private int delay_ms = 30;
+
+  private boolean drawScaleBar = false;
+  private boolean showTeleportedAgents = false;
+
+  private List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
+	
+  public OTFVisConfig() {
+    super(GROUP_NAME);
+  }
 	
 	public List<ZoomEntry> getZooms() {
 		return this.zooms;
@@ -105,54 +100,12 @@ public class OTFVisConfig extends Module {
 	public Point3f getZoomValue(String zoomName) {
 		Point3f result = null;
 		for(ZoomEntry entry : this.zooms) {
-			if(entry.name.equals(zoomName))result = entry.zoomstart;
+			if(entry.getName().equals(zoomName)) {
+			  result = entry.getZoomstart();
+			}
 		}
 		return result;
 	}
-
-	List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
-
-	public OTFVisConfig() {
-		super(GROUP_NAME);
-	}
-
-	public static final String AGENT_SIZE = "agentSize";
-	public static final String MIDDLE_MOUSE_FUNC = "middleMouseFunc";
-	public static final String LEFT_MOUSE_FUNC = "leftMouseFunc";
-	public static final String RIGHT_MOUSE_FUNC = "rightMouseFunc";
-
-	public static final String FILE_VERSION = "fileVersion";
-	public static final String FILE_MINOR_VERSION = "fileMinorVersion";
-
-	public static final String BIG_TIME_STEP = "bigTimeStep";
-	public static final String SHOW_TELEPORTATION = "showTeleportation";
-//	public static final String TIME_STEP = "timeStep";
-
-	private  float agentSize = 120.f;
-	private  String middleMouseFunc = "Pan";
-	private  String leftMouseFunc = "Zoom";
-	private  String rightMouseFunc = "Select";
-	private int fileVersion = OTFFileWriter.VERSION;
-	private int fileMinorVersion = OTFFileWriter.MINORVERSION;
-
-	private int bigTimeStep = 600;
-//	private final int timeStep = 1;
-	private String queryType = "agentPlan";
-	private boolean multipleSelect = false;
-	private boolean showParking = false;
-	private Color backgroundColor = new Color(255, 255, 255, 0);
-	private Color networkColor = new Color(128, 128, 128, 200);
-	private float linkWidth = 30;
-	private boolean drawLinkIds = false;
-	private boolean drawTime = false;
-	private boolean drawOverlays = true;
-	private boolean renderImages = false;
-	private boolean modified = false;
-	private boolean cachingAllowed = true;
-	private int delay_ms = 30;
-
-	private boolean drawScaleBar = false;
-	private boolean showTeleportedAgents = false;
 
 	/**
 	 * @return the delay_ms

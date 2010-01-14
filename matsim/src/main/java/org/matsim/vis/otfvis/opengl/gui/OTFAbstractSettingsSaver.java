@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -41,6 +43,8 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
 
@@ -133,12 +137,18 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 	    return erg;
 	}
 
-	public void openAndReadConfigFromFile(File file) {
+	public OTFVisConfig openAndReadConfigFromFile(File file) {
     	ObjectInputStream inFile;
-    	if(file == null) return;
+    	if(file == null) {
+    	  throw new IllegalArgumentException("Not able to read config from file: " + file.getPath());
+    	}
 		try {
 			inFile = new ObjectInputStream(new FileInputStream(file));
 			this.visConfig = (OTFVisConfig)inFile.readObject();
+			log.info("Config read from file : " + file.getAbsolutePath());
+			log.info("Config has " + this.visConfig.getZooms().size() + " zoom entries...");
+			this.dumpConfig();
+			return this.visConfig;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -146,14 +156,14 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-
+    throw new IllegalArgumentException("Not able to read config from file: " + file.getPath());
 	 }
 
 	
 
 	private void openAndSaveConfig() {
+	  log.debug("trying to save config to : " + this.fileName);
 		// We have to use truezip API here as Java does not UPDATE zip files correctly
-		OTFVisConfig config = this.visConfig;
 		try {
 			de.schlichtherle.io.File.setDefaultArchiveDetector(new DefaultArchiveDetector(
 			        ArchiveDetector.NULL, // delegate
@@ -181,11 +191,12 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 	    		de.schlichtherle.io.File.umount(true);
 	    		return;
 			}
+			
 			OutputStream out = new de.schlichtherle.io.FileOutputStream(fileName + "/config.bin");
 			try {
 				ObjectOutputStream outFile = new ObjectOutputStream(out);
-				config.clearModified(); //the saved version should be cleared already
-				outFile.writeObject(config);
+				this.visConfig.clearModified(); //the saved version should be cleared already
+				outFile.writeObject(this.visConfig);
 			} finally {
 			    out.close(); // ALWAYS close the stream!
 			}
@@ -193,7 +204,7 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 			try {
 				  // Create XML encoder.
 				XMLEncoder xenc = new XMLEncoder(out);
-				xenc.writeObject(config);
+				xenc.writeObject(this.visConfig);
 				xenc.close();
 			} finally {
 			    out.close(); // ALWAYS close the stream!
@@ -213,17 +224,25 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 	}
 	
 	public void saveSettingsAs() {
-		OTFVisConfig config = this.visConfig;
 		File file = chooseFile(true);
 		if(file != null){
 			OutputStream out;
 			try {
 				boolean asXML = file.getAbsolutePath().endsWith("vxmlcfg");
 				out = new FileOutputStream(file);
-				Writer outFile = asXML ? new XMLWriter(out) : new BinWriter(out);
-				config.clearModified(); //the saved version should be cleared already
-				outFile.writeObject(config);
+				Writer outFile = null;
+				if (asXML) {
+				  outFile = new XMLWriter(out); 
+				}
+				else {
+				  outFile = new BinWriter(out);
+				}
+				this.visConfig.clearModified(); //the saved version should be cleared already
+				outFile.writeObject(this.visConfig);
 				outFile.close();
+				log.info("Config has " + this.visConfig.getZooms().size() + " zoom entries");
+				log.info("Config written to file...");
+				this.dumpConfig();
 				out.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -232,9 +251,20 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 			}
 		}
 	}
-	public void readSettings() {
+	public OTFVisConfig readSettings() {
     	File file = chooseFile(false);
-		openAndReadConfigFromFile(file);
+		return openAndReadConfigFromFile(file);
+	}
+	
+	private void dumpConfig(){
+    log.info("OTFVis config dump:");
+    StringWriter writer = new StringWriter();
+    Config tmpConfig = new Config();
+    tmpConfig.addModule(OTFVisConfig.GROUP_NAME, this.visConfig);
+    PrintWriter pw = new PrintWriter(writer);
+    new ConfigWriter(tmpConfig, pw).writeStream(pw);
+    log.info("\n\n" + writer.getBuffer().toString());
+    log.info("Complete config dump done.");
 	}
 
 

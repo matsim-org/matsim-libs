@@ -42,7 +42,7 @@ import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.gui.OTFAbstractSettingsSaver;
+import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
 
 
 /**
@@ -63,7 +63,7 @@ public abstract class OTFClient extends Thread {
 
 	protected OTFHostControlBar hostControlBar = null;
 	
-	protected OTFAbstractSettingsSaver saver;
+	protected OTFLiveSettingsSaver saver;
 
 	protected OTFDrawer mainDrawer;
 	
@@ -73,13 +73,15 @@ public abstract class OTFClient extends Thread {
 
 	@Override
 	public void run() {
-		getOTFVisConfig();
+		this.visconf = createOTFVisConfig();
+		OTFClientControl.getInstance().setOTFVisConfig(this.visconf);
 		log.info("got OTFVis config");
 		createMainFrame();
 		log.info("created MainFrame");
 		createHostControlBar();
 		log.info("created HostControlBar");
-		createDrawer();
+		this.mainDrawer = createDrawer();
+		OTFClientControl.getInstance().setMainOTFDrawer(this.mainDrawer);
 		log.info("created drawer");
 		addDrawerToSplitPane(this.url);
 		this.hostControlBar.addDrawer(this.url, mainDrawer);
@@ -158,8 +160,8 @@ public abstract class OTFClient extends Thread {
 		this.frame.setSize(screenSize.width/2,screenSize.height/2);
 	}
 
-	protected abstract void createDrawer();
+	protected abstract OTFDrawer createDrawer();
 
-	protected abstract void getOTFVisConfig();
+	protected abstract OTFVisConfig createOTFVisConfig();
 
 }

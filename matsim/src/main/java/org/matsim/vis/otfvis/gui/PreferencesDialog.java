@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.rmi.RemoteException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -46,6 +47,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.vis.otfvis.opengl.queries.QueryToggleShowParking;
 
@@ -316,7 +319,8 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	}
 
 
-	public void buildMenu(final OTFFrame frame, final PreferencesDialog preferencesDialog, final OTFSettingsSaver save) {
+	public void buildMenu(final OTFFrame frame, final PreferencesDialog preferencesDialog, 
+	    final OTFSettingsSaver save) {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
@@ -363,12 +367,20 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 
 			public void actionPerformed(final ActionEvent e) {
-				save.readSettings();
+				cfg = save.readSettings();
+				Gbl.getConfig().removeModule(OTFVisConfig.GROUP_NAME);
+	      Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, cfg);
+	      OTFClientControl.getInstance().setOTFVisConfig(cfg);
 				if (frame != null) {
 					frame.getContentPane().invalidate();
 					PreferencesDialog preferencesDialog = new PreferencesDialog(frame, cfg, host);
 					preferencesDialog.buildMenu(frame, preferencesDialog, save);
 				}
+				try {
+          OTFClientControl.getInstance().getMainOTFDrawer().invalidate(-1);
+        } catch (RemoteException e1) {
+          e1.printStackTrace();
+        }
 			}
 		};
 		fileMenu.add(openAction);

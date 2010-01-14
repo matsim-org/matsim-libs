@@ -60,8 +60,8 @@ public class OTFDoubleMVI extends OTFClientFile {
 	}
 
 	@Override
-	protected void createDrawer() {
-		super.createDrawer();
+	protected OTFDrawer createDrawer() {
+		OTFDrawer superDrawer = super.createDrawer();
 		OTFDrawer drawer;
 		try {
 			drawer = new OTFOGLDrawer(this.visconf, frame, this.getLeftDrawerComponent());
@@ -97,6 +97,7 @@ public class OTFDoubleMVI extends OTFClientFile {
 		} catch (NotBoundException e) {
 			e.printStackTrace();
 		}
+		return superDrawer;
 	}
 
 	public static void main( String[] args) {
