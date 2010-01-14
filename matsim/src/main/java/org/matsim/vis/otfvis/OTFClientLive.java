@@ -24,7 +24,6 @@ import java.awt.BorderLayout;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
@@ -36,9 +35,12 @@ import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
 
 public class OTFClientLive extends OTFClient {
 
+  
 	private static final Logger log = Logger.getLogger(OTFClientLive.class);
 
 	private OTFConnectionManager connect = new OTFConnectionManager();
+
+  private OTFVisConfig visconf;
 
 
 	public OTFClientLive(String url, OTFConnectionManager connect) {
@@ -48,12 +50,11 @@ public class OTFClientLive extends OTFClient {
 
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
-		if (this.visconf == null) {
+	  if (visconf == null) {
 			log.warn("No otfvis config set, using defaults");
-			this.visconf = new OTFVisConfig();
+			visconf = new OTFVisConfig();
 		}
-		String netName = Gbl.getConfig().network().getInputFile();
-		saver = new OTFLiveSettingsSaver(this.visconf, netName);
+		saver = new OTFLiveSettingsSaver(visconf, "otfsettings");
 		(saver).readDefaultSettings();
 		visconf.setCachingAllowed(false); // no use to cache in live mode
 		return visconf;

@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.otfvis.OTFClientControl;
 
 
 /**
@@ -75,8 +75,7 @@ public class OTFFrame extends JFrame {
 	    }
 
 	void endProgram(int code) {
-		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
-		if(config.isModified()) {
+		if(OTFClientControl.getInstance().getOTFVisConfig().isModified()) {
 			final JDialog dialog = new JDialog((JFrame)null, "Preferences are unsaved and modified...", true);
 			final JOptionPane optionPane = new JOptionPane(
 				    "There are potenially unsaved changes in Preferences.\nQuit anyway?",

@@ -38,10 +38,10 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 /**
  * The OTF has a file Reader and a file Writer part.
@@ -139,11 +139,9 @@ public class OTFFileReader implements OTFServerRemote {
 			version = this.inFile.readInt();
 			minorversion = this.inFile.readInt();
 			this.intervall_s = this.inFile.readDouble();
-			OTFVisConfig config = (OTFVisConfig) Gbl.getConfig().getModule(
-					OTFVisConfig.GROUP_NAME);
 
-			config.setFileVersion(version);
-			config.setFileMinorVersion(minorversion);
+			OTFClientControl.getInstance().getOTFVisConfig().setFileVersion(version);
+			OTFClientControl.getInstance().getOTFVisConfig().setFileMinorVersion(minorversion);
 
 			scanZIPFile(zipFile);
 			zipFile.close();

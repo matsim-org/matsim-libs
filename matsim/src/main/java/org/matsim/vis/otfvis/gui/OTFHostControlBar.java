@@ -46,9 +46,9 @@ import javax.swing.JToolBar;
 import javax.swing.border.Border;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -317,9 +317,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			frame.setBounds(this.windowBounds);
 			frame.setVisible(true);
 		}
-		OTFVisConfig cfg = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME));
-		float linkWidth = cfg.getLinkWidth();
-		cfg.setLinkWidth(linkWidth + 0.01f);// forces redraw of network, haven't found a better way to do it. marcel/19apr2009
+		float linkWidth = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
+		OTFClientControl.getInstance().getOTFVisConfig().setLinkWidth(linkWidth + 0.01f);// forces redraw of network, haven't found a better way to do it. marcel/19apr2009
 		SimpleStaticNetLayer.marktex = null;
 		redrawDrawers();
 	}
@@ -349,7 +348,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void pressed_STEP_FF() throws IOException {
-		int bigStep = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getBigTimeStep();
+		int bigStep = OTFClientControl.getInstance().getOTFVisConfig().getBigTimeStep();
 		if(movieTimer != null) pressed_PAUSE();
 		else requestTimeStep(simTime+bigStep, OTFServerRemote.TimePreference.LATER);
 	}
@@ -359,7 +358,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void pressed_STEP_BB() throws IOException {
-		int bigStep = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getBigTimeStep();
+		int bigStep = OTFClientControl.getInstance().getOTFVisConfig().getBigTimeStep();
 		requestTimeStep(simTime-bigStep, OTFServerRemote.TimePreference.EARLIER);
 }
 
@@ -544,8 +543,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 			while (!terminate) {
 				try {
-					OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
-					if(config != null) delay = config.getDelay_ms();
+				  delay = OTFClientControl.getInstance().getOTFVisConfig().getDelay_ms();
 					sleep(delay);
 					synchronized(hostControl.blockReading) {
 						if (isActive && synchronizedPlay &&

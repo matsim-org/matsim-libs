@@ -39,11 +39,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -199,7 +198,7 @@ public class QueryAgentPTBus implements OTFQuery {
 
 		gl.glEnable(GL.GL_LINE_SMOOTH);
 		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
-		gl.glLineWidth(1.f*((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth());
+		gl.glLineWidth(1.f*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
 		gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
 		gl.glDrawArrays (GL.GL_LINE_STRIP, 0, this.vertex.length/2);
 		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);

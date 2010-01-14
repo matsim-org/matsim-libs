@@ -30,7 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
@@ -53,8 +52,6 @@ public abstract class OTFClient extends Thread {
 
   private static final Logger log = Logger.getLogger(OTFClient.class);
 	
-  protected OTFVisConfig visconf;
-
 	protected String url;
 	
 	protected OTFFrame frame;
@@ -73,8 +70,8 @@ public abstract class OTFClient extends Thread {
 
 	@Override
 	public void run() {
-		this.visconf = createOTFVisConfig();
-		OTFClientControl.getInstance().setOTFVisConfig(this.visconf);
+		OTFVisConfig visconf = createOTFVisConfig();
+		OTFClientControl.getInstance().setOTFVisConfig(visconf);
 		log.info("got OTFVis config");
 		createMainFrame();
 		log.info("created MainFrame");
@@ -109,7 +106,7 @@ public abstract class OTFClient extends Thread {
 	}
 
 	public OTFClientQuad createNewView(String id, OTFConnectionManager connect, OTFHostConnectionManager hostControl) throws RemoteException {
-		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+		OTFVisConfig config = OTFClientControl.getInstance().getOTFVisConfig();
 
 		if((config.getFileVersion() < OTFFileWriter.VERSION) || (config.getFileMinorVersion() < OTFFileWriter.MINORVERSION)) {
 			// go through every reader class and look for the appropriate Reader Version for this fileformat
@@ -141,7 +138,7 @@ public abstract class OTFClient extends Thread {
 			this.hostControlBar = new OTFHostControlBar(this.url);
 			hostControlBar.frame = frame;
 			frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
-			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, visconf, hostControlBar);
+			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, OTFClientControl.getInstance().getOTFVisConfig(), hostControlBar);
 			preferencesDialog.buildMenu(frame, preferencesDialog, saver);
 		} catch (RemoteException e) {
 			e.printStackTrace();

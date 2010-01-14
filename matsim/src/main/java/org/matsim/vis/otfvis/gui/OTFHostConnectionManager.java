@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
@@ -107,9 +107,8 @@ public class OTFHostConnectionManager {
 	}
 
 	public void finishedInitialisition() {
-		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 		try {
-			if(!getOTFServer().isLive() && config.isCachingAllowed()) {
+			if(!getOTFServer().isLive() && OTFClientControl.getInstance().getOTFVisConfig().isCachingAllowed()) {
 				new PreloadHelper().start();
 			}
 		} catch (RemoteException e) {

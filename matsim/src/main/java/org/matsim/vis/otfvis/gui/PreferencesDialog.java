@@ -47,7 +47,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.vis.otfvis.opengl.queries.QueryToggleShowParking;
@@ -368,8 +367,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 			public void actionPerformed(final ActionEvent e) {
 				cfg = save.readSettings();
-				Gbl.getConfig().removeModule(OTFVisConfig.GROUP_NAME);
-	      Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, cfg);
 	      OTFClientControl.getInstance().setOTFVisConfig(cfg);
 				if (frame != null) {
 					frame.getContentPane().invalidate();

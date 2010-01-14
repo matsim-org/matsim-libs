@@ -31,10 +31,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
@@ -297,9 +296,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 
 		result.finish();
-		OTFVisConfig cfg = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis"));
 
-		if (cfg.isCachingAllowed()) this.cachedTimes.put(time, result);
+		if (OTFClientControl.getInstance().getOTFVisConfig().isCachingAllowed()) {
+		  this.cachedTimes.put(time, result);
+		}
 		return result;
 	}
 

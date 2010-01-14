@@ -24,7 +24,6 @@ import java.awt.BorderLayout;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -122,23 +121,9 @@ public class OTFClientFile extends OTFClient {
 	
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
-	  boolean gblConfigGiven = false;
-		if (Gbl.getConfig() != null) {
-			visconf = Gbl.getConfig().otfVis();
-			gblConfigGiven = true;
-		}
-		else {
-			Gbl.createConfig(null);
-			visconf = Gbl.getConfig().otfVis();
-		}
-		fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);
-		
-		if (!gblConfigGiven) {
-			visconf = fileSettingsSaver.openAndReadConfig();
-		} 
-		else {
-			log.warn("OTFVisConfig already defined, cant read settings from file");
-		}
+		OTFVisConfig visconf = new OTFVisConfig();
+		fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);	
+		visconf = fileSettingsSaver.openAndReadConfig();
 		saver = new OTFLiveSettingsSaver(visconf, this.url);
 		return visconf;
 	}

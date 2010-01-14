@@ -30,15 +30,14 @@ import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.gui.OTFDrawable;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.opengl.drawer.OGLProvider;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -85,7 +84,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	protected void checkNetList(GL gl) {
 		List<OTFDrawable> it = items;
 
-		float cellWidthAct_m = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
+		float cellWidthAct_m = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
 
 		if (netDisplListMap.containsKey(myDrawer) && (cellWidth_m != cellWidthAct_m)){
 			int displList = netDisplListMap.get(myDrawer);
@@ -126,7 +125,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 			marktex.bind();
 		}
 		//gl.glDisable(GL.GL_BLEND);
-		Color netColor = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getNetworkColor();
+		Color netColor = OTFClientControl.getInstance().getOTFVisConfig().getNetworkColor();
 		float[] components = netColor.getColorComponents(new float[4]);
 		gl.glColor4d(components[0], components[1], components[2], netColor.getAlpha() / 255.0f);
 		gl.glCallList(netDisplList);

@@ -27,7 +27,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 
@@ -60,11 +60,10 @@ public class OTFFileSettingsSaver extends OTFAbstractSettingsSaver {
 				if(infoEntry != null) {
 					//load config settings
 					inFile = new OTFFileReader.OTFObjectInputStream(zipFile.getInputStream(infoEntry));
-					Gbl.getConfig().removeModule(OTFVisConfig.GROUP_NAME);
 					OTFVisConfig cfg = (OTFVisConfig)inFile.readObject();
 					// force this to 30 if zero!
 					cfg.setDelay_ms(cfg.getDelay_ms() == 0 ? 30: cfg.getDelay_ms());
-					Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, cfg);
+					OTFClientControl.getInstance().setOTFVisConfig(cfg);
 				} 
 			} catch (IOException e1) {
 				log.error("Not able to load config from file. This is not fatal.");
@@ -73,11 +72,11 @@ public class OTFFileSettingsSaver extends OTFAbstractSettingsSaver {
 				e.printStackTrace();
 			} 
 		// Test if loading worked, otherwise create default
-		if(Gbl.getConfig().otfVis() == null) {
+		if(OTFClientControl.getInstance().getOTFVisConfig() == null) {
 			log.info("No otfvis config loaded creating default otfvisconfig.");
-			Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, new OTFVisConfig());
+			OTFClientControl.getInstance().setOTFVisConfig(new OTFVisConfig());
 		}
-		conf = (OTFVisConfig)Gbl.getConfig().otfVis();
+		conf = OTFClientControl.getInstance().getOTFVisConfig();
 		conf.clearModified();
 		return conf;
 	}		

@@ -46,14 +46,13 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -265,7 +264,7 @@ public class QueryAgentPlan implements OTFQuery {
 	}
 
 	private float getLineWidth() {
-		return ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
+		return OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
 	}
 
 	private void drawArrowFromAgentToTextLabel(Point2D.Double pos, GL gl) {

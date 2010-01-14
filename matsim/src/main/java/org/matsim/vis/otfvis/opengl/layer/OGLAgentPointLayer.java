@@ -32,11 +32,10 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
@@ -101,7 +100,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 		
 		protected void setAgentSize() {
-			float agentSize = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getAgentSize();
+			float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
 			if (gl.isFunctionAvailable("glPointParameterf")) {
 				// Query for the max point size supported by the hardware
 				float [] maxSize = {0.0f};

@@ -47,11 +47,10 @@ import org.jdesktop.animation.timing.TimingTargetAdapter;
 import org.jdesktop.animation.timing.interpolation.KeyFrames;
 import org.jdesktop.animation.timing.interpolation.KeyValues;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.Camera;
@@ -165,13 +164,13 @@ implements MouseWheelListener{
 		String function = "";
 		switch (mbutton) {
 			case 1:
-				function = Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.LEFT_MOUSE_FUNC);
+				function = OTFClientControl.getInstance().getOTFVisConfig().getLeftMouseFunc();
 				break;
 			case 2:
-				function = Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.MIDDLE_MOUSE_FUNC);
+				function = OTFClientControl.getInstance().getOTFVisConfig().getMiddleMouseFunc();
 				break;
 			case 3:
-				function = Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.RIGHT_MOUSE_FUNC);
+				function = OTFClientControl.getInstance().getOTFVisConfig().getRightMouseFunc();
 				break;
 		}
 		if(function.equals("Zoom")) button = 1;
@@ -247,7 +246,8 @@ implements MouseWheelListener{
 		clickHandler.redraw();
 	}
 
-	public void mouseWheelMoved(MouseWheelEvent e) {
+	@Override
+  public void mouseWheelMoved(MouseWheelEvent e) {
 		float delta = -0.1f*e.getWheelRotation();
 		scaleNetworkRelative(1.f -delta);
 		//InfoText.showText("Scale");
