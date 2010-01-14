@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.AbstractLocation;
@@ -69,6 +70,7 @@ public class LinkImpl extends AbstractLocation implements Link {
 	static private double cpWarnCnt = 0 ;
 	static private double plWarnCnt = 0 ;
 	static private double lengthWarnCnt = 0;
+	static private int loopWarnCnt = 0 ;
 	
 	public LinkImpl(final Id id, final Node from, final Node to,
 			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
@@ -86,7 +88,13 @@ public class LinkImpl extends AbstractLocation implements Link {
 
 		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
 
-		if (this.from.equals(this.to)) { log.warn("[from=to=" + this.to + " link is a loop]"); }
+		if (this.from.equals(this.to)) { 
+			if ( loopWarnCnt < 1 ) {
+				loopWarnCnt++ ;
+				log.warn("[from=to=" + this.to + " link is a loop]");
+				log.warn(Gbl.ONLYONCE) ;
+			}
+		}
 	}
 	
 	private void calculateFlowCapacity() {
