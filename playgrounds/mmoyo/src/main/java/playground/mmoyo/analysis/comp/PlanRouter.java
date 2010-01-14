@@ -12,6 +12,8 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
+import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.xml.sax.SAXException;
@@ -19,8 +21,6 @@ import org.xml.sax.SAXException;
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
 import playground.mmoyo.analysis.PTLegIntoPlanConverter;
-import playground.mrieser.pt.config.TransitConfigGroup;
-import playground.mrieser.pt.router.PlansCalcTransitRoute;
 
 /**reads a config file, routes the transit plans and writes a routed plans file*/
 public class PlanRouter {
@@ -33,7 +33,7 @@ public class PlanRouter {
 
 		//split pt connections into plans
 		new PTLegIntoPlanConverter().run(scenario);
-		
+
 		PlansCalcRoute router= null;
 		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory();
 

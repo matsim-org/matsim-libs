@@ -25,25 +25,22 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
 
-//import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
-//import org.matsim.run.OTFVis;
 import playground.mrieser.OTFDemo;
-import playground.mrieser.pt.config.TransitConfigGroup;
 import playground.mrieser.pt.controler.TransitControler;
-//import playground.mzilske.bvg09.TransitControler;
 
 public class MMoyoTransitControler extends TransitControler {
 	boolean launchOTFDemo=false;
-	
+
 	public MMoyoTransitControler(final ScenarioImpl scenario, boolean launchOTFDemo){
 		super(scenario);
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		this.setOverwriteFiles(true);   
+		this.setOverwriteFiles(true);
 		this.launchOTFDemo = launchOTFDemo;
 	}
-	
+
 	@Override
 	protected void runMobSim() {
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
@@ -65,14 +62,14 @@ public class MMoyoTransitControler extends TransitControler {
 		return new MMoyoPlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 				this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), new TransitConfigGroup());
 	}
-	
+
 	public static void main(final String[] args) {
 		if (args.length > 0) {
 			ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(args[0]); //load from configFile
 			ScenarioImpl scenario = scenarioLoader.getScenario();
 			scenarioLoader.loadScenario();
 			new MMoyoTransitControler(scenario, true).run();
-		} 
+		}
 	}
-	
+
 }

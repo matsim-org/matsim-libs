@@ -40,15 +40,15 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.BasicVehicleReaderV1;
 import org.xml.sax.SAXException;
 
-import playground.mrieser.pt.config.TransitConfigGroup;
 import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
-import playground.mrieser.pt.router.PlansCalcTransitRoute;
 
 /**
  * @author mrieser
@@ -114,7 +114,7 @@ public class TransitControler extends Controler {
 
 	@Override
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
-		// if I see this correctly, in the following the first 5 arguments are just passed through.  That is, 
+		// if I see this correctly, in the following the first 5 arguments are just passed through.  That is,
 		// "getLeastCostPathCalculatorFactory()" just defines the (car) routing algo from the standard controler.  kai, nov'09
 		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 				this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.transitConfig);

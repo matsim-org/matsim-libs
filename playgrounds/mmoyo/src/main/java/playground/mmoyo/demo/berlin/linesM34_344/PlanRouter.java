@@ -15,7 +15,9 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
@@ -23,8 +25,6 @@ import org.xml.sax.SAXException;
 
 import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
 import playground.mrieser.OTFDemo;
-import playground.mrieser.pt.config.TransitConfigGroup;
-import playground.mrieser.pt.router.PlansCalcTransitRoute;
 
 @Deprecated
 public class PlanRouter {

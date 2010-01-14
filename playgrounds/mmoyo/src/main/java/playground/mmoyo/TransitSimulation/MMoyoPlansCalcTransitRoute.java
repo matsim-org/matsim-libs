@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -25,13 +24,13 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.pt.router.TransitActsRemover;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.PTRouter.PTRouter;
-import playground.mrieser.pt.config.TransitConfigGroup;
-import playground.mrieser.pt.router.TransitActsRemover;
-import playground.mrieser.pt.router.TransitRouterConfig;
 
 /**copy of marcel.pt.router.PlansCalcTransitRoute.java to test the ptRouter in the simulation*/
 public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
@@ -59,7 +58,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 		this.schedule = schedule;
 		this.transitConfig = transitConfig;
 		this.transitRouter = new PTRouter(schedule, this.routerConfig);
-		
+
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
 		if (routeAlgo instanceof Dijkstra) {
 			((Dijkstra) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
@@ -102,42 +101,42 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 	}
 
 	private void replaceLegs() {
-		Iterator<Tuple<Leg, List<Leg>>> replacementIterator = this.legReplacements.iterator();   
-		if (!replacementIterator.hasNext()) {													
+		Iterator<Tuple<Leg, List<Leg>>> replacementIterator = this.legReplacements.iterator();
+		if (!replacementIterator.hasNext()) {
 			return;
 		}
-		List<PlanElement> planElements = this.currentPlan.getPlanElements();					 			
-		Tuple<Leg, List<Leg>> currentTuple = replacementIterator.next();						
-		for (int i = 0; i < this.currentPlan.getPlanElements().size(); i++) {					
-			PlanElement pe = planElements.get(i);												
-			if (pe instanceof Leg) {																
-				Leg leg = (Leg) pe;	
-				if (leg == currentTuple.getFirst()) {																			
+		List<PlanElement> planElements = this.currentPlan.getPlanElements();
+		Tuple<Leg, List<Leg>> currentTuple = replacementIterator.next();
+		for (int i = 0; i < this.currentPlan.getPlanElements().size(); i++) {
+			PlanElement pe = planElements.get(i);
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				if (leg == currentTuple.getFirst()) {
 					// do the replacement
-					if (currentTuple.getSecond() != null) {											
+					if (currentTuple.getSecond() != null) {
 						// first and last leg do not have the route set, as the start or end  link is unknown.
-						Leg firstLeg = currentTuple.getSecond().get(0);							
-						Link fromLink = ((ActivityImpl) planElements.get(i-1)).getLink(); 		
+						Leg firstLeg = currentTuple.getSecond().get(0);
+						Link fromLink = ((ActivityImpl) planElements.get(i-1)).getLink();
 						Link lastActLink = fromLink;
-						Link toLink = null;													
-						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available 		
-							toLink = ((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLink();   
+						Link toLink = null;
+						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
+							toLink = ((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLink();
 						} else {
-							toLink = ((ActivityImpl) planElements.get(i+1)).getLink();						
+							toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
 						}
 						Link nextPeLink = toLink;
-						firstLeg.setRoute(new GenericRouteImpl(fromLink, toLink));							
+						firstLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
 
-						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);	
-						toLink = ((ActivityImpl) planElements.get(i+1)).getLink();								
-						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available		
+						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
+						toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
+						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
 							fromLink = ((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLink();   //fromLink es el ultimo link de los pt legs
 						}
-						
+
 						//remove legs between a same link
 						/*
 						boolean sameLink = (lastActLink.getId().equals(nextPeLink.getId()));
-						if (!sameLink){currentTuple.getSecond().get(0).setMode(TransportMode.undefined);}else{currentTuple.getSecond().remove(0);}					
+						if (!sameLink){currentTuple.getSecond().get(0).setMode(TransportMode.undefined);}else{currentTuple.getSecond().remove(0);}
 						if (fromLink.equals(toLink)) currentTuple.getSecond().remove(lastLeg);
 
 						//PtRouter describe a transfer with a leg, it is also removed
@@ -148,26 +147,26 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 							}
 						}*/
 						///////////////////
-						
-						lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));							
-						
+
+						lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
+
 						boolean isFirstLeg = true;
 						Coord nextCoord = null;
-						for (Leg leg2 : currentTuple.getSecond()) {												
-							if (isFirstLeg) {																						
-								planElements.set(i, leg2);														
-								isFirstLeg = false;																		
+						for (Leg leg2 : currentTuple.getSecond()) {
+							if (isFirstLeg) {
+								planElements.set(i, leg2);
+								isFirstLeg = false;
 							} else {
-								i++;															
-								if (leg2.getRoute() instanceof ExperimentalTransitRoute) {						
-								
-									ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();   // 
-									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), (LinkImpl) tRoute.getStartLink());
+								i++;
+								if (leg2.getRoute() instanceof ExperimentalTransitRoute) {
+
+									ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();   //
+									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLink());
 									act.setDuration(0.0);
 									planElements.add(i, act);
 									nextCoord = this.schedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
 								} else { // walk legs don't have a coord, use the coord from the last egress point
-									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, nextCoord, (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink());
+									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, nextCoord, ((RouteWRefs) leg2.getRoute()).getStartLink());
 									act.setDuration(0.0);
 									planElements.add(i, act);
 									leg2.setMode(TransportMode.undefined);

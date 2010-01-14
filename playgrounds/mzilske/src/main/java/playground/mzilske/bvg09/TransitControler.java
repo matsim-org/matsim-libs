@@ -40,16 +40,15 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.BasicVehicleReaderV1;
 import org.xml.sax.SAXException;
 
-import playground.dgrether.utils.LogOutputEventHandler;
-import playground.mrieser.pt.config.TransitConfigGroup;
 import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
-import playground.mrieser.pt.router.PlansCalcTransitRoute;
 
 /**
  * @author mrieser
