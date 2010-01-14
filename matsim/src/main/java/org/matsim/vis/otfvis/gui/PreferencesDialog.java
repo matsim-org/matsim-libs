@@ -290,7 +290,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			this.cfg.setAgentSize(this.agentSizeSlider.getValue());
 			if (this.host != null)
 				this.host.invalidateDrawers();
-			System.out.println("val: " + this.agentSizeSlider.getValue());
 		 } else if (e.getSource() == this.linkWidthSlider) {
 			 this.cfg.setLinkWidth(this.linkWidthSlider.getValue());
 			 if (this.host != null){
@@ -301,7 +300,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			 if (this.host != null){
 				host.redrawDrawers();
 			 }
-			 //System.out.println("val: "+ this.linkWidthSlider.getValue());
 		}
 	}
 
