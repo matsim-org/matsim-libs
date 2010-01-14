@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.gbl.Gbl;
 
 public class NodeImpl implements Node {
 
@@ -101,25 +102,35 @@ public class NodeImpl implements Node {
 		this.type = type == null ? null : type.intern();
 	}
 	
+	private static int cnt2 = 0 ;
 	public final boolean addInLink(Link inlink) {
 		Id linkid = inlink.getId();
 		if (this.inlinks.containsKey(linkid)) {
 			throw new IllegalArgumentException(this + "[inlink_id=" + inlink.getId() + " already exists]");
 		}
 		if (this.outlinks.containsKey(linkid)) {
-			log.warn(this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
+			if ( cnt2 < 1 ) {
+				cnt2++ ;
+				log.warn(this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
+				log.warn(Gbl.ONLYONCE) ;
+			}
 		}
 		this.inlinks.put(linkid, inlink);
 		return true; // yy should return true only if collection changed as result of call
 	}
 
+	private static int cnt = 0 ;
 	public final boolean addOutLink(Link outlink) {
 		Id linkid = outlink.getId();
 		if (this.outlinks.containsKey(linkid)) {
 			throw new IllegalArgumentException(this + "[inlink_id=" + outlink.getId() + " already exists]");
 		}
 		if (this.inlinks.containsKey(linkid)) {
-			log.warn(this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
+			if ( cnt < 1 ) {
+				cnt++ ;
+				log.warn(this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
+				log.warn(Gbl.ONLYONCE) ;
+			}
 		}
 		this.outlinks.put(linkid, outlink);
 		return true ; // yy should return true only if collection changed as result of call
