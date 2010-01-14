@@ -98,29 +98,29 @@ public class RouteSummaryTest {
 						this.writer.write("odPair :\t" + odPair + "\n");
 						for (List<Id> linkIds : routes) {
 							Integer routeFlows = this.routeCounters
-									.get(linkIds);
+							.get(linkIds);
 							Integer num_of_num_of_routes = this.numRoutesDistribution
-									.get(routeFlows);
+							.get(routeFlows);
 							this.numRoutesDistribution.put(routeFlows,
 									(num_of_num_of_routes == null) ? 1
 											: num_of_num_of_routes + 1);
 							this.writer
-									.write(linkIds.toString()
-											+ "\tnum_of_routes :\t"
-											+ routeFlows + "\n");
+							.write(linkIds.toString()
+									+ "\tnum_of_routes :\t"
+									+ routeFlows + "\n");
 						}
 						this.writer.write("-----------------------\n");
 						this.writer.flush();
 					}
 				}
 				this.writer
-						.write("number_of_routes\tnumber_of_number_of_routes\n");
+				.write("number_of_routes\tnumber_of_number_of_routes\n");
 				for (Integer n_o_routes : this.numRoutesDistribution.keySet()) {
 					this.writer
-							.write(n_o_routes
-									+ "\t"
-									+ this.numRoutesDistribution
-											.get(n_o_routes) + "\n");
+					.write(n_o_routes
+							+ "\t"
+							+ this.numRoutesDistribution
+							.get(n_o_routes) + "\n");
 				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -147,15 +147,12 @@ public class RouteSummaryTest {
 
 							LegImpl l = (LegImpl) pe;
 
-							Id previousActLinkId = ((PlanImpl) p).getPreviousActivity(l)
-									.getLinkId();
+							Id previousActLinkId = ((PlanImpl) p).getPreviousActivity(l).getLinkId();
 							Id nextActLinkId = ((PlanImpl) p).getNextActivity(l).getLinkId();
 
-							String odPair = previousActLinkId.toString() + "->"
-									+ nextActLinkId.toString();
+							String odPair = previousActLinkId.toString() + "->" + nextActLinkId.toString();
 
-							Set<List<Id>> aOdRouteSet = this.odRoutes
-									.get(odPair);
+							Set<List<Id>> aOdRouteSet = this.odRoutes.get(odPair);
 							if (aOdRouteSet == null)
 								aOdRouteSet = new HashSet<List<Id>>();
 
@@ -163,19 +160,19 @@ public class RouteSummaryTest {
 							NetworkRouteWRefs r = (NetworkRouteWRefs) l.getRoute();
 							// boolean illegalRoute = false;
 
-							if (r.getNodes().size() > 0) {
+							if (r.getStartLinkId() != r.getEndLinkId()) {
 								LinkedList<Id> tmpRouteLinkList = new LinkedList<Id>();
 								tmpRouteLinkList.addFirst(previousActLinkId);
 								List<Id> origRouteLinkIds = r.getLinkIds();
 								for (int i = 0; i < origRouteLinkIds.size(); i++) {
-									tmpRouteLinkList.add(origRouteLinkIds
-											.get(i));
+									tmpRouteLinkList.add(origRouteLinkIds.get(i));
 								}
 								tmpRouteLinkList.addLast(nextActLinkId);
 								routeLinkIds = tmpRouteLinkList;
-							} else if (r.getNodes().size() == 0
-									&& previousActLinkId.equals(nextActLinkId))
+							} else if ((r.getStartLinkId() == r.getEndLinkId())
+									&& previousActLinkId.equals(nextActLinkId)) {
 								routeLinkIds.add(previousActLinkId);
+							}
 							// else
 							// illegalRoute = true;
 

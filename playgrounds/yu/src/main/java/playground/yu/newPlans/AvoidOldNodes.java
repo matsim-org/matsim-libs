@@ -35,17 +35,19 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.utils.misc.RouteUtils;
 
 /**
  * @author yu
- * 
  */
 public class AvoidOldNodes extends NewPopulation {
 	private boolean nullRoute = false;
 	private final Set<String> nodeIds;
+	private final Network network;
 
 	public AvoidOldNodes(final Network network, final Population plans) {
 		super(network, plans);
+		this.network = network;
 		this.nodeIds = new HashSet<String>();
 	}
 
@@ -67,7 +69,7 @@ public class AvoidOldNodes extends NewPopulation {
 					Leg bl = (Leg) pe;
 					NetworkRouteWRefs br = (NetworkRouteWRefs) bl.getRoute();
 					if (br != null) {
-						tag: for (final Node n : br.getNodes()) {
+						tag: for (final Node n : RouteUtils.getNodes(br, this.network)) {
 							final String nId = n.getId().toString();
 							for (String nodeId : this.nodeIds) {
 								if (nId.equals(nodeId)) {
@@ -92,7 +94,7 @@ public class AvoidOldNodes extends NewPopulation {
 	 */
 	public static void main(final String[] args) {
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
-	
+
 		Population population = scenario.getPopulation();
 
 		AvoidOldNodes aon = new AvoidOldNodes(scenario.getNetwork(), population);
