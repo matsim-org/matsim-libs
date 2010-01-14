@@ -31,6 +31,7 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
@@ -180,9 +181,11 @@ public class OTFVis {
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 		if (loader.getScenario().getConfig().getQSimConfigGroup() == null){
-		  log.error("Cannot play live config without configuration for QSim. Please add" +
-		  		"a module qsim (in java QSimConfigGroup) to the config and run OTFVis again.");
-		  return;
+		  log.error("Cannot play live config without config module for QSim (in Java QSimConfigGroup). " +
+		  		"Fixing this by adding default config module for QSim. " + 
+		  		"Please check if default values fit your needs, otherwise correct them in " +
+		  		"the config given as parameter to get a valid visualization!");
+		  loader.getScenario().getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		}
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
