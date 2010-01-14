@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
@@ -190,6 +191,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 		this.teleportationWriter.setTime(time);
 	}
 
+	private static int cnt = 0 ;
 	@Override
 	public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
 		if (this.otfServer != null) {
@@ -198,7 +200,11 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 				this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId())));
 			}
 			else {
-				log.warn("Not able to visualize teleport agent " + agent.getPerson().getId() + " because the teleportation coordinates are equal!");
+				if ( cnt < 1 ) {
+					cnt++ ;
+					log.warn("Not able to visualize teleport agent " + agent.getPerson().getId() + " because the teleportation coordinates are equal!");
+					log.warn(Gbl.ONLYONCE) ;
+				}
 			}
 		}
 	}
