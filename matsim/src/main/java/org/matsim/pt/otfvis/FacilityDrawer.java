@@ -83,6 +83,7 @@ public class FacilityDrawer {
 					out.putDouble( ps.getEasting() - OTFServerQuad2.offsetEast ) ;
 					out.putDouble( ps.getNorthing() - OTFServerQuad2.offsetNorth ) ;
 				} else {
+					ByteBufferUtils.putString(out,"");
 					out.putDouble(facility.getCoord().getX() - OTFServerQuad2.offsetEast);
 					out.putDouble(facility.getCoord().getY() - OTFServerQuad2.offsetNorth);
 				}
@@ -156,10 +157,12 @@ public class FacilityDrawer {
 		}
 
 		public void initTexts() {
-			for (VisBusStop stop : this.stops) {
-				stop.stopText = InfoTextContainer.showTextPermanent(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f, 2.0f);
-				stop.stopText.setLinkId(new IdImpl(stop.linkId));
-			}
+//			for (VisBusStop stop : this.stops) {
+//				if ( stop.linkId!=null ) {
+//					stop.stopText = InfoTextContainer.showTextPermanent(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f, 2.0f);
+//					stop.stopText.setLinkId(new IdImpl(stop.linkId));
+//				}
+//			}
 		}
 
 	}
@@ -181,7 +184,7 @@ public class FacilityDrawer {
 		}
 		
 		private void updateText() {
-			stopText.setText(buildText());
+//			stopText.setText(buildText());
 		}
 
 		private String buildText() {
