@@ -35,6 +35,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -57,11 +58,10 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.lanes.otfvis.OTFLanesConnectionManagerFactory;
+import org.matsim.ptproject.qsim.lanes.QLanesNetworkFactory;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.systems.SignalSystems;
@@ -69,15 +69,8 @@ import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
-import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
-import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
-import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
-import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
-import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
-import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 
 /**
  * Implementation of a queue-based transport simulation.
@@ -89,17 +82,16 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  */
 public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation{
 
+  protected static final int INFO_PERIOD = 3600;
 	private int snapshotPeriod = 0;
 	private double snapshotTime = 0.0;
-	protected static final int INFO_PERIOD = 3600;
 	private double infoTime = 0;
-	private final Config config;
-	protected final PopulationImpl population;
+//	private Config config;
+	protected PopulationImpl population;
 	protected QueueNetwork network;
 	protected Network networkLayer;
 	private static EventsManager events = null;
 	protected  SimStateWriterI netStateWriter = null;
-	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 	protected QueueSimEngine simEngine = null;
 	private CarDepartureHandler carDepartureHandler;
@@ -126,38 +118,67 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
+  private QSimSnapshotWriterManager snapshotManager;
 
 	/**
-	 * Initialize the QueueSimulation without signal systems
-	 * @param network
-	 * @param plans
-	 * @param events
+	 * Initialize the QueueSimulation 
+	 * @deprecated use constructor QueueSimulation(Scenario, EventsManager), hopefully ok for everybody? dgjan2010
 	 */
-	public QueueSimulation(final Network network, final Population plans, final EventsManager events) {
-		log.info("Using QSim...");
-	  // In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
-		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
-		Simulation.reset();
-		this.config = Gbl.getConfig();
-		SimulationTimer.reset(this.config.getQSimConfigGroup().getTimeStepSize());
-		setEvents(events);
-		this.population = (PopulationImpl) plans;
-		this.networkLayer = network;
-		this.network = new QueueNetwork(this.networkLayer);
-		this.agentFactory = new AgentFactory(this);
-		this.notTeleportedModes.add(TransportMode.car);
-		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
-		installCarDepartureHandler();
+	@Deprecated
+  public QueueSimulation(final Network network, final Population plans, final EventsManager eventsManager) {
+	  this.scenario = new ScenarioImpl(Gbl.getConfig());
+	  ((ScenarioImpl)this.scenario).setNetwork((NetworkImpl)network);
+	  ((ScenarioImpl)this.scenario).setPopulation((PopulationImpl) plans);
+	  init(this.scenario, eventsManager);
 	}
 
 	/**
-	 * Initialize the QueueSimulation without signal systems
+	 * Initialize the QueueSimulation 
 	 * @param scenario
 	 * @param events
 	 */
 	public QueueSimulation(final Scenario scenario, final EventsManager events) {
-		this(scenario.getNetwork(), scenario.getPopulation(), events);
 		this.scenario = scenario;
+		init(this.scenario, events);
+	}
+	/**
+	 * extended constructor method that can also be 
+	 * after assignments of another constructor
+	 */
+	private void init(Scenario sc, EventsManager eventsManager){
+    log.info("Using QSim...");
+    // In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
+    this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
+    Simulation.reset();
+    SimulationTimer.reset(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
+    setEvents(eventsManager);
+    this.population = (PopulationImpl) sc.getPopulation();
+    this.networkLayer = sc.getNetwork();
+    Config config = sc.getConfig();
+    if (config.scenario().isUseLanes()) {
+      if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
+        throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
+      }
+      this.setLaneDefinitions(((ScenarioImpl)sc).getLaneDefinitions());
+      this.network = new QueueNetwork(this.networkLayer, new QLanesNetworkFactory(new DefaultQueueNetworkFactory()));
+    }
+    else {
+      this.network = new QueueNetwork(this.networkLayer);
+    }
+    if (config.scenario().isUseSignalSystems()) {
+      if ((((ScenarioImpl)sc).getSignalSystems() == null)
+          || (((ScenarioImpl)sc).getSignalSystemConfigurations() == null)) {
+        throw new IllegalStateException(
+            "Signal systems and signal system configurations have to be set if feature is enabled!");
+      }
+      this.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
+    }
+  
+    
+    this.agentFactory = new AgentFactory(this);
+    this.notTeleportedModes.add(TransportMode.car);
+    this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
+    installCarDepartureHandler();
 	}
 
 	private void installCarDepartureHandler() {
@@ -255,56 +276,13 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		 * In my eyes, the configuration should usually be a read-only object in general, but
 		 * that's hard to be implemented...
 		 */
-		this.config.network().setInputFile(networkFilename);
-		this.config.simulation().setSnapshotFormat("netvis");
-		this.config.simulation().setSnapshotPeriod(snapshotPeriod);
-		this.config.simulation().setSnapshotFile(snapshotFilename);
+		this.scenario.getConfig().network().setInputFile(networkFilename);
+		this.scenario.getConfig().simulation().setSnapshotFormat("netvis");
+		this.scenario.getConfig().simulation().setSnapshotPeriod(snapshotPeriod);
+		this.scenario.getConfig().simulation().setSnapshotFile(snapshotFilename);
 	}
 
-	private void createSnapshotwriter() {
-		// A snapshot period of 0 or less indicates that there should be NO snapshot written
-		if (this.snapshotPeriod > 0 ) {
-			String snapshotFormat =  this.config.getQSimConfigGroup().getSnapshotFormat();
-			Integer itNumber = this.iterationNumber;
-			if (this.controlerIO == null) {
-			  log.error("Not able to create io path via ControlerIO in mobility simulation, not able to write visualizer output!");
-			  return;
-			}
-			else if (itNumber == null) {
-			  log.warn("No iteration number set in mobility simulation using iteration number 0 for snapshot file...");
-			  itNumber = 0;
-			}
-			if (snapshotFormat.contains("plansfile")) {
-				String snapshotFilePrefix = this.controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
-				String snapshotFileSuffix = "xml";
-				this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, this.networkLayer));
-			}
-			if (snapshotFormat.contains("transims")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh");
-				this.snapshotWriters.add(new TransimsSnapshotWriter(snapshotFile));
-			}
-			if (snapshotFormat.contains("googleearth")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "googleearth.kmz");
-				String coordSystem = this.config.global().getCoordinateSystem();
-				this.snapshotWriters.add(new KmlSnapshotWriter(snapshotFile,
-						TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
-			}
-			if (snapshotFormat.contains("netvis")) {
-				log.warn("Snapshot format netvis is no longer supported by this simulation");
-			}
-			if (snapshotFormat.contains("otfvis")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "otfvis.mvi");
-				OTFFileWriter writer = null;
 
-				OTFConnectionManagerFactory connectionManagerFactory = new OTFFileWriterQSimConnectionManagerFactory();
-				if (this.config.scenario().isUseLanes() && ! this.config.scenario().isUseSignalSystems()) {
-				  connectionManagerFactory = new OTFLanesConnectionManagerFactory(connectionManagerFactory);
-				}
-				writer = new OTFFileWriter(this.snapshotPeriod, new OTFQSimServerQuadBuilder(this.network), snapshotFile, connectionManagerFactory);
-				this.snapshotWriters.add(writer);
-			}
-		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
-	}
 
 	private void prepareNetworkChangeEventsQueue() {
 		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)(this.networkLayer)).getNetworkChangeEvents();
@@ -328,36 +306,35 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 			this.signalEngine.prepareSignalSystems();
 		}
 
-		// Initialize Snapshot file
-		this.snapshotPeriod = (int) this.config.getQSimConfigGroup().getSnapshotPeriod();
 
-		double startTime = this.config.getQSimConfigGroup().getStartTime();
-		this.stopTime = this.config.getQSimConfigGroup().getEndTime();
-
+		double startTime = this.scenario.getConfig().getQSimConfigGroup().getStartTime();
+		this.stopTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
 		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
 		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
-
 		SimulationTimer.setSimStartTime(24*3600);
 		SimulationTimer.setTime(startTime);
 
-		createAgents();
-
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		double simStartTime = 0;
+		createAgents();
 		DriverAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
 			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
 		}
 		this.infoTime = Math.floor(simStartTime / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
 		this.snapshotTime = Math.floor(simStartTime / this.snapshotPeriod) * this.snapshotPeriod;
-		if (this.snapshotTime < simStartTime) {
-			this.snapshotTime += this.snapshotPeriod;
-		}
 		SimulationTimer.setSimStartTime(simStartTime);
 		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
 
-		createSnapshotwriter();
-
+		// Initialize Snapshot file
+		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
+		this.snapshotManager = new QSimSnapshotWriterManager();
+		this.snapshotManager.createSnapshotwriter(this.network, this.scenario, this.snapshotPeriod, this.iterationNumber, 
+		    this.scenario.getConfig().getQSimConfigGroup(), this.controlerIO);
+    if (this.snapshotTime < simStartTime) {
+      this.snapshotTime += this.snapshotPeriod;
+    }
+		
 		prepareNetworkChangeEventsQueue();
 
 		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
@@ -375,7 +352,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 					log.error(message);
 					throw new IllegalStateException(message);
 				}
-				((QueueLinkImpl)link).createLanes(laneToLink.getLanes());
+				((QLinkLanesImpl)link).createLanes(laneToLink.getLanes());
 			}
 		}
 	}
@@ -405,7 +382,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		}
 		this.activityEndsList.clear();
 
-		for (SnapshotWriter writer : this.snapshotWriters) {
+		for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
 			writer.finish();
 		}
 
@@ -463,9 +440,9 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 	}
 
 	private void doSnapshot(final double time) {
-		if (!this.snapshotWriters.isEmpty()) {
+		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
 			Collection<PositionInfo> positions = this.network.getVehiclePositions(time);
-			for (SnapshotWriter writer : this.snapshotWriters) {
+			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
 				writer.beginSnapshot(time);
 				for (PositionInfo position : positions) {
 					writer.addAgent(position);
@@ -596,14 +573,6 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		for (DepartureHandler departureHandler : departureHandlers) {
 			departureHandler.handleDeparture(now, agent, linkId, leg);
 		}
-	}
-
-	public boolean addSnapshotWriter(final SnapshotWriter writer) {
-		return this.snapshotWriters.add(writer);
-	}
-
-	public boolean removeSnapshotWriter(final SnapshotWriter writer) {
-		return this.snapshotWriters.remove(writer);
 	}
 
 	public void setAgentFactory(final AgentFactory fac) {

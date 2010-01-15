@@ -372,23 +372,23 @@ public class TransitQueueNetworkTest extends TestCase {
 		SimulationTimer.setTime(303);
 		f.simEngine.simStep(303);
 		assertEquals(2, f.qlink3.getAllVehicles().size()); // includes parked vehicles
-		assertEquals(1, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
-		vehicles = f.qlink3.getQueueLanes().get(0).getAllVehicles().toArray(vehicles);
+		assertEquals(1, f.qlink3.getAllNonParkedVehicles().size());
+		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 320: transitVeh is still at the stop
 		SimulationTimer.setTime(320);
 		f.simEngine.simStep(320);
 		assertEquals(2, f.qlink3.getAllVehicles().size()); // includes parked vehicles
-		assertEquals(1, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
-		vehicles = f.qlink3.getQueueLanes().get(0).getAllVehicles().toArray(vehicles);
+		assertEquals(1, f.qlink3.getAllNonParkedVehicles().size());
+		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 321: transitVeh leaves stop and link
 		SimulationTimer.setTime(321);
 		f.simEngine.simStep(321);
 		assertEquals(2, f.qlink3.getAllVehicles().size()); // includes parked vehicles
-		assertEquals(0, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
+		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
 	}
 
 	/**
@@ -454,8 +454,8 @@ public class TransitQueueNetworkTest extends TestCase {
 		SimulationTimer.setTime(303);
 		f.simEngine.simStep(303);
 		assertEquals(2, f.qlink3.getAllVehicles().size());
-		assertEquals(2, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
-		vehicles = f.qlink3.getQueueLanes().get(0).getAllVehicles().toArray(vehicles);
+		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
+		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 		assertEquals(f.normalVehicle, vehicles[1]);
 
@@ -463,7 +463,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		SimulationTimer.setTime(321);
 		f.simEngine.simStep(321);
 		assertEquals(2, f.qlink3.getAllVehicles().size()); // includes parked vehicles
-		assertEquals(0, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
+		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
 	}
 
 	public void testTwoStopsOnOneLink_FirstLink() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -807,37 +807,37 @@ public class TransitQueueNetworkTest extends TestCase {
 		// time 321: transitVeh @ stop3 (non-blocking, delay 19, exit-time 340), normalVeh left qlink3
 		SimulationTimer.setTime(321);
 		f.simEngine.simStep(321);
-		assertEquals(2, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
-		vehicles = f.qlink3.getQueueLanes().get(0).getAllVehicles().toArray(vehicles);
+		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
+		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 325: transitVeh @ stop3, normalVeh2 @ qlink3
 		SimulationTimer.setTime(325);
 		f.simEngine.simStep(325);
-		assertEquals(2, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
-		vehicles = f.qlink3.getQueueLanes().get(0).getAllVehicles().toArray(vehicles);
+		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
+		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 326: transitVeh @ stop3, normalVeh2 left qlink3
 		SimulationTimer.setTime(326);
 		f.simEngine.simStep(326);
-		assertEquals(1, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
-		vehicles = f.qlink3.getQueueLanes().get(0).getAllVehicles().toArray(vehicles);
+		assertEquals(1, f.qlink3.getAllNonParkedVehicles().size());
+		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 339: transitVeh @ stop3
 		SimulationTimer.setTime(339);
 		f.simEngine.simStep(339);
-		assertEquals(1, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
-		vehicles = f.qlink3.getQueueLanes().get(0).getAllVehicles().toArray(vehicles);
+		assertEquals(1, f.qlink3.getAllNonParkedVehicles().size());
+		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 340: transitVeh left qlink3
 		SimulationTimer.setTime(340);
 		f.simEngine.simStep(340);
-		assertEquals(0, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
+		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
 	}
 
 	public void testTwoStopsOnOneLink_LastLink_FirstNonBlockThenBlock() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -914,36 +914,36 @@ public class TransitQueueNetworkTest extends TestCase {
 		// time 303: transitVeh @ stop2, normalVeh left qlink3
 		SimulationTimer.setTime(303);
 		f.simEngine.simStep(303);
-		assertEquals(2, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
-		vehicles = f.qlink3.getQueueLanes().get(0).getAllVehicles().toArray(vehicles);
+		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
+		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 320: transitVeh @ stop2
 		SimulationTimer.setTime(320);
 		f.simEngine.simStep(320);
-		assertEquals(2, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
+		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
 
 		// time 321: transitVeh @ stop3 (blocking, delay 19, exit-time 340)
 		SimulationTimer.setTime(321);
 		f.simEngine.simStep(321);
-		assertEquals(2, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
-		vehicles = f.qlink3.getQueueLanes().get(0).getAllVehicles().toArray(vehicles);
+		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
+		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 339: transitVeh @ stop3, normalVeh2 blocked behind transitVeh
 		SimulationTimer.setTime(339);
 		f.simEngine.simStep(339);
-		assertEquals(2, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
-		vehicles = f.qlink3.getQueueLanes().get(0).getAllVehicles().toArray(vehicles);
+		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
+		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 340: transitVeh left qlink3, and also normalVeh2 left qlink3 (no flow-restriction when leaving link)
 		SimulationTimer.setTime(340);
 		f.simEngine.simStep(340);
-		assertEquals(0, f.qlink3.getQueueLanes().get(0).getAllVehicles().size());
+		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
 	}
 
 	protected static class TestSimEngine extends QueueSimEngine {

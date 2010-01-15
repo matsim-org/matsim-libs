@@ -20,6 +20,7 @@
 package org.matsim.ptproject.qsim;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -61,6 +62,8 @@ public interface QueueLink {
    * @return the total space capacity available on that link (includes the space on lanes if available)
    */
   public double getSpaceCap();
+  
+  public LinkedList<QueueVehicle> getVehQueue();
 
 //  public Queue<QueueVehicle> getVehiclesInBuffer();
 

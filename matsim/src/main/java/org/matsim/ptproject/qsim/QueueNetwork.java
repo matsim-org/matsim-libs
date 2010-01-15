@@ -69,7 +69,7 @@ public class QueueNetwork {
 		}
 	}
 
-	public Network getNetworkLayer() {
+  public Network getNetworkLayer() {
 		return this.networkLayer;
 	}
 

@@ -35,7 +35,6 @@ import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.SignalGroupSettings;
 import org.matsim.signalsystems.config.SignalSystemConfiguration;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
-import org.matsim.signalsystems.config.SignalSystemConfigurationsImpl;
 import org.matsim.signalsystems.config.SignalSystemPlan;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.testcases.MatsimTestCase;
@@ -79,19 +78,18 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
 		conf.setQSimConfigGroup(new QSimConfigGroup());
-		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
+		ScenarioImpl scenario = new ScenarioImpl(conf);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
+		
 		loader.loadScenario();
 		
-		LaneDefinitions lanedefs = data.getLaneDefinitions();
-		SignalSystems signalSystems = data.getSignalSystems();
+		LaneDefinitions lanedefs = scenario.getLaneDefinitions();
+		SignalSystems signalSystems = scenario.getSignalSystems();
 
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(this);
 
-		SignalSystemConfigurations lssConfigs = new SignalSystemConfigurationsImpl();
-  	MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(lssConfigs);
-		reader.readFile(lsaConfig);
+		SignalSystemConfigurations lssConfigs = scenario.getSignalSystemConfigurations();
 		for (SignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
 			PlanBasedSignalSystemControlInfo controlInfo = (PlanBasedSignalSystemControlInfo) lssConfig
 					.getControlInfo();
@@ -103,12 +101,10 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 			group.setDropping(60);
 		}
 
-		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
-		sim.setLaneDefinitions(lanedefs);
-		sim.setSignalSystems(signalSystems, lssConfigs);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.run();
 		
-		sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
+		sim = new QueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
 		sim.run();
 	}
 

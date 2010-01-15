@@ -24,6 +24,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -56,7 +57,7 @@ public class ScenarioImpl implements Scenario {
 	
 	//mandatory attributes 
 	private Config config;
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private PopulationImpl population;
 	private ActivityFacilitiesImpl facilities;
 	
@@ -93,7 +94,7 @@ public class ScenarioImpl implements Scenario {
 		this.world.complete();
 		this.population = new PopulationImpl(this);
 		this.facilities = new ActivityFacilitiesImpl();
-		this.world.setFacilityLayer((ActivityFacilitiesImpl) this.facilities);
+		this.world.setFacilityLayer(this.facilities);
 	
 		if (this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();
@@ -157,7 +158,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	public NetworkLayer getNetwork() {
-		return this.network;
+		return (NetworkLayer) this.network;
 	}
 
 	public PopulationImpl getPopulation() {
@@ -221,7 +222,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Deprecated
-	public void setNetwork(NetworkLayer network2) {
+	public void setNetwork(NetworkImpl network2) {
 		this.network = network2;
 	}
 

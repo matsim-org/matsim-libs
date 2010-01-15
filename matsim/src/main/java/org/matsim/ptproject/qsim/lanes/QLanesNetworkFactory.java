@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOtfSignalWriter
+ * QLanesNetworkFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,53 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.otfvis.io;
+package org.matsim.ptproject.qsim.lanes;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.otfvis.io.OTFLaneWriter;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.ptproject.qsim.QLaneNode;
 import org.matsim.ptproject.qsim.QLinkLanesImpl;
-import org.matsim.ptproject.qsim.QueueLane;
-import org.matsim.vis.otfvis.data.OTFDataWriter;
+import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QueueNetworkFactory;
+import org.matsim.ptproject.qsim.QueueNode;
 
 
-/**
- * @author dgrether
- *
- */
-public class OTFSignalWriter extends OTFLaneWriter {
-	
-	private static final Logger log = Logger.getLogger(OTFSignalWriter.class);
-	
-	/**
-	 * 
-	 */
-	public OTFSignalWriter() {
-	}
-	
-	@Override
-	public void writeDynData(ByteBuffer out) throws IOException {
-		int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
-		out.putInt(numberOfToNodeQueueLanes);
-		if (numberOfToNodeQueueLanes > 1) {
-			for (QueueLane ql : this.src.getToNodeQueueLanes()){
-				ByteBufferUtils.putString(out, ql.getLaneId().toString());
-				if (ql.isThisTimeStepGreen()) {
-					out.putInt(1);
-				}
-				else {
-					out.putInt(0);
-				}
-			}
-		}
-	}
-	
-	@Override
-	public OTFDataWriter<QLinkLanesImpl> getWriter() {
-		return new OTFSignalWriter();
-	}
-	
+public class QLanesNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
+
+  private QueueNetworkFactory<QueueNode, QueueLink> delegate;
+
+  public QLanesNetworkFactory(QueueNetworkFactory<QueueNode, QueueLink> delegate){
+    this.delegate = delegate;
+  }
+  
+  @Override
+  public QLinkLanesImpl newQueueLink(Link link, QueueNetwork queueNetwork,
+      QueueNode queueNode) {
+    return new QLinkLanesImpl(link, queueNetwork, queueNode);
+  }
+
+  @Override
+  public QueueNode newQueueNode(Node node, QueueNetwork queueNetwork) {
+    return new QLaneNode(node, queueNetwork);
+  }
+
 }

@@ -141,7 +141,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 				this.signalGroupDefinitionsBySystemId.put(signalGroupDefinition.getSignalSystemDefinitionId(), list);
 			}
 			list.add(signalGroupDefinition);
-			((QueueLinkImpl)queueLink).addSignalGroupDefinition(signalGroupDefinition);
+			((QLinkLanesImpl)queueLink).addSignalGroupDefinition(signalGroupDefinition);
 			this.network.getNodes().get(queueLink.getLink().getToNode().getId()).setSignalized(true);
 		}
 	}

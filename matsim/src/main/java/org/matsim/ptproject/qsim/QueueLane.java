@@ -164,10 +164,11 @@ public class QueueLane {
 	 */
 	private boolean fireLaneEvents = false;
 	
-	private TransitQueueLaneFeature transitQueueLaneFeature = new TransitQueueLaneFeature(this);
+	private TransitQueueLaneFeature transitQueueLaneFeature;
 
 	/*package*/ QueueLane(final QueueLink ql, Lane laneData) {
 		this.queueLink = ql;
+		this.transitQueueLaneFeature = new TransitQueueLaneFeature(this.getQueueLink());
 		this.originalLane = (laneData == null) ? true : false;
 		this.laneData = laneData;
 		this.length = ql.getLink().getLength();
@@ -242,7 +243,7 @@ public class QueueLane {
 		}
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * numberOfLanes)
-				/ ((NetworkImpl) ((QueueLinkImpl)this.queueLink).getQueueNetwork().getNetworkLayer()).getEffectiveCellSize() * storageCapFactor;
+				/ ((NetworkImpl) ((QLinkLanesImpl)this.queueLink).getQueueNetwork().getNetworkLayer()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -382,7 +383,7 @@ public class QueueLane {
 				// Check if veh has reached destination:
 				if ((driver.getDestinationLinkId() == this.queueLink.getLink().getId()) && (driver.chooseNextLinkId() == null)) {
 					driver.legEnds(now);
-					((QueueLinkImpl)this.queueLink).processVehicleArrival(now, veh);
+					((QLinkLanesImpl)this.queueLink).processVehicleArrival(now, veh);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
 					this.usedStorageCapacity -= veh.getSizeInEquivalents();

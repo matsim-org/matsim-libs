@@ -124,12 +124,13 @@ public class QueueLaneTest extends MatsimTestCase {
 	public void testCapacityWithOneLaneOneLane() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().scenario().setUseLanes(true);
 		Network network = this.initNetwork(scenario.getNetwork());
 		LaneDefinitions lanes = this.createOneLane(scenario, 1);
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
-		QueueLinkImpl ql = (QueueLinkImpl) queueNetwork.getQueueLink(id1);
+		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQueueLink(id1);
 
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();
@@ -156,12 +157,13 @@ public class QueueLaneTest extends MatsimTestCase {
 	public void testCapacityWithOneLaneOneLaneTwoLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().scenario().setUseLanes(true);
 		Network network = this.initNetwork(scenario.getNetwork());
 		LaneDefinitions lanes = this.createOneLane(scenario, 2);
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
-		QueueLinkImpl ql = (QueueLinkImpl) queueNetwork.getQueueLink(id1);
+		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQueueLink(id1);
 
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();
@@ -190,12 +192,13 @@ public class QueueLaneTest extends MatsimTestCase {
 	public void testCapacityWithLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().scenario().setUseLanes(true);
 		Network network = this.initNetwork(scenario.getNetwork());
 		LaneDefinitions lanes = this.createLanes(scenario);
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
-		QueueLinkImpl ql = (QueueLinkImpl) queueNetwork.getQueueLink(id1);
+		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQueueLink(id1);
 
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();

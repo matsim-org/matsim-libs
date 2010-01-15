@@ -10,10 +10,9 @@ import java.util.ListIterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.PersonAgentI;
-import org.matsim.ptproject.qsim.QueueLane;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.QueueVehicle;
 import org.matsim.ptproject.qsim.QueueVehicleEarliestLinkExitTimeComparator;
 import org.matsim.transitSchedule.api.TransitStopFacility;
@@ -31,9 +30,9 @@ public class TransitQueueLaneFeature {
 	 */
 	private final Queue<QueueVehicle> transitVehicleStopQueue = new PriorityQueue<QueueVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
-	private final QueueLane queueLane;
+	private final QueueLink queueLane;
 	
-	public TransitQueueLaneFeature(QueueLane queueLane) {
+	public TransitQueueLaneFeature(QueueLink queueLane) {
 		this.queueLane = queueLane;
 	}
 
@@ -75,7 +74,7 @@ public class TransitQueueLaneFeature {
 		if (driver instanceof TransitDriverAgent) {
 			TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
 			TransitStopFacility stop = transitDriver.getNextTransitStop();
-			if ((stop != null) && (stop.getLinkId() == queueLane.getQueueLink().getLink().getId())) {
+			if ((stop != null) && (stop.getLinkId() == queueLane.getLink().getId())) {
 				double delay = transitDriver.handleTransitStop(stop, now);
 				if (delay > 0.0) {
 					veh.setEarliestLinkExitTime(now + delay);
@@ -100,7 +99,7 @@ public class TransitQueueLaneFeature {
 			// are handled via a separate data structure ("transitVehicleStopQueue") --???  kai, nov'09
 			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 			TransitStopFacility stop = driver.getNextTransitStop();
-			if ((stop != null) && (stop.getLinkId() == queueLane.getQueueLink().getLink().getId())) {
+			if ((stop != null) && (stop.getLinkId() == queueLane.getLink().getId())) {
 				double delay = driver.handleTransitStop(stop, now);
 				if (delay > 0.0) {
 					veh.setEarliestLinkExitTime(now + delay);
@@ -122,9 +121,9 @@ public class TransitQueueLaneFeature {
 			int lane) {
 		if (this.transitVehicleStopQueue.size() > 0) {
 			lane++; // place them one lane further away
-			double vehPosition = queueLane.getQueueLink().getLink().getLength();
+			double vehPosition = queueLane.getLink().getLength();
 			for (QueueVehicle veh : this.transitVehicleStopQueue) {
-				PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, veh.getDriver().getPerson().getId(), queueLane.getQueueLink().getLink(),
+				PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, veh.getDriver().getPerson().getId(), queueLane.getLink(),
 						vehPosition, lane, 0.0, 	PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				vehPosition -= veh.getSizeInEquivalents() * cellSize;

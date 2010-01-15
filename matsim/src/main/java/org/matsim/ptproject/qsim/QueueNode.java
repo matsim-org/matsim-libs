@@ -26,22 +26,19 @@ import java.util.Comparator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.gbl.Gbl;
 
 /**
  * Represents a node in the QueueSimulation.
  */
-public class QueueNode {
+public abstract class QueueNode {
 
 	private static final Logger log = Logger.getLogger(QueueNode.class);
 
 	private static final QueueLinkIdComparator qlinkIdComparator = new QueueLinkIdComparator();
 
-	private final QueueLink[] inLinksArrayCache;
+	protected final QueueLink[] inLinksArrayCache;
 	private final QueueLink[] tempLinks;
 
 	private boolean active = false;
@@ -85,84 +82,6 @@ public class QueueNode {
 		return this.node;
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// Queue related movement code
-	// ////////////////////////////////////////////////////////////////////
-	/**
-	 * @param veh
-	 * @param currentLane
-	 * @param now
-	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
-	 * otherwise (e.g. in case where the next link is jammed)
-	 */
-	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
-		Id nextLinkId = veh.getDriver().chooseNextLinkId();
-		Link currentLink = currentLane.getQueueLink().getLink();
-
-		// veh has to move over node
-		if (nextLinkId != null) {
-			Link nextLink = this.queueNetwork.getNetworkLayer().getLinks().get(nextLinkId);
-
-			if (currentLink.getToNode() != nextLink.getFromNode()) {
-				throw new RuntimeException("Cannot move vehicle " + veh.getId() +
-						" from link " + currentLink.getId() + " to link " + nextLinkId);
-			}
-			if ((!currentLane.isOriginalLane()) && (!currentLane.getDestinationLinkIds().contains(nextLinkId))) {
-				StringBuilder b = new StringBuilder();
-				b.append("Link Id ");
-				b.append(nextLinkId);
-				b.append(" is not accessible from lane id ");
-				b.append(currentLane.getLaneId());
-				b.append(" on Link Id " );
-				b.append(currentLink.getId());
-				b.append(". Check the definition of the lane and add the link as toLink!");
-				log.error(b.toString());
-				throw new IllegalStateException(b.toString());
-			}
-			
-			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
-
-			if (nextQueueLink.hasSpace()) {
-				currentLane.popFirstFromBuffer();
-				veh.getDriver().moveOverNode();
-				nextQueueLink.add(veh);
-				return true;
-			}
-
-			// check if veh is stuck!
-
-			if ((now - currentLane.bufferLastMovedTime) > Simulation.getStuckTime()) {
-				/* We just push the vehicle further after stucktime is over, regardless
-				 * of if there is space on the next link or not.. optionally we let them
-				 * die here, we have a config setting for that!
-				 */
-				if (Gbl.getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
-					currentLane.popFirstFromBuffer();
-					Simulation.decLiving();
-					Simulation.incLost();
-					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
-				} else {
-					currentLane.popFirstFromBuffer();
-					veh.getDriver().moveOverNode();
-					nextQueueLink.add(veh);
-					return true;
-				}
-			}
-			return false;
-		}
-
-		// --> nextLink == null
-		currentLane.popFirstFromBuffer();
-		Simulation.decLiving();
-		Simulation.incLost();
-		log.error(
-				"Agent has no or wrong route! agentId=" + veh.getDriver().getPerson().getId()
-						+ " currentLink=" + currentLink.getId().toString()
-						+ ". The agent is removed from the simulation.");
-		return true;
-	}
-
 	protected final void activateNode() {
 		this.active = true;
 	}
@@ -191,7 +110,7 @@ public class QueueNode {
 		/* called by the framework, do all necessary action for node movement here */
 		if (this.signalized) {
 			for (QueueLink link : this.inLinksArrayCache){
-				for (QueueLane lane : ((QueueLinkImpl)link).getToNodeQueueLanes()) {
+				for (QueueLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
 					lane.updateGreenState(now);
 					if (lane.isThisTimeStepGreen()){
 						this.clearLaneBuffer(lane, now);
@@ -231,8 +150,13 @@ public class QueueNode {
 						inLinksCapSum -= link.getLink().getCapacity(now);
 						this.tempLinks[i] = null;
 						//move the link
-						for (QueueLane lane : ((QueueLinkImpl)link).getToNodeQueueLanes()) {
-							this.clearLaneBuffer(lane, now);
+						if (link instanceof QueueLinkImpl){
+						  this.clearLinkBuffer((QueueLinkImpl) link, now);
+						}
+						else {
+		          for (QueueLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
+		            this.clearLaneBuffer(lane, now);
+		          }
 						}
 						break;
 					}
@@ -240,15 +164,10 @@ public class QueueNode {
 			}
 		}
 	}
+	
+	protected abstract void clearLinkBuffer(final QueueLinkImpl lane, final double now);
 
-	private void clearLaneBuffer(final QueueLane lane, final double now){
-		while (!lane.bufferIsEmpty()) {
-			QueueVehicle veh = lane.getFirstFromBuffer();
-			if (!moveVehicleOverNode(veh, lane, now)) {
-				break;
-			}
-		}
-	}
+	protected abstract void clearLaneBuffer(final QueueLane lane, final double now);
 
 	public void setSignalized(final boolean b) {
 		this.signalized = b;

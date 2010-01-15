@@ -32,8 +32,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.QLinkLanesImpl;
 import org.matsim.ptproject.qsim.QueueLane;
-import org.matsim.ptproject.qsim.QueueLinkImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
@@ -41,7 +41,7 @@ import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
-public class OTFLaneWriter extends OTFDataWriter<QueueLinkImpl> implements OTFWriterFactory<QueueLinkImpl>{
+public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFWriterFactory<QLinkLanesImpl>{
 	
 	private static final Logger log = Logger.getLogger(OTFLaneWriter.class);
 	
@@ -180,7 +180,7 @@ public class OTFLaneWriter extends OTFDataWriter<QueueLinkImpl> implements OTFWr
 		//nothing to do as lanes are non dynamical
 	}
 
-	public OTFDataWriter<QueueLinkImpl> getWriter() {
+	public OTFDataWriter<QLinkLanesImpl> getWriter() {
 		return new OTFLaneWriter();
 	}
 }

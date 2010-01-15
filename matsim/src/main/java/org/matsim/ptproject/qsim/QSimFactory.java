@@ -21,9 +21,7 @@ package org.matsim.ptproject.qsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 
@@ -39,22 +37,6 @@ public class QSimFactory implements MobsimFactory {
   @Override
   public IOSimulation createMobsim(Scenario sc, EventsManager eventsManager) {
     QueueSimulation sim = new QueueSimulation(sc, eventsManager);
-    Config config = sc.getConfig();
-    if (config.scenario().isUseLanes()) {
-      if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
-        throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
-      }
-      sim.setLaneDefinitions(((ScenarioImpl)sc).getLaneDefinitions());
-    }
-    if (config.scenario().isUseSignalSystems()) {
-      if ((((ScenarioImpl)sc).getSignalSystems() == null)
-          || (((ScenarioImpl)sc).getSignalSystemConfigurations() == null)) {
-        throw new IllegalStateException(
-            "Signal systems and signal system configurations have to be set if feature is enabled!");
-      }
-      sim.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
-    }
-    log.info("using QSim...");
     return sim;
   }
 
