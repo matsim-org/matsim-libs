@@ -34,6 +34,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.meisterk.phd.config.PopulationConvergenceConfigGroup;
+
 public class PersonTreatmentRecorderTest extends MatsimTestCase {
 
 	private static final int DEFAULT_PERSON_NUMBER = 1;
@@ -43,7 +45,11 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		this.sc = new ScenarioImpl() ;
+		this.sc = new ScenarioImpl();
+
+		PopulationConvergenceConfigGroup populationConvergenceConfigGroup = new PopulationConvergenceConfigGroup();
+		this.sc.getConfig().addModule(PopulationConvergenceConfigGroup.GROUP_NAME, populationConvergenceConfigGroup);
+		
 		Population pop = this.sc.getPopulation() ;
 		PopulationFactory pf = pop.getFactory() ;
 		for (int personId : new int[]{1, 2, 3}) {
@@ -66,7 +72,8 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 
 	public void testGetRankOfSelectedPlan() {
 
-		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
+		PersonTreatmentRecorder testee = 
+			new PersonTreatmentRecorder((PopulationConvergenceConfigGroup) this.sc.getConfig().getModule(PopulationConvergenceConfigGroup.GROUP_NAME));
 
 		Person person = this.sc.getPopulation().getPersons().get(new IdImpl(DEFAULT_PERSON_NUMBER));
 
@@ -96,7 +103,8 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 		
 		Person testPerson = this.sc.getPopulation().getPersons().get(new IdImpl(DEFAULT_PERSON_NUMBER));
 		
-		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
+		PersonTreatmentRecorder testee = 
+			new PersonTreatmentRecorder((PopulationConvergenceConfigGroup) this.sc.getConfig().getModule(PopulationConvergenceConfigGroup.GROUP_NAME));
 
 		for (int i=0; i<3; i++) {
 			Plan plan = testPerson.getPlans().get(i);
@@ -145,7 +153,8 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 	
 	public void testGetScoreDifference() {
 
-		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
+		PersonTreatmentRecorder testee = 
+			new PersonTreatmentRecorder((PopulationConvergenceConfigGroup) this.sc.getConfig().getModule(PopulationConvergenceConfigGroup.GROUP_NAME));
 
 		Person person = this.sc.getPopulation().getPersons().get(new IdImpl(DEFAULT_PERSON_NUMBER));
 
@@ -195,7 +204,8 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 		}
 
 
-		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
+		PersonTreatmentRecorder testee = 
+			new PersonTreatmentRecorder((PopulationConvergenceConfigGroup) this.sc.getConfig().getModule(PopulationConvergenceConfigGroup.GROUP_NAME));
 		String actualString = testee.getCountsString(personTreatment, 3);
 		assertEquals("\t0\t0\t1\t0\t0\t1\t0\t0\t1\t0\t0\t0", actualString);
 	}
@@ -230,7 +240,8 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 			}
 		}
 
-		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
+		PersonTreatmentRecorder testee = 
+			new PersonTreatmentRecorder((PopulationConvergenceConfigGroup) this.sc.getConfig().getModule(PopulationConvergenceConfigGroup.GROUP_NAME));
 		String actualString = testee.getScoreDifferencesString(personTreatment);
 		assertEquals("\t0.4\t44.9", actualString);
 	}
@@ -266,7 +277,8 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 			}
 		}
 
-		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
+		PersonTreatmentRecorder testee = 
+			new PersonTreatmentRecorder((PopulationConvergenceConfigGroup) this.sc.getConfig().getModule(PopulationConvergenceConfigGroup.GROUP_NAME));
 		String actualString = testee.getIsPersonSatisfiedString(personTreatment, this.sc.getConfig().charyparNagelScoring());
 		assertEquals("\t0\t0.5", actualString);
 		

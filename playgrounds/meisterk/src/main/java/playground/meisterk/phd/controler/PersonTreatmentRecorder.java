@@ -44,6 +44,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
+import playground.meisterk.phd.config.PopulationConvergenceConfigGroup;
 import playground.meisterk.phd.replanning.PhDStrategyManager;
 
 /**
@@ -60,12 +61,19 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 
 	private PrintStream out;
 
+	private final double alphaSelected; 
+	
 	static {
 		log = Logger.getLogger(PersonTreatmentRecorder.class);
 		differenceFormat = NumberFormat.getInstance();
 		differenceFormat.setMaximumFractionDigits(3);
 	}
 	
+	public PersonTreatmentRecorder(
+			PopulationConvergenceConfigGroup populationConvergenceConfigGroup) {
+		this.alphaSelected = populationConvergenceConfigGroup.getAlphaSelected();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.matsim.core.controler.listener.StartupListener#notifyStartup(org.matsim.core.controler.events.StartupEvent)
 	 */
@@ -250,7 +258,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		ExpBetaPlanSelector expBetaPlanSelector = new ExpBetaPlanSelector(charyparNagelScoringConfigGroup);
 		double pSelOfSelectedPlan = expBetaPlanSelector.getSelectionProbability(person.getSelectedPlan());
 		
-		if (pSelOfSelectedPlan < 0.95) {
+		if (pSelOfSelectedPlan < this.alphaSelected) {
 			isPersonSatisfied = true;
 		}
 		

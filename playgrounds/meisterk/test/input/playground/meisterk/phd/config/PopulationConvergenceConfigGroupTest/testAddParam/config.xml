@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<!-- ====================================================================== -->
+
+	<module name="populationConvergence">
+		<param name="alpha_selected" value="0.567" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+</config>

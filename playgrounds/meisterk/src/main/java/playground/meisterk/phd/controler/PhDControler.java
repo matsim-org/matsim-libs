@@ -35,6 +35,7 @@ import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
+import playground.meisterk.phd.config.PopulationConvergenceConfigGroup;
 import playground.meisterk.phd.replanning.PhDStrategyManager;
 
 public class PhDControler extends Controler {
@@ -42,6 +43,8 @@ public class PhDControler extends Controler {
 	private static final Logger log;
 	private static final NumberFormat timeFormat; 
 
+	private final PopulationConvergenceConfigGroup populationConvergenceConfigGroup = new PopulationConvergenceConfigGroup();
+	
 	static {
 		log = Logger.getLogger(PhDControler.class);
 		timeFormat = NumberFormat.getInstance();
@@ -50,13 +53,14 @@ public class PhDControler extends Controler {
 	
 	public PhDControler(String[] args) {
 		super(args);
+		super.config.addModule(PopulationConvergenceConfigGroup.GROUP_NAME, populationConvergenceConfigGroup);
 	}
 
 	@Override
 	protected void loadControlerListeners() {
 		super.loadControlerListeners();
 		this.addControlerListener(new LinkTravelTimeWriter());
-		this.addControlerListener(new PersonTreatmentRecorder());
+		this.addControlerListener(new PersonTreatmentRecorder(this.populationConvergenceConfigGroup));
 	}
 
 	@Override
