@@ -21,7 +21,6 @@
 package playground.meisterk.phd.controler;
 
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -93,33 +92,57 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 
 	}
 
-	public void testIsSelectedPlanTheBestPlan() {
+	public void testIsPersonSatisfied() {
+		
+		Person testPerson = this.sc.getPopulation().getPersons().get(new IdImpl(DEFAULT_PERSON_NUMBER));
+		
+		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
 
-		Map<Double, Long> expectedResults = new LinkedHashMap<Double, Long>();
-		/*
-		 * TODO Intuitively, I should use Double.POSITIVE_INFINITY here (instead of Double.MAX_VALUE), but that doesn't work...
-		 */
-		expectedResults.put(Double.MAX_VALUE, 100000L);
-		expectedResults.put(2.0, 55012L);
-		expectedResults.put(0.0, 24881L);
-
-		for (Double brainExpBeta : expectedResults.keySet()) {
-			this.sc.getConfig().charyparNagelScoring().setBrainExpBeta(brainExpBeta);
-			long cntBest = 0;
-			PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
-			Person person = this.sc.getPopulation().getPersons().get(new IdImpl(DEFAULT_PERSON_NUMBER));
-			for (int j = 0; j < 100000; j++) {
-				Plan plan = person.getPlans().get(2);
-				plan.setSelected(true);
-				if (testee.isSelectedPlanTheBestPlan(person, this.sc.getConfig().charyparNagelScoring())) {
-					cntBest++;
-				}
+		for (int i=0; i<3; i++) {
+			Plan plan = testPerson.getPlans().get(i);
+			plan.setSelected(true);
+			boolean actualJudgement = testee.isPersonSatisfied(testPerson, this.sc.getConfig().charyparNagelScoring());
+			switch(i) {
+			case 0:
+				assertTrue(actualJudgement);
+				break;
+			case 1:
+				assertTrue(actualJudgement);
+				break;
+			case 2:
+				assertTrue(actualJudgement);
+				break;
+			case 3:
+				assertTrue(actualJudgement);
+				break;
 			}
-			assertEquals("wrong results for brainExpBeta=" + brainExpBeta + ". ", expectedResults.get(brainExpBeta).longValue(), cntBest);
+		}
+		
+		this.sc.getConfig().charyparNagelScoring().setBrainExpBeta(9.0);
+
+		for (int i=0; i<3; i++) {
+			Plan plan = testPerson.getPlans().get(i);
+			plan.setSelected(true);
+			boolean actualJudgement = testee.isPersonSatisfied(testPerson, this.sc.getConfig().charyparNagelScoring());
+			switch(i) {
+			case 0:
+				assertTrue(actualJudgement);
+				break;
+			case 1:
+				assertTrue(actualJudgement);
+				break;
+			case 2:
+				assertFalse(actualJudgement);
+				break;
+			case 3:
+				assertTrue(actualJudgement);
+				break;
+			}
 		}
 
 	}
-
+	
+	
 	public void testGetScoreDifference() {
 
 		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
@@ -211,9 +234,10 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 		String actualString = testee.getScoreDifferencesString(personTreatment);
 		assertEquals("\t0.4\t44.9", actualString);
 	}
-
-	public void testGetExpBetaSelectorString() {
-		this.sc.getConfig().charyparNagelScoring().setBrainExpBeta(Double.MAX_VALUE);
+	
+	public void testGetIsPersonSatisfiedString() {
+		
+		this.sc.getConfig().charyparNagelScoring().setBrainExpBeta(9.0);
 
 		Map<String, Set<Person>> personTreatment = new TreeMap<String, Set<Person>>();
 
@@ -243,9 +267,9 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 		}
 
 		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
-		String actualString = testee.getExpBetaSelectorString(personTreatment, this.sc.getConfig().charyparNagelScoring());
-		assertEquals("\t1\t0.5", actualString);
-
+		String actualString = testee.getIsPersonSatisfiedString(personTreatment, this.sc.getConfig().charyparNagelScoring());
+		assertEquals("\t0\t0.5", actualString);
+		
 	}
 	
 }

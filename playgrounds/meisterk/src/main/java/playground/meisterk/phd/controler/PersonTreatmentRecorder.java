@@ -71,7 +71,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 	 */
 	public void notifyStartup(StartupEvent event) {
 		try {
-			this.out = new PrintStream(org.matsim.core.controler.Controler.getOutputFilename(FILENAME));
+			this.out = new PrintStream(event.getControler().getControlerIO().getOutputFilename(FILENAME));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -92,7 +92,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		}
 		for (PlanStrategy strategy : c.getStrategyManager().getStrategies()) {
 			out.print("\t");
-			out.print(strategy.toString() + "_expBeta");
+			out.print(strategy.toString() + "_satisfied");
 		}
 		out.println();
 
@@ -124,34 +124,11 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		out.print(event.getIteration());
 		out.print(this.getCountsString(personTreatment, memorySize));
 		out.print(this.getScoreDifferencesString(personTreatment));
-		out.print(this.getExpBetaSelectorString(personTreatment, c.getConfig().charyparNagelScoring()));
+		out.print(this.getIsPersonSatisfiedString(personTreatment, c.getConfig().charyparNagelScoring()));
 		out.println();
 		
 		log.info("Writing results...done.");
 
-	}
-
-	String getExpBetaSelectorString(
-			Map<String, Set<Person>> personTreatment, CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
-
-		String str = new String();
-		
-		for (String strategyName : personTreatment.keySet()) {
-			Frequency freq = new Frequency();
-			
-			Set<Person> persons = personTreatment.get(strategyName);
-			for (Person person : persons) {
-				boolean isBest = this.isSelectedPlanTheBestPlan(person, charyparNagelScoringConfigGroup);
-				freq.addValue(isBest ? 1 : 0);
-			}
-
-			str = str.concat("\t");
-			str = str.concat(differenceFormat.format(freq.getPct(1)));
-			
-		}
-		
-		return str;
-		
 	}
 
 	String getCountsString(Map<String, Set<Person>> personTreatment, int memorySize) {
@@ -231,16 +208,6 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		return rank;
 	}
 
-	boolean isSelectedPlanTheBestPlan(Person person, CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
-		
-		ExpBetaPlanSelector expBetaPlanSelector = new ExpBetaPlanSelector(charyparNagelScoringConfigGroup);
-		
-		Plan thePlanItWouldSelect = expBetaPlanSelector.selectPlan(person);
-		return (thePlanItWouldSelect == person.getSelectedPlan());
-//		return (this.getRankOfSelectedPlan(person) == 0);
-		
-	}
-	
 	/**
 	 * @param person
 	 * @return the difference of the score of the selected plan to the score of the next worse plan
@@ -274,8 +241,43 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		
 	}
 	
-	private String getColumnName(String strategyName, int rank) {
-		return strategyName + "_" + Integer.toString(rank);
+	boolean isPersonSatisfied(
+			Person person, 
+			CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
+		
+		boolean isPersonSatisfied = false;
+		
+		ExpBetaPlanSelector expBetaPlanSelector = new ExpBetaPlanSelector(charyparNagelScoringConfigGroup);
+		double pSelOfSelectedPlan = expBetaPlanSelector.getSelectionProbability(person.getSelectedPlan());
+		
+		if (pSelOfSelectedPlan < 0.95) {
+			isPersonSatisfied = true;
+		}
+		
+		return isPersonSatisfied;
+	}
+
+	String getIsPersonSatisfiedString(
+			Map<String, Set<Person>> personTreatment,
+			CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
+
+		String str = new String();
+		
+		for (String strategyName : personTreatment.keySet()) {
+			Frequency freq = new Frequency();
+			
+			Set<Person> persons = personTreatment.get(strategyName);
+			for (Person person : persons) {
+				boolean isSatisfied = this.isPersonSatisfied(person, charyparNagelScoringConfigGroup);
+				freq.addValue(isSatisfied ? 1 : 0);
+			}
+
+			str = str.concat("\t");
+			str = str.concat(differenceFormat.format(freq.getPct(1)));
+			
+		}
+		
+		return str;
 	}
 
 }
