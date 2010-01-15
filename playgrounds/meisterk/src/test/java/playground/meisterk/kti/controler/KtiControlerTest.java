@@ -22,7 +22,7 @@ package playground.meisterk.kti.controler;
 
 import java.io.File;
 
-import org.matsim.core.controler.Controler;
+import org.junit.Ignore;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.testcases.MatsimTestCase;
@@ -30,6 +30,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 
+@Ignore("not useful for nightly tests")
 public class KtiControlerTest extends MatsimTestCase {
 
 	public void testRun() {
@@ -62,10 +63,10 @@ public class KtiControlerTest extends MatsimTestCase {
 //		assertTrue(new File(this.getOutputDirectory() + KTIControler.SVN_INFO_FILE_NAME).exists());
 		assertTrue(new File(this.getOutputDirectory() + KTIControler.CALC_LEG_TIMES_KTI_FILE_NAME).exists());
 		assertTrue(new File(this.getOutputDirectory() + KTIControler.SCORE_ELEMENTS_FILE_NAME).exists());
-		assertTrue(new File(Controler.getIterationFilename(KTIControler.LEG_DISTANCE_DISTRIBUTION_FILE_NAME, 0)).exists());
-		assertTrue(new File(Controler.getIterationFilename(KTIControler.LEG_DISTANCE_DISTRIBUTION_FILE_NAME, 10)).exists());
-		assertTrue(new File(Controler.getIterationFilename(KTIControler.LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME, 0)).exists());
-		assertTrue(new File(Controler.getIterationFilename(KTIControler.LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME, 10)).exists());
+		assertTrue(new File(testee.getControlerIO().getIterationFilename(0, KTIControler.LEG_DISTANCE_DISTRIBUTION_FILE_NAME)).exists());
+		assertTrue(new File(testee.getControlerIO().getIterationFilename(10, KTIControler.LEG_DISTANCE_DISTRIBUTION_FILE_NAME)).exists());
+		assertTrue(new File(testee.getControlerIO().getIterationFilename(0, KTIControler.LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME)).exists());
+		assertTrue(new File(testee.getControlerIO().getIterationFilename(10, KTIControler.LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME)).exists());
 	}
 
 }
