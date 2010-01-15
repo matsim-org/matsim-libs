@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -150,7 +151,9 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
-		TransitQueueSimulation tqsim = null;
+		Scenario scenario = new ScenarioImpl();
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		TransitQueueSimulation tqsim = new TransitQueueSimulation(scenario, new EventsManagerImpl());
 		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim, new SimpleTransitStopHandler());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
@@ -161,7 +164,6 @@ public class TransitDriverTest extends MatsimTestCase {
 		driver.setVehicle(new TransitQueueVehicle(vehicle, 3.0));
 		ScenarioImpl sc = new ScenarioImpl();
 		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		new TransitQueueSimulation(sc, new EventsManagerImpl()); // required for Events to be set
 
 		assertEquals(stop1, driver.getNextTransitStop());
 		assertEquals(0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
