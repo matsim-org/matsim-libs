@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.pt.queuesim;
 
 import java.util.ArrayList;
@@ -37,7 +56,6 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private final QueueSimulation sim;
 	private TransitRouteStop currentStop = null;
 	private TransitRouteStop nextStop;
-	private TransitStopFacility lastHandledStop = null;
 	private ListIterator<TransitRouteStop> stopIterator;
 
 	public abstract void legEnds(final double now);
@@ -133,7 +151,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	private void processEventVehicleArrives(final TransitStopFacility stop,
 			final double now) {
-		EventsManager events = QueueSimulation.getEvents();
+		EventsManager events = this.sim.getEventsManager();
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
 			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
@@ -147,24 +165,23 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	private double longerStopTimeIfWeAreAheadOfSchedule(final double now,
-			double stopTime) {
+			final double stopTime) {
 		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
 			double earliestDepTime = getDepartureTime() + this.nextStop.getDepartureOffset();
 			if (now + stopTime < earliestDepTime) {
-				stopTime = earliestDepTime - now;
+				return earliestDepTime - now;
 			}
 		}
 		return stopTime;
 	}
 
 	private void depart(final double now) {
-		EventsManager events = QueueSimulation.getEvents();
+		EventsManager events = this.sim.getEventsManager();
 		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), this.currentStop.getStopFacility().getId()));
 		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
 		if(this.nextStop == null) {
 			assertVehicleIsEmpty();
 		}
-		this.lastHandledStop = this.currentStop.getStopFacility();
 		this.currentStop = null;
 	}
 
@@ -185,14 +202,14 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility());
 		this.vehicle.addPassenger(passenger);
 		DriverAgent agent = (DriverAgent) passenger;
-		EventsManager events = QueueSimulation.getEvents();
+		EventsManager events = this.sim.getEventsManager();
 		events.processEvent(new PersonEntersVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle(), this.getTransitRoute().getId()));
 	}
 
 	public void handlePassengerLeaving(final PassengerAgent passenger, final double time) {
 		this.vehicle.removePassenger(passenger);
 		DriverAgent agent = (DriverAgent) passenger;
-		EventsManager events = QueueSimulation.getEvents();
+		EventsManager events = this.sim.getEventsManager();
 		events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle().getId(), this.getTransitRoute().getId()));
 		agent.teleportToLink(this.currentStop.getStopFacility().getLinkId());
 //			events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),

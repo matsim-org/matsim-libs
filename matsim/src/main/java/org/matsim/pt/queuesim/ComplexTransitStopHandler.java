@@ -1,10 +1,31 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.pt.queuesim;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
+/**
+ * @author aneumann
+ */
 public class ComplexTransitStopHandler implements TransitStopHandler {
 
 	private boolean doorsOpen = false;
@@ -75,8 +96,6 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 					if (this.passengersLeavingTimeFraction < 1.0) {
 						// next passenger can leave the veh
-
-						ArrayList<PassengerAgent> leaving = new ArrayList<PassengerAgent>();
 
 						while (this.passengersLeavingTimeFraction < 1.0) {
 							if (leavingPassengers.size() == 0) {
