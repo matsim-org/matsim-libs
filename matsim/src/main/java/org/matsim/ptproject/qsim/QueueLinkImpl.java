@@ -50,60 +50,6 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * @author dgrether
  * @author mrieser
  *
- * A QueueLink can consist of one or more QueueLanes, which may have the following layout
- * (Dashes stand for the borders of the QueueLink, equal signs (===) depict one lane, 
- * plus signs (+) symbolize a decision point where one lane splits into several lanes) :
- * <pre>
- * ----------------
- * ================
- * ----------------
- *</pre>
- *
- *<pre>
- * ----------------
- *          =======
- * ========+
- *          =======
- * ----------------
- *</pre>
- *
- *<pre>
- * ----------------
- *         ========
- * =======+========
- *         ========
- * ----------------
- * </pre>
- * 
- * 
- * The following layouts are not allowed:
- * <pre>
- * ----------------
- * ================
- * ================
- * ----------------
- *</pre>
- *
- *<pre>
- * ----------------
- * =======
- *        +========
- * =======
- * ----------------
- * </pre>
- * 
- *agent
- * Queue Model Link implementation with the following properties:
- * <ul>
- *   <li>The queue behavior itself is simulated by one or more instances of QueueLane</li>
- *   <li>Each QueueLink has at least one QueueLane. All QueueVehicles added to the QueueLink
- *   are placed on this always existing instance.
- *    </li>
- *   <li>All QueueLane instances which are connected to the ToQueueNode are 
- *   held in the attribute toNodeQueueLanes</li>
- *   <li>QueueLink is active as long as at least one 
- * of its QueueLanes is active.</li>
- * </ul>
  */
 public class QueueLinkImpl implements QueueLink {
 
