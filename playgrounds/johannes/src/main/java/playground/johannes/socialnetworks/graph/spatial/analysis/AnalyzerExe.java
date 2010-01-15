@@ -22,12 +22,12 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 import java.io.IOException;
 
 import org.geotools.feature.Feature;
-import org.matsim.contrib.sna.gis.io.FeatureSHP;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
+import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphProjectionBuilder;
 
