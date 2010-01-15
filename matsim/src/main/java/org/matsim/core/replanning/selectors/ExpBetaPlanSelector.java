@@ -20,6 +20,9 @@
 
 package org.matsim.core.replanning.selectors;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -38,7 +41,6 @@ public class ExpBetaPlanSelector implements PlanSelector {
 
 	public ExpBetaPlanSelector(CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
 		this.beta = charyparNagelScoringConfigGroup.getBrainExpBeta();
-//		this.beta = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
 	}
 
 	/**
@@ -46,35 +48,21 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	 */
 	public Plan selectPlan(final Person person) {
 
-		// Build the weights of all plans
-		// - first find the max. score of all plans of this person
-		double maxScore = Double.NEGATIVE_INFINITY;
-		for (Plan plan : person.getPlans()) {
-			if ((plan.getScore() != null) && (plan.getScore().doubleValue() > maxScore)) {
-				maxScore = plan.getScore().doubleValue();
-			}
-		}
-
-		// - now calculate the weights
-		double[] weights = new double[person.getPlans().size()];
+		// get the weights of all plans
+		Map<Plan, Double> weights = this.calcWeights(person);
+		
 		double sumWeights = 0.0;
-
-		int idx = 0;
-		for (Plan plan : person.getPlans()) {
-			weights[idx] = calcPlanWeight(plan, maxScore);
-			sumWeights += weights[idx];
-			idx++;
+		for (Plan plan : weights.keySet()) {
+			sumWeights += weights.get(plan);
 		}
-
-		// choose a random number over interval [0,sumWeights[
-		double selnum = sumWeights*MatsimRandom.getRandom().nextDouble();
-		idx = 0;
+		
+		// choose a random number over interval [0, sumWeights[
+		double selnum = sumWeights * MatsimRandom.getRandom().nextDouble();
 		for (Plan plan : person.getPlans()) {
-			selnum -= weights[idx];
+			selnum -= weights.get(plan);
 			if (selnum <= 0.0) {
 				return plan;
 			}
-			idx++;
 		}
 
 		// hmm, no plan returned... either the person has no plans, or the plan(s) have no score.
@@ -87,18 +75,59 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	}
 
 	/**
-	 * Calculates the weight of a single plan
+	 * Calculates the weight of a single plan.
 	 *
 	 * @param plan
 	 * @param maxScore
 	 * @return the weight of the plan
 	 */
 	protected double calcPlanWeight(final Plan plan, final double maxScore) {
+		
 		if (plan.getScore() == null) {
 			return Double.NaN;
 		}
 		double weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		if (weight < MIN_WEIGHT) weight = MIN_WEIGHT;
 		return weight;
+	}
+
+	/**
+	 * Builds the weights of all plans.
+	 * 
+	 * @param person
+	 * @return a map containing the weights of all plans
+	 */
+	Map<Plan, Double> calcWeights(final Person person) {
+
+		// - first find the max. score of all plans of this person
+		double maxScore = Double.NEGATIVE_INFINITY;
+		for (Plan plan1 : person.getPlans()) {
+			if ((plan1.getScore() != null) && (plan1.getScore().doubleValue() > maxScore)) {
+				maxScore = plan1.getScore().doubleValue();
+			}
+		}
+
+		Map<Plan, Double> weights = new LinkedHashMap<Plan, Double>(person.getPlans().size());
+
+		int idx = 0;
+		for (Plan plan : person.getPlans()) {
+			weights.put(plan, this.calcPlanWeight(plan, maxScore));
+			idx++;
+		}
+
+		return weights;
+	}
+	
+	public double getSelectionProbability(final Plan plan) {
+
+		Map<Plan, Double> weights = this.calcWeights(plan.getPerson());
+		double thisWeight = weights.get(plan);
+
+		double sumWeights = 0.0;
+		for (Plan plan1 : weights.keySet()) {
+			sumWeights += weights.get(plan1);
+		}
+		
+		return (thisWeight / sumWeights);
 	}
 }

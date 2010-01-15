@@ -165,4 +165,30 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		assertEquals(6460, cnt5);
 	}
 
+	public void testGetSelectionProbability() {
+		
+		/*
+		 * the expected results were computed with R. The standard output of double precision numbers in R has 7 digits.
+		 */
+		final double EPSILON_R = 1e-7;
+		
+		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan1 = person.createAndAddPlan(false); 
+		plan1.setScore(180.0);
+		PlanImpl plan2 = person.createAndAddPlan(false); 
+		plan2.setScore(180.1);
+		PlanImpl plan3 = person.createAndAddPlan(false); 
+		plan3.setScore(180.5);
+		PlanImpl plan4 = person.createAndAddPlan(false); 
+		plan4.setScore(169.9);
+
+		ExpBetaPlanSelector testee = new ExpBetaPlanSelector(this.config.charyparNagelScoring());
+		
+		assertEquals(0.2024421, testee.getSelectionProbability(plan1), EPSILON_R);
+		assertEquals(0.2472634, testee.getSelectionProbability(plan2), EPSILON_R);
+		assertEquals(0.5502947, testee.getSelectionProbability(plan3), EPSILON_R);
+		assertEquals(6.208075e-10, testee.getSelectionProbability(plan4), EPSILON_R);
+	}
+	
 }
