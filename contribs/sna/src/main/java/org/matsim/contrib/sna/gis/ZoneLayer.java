@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.gis;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +27,9 @@ import java.util.Set;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
+import com.vividsolutions.jts.index.strtree.STRtree;
 
 /**
  * Representation of a spatial index containing zones backed by a quadtree.
@@ -36,7 +39,7 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
  */
 public class ZoneLayer {
 
-	private final Quadtree quadtree;
+	private final SpatialIndex quadtree;
 	
 	private final Set<Zone> zones;
 	
@@ -48,20 +51,22 @@ public class ZoneLayer {
 	public ZoneLayer(Set<Zone> zones) {
 		this.zones = Collections.unmodifiableSet(zones);
 		quadtree = new Quadtree();
-	}
-	
-	/**
-	 * Returns a list of zones that intersects <tt>env</tt>.
-	 * 
-	 * @param env a search envelope.
-	 * @return a list of zones.
-	 * @see {@link Quadtree#query(Envelope)}
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Zone> getZones(Envelope env) {
-		return quadtree.query(env);
+		for(Zone zone : zones) {
+			quadtree.insert(zone.getGeometry().getEnvelopeInternal(), zone);
+		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private List<Zone> getZones(Point point) {
+		List<Zone> result = quadtree.query(point.getEnvelopeInternal());
+		List<Zone> zones = new ArrayList<Zone>(result.size());
+		for(Zone z : result) {
+			if(z.getGeometry().contains(point))
+				zones.add(z);
+		}
+		return zones;
+	}
+	
 	/**
 	 * Returns the zone containing <tt>point</tt>. If multiple zones contain
 	 * <tt>point</tt> one random zone is returned.
@@ -70,7 +75,7 @@ public class ZoneLayer {
 	 * @return the zone containing <tt>point</tt>, or <tt>null</tt> if no zone contains <tt>point</tt>.
 	 */
 	public Zone getZone(Point point) {
-		List<Zone> zones = getZones(point.getEnvelopeInternal());
+		List<Zone> zones = getZones(point);
 		if(zones.isEmpty())
 			return null;
 		else
