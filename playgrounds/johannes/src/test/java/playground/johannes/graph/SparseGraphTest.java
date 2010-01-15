@@ -44,9 +44,9 @@ public class SparseGraphTest extends TestCase {
 		SparseVertex vertex4 = builder.addVertex(graph);
 		
 		SparseEdge edge1 = builder.addEdge(graph, vertex1, vertex2);
-		SparseEdge edge2 = builder.addEdge(graph, vertex2, vertex3);
-		SparseEdge edge3 = builder.addEdge(graph, vertex3, vertex4);
-		SparseEdge edge4 = builder.addEdge(graph, vertex4, vertex1);
+//		SparseEdge edge2 = builder.addEdge(graph, vertex2, vertex3);
+//		SparseEdge edge3 = builder.addEdge(graph, vertex3, vertex4);
+//		SparseEdge edge4 = builder.addEdge(graph, vertex4, vertex1);
 		
 		assertEquals(4, graph.getVertices().size());
 		assertEquals(4, graph.getEdges().size());

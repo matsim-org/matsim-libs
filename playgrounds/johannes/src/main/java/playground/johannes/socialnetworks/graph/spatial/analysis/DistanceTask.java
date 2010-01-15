@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,15 +29,14 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzerTask;
-import playground.johannes.socialnetworks.graph.analysis.GraphPropertyFactory;
+import playground.johannes.socialnetworks.graph.analysis.AbstractGraphAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.Distance;
 
 /**
  * @author illenberger
  *
  */
-public class DistanceTask implements GraphAnalyzerTask {
+public class DistanceTask extends AbstractGraphAnalyzerTask {
 
 	private static final Logger logger = Logger.getLogger(DistanceTask.class);
 	
@@ -51,11 +52,21 @@ public class DistanceTask implements GraphAnalyzerTask {
 	
 	public static final String MAX_EDGE_LENGTH_I = "d_i_max";
 	
+	public DistanceTask(String output) {
+		super(output);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void analyze(Graph graph, GraphPropertyFactory factory, Map<String, Double> stats) {
-		if(factory instanceof SpatialGraphPropertyFactory) {
-			Distance distance = ((SpatialGraphPropertyFactory)factory).newDistance();
+	public void analyze(Graph graph, Map<String, Object> analyzers, Map<String, Double> stats) {
+			Distance distance;
+			Object obj = analyzers.get(this.getClass().getCanonicalName());
+			if(obj == null)
+				distance = new Distance();
+			else {
+				distance = (Distance) obj;
+				logger.info("Using analyzer class " + distance.getClass().getCanonicalName());
+			}
 			
 			Distribution distr = distance.distribution((Set<? extends SpatialVertex>) graph.getVertices());
 			double d_mean = distr.mean();
@@ -67,6 +78,16 @@ public class DistanceTask implements GraphAnalyzerTask {
 			
 			logger.info(String.format("d_mean = %1$.4f, d_max = %2$.4f, d_min = %3$.4f", d_mean, d_max, d_min));
 			
+			if(getOutputDirectory() != null) {
+				try {
+					writeHistograms(distr, 1000.0, true, "d");
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			distr = distance.vertexAccumulatedDistribution((Set<? extends SpatialVertex>) graph.getVertices());
 			double d_i_mean = distr.mean();
 			double d_i_max = distr.max();
@@ -76,9 +97,17 @@ public class DistanceTask implements GraphAnalyzerTask {
 			stats.put(MIN_EDGE_LENGTH_I, d_i_min);
 			
 			logger.info(String.format("d_i_mean = %1$.4f, d_i_max = %2$.4f, d_i_min = %3$.4f", d_i_mean, d_i_max, d_i_min));
-		} else {
-			logger.warn("This is no spatial graph property factory! Cannot analyze spatial indicators.");
-		}
+			
+			if(getOutputDirectory() != null) {
+				try {
+					writeHistograms(distr, 1000.0, true, "d_i");
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		
 
 	}
 

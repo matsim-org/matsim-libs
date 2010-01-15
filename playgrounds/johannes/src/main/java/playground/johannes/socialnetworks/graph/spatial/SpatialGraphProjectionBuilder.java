@@ -36,6 +36,9 @@ import com.vividsolutions.jts.geom.Geometry;
 public class SpatialGraphProjectionBuilder<G extends SpatialGraph, V extends SpatialVertex, E extends SpatialEdge> extends
 		GraphProjectionBuilder<G, V, E, SpatialGraphProjection<G, V, E>, SpatialVertexDecorator<V>, SpatialEdgeDecorator<E>> {
 
+	public SpatialGraphProjectionBuilder(SpatialGraphProjectionFactory<G, V, E> factory) {
+		super(factory);
+	}
 	/**
 	 * @param factory
 	 */

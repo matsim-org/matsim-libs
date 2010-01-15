@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -29,7 +31,7 @@ import org.matsim.contrib.sna.math.Distribution;
  * @author illenberger
  *
  */
-public class TransitivityTask implements GraphAnalyzerTask {
+public class TransitivityTask extends AbstractGraphAnalyzerTask {
 	
 	public static final Logger logger = Logger.getLogger(TransitivityTask.class);
 
@@ -41,10 +43,21 @@ public class TransitivityTask implements GraphAnalyzerTask {
 	
 	public static final String GLOBAL_CLUSTERING_COEFFICIENT = "c_global";
 	
+	public TransitivityTask(String output) {
+		super(output);
+	}
+	
 	@Override
-	public void analyze(Graph graph, GraphPropertyFactory factory,
-			Map<String, Double> stats) {
-		Transitivity transitivity = factory.newTransitivity();
+	public void analyze(Graph graph, Map<String, Object> analyzers, Map<String, Double> stats) {
+		Transitivity transitivity;
+		Object obj = analyzers.get(this.getClass().getCanonicalName());
+		if(obj == null)
+			transitivity = new Transitivity();
+		else {
+			transitivity = (Transitivity) obj;
+			logger.info("Using analyzer class " + transitivity.getClass().getCanonicalName());
+		}
+		
 		Distribution distr = transitivity.localClusteringDistribution(graph.getVertices());
 		double c_mean = distr.mean();
 		double c_max = distr.max();
@@ -57,6 +70,16 @@ public class TransitivityTask implements GraphAnalyzerTask {
 		stats.put(GLOBAL_CLUSTERING_COEFFICIENT, c_global);
 		
 		logger.info(String.format("c_local_mean = %1$.4f, c_local_max = %2$.4f, c_local_min = %3$.4f, c_global = %4$.4f.", c_mean, c_max, c_min, c_global));
+		
+		if(getOutputDirectory() != null) {
+			try {
+				writeHistograms(distr, 0.05, false, "c");
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

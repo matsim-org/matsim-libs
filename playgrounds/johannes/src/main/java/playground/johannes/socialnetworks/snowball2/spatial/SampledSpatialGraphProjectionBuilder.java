@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimpleGraphPropertyFactory.java
+ * SampledSpatialGraphProjectionBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,22 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.socialnetworks.snowball2.spatial;
+
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
+
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraphProjectionBuilder;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger
  *
  */
-public class SimpleGraphPropertyFactory implements GraphPropertyFactory {
+public class SampledSpatialGraphProjectionBuilder <G extends SampledSpatialGraph, V extends SampledSpatialVertex, E extends SampledSpatialEdge> extends
+												SpatialGraphProjectionBuilder<G, V, E> {
 
-	@Override
-	public Degree newDegree() {
-		return new Degree();
+	public SampledSpatialGraphProjectionBuilder() {
+		super(new SampledSpatialGraphProjectionFactory<G, V, E>());
 	}
-
+	
 	@Override
-	public Transitivity newTransitivity() {
-		return new Transitivity();
+	public SampledSpatialGraphProjection<G, V, E> decorate(G delegate,
+			Geometry geometry) {
+		return (SampledSpatialGraphProjection<G, V, E>) super.decorate(delegate, geometry);
 	}
 
 }

@@ -28,7 +28,6 @@ import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 
 import playground.johannes.socialnetworks.graph.analysis.DegreeTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
-import playground.johannes.socialnetworks.graph.analysis.SimpleGraphPropertyFactory;
 import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.TransitivityTask;
 
@@ -44,8 +43,7 @@ public class GraphAnalyzerTest extends TestCase {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(INPUT_FILE);
 		
-//		GraphAnalyzer analyzer = new GraphAnalyzer();
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, new SimpleGraphPropertyFactory(), new StandardAnalyzerTask());
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, null, new StandardAnalyzerTask(null));
 		
 		assertEquals(7.1462, stats.get(DegreeTask.MEAN_DEGREE), 0.0001);
 		assertEquals(19.0, stats.get(DegreeTask.MAX_DEGREE));

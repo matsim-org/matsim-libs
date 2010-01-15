@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphPropertyFactory.java
+ * SampledSpatialEdgeDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,21 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.analysis;
+package playground.johannes.socialnetworks.snowball2.spatial;
 
-import playground.johannes.socialnetworks.graph.analysis.Degree;
-import playground.johannes.socialnetworks.graph.analysis.SimpleGraphPropertyFactory;
-import playground.johannes.socialnetworks.snowball2.SampledDegree;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
+import org.matsim.core.utils.collections.Tuple;
+
+import playground.johannes.socialnetworks.graph.spatial.SpatialEdgeDecorator;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphPropertyFactory extends SimpleGraphPropertyFactory {
+public class SampledSpatialEdgeDecorator<E extends SampledSpatialEdge> extends SpatialEdgeDecorator<E>
+		implements SampledSpatialEdge {
+
+	protected SampledSpatialEdgeDecorator(E delegate) {
+		super(delegate);
+	}
 
 	@Override
-	public Degree newDegree() {
-		return new SampledDegree();
+	public SampledSpatialVertexDecorator<?> getOpposite(Vertex v) {
+		return (SampledSpatialVertexDecorator<?>) super.getOpposite(v);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Tuple<? extends SampledSpatialVertexDecorator<?>, ? extends SampledSpatialVertexDecorator<?>> getVertices() {
+		return (Tuple<? extends SampledSpatialVertexDecorator<?>, ? extends SampledSpatialVertexDecorator<?>>) super.getVertices();
 	}
 
 }

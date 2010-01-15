@@ -29,21 +29,24 @@ import org.matsim.contrib.sna.graph.Graph;
  * @author illenberger
  *
  */
-public abstract class GraphAnalyzerTaskComposite implements GraphAnalyzerTask {
+public class GraphAnalyzerTaskComposite extends AbstractGraphAnalyzerTask {
 
 	private Set<GraphAnalyzerTask> tasks;
 	
-	public GraphAnalyzerTaskComposite() {
+	public GraphAnalyzerTaskComposite(String output) {
+		super(output);
 		tasks = new LinkedHashSet<GraphAnalyzerTask>();
-		addTasks(tasks);
 	}
 	
-	abstract protected void addTasks(Set<GraphAnalyzerTask> taskSet);
-		
+	public void addTasks(GraphAnalyzerTask task) {
+		tasks.add(task);
+	}
+	
+	
 	@Override
-	public void analyze(Graph graph, GraphPropertyFactory factory, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, Object> analyzers, Map<String, Double> stats) {
 		for(GraphAnalyzerTask task : tasks)
-			task.analyze(graph, factory, stats);
+			task.analyze(graph, analyzers, stats);
 	}
 
 }

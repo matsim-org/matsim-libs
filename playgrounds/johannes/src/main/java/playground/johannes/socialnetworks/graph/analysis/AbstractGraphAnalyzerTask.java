@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StandardAnalyzerTask.java
+ * AbstractGraphAnalyzerTast.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,17 +19,38 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.matsim.contrib.sna.math.Distribution;
+
 
 /**
  * @author illenberger
  *
  */
-public class StandardAnalyzerTask extends GraphAnalyzerTaskComposite {
+public abstract class AbstractGraphAnalyzerTask implements GraphAnalyzerTask {
 
-	public StandardAnalyzerTask(String output) {
-		super(output);
-		addTasks(new DegreeTask(getOutputDirectory()));
-		addTasks(new TransitivityTask(getOutputDirectory()));
+	private String output;
+	
+	public AbstractGraphAnalyzerTask(String output) {
+		this.output = output;
 	}
-
+	
+	protected String getOutputDirectory() {
+		return output;
+	}
+	
+	protected void writeHistograms(Distribution distr, double binsize, boolean log, String name) throws FileNotFoundException, IOException {
+		Distribution.writeHistogram(distr.absoluteDistribution(binsize), String.format("%1$s/%2$s.txt", output, name));
+		Distribution.writeHistogram(distr.normalizedDistribution(binsize), String.format("%1$s/%2$s.share.txt", output, name));
+		
+		if(log) {
+			Distribution.writeHistogram(distr.absoluteDistributionLog10(binsize), String.format("%1$s/%2$s.log10.txt", output, name));
+			Distribution.writeHistogram(distr.absoluteDistributionLog2(binsize), String.format("%1$s/%2$s.log2.txt", output, name));
+		
+			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog10(binsize)), String.format("%1$s/%2$s.share.log10.txt", output, name));
+			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog2(binsize)), String.format("%1$s/%2$s.share.log2.txt", output, name));
+		}
+	}
 }

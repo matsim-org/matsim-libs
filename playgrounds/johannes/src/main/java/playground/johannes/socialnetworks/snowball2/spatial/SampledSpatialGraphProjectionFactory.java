@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialGraphPropertyFactory.java
+ * SampledSpatialGraphProjectionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,18 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.analysis;
+package playground.johannes.socialnetworks.snowball2.spatial;
 
-import playground.johannes.socialnetworks.graph.analysis.SimpleGraphPropertyFactory;
-import playground.johannes.socialnetworks.graph.spatial.Distance;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
+
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraphProjectionFactory;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialGraphPropertyFactory extends SimpleGraphPropertyFactory {
+public class SampledSpatialGraphProjectionFactory <G extends SampledSpatialGraph, V extends SampledSpatialVertex, E extends SampledSpatialEdge>
+							extends SpatialGraphProjectionFactory<G, V, E> {
 
-	public Distance newDistance() {
-		return new Distance();
+	@Override
+	public SampledSpatialEdgeDecorator<E> createEdge(E delegate) {
+		return new SampledSpatialEdgeDecorator<E>(delegate);
 	}
+
+	@Override
+	public SampledSpatialGraphProjection<G, V, E> createGraph(G delegate) {
+		return new SampledSpatialGraphProjection<G, V, E>(delegate);
+	}
+
+	@Override
+	public SampledSpatialVertexDecorator<V> createVertex(V delegate) {
+		return new SampledSpatialVertexDecorator<V>(delegate);
+	}
+
 }

@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import java.util.Set;
-
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
 
@@ -31,11 +28,10 @@ import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
  */
 public class SpatialAnalyzerTask extends GraphAnalyzerTaskComposite {
 
-	@Override
-	protected void addTasks(Set<GraphAnalyzerTask> taskSet) {
-		taskSet.add(new StandardAnalyzerTask());
-		taskSet.add(new DistanceTask());
-
+	public SpatialAnalyzerTask(String output) {
+		super(output);
+		addTasks(new StandardAnalyzerTask(getOutputDirectory()));
+		addTasks(new DistanceTask(getOutputDirectory()));
 	}
 
 }

@@ -29,6 +29,6 @@ import org.matsim.contrib.sna.graph.Graph;
  */
 public interface GraphAnalyzerTask {
 
-	public void analyze(Graph graph, GraphPropertyFactory factory, Map<String, Double> stats);
+	public void analyze(Graph graph, Map<String, Object> analyzers, Map<String, Double> stats);
 	
 }

@@ -47,8 +47,8 @@ public class AnalyzerExe {
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialGraph graph = reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/graph/graph.graphml");
 		
-		
-		GraphAnalyzer.analyze(graph, new SpatialGraphPropertyFactory(), new SpatialAnalyzerTask());
+		SpatialAnalyzerTask task = new SpatialAnalyzerTask("/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/");
+		GraphAnalyzer.writeStats(GraphAnalyzer.analyze(graph, null, task), "/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/stats.txt");
 
 		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/gemeindegrenzen2008.zip Folder/g1g08_shp_080606.zip Folder/G1L08.shp").iterator().next();
 		Geometry geometry = feature.getDefaultGeometry();
@@ -57,7 +57,7 @@ public class AnalyzerExe {
 		
 		SpatialGraph graphPrj = builder.decorate(graph, geometry);
 		
-		GraphAnalyzer.analyze(graphPrj, new SpatialGraphPropertyFactory(), new SpatialAnalyzerTask());
+		GraphAnalyzer.analyze(graphPrj, null, new SpatialAnalyzerTask(null));
 	}
 
 }
