@@ -22,8 +22,6 @@ package org.matsim.ptproject.qsim;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.matsim.core.gbl.Gbl;
-
 public abstract class Simulation {
 
 	/*
@@ -50,10 +48,10 @@ public abstract class Simulation {
 	
 	private static double stuckTime = Double.MAX_VALUE;
 
-	public static void reset() {
+	public static void reset(double stucktime) {
 		setLiving(0);
 		resetLost();
-		setStuckTime(Gbl.getConfig().getQSimConfigGroup().getStuckTime());
+		setStuckTime(stucktime);
 	}
 
 	public static final double getStuckTime() {return stuckTime;	}

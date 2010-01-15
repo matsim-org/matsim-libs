@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.ptproject.qsim;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -43,18 +45,31 @@ public class QLaneNode extends QueueNode {
     super(n, queueNetwork);
   }
   
- 
+  
   @Override
-  protected void clearLaneBuffer(final QueueLane lane, final double now){
-    while (!lane.bufferIsEmpty()) {
-      QueueVehicle veh = lane.getFirstFromBuffer();
-      if (!moveVehicleOverNode(veh, lane, now)) {
-        break;
+  public void moveNode(final double now, final Random random) {
+    /* called by the framework, do all necessary action for node movement here */
+    if (this.isSignalized()) {
+      for (QueueLink link : this.inLinksArrayCache){
+        for (QueueLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
+          lane.updateGreenState(now);
+          if (lane.isThisTimeStepGreen()){
+            while (!lane.bufferIsEmpty()) {
+              QueueVehicle veh = lane.getFirstFromBuffer();
+              if (!moveVehicleOverNode(veh, lane, now)) {
+                break;
+              }
+            }
+          }
+        }
       }
     }
+    else {
+      super.moveNode(now, random);
+    }
   }
-
-  // ////////////////////////////////////////////////////////////////////
+  
+   // ////////////////////////////////////////////////////////////////////
   // Queue related movement code
   // ////////////////////////////////////////////////////////////////////
   /**
@@ -64,6 +79,7 @@ public class QLaneNode extends QueueNode {
    * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
    * otherwise (e.g. in case where the next link is jammed)
    */
+  @Override
   protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
     Id nextLinkId = veh.getDriver().chooseNextLinkId();
     Link currentLink = currentLane.getQueueLink().getLink();
@@ -133,8 +149,4 @@ public class QLaneNode extends QueueNode {
   }
 
 
-  @Override
-  protected void clearLinkBuffer(QueueLinkImpl lane, double now) {
-    throw new UnsupportedOperationException("wrong instance!");
-  }
 }

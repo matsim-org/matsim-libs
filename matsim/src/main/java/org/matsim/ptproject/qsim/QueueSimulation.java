@@ -149,7 +149,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
     log.info("Using QSim...");
     // In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
     this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
-    Simulation.reset();
+    Simulation.reset(sc.getConfig().getQSimConfigGroup().getStuckTime());
     SimulationTimer.reset(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
     setEvents(eventsManager);
     this.population = (PopulationImpl) sc.getPopulation();
