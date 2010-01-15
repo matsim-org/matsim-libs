@@ -206,6 +206,7 @@ public class OTFVis {
 	
 	public static final void playNetwork(final String[] args) {
 		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		EventsManagerImpl events = new EventsManagerImpl();
 		OTFVisQueueSim queueSimulation = new OTFVisQueueSim(scenario, events);
