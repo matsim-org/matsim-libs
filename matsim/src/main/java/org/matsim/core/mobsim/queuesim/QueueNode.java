@@ -86,14 +86,14 @@ public class QueueNode {
 	// ////////////////////////////////////////////////////////////////////
 	/**
 	 * @param veh
-	 * @param currentLane
+	 * @param link
 	 * @param now
 	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
-	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
+	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLink link, final double now) {
 		Id nextLinkId = veh.getDriver().chooseNextLinkId();
-		Link currentLink = currentLane.queueLink.getLink();
+		Link currentLink = link.getLink();
 
 		// veh has to move over node
 		if (nextLinkId != null) {
@@ -102,23 +102,11 @@ public class QueueNode {
 				throw new RuntimeException("Cannot move vehicle " + veh.getId() +
 						" from link " + currentLink.getId() + " to link " + nextLinkId);
 			}
-			if ((!currentLane.isOriginalLane()) && (!currentLane.getDestinationLinkIds().contains(nextLinkId))) {
-				StringBuilder b = new StringBuilder();
-				b.append("Link Id ");
-				b.append(nextLinkId);
-				b.append(" is not accessible from lane id ");
-				b.append(currentLane.getLaneId());
-				b.append(" on Link Id " );
-				b.append(currentLink.getId());
-				b.append(". Check the definition of the lane and add the link as toLink!");
-				log.error(b.toString());
-				throw new IllegalStateException(b.toString());
-			}
 			
 			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
 
 			if (nextQueueLink.hasSpace()) {
-				currentLane.popFirstFromBuffer();
+				link.popFirstFromBuffer();
 				veh.getDriver().moveOverNode();
 				nextQueueLink.add(veh);
 				return true;
@@ -126,19 +114,19 @@ public class QueueNode {
 
 			// check if veh is stuck!
 
-			if ((now - currentLane.bufferLastMovedTime) > AbstractSimulation.getStuckTime()) {
+			if ((now - link.bufferLastMovedTime) > AbstractSimulation.getStuckTime()) {
 				/* We just push the vehicle further after stucktime is over, regardless
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
 				 */
 				if (Gbl.getConfig().simulation().isRemoveStuckVehicles()) {
-					currentLane.popFirstFromBuffer();
+					link.popFirstFromBuffer();
 					AbstractSimulation.decLiving();
 					AbstractSimulation.incLost();
 					QueueSimulation.getEvents().processEvent(
 							new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
 				} else {
-					currentLane.popFirstFromBuffer();
+					link.popFirstFromBuffer();
 					veh.getDriver().moveOverNode();
 					nextQueueLink.add(veh);
 					return true;
@@ -148,7 +136,7 @@ public class QueueNode {
 		}
 
 		// --> nextLink == null
-		currentLane.popFirstFromBuffer();
+		link.popFirstFromBuffer();
 		AbstractSimulation.decLiving();
 		AbstractSimulation.incLost();
 		log.error(
@@ -214,19 +202,17 @@ public class QueueNode {
 	        inLinksCapSum -= link.getLink().getCapacity(now);
 	        this.tempLinks[i] = null;
 	        //move the link
-	        for (QueueLane lane : link.getToNodeQueueLanes()) {
-	          this.clearLaneBuffer(lane, now);
-	        }
+	        this.clearLaneBuffer(link, now);
 	        break;
 	      }
 	    }
 		}
 	}
 
-	private void clearLaneBuffer(final QueueLane lane, final double now){
-		while (!lane.bufferIsEmpty()) {
-			QueueVehicle veh = lane.getFirstFromBuffer();
-			if (!moveVehicleOverNode(veh, lane, now)) {
+	private void clearLaneBuffer(final QueueLink link, final double now){
+		while (!link.bufferIsEmpty()) {
+			QueueVehicle veh = link.getFirstFromBuffer();
+			if (!moveVehicleOverNode(veh, link, now)) {
 				break;
 			}
 		}

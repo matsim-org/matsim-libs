@@ -61,8 +61,6 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.LaneDefinitions;
-import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
@@ -126,8 +124,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	protected Scenario scenario = null;
 
-	private LaneDefinitions laneDefintions;
-
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
 	private int cntTeleportVehicle = 0;
@@ -182,13 +178,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 				this.listenerManager.addQueueSimulationListener(listener);
 	}
 
-	/**
-	 * Set the lanes used in the simulation
-	 * @param laneDefs
-	 */
-	public void setLaneDefinitions(final LaneDefinitions laneDefs){
-		this.laneDefintions = laneDefs;
-	}
 
 	public final void run() {
 		prepareSim();
@@ -300,8 +289,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
 
-		prepareLanes();
-
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) this.config.simulation().getSnapshotPeriod();
 
@@ -335,20 +322,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		prepareNetworkChangeEventsQueue();
 	}
 
-	protected void prepareLanes(){
-		if (this.laneDefintions != null){
-			log.info("Lanes enabled...");
-			for (LanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignmentsList()){
-				QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
-				if (link == null) {
-					String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";
-					log.error(message);
-					throw new IllegalStateException(message);
-				}
-				link.createLanes(laneToLink.getLanes());
-			}
-		}
-	}
 
 	/**
 	 * Close any files, etc.

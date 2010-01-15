@@ -24,6 +24,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.mobsim.queuesim.QueueLink.AgentOnLink;
 import org.matsim.vis.netvis.DisplayNetStateWriter;
 import org.matsim.vis.netvis.VisConfig;
 
@@ -39,7 +40,7 @@ import org.matsim.vis.netvis.VisConfig;
 	private final QueueNetwork queueNetwork;
 
     @Override
-    protected Collection<org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink> getAgentsOnLink(final Link link) {
+    protected Collection<AgentOnLink> getAgentsOnLink(final Link link) {
     		QueueLink qlink = this.queueNetwork.getQueueLink(link.getId());
         return qlink.getVisData().getDrawableCollection();
     }

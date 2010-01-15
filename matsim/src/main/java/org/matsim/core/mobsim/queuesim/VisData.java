@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import java.util.Collection;
 
+import org.matsim.core.mobsim.queuesim.QueueLink.AgentOnLink;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 /**
  * Interface for methods to provide a visualizer with data.
@@ -43,7 +44,7 @@ public interface VisData {
 	 */
 	public double getDisplayableTimeCapValue();
 
-	public Collection<org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink> getDrawableCollection();
+	public Collection<AgentOnLink> getDrawableCollection();
 
 	public Collection<PositionInfo> getVehiclePositions(
 			final Collection<PositionInfo> positions);

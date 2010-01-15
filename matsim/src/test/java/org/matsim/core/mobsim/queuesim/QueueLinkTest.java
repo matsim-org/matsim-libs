@@ -142,7 +142,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		// time step 2, vehicle leaves link
 		f.qlink1.moveLink(2.0);
-		assertEquals(veh, f.qlink1.getToNodeQueueLanes().get(0).popFirstFromBuffer());
+		assertEquals(veh, f.qlink1.popFirstFromBuffer());
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
@@ -242,7 +242,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		// vehicle leaves link
-		assertEquals(veh, f.qlink1.getToNodeQueueLanes().get(0).popFirstFromBuffer());
+		assertEquals(veh, f.qlink1.popFirstFromBuffer());
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
@@ -314,7 +314,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertEquals(1, qlink.vehOnLinkCount());
 		assertFalse(qlink.bufferIsEmpty());
 		// v1 leaves buffer
-		assertEquals(v1, qlink.getToNodeQueueLanes().get(0).popFirstFromBuffer());
+		assertEquals(v1, qlink.popFirstFromBuffer());
 		assertEquals(1, qlink.vehOnLinkCount());
 		assertTrue(qlink.bufferIsEmpty());
 		// time step 3, v2 moves to buffer
@@ -322,7 +322,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertEquals(0, qlink.vehOnLinkCount());
 		assertFalse(qlink.bufferIsEmpty());
 		// v2 leaves buffer
-		assertEquals(v2, qlink.getToNodeQueueLanes().get(0).popFirstFromBuffer());
+		assertEquals(v2, qlink.popFirstFromBuffer());
 		assertEquals(0, qlink.vehOnLinkCount());
 		assertTrue(qlink.bufferIsEmpty());
 		// time step 4, empty link
@@ -354,7 +354,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		f.qlink2.moveLink(5.0); // first veh moves to buffer, used vehicle equivalents: 5
 		assertTrue(f.qlink2.hasSpace());
 		assertFalse(f.qlink2.bufferIsEmpty());
-		f.qlink2.getToNodeQueueLanes().get(0).popFirstFromBuffer();  // first veh leaves buffer
+		f.qlink2.popFirstFromBuffer();  // first veh leaves buffer
 		assertTrue(f.qlink2.hasSpace());
 		
 		f.qlink2.add(veh25); // used vehicle equivalents: 7.5
@@ -389,7 +389,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		/*package*/ Fixture() {
 			this.scenario = new ScenarioImpl();
-			NetworkLayer network = (NetworkLayer) this.scenario.getNetwork();
+			NetworkLayer network = this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
 			Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 			Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1, 0));
