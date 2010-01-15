@@ -30,7 +30,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 
-@Ignore("not useful for nightly tests")
+@Ignore("test requires real-world input data which cannot be uploaded to test server")
 public class KtiControlerTest extends MatsimTestCase {
 
 	public void testRun() {
