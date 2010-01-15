@@ -1,0 +1,5 @@
+VehicleID,a,b,c,PercentageMinor,PercentageMajor,f
+1,0,0,0,0.10,0.10,0
+2,0,0,0,0.50,0.50,0
+3,0,0,0,0.90,0.90,0
+4,0,0,0,0.95,0.95,0
