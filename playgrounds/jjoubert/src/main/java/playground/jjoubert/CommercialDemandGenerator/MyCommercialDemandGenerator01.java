@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -38,8 +39,8 @@ public class MyCommercialDemandGenerator01 {
 	private final String root;
 	private final String studyArea;
 	private final double activityThreshold;
-	private ArrayList<Integer> withinList;
-	private ArrayList<Integer> throughList;
+	private List<Integer> withinList;
+	private List<Integer> throughList;
 
 	private final static int dimensionStart = 24; 		// values 00h00m00 - 23h59m59
 	private final static int dimensionActivities = 21; 	// index '0' should never be used
@@ -91,7 +92,7 @@ public class MyCommercialDemandGenerator01 {
 		log.info("Building 'within' and 'through' vehicle lists.");
 		MyVehicleIdentifier mvi = new MyVehicleIdentifier(activityThreshold);
 		try{
-			ArrayList<ArrayList<Integer>> lists = mvi.buildVehicleLists(vehicleStatistics, ",");
+			List<List<Integer>> lists = mvi.buildVehicleLists(vehicleStatistics, ",");
 			withinList = lists.get(0);
 			throughList = lists.get(1);
 		} finally{
@@ -262,12 +263,12 @@ public class MyCommercialDemandGenerator01 {
 		return activityThreshold;
 	}
 	
-	public ArrayList<Integer> getWithinList() {
+	public List<Integer> getWithinList() {
 		return withinList;
 	}
 	
 
-	public ArrayList<Integer> getThroughList() {
+	public List<Integer> getThroughList() {
 		return throughList;
 	}
 	

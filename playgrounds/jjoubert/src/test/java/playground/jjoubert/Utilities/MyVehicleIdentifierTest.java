@@ -20,47 +20,60 @@
 
 package playground.jjoubert.Utilities;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.testcases.MatsimTestCase;
 
 
 public class MyVehicleIdentifierTest extends MatsimTestCase{
 	
-	public void testMyVehicleIdentifier(){
-		
-		String testFile = getInputDirectory() + "testVehicleStats.txt";
-		
+	public void testMyVehicleIdentifierConstructor1(){
 		// Test the first constructor
 		double lowerThreshold = 0.6;
 		double upperThreshold = 0.92;
 		MyVehicleIdentifier mvi1 = new MyVehicleIdentifier(lowerThreshold, upperThreshold);
 		assertEquals("Lower threshold incorrect.", lowerThreshold, mvi1.getLowerThreshold());
 		assertEquals("Upper threshold incorrect.", upperThreshold, mvi1.getUpperThreshold());
-		assertEquals("Threshold must be null", true, mvi1.getThreshold()==null);
-		
+		assertEquals("Threshold must be Double.MIN_VALUE", Double.valueOf(Double.MIN_VALUE), mvi1.getThreshold());
+	}
+	
+	public void testMyVehicleIdentifierConstructor2(){
 		// Test the second constructor
 		double threshold = 0.9;
 		MyVehicleIdentifier mvi2 = new MyVehicleIdentifier(threshold);
-		assertEquals("Lower threshold must be null.", null, mvi2.getLowerThreshold());
-		assertEquals("Upper threshold must be null.", null, mvi2.getUpperThreshold());
+		assertEquals("Lower threshold must be Double.MIN_VALUE.", Double.valueOf(Double.MIN_VALUE), mvi2.getLowerThreshold());
+		assertEquals("Upper threshold must be Double.MIN_VALUE.", Double.valueOf(Double.MIN_VALUE), mvi2.getUpperThreshold());
 		assertEquals("Threshold incorrect", threshold, mvi2.getThreshold());
-			
+	}
+	
+	public void testBuildVehicleList(){
+		String testFile = getInputDirectory() + "testVehicleStats.txt";
+		double lowerThreshold = 0.6;
+		double upperThreshold = 0.92;
+		MyVehicleIdentifier mvi = new MyVehicleIdentifier(lowerThreshold, upperThreshold);
+
 		// Test double threshold
-		ArrayList<Integer> list = mvi1.buildVehicleList(testFile, ",");
+		List<Integer> list = mvi.buildVehicleList(testFile, ",");
 		assertEquals("Wrong number of vehicles.", 1, list.size());
 		assertEquals("Wrong vehicle in list.", Integer.valueOf(3), Integer.valueOf(list.get(0)));
+	}
+	
+	public void testBuildVehicleLists(){
+		String testFile = getInputDirectory() + "testVehicleStats.txt";
+		double threshold = 0.9;
+		MyVehicleIdentifier mvi = new MyVehicleIdentifier(threshold);
 		
 		// Test single threshold
-		ArrayList<ArrayList<Integer>> lists = mvi2.buildVehicleLists(testFile, ",");
-		ArrayList<Integer> listWithin = lists.get(0);
+		List<List<Integer>> lists = mvi.buildVehicleLists(testFile, ",");
+		List<Integer> listWithin = lists.get(0);
 		assertEquals("Wrong number of vehicles in 'within' list.", Integer.valueOf(1), Integer.valueOf(listWithin.size()));
 		assertEquals("Wrong vehicle in 'within' list.", Integer.valueOf(4), Integer.valueOf(listWithin.get(0)));
 		
-		ArrayList<Integer> listThrough = lists.get(1);		
-		assertEquals("Wrong number of vehicles in 'through' list.", Integer.valueOf(2), Integer.valueOf(listThrough.size()));
-		assertEquals("Wrong vehicle in 'through' list.", Integer.valueOf(2), Integer.valueOf(listThrough.get(0)));
-		assertEquals("Wrong vehicle in 'through' list.", Integer.valueOf(3), Integer.valueOf(listThrough.get(1)));
+		List<Integer> listThrough = lists.get(1);		
+		assertEquals("Wrong number of vehicles in 'through' list.", Integer.valueOf(3), Integer.valueOf(listThrough.size()));
+		assertEquals("Wrong vehicle in 'through' list.", Integer.valueOf(1), Integer.valueOf(listThrough.get(0)));
+		assertEquals("Wrong vehicle in 'through' list.", Integer.valueOf(2), Integer.valueOf(listThrough.get(1)));
+		assertEquals("Wrong vehicle in 'through' list.", Integer.valueOf(3), Integer.valueOf(listThrough.get(2)));
 	}
 
 }

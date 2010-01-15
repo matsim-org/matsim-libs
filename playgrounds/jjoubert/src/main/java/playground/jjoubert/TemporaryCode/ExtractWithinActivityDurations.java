@@ -28,6 +28,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
@@ -44,8 +45,8 @@ public class ExtractWithinActivityDurations {
 	private final static Logger log = Logger.getLogger(ExtractWithinActivityDurations.class);
 
 	public static void main(String[] args) {
-		ArrayList<Integer> withinVehicles = new ArrayList<Integer>();
-		ArrayList<Integer> withinDurations = new ArrayList<Integer>();
+		List<Integer> withinVehicles = new ArrayList<Integer>();
+		List<Integer> withinDurations = new ArrayList<Integer>();
 		
 		// build ArrayList of 'within' vehicles
 		String fileToRead = ROOT + "Gauteng/Activities/GautengVehiclestats.txt";
