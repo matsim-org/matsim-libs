@@ -51,7 +51,7 @@ public class MyFileFilter implements FilenameFilter {
 		int filepathLength = filename.length();
 		int pos = filename.indexOf(".");
 		String extention = filename.substring(pos, filepathLength);
-		if(extention.equalsIgnoreCase(".txt")){
+		if(extention.equalsIgnoreCase(this.extension)){
 			return true;
 		} else{
 			return false;
