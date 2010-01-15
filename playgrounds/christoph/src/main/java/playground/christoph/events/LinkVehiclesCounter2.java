@@ -24,7 +24,6 @@ import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.queuesim.QueueLane;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 
@@ -134,10 +133,7 @@ public class LinkVehiclesCounter2 implements LinkEnterEventHandler,
             QueueLink queueLink = this.queueNetwork.getLinks().get(id);
             
     		int vehiclesCount = 0;
-    		for (QueueLane queueLane : queueLink.getQueueLanes())
-    		{
-    			vehiclesCount = vehiclesCount + queueLane.getAllVehicles().size();
-    		}
+   			vehiclesCount = vehiclesCount + queueLink.getAllVehicles().size();
     		
     		// Assumption...
     		MyLinkImpl link = (MyLinkImpl)queueLink.getLink();

@@ -21,10 +21,7 @@
 package playground.christoph.router.costcalculators;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.queuesim.QueueLane;
-import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 
 import playground.christoph.network.MyLinkImpl;
