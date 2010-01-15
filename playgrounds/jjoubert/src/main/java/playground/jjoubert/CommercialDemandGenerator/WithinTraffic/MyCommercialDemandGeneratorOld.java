@@ -216,7 +216,7 @@ public class MyCommercialDemandGeneratorOld {
 
 			// Write plans.xml file
 			log.info("Writing plans to XML file... ");
-			new PopulationWriter(population).writeFile(ROOT + "Commercial/plans" +
+			new PopulationWriter(population,sc.getNetwork()).writeFile(ROOT + "Commercial/plans" +
 					PROVINCE + populationSize + "_Sample" + sampleNumber + ".xml");
 			log.info("Done writing plans to XML file.");
 			log.info("Plans generation: Completed for sample " + sampleNumber + " of " + numberOfSamples);
