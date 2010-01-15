@@ -10,6 +10,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -49,6 +50,7 @@ public class OTFSnapshotGenerator {
 		this.scenario.getConfig().simulation().setSnapshotFormat("otfvis");
 		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
 		this.scenario.getConfig().simulation().setEndTime(4*3600+30*60);
+		this.scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		
 		this.scenario.getConfig().evacuation().setBuildingsFile("../../../../inputs/networks/evac_zone_buildings_v20090728.shp");
 //		this.scenario.getConfig().evacuation().setSampleSize("0.1");
