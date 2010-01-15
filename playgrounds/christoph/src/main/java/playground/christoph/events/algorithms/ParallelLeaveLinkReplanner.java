@@ -26,6 +26,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -36,23 +37,28 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author Christoph Dobler
  */
 public class ParallelLeaveLinkReplanner extends ParallelReplanner {
-	
+
 	private final static Logger log = Logger.getLogger(ParallelLeaveLinkReplanner.class);
-	
+
 	private CyclicBarrier timeStepStartBarrier;
 	private CyclicBarrier timeStepEndBarrier;
 	private ReplannerThread[] replannerThreads;
-	
-	/** 
+	private final Network network;
+
+	public ParallelLeaveLinkReplanner(Network network) {
+		this.network = network;
+	}
+
+	/**
 	 * The Method uses the same structure as the LeaveLinkReplanner but instead of single node and vehicles
 	 * Objects now ArrayLists are handed over.
-	 * 
+	 *
 	 * //@param currentNodes
 	 * @param vehicles
 	 * @param time
 	 */
 	public void run(List<QueueVehicle> vehicles, double time)
-	{	
+	{
 		/*
 		 *  distribute workload between threads
 		 *  as long as threads are waiting we don't need synchronized data structures
@@ -60,19 +66,19 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		for(int i = 0; i < vehicles.size(); i++)
 		{
 			QueueVehicle vehicle = vehicles.get(i);
-			
+
 			replannerThreads[i % numOfThreads].handleVehicle(vehicle);
 		}
-		
+
 		try
 		{
 			ReplannerThread.setTime(time);
-				
+
 			this.timeStepStartBarrier.await();
-				
+
 			this.timeStepEndBarrier.await();
-	
-		} 
+
+		}
 		catch (InterruptedException e)
 		{
 			Gbl.errorMsg(e);
@@ -82,76 +88,78 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 	      	Gbl.errorMsg(e);
 		}
 	}
-	
+
 	@Override
 	public void init()
-	{		
+	{
 		this.timeStepStartBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.timeStepEndBarrier = new CyclicBarrier(numOfThreads + 1);
-		
+
 		replannerThreads = new ReplannerThread[numOfThreads];
-		
+
 		// setup threads
-		for (int i = 0; i < numOfThreads; i++) 
+		for (int i = 0; i < numOfThreads; i++)
 		{
-			ReplannerThread replannerThread = new ReplannerThread(i, replannerArray, replanners);
+			ReplannerThread replannerThread = new ReplannerThread(i, replannerArray, replanners, this.network);
 			replannerThread.setName("ParallelLeaveLinkReplanner" + i);
 			replannerThread.setCyclicTimeStepStartBarrier(this.timeStepStartBarrier);
 			replannerThread.setCyclicTimeStepEndBarrier(this.timeStepEndBarrier);
-			
+
 			replannerThreads[i] = replannerThread;
-			
+
 			replannerThread.start();
 		}
-		
+
 		/*
 		 * After initialization the Threads are waiting at the
-		 * TimeStepEndBarrier. We trigger this Barrier once so 
+		 * TimeStepEndBarrier. We trigger this Barrier once so
 		 * they wait at the TimeStepStartBarrier what has to be
 		 * their state if the run() method is called.
 		 */
 		try
 		{
 			this.timeStepEndBarrier.await();
-		} 
-		catch (InterruptedException e) 
+		}
+		catch (InterruptedException e)
 		{
 			Gbl.errorMsg(e);
-		} 
+		}
 		catch (BrokenBarrierException e)
 		{
 			Gbl.errorMsg(e);
 		}
 	}
-		
+
 	/**
 	 * The thread class that really handles the persons.
 	 */
-	private static class ReplannerThread extends Thread 
+	private static class ReplannerThread extends Thread
 	{
 		private static double time = 0.0;
 		private static boolean simulationRunning = true;
-		
+
 		public final int threadId;
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
 		private final LinkedList<QueueVehicle> vehicles = new LinkedList<QueueVehicle>();
+		private final Network network;
 
 		private CyclicBarrier timeStepStartBarrier;
 		private CyclicBarrier timeStepEndBarrier;
-		
-		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners)
+
+		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, Network network)
 		{
 			this.threadId = i;
 			this.replannerArray = replannerArray;
 			this.replanners = replanners;
+			this.network = network;
 		}
-		
+
 		public static void setTime(final double t)
 		{
 			time = t;
 		}
-		
+
 		public void handleVehicle(final QueueVehicle vehicle)
 		{
 			this.vehicles.add(vehicle);
@@ -161,12 +169,12 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		{
 			this.timeStepStartBarrier = barrier;
 		}
-		
+
 		public void setCyclicTimeStepEndBarrier(CyclicBarrier barrier)
 		{
 			this.timeStepEndBarrier = barrier;
 		}
-				
+
 		@Override
 		public void run()
 		{
@@ -175,40 +183,40 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 				try
 				{
 					/*
-					 * The End of the Replanning is synchronized with 
+					 * The End of the Replanning is synchronized with
 					 * the TimeStepEndBarrier. If all Threads reach this Barrier
 					 * the main run() Thread can go on.
-					 * 
+					 *
 					 * The Threads wait now at the TimeStepStartBarrier until
 					 * they are triggered again in the next TimeStep by the main run()
 					 * method.
 					 */
 					timeStepEndBarrier.await();
-						
+
 					timeStepStartBarrier.await();
 
 //					int numRuns = 0;
-					
+
 					while(vehicles.peek() != null)
 					{
 						QueueVehicle vehicle = vehicles.poll();
 
 						// replanner of the person
 						PlanAlgorithm replanner = (PlanAlgorithm)vehicle.getDriver().getPerson().getCustomAttributes().get("Replanner");
-						
+
 						// get the index of the Replanner in the replanners Array
 						int index = replanners.indexOf(replanner);
-						
+
 						// get the replanner or a clone if it, if it's not the first running thread
 						replanner = this.replannerArray[index][threadId];
 
-						new LeaveLinkReplanner(vehicle, time, replanner);
+						new LeaveLinkReplanner(vehicle, time, replanner, this.network);
 						//log.info("Did Leave Link Replanning...");
-						
+
 //						numRuns++;
 //						if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + threadId);
 					}
-					
+
 //					log.info("Thread " + threadId + " done.");
 				}
 				catch (InterruptedException e)
@@ -220,7 +228,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 	            {
 	            	Gbl.errorMsg(e);
 	            }
-			}	// while Simulation Running			
+			}	// while Simulation Running
 		}	// run()
 	}	// ReplannerThread
 }

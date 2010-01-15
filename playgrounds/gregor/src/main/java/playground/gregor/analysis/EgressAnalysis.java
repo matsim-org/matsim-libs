@@ -62,6 +62,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.gregor.gis.helper.GTH;
 
@@ -180,7 +181,7 @@ public class EgressAnalysis {
 			log.info("handle plans");
 			for (Person person : this.population.getPersons().values()) {
 				LegImpl leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
-				List<Node> route = ((NetworkRouteWRefs) leg.getRoute()).getNodes();
+				List<Node> route = RouteUtils.getNodes((NetworkRouteWRefs) leg.getRoute(), this.network);
 				Node node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
 				PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
@@ -193,7 +194,7 @@ public class EgressAnalysis {
 				plan.addActivity(((PlanImpl) person.getSelectedPlan()).getNextActivity(leg));
 				this.router.run(plan);
 				LegImpl leg2 = plan.getNextLeg(plan.getFirstActivity());
-				List<Node> route2 = ((NetworkRouteWRefs) leg2.getRoute()).getNodes();
+				List<Node> route2 = RouteUtils.getNodes((NetworkRouteWRefs) leg2.getRoute(), this.network);
 				Node node2 = route2.get(route2.size()-2);
 				this.egressNodes.get(node2.getId()).num_shortest++;
 

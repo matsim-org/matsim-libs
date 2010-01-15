@@ -101,7 +101,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		LegImpl leg2 = (LegImpl) plan2.getPlanElements().get(1);
 		NetworkRouteWRefs route2 = (NetworkRouteWRefs) leg2.getRoute();
 		assertNotNull("no route assigned.", route2);
-		assertEquals("wrong route", 3, route2.getNodes().size());
+		assertEquals("wrong route", 2, route2.getLinkIds().size());
 	}
 
 }

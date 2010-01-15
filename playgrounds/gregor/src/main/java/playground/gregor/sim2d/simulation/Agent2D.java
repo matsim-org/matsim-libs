@@ -15,6 +15,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -22,7 +23,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class Agent2D  {
 
 	public enum AgentState {MOVING,ACTING, ARRIVING};
-	
+
 	private static final Logger log = Logger.getLogger(Agent2D.class);
 
 	private static final double ACTIVITY_DIST = 1.0;
@@ -33,7 +34,7 @@ public class Agent2D  {
 	int actLegPointer = 0;
 	private Link currentLink;
 	private LegImpl currentLeg;
-	
+
 	private List<Node> cacheRouteNodes;
 	private int currentNodeIndex;
 
@@ -42,11 +43,11 @@ public class Agent2D  {
 	private final Sim2D simulation;
 
 	private AgentState state;
-	
+
 	private final double disieredVelocity = 1.0 + MatsimRandom.getRandom().nextDouble()/2-0.25;
 //	private final double disieredVelocity = 1.34;
 	private final double weight = 1000*(90 + 40*MatsimRandom.getRandom().nextDouble()-20);
-	
+
 	private Activity currentAct;
 
 	private boolean departed = false;
@@ -59,11 +60,11 @@ public class Agent2D  {
 		this.currentPlan = p.getSelectedPlan();
 		this.simulation = sim2D;
 	}
-	
+
 	public Activity getAct() {
 		return this.currentAct;
 	}
-	
+
 	public Activity getOldAct() {
 		return this.oldAct;
 	}
@@ -78,8 +79,8 @@ public class Agent2D  {
 		this.state = AgentState.MOVING;
 		this.departed  = true;
 	}
-	
-	
+
+
 	public Link getCurrentLink() {
 		return this.currentLink;
 	}
@@ -96,15 +97,15 @@ public class Agent2D  {
 	public double getDisiredVelocity() {
 		return this.disieredVelocity;
 	}
-	
+
 	public AgentState getState() {
 		return this.state;
 	}
-	
-	
+
+
 	public Link chooseNextLink() {
 		if (this.cacheRouteNodes == null) {
-			this.cacheRouteNodes = ((NetworkRouteWRefs) this.currentLeg.getRoute()).getNodes();
+			this.cacheRouteNodes = RouteUtils.getNodes((NetworkRouteWRefs) this.currentLeg.getRoute(), this.simulation.getNetwork());
 			this.currentNodeIndex = 1;
 		}
 		if (this.currentNodeIndex >= this.cacheRouteNodes.size() ) {

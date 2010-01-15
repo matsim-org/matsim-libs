@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -17,31 +16,15 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.AgentFactory;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
-import org.matsim.evacuation.otfvis.readerwriter.AgentReader;
-import org.matsim.evacuation.otfvis.readerwriter.AgentWriter;
-import org.matsim.evacuation.otfvis.readerwriter.TextureDataWriter;
-import org.matsim.evacuation.otfvis.readerwriter.TextutreDataReader;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
-import org.matsim.vis.otfvis.OTFClient;
-import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
-import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
 
-import playground.gregor.sim2d.gisdebug.StaticForceFieldToShape;
 import playground.gregor.sim2d.otfdebug.readerwriter.Agent2DWriter;
 import playground.gregor.sim2d.otfdebug.readerwriter.ForceArrowWriter;
 
@@ -60,8 +43,8 @@ public class Sim2D {
 	private double startTime;
 	private Agent2DWriter agentWriter;
 	private List<ExtendedPositionInfo> agentData;
-	
-	
+
+
 	protected final PriorityBlockingQueue<Agent2D> activityEndsList = new PriorityBlockingQueue<Agent2D>(500, new Agent2DDepartureTimeComparator());
 	private OnTheFlyServer myOTFServer = null;
 	private final double endTime;
@@ -78,14 +61,14 @@ public class Sim2D {
 			f.put(e.getKey(),this.network);
 //			fg = new StaticForceFieldGenerator(e.getKey());
 		}
-		
+
 //		QuadTree<Force> q;
 //		q = fg.loadStaticForceField();
 //		StaticForceFieldWriter s = new StaticForceFieldWriter();
 //		s.write("test.xml", q.values());
-//		
+//
 //		q = new StaticForceFieldReader("test.xml").getStaticForceField();
-		
+
 //		new StaticForceFieldToShape(q).createShp();
 		this.network2D = new Network2D(this.network,f,sff);
 
@@ -125,7 +108,7 @@ public class Sim2D {
 		}
 		return true;
 	}
-	
+
 	private void handleAgentRemoves(double time) {
 		while (this.agentsToRemoveList.peek() != null) {
 			Agent2D agent = this.agentsToRemoveList.poll();
@@ -138,13 +121,13 @@ public class Sim2D {
 
 	public void scheduleAgentRemove(Agent2D agent2d) {
 		this.agentsToRemoveList.add(agent2d);
-		
+
 	}
 
 	protected void scheduleActivityEnd(final Agent2D agent) {
 		this.activityEndsList.add(agent);
 	}
-	
+
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
 			Agent2D agent = this.activityEndsList.peek();
@@ -171,25 +154,25 @@ public class Sim2D {
 		if (this.startTime == Time.UNDEFINED_TIME) this.startTime = 0.0;
 		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
 
-		
+
 		createAgents();
-		
-		
+
+
 		double simStartTime = 0;
 		Agent2D firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
 			simStartTime = Math.floor(Math.max(this.startTime, firstAgent.getNextDepartureTime()));
 		}
-		
+
 		SimulationTimer.setSimStartTime(simStartTime);
 		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
-		
-		
+
+
 
 
 	}
 
-	
+
 	private void createAgents() {
 		if (this.population == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
@@ -205,7 +188,7 @@ public class Sim2D {
 				floor.addAgent(agent);
 			}
 		}
-		
+
 	}
 
 
@@ -215,15 +198,15 @@ public class Sim2D {
 			this.myOTFServer.updateStatus(time);
 		}
 	}
-	
-	
+
+
 	private void visualizeAgents(double time) {
 		updatePositionInfos();
 		this.agentWriter.setSrc(this.agentData);
-		
+
 		List<double []>forceData = updateForceInfos();
 		this.forceArrowWriter.setSrc(forceData);
-		
+
 	}
 
 
@@ -253,7 +236,7 @@ public class Sim2D {
 			}
 		}
 	}
-	
+
 	private static final double TWO_PI = 2 * Math.PI;
 	private static final double PI_HALF =  Math.PI / 2;
 
@@ -278,6 +261,10 @@ public class Sim2D {
 		return events;
 	}
 
+	/*package*/ Network getNetwork() {
+		return this.network;
+	}
+
 	private static final void setEvents(final EventsManager events) {
 		Sim2D.events = events;
 	}
@@ -293,7 +280,7 @@ public class Sim2D {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 

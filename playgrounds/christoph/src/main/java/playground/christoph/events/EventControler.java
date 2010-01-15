@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -82,16 +81,16 @@ import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
  * The Controler is responsible for complete simulation runs, including the
  * initialization of all required data, running the iterations and the
  * replanning, analyses, etc.
- * 
+ *
  * @author Christoph Dobler
  */
 
 
 /*
  * Example for the new entries in a config.xml file to read / write selected
- * nodes from / to files. 
- * <module name="selection"> 
- * 		<param name="readSelection" value="true"/> 
+ * nodes from / to files.
+ * <module name="selection">
+ * 		<param name="readSelection" value="true"/>
  * 		<param name="inputSelectionFile" value="mysimulations/berlin/selection.xml.gz" />
  * 		<param name="writeSelection" value="true"/>
  * 		<param name="outputSelectionFile" value="./output/berlin/selection.xml.gz" />
@@ -120,7 +119,7 @@ public class EventControler extends Controler {
 	protected int leaveLinkReplanningCounter = 0;
 
 	protected int numReplanningThreads = 2;
-	
+
 	protected KnowledgeTravelTimeCalculator knowledgeTravelTime;
 
 	protected ParallelInitialReplanner parallelInitialReplanner;
@@ -135,7 +134,7 @@ public class EventControler extends Controler {
 
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
-	 * 
+	 *
 	 * @param args
 	 *            The arguments to initialize the controler with.
 	 *            <code>args[0]</code> is expected to contain the path to a
@@ -169,11 +168,11 @@ public class EventControler extends Controler {
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
-		
+
 		this.setTravelCostCalculator(travelCostWrapper);
 //		this.setTravelCostCalculator(travelCost);
 	}
-	
+
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
@@ -218,10 +217,10 @@ public class EventControler extends Controler {
 		// CostCalculators can be used
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
 		KnowledgeTravelTimeWrapper travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
-		
+
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
-		
+
 		travelTimeWrapper.checkNodeKnowledge(false);
 		travelCostWrapper.checkNodeKnowledge(false);
 
@@ -233,20 +232,20 @@ public class EventControler extends Controler {
 /*
 		// Don't use Wrappers with LookupTables KnowledgeTravelTimeCalculator
 		travelTime = new KnowledgeTravelTimeCalculator();
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime); 
-		
+		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+
 		// Dijkstra
-		dijkstra = new Dijkstra(network, travelCost, travelTime); 
+		dijkstra = new Dijkstra(network, travelCost, travelTime);
 		// DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime);
-		
+
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
-		travelCostWrapper.useLookupTable(false); Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime); 
+		travelCostWrapper.useLookupTable(false); Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
 		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime);
 */
-		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
+		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network,
 				travelCostWrapper, travelTimeWrapper, new DijkstraWrapperFactory());
-		
+
 		replanners.add(dijkstraRouter);
 	}
 
@@ -258,20 +257,20 @@ public class EventControler extends Controler {
 	 * Hands over the ArrayList to the ParallelReplanner
 	 */
 	protected void initParallelReplanningModules()
-	{	
+	{
 		this.parallelInitialReplanner = new ParallelInitialReplanner();
 		this.parallelInitialReplanner.setNumberOfThreads(numReplanningThreads);
 		this.parallelInitialReplanner.setReplannerArrayList(replanners);
 		this.parallelInitialReplanner.createReplannerArray();
 		this.parallelInitialReplanner.init();
-		
+
 		this.parallelActEndReplanner = new ParallelActEndReplanner();
 		this.parallelActEndReplanner.setNumberOfThreads(numReplanningThreads);
 		this.parallelActEndReplanner.setReplannerArrayList(replanners);
 		this.parallelActEndReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
 		this.parallelActEndReplanner.init();
 
-		this.parallelLeaveLinkReplanner = new ParallelLeaveLinkReplanner();
+		this.parallelLeaveLinkReplanner = new ParallelLeaveLinkReplanner(network);
 		this.parallelLeaveLinkReplanner.setNumberOfThreads(numReplanningThreads);
 		this.parallelLeaveLinkReplanner.setReplannerArrayList(replanners);
 		this.parallelLeaveLinkReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
@@ -301,7 +300,7 @@ public class EventControler extends Controler {
 	 * Creates the Handler and Listener Object so that
 	 * they can be handed over to the Within Day
 	 * Replanning Modules (TravelCostWrapper, etc).
-	 * 
+	 *
 	 * The full initialization of them is done later
 	 * (we don't have all necessary Objects yet).
 	 */
@@ -312,47 +311,47 @@ public class EventControler extends Controler {
 		lookupTableUpdater = new LookupTableUpdater();
 		replanningManager = new ReplanningManager();
 	}
-	
+
 	@Override
-	protected void runMobSim() 
+	protected void runMobSim()
 	{
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 
 		sim.useKnowledgeStorageHandler(true);
-		
+
 		createHandlersAndListeners();
 
 		// fully initialize & add LinkVehiclesCounter
 		linkVehiclesCounter.setQueueNetwork(sim.getQueueNetwork());
-		
+
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
 		 */
 		FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
-		
+
 		foqsl.addQueueSimulationInitializedListener(linkVehiclesCounter);
 		foqsl.addQueueSimulationAfterSimStepListener(linkVehiclesCounter);
-		
+
 //		foqsl.addQueueSimulationInitializedListener(lookupTableUpdater);
 //		foqsl.addQueueSimulationAfterSimStepListener(lookupTableUpdater);
 
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
-		
+
 		sim.addQueueSimulationListeners(foqsl);
-		
+
 //		sim.addQueueSimulationListeners(lookupTableUpdater);
 //		sim.addQueueSimulationListeners(linkVehiclesCounter);
-		
+
 		this.events.addHandler(linkVehiclesCounter);
-		
+
 		// fully initialize & add LinkReplanningMap
 		linkReplanningMap.setQueueNetwork(sim.getQueueNetwork());
 		this.events.addHandler(linkReplanningMap);
 
 		// set QueueNetwork in the Traveltime Calculator
 //		if (knowledgeTravelTime != null) knowledgeTravelTime.setQueueNetwork(sim.getQueueNetwork());
-		
+
 //		log.info("Remove not selected Plans");
 //		clearPlans();
 
@@ -389,29 +388,29 @@ public class EventControler extends Controler {
 		/*
 		 * Could be done before or after the creation of the activity rooms -
 		 * depending on the intention of the simulation.
-		 * 
+		 *
 		 * If done before, the new created Route is the base for the activity
 		 * rooms.
-		 * 
+		 *
 		 * If done afterwards, existing routes are the base for the activity
 		 * rooms and the replanners have to act within the borders of the
 		 * already defined rooms. The existing plans could for example be the
 		 * results of a relaxed solution of a standard MATSim simulation.
 		 */
 		log.info("do initial Replanning");
-		doInitialReplanning();	
-		
+		doInitialReplanning();
+
 //		lookupTableUpdater.addLookupTable(LookupTable lookupTable);
-		
+
 		ActEndReplanningModule actEndReplanning = new ActEndReplanningModule(parallelActEndReplanner, sim);
 		LeaveLinkReplanningModule leaveLinkReplanning = new LeaveLinkReplanningModule(parallelLeaveLinkReplanner, linkReplanningMap);
-		
+
 		replanningManager.setActEndReplanningModule(actEndReplanning);
 		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
-		
+
 //		replanningManager.doActEndReplanning(false);
 //		replanningManager.doLeaveLinkReplanning(false);
-		
+
 		sim.run();
 	}
 
@@ -420,7 +419,7 @@ public class EventControler extends Controler {
 	 * the plans of this person should be replanned each time if an activity
 	 * ends, each time a link is left, before the simulation starts or never
 	 * during an iteration.
-	 * 
+	 *
 	 * I don't like this way but, it is the best way I know at the moment... In
 	 * my opinion these variables should be part of the PersonAgents within the
 	 * QueueSimulation - but they can't be accessed from an EventHandler.
@@ -436,9 +435,9 @@ public class EventControler extends Controler {
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
 			double probability = MatsimRandom.getRandom().nextDouble();
-			
+
 			// No Replanning
-			if (probability <= pNoReplanning) 
+			if (probability <= pNoReplanning)
 			{
 				noReplanningCounter++;
 				customAttributes.put("initialReplanning", new Boolean(false));
@@ -448,7 +447,7 @@ public class EventControler extends Controler {
 
 			// Initial Replanning
 			else if ((probability > pNoReplanning)
-					&& (probability <= pNoReplanning + pInitialReplanning)) 
+					&& (probability <= pNoReplanning + pInitialReplanning))
 			{
 				initialReplanningCounter++;
 				customAttributes.put("initialReplanning", new Boolean(true));
@@ -458,7 +457,7 @@ public class EventControler extends Controler {
 
 			// Act End Replanning
 			else if ((probability > pNoReplanning + pInitialReplanning)
-					&& (probability <= pNoReplanning + pInitialReplanning + pActEndReplanning)) 
+					&& (probability <= pNoReplanning + pInitialReplanning + pActEndReplanning))
 			{
 				actEndReplanningCounter++;
 				customAttributes.put("initialReplanning", new Boolean(false));
@@ -467,14 +466,14 @@ public class EventControler extends Controler {
 			}
 
 			// Leave Link Replanning
-			else 
+			else
 			{
 				leaveLinkReplanningCounter++;
 				customAttributes.put("initialReplanning", new Boolean(false));
 				customAttributes.put("leaveLinkReplanning", new Boolean(true));
 				customAttributes.put("endActivityReplanning", new Boolean(false));
 			}
-			
+
 			// (de)activate replanning
 			if (actEndReplanningCounter == 0) replanningManager.doActEndReplanning(false);
 			else replanningManager.doActEndReplanning(true);
@@ -496,20 +495,20 @@ public class EventControler extends Controler {
 		log.info(leaveLinkReplanningCounter + " persons replan their plans at each node (" + leaveLinkReplanningCounter / numPersons * 100.0 + "%)");
 		/*
 		 * int counter = 0;
-		 * 
+		 *
 		 * Iterator<Person> PersonIterator =
 		 * this.getPopulation().getPersons().values().iterator(); while
 		 * (PersonIterator.hasNext()) { Person p = PersonIterator.next();
-		 * 
+		 *
 		 * // count persons - is decreased again, if a person is replanning
 		 * noReplanningCounter++;
-		 * 
+		 *
 		 * counter++; if(counter < 1000000) { Map<String,Object>
 		 * customAttributes = p.getCustomAttributes();
 		 * customAttributes.put("initialReplanning", new Boolean(true));
 		 * customAttributes.put("leaveLinkReplanning", new Boolean(true));
 		 * customAttributes.put("endActivityReplanning", new Boolean(true));
-		 * 
+		 *
 		 * // (de)activate replanning
 		 * MyQueueNetwork.doLeaveLinkReplanning(true);
 		 * MyQueueNetwork.doActEndReplanning(true); } else { Map<String,Object>
@@ -517,7 +516,7 @@ public class EventControler extends Controler {
 		 * customAttributes.put("initialReplanning", new Boolean(false));
 		 * customAttributes.put("leaveLinkReplanning", new Boolean(false));
 		 * customAttributes.put("endActivityReplanning", new Boolean(false));
-		 * 
+		 *
 		 * // deactivate replanning MyQueueNetwork.doLeaveLinkReplanning(false);
 		 * MyQueueNetwork.doActEndReplanning(false); } }
 		 */
@@ -527,7 +526,7 @@ public class EventControler extends Controler {
 	 * Assigns a replanner to every Person of the population. Same problem as
 	 * above: should be part of the PersonAgents, but only Persons are available
 	 * in the replanning modules.
-	 * 
+	 *
 	 * At the moment: Replanning Modules are assigned hard coded. Later: Modules
 	 * are assigned based on probabilities from config files.
 	 */
@@ -549,10 +548,10 @@ public class EventControler extends Controler {
 	 * to create an activity rooms for every Person. It is possible to assign
 	 * more than one Selector to each Person. If non is selected the Person
 	 * knows every Node of the network.
-	 * 
+	 *
 	 * At the moment: Selection Modules are assigned hard coded. Later: Modules
 	 * are assigned based on probabilities from config files.
-	 * 
+	 *
 	 * If no NodeSelectors is added (the ArrayList is initialized but empty) the
 	 * person knows the entire Network (KnowledgeTools.knowsLink(...) always
 	 * returns true).
@@ -596,7 +595,7 @@ public class EventControler extends Controler {
 			log.info("Path: " + path);
 
 			// reading single File
-			new SelectionReaderMatsim(this.network, this.population,(((ScenarioImpl) this.getScenario()).getKnowledges())).readFile(path);
+			new SelectionReaderMatsim(this.network, this.population,((this.getScenario()).getKnowledges())).readFile(path);
 
 			// reading multiple Files automatically
 			// new SelectionReaderMatsim(this.network,
@@ -642,7 +641,7 @@ public class EventControler extends Controler {
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 			/*
 			 * CellNetworkMapping cellNetworkMapping = new CellNetworkMapping(network); cellNetworkMapping.createMapping();
-			 * 
+			 *
 			 * NodeKnowledge nodeKnowledge = new CellKnowledge(cellNetworkMapping);
 			 */
 			customAttributes.put("NodeKnowledgeStorageType", MapKnowledgeDB.class.getName());
@@ -665,22 +664,22 @@ public class EventControler extends Controler {
 		/*
 		 * SubNetworkCreator snc = new SubNetworkCreator(this.network);
 		 * KnowledgeTools kt = new KnowledgeTools();
-		 * 
+		 *
 		 * int i = 0; for(PersonImpl person :
 		 * this.getPopulation().getPersons().values()) { Map<String, Object>
 		 * customAttributes = person.getCustomAttributes();
-		 * 
+		 *
 		 * NodeKnowledge nk = kt.getNodeKnowledge(person);
-		 * 
+		 *
 		 * ((MapKnowledgeDB)nk).readFromDB();
-		 * 
+		 *
 		 * SubNetwork subNetwork = snc.createSubNetwork(nk);
-		 * 
+		 *
 		 * ((MapKnowledgeDB)nk).clearLocalKnowledge();
-		 * 
+		 *
 		 * // log.info("Nodes: " + subNetwork.getNodes().size() + ", Links: " +
 		 * subNetwork.getLinks().size());
-		 * 
+		 *
 		 * customAttributes.put("SubNetwork", subNetwork); i++; if (i % 1000 ==
 		 * 0) log.info("Subnetworks: " + i); //
 		 * customAttributes.put("SubNetwork", new SubNetwork(this.network)); }
@@ -731,7 +730,7 @@ public class EventControler extends Controler {
 		 * for (Person person : this.getPopulation().getPersons().values()) {
 		 * boolean replanning =
 		 * (Boolean)person.getCustomAttributes().get("initialReplanning");
-		 * 
+		 *
 		 * if (replanning) { KnowledgePlansCalcRoute replanner =
 		 * (KnowledgePlansCalcRoute)replanners.get(1);
 		 * replanner.setPerson(person); replanner.run(person.getSelectedPlan());
@@ -791,7 +790,7 @@ public class EventControler extends Controler {
 		MyStrategyManagerConfigLoader.load(this, this.config, manager);
 		return manager;
 	}
-	
+
 	@Override
 	protected void shutdown(final boolean unexpected) {
 		if (calcWardrop) {

@@ -47,23 +47,19 @@ import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.replanning.TravelTimeCollector;
-import playground.christoph.replanning.TravelTimeEstimator;
-import playground.christoph.replanning.TravelTimeEstimatorHandlerAndListener;
 import playground.christoph.router.KnowledgePlansCalcRoute;
-import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import playground.christoph.router.costcalculators.SystemOptimalTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 
 /**
  * This Controler should give an Example what is needed to run
  * Simulations with WithinDayReplanning.
- * 
+ *
  * The Path to a Config File is needed as Argument to run the
  * Simulation.
- * 
+ *
  * By default "test/scenarios/berlin/config.xml" should work.
- * 
+ *
  * @author Christoph Dobler
  */
 
@@ -89,10 +85,10 @@ public class WithinDayControler extends Controler {
 	protected int leaveLinkReplanningCounter = 0;
 
 	/*
-	 * How many parallel Threads shall do the Replanning. 
+	 * How many parallel Threads shall do the Replanning.
 	 */
 	protected int numReplanningThreads = 8;
-	
+
 	protected TravelTime travelTime;
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelActEndReplanner parallelActEndReplanner;
@@ -102,7 +98,7 @@ public class WithinDayControler extends Controler {
 	protected ReplanningManager replanningManager;
 	protected ReplanningQueueSimulation sim;
 	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
-	
+
 	private static final Logger log = Logger.getLogger(WithinDayControler.class);
 
 	public WithinDayControler(String[] args)
@@ -132,16 +128,16 @@ public class WithinDayControler extends Controler {
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 	}
-	
+
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
 	 */
 	protected void initReplanningRouter() {
 		replanners = new ArrayList<PlanAlgorithm>();
-		
+
 		/*
-		 * Calculate the TravelTime based on the actual load of the links. Use only 
+		 * Calculate the TravelTime based on the actual load of the links. Use only
 		 * the TravelTime to find the LeastCostPath.
 		 */
 //		travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
@@ -150,21 +146,21 @@ public class WithinDayControler extends Controler {
 //		foqsl.addQueueSimulationInitializedListener(linkVehiclesCounter);	// for KnowledgeTravelTimeCalculator
 //		foqsl.addQueueSimulationAfterSimStepListener(linkVehiclesCounter);	// for KnowledgeTravelTimeCalculator
 //		this.events.addHandler(linkVehiclesCounter);	// for KnowledgeTravelTimeCalculator
-		
+
 //		TravelTimeEstimatorHandlerAndListener handlerAndListener = new TravelTimeEstimatorHandlerAndListener(population, network, 60, 86400 * 2);
 //		travelTime = new TravelTimeEstimator(handlerAndListener);
 //		foqsl.addQueueSimulationInitializedListener((TravelTimeEstimatorHandlerAndListener)handlerAndListener); // for TravelTimeEstimator
 //		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeEstimatorHandlerAndListener)handlerAndListener);	// for TravelTimeEstimator
 //		this.events.addHandler((TravelTimeEstimatorHandlerAndListener)handlerAndListener);	// for TravelTimeEstimator
-		
+
 		travelTime = new TravelTimeCollector(network);
 		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-		
+
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 //		SystemOptimalTravelCostCalculator travelCost = new SystemOptimalTravelCostCalculator(travelTime);
-			
+
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
 		replanners.add(dijkstraRouter);
 	}
@@ -173,20 +169,20 @@ public class WithinDayControler extends Controler {
 	 * Hands over the ArrayList to the ParallelReplannerModules
 	 */
 	protected void initParallelReplanningModules()
-	{	
+	{
 		this.parallelInitialReplanner = new ParallelInitialReplanner();
 		this.parallelInitialReplanner.setNumberOfThreads(numReplanningThreads);
 		this.parallelInitialReplanner.setReplannerArrayList(replanners);
 		this.parallelInitialReplanner.createReplannerArray();
 		this.parallelInitialReplanner.init();
-		
+
 		this.parallelActEndReplanner = new ParallelActEndReplanner();
 		this.parallelActEndReplanner.setNumberOfThreads(numReplanningThreads);
 		this.parallelActEndReplanner.setReplannerArrayList(replanners);
 		this.parallelActEndReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
 		this.parallelActEndReplanner.init();
 
-		this.parallelLeaveLinkReplanner = new ParallelLeaveLinkReplanner();
+		this.parallelLeaveLinkReplanner = new ParallelLeaveLinkReplanner(network);
 		this.parallelLeaveLinkReplanner.setNumberOfThreads(numReplanningThreads);
 		this.parallelLeaveLinkReplanner.setReplannerArrayList(replanners);
 		this.parallelLeaveLinkReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
@@ -196,7 +192,7 @@ public class WithinDayControler extends Controler {
 	/*
 	 * Creates the Handler and Listener Object so that they can be handed over to the Within Day
 	 * Replanning Modules (TravelCostWrapper, etc).
-	 * 
+	 *
 	 * The full initialization of them is done later (we don't have all necessary Objects yet).
 	 */
 	protected void createHandlersAndListeners()
@@ -205,22 +201,22 @@ public class WithinDayControler extends Controler {
 		linkReplanningMap = new LinkReplanningMap();
 		replanningManager = new ReplanningManager();
 	}
-	
+
 	@Override
-	protected void runMobSim() 
+	protected void runMobSim()
 	{
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
-		
+
 		createHandlersAndListeners();
-				
+
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
-		 */	
+		 */
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
-		
+
 		sim.addQueueSimulationListeners(foqsl);
-		
+
 		// fully initialize & add LinkReplanningMap
 		linkReplanningMap.setQueueNetwork(sim.getQueueNetwork());
 		this.events.addHandler(linkReplanningMap);
@@ -238,14 +234,14 @@ public class WithinDayControler extends Controler {
 		setReplanners();
 
 		log.info("do initial Replanning");
-		doInitialReplanning();	
-				
+		doInitialReplanning();
+
 		ActEndReplanningModule actEndReplanning = new ActEndReplanningModule(parallelActEndReplanner, sim);
 		LeaveLinkReplanningModule leaveLinkReplanning = new LeaveLinkReplanningModule(parallelLeaveLinkReplanner, linkReplanningMap);
-		
+
 		replanningManager.setActEndReplanningModule(actEndReplanning);
 		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
-				
+
 		sim.run();
 	}
 
@@ -268,16 +264,16 @@ public class WithinDayControler extends Controler {
 
 			double probability;
 			boolean noReplanning = true;
-			
+
 			probability = MatsimRandom.getRandom().nextDouble();
 			if (probability > pInitialReplanning)customAttributes.put("initialReplanning", new Boolean(false));
-			else 
+			else
 			{
 				customAttributes.put("initialReplanning", new Boolean(true));
 				noReplanning = false;
 				initialReplanningCounter++;
 			}
-			
+
 			// No Replanning
 			probability = MatsimRandom.getRandom().nextDouble();
 			if (probability > pActEndReplanning) customAttributes.put("endActivityReplanning", new Boolean(false));
@@ -287,7 +283,7 @@ public class WithinDayControler extends Controler {
 				noReplanning = false;
 				actEndReplanningCounter++;
 			}
-				
+
 			// No Replanning
 			probability = MatsimRandom.getRandom().nextDouble();
 			if (probability > pLeaveLinkReplanning) customAttributes.put("leaveLinkReplanning", new Boolean(false));
@@ -296,11 +292,11 @@ public class WithinDayControler extends Controler {
 				customAttributes.put("leaveLinkReplanning", new Boolean(true));
 				noReplanning = false;
 				leaveLinkReplanningCounter++;
-			}	
-			
+			}
+
 			// if non of the Replanning Modules was activated
 			if (noReplanning) noReplanningCounter++;
-						
+
 			// (de)activate replanning if they are not needed
 			if (actEndReplanningCounter == 0) replanningManager.doActEndReplanning(false);
 			else replanningManager.doActEndReplanning(true);
@@ -321,12 +317,12 @@ public class WithinDayControler extends Controler {
 	}
 
 	/*
-	 * Assigns a replanner to every Person of the population. 
-	 * 
+	 * Assigns a replanner to every Person of the population.
+	 *
 	 * At the moment: Replanning Modules are assigned hard coded. Later: Modules
 	 * are assigned based on probabilities from config files.
 	 */
-	protected void setReplanners() 
+	protected void setReplanners()
 	{
 		for (Person p : this.getPopulation().getPersons().values()) {
 			Map<String, Object> customAttributes = p.getCustomAttributes();

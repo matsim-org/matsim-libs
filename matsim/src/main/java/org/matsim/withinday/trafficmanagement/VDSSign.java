@@ -103,7 +103,7 @@ public class VDSSign {
 	public void setupIteration(){
 		this.setupIteration(null);
 	}
-	
+
 	/**
 	 * Sets the time for the first guidance message generation.
 	 *
@@ -346,11 +346,11 @@ public class VDSSign {
 	}
 
 	/**
-	 * Returns the <code>directionLinks</code>
+	 * Returns the <code>directionLink</code>
 	 *
-	 * @return directionLinks
+	 * @return directionLink
 	 */
-	public Link getDirectionLinks() {
+	public Link getDirectionLink() {
 		return this.directionLink;
 	}
 

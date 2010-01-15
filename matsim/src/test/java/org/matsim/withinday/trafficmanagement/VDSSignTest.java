@@ -174,8 +174,8 @@ public class VDSSignTest extends MatsimTestCase {
 		assertEquals("nodes should be equal", sign.getSignLink().getToNode(), rl1.get(0));
 		assertEquals("nodes should be equal", sign.getSignLink().getToNode(), rl2.get(0));
 
-		assertEquals("nodes should be equal", sign.getDirectionLinks().getFromNode(), rl1.get(rl1.size() -1));
-		assertEquals("nodes should be equal", sign.getDirectionLinks().getFromNode(), rl2.get(rl2.size() -1));
+		assertEquals("nodes should be equal", sign.getDirectionLink().getFromNode(), rl1.get(rl1.size() -1));
+		assertEquals("nodes should be equal", sign.getDirectionLink().getFromNode(), rl2.get(rl2.size() -1));
 		for (int i = 1; i < rl1.size() -1; i++) {
 			assertEquals("nodes should be equal", this.route1.getNodes().get(i-1), rl1.get(i));
 			assertEquals("nodes should be equal", this.route2.getNodes().get(i-1), rl2.get(i));

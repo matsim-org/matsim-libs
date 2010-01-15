@@ -31,6 +31,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider;
@@ -188,18 +189,18 @@ public class CoopersRouteProviderTest extends MatsimTestCase {
 	  //check routing
 	  NetworkRouteWRefs r = provider.requestRoute(linkNo1, this.network.getLinks().get(new IdImpl("7")), SimulationTimer.getTime());
 //	  System.out.println("Route is: " + LogRouteUtils.getNodeRoute(r));
-		for (int i = 0; i < r.getNodes().size(); i++) {
-			assertEquals(providerRouteNodes.get(i), r.getNodes().get(i));
+	  List<Node> nodes = RouteUtils.getNodes(r, this.network);
+		for (int i = 0; i < nodes.size(); i++) {
+			assertEquals(providerRouteNodes.get(i), nodes.get(i));
 		}
 
 	  r = provider.requestRoute(linkNo1, this.network.getLinks().get(new IdImpl("8")), SimulationTimer.getTime());
 	  providerRouteNodes.add(this.network.getNodes().get(new IdImpl("5")));
-//	  System.out.println("Route is: " + LogRouteUtils.getNodeRoute(r));
-		for (int i = 0; i < r.getNodes().size(); i++) {
-			assertEquals(providerRouteNodes.get(i), r.getNodes().get(i));
+
+	  nodes = RouteUtils.getNodes(r, this.network);
+		for (int i = 0; i < nodes.size(); i++) {
+			assertEquals(providerRouteNodes.get(i), nodes.get(i));
 		}
 	}
-
-
 
 }

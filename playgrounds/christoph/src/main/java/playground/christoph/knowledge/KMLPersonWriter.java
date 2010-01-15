@@ -50,6 +50,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
@@ -58,7 +59,7 @@ import org.matsim.vis.kml.NetworkFeatureFactory;
 public class KMLPersonWriter {
 
 	private static final Logger log = Logger.getLogger(KMLPersonWriter.class);
-	
+
 	protected String netFileName;
 	protected String kmzFileName;
 	protected String outputDirectory;
@@ -68,19 +69,19 @@ public class KMLPersonWriter {
 	protected NetworkImpl network;
 	protected Map<Id, Node> nodes;
 	protected NetworkRouteWRefs route;
-	
+
 	protected boolean writeKnownNodes = true;
 	protected boolean writeActivityLinks = true;
 	protected boolean writeRouteNodes = true;
 	protected boolean writeNetwork = false;
-	
+
 	private MatsimKmlStyleFactory styleFactory;
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	private StyleType networkLinkStyle;
 	private NetworkFeatureFactory networkFeatureFactory;
 	private StyleType networkNodeStyle;
 	private CoordinateTransformation coordinateTransform = new IdentityTransformation();
-	
+
 	public KMLPersonWriter(NetworkImpl network, PersonImpl person)
 	{
 //		kmzFileName = "D:/Master_Thesis_HLI/Workspace/TestNetz/test.kmz";
@@ -88,15 +89,15 @@ public class KMLPersonWriter {
 		setPerson(person);
 		getKnownNodes();
 	}
-	
+
 	public KMLPersonWriter()
 	{
 	}
-	
-	public void writeFile() 
-	{	
+
+	public void writeFile()
+	{
 		String outputFile;
-		
+
 		if (kmzFileName == null || kmzFileName.equals(""))
 		{
 			outputFile = outputDirectory + "/" + this.person.getId() + ".kmz";
@@ -105,9 +106,9 @@ public class KMLPersonWriter {
 		{
 			outputFile = outputDirectory + "/" + kmzFileName;
 		}
-		
+
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
-			
+
 		// create main file and document
 		KmlType mainKml = kmlObjectFactory.createKmlType();
 		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
@@ -119,13 +120,13 @@ public class KMLPersonWriter {
 		mainFolder.setId("2dnetworklinksfolder");
 		mainFolder.setName("Matsim Data");
 		mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(mainFolder));
-		
+
 		// create the writer
 		KMZWriter writer = new KMZWriter(outputFile);
-		
+
 		this.styleFactory = new MatsimKmlStyleFactory(writer, mainDoc);
 		this.networkFeatureFactory = new NetworkFeatureFactory(coordinateTransform, network);
-		
+
 		try
 		{
 			// add the MATSim Logo to the kml
@@ -139,7 +140,7 @@ public class KMLPersonWriter {
 				FolderType networkFolder = netWriter.getNetworkFolder();
 				mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networkFolder));
 			}
-			
+
 			// add the Person's Activity Room to the kml
 			if (writeKnownNodes)
 			{
@@ -147,9 +148,9 @@ public class KMLPersonWriter {
 				if (nodesFolder != null)
 				{
 					mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(nodesFolder));
-				}				
+				}
 			}
-			
+
 			// add the Person's Route to the kml
 			if (writeRouteNodes)
 			{
@@ -157,9 +158,9 @@ public class KMLPersonWriter {
 				if (routeFolder != null)
 				{
 					mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(routeFolder));
-				}							
+				}
 			}
-			
+
 			// add the Person's Activity Links to the kml
 			if (writeActivityLinks)
 			{
@@ -167,11 +168,11 @@ public class KMLPersonWriter {
 				if (activityFolder != null)
 				{
 					mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(activityFolder));
-				}							
+				}
 			}
-			
-		} 
-		catch (IOException e) 
+
+		}
+		catch (IOException e)
 		{
 			Gbl.errorMsg("Cannot create kmz or logo because of: " + e.getMessage());
 			e.printStackTrace();
@@ -179,21 +180,21 @@ public class KMLPersonWriter {
 		writer.writeMainKml(mainKml);
 		writer.close();
 	}
-	
+
 	/*
 	 * adapted from KmlNetworkWriter.getNetworkFolder()
 	 */
 	private FolderType getNodesFolder() throws IOException {
-		
+
 		if (nodes == null) return null;
-		
+
 		FolderType folder = this.kmlObjectFactory.createFolderType();
-		
+
 		//folder.setName("MATSIM Network: " + this.network.getName());
 		folder.setName("Activity Room of Person " + this.person.getId());
 		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
 		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
-		
+
 		FolderType nodeFolder = kmlObjectFactory.createFolderType();
 		nodeFolder.setName("Activity Room");
 
@@ -201,35 +202,35 @@ public class KMLPersonWriter {
 		for (Node node : this.nodes.values())
 		{
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(node, this.networkNodeStyle);
-			if (abstractFeature.getClass().equals(PlacemarkType.class)) 
+			if (abstractFeature.getClass().equals(PlacemarkType.class))
 			{
 				nodeFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
-			} 
-			else 
+			}
+			else
 			{
 				log.warn("Not yet implemented: Adding node KML features of type " + abstractFeature.getClass());
 			}
-			
+
 		}	// for (Node node : nodes.values())
 		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(nodeFolder));
-		
-		return folder;		
+
+		return folder;
 	}
-	
+
 	/*
 	 * adapted from KmlNetworkWriter.getNetworkFolder()
 	 */
 	private FolderType getRouteNodesFolder() throws IOException {
-		
+
 		if (routeNodes == null) return null;
-		
+
 		FolderType folder = this.kmlObjectFactory.createFolderType();
-		
+
 		//folder.setName("MATSIM Network: " + this.network.getName());
 		folder.setName("Route of Person " + this.person.getId());
 		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
 		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
-		
+
 		FolderType nodeFolder = kmlObjectFactory.createFolderType();
 		nodeFolder.setName("Route");
 
@@ -237,29 +238,29 @@ public class KMLPersonWriter {
 		for (Node node : routeNodes)
 		{
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(node, this.networkNodeStyle);
-			if (abstractFeature.getClass().equals(PlacemarkType.class)) 
+			if (abstractFeature.getClass().equals(PlacemarkType.class))
 			{
 				nodeFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
-			} 
-			else 
+			}
+			else
 			{
 				log.warn("Not yet implemented: Adding node KML features of type " + abstractFeature.getClass());
-			}	
+			}
 		}	// for (Node  node : route.getRoute())
 		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(nodeFolder));
-		
-		return folder;		
+
+		return folder;
 	}
-	
+
 	/*
 	 * adapted from KmlNetworkWriter.getNetworkFolder()
 	 */
 	private FolderType getActivityLinksFolder() throws IOException {
-		
+
 		if (routeNodes == null) return null;
-		
+
 		FolderType folder = this.kmlObjectFactory.createFolderType();
-		
+
 		//folder.setName("MATSIM Network: " + this.network.getName());
 		folder.setName("Activity Links of Person " + this.person.getId());
 		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
@@ -268,27 +269,27 @@ public class KMLPersonWriter {
 		FolderType linkFolder = kmlObjectFactory.createFolderType();
 		linkFolder.setName("Activity Links");
 //		linkFolder.addStyle(this.networkLinkStyle);
-		for (Link link : activityLinks) 
+		for (Link link : activityLinks)
 		{
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLinkFeature(link, this.networkLinkStyle);
-			if (abstractFeature.getClass().equals(PlacemarkType.class)) 
+			if (abstractFeature.getClass().equals(PlacemarkType.class))
 			{
 				linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
-			} 
-			else 
+			}
+			else
 			{
 				log.warn("Not yet implemented: Adding node KML features of type " + abstractFeature.getClass());
 			}
 		}
 		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(linkFolder));
-		
-		return folder;		
+
+		return folder;
 	}
-	
+
 	private void createRouteNodes()
 	{
 		this.routeNodes = new ArrayList<Node>();
-		
+
 		if (this.person != null)
 		{
 			Plan selectedPlan = this.person.getSelectedPlan();
@@ -297,11 +298,11 @@ public class KMLPersonWriter {
 				for (PlanElement pe : selectedPlan.getPlanElements()) {
 					if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
-						
+
 						if (leg.getRoute() instanceof NetworkRouteWRefs)
 						{
 							NetworkRouteWRefs route = (NetworkRouteWRefs)leg.getRoute();
-							for(Node node : route.getNodes())
+							for(Node node : RouteUtils.getNodes(route, this.network))
 							{
 								routeNodes.add(node);
 							}
@@ -312,16 +313,16 @@ public class KMLPersonWriter {
 						}
 					}
 				}
-								
+
 			}
-			
+
 		}
 	}
-	
+
 	private void createActivityLinks()
 	{
 		this.activityLinks = new ArrayList<Link>();
-		
+
 		if (this.person != null)
 		{
 			Plan selectedPlan = this.person.getSelectedPlan();
@@ -333,53 +334,53 @@ public class KMLPersonWriter {
 						activityLinks.add(network.getLinks().get(act.getLinkId()));
 					}
 				}
-								
+
 			}
-			
+
 		}
 	}
-	
+
 	private void getKnownNodes() // TODO bad naming: method is called get*, but doesn't return anything
-	{ 
+	{
 		if(this.person != null)
 		{
 //			Knowledge knowledge = this.person.getKnowledge();
-//		
+//
 //			if (knowledge != null)
 //			{
 				Map<String,Object> customAttributes = person.getCustomAttributes();
-				
+
 				if (customAttributes != null)
 				{
 					if (customAttributes.containsKey("Nodes"))
 					{
 						nodes = (Map<Id, Node>)customAttributes.get("Nodes");
-						
+
 					}	// if (customAttributes.containsKey("Nodes");
 					else nodes = null;
-					
+
 				}	// if (customAttributes != null)
 				else nodes = null;
-				
+
 //			}	// if (knowledge  != null)
 //			else nodes = null;
-			
+
 		}	// if (this.person != null)
 		else nodes = null;
-		
+
 	}	// getKnownNodes()
-	
-	
-	
+
+
+
 	/*
 	 * Getters & Setters
 	 */
-	
+
 	public void writeKnownNodes(boolean value)
 	{
 		this.writeKnownNodes = value;
 	}
-	
+
 	public void writeRouteNodes(boolean value)
 	{
 		this.writeRouteNodes = value;
@@ -389,93 +390,93 @@ public class KMLPersonWriter {
 	{
 		this.writeActivityLinks = value;
 	}
-	
+
 	public void writeNetwork(boolean value)
 	{
 		this.writeNetwork = value;
 	}
-	
+
 	public void setNetwork(NetworkImpl network)
 	{
 		this.network = network;
 	}
-	
+
 	public void loadNetwork(String netFileName)
 	{
 		this.network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 	}
-	
+
 	public void setCoordinateTransformation(CoordinateTransformation coordinateTransform)
 	{
 		this.coordinateTransform = coordinateTransform;
 	}
-	
+
 	public CoordinateTransformation getCoordinateTransformation()
 	{
 		return this.coordinateTransform;
 	}
-	
+
 	public void setOutputDirectory(String directory)
 	{
 		this.outputDirectory = directory;
 	}
-	
+
 	public String getOutputDirectory()
 	{
 		return this.outputDirectory;
 	}
-	
+
 	public void setPerson(PersonImpl person)
 	{
 		this.person = person;
-		
-		if (person != null) 
+
+		if (person != null)
 		{
 			createRouteNodes();
 			createActivityLinks();
 		}
-		else 
+		else
 		{
 			routeNodes = null;
 			activityLinks = null;
 		}
 	}
-	
+
 	public PersonImpl getPerson()
 	{
 		return this.person;
 	}
-	
+
 	public void setKmzFileName(String name)
 	{
 		kmzFileName = name;
 	}
-	
+
 	public String getKmzFileName()
 	{
 		return this.kmzFileName;
 	}
-	
-		
+
+
 /*
 	public static void main(String[] args) {
 		final String netFilename = "D:/Master_Thesis_HLI/Workspace/TestNetz/network.xml";
 		final String kmzFilename = "test.kmz";
-		final String outputDirectory = "D:/Master_Thesis_HLI/Workspace/TestNetz"; 
+		final String outputDirectory = "D:/Master_Thesis_HLI/Workspace/TestNetz";
 
 		Gbl.createConfig(null);
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(netFilename);
-	
+
 		KMLPersonWriter test = new KMLPersonWriter();
-				
+
 		test.setKmzFileName(kmzFilename);
 		test.setOutputDirectory(outputDirectory);
 		test.setNetwork(network);
 
 		test.writeFile();
-		
+
 		log.info("Done!");
 	}
 */

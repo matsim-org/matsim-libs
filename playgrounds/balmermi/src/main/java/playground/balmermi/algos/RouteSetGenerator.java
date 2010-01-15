@@ -41,6 +41,7 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.misc.RouteUtils;
 
 public class RouteSetGenerator {
 
@@ -82,10 +83,10 @@ public class RouteSetGenerator {
 	}
 
 	private boolean containsRoute(NetworkRouteWRefs route, LinkedList<NetworkRouteWRefs> routes) {
-		List<Node> nodes = route.getNodes();
+		List<Node> nodes = RouteUtils.getNodes(route, this.network);
 		Iterator<NetworkRouteWRefs> r_it = routes.iterator();
 		while (r_it.hasNext()) {
-			List<Node> ns = r_it.next().getNodes();
+			List<Node> ns = RouteUtils.getNodes(r_it.next(), this.network);
 			if (ns.size() == nodes.size()) {
 				boolean is_equal = true;
 				for (int i=0; i<ns.size(); i++) {
@@ -132,12 +133,12 @@ public class RouteSetGenerator {
 				route.setNodes(path.links.get(0),path.nodes,path.links.get(path.links.size()-1));
 			}
 
-			//first check if route is local route (i.e. contains only local road links) 
+			//first check if route is local route (i.e. contains only local road links)
 			//if so, add it to the list of local route (unless already included)
 			//else add it to the list of non local routes (unless already included)
 			//Also, create the link sets for the next level (d+1) of the tree for the current link set
 
-			if(route != null) {	
+			if(route != null) {
 
 				boolean newLinkSet = false;
 				if (this.isLocalRoute(route) && !this.containsRoute(route, localRoutes)) {
@@ -149,8 +150,8 @@ public class RouteSetGenerator {
 				}
 
 				// for each link of the calc route create a new link set with the
-				// other links of the current link set				
-				if (newLinkSet) {					
+				// other links of the current link set
+				if (newLinkSet) {
 
 					for (Id linkId : route.getLinkIds()) {
 						Id[] new_ls = new Id[ls.length+1];
@@ -170,7 +171,7 @@ public class RouteSetGenerator {
 
 		System.out.println("---  end a level of the tree  ---");
 		// go to the next level (d+1) of the tree, if not already enough routes are found
-		if (((nonLocalRoutes.size() < k) || ((localRoutes.size()< l) && (nonLocalRoutes.size() < k*3))) && !new_linkIds.isEmpty()) { 
+		if (((nonLocalRoutes.size() < k) || ((localRoutes.size()< l) && (nonLocalRoutes.size() < k*3))) && !new_linkIds.isEmpty()) {
 			this.calcRouteOnSubNet(o,d,k,l,time,new_linkIds,nonLocalRoutes,localRoutes);
 		}
 	}
@@ -194,7 +195,7 @@ public class RouteSetGenerator {
 		for (Link link : path.links) {
 			Id[] lls = new Id[1];
 			lls[0] = link.getId();
-			links.add(lls);	
+			links.add(lls);
 		}
 		// creating a route set with the minimum of k*var_factor routes
 		this.calcRouteOnSubNet(o,d,Math.round(k*var_factor*(1-localRoute_factor)), Math.round(k*var_factor*localRoute_factor),time,links,nonLocalRoutes, localRoutes);
@@ -202,17 +203,17 @@ public class RouteSetGenerator {
 		System.out.println("--- Number of created routes = " + routes.size() + " ---");
 		System.out.println("--- Randomly removing routes until " + k + " routes left... ---");
 		// Remove randomly some routes from the localRoutes until it contains k*(localRouteFactor) elements
-		while (k*localRoute_factor < localRoutes.size()) { 
+		while (k*localRoute_factor < localRoutes.size()) {
 			localRoutes.remove(MatsimRandom.getRandom().nextInt(localRoutes.size()));
 		}
 		// Remove randomly some routes from the nonLocalRoutes until it contains k*(1-localRouteFactor)-1 elements
-		while (k*(1-localRoute_factor)-1 < nonLocalRoutes.size()) { 
+		while (k*(1-localRoute_factor)-1 < nonLocalRoutes.size()) {
 			nonLocalRoutes.remove(MatsimRandom.getRandom().nextInt(nonLocalRoutes.size()));
 		}
 		// add the least cost path at the beginning of the route
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(path.links.get(0),path.links.get(path.links.size()-1));
 		route.setNodes(path.links.get(0), path.nodes, path.links.get(path.links.size()-1));
-		routes.addFirst(route);	
+		routes.addFirst(route);
 
 		// joining the resulting routes in one linked list which is returned by the algorithm
 

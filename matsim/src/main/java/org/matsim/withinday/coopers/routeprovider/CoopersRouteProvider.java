@@ -58,7 +58,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 	public boolean providesRoute(final Id currentLinkId, final NetworkRouteWRefs subRoute) {
 		for (VDSSign s : this.signs) {
 			log.trace("signLink: " + s.getSignLink().getId() + " currentLInk: " + currentLinkId);
-			if (s.getSignLink().getId().equals(currentLinkId) && containsLink(subRoute, s.getDirectionLinks())) {
+			if (s.getSignLink().getId().equals(currentLinkId) && containsLink(subRoute, s.getDirectionLink())) {
 				this.currentRoute = s.requestRoute();
 				if (this.currentRoute == null) {
 					log.trace("Sign is currently switched off!");

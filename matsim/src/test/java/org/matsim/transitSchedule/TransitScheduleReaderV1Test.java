@@ -767,7 +767,6 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(link2.getId(), netRoute.getStartLinkId());
 		assertEquals(link2.getId(), netRoute.getEndLinkId());
 		assertEquals(0, netRoute.getLinkIds().size());
-		assertEquals(0, netRoute.getNodes().size());
 	}
 
 	public void testRouteProfileRoute_TwoLinks() {
@@ -828,8 +827,6 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(link3.getId(), netRoute.getStartLinkId());
 		assertEquals(link4.getId(), netRoute.getEndLinkId());
 		assertEquals(0, netRoute.getLinkIds().size());
-		assertEquals(1, netRoute.getNodes().size());
-		assertEquals(node4, netRoute.getNodes().get(0));
 	}
 
 	public void testRouteProfileRoute_MoreLinks() {
@@ -896,10 +893,6 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(2, netRoute.getLinkIds().size());
 		assertEquals(link2.getId(), netRoute.getLinkIds().get(0));
 		assertEquals(link3.getId(), netRoute.getLinkIds().get(1));
-		assertEquals(3, netRoute.getNodes().size());
-		assertEquals(node2, netRoute.getNodes().get(0));
-		assertEquals(node3, netRoute.getNodes().get(1));
-		assertEquals(node4, netRoute.getNodes().get(2));
 	}
 
 	public void testDepartures_Single() {
