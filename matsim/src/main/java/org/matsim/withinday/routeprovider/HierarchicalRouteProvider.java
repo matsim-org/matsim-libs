@@ -47,7 +47,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	private List<RouteProvider> providers;
 
 	private RouteProviderComparator comparator;
-	
+
 	private final Network network;
 
 	public HierarchicalRouteProvider(final AStarLandmarksRouteProvider aStarProvider, final Network network) {
@@ -58,15 +58,16 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	}
 
 	@Override
-	public NetworkRouteWRefs requestRoute(Link departureLink, final Link destinationLink, final double time) {
+	public NetworkRouteWRefs requestRoute(final Link departureLink, final Link destinationLink, final double time) {
 		NetworkRouteWRefs subRoute;
 		NetworkRouteWRefs returnRoute = (NetworkRouteWRefs) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(TransportMode.car, departureLink, destinationLink);
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
+		Link tmpDepLink = departureLink;
 		for (RouteProvider rp : this.providers) {
 			if (log.isTraceEnabled()) {
 				log.trace("Used RouteProvider class: " + rp.getClass());
 			}
-			subRoute = rp.requestRoute(departureLink, destinationLink, time);
+			subRoute = rp.requestRoute(tmpDepLink, destinationLink, time);
 			//in the first iteration of the loop we have to add all nodes
 			if (routeNodes.isEmpty()) {
 				routeNodes.addAll(subRoute.getNodes());
@@ -80,7 +81,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 				return returnRoute;
 			}
 			List<Link> returnRouteLinks = NetworkUtils.getLinks(this.network, returnRoute.getLinkIds());
-			departureLink = returnRouteLinks.get(returnRouteLinks.size()-1);
+			tmpDepLink = returnRouteLinks.get(returnRouteLinks.size()-1);
 		}
 		return null;
 	}
