@@ -21,6 +21,7 @@ package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -41,6 +42,7 @@ public class DenverStarter {
 		
 		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(configFile);
 		Scenario sc = scl.loadScenario();
+		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		EventsManagerImpl e = new EventsManagerImpl();
 		
 		DgOnTheFlyQueueSimQuad sim = new DgOnTheFlyQueueSimQuad(sc, e);

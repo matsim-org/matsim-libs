@@ -21,6 +21,7 @@ package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.vis.otfvis.OTFVisQueueSim;
@@ -50,6 +51,7 @@ public class FourWaysVis {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().network().setInputFile(netFile);
 		scenario.getConfig().plans().setInputFile(popFile);
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
 		scenario.getConfig().getQSimConfigGroup().setStuckTime(100.0);
 		
@@ -58,7 +60,7 @@ public class FourWaysVis {
 		
 		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
 		scenario.getConfig().signalSystems().setSignalSystemConfigFile(signalConfigFile);
-		scenario.getConfig().scenario().setUseSignalSystems(true);
+//		scenario.getConfig().scenario().setUseSignalSystems(true);
 		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
