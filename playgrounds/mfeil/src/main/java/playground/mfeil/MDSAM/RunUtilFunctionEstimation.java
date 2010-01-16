@@ -42,9 +42,9 @@ public class RunUtilFunctionEstimation {
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
-		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans0944.dat";
+		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans0949.dat";
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model0944.mod";
+		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model0949.mod";
 		
 /*		final String populationFilename = "./plans/output_plans.xml";
 		final String networkFilename = "./plans/network.xml";
@@ -63,7 +63,7 @@ public class RunUtilFunctionEstimation {
 		String gender 			= "yes";
 		String age 				= "no";
 		String income	 		= "no";
-		String license 			= "yes";
+		String license 			= "no";
 		String carAvail 		= "no";
 		String seasonTicket 	= "no";
 		String travelDistance	= "no"; 
@@ -71,6 +71,7 @@ public class RunUtilFunctionEstimation {
 		String travelConstant 	= "yes";
 		String beta_travel		= "no";
 		String bikeIn			= "yes";
+		String munType			= "yes";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
@@ -88,7 +89,7 @@ public class RunUtilFunctionEstimation {
 		//pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
 		//		similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, employed, license, carAvail, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn);
 		pc.writePlansForBiogemeWithRandomSelectionAccumulated(outputFileBiogeme, attributesInputFile, 
-				beta, gamma, similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, income, license, carAvail, seasonTicket, travelDistance, travelCost, travelConstant, beta_travel, bikeIn);
+				beta, gamma, similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, income, license, carAvail, seasonTicket, travelDistance, travelCost, travelConstant, beta_travel, bikeIn, munType);
 		pc.writeModFileWithRandomSelection(outputFileMod);
 		log.info("Process finished.");
 	}

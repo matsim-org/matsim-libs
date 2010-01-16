@@ -86,7 +86,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
-	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, income, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn, beta, gamma, beta_travel;
+	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, income, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn, beta, gamma, beta_travel, munType; 
 	protected double travelCostCar, costPtNothing, costPtHalbtax, costPtGA;
 
 
@@ -189,11 +189,11 @@ public class PlansConstructor implements PlanStrategyModule{
 
 	// Type of writing the Biogeme file
 		//	this.writePlansForBiogeme(this.outputFileBiogeme);
-		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile,
-		//		this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);
-		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile,
-				this.beta, this.gamma, this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.income, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.beta_travel, this.bikeIn);
-
+		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
+		//		this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
+		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile, 
+				this.beta, this.gamma, this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.income, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.beta_travel, this.bikeIn, this.munType);	
+		
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
 		//	this.writeModFileWithSequence(this.outputFileMod);
@@ -1075,7 +1075,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			String travelCost,
 			String travelConstant,
 			String beta_travel,
-			String bikeIn){
+			String bikeIn,
+			String munType){
 
 		log.info("Writing plans for Biogeme...");
 
@@ -1099,6 +1100,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.travelConstant=travelConstant;
 		this.beta_travel=beta_travel;
 		this.bikeIn=bikeIn;
+		this.munType=munType;
 
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
@@ -1149,12 +1151,16 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			incomeAverage=incomeAverage/counterIncome;
 		}
-		if (age.equals("yes")) {
+	/*	if (age.equals("yes")) {
 			stream.print("Age_0_15\t");
 			stream.print("Age_16_30\t");
 			stream.print("Age_31_60\t");
 			stream.print("Age_61\t");
 			counterFirst+=4;
+		}*/
+		if (age.equals("yes")) {
+			stream.print("Age\t"); 
+			counterFirst++;
 		}
 		if (gender.equals("yes")) {
 			stream.print("Female\t");
@@ -1174,6 +1180,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		if (seasonTicket.equals("yes")) {
 			stream.print("SeasonTicket\t");
+			counterFirst++;
+		}
+		if (munType.equals("yes")) {
+			stream.print("MunType\t"); 
 			counterFirst++;
 		}
 
@@ -1327,12 +1337,16 @@ public class PlansConstructor implements PlanStrategyModule{
 				stream.print(((double)(aaa.getIncome().get(person.getId()))/(double)(incomeAverage))+"\t");
 				counterRow++;
 			}
-			if (age.equals("yes")) {
+	/*		if (age.equals("yes")) {
 				if (person.getAge()<=15) stream.print(1+"\t"+0+"\t"+0+"\t"+0+"\t");
 				else if (person.getAge()<=30) stream.print(0+"\t"+1+"\t"+0+"\t"+0+"\t");
 				else if (person.getAge()<=60) stream.print(0+"\t"+0+"\t"+1+"\t"+0+"\t");
 				else stream.print(0+"\t"+0+"\t"+0+"\t"+1+"\t");
 				counterRow+=4;
+			}*/
+			if (age.equals("yes")) {
+				stream.print(person.getAge()+"\t"); 
+				counterRow++;
 			}
 			if (gender.equals("yes")) {
 				if (person.getSex().equals("f")) stream.print(1+"\t");
@@ -1361,8 +1375,12 @@ public class PlansConstructor implements PlanStrategyModule{
 				stream.print(aaa.getSeasonTicket().get(person.getId())+"\t");
 				counterRow++;
 			}
-
-			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise
+			if (munType.equals("yes")) {
+				stream.print(aaa.getMunType().get(person.getId())+"\t"); 
+				counterRow++;
+			}
+			
+			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
 			int counterFound = 0;
 			for (int i=0;i<this.actChains.size();i++){
 				boolean found = false;
@@ -1858,7 +1876,8 @@ public class PlansConstructor implements PlanStrategyModule{
 				this.travelCost,
 				this.travelConstant,
 				this.beta_travel,
-				this.bikeIn);
+				this.bikeIn,
+				this.munType);
 	}
 
 
