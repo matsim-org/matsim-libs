@@ -74,8 +74,8 @@ public class IncomeAttacher {
 		final String populationInput = "/home/baug/mfeil/data/Zurich10/plans.xml";
 		final String haushalte = "/home/baug/mfeil/data/Zurich10/Haushalte.txt";
 		final String zielpersonen = "/home/baug/mfeil/data/Zurich10/Zielpersonen.txt";
-		final String agentsIncome = "/home/baug/mfeil/data/Zurich10/agents_income.txt";
-		final String munStatsOutput = "/home/baug/mfeil/data/Zurich10/mun_stats.txt";
+		final String agentsIncome = "/home/baug/mfeil/data/Zurich10/agents_income_neu.txt";
+		final String munStatsOutput = "/home/baug/mfeil/data/Zurich10/mun_stats_neu.txt";
 
 
 		/*
@@ -114,10 +114,17 @@ public class IncomeAttacher {
 		this.scenario = scenario;
 	}
 
-
-	private void run (String municipalityIncome,
-			String agentsEducation,
-			String haushalte,
+	
+	/** 
+	 * Method that reads/calculates all necessary input data (agents' municipality and education, and income per education) 
+	 * @param municipalityIncome
+	 * @param agentsEducation
+	 * @param haushalte
+	 * @param zielpersonen
+	 */
+	private void run (String municipalityIncome, 
+			String agentsEducation, 
+			String haushalte, 
 			String zielpersonen){
 
 		log.info("  reading municipality income information... ");
@@ -179,7 +186,6 @@ public class IncomeAttacher {
 				}
 				this.agentsMuns.put(person.getId(), munAtts.get(position));
 				this.incomePerMunicipality.put(person.getId(), this.municipalities.getMunicipality(munAtts.get(position)).getIncome());
-
 			}
 			else if (munAtts.size()== 0){
 				noListing++;
@@ -213,7 +219,7 @@ public class IncomeAttacher {
 			e.printStackTrace();
 			return;
 		}
-		stream.println("Agent_Id\tMunicipality_Id\tMunicipality_income\tIncome_Education\tMun_factor\tAdjusted_income\tIncome");
+		stream.println("Agent_Id\tMunicipality_Id\tMunicipalityType\tMunicipality_income\tIncome_Education\tMun_factor\tAdjusted_income\tIncome");
 		Random random = new Random();
 
 		this.muns = new HashMap<Id, double[]>(); // {count, income of agents according to education, differenceToMove}
@@ -272,9 +278,9 @@ public class IncomeAttacher {
 			double eduIncome = Double.parseDouble(person.getCustomAttributes().get("income").toString());
 			person.getCustomAttributes().clear();
 			person.getCustomAttributes().put("income", income);
-			stream.println(person.getId()+"\t"+this.agentsMuns.get(person.getId())+"\t"+this.incomePerMunicipality.get(person.getId())+"\t"+eduIncome+"\t"+muns.get(this.agentsMuns.get(person.getId()))[2]+"\t"+incomeAdjusted+"\t"+income);
+			stream.println(person.getId()+"\t"+this.agentsMuns.get(person.getId())+"\t"+this.municipalities.getMunicipality(this.agentsMuns.get(person.getId())).getRegType()+"\t"+this.incomePerMunicipality.get(person.getId())+"\t"+eduIncome+"\t"+muns.get(this.agentsMuns.get(person.getId()))[2]+"\t"+incomeAdjusted+"\t"+income);
 		}
-		stream.println("\t\t\t\t"+(munScaling/172598)+"\t"+(adjIncome/172598)+"\t"+(finIncome/172598));
+		stream.println("\t\t\t\t\t"+(munScaling/172598)+"\t"+(adjIncome/172598)+"\t"+(finIncome/172598));
 		log.info("   done.");
 	}
 

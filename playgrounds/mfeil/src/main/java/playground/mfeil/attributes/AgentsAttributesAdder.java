@@ -51,6 +51,7 @@ public class AgentsAttributesAdder {
 	private Map<Id, Integer> carAvail;
 	private Map<Id, Integer> seasonTicket;	
 	private Map<Id, Double> agentsWeight;
+	private Map<Id, Integer> munType;
 	
 
 
@@ -59,6 +60,7 @@ public class AgentsAttributesAdder {
 		this.carAvail = new TreeMap<Id, Integer>();
 		this.seasonTicket = new TreeMap<Id, Integer>();
 		this.agentsWeight = new TreeMap<Id, Double> ();
+		this.munType = new TreeMap<Id, Integer> ();
 	}
 	
 	public static void main (String[]args){
@@ -105,7 +107,8 @@ public class AgentsAttributesAdder {
 	}
 	
 	
-	/** Reads agents' attributes for the selected Ids of readPlans() from the MobTSet_1 file
+	/** Reads agents' attributes for the selected Ids of readPlans() from the MobTSet_1 file so that further 
+	 * analysis can be conducted manually from the resulting excel file 
 	 * @param inputFile
 	 * @param outputFile
 	 * @param ids
@@ -385,7 +388,7 @@ public class AgentsAttributesAdder {
 		return probabilities;
 	}	
 	
-	/** Reads the agent attributes from MobTSet_1 as requested by PlansConstructor
+	/** Reads the agent attributes from attributs_MZ2005.txt (from PlansConstructor) as requested by PlansConstructor
 	 * @param inputFile
 	 */
 	public void runMZ (final String inputFile){
@@ -421,6 +424,9 @@ public class AgentsAttributesAdder {
 				
 				token = tokenizer.nextToken();				
 				this.agentsWeight.put(new IdImpl(tokenId), Double.parseDouble(token));
+				
+				token = tokenizer.nextToken();				
+				this.munType.put(new IdImpl(tokenId), Integer.parseInt(token));
 				
 				line = br.readLine();
 			}		
@@ -479,9 +485,13 @@ public class AgentsAttributesAdder {
 				tokenId = tokenizer.nextToken();
 				
 				// Watch out that the order is equal to the order in the file!
-				for (int i=0;i<5;i++) tokenizer.nextToken(); // jump over irrelevant information
+				tokenizer.nextToken(); // jump over irrelevant information
 				token = tokenizer.nextToken();		
-				income.put(new IdImpl(tokenId), Double.parseDouble(token));
+				this.munType.put(new IdImpl(tokenId), Integer.parseInt(token));
+				
+				for (int i=0;i<4;i++) tokenizer.nextToken(); // jump over irrelevant information
+				token = tokenizer.nextToken();		
+				this.income.put(new IdImpl(tokenId), Double.parseDouble(token));
 				
 				line = br.readLine();
 			}		
@@ -503,6 +513,9 @@ public class AgentsAttributesAdder {
 	
 	public Map<Id, Integer> getSeasonTicket (){
 		return this.seasonTicket;
+	}
+	public Map<Id, Integer> getMunType (){
+		return this.munType;
 	}
 }
 
