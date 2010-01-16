@@ -454,6 +454,11 @@ public class AgentsAttributesAdder {
 			} catch (Exception e) {
 				log.warn("No income information found for agent "+person.getId());
 			}
+			try{
+				person.getCustomAttributes().put("munType", this.getMunType().get(person.getId()));
+			} catch (Exception e) {
+				log.warn("No munType information found for agent "+person.getId());
+			}
 		}	
 		log.info("   ... done.");
 	}
