@@ -76,7 +76,7 @@ public class ExpBetaPlanSelector_Probs extends ExpBetaPlanSelector {
 
 		System.out.print(ExpBetaPlanSelector_Probs.class.getName() + "\t"
 				+ DebugTools.getLineNumber(new Exception()) + "\tperson\t"
-				+ person.getId() + "probs:\t");
+				+ person.getId() + "\tprobs:\t");
 		for (int i = 0; i < weights.length; i++)
 			System.out.print(weights[i] / sumWeights + "\t");
 		System.out.println();
