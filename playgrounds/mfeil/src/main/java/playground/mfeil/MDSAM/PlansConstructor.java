@@ -1179,12 +1179,18 @@ public class PlansConstructor implements PlanStrategyModule{
 			counterFirst+=3;
 		}
 		if (seasonTicket.equals("yes")) {
-			stream.print("SeasonTicket\t");
-			counterFirst++;
+			stream.print("SeasonTicket_1\t");
+			stream.print("SeasonTicket_2\t");
+			stream.print("SeasonTicket_3\t");
+			counterFirst+=3;
 		}
 		if (munType.equals("yes")) {
-			stream.print("MunType\t"); 
-			counterFirst++;
+			stream.print("MunType_1\t"); 
+			stream.print("MunType_2\t"); 
+			stream.print("MunType_3\t"); 
+			stream.print("MunType_4\t"); 
+			stream.print("MunType_5\t"); 
+			counterFirst+=5;
 		}
 
 		for (int i = 0;i<this.actChains.size();i++){
@@ -1372,12 +1378,22 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterRow+=3;
 			}
 			if (seasonTicket.equals("yes")) {
-				stream.print(aaa.getSeasonTicket().get(person.getId())+"\t");
-				counterRow++;
+				int st = aaa.getSeasonTicket().get(person.getId());				
+				if (st==1) stream.print(1+"\t"+0+"\t"+0+"\t");
+				else if (st==2) stream.print(0+"\t"+1+"\t"+0+"\t");
+				else if (st==3) stream.print(0+"\t"+0+"\t"+1+"\t");
+				else log.warn("Unidentified seasonTicket "+st+" for person "+person.getId());
+				counterRow+=3;
 			}
 			if (munType.equals("yes")) {
-				stream.print(aaa.getMunType().get(person.getId())+"\t"); 
-				counterRow++;
+				int mt = aaa.getMunType().get(person.getId());				
+				if (mt==1) stream.print(1+"\t"+0+"\t"+0+"\t"+0+"\t"+0+"\t");
+				else if (mt==2) stream.print(0+"\t"+1+"\t"+0+"\t"+0+"\t"+0+"\t");
+				else if (mt==3) stream.print(0+"\t"+0+"\t"+1+"\t"+0+"\t"+0+"\t");
+				else if (mt==4) stream.print(0+"\t"+0+"\t"+0+"\t"+1+"\t"+0+"\t");
+				else if (mt==5) stream.print(0+"\t"+0+"\t"+0+"\t"+0+"\t"+1+"\t");
+				else log.warn("Unidentified munType "+mt+" for person "+person.getId());
+				counterRow+=5;
 			}
 			
 			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
