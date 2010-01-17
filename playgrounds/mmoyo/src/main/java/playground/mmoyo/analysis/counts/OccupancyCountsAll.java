@@ -5,7 +5,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 /**Counts occupancy for routed plans with parameterized router*/
-public class OccupancyCounts_900s_small {
+public class OccupancyCountsAll {
 
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
 		String transitLineStrId = "BVB----344";

@@ -35,7 +35,7 @@ public class PlanRouter {
 		new PTLegIntoPlanConverter().run(scenario);
 
 		PlansCalcRoute router= null;
-		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory();
+		String routedPlansFile = "../playgrounds/mmoyo/output";
 
 		/**route plans*/
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
