@@ -45,6 +45,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 
 
+
 /**
  * @author Matthias Feil
  * Includes also the optimization of the distance coefficients
@@ -70,6 +71,7 @@ public class RecyclingModule implements PlanStrategyModule{
 	
 	private final int iterations, noOfAssignmentAgents, noOfSoftCoefficients;
 	private final DistanceCoefficients 				coefficients;
+	private ArrayList<double[]> 					tabuList;
 	private final String primActsDistance, homeLocationDistance, sex, age, license, car_avail, employed; 
 	private final ArrayList<String> 				softCoef; 
 	private final ArrayList<String> 				allCoef; 
@@ -100,7 +102,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.age 					= "yes";
 		this.license 				= "no";
 		this.car_avail 				= "no";
-		this.employed 				= "no";
+		this.employed 				= "yes";
 		this.softCoef 				= this.detectSoftCoefficients();
 		this.allCoef 				= this.detectAllCoefficients();
 		this.noOfSoftCoefficients	= this.softCoef.size();
@@ -274,143 +276,148 @@ public class RecyclingModule implements PlanStrategyModule{
 	private void detectCoefficients (){
 		
 		/* Initialization */
+		this.tabuList = new ArrayList<double[]>();
 		double offset = 0.5;
-		double coefMatrix [][] = new double [this.iterations+1][this.noOfSoftCoefficients];	// first solution is base solution, then 'this.iterations' iterations
-		for (int i=0;i<coefMatrix[0].length;i++){
-			double aux = this.coefficients.getSingleCoef(i);
-			coefMatrix[0][i] = aux;
-		}
-		double score [] = new double [this.iterations+1];
+		double coefSet [] = new double [this.noOfSoftCoefficients];	// set for calculation input
+		double coefIterBase [] = new double [this.noOfSoftCoefficients];	// set that is static in iteration
+		double coefIterBest [] = new double [this.noOfSoftCoefficients];	// set with iteration's best coefficients
+		double coefBest [] = new double [this.noOfSoftCoefficients];	// set with best coefficients
+		double scoreIter;
+		double scoreBest;
 		double scoreAux, coefAux;
-		int [] modified = new int [this.noOfSoftCoefficients-1]; // last coefficient fixed
+		int [] modified = new int [this.noOfSoftCoefficients]; // last coefficient fixed
+		for (int z=0;z<modified.length;z++){
+			modified[z]=0;
+		}
 		int modifiedAux;
 		
 		/* Iteration 0 */
-		score [0]= this.calculate();		// calculate score for initial vector
-		
-		score[0]=this.rescheduleNonassigedAgents();		
-		/*this.schedulingModule.prepareReplanning();
-		Iterator<String> naa = this.nonassignedAgents.iterator();
-		while (naa.hasNext()) {
-			String st = naa.next();
-			for (int x=0;x<this.list[1].size();x++){
-				if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
-					schedulingModule.handlePlan(list[1].get(x));
-					this.list1Pointer.add(x);
-					break;
-				}
-			}
+		scoreIter = this.calculate();		// calculate score of initial set
+		scoreIter = this.rescheduleNonassigedAgents();		// in case some agents were not assignable
+		scoreBest = scoreIter;	
+		for (int z=0;z<coefSet.length;z++){
+			coefAux = this.coefficients.getSingleCoef(z);  // set previous iteration's coef
+			System.out.println(coefAux);
+			coefIterBase[z] = coefAux;
+			coefSet[z] = coefAux;
 		}
-		schedulingModule.finishReplanning();	
-		java.util.Collections.sort(this.list1Pointer);
-		for (int x=list1Pointer.size()-1;x>=0;x--){
-			this.list[0].add(this.list[1].get(list1Pointer.get(x)));
-			//this.list[1].remove(list1Pointer.get(x));
-			this.agents.addAgent((this.list[0].get(this.list[0].size()-1)));
-			
-		}
-		if (this.nonassignedAgents.size()>0){
-			this.nonassignedAgents.clear();
-			score [0]= this.calculate();// Do this again, now all agents must be assignable.
-			if (this.nonassignedAgents.size()>0) log.warn("Something went wrong when optimizing the non-assigned agents of the metric detection phase!");
-		}*/
-		
-		for (int i=1;i<this.iterations+1;i++) score[i]=-100000;	// set all other iterations' scores to minimum value
 	
 		/* Further iterations */
 		for (int i=1;i<this.iterations+1;i++){
 			log.info("Metric detection: iteration "+i);
+			scoreIter = -Double.MAX_VALUE;
 			
-			for (int z=1;z<coefMatrix[0].length;z++){
-				coefMatrix[i][z]=coefMatrix[i-1][z];
+			System.out.print("coefIterBase:");
+			for (int z=0;z<coefSet.length;z++){
+				System.out.print(coefIterBase[z]+" ");
 			}
-			for (int j=0;j<this.noOfSoftCoefficients-1;j++){
-				modifiedAux = modified[j];
-				
+			System.out.println();
+			System.out.print("modified:");
+			for (int z=0;z<coefSet.length;z++){
+				System.out.print(modified[z]+" ");
+			}
+			System.out.println();
+			for (int z=0;z<coefSet.length;z++){
+				coefAux = coefIterBase[z]; // increase coef by offset
+				coefSet[z] = coefAux;
+			}
+			
+			for (int j=0;j<this.noOfSoftCoefficients-1;j++){ // last coef fixed
+				modifiedAux = modified[j];				
 				modified[j]=0;
-				coefMatrix [i][j] = coefMatrix [i-1][j];
-				if (modifiedAux!=-1){
-					coefMatrix [i][j] = coefMatrix [i-1][j]+offset;
-					coefMatrix [i][j] = this.checkTabuList(coefMatrix, i, j, offset);					
-					this.coefficients.setSingleCoef(coefMatrix[i][j], j);
+		
+				if (modifiedAux!=-1){ // if not decreased by offset in previous iteration
+					coefAux = coefIterBase[j] + offset; // increase coef by offset
+					coefSet[j] = coefAux;
+					log.info("Increase: vor tabu "+j+" = "+coefSet[j]);
+					this.checkTabuList(coefSet, j, offset, false);	
+					log.info("Increase: nach tabu "+j+" = "+coefSet[j]);
+					this.coefficients.setSingleCoef(coefSet[j], j);
 					scoreAux = this.calculate();
-					if (scoreAux>score[i]) {
-						score[i] = scoreAux;
-						modified [j] = 1; // 1 means "increased by offset";
+					if (scoreAux>scoreIter) {
+						scoreIter = scoreAux;
 						for (int x=0;x<j;x++){
 							modified [x]=0;	// set back the former index;
-							coefMatrix[i][x]=coefMatrix[i-1][x]; // set back the coef itself;
+						}
+						modified [j] = 1; // 1 means "increased by offset";
+						for (int x=0;x<modified.length;x++){
+							coefAux = coefSet[x];// set back the coef itself;
+							coefIterBest[x] = coefAux;
 						}
 					}
-					else {
-						coefMatrix [i][j] = coefMatrix [i-1][j];
-					}
+					coefAux = coefIterBase[j];
+					coefSet[j] = coefAux;
 				}
 				
 				if (modifiedAux!=1){
-					coefAux = coefMatrix [i][j];	// keep coef solution temporarily;
-					
-					if (coefMatrix [i-1][j]-offset>=0){
-						coefMatrix [i][j] = coefMatrix [i-1][j]-offset;
-						coefMatrix [i][j] = this.checkTabuList(coefMatrix, i, j, offset);	
-						this.coefficients.setSingleCoef(coefMatrix[i][j], j);
+					if (coefIterBase[j] - offset>=0){
+						coefSet[j] = coefIterBase[j] - offset;
+						log.info("Decrease: vor tabu "+j+" = "+coefSet[j]);
+						this.checkTabuList(coefSet, j, offset, true);	
+						log.info("Decrease: nach tabu "+j+" = "+coefSet[j]);
+						this.coefficients.setSingleCoef(coefSet[j], j);
 						scoreAux = this.calculate();
-						if (scoreAux>score[i]) {
-							score[i] = scoreAux;
-							if (modified [j] == 1) modified [j] = -1; // -1 means "decreased by offset";
-							else {
-								for (int x=0;x<j;x++){
-									modified [x]=0;	// set back to former index;
-									coefMatrix[i][x]=coefMatrix[i-1][x]; // set back the coef itself;
-								}
-								modified [j] = -1;
+						if (scoreAux>scoreIter) {
+							scoreIter = scoreAux;
+							
+							// check whether coef has been really decreased, or eventually increased by method checkTabuList() 
+							int movement = 0;
+							if (coefSet[j]>coefIterBase[j]) movement = 1;
+							else if (coefSet[j]<coefIterBase[j]) movement = -1;
+							else log.warn("coef chosen but neither bigger or smaller than in previous iterations. This may not happen!");
+							for (int x=0;x<j;x++){
+								modified [x]=0;	// set back the former index;
+							}
+							modified [j] = movement; // 1 means "increased by offset";
+							for (int x=0;x<modified.length;x++){
+								coefAux = coefSet[x];// set back the coef itself;
+								coefIterBest[x] = coefAux;
 							}
 						}
-						else {
-							coefMatrix [i][j] = coefAux; // set back to former value;
-						}
+						coefAux = coefIterBase[j];
+						coefSet[j] = coefAux;
 					}
 					else {
-						coefMatrix [i][j] = coefMatrix [i-1][j]+2*offset;
-						coefMatrix [i][j] = this.checkTabuList(coefMatrix, i, j, offset);	
-						this.coefficients.setSingleCoef(coefMatrix[i][j], j);
+						coefSet[j] = coefIterBase[j] + 2*offset;
+						log.info("Decrease->Increase: vor tabu "+j+" = "+coefSet[j]);
+						this.checkTabuList(coefSet, j, offset, false);	
+						log.info("Decrease->Increase: nach tabu "+j+" = "+coefSet[j]);
+						this.coefficients.setSingleCoef(coefSet[j], j);
 						scoreAux = this.calculate();
-						if (scoreAux>score[i]) {
-							score[i] = scoreAux;
-							if (modified [j] != 1) {
-								for (int x=0;x<j;x++){
-									modified [x]=0;	// set back to former index;
-									coefMatrix[i][x]=coefMatrix[i-1][x]; // set back the coef itself;
-								}
-								modified [j] = 1;
+						if (scoreAux>scoreIter) {
+							scoreIter = scoreAux;
+							for (int x=0;x<j;x++){
+								modified [x]=0;	// set back the former index;
 							}
-						}
-						else {
-							coefMatrix [i][j] = coefAux; // set back to former value;
+							modified [j] = 1; // 1 means "increased by offset";
+							for (int x=0;x<modified.length;x++){
+								coefAux = coefSet[x];// set back the coef itself;
+								coefIterBest[x] = coefAux;
+							}
 						}
 					}
 				}
 			}
-		}
-		
-		for (int i=0;i<score.length;i++){
-			for (int j=0;j<coefMatrix[0].length-1;j++){
-				log.info(coefMatrix[i][j]+" ");
+			if (scoreIter>scoreBest){
+				scoreBest = scoreIter;
+				for (int x=0;x<coefIterBest.length;x++){
+					coefAux = coefIterBest[x];// set back the coef itself;
+					coefBest[x] = coefAux;
+				}
 			}
-			log.info(this.coefficients.getSingleCoef(coefMatrix[0].length-1)+" "+score[i]);
-		}
-		
-		
-		double tmpScoreFinal = -100000;
-		for (int i=0;i<this.iterations+1;i++){
-			if (score[i]>tmpScoreFinal){
-				tmpScoreFinal = score[i];
-				this.coefficients.setCoef(coefMatrix[i]);
-				for (int j=0;j<this.noOfSoftCoefficients;j++) log.info(softCoef.get(j)+" = "+this.coefficients.getCoef()[j]);
-				log.info("Score = "+tmpScoreFinal);
-				log.info("");
+			for (int s=0;s<coefIterBest.length;s++){
+				log.info("Chosen coef set "+s+" = "+coefIterBest[s]);
+				coefAux = coefIterBest[s];  // set previous iteration's coef
+				coefIterBase[s] = coefAux;
 			}
+			log.info("Iteration's score = "+scoreIter);
 		}
+			
+
+		this.coefficients.setCoef(coefBest);
+		for (int j=0;j<this.noOfSoftCoefficients;j++) log.info(softCoef.get(j)+" = "+this.coefficients.getCoef()[j]);
+		log.info("Score = "+scoreBest);
+		log.info("");
 	}
 	
 	private double calculate (){
@@ -506,19 +513,62 @@ public class RecyclingModule implements PlanStrategyModule{
 	}
 	
 	
-	private double checkTabuList (double [][] coefMatrix, int i, int j, double offset){
-		OuterLoop:
-		for (int x=0;x<i;x++){
-			for (int y=0;y<coefMatrix[i].length-1;y++){
-				if (coefMatrix[x][y]!=coefMatrix[i][y]) continue OuterLoop;
+	private void checkTabuList (double [] coefMatrix, int j, double offset, boolean decrease){
+		boolean modified = false;
+		ArrayList<Double> takenNumbers = new ArrayList<Double>();
+		do {
+			modified = false;
+			OuterLoop:
+			for (int x=0;x<this.tabuList.size();x++){
+				System.out.print("tabuList "+x+" ");
+				for (int y=0;y<coefMatrix.length;y++){
+					System.out.print(this.tabuList.get(x)[y]+" ");
+				}
+				System.out.println();
+				System.out.print("coefMatrix "+x+" ");
+				for (int y=0;y<coefMatrix.length;y++){
+					System.out.print(coefMatrix[y]+" ");
+				}
+				System.out.println();
+				for (int y=0;y<coefMatrix.length-1;y++){
+					if (this.tabuList.get(x)[y]!=coefMatrix[y]) continue OuterLoop;
+				}
+				// coef set already in tabuList
+		//		log.warn("tabuList: coef set already tested!");
+		//		for (int s=0;s<this.tabuList.get(x).length;s++){
+		//			log.warn("tabuList "+s+" = "+this.tabuList.get(x)[s]);
+		//		}
+				modified = true;
+				if (decrease) {
+					// decrease as long as >=0
+					if (coefMatrix[j]-offset>=0) {
+						double aux = coefMatrix[j];
+						takenNumbers.add(aux);
+						coefMatrix[j]=coefMatrix[j]-offset;
+					}
+					// reaching <0 increase beyond start value
+					else {
+						if (takenNumbers.isEmpty()){
+							coefMatrix[j]=coefMatrix[j]+offset;
+						}
+						else {
+							java.util.Collections.sort(takenNumbers);
+							coefMatrix[j]=takenNumbers.get(takenNumbers.size()-1)+offset;
+						}
+					}
+				}
+				// increase is straight forward
+				else coefMatrix[j]=coefMatrix[j]+offset;
 			}
-			double coefAux = -1;
-			for (int z=0;z<i;z++){
-				if (coefMatrix[z][j]>coefAux)coefAux=coefMatrix[z][j];
-			}
-			return coefAux+offset;
+		} while (modified);
+		// write chosen coef set into tabuList
+		double[] tabu = new double[coefMatrix.length];
+		for (int y=0;y<coefMatrix.length;y++){
+			double aux = coefMatrix[y];
+		//	log.info("aux = "+aux);
+			tabu[y] = aux;
 		}
-		return coefMatrix[i][j];
+		this.tabuList.add(tabu);
 	}
 	
 	public OptimizedAgents getOptimizedAgents (){
