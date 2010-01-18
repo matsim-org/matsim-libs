@@ -297,7 +297,6 @@ public class RecyclingModule implements PlanStrategyModule{
 		scoreBest = scoreIter;	
 		for (int z=0;z<coefSet.length;z++){
 			coefAux = this.coefficients.getSingleCoef(z);  // set previous iteration's coef
-			System.out.println(coefAux);
 			coefIterBase[z] = coefAux;
 			coefSet[z] = coefAux;
 		}
@@ -307,7 +306,7 @@ public class RecyclingModule implements PlanStrategyModule{
 			log.info("Metric detection: iteration "+i);
 			scoreIter = -Double.MAX_VALUE;
 			
-			System.out.print("coefIterBase:");
+		/*	System.out.print("coefIterBase:");
 			for (int z=0;z<coefSet.length;z++){
 				System.out.print(coefIterBase[z]+" ");
 			}
@@ -317,8 +316,10 @@ public class RecyclingModule implements PlanStrategyModule{
 				System.out.print(modified[z]+" ");
 			}
 			System.out.println();
+		*/	
+			
 			for (int z=0;z<coefSet.length;z++){
-				coefAux = coefIterBase[z]; // increase coef by offset
+				coefAux = coefIterBase[z]; 
 				coefSet[z] = coefAux;
 			}
 			
@@ -329,9 +330,7 @@ public class RecyclingModule implements PlanStrategyModule{
 				if (modifiedAux!=-1){ // if not decreased by offset in previous iteration
 					coefAux = coefIterBase[j] + offset; // increase coef by offset
 					coefSet[j] = coefAux;
-					log.info("Increase: vor tabu "+j+" = "+coefSet[j]);
 					this.checkTabuList(coefSet, j, offset, false);	
-					log.info("Increase: nach tabu "+j+" = "+coefSet[j]);
 					this.coefficients.setSingleCoef(coefSet[j], j);
 					scoreAux = this.calculate();
 					if (scoreAux>scoreIter) {
@@ -352,9 +351,7 @@ public class RecyclingModule implements PlanStrategyModule{
 				if (modifiedAux!=1){
 					if (coefIterBase[j] - offset>=0){
 						coefSet[j] = coefIterBase[j] - offset;
-						log.info("Decrease: vor tabu "+j+" = "+coefSet[j]);
 						this.checkTabuList(coefSet, j, offset, true);	
-						log.info("Decrease: nach tabu "+j+" = "+coefSet[j]);
 						this.coefficients.setSingleCoef(coefSet[j], j);
 						scoreAux = this.calculate();
 						if (scoreAux>scoreIter) {
@@ -379,9 +376,7 @@ public class RecyclingModule implements PlanStrategyModule{
 					}
 					else {
 						coefSet[j] = coefIterBase[j] + 2*offset;
-						log.info("Decrease->Increase: vor tabu "+j+" = "+coefSet[j]);
 						this.checkTabuList(coefSet, j, offset, false);	
-						log.info("Decrease->Increase: nach tabu "+j+" = "+coefSet[j]);
 						this.coefficients.setSingleCoef(coefSet[j], j);
 						scoreAux = this.calculate();
 						if (scoreAux>scoreIter) {
@@ -415,6 +410,8 @@ public class RecyclingModule implements PlanStrategyModule{
 			
 
 		this.coefficients.setCoef(coefBest);
+		log.info("");
+		log.info("Final coefficients:");
 		for (int j=0;j<this.noOfSoftCoefficients;j++) log.info(softCoef.get(j)+" = "+this.coefficients.getCoef()[j]);
 		log.info("Score = "+scoreBest);
 		log.info("");
@@ -425,7 +422,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.assignmentModule.prepareReplanning();
 		for (int j=0;j<java.lang.Math.min(this.noOfAssignmentAgents, list[1].size());j++){
 			assignmentModule.handlePlan(list[1].get(j));
-			log.info("Calculating agent "+list[1].get(j).getPerson().getId());
+		//	log.info("Calculating agent "+list[1].get(j).getPerson().getId());
 		}
 		assignmentModule.finishReplanning();
 		for (int j=0;j<java.lang.Math.min(this.noOfAssignmentAgents, list[1].size());j++){
@@ -464,9 +461,9 @@ public class RecyclingModule implements PlanStrategyModule{
 				log.warn("Something went wrong when optimizing the non-assigned agents of the metric detection phase!");
 			}
 		}
-		log.info("list[0]:");
+		log.info("Agents to be optimized individually:");
 		for (int i=0;i<this.list[0].size();i++){
-			log.info("i: "+i+": "+list[0].get(i).getPerson().getId());
+			log.info("Agent "+(i+1)+": "+list[0].get(i).getPerson().getId());
 		}
 		
 		return score;
@@ -520,24 +517,9 @@ public class RecyclingModule implements PlanStrategyModule{
 			modified = false;
 			OuterLoop:
 			for (int x=0;x<this.tabuList.size();x++){
-				System.out.print("tabuList "+x+" ");
-				for (int y=0;y<coefMatrix.length;y++){
-					System.out.print(this.tabuList.get(x)[y]+" ");
-				}
-				System.out.println();
-				System.out.print("coefMatrix "+x+" ");
-				for (int y=0;y<coefMatrix.length;y++){
-					System.out.print(coefMatrix[y]+" ");
-				}
-				System.out.println();
 				for (int y=0;y<coefMatrix.length-1;y++){
 					if (this.tabuList.get(x)[y]!=coefMatrix[y]) continue OuterLoop;
 				}
-				// coef set already in tabuList
-		//		log.warn("tabuList: coef set already tested!");
-		//		for (int s=0;s<this.tabuList.get(x).length;s++){
-		//			log.warn("tabuList "+s+" = "+this.tabuList.get(x)[s]);
-		//		}
 				modified = true;
 				if (decrease) {
 					// decrease as long as >=0
