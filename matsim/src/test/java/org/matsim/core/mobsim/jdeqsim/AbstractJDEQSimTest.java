@@ -33,9 +33,23 @@ import org.matsim.testcases.MatsimTestCase;
 
 public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 
-	protected HashMap<Id, LinkedList<PersonEvent>> eventsByPerson = new HashMap<Id, LinkedList<PersonEvent>>();
-	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
+	protected HashMap<Id, LinkedList<PersonEvent>> eventsByPerson = null;
+	public LinkedList<PersonEvent> allEvents = null;
 
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		this.eventsByPerson = new HashMap<Id, LinkedList<PersonEvent>>();
+		this.allEvents = new LinkedList<PersonEvent>();
+	}
+	
+	@Override
+	protected void tearDown() throws Exception {
+		this.eventsByPerson = null;
+		this.allEvents = null;
+		super.tearDown();
+	}
+	
 
 	// if populationModifier == null, then the DummyPopulationModifier is used
 	// if planFilePath == null, then the plan specified in the config file is
