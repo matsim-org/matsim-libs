@@ -86,7 +86,8 @@ public class ZoneLayerSHPTest extends TestCase {
 		zones.add(zone);
 		ZoneLayer layer1 = new ZoneLayer(zones);
 		
-		String tmpfile = TestCaseUtils.getOutputDirectory() + "Zone.shp";
+//		String tmpfile = TestCaseUtils.getOutputDirectory() + "Zone.shp";
+		String tmpfile = "path/to/shapefile/once/this/test/works";
 		ZoneLayerSHP.write(layer1, tmpfile);
 		
 		ZoneLayer layer2 = ZoneLayerSHP.read(tmpfile);
