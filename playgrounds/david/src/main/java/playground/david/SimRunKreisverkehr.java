@@ -32,6 +32,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.netvis.NetVis;
 
 public class SimRunKreisverkehr {
@@ -58,7 +59,7 @@ public class SimRunKreisverkehr {
 		int cellcount2 = 0;
 		int count3 = 0;
 		for (LinkImpl link : network.getLinks().values()) {
-			double length = link.getLength()*link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+			double length = link.getLength()*NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, link);
 			cellcount += Math.ceil(length/7.5);
 			cellcount2 += link.getLength();
 		}

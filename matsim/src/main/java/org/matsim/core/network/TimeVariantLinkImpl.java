@@ -201,32 +201,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		int key = Arrays.binarySearch(this.aLanesTimes, time);
 		key = key >= 0 ? key : -key - 2;
 		return this.aLanesValues[key];
-		
 	}
-
-	/**
-	 * @param time - the time in seconds.
-	 * @return the number of lanes at time <tt>time</tt>.
-	 */
-	/*
-	 * I do not see any reason for this method! See above... joh 10may2008
-	 * this method is just for being backward compatible ... Might be we
-	 * could mark this method as deprecated [GL] - 13may2008   
-	 */
-	@Override
-	public synchronized int getLanesAsInt(final double time) {
-		
-		if ((this.aLanesTimes == null) || (this.aLanesTimes.length != this.aLanesEvents)) {
-			initLanesEventsArrays();
-		}
-		
-		int key = Arrays.binarySearch(this.aLanesTimes, time);
-		key = key >= 0 ? key : -key - 2;
-		return Math.round((float)Math.max(this.aLanesValues[key],1.0d));
-		
-	}
-
-	
 	
 	private void initFreespeedEventsArrays() {
 		

@@ -315,7 +315,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
 				agent.speed = speed;
-				int lane = 1 + (agent.intId % this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+				int lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, this.link));
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/,
 						lane, speed, PositionInfo.VehicleState.Driving,null);
@@ -327,7 +327,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			/* Put the vehicles from the waiting list in positions.
 			 * Their actual position doesn't matter, so they are just placed
 			 * to the coordinates of the from node */
-			int lane = this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
+			int lane = NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, this.link) + 1; // place them next to the link
 			for (EventAgent agent : this.waitingQueue) {
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, this.effectiveCellSize, lane, 0.0, PositionInfo.VehicleState.Parking,null);
@@ -337,7 +337,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			/* put the vehicles from the parking list in positions
 			 * their actual position doesn't matter, so they are just placed
 			 * to the coordinates of the from node */
-			lane = this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
+			lane = NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, this.link) + 2; // place them next to the link
 			for (EventAgent agent : this.parkingQueue) {
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, this.effectiveCellSize, lane, 0.0, PositionInfo.VehicleState.Parking,null);
