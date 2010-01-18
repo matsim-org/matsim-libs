@@ -24,10 +24,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.lanes.otfvis.OTFLanesConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
@@ -50,8 +48,7 @@ public class QSimSnapshotWriterManager {
   private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
   
   void createSnapshotwriter(QueueNetwork network, Scenario scenario, int snapshotPeriod, 
-      Integer iterationNumber, QSimConfigGroup qSimConfigGroup, 
-      ControlerIO controlerIO) {
+      Integer iterationNumber, ControlerIO controlerIO) {
     // A snapshot period of 0 or less indicates that there should be NO snapshot written
     if (snapshotPeriod > 0 ) {
       String snapshotFormat =  scenario.getConfig().getQSimConfigGroup().getSnapshotFormat();
@@ -87,13 +84,15 @@ public class QSimSnapshotWriterManager {
         OTFFileWriter writer = null;
 
         OTFConnectionManagerFactory connectionManagerFactory = new OTFFileWriterQSimConnectionManagerFactory();
-        if (scenario.getConfig().scenario().isUseLanes() && ! scenario.getConfig().scenario().isUseSignalSystems()) {
-          connectionManagerFactory = new OTFLanesConnectionManagerFactory(connectionManagerFactory);
-        }
+//        if (scenario.getConfig().scenario().isUseLanes() && (!scenario.getConfig().scenario().isUseSignalSystems())) {
+//          connectionManagerFactory = new OTFLanesConnectionManagerFactory(connectionManagerFactory);
+//        }
         writer = new OTFFileWriter(snapshotPeriod, new OTFQSimServerQuadBuilder(network), snapshotFile, connectionManagerFactory);
         this.snapshotWriters.add(writer);
       }
-    } else snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
+    } else {
+      snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
+    }
   }
   
   

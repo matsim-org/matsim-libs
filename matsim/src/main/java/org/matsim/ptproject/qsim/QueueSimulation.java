@@ -321,6 +321,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		if (firstAgent != null) {
 			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
 		}
+		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
 		this.infoTime = Math.floor(simStartTime / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
 		this.snapshotTime = Math.floor(simStartTime / this.snapshotPeriod) * this.snapshotPeriod;
 		SimulationTimer.setSimStartTime(simStartTime);
@@ -329,8 +330,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
 		this.snapshotManager = new QSimSnapshotWriterManager();
-		this.snapshotManager.createSnapshotwriter(this.network, this.scenario, this.snapshotPeriod, this.iterationNumber, 
-		    this.scenario.getConfig().getQSimConfigGroup(), this.controlerIO);
+		this.snapshotManager.createSnapshotwriter(this.network, this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
     if (this.snapshotTime < simStartTime) {
       this.snapshotTime += this.snapshotPeriod;
     }

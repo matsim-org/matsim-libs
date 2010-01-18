@@ -151,11 +151,15 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 	}
 	
 	public Collection<Class> getToEntries(Class srcClass) {
-		if (!isValidated) validate();
+		if (!isValidated) {
+		  validate();
+		}
 		
 		List<Class> classList = new LinkedList<Class>();
 		for(Entry entry : connections) {
-			if (entry.from.equals(srcClass)) classList.add(entry.to);
+			if (entry.from.equals(srcClass)) {
+			  classList.add(entry.to);
+			}
 		}
 		return classList;
 	}
