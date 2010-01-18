@@ -417,10 +417,15 @@ public class AgentsAttributesAdder {
 				this.income.put(new IdImpl(tokenId), Double.parseDouble(token)*1000);
 				
 				token = tokenizer.nextToken();				
-				this.carAvail.put(new IdImpl(tokenId), (int)(Double.parseDouble(token)));
+				this.carAvail.put(new IdImpl(tokenId), Integer.parseInt(token));
 				
 				token = tokenizer.nextToken();				
-				this.seasonTicket.put(new IdImpl(tokenId), (int)(Double.parseDouble(token)));
+				int in = Integer.parseInt(token);
+				int ticket = 0;
+				if (in==2 || in==3) ticket = 3;
+				else if (in==11) ticket = 1;
+				else ticket = 2;
+				this.seasonTicket.put(new IdImpl(tokenId), ticket);
 				
 				token = tokenizer.nextToken();				
 				this.agentsWeight.put(new IdImpl(tokenId), Double.parseDouble(token));
