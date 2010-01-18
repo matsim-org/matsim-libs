@@ -62,4 +62,8 @@ public class TransitQueueSimulation extends QueueSimulation {
 		queueSimulationFeature.setUseUmlaeufe(useUmlaeufe);
 	}
 	
+	public void setTransitStopHandlerFactory(TransitStopHandlerFactory stopHandlerFactory) {
+		queueSimulationFeature.setTransitStopHandlerFactory(stopHandlerFactory);
+	}
+	
 }
