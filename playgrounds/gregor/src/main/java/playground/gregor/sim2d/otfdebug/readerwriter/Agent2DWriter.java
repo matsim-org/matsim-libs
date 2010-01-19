@@ -8,8 +8,7 @@ import java.util.Collection;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 public class Agent2DWriter extends OTFDataWriter{
 
@@ -17,7 +16,7 @@ public class Agent2DWriter extends OTFDataWriter{
 	 * 
 	 */
 	private static final long serialVersionUID = -3182614793084430910L;
-	public transient Collection<ExtendedPositionInfo> positions = new ArrayList<ExtendedPositionInfo>();
+	public transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 
 	@Override
 	public void writeConstData(ByteBuffer out) throws IOException {
@@ -26,7 +25,7 @@ public class Agent2DWriter extends OTFDataWriter{
 	}
 
 	
-	public void writeAgent(PositionInfo pos, ByteBuffer out) {
+	public void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
 		String id = pos.getId().toString();
 		ByteBufferUtils.putString(out, id);
 		out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
@@ -38,12 +37,12 @@ public class Agent2DWriter extends OTFDataWriter{
 	public void writeDynData(ByteBuffer out) throws IOException {
 		// Write additional agent data
 		if (this.src instanceof ArrayList) {
-			this.positions = (Collection<ExtendedPositionInfo>) this.src;
+			this.positions = (Collection<AgentSnapshotInfo>) this.src;
 		}
 		
 		out.putInt(this.positions.size());
 
-		for (PositionInfo pos : this.positions) {
+		for (AgentSnapshotInfo pos : this.positions) {
 			writeAgent(pos, out);
 		}
 		this.positions.clear();

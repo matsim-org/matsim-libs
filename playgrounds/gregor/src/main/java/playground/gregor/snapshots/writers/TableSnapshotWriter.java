@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 
 public class TableSnapshotWriter {
@@ -27,7 +27,7 @@ public class TableSnapshotWriter {
 		}
 	}
 
-	public void addVehicle(double time, PositionInfo pos) throws IOException {
+	public void addVehicle(double time, AgentSnapshotInfo pos) throws IOException {
 		StringBuffer buff = new StringBuffer();
 		buff.append(time);
 		buff.append("\t");

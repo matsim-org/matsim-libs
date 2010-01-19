@@ -60,9 +60,9 @@ import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 import playground.gregor.otf.readerwriter.InundationDataFromBinaryFileReader;
 
@@ -220,7 +220,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 private Map<String, ArrayList<Tuple<Integer,Double>>> occMap = null;
 
 
-	public void addVehicle(final double time, final ExtendedPositionInfo position) {
+	public void addVehicle(final double time, final AgentSnapshotInfo position) {
 		this.cntPositions++;
 
 		// Init lastTime with first occurence of time!

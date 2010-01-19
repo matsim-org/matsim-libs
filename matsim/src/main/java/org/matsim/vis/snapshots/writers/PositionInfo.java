@@ -65,16 +65,16 @@ public class PositionInfo implements AgentSnapshotInfo {
 	private double elevation;
 	private double azimuth;
 	final private double distanceOnLink;
-	final private String visualizerData;
+//	final private String visualizerData;
 
-	final private double speed;
+	private double speed;
 
-	final private AgentState vehicleState;
+	private AgentState vehicleState;
 	final private Link link;
 
-	protected int type = 0;
+	private int type = 0;
 
-	protected int user = 0;
+	private int user = 0;
 
 	/**Uses PositionInfo to generate a position for facilities.  This looks like an abuse of PositionInfo only because it was 
 	 * made quite vehicle-oriented over the last years.
@@ -98,15 +98,19 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * 		Lanes are counted from the middle of a bi-directional link, beginning with 1.
 	 * @param speed The speed the agent is traveling with.
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
-	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
+	 * @param visualizerData additional data (null allowed) that may be used by some visualizers.  Ignored.
 	 */
-	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState, final String visualizerData) {
+	@Deprecated // in my view, use shorter constructors.  kai, jan'10
+	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState, final String ignored ) {
+		this( agentId, link, distanceOnLink, lane ) ;
+		this.speed = speed;
+		this.vehicleState = vehicleState;
+//		this.visualizerData = visualizerData;
+	}
+	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane ) {
 		this.agentId = agentId;
 		this.link = link;
-		this.speed = speed;
 		this.distanceOnLink = distanceOnLink;
-		this.vehicleState = vehicleState;
-		this.visualizerData = visualizerData;
 		this.calculatePosition(1.0, lane);
 	}
 	
@@ -116,7 +120,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 *
 	 * @param agentId The id of the agent.
 	 * @param link The link the vehicle is currently driving or parking on.
-	 * @param distanceOnLink The distance of the agent from the fromNode of the link (measured on the link's real length, not its euklidean length)
+	 * @param distanceOnLink The distance of the agent from the fromNode of the link (measured on the link's real length, not its Euklidean length)
 	 * @param lane The number of the lane the agent is on.
 	 * 		Lanes are counted from the middle of a bi-directional link, beginning with 1.
 	 * @param speed The speed the agent is traveling with.
@@ -129,7 +133,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.speed = speed;
 		this.distanceOnLink = distanceOnLink;
 		this.vehicleState = vehicleState;
-		this.visualizerData = visualizerData;
+//		this.visualizerData = visualizerData;
 		this.calculatePosition(linkScale, lane);
 	}
 	
@@ -155,7 +159,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.speed = speed;
 		this.vehicleState = vehicleState;
 		this.distanceOnLink = 0.0; // is unknown
-		this.visualizerData = visualizerData;
+//		this.visualizerData = visualizerData;
 	}
 
 	
@@ -217,9 +221,15 @@ public class PositionInfo implements AgentSnapshotInfo {
 	public double getSpeed() {
 		return this.speed;
 	}
+	public void setSpeed( double spd ) {
+		this.speed = spd ;
+	}
 
 	public AgentState getAgentState(){
 		return this.vehicleState;
+	}
+	public void setAgentState( AgentState state ) {
+		this.vehicleState = state ;
 	}
 
 	@Deprecated // yyyyyy not from here
@@ -236,9 +246,16 @@ public class PositionInfo implements AgentSnapshotInfo {
 	public int getType() {
 		return this.type;
 	}
+	@Deprecated // yyyy I don't know what this is.  kai, jan'10
+	public void setType( int tmp ) {
+		this.type = tmp ;
+	}
 	
 	public int getUserDefined() {
 		return this.user;
+	}
+	public void setUserDefined( int tmp ) {
+		this.user = tmp ;
 	}
 
 //	public String getVisualizerData() {

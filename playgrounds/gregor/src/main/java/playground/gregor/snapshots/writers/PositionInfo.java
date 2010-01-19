@@ -183,14 +183,14 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 		
 	}
 
-	public void setType(int type) {
-		this.type  = type;
-		
-	}
+//	public void setType(int type) {
+//		this.type  = type;
+//		
+//	}
 
-	public int getType() {
-		return this.type;
-	}
+//	public int getType() {
+//		return this.type;
+//	}
 	
 	public void setUserData(int usr) {
 		this.usr = usr;

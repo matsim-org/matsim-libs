@@ -91,6 +91,8 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 						String elevation = result[13];
 						String azimuth = result[14];
 						//String type = result[7];
+//						ExtendedPositionInfo position = new ExtendedPositionInfo(new IdImpl(agent), easting, northing,
+//								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 						ExtendedPositionInfo position = new ExtendedPositionInfo(new IdImpl(agent), easting, northing,
 								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 						addVehicle(Double.parseDouble(time), position);

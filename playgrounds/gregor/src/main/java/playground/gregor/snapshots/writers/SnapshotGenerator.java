@@ -49,6 +49,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 import playground.gregor.snapshots.postprocessors.PostProcessorI;
 
@@ -166,7 +167,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			for (PostProcessorI pp : this.colorizers){
 				pp.processPositionInfo(pos);
 			}
-			ExtendedPositionInfo position = new ExtendedPositionInfo(pos.getId(), pos.getEasting(), 
+			AgentSnapshotInfo position = new ExtendedPositionInfo(pos.getId(), pos.getEasting(), 
 					pos.getNorthing(), pos.getElevation(), pos.getAzimuth(), pos.getSpeed(),
 					pos.getAgentState(),pos.getType(),pos.getUserData());
 			this.writer.addVehicle(time, position);

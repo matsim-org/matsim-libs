@@ -21,8 +21,9 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
+import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 import playground.gregor.sim2d.otfdebug.readerwriter.Agent2DWriter;
@@ -42,7 +43,7 @@ public class Sim2D {
 	private final Network2D network2D;
 	private double startTime;
 	private Agent2DWriter agentWriter;
-	private List<ExtendedPositionInfo> agentData;
+	private List<AgentSnapshotInfo> agentData;
 
 
 	protected final PriorityBlockingQueue<Agent2D> activityEndsList = new PriorityBlockingQueue<Agent2D>(500, new Agent2DDepartureTimeComparator());
@@ -221,7 +222,7 @@ public class Sim2D {
 
 
 	private void updatePositionInfos() {
-		this.agentData = new ArrayList<ExtendedPositionInfo>();
+		this.agentData = new ArrayList<AgentSnapshotInfo>();
 		for (Floor floor : this.network2D.getFloors()) {
 			for (Agent2D agent : floor.getAgents()) {
 				Coordinate coord = agent.getPosition();
@@ -231,7 +232,7 @@ public class Sim2D {
 				alpha /= TWO_PI;
 				alpha *= 360;
 				alpha += 90;
-				ExtendedPositionInfo pos = new ExtendedPositionInfo(agent.getId(),coord.x,coord.y,0,alpha,velocity,AgentState.AGENT_MOVING,Math.abs(agent.getId().hashCode())%10,1);
+				AgentSnapshotInfo pos = new OTFAgentsListHandler.ExtendedPositionInfo(agent.getId(),coord.x,coord.y,0,alpha,velocity,AgentState.AGENT_MOVING,Math.abs(agent.getId().hashCode())%10,1);
 				this.agentData.add(pos);
 			}
 		}

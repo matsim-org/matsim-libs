@@ -59,13 +59,13 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 		public ExtendedPositionInfo(Id driverId, double easting, double northing, double elevation, double azimuth, double speed, AgentState vehicleState, int type, int userdata) {
 			super(driverId, easting, northing, elevation, azimuth, speed, vehicleState, "");
-			this.type = type;
-			this.user = userdata;
+			this.setType(type);
+			this.setUserDefined(userdata);
 		}
 		public ExtendedPositionInfo(AgentSnapshotInfo i, int type, int userdata) {
 			super(i.getId(), i.getEasting(), i.getNorthing(), i.getElevation(), i.getAzimuth(), i.getSpeed(), i.getAgentState(), "");
-			this.type = type;
-			this.user = userdata;
+			this.setType(type);
+			this.setUserDefined(userdata);
 		}
 
 	}
@@ -81,7 +81,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		public void writeConstData(ByteBuffer out) throws IOException {
 		}
 
-		public void writeAgent(PositionInfo pos, ByteBuffer out) {
+		public void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
 			String id = pos.getId().toString();
 			ByteBufferUtils.putString(out, id);
 			out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
@@ -96,7 +96,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			// Write additional agent data
 			out.putInt(this.positions.size());
 
-			for (PositionInfo pos : this.positions) {
+			for (AgentSnapshotInfo pos : this.positions) {
 				writeAgent(pos, out);
 			}
 			this.positions.clear();
