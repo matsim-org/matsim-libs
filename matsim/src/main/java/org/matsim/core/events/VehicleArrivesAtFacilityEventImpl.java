@@ -32,11 +32,17 @@ public class VehicleArrivesAtFacilityEventImpl extends EventImpl implements
 
 	private final Id vehicleId;
 	private final Id facilityId;
+	private final double delay;
 
-	public VehicleArrivesAtFacilityEventImpl(final double time, final Id vehicleId, final Id facilityId) {
+	public VehicleArrivesAtFacilityEventImpl(final double time, final Id vehicleId, final Id facilityId, double delay) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.facilityId = facilityId;
+		this.delay = delay;
+	}
+	
+	public double getDelay() {
+		return this.delay;
 	}
 
 	public Id getFacilityId() {
@@ -57,6 +63,7 @@ public class VehicleArrivesAtFacilityEventImpl extends EventImpl implements
 		Map<String, String> attributes = super.getAttributes();
 		attributes.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		attributes.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
+		attributes.put(ATTRIBUTE_DELAY, Double.toString(this.delay));
 		return attributes;
 	}
 

@@ -31,8 +31,11 @@ public interface VehicleDepartsAtFacilityEvent extends Event {
 	public static final String EVENT_TYPE = "VehicleDepartsAtFacility";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_FACILITY = "facility";
+	public static final String ATTRIBUTE_DELAY = "delay";
 
 	public Id getVehicleId();
 	
 	public Id getFacilityId();
+	
+	public double getDelay();
 }

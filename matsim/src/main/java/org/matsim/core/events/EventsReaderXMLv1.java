@@ -138,11 +138,13 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createVehicleArrivesAtFacilityEvent(time,
 					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
-					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY))));			
+					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY)),
+					Double.parseDouble(atts.getValue(VehicleDepartsAtFacilityEvent.ATTRIBUTE_DELAY))));			
 		} else if (VehicleDepartsAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createVehicleDepartsAtFacilityEvent(time,
 					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
-					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY))));			
+					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY)),
+					Double.parseDouble(atts.getValue(VehicleDepartsAtFacilityEvent.ATTRIBUTE_DELAY))));			
 		}
 	}
 

@@ -29,10 +29,11 @@ import org.matsim.testcases.MatsimTestCase;
 public class BasicVehicleArrivesAtFacilityEventImplTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		VehicleArrivesAtFacilityEventImpl event = new VehicleArrivesAtFacilityEventImpl(Time.parseTime("10:55:00"), new IdImpl(5), new IdImpl(11));
+		VehicleArrivesAtFacilityEventImpl event = new VehicleArrivesAtFacilityEventImpl(Time.parseTime("10:55:00"), new IdImpl(5), new IdImpl(11), -1.2);
 		VehicleArrivesAtFacilityEventImpl event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
 		assertEquals(Time.parseTime("10:55:00"), event2.getTime(), EPSILON);
 		assertEquals(new IdImpl(5), event2.getVehicleId());
 		assertEquals(new IdImpl(11), event2.getFacilityId());
+		assertEquals(Double.valueOf(-1.2), Double.valueOf(event2.getDelay()));
 	}
 }

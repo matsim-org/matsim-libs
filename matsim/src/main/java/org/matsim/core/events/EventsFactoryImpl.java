@@ -85,12 +85,12 @@ public class EventsFactoryImpl implements EventsFactory {
 		return e;
 	}
 	
-	public VehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
-		return new VehicleArrivesAtFacilityEventImpl(time, vehicleId, facilityId);
+	public VehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, final double delay) {
+		return new VehicleArrivesAtFacilityEventImpl(time, vehicleId, facilityId, delay);
 	}
 	
-	public VehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
-		return new VehicleDepartsAtFacilityEventImpl(time, vehicleId, facilityId);
+	public VehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, final double delay) {
+		return new VehicleDepartsAtFacilityEventImpl(time, vehicleId, facilityId, delay);
 	}
 
 	
