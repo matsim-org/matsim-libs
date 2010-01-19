@@ -120,7 +120,9 @@ public class OTFHostConnectionManager {
 		boolean result = getOTFServer().requestNewTime(time, OTFServerRemote.TimePreference.LATER);
 		
 		for(OTFDrawer handler : getDrawer().values()) {
-			if(handler != timeLine) handler.getQuad().getSceneGraphNoCache(getOTFServer().getLocalTime(), null, handler);
+			if(handler != timeLine) {
+			  handler.getQuad().getSceneGraphNoCache(getOTFServer().getLocalTime(), null, handler);
+			}
 		}
 		return result;
 	}

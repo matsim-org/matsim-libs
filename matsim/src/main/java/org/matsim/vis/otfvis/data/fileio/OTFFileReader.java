@@ -346,10 +346,12 @@ public class OTFFileReader implements OTFServerRemote {
 
 	public byte[] getQuadDynStateBuffer(final String id, final Rect bounds)
 	throws RemoteException {
-		// DS TODO bounds is ignored, maybe throw exception if bounds !=
-		// null??
-		if (this.actBuffer == null)
-			this.actBuffer = getStateBuffer();
+	  if (bounds == null) {
+	    log.warn("Bounds are ignored but set!");
+	  }
+		if (this.actBuffer == null) {
+		  this.actBuffer = getStateBuffer();
+		}
 		return this.actBuffer;
 	}
 
@@ -370,35 +372,36 @@ public class OTFFileReader implements OTFServerRemote {
 		return buffer;
 	}
 
-	public boolean requestNewTime(final int time,
-			final TimePreference searchDirection) throws RemoteException {
-		double lastTime = -1;
-		double foundTime = -1;
-		for (Double timestep : this.timesteps.keySet()) {
-			if(timestep == time) {
-				foundTime = time;
-				break;
-			}else 
-				if (searchDirection == TimePreference.EARLIER) {
-					if (timestep >= time) {
-						// take next lesser time than requested, if not exacty
-						// the same
-						foundTime = lastTime;
-						break;
-					}
-				} else if (timestep >= time) {
-					foundTime = timestep; // the exact time or one biggers
-					break;
-				}
-			lastTime = timestep;
-		}
-		if (foundTime == -1)
-			return false;
+  public boolean requestNewTime(final int time,
+      final TimePreference searchDirection) throws RemoteException {
+    double lastTime = -1;
+    double foundTime = -1;
+    for (Double timestep : this.timesteps.keySet()) {
+      if (timestep == time) {
+        foundTime = time;
+        break;
+      }
+      else if (searchDirection == TimePreference.EARLIER) {
+        if (timestep >= time) {
+          // take next lesser time than requested, if not exacty
+          // the same
+          foundTime = lastTime;
+          break;
+        }
+      }
+      else if (timestep >= time) {
+        foundTime = timestep; // the exact time or one biggers
+        break;
+      }
+      lastTime = timestep;
+    }
+    if (foundTime == -1)
+      return false;
 
-		this.nextTime = foundTime;
-		this.actBuffer = null;
-		return true;
-	}
+    this.nextTime = foundTime;
+    this.actBuffer = null;
+    return true;
+  }
 
 	public Collection<Double> getTimeSteps() {
 		return this.timesteps.keySet();

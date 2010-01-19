@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.lanes.otfvis.OTFLanesConnectionManagerFactory;
+import org.matsim.signalsystems.otfvis.OTFSignalsConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
@@ -84,9 +86,12 @@ public class QSimSnapshotWriterManager {
         OTFFileWriter writer = null;
 
         OTFConnectionManagerFactory connectionManagerFactory = new OTFFileWriterQSimConnectionManagerFactory();
-//        if (scenario.getConfig().scenario().isUseLanes() && (!scenario.getConfig().scenario().isUseSignalSystems())) {
-//          connectionManagerFactory = new OTFLanesConnectionManagerFactory(connectionManagerFactory);
-//        }
+        if (scenario.getConfig().scenario().isUseLanes() && (!scenario.getConfig().scenario().isUseSignalSystems())) {
+          connectionManagerFactory = new OTFLanesConnectionManagerFactory(connectionManagerFactory);
+        }
+        else if (scenario.getConfig().scenario().isUseLanes() && scenario.getConfig().scenario().isUseSignalSystems()){
+          connectionManagerFactory = new OTFSignalsConnectionManagerFactory(connectionManagerFactory);
+        }
         writer = new OTFFileWriter(snapshotPeriod, new OTFQSimServerQuadBuilder(network), snapshotFile, connectionManagerFactory);
         this.snapshotWriters.add(writer);
       }

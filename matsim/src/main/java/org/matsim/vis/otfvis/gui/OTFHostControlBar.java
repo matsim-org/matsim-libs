@@ -335,9 +335,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			return true;
 		}
 		if (prefTime == OTFServerRemote.TimePreference.EARLIER) {
-			System.out.println("No previous timestep found");
+			log.info("No previous timestep found");
 		} else {
-			System.out.println("No succeeding timestep found");
+		  log.info("No succeeding timestep found");
 		}
 		return false;
 	}
@@ -377,11 +377,16 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			}
 			
 			synchronized(hostControl.blockReading) {
-			if(restart)requestTimeStep(gotoTime, OTFServerRemote.TimePreference.RESTART);
-			else if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER))
+			if(restart){
+			  requestTimeStep(gotoTime, OTFServerRemote.TimePreference.RESTART);
+			}
+			else if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER)) {
 				requestTimeStep(gotoTime, OTFServerRemote.TimePreference.LATER);
+			}
 			
-			if (progressBar != null) progressBar.terminate = true;
+			if (progressBar != null) {
+			  progressBar.terminate = true;
+			}
 			simTime = hostControl.getOTFServer().getLocalTime();
 			updateTimeLabel();
 			}
