@@ -111,6 +111,12 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 				if (!agentKnActTypes.contains("education_kindergarten")) agentCuActTypes.remove("education_kindergarten");
 				if (!agentKnActTypes.contains("education_primary"))agentCuActTypes.remove("education_primary");
 				if (!agentKnActTypes.contains("education_secondary"))agentCuActTypes.remove("education_secondary");
+				if ((((PersonImpl) agent).getEmployed()!=null) && !(((PersonImpl) agent).isEmployed())){
+					if (!agentKnActTypes.contains("work_sector2"))agentCuActTypes.remove("work_sector2");
+					else log.warn("Person "+((PersonImpl)agent).getId()+" is unemployed but has a work type in his knowledge!");
+					if (!agentKnActTypes.contains("work_sector3"))agentCuActTypes.remove("work_sector3");
+					else log.warn("Person "+((PersonImpl)agent).getId()+" is unemployed but has a work type in his knowledge!");
+				}
 				return agentCuActTypes;
 			}
 		}

@@ -1378,10 +1378,14 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterRow+=3;
 			}
 			if (seasonTicket.equals("yes")) {
-				int st = aaa.getSeasonTicket().get(person.getId());				
-				if (st==1) stream.print(1+"\t"+0+"\t"+0+"\t");
-				else if (st==2) stream.print(0+"\t"+1+"\t"+0+"\t");
-				else if (st==3) stream.print(0+"\t"+0+"\t"+1+"\t");
+				int st = aaa.getSeasonTicket().get(person.getId());		
+				int ticket = 0;
+				if (st==2 || st==3) ticket = 3;
+				else if (st==11) ticket = 1;
+				else ticket = 2;
+				if (ticket==1) stream.print(1+"\t"+0+"\t"+0+"\t");
+				else if (ticket==2) stream.print(0+"\t"+1+"\t"+0+"\t");
+				else if (ticket==3) stream.print(0+"\t"+0+"\t"+1+"\t");
 				else log.warn("Unidentified seasonTicket "+st+" for person "+person.getId());
 				counterRow+=3;
 			}
