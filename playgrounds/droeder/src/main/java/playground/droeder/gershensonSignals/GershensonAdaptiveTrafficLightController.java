@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
@@ -33,36 +35,85 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  */
 public class GershensonAdaptiveTrafficLightController extends
 			AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, LaneLeaveEventHandler{
+	
+	private final Id id1 = new IdImpl("1");
+	private final Id id2 = new IdImpl("2");
+	private final Id id11 = new IdImpl("11");
+	private final Id id13 = new IdImpl("13");
+	private double vehOnLink11 = 0;	
+	private double counterLink11 = vehOnLink11;
+	private double vehOnLink13 = 0;
+	private double counterLink13 = vehOnLink13;
+	private double  greenTime = 0;
+	private double allGreenTime = 0;
+	private static int threshold = 50;
+	
 
-
-	public GershensonAdaptiveTrafficLightController(
-			AdaptiveSignalSystemControlInfo controlInfo) {
+ 
+	public GershensonAdaptiveTrafficLightController(AdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
+		iteration = 0;
+		if (counterLink11 > threshold){
+			counterLink11 = 0;
+		}
+		if (counterLink13 > threshold){
+			counterLink13 = 0;
+		}
 	}
 	
-	@Override
-	public void handleEvent(LaneEnterEvent event) {
-		// TODO Auto-generated method stub
+	
+	public void handleEvent(LaneEnterEvent e) {
 		
+		if (e.getLinkId().equals(id11) && e.getLaneId().equals(id2)) {
+			this.vehOnLink11++;
+		}	
+		else if (e.getLinkId().equals(id13) && e.getLaneId().equals(id2)) {
+			this.vehOnLink13++;
+		}	
 	}
 
-	@Override
-	public void handleEvent(LaneLeaveEvent event) {
-		// TODO Auto-generated method stub
-		
+	
+	public void handleEvent(LaneLeaveEvent e) {
+		if (e.getLinkId().equals(id11) && e.getLaneId().equals(id2)) {
+			this.vehOnLink11--;
+		}
+		if (e.getLinkId().equals(id13) && e.getLaneId().equals(id2)) {
+			this.vehOnLink13--;
+		}		
 	}
 
-	@Override
-	public boolean givenSignalGroupIsGreen(double time,
-			SignalGroupDefinition signalGroup) {
-		// TODO Auto-generated method stub
-		return false;
+
+	public boolean givenSignalGroupIsGreen(double time, SignalGroupDefinition signalGroup) {
+		greenTime = time - allGreenTime;
+		 		
+		counterLink11 = vehOnLink11 * greenTime;
+		counterLink13 = vehOnLink13 * greenTime;
+		
+		if (signalGroup.getLinkRefId().equals(id11)){
+			
+			if (vehOnLink11 > 0 && counterLink13 < threshold) {
+				return true;
+			}
+			else {
+				allGreenTime = allGreenTime + greenTime;
+				return false;
+			}
+			
+		}
+		if (signalGroup.getLinkRefId().equals(id13)){
+			if (vehOnLink13 > 0 && counterLink11 < threshold){
+				return true;
+			}
+			else {
+				allGreenTime = allGreenTime + greenTime;
+				return false;
+			}
+			
+		}
+		return true;
 	}
 
 }

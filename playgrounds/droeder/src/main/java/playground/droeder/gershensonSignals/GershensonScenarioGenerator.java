@@ -31,6 +31,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -70,11 +72,16 @@ public class GershensonScenarioGenerator {
 	public static final String SIGNALSYSTEMSOUTPUTFILE = OUTPUT + "gershensonSignalSystems.xml";
 	public static final String SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE = OUTPUT + "gershensonSignalSystemsConfig.xml";
 	public static final String POPULATIONOUTPUTFILE = OUTPUT + "gershensonPopulation.xml";
+	private static final String PLANSOUTPUTFILE = OUTPUT + "gershensonPlans.xml";
+	private static final String OUTPUTDIRECTORY = OUTPUT + "route//";;
 	
 	private static final boolean isUseLanes = true;
 	private static final boolean isUseSignalSystems = true;
 	
 	private static final String controllerClass = GershensonAdaptiveTrafficLightController.class.getCanonicalName();
+	private static final int iterations = 1000;
+
+
 	
 	private Id id1, id2, id3, id11, id12, id13, id14;
 	
@@ -148,38 +155,38 @@ public class GershensonScenarioGenerator {
 
 		//lanes for link 11
 		LanesToLinkAssignment lanesForLink11 = factory.createLanesToLinkAssignment(id11);
-		Lane link11lane1 = factory.createLane(id1);
+//		Lane link11lane1 = factory.createLane(id1);
 		Lane link11lane2 = factory.createLane(id2);
-		Lane link11lane3 = factory.createLane(id3);
+//		Lane link11lane3 = factory.createLane(id3);
 		
-		link11lane1.addToLinkId(id13);
-		link11lane1.setNumberOfRepresentedLanes(1);
+//		link11lane1.addToLinkId(id13);
+//		link11lane1.setNumberOfRepresentedLanes(1);
 		link11lane2.addToLinkId(id12);
 		link11lane2.setNumberOfRepresentedLanes(1);
-		link11lane3.addToLinkId(id14);
-		link11lane3.setNumberOfRepresentedLanes(1);
+//		link11lane3.addToLinkId(id14);
+//		link11lane3.setNumberOfRepresentedLanes(1);
 		
-		lanesForLink11.addLane(link11lane1);
+//		lanesForLink11.addLane(link11lane1);
 		lanesForLink11.addLane(link11lane2);
-		lanesForLink11.addLane(link11lane3);
+//		lanesForLink11.addLane(link11lane3);
 		lanes.addLanesToLinkAssignment(lanesForLink11);
 		
 		//lanes for link 13
 		LanesToLinkAssignment lanesForLink13 = factory.createLanesToLinkAssignment(id13);
-		Lane link13lane1 = factory.createLane(id1);
+//		Lane link13lane1 = factory.createLane(id1);
 		Lane link13lane2 = factory.createLane(id2);
-		Lane link13lane3 = factory.createLane(id3);
+//		Lane link13lane3 = factory.createLane(id3);
 		
-		link13lane1.addToLinkId(id12);
-		link13lane1.setNumberOfRepresentedLanes(1);
+//		link13lane1.addToLinkId(id12);
+//		link13lane1.setNumberOfRepresentedLanes(1);
 		link13lane2.addToLinkId(id14);
 		link13lane2.setNumberOfRepresentedLanes(1);
-		link13lane3.addToLinkId(id11);
-		link13lane3.setNumberOfRepresentedLanes(1);
+//		link13lane3.addToLinkId(id11);
+//		link13lane3.setNumberOfRepresentedLanes(1);
 		
-		lanesForLink13.addLane(link13lane1);
+//		lanesForLink13.addLane(link13lane1);
 		lanesForLink13.addLane(link13lane2);
-		lanesForLink13.addLane(link13lane3);
+//		lanesForLink13.addLane(link13lane3);
 		lanes.addLanesToLinkAssignment(lanesForLink13);
 		return lanes;
 	}
@@ -212,20 +219,20 @@ public class GershensonScenarioGenerator {
 		
 		//create signal group for traffic on link 11 
 		SignalGroupDefinition groupLink11 = factory.createSignalGroupDefinition(id11, id1);
-		groupLink11.addLaneId(id1);
+//		groupLink11.addLaneId(id1);
 		groupLink11.addLaneId(id2);
-		groupLink11.addLaneId(id3);
+//		groupLink11.addLaneId(id3);
 		groupLink11.addToLinkId(id12);
-		groupLink11.addToLinkId(id13);
-		groupLink11.addToLinkId(id14);
+//		groupLink11.addToLinkId(id13);
+//		groupLink11.addToLinkId(id14);
 		
 		//create signal group for traffic on link 13
 		SignalGroupDefinition groupLink13 = factory.createSignalGroupDefinition(id13, id2);
-		groupLink13.addLaneId(id1);
+//		groupLink13.addLaneId(id1);
 		groupLink13.addLaneId(id2);
-		groupLink13.addLaneId(id3);
-		groupLink13.addToLinkId(id11);
-		groupLink13.addToLinkId(id12);
+//		groupLink13.addLaneId(id3);
+//		groupLink13.addToLinkId(id11);
+//		groupLink13.addToLinkId(id12);
 		groupLink13.addToLinkId(id14);
 		
 	
@@ -298,9 +305,7 @@ public class GershensonScenarioGenerator {
 			plan.addActivity(act22);	
 			
 			population.addPerson(p2);
-			
-			
-			
+					
 			
 			
 		}
@@ -309,9 +314,48 @@ public class GershensonScenarioGenerator {
 	}
 
 	private void createConfig(Config config) {
+		
+		config.network().setInputFile(NETWORKFILE);
+		config.plans().setInputFile(POPULATIONOUTPUTFILE);
+
+		// configure scoring for plans
+		config.charyparNagelScoring().setLateArrival(0.0);
+		config.charyparNagelScoring().setPerforming(6.0);
+
+		// set it with f. strings
+		config.charyparNagelScoring().addParam("activityType_0", "h");
+		config.charyparNagelScoring().addParam("activityTypicalDuration_0",
+				"24:00:00");
+
+		// configure controler
+		config.travelTimeCalculator().setTraveltimeBinSize(1);
+		config.controler().setLastIteration(iterations);
+		config.controler().setOutputDirectory(OUTPUTDIRECTORY);
+
+
+		// configure simulation and snapshot writing
 		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
+		config.getQSimConfigGroup().setSnapshotFile("cmcf.mvi");
+		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
+		config.getQSimConfigGroup().setSnapshotStyle("queue");
+		// configure strategies for replanning
+		
+		config.strategy().setMaxAgentPlanMemorySize(4);
+		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(id1);
+		selectExp.setProbability(0.9);
+		selectExp.setModuleName("ChangeExpBeta");
+		config.strategy().addStrategySettings(selectExp);
+
+		StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings(id2);
+		reRoute.setProbability(0.1);
+		reRoute.setModuleName("ReRoute");
+		reRoute.setDisableAfter(iterations);
+		config.strategy().addStrategySettings(reRoute);
 	}
 
+	
+	
 	public static void main(final String[] args) {
 		try {
 			new GershensonScenarioGenerator().createScenario();
