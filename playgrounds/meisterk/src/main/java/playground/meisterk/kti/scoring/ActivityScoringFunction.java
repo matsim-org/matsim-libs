@@ -33,6 +33,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
@@ -71,6 +72,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	public static final double MINIMUM_DURATION = 0.5 * 3600;
 
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
+	private final ActivityFacilities facilities;
 
 	private static final DayType DEFAULT_DAY = DayType.wed;
 	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();
@@ -81,17 +83,18 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunction.class);
 
-	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties) {
+	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
 		super(plan, params);
 		this.facilityPenalties = facilityPenalties;
+		this.facilities = facilities;
 	}
 
 	/*
 	 * Variables only used in activity score calculation.
 	 */
 	private List<ScoringPenalty> penalty = null;
-	private HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
-	private HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
+	private final HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
+	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
 	private double accumulatedTooShortDuration;
 	private double timeSpentWaiting;
 	private double accumulatedNegativeDuration;
@@ -120,7 +123,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			SortedSet<OpeningTime> openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element, 
 			// assume facility is always open
-			ActivityOptionImpl actOpt = act.getFacility().getActivityOptions().get(act.getType());
+			ActivityOptionImpl actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
 			if (actOpt != null) {
 				openTimes = actOpt.getOpeningTimes(ActivityScoringFunction.DEFAULT_DAY);
 				if (openTimes == null) {
@@ -181,7 +184,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 						this.penalty.add(new ScoringPenalty(
 								activityStart, 
 								activityEnd, 
-								this.facilityPenalties.get(act.getFacility().getId()), 
+								this.facilityPenalties.get(act.getFacilityId()), 
 								scoreImprovement));
 					}
 

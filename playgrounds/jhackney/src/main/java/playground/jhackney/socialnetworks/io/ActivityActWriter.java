@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.ActivityImpl;
 
@@ -24,9 +25,10 @@ import org.matsim.core.population.ActivityImpl;
 public class ActivityActWriter {
 
 	BufferedWriter out;
+	ActivityFacilities facilities;
 
-	public ActivityActWriter(){
-
+	public ActivityActWriter(ActivityFacilities facilities){
+		this.facilities = facilities;
 	}
 	public void openFile(String outFileName){
 		//open file here
@@ -55,7 +57,7 @@ public class ActivityActWriter {
 
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					ActivityImpl myAct= (ActivityImpl) actsLegs.get(j);
-					ActivityOptionImpl myActivity=myAct.getFacility().getActivityOptions().get(myAct.getType());
+					ActivityOptionImpl myActivity=this.facilities.getFacilities().get(myAct.getFacilityId()).getActivityOptions().get(myAct.getType());
 //					System.out.println(" AAW DEBUG J=: "+j);
 					try {
 						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+myActivity.getType());

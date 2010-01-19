@@ -54,9 +54,9 @@ import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeB
 public class LocationMutatorTGSimple extends LocationMutator {
 	
 	protected int unsuccessfullLC = 0;
-	private DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
-	private LeisureFacilityExtractor leisureFacilityExtractor;	
-	private QuadTreeRing<ActivityFacilityImpl> leisureQuadtree;
+	private final DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
+	private final LeisureFacilityExtractor leisureFacilityExtractor;	
+	private final QuadTreeRing<ActivityFacilityImpl> leisureQuadtree;
 	
 	private final static Logger log = Logger.getLogger(LeisureFacilityExtractor.class);
 	
@@ -75,6 +75,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		leisureFacilityExtractor = new LeisureFacilityExtractor(this.leisureQuadtree);	
 	}
 	
+	@Override
 	public void handlePlan(final Plan plan){
 		if (!this.handleShopActs((PlanImpl)plan) && !this.handleLeisureActs((PlanImpl)plan)){
 			this.unsuccessfullLC++;
@@ -159,7 +160,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		else {
 			return false;
 		}
-		act.setFacility(facility);
+		act.setFacilityId(facility.getId());
    		act.setLink(((NetworkImpl) this.network).getNearestLink(facility.getCoord()));
    		act.setCoord(facility.getCoord());
    		
@@ -213,7 +214,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			facility = leisureFacilityExtractor.getFacility(coordActPre, dist);
 		}
 		if (facility != null) {
-			act.setFacility(facility);
+			act.setFacilityId(facility.getId());
 	   		act.setLink(((NetworkImpl) this.network).getNearestLink(facility.getCoord()));
 	   		act.setCoord(facility.getCoord());	   		
 	   		return true;

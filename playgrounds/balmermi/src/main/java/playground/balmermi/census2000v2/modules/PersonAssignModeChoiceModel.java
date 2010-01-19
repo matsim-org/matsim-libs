@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -66,16 +67,18 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	private final PlanAnalyzeSubtours past = new PlanAnalyzeSubtours(Gbl.getConfig().planomat());
 	private final Municipalities municipalities;
 
-	private Knowledges knowledges;
+	private final Knowledges knowledges;
+	private final ActivityFacilities facilities;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignModeChoiceModel(final Municipalities municipalities, String outfile, Knowledges knowledges) {
+	public PersonAssignModeChoiceModel(final Municipalities municipalities, String outfile, Knowledges knowledges, final ActivityFacilities facilities) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.municipalities = municipalities;
 		this.knowledges = knowledges;
+		this.facilities = facilities;
 		try {
 			fw = new FileWriter(outfile);
 			out = new BufferedWriter(fw);
@@ -133,7 +136,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 	private final int getUrbanDegree(ArrayList<Integer> act_indices, Plan p) {
 		ActivityImpl act = (ActivityImpl)p.getPlanElements().get(act_indices.get(0));
-		Zone zone = (Zone)((ActivityFacilityImpl) act.getFacility()).getUpMapping().values().iterator().next();
+		Zone zone = (Zone)((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getUpMapping().values().iterator().next();
 		return this.municipalities.getMunicipality(zone.getId()).getRegType();
 	}
 	
@@ -144,7 +147,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		for (int j=1; j<act_indices.size(); j++) {
 			ActivityImpl from_act = (ActivityImpl)p.getPlanElements().get(act_indices.get(j-1));
 			ActivityImpl to_act = (ActivityImpl)p.getPlanElements().get(act_indices.get(j));
-			dist += CoordUtils.calcDistance(to_act.getFacility().getCoord(), from_act.getFacility().getCoord());
+			dist += CoordUtils.calcDistance(this.facilities.getFacilities().get(to_act.getFacilityId()).getCoord(), this.facilities.getFacilities().get(from_act.getFacilityId()).getCoord());
 		}
 		return dist/1000.0;
 	}

@@ -24,13 +24,13 @@ public class ActivityDifferentiationShop {
 	private final static Logger log = Logger.getLogger(ActivityDifferentiationShop.class);
 	
 	// from Microcensus for all modes
-	private double groceryShare = 0.66;
+	private final double groceryShare = 0.66;
 	private int numberOfShopActs;
 	
 	private final ScenarioImpl scenario;
 	
 	private ActivityFacilitiesImpl facilitiesActDiff;
-	private String facilitiesActDifffilePath = "input/facilities/facilitiesActDiff.xml.gz";
+	private final String facilitiesActDifffilePath = "input/facilities/facilitiesActDiff.xml.gz";
 	
 	public ActivityDifferentiationShop(ScenarioImpl scenario) {
 		this.scenario = scenario;
@@ -103,12 +103,12 @@ public class ActivityDifferentiationShop {
 					else {
 						if (assignedNumberOf_NonGroceryActs < (1.0 - groceryShare) * numberOfShopActs) {
 							act.setType("shop_nongrocery");
-							act.setFacility(null);
+							act.setFacilityId(null);
 							assignedNumberOf_NonGroceryActs++;
 						}
 						else {
 							act.setType("shop_grocery");
-							act.setFacility(null);
+							act.setFacilityId(null);
 							assignedNumberOf_GroceryActs++;
 						}
 					}	
@@ -140,10 +140,10 @@ public class ActivityDifferentiationShop {
 		QuadTree<ActivityFacilityImpl> groceryTree = builder.buildFacilityQuadTree("shop_grocery", groceryFacilities);
 		QuadTree<ActivityFacilityImpl> nongroceryTree = builder.buildFacilityQuadTree("shop_nongrocery", nonGroceryFacilities);
 		
-		AssignLocations assignShops = new AssignLocations((QuadTreeRing<ActivityFacilityImpl>)nongroceryTree);
+		AssignLocations assignShops = new AssignLocations((QuadTreeRing<ActivityFacilityImpl>)nongroceryTree, this.facilitiesActDiff);
 		assignShops.run(this.scenario.getPopulation(), "shop_nongrocery");
 		
-		assignShops = new AssignLocations((QuadTreeRing<ActivityFacilityImpl>) groceryTree);
+		assignShops = new AssignLocations((QuadTreeRing<ActivityFacilityImpl>) groceryTree, this.facilitiesActDiff);
 		assignShops.run(this.scenario.getPopulation(), "shop_grocery");	
 	}
 

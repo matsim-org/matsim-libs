@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -53,7 +54,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 	// ellipse, bean, cassini, superellipse
 //	private static final String activity_shape = EllipseObjective.OBJECTIVE_NAME;
 	private String activity_shape = null;
-	private Knowledges knowledges;
+	private final Knowledges knowledges;
 //	private static final String [] activity_shapes = {CassiniObjective.OBJECTIVE_NAME,BeanObjective.OBJECTIVE_NAME,SuperEllipseObjective.OBJECTIVE_NAME,EllipseObjective.OBJECTIVE_NAME};
 	private static final String [] activity_shapes = {EllipseObjective.OBJECTIVE_NAME};
 	private static final double theta_stepsize = Math.PI / 8.0;
@@ -61,6 +62,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 //	private static final int shape = 1;
 	// 0.0 < coverage <= 1.0
 	private static final double coverage = 0.95;
+	private final ActivityFacilities facilities;
 
 	private final static Logger log = Logger.getLogger(PersonCalcEgoSpace.class);
 
@@ -76,9 +78,10 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 //	super();
 //	}
 
-	public PersonCalcEgoSpace(Knowledges knowledges) {
+	public PersonCalcEgoSpace(Knowledges knowledges, ActivityFacilities facilities) {
 		super();
 		this.knowledges = knowledges;
+		this.facilities = facilities;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -106,7 +109,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 		// use morning home, the first act in each selected plan
 		Iterator<Person> e_it=egoNet.getAlters().iterator();
 		while(e_it.hasNext()){
-			activities.add( ((ActivityImpl)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacility().getActivityOptions().get("home"));
+			activities.add(this.facilities.getFacilities().get(((ActivityImpl)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacilityId()).getActivityOptions().get("home"));
 		}
 		
 		Iterator<ActivityOptionImpl> a_it = null;

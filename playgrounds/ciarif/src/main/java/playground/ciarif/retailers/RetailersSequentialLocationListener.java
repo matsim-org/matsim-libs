@@ -76,8 +76,8 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
-	private ArrayList<LinkRetailersImpl> retailersLinks = null;
-	private RetailZones retailZones = new RetailZones();
+	private final ArrayList<LinkRetailersImpl> retailersLinks = null;
+	private final RetailZones retailZones = new RetailZones();
 	private Map<Id,? extends ActivityFacility> controlerFacilities = null;
 	ArrayList<ActivityFacility> sampledShops = new ArrayList<ActivityFacility>();
 
@@ -182,7 +182,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 						ActivityImpl act = (ActivityImpl) pe;
 						if (movedFacilities.containsKey(act.getFacilityId())) { //TODO use here another movedFacilities object, this one very 
 							// likely contains too much persons in it!!!!
-							act.setLink(((ActivityFacilityImpl) act.getFacility()).getLink());
+							act.setLink(((ActivityFacilityImpl) this.controlerFacilities.get(act.getFacilityId())).getLink());
 							routeIt = true;
 						}
 					}
@@ -235,7 +235,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				double y2= y1 + y_width;
 				RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
 				for (Person p : persons ) {
-					Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
+					Coord c = this.controlerFacilities.get(((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacilityId()).getCoord();
 					if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
 						rz.addPersonToQuadTree(c,p);
 					}		

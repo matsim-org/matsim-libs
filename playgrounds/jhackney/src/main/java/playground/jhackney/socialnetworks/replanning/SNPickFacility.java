@@ -65,13 +65,13 @@ public class SNPickFacility implements PlanAlgorithm {
 
 
 	private final String weights;
-	private double[] cum_p_factype;
-	private Network network;
-	private TravelCost tcost;
-	private TravelTime ttime;
-	private String[] factypes;
+	private final double[] cum_p_factype;
+	private final Network network;
+	private final TravelCost tcost;
+	private final TravelTime ttime;
+	private final String[] factypes;
 	private final Logger log = Logger.getLogger(SNPickFacility.class);
-	private Knowledges knowledges;
+	private final Knowledges knowledges;
 
 	public SNPickFacility(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, Knowledges knowledges){
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
@@ -184,20 +184,20 @@ public class SNPickFacility implements PlanAlgorithm {
 					ActivityImpl lastAct = (ActivityImpl) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 					lastAct.setLink(f.getLink());
 					lastAct.setCoord(f.getCoord());
-					lastAct.setFacility(f);
+					lastAct.setFacilityId(f.getId());
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLinkId() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId())){
 					ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
 					firstAct.setLink(f.getLink());
 					firstAct.setCoord(f.getCoord());
-					firstAct.setFacility(f);
+					firstAct.setFacilityId(f.getId());
 				}
 				// Change the activity
 //				System.out.println("  ##### Act at "+newAct.getFacility().getId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+f.getLink().getId());
 				newAct.setLink(f.getLink());
 				newAct.setCoord(f.getCoord());
-				newAct.setFacility(f);
+				newAct.setFacilityId(f.getId());
 				changed = true;
 			}
 

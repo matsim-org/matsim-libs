@@ -80,12 +80,12 @@ public class MentalMap {
 
 
 //	The activity score
-	private LinkedHashMap<ActivityOptionImpl, Double> activityScore = new LinkedHashMap<ActivityOptionImpl, Double>();
+	private final LinkedHashMap<ActivityOptionImpl, Double> activityScore = new LinkedHashMap<ActivityOptionImpl, Double>();
 
 //	Total maximum number of activities (locations + action) an agent can remember
 
 	private KnowledgeImpl knowledge = null;
-	private Logger log= Logger.getLogger(MentalMap.class);
+	private final Logger log= Logger.getLogger(MentalMap.class);
 
 	public MentalMap(KnowledgeImpl knowledge){
 		this.knowledge=knowledge;
@@ -98,12 +98,12 @@ public class MentalMap {
 		for (PlanElement pe : myPlan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl myAct = (ActivityImpl) pe;
-				if(myAct.getFacility()==null){ // new Acts are assigned a facility in the Plans file
+				if(myAct.getFacilityId()==null){ // new Acts are assigned a facility in the Plans file
 					ActivityOptionImpl myActivity = null;
 					// If there is already knowledge in the initial plans file, use it
 					if(this.knowledge.getActivities(myAct.getType()).size()>0){
 						myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.getRandom().nextInt(this.knowledge.getActivities(myAct.getType()).size()));
-						myAct.setFacility(myActivity.getFacility());
+						myAct.setFacilityId(myActivity.getFacility().getId());
 						//TODO JH add logic to label this activity primary or secondary
 						this.knowledge.addActivity(myActivity, false);
 //					learnActsActivities(myAct,myActivity);
@@ -122,7 +122,7 @@ public class MentalMap {
 						ActivityFacilityImpl f = (ActivityFacilityImpl) facs[k];
 						myActivity = f.getActivityOptions().get(myAct.getType());
 						if(myActivity!=null){
-							myAct.setFacility(myActivity.getFacility());
+							myAct.setFacilityId(myActivity.getFacility().getId());
 							//TODO JH add logic to label this activity primary or secondary
 							this.knowledge.addActivity(myActivity,false);
 						}

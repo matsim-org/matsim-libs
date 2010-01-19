@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
@@ -37,11 +38,14 @@ public class SpatialInteractorEvents {
 //	TrackEventsOverlap teo;
 	MakeTimeWindowsFromEvents teo;
 	private final Logger log = Logger.getLogger(SpatialInteractorEvents.class);
+	
+	private final ActivityFacilities facilities;
 
 //	public SpatialInteractorEvents(SocialNetwork snet, TrackEventsOverlap teo) {
-	public SpatialInteractorEvents(SocialNetwork snet, MakeTimeWindowsFromEvents teo) {
+	public SpatialInteractorEvents(SocialNetwork snet, MakeTimeWindowsFromEvents teo, ActivityFacilities facilities) {
 		this.net = snet;
 		this.teo=teo;
+		this.facilities = facilities;
 		log.warn("Methods are only for Undirected social interactions");
 	}
 
@@ -259,7 +263,7 @@ public class SpatialInteractorEvents {
 					TimeWindow tw2 = (TimeWindow) visits[iii];
 					PersonImpl p2 = tw2.person;
 					String actType2=tw2.act.getType();
-					if(CompareTimeWindows.overlapTimePlaceType(tw1, tw2)){
+					if(CompareTimeWindows.overlapTimePlaceType(tw1, tw2,this.facilities)){
 						//agents encounter and may befriend
 						//note that p2 could be present twice;
 						//no problems here, but if we are counting duration
@@ -334,7 +338,7 @@ public class SpatialInteractorEvents {
 					TimeWindow tw2=(TimeWindow) visits[iii];
 					PersonImpl p2 = tw2.person;
 					String actType2=tw2.act.getType();
-					if(CompareTimeWindows.overlapTimePlaceType(tw1,tw2)&& !p1.equals(p2)){
+					if(CompareTimeWindows.overlapTimePlaceType(tw1,tw2,this.facilities)&& !p1.equals(p2)){
 						//agents encoutner and may befriend
 						if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(actType2)){
 							// If they know each other, probability is 1.0 that the relationship is reinforced
@@ -359,7 +363,7 @@ public class SpatialInteractorEvents {
 //		interactions take place
 		double total_spatial_fraction=0;
 		for (int jjj = 0; jjj < fractionS2.length; jjj++) {
-			total_spatial_fraction = (double) total_spatial_fraction + Double.parseDouble(fractionS2[jjj].toString());
+			total_spatial_fraction = total_spatial_fraction + Double.parseDouble(fractionS2[jjj].toString());
 		}
 		return total_spatial_fraction;
 	}

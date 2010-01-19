@@ -85,9 +85,9 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
-	private ArrayList<LinkRetailersImpl> retailersLinks = new ArrayList<LinkRetailersImpl>();
+	private final ArrayList<LinkRetailersImpl> retailersLinks = new ArrayList<LinkRetailersImpl>();
 	private Map<Id,? extends ActivityFacility> controlerFacilities = null;
-	private Map<Id,ActivityFacility> retailersFacilities = new TreeMap<Id, ActivityFacility>();
+	private final Map<Id,ActivityFacility> retailersFacilities = new TreeMap<Id, ActivityFacility>();
 	
 	public RetailersParallelLocationListener() {
 	}
@@ -160,7 +160,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		
 		
 		Controler controler = event.getControler();
-		if (controler.getIteration()%1==0 & controler.getIteration()>0){ // & controler.getLastIteration()-controler.getIteration()>=50) {
+		if (controler.getIterationNumber()%1==0 & controler.getIterationNumber()>0){ // & controler.getLastIteration()-controler.getIteration()>=50) {
 			
 
 			
@@ -199,7 +199,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 			Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
 			
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-			int retailers_count = 0;
+//			int retailers_count = 0;
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				log.info("THE RETAILER " + r.getId() + " WILL TRY TO RELOCATE ITS FACILITIES");
 				//movedFacilities = r.runStrategy(this.retailersLinks);
@@ -209,7 +209,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 				//TODO The check of moved facilities should happen here!!!!
 			}
 			
-			int iter = controler.getIteration();
+			int iter = controler.getIterationNumber();
 			this.rs.write(this.retailers);
 			
 			for (Person p : controler.getPopulation().getPersons().values()) {
@@ -221,7 +221,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 						if (pe instanceof ActivityImpl) {
 							ActivityImpl act = (ActivityImpl) pe;
 							if (movedFacilities.containsKey(act.getFacilityId())) {
-								act.setLink(((ActivityFacilityImpl) act.getFacility()).getLink());
+								act.setLink(((ActivityFacilityImpl) this.controlerFacilities.get(act.getFacilityId())).getLink());
 								routeIt = true;
 							}
 						}
@@ -262,7 +262,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		log.info("minx = " + minx + "; miny = " + miny + "; maxx = " + maxx + "; maxy =" + maxy );
 		QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
 		for (Person p : controler.getPopulation().getPersons().values()) {
-			Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
+			Coord c = this.controlerFacilities.get(((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacilityId()).getCoord();
 			personQuadTree.put(c.getX(),c.getY(),p);
 		}
 		return personQuadTree;

@@ -26,7 +26,6 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -141,7 +140,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
-		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
+		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Make a new zone layer (Raster)
 //		if(!(this.controler.getConfig().socnetmodule().getGridSpace().equals(null))){
 //		int gridSpacing = Integer.valueOf(this.controler.getConfig().socnetmodule().getGridSpace());
@@ -181,7 +180,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		
 		this.log.info(" ... Instantiation of events overlap tracking done");
 //		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
-		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
+		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm,controler.getFacilities());
 		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats);
 		
 		this.controler.setScoringFunctionFactory(factory);
@@ -214,7 +213,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		teo.makeTimeWindows(epp);
 		twm= teo.getTimeWindowMap();
 
-		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
+		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm,controler.getFacilities()));
 		log.info("SSTEST Finish Scoring with actStats "+snIter);
 		scoring.finish();
 	}
@@ -246,7 +245,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				Gbl.printMemoryUsage();
 				
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
-				aaw=new ActivityActWriter();
+				aaw=new ActivityActWriter(this.controler.getFacilities());
 				aaw.openFile(SOCNET_OUT_DIR+"ActivityActMap"+snIter+".txt");
 				this.log.info(" Writing out the map between Acts and Facilities ...");
 				aaw.write(snIter,this.controler.getPopulation());
@@ -412,13 +411,13 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("... done");
 
 		this.log.info(" Initializing the social network ...");
-		this.snet = new SocialNetwork(this.controler.getPopulation());
+		this.snet = new SocialNetwork(this.controler.getPopulation(), this.controler.getFacilities());
 		this.log.info("... done");
 
 		if(CALCSTATS){
 //			this.log.info(" Calculating the statistics of the initial social network)...");
 			this.log.info(" Opening the files for the social network statistics...");
-			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
+			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR, this.controler.getFacilities());
 			this.snetstat.openFiles();
 //			Social networks do not change until the first iteration of Replanning,
 //			so we can skip writing out this initial state because the networks will still be unchanged after the first assignment
@@ -429,7 +428,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 		this.log.info("  Initializing the KML output");
 
-		EgoNetPlansItersMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
+		EgoNetPlansItersMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork(), this.controler.getFacilities());
 		EgoNetPlansItersMakeKML.generateStyles();
 		this.log.info("... done");
 
@@ -444,7 +443,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info(" Setting up the Spatial interactor ...");
 		//InteractorTest
 //		this.plansInteractorS=new SpatialInteractorActs(this.snet);
-		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo);
+		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo, controler.getFacilities());
 		this.log.info("... done");
 
 		this.snIter = this.controler.getFirstIteration();

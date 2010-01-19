@@ -25,8 +25,8 @@ import org.matsim.core.utils.misc.Counter;
 
 public class LocationModifier extends Modifier {
 
-	private TreeMap<Id,ActivityFacilityImpl> shop_facilities=new TreeMap<Id,ActivityFacilityImpl>();
-	private TreeMap<Id,ActivityFacilityImpl> leisure_facilities=new TreeMap<Id,ActivityFacilityImpl>();
+	private final TreeMap<Id,ActivityFacilityImpl> shop_facilities=new TreeMap<Id,ActivityFacilityImpl>();
+	private final TreeMap<Id,ActivityFacilityImpl> leisure_facilities=new TreeMap<Id,ActivityFacilityImpl>();
 	private QuadTree<ActivityFacilityImpl> shopFacQuadTree = null;
 	private QuadTree<ActivityFacilityImpl> leisFacQuadTree = null;
 
@@ -110,7 +110,7 @@ public class LocationModifier extends Modifier {
 					ActivityFacilityImpl facility=exchange_facilities.get(
 							MatsimRandom.getRandom().nextInt(exchange_facilities.size()));
 
-					act.setFacility(facility);
+					act.setFacilityId(facility.getId());
 					act.setLink(facility.getLink());
 					act.setCoord(facility.getCoord());
 				}

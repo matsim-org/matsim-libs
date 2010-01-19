@@ -1,5 +1,6 @@
 package playground.jhackney.socialnetworks.algorithms;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 
@@ -43,16 +44,18 @@ public class CompareActs {
 	 * @param act2
 	 * @return
 	 */
-	public static boolean overlapTimePlaceType(ActivityImpl act1, ActivityImpl act2){
+	public static boolean overlapTimePlaceType(ActivityImpl act1, ActivityImpl act2, ActivityFacilities facilities){
+		ActivityFacilityImpl af1 = (ActivityFacilityImpl) facilities.getFacilities().get(act1.getFacilityId());
+		ActivityFacilityImpl af2 = (ActivityFacilityImpl) facilities.getFacilities().get(act2.getFacilityId());
 //		System.out.println("Checking overlap "+act1.getType()+" "+act1.getFacility().getId()+": "+act2.getType()+" "+act2.getFacility().getId());
-		if(((ActivityFacilityImpl) act2.getFacility()).getActivityOptions().get(act2.getType())==null){
+		if(af2.getActivityOptions().get(act2.getType())==null){
 			System.out.println("It's act2 "+act1.getType()+" "+act1.getFacilityId()+": "+act2.getType()+" "+act2.getFacilityId());
 		}
-		if(((ActivityFacilityImpl) act1.getFacility()).getActivityOptions().get(act1.getType())==null){
+		if(af1.getActivityOptions().get(act1.getType())==null){
 			System.out.println("It's act1 "+act1.getType()+" "+act1.getFacilityId()+": "+act2.getType()+" "+act2.getFacilityId());
 		}
 		boolean overlap=false;
-		if(((ActivityFacilityImpl) act2.getFacility()).getActivityOptions().get(act2.getType()).equals(((ActivityFacilityImpl) act1.getFacility()).getActivityOptions().get(act1.getType()))){
+		if(af2.getActivityOptions().get(act2.getType()).equals(af1.getActivityOptions().get(act1.getType()))){
 			if(act2.getEndTime() >=act1.getStartTime() && act2.getStartTime()<=act1.getEndTime()){
 				overlap=true;
 			}

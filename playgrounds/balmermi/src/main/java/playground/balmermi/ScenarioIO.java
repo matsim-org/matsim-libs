@@ -136,7 +136,7 @@ public class ScenarioIO {
 		System.out.println("done. (loading population)");
 
 		System.out.println("running algorithms...");
-		new PersonFacility2Link().run(population);
+		new PersonFacility2Link(af).run(population);
 		Gbl.printMemoryUsage();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(timeCostCalc);

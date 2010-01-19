@@ -30,7 +30,7 @@ public class FlexibleTransportControler extends Controler {
 	private final FtConfigGroup ftConfigGroup;
 	private KtiConfigGroup kTIConfigGroup; //TODO now is null and dosn't take any value when the FlexibleTransportControler is instantiated
 	
-	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(kTIConfigGroup);
+	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(kTIConfigGroup);
 
 	public FlexibleTransportControler(String[] args) {
 		super(args);
@@ -54,7 +54,8 @@ public class FlexibleTransportControler extends Controler {
 		FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
 				super.config, 
 				this.ftConfigGroup,
-				this.getFacilityPenalties());
+				this.getFacilityPenalties(),
+				this.getFacilities());
 		this.setScoringFunctionFactory(ftScoringFunctionFactory);
 
 		super.setUp();

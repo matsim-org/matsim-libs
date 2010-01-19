@@ -87,7 +87,7 @@ public class AnalyzeTimeCorrelations {
 		//read in social network
 		config.socnetmodule().setInitIter(Integer.toString(isoc));
 		System.out.println(" Initializing the social network ...");
-		SocialNetwork snet=new SocialNetwork(plans);
+		SocialNetwork snet=new SocialNetwork(plans, facilities);
 		System.out.println("... done");
 
 //		double totaliterationfriendscore=0;
@@ -102,7 +102,7 @@ public class AnalyzeTimeCorrelations {
 		String out1=Scenario.getOut1();
 		MakeTimeWindowsFromEvents teo= new MakeTimeWindowsFromEvents();
 		teo.makeTimeWindows(epp);
-		new TimeWindowCalcTimeCorrelations(teo.getTimeWindowMap(), out2, out1);
+		new TimeWindowCalcTimeCorrelations(teo.getTimeWindowMap(), out2, out1, facilities);
 		System.out.println("Type\tId");
 		new WriteActivityLocationsByType(plans);
 		System.out.println("TEST SUCCEEDED.");

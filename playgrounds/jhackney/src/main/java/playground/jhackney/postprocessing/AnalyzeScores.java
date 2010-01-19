@@ -88,7 +88,7 @@ public class AnalyzeScores {
 		config.socnetmodule().setInitIter(Integer.toString(isoc));
 		config.socnetmodule().setInDirName(ScenarioConfig.getSNInDir());
 		
-		SocialNetwork snet=new SocialNetwork(plans);
+		SocialNetwork snet=new SocialNetwork(plans, facilities);
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventsMapStartEndTimes epp;
 		MakeTimeWindowsFromEvents teo=null;
@@ -104,7 +104,7 @@ public class AnalyzeScores {
 		teo=new MakeTimeWindowsFromEvents();
 		teo.makeTimeWindows(epp);
 		twm=teo.getTimeWindowMap();
-		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
+		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm,facilities);
 		playground.jhackney.scoring.EventSocScoringFactory factory = new playground.jhackney.scoring.EventSocScoringFactory("leisure",actStats);
 //		ScoringFunctionFactory cnfactory = new CharyparNagelScoringFunctionFactory(ScenarioConfig.getConfig().charyparNagelScoring());
 //		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", cnfactory,actStats);
@@ -122,7 +122,7 @@ public class AnalyzeScores {
 		teo.makeTimeWindows(epp);
 		twm=teo.getTimeWindowMap();
 		actStats.clear();
-		actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
+		actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm,facilities));
 //		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
 //		scoring = new EventsToScore(plans, factory);
 		scoring.finish();

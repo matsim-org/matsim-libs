@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -40,15 +41,17 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(PersonAssignPrimaryActivities.class);
-	private Knowledges knowledges;
+	private final Knowledges knowledges;
+	private final ActivityFacilities facilities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignPrimaryActivities(Knowledges knowledges) {
+	public PersonAssignPrimaryActivities(Knowledges knowledges, ActivityFacilities facilities) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.knowledges = knowledges;
+		this.facilities = facilities;
 		log.info("    done.");
 	}
 
@@ -69,8 +72,8 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			String curr_type = act.getType();
-			ActivityOptionImpl a = act.getFacility().getActivityOptions().get(curr_type);
-			if (a == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacility()+"!"); }
+			ActivityOptionImpl a = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(curr_type);
+			if (a == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacilityId()+"!"); }
 			if (!prim_acts.contains(a)) { k.addActivity(a,false); }
 		}
 	}

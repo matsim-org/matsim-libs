@@ -26,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -94,7 +93,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.finder					= finder;
 		this.module					= recyclingModule;
 		this.nonassignedAgents		= nonassignedAgents;
-		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
+		this.knowledges = (controler.getScenario()).getKnowledges();
 		
 		this.coefficients = coefficients;
 		this.primActsDistance	="no";
@@ -289,8 +288,8 @@ public class AgentsAssigner implements PlanAlgorithm{
 	
 	protected void writePlan (Plan in, Plan out){
 		PlanImpl bestPlan = new org.matsim.core.population.PlanImpl (in.getPerson());
-		bestPlan.copyPlan((PlanImpl) in);
-		List<PlanElement> al = (List<PlanElement>) out.getPlanElements();
+		bestPlan.copyPlan(in);
+		List<PlanElement> al = out.getPlanElements();
 		
 		// NEW NEW NEW NEW NEW NEW NEW
 		ArrayList<ActivityOptionImpl> primActs = new ArrayList<ActivityOptionImpl>(this.knowledges.getKnowledgesByPersonId().get(out.getPerson().getId()).getActivities(true));
@@ -300,7 +299,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 				for (int j=0;j<primActs.size();j++){
 					if (((ActivityImpl)(bestPlan.getPlanElements().get(i))).getType().equals(primActs.get(j).getType())){
 						ActivityFacility fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
-						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setFacility(fac);
+						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setFacilityId(fac.getId());
 						// not only update of fac required but also coord and link; data inconsistencies otherwise
 						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCoord());
 						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setLink(((ActivityFacilityImpl) fac).getLink());

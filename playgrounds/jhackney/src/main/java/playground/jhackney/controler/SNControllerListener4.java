@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -129,7 +128,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 	}
 
 	public void notifyStartup(final StartupEvent event) {
-		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
+		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldConnectLocations().run(controler.getWorld());
 
@@ -147,7 +146,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		controler.setTwm(teo.getTimeWindowMap());
 
 		this.log.info(" ... Instantiation of events overlap tracking done");
-		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(controler.getTwm());
+		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(controler.getTwm(), controler.getFacilities());
 		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats);
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");
@@ -233,7 +232,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		}//new bracket position: run social scoring each iteration
 //			update activity statistics
 			this.log.info(" Remaking actStats from events");
-			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(controler.getTwm()));
+			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(controler.getTwm(), controler.getFacilities()));
 
 			Gbl.printMemoryUsage();
 
@@ -263,7 +262,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 			if(CALCSTATS && (event.getIteration()%50==0)){//50
 
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
-				aaw=new ActivityActWriter();
+				aaw=new ActivityActWriter(this.controler.getFacilities());
 				aaw.openFile(SOCNET_OUT_DIR+"/ActivityActMap"+snIter+".txt");
 				this.log.info(" Writing out the map between Acts and Facilities ...");
 				aaw.write(snIter,this.controler.getPopulation());
@@ -337,19 +336,19 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		this.log.info("... done");
 
 		this.log.info(" Initializing the social network ...");
-		this.snet = new SocialNetwork(this.controler.getPopulation());
+		this.snet = new SocialNetwork(this.controler.getPopulation(), this.controler.getFacilities());
 		this.log.info("... done");
 
 		if(CALCSTATS){
 			this.log.info(" Opening the files for the social network statistics...");
-			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
+			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR, this.controler.getFacilities());
 			this.snetstat.openFiles();
 			this.log.info(" ... done");
 		}
 
 		this.log.info("  Initializing the KML output");
 
-		EgoNetPlansItersMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
+		EgoNetPlansItersMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork(), this.controler.getFacilities());
 		EgoNetPlansItersMakeKML.generateStyles();
 		this.log.info("... done");
 
@@ -358,7 +357,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
-		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo);
+		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo, this.controler.getFacilities());
 		this.log.info("... done");
 
 		this.snIter = this.controler.getFirstIteration();

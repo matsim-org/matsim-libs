@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -43,13 +44,15 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	private final static Logger log = Logger.getLogger(PersonAssignToNetwork.class);
 
 	private final PlansCalcRoute router;
+	private final ActivityFacilities facilities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignToNetwork(final NetworkLayer network) {
+	public PersonAssignToNetwork(final NetworkLayer network, final ActivityFacilities facilities) {
 		log.info("    init " + this.getClass().getName() + " module...");
+		this.facilities = facilities;
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 		preprocess.run(network);
@@ -74,7 +77,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
-				act.setLink(((ActivityFacilityImpl) act.getFacility()).getLink());
+				act.setLink(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLink());
 			}
 		}
 		this.router.run(plan);

@@ -20,6 +20,7 @@ package playground.jhackney.postprocessing;
  * *********************************************************************** */
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -49,7 +50,7 @@ public class CreateKMZFromOutput {
 //		config.plans().setInputFile(Scenario.getSNInDir() + "output_plans"+i+".xml");
 
 		World world = Scenario.readWorld();
-		Scenario.readFacilities();
+		ActivityFacilities facilities = Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
 		new WorldConnectLocations().run(world);
 
@@ -57,7 +58,7 @@ public class CreateKMZFromOutput {
 //		Write out the KML for the EgoNet of a chosen agent
 		System.out.println("  Initializing the KML output");
 
-		EgoNetPlansItersMakeKML.setUp(Scenario.getConfig(), network);
+		EgoNetPlansItersMakeKML.setUp(Scenario.getConfig(), network, facilities);
 		EgoNetPlansItersMakeKML.generateStyles();
 
 		System.out.println("... done");
@@ -69,7 +70,7 @@ public class CreateKMZFromOutput {
 			PopulationImpl plans = Scenario.readPlansAndKnowledges();
 			//read in social network
 			System.out.println(" Initializing the social network ...");
-			SocialNetwork snet=new SocialNetwork(plans);
+			SocialNetwork snet=new SocialNetwork(plans, facilities);
 
 			System.out.println("... done");
 

@@ -56,6 +56,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -93,6 +94,7 @@ public class EgoNetPlansMakeKML {
 //	, coloredLinkKML;
 	private static DocumentType myKMLDocument;
 //	, coloredLinkKMLDocument;
+	private static ActivityFacilities facilities; 
 
 	private static StyleType workStyle, leisureStyle, blueLineStyle,
 	educStyle, shopStyle, homeStyle;//, agentLinkStyle;
@@ -101,7 +103,8 @@ public class EgoNetPlansMakeKML {
 	private static Config config = null;
 
 
-	public static void setUp(Config config, NetworkLayer network) {
+	public static void setUp(Config config, NetworkLayer network, ActivityFacilities facilities) {
+		EgoNetPlansMakeKML.facilities = facilities;
 		EgoNetPlansMakeKML.config=config;
 		if(config.getModule(KML21_MODULE)==null) return;
 
@@ -377,7 +380,7 @@ public class EgoNetPlansMakeKML {
 				
 				PlacemarkType aFacility = kmlObjectFactory.createPlacemarkType();
 				aFacility.setName(myAct.getType()+" facility");
-				aFacility.setDescription(myAct.getFacility().getActivityOptions().get(myAct.getType()).toString());
+				aFacility.setDescription(facilities.getFacilities().get(myAct.getFacilityId()).getActivityOptions().get(myAct.getType()).toString());
 				aFacility.setAddress("address");
 				aFacility.setStyleUrl(myStyle.getId());
 				

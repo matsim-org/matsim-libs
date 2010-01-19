@@ -21,9 +21,9 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -31,10 +31,7 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -43,6 +40,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
 	private PersonImpl person = null;
 	private PlanImpl plan = null;
+	private ActivityFacilities facilities = null;
 
 	private static final String UNUSED_OPENTIME_ACTIVITY_TYPE = "no wed and wkday open time activity";
 	private static final String ONE_WKDAY_ACTIVITY_TYPE = "one opening interval on wkday activity";
@@ -53,10 +51,10 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		super.setUp();
 
 		// create facilities, activities in it and open times
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		this.facilities = new ActivityFacilitiesImpl();
 
 		Coord defaultCoord = new CoordImpl(0.0, 0.0);
-		ActivityFacilityImpl testFacility = facilities.createFacility(new IdImpl(0), defaultCoord);
+		ActivityFacilityImpl testFacility = ((ActivityFacilitiesImpl) facilities).createFacility(new IdImpl(0), defaultCoord);
 
 		ActivityOptionImpl noWedAndWkDay = testFacility.createActivityOption(CharyparNagelOpenTimesScoringFunctionTest.UNUSED_OPENTIME_ACTIVITY_TYPE);
 		noWedAndWkDay.addOpeningTime(new OpeningTimeImpl(DayType.fri, 8.0 * 3600, 16.0 * 3600));
@@ -78,13 +76,14 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		ActivityImpl act = plan.createAndAddActivity("no type", testFacility);
 		act.setStartTime(8.0 * 3600);
 		act.setEndTime(16.0 * 3600);
-		act.setFacility(testFacility);
+		act.setFacilityId(testFacility.getId());
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
 		this.plan = null;
 		this.person = null;
+		this.facilities = null;
 		super.tearDown();
 	}
 
@@ -92,7 +91,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		final Config config = loadConfig(null);
 		ActivityImpl act = this.plan.getFirstActivity();
 
-		CharyparNagelOpenTimesScoringFunction testee = new CharyparNagelOpenTimesScoringFunction(this.plan, new CharyparNagelScoringParameters(config.charyparNagelScoring()));
+		CharyparNagelOpenTimesScoringFunction testee = new CharyparNagelOpenTimesScoringFunction(this.plan, new CharyparNagelScoringParameters(config.charyparNagelScoring()), this.facilities);
 
 		double[] openInterval = null;
 

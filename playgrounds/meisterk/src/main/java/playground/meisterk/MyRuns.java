@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
@@ -214,7 +215,7 @@ public class MyRuns {
 		logger.info("Reading facilities xml file...");
 
 		// - population
-		PersonAnalyzeModeChainFeasibility pa = new PersonAnalyzeModeChainFeasibility();
+		PersonAnalyzeModeChainFeasibility pa = new PersonAnalyzeModeChainFeasibility(facilities);
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
@@ -230,9 +231,11 @@ public class MyRuns {
 	private class PersonAnalyzeModeChainFeasibility implements PersonAlgorithm {
 
 		private int numInfeasiblePlans = 0;
+		private final ActivityFacilities facilities;
 
-		public PersonAnalyzeModeChainFeasibility() {
+		public PersonAnalyzeModeChainFeasibility(ActivityFacilities facilities) {
 			super();
+			this.facilities = facilities;
 		}
 
 		public void run(Person person) {
@@ -255,7 +258,8 @@ public class MyRuns {
 					selectedPlan,
 					candidate,
 					meisterkConfigGroup.getChainBasedModes(),
-					PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility);
+					PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility,
+					this.facilities);
 
 			if (!isFeasible) {
 

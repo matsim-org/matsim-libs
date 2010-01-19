@@ -49,28 +49,30 @@ import org.matsim.core.utils.io.IOUtils;
 public class InteractionHandler implements DeprecatedActivityStartEventHandler,
 DeprecatedActivityEndEventHandler {
 
-	private InteractionSelector selector;
+	private final InteractionSelector selector;
 	
-	private Interactor interactor;
+	private final Interactor interactor;
 	
-	private Map<ActivityFacility, PhysicalFacility> pfacilities;
+	private final Map<Id, PhysicalFacility> pfacilities;
 	
 	private final Population population;
+	
+	private final ActivityFacilities facilities;
 	
 	public InteractionHandler(InteractionSelector selector, Interactor interactor, ActivityFacilities facilities, Population population) {
 		this.selector = selector;
 		this.interactor = interactor;
 		this.population = population;
-		this.pfacilities = new HashMap<ActivityFacility, PhysicalFacility>();
+		this.facilities = facilities;
+		this.pfacilities = new HashMap<Id, PhysicalFacility>();
 		
 		for(ActivityFacility f : facilities.getFacilities().values()) {
-			this.pfacilities.put(f, new PhysicalFacility());
+			this.pfacilities.put(f.getId(), new PhysicalFacility());
 		}
 	}
 	
 	public void handleEvent(ActivityStartEventImpl event) {
-		ActivityFacility f = event.getAct().getFacility();
-		PhysicalFacility pf = pfacilities.get(f);
+		PhysicalFacility pf = pfacilities.get(event.getAct().getFacilityId());
 //		if(pf == null) {
 //			pf = new PhysicalFacility();
 //			facilities.put(f, pf);
@@ -86,8 +88,7 @@ DeprecatedActivityEndEventHandler {
 
 	public void handleEvent(ActivityEndEventImpl event) {
 		if(!event.getActType().equalsIgnoreCase("home")) {
-		ActivityFacility f = event.getAct().getFacility();
-		PhysicalFacility pf = pfacilities.get(f);
+		PhysicalFacility pf = pfacilities.get(event.getAct().getFacilityId());
 		
 		if(pf == null)
 			 throw new RuntimeException("Tried to remove a visitor from a non-existing physical facility!");
@@ -105,9 +106,9 @@ DeprecatedActivityEndEventHandler {
 		
 		final String TAB = "\t"; 
 		final String WSPACE = " "; 
-		for(ActivityFacility f : pfacilities.keySet()) {
-			PhysicalFacility pf = pfacilities.get(f);
-			writer.write(f.getId().toString());
+		for(Id fId : pfacilities.keySet()) {
+			PhysicalFacility pf = pfacilities.get(fId);
+			writer.write(fId.toString());
 			writer.write(TAB);
 			writer.write(String.valueOf(pf.totalVisitors));
 			writer.write(TAB);
@@ -117,6 +118,7 @@ DeprecatedActivityEndEventHandler {
 			writer.write(TAB);
 			writer.write(String.valueOf(pf.concurrentVisitors.getMean()));
 			writer.write(TAB);
+			ActivityFacility f = this.facilities.getFacilities().get(fId);
 			for(ActivityOptionImpl opt : f.getActivityOptions().values()) {
 				writer.write(opt.getType());
 				writer.write(WSPACE);
@@ -130,9 +132,9 @@ DeprecatedActivityEndEventHandler {
 		
 		private int totalVisitors;
 		
-		private DescriptiveStatistics concurrentVisitors = new DescriptiveStatistics();
+		private final DescriptiveStatistics concurrentVisitors = new DescriptiveStatistics();
 		
-		private Map<Id, Visitor> visitors = new HashMap<Id, Visitor>(); // <PersonId, Visitor>
+		private final Map<Id, Visitor> visitors = new HashMap<Id, Visitor>(); // <PersonId, Visitor>
 		
 		private void enterPerson(Id personId, double time) {
 			visitors.put(personId, new Visitor(personId, time));

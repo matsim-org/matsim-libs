@@ -26,7 +26,6 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -116,7 +115,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
-		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
+		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldConnectLocations().run(controler.getWorld());
 
@@ -192,7 +191,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 //		Update activity statistics with pruned social network
 		this.log.info(" Remaking actStats from events");
-		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
+		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm,controler.getFacilities()));
 
 		Gbl.printMemoryUsage();
 
@@ -222,7 +221,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
-				ActivityActWriter aaw=new ActivityActWriter();
+				ActivityActWriter aaw=new ActivityActWriter(this.controler.getFacilities());
 				aaw.openFile(SOCNET_OUT_DIR+"/ActivityActMap"+snIter+".txt");
 				this.log.info(" Writing out the map between Acts and Facilities ...");
 				aaw.write(snIter,this.controler.getPopulation());
@@ -298,19 +297,19 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		}
 
 		this.log.info(" Initializing the social network ...");
-		this.snet = new SocialNetwork(this.controler.getPopulation());
+		this.snet = new SocialNetwork(this.controler.getPopulation(), this.controler.getFacilities());
 		this.log.info("... done");
 
 		if(reportInterval>0){
 			this.log.info(" Opening the files for the social network statistics...");
-			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
+			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR, this.controler.getFacilities());
 			this.snetstat.openFiles();
 			this.log.info(" ... done");
 		}
 
 		this.log.info("  Initializing the KML output");
 
-		EgoNetPlansItersMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
+		EgoNetPlansItersMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork(), this.controler.getFacilities());
 		EgoNetPlansItersMakeKML.generateStyles();
 		this.log.info("... done");
 
@@ -319,7 +318,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
-		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo);
+		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo, this.controler.getFacilities());
 		this.log.info("... done");
 
 		this.snIter = this.controler.getFirstIteration();		
@@ -337,7 +336,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		this.log.info("... done");
 
 		this.log.info(" Setting up scoring factory ...");
-		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
+		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm,controler.getFacilities());
 		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats);
 //		SocScoringFactoryEvent factory = new playground.jhackney.scoring.SocScoringFactoryEvent("leisure", actStats);
 		this.controler.setScoringFunctionFactory(factory);

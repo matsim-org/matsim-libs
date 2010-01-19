@@ -58,7 +58,8 @@ public class KTIControler extends Controler {
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				super.config, 
 				this.ktiConfigGroup,
-				this.getFacilityPenalties());
+				this.getFacilityPenalties(),
+				this.getFacilities());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
 		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);

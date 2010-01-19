@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -81,7 +82,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		log.info("Reading facilities xml file...done.");
 
 		// run
-		this.runDemo((Layer) facilities);
+		this.runDemo(facilities, facilities);
 
 	}
 
@@ -97,11 +98,11 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		this.config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
 
 		// run
-		this.runDemo((Layer) network);
+		this.runDemo(network, null);
 
 	}
 
-	protected void runDemo(Layer layer) {
+	protected void runDemo(Layer layer, ActivityFacilities facilities) {
 
 		HashMap<String, ArrayList<TransportMode[]>> testCases = new HashMap<String, ArrayList<TransportMode[]>>();
 
@@ -371,7 +372,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
-		PlanAnalyzeTourModeChoiceSet testee = new PlanAnalyzeTourModeChoiceSet(new MeisterkConfigGroup().getChainBasedModes(), this.config.planomat().getTripStructureAnalysisLayer());
+		PlanAnalyzeTourModeChoiceSet testee = new PlanAnalyzeTourModeChoiceSet(new MeisterkConfigGroup().getChainBasedModes(), this.config.planomat().getTripStructureAnalysisLayer(), facilities);
 		EnumSet<TransportMode> possibleModes = EnumSet.of(TransportMode.walk, TransportMode.bike, TransportMode.pt, TransportMode.car);
 		testee.setModeSet(possibleModes);
 
@@ -389,14 +390,14 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			ArrayList<TransportMode[]> actual = testee.getChoiceSet();
 			assertEquals(entry.getValue().size(), actual.size());
 			assertTrue(Arrays.deepEquals(
-					(TransportMode[][]) entry.getValue().toArray(new TransportMode[0][0]), 
-					(TransportMode[][]) actual.toArray(new TransportMode[0][0])));
+					entry.getValue().toArray(new TransportMode[0][0]), 
+					actual.toArray(new TransportMode[0][0])));
 
 		}
 
 	}
 
-	public void testIsModeChainFeasible() {
+	public void testIsModeChainFeasible(ActivityFacilities facilities) {
 		
 		// load data
 		log.info("Reading network xml file...");
@@ -451,7 +452,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		for (TransportMode[] candidate : candidates.keySet()) {
 			assertEquals(
-					Boolean.valueOf(PlanAnalyzeTourModeChoiceSet.isModeChainFeasible(testPlan, candidate, chainBasedModes, this.config.planomat().getTripStructureAnalysisLayer())),
+					Boolean.valueOf(PlanAnalyzeTourModeChoiceSet.isModeChainFeasible(testPlan, candidate, chainBasedModes, this.config.planomat().getTripStructureAnalysisLayer(), facilities)),
 					candidates.get(candidate));
 		}
 		

@@ -168,7 +168,7 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 				Link l = f.getLink();
 				if (l == null) { throw new RuntimeException("Link == null; something is wrong!"); }
 				
-				act.setFacility(f);
+				act.setFacilityId(f.getId());
 				act.setLink(l);
 				Coord coord_f = f.getCoord();
 				act.setCoord(coord_f);

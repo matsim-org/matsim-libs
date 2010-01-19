@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -54,10 +55,12 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ScenarioCut {
-
+	
 	//////////////////////////////////////////////////////////////////////
 
 	private static void calcExtent(Scenario scenario) {
+		final Network network = scenario.getNetwork();
+		final ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		Coord min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		Coord max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
 		for (ActivityFacilityImpl f : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
@@ -92,19 +95,19 @@ public class ScenarioCut {
 							if (a.getCoord().getY() > max.getY()) { max.setY(a.getCoord().getY()); }
 						}
 						if (a.getLinkId() != null) {
-							Node n = a.getLink().getFromNode();
+							Node n = network.getLinks().get(a.getLinkId()).getFromNode();
 							if (n.getCoord().getX() < min.getX()) { min.setX(n.getCoord().getX()); }
 							if (n.getCoord().getY() < min.getY()) { min.setY(n.getCoord().getY()); }
 							if (n.getCoord().getX() > max.getX()) { max.setX(n.getCoord().getX()); }
 							if (n.getCoord().getY() > max.getY()) { max.setY(n.getCoord().getY()); }
-							n = a.getLink().getToNode();
+							n = network.getLinks().get(a.getLinkId()).getToNode();
 							if (n.getCoord().getX() < min.getX()) { min.setX(n.getCoord().getX()); }
 							if (n.getCoord().getY() < min.getY()) { min.setY(n.getCoord().getY()); }
 							if (n.getCoord().getX() > max.getX()) { max.setX(n.getCoord().getX()); }
 							if (n.getCoord().getY() > max.getY()) { max.setY(n.getCoord().getY()); }
 						}
 						if (a.getFacilityId() != null) {
-							ActivityFacility f = a.getFacility();
+							ActivityFacility f = facilities.getFacilities().get(a.getFacilityId());
 							if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 							if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
 							if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }

@@ -54,6 +54,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -113,8 +114,10 @@ public class EgoNetPlansItersMakeKML {
 	private static int nColors=13;//36
 	private static Person ai;
 	private static Knowledges knowledges;
+	private static ActivityFacilities facilities;
 
-	public static void setUp(Config config, Network network) {
+	public static void setUp(Config config, Network network, ActivityFacilities facilities) {
+		EgoNetPlansItersMakeKML.facilities = facilities;
 		EgoNetPlansItersMakeKML.config=config;
 		if(config.getModule(KML21_MODULE)==null) return;
 
@@ -440,7 +443,7 @@ public class EgoNetPlansItersMakeKML {
 			if (o instanceof ActivityImpl) {
 				ActivityImpl myAct = (ActivityImpl) o;
 	//			Activity myActivity =myPerson.getKnowledge().getMentalMap().getActivity(myAct).getFacility().toString();
-				String myActivity=myAct.getFacility().getActivityOptions().get(myAct.getType()).toString();
+				String myActivity=facilities.getFacilities().get(myAct.getFacilityId()).getActivityOptions().get(myAct.getType()).toString();
 				//Above lines call code that results in a null pointer. Test
 				// michi's new change. Note the Act.setFacility() might not
 				// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008
@@ -512,7 +515,7 @@ public class EgoNetPlansItersMakeKML {
 		}
 
 		// make the activity spaces
-		new PersonCalcEgoSpace(knowledges).run(ego);
+		new PersonCalcEgoSpace(knowledges, facilities).run(ego);
 
 		// add the points of the activity space to the polygon
 		// if PersonCalcEgoSpace() failed to give an activity space, ...

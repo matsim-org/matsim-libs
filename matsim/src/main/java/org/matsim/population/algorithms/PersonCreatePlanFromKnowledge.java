@@ -35,7 +35,7 @@ import org.matsim.knowledges.Knowledges;
 
 public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 
-	private Knowledges knowledges;
+	private final Knowledges knowledges;
 
 	public PersonCreatePlanFromKnowledge(Knowledges knowledges) {
 		super();
@@ -57,7 +57,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		a.setStartTime(0.0);
 		a.setDuration(time);
 		a.setEndTime(time);
-		a.setFacility(home_facility);
+		a.setFacilityId(home_facility.getId());
 		LegImpl l = p.createAndAddLeg(TransportMode.car);
 		l.setDepartureTime(time);
 		l.setTravelTime(0);
@@ -76,7 +76,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 			a.setStartTime(time);
 			a.setDuration(dur);
 			a.setEndTime(time + dur);
-			a.setFacility(f);
+			a.setFacilityId(f.getId());
 			time += dur;
 			l = p.createAndAddLeg(TransportMode.car);
 			l.setDepartureTime(time);
@@ -90,6 +90,6 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		a.setStartTime(time);
 		a.setEndTime(24*3600);
 		a.setDuration(24*3600 - time);
-		a.setFacility(home_facility);
+		a.setFacilityId(home_facility.getId());
 	}
 }

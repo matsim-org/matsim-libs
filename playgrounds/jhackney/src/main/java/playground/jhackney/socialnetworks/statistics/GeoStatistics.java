@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -35,9 +36,10 @@ public class GeoStatistics {
 	LinkedHashMap<Vertex, MappedLocation> vertexLoc = new LinkedHashMap<Vertex,MappedLocation>();
 	LinkedHashMap<Edge, Double> edgeStrength = new LinkedHashMap<Edge,Double>();
 //	Collection<Location> locations;
+	ActivityFacilities facilities;
 
-	public GeoStatistics(Population plans, SocialNetwork snet) {
-
+	public GeoStatistics(Population plans, SocialNetwork snet, ActivityFacilities facilities) {
+		this.facilities = facilities;
 		this.plans=plans;
 		this.snet=snet;
 //		gg=makeJungGraph();
@@ -51,7 +53,7 @@ public class GeoStatistics {
 			Vertex v;
 //			Choose the first location in the plan and assume it's where the person lives
 
-			ActivityFacility aHome = ((PlanImpl) aPerson.getSelectedPlan()).getFirstActivity().getFacility();
+			ActivityFacility aHome = this.facilities.getFacilities().get(((PlanImpl) aPerson.getSelectedPlan()).getFirstActivity().getFacilityId());
 			//			Each facility should only have one location but UpMapping is a TreeMap so pick the first entry
 			MappedLocation aLoc = ((ActivityFacilityImpl) aHome).getUpMapping().get(((ActivityFacilityImpl) aHome).getUpMapping().firstKey());
 			if(this.locVertex.containsKey(aLoc)){
@@ -80,8 +82,8 @@ public class GeoStatistics {
 			Person personA = link.getPersonFrom();
 			Person personB = link.getPersonTo();
 
-			ActivityFacilityImpl aHome=(ActivityFacilityImpl) ((PlanImpl) personA.getSelectedPlan()).getFirstActivity().getFacility();
-			ActivityFacilityImpl bHome=(ActivityFacilityImpl) ((PlanImpl) personB.getSelectedPlan()).getFirstActivity().getFacility();
+			ActivityFacilityImpl aHome=(ActivityFacilityImpl) this.facilities.getFacilities().get(((PlanImpl) personA.getSelectedPlan()).getFirstActivity().getFacilityId());
+			ActivityFacilityImpl bHome=(ActivityFacilityImpl) this.facilities.getFacilities().get(((PlanImpl) personB.getSelectedPlan()).getFirstActivity().getFacilityId());
 			MappedLocation aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			MappedLocation bLoc = bHome.getUpMapping().get(bHome.getUpMapping().firstKey());
 

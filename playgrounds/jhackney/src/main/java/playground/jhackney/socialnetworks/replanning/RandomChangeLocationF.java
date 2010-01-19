@@ -56,12 +56,12 @@ import playground.jhackney.socialnetworks.mentalmap.MentalMap;
 public class RandomChangeLocationF  implements PlanAlgorithm{
 	private final String weights;
 
-	private double[] cum_p_factype;
-	private Network network;
-	private TravelCost tcost;
-	private TravelTime ttime;
-	private String[] factypes;
-	private ActivityFacilities facs;
+	private final double[] cum_p_factype;
+	private final Network network;
+	private final TravelCost tcost;
+	private final TravelTime ttime;
+	private final String[] factypes;
+	private final ActivityFacilities facs;
 
 	public RandomChangeLocationF(String[] factypes, Network network, TravelCost tcost, TravelTime ttime, ActivityFacilities facs) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
@@ -130,7 +130,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 			person.getPlans().remove(newPlan);
 			return;
 		}else{
-			ActivityImpl newAct = (ActivityImpl)(actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
+			ActivityImpl newAct = (actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 			// Replace with plan.getRandomActivity(type)
 
@@ -150,20 +150,20 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 						ActivityImpl lastAct = (ActivityImpl) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 						lastAct.setLink(fFromFacilities.getLink());
 						lastAct.setCoord(fFromFacilities.getCoord());
-						lastAct.setFacility(fFromFacilities);
+						lastAct.setFacilityId(fFromFacilities.getId());
 					}
 					// If the last activity was chosen, make sure the first activity is also changed
 					if(newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLinkId() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId()){
-						ActivityImpl firstAct = (ActivityImpl) ((PlanImpl) newPlan).getFirstActivity();
+						ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
 						firstAct.setLink(fFromFacilities.getLink());
 						firstAct.setCoord(fFromFacilities.getCoord());
-						firstAct.setFacility(fFromFacilities);
+						firstAct.setFacilityId(fFromFacilities.getId());
 					}
 					// Change the activity
 //					System.out.println("  ##### Act at "+newAct.getFacility().getId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
 					newAct.setLink(fFromFacilities.getLink());
 					newAct.setCoord(fFromFacilities.getCoord());
-					newAct.setFacility(fFromFacilities);
+					newAct.setFacilityId(fFromFacilities.getId());
 					((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(fFromFacilities.getActivityOptions().get(factype));
 					changed = true;
 				}

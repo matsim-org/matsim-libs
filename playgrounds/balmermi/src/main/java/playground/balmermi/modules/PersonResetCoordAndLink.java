@@ -22,6 +22,7 @@ package playground.balmermi.modules;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -30,8 +31,10 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PersonResetCoordAndLink extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	public PersonResetCoordAndLink() {
-		super();
+	private final ActivityFacilities facilities;
+	
+	public PersonResetCoordAndLink(final ActivityFacilities facilities) {
+		this.facilities = facilities;
 	}
 
 	@Override
@@ -45,8 +48,8 @@ public class PersonResetCoordAndLink extends AbstractPersonAlgorithm implements 
 		for (int i=0; i<plan.getPlanElements().size(); i++) {
 			if (i%2==0) {
 				ActivityImpl a = (ActivityImpl)plan.getPlanElements().get(i);
-				a.setCoord(a.getFacility().getCoord());
-				a.setLink(((ActivityFacilityImpl) a.getFacility()).getLink());
+				a.setCoord(this.facilities.getFacilities().get(a.getFacilityId()).getCoord());
+				a.setLink(((ActivityFacilityImpl) this.facilities.getFacilities().get(a.getFacilityId())).getLink());
 			}
 			else {
 				LegImpl l = (LegImpl)plan.getPlanElements().get(i);

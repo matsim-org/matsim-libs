@@ -111,7 +111,7 @@ public class RandomLocationMutator extends LocationMutator {
 	
 	private void setNewLocationForAct(ActivityImpl act, int length) {
 		ActivityFacilityImpl facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];				
-		act.setFacility(facility);
+		act.setFacilityId(facility.getId());
 		act.setLink(((NetworkImpl) this.network).getNearestLink(facility.getCoord()));
 		act.setCoord(facility.getCoord());	
 	}

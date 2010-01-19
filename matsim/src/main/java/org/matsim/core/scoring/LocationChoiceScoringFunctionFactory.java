@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
@@ -41,17 +42,19 @@ public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFact
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 
 	private final CharyparNagelScoringParameters params;
+	private final ActivityFacilities facilities;
 	
 	public LocationChoiceScoringFunctionFactory(final CharyparNagelScoringConfigGroup config, 
-			final TreeMap<Id, FacilityPenalty> facilityPenalties) {
+			final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
 		this.params = new CharyparNagelScoringParameters(config);
 		this.facilityPenalties = facilityPenalties;
+		this.facilities = facilities;
 	}
 	
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new LocationChoiceScoringFunction(plan, params, facilityPenalties));
+		scoringFunctionAccumulator.addScoringFunction(new LocationChoiceScoringFunction(plan, params, facilityPenalties, this.facilities));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, params));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));

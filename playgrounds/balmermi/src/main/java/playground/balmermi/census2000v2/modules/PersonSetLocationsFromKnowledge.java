@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -42,15 +43,17 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(PersonSetLocationsFromKnowledge.class);
-	private Knowledges knowledges;
+	private final Knowledges knowledges;
+	private final ActivityFacilities facilities;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonSetLocationsFromKnowledge(Knowledges knowledges) {
+	public PersonSetLocationsFromKnowledge(Knowledges knowledges, final ActivityFacilities facilities) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.knowledges = knowledges;
+		this.facilities = facilities;
 		log.info("    done.");
 	}
 
@@ -94,8 +97,8 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 				if (act.getType().startsWith("h")) {
 					if (prev_home != null) { log.warn("TODO pid="+person.getId()+": Two home acts in a row. Not sure yet how to handle that..."); }
 					act.setType(home_act.getType());
-					act.setFacility(home_act.getFacility());
-					act.setCoord(act.getFacility().getCoord());
+					act.setFacilityId(home_act.getFacility().getId());
+					act.setCoord(this.facilities.getFacilities().get(act.getFacilityId()).getCoord());
 					prev_home = home_act;
 					prev_work = null;
 					prev_educ = null;
@@ -113,8 +116,8 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 						work_act = work_acts.get(MatsimRandom.getRandom().nextInt(work_acts.size()));
 					}
 					act.setType(work_act.getType());
-					act.setFacility(work_act.getFacility());
-					act.setCoord(act.getFacility().getCoord());
+					act.setFacilityId(work_act.getFacility().getId());
+					act.setCoord(this.facilities.getFacilities().get(act.getFacilityId()).getCoord());
 					prev_home = null;
 					prev_work = work_act;
 					prev_educ = null;
@@ -132,8 +135,8 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 						educ_act = educ_acts.get(MatsimRandom.getRandom().nextInt(educ_acts.size()));
 					}
 					act.setType(educ_act.getType());
-					act.setFacility(educ_act.getFacility());
-					act.setCoord(act.getFacility().getCoord());
+					act.setFacilityId(educ_act.getFacility().getId());
+					act.setCoord(this.facilities.getFacilities().get(act.getFacilityId()).getCoord());
 					prev_home = null;
 					prev_work = null;
 					prev_educ = educ_act;

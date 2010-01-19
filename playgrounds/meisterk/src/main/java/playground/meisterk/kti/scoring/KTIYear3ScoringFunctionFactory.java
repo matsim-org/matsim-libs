@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -37,15 +38,18 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 	private final Config config;
 	private final KtiConfigGroup ktiConfigGroup;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
+	private final ActivityFacilities facilities;
 	
 	public KTIYear3ScoringFunctionFactory(
 			final Config config, 
 			final KtiConfigGroup ktiConfigGroup,
-			final TreeMap<Id, FacilityPenalty> facilityPenalties) {
+			final TreeMap<Id, FacilityPenalty> facilityPenalties,
+			final ActivityFacilities facilities) {
 		super(config.charyparNagelScoring());
 		this.config = config;
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.facilityPenalties = facilityPenalties;
+		this.facilities = facilities;
 	}
 
 	@Override
@@ -56,7 +60,8 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
 				plan, 
 				super.getParams(), 
-				this.facilityPenalties));
+				this.facilityPenalties,
+				this.facilities));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
 				plan, 
 				super.getParams(),
@@ -66,7 +71,6 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(super.getParams()));
 		
 		return scoringFunctionAccumulator;
-		
 	}
 
 }

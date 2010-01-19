@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
@@ -55,13 +56,16 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
 	private final EnumSet<TransportMode> chainBasedModes;
 	private final PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer;
+	private final ActivityFacilities facilities;
 	
 	public PlanAnalyzeTourModeChoiceSet(
 			final EnumSet<TransportMode> chainBasedModes, 
-			final PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+			final PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer,
+			final ActivityFacilities facilities) {
 		super();
 		this.chainBasedModes = chainBasedModes;
 		this.tripStructureAnalysisLayer = tripStructureAnalysisLayer;
+		this.facilities = facilities;
 	}
 
 	private ArrayList<TransportMode[]> choiceSet = null;
@@ -112,7 +116,8 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 					plan, 
 					candidate, 
 					this.chainBasedModes, 
-					this.tripStructureAnalysisLayer);
+					this.tripStructureAnalysisLayer,
+					this.facilities);
 			
 			if (this.doLogging) {
 				log.info(numCombination + "\t");
@@ -144,10 +149,11 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			Plan plan, 
 			TransportMode[] candidate, 
 			EnumSet<TransportMode> chainBasedModes,
-			PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+			PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer,
+			ActivityFacilities facilities) {
 		
 		int numLegs = plan.getPlanElements().size() / 2;
-		int lastFeasibleLegNum = analyzeModeChainFeasability(plan, candidate, chainBasedModes, tripStructureAnalysisLayer);
+		int lastFeasibleLegNum = analyzeModeChainFeasability(plan, candidate, chainBasedModes, tripStructureAnalysisLayer, facilities);
 		
 		return (numLegs == lastFeasibleLegNum);
 		
@@ -169,7 +175,8 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			Plan plan, 
 			TransportMode[] candidate, 
 			EnumSet<TransportMode> chainBasedModes,
-			PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+			PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer,
+			ActivityFacilities facilities) {
 
 		boolean isModeChainFeasible = true;
 
@@ -181,7 +188,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			if (!modeTracker.containsKey(mode)) {
 				if (chainBasedModes.contains(mode)) {
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-						currentLocation = (ActivityFacilityImpl) ((PlanImpl) plan).getFirstActivity().getFacility();
+						currentLocation = (ActivityFacilityImpl) facilities.getFacilities().get(((PlanImpl) plan).getFirstActivity().getFacilityId());
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
 						currentLocation = (LinkImpl) ((PlanImpl) plan).getFirstActivity().getLink();
 					}
@@ -202,13 +209,13 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				if (chainBasedModes.contains(legMode)) {
 					currentLocation = modeTracker.get(legMode);
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-						requiredLocation = (ActivityFacilityImpl) ((PlanImpl) plan).getPreviousActivity(currentLeg).getFacility();
+						requiredLocation = (ActivityFacilityImpl) facilities.getFacilities().get(((PlanImpl) plan).getPreviousActivity(currentLeg).getFacilityId());
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
 						requiredLocation = (LinkImpl) ((PlanImpl) plan).getPreviousActivity(currentLeg).getLink();
 					}
 					if (currentLocation.equals(requiredLocation)) {
 						if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-							nextLocation = (ActivityFacilityImpl) ((PlanImpl) plan).getNextActivity(currentLeg).getFacility();
+							nextLocation = (ActivityFacilityImpl) facilities.getFacilities().get(((PlanImpl) plan).getNextActivity(currentLeg).getFacilityId());
 						} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
 							nextLocation = (LinkImpl) ((PlanImpl) plan).getNextActivity(currentLeg).getLink();
 						}
@@ -230,8 +237,8 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			HashSet<MappedLocation> allowedLocations = new HashSet<MappedLocation>();
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility
 					.equals(tripStructureAnalysisLayer)) {
-				allowedLocations.add((ActivityFacilityImpl) ((PlanImpl) plan).getFirstActivity().getFacility());
-				allowedLocations.add((ActivityFacilityImpl) ((PlanImpl) plan).getLastActivity().getFacility());
+				allowedLocations.add((ActivityFacilityImpl) facilities.getFacilities().get(((PlanImpl) plan).getFirstActivity().getFacilityId()));
+				allowedLocations.add((ActivityFacilityImpl) facilities.getFacilities().get(((PlanImpl) plan).getLastActivity().getFacilityId()));
 			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link
 					.equals(tripStructureAnalysisLayer)) {
 				allowedLocations.add((LinkImpl) ((PlanImpl) plan).getFirstActivity().getLink());

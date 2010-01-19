@@ -47,7 +47,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 
 	private final String[] w_acts = { CAtts.ACT_W2, CAtts.ACT_W3 };
 	private final String[] e_acts = { CAtts.ACT_EKIGA, CAtts.ACT_EPRIM, CAtts.ACT_ESECO, CAtts.ACT_EHIGH, CAtts.ACT_EOTHR };
-	private Knowledges knowledges;
+	private final Knowledges knowledges;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -101,7 +101,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				act.setStartTime(0);
 				act.setEndTime(24*3600);
 				act.setDuration(24*3600);
-				act.setFacility(home.getFacility());
+				act.setFacilityId(home.getFacility().getId());
 			}
 			else {
 				// home act end time = [6am-8am]
@@ -113,7 +113,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
 				act.setDuration(end_time);
-				act.setFacility(home.getFacility());
+				act.setFacilityId(home.getFacility().getId());
 				LegImpl leg = ((PlanImpl) p).createAndAddLeg(TransportMode.car);
 				leg.setDepartureTime(end_time);
 				leg.setTravelTime(0.0);
@@ -129,7 +129,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
-					act.setFacility(work.getFacility());
+					act.setFacilityId(work.getFacility().getId());
 					LegImpl leg2 = ((PlanImpl) p).createAndAddLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
 					leg2.setTravelTime(0.0);
@@ -146,7 +146,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
-					act.setFacility(educ.getFacility());
+					act.setFacilityId(educ.getFacility().getId());
 					LegImpl leg2 = ((PlanImpl) p).createAndAddLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
 					leg2.setTravelTime(0.0);
@@ -160,7 +160,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
 				act.setDuration(end_time-start_time);
-				act.setFacility(home.getFacility());
+				act.setFacilityId(home.getFacility().getId());
 			}
 		}
 		catch (Exception e) {

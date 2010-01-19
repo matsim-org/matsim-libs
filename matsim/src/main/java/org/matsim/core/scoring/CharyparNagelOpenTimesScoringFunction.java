@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
@@ -42,8 +43,11 @@ import org.matsim.core.utils.misc.Time;
  */
 public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFunction {
 
-	public CharyparNagelOpenTimesScoringFunction(Plan plan, final CharyparNagelScoringParameters params) {
+	private final ActivityFacilities facilities;
+	
+	public CharyparNagelOpenTimesScoringFunction(Plan plan, final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
 		super(plan, params);
+		this.facilities = facilities;
 	}
 
 	@Override
@@ -56,7 +60,7 @@ public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFuncti
 
 		boolean foundAct = false;
 
-		ActivityFacility facility = act.getFacility();
+		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
 		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
 		String facilityActType = null;
 		Set<OpeningTime> opentimes = null;

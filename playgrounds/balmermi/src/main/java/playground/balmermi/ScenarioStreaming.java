@@ -134,7 +134,7 @@ public class ScenarioStreaming {
 		plansWriter.startStreaming(sl.getScenario().getConfig().plans().getOutputFile());
 
 		System.out.println("adding algorithms...");
-		population.addAlgorithm(new PersonResetCoordAndLink());
+		population.addAlgorithm(new PersonResetCoordAndLink(af));
 		population.addAlgorithm(plansWriter);
 		population.addAlgorithm(new PersonStupidDeleteKnowledgeForStreamingModule(sl.getScenario().getKnowledges()));
 		Gbl.printMemoryUsage();

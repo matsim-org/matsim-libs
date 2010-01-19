@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -71,7 +70,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	private final ActivityTypeFinder 		finder;
 	
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
-	private Knowledges knowledges;
+	private final Knowledges knowledges;
 	
 	
 	
@@ -117,7 +116,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		
 		this.locator				= locator;	
 		
-		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
+		this.knowledges = (controler.getScenario()).getKnowledges();
 	}
 	
 		
@@ -458,7 +457,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			
 			// change number
 			int[] numberPositions = {0,0,1,1};		// "where to add activity, where to remove activity, number of adding cycles, number of removing cycles"
-			int[] actsToBeAdded = new int [(int)(neighbourhood[0].getPlanElements().size()/2)+1];
+			int[] actsToBeAdded = new int [(neighbourhood[0].getPlanElements().size()/2)+1];
 			/*for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos++){
 				infoOnNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], numberPositions, actsToBeAdded, actTypes, primActs);
 			}*/
@@ -470,7 +469,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			}
 			
 			// change type
-			int [] typePosition = {(int)(MatsimRandom.getRandom().nextDouble()*((int)(neighbourhood[0].getPlanElements().size()/2)-1))+1,1};
+			int [] typePosition = {(int)(MatsimRandom.getRandom().nextDouble()*((neighbourhood[0].getPlanElements().size()/2)-1))+1,1};
 			int [] actsToBeChanged = new int [actsToBeAdded.length];
 			for (int i = 0; i<actsToBeChanged.length;i++){
 				actsToBeChanged[i] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size());
@@ -555,14 +554,14 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		
 		// Randomly define position when removing an act for the first time
 		if(positions[1]==0){
-			positions[1] = (int)(MatsimRandom.getRandom().nextDouble()*((int)(basePlan.getPlanElements().size()/2)-1))+1;
+			positions[1] = (int)(MatsimRandom.getRandom().nextDouble()*((basePlan.getPlanElements().size()/2)-1))+1;
 		}
 		
 		OuterLoop:
-		while (positions[3]<(int)(basePlan.getPlanElements().size()/2)){
+		while (positions[3]<(basePlan.getPlanElements().size()/2)){
 			
 			// proceed through planElements
-			if (positions[1]<=(int)(basePlan.getPlanElements().size()/2)-1){
+			if (positions[1]<=(basePlan.getPlanElements().size()/2)-1){
 				if ((this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs) && !(this.checkForSamePrimary(basePlan, positions[1])))  ||
 						!this.checkForHomeSequenceRemoving(basePlan, positions[1]*2)) {
 					positions[1]++;
@@ -594,7 +593,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			List<String> actTypes, ArrayList<ActivityOptionImpl> primActs){
 		
 		/* Adding an activity, "cycling"*/			
-		if (positions[2]<=actTypes.size()+(actTypes.size()-1)*((int)(basePlan.getPlanElements().size()/2)-1)){ //maximum number of possible insertions
+		if (positions[2]<=actTypes.size()+(actTypes.size()-1)*((basePlan.getPlanElements().size()/2)-1)){ //maximum number of possible insertions
 			
 			boolean [] HomeActInserted = {false,false};  // {"insertion failed", "home act inserted"}
 			
@@ -606,7 +605,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				HomeActInserted = this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);
 				
 			}
-			else if (positions[0]<=(int)(basePlan.getPlanElements().size()/2)){ // going through activity list
+			else if (positions[0]<=(basePlan.getPlanElements().size()/2)){ // going through activity list
 				HomeActInserted = this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);				
 			}
 			else { // jumping back to first activity
@@ -650,14 +649,14 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			}
 			// Randomly define position when removing an act for the first time
 			if(positions[1]==0){
-				positions[1] = (int)(MatsimRandom.getRandom().nextDouble()*((int)(basePlan.getPlanElements().size()/2)-1))+1;
+				positions[1] = (int)(MatsimRandom.getRandom().nextDouble()*((basePlan.getPlanElements().size()/2)-1))+1;
 			}
 			
 			OuterLoop:
-			while (positions[3]<(int)(basePlan.getPlanElements().size()/2)){
+			while (positions[3]<(basePlan.getPlanElements().size()/2)){
 				
 				// proceed through planElements
-				if (positions[1]<=(int)(basePlan.getPlanElements().size()/2)-1){
+				if (positions[1]<=(basePlan.getPlanElements().size()/2)-1){
 					if ((this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs) && !(this.checkForSamePrimary(basePlan, positions[1])))  ||
 							!this.checkForHomeSequenceRemoving(basePlan, positions[1]*2)) {
 						positions[1]++;
@@ -687,7 +686,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		else{	
 			
 			/* Adding an activity, "cycling"*/			
-			if (positions[2]<=actTypes.size()+(actTypes.size()-1)*((int)(basePlan.getPlanElements().size()/2)-1)){ //maximum number of possible insertions
+			if (positions[2]<=actTypes.size()+(actTypes.size()-1)*((basePlan.getPlanElements().size()/2)-1)){ //maximum number of possible insertions
 				
 				boolean [] HomeActInserted = {false,false};  // {"insertion failed", "home act inserted"}
 				
@@ -699,7 +698,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 					HomeActInserted = this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);
 					
 				}
-				else if (positions[0]<=(int)(basePlan.getPlanElements().size()/2)){ // going through activity list
+				else if (positions[0]<=(basePlan.getPlanElements().size()/2)){ // going through activity list
 					HomeActInserted = this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);				
 				}
 				else { // jumping back to first activity
@@ -785,7 +784,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NE
 		OuterLoop:
-		while (position[1]<=(actTypes.size()-1)*(((int)(basePlan.getPlanElements().size()/2))-1)){
+		while (position[1]<=(actTypes.size()-1)*(((basePlan.getPlanElements().size()/2))-1)){
 			if (position[0]>basePlan.getPlanElements().size()/2-1) position[0] = 1;		
 			
 			ActivityImpl act = (ActivityImpl) basePlan.getPlanElements().get(position[0]*2);
@@ -806,7 +805,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			} while (type.equals(act.getType()) || (type.equalsIgnoreCase("home") && !this.checkForHomeSequenceChangeType(basePlan, position[0]*2))); // continue if either type is same as current one or if two home acts would fall together 
 			act.setType(type);
 			if (act.getType().equalsIgnoreCase("home")){
-				act.setFacility(((ActivityImpl)(basePlan.getPlanElements().get(0))).getFacility());
+				act.setFacilityId(((ActivityImpl)(basePlan.getPlanElements().get(0))).getFacilityId());
 				act.setCoord(((ActivityImpl)(basePlan.getPlanElements().get(0))).getCoord());
 				act.setLink(((ActivityImpl)(basePlan.getPlanElements().get(0))).getLink());
 				position[0]++;

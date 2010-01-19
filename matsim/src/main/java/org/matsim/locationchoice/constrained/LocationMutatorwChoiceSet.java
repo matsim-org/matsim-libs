@@ -167,7 +167,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
            	//		           MatsimRandom.random.nextInt(choiceSet.size())];
 			final ActivityFacility facility = choiceSet.get(MatsimRandom.getRandom().nextInt(choiceSet.size()));
 			
-			act.setFacility(facility);
+			act.setFacilityId(facility.getId());
        		act.setLink(((NetworkImpl) this.network).getNearestLink(facility.getCoord()));
        		act.setCoord(facility.getCoord());
        		return true;

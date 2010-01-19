@@ -31,7 +31,7 @@ public class AssignInitalShopFacilities {
 					}
 				}
 				ActivityFacilityImpl facility = this.actTree.get(actAnchor.getCoord().getX(), actAnchor.getCoord().getY());
-				act.setFacility(facility);
+				act.setFacilityId(facility.getId());
 				act.setCoord(facility.getCoord());
 			}
 			actPre = act;

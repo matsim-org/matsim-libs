@@ -19,7 +19,7 @@ import playground.jhackney.socialnetworks.socialnet.EgoNet;
 public class SNAdjustTimes implements PlanAlgorithm {
 
 //	private Controler controler;
-	private playground.jhackney.controler.SNController3 controler;
+	private final playground.jhackney.controler.SNController3 controler;
 	private final Logger log = Logger.getLogger(SNAdjustTimes.class);
 
 	public SNAdjustTimes(playground.jhackney.controler.SNController3 controler){
@@ -85,7 +85,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 				tw2 = visits.get(j);
 
 				//Check if the overlapping agents are friends and sum the arrival times
-				if(CompareTimeWindows.overlapTimePlaceType(tw1,tw2) && !p1.equals(p2)){
+				if(CompareTimeWindows.overlapTimePlaceType(tw1,tw2,this.controler.getFacilities()) && !p1.equals(p2)){
 					EgoNet net = (EgoNet)p1.getCustomAttributes().get(EgoNet.NAME);
 					if(net.getAlters().contains(p2)){
 						avgStartTime+=tw2.startTime;

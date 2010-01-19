@@ -48,14 +48,14 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 	private final String weights;
 
-	private double[] cum_p_factype;
+	private final double[] cum_p_factype;
 
-	private NetworkLayer network;
-	private TravelCost tcost;
-	private TravelTime ttime;
-	private String[] factypes;
+	private final NetworkLayer network;
+	private final TravelCost tcost;
+	private final TravelTime ttime;
+	private final String[] factypes;
 
-	private Knowledges knowledges;
+	private final Knowledges knowledges;
 
 	public RandomChangeLocShortestK(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, Knowledges knowledges) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
@@ -143,20 +143,20 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 					ActivityImpl lastAct = (ActivityImpl) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 					lastAct.setLink(fFromKnowledge.getLink());
 					lastAct.setCoord(fFromKnowledge.getCoord());
-					lastAct.setFacility(fFromKnowledge);
+					lastAct.setFacilityId(fFromKnowledge.getId());
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLinkId() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId())){
 					ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
 					firstAct.setLink(fFromKnowledge.getLink());
 					firstAct.setCoord(fFromKnowledge.getCoord());
-					firstAct.setFacility(fFromKnowledge);
+					firstAct.setFacilityId(fFromKnowledge.getId());
 				}
 				// Change the activity
 //				System.out.println("  ##### Act "+newAct.getRefId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
 				newAct.setLink(fFromKnowledge.getLink());
 				newAct.setCoord(fFromKnowledge.getCoord());
-				newAct.setFacility(fFromKnowledge);
+				newAct.setFacilityId(fFromKnowledge.getId());
 
 				//if new plan shorter than unchanged plan set true
 				if(getPlanLength(newPlan)<getPlanLength(plan)){

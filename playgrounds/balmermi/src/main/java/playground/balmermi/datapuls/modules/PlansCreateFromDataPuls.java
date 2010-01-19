@@ -95,7 +95,7 @@ public class PlansCreateFromDataPuls {
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Person p : population.getPersons().values()) {
-			Coord c = ((PlanImpl) p.getPlans().get(0)).getFirstActivity().getFacility().getCoord();
+			Coord c = this.datapulsFacilities.getFacilities().get(((PlanImpl) p.getPlans().get(0)).getFirstActivity().getFacilityId()).getCoord();
 			if (c.getX() < minx) { minx = c.getX(); }
 			if (c.getY() < miny) { miny = c.getY(); }
 			if (c.getX() > maxx) { maxx = c.getX(); }
@@ -111,7 +111,7 @@ public class PlansCreateFromDataPuls {
 		log.info("    assinging persons to their group...");
 		for (Person pp : population.getPersons().values()) {
 			PersonImpl p = (PersonImpl) pp;
-			Coord c = ((PlanImpl) p.getPlans().get(0)).getFirstActivity().getFacility().getCoord();
+			Coord c = this.datapulsFacilities.getFacilities().get(((PlanImpl) p.getPlans().get(0)).getFirstActivity().getFacilityId()).getCoord();
 			if (p.getSex().equals("m")) {
 				if (p.getAge()<7) { qts.get(0).put(c.getX(),c.getY(),p); }
 				else if (p.getAge()<15) { qts.get(1).put(c.getX(),c.getY(),p); }
@@ -316,7 +316,7 @@ public class PlansCreateFromDataPuls {
 				if (acts.isEmpty()) { throw new RuntimeException("pid="+dPerson.getId()+", aType="+a.getType()+": not defined in knowledge!"); }
 				ActivityFacilityImpl f = acts.get(random.nextInt(acts.size())).getFacility();
 				a.setCoord(f.getCoord());
-				a.setFacility(f);
+				a.setFacilityId(f.getId());
 			}
 		}
 	}

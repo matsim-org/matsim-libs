@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -35,7 +34,6 @@ public class AddParkingsToPlans {
 	 * The facility is also added to the existing acts.
 	 */
 	private static void addParkings(ScenarioImpl scenario) {
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			List<PlanElement> planElements = person.getSelectedPlan()
@@ -59,22 +57,22 @@ public class AddParkingsToPlans {
 
 					// add parking departure activity
 					newPlanElements.add(getParkingFacility(previousActivity,
-							"parkingDeparture",facilities));
+							"parkingDeparture"));
 					
 					// add the actual car leg
 					newPlanElements.add(planElements.get(i));
 					
 					// add parking arrival activity
 					newPlanElements.add(getParkingFacility(nextActivity,
-					"parkingArrival",facilities));
+					"parkingArrival"));
 
 					// add leg from parking to next activity Activity to parking
 					newPlanElements.add(getParkingWalkLeg(nextActivity.getLink()));
 					
 					
 					// set the facility of the activities also
-					previousActivity.setFacility(facilities.getFacilities().get(new IdImpl("facility_" + previousActivity.getLinkId().toString())));
-					nextActivity.setFacility(facilities.getFacilities().get(new IdImpl("facility_" + previousActivity.getLinkId().toString())));
+					previousActivity.setFacilityId(new IdImpl("facility_" + previousActivity.getLinkId().toString()));
+					nextActivity.setFacilityId(new IdImpl("facility_" + previousActivity.getLinkId().toString()));
 					
 				} else {
 					// add every thing else the new plan without change
@@ -115,15 +113,15 @@ public class AddParkingsToPlans {
 	 * @return
 	 */
 	private static ActivityImpl getParkingFacility(ActivityImpl activity,
-			String activityType, ActivityFacilitiesImpl facilities) {
+			String activityType) {
 		double parkingActivityDuration = 10; // in seconds
 
 		// copy the activity
-		ActivityImpl parkingActivity = new ActivityImpl((ActivityImpl) activity);
+		ActivityImpl parkingActivity = new ActivityImpl(activity);
 
 		parkingActivity.setType(activityType);
 		parkingActivity.setDuration(parkingActivityDuration);
-		parkingActivity.setFacility(facilities.getFacilities().get(new IdImpl("facility_" + activity.getLinkId().toString())));
+		parkingActivity.setFacilityId(new IdImpl("facility_" + activity.getLinkId().toString()));
 
 		return parkingActivity;
 	}

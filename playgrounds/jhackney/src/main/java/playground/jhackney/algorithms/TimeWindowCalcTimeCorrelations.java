@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 
@@ -16,6 +17,8 @@ import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 
 public class TimeWindowCalcTimeCorrelations {
 
+	private final ActivityFacilities facilities;
+	
 	/**
 	 * Writes out a flat file with one line per agent and time window 
 	 * indicating various statistics about the time window object, including:
@@ -33,7 +36,8 @@ public class TimeWindowCalcTimeCorrelations {
 	 * @param out1name
 	 * @author jhackney
 	 */
-	public TimeWindowCalcTimeCorrelations(LinkedHashMap<Id,ArrayList<TimeWindow>> timeWindowMap, String out2name, String out1name){ 
+	public TimeWindowCalcTimeCorrelations(LinkedHashMap<Id,ArrayList<TimeWindow>> timeWindowMap, String out2name, String out1name, ActivityFacilities facilities){ 
+		this.facilities = facilities;
 		// First identify the overlapping Acts and the Persons involved
 		Object[] facIds = timeWindowMap.keySet().toArray();
 		Vector<Double> tbins=new Vector<Double>();
@@ -78,7 +82,7 @@ public class TimeWindowCalcTimeCorrelations {
 				double tdur_egonet=tf_egonet-ti_egonet;
 				tdur_egonet=(tdur_egonet+numbins*binwidth)%(numbins*binwidth);
 				int n_egonet=0;
-				double dist_egonet=((ActivityFacilityImpl) tw1.act.getFacility()).calcDistance(((ActivityImpl)(tw1.person.getSelectedPlan().getPlanElements().get(0))).getFacility().getCoord());
+				double dist_egonet=((ActivityFacilityImpl) this.facilities.getFacilities().get(tw1.act.getFacilityId())).calcDistance(this.facilities.getFacilities().get(((ActivityImpl)(tw1.person.getSelectedPlan().getPlanElements().get(0))).getFacilityId()).getCoord());
 
 				double ti_act=tw1.startTime;
 				ti_act=(ti_act+numbins*binwidth)%(numbins*binwidth);
@@ -91,10 +95,10 @@ public class TimeWindowCalcTimeCorrelations {
 
 				for (int iii=ii+1;iii<visits.length;iii++){
 					TimeWindow tw2 = (TimeWindow) visits[iii];
-					double dist_alter=((ActivityFacilityImpl) tw2.act.getFacility()).calcDistance(((ActivityImpl)(tw2.person.getSelectedPlan().getPlanElements().get(0))).getFacility().getCoord());
+					double dist_alter=((ActivityFacilityImpl) this.facilities.getFacilities().get(tw2.act.getFacilityId())).calcDistance(this.facilities.getFacilities().get(((ActivityImpl)(tw2.person.getSelectedPlan().getPlanElements().get(0))).getFacilityId()).getCoord());
 
 					// Others there who are friends
-					if(CompareTimeWindows.overlapTimePlaceTypeFriend(tw1, tw2)){
+					if(CompareTimeWindows.overlapTimePlaceTypeFriend(tw1, tw2, this.facilities)){
 						n_egonet++;
 						ti_egonet=ti_egonet+tw2.startTime;
 						tf_egonet=tf_egonet+tw2.endTime;
@@ -105,7 +109,7 @@ public class TimeWindowCalcTimeCorrelations {
 
 					}
 					// Others there, not necessarily friends
-					if(CompareTimeWindows.overlapTimePlaceType(tw1, tw2)){										
+					if(CompareTimeWindows.overlapTimePlaceType(tw1, tw2, this.facilities)){										
 						n_act++;
 //						double tdurunfolded=(tw1.endTime-tw1.startTime+numbins*binwidth)%(numbins*binwidth);
 						double tdurunfolded=(CompareTimeWindows.getTimeWindowOverlapDuration(tw1, tw2)+numbins*binwidth)%(numbins*binwidth);
@@ -157,7 +161,7 @@ public class TimeWindowCalcTimeCorrelations {
 					}
 				}else if(tstart>tend){
 					// Agents and egonets spending time between 0 and EndTime
-					for(int j= (int) 0; j< (int) (tend/binwidth); j++){
+					for(int j= 0; j< (int) (tend/binwidth); j++){
 
 						if(tw1.act.getType().equals("home")){
 							hist[j][0]=hist[j][0]+1;					
@@ -175,7 +179,7 @@ public class TimeWindowCalcTimeCorrelations {
 							hist[j][4]=hist[j][4]+1;					
 						}
 					}
-					for(int j= (int) (tstart/binwidth); j< (int) numbins; j++){
+					for(int j= (int) (tstart/binwidth); j< numbins; j++){
 
 						if(tw1.act.getType().equals("home")){
 							hist[j][0]=hist[j][0]+1;					
@@ -217,7 +221,7 @@ public class TimeWindowCalcTimeCorrelations {
 						}
 					}
 				}else if(tstart>tend){
-					for(int j = (int) 0; j< (int) (tend/binwidth); j++){
+					for(int j = 0; j< (int) (tend/binwidth); j++){
 						if(tw1.act.getType().equals("home")){
 							hist[j][5]=hist[j][5]+1;					
 						}
@@ -236,7 +240,7 @@ public class TimeWindowCalcTimeCorrelations {
 					}
 					// Agents and egonets spending time between StartTime and 90000
 
-					for(int j = (int) (tstart/binwidth); j< (int) numbins; j++){
+					for(int j = (int) (tstart/binwidth); j< numbins; j++){
 						if(tw1.act.getType().equals("home")){
 							hist[j][5]=hist[j][5]+1;					
 						}

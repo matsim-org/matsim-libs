@@ -27,15 +27,16 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 /**
@@ -61,8 +62,8 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 	
 	public static final double MINIMUM_DURATION = 0.5 * 3600;
 
-	private HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
-	private HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
+	private final HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
+	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
 	private double accumulatedTooShortDuration;
 	private double timeSpentWaiting;
 	private double accumulatedNegativeDuration;
@@ -79,9 +80,11 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 	private boolean densityScore = false;						
 	private boolean shoppingCentersScore = false;
 	private ShoppingScoreAdditionals shoppingScoreAdditionals;
+	private final ActivityFacilities facilities;
 	
-	public ActivityScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params) {
+	public ActivityScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
 		super(plan, params);
+		this.facilities = facilities;
 	}
 
 	@Override
@@ -108,10 +111,10 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 			SortedSet<OpeningTime> openTimes = null;
 			ActivityOptionImpl actOpt = null;
 			if (act.getType().startsWith("leisure")) {
-				actOpt = act.getFacility().getActivityOptions().get("leisure");
+				actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get("leisure");
 			}
 			else {
-				ActivityFacilityImpl facility = (ActivityFacilityImpl)act.getFacility();
+				ActivityFacilityImpl facility = (ActivityFacilityImpl)this.facilities.getFacilities().get(act.getFacilityId());
 				if (facility != null) {
 					actOpt = facility.getActivityOptions().get(act.getType());
 				}

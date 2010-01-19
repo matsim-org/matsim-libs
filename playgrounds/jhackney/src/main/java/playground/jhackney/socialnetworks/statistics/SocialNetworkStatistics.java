@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -83,7 +84,8 @@ public class SocialNetworkStatistics {
 
 	private final int writeInterval=50;
 	private final Logger log = Logger.getLogger(SocialNetworkStatistics.class);
-	private String statsoutdir;
+	private final String statsoutdir;
+	private final ActivityFacilities facilities;
 
 	private BufferedWriter aout = null;
 
@@ -103,8 +105,8 @@ public class SocialNetworkStatistics {
 	// to get the Person ID given a Vertex object
 	TreeMap<Id, Vertex> verticesPersons = new TreeMap<Id, Vertex>();
 
-	public SocialNetworkStatistics(String dir) {
-
+	public SocialNetworkStatistics(String dir, ActivityFacilities facilities) {
+		this.facilities = facilities;
 		// statsoutdir = Gbl.getConfig().socnetmodule().getOutDir()+"stats/";
 		statsoutdir = dir + "/stats/";
 	}
@@ -294,9 +296,9 @@ public class SocialNetworkStatistics {
 	private Vector<Person> getEdgePersons(Edge e, PopulationImpl plans) {
 		Vector<Person> persons = new Vector<Person>(2);
 		Vertex v1 = (Vertex) e.getEndpoints().getFirst();
-		Person p1 = plans.getPersons().get((Id) v1.getUserDatum("personId"));
+		Person p1 = plans.getPersons().get(v1.getUserDatum("personId"));
 		Vertex v2 = (Vertex) e.getEndpoints().getSecond();
-		Person p2 = plans.getPersons().get((Id) v2.getUserDatum("personId"));
+		Person p2 = plans.getPersons().get(v2.getUserDatum("personId"));
 		persons.add(p1);
 		persons.add(p2);
 		return persons;
@@ -316,11 +318,11 @@ public class SocialNetworkStatistics {
 	private double getDyadDistance(Edge myEdge, PopulationImpl plans) {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
-		Person pFrom = plans.getPersons().get((Id) vFrom.getUserDatum("personId"));
+		Person pFrom = plans.getPersons().get(vFrom.getUserDatum("personId"));
 		Coord fromCoord = ((ActivityImpl) pFrom.getSelectedPlan().getPlanElements().get(
 				0)).getCoord();
 		Vertex vTo = (Vertex) myEdge.getEndpoints().getSecond();
-		Person pTo = plans.getPersons().get((Id) vTo.getUserDatum("personId"));
+		Person pTo = plans.getPersons().get(vTo.getUserDatum("personId"));
 		Coord toCoord = ((ActivityImpl) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
 		dist = CoordUtils.calcDistance(fromCoord, toCoord);
@@ -358,7 +360,7 @@ public class SocialNetworkStatistics {
 		StatisticalMoments smASD2 = new StatisticalMoments();
 		StatisticalMoments smASD3 = new StatisticalMoments();
 		PlanEuclideanLength len = new PlanEuclideanLength();
-		GeoStatistics gstat = new GeoStatistics(plans, snet);
+		GeoStatistics gstat = new GeoStatistics(plans, snet, this.facilities);
 		Graph g = gstat.makeJungGraph();
 
 		Set<Vertex> vertices = this.g.getVertices();
@@ -367,7 +369,7 @@ public class SocialNetworkStatistics {
 		while (ivert.hasNext()) {
 
 			Vertex myVert = ivert.next();
-			Person myPerson = plans.getPersons().get((Id) myVert.getUserDatum("personId"));
+			Person myPerson = plans.getPersons().get(myVert.getUserDatum("personId"));
 			int id = Integer.parseInt(myVert.getUserDatum("personId").toString());
 			// Agent's Home Location ID
 			ActivityImpl myAct = (ActivityImpl) myPerson.getSelectedPlan().getPlanElements().get(0);
@@ -398,7 +400,7 @@ public class SocialNetworkStatistics {
 //			myPerson.getKnowledge().clearActivitySpaces();
 
 			//Geographical aggregation
-			ActivityFacilityImpl myHome=(ActivityFacilityImpl) ((ActivityImpl)(myPerson.getSelectedPlan().getPlanElements().get(0))).getFacility();
+			ActivityFacilityImpl myHome=(ActivityFacilityImpl) this.facilities.getFacilities().get(((ActivityImpl)(myPerson.getSelectedPlan().getPlanElements().get(0))).getFacilityId());
 			Location myLoc=myHome.getUpMapping().get(myHome.getUpMapping().firstKey());
 			Vertex myVertex=gstat.getLocVertex().get(myLoc);
 			double pop=(Integer) myVertex.getUserDatum("population");

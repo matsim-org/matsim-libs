@@ -4,6 +4,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -20,15 +21,18 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
 	private final Config config;
 		private final FtConfigGroup ftConfigGroup;
 		private final TreeMap<Id, FacilityPenalty> facilityPenalties;
+		private final ActivityFacilities facilities;
 		
 		public FtScoringFunctionFactory(
 				final Config config, 
 				final FtConfigGroup ftConfigGroup,
-				final TreeMap<Id, FacilityPenalty> facilityPenalties) {
+				final TreeMap<Id, FacilityPenalty> facilityPenalties,
+				final ActivityFacilities facilities) {
 			super(config.charyparNagelScoring());
 			this.config = config;
 			this.ftConfigGroup = ftConfigGroup;
 			this.facilityPenalties = facilityPenalties;
+			this.facilities = facilities;
 		}
 	
 		@Override
@@ -39,7 +43,8 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
 			scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
 					plan, 
 					super.getParams(), 
-					this.facilityPenalties));
+					this.facilityPenalties,
+					this.facilities));
 			scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
 					(PlanImpl) plan, 
 					super.getParams(),

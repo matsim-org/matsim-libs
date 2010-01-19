@@ -36,7 +36,7 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
-	private boolean parallel = false;
+	private final boolean parallel = false;
 	private String facilityIdFile = null;
 	private Retailers retailers;
 	private Controler controler;
@@ -85,7 +85,7 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				r.runStrategy(lrr.getFreeLinks());
 				lrr.updateFreeLinks();
-				new ReRoutePersons().run(r.getMovedFacilities(), controler.getNetwork(), controler.getPopulation().getPersons(), pcrl);  
+				new ReRoutePersons().run(r.getMovedFacilities(), controler.getNetwork(), controler.getPopulation().getPersons(), pcrl, controler.getFacilities());  
 			}
 		}
 	}

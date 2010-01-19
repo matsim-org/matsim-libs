@@ -128,7 +128,7 @@ public class IIDMAssign2Network {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		pop.addAlgorithm(new PersonAssignToNetwork(network));
+		pop.addAlgorithm(new PersonAssignToNetwork(network, facilities));
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

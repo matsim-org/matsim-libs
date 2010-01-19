@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
@@ -32,14 +33,14 @@ public class GravityModel
   public final static String CONFIG_SAMPLE__TYPE_SHOPS = "samplingTypeShops";
   public final static String CONFIG_SAMPLE_PERSONS = "samplingRatePersons";
   private double[] betas;
-  private Controler controler;
+  private final Controler controler;
   private Map<Id,ActivityFacilityImpl> shops = new TreeMap<Id,ActivityFacilityImpl>();
-  private Collection<? extends ActivityFacility> controlerFacilities;
-  private Map<Id, PersonRetailersImpl> retailersPersons = new TreeMap<Id, PersonRetailersImpl>();
-  private RetailZones retailZones = new RetailZones();
-  private Map<Id, ActivityFacilityImpl> retailersFacilities;
+  private final ActivityFacilities controlerFacilities;
+  private final Map<Id, PersonRetailersImpl> retailersPersons = new TreeMap<Id, PersonRetailersImpl>();
+  private final RetailZones retailZones = new RetailZones();
+  private final Map<Id, ActivityFacilityImpl> retailersFacilities;
   private TreeMap<Integer,String> first;
-  private Map<Id, ? extends Person> persons;
+  private final Map<Id, ? extends Person> persons;
   private int counter=0;
   private int nextCounterMsg =1;
   
@@ -48,8 +49,8 @@ public class GravityModel
   {
     this.controler = controler;
     this.retailersFacilities = retailerFacilities;
-    this.controlerFacilities = controler.getFacilities().getFacilities().values();
-    this.shops = this.findScenarioShops(this.controlerFacilities);
+    this.controlerFacilities = controler.getFacilities();
+    this.shops = this.findScenarioShops(this.controlerFacilities.getFacilities().values());
     this.persons = (controler.getPopulation().getPersons());
     
   }
@@ -66,7 +67,7 @@ public void init() {
 	//TODO Define the asymmetric version, at the moment only the symmetric is possible
 	if (number_of_zones == 0) { throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" not defined!");}
 	this.createZonesFromPersonsShops(n);
-	this.findScenarioShops(controlerFacilities);
+	this.findScenarioShops(this.controlerFacilities.getFacilities().values());
 	Gbl.printMemoryUsage();
 	
 	for  (Person p:controler.getPopulation().getPersons().values()) {
@@ -91,11 +92,11 @@ public double computePotential(ArrayList<Integer> solution){
 		double pers_sum_potential = 0.0D;
         double pers_potential = 0.0D;
         double pers_likelihood = 0.0D;
-        double dist1 = 0.0D;
         
-        if (((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord) == 0.0D) dist1 = 10.0D;
-        else {
-          dist1 = ((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord);
+        ActivityFacility firstFacility = this.controlerFacilities.getFacilities().get(((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacilityId());
+       	double dist1 = ((ActivityFacilityImpl) firstFacility).calcDistance(coord);
+        if (dist1 == 0.0D) {
+        	dist1 = 10.0D;
         }
         pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOptions().get("shop").getCapacity().doubleValue(), this.betas[1]);
         
@@ -112,11 +113,9 @@ public double computePotential(ArrayList<Integer> solution){
 		            int index = count;
 		            Coord coord1 = this.controler.getNetwork().getLinks().get(new IdImpl(this.first.get(solution.get(index)))).getCoord();
 		            
-		            if (((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord1) == 0.0D) {
+		            dist = ((ActivityFacilityImpl) firstFacility).calcDistance(coord1);
+		            if (dist == 0.0D) {
 		            	dist = 10.0D;
-		            }
-		            else {
-		              dist = ((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord1);
 		            }
 		          }
 		          else if (CoordUtils.calcDistance(s.getCoord(), ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
@@ -198,7 +197,7 @@ public double computePotential(ArrayList<Integer> solution){
 					double y2= y1 + y_width;
 					RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
 					for (Person p : persons.values() ) {
-						Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
+						Coord c = this.controlerFacilities.getFacilities().get(((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacilityId()).getCoord();
 						if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
 							rz.addPersonToQuadTree(c,p);
 						}		
@@ -225,7 +224,7 @@ public double computePotential(ArrayList<Integer> solution){
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		
-		for (ActivityFacility af : controlerFacilities) {
+		for (ActivityFacility af : this.controlerFacilities.getFacilities().values()) {
 			if (af.getCoord().getX() < minx) { minx = af.getCoord().getX(); }
 			if (af.getCoord().getY() < miny) { miny = af.getCoord().getY(); }
 			if (af.getCoord().getX() > maxx) { maxx = af.getCoord().getX(); }
@@ -257,7 +256,7 @@ public double computePotential(ArrayList<Integer> solution){
 				for (Person p : persons.values() ) { //TODO think if it is not better to put the following in a separate method
 					// like it is now it is not needed to go through all zones again in order to assign them persons and shops
 					// the other way is probably cleaner and this part below doesn't need to appear twice
-					Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
+					Coord c = this.controlerFacilities.getFacilities().get(((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacilityId()).getCoord();
 					if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
 						rz.addPersonToQuadTree(c,p);
 					}		

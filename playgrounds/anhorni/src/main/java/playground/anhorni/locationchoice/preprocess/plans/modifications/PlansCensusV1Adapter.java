@@ -87,23 +87,23 @@ public class PlansCensusV1Adapter {
 					
 		if (act.getType().startsWith("h")) {
 			fullType = "home";
-			act.setFacility(this.homeTree.get(act.getCoord().getX(), act.getCoord().getY()));
+			act.setFacilityId(this.homeTree.get(act.getCoord().getX(), act.getCoord().getY()).getId());
 		}
 		else if (act.getType().startsWith("e")){
 			fullType = "education";
-			act.setFacility(this.educationTree.get(act.getCoord().getX(), act.getCoord().getY()));
+			act.setFacilityId(this.educationTree.get(act.getCoord().getX(), act.getCoord().getY()).getId());
 		}
 		else if (act.getType().startsWith("s")){
 			fullType = "shop";
-			act.setFacility(this.shopTree.get(act.getCoord().getX(), act.getCoord().getY()));
+			act.setFacilityId(this.shopTree.get(act.getCoord().getX(), act.getCoord().getY()).getId());
 		}
 		else if (act.getType().startsWith("l")){
 			fullType = "leisure";
-			act.setFacility(this.leisureTree.get(act.getCoord().getX(), act.getCoord().getY()));
+			act.setFacilityId(this.leisureTree.get(act.getCoord().getX(), act.getCoord().getY()).getId());
 		}	
 		else if (act.getType().startsWith("w")){
 			fullType = "work";
-			act.setFacility(this.workTree.get(act.getCoord().getX(), act.getCoord().getY()));
+			act.setFacilityId(this.workTree.get(act.getCoord().getX(), act.getCoord().getY()).getId());
 		}
 		if (((PersonImpl) person).getDesires().getActivityDuration(fullType) <= 0.0) {
 			((PersonImpl) person).getDesires().putActivityDuration(fullType, desiredDuration);

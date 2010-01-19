@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -59,27 +60,28 @@ import playground.jhackney.socialnetworks.io.MakeSocialNetworkFromFile;
 public class SocialNetwork {
 
 	private boolean UNDIRECTED;
-	private SocNetConfigGroup socnetConfig = Gbl.getConfig().socnetmodule();
+	private final SocNetConfigGroup socnetConfig = Gbl.getConfig().socnetmodule();
 	String linkRemovalCondition= socnetConfig.getSocNetLinkRemovalAlgo();
 	String edge_type= socnetConfig.getEdgeType();
 	double remove_p= Double.parseDouble(socnetConfig.getSocNetLinkRemovalP());
 	double remove_age= Double.parseDouble(socnetConfig.getSocNetLinkRemovalAge());
-	private double degree_saturation_rate= Double.parseDouble(socnetConfig.getDegSat());
-	private Collection<? extends Person> persons;
+	private final double degree_saturation_rate= Double.parseDouble(socnetConfig.getDegSat());
+	private final Collection<? extends Person> persons;
 
 	// a Collection of all the Links in the network
 	//public ArrayList<SocialNetEdge> linksList = new ArrayList<SocialNetEdge>();
 	public TreeSet<SocialNetEdge> linksList = new TreeSet<SocialNetEdge>();
-	
+	private final ActivityFacilities facilities;
 	
 //	public int setupIter=0;
 	// public ArrayList<SocialNetNode> nodes;
 
 	private final static Logger log = Logger.getLogger(SocialNetwork.class);
 
-	public SocialNetwork(Population plans) {
+	public SocialNetwork(Population plans, ActivityFacilities facilities) {
 
 		this.persons=plans.getPersons().values();
+		this.facilities = facilities;
 
 		if(edge_type.equals("UNDIRECTED")){
 			UNDIRECTED=true;
@@ -157,8 +159,8 @@ public class SocialNetwork {
 //			for (int i = 0; i < numLinks; i++) {
 			PersonImpl person1 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
 			PersonImpl person2 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
-			Coord home1=((ActivityImpl)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
-			Coord home2=((ActivityImpl)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
+			Coord home1=this.facilities.getFacilities().get(((ActivityImpl)person1.getSelectedPlan().getPlanElements().get(0)).getFacilityId()).getCoord();
+			Coord home2=this.facilities.getFacilities().get(((ActivityImpl)person2.getSelectedPlan().getPlanElements().get(0)).getFacilityId()).getCoord();
 			double distance = CoordUtils.calcDistance(home1, home2);
 //			double pdist=c*Math.pow((distance+rmin),-alpha);
 			double pdist=p0*Math.pow((distance/rmin+1),-alpha);
@@ -199,7 +201,7 @@ public class SocialNetwork {
 
 		double gamma = 2.5; //
 		int kbar=Integer.parseInt(socnetConfig.getSocNetKbar()); 
-		int m0= (int) (((double)kbar)/2.); // initial core size
+		int m0= (int) ((kbar)/2.); // initial core size
 		int m=m0;// number of links to add each step, m< m0
 //		if(m>m0){
 //		Gbl.errorMsg(this.getClass()+" m must be >= m0");
@@ -210,7 +212,7 @@ public class SocialNetwork {
 		PersonImpl[] personList = new PersonImpl[1];
 		personList = plans.getPersons().values().toArray( personList );
 
-		int maxE = (int) ((double)kbar/2.)*personList.length;
+		int maxE = (int) (kbar/2.)*personList.length;
 
 		log.info("Links the Persons together in UNDIRECTED Barabasi/Albert random graph of Gamma="+gamma+", core="+m0+", Emax="+maxE);
 
@@ -277,14 +279,14 @@ public class SocialNetwork {
 		personList = plans.getPersons().values().toArray( personList );
 
 		int numLinks = (int) ((kbar * personList.length) / 2.);
-		double pdist=2.*(double)numLinks/((personList.length*(personList.length-1)));
+		double pdist=2.*numLinks/((personList.length*(personList.length-1)));
 		int i=0;
 		while(i<numLinks){
 //		for (int i = 0; i < numLinks; i++) {
 			PersonImpl person1 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
 			PersonImpl person2 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
-			Coord home1=((ActivityImpl)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
-			Coord home2=((ActivityImpl)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
+			Coord home1=this.facilities.getFacilities().get(((ActivityImpl)person1.getSelectedPlan().getPlanElements().get(0)).getFacilityId()).getCoord();
+			Coord home2=this.facilities.getFacilities().get(((ActivityImpl)person2.getSelectedPlan().getPlanElements().get(0)).getFacilityId()).getCoord();
 			double distance = CoordUtils.calcDistance(home1, home2);
 			
 //			makeSocialContact( person1, person2, -1);
@@ -631,7 +633,7 @@ public class SocialNetwork {
 			int kbar=Integer.parseInt(socnetConfig.getSocNetKbar());
 
 			if (UNDIRECTED) {
-				int nRemove=this.getLinks().size()-(int) ((double) kbar/2.*this.persons.size());
+				int nRemove=this.getLinks().size()-(int) (kbar/2.*this.persons.size());
 				log.info("  Number of links to remove: "+nRemove);
 				int i=0;
 				while(i<nRemove){

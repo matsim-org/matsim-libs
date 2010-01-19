@@ -296,7 +296,7 @@ public class PlansVariator implements PlanAlgorithm {
 		
 		act.setType(this.actTypes.get(position[rotationPos]));
 		if (act.getType().equalsIgnoreCase("home")){
-			act.setFacility(((ActivityImpl)(plan.getPlanElements().get(0))).getFacility());
+			act.setFacilityId(((ActivityImpl)(plan.getPlanElements().get(0))).getFacilityId());
 			act.setCoord(((ActivityImpl)(plan.getPlanElements().get(0))).getCoord());
 			act.setLink(((ActivityImpl)(plan.getPlanElements().get(0))).getLink());
 		}
@@ -333,7 +333,7 @@ public class PlansVariator implements PlanAlgorithm {
 	 * */
 	private int checksubtourDistance2 (List<PlanElement> actslegs, PlanAnalyzeSubtours planAnalyzeSubtours, int pos){
 		double distance = 0;
-		for (int k=0;k<((int)(actslegs.size()/2));k++){
+		for (int k=0;k<((actslegs.size()/2));k++){
 			if ((planAnalyzeSubtours.getSubtourIndexation()[k])==pos){
 				distance=distance+CoordUtils.calcDistance(((ActivityImpl)(actslegs.get(k*2))).getCoord(), ((ActivityImpl)(actslegs.get(k*2+2))).getCoord());
 				if (distance>this.maxWalkingDistance) {

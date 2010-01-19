@@ -21,10 +21,10 @@
 package playground.anhorni.locationchoice.run.scoring;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -41,7 +41,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.charyparN
 	private boolean densityScore = false;						
 	private boolean shoppingCentersScore = false;
 	private QuadTree<ActivityFacilityImpl> shopQuadTree;
-	private Controler controler;
+	private final Controler controler;
 	
 	private final static Logger log = Logger.getLogger(TRBScoringFunctionFactory.class);
 		
@@ -67,7 +67,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.charyparN
 					this.controler.getConfig().getModule("trb_scoring").getValue("shoppingCentersScore"));
 			log.info("Shopping center scoring: " + this.shoppingCentersScore);
 			
-			this.shoppingScoreAdditionals = new ShoppingScoreAdditionals();	
+			this.shoppingScoreAdditionals = new ShoppingScoreAdditionals(this.controler.getFacilities());	
 	}
 	
 	private void initQuadTree() {
@@ -85,7 +85,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.charyparN
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		this.scoringFunction = new ActivityScoringFunction(plan, super.getParams());
+		this.scoringFunction = new ActivityScoringFunction(plan, super.getParams(), this.controler.getFacilities());
 		this.scoringFunction.setSign(this.sign);
 		this.scoringFunction.setSizeScore(this.sizeScore);
 		this.scoringFunction.setDensityScore(this.densityScore);

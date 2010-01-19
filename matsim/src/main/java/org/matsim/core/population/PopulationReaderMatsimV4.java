@@ -346,7 +346,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			if (f == null) {
 				Gbl.errorMsg("facility id=" + fId + " does not exist!");
 			}
-			this.curract.setFacility(f);
+			this.curract.setFacilityId(f.getId());
 		}
 		if (this.routeDescription != null) {
 			if (this.currRoute instanceof GenericRoute) {

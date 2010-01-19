@@ -136,12 +136,12 @@ public class IIDMGenerationPart2 {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		pop.addAlgorithm(new PersonSetLocationsFromKnowledge(knowledges));
+		pop.addAlgorithm(new PersonSetLocationsFromKnowledge(knowledges, facilities));
 		pop.addAlgorithm(new PersonAssignShopLeisureLocations(facilities));
 		pop.addAlgorithm(new PersonAssignAndNormalizeTimes());
-		PersonAssignModeChoiceModel pamcm = new PersonAssignModeChoiceModel(municipalities,outdir+"/subtours.txt", knowledges);
+		PersonAssignModeChoiceModel pamcm = new PersonAssignModeChoiceModel(municipalities,outdir+"/subtours.txt", knowledges, facilities);
 		pop.addAlgorithm(pamcm);
-		pop.addAlgorithm(new PersonAssignPrimaryActivities(knowledges));
+		pop.addAlgorithm(new PersonAssignPrimaryActivities(knowledges, facilities));
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

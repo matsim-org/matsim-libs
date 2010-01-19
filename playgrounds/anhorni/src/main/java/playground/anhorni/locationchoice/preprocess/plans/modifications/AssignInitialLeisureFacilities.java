@@ -1,8 +1,8 @@
 package playground.anhorni.locationchoice.preprocess.plans.modifications;
 
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -13,7 +13,7 @@ import playground.anhorni.locationchoice.run.replanning.LeisureFacilityExtractor
 public class AssignInitialLeisureFacilities {
 	
 	private final QuadTreeRing<ActivityFacilityImpl> actTree;
-	private LeisureFacilityExtractor leisureFacilityExtractor;
+	private final LeisureFacilityExtractor leisureFacilityExtractor;
 	
 	public AssignInitialLeisureFacilities(final QuadTreeRing<ActivityFacilityImpl> actTree) {
 		this.leisureFacilityExtractor = new LeisureFacilityExtractor(actTree);
@@ -49,7 +49,7 @@ public class AssignInitialLeisureFacilities {
 						}
 					}
 				}
-				act.setFacility(facility);
+				act.setFacilityId(facility.getId());
 				act.setCoord(facility.getCoord());				
 			}
 			actPre = act;

@@ -29,6 +29,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -42,10 +43,12 @@ public class PersonConsolidateInitDemand extends AbstractPersonAlgorithm impleme
 
 	private static final Logger log = Logger.getLogger(PersonConsolidateInitDemand.class);
 	private final Knowledges knowledges;
+	private final ActivityFacilities facilities;
 
-	public PersonConsolidateInitDemand(Knowledges knowledges) {
+	public PersonConsolidateInitDemand(Knowledges knowledges, final ActivityFacilities facilities) {
 		super();
 		this.knowledges = knowledges;
+		this.facilities = facilities;
 	}
 
 	@Override
@@ -64,13 +67,13 @@ public class PersonConsolidateInitDemand extends AbstractPersonAlgorithm impleme
 		ActivityImpl act = plan.getFirstActivity();
 		while (act != plan.getLastActivity()) {
 			String actType = act.getType();
-			ActivityOptionImpl ao = act.getFacility().getActivityOptions().get(actType);
+			ActivityOptionImpl ao = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(actType);
 			if (ao == null) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": act of type="+actType+" does not fit to facility id="+act.getFacilityId()+"!"); }
 			actOptions.add(ao);
 			act = plan.getNextActivity(plan.getNextLeg(act));
 		}
 		String actType = act.getType();
-		ActivityOptionImpl ao = act.getFacility().getActivityOptions().get(actType);
+		ActivityOptionImpl ao = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(actType);
 		if (ao == null) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": act of type="+actType+" does not fit to facility id="+act.getFacilityId()+"!"); }
 		actOptions.add(ao);
 

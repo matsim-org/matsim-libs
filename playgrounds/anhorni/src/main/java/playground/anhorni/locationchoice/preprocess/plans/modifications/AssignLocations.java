@@ -27,13 +27,13 @@ import java.util.Vector;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
 public class AssignLocations {
@@ -41,10 +41,12 @@ public class AssignLocations {
 	//private final static Logger log = Logger.getLogger(AssignLocations.class);
 
 	private QuadTreeRing<ActivityFacilityImpl> actTree = null;
+	private final ActivityFacilities facilities;
 
-	public AssignLocations(final QuadTreeRing<ActivityFacilityImpl> actTree) {
+	public AssignLocations(final QuadTreeRing<ActivityFacilityImpl> actTree, final ActivityFacilities facilities) {
 		super();
 		this.actTree = actTree;
+		this.facilities = facilities;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -84,13 +86,13 @@ public class AssignLocations {
 		if ((dx == 0.0) && (dy == 0.0)) {
 			// c_start and c_end equal			
 			ActivityFacilityImpl facility = this.getFacilities(c_start.getX(), c_start.getY(), 1000.0);
-			act.setFacility(facility);
+			act.setFacilityId(facility.getId());
 			act.setCoord(facility.getCoord());
 		}
 		else {
 			// c_start and c_end different
 			ActivityFacilityImpl facility = this.getFacilities(c_start, c_end);
-			act.setFacility(facility);
+			act.setFacilityId(facility.getId());
 			act.setCoord(facility.getCoord());
 		}
 	}
@@ -112,13 +114,14 @@ public class AssignLocations {
 	private void run(Plan plan, String type) {
 		for (int i = 0; i < plan.getPlanElements().size(); i = i + 2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
-			if (act.getFacility() == null && act.getType().equals(type)) {
+			ActivityFacility actFacility = this.facilities.getFacilities().get(act.getFacilityId());
+			if (actFacility == null && act.getType().equals(type)) {
 				// get the prev act with a facility
 				ActivityFacility start = null;
 				for (int b = i - 2; b >= 0; b = b - 2) {
 					ActivityImpl b_act = (ActivityImpl)plan.getPlanElements().get(b);
-					if (b_act.getFacility() != null) {
-						start = b_act.getFacility(); 
+					if (b_act.getFacilityId() != null) {
+						start = this.facilities.getFacilities().get(b_act.getFacilityId()); 
 						break; 
 					}
 				}
@@ -126,8 +129,8 @@ public class AssignLocations {
 				ActivityFacility end = null;
 				for (int a = i + 2; a < plan.getPlanElements().size(); a = a + 2) {
 					ActivityImpl a_act = (ActivityImpl)plan.getPlanElements().get(a);
-					if (a_act.getFacility() != null) {
-						end = a_act.getFacility(); 
+					if (a_act.getFacilityId() != null) {
+						end = this.facilities.getFacilities().get(a_act.getFacilityId()); 
 						break;
 					}
 				}

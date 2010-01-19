@@ -41,7 +41,7 @@ public class ActivityImpl implements Activity {
 	private String type;
 	private Coord coord = null;
 	protected Link link = null;
-	protected ActivityFacility facility = null;
+	protected Id facilityId = null;
 	
 	private ActivityImpl(final String type) {
 		this.type = type.intern();
@@ -59,7 +59,7 @@ public class ActivityImpl implements Activity {
 
 	public ActivityImpl(final String type, final ActivityFacility fac) {
 		this(type);
-		this.setFacility(fac);
+		this.setFacilityId(fac.getId());
 	}
 
 	public ActivityImpl(final String type, final Coord coord, final Link link) {
@@ -76,7 +76,7 @@ public class ActivityImpl implements Activity {
 		this.setStartTime(act.getStartTime());
 		this.setEndTime(act.getEndTime());
 		this.setDuration(act.getDuration());
-		this.setFacility(act.getFacility());
+		this.setFacilityId(act.getFacilityId());
 	}
 
 	public final double getEndTime() {
@@ -122,13 +122,11 @@ public class ActivityImpl implements Activity {
 	}
 	
 	public final Id getFacilityId() {
-		if (this.facility != null)
-			return this.facility.getId();
-		return null;
+		return this.facilityId;
 	}
 	
-	public final void setFacility(final ActivityFacility facility) {
-		this.facility = facility;
+	public final void setFacilityId(final Id facilityId) {
+		this.facilityId = facilityId;
 	}
 
 	public final void setLink(final Link link) {
@@ -138,11 +136,6 @@ public class ActivityImpl implements Activity {
 	@Deprecated // use getLinkId
 	public Link getLink() {
 		return this.link;
-	}
-
-	@Deprecated // use getFacilityId
-	public ActivityFacility getFacility() {
-		return this.facility;
 	}
 	
 	@Override

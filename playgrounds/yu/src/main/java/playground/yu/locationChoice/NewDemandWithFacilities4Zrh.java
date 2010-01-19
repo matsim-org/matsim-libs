@@ -62,7 +62,7 @@ public class NewDemandWithFacilities4Zrh {
 		private PersonImpl currentPerson = null;
 		private KnowledgeImpl currentKnowledge = null;
 		private long facCnt = 0;
-		private Knowledges knowledges;
+		private final Knowledges knowledges;
 
 		public CreateActFacility(final ActivityFacilitiesImpl activityFacilities, Knowledges knowledges) {
 			afs = activityFacilities;
@@ -101,7 +101,7 @@ public class NewDemandWithFacilities4Zrh {
 				af = afs.createFacility(new IdImpl(facCnt++), coord);
 				afMap.put(coord, af);
 			}
-			act.setFacility(af);
+			act.setFacilityId(af.getId());
 			ActivityOptionImpl ao = af.getActivityOptions().get(type);
 			if (ao == null)
 				ao = af.createActivityOption(type);

@@ -56,17 +56,19 @@ import edu.uci.ics.jung.graph.Vertex;
 
 public class PajekWriter {
 
-	private Coord minCoord;
-	private Coord maxCoord;
-	private TreeMap<Id, Integer> pajekIndex= new TreeMap<Id, Integer>();
+	private final Coord minCoord;
+	private final Coord maxCoord;
+	private final TreeMap<Id, Integer> pajekIndex= new TreeMap<Id, Integer>();
 	String dir;
-	private Knowledges knowledges;
+	private final Knowledges knowledges;
+	private final ActivityFacilities facilities;
 
 	private final static Logger log = Logger.getLogger(PajekWriter.class);
 
 	public PajekWriter(String dir, ActivityFacilities facilities, Knowledges knowledges){
 		this.dir= dir + "/";
 		this.knowledges = knowledges;
+		this.facilities = facilities;
 		File pjDir=new File(this.dir+"pajek/");
 		log.info("PajekWriter1 make dir "+this.dir + "pajek/");
 		if(!(pjDir.mkdir())&& !pjDir.exists()){
@@ -159,7 +161,7 @@ public class PajekWriter {
 	}
 	public void writeGeo(Population plans, SocialNetwork snet, int iter) {
 
-		GeoStatistics gstat = new GeoStatistics(plans, snet);
+		GeoStatistics gstat = new GeoStatistics(plans, snet, this.facilities);
 		Graph g = gstat.makeJungGraph();
 
 		BufferedWriter pjnet = null;

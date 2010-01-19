@@ -64,7 +64,7 @@ public class EgoNetMakeActivitySpaces {
 		ActivityFacilitiesImpl facilities = Scenario.readFacilities();
 		//read in social network
 		System.out.println(" Initializing the social network ...");
-		new SocialNetwork(plans);
+		new SocialNetwork(plans, facilities);
 		System.out.println("... done");
 
 		//read in facilities knowledge
