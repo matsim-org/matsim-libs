@@ -39,12 +39,12 @@ import org.matsim.core.utils.misc.IntegerCache;
 public class TravelTimeDataHashMap implements TravelTimeData {
 	private final Map<Integer,TimeStruct> travelTimes;
 	
-	private final Link link;
+	protected final Link link;
 
 	public TravelTimeDataHashMap(final Link link) {
 		this.travelTimes =  new ConcurrentHashMap<Integer,TimeStruct>();
 		this.link = link;
-		resetTravelTimes();
+//		resetTravelTimes();
 	}
 
 	public void resetTravelTimes() {

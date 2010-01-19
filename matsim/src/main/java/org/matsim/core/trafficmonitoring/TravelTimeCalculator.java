@@ -62,7 +62,7 @@ public class TravelTimeCalculator
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
 	"agent is not known the turning move travel time cannot be calculated!";
 	
-	/*package*/ final int timeslice;
+	/*package*/ final int timeSlice;
 	/*package*/ final int numSlots;
 	private AbstractTravelTimeAggregator aggregator;
 	
@@ -86,9 +86,9 @@ public class TravelTimeCalculator
 
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
 			TravelTimeCalculatorConfigGroup ttconfigGroup) {
-		this.timeslice = timeslice;
-		this.numSlots = (maxTime / this.timeslice) + 1;
-		this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeslice);
+		this.timeSlice = timeslice;
+		this.numSlots = (maxTime / this.timeSlice) + 1;
+		this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeSlice);
 		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
 		this.calculateLinkTravelTimes = ttconfigGroup.isCalculateLinkTravelTimes();
 		this.calculateLinkToLinkTravelTimes = ttconfigGroup.isCalculateLinkToLinkTravelTimes();
@@ -236,8 +236,8 @@ public class TravelTimeCalculator
 				TravelTimeData r = data.ttData;
 				double prevTravelTime = r.getTravelTime(1, 0.0);
 				for (int i = 1; i < this.numSlots; i++) {
-					double time = r.getTravelTime(i, i * this.timeslice);
-					double minTime = prevTravelTime - this.timeslice;
+					double time = r.getTravelTime(i, i * this.timeSlice);
+					double minTime = prevTravelTime - this.timeSlice;
 					if (time < minTime) {
 						r.addTravelTime(i, minTime);
 						prevTravelTime = minTime;
@@ -250,6 +250,14 @@ public class TravelTimeCalculator
 		}
 	}
 
+	public int getNumSlots() {
+		return this.numSlots;
+	}
+
+	public int getTimeSlice(){
+		return this.timeSlice;
+	}
+	
 	private static class DataContainer {
 		/*package*/ final TravelTimeData ttData;
 		/*package*/ volatile boolean needsConsolidation = false;
