@@ -3,11 +3,13 @@
  */
 package playground.yu.utils;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
 import playground.yu.utils.io.SimpleReader;
@@ -55,12 +57,16 @@ public class MyOTFEvents2Mvi {
 		}
 
 		Gbl.startMeasurement();
-		// Gbl.createConfig(null);
-		new ScenarioLoaderImpl((String) null).loadScenario().getConfig();
 
-		NetworkLayer net = new NetworkLayer();
+		Scenario s = new ScenarioImpl();
+
+		NetworkImpl net = (NetworkImpl) s.getNetwork();
 		new MatsimNetworkReader(net).readFile(args[0]);
-
+// important?
+		QSimConfigGroup qscfg = new QSimConfigGroup();
+		qscfg.setFlowCapFactor(0.1);
+		s.getConfig().setQSimConfigGroup(qscfg);
+//---------------------------------------------------------
 		SimpleReader sr = new SimpleReader(args[1]);
 
 		String eventsOutputFilename = args[1].replaceAll("events",
@@ -90,5 +96,4 @@ public class MyOTFEvents2Mvi {
 
 		System.out.println("done.");
 	}
-
 }
