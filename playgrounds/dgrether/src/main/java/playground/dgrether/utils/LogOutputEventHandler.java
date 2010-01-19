@@ -45,11 +45,15 @@ import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
+import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -63,7 +67,8 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	AgentMoneyEventHandler, AgentStuckEventHandler, 
 	PersonEventHandler, AgentWait2LinkEventHandler,
 	LaneEnterEventHandler, LaneLeaveEventHandler,
-	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
+	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
 
 	private static final Logger log = Logger.getLogger(LogOutputEventHandler.class);
 
@@ -132,5 +137,14 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 		log.info("PersonLeavesVehicleEvent at " + Time.writeTime(e.getTime()) + " person id " + e.getPersonId() + " vehicle id " + e.getVehicleId());		
 	}
 
+	@Override
+	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+		log.info("VehicleArrivesAtFacilityEvent at " + Time.writeTime(event.getTime()) + " facility id " + event.getFacilityId() + " vehicle id " + event.getVehicleId() + " delay " + event.getDelay());
+	}
+	
+	@Override
+	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+		log.info("VehicleDepartsAtFacilityEvent at " + Time.writeTime(event.getTime()) + " facility id " + event.getFacilityId() + " vehicle id " + event.getVehicleId() + " delay " + event.getDelay());
+	}
 
 }
