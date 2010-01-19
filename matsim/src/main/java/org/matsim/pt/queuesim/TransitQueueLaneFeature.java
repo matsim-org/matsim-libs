@@ -17,6 +17,7 @@ import org.matsim.ptproject.qsim.QueueVehicle;
 import org.matsim.ptproject.qsim.QueueVehicleEarliestLinkExitTimeComparator;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 
@@ -124,7 +125,7 @@ public class TransitQueueLaneFeature {
 			double vehPosition = queueLane.getLink().getLength();
 			for (QueueVehicle veh : this.transitVehicleStopQueue) {
 				PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, veh.getDriver().getPerson().getId(), queueLane.getLink(),
-						vehPosition, lane, 0.0, 	PositionInfo.VehicleState.Driving, null);
+						vehPosition, lane, 0.0, 	AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
 				positions.add(position);
 				vehPosition -= veh.getSizeInEquivalents() * cellSize;
 			}

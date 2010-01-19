@@ -159,7 +159,7 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 	public void addAgent(final PositionInfo position) {
 
 		//drop all parking vehicles
-		if (position.getVehicleState() == PositionInfo.VehicleState.Parking) {
+		if (position.getAgentState() == AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY) {
 			return;
 		}
 

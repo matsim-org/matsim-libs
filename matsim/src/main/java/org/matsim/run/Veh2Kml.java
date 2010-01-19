@@ -32,6 +32,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
@@ -222,7 +223,7 @@ public class Veh2Kml {
 						String elevation = result[13];
 						String azimuth = result[14];
 						PositionInfo position = new PositionInfo(new IdImpl(agent), easting, northing,
-								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving,null);
+								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING,null);
 						addVehicle(Double.parseDouble(time), position);
 					}
 				}

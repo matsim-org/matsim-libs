@@ -75,7 +75,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 	}
 
 	public void addAgent(final PositionInfo position) {
-		PersonImpl pers = new PersonImpl(position.getAgentId());
+		PersonImpl pers = new PersonImpl(position.getId());
 
 		PlanImpl plan = new PlanImpl(pers);
 		ActivityImpl actA = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(position.getEasting(), position.getNorthing()),

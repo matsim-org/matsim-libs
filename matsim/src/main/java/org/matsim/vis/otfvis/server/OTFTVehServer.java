@@ -45,7 +45,7 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 /**
  * OTFTVehServer is a Server that reads from the T.veh file format.
@@ -127,7 +127,7 @@ public class OTFTVehServer implements OTFServerRemote {
 					lineFound = true;
 					this.time = Double.parseDouble(time);
 					this.readVehicle = new OTFAgentsListHandler.ExtendedPositionInfo(new IdImpl(agent), easting, northing,
-							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
+							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 					return true;
 				}
 			}

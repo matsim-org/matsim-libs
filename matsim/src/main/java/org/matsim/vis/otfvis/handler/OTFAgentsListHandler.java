@@ -30,11 +30,12 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
+import org.matsim.vis.otfvis.data.OTFDataWriter;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -56,24 +57,15 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
 	public static class ExtendedPositionInfo extends PositionInfo {
 
-		int type = 0;
-		int user = 0;
-
-		public ExtendedPositionInfo(Id driverId, double easting, double northing, double elevation, double azimuth, double speed, VehicleState vehicleState, int type, int userdata) {
+		public ExtendedPositionInfo(Id driverId, double easting, double northing, double elevation, double azimuth, double speed, AgentState vehicleState, int type, int userdata) {
 			super(driverId, easting, northing, elevation, azimuth, speed, vehicleState, "");
 			this.type = type;
 			this.user = userdata;
 		}
-		public ExtendedPositionInfo(PositionInfo i, int type, int userdata) {
-			super(i.getAgentId(), i.getEasting(), i.getNorthing(), i.getElevation(), i.getAzimuth(), i.getSpeed(), i.getVehicleState(), "");
+		public ExtendedPositionInfo(AgentSnapshotInfo i, int type, int userdata) {
+			super(i.getId(), i.getEasting(), i.getNorthing(), i.getElevation(), i.getAzimuth(), i.getSpeed(), i.getAgentState(), "");
 			this.type = type;
 			this.user = userdata;
-		}
-		public int getType() {
-			return this.type;
-		}
-		public int getUser() {
-			return this.user;
 		}
 
 	}
@@ -89,13 +81,13 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		public void writeConstData(ByteBuffer out) throws IOException {
 		}
 
-		public void writeAgent(ExtendedPositionInfo pos, ByteBuffer out) {
-			String id = pos.getAgentId().toString();
+		public void writeAgent(PositionInfo pos, ByteBuffer out) {
+			String id = pos.getId().toString();
 			ByteBufferUtils.putString(out, id);
 			out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
 			out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
-			out.putInt(pos.type);
-			out.putInt(pos.user);
+			out.putInt(pos.getType());
+			out.putInt(pos.getUserDefined());
 			out.putFloat((float)pos.getSpeed());
 		}
 
@@ -104,7 +96,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			// Write additional agent data
 			out.putInt(this.positions.size());
 
-			for (ExtendedPositionInfo pos : this.positions) {
+			for (PositionInfo pos : this.positions) {
 				writeAgent(pos, out);
 			}
 			this.positions.clear();

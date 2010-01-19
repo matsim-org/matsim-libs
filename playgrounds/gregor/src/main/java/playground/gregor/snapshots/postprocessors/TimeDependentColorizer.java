@@ -53,7 +53,7 @@ public class TimeDependentColorizer implements PostProcessorI, AgentDepartureEve
 	}
 
 	public void processPositionInfo(PositionInfo pos) {
-		EventAgent e = this.agents.get(pos.getAgentId().toString());
+		EventAgent e = this.agents.get(pos.getId().toString());
 		int time =  (int) ((e.endtime-e.starttime) / 60);
 		pos.setType(Math.min(time,255));
 	}

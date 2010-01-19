@@ -31,6 +31,7 @@ import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -76,7 +77,7 @@ public class OTFEvent2MVI extends OTFFileWriter {
 	@Override
 	public void addAgent(PositionInfo position) {
 		//drop all parking vehicles
-		if (position.getVehicleState() == PositionInfo.VehicleState.Parking) return;
+		if (position.getAgentState() == AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY) return;
 
 		this.writer.positions.add(new OTFAgentsListHandler.ExtendedPositionInfo(position, 0,0));
 	}

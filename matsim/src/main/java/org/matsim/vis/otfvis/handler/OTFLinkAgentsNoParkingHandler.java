@@ -25,8 +25,8 @@ import java.nio.ByteBuffer;
 import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.snapshots.writers.PositionInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 
 /**
@@ -47,13 +47,13 @@ public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 			positions.clear();
 			src.getVisData().getVehiclePositions(SimulationTimer.getTime(), positions);
 			int valid = 0;
-			for (PositionInfo pos : positions) {
-				if (pos.getVehicleState() != VehicleState.Parking) valid++;
+			for (AgentSnapshotInfo pos : positions) {
+				if (pos.getAgentState() != AgentState.AGENT_AT_ACTIVITY) valid++;
 			}
 			out.putInt(valid);
 
-			for (PositionInfo pos : positions) {
-				if (pos.getVehicleState() != VehicleState.Parking) writeAgent(pos, out);
+			for (AgentSnapshotInfo pos : positions) {
+				if (pos.getAgentState() != AgentState.AGENT_AT_ACTIVITY) writeAgent(pos, out);
 			}
 		}
 

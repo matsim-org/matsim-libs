@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 
 public class TableSnapshotWriter {
@@ -27,11 +27,11 @@ public class TableSnapshotWriter {
 		}
 	}
 
-	public void addVehicle(double time, ExtendedPositionInfo pos) throws IOException {
+	public void addVehicle(double time, PositionInfo pos) throws IOException {
 		StringBuffer buff = new StringBuffer();
 		buff.append(time);
 		buff.append("\t");
-		buff.append(pos.getAgentId());
+		buff.append(pos.getId());
 		buff.append("\t");
 		buff.append(pos.getEasting());
 		buff.append("\t");

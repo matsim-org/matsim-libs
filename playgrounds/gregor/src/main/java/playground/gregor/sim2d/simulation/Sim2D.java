@@ -23,7 +23,7 @@ import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
-import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 import playground.gregor.sim2d.otfdebug.readerwriter.Agent2DWriter;
 import playground.gregor.sim2d.otfdebug.readerwriter.ForceArrowWriter;
@@ -231,7 +231,7 @@ public class Sim2D {
 				alpha /= TWO_PI;
 				alpha *= 360;
 				alpha += 90;
-				ExtendedPositionInfo pos = new ExtendedPositionInfo(agent.getId(),coord.x,coord.y,0,alpha,velocity,VehicleState.Driving,Math.abs(agent.getId().hashCode())%10,1);
+				ExtendedPositionInfo pos = new ExtendedPositionInfo(agent.getId(),coord.x,coord.y,0,alpha,velocity,AgentState.AGENT_MOVING,Math.abs(agent.getId().hashCode())%10,1);
 				this.agentData.add(pos);
 			}
 		}

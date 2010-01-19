@@ -35,8 +35,9 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 
 /**
@@ -51,14 +52,14 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 	
 	protected static final transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 
-	public void writeAgent(PositionInfo pos, ByteBuffer out) {
-		String id = pos.getAgentId().toString();
+	public void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
+		String id = pos.getId().toString();
 		ByteBufferUtils.putString(out, id);
 		out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
 		out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
-		if (pos.getVehicleState()== VehicleState.Parking) {
+		if (pos.getAgentState()== AgentState.AGENT_AT_ACTIVITY) {
 			// What is the next legs mode?
-			QueueVehicle veh = src.getVehicle(pos.getAgentId());
+			QueueVehicle veh = src.getVehicle(pos.getId());
 			if (veh == null) {
 				out.putInt(1);
 			} else {
@@ -91,18 +92,18 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 		if (showParked) {
 			out.putInt(positions.size());
 
-			for (PositionInfo pos : positions) {
+			for (AgentSnapshotInfo pos : positions) {
 				writeAgent(pos, out);
 			}
 		} else {
 			int valid = 0;
-			for (PositionInfo pos : positions) {
-				if (pos.getVehicleState() != VehicleState.Parking) valid++;
+			for (AgentSnapshotInfo pos : positions) {
+				if (pos.getAgentState() != AgentState.AGENT_AT_ACTIVITY) valid++;
 			}
 			out.putInt(valid);
 
-			for (PositionInfo pos : positions) {
-				if (pos.getVehicleState() != VehicleState.Parking) writeAgent(pos, out);
+			for (AgentSnapshotInfo pos : positions) {
+				if (pos.getAgentState() != AgentState.AGENT_AT_ACTIVITY) writeAgent(pos, out);
 			}
 		}
 

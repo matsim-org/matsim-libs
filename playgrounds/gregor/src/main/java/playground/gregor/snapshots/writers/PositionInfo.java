@@ -51,18 +51,17 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 	final private double distanceOnLink;
 	final private String visualizerData;
 	final private double speed;
-	final private VehicleState vehicleState;
+	final private AgentState vehicleState;
 	final private LinkImpl link;
 
 
-	private int type = 0;
 	private int usr = 0;
 	
 	
 	
 	public PositionInfo(final Id agentId, final LinkImpl link, final double distanceOnLink, final int lane, final double speed,
-			final VehicleState vehicleState, final String visualizerData) {
-		super(agentId, 0, 0, 0, 0, 0, PositionInfo.VehicleState.Driving,	null);
+			final AgentState vehicleState, final String visualizerData) {
+		super(agentId, 0, 0, 0, 0, 0, PositionInfo.AgentState.AGENT_MOVING,	null);
 		this.agentId = agentId;
 		this.link = link;
 		final TreeMap<Double,LineSegment> lsMap = lsTree.getTreeMap(link.getId().toString());
@@ -116,7 +115,7 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 	
 
 	@Override
-	public Id getAgentId() {
+	public Id getId() {
 		return this.agentId;
 	}
 
@@ -152,7 +151,7 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 
 
 	@Override
-	public VehicleState getVehicleState(){
+	public AgentState getAgentState(){
 		return this.vehicleState;
 	}
 
@@ -169,10 +168,10 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 	}
 
 
-	@Override
-	public String getVisualizerData() {
-		return this.visualizerData;
-	}
+//	@Override
+//	public String getVisualizerData() {
+//		return this.visualizerData;
+//	}
 
 	public void setEasting(double teleportationX) {
 		this.easting = teleportationX;

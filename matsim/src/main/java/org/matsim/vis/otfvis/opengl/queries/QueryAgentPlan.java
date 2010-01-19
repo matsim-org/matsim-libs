@@ -61,6 +61,7 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 import com.sun.opengl.util.BufferUtil;
@@ -146,7 +147,7 @@ public class QueryAgentPlan implements OTFQuery {
 				if (coord == null) {
 					assert( net!=null ) ;
 					Link link = net.getLinks().get( act.getLinkId() ) ;
-					PositionInfo pi = new PositionInfo( new IdImpl(this.agentId), link ) ;
+					AgentSnapshotInfo pi = new PositionInfo( new IdImpl(this.agentId), link ) ;
 					coord = new CoordImpl( pi.getEasting(), pi.getNorthing() ) ;
 //					coord = link.getCoord();
 				}

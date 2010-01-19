@@ -50,7 +50,7 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 	}
 
 	public void processPositionInfo(PositionInfo pos) {
-		String color = getColor(pos.getAgentId().toString());
+		String color = getColor(pos.getId().toString());
 		pos.setUserData(Integer.parseInt(color));
 	}
 

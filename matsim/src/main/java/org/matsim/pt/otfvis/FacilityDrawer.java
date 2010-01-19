@@ -46,6 +46,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 
@@ -78,7 +79,7 @@ public class FacilityDrawer {
 					if ( link==null ) {
 						log.warn( " link not found; linkId: " + facility.getLinkId() ) ;
 					}
-					PositionInfo ps = new PositionInfo(facility.getId(),link) ;
+					AgentSnapshotInfo ps = new PositionInfo(facility.getId(),link) ;
 					
 					out.putDouble( ps.getEasting() - OTFServerQuad2.offsetEast ) ;
 					out.putDouble( ps.getNorthing() - OTFServerQuad2.offsetNorth ) ;

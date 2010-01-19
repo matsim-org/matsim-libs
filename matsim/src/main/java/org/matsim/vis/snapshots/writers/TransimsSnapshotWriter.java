@@ -63,22 +63,22 @@ public class TransimsSnapshotWriter implements SnapshotWriter {
 	public void addAgent(PositionInfo position) {
 		
 		//drop all parking vehicles 
-		if (position.getVehicleState() == PositionInfo.VehicleState.Parking) return;
+		if (position.getAgentState() == AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY) return;
 		
-		String visualizerData = 	position.getVisualizerData();
-		if (visualizerData == null){
-			visualizerData = "0";
-		}
+//		String visualizerData = 	position.getVisualizerData();
+//		if (visualizerData == null){
+//			visualizerData = "0";
+//		}
 		
-		String buffer = position.getAgentId().toString()
+		String buffer = position.getId().toString()
 					    			+ "\t" + (int)this.currentTime
 		                + "\t0\t0\t1\t0\t" + position.getSpeed() // link(0), from node(0), lane(1), dist(0), speed
-		                + "\t1\t0\t" + position.getAgentId().toString()   // vehtype(1), acceleration(0), driver-id
+		                + "\t1\t0\t" + position.getId().toString()   // vehtype(1), acceleration(0), driver-id
 		                + "\t0\t" + position.getEasting()   // # of passengers(0), easting
 		                + "\t" + position.getNorthing() 
 		                + "\t" + position.getElevation()
 		                + "\t" + position.getAzimuth()
-		                + "\t"+ visualizerData + "\n"; // user(0)
+		                + "\t"+ "0" + "\n"; // user(0)
 		try {
 			out.write(buffer);
 		} catch (IOException e) {

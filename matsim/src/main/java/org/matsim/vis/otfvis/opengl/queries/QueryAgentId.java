@@ -34,8 +34,9 @@ import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  * QueryAgentId is an internal query.
@@ -78,9 +79,9 @@ public class QueryAgentId implements OTFQuery {
 		for( QueueLink qlink : net.getLinks().values()) {
 			List<PositionInfo> positions = new LinkedList<PositionInfo>();
 			qlink.getVisData().getVehiclePositions(SimulationTimer.getTime(), positions);
-			for(PositionInfo info : positions) {
+			for(AgentSnapshotInfo info : positions) {
 				
-				if ((info.getVehicleState()== VehicleState.Parking) && !OTFLinkAgentsHandler.showParked) continue;
+				if ((info.getAgentState()== AgentState.AGENT_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
 
 				double xDist = info.getEasting() - this.x;
 				double yDist = info.getNorthing() - this.y;
@@ -90,12 +91,12 @@ public class QueryAgentId implements OTFQuery {
 					if(dist < minDist){
 						minDist = dist;
 						this.agentIds.clear();
-						this.agentIds.add(info.getAgentId().toString());
+						this.agentIds.add(info.getId().toString());
 					}
 				} else {
 					// search for all agents in given RECT
 					if( (xDist < width) && (yDist < height) && (xDist >= 0) && (yDist >= 0) ) {
-						this.agentIds.add(info.getAgentId().toString());
+						this.agentIds.add(info.getId().toString());
 					}
 				}
 			}

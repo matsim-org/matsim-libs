@@ -42,6 +42,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -593,7 +594,7 @@ public class QueueLink {
 
       List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
       for (PositionInfo pos : positions) {
-        if (pos.getVehicleState() == PositionInfo.VehicleState.Driving) {
+        if (pos.getAgentState() == AgentSnapshotInfo.AgentState.AGENT_MOVING) {
           AgentOnLink veh = new AgentOnLink();
           veh.posInLink_m = pos.getDistanceOnLink();
           vehs.add(veh);
@@ -641,7 +642,7 @@ public class QueueLink {
           int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
           double speed = (time > cmp ? 0.0 : freespeed);
           PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
-              distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
+              distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
           positions.add(position);
           distFromFromNode -= cellSize;
         }
@@ -652,7 +653,7 @@ public class QueueLink {
           int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
           double speed = (time > cmp ? 0.0 : freespeed);
           PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
-              distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
+              distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
           positions.add(position);
           distFromFromNode -= cellSize;
         }
@@ -668,7 +669,7 @@ public class QueueLink {
         double distFromFromNode = QueueLink.this.getLink().getLength() - cellSize / 2.0;
         for (QueueVehicle veh : QueueLink.this.waitingList) {
           PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
-              distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+              distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY, null);
           positions.add(position);
           distFromFromNode -= cellSize;
         }
@@ -727,7 +728,7 @@ public class QueueLink {
         double speed = (now > cmp) ? 0.0 : link.getFreespeed(Time.UNDEFINED_TIME);
 
         PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), link, queueEnd,
-            lane, speed, PositionInfo.VehicleState.Driving, null);
+            lane, speed, AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
         positions.add(position);
         queueEnd -= vehLen;
       }
@@ -778,7 +779,7 @@ public class QueueLink {
         }
         int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
         PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), link, distanceOnLink,
-            lane, speed, PositionInfo.VehicleState.Driving, null);
+            lane, speed, AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
         positions.add(position);
         lastDistance = distanceOnLink;
       }
@@ -795,7 +796,7 @@ public class QueueLink {
       int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
       for (QueueVehicle veh : QueueLink.this.waitingList) {
         PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
-            /*positionOnLink*/cellSize, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+            /*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY, null);
         positions.add(position);
       }
       return lane;

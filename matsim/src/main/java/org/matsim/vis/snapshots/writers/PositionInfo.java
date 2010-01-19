@@ -36,9 +36,7 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  *
  * @author mrieser
  */
-public class PositionInfo {
-	public enum VehicleState {Driving, Parking, DrivingTransitVehicle, ParkingTransitVehicle };
-
+public class PositionInfo implements AgentSnapshotInfo {
 	private static final double LANE_WIDTH = 3.75;//TODO lane width is no longer static but it is defined in network. The question is,
 	//how to get this information here? One possibility is to use Gbl ... but I suppose not everyone
 	//would be comfortable with this idea? Is there a solution to do this in a strict OO manner 
@@ -71,8 +69,12 @@ public class PositionInfo {
 
 	final private double speed;
 
-	final private VehicleState vehicleState;
+	final private AgentState vehicleState;
 	final private Link link;
+
+	protected int type = 0;
+
+	protected int user = 0;
 
 	/**Uses PositionInfo to generate a position for facilities.  This looks like an abuse of PositionInfo only because it was 
 	 * made quite vehicle-oriented over the last years.
@@ -80,10 +82,10 @@ public class PositionInfo {
 	 * @param link
 	 */
 	public PositionInfo( final Id agentId, final Link link ) {
-		this( agentId, link, 0.9*link.getLength(), 10, 0., VehicleState.Parking, "") ;
+		this( agentId, link, 0.9*link.getLength(), 10, 0., AgentState.AGENT_AT_ACTIVITY, "") ;
 	}
 	public PositionInfo( final Id agentId, final Link link, int cnt ) {
-		this( agentId, link, 0.9*link.getLength(), 10+2*cnt, 0., VehicleState.Parking, "") ;
+		this( agentId, link, 0.9*link.getLength(), 10+2*cnt, 0., AgentState.AGENT_AT_ACTIVITY, "") ;
 	}
 
 	/**
@@ -98,7 +100,7 @@ public class PositionInfo {
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
 	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
-	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
+	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState, final String visualizerData) {
 		this.agentId = agentId;
 		this.link = link;
 		this.speed = speed;
@@ -121,7 +123,7 @@ public class PositionInfo {
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
 	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
-	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
+	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState, final String visualizerData) {
 		this.agentId = agentId;
 		this.link = link;
 		this.speed = speed;
@@ -143,7 +145,7 @@ public class PositionInfo {
 	 * @param vehicleState The state of the vehicle (Parking, Driving)
 	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
-	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final VehicleState vehicleState, final String visualizerData) {
+	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final AgentState vehicleState, final String visualizerData) {
 		this.agentId = driverId;
 		this.link = null;
 		this.easting = easting;
@@ -192,7 +194,7 @@ public class PositionInfo {
 	}
 
 	
-	public Id getAgentId() {
+	public Id getId() {
 		return this.agentId;
 	}
 
@@ -216,20 +218,31 @@ public class PositionInfo {
 		return this.speed;
 	}
 
-	public VehicleState getVehicleState(){
+	public AgentState getAgentState(){
 		return this.vehicleState;
 	}
 
+	@Deprecated // yyyyyy not from here
 	public Link getLink() {
 		return this.link;
 	}
 
+	@Deprecated // yyyyyy not from here
 	public double getDistanceOnLink() {
 		return this.distanceOnLink;
 	}
-
-	public String getVisualizerData() {
-		return this.visualizerData;
+	
+	@Deprecated // yyyy I don't know what this is.  kai, jan'10
+	public int getType() {
+		return this.type;
 	}
+	
+	public int getUserDefined() {
+		return this.user;
+	}
+
+//	public String getVisualizerData() {
+//		return this.visualizerData;
+//	}
 
 }

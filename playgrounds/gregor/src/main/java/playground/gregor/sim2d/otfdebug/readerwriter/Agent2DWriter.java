@@ -9,6 +9,7 @@ import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 public class Agent2DWriter extends OTFDataWriter{
 
@@ -25,8 +26,8 @@ public class Agent2DWriter extends OTFDataWriter{
 	}
 
 	
-	public void writeAgent(ExtendedPositionInfo pos, ByteBuffer out) {
-		String id = pos.getAgentId().toString();
+	public void writeAgent(PositionInfo pos, ByteBuffer out) {
+		String id = pos.getId().toString();
 		ByteBufferUtils.putString(out, id);
 		out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
 		out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
@@ -42,7 +43,7 @@ public class Agent2DWriter extends OTFDataWriter{
 		
 		out.putInt(this.positions.size());
 
-		for (ExtendedPositionInfo pos : this.positions) {
+		for (PositionInfo pos : this.positions) {
 			writeAgent(pos, out);
 		}
 		this.positions.clear();
