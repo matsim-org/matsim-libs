@@ -16,8 +16,9 @@ public class PTTravelCost implements TravelCost{
 	//byte aliasType;
 	
 	////coefficients with original values set to count only travelTime///
-	double timeCoefficient =.85;
-	double distanceCoefficient=.15;
+	double timeCoefficient = PTValues.timeCoefficient;
+	double distanceCoefficient= PTValues.distanceCoefficient;
+
 	double transferPenalty=60;
 	double walkCoefficient= 1; 
 	//double waitCoefficient=0;

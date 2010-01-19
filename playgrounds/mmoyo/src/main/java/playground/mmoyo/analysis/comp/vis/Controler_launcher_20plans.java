@@ -6,12 +6,13 @@ public class Controler_launcher_20plans {
 	
 	public static void main(String[] args) {
 		
-		//nullfall version
-		//String conf = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/nullFall/config_20RoutedPlans.xml";
-		
+		String conf;
 		//20 plans of 900s small
-		String conf = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/20plans/config_20plans900s_small.xml";
-		MMoyoTransitControler.main(new String []{conf});
+		conf = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/20plans/config_20plans900s_small.xml";
 		
-		}
+		//20 plans of NullFall_Alles inside investigation area
+		//conf = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/NullFallAlles/configRouted.insideArea20Plans.xml";
+		
+		MMoyoTransitControler.main(new String []{conf});
+	}
 }

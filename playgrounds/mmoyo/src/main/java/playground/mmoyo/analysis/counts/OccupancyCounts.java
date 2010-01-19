@@ -76,7 +76,7 @@ public class OccupancyCounts {
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		//scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 
 		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
 		new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getVehicles()).run();

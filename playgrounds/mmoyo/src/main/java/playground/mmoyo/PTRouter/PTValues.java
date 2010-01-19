@@ -25,7 +25,11 @@ public abstract class PTValues {
 	public final static int INI_STATIONS_NUM = 2;			//number of stations to find in order to start the route search
 
 	public static byte routerCalculator = 0;
-	public static String scenario; 
+	public static String scenario ; 
+	public static double distanceCoefficient =0.15;
+	public static double timeCoefficient = 0.85;
+
+	
 }
 
 /*

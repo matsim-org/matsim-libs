@@ -2,7 +2,6 @@ package playground.mmoyo.TransitSimulation;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -27,7 +26,6 @@ public class MMoyoTransitControler extends TransitControler {
 	public MMoyoTransitControler(final ScenarioImpl scenario, boolean launchOTFDemo){
 		super(scenario);
 		this.config = scenario.getConfig();
-		config.setQSimConfigGroup(new QSimConfigGroup());
 		this.setOverwriteFiles(true);   
 		this.launchOTFDemo = launchOTFDemo;
 	}
@@ -35,6 +33,7 @@ public class MMoyoTransitControler extends TransitControler {
 	@Override
 	protected void runMobSim() {
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
+		sim.setUseUmlaeufe(true);
 		if (launchOTFDemo){
 			sim.startOTFServer("livesim");
 			OTFDemo.ptConnect("livesim", config);
