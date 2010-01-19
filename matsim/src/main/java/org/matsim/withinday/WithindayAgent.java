@@ -78,7 +78,7 @@ public class WithindayAgent extends PersonAgent {
 	private double replanningThreshold;
 
 	private final List<AgentPercepts> percepts;
-	
+
 	private final Network network;
 
 	public WithindayAgent(final Person person, final QueueSimulation simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
@@ -265,7 +265,7 @@ public class WithindayAgent extends PersonAgent {
 //		this.cachedNextLink = null;
 		Id linkId = super.chooseNextLinkId();
 		if (log.isTraceEnabled())
-			log.trace("vehicle : " + this.getPerson().getId() + " next choosen link:" + linkId.toString());
+			log.trace("vehicle : " + this.getPerson().getId() + " next choosen link:" + linkId);
 		return linkId;
 	}
 
