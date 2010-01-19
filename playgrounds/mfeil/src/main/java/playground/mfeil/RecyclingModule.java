@@ -72,7 +72,7 @@ public class RecyclingModule implements PlanStrategyModule{
 	private final int iterations, noOfAssignmentAgents, noOfSoftCoefficients;
 	private final DistanceCoefficients 				coefficients;
 	private ArrayList<double[]> 					tabuList;
-	private final String primActsDistance, homeLocationDistance, sex, age, license, car_avail, employed; 
+	private final String primActsDistance, homeLocationDistance, municipality, sex, age, license, car_avail, employed; 
 	private final ArrayList<String> 				softCoef; 
 	private final ArrayList<String> 				allCoef; 
 	private ArrayList<Integer> 						list1Pointer; 
@@ -98,6 +98,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.noOfAssignmentAgents	= 10;
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
+		this.municipality			= "yes";
 		this.sex 					= "no";
 		this.age 					= "yes";
 		this.license 				= "no";
@@ -153,6 +154,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		Statistics.noCarAvailAssignment=false;
 		Statistics.noEmploymentAssignment=false;
 		Statistics.noLicenseAssignment=false;
+		Statistics.noMunicipalityAssignment=false;
 		
 		/* Individual optimization of agents */
 		for (int i=0;i<this.noOfSchedulingAgents;i++) {
@@ -266,9 +268,11 @@ public class RecyclingModule implements PlanStrategyModule{
 		if (Statistics.noCarAvailAssignment) log.warn("There are agents that have no car availabiity information."); 
 		if (Statistics.noEmploymentAssignment) log.warn("There are agents that have no employment information."); 
 		if (Statistics.noLicenseAssignment) log.warn("There are agents that have no license information."); 
+		if (Statistics.noMunicipalityAssignment) log.warn("There are agents that have no municipality information."); 
 		if (Statistics.noSexAssignment ||
 				Statistics.noCarAvailAssignment ||
 				Statistics.noEmploymentAssignment ||
+				Statistics.noMunicipalityAssignment ||
 				Statistics.noLicenseAssignment) log.warn("For these agents, recycling was conducted without the relevant attribute.");
 		Statistics.list.clear();
 	}
@@ -477,6 +481,9 @@ public class RecyclingModule implements PlanStrategyModule{
 		if (this.homeLocationDistance.equals("yes")) {
 			softCoef.add("homeLocationDistance");
 		}
+		if (this.municipality.equals("yes")) {
+			softCoef.add("municipality");
+		}
 		if (this.age.equals("yes")) {
 			softCoef.add("age");
 		}
@@ -490,6 +497,9 @@ public class RecyclingModule implements PlanStrategyModule{
 		}
 		if (this.homeLocationDistance.equals("yes")) {
 			allCoef.add("homeLocationDistance");
+		}
+		if (this.municipality.equals("yes")) {
+			allCoef.add("municipality");
 		}
 		if (this.sex.equals("yes")) {
 			allCoef.add("sex");

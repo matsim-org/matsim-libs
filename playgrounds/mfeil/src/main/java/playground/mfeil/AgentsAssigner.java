@@ -72,7 +72,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		
 	
 	private final DistanceCoefficients coefficients;
-	private String primActsDistance, homeLocation, age, sex, license, car_avail, employed;
+	private String primActsDistance, homeLocation, municipality, age, sex, license, car_avail, employed;
 	
 	
 	public AgentsAssigner (Controler controler, DepartureDelayAverageCalculator 	tDepDelayCalc,
@@ -106,6 +106,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		for (int i=0; i<this.coefficients.getNamesOfCoef().size();i++){
 			if (this.coefficients.getNamesOfCoef().get(i).equals("primActsDistance")) this.primActsDistance="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("homeLocation")) this.homeLocation="yes";
+			if (this.coefficients.getNamesOfCoef().get(i).equals("municipality")) this.municipality="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("age")) this.age="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("sex")) this.sex="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("license")) this.license="yes";
@@ -241,9 +242,17 @@ public class AgentsAssigner implements PlanAlgorithm{
 						java.lang.Math.pow((this.knowledges.getKnowledgesByPersonId().get(agents.getAgentPerson(j).getId()).getActivities("home", true).get(0).getFacility().getCoord().getY()-homelocationAgentY),2));
 			}
 			
+			// Municipality type
+			if (this.municipality=="yes"){
+				if (plan.getPerson().getCustomAttributes()!=null && plan.getPerson().getCustomAttributes().containsKey("municipality")){
+					distanceAgent += this.coefficients.getSingleCoef("municipality") * java.lang.Math.abs(Integer.parseInt(plan.getPerson().getCustomAttributes().get("municipality").toString())-Integer.parseInt(agents.getAgentPerson(j).getCustomAttributes().get("municipality").toString()));
+				}
+				else Statistics.noMunicipalityAssignment = true;
+			}
+			
 			// TODO @mfeil: exception handling missing
 			if (this.age=="yes"){
-				distanceAgent+= this.coefficients.getSingleCoef("age")* (((PersonImpl) plan.getPerson()).getAge()-((PersonImpl) agents.getAgentPerson(j)).getAge());
+				distanceAgent+= this.coefficients.getSingleCoef("age")* java.lang.Math.abs(((PersonImpl)(plan.getPerson())).getAge()-((PersonImpl)(agents.getAgentPerson(j))).getAge());
 			}
 			
 			if (distanceAgent<distance){
