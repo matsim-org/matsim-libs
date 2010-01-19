@@ -107,11 +107,6 @@ public class PersonAgent implements DriverAgent {
 		return this.currentLeg;
 	}
 
-	protected void setCurrentLeg(final LegImpl leg) {
-		this.currentLeg  = leg;
-		this.cacheRouteNodes = null;
-	}
-
 	public int getCurrentNodeIndex() {
 		return this.currentNodeIndex;
 	}
