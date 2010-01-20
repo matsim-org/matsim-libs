@@ -445,7 +445,7 @@ public class AgentsAttributesAdder {
 	public void loadIncomeData(ScenarioImpl scenario){
 		log.info("   adding agents income data...");
 		
-		this.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income.txt");
+		this.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income_MZoverall_weighted.txt");
 		if (this.income.isEmpty()) return; // No income loaded
 		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
