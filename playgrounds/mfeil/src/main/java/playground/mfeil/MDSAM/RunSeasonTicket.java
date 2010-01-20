@@ -49,14 +49,14 @@ public class RunSeasonTicket {
 
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/data/Zurich10/plans.xml";
-		final String output_populationFilename = "/home/baug/mfeil/data/Zurich10/plans_with_seasonticket.xml.gz";
+		final String populationFilename = "/home/baug/mfeil/output/10_rec/output_plans.xml";
+		final String output_populationFilename = "/home/baug/mfeil/output/10_rec/output_plans_with_seasonticket.xml.gz";
 
 		final String input1 = "/home/baug/mfeil/data/Zurich10/MobTSet_1.txt";
 		final String input2 = "/home/baug/mfeil/data/Zurich10/Zurich10_ids.dat";
 	//	final String output1 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/choiceSet_1.dat";
 	//	final String output2 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/modFile_1.mod";
-		final String output3 = "/home/baug/mfeil/data/Zurich10/probabilities.xls";
+		final String output3 = "/home/baug/mfeil/data/Zurich10/probabilities_10_rec.xls";
 
 	/*// Biogeme code
 		AgentsAttributesAdder choiceSetter = new AgentsAttributesAdder();

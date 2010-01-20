@@ -42,9 +42,9 @@ public class RunUtilFunctionEstimation {
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
-		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans0950.dat";
+		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans0951.dat";
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model0950.mod";
+		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model0951.mod";
 		
 /*		final String populationFilename = "./plans/output_plans.xml";
 		final String networkFilename = "./plans/network.xml";

@@ -924,7 +924,7 @@ public class ModFileMaker {
 			stream.println("beta_license_walk \t0  \t-50 \t50  \t0");
 		}
 		if (munType.equals("yes")) {
-			stream.println("beta_munType_car_1 \t0  \t-50 \t50  \t0");
+		/*	stream.println("beta_munType_car_1 \t0  \t-50 \t50  \t0");
 			stream.println("beta_munType_pt_1 \t0  \t-50 \t50  \t0");
 			stream.println("beta_munType_bike_1 \t0  \t-50 \t50  \t0");
 			stream.println("beta_munType_walk_1 \t0  \t-50 \t50  \t0");
@@ -943,15 +943,15 @@ public class ModFileMaker {
 			stream.println("beta_munType_car_5 \t0  \t-50 \t50  \t0");
 			stream.println("beta_munType_pt_5 \t0  \t-50 \t50  \t0");
 			stream.println("beta_munType_bike_5 \t0  \t-50 \t50  \t0");
-			stream.println("beta_munType_walk_5 \t0  \t-50 \t50  \t0");
-		/*	stream.println("beta_munType_home \t0  \t-50 \t50  \t0");
+			stream.println("beta_munType_walk_5 \t0  \t-50 \t50  \t0");*/
+			stream.println("beta_munType_home \t0  \t-50 \t50  \t0");
 			stream.println("beta_munType_work \t0  \t-50 \t50  \t0");
 			stream.println("beta_munType_education \t0  \t-50 \t50  \t0");
 			stream.println("beta_munType_leisure \t0  \t-50 \t50  \t0");
-			stream.println("beta_munType_shop \t0  \t-50 \t50  \t0");*/
+			stream.println("beta_munType_shop \t0  \t-50 \t50  \t0");
 		}
 		if (seasonTicket.equals("yes")) {
-			stream.println("beta_seasonTicket_car_1 \t0  \t-50 \t50  \t0");
+		/*	stream.println("beta_seasonTicket_car_1 \t0  \t-50 \t50  \t0");
 			stream.println("beta_seasonTicket_pt_1 \t0  \t-50 \t50  \t0");
 			stream.println("beta_seasonTicket_bike_1 \t0  \t-50 \t50  \t0");
 			stream.println("beta_seasonTicket_walk_1 \t0  \t-50 \t50  \t0");
@@ -962,7 +962,11 @@ public class ModFileMaker {
 			stream.println("beta_seasonTicket_car_3 \t0  \t-50 \t50  \t0");
 			stream.println("beta_seasonTicket_pt_3 \t0  \t-50 \t50  \t0");
 			stream.println("beta_seasonTicket_bike_3 \t0  \t-50 \t50  \t0");
-			stream.println("beta_seasonTicket_walk_3 \t0  \t-50 \t50  \t0");
+			stream.println("beta_seasonTicket_walk_3 \t0  \t-50 \t50  \t0");*/
+			stream.println("beta_seasonTicket_car \t0  \t-50 \t50  \t0");
+			stream.println("beta_seasonTicket_pt \t0  \t-50 \t50  \t0");
+			stream.println("beta_seasonTicket_bike \t0  \t-50 \t50  \t0");
+			stream.println("beta_seasonTicket_walk \t0  \t-50 \t50  \t0");
 		}
 		
 		stream.println();
@@ -1189,8 +1193,11 @@ public class ModFileMaker {
 		//	if (gender.equals("yes") && income.equals("no")) stream.print("( one + beta_female_act * Female ) * ");
 		//	else if (gender.equals("no") && income.equals("yes")) stream.print("( one + beta_income_home * Income ) * ");
 		//	else if (gender.equals("yes") && income.equals("yes")) stream.print("( one + beta_female_act * Female + beta_income_home * Income ) * ");
-			if (gender.equals("yes")) stream.print("( one + beta_female_act * Female ) * ");
+			if (gender.equals("yes")) stream.print("( one + beta_female_act * Female ");
 			//if (age.equals("yes")) stream.print("( one + beta_age_0_15 * Age_0_15 + beta_age_16_30 * Age_16_30 + beta_age_31_60 * Age_31_60 + beta_age_61 * Age_61 ) * ");
+			if (munType.equals("yes") && gender.equals("yes")) stream.print("+ beta_munType_home * MunType ");
+			if (munType.equals("yes") && gender.equals("no")) stream.print("( one + beta_munType_home * MunType ");
+			if (gender.equals("yes") || munType.equals("yes")) stream.print(") * ");
 			if (beta.equals("no") && gamma.equals("no")) stream.print("HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+1+" ) ) )");			
 			else if (beta.equals("yes") && gamma.equals("no")) stream.print("HomeUmax * one / ( one + exp( HomeBeta * ( HomeAlpha * one - x"+(i+1)+""+1+" ) ) )");			
 			else if (beta.equals("no") && gamma.equals("yes")) stream.print("HomeUmax * one / ( ( one + HomeGamma * exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+1+" ) ) ) ^ ( one / HomeGamma * one ) )");			
@@ -1200,7 +1207,22 @@ public class ModFileMaker {
 				if (j%2==0){
 					ActivityImpl act = (ActivityImpl)actslegs.get(j);
 					stream.print(" + ");
-					if (gender.equals("yes") /*&& income.equals("no")*/) stream.print("( one + beta_female_act * Female ) * ");
+					if (gender.equals("yes") /*&& income.equals("no")*/) stream.print("( one + beta_female_act * Female ");
+					if (munType.equals("yes") && gender.equals("yes")) {
+						if (act.getType().toString().equals("h")) stream.print("+ beta_munType_home * MunType ");
+						else if (act.getType().toString().equals("w")) stream.print("+ beta_munType_work * MunType ");
+						else if (act.getType().toString().equals("e")) stream.print("+ beta_munType_education * MunType ");
+						else if (act.getType().toString().equals("shop")) stream.print("+ beta_munType_shop * MunType ");
+						else if (act.getType().toString().equals("leisure")) stream.print("+ beta_munType_leisure * MunType ");
+					}
+					if (munType.equals("yes") && gender.equals("no")) {
+						if (act.getType().toString().equals("h")) stream.print("( one + beta_munType_home * MunType ");
+						else if (act.getType().toString().equals("w")) stream.print("( one + beta_munType_work * MunType ");
+						else if (act.getType().toString().equals("e")) stream.print("( one + beta_munType_education * MunType ");
+						else if (act.getType().toString().equals("shop")) stream.print("( one + beta_munType_shop * MunType ");
+						else if (act.getType().toString().equals("leisure")) stream.print("( one + beta_munType_leisure * MunType ");
+					}
+					if (munType.equals("yes") || gender.equals("yes")) stream.print(") * ");
 			/*		else if (gender.equals("no") && income.equals("yes")) {
 						if (act.getType().toString().equals("h")) stream.print("( one + beta_income_home * Income ) * ");
 						else if (act.getType().toString().equals("w")) stream.print("( one + beta_income_work * Income ) * ");
@@ -1364,8 +1386,9 @@ public class ModFileMaker {
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_car * CarAlways + beta_carSometimes_car * CarSometimes + beta_carNever_car * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_car * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_car * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (age.equals("yes")) {
@@ -1373,37 +1396,43 @@ public class ModFileMaker {
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_car * CarAlways + beta_carSometimes_car * CarSometimes + beta_carNever_car * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_car * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_car * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (carAvail.equals("yes")) {
 						stream.print(" * ( one + beta_carAlways_car * CarAlways + beta_carSometimes_car * CarSometimes + beta_carNever_car * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_car * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_car * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (income.equals("yes")) {
 						stream.print(" * ( one + beta_income_car * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_car * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (license.equals("yes")) {
 						stream.print("+ beta_license_car * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car * SeasonTicket ");
 						stream.print(")");
 					}
-					else if (munType.equals("yes")) {
-						stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
-						stream.print(")");
-					}
-					else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 )");
+				//	else if (munType.equals("yes")) {
+				//		stream.print("+ beta_munType_car_1 * MunType_1 + beta_munType_car_2 * MunType_2 + beta_munType_car_3 * MunType_3 + beta_munType_car_4 * MunType_4 + beta_munType_car_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car * SeasonTicket ");
+				//		stream.print(")");
+				//	}
+				//	else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car_1 * SeasonTicket_1 + beta_seasonTicket_car_2 * SeasonTicket_2 + beta_seasonTicket_car_3 * SeasonTicket_3 )");
+					else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_car * SeasonTicket )");
 				}
 				if (pt==1){
 					stream.print(" + beta_time_pt * x"+(i+1)+"_pt_time");
@@ -1413,8 +1442,9 @@ public class ModFileMaker {
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_pt * CarAlways + beta_carSometimes_pt * CarSometimes + beta_carNever_pt * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_pt * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_pt * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (age.equals("yes")) {
@@ -1422,37 +1452,43 @@ public class ModFileMaker {
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_pt * CarAlways + beta_carSometimes_pt * CarSometimes + beta_carNever_pt * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_pt * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_pt * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (carAvail.equals("yes")) {
 						stream.print(" * ( one + beta_carAlways_pt * CarAlways + beta_carSometimes_pt * CarSometimes + beta_carNever_pt * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_pt * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_pt * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (income.equals("yes")) {
 						stream.print(" * ( one + beta_income_pt * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_pt * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (license.equals("yes")) {
 						stream.print("+ beta_license_pt * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt * SeasonTicket ");
 						stream.print(")");
 					}
-					else if (munType.equals("yes")) {
-						stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
-						stream.print(")");
-					}
-					else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 )");
+				//	else if (munType.equals("yes")) {
+				//		stream.print("+ beta_munType_pt_1 * MunType_1 + beta_munType_pt_2 * MunType_2 + beta_munType_pt_3 * MunType_3 + beta_munType_pt_4 * MunType_4 + beta_munType_pt_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt * SeasonTicket ");
+				//		stream.print(")");
+				//	}
+				//	else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 )");
+					else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt * SeasonTicket )");
 				}
 				if (bike==1){
 					stream.print(" + beta_time_bike * x"+(i+1)+"_bike_time");
@@ -1462,8 +1498,9 @@ public class ModFileMaker {
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_bike * CarAlways + beta_carSometimes_bike * CarSometimes + beta_carNever_bike * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_bike * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_bike * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (age.equals("yes")) {
@@ -1471,37 +1508,43 @@ public class ModFileMaker {
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_bike * CarAlways + beta_carSometimes_bike * CarSometimes + beta_carNever_bike * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_bike * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_bike * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (carAvail.equals("yes")) {
 						stream.print(" * ( one + beta_carAlways_bike * CarAlways + beta_carSometimes_bike * CarSometimes + beta_carNever_bike * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_bike * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_bike * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (income.equals("yes")) {
 						stream.print(" * ( one + beta_income_bike * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_bike * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (license.equals("yes")) {
 						stream.print("+ beta_license_bike * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike * SeasonTicket ");
 						stream.print(")");
 					}
-					else if (munType.equals("yes")) {
-						stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
-						stream.print(")");
-					}
-					else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 )");
+				//	else if (munType.equals("yes")) {
+				//		stream.print("+ beta_munType_bike_1 * MunType_1 + beta_munType_bike_2 * MunType_2 + beta_munType_bike_3 * MunType_3 + beta_munType_bike_4 * MunType_4 + beta_munType_bike_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike * SeasonTicket ");
+				//		stream.print(")");
+				//	}
+				//	else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 )");
+					else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike * SeasonTicket )");
 				}
 				if (walk==1){
 					stream.print(" + beta_time_walk * x"+(i+1)+"_walk_time");
@@ -1511,8 +1554,9 @@ public class ModFileMaker {
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_walk * CarAlways + beta_carSometimes_walk * CarSometimes + beta_carNever_walk * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_walk * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_walk * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (age.equals("yes")) {
@@ -1520,37 +1564,43 @@ public class ModFileMaker {
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_walk * CarAlways + beta_carSometimes_walk * CarSometimes + beta_carNever_walk * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_walk * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_walk * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (carAvail.equals("yes")) {
 						stream.print(" * ( one + beta_carAlways_walk * CarAlways + beta_carSometimes_walk * CarSometimes + beta_carNever_walk * CarNever ");
 						if (income.equals("yes")) stream.print("+ beta_income_walk * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_walk * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (income.equals("yes")) {
 						stream.print(" * ( one + beta_income_walk * Income ");
 						if (license.equals("yes")) stream.print("+ beta_license_walk * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk * SeasonTicket ");
 						stream.print(")");
 					}
 					else if (license.equals("yes")) {
 						stream.print("+ beta_license_walk * License ");
-						if (munType.equals("yes")) stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+				//		if (munType.equals("yes")) stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk * SeasonTicket ");
 						stream.print(")");
 					}
-					else if (munType.equals("yes")) {
-						stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
-						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
-						stream.print(")");
-					}
-					else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 )");
+				//	else if (munType.equals("yes")) {
+				//		stream.print("+ beta_munType_walk_1 * MunType_1 + beta_munType_walk_2 * MunType_2 + beta_munType_walk_3 * MunType_3 + beta_munType_walk_4 * MunType_4 + beta_munType_walk_5 * MunType_5 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
+				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk * SeasonTicket ");
+				//		stream.print(")");
+				//	}
+				//	else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 )");
+					else if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk * SeasonTicket )");
 				}	
 			}
 			stream.println();
