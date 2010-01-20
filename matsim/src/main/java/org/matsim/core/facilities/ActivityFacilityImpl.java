@@ -159,6 +159,7 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 		return this.activities;
 	}
 
+	@Deprecated // use getLinkId()
 	public final LinkImpl getLink() {
 		if (this.down_mapping.isEmpty()) { return null; }
 		if (this.down_mapping.size() > 1) { Gbl.errorMsg("Something is wrong!!! A facility contains at most one Link (as specified for the moment)!"); }
