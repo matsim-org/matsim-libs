@@ -118,13 +118,13 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double uMax_leisure = 0.987;  //35
 	
 	private static final double alpha_home = 8.31;//6
-	private static final double alpha_work = 6.20;//4
+	private static final double alpha_work = 6.2;//4
 	private static final double alpha_education = 2.07;//3
 	private static final double alpha_shopping = 0.264;//1
 	private static final double alpha_leisure = 0.571;//2
 	
 	private static final double beta_home = 0.360;//1.2
-	private static final double beta_work = 0.660;
+	private static final double beta_work = 0.66;
 	private static final double beta_education = 2.60;
 	private static final double beta_shopping = 5.00;
 	private static final double beta_leisure = 100;
@@ -145,8 +145,8 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		// check seasonTicket
 		PersonImpl person = (PersonImpl) plan.getPerson();
 		if (person.getTravelcards()!=null){
-			if (person.getTravelcards().contains("ga")) this.seasonTicket = "ga";
-			else if (person.getTravelcards().contains("halbtax")) this.seasonTicket = "halbtax";
+			if (person.getTravelcards().contains("ch-GA")) this.seasonTicket = "ch-GA";
+			else if (person.getTravelcards().contains("ch-HT")) this.seasonTicket = "ch-HT";
 			else {
 				this.seasonTicket = "none";
 				log.warn("Unknown travel card type "+person.getTravelcards().first()+" for person "+person.getId()+". " +
@@ -162,17 +162,20 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		else this.income = -1;
 		
 		// check gender
-		if (person.getSex().equals("m") || person.getSex().equals("male")){
-			this.female = 0;
+		if (person.getSex()!=null){
+			if(person.getSex().equals("m") || person.getSex().equals("male")){
+				this.female = 0;
+			}
+			else if (person.getSex().equals("f") || person.getSex().equals("female")){
+				this.female = 1;
+			}
+			else {
+				log.warn("Unknown gender "+person.getAge()+" for person "+person.getId()+". " +
+				"Setting gender to default \"male\".");
+				this.female = 0;
+			}
 		}
-		else if (person.getSex().equals("f") || person.getSex().equals("female")){
-			this.female = 1;
-		}
-		else {
-			log.warn("Unknown gender "+person.getAge()+" for person "+person.getId()+". " +
-			"Setting gender to default \"male\".");
-			this.female = 0;
-		}
+		else this.female = 0; 
 		
 		this.plan = plan;
 		this.person = this.plan.getPerson();
@@ -225,6 +228,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	}
 
 	public double getScore() {
+	//	if (this.score<0) log.info("score = "+this.score);
 		return this.score;
 	}
 
@@ -308,7 +312,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
-			tmpScore += factorOfLateArrival * (1 - repeat * gamma) * (1+beta_female_act*this.female) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-((activityStart - latestStartTime)/3600))),1/params.getGamma())));
+			tmpScore -= factorOfLateArrival * (1 - repeat * gamma) * (1+beta_female_act*this.female) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-((activityStart - latestStartTime)/3600))),1/params.getGamma())));
 		}
 
 		// utility of performing an action
@@ -319,9 +323,10 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			double utilWait = (1+beta_female_act*this.female) * marginalUtilityOfWaiting / 3600 * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
+		//	log.info("negative duration of "+duration);
 			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
-			tmpScore += factorOfLateArrival * (1 - repeat * gamma) * (1+beta_female_act*this.female) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma())));
+			tmpScore -= factorOfLateArrival * (1 - repeat * gamma) * (1+beta_female_act*this.female) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma())));
 		}
 
 		// disutility if stopping too early
@@ -365,8 +370,8 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			double cost = 0;
-			if (this.seasonTicket.equals("ga")) cost = travelCostPt_GA;
-			else if (this.seasonTicket.equals("halbtax")) cost = travelCostPt_Halbtax; 
+			if (this.seasonTicket.equals("ch-GA")) cost = travelCostPt_GA;
+			else if (this.seasonTicket.equals("ch-HT")) cost = travelCostPt_Halbtax; 
 			else cost = travelCostPt_None; 
 			tmpScore += (1+beta_female_travel*this.female) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist/1000 + constantPt;
 		} else if (TransportMode.walk.equals(leg.getMode())) {
@@ -375,7 +380,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			// use the same values as for "car"
 			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000;
 		}
-
+	//	log.info("Score = "+tmpScore);
 		return tmpScore;
 	}
 	
