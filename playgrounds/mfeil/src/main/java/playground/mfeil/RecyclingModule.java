@@ -90,20 +90,18 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.tDepDelayCalc 			= new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.nonassignedAgents 		= new LinkedList<String>();
-		this.noOfSchedulingAgents	= 5;
-		
-		this.finder					= finder;
-		
+		this.noOfSchedulingAgents	= 100;
+		this.noOfAssignmentAgents	= 500;
+		this.finder					= finder;		
 		this.iterations 			= 20;
-		this.noOfAssignmentAgents	= 10;
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
 		this.municipality			= "yes";
 		this.sex 					= "no";
-		this.age 					= "yes";
+		this.age 					= "no";
 		this.license 				= "no";
 		this.car_avail 				= "no";
-		this.employed 				= "yes";
+		this.employed 				= "no";
 		this.softCoef 				= this.detectSoftCoefficients();
 		this.allCoef 				= this.detectAllCoefficients();
 		this.noOfSoftCoefficients	= this.softCoef.size();
