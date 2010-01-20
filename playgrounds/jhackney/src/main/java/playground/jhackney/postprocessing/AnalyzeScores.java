@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
@@ -58,6 +58,7 @@ public class AnalyzeScores {
 	static PopulationImpl plans;
 	static ActivityFacilitiesImpl facilities;
 	static Knowledges knowledges;
+	static Network network;
 	
 	public static void run() throws Exception {
 
@@ -69,7 +70,7 @@ public class AnalyzeScores {
 
 		World world = ScenarioConfig.readWorld();
 		facilities = ScenarioConfig.readFacilities();
-		NetworkLayer network =ScenarioConfig.readNetwork();
+		network =ScenarioConfig.readNetwork();
 		new WorldConnectLocations().run(world);
 		int iplans=500;
 		int isoc=500;
@@ -192,7 +193,7 @@ public class AnalyzeScores {
 		Gbl.printElapsedTime();
 	}
 	protected static void initializeKnowledge() {
-		new InitializeKnowledge(plans, facilities, knowledges);
+		new InitializeKnowledge(plans, facilities, knowledges, network);
 	}
 }
 

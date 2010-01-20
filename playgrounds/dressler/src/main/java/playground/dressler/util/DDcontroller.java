@@ -102,7 +102,7 @@ public class DDcontroller {
 				Node node1 = null;
 				for (int n = 1; n < route.getLinkIds().size(); n++) {
 					node1 = network.getLinks().get(route.getLinkIds().get(n)).getFromNode();
-					if (node1.getId() != node2.getId()) {
+					if (!node1.getId().equals(node2.getId())) {
 					System.out.println("Person " + person.getId() + " starts on link " + act.getLinkId());
 					System.out.println(route.getLinkIds().get(n) + " does not match next link.");
 					System.out.println(node1.getId() + " != " + node2.getId());

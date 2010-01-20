@@ -29,6 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
@@ -65,7 +66,8 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 	private double[] throughLegDistanceCounts;
 	private double[] throughDayDistanceCounts;
 
-	public DailyDistance4Zrh() {
+	public DailyDistance4Zrh(final Network network) {
+		super(network);
 		throughWorkDist = 0.0;
 		throughEducDist = 0.0;
 		throughShopDist = 0.0;
@@ -74,8 +76,8 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		throughOtherDist = 0.0;
 	}
 
-	public DailyDistance4Zrh(final RoadPricingScheme toll) {
-		this();
+	public DailyDistance4Zrh(final RoadPricingScheme toll, final Network network) {
+		this(network);
 		throughLegDistanceCounts = new double[101];
 		throughDayDistanceCounts = new double[101];
 		this.toll = toll;
@@ -183,9 +185,9 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 					}
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 				} else if (bl.getMode().equals(TransportMode.walk)) {
-					dist = CoordUtils.calcDistance(((PlanImpl) plan).getPreviousActivity(bl)
-							.getLink().getCoord(), ((PlanImpl) plan).getNextActivity(bl)
-							.getLink().getCoord()) * 1.5 / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(((PlanImpl) plan).getPreviousActivity(bl)
+							.getLinkId()).getCoord(), this.network.getLinks().get(((PlanImpl) plan).getNextActivity(bl)
+							.getLinkId()).getCoord()) * 1.5 / 1000.0;
 					wlkDist += dist;
 					wlkDayDist += dist;
 					switch (ats) {
@@ -479,7 +481,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyDistance4Zrh dd = new DailyDistance4Zrh(tollReader.getScheme());
+		DailyDistance4Zrh dd = new DailyDistance4Zrh(tollReader.getScheme(), network);
 		dd.run(population);
 		dd.write(outputFilename);
 

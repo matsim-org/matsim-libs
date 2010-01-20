@@ -21,7 +21,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
  * Translates logic nodes and links into plain nodes and links. 
  */
 public class LogicIntoPlainTranslator {
-	private NetworkLayer plainNet;
+	private final NetworkLayer plainNet;
 	//private Map<Id,Node> logicToPlainStopMap;
 	//private Map<Id,LinkImpl> logicToPlainLinkMap;  
 	//private Map<Id,LinkImpl> lastLinkMap;
@@ -80,7 +80,7 @@ public class LogicIntoPlainTranslator {
 				if (pe instanceof ActivityImpl) {  				
 					ActivityImpl act =  (ActivityImpl) pe;					
 					Link plainLink= plainNet.getNearestLink(act.getCoord()); 
-					act.setLink(plainLink);
+					act.setLinkId(plainLink.getId());
 				}else{
 					LegImpl leg = (LegImpl)pe;
 					NetworkRouteWRefs logicRoute = (NetworkRouteWRefs)leg.getRoute();

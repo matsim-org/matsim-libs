@@ -70,7 +70,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
-					if (act.getLink() == null) {
+					if (act.getLinkId() == null) {
 						needsXY2Links = true;
 						needsReRoute = true;
 						break;

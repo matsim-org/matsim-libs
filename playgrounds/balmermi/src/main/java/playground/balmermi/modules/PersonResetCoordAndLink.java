@@ -49,7 +49,7 @@ public class PersonResetCoordAndLink extends AbstractPersonAlgorithm implements 
 			if (i%2==0) {
 				ActivityImpl a = (ActivityImpl)plan.getPlanElements().get(i);
 				a.setCoord(this.facilities.getFacilities().get(a.getFacilityId()).getCoord());
-				a.setLink(((ActivityFacilityImpl) this.facilities.getFacilities().get(a.getFacilityId())).getLink());
+				a.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(a.getFacilityId())).getLinkId());
 			}
 			else {
 				LegImpl l = (LegImpl)plan.getPlanElements().get(i);

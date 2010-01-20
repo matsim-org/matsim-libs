@@ -39,10 +39,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.xml.sax.SAXException;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
@@ -50,7 +48,6 @@ import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
 import playground.yu.analysis.LegDistance;
 import playground.yu.analysis.ModeSplit;
-import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -155,11 +152,11 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 		if (plansFilename != null) {
 			PopulationImpl population = s.getPopulation();
 
-			catl = new CalcAverageTripLength();
+			catl = new CalcAverageTripLength(network);
 			ms = new ModeSplit(toll);
 			orms = new EnRouteModalSplit4Zrh(scenario, population, toll);
 			lttms = new LegTravelTimeModalSplit4Zrh(population, toll);
-			dd = new DailyDistance4Zrh(toll);
+			dd = new DailyDistance4Zrh(toll, network);
 			dert = new DailyEnRouteTime4Zrh(toll);
 			ld = new LegDistance(network, toll, population);
 			// in future, add some PersonAlgorithm and EventsHandler

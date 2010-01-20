@@ -78,7 +78,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		person1 = new PersonImpl(new IdImpl(1));
 		PlanImpl plan1 = person1.createAndAddPlan(true);
-		Activity a1 = plan1.createAndAddActivity("h", f.link1);
+		Activity a1 = plan1.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
 		NetworkRouteWRefs route1 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
@@ -87,18 +87,18 @@ public class ControlerTest extends MatsimTestCase {
 		nodes.add(f.node2);
 		nodes.add(f.node3);
 		route1.setNodes(f.link1, nodes, f.link3);
-		plan1.createAndAddActivity("h", f.link3);
+		plan1.createAndAddActivity("h", f.link3.getId());
 		population.addPerson(person1);
 
 		PersonImpl person2 = new PersonImpl(new IdImpl(2));
 		PlanImpl plan2 = person2.createAndAddPlan(true);
-		Activity a2 = plan2.createAndAddActivity("h", f.link1);
+		Activity a2 = plan2.createAndAddActivity("h", f.link1.getId());
 		a2.setEndTime(7.0*3600);
 		LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
 		NetworkRouteWRefs route2 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg2.setRoute(route2);
 		route2.setNodes(f.link1, nodes, f.link3);
-		plan2.createAndAddActivity("h", f.link3);
+		plan2.createAndAddActivity("h", f.link3.getId());
 		population.addPerson(person2);
 
 		// Complete the configuration for our test case
@@ -195,19 +195,19 @@ public class ControlerTest extends MatsimTestCase {
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
 		PlanImpl plan1 = person1.createAndAddPlan(true);
-		Activity a1 = plan1.createAndAddActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		Activity a1 = plan1.createAndAddActivity("h", f.link1.getId());//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a1.setEndTime(7.0*3600);
 		leg1 = plan1.createAndAddLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		plan1.createAndAddActivity("h", f.link3);
+		plan1.createAndAddActivity("h", f.link3.getId());
 		// --- plan 2 ---
 		PlanImpl plan2 = person1.createAndAddPlan(true);
-		Activity a2 = plan2.createAndAddActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		Activity a2 = plan2.createAndAddActivity("h", f.link1.getId());//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a2.setEndTime(7.0*3600);
 
 		leg2 = plan2.createAndAddLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		plan2.createAndAddActivity("h", f.link3);
+		plan2.createAndAddActivity("h", f.link3.getId());
 		population.addPerson(person1);
 
 		// Complete the configuration for our test case
@@ -315,17 +315,17 @@ public class ControlerTest extends MatsimTestCase {
 		controler.setCreateGraphs(false);
 		controler.run();
 
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 1)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 2)).exists());
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 3)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 4)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 5)).exists());
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 6)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 7)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 8)).exists());
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 9)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 10)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(3, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(4, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(6, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_TXT)).exists());
 	}
 
 	/**
@@ -342,17 +342,17 @@ public class ControlerTest extends MatsimTestCase {
 		controler.run();
 		assertEquals(4, controler.getWriteEventsInterval());
 
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 1)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 2)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 3)).exists());
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 4)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 5)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 6)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 7)).exists());
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 8)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 9)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 10)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(3, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(4, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(6, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_TXT)).exists());
 	}
 
 	/**
@@ -370,8 +370,8 @@ public class ControlerTest extends MatsimTestCase {
 		controler.setCreateGraphs(false);
 		controler.run();
 
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 1)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_TXT)).exists());
 	}
 
 	/**
@@ -387,8 +387,8 @@ public class ControlerTest extends MatsimTestCase {
 		controler.setCreateGraphs(false);
 		controler.run();
 
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 1)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_TXT)).exists());
 	}
 
 	/**
@@ -405,8 +405,8 @@ public class ControlerTest extends MatsimTestCase {
 		controler.setCreateGraphs(false);
 		controler.run();
 
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_XML, 0)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -423,8 +423,8 @@ public class ControlerTest extends MatsimTestCase {
 		controler.setCreateGraphs(false);
 		controler.run();
 
-		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_XML, 0)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(0,  Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -441,8 +441,8 @@ public class ControlerTest extends MatsimTestCase {
 		controler.setCreateGraphs(false);
 		controler.run();
 
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
-		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_XML, 0)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
 

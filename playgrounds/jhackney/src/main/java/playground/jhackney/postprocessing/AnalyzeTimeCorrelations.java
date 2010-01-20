@@ -20,11 +20,11 @@ package playground.jhackney.postprocessing;
  *                                                                         *
  * *********************************************************************** */
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.World;
@@ -46,6 +46,7 @@ public class AnalyzeTimeCorrelations {
 	static PopulationImpl plans;
 	static ActivityFacilitiesImpl facilities;
 	static Knowledges knowledges;
+	static Network network;
 	
 	public static void run() throws Exception {
 
@@ -56,7 +57,7 @@ public class AnalyzeTimeCorrelations {
 
 		World world = Scenario.readWorld();
 		facilities= Scenario.readFacilities();
-		NetworkLayer network =Scenario.readNetwork();
+		network =Scenario.readNetwork();
 		new WorldConnectLocations().run(world);
 
 		int iplan=500;
@@ -122,7 +123,7 @@ public class AnalyzeTimeCorrelations {
 		Gbl.printElapsedTime();
 	}
 	protected static void initializeKnowledge() {
-		new InitializeKnowledge(plans, facilities, knowledges);
+		new InitializeKnowledge(plans, facilities, knowledges, network);
 	}
 }
 

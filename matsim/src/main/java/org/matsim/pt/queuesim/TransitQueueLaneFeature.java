@@ -75,7 +75,7 @@ public class TransitQueueLaneFeature {
 		if (driver instanceof TransitDriverAgent) {
 			TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
 			TransitStopFacility stop = transitDriver.getNextTransitStop();
-			if ((stop != null) && (stop.getLinkId() == queueLane.getLink().getId())) {
+			if ((stop != null) && (stop.getLinkId().equals(queueLane.getLink().getId()))) {
 				double delay = transitDriver.handleTransitStop(stop, now);
 				if (delay > 0.0) {
 					veh.setEarliestLinkExitTime(now + delay);
@@ -100,7 +100,7 @@ public class TransitQueueLaneFeature {
 			// are handled via a separate data structure ("transitVehicleStopQueue") --???  kai, nov'09
 			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 			TransitStopFacility stop = driver.getNextTransitStop();
-			if ((stop != null) && (stop.getLinkId() == queueLane.getLink().getId())) {
+			if ((stop != null) && (stop.getLinkId().equals(queueLane.getLink().getId()))) {
 				double delay = driver.handleTransitStop(stop, now);
 				if (delay > 0.0) {
 					veh.setEarliestLinkExitTime(now + delay);

@@ -150,7 +150,7 @@ public class RandomPlansGenerator {
 
 			//create home act
 			ActivityImpl a = plan.createAndAddActivity("h", homeCoord);
-			a.setLink(lHome);
+			a.setLinkId(lHome.getId());
 			a.setStartTime(startTime);
 			a.setEndTime(endTime);
 
@@ -163,7 +163,7 @@ public class RandomPlansGenerator {
 
 			//create work act
 			a = plan.createAndAddActivity("h", workCoord);
-			a.setLink(lWork);
+			a.setLinkId(lWork.getId());
 			a.setDuration(this.workDuration);
 
 			//finally add person to population instance

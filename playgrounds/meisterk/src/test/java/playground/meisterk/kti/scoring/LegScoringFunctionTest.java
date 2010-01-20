@@ -89,9 +89,9 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		testPlan = new PlanImpl();
 		testPerson.addPlan(testPlan);
 
-		ActivityImpl home = new ActivityImpl("home", network.getLinks().get(new IdImpl("1")));
+		ActivityImpl home = new ActivityImpl("home", new IdImpl("1"));
 		home.setCoord(new CoordImpl(1050.0, 1050.0));
-		ActivityImpl work = new ActivityImpl("work", network.getLinks().get(new IdImpl("2")));
+		ActivityImpl work = new ActivityImpl("work", new IdImpl("2"));
 		work.setCoord(new CoordImpl(1150.0, 1150.0));
 
 		LegImpl testLeg = new LegImpl(TransportMode.undefined);
@@ -148,8 +148,8 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		LegImpl testLeg = (LegImpl) this.testPlan.getPlanElements().get(1);
 		testLeg.setMode(mode);
 
-		Link startLink = testPlan.getPreviousActivity(testLeg).getLink();
-		Link endLink = testPlan.getNextActivity(testLeg).getLink();
+		Link startLink = this.network.getLinks().get(testPlan.getPreviousActivity(testLeg).getLinkId());
+		Link endLink = this.network.getLinks().get(testPlan.getNextActivity(testLeg).getLinkId());
 
 		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
 			this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(this.ktiConfigGroup);

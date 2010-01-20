@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -143,7 +144,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		this.log.info(" Initializing agent knowledge about geography ...");
 
 //		initializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges);
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork());
 		this.log.info("... done");
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
@@ -329,7 +330,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final PopulationImpl plans, ActivityFacilitiesImpl facilities ) {
+	void initializeKnowledge(final PopulationImpl plans, ActivityFacilitiesImpl facilities, Network network) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)
@@ -354,7 +355,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 				Plan plan = person.getPlans().get(ii);
 
 				// TODO balmermi: double check if this is the right place to create the MentalMap and the EgoNet
-				if (person.getCustomAttributes().get(MentalMap.NAME) == null) { person.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }
+				if (person.getCustomAttributes().get(MentalMap.NAME) == null) { person.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k, network)); }
 				if (person.getCustomAttributes().get(EgoNet.NAME) == null) { person.getCustomAttributes().put(EgoNet.NAME,new EgoNet()); }
 
 				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).prepareActs(plan); // // JH Hack to make sure act types are compatible with social nets

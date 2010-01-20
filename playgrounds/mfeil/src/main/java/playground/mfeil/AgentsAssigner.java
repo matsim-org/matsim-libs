@@ -311,7 +311,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setFacilityId(fac.getId());
 						// not only update of fac required but also coord and link; data inconsistencies otherwise
 						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCoord());
-						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setLink(((ActivityFacilityImpl) fac).getLink());
+						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setLinkId(((ActivityFacilityImpl) fac).getLinkId());
 						if (!primActs.get(j).getType().toString().equals("home")) primActs.remove(j);
 						break;
 					}

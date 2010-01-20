@@ -68,7 +68,7 @@ public class EgoNetMakeActivitySpaces {
 		System.out.println("... done");
 
 		//read in facilities knowledge
-		new InitializeKnowledge(plans, facilities,  knowledges);
+		new InitializeKnowledge(plans, facilities,  knowledges, network);
 		new WorldConnectLocations().run(world);
 		//////////////////////////////////////////////////////////////////////
 

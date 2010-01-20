@@ -80,9 +80,9 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 		testee.setDoLogging(true);
 		
 		Id dummyPersonId = new IdImpl(123456);
-		ActivityImpl homeActivity = new ActivityImpl("home", network.getLinks().get(new IdImpl("1002")));
+		ActivityImpl homeActivity = new ActivityImpl("home", new IdImpl("1002"));
 		homeActivity.setCoord(new CoordImpl(5000.0, 10000.0));
-		ActivityImpl workActivity = new ActivityImpl("work", network.getLinks().get(new IdImpl("5006")));
+		ActivityImpl workActivity = new ActivityImpl("work", new IdImpl("5006"));
 		workActivity.setCoord(new CoordImpl(35000.0, 10000.0));
 		
 		for (TransportMode mode : new TransportMode[]{TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk, TransportMode.car}) {

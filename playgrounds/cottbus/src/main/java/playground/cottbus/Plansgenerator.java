@@ -204,7 +204,7 @@ public class Plansgenerator {
 			//home
 			homeEndtime += Math.floor(Math.random() * DURATION); //0.05 * 60;
 			ActivityImpl a = plan.createAndAddActivity("h", homeCoord);
-			a.setLink(start);
+			a.setLinkId(start.getId());
 			a.setEndTime(homeEndtime);
 			//leg to work
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -213,7 +213,7 @@ public class Plansgenerator {
 			leg.setRoute(route);
 			//work
 			a = plan.createAndAddActivity("w", workCoord);
-			a.setLink(target);
+			a.setLinkId(target.getId());
 
 			this.plans.addPerson(p);
 

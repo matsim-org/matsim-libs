@@ -140,7 +140,7 @@ public class DilutedZurichFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(pop_writer,areaOfInterest);
+		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(pop_writer,areaOfInterest, network);
 		filter.setAlternativeAOI(center,radius);
 		pop.addAlgorithm(filter);
 		log.info("  done.");

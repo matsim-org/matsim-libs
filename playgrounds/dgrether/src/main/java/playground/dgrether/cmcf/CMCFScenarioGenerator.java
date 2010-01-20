@@ -177,7 +177,7 @@ public class CMCFScenarioGenerator {
 				homeEndTime++;
 			}
 			ActivityImpl act1 = plan.createAndAddActivity("h", l1.getCoord());
-			act1.setLink(l1);
+			act1.setLinkId(l1.getId());
 			act1.setEndTime(homeEndTime);
 			//leg to home
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -190,7 +190,7 @@ public class CMCFScenarioGenerator {
 			}
 			leg.setRoute(route);
 			ActivityImpl act2 = plan.createAndAddActivity("h", l6.getCoord());
-			act2.setLink(l6);
+			act2.setLinkId(l6.getId());
 			this.plans.addPerson(p);
 		}
 	}

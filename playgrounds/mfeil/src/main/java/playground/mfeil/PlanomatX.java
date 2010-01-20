@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
@@ -71,7 +73,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final Knowledges knowledges;
-	
+	private final Network network;
 	
 	
 	//////////////////////////////////////////////////////////////////////
@@ -82,7 +84,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	public PlanomatX (Controler controler, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc, ActivityTypeFinder finder){
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
-
+		this.network = controler.getNetwork();
+		
 		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
 		
 		this.finder 				= finder;	
@@ -738,7 +741,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			LegImpl legHelp;
 			legHelp = new LegImpl (TransportMode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
 			//legHelp.setTravelTime(3600);
-			legHelp.setRoute(new LinkNetworkRouteImpl(actHelp.getLink(), actHelp.getLink()));
+			legHelp.setRoute(new LinkNetworkRouteImpl(this.network.getLinks().get(actHelp.getLinkId()), this.network.getLinks().get(actHelp.getLinkId())));
 			
 			actslegs.add(legHelp);
 			actslegs.add(actHelp);	
@@ -805,9 +808,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			} while (type.equals(act.getType()) || (type.equalsIgnoreCase("home") && !this.checkForHomeSequenceChangeType(basePlan, position[0]*2))); // continue if either type is same as current one or if two home acts would fall together 
 			act.setType(type);
 			if (act.getType().equalsIgnoreCase("home")){
-				act.setFacilityId(((ActivityImpl)(basePlan.getPlanElements().get(0))).getFacilityId());
-				act.setCoord(((ActivityImpl)(basePlan.getPlanElements().get(0))).getCoord());
-				act.setLink(((ActivityImpl)(basePlan.getPlanElements().get(0))).getLink());
+				act.setFacilityId(((Activity)(basePlan.getPlanElements().get(0))).getFacilityId());
+				act.setCoord(((Activity)(basePlan.getPlanElements().get(0))).getCoord());
+				act.setLinkId(((Activity)(basePlan.getPlanElements().get(0))).getLinkId());
 				position[0]++;
 				position[1]++;
 				return (new int[]{0,-1,-1}); // no location choice if changed to home act type

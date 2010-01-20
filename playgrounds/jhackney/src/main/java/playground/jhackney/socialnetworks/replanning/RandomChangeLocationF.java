@@ -144,24 +144,24 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 
 //				And replace the activity in the chain with it (only changes the facility)
 
-				if(newAct.getLinkId()!=fFromFacilities.getLink().getId()){
+				if(!newAct.getLinkId().equals(fFromFacilities.getLink().getId())){
 					// If the first activity was chosen, make sure the last activity is also changed
-					if(newAct.getType() == ((PlanImpl) plan).getFirstActivity().getType() && newAct.getLinkId() == ((PlanImpl) plan).getFirstActivity().getLinkId()){
+					if(newAct.getType() == ((PlanImpl) plan).getFirstActivity().getType() && newAct.getLinkId().equals(((PlanImpl) plan).getFirstActivity().getLinkId())){
 						ActivityImpl lastAct = (ActivityImpl) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
-						lastAct.setLink(fFromFacilities.getLink());
+						lastAct.setLinkId(fFromFacilities.getLinkId());
 						lastAct.setCoord(fFromFacilities.getCoord());
 						lastAct.setFacilityId(fFromFacilities.getId());
 					}
 					// If the last activity was chosen, make sure the first activity is also changed
-					if(newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLinkId() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId()){
+					if(newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLinkId().equals(((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId())){
 						ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
-						firstAct.setLink(fFromFacilities.getLink());
+						firstAct.setLinkId(fFromFacilities.getLinkId());
 						firstAct.setCoord(fFromFacilities.getCoord());
 						firstAct.setFacilityId(fFromFacilities.getId());
 					}
 					// Change the activity
 //					System.out.println("  ##### Act at "+newAct.getFacility().getId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
-					newAct.setLink(fFromFacilities.getLink());
+					newAct.setLinkId(fFromFacilities.getLinkId());
 					newAct.setCoord(fFromFacilities.getCoord());
 					newAct.setFacilityId(fFromFacilities.getId());
 					((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(fFromFacilities.getActivityOptions().get(factype));

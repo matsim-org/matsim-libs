@@ -23,6 +23,7 @@ package playground.jhackney;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -279,7 +280,7 @@ public abstract class ScenarioConfig {
 //		return scenario.getPopulation();
 //	}
 	
-	public static final PopulationImpl readPlansAndKnowledges(final NetworkLayer network, Knowledges kn) {
+	public static final PopulationImpl readPlansAndKnowledges(final Network network, Knowledges kn) {
 		System.out.println("  reading plans xml file... ");
 		PopulationImpl plans = scenario.getPopulation();
 		String filename=input_directory +popFileName;

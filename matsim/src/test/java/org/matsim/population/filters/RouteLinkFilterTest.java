@@ -71,35 +71,35 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 		person = new PersonImpl(new IdImpl("1"));
 		plan = person.createAndAddPlan(true);
-		ActivityImpl a = plan.createAndAddActivity("h", link1);
+		ActivityImpl a = plan.createAndAddActivity("h", link1.getId());
 		a.setEndTime(7.0 * 3600);
 		leg = plan.createAndAddLeg(TransportMode.car);
 		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 7 12"), link20);
 		leg.setRoute(route);
-		plan.createAndAddActivity("w", link20);
+		plan.createAndAddActivity("w", link20.getId());
 		population.addPerson(person);
 
 		person = new PersonImpl(new IdImpl("2"));
 		plan = person.createAndAddPlan(true);
-		ActivityImpl a2 = plan.createAndAddActivity("h", link1);
+		ActivityImpl a2 = plan.createAndAddActivity("h", link1.getId());
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);
 		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 7 12"), link20);
 		leg.setRoute(route);
-		plan.createAndAddActivity("w", link20);
+		plan.createAndAddActivity("w", link20.getId());
 		population.addPerson(person);
 
 		person = new PersonImpl(new IdImpl("3"));
 		plan = person.createAndAddPlan(true);
-		ActivityImpl a3 = plan.createAndAddActivity("h", link1);
+		ActivityImpl a3 = plan.createAndAddActivity("h", link1.getId());
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);
 		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 6 12"), link20);
 		leg.setRoute(route);
-		plan.createAndAddActivity("w", link20);
+		plan.createAndAddActivity("w", link20.getId());
 		population.addPerson(person);
 
 		return population;

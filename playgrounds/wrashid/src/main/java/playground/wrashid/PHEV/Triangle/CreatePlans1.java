@@ -99,14 +99,14 @@ public class CreatePlans1 {
 			// home: 17.30-0:00
 
 			ActivityImpl a = plan.createAndAddActivity("home",home_facility.getCoord());
-			a.setLink(home_facility.getLink());
+			a.setLinkId(home_facility.getLinkId());
 			a.setEndTime(depTimeHome);
 			LegImpl l = plan.createAndAddLeg(TransportMode.car);
 			l.setArrivalTime(depTimeHome);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTimeHome);
 			a = plan.createAndAddActivity("work",work_facility.getCoord());
-			a.setLink(work_facility.getLink());
+			a.setLinkId(work_facility.getLinkId());
 			a.setStartTime(depTimeHome);
 			a.setEndTime(depTimeWork);
 			a.setDuration(depTimeWork-depTimeHome);
@@ -115,7 +115,7 @@ public class CreatePlans1 {
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTimeWork);
 			a = plan.createAndAddActivity("shop",shop_facility.getCoord());
-			a.setLink(shop_facility.getLink());
+			a.setLinkId(shop_facility.getLinkId());
 			a.setStartTime(depTimeWork);
 			a.setEndTime(depTimeShop);
 			a.setDuration(depTimeShop-depTimeWork);
@@ -124,7 +124,7 @@ public class CreatePlans1 {
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTimeShop);
 			a = plan.createAndAddActivity("home",home_facility.getCoord());
-			a.setLink(home_facility.getLink());
+			a.setLinkId(home_facility.getLinkId());
 			// assign home-work-home activities to each person
 
 

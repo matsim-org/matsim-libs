@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -45,7 +46,7 @@ public class DeadEndRemover {
 	
 	private static KnowledgeTools knowledgeTools = new KnowledgeTools();
 	
-	public static void removeDeadEnds(Person person)
+	public static void removeDeadEnds(Person person, Network network)
 	{
 		Map<Id, Node> knownNodesMap;
 		
@@ -61,12 +62,12 @@ public class DeadEndRemover {
 		if(knownNodesMap != null)
 		{
 			// Nodes that must not be Dead Ends because they are parts of the Persons Activities.
-			Map<Id, Node> activityNodesMap = getActivityNodesMap(person);
+			Map<Id, Node> activityNodesMap = getActivityNodesMap(person, network);
 			
 			Map<Id, Node> deadEndsMap = new HashMap<Id, Node>();
 			Map<Id, Node> possibleDeadEndsMap = new HashMap<Id, Node>();
 
-			int previousNodeCount = knownNodesMap.size();
+//			int previousNodeCount = knownNodesMap.size();
 
 			// initially put all known Nodes in the possibleDeadEnds
 			for(Node node : knownNodesMap.values())
@@ -153,7 +154,7 @@ public class DeadEndRemover {
 	 * Returns a Map with the Start- and Endnodes of the Activities of the selected Plan of a Person.
 	 */
 	//public static ArrayList<Node> getActivityNodes(Person person)
-	public static Map<Id, Node> getActivityNodesMap(Person person)
+	public static Map<Id, Node> getActivityNodesMap(Person person, Network network)
 	{
 		Map<Id, Node> activityNodesMap = new HashMap<Id, Node>();
 		
@@ -163,8 +164,8 @@ public class DeadEndRemover {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
 				
-				Node fromNode = act.getLink().getFromNode();
-				Node toNode = act.getLink().getToNode();
+				Node fromNode = network.getLinks().get(act.getLinkId()).getFromNode();
+				Node toNode = network.getLinks().get(act.getLinkId()).getToNode();
 				
 				if(!activityNodesMap.containsKey(fromNode.getId())) activityNodesMap.put(fromNode.getId(), fromNode);
 				if(!activityNodesMap.containsKey(toNode.getId())) activityNodesMap.put(toNode.getId(), toNode);

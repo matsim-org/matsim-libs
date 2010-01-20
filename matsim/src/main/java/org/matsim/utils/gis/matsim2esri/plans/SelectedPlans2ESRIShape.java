@@ -173,7 +173,7 @@ public class SelectedPlans2ESRIShape {
 		Double endTime = act.getEndTime();
 		double rx = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		double ry = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
-		Coord cc = act.getLink().getCoord();
+		Coord cc = this.network.getLinks().get(act.getLinkId()).getCoord();
 		Coord c = new CoordImpl(cc.getX()+rx,cc.getY()+ry);
 		try {
 			return this.featureTypeAct.create(new Object [] {MGC.coord2Point(c),id, type, linkId, startTime, dur, endTime});

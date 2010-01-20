@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -66,7 +65,7 @@ public class Flow {
 	/**
 	 * used to calculate the length of every edge in the network
 	 */
-	private Map<Link, FlowEdgeTraversalCalculator> _lengths = new HashMap<Link, FlowEdgeTraversalCalculator>(); 
+	private final Map<Link, FlowEdgeTraversalCalculator> _lengths = new HashMap<Link, FlowEdgeTraversalCalculator>(); 
 	
 	/**
 	 * Edge representation of flow on the network  
@@ -76,7 +75,7 @@ public class Flow {
 	/**
 	 * TimeExpandedTimeExpandedPath representation of flow on the network
 	 */
-	private LinkedList<TimeExpandedPath> _TimeExpandedPaths;
+	private final LinkedList<TimeExpandedPath> _TimeExpandedPaths;
 	
 	/**
 	 * list of all sources
@@ -91,7 +90,7 @@ public class Flow {
 	/**
 	 *stores for all nodes whether they are an non active source 
 	 */
-	private HashMap<Node,Boolean> _nonactives;
+	private final HashMap<Node,Boolean> _nonactives;
 
 	/**
 	 * the sink, to which all flow is directed
@@ -702,10 +701,10 @@ public class Flow {
 						//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 						leg.setRoute(route);
 						Link fromlink =_network.getLinks().get(ids.getFirst());
-						ActivityImpl home = new ActivityImpl("h", (LinkImpl)fromlink);
+						ActivityImpl home = new ActivityImpl("h", fromlink.getId());
 //						home.setLinkId(fromlink.getId());
 						Link tolink =_network.getLinks().get(ids.getLast());
-						ActivityImpl work = new ActivityImpl("w", (LinkImpl)tolink);
+						ActivityImpl work = new ActivityImpl("w", tolink.getId());
 //						work.setLinkId(tolink.getId());
 						
 

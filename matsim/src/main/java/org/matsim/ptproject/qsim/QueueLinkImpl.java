@@ -130,7 +130,7 @@ public class QueueLinkImpl implements QueueLink {
    */
   private double buffercap_accumulate = 1.0;
   
-  private TransitQueueLaneFeature transitQueueLaneFeature = new TransitQueueLaneFeature(this);
+  private final TransitQueueLaneFeature transitQueueLaneFeature = new TransitQueueLaneFeature(this);
 
   
 	/**
@@ -305,7 +305,7 @@ public class QueueLinkImpl implements QueueLink {
      
      if (!handled) {
        // Check if veh has reached destination:
-       if ((driver.getDestinationLinkId() == this.getLink().getId()) && (driver.chooseNextLinkId() == null)) {
+       if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
          driver.legEnds(now);
          this.processVehicleArrival(now, veh);
          // remove _after_ processing the arrival to keep link active

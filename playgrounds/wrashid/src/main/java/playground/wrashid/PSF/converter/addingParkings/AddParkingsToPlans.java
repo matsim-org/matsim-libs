@@ -53,7 +53,7 @@ public class AddParkingsToPlans {
 					ActivityImpl nextActivity = (ActivityImpl) planElements.get(i + 1);
 
 					// add leg from previous Activity to parking
-					newPlanElements.add(getParkingWalkLeg(previousActivity.getLink()));
+					newPlanElements.add(getParkingWalkLeg(scenario.getNetwork().getLinks().get(previousActivity.getLinkId())));
 
 					// add parking departure activity
 					newPlanElements.add(getParkingFacility(previousActivity,
@@ -67,7 +67,7 @@ public class AddParkingsToPlans {
 					"parkingArrival"));
 
 					// add leg from parking to next activity Activity to parking
-					newPlanElements.add(getParkingWalkLeg(nextActivity.getLink()));
+					newPlanElements.add(getParkingWalkLeg(scenario.getNetwork().getLinks().get(nextActivity.getLinkId())));
 					
 					
 					// set the facility of the activities also

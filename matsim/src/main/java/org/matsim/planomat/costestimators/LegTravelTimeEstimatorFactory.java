@@ -60,7 +60,8 @@ public class LegTravelTimeEstimatorFactory {
 					this.travelTime,
 					this.tDepDelayCalc,
 					routingAlgorithm,
-					simLegInterpretation);
+					simLegInterpretation,
+					network);
 			
 		}
 		

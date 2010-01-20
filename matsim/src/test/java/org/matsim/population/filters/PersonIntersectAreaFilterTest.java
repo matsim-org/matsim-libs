@@ -65,14 +65,14 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		PlanImpl plan = person.createAndAddPlan(true);
 
-		ActivityImpl act1 = plan.createAndAddActivity("h", link0);
+		ActivityImpl act1 = plan.createAndAddActivity("h", link0.getId());
 		act1.setEndTime(8.0*3600);
 
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		leg.setDepartureTime(8.0*3600);
 		leg.setTravelTime(2.0*60);
 
-		plan.createAndAddActivity("w", link5);
+		plan.createAndAddActivity("w", link5.getId());
 
 		NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link0, link5);
 		leg.setRoute(route);
@@ -89,25 +89,25 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		// test route through aoi
 		aoi.clear();
 		aoi.put(link2.getId(), link2);
-		filter = new PersonIntersectAreaFilter(null, aoi);
+		filter = new PersonIntersectAreaFilter(null, aoi, network);
 		assertTrue("test route through aoi", filter.judge(person));
 
 		// test departure link
 		aoi.clear();
 		aoi.put(link0.getId(), link0);
-		filter = new PersonIntersectAreaFilter(null, aoi);
+		filter = new PersonIntersectAreaFilter(null, aoi, network);
 		assertTrue("test departure link as aoi", filter.judge(person));
 
 		// test arrival link
 		aoi.clear();
 		aoi.put(link5.getId(), link5);
-		filter = new PersonIntersectAreaFilter(null, aoi);
+		filter = new PersonIntersectAreaFilter(null, aoi, network);
 		assertTrue("test arrival link as aoi", filter.judge(person));
 
 		// test route outside aoi
 		aoi.clear();
 		aoi.put(link4.getId(), link4);
-		filter = new PersonIntersectAreaFilter(null, aoi);
+		filter = new PersonIntersectAreaFilter(null, aoi, network);
 		assertFalse("test route outside aoi", filter.judge(person));
 
 		// prepare bee-line tests
@@ -117,20 +117,20 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		// test bee-line without alternative aoi
 		aoi.clear();
 		aoi.put(link2.getId(), link2);
-		filter = new PersonIntersectAreaFilter(null, aoi);
+		filter = new PersonIntersectAreaFilter(null, aoi, network);
 		assertFalse("test bee-line without alternative aoi", filter.judge(person));
 
 		// test bee-line with too small alternative aoi
 		aoi.clear();
 		aoi.put(link2.getId(), link2);
-		filter = new PersonIntersectAreaFilter(null, aoi);
+		filter = new PersonIntersectAreaFilter(null, aoi, network);
 		filter.setAlternativeAOI(new CoordImpl(100, 0), 20.0);
 		assertFalse("test bee-line with too small alternative aoi", filter.judge(person));
 
 		// test bee-line with big enough alternative aoi
 		aoi.clear();
 		aoi.put(link2.getId(), link2);
-		filter = new PersonIntersectAreaFilter(null, aoi);
+		filter = new PersonIntersectAreaFilter(null, aoi, network);
 		filter.setAlternativeAOI(new CoordImpl(100, 0), 80.0);
 		assertTrue("test bee-line with big enough alternative aoi", filter.judge(person));
 

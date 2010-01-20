@@ -48,6 +48,9 @@ import playground.yu.analysis.PlanModeJudger;
  *
  */
 public class NewAgentWalkPlan extends NewPopulation {
+	
+	private final Network network;
+	
 	/**
 	 * Constructor, writes file-head
 	 *
@@ -56,10 +59,12 @@ public class NewAgentWalkPlan extends NewPopulation {
 	 */
 	public NewAgentWalkPlan(final Network network, final Population plans) {
 		super(network, plans);
+		this.network = network;
 	}
 
 	public NewAgentWalkPlan(final Network network, final PopulationImpl population, final String filename) {
 		super(network, population, filename);
+		this.network = network;
 	}
 
 	@SuppressWarnings( { "deprecation", "unchecked" })
@@ -113,9 +118,9 @@ public class NewAgentWalkPlan extends NewPopulation {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl) pe;
-				if (CoordUtils.calcDistance(((PlanImpl) plan).getPreviousActivity(leg)
-						.getLink().getCoord(), ((PlanImpl) plan).getNextActivity(leg)
-						.getLink().getCoord()) / 1000.0 > 3.0)
+				if (CoordUtils.calcDistance(this.network.getLinks().get(((PlanImpl) plan).getPreviousActivity(leg)
+						.getLinkId()).getCoord(), this.network.getLinks().get(((PlanImpl) plan).getNextActivity(leg)
+						.getLinkId()).getCoord()) / 1000.0 > 3.0)
 					return true;
 			}
 		}

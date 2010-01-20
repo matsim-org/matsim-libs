@@ -198,7 +198,7 @@ public class CMCFDemandWriter{
 			act1 = ((PlanImpl) plan).getFirstActivity();
 			leg = ((PlanImpl) plan).getNextLeg(act1);
 			act2 = ((PlanImpl) plan).getNextActivity(leg);
-			com.add( act1.getLink().getToNode(), act2.getLink().getFromNode(), 1);
+			com.add( this.network.getLinks().get(act1.getLinkId()).getToNode(), this.network.getLinks().get(act2.getLinkId()).getFromNode(), 1);
 		}
 
 		//now write the output

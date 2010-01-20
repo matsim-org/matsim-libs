@@ -160,7 +160,7 @@ public class RouteSummaryTest {
 							NetworkRouteWRefs r = (NetworkRouteWRefs) l.getRoute();
 							// boolean illegalRoute = false;
 
-							if (r.getStartLinkId() != r.getEndLinkId()) {
+							if (!r.getStartLinkId().equals(r.getEndLinkId())) {
 								LinkedList<Id> tmpRouteLinkList = new LinkedList<Id>();
 								tmpRouteLinkList.addFirst(previousActLinkId);
 								List<Id> origRouteLinkIds = r.getLinkIds();

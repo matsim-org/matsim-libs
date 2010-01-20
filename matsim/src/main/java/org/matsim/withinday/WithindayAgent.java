@@ -153,7 +153,7 @@ public class WithindayAgent extends PersonAgent {
 		}
 		Link currentLink = this.network.getLinks().get(this.getCurrentLinkId());
 		ActivityImpl nextAct = ((PlanImpl) this.getPerson().getSelectedPlan()).getNextActivity(this.getCurrentLeg());
-		Link destinationLink = nextAct.getLink();
+		Link destinationLink = this.network.getLinks().get(nextAct.getLinkId());
 		NetworkRouteWRefs alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
 		Plan oldPlan = this.getPerson().getSelectedPlan();
 		LegImpl currentLeg = (LegImpl) this.getCurrentLeg();

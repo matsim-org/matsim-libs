@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -141,19 +140,19 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 					if (currentTuple.getSecond() != null) {
 						// first and last leg do not have the route set, as the start or end  link is unknown.
 						Leg firstLeg = currentTuple.getSecond().get(0);
-						Link fromLink = ((ActivityImpl) planElements.get(i-1)).getLink();
+						Link fromLink = this.network.getLinks().get(((ActivityImpl) planElements.get(i-1)).getLinkId());
 						Link toLink = null;
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							toLink = ((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLink();
+							toLink = this.network.getLinks().get(((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLinkId());
 						} else {
-							toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
+							toLink = this.network.getLinks().get(((ActivityImpl) planElements.get(i+1)).getLinkId());
 						}
 						firstLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
 
 						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
-						toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
+						toLink = this.network.getLinks().get(((ActivityImpl) planElements.get(i+1)).getLinkId());
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							fromLink = ((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLink();
+							fromLink = this.network.getLinks().get(((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLinkId());
 						}
 						lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
 
@@ -167,12 +166,12 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 								i++;
 								if (leg2.getRoute() instanceof ExperimentalTransitRoute) {
 									ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();
-									ActivityImpl act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), (LinkImpl) tRoute.getStartLink());
+									ActivityImpl act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLink());
 									act.setDuration(0.0);
 									planElements.add(i, act);
 									nextCoord = this.schedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
 								} else { // walk legs don't have a coord, use the coord from the last egress point
-									ActivityImpl act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink());
+									ActivityImpl act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, ((RouteWRefs) leg2.getRoute()).getStartLink());
 									act.setDuration(0.0);
 									planElements.add(i, act);
 								}

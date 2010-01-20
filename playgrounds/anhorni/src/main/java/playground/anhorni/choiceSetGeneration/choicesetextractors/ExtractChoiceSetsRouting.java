@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -48,7 +47,7 @@ import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
 public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements AfterMobsimListener  {
 	
 	private final static Logger log = Logger.getLogger(ExtractChoiceSetsRouting.class);
-	private String mode;
+	private final String mode;
 
 	public ExtractChoiceSetsRouting(Controler controler, ZHFacilities facilities, 
 			List<ChoiceSet> choiceSets, String mode, int tt) {
@@ -60,7 +59,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		
-		if (event.getIteration() < Gbl.getConfig().controler().getLastIteration()) {
+		if (event.getIteration() < event.getControler().getLastIteration()) {
 			return;
 		}
 		log.info("Number of ZH facilities " + this.facilities.getNumberOfFacilities());
@@ -101,19 +100,19 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		 */
 		//Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
 		LinkImpl linkBefore = network.getLinks().get(choiceSet.getTrip().getBeforeShoppingAct().getLinkId());
-		ActivityImpl fromAct0 = new org.matsim.core.population.ActivityImpl("beforeShop", linkBefore);
+		ActivityImpl fromAct0 = new org.matsim.core.population.ActivityImpl("beforeShop", linkBefore.getId());
 		fromAct0.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
 		fromAct0.setCoord(linkBefore.getCoord());
 					
 		LinkImpl link = network.getLinks().get(linkId);
-		ActivityImpl toAct0 = new org.matsim.core.population.ActivityImpl("shop", link);
+		ActivityImpl toAct0 = new org.matsim.core.population.ActivityImpl("shop", linkId);
 		toAct0.setCoord(link.getCoord());
 					
 		LegImpl legBefore = computeLeg(fromAct0, toAct0, controler);				
 		double travelTimeBeforeShopping = legBefore.getTravelTime();
 		
 		//--------------------------------------------------			
-		ActivityImpl fromAct1 = new org.matsim.core.population.ActivityImpl(toAct0.getType(), toAct0.getLink());
+		ActivityImpl fromAct1 = new org.matsim.core.population.ActivityImpl(toAct0.getType(), toAct0.getLinkId());
 		double endTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + 
 		travelTimeBeforeShopping +
 		choiceSet.getTrip().getShoppingAct().calculateDuration();			
@@ -122,7 +121,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 					
 		//Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
 		LinkImpl linkAfter = network.getLinks().get(choiceSet.getTrip().getAfterShoppingAct().getLinkId());
-		ActivityImpl toAct1 = new org.matsim.core.population.ActivityImpl("afterShop", linkAfter);
+		ActivityImpl toAct1 = new org.matsim.core.population.ActivityImpl("afterShop", linkAfter.getId());
 		toAct1.setCoord(linkAfter.getCoord());
 					
 		LegImpl legAfter = computeLeg(fromAct1, toAct1, controler);	

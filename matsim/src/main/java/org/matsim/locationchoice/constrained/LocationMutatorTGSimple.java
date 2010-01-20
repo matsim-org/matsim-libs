@@ -137,7 +137,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			return false;
 		}
 		act.setFacilityId(facility.getId());
-   		act.setLink(((NetworkImpl) this.network).getNearestLink(facility.getCoord()));
+   		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());
    		act.setCoord(facility.getCoord());
    		
    		return true;

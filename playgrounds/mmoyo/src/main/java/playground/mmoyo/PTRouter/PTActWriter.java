@@ -49,10 +49,10 @@ public class PTActWriter {
 	private LinkImpl egressLink;
 	private final double firstWalkRange;
 
-	private NetworkLayer logicNet;
+	private final NetworkLayer logicNet;
 	private NetworkLayer plainNet;
-	private PTRouter ptRouter;
-	private LogicIntoPlainTranslator logicToPlainConverter;
+	private final PTRouter ptRouter;
+	private final LogicIntoPlainTranslator logicToPlainConverter;
 
 	public PTActWriter(final LogicFactory logicFactory, final String configFile, final String plansFile, final String outputFile){
 		this.outputFile= outputFile;
@@ -178,9 +178,9 @@ public class PTActWriter {
 				    		}
 			    		}
 					}
-			    	thisAct.setLink(logicNet.getNearestLink(thisAct.getCoord()));
+			    	thisAct.setLinkId(logicNet.getNearestLink(thisAct.getCoord()).getId());
 
-			    	newPlan.addActivity(newPTAct(thisAct.getType(), thisAct.getCoord(), thisAct.getLink(), thisAct.getStartTime(), thisAct.getEndTime()));
+			    	newPlan.addActivity(newPTAct(thisAct.getType(), thisAct.getCoord(), logicNet.getLinks().get(thisAct.getLinkId()), thisAct.getStartTime(), thisAct.getEndTime()));
 					lastAct = thisAct;
 					first=false;
 				}

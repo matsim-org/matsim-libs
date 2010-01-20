@@ -96,7 +96,7 @@ public class PlansPrepare {
 		PopulationWriter writer = new PopulationWriter(pop, this.scenario.getNetwork());
 		writer.startStreaming(toFile);
 
-		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(writer, areaOfInterest);
+		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(writer, areaOfInterest, network);
 		filter.setAlternativeAOI(center, radius);
 		pop.addAlgorithm(filter);
 

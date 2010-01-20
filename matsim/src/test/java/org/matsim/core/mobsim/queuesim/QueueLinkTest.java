@@ -108,11 +108,11 @@ public class QueueLinkTest extends MatsimTestCase {
 		PersonImpl p = new PersonImpl(new IdImpl(23));
 		Plan plan = new PlanImpl();
 		p.addPlan(plan);
-		plan.addActivity(new ActivityImpl("home", f.link1));
+		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
 		leg.setRoute(new LinkNetworkRouteImpl(f.link1, f.link2));
 		plan.addLeg(leg);
-		plan.addActivity(new ActivityImpl("work", f.link2));
+		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonAgent driver = new PersonAgent(p, qsim);
 		driver.initialize();
 		veh.setDriver(driver);
@@ -165,11 +165,11 @@ public class QueueLinkTest extends MatsimTestCase {
 		PersonImpl p = new PersonImpl(new IdImpl(42));
 		Plan plan = new PlanImpl();
 		p.addPlan(plan);
-		plan.addActivity(new ActivityImpl("home", f.link1));
+		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
 		leg.setRoute(new LinkNetworkRouteImpl(f.link1, f.link2));
 		plan.addLeg(leg);
-		plan.addActivity(new ActivityImpl("work", f.link2));
+		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonAgent driver = new PersonAgent(p, qsim);
 		driver.initialize();
 		veh.setDriver(driver);
@@ -211,11 +211,11 @@ public class QueueLinkTest extends MatsimTestCase {
 		PersonImpl p = new PersonImpl(new IdImpl(80));
 		Plan plan = new PlanImpl();
 		p.addPlan(plan);
-		plan.addActivity(new ActivityImpl("home", f.link1));
+		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
 		leg.setRoute(new LinkNetworkRouteImpl(f.link1, f.link2));
 		plan.addLeg(leg);
-		plan.addActivity(new ActivityImpl("work", f.link2));
+		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonAgent driver = new PersonAgent(p, qsim);
 		driver.initialize();
 		veh.setDriver(driver);
@@ -273,13 +273,13 @@ public class QueueLinkTest extends MatsimTestCase {
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		PlanImpl plan = p.createAndAddPlan(true);
 		try {
-			plan.createAndAddActivity("h", link1);
+			plan.createAndAddActivity("h", link1.getId());
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link2);
 			leg.setRoute(route);
 			route.setLinks(link1, null, link2);
 			leg.setRoute(route);
-			plan.createAndAddActivity("w", link2);
+			plan.createAndAddActivity("w", link2.getId());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -106,13 +106,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		reader.endTag("act", "", context);
 		reader.startTag("leg", new AttributesBuilder().add("mode", "car").get(), context);
 		reader.endTag("leg", "", context);
-		try {
-			reader.startTag("act", new AttributesBuilder().add("type", "h").add("link", "2").get(), context);
-			fail("missing exception.");
-		}
-		catch (IllegalArgumentException e) {
-			log.info("catched expected exception.", e);
-		}
+		reader.startTag("act", new AttributesBuilder().add("type", "h").add("link", "2").get(), context);
 		reader.endTag("plan", "", context);
 		reader.endTag("person", "", context);
 		reader.endTag("plans", "", context);
@@ -121,6 +115,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		Person person = population.getPersons().get(new IdImpl("2"));
 		Plan plan = person.getPlans().get(0);
 		assertEquals(link3.getId(), ((Activity) plan.getPlanElements().get(0)).getLinkId());
+		assertEquals(new IdImpl("2"), ((Activity) plan.getPlanElements().get(2)).getLinkId());
 	}
 
 }

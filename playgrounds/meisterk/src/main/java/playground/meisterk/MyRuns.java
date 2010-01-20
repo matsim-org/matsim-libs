@@ -32,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -215,7 +216,7 @@ public class MyRuns {
 		logger.info("Reading facilities xml file...");
 
 		// - population
-		PersonAnalyzeModeChainFeasibility pa = new PersonAnalyzeModeChainFeasibility(facilities);
+		PersonAnalyzeModeChainFeasibility pa = new PersonAnalyzeModeChainFeasibility(facilities, network);
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
@@ -232,10 +233,12 @@ public class MyRuns {
 
 		private int numInfeasiblePlans = 0;
 		private final ActivityFacilities facilities;
+		private final Network network;
 
-		public PersonAnalyzeModeChainFeasibility(ActivityFacilities facilities) {
+		public PersonAnalyzeModeChainFeasibility(ActivityFacilities facilities, Network network) {
 			super();
 			this.facilities = facilities;
+			this.network = network;
 		}
 
 		public void run(Person person) {
@@ -259,7 +262,8 @@ public class MyRuns {
 					candidate,
 					meisterkConfigGroup.getChainBasedModes(),
 					PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility,
-					this.facilities);
+					this.facilities,
+					this.network);
 
 			if (!isFeasible) {
 

@@ -119,7 +119,7 @@ public class PersonSetActToLinkWithNonNullFacility extends AbstractPersonAlgorit
 					Gbl.errorMsg("p_id=" + plan.getPerson().getId() + ": no facility found for act=" + act);
 				}
 				act.setCoord(nearest_f.getCoord());
-				act.setLink(nearest_f.getLink());//JH
+				act.setLinkId(nearest_f.getLinkId());//JH
 				System.out.println("f link "+ nearest_f.getId()+" "+nearest_f.getLink().getId());
 				System.out.println("  p_id=" + plan.getPerson().getId() + ", act=" + act.getType() + ": nearest dist=" + nearest_dist);
 			}

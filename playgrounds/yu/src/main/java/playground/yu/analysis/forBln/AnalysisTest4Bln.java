@@ -130,11 +130,11 @@ public class AnalysisTest4Bln {
 		if (plansFilename != null) {
 			PopulationImpl population = sc.getPopulation();
 
-			catl = new CalcAverageTripLength();
+			catl = new CalcAverageTripLength(network);
 			ms = new ModeSplit(toll);
 			orms = new EnRouteModalSplit(scenario, population, toll);
 			lttms = new LegTravelTimeModalSplit(population, toll);
-			dd = new DailyDistance4Bln(toll);
+			dd = new DailyDistance4Bln(toll, network);
 			dert = new DailyEnRouteTime4Bln(toll);
 			ld = new LegDistance(network, toll, population);
 			// in future, add some PersonAlgorithm and EventsHandler

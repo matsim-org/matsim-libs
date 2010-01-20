@@ -93,19 +93,19 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.person = new PersonImpl(new IdImpl(1));
 		this.plan = this.person.createAndAddPlan(true);
 		try {
-			this.plan.createAndAddActivity("h", link1);
+			this.plan.createAndAddActivity("h", link1.getId());
 			LegImpl leg = this.plan.createAndAddLeg(TransportMode.car);
 			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link3);
 			leg.setRoute(route);
 			route.setDistance(25000.0);
 			route.setTravelTime(0.5*3600);
-			this.plan.createAndAddActivity("w", link3);
+			this.plan.createAndAddActivity("w", link3.getId());
 			leg = this.plan.createAndAddLeg(TransportMode.pt);
 			route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link3, link5);
 			leg.setRoute(route);
 			route.setDistance(20000.0);
 			route.setTravelTime(0.25*3600);
-			this.plan.createAndAddActivity("h", link5);
+			this.plan.createAndAddActivity("h", link5.getId());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

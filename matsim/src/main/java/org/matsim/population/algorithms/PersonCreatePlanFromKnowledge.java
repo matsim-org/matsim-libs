@@ -53,7 +53,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 
 		// first act (= home)
 		ActivityImpl a = p.createAndAddActivity("home", home_facility.getCoord());
-		a.setLink(home_facility.getLink());
+		a.setLinkId(home_facility.getLinkId());
 		a.setStartTime(0.0);
 		a.setDuration(time);
 		a.setEndTime(time);
@@ -72,7 +72,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 			ActivityOptionImpl act = acts.get(act_index);
 			ActivityFacilityImpl f = act.getFacility();
 			a = p.createAndAddActivity(act.getType(),f.getCoord());
-			a.setLink(f.getLink());
+			a.setLinkId(f.getLinkId());
 			a.setStartTime(time);
 			a.setDuration(dur);
 			a.setEndTime(time + dur);
@@ -86,7 +86,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 
 		// last act (= home)
 		a = p.createAndAddActivity("home",home_facility.getCoord());
-		a.setLink(home_facility.getLink());
+		a.setLinkId(home_facility.getLinkId());
 		a.setStartTime(time);
 		a.setEndTime(24*3600);
 		a.setDuration(24*3600 - time);

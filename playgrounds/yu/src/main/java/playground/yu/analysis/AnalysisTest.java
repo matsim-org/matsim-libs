@@ -124,11 +124,11 @@ public class AnalysisTest {
 		if (plansFilename != null) {
 			PopulationImpl population = scenario2.getPopulation();
 
-			catl = new CalcAverageTripLength();
+			catl = new CalcAverageTripLength(network);
 			ms = new ModeSplit(toll);
 			orms = new EnRouteModalSplit(scenario, population, toll);
 			lttms = new LegTravelTimeModalSplit(population, toll);
-			dd = new DailyDistance(toll);
+			dd = new DailyDistance(toll, network);
 			dert = new DailyEnRouteTime(toll);
 			ld = new LegDistance(scenario2.getNetwork(), toll, population);
 			// in future, add some PersonAlgorithm and EventsHandler

@@ -29,9 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -41,24 +43,26 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	public FromToSummary() {
+	private final Network network;
+	
+	public FromToSummary(final Network network) {
 		super();
-
+		this.network = network;
 		this.comparator = new NodePairComparator();
 
 		this.fromToMap = new TreeMap<NodePair, StartTimeOccurrence>(
 				this.comparator);
 	}
 
-	public FromToSummary(NodeImpl fromNode, NodeImpl toNode, int startTime) {
-		this();
+	public FromToSummary(final Network network, NodeImpl fromNode, NodeImpl toNode, int startTime) {
+		this(network);
 
 		addStartTimeOccurrence(fromNode, toNode, startTime);
 	}
 
-	private NodePairComparator comparator;
+	private final NodePairComparator comparator;
 
-	private TreeMap<NodePair, StartTimeOccurrence> fromToMap;
+	private final TreeMap<NodePair, StartTimeOccurrence> fromToMap;
 
 	Rectangle2D.Double travelZone = new Rectangle2D.Double();
 
@@ -124,15 +128,15 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	}
 
 	public void run(Plan plan) {
-		List actslegs = plan.getPlanElements();
+		List<PlanElement> actslegs = plan.getPlanElements();
 		ActivityImpl fromAct = (ActivityImpl) actslegs.get(0);
-		Node fromNode = fromAct.getLink().getToNode();
+		Node fromNode = this.network.getLinks().get(fromAct.getLinkId()).getToNode();
 
 		for (int j = 2; j < actslegs.size(); j = j + 2) {
 			ActivityImpl toAct = (ActivityImpl) actslegs.get(j);
 
 			if (fromAct.getEndTime() >= 0) {
-				Node toNode = toAct.getLink().getFromNode();
+				Node toNode = this.network.getLinks().get(toAct.getLinkId()).getFromNode();
 				addStartTimeOccurrence(fromNode, toNode, fromAct.getEndTime());
 				this.travelZone.add(fromNode.getCoord().getX(), fromNode.getCoord()
 						.getY());
@@ -243,7 +247,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 
 		private int occurrenceCnt = 0;
 
-		private TreeMap<Double, Integer> startTimeOccurrenceCnt = new TreeMap<Double, Integer>();
+		private final TreeMap<Double, Integer> startTimeOccurrenceCnt = new TreeMap<Double, Integer>();
 
 		public void addOccurrence(double startTime) {
 			Double time = Double.valueOf(startTime);

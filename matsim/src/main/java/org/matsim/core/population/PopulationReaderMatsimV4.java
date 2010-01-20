@@ -28,10 +28,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -319,14 +319,10 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startAct(final Attributes atts) {
-		Link link = null;
 		Coord coord = null;
 		if (atts.getValue("link") != null) {
-			link = this.network.getLinks().get(new IdImpl(atts.getValue("link")));
-			if (link == null) {
-				throw new IllegalArgumentException("No link found with id = " + atts.getValue("link"));
-			}
-			this.curract = this.currplan.createAndAddActivity(atts.getValue("type"), link);
+			Id linkId = new IdImpl(atts.getValue("link"));
+			this.curract = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
 				this.curract.setCoord(coord);
@@ -350,9 +346,9 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		}
 		if (this.routeDescription != null) {
 			if (this.currRoute instanceof GenericRoute) {
-				((GenericRoute) this.currRoute).setRouteDescription(this.prevAct.getLink(), this.routeDescription.trim(), this.curract.getLink());
+				((GenericRoute) this.currRoute).setRouteDescription(this.network.getLinks().get(this.prevAct.getLinkId()), this.routeDescription.trim(), this.network.getLinks().get(this.curract.getLinkId()));
 			} else if (this.currRoute instanceof NetworkRouteWRefs) {
-				((NetworkRouteWRefs) this.currRoute).setNodes(this.prevAct.getLink(), NetworkUtils.getNodes(this.network, this.routeDescription), this.curract.getLink());
+				((NetworkRouteWRefs) this.currRoute).setNodes(this.network.getLinks().get(this.prevAct.getLinkId()), NetworkUtils.getNodes(this.network, this.routeDescription), this.network.getLinks().get(this.curract.getLinkId()));
 			} else {
 				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
 			}
@@ -373,7 +369,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currRoute = ((NetworkFactoryImpl) this.network.getFactory()).createRoute(this.currleg.getMode(), this.prevAct.getLink(), this.prevAct.getLink());
+		this.currRoute = ((NetworkFactoryImpl) this.network.getFactory()).createRoute(this.currleg.getMode(), this.network.getLinks().get(this.prevAct.getLinkId()), this.network.getLinks().get(this.prevAct.getLinkId()));
 		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));

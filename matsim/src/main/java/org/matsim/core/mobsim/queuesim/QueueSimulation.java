@@ -540,7 +540,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 				throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + linkId);
 			}
 			vehicle.setDriver(agent);
-			if ((route.getEndLinkId() == linkId) && (agent.chooseNextLinkId() == null)) {
+			if ((route.getEndLinkId().equals(linkId)) && (agent.chooseNextLinkId() == null)) {
 				agent.legEnds(now);
 				qlink.processVehicleArrival(now, vehicle);
 			} else {

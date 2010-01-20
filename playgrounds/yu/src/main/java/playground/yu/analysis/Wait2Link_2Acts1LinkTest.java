@@ -91,7 +91,7 @@ public class Wait2Link_2Acts1LinkTest {
 					for (int i = 0; i < max; i++)
 						if (i % 2 == 0) {
 							ActivityImpl a = (ActivityImpl) actsLegs.get(i);
-							nextTmpLinkId = a.getLink().getId().toString();
+							nextTmpLinkId = a.getLinkId().toString();
 							if (tmpLinkId != null && nextTmpLinkId != null)
 								if (tmpLinkId.equals(nextTmpLinkId)) {
 									this.actLocCount++;

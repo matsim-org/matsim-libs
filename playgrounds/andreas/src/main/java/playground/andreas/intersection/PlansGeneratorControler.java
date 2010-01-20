@@ -165,13 +165,13 @@ public class PlansGeneratorControler extends Controler {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {
 			ActivityImpl act1 = plan.createAndAddActivity("h", new CoordImpl(100., 100.));
-			act1.setLink(fromLink);
+			act1.setLinkId(fromLink.getId());
 			act1.setStartTime(0.);
 			act1.setEndTime(3 * 60 * 60.);
 //			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
 			plan.createAndAddLeg(TransportMode.car);
 			ActivityImpl act2 = plan.createAndAddActivity("h", new CoordImpl(200., 200.));
-			act2.setLink(toLink);
+			act2.setLinkId(toLink.getId());
 			act2.setStartTime(8 * 60 * 60);
 
 			p.addPlan(plan);

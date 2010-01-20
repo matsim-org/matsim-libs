@@ -63,7 +63,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		PersonImpl testPerson = new PersonImpl(new IdImpl("1000"));
 		PlanImpl testPlan = testPerson.createAndAddPlan(true);
 		
-		ActivityImpl act = testPlan.createAndAddActivity("startActivity", startLink);
+		ActivityImpl act = testPlan.createAndAddActivity("startActivity", startLink.getId());
 		
 		Leg leg = testPlan.createAndAddLeg(TransportMode.car);
 		
@@ -72,7 +72,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		
 		leg.setRoute(route);
 		
-		act = testPlan.createAndAddActivity("endActivity", endLink);
+		act = testPlan.createAndAddActivity("endActivity", endLink.getId());
 		
 		PopulationImpl pop = scenario.getPopulation();
 		pop.setIsStreaming(true);

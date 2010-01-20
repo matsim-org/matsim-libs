@@ -20,6 +20,7 @@
 
 package org.matsim.analysis;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
@@ -32,7 +33,12 @@ public class CalcAverageTripLength extends AbstractPersonAlgorithm implements Pl
 
 	private double sumLength = 0.0;
 	private int cntTrips = 0;
-
+	private final Network network;
+	
+	public CalcAverageTripLength(final Network network) {
+		this.network = network;
+	}
+	
 	@Override
 	public void run(final Person person) {
 		this.run(person.getSelectedPlan());
@@ -45,8 +51,8 @@ public class CalcAverageTripLength extends AbstractPersonAlgorithm implements Pl
 			RouteWRefs route = leg.getRoute();
 			if (route != null) {
 				double dist = route.getDistance();
-				if (act.getLink() != null) {
-					dist += act.getLink().getLength();
+				if (act.getLinkId() != null) {
+					dist += this.network.getLinks().get(act.getLinkId()).getLength();
 				}
 				this.sumLength += dist;
 				this.cntTrips++;

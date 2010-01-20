@@ -92,8 +92,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 			ActivityImpl toAct = (ActivityImpl)actslegs.get(j);
 			LegImpl leg = (LegImpl)actslegs.get(j-1);
 
-			Link startlink = fromAct.getLink();
-			if (startlink == null) throw new Exception("start link missing");
+			Link startlink = this.network.getLinks().get(fromAct.getLinkId());
 			Node startnode = startlink.getFromNode();
 
 			ArrayList<Node> nodes = new ArrayList<Node>();

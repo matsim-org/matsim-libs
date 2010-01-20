@@ -165,7 +165,7 @@ public class ASPActivityChains {
 				}
 				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
 					if (((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getType().equalsIgnoreCase("home")){
-						if (((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getFacilityId()!=homeId){
+						if (!((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getFacilityId().equals(homeId)){
 							log.warn("Non-primary home act found in plan of person "+this.plans.get(i).get(j).getPerson().getId());
 							break;
 						}

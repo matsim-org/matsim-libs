@@ -38,7 +38,7 @@ public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements
 	public void run(final Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
-				((ActivityImpl) pe).setLink(null);
+				((ActivityImpl) pe).setLinkId(null);
 			} else if (pe instanceof LegImpl) {
 				((LegImpl) pe).setRoute(null);
 			}

@@ -76,7 +76,7 @@ public class PTRouter{
 
 		//if the two activities are located in the same link, create an undefined transport mode leg between them
 		//System.out.println(fromAct.getType() + " " + toAct.getType() + " " + fromAct.getLinkId() + " " + toAct.getLinkId());
-		GenericRouteImpl undefinedRoute = new GenericRouteImpl(fromAct.getLink(),toAct.getLink());
+		GenericRouteImpl undefinedRoute = new GenericRouteImpl(this.logicNet.getLinks().get(fromAct.getLinkId()),this.logicNet.getLinks().get(toAct.getLinkId()));
 		undefinedRoute.setDistance(CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()));
 		LegImpl undefinedLeg = new LegImpl(TransportMode.undefined);
 		undefinedLeg.setTravelTime(undefinedRoute.getDistance() * PTValues.AV_WALKING_SPEED);

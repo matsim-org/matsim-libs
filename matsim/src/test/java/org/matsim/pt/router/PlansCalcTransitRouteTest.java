@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -54,14 +54,16 @@ public class PlansCalcTransitRouteTest extends TestCase {
 		PopulationFactory pb = f.scenario.getPopulation().getFactory();
 		Plan plan = pb.createPlan();
 		Activity act1 = pb.createActivityFromCoord("h", fromCoord);
+		((ActivityImpl) act1).setLinkId(f.scenario.createId("1"));
 		act1.setEndTime(5.0*3600);
 		Leg leg = pb.createLeg(TransportMode.pt);
 		Activity act2 = pb.createActivityFromCoord("w", toCoord);
+		((ActivityImpl) act2).setLinkId(f.scenario.createId("2"));
 		plan.addActivity(act1);
 		plan.addLeg(leg);
 		plan.addActivity(act2);
 		
-		router.run((PlanImpl) plan);
+		router.run(plan);
 
 		List<PlanElement> pes = plan.getPlanElements();
 		assertEquals(11, pes.size());

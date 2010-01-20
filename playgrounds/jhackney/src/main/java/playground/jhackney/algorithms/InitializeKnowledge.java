@@ -3,6 +3,7 @@ package playground.jhackney.algorithms;
 import java.io.File;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -16,7 +17,7 @@ import playground.jhackney.socialnetworks.mentalmap.MentalMap;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
 public class InitializeKnowledge {
-	public InitializeKnowledge(final Population plans, final ActivityFacilities facilities, Knowledges knowledges){
+	public InitializeKnowledge(final Population plans, final ActivityFacilities facilities, Knowledges knowledges, Network network){
 
 		ActivityActReader aar = null;
 
@@ -54,7 +55,7 @@ public class InitializeKnowledge {
 				Plan plan = person.getPlans().get(ii);
 
 				// TODO balmermi: double check if this is the right place to create the MentalMap and the EgoNet
-				if (person.getCustomAttributes().get(MentalMap.NAME) == null) { person.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }
+				if (person.getCustomAttributes().get(MentalMap.NAME) == null) { person.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k, network)); }
 				if (person.getCustomAttributes().get(EgoNet.NAME) == null) { person.getCustomAttributes().put(EgoNet.NAME,new EgoNet()); }
 
 				// JH Hack to make sure act types are compatible with social nets

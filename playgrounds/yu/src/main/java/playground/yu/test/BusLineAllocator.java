@@ -94,8 +94,8 @@ public class BusLineAllocator {
 		}
 	}
 
-	private NetworkImpl carNet;
-	private Map<Id, List<Tuple<Link, Tuple<Coord, Coord>>>> coordPairs;// <ptRouteId,<ptLink<fromNodeCoord,toNodeCoord>>>
+	private final NetworkImpl carNet;
+	private final Map<Id, List<Tuple<Link, Tuple<Coord, Coord>>>> coordPairs;// <ptRouteId,<ptLink<fromNodeCoord,toNodeCoord>>>
 	// private Map<Id, List<Tuple<String, Tuple<Coord, Coord>>>>
 	// coordPairs4rtf;//
 	// <ptRouteId,<ptLinkId:next_ptLinkId<fromNodeCoord,toNodeCoord>>>
@@ -103,7 +103,7 @@ public class BusLineAllocator {
 	 * <ptRouteId,List<ptLinkId,Path_Links(shouldn't be pt linkId, but there
 	 * also is exception))>>
 	 */
-	private Map<Id, List<Tuple<Id, List<Id>/* path */>>> paths = new HashMap<Id, List<Tuple<Id, List<Id>/*
+	private final Map<Id, List<Tuple<Id, List<Id>/* path */>>> paths = new HashMap<Id, List<Tuple<Id, List<Id>/*
 																										 * Path.
 																										 * links
 																										 */>>>();
@@ -117,19 +117,19 @@ public class BusLineAllocator {
 	// * links
 	// */>>>();
 	//
-	private String outputFile;
+	private final String outputFile;
 	private Dijkstra dijkstra;
 	private Link tmpPtLink = null;
 	private Id tmpPtRouteId = null;
-	private Set<Link> startLinks = new HashSet<Link>(),
+	private final Set<Link> startLinks = new HashSet<Link>(),
 			endLinks = new HashSet<Link>(),
 			// nullLinks = new HashSet<Link>(),
 			links2add = new HashSet<Link>();
 	// private Set<Node> nodes2add = new HashSet<Node>();
 	// private Map<Link, Node> startLinksNewToNodes = new HashMap<Link, Node>();
-	private TransitSchedule schedule;
+	private final TransitSchedule schedule;
 	private boolean hasStartLink = false;
-	private Network multiModalNetwork;
+	private final Network multiModalNetwork;
 	private static Set<TransportMode> modes = new HashSet<TransportMode>();
 
 	/**
@@ -788,7 +788,6 @@ public class BusLineAllocator {
 	}
 
 	private void generateNewPlans(PopulationImpl pop, String newPopFile) {
-		Map<Id, List<Id>/* path */> linkIdPaths = convertResult();
 
 		for (Person person : pop.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
@@ -801,8 +800,8 @@ public class BusLineAllocator {
 							&& linkId.toString().startsWith("tr_")) {
 						Link actLink = carNet.getLinks().get(linkId);
 						if (actLink == null)
-							act.setLink(carNet.getNearestLink(multiModalNetwork
-									.getLinks().get(linkId).getCoord()));
+							act.setLinkId(carNet.getNearestLink(multiModalNetwork
+									.getLinks().get(linkId).getCoord()).getId());
 					}
 				}
 			}

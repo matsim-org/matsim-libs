@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -31,7 +30,7 @@ public class TestsUtil {
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(planomatConfigGroup.getTripStructureAnalysisLayer())) {
 				act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacilityImpl) location);
 			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(planomatConfigGroup.getTripStructureAnalysisLayer())) {
-				act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], (LinkImpl) location);
+				act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
 			} else {
 				throw new RuntimeException("Unknown tripStrucureAnalysisLayerOption");
 			}

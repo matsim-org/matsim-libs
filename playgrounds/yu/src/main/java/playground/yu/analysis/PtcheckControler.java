@@ -48,7 +48,7 @@ import org.matsim.core.utils.io.IOUtils;
  * 
  */
 public class PtcheckControler extends Controler {
-	private String scenario;
+	private final String scenario;
 
 	public String getScenarioName() {
 		return scenario;
@@ -65,7 +65,7 @@ public class PtcheckControler extends Controler {
 		 * internal bufferedWriter
 		 */
 		private BufferedWriter ptRateWriter = null;
-		private String scenario;
+		private final String scenario;
 
 		private CalcAverageTripLength catl = null;
 		private CalcNetAvgSpeed cas = null;
@@ -114,7 +114,7 @@ public class PtcheckControler extends Controler {
 			if (it % 10 == 0) {
 				Config cf = ctl.getConfig();
 				rp = ctl.getRoadPricing();
-				catl = new CalcAverageTripLength();
+				catl = new CalcAverageTripLength(ctl.getNetwork());
 				catl.run(event.getControler().getPopulation());
 				try {
 					ptRateWriter

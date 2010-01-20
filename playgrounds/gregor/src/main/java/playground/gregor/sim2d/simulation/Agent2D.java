@@ -155,7 +155,7 @@ public class Agent2D  {
 	public boolean initialize() {
 		ActivityImpl firstAct = ((ActivityImpl)this.currentPlan.getPlanElements().get(this.actLegPointer));
 		double departureTime = firstAct.getEndTime();
-		this.currentLink = firstAct.getLink();
+		this.currentLink = this.simulation.getNetwork().getLinks().get(firstAct.getLinkId());
 //		this.position = new Coordinate(this.currentLink.getToNode().getCoord().getX(),this.currentLink.getToNode().getCoord().getY());
 		this.position = MGC.coord2Coordinate(firstAct.getCoord());
 		if ((departureTime != Time.UNDEFINED_TIME) && (this.currentPlan.getPlanElements().size() > 1)) {
@@ -182,9 +182,5 @@ public class Agent2D  {
 		}
 		return false;
 	}
-
-
-
-
 
 }

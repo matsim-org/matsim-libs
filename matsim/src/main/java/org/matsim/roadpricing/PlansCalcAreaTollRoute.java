@@ -104,18 +104,12 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				// it is a car leg...
 
 				// # init some values before searching for routes:
-				Link fromLink = fromAct.getLink();
-				Link toLink = toAct.getLink();
-				if (fromLink == null) {
-					throw new RuntimeException("fromLink missing.");
-				}
-				if (toLink == null) {
-					throw new RuntimeException("toLink missing.");
-				}
+				Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
+				Link toLink = this.network.getLinks().get(toAct.getLinkId());
 				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 				Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-				NetworkRouteWRefs tollRoute = (NetworkRouteWRefs) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
+				NetworkRouteWRefs tollRoute = (NetworkRouteWRefs) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, fromLink, toLink);
 				NetworkRouteWRefs noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll

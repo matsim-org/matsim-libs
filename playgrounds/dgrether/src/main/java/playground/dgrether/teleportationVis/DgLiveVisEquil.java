@@ -77,11 +77,11 @@ public class DgLiveVisEquil {
 			pop.addPerson(pers);
 			Activity act1 = fac.createActivityFromCoord("h", sc.createCoord(0, 0));
 			Link link1 = sc.getNetwork().getLinks().get(sc.createId(Integer.toString(id1)));
-			((ActivityImpl)act1).setLink(link1);
+			((ActivityImpl)act1).setLinkId(link1.getId());
 			act1.setEndTime(3600.0);
 			Activity act2 = fac.createActivityFromCoord("h", sc.createCoord(5000, 0));
 			Link link6 = sc.getNetwork().getLinks().get(sc.createId(Integer.toString(id2)));
-			((ActivityImpl)act2).setLink(link6);
+			((ActivityImpl)act2).setLinkId(link6.getId());
 			Leg leg = fac.createLeg(TransportMode.walk); 
 			leg.setTravelTime(600.0 - id1);
      

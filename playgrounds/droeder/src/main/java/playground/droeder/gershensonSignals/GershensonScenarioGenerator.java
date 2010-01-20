@@ -32,7 +32,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -279,7 +278,7 @@ public class GershensonScenarioGenerator {
 			plan1.addLeg(leg1);
 				
 			ActivityImpl act12 = (ActivityImpl) factory.createActivityFromLinkId("h", l12.getId());
-			act12.setLink(l12);
+			act12.setLinkId(l12.getId());
 			plan1.addActivity(act12);	
 			
 			population.addPerson(p1);
@@ -301,7 +300,7 @@ public class GershensonScenarioGenerator {
 			plan.addLeg(leg2);
 				
 			ActivityImpl act22 = (ActivityImpl) factory.createActivityFromLinkId("h", l14.getId());
-			act22.setLink(l14);
+			act22.setLinkId(l14.getId());
 			plan.addActivity(act22);	
 			
 			population.addPerson(p2);

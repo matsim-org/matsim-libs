@@ -10,7 +10,7 @@ public class CarDepartureHandler implements DepartureHandler {
 	
 	private static Logger log = Logger.getLogger(CarDepartureHandler.class);
 	
-	private QueueSimulation queueSimulation;
+	private final QueueSimulation queueSimulation;
 	
 	private boolean teleportVehicles = true;
 	
@@ -60,7 +60,7 @@ public class CarDepartureHandler implements DepartureHandler {
 			throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + linkId);
 		}
 		vehicle.setDriver(agent);
-		if ((route.getEndLinkId() == linkId) && (agent.chooseNextLinkId() == null)) {
+		if ((route.getEndLinkId().equals(linkId)) && (agent.chooseNextLinkId() == null)) {
 			agent.legEnds(now);
 			qlink.processVehicleArrival(now, vehicle);
 		} else {

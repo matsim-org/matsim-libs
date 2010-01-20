@@ -28,14 +28,14 @@ public class ReaderTripHandler {
 		// in seconds after midnight
 		double endTimeBeforeShoppingAct = 60.0 * Double.parseDouble(entries[12].trim());
 		beforeShoppingAct.setEndTime(endTimeBeforeShoppingAct);
-		beforeShoppingAct.setLink(network.getNearestLink(beforeShoppingCoord));
+		beforeShoppingAct.setLinkId(network.getNearestLink(beforeShoppingCoord).getId());
 		
 		Id chosenFacilityId = new IdImpl(entries[2].trim());
 	
 		ZHFacility chosenFacility = facilities.getZhFacilities().get(chosenFacilityId);
 		LinkImpl link = network.getLinks().get(chosenFacility.getLinkId());
 
-		ActivityImpl shoppingAct = new org.matsim.core.population.ActivityImpl("shop", link);
+		ActivityImpl shoppingAct = new org.matsim.core.population.ActivityImpl("shop", link.getId());
 		shoppingAct.setCoord(link.getCoord());
 		
 		double startTimeShoppingAct = 60.0 * Double.parseDouble(entries[15].trim());
@@ -47,7 +47,7 @@ public class ReaderTripHandler {
 			
 		Coord afterShoppingCoord = mzTrip.getCoordEnd();
 		ActivityImpl afterShoppingAct = new org.matsim.core.population.ActivityImpl("end", afterShoppingCoord);
-		afterShoppingAct.setLink(network.getNearestLink(afterShoppingCoord));
+		afterShoppingAct.setLinkId(network.getNearestLink(afterShoppingCoord).getId());
 		
 		if (!(mzTrip.getEndTime() > 0.0)) {
 			log.error("No end time found for person : " /*+ mzTrip.getPersonId()*/);

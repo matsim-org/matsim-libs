@@ -111,7 +111,7 @@ public class LocationModifier extends Modifier {
 							MatsimRandom.getRandom().nextInt(exchange_facilities.size()));
 
 					act.setFacilityId(facility.getId());
-					act.setLink(facility.getLink());
+					act.setLinkId(facility.getLinkId());
 					act.setCoord(facility.getCoord());
 				}
 			}

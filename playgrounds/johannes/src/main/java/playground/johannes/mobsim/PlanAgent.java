@@ -26,6 +26,7 @@ package playground.johannes.mobsim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -54,6 +55,8 @@ public class PlanAgent implements MobsimAgent {
 	private int currentRouteIndex;
 
 	private Link currentLink;
+	
+	private final Network network;
 
 	// =======================================================
 	// constructor
@@ -68,8 +71,9 @@ public class PlanAgent implements MobsimAgent {
 	 *            the underlying data source. <tt>person</tt> must have a
 	 *            selected plan!
 	 */
-	public PlanAgent(Person person) {
+	public PlanAgent(Person person, Network network) {
 		this.person = person;
+		this.network = network;
 	}
 
 	// =======================================================
@@ -153,11 +157,11 @@ public class PlanAgent implements MobsimAgent {
 			if (isDone())
 				return getLink();
 			else
-				return ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(
-						currentPlanIndex + 2)).getLink();
+				return this.network.getLinks().get(((ActivityImpl) person.getSelectedPlan().getPlanElements().get(
+						currentPlanIndex + 2)).getLinkId());
 		else
-			return ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(
-					currentPlanIndex + 1)).getLink();
+			return this.network.getLinks().get(((ActivityImpl) person.getSelectedPlan().getPlanElements().get(
+					currentPlanIndex + 1)).getLinkId());
 	}
 
 	/**
@@ -182,7 +186,7 @@ public class PlanAgent implements MobsimAgent {
 			act.setEndTime(act.getDuration());
 		}
 
-		currentLink = act.getLink();
+		currentLink = this.network.getLinks().get(act.getLinkId());
 	}
 
 	/**
@@ -267,7 +271,7 @@ public class PlanAgent implements MobsimAgent {
 		currentRouteIndex++;
 		Id desiredLinkId = ((NetworkRouteWRefs) ((LegImpl) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex)).getRoute()).getLinkIds().get(currentRouteIndex);
-		if (currentLink.getId() != desiredLinkId)
+		if (!currentLink.getId().equals(desiredLinkId))
 			currentRouteIndex--;
 	}
 

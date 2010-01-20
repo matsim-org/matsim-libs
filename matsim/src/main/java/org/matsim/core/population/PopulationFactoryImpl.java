@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
@@ -68,7 +67,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	public ActivityImpl createActivityFromLinkId(final String actType, final Id linkId) {
-		ActivityImpl act = new ActivityImpl(actType, (LinkImpl) this.scenario.getNetwork().getLinks().get(linkId));
+		ActivityImpl act = new ActivityImpl(actType, linkId);
 		return act;
 	}
 

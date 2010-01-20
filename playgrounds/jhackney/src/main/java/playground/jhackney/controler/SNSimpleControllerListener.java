@@ -346,7 +346,7 @@ public class SNSimpleControllerListener implements StartupListener, BeforeMobsim
 	}
 
 	protected void initializeKnowledge() {
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges);
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork());
 	}
 }
 

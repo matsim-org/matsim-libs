@@ -140,7 +140,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 					return null;
 				}
 
-				if (outNodeD.getId() == toNode.getId()){
+				if (outNodeD.getId().equals(toNode.getId())){
 					toNodes.add(outNodeD);
 					foundRoute = true;
 					minCost = Math.min(minCost, outNodeD.getCost());
@@ -529,7 +529,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 				final double prob = node.getProb();
 				while (node.getId() != fromNode.getId()) {
 					for (final Link l : node.getMatsimNode().getInLinks().values()) {
-						if (l.getFromNode().getId() == node.getPrev().getId()) {
+						if (l.getFromNode().getId().equals(node.getPrev().getId())) {
 							this.netStateWriter.setLinkColor(l.getId(), color);
 							this.netStateWriter.setLinkMsg(l.getId(), getString(prob));
 //							this.netStateWriter.setNodeMsg(l.getFromNode().getId(), );

@@ -99,9 +99,9 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		for (TransportMode mode : TransportMode.values()) {
 			
 			LegImpl leg = new LegImpl(mode);
-			ActivityImpl fromAct = new ActivityImpl("home", network.getLinks().get(new IdImpl("1")));
+			ActivityImpl fromAct = new ActivityImpl("home", new IdImpl("1"));
 			fromAct.setCoord(new CoordImpl(1050.0, 1050.0));
-			ActivityImpl toAct = new ActivityImpl("work", network.getLinks().get(new IdImpl("1")));
+			ActivityImpl toAct = new ActivityImpl("work", new IdImpl("1"));
 			toAct.setCoord(new CoordImpl(1052.0, 1052.0));
 			
 			try {
@@ -127,9 +127,9 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		PlanImpl plan = new PlanImpl();
 		person.addPlan(plan);
 		
-		ActivityImpl home = new ActivityImpl("home", network.getLinks().get(new IdImpl("1")));
+		ActivityImpl home = new ActivityImpl("home", new IdImpl("1"));
 		home.setCoord(new CoordImpl(1050.0, 1050.0));
-		ActivityImpl work = new ActivityImpl("work", network.getLinks().get(new IdImpl("2")));
+		ActivityImpl work = new ActivityImpl("work", new IdImpl("2"));
 		work.setCoord(new CoordImpl(1150.0, 1150.0));
 
 		LegImpl leg = new LegImpl(TransportMode.pt);

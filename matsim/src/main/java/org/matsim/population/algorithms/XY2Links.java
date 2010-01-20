@@ -64,7 +64,7 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 			if (null == link) {
 				throw new RuntimeException("For person id="+plan.getPerson().getId()+": getNearestLink returned Null! act="+act);
 			}
-			act.setLink(link);
+			act.setLinkId(link.getId());
 		}
 	}
 }

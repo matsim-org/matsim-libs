@@ -27,6 +27,8 @@ import java.util.zip.Adler32;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.ActivityImpl;
@@ -64,6 +66,7 @@ LegTravelTimeEstimator {
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
 	private final PlansCalcRoute plansCalcRoute;
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
+	private final Network network;
 
 	private boolean doLogging = false;
 
@@ -73,10 +76,12 @@ LegTravelTimeEstimator {
 			TravelTime linkTravelTimeEstimator,
 			DepartureDelayAverageCalculator depDelayCalc,
 			PlansCalcRoute plansCalcRoute,
-			SimLegInterpretation simLegInterpretation) {
+			SimLegInterpretation simLegInterpretation,
+			Network network) {
 		super();
 		this.linkTravelTimeEstimator = linkTravelTimeEstimator;
 		tDepDelayCalc = depDelayCalc;
+		this.network = network;
 		this.plansCalcRoute = plansCalcRoute;
 		this.simLegInterpretation = simLegInterpretation;
 	}
@@ -133,8 +138,8 @@ LegTravelTimeEstimator {
 
 	}
 
-	private HashMap<DynamicODMatrixEntry, Double> dynamicODMatrix = new HashMap<DynamicODMatrixEntry, Double>();
-	private HashMap<LegImpl, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<LegImpl, HashMap<TransportMode, Double>>();
+	private final HashMap<DynamicODMatrixEntry, Double> dynamicODMatrix = new HashMap<DynamicODMatrixEntry, Double>();
+	private final HashMap<LegImpl, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<LegImpl, HashMap<TransportMode, Double>>();
 
 	protected double getInterpolation(double departureTime, ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
 
@@ -154,7 +159,9 @@ LegTravelTimeEstimator {
 				break;
 			}
 
-			DynamicODMatrixEntry entry = new DynamicODMatrixEntry(actOrigin.getLink(), actDestination.getLink(), legIntermediate.getMode(), samplingPoint);
+			Link originLink = this.network.getLinks().get(actOrigin.getLinkId());
+			Link destinationLink = this.network.getLinks().get(actDestination.getLinkId());
+			DynamicODMatrixEntry entry = new DynamicODMatrixEntry(originLink, destinationLink, legIntermediate.getMode(), samplingPoint);
 
 			if (this.dynamicODMatrix.containsKey(entry)) {
 
@@ -203,11 +210,11 @@ LegTravelTimeEstimator {
 		if (MODES_WITH_VARIABLE_TRAVEL_TIME.contains(legIntermediate.getMode())) {
 			
 			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(actOrigin.getLink(), departureTime);
+				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(this.network.getLinks().get(actOrigin.getLinkId()), departureTime);
 			}
 			legTravelTimeEstimation += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime + legTravelTimeEstimation);
 			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(actDestination.getLink(), departureTime + legTravelTimeEstimation);
+				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(this.network.getLinks().get(actDestination.getLinkId()), departureTime + legTravelTimeEstimation);
 			}
 			
 		} else {

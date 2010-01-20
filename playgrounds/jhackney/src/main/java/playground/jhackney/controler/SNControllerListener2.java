@@ -350,7 +350,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 	}
 
 	protected void initializeKnowledge() {
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges);
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork());
 	}
 }
 

@@ -47,9 +47,9 @@ public class PersonFacility2Link extends AbstractPersonAlgorithm implements Plan
 	public void run(final Plan plan) {
 		ActivityImpl act = ((PlanImpl) plan).getFirstActivity();
 		while (act != ((PlanImpl) plan).getLastActivity()) {
-			act.setLink(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLink());
+			act.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLinkId());
 			act = ((PlanImpl) plan).getNextActivity(((PlanImpl) plan).getNextLeg(act));
 		}
-		act.setLink(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLink());
+		act.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLinkId());
 	}
 }

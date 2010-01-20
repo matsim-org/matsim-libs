@@ -59,7 +59,7 @@ public class ActLocationFalsifier extends AbstractPersonAlgorithm implements Pla
 				Coord coord = act.getCoord();
 				coord.setXY(coord.getX() + (MatsimRandom.getRandom().nextDouble() - 0.5) *  this.totalDistance,
 						coord.getY() + (MatsimRandom.getRandom().nextDouble() - 0.5) * this.totalDistance);
-				act.setLink(null);
+				act.setLinkId(null);
 			} else if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl) pe;
 				leg.setRoute(null);

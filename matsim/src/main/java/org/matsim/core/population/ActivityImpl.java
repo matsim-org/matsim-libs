@@ -40,16 +40,16 @@ public class ActivityImpl implements Activity {
 
 	private String type;
 	private Coord coord = null;
-	protected Link link = null;
+	protected Id linkId = null;
 	protected Id facilityId = null;
 	
 	private ActivityImpl(final String type) {
 		this.type = type.intern();
 	}
 	
-	public ActivityImpl(final String type, final Link link) {
+	public ActivityImpl(final String type, final Id linkId) {
 		this(type);
-		this.setLink(link);
+		this.setLinkId(linkId);
 	}
 
 	public ActivityImpl(final String type, final Coord coord) {
@@ -63,7 +63,7 @@ public class ActivityImpl implements Activity {
 	}
 
 	public ActivityImpl(final String type, final Coord coord, final Link link) {
-		this(type, link);
+		this(type, link.getId());
 		this.setCoord(coord);
 	}
 
@@ -72,7 +72,7 @@ public class ActivityImpl implements Activity {
 		// Act coord could be null according to first c'tor!
 		Coord c = act.getCoord() == null ? null : new CoordImpl(act.getCoord());
 		this.setCoord(c);
-		this.link = act.getLink();
+		this.linkId = act.getLinkId();
 		this.setStartTime(act.getStartTime());
 		this.setEndTime(act.getEndTime());
 		this.setDuration(act.getDuration());
@@ -116,9 +116,7 @@ public class ActivityImpl implements Activity {
 	}
 
 	public final Id getLinkId() { 
-		if (this.link != null)
-			return this.link.getId();
-		return null;
+		return this.linkId;
 	}
 	
 	public final Id getFacilityId() {
@@ -129,20 +127,15 @@ public class ActivityImpl implements Activity {
 		this.facilityId = facilityId;
 	}
 
-	public final void setLink(final Link link) {
-		this.link = link;
-	}
-	
-	@Deprecated // use getLinkId
-	public Link getLink() {
-		return this.link;
+	public final void setLinkId(final Id linkId) {
+		this.linkId = linkId;
 	}
 	
 	@Override
 	public final String toString() {
 		return "[type=" + this.getType() + "]" +
 				"[coord=" + this.getCoord() + "]" +
-				"[link=" + this.link + "]" +
+				"[linkId=" + this.linkId + "]" +
 				"[startTime=" + Time.writeTime(this.getStartTime()) + "]" +
 				"[endTime=" + Time.writeTime(this.getEndTime()) + "]";
 	}

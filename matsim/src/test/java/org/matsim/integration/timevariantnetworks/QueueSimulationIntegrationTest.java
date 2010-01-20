@@ -201,7 +201,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		for(int i = 0; i < count; i++) {
 			PersonImpl person = new PersonImpl(new IdImpl(i + (int)departureTime));
 			PlanImpl plan1 = person.createAndAddPlan(true);
-			ActivityImpl a1 = plan1.createAndAddActivity("h", depLink);
+			ActivityImpl a1 = plan1.createAndAddActivity("h", depLink.getId());
 			a1.setEndTime(departureTime);
 			LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
 			leg1.setDepartureTime(departureTime);
@@ -209,7 +209,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, depLink, destLink);
 			route.setNodes(depLink, NetworkUtils.getNodes(network, "2 3"), destLink);
 			leg1.setRoute(route);
-			plan1.createAndAddActivity("w", destLink);
+			plan1.createAndAddActivity("w", destLink.getId());
 
 			persons.add(person);
 			departureTime++;
@@ -242,9 +242,9 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getPersonId() == this.person1.getId()) {
+			if (event.getPersonId().equals(this.person1.getId())) {
 				this.person1enterTime = event.getTime();
-			} else if (event.getPersonId() == this.person2.getId()) {
+			} else if (event.getPersonId().equals(this.person2.getId())) {
 				this.person2enterTime = event.getTime();
 			}
 		}
@@ -253,9 +253,9 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getPersonId() == this.person1.getId()) {
+			if (event.getPersonId().equals(this.person1.getId())) {
 				this.person1leaveTime = event.getTime();
-			} else if (event.getPersonId() == this.person2.getId()) {
+			} else if (event.getPersonId().equals(this.person2.getId())) {
 				this.person2leaveTime = event.getTime();
 			}
 		}

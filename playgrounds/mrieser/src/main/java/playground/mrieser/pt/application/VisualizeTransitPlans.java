@@ -110,7 +110,7 @@ public class VisualizeTransitPlans {
 						visAct.setStartTime(act.getStartTime());
 						visAct.setDuration(((ActivityImpl)act).getDuration());
 						visAct.setEndTime(act.getEndTime());
-						visAct.setLink(this.visScenario.getNetwork().getNearestLink(act.getCoord()));
+						visAct.setLinkId(this.visScenario.getNetwork().getNearestLink(act.getCoord()).getId());
 						visPlan.addActivity(visAct);
 					} else if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
@@ -133,7 +133,7 @@ public class VisualizeTransitPlans {
 				for (PlanElement pe : visPlan.getPlanElements()) {
 					if (pe instanceof ActivityImpl) {
 						fromLink = toLink;
-						toLink = ((ActivityImpl) pe).getLink();
+						toLink = this.visScenario.getNetwork().getLinks().get(((Activity) pe).getLinkId());
 						if (route != null) {
 							if (route instanceof GenericRouteImpl) {
 								((GenericRouteImpl) route).setStartLink(fromLink);

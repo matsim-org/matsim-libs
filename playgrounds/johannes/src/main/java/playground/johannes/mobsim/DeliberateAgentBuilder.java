@@ -26,6 +26,7 @@ package playground.johannes.mobsim;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.PopulationImpl;
 
 /**
@@ -44,9 +45,9 @@ public class DeliberateAgentBuilder implements MobsimAgentBuilder {
 	// private fields
 	// =======================================================
 
-	private PlanAgentBuilder planAgentBuilder;
+	private final PlanAgentBuilder planAgentBuilder;
 	
-	private IntradayStrategyBuilder strategyBuilder;
+	private final IntradayStrategyBuilder strategyBuilder;
 	
 	private int replanCoolDownTime = DeliberateAgent.DEFAULT_REPLAN_COOL_DOWN_TIME;
 
@@ -62,9 +63,9 @@ public class DeliberateAgentBuilder implements MobsimAgentBuilder {
 	 * @param population the population of persons.
 	 * @param sBuilder the strategy builder.
 	 */
-	public DeliberateAgentBuilder(PopulationImpl population, IntradayStrategyBuilder sBuilder) {
+	public DeliberateAgentBuilder(PopulationImpl population, Network network, IntradayStrategyBuilder sBuilder) {
 		this.strategyBuilder = sBuilder;
-		planAgentBuilder = new PlanAgentBuilder(population);
+		planAgentBuilder = new PlanAgentBuilder(population, network);
 	}
 	
 	// =======================================================

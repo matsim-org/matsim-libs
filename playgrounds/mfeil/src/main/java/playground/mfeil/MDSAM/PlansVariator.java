@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
@@ -184,7 +185,6 @@ public class PlansVariator implements PlanAlgorithm {
 			counter++;
 		}		
 		
-		
 		/* Location choice for all slots */
 		for (int i=0;i<output.length;i++){
 			locator.handlePlan(output[i]);
@@ -267,7 +267,7 @@ public class PlansVariator implements PlanAlgorithm {
 					ActivityImpl act0 = (ActivityImpl)(actslegs.get(planBasePos));
 					ActivityImpl act1 = (ActivityImpl)(actslegs.get(planRunningPos));
 					if (act0.getType()!=act1.getType() &&
-							act0.getFacilityId() != act1.getFacilityId()){
+							!act0.getFacilityId().equals(act1.getFacilityId())){
 							
 						ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get(planBasePos)));
 						
@@ -296,9 +296,9 @@ public class PlansVariator implements PlanAlgorithm {
 		
 		act.setType(this.actTypes.get(position[rotationPos]));
 		if (act.getType().equalsIgnoreCase("home")){
-			act.setFacilityId(((ActivityImpl)(plan.getPlanElements().get(0))).getFacilityId());
-			act.setCoord(((ActivityImpl)(plan.getPlanElements().get(0))).getCoord());
-			act.setLink(((ActivityImpl)(plan.getPlanElements().get(0))).getLink());
+			act.setFacilityId(((Activity)(plan.getPlanElements().get(0))).getFacilityId());
+			act.setCoord(((Activity)(plan.getPlanElements().get(0))).getCoord());
+			act.setLinkId(((Activity)(plan.getPlanElements().get(0))).getLinkId());
 		}
 		position[rotationPos]++;
 		if (position[rotationPos]>=this.actTypes.size()) position[rotationPos] = 0;

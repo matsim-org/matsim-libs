@@ -185,12 +185,12 @@ import org.matsim.core.utils.misc.Time;
 		PersonImpl person = new PersonImpl(new IdImpl(personId));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
-		plan.createAndAddActivity("h", homeLink).setEndTime(Time.parseTime(startTime));
+		plan.createAndAddActivity("h", homeLink.getId()).setEndTime(Time.parseTime(startTime));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);//"car", startTime, "00:01", null);
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(homeLink, workLink);
 		route.setNodes(homeLink, routeNodes, workLink);
 		leg.setRoute(route);
-		plan.createAndAddActivity("w", workLink);//, null, "24:00", null, "yes");
+		plan.createAndAddActivity("w", workLink.getId());//, null, "24:00", null, "yes");
 		return person;
 	}
 
@@ -198,15 +198,15 @@ import org.matsim.core.utils.misc.Time;
 		PersonImpl person = new PersonImpl(new IdImpl(personId));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
-		ActivityImpl act = plan.createAndAddActivity("h", homeLink);
+		ActivityImpl act = plan.createAndAddActivity("h", homeLink.getId());
 		act.setCoord(homeLink.getCoord());
 		act.setEndTime(Time.parseTime(startTime));
 		plan.createAndAddLeg(TransportMode.car);
-		act = plan.createAndAddActivity("w", workLink);
+		act = plan.createAndAddActivity("w", workLink.getId());
 		act.setCoord(workLink.getCoord());
 		act.setEndTime(16.0 * 3600);
 		plan.createAndAddLeg(TransportMode.car);
-		act = plan.createAndAddActivity("h", finishLink);
+		act = plan.createAndAddActivity("h", finishLink.getId());
 		act.setCoord(finishLink.getCoord());
 		return person;
 	}

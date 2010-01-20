@@ -20,7 +20,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.world.World;
 
 public class CreatePlans {
 
@@ -37,7 +36,6 @@ public class CreatePlans {
 		config.plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/5000plan/plans.xml");
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		final World world = scenario.getWorld();
 
 		PopulationImpl plans = scenario.getPopulation();
 		Knowledges knowledges = scenario.getKnowledges();
@@ -87,14 +85,14 @@ public class CreatePlans {
 			double duration=3600*8;
 
 			ActivityImpl a = plan.createAndAddActivity("home",home_facility.getCoord());
-			a.setLink(home_facility.getLink());
+			a.setLinkId(home_facility.getLinkId());
 			a.setEndTime(depTime);
 			LegImpl l = plan.createAndAddLeg(TransportMode.car);
 			l.setArrivalTime(depTime);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTime);
 			a = plan.createAndAddActivity("work",work_facility.getCoord());
-			a.setLink(work_facility.getLink());
+			a.setLinkId(work_facility.getLinkId());
 			a.setStartTime(depTime);
 			a.setEndTime(depTime+duration);
 			a.setDuration(duration);
@@ -103,7 +101,7 @@ public class CreatePlans {
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTime+duration);
 			a = plan.createAndAddActivity("home",home_facility.getCoord());
-			a.setLink(home_facility.getLink());
+			a.setLinkId(home_facility.getLinkId());
 			// assign home-work-home activities to each person
 
 

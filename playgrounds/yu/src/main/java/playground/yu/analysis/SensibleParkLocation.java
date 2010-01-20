@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -52,12 +53,14 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 	private int n = 0, f = 0;
 	static int nullCnt = 0;
 	private static SimpleWriter writer = null;
+	private final Network network;
 
-	public SensibleParkLocation(String outputFilename) {
+	public SensibleParkLocation(String outputFilename, final Network network) {
 		writer = new SimpleWriter(outputFilename);
+		this.network = network;
 	}
 
-	private static boolean checkParkSensible(Plan plan) {
+	private static boolean checkParkSensible(final Plan plan, final Network network) {
 		int carLegCnt = 0;
 		ParkLocation origPark = null, lastNextPark = null;
 
@@ -68,9 +71,9 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 			LegImpl leg = (LegImpl) pes.get(i);
 			if (leg.getMode().equals(TransportMode.car)) {
 				ParkLocation prePark = new ParkLocation(((PlanImpl) plan)
-						.getPreviousActivity(leg));
+						.getPreviousActivity(leg), network);
 				ParkLocation nextPark = new ParkLocation(((PlanImpl) plan)
-						.getNextActivity(leg));
+						.getNextActivity(leg), network);
 
 				if (carLegCnt == 0)
 					origPark = prePark;
@@ -104,7 +107,7 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 			if (((ActivityImpl) pes.get(i)).getType().equals("tta"))
 				return;
 
-		if (!checkParkSensible(plan)) {
+		if (!checkParkSensible(plan, this.network)) {
 			writer.writeln(getPlanElementsPattern(plan));
 			writer.writeln("---------------------------");
 			writer.flush();
@@ -162,7 +165,7 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 		System.out.println("-----> done \"read population\"");
 
-		SensibleParkLocation spl = new SensibleParkLocation(outputFilename);
+		SensibleParkLocation spl = new SensibleParkLocation(outputFilename, network);
 		System.out.println("-----> \"run population\" begins");
 		spl.run(population);
 		spl.close();

@@ -43,7 +43,7 @@ public class CalcAvgTripLengthTest {
 		PopulationImpl pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(popFilename);
 
-		CalcAverageTripLength catl = new CalcAverageTripLength();
+		CalcAverageTripLength catl = new CalcAverageTripLength(net);
 		catl.run(pop);
 		System.out.println("avg. trip length :\t" + catl.getAverageTripLength()
 				+ " [m]");

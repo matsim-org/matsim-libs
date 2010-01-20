@@ -30,11 +30,11 @@ public class TestCellKnowledge {
 
 	private final ScenarioImpl scenario;
 	private Config config;
-	private Person person;
+	private final Person person;
 	private SelectNodesDijkstra selectNodesDijkstra;
 	private Map<Id, Node> nodesMap;
 	private CellKnowledge cellKnowledge;
-	private CellNetworkMapping cellNetworkMapping;
+	private final CellNetworkMapping cellNetworkMapping;
 	private CellKnowledgeCreator createCellKnowledge;
 
 	private final String configFileName = "mysimulations/kt-zurich/config.xml";
@@ -112,8 +112,8 @@ public class TestCellKnowledge {
 		
 		for(int j = 1; j < acts.size(); j++)
 		{						
-			Node startNode = acts.get(j-1).getLink().getToNode();
-			Node endNode = acts.get(j).getLink().getFromNode();
+			Node startNode = this.scenario.getNetwork().getLinks().get(acts.get(j-1).getLinkId()).getToNode();
+			Node endNode = this.scenario.getNetwork().getLinks().get(acts.get(j).getLinkId()).getFromNode();
 				
 			selectNodesDijkstra.setStartNode(startNode);
 			selectNodesDijkstra.setEndNode(endNode);

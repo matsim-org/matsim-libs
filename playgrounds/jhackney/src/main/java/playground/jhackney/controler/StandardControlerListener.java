@@ -1,8 +1,6 @@
 package playground.jhackney.controler;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -18,7 +16,7 @@ public class StandardControlerListener implements StartupListener {
 	
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
-		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
+		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
 //		new WorldConnectLocations().run(Gbl.getWorld());
 
@@ -28,6 +26,6 @@ public class StandardControlerListener implements StartupListener {
 
 	}
 	protected void initializeKnowledge() {
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges);
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork());
 	}
 }

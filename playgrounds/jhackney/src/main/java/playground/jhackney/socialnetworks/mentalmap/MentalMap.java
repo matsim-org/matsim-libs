@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -86,9 +87,11 @@ public class MentalMap {
 
 	private KnowledgeImpl knowledge = null;
 	private final Logger log= Logger.getLogger(MentalMap.class);
+	private final Network network;
 
-	public MentalMap(KnowledgeImpl knowledge){
+	public MentalMap(KnowledgeImpl knowledge, Network network){
 		this.knowledge=knowledge;
+		this.network = network;
 	}
 
 	public void initializeActActivityMapRandom (Plan myPlan){
@@ -110,7 +113,7 @@ public class MentalMap {
 					}
 					
 					// Else the activity is null and we choose an activity to assign to the act
-					Link myLink = myAct.getLink();
+					Link myLink = this.network.getLinks().get(myAct.getLinkId());
 					// These Locations are facilities by the new convention
 					Collection<MappedLocation> locations = ((LinkImpl) myLink).getUpMapping().values();
 					// These Objects are facilities by convention

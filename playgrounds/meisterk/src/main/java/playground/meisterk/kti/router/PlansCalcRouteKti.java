@@ -89,8 +89,8 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		
 		double travelTime = 0.0;
 		
-		Link fromLink = fromAct.getLink();
-		Link toLink = toAct.getLink();
+		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
+		Link toLink = this.network.getLinks().get(toAct.getLinkId());
 		if (fromLink.equals(toLink)) {
 			// create an empty route == staying on place if toLink == endLink
 			RouteWRefs route = this.getRouteFactory().createRoute(mode, fromLink, toLink);
@@ -138,7 +138,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		Location fromMunicipality = froms.get(0);
 		Location toMunicipality = tos.get(0);
 
-		KtiPtRoute newRoute = new KtiPtRoute(fromAct.getLink(), toAct.getLink(), plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
+		KtiPtRoute newRoute = new KtiPtRoute(this.network.getLinks().get(fromAct.getLinkId()), this.network.getLinks().get(toAct.getLinkId()), plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
 		leg.setRoute(newRoute);
 
 //		final double timeInVehicle = newRoute.calcInVehicleTime();

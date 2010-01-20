@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -50,6 +51,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	private static final Logger log = Logger.getLogger(PlanAgentBuilder.class);
 	
 	private final PopulationImpl population;
+	private final Network network;
 	
 	// =======================================================
 	// constructor
@@ -62,8 +64,9 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	 * @param population
 	 *            the population of persons.
 	 */
-	public PlanAgentBuilder(PopulationImpl population) {
+	public PlanAgentBuilder(PopulationImpl population, Network network) {
 		this.population = population;
+		this.network = network;
 	}
 
 	// =======================================================
@@ -80,7 +83,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 		int countInvalid = 0;
 		for(Person p : population.getPersons().values()) {
 			if(validatePerson(p)) {
-				agents.add(buildAgent(p));
+				agents.add(buildAgent(p, this.network));
 			} else
 				countInvalid++;
 		}
@@ -105,8 +108,8 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	 *            the person which will act as underlying data source.
 	 * @return a new {@link PlanAgent} instance.
 	 */
-	protected PlanAgent buildAgent(Person p) {
-		return new PlanAgent(p);
+	protected PlanAgent buildAgent(Person p, Network network) {
+		return new PlanAgent(p, network);
 	}
 
 	/**

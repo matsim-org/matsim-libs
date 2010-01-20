@@ -54,6 +54,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
@@ -405,9 +406,9 @@ public class EgoNetPlansItersMakeKML {
 			planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(facilitiesFolder));
 		}
 
-		Iterator actLegIter = myPlan.getPlanElements().iterator();
+		Iterator<PlanElement> actLegIter = myPlan.getPlanElements().iterator();
 		ActivityImpl act0 = (ActivityImpl) actLegIter.next(); // assume first is always an Activity
-		makeActKML(alter, act0, 0, planFolder, agentLinkStyle, iter);
+		makeActKML(alter, act0, 0, planFolder, agentLinkStyle, iter, network);
 		int actNumber=0;
 		while(actLegIter.hasNext()) {
 			Object o = actLegIter.next();
@@ -433,7 +434,7 @@ public class EgoNetPlansItersMakeKML {
 			} else if (o instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) o;
 				actNumber++;
-				makeActKML(alter, act,actNumber, planFolder,agentLinkStyle, iter);
+				makeActKML(alter, act,actNumber, planFolder,agentLinkStyle, iter, network);
 			}
 		}
 
@@ -788,7 +789,7 @@ public class EgoNetPlansItersMakeKML {
 //
 //	}
 
-	private static void makeActKML(Person myPerson, ActivityImpl act, int actNo, FolderType planFolder, StyleType agentLinkStyle, int iter) {
+	private static void makeActKML(Person myPerson, ActivityImpl act, int actNo, FolderType planFolder, StyleType agentLinkStyle, int iter, Network network) {
 
 		String styleUrl = null;
 		String fullActName = null;
@@ -851,7 +852,7 @@ public class EgoNetPlansItersMakeKML {
 		}
 
 //		if (!fullActName.equals("evening home")) {
-		Link actLink = act.getLink();
+		Link actLink = network.getLinks().get(act.getLinkId());
 		PlacemarkType agentLink = generateLinkPlacemark(actLink, agentLinkStyle, trafo);
 		
 		featureExists = false;

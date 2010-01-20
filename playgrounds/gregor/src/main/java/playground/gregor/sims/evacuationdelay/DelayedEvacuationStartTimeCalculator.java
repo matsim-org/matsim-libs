@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -18,14 +19,13 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTimeCalculator {
 
-	
-	
-	
 	private final double baseTime;
 	private QuadTree<Coord> coordQuadTree;
+	private final Network network;
 
-	public DelayedEvacuationStartTimeCalculator(double earliestEvacTime, String shorelineFile) {
+	public DelayedEvacuationStartTimeCalculator(double earliestEvacTime, String shorelineFile, Network network) {
 		this.baseTime = earliestEvacTime;
+		this.network = network;
 		try {
 			loadShapeFile(shorelineFile);
 		} catch (IOException e) {
@@ -53,7 +53,7 @@ public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTime
 	public double getEvacuationStartTime(ActivityImpl act) {
 		Coord c = act.getCoord();
 		if (c == null) {
-			c = act.getLink().getCoord();
+			c = this.network.getLinks().get(act.getLinkId()).getCoord();
 		}
 		double dist = ((CoordImpl) this.coordQuadTree.get(c.getX(), c.getY())).calcDistance(c);
 		return this.baseTime + getOffset(dist);

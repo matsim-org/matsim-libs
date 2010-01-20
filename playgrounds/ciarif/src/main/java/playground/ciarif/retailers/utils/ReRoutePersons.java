@@ -29,7 +29,7 @@ public class ReRoutePersons {
 					if (pe instanceof ActivityImpl) {
 						ActivityImpl act = (ActivityImpl) pe;
 						if (movedFacilities.containsKey(act.getFacilityId())) { 
-							act.setLink(((ActivityFacilityImpl) facilities.getFacilities().get((act.getFacilityId()))).getLink());
+							act.setLinkId(((ActivityFacilityImpl) facilities.getFacilities().get((act.getFacilityId()))).getLinkId());
 							routeIt = true;
 						}
 					}

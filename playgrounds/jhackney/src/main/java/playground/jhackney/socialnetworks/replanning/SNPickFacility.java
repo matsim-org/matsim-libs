@@ -178,24 +178,24 @@ public class SNPickFacility implements PlanAlgorithm {
 			
 //			And replace the activity in the chain with it (only changes the facility)
 
-			if(newAct.getLinkId()!=f.getLink().getId()){
+			if(!newAct.getLinkId().equals(f.getLink().getId())){
 				// If the first activity was chosen, make sure the last activity is also changed
-				if((newAct.getType() == ((PlanImpl) plan).getFirstActivity().getType()) && (newAct.getLinkId() == ((PlanImpl) plan).getFirstActivity().getLinkId())){
+				if((newAct.getType() == ((PlanImpl) plan).getFirstActivity().getType()) && (newAct.getLinkId().equals(((PlanImpl) plan).getFirstActivity().getLinkId()))){
 					ActivityImpl lastAct = (ActivityImpl) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
-					lastAct.setLink(f.getLink());
+					lastAct.setLinkId(f.getLinkId());
 					lastAct.setCoord(f.getCoord());
 					lastAct.setFacilityId(f.getId());
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
-				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLinkId() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId())){
+				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLinkId().equals(((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId()))){
 					ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
-					firstAct.setLink(f.getLink());
+					firstAct.setLinkId(f.getLinkId());
 					firstAct.setCoord(f.getCoord());
 					firstAct.setFacilityId(f.getId());
 				}
 				// Change the activity
 //				System.out.println("  ##### Act at "+newAct.getFacility().getId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+f.getLink().getId());
-				newAct.setLink(f.getLink());
+				newAct.setLinkId(f.getLinkId());
 				newAct.setCoord(f.getCoord());
 				newAct.setFacilityId(f.getId());
 				changed = true;

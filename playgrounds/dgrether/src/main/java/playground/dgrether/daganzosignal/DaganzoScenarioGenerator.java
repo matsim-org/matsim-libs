@@ -229,7 +229,7 @@ public class DaganzoScenarioGenerator {
 			plan.addLeg(leg);
 
 			ActivityImpl act2 = (ActivityImpl) factory.createActivityFromLinkId("h", l7.getId());
-			act2.setLink(l7);
+			act2.setLinkId(l7.getId());
 			plan.addActivity(act2);
 			population.addPerson(p);
 		}

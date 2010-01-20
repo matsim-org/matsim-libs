@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -69,11 +70,11 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	private ActivityFacilitiesImpl facilities;
 	private PopulationImpl population;
 	private Config config;
-	private ScenarioImpl scenario;
+	private final ScenarioImpl scenario;
 
-	private int numOfThreads = 8;
+	private final int numOfThreads = 8;
 	
-	private double[] dijkstraCostFactors = {1.0, 1.25, 1.5, 1.75, 2.0};
+	private final double[] dijkstraCostFactors = {1.0, 1.25, 1.5, 1.75, 2.0};
 	private List<Double> costFactorsList;
 	
 	/*
@@ -81,7 +82,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	 * The selected Nodes depend on the used Cost Calculator
 	 */
 	// null as Argument: -> no TimeCalculator -> use FreeSpeedTravelTime
-	private TravelCost costCalculator = new OnlyTimeDependentTravelCostCalculator(null);
+	private final TravelCost costCalculator = new OnlyTimeDependentTravelCostCalculator(null);
 	
 	/*
 	 * How to call the Table in the Database. Additionally the used size
@@ -258,7 +259,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 			DijkstraForSelectNodes dijkstra = new DijkstraForSelectNodes(this.network);
 			dijkstra.setCostCalculator(costCalculator);
 			
-			CreateKnowledgeThread createKnowledgeThread = new CreateKnowledgeThread(i, dijkstra, costFactorsList, stp.clone());
+			CreateKnowledgeThread createKnowledgeThread = new CreateKnowledgeThread(i, dijkstra, costFactorsList, stp.clone(), network);
 						
 			creationThreads[i] = createKnowledgeThread;
 			
@@ -301,13 +302,15 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		public final int threadId;
 		private final List<Double> costFactors;
 		private final List<Person> persons;
-		private KnowledgeTools knowledgeTools;
-		private DijkstraForSelectNodes dijkstra;
-		private SpanningTreeProvider stp;
+		private final KnowledgeTools knowledgeTools;
+		private final DijkstraForSelectNodes dijkstra;
+		private final SpanningTreeProvider stp;
+		private final Network network;
 		
-		public CreateKnowledgeThread(final int i, final DijkstraForSelectNodes dijkstra, final List<Double> costFactors, SpanningTreeProvider stp)
+		public CreateKnowledgeThread(final int i, final DijkstraForSelectNodes dijkstra, final List<Double> costFactors, SpanningTreeProvider stp, final Network network)
 		{
 			this.threadId = i;
+			this.network = network;
 			
 			// Sort the List - this is necessary for the Algorithm to work properly!
 			Collections.sort(costFactors);
@@ -353,8 +356,8 @@ public class CreateDijkstraKnowledge4MultiFactors {
 				
 				for(int i = 1; i < acts.size(); i++)
 				{						
-					Node startNode = acts.get(i-1).getLink().getToNode();
-					Node endNode = acts.get(i).getLink().getFromNode();
+					Node startNode = this.network.getLinks().get(acts.get(i-1).getLinkId()).getToNode();
+					Node endNode = this.network.getLinks().get(acts.get(i).getLinkId()).getFromNode();
 					
 					List<Map<Id, Node>> additionalKnowledges = multiRun(startNode, endNode);
 					

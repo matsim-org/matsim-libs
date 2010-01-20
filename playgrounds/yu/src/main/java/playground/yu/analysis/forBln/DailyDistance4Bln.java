@@ -6,6 +6,7 @@ package playground.yu.analysis.forBln;
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
@@ -49,12 +50,12 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 			othersFreizeitSonstSportDist, othersHolidayJourneyDist,
 			othersMultipleDist, othersSeeADoctorDist, othersNotSpecifiedDist;
 
-	public DailyDistance4Bln() {
-		super();
+	public DailyDistance4Bln(final Network network) {
+		super(network);
 	}
 
-	public DailyDistance4Bln(final RoadPricingScheme toll) {
-		super(toll);
+	public DailyDistance4Bln(final RoadPricingScheme toll, final Network network) {
+		super(toll, network);
 	}
 
 	@Override
@@ -177,9 +178,9 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case walk:
-					dist = CoordUtils.calcDistance(((PlanImpl) plan).getPreviousActivity(bl)
-							.getLink().getCoord(), ((PlanImpl) plan).getNextActivity(bl)
-							.getLink().getCoord()) * 1.5 / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(((PlanImpl) plan).getPreviousActivity(bl)
+							.getLinkId()).getCoord(), this.network.getLinks().get(((PlanImpl) plan).getNextActivity(bl)
+							.getLinkId()).getCoord()) * 1.5 / 1000.0;
 					wlkDist += dist;
 					wlkDayDist += dist;
 					switch (at) {
@@ -226,9 +227,9 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case bike:
-					dist = CoordUtils.calcDistance(((PlanImpl) plan).getPreviousActivity(bl)
-							.getLink().getCoord(), ((PlanImpl) plan).getNextActivity(bl)
-							.getLink().getCoord()) / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(((PlanImpl) plan).getPreviousActivity(bl)
+							.getLinkId()).getCoord(), this.network.getLinks().get(((PlanImpl) plan).getNextActivity(bl)
+							.getLinkId()).getCoord()) / 1000.0;
 					bikeDist += dist;
 					bikeDayDist += dist;
 					switch (at) {
@@ -275,9 +276,9 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 					bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				default:
-					dist = CoordUtils.calcDistance(((PlanImpl) plan).getPreviousActivity(bl)
-							.getLink().getCoord(), ((PlanImpl) plan).getNextActivity(bl)
-							.getLink().getCoord()) / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(((PlanImpl) plan).getPreviousActivity(bl)
+							.getLinkId()).getCoord(), this.network.getLinks().get(((PlanImpl) plan).getNextActivity(bl)
+							.getLinkId()).getCoord()) / 1000.0;
 					othersDist += dist;
 					othersDayDist += dist;
 					switch (at) {

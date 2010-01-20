@@ -109,7 +109,7 @@ public class PtcheckControlerTest extends Controler {
 			Config cf = ctl.getConfig();
 			if (it % 10 == 0) {
 				this.rp = ctl.getRoadPricing();
-				this.catl = new CalcAverageTripLength();
+				this.catl = new CalcAverageTripLength(ctl.getNetwork());
 				this.catl.run(event.getControler().getPopulation());
 				try {
 					this.ptRateWriter

@@ -464,7 +464,7 @@ public class CompareScenarios {
 
 				PlanAverageScore planAverageScore = new PlanAverageScore();
 				planAverageScore.run(plansSubPop);
-				CalcAverageTripLength calcAverageTripLength = new CalcAverageTripLength();
+				CalcAverageTripLength calcAverageTripLength = new CalcAverageTripLength(scenarioNetworks.get(scenarioName));
 				calcAverageTripLength.run(plansSubPop);
 
 				EventsManagerImpl events = new EventsManagerImpl();

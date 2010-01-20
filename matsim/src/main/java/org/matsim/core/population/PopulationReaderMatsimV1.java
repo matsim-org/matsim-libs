@@ -27,8 +27,8 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -185,12 +185,12 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startAct(final Attributes atts) {
-		Link link = null;
+		Id linkId = null;
 		Coord coord = null;
 		ActivityImpl act = null;
 		if (atts.getValue("link") != null) {
-			link = this.network.getLinks().get(new IdImpl(atts.getValue("link")));
-			act = this.currplan.createAndAddActivity(atts.getValue("type"), link);
+			linkId = new IdImpl(atts.getValue("link"));
+			act = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
 			if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
 				coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));
 				act.setCoord(coord);
@@ -206,7 +206,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		act.setEndTime(Time.parseTime(atts.getValue("end_time")));
 
 		if (this.routeNodes != null) {
-			this.currroute.setNodes(this.prevAct.getLink(), NetworkUtils.getNodes(this.network, this.routeNodes), act.getLink());
+			this.currroute.setNodes(this.network.getLinks().get(this.prevAct.getLinkId()), NetworkUtils.getNodes(this.network, this.routeNodes), this.network.getLinks().get(act.getLinkId()));
 			this.routeNodes = null;
 			this.currroute = null;
 		}
@@ -221,7 +221,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.prevAct.getLink(), this.prevAct.getLink());
+		this.currroute = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.network.getLinks().get(this.prevAct.getLinkId()), this.network.getLinks().get(this.prevAct.getLinkId()));
 		this.currleg.setRoute(this.currroute);
 		if (atts.getValue("dist") != null) {
 			this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));

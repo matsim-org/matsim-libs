@@ -1,6 +1,3 @@
-/**
- *
- */
 package playground.yu.analysis;
 
 import java.io.IOException;
@@ -9,6 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -66,13 +64,15 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 	protected int count;
 	protected Person person;
 	protected RoadPricingScheme toll = null;
+	protected final Network network;
 
-	public DailyDistance(final RoadPricingScheme toll) {
-		this();
+	public DailyDistance(final RoadPricingScheme toll, final Network network) {
+		this(network);
 		this.toll = toll;
 	}
 
-	public DailyDistance() {
+	public DailyDistance(Network network) {
+		this.network = network;
 		carDist = 0.0;
 		ptDist = 0.0;
 		wlkDist = 0.0;
@@ -220,9 +220,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case walk:
-					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-							.getLink().getCoord(), plan.getNextActivity(bl)
-							.getLink().getCoord()) * 1.5 / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(plan.getPreviousActivity(bl).getLinkId()).getCoord(),
+							this.network.getLinks().get(plan.getNextActivity(bl).getLinkId()).getCoord()) * 1.5 / 1000.0;
 					wlkDist += dist;
 					wlkDayDist += dist;
 					switch (at) {
@@ -248,9 +247,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case bike:
-					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-							.getLink().getCoord(), plan.getNextActivity(bl)
-							.getLink().getCoord()) / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(plan.getPreviousActivity(bl).getLinkId()).getCoord(),
+							this.network.getLinks().get(plan.getNextActivity(bl).getLinkId()).getCoord()) / 1000.0;
 					bikeDist += dist;
 					bikeDayDist += dist;
 					switch (at) {
@@ -276,9 +274,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 					bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				default:
-					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-							.getLink().getCoord(), plan.getNextActivity(bl)
-							.getLink().getCoord()) / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(plan.getPreviousActivity(bl).getLinkId()).getCoord(),
+							this.network.getLinks().get(plan.getNextActivity(bl).getLinkId()).getCoord()) / 1000.0;
 					othersDist += dist;
 					othersDayDist += dist;
 					switch (at) {
@@ -547,7 +544,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyDistance dd = new DailyDistance(tollReader.getScheme());
+		DailyDistance dd = new DailyDistance(tollReader.getScheme(), network);
 		dd.run(population);
 		dd.write(outputFilename);
 

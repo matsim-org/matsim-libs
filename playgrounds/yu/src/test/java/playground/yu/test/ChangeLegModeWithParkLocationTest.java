@@ -249,7 +249,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 			PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
 			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(
-					this.config));
+					this.config, this.network));
 			strategy2.addStrategyModule(new ReRoute(this));
 			manager.addStrategy(strategy2, 0.5);
 

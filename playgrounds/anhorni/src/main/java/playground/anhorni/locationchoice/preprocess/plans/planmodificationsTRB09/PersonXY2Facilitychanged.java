@@ -170,7 +170,7 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 				if (l == null) { Gbl.errorMsg("Link == null; something is wrong!"); }
 				
 				act.setFacilityId(f.getId());
-				act.setLink(l);
+				act.setLinkId(l.getId());
 				Coord coord_f = f.getCoord();
 				act.setCoord(coord_f);
 			}

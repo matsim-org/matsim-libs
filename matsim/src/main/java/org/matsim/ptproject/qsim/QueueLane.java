@@ -152,7 +152,7 @@ public class QueueLane {
 
 	private SortedMap<Id, SignalGroupDefinition> signalGroups;
 
-	private Lane laneData;
+	private final Lane laneData;
 	/**
 	 * This id is only set, if there is no laneData for the Lane, i.e. it is the original lane
 	 */
@@ -165,7 +165,7 @@ public class QueueLane {
 	 */
 	private boolean fireLaneEvents = false;
 	
-	private TransitQueueLaneFeature transitQueueLaneFeature;
+	private final TransitQueueLaneFeature transitQueueLaneFeature;
 
 	/*package*/ QueueLane(final QueueLink ql, Lane laneData) {
 		this.queueLink = ql;
@@ -382,7 +382,7 @@ public class QueueLane {
 			
 			if (!handled) {
 				// Check if veh has reached destination:
-				if ((driver.getDestinationLinkId() == this.queueLink.getLink().getId()) && (driver.chooseNextLinkId() == null)) {
+				if ((driver.getDestinationLinkId().equals(this.queueLink.getLink().getId())) && (driver.chooseNextLinkId() == null)) {
 					driver.legEnds(now);
 					((QLinkLanesImpl)this.queueLink).processVehicleArrival(now, veh);
 					// remove _after_ processing the arrival to keep link active

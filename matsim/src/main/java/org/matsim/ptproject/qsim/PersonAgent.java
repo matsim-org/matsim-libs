@@ -279,7 +279,7 @@ public class PersonAgent implements DriverAgent {
 				this.cachedNextLinkId = destinationLink.getId();
 				return this.cachedNextLinkId;
 			}
-			if (this.currentLinkId != this.destinationLinkId) {
+			if (!(this.currentLinkId.equals(this.destinationLinkId))) {
 				// there must be something wrong. Maybe the route is too short, or something else, we don't know...
 				log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.currentLinkId.toString()
 						+ ", is at the end of its route, but has not yet reached its destination link " + this.destinationLinkId.toString());

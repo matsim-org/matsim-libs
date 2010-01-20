@@ -221,7 +221,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 						if (pe instanceof ActivityImpl) {
 							ActivityImpl act = (ActivityImpl) pe;
 							if (movedFacilities.containsKey(act.getFacilityId())) {
-								act.setLink(((ActivityFacilityImpl) this.controlerFacilities.get(act.getFacilityId())).getLink());
+								act.setLinkId(((ActivityFacilityImpl) this.controlerFacilities.get(act.getFacilityId())).getLinkId());
 								routeIt = true;
 							}
 						}

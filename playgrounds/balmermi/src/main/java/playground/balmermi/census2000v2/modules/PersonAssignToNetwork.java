@@ -77,7 +77,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
-				act.setLink(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLink());
+				act.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLinkId());
 			}
 		}
 		this.router.run(plan);

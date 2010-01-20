@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -116,21 +117,21 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 					if (currentTuple.getSecond() != null) {
 						// first and last leg do not have the route set, as the start or end  link is unknown.
 						Leg firstLeg = currentTuple.getSecond().get(0);
-						Link fromLink = ((ActivityImpl) planElements.get(i-1)).getLink();
+						Link fromLink = this.network.getLinks().get(((Activity) planElements.get(i-1)).getLinkId());
 						Link lastActLink = fromLink;
 						Link toLink = null;
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							toLink = ((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLink();
+							toLink = this.network.getLinks().get(((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLinkId());
 						} else {
-							toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
+							toLink = this.network.getLinks().get(((Activity) planElements.get(i+1)).getLinkId());
 						}
 						Link nextPeLink = toLink;
 						firstLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
 
 						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
-						toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
+						toLink = this.network.getLinks().get(((Activity) planElements.get(i+1)).getLinkId());
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							fromLink = ((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLink();   //fromLink es el ultimo link de los pt legs
+							fromLink = this.network.getLinks().get(((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLinkId());   //fromLink es el ultimo link de los pt legs
 						}
 
 						//remove legs between a same link

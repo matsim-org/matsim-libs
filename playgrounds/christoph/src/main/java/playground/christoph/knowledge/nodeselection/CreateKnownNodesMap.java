@@ -85,8 +85,8 @@ public class CreateKnownNodesMap {
 			
 			for(int j = 1; j < acts.size(); j++)
 			{			
-				Node startNode = acts.get(j-1).getLink().getToNode();
-				Node endNode = acts.get(j).getLink().getFromNode();
+				Node startNode = network.getLinks().get(acts.get(j-1).getLinkId()).getToNode();
+				Node endNode = network.getLinks().get(acts.get(j).getLinkId()).getFromNode();
 				
 				((SelectNodesDijkstra)nodeSelector).setStartNode(startNode);
 				((SelectNodesDijkstra)nodeSelector).setEndNode(endNode);
@@ -102,8 +102,8 @@ public class CreateKnownNodesMap {
 				 *  This ensures that a Person knows at least the Link where the Activity
 				 *  takes place.
 				 */
-				Node startNodeFrom = acts.get(j-1).getLink().getFromNode();			
-				Node endNodeTo = acts.get(j).getLink().getToNode();
+				Node startNodeFrom = network.getLinks().get(acts.get(j-1).getLinkId()).getFromNode();			
+				Node endNodeTo = network.getLinks().get(acts.get(j).getLinkId()).getToNode();
 				newNodes.put(startNodeFrom.getId(), startNodeFrom);
 				newNodes.put(endNodeTo.getId(), endNodeTo);
 				
@@ -125,7 +125,7 @@ public class CreateKnownNodesMap {
 			
 			for (ActivityImpl activityImpl : acts)
 			{
-				((SelectNodesCircular)nodeSelector).setLink(activityImpl.getLink());
+				((SelectNodesCircular)nodeSelector).setLink(network.getLinks().get(activityImpl.getLinkId()));
 				((SelectNodesCircular)nodeSelector).addNodesToMap(nodesMap);
 			}
 		}
@@ -137,7 +137,7 @@ public class CreateKnownNodesMap {
 	
 //		if (nodesMap.size() == 0) log.error("No known Nodes found?!");
 		
-		if(removeDeadEnds) DeadEndRemover.removeDeadEnds(p);
+		if(removeDeadEnds) DeadEndRemover.removeDeadEnds(p, network);
 	}
 	
 	public static void setRemoveDeadEnds(boolean value)

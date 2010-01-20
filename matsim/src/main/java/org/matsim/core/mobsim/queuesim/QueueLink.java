@@ -40,6 +40,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.QueueLane;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -295,7 +296,7 @@ public class QueueLink {
      }
      DriverAgent driver = veh.getDriver();
        // Check if veh has reached destination:
-       if ((driver.getDestinationLinkId() == this.getLink().getId()) && (driver.chooseNextLinkId() == null)) {
+       if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
          driver.legEnds(now);
          this.processVehicleArrival(now, veh);
          // remove _after_ processing the arrival to keep link active
@@ -557,7 +558,7 @@ public class QueueLink {
    */
   class VisDataImpl implements VisData {
     
-    private double linkScale =  OTFDefaultLinkHandler.LINK_SCALE;
+    private final double linkScale =  OTFDefaultLinkHandler.LINK_SCALE;
     
     /**
      * @return The value for coloring the link in NetVis. Actual: veh count / space capacity

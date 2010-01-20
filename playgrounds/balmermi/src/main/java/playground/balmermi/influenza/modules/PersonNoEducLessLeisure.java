@@ -75,14 +75,14 @@ public class PersonNoEducLessLeisure extends AbstractPersonAlgorithm {
 			if (currAct.getType().startsWith("e")) {
 				currAct.setType("home");
 				currAct.setFacilityId(homeAct.getFacilityId());
-				currAct.setLink(homeAct.getLink());
+				currAct.setLinkId(homeAct.getLinkId());
 				currAct.setCoord(homeAct.getCoord());
 			}
 			else if (currAct.getType().startsWith("l")) {
 				if (random.nextDouble() < pctRemainingLeisure) {
 					currAct.setType("home");
 					currAct.setFacilityId(homeAct.getFacilityId());
-					currAct.setLink(homeAct.getLink());
+					currAct.setLinkId(homeAct.getLinkId());
 					currAct.setCoord(homeAct.getCoord());
 				}
 			}

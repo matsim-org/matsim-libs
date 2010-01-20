@@ -86,8 +86,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		// test with only one plan...
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
-		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6);
-		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7);
+		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
+		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
@@ -108,8 +108,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		assertNotNull(selector.selectPlan(person));
 
 		// ... test with multiple plans that all have negative score
-		a = new org.matsim.core.population.ActivityImpl("h", l6);
-		b = new org.matsim.core.population.ActivityImpl("w", l7);
+		a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
+		b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
 		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
@@ -128,8 +128,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p2.setScore(-10.0);
 		person.addPlan(p2);
 
-		a = new org.matsim.core.population.ActivityImpl("h", l6);
-		b = new org.matsim.core.population.ActivityImpl("w", l7);
+		a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
+		b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
 		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
@@ -157,8 +157,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		// test with only one plan, but with NEGATIVE_INFINITY...
 		person = new PersonImpl(new IdImpl(1));
 		p1 = new org.matsim.core.population.PlanImpl(person);
-		a = new org.matsim.core.population.ActivityImpl("h", l6);
-		b = new org.matsim.core.population.ActivityImpl("w", l7);
+		a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
+		b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
 		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
@@ -190,8 +190,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
-		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6);
-		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7);
+		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
+		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
@@ -225,8 +225,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
-		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6);
-		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7);
+		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
+		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
@@ -243,8 +243,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p1.setScore(-10.0);
 		person.addPlan(p1);
 	
-		a = new org.matsim.core.population.ActivityImpl("h", l6);
-		b = new org.matsim.core.population.ActivityImpl("w", l7);
+		a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
+		b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
 		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
@@ -263,8 +263,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p2.setScore(-10.0);
 		person.addPlan(p2);
 		
-		a = new org.matsim.core.population.ActivityImpl("h", l6);
-		b = new org.matsim.core.population.ActivityImpl("w", l7);
+		a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
+		b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
 		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
