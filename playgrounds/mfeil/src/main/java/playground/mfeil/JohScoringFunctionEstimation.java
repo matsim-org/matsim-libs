@@ -33,6 +33,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * New scoring function following Joh's dissertation:
@@ -62,6 +63,10 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final int INITIAL_INDEX = 0;
 	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
+	
+	private final String seasonTicket;
+	private final double income;
+	private final int female;
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
 	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
@@ -76,54 +81,99 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final Logger log = Logger.getLogger(JohScoringFunctionEstimation.class);
 	
 	private static final TreeMap<String, JohActUtilityParameters> utilParams = new TreeMap<String, JohActUtilityParameters>();
-	private static double marginalUtilityOfWaiting = -6; //war -6
-	private static double marginalUtilityOfLateArrival = -18; //war -18
-	private static double marginalUtilityOfEarlyDeparture = -0; // war -0
-	private static double marginalUtilityOfTraveling = -6; // war fuer alle -6
-	private static double marginalUtilityOfTravelingPT = -6; 
-	private static double marginalUtilityOfTravelingWalk = -6;
-	private static double marginalUtilityOfDistance = 0; // war 0
+	private static double marginalUtilityOfWaiting = 0; //war -6
+	private static double factorOfLateArrival = 3; 
+	private static double marginalUtilityOfEarlyDeparture = 0; // war -0
 	
-	private static double repeat = 0.332;
+	private static double beta_time_car = -4.08; // war fuer alle -6
+	private static double beta_time_pt = 0.355; 
+	private static double beta_time_walk = -1.94;
+	
+	private static double constantPt = -0.659;
+	private static double constantWalk = 0.774;
+	
+	private static double beta_cost_car = 0.0569;
+	private static double beta_cost_pt = -0.115;
+	
+	private static double beta_female_act = 0.169;
+	private static double beta_female_travel = 0.158;
+	
+	private static double travelCostCar = 0.5;	// CHF/km
+	private static double travelCostPt_None = 0.28;	// CHF/km
+	private static double travelCostPt_Halbtax = 0.15;	// CHF/km
+	private static double travelCostPt_GA = 0.08;	// CHF/km;
+	
+	private static double repeat = 0;
 	
 	private static final double uMin_home = 0;
-	private static final double uMin_home_inner = 0;
 	private static final double uMin_work = 0;
+	private static final double uMin_education = 0;
 	private static final double uMin_shopping = 0;
 	private static final double uMin_leisure = 0;
-	private static final double uMax_home = 60; //60
-	private static final double uMax_home_inner = 60; //60
-	private static final double uMax_work= 55;  //55
-	private static final double uMax_shopping = 12; //12
-	private static final double uMax_leisure = 35;  //35
-	private static final double alpha_home = 6;//6
-	private static final double alpha_home_inner = 6;//6
-	private static final double alpha_work = 4;//4
-	private static final double alpha_shopping = 1;//1
-	private static final double alpha_leisure = 2;//2
-	private static final double beta_home = 1.2;//1.2
-	private static final double beta_home_inner = 1.2;//1.2
-	private static final double beta_work = 1.2;
-	private static final double beta_shopping = 1.2;
-	private static final double beta_leisure = 1.2;
+	
+	private static final double uMax_home = 4.94; //60
+	private static final double uMax_work= 2.68;  //55
+	private static final double uMax_education = 1.29;//40
+	private static final double uMax_shopping = 0.681; //12
+	private static final double uMax_leisure = 0.987;  //35
+	
+	private static final double alpha_home = 8.31;//6
+	private static final double alpha_work = 6.20;//4
+	private static final double alpha_education = 2.07;//3
+	private static final double alpha_shopping = 0.264;//1
+	private static final double alpha_leisure = 0.571;//2
+	
+	private static final double beta_home = 0.360;//1.2
+	private static final double beta_work = 0.660;
+	private static final double beta_education = 2.60;
+	private static final double beta_shopping = 5.00;
+	private static final double beta_leisure = 100;
+	
 	private static final double gamma_home = 1;//1
-	private static final double gamma_home_inner = 1;//1
 	private static final double gamma_work = 1;
+	private static final double gamma_education = 1;
 	private static final double gamma_shopping = 1;
 	private static final double gamma_leisure = 1;
 	
-	private static final double uMin_education = 0;
-	private static final double uMax_education = 40;//40
-	private static final double alpha_education = 3;//3
-	private static final double beta_education = 1.2;
-	private static final double gamma_education = 1;
 	
 	
 	
 	public JohScoringFunctionEstimation(final Plan plan) {
 		init();
 		this.reset();
-
+		
+		// check seasonTicket
+		PersonImpl person = (PersonImpl) plan.getPerson();
+		if (person.getTravelcards()!=null){
+			if (person.getTravelcards().contains("ga")) this.seasonTicket = "ga";
+			else if (person.getTravelcards().contains("halbtax")) this.seasonTicket = "halbtax";
+			else {
+				this.seasonTicket = "none";
+				log.warn("Unknown travel card type "+person.getTravelcards().first()+" for person "+person.getId()+". " +
+					"Using travel cost as if the person had no travel card.");
+			}
+		}
+		else this.seasonTicket = "none";
+		
+		// check income
+		if (person.getCustomAttributes()!=null && person.getCustomAttributes().containsKey("income")) {
+			this.income=Double.parseDouble(person.getCustomAttributes().get("income").toString());
+		}
+		else this.income = -1;
+		
+		// check gender
+		if (person.getSex().equals("m") || person.getSex().equals("male")){
+			this.female = 0;
+		}
+		else if (person.getSex().equals("f") || person.getSex().equals("female")){
+			this.female = 1;
+		}
+		else {
+			log.warn("Unknown gender "+person.getAge()+" for person "+person.getId()+". " +
+			"Setting gender to default \"male\".");
+			this.female = 0;
+		}
+		
 		this.plan = plan;
 		this.person = this.plan.getPerson();
 		this.lastActIndex = this.plan.getPlanElements().size() - 1;
@@ -137,6 +187,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		this.score = INITIAL_SCORE;
 
 	}
+	
 	
 	// the activity is currently handled by startLeg()
 	public void startActivity(final double time, final Activity act) {
@@ -182,17 +233,14 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.clear();
 		readUtilityValues();
 		scoreActs = ((marginalUtilityOfWaiting != 0) ||
-				(marginalUtilityOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
+				(factorOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
 		initialized = true;
 	}
 
 	private final double calcActScore(final double arrivalTime, final double departureTime, final ActivityImpl act) {
 		
 		JohActUtilityParameters params = null;
-		if (!act.getType().equalsIgnoreCase("home")) params = utilParams.get(act.getType());
-		else if ((this.index==0) || (this.index==this.lastActIndex)) params = utilParams.get("home");
-		else if ((this.index!=0) && (this.index!=this.lastActIndex)) params = utilParams.get("h_inner");
-		
+		params = utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
@@ -255,22 +303,25 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			tmpScore += marginalUtilityOfWaiting / 3600 * (activityStart - arrivalTime);
 		}
 
-		// disutility if too late
+		// disutility if too late: multiplicate utility of activity duration with penalty factor
 		double latestStartTime = params.getLatestStartTime();
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
-			tmpScore += marginalUtilityOfLateArrival / 3600 * (activityStart - latestStartTime);
+			int gamma = 0;
+			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
+			tmpScore += factorOfLateArrival * (1 - repeat * gamma) * (1+beta_female_act*this.female) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-((activityStart - latestStartTime)/3600))),1/params.getGamma())));
 		}
 
 		// utility of performing an action
-		if (duration > 0) {
-			/*int gamma = 0;
+		if (duration>=0) {
+			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
-			*/double utilPerf = /*(1 - repeat * gamma) * */(params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
-			double utilWait = marginalUtilityOfWaiting / 3600 * duration;
+			double utilPerf = (1 - repeat * gamma) * (1+beta_female_act*this.female) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
+			double utilWait = (1+beta_female_act*this.female) * marginalUtilityOfWaiting / 3600 * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
-		} else if (duration<0){
-			tmpScore += 2*marginalUtilityOfLateArrival / 3600 *Math.abs(duration);
-
+		} else {
+			int gamma = 0;
+			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
+			tmpScore += factorOfLateArrival * (1 - repeat * gamma) * (1+beta_female_act*this.female) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma())));
 		}
 
 		// disutility if stopping too early
@@ -308,28 +359,27 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
-		double dist = 0.0; // distance in meters
-
+		double dist = leg.getRoute().getDistance()/1000; // distance in kilometers
+		
 		if (TransportMode.car.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTraveling / 3600 + marginalUtilityOfDistance / 3600 * dist;
+			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTravelingPT / 3600 + marginalUtilityOfDistance / 3600 * dist;
+			double cost = 0;
+			if (this.seasonTicket.equals("ga")) cost = travelCostPt_GA;
+			else if (this.seasonTicket.equals("halbtax")) cost = travelCostPt_Halbtax; 
+			else cost = travelCostPt_None; 
+			tmpScore += (1+beta_female_travel*this.female) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist/1000 + constantPt;
 		} else if (TransportMode.walk.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTravelingWalk / 3600 + marginalUtilityOfDistance / 3600 * dist;
+			tmpScore += beta_time_walk * travelTime/3600 + constantWalk;
 		} else {
 			// use the same values as for "car"
-			tmpScore += travelTime * marginalUtilityOfTraveling / 3600 + marginalUtilityOfDistance / 3600 * dist;
+			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000;
 		}
 
 		return tmpScore;
 	}
 	
-	/*
-	private static double getStuckPenalty() {
-		return abortedPlanScore;
-	}
-	 */
-	
+
 	/**
 	 * reads all activity utility values from the config-file
 	 */
@@ -443,10 +493,6 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		
 		type = "h";
 		actParams = new JohActUtilityParameters("h", uMin_home, uMax_home, alpha_home, beta_home, gamma_home);
-		utilParams.put(type, actParams);
-		
-		type = "h_inner";
-		actParams = new JohActUtilityParameters("h_inner", uMin_home_inner, uMax_home_inner, alpha_home_inner, beta_home_inner, gamma_home_inner);
 		utilParams.put(type, actParams);
 		
 		type = "s";
