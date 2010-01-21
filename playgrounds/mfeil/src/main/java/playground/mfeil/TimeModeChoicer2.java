@@ -20,6 +20,7 @@
 package playground.mfeil;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -31,13 +32,13 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
+import org.matsim.api.core.v01.population.Plan;
 
 
 /**
@@ -61,7 +62,6 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 	public TimeModeChoicer2 (Controler controler, LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer){
 		
 		super (controler, estimatorFactory, scorer);
-		
 		this.MAX_ITERATIONS 		= 30;
 		this.STOP_CRITERION			= 5;
 		this.network = controler.getNetwork();
@@ -69,7 +69,8 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 
 	
 	// TODO: this is bad programming style... needs to be improved!
-	public void run (PlanImpl basePlan){
+	@Override
+	public void run (Plan basePlan){
 		
 		/*Do nothing if the plan has only one or two activities (=24h home)*/
 		if (basePlan.getPlanElements().size()<=3) return;
