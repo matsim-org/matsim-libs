@@ -6,6 +6,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
@@ -25,7 +26,7 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * @author yu
- *
+ * 
  */
 public class PtPlansFileCreator {
 	private int personCount = 0;
@@ -142,15 +143,17 @@ public class PtPlansFileCreator {
 		try {
 			PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(pl);
-			LinkImpl startLink = this.network.getLinks().get(new IdImpl(startLinkId));
-			ActivityImpl a = pl.createAndAddActivity("h", startLink.getId());
+			Id startLinkID = new IdImpl(startLinkId);
+			LinkImpl startLink = this.network.getLinks().get(startLinkID);
+			ActivityImpl a = pl.createAndAddActivity("h", startLinkID);
 			a.setEndTime(Time.parseTime(endTime));
 			LegImpl leg = pl.createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));
 			NetworkRouteWRefs route = new NodeNetworkRouteImpl();
 			leg.setRoute(route);
-			LinkImpl endLink = this.network.getLinks().get(new IdImpl(endLinkId));
-			pl.createAndAddActivity("w", endLink.getId());
+			Id endLinkID = new IdImpl(endLinkId);
+			LinkImpl endLink = this.network.getLinks().get(endLinkID);
+			pl.createAndAddActivity("w", endLinkID);
 			route.setNodes(startLink, srcRoute, endLink);
 			this.pop.addPerson(p);
 			this.personCount++;
@@ -178,7 +181,8 @@ public class PtPlansFileCreator {
 
 		pfc.setPop(scenario.getPopulation());
 		pfc.createPersons();
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(newPlansFilename);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork())
+				.writeFile(newPlansFilename);
 		System.out.println("done.");
 	}
 }

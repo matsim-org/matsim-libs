@@ -75,9 +75,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * tries to allocate bus stop coordinates to links in MATSim "car" network
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class BusLineAllocator {
 	private class TravelCostFunctionDistance implements TravelCost {
@@ -104,9 +104,9 @@ public class BusLineAllocator {
 	 * also is exception))>>
 	 */
 	private final Map<Id, List<Tuple<Id, List<Id>/* path */>>> paths = new HashMap<Id, List<Tuple<Id, List<Id>/*
-																										 * Path.
-																										 * links
-																										 */>>>();
+																											 * Path.
+																											 * links
+																											 */>>>();
 	/*
 	 * <ptRouteId,List<ptLinkId:next_ptLinkId,Path(linkIds (shouldn't be pt
 	 * linkIds))>>
@@ -134,8 +134,8 @@ public class BusLineAllocator {
 
 	/**
 	 * @param netWithoutBus
-	 *            a normal MATsim <code>NetworkImpl</code>, in which there
-	 *            are no "pt" links
+	 *            a normal MATsim <code>NetworkImpl</code>, in which there are
+	 *            no "pt" links
 	 * @param stopCoords
 	 *            a Collection of
 	 *            <ptRouteId,<ptLinkId<fromNodeCoord,toNodeCoord>>>
@@ -197,7 +197,8 @@ public class BusLineAllocator {
 			Id ptFromId = ptFrom.getId();
 			Node carFrom = carNet.getNodes().get(ptFromId);
 			if (carFrom == null) { /* this node with this Id dosn't exist. */
-				carFrom = carNet.getFactory().createNode(ptFromId, ptFrom.getCoord());
+				carFrom = carNet.getFactory().createNode(ptFromId,
+						ptFrom.getCoord());
 				carNet.addNode(carFrom);
 			}
 			carFrom.getOutLinks().remove(l2a.getId());
@@ -211,7 +212,8 @@ public class BusLineAllocator {
 			}
 			carTo.getInLinks().remove(l2a.getId());
 
-			Link createdLink = carNet.getFactory().createLink(l2a.getId(), carFrom.getId(), carTo.getId());
+			Link createdLink = carNet.getFactory().createLink(l2a.getId(),
+					carFrom.getId(), carTo.getId());
 			createdLink.setLength(l2a.getLength());
 			createdLink.setFreespeed(l2a.getFreespeed(0));
 			createdLink.setCapacity(l2a.getCapacity(0));
@@ -500,7 +502,7 @@ public class BusLineAllocator {
 	}
 
 	/**
-	 * @return
+	 * @return 
 	 *         Map<TransitRouteId,List<Tuple<TransitLinkId,Tuple<fromCoord,toCoord
 	 *         >>>>
 	 */
@@ -579,8 +581,10 @@ public class BusLineAllocator {
 			Link newLink = multiModalNetwork.getLinks().get(newLinkId);
 			if (newLink == null) {
 				Node A = tmpPtLink.getFromNode();
-				newLink = multiModalNetwork.getFactory().createLink(newLinkId, A.getId(), nodeA.getId());
-				newLink.setLength(CoordUtils.calcDistance(coordA, nodeA.getCoord()));
+				newLink = multiModalNetwork.getFactory().createLink(newLinkId,
+						A.getId(), nodeA.getId());
+				newLink.setLength(CoordUtils.calcDistance(coordA, nodeA
+						.getCoord()));
 				newLink.setFreespeed(tmpPtLink.getFreespeed(0));
 				newLink.setCapacity(tmpPtLink.getCapacity(0));
 				newLink.setNumberOfLanes(tmpPtLink.getNumberOfLanes(0));
@@ -595,8 +599,10 @@ public class BusLineAllocator {
 			Link newLink = multiModalNetwork.getLinks().get(newLinkId);
 			if (newLink == null) {
 				Node B = tmpPtLink.getToNode();
-				newLink = multiModalNetwork.getFactory().createLink(newLinkId, nodeB.getId(), B.getId());
-				newLink.setLength(CoordUtils.calcDistance(coordB, nodeB.getCoord()));
+				newLink = multiModalNetwork.getFactory().createLink(newLinkId,
+						nodeB.getId(), B.getId());
+				newLink.setLength(CoordUtils.calcDistance(coordB, nodeB
+						.getCoord()));
 				newLink.setFreespeed(tmpPtLink.getFreespeed(0));
 				newLink.setCapacity(tmpPtLink.getCapacity(0));
 				newLink.setNumberOfLanes(tmpPtLink.getNumberOfLanes(0));
@@ -696,7 +702,8 @@ public class BusLineAllocator {
 			if (path != null) {
 				if (path.size() > 0)
 					/*------with carNet-----*/
-					stop.setLink(carNet.getLinks().get(path.get(path.size() - 1)));
+					stop.setLink(carNet.getLinks().get(
+							path.get(path.size() - 1)));
 				else
 					stop.setLink(null);
 			} else {
@@ -800,8 +807,9 @@ public class BusLineAllocator {
 							&& linkId.toString().startsWith("tr_")) {
 						Link actLink = carNet.getLinks().get(linkId);
 						if (actLink == null)
-							act.setLinkId(carNet.getNearestLink(multiModalNetwork
-									.getLinks().get(linkId).getCoord()).getId());
+							act.setLinkId(carNet.getNearestLink(
+									multiModalNetwork.getLinks().get(linkId)
+											.getCoord()).getId());
 					}
 				}
 			}

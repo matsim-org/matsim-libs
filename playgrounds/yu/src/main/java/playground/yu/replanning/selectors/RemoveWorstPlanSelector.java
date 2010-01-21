@@ -42,7 +42,7 @@ public class RemoveWorstPlanSelector implements PlanSelector {
 	private List<Tuple<Id, Plan>> removeds = new ArrayList<Tuple<Id, Plan>>();
 
 	public List<Tuple<Id, Plan>> getRemoveds() {
-		System.out.println(">>>>>\tremoveds:\t" + removeds);
+		// System.out.println(">>>>>\tremoveds:\t" + removeds);
 		return removeds;
 	}
 

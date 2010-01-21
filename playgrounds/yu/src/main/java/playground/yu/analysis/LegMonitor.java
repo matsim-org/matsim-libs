@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
  * 
  */
 public class LegMonitor {
-	private double depTime, arrTime = Double.NaN, dist = 0.0/* [m] */,
+	private double depTime, arrTime = Double.NaN, dist = 0.0/* [km] */,
 			dur = 0.0/* [h] */;
 
 	private int idx;
@@ -57,10 +57,10 @@ public class LegMonitor {
 	public void setArrTime(double arrTime) {
 		this.arrTime = arrTime;
 		this.dur += this.calcDuration_h();
-		this.dist += this.calcDistance_m();
+		this.dist += this.calcDistance_km();
 	}
 
-	public double getTotalDistances_m() {
+	public double getTotalDistances_km() {
 		return dist;
 	}
 
@@ -73,9 +73,9 @@ public class LegMonitor {
 	 * @see {@code org.matsim.core.scoring.charyparNagel.LegScoringFunction}
 	 *      line 100
 	 */
-	private double calcDistance_m() {
+	private double calcDistance_km() {
 		return ((Leg) this.plan.getPlanElements().get(this.idx)).getRoute()
-				.getDistance();
+				.getDistance() / 1000.0;
 	}
 
 	/**
