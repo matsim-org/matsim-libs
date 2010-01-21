@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -37,8 +36,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -54,7 +56,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
@@ -64,29 +65,11 @@ import org.xml.sax.SAXException;
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
+import playground.meisterk.phd.controler.PhDControler;
 
 public class MyRuns {
 
-	public final static String CONFIG_MODULE = "planCalcScore";
-	public final static String CONFIG_WAITING = "waiting";
-	public final static String CONFIG_LATE_ARRIVAL = "lateArrival";
-	public final static String CONFIG_EARLY_DEPARTURE = "earlyDeparture";
-	public final static String CONFIG_TRAVELING = "traveling";
-	public final static String CONFIG_PERFORMING = "performing";
-	public final static String CONFIG_LEARNINGRATE = "learningRate";
-	public final static String CONFIG_DISTANCE_COST = "distanceCost";
-
 	public static final int TIME_BIN_SIZE = 300;
-
-	protected static final TreeMap<String, ActivityUtilityParameters> utilParams = new TreeMap<String, ActivityUtilityParameters>();
-	protected static double marginalUtilityOfWaiting = Double.NaN;
-	protected static double marginalUtilityOfLateArrival = Double.NaN;
-	protected static double marginalUtilityOfEarlyDeparture = Double.NaN;
-	protected static double marginalUtilityOfTraveling = Double.NaN;
-	protected static double marginalUtilityOfPerforming = Double.NaN;
-	protected static double distanceCost = Double.NaN;
-	protected static double abortedPlanScore = Double.NaN;
-	protected static double learningRate = Double.NaN;
 
 	private static Logger logger = Logger.getLogger(MyRuns.class);
 
@@ -116,13 +99,67 @@ public class MyRuns {
 
 	public static void main(final String[] args) throws Exception {
 
-		Config config = Gbl.createConfig(args);
+//		Config config = Gbl.createConfig(args);
 
 		MyRuns myRuns = new MyRuns();
-		myRuns.run(config);
-
+		myRuns.doBrownbag250110(args);
+		
 	}
 
+	/**
+	 * Generates the results presented at the Brownbag on January 25th, 2010.
+	 */
+	void doBrownbag250110(final String[] args) {
+		
+		final double[] VARY_BETA = new double[]{0.1, 1.0, 2.0, 4.0, 10.0, Double.MAX_VALUE};
+		final double[] VARY_LEARNING_RATE = new double[]{0.1, 1.0};
+		final String[] VARY_TIME_MODULE = new String[]{"Planomat", "TimeAllocationMutator"};
+		final String OUTPUT_PARENT_DIRECTORY_NAME = "brownbag250110";
+		
+		for (double beta : VARY_BETA) {
+			for (double learningRate : VARY_LEARNING_RATE) {
+				
+				for (String timingModule : VARY_TIME_MODULE) {
+					Controler testee = new PhDControler(args);
+					
+					StrategySettings timingStrategy = new StrategySettings(new IdImpl(3));
+					timingStrategy.setModuleName(timingModule);
+					timingStrategy.setProbability(0.1);
+					testee.getConfig().strategy().addStrategySettings(timingStrategy);
+					
+					if (timingModule.equals("Planomat")) {
+						testee.getConfig().plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz");
+					} else if (timingModule.equals("TimeAllocationMutator")) {
+						testee.getConfig().plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateAll6AM/expected_plans.xml.gz");
+					}
+					
+					testee.getConfig().controler().setOutputDirectory(
+							"output/"
+									+ OUTPUT_PARENT_DIRECTORY_NAME
+									+ "/"
+									+ this.getBrownbag250110RunDescriptor(timingModule, beta, learningRate));
+					testee.getConfig().charyparNagelScoring().setBrainExpBeta(beta);
+					testee.getConfig().charyparNagelScoring().setLearningRate(learningRate);
+					
+					testee.setCreateGraphs(false);
+					testee.setWriteEventsInterval(0);
+					testee.run();
+				}
+
+			}
+		}
+		
+	}
+	
+	String getBrownbag250110RunDescriptor(final String timingModule, final double beta, final double learningRate) {
+		
+		return 
+		"timingModule_" + timingModule + "-" + 
+		"beta_" + Double.toString(beta) + "-" + 
+		"learningRate_" + Double.toString(learningRate);
+		
+	}
+	
 	/**
 	 * @param config
 	 *

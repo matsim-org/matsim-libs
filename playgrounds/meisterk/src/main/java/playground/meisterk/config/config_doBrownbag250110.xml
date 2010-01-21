@@ -1,5 +1,9 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+        [
+                <!ENTITY MATSIM_BASE  "../../matsim">
+        ]
+>
 <config>
 
 	<module name="global">
@@ -8,21 +12,22 @@
 
 	<module name="controler">
 		<param name="firstIteration" value="0" />
-<!--		<param name="lastIteration" value="10000" />-->
+<!--		<param name="lastIteration" value="1000" />-->
 		<param name="lastIteration" value="10" />
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/equil/network.xml" />
+		<param name="inputNetworkFile" value="&MATSIM_BASE;/test/scenarios/equil/network.xml" />
 	</module>
 
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
+		<param name="inputFacilitiesFile" value="&MATSIM_BASE;/test/scenarios/equil/facilities.xml" />
 	</module>
 
 	<module name="planCalcScore">
-		<param name="learningRate" value="0.1" />
-		<param name="BrainExpBeta" value="2.0" />
+<!--		varied by program runner -->
+<!--		<param name="learningRate" value="1.0" />-->
+<!--		<param name="BrainExpBeta" value="2.0" />-->
 
 		<param name="lateArrival" value="-18" />
 		<param name="earlyDeparture" value="-0" />
@@ -51,7 +56,8 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateAll6AM/expected_plans.xml.gz" />
+<!--		varied by program runner -->
+<!--		<param name="inputPlansFile" value="test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz" />-->
 	</module>
 
 	<module name="strategy">
@@ -59,9 +65,7 @@
 		<param name="ModuleProbability_1" value="0.8" />
 		<param name="Module_1" value="SelectExpBeta" />
 		<param name="ModuleProbability_2" value="0.1" />
-		<param name="Module_2" value="TimeAllocationMutator" />
-		<param name="ModuleProbability_3" value="0.1" />
-		<param name="Module_3" value="ReRoute" />
+		<param name="Module_2" value="ReRoute" />
 	</module>
 
 </config>
