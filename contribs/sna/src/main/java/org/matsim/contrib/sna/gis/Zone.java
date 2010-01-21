@@ -81,6 +81,14 @@ public class Zone {
 	}
 	
 	/**
+	 * Returns the population density in inhabitants per km^2.
+	 * 
+	 * @return the population density in inhabitants per km^2.
+	 */
+	public double getPopulationDensity() {
+		return getInhabitants()/getGeometry().getArea() * 1000 * 1000;
+	}
+	/**
 	 * Returns the ID of the wrapped feature.
 	 * 
 	 * @return the ID of the wrapped feature.

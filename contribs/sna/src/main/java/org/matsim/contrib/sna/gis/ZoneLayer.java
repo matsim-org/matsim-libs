@@ -24,12 +24,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
-import com.vividsolutions.jts.index.strtree.STRtree;
 
 /**
  * Representation of a spatial index containing zones backed by a quadtree.

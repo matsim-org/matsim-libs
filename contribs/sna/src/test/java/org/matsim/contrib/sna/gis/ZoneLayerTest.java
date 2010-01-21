@@ -22,6 +22,8 @@ package org.matsim.contrib.sna.gis;
 import java.util.HashSet;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -38,8 +40,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-import junit.framework.TestCase;
 
 /**
  * @author jillenberger
