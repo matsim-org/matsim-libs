@@ -1,6 +1,6 @@
 package playground.mmoyo.analysis.comp.vis;
 
-import playground.mmoyo.TransitSimulation.MMoyoTransitControler;
+import playground.mzilske.bvg09.TransitControler;
 
 public class Control_launcher_900s_small_routedPlans {
 	public static void main(String[] args) {
@@ -19,6 +19,6 @@ public class Control_launcher_900s_small_routedPlans {
 				configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/routed_configs/config_900s_small_moyo_parameterized.xml";
 				break;
 		}
-		MMoyoTransitControler.main(new String[]{configFile});
+		TransitControler.main(new String[]{configFile});
 	}
 }
