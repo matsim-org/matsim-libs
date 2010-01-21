@@ -21,7 +21,7 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.io.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -192,7 +192,15 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		// Start calculation
 		//////////////////////////////////////////////////////////////////////
 		
-		
+		// Optimize the plan with the given activity chain
+		// Route the plan if legs without route exist (coming from unsuccessful schedule recycling)
+		for (int i=1;i<plan.getPlanElements().size();i+=2){
+			LegImpl leg = (LegImpl) plan.getPlanElements().get(i);
+			if (leg.getRoute()==null){
+				this.router.run(plan);
+				break;
+			}
+		}
 		this.locator.run(plan);
 		if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
 			for (int z=1;z<plan.getPlanElements().size();z+=2){
