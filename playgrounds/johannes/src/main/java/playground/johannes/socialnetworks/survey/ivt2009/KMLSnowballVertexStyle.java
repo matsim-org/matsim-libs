@@ -47,17 +47,24 @@ public class KMLSnowballVertexStyle extends KMLVertexColorStyle<SampledGraph, Sa
 	protected TDoubleObjectHashMap<String> getValues(SampledGraph graph) {
 		
 		TDoubleObjectHashMap<String> values = new TDoubleObjectHashMap<String>();
-		for(Object v : graph.getVertices()) {
-			values.put(((SampledVertex) v).getIterationSampled(), String.valueOf(((SampledVertex) v).getIterationSampled()));
+//		for(Object v : graph.getVertices()) {
+//			values.put(((SampledVertex) v).getIterationSampled(), String.valueOf(((SampledVertex) v).getIterationSampled()));
+//		}
+		for(int i = -1 ; i < 7; i++) {
+			values.put(i, String.valueOf(i));
 		}
-		values.put(1.0, "1.0");
+//		values.put(0.0, "-1");
+//		values.put(0.05, "0");
+//		values.put(0.1, "1");
+//		values.put(0.15, "2");
+//		values.put(0.2, "3");
 		
 		return values;
 	}
 
 	@Override
 	public String getObjectSytleId(SampledVertex object) {
-		return String.valueOf(object.getIterationSampled());
+		return String.valueOf(object.getIterationDetected());
 	}
 
 	/* (non-Javadoc)

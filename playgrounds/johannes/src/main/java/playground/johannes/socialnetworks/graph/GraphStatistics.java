@@ -45,9 +45,9 @@ import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
 import org.matsim.contrib.sna.graph.GraphProjectionFactory;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.analysis.Degree;
 import playground.johannes.socialnetworks.graph.analysis.Transitivity;
 import playground.johannes.socialnetworks.statistics.Correlations;
 

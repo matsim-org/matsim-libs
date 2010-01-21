@@ -27,20 +27,25 @@ import gnu.trove.TIntObjectIterator;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraphBuilder;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseGraph;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseVertex;
 import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
+import playground.johannes.socialnetworks.snowball2.spatial.io.KMLTimeSpan;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -80,6 +85,9 @@ public class TXT2GraphML {
 		
 		TIntObjectHashMap<SampledSpatialSparseVertex> vertexIds = new TIntObjectHashMap<SampledSpatialSparseVertex>();
 		
+		Map<Vertex, String> timeStamps = new HashMap<Vertex, String>();
+		Map<String, Map<String, String>> surveyData = new CSVReader().readSnowballData("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/tbl_surveydata.csv");
+		
 		int egocount = 0;
 		while((line = reader.readLine()) != null) {
 			tokens = line.split(TAB);
@@ -95,10 +103,20 @@ public class TXT2GraphML {
 					Coord c = getCoord(tokens, longIdx, latIdx);
 					if (c != null) {
 						SampledSpatialSparseVertex v = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(c.getX(), c.getY())));
-						v.sample(0);
+						int it = 0;
+						if(id >= 1000 && id < 10000)
+							it = 1;
+						else if(id >= 10000)
+							it = 2;
+						v.sample(it);
+						v.detect(Math.max(0, it - 1));
 						if(vertexIds.put(id, v) != null)
 							System.err.println("Overwriting ego with id " + id);
 						egocount++;
+						
+						Map<String, String> egoData = surveyData.get(tokens[2]);
+						String time = egoData.get("timeStamp");
+						timeStamps.put(v, time);
 					}
 				}
 			}
@@ -156,6 +174,8 @@ public class TXT2GraphML {
 						Coord c = getCoord(tokens, longIdx, latIdx);
 						if (c != null) {
 							alter = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(c.getX(), c.getY())));
+							alter.detect(Math.max(0, ego.getIterationSampled()));
+							timeStamps.put(alter, timeStamps.get(ego));
 							if(vertexIds.put(id, alter) != null)
 								System.err.println("Overwriting alter with id " + id);
 							altercount++;
@@ -200,13 +220,18 @@ public class TXT2GraphML {
 		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
 		writer.write(graph, args[2]);
 		
-		KMLWriter kmlwriter = new KMLWriter();
-		kmlwriter.setCoordinateTransformation(new CH1903LV03toWGS84());
+		SpatialGraphKMLWriter kmlwriter = new SpatialGraphKMLWriter();
+//		kmlwriter.setCoordinateTransformation(new CH1903LV03toWGS84());
 		kmlwriter.setDrawEdges(false);
-		kmlwriter.setVertexStyle(new KMLSnowballVertexStyle(kmlwriter.getVertexIconLink()));
+//		kmlwriter.setVertexStyle(new KMLSnowballVertexStyle(kmlwriter.getVertexIconLink()));
 //		writer.setVertexStyle(new KMLDegreeStyle(writer.getVertexIconLink()));
 //		writer.setVertexDescriptor(new KMLSnowballDescriptor());
-		kmlwriter.setVertexDescriptor(new KMLVertexDescriptor(graph));
+		KMLObjectDetailComposite<SpatialVertex> composite = new KMLObjectDetailComposite<SpatialVertex>();
+		composite.addObjectDetail(new org.matsim.contrib.sna.graph.spatial.io.KMLVertexDescriptor(graph));
+		composite.addObjectDetail(new KMLTimeSpan(timeStamps));
+//		kmlwriter.setVertexDescriptor(new KMLVertexDescriptor(graph));
+//		kmlwriter.setPlacemarkCustomizable(new KMLTimeSpan(timeStamps));
+		kmlwriter.setKmlVertexDetail(composite);
 		kmlwriter.write(graph, args[2] + ".kmz");
 	}
 	

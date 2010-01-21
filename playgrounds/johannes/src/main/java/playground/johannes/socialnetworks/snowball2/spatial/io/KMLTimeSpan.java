@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialAnalyzerTask.java
+ * KMLTimeSpan.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,24 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.analysis;
+package playground.johannes.socialnetworks.snowball2.spatial.io;
 
-import org.matsim.contrib.sna.gis.ZoneLayer;
+import java.util.Map;
 
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.TimeSpanType;
+
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialAnalyzerTask extends GraphAnalyzerTaskComposite {
+public class KMLTimeSpan implements KMLObjectDetail<SpatialVertex> {
 
-	public SpatialAnalyzerTask(String output, ZoneLayer zones) {
-		super(output);
-		addTasks(new StandardAnalyzerTask(getOutputDirectory()));
-		addTasks(new DistanceTask(getOutputDirectory()));
-		addTasks(new PopDensityTask(getOutputDirectory(), zones));
+	private ObjectFactory factory = new ObjectFactory();
+	
+	private Map<Vertex, String> timeStamps;
+	
+	public KMLTimeSpan(Map<Vertex, String> timeStamps) {
+		this.timeStamps = timeStamps;
+	}
+	
+
+	@Override
+	public void addDetail(PlacemarkType kmlPlacemark, SpatialVertex vertex) {
+		TimeSpanType tType = factory.createTimeSpanType();
+		
+		String timeStamp = timeStamps.get(vertex);
+		tType.setBegin(timeStamp.replace(" ", "T"));
+//		tType.setBegin(String.valueOf(((SampledVertex)vertex).getIterationDetected()+2000));
+		kmlPlacemark.setAbstractTimePrimitiveGroup(factory.createTimeSpan(tType));
+		
 	}
 
 }

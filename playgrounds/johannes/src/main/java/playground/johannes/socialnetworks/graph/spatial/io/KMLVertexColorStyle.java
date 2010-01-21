@@ -38,8 +38,8 @@ import net.opengis.kml._2.StyleType;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
 
-import playground.johannes.socialnetworks.graph.social.util.ColorUtils;
 
 /**
  * @author illenberger
@@ -110,7 +110,7 @@ public abstract class KMLVertexColorStyle<G extends Graph, V extends Vertex> imp
 			color = (val - min) / (max - min);
 		}
 		
-		return ColorUtils.getHeatmapColor(color);
+		return ColorUtils.getGRBColor(color);
 	}
 	
 	public String getObjectSytleId(V object) {

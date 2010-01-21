@@ -21,20 +21,23 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.Zone;
 import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.Degree;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
 import playground.johannes.socialnetworks.graph.analysis.AbstractGraphAnalyzerTask;
-import playground.johannes.socialnetworks.graph.analysis.Degree;
 import playground.johannes.socialnetworks.graph.analysis.DegreeTask;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -44,30 +47,28 @@ import playground.johannes.socialnetworks.statistics.Correlations;
  */
 public class PopDensityTask extends AbstractGraphAnalyzerTask {
 
+	private static final Logger logger = Logger.getLogger(PopDensityTask.class);
+	
+	public static final String POPDENSITY_PERARSON_CORRELATION = "rho_rho_pearson";
+	
 	private ZoneLayer zones;
 	
-	/**
-	 * @param output
-	 */
-	public PopDensityTask(String output) {
+	public PopDensityTask(String output, ZoneLayer zones) {
 		super(output);
-		// TODO Auto-generated constructor stub
+		this.zones = zones;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.socialnetworks.graph.analysis.GraphAnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map, java.util.Map)
-	 */
 	@Override
 	public void analyze(Graph graph, Map<String, Object> analyzers,	Map<String, Double> stats) {
 		if(getOutputDirectory() != null) {
+			try {
 			Set<? extends SpatialVertex> vertices = (Set<? extends SpatialVertex>) graph.getVertices();
 			TObjectDoubleHashMap<SpatialVertex> densityValues = new TObjectDoubleHashMap<SpatialVertex>();
 
 			for (SpatialVertex v : vertices) {
 				Zone zone = zones.getZone(v.getPoint());
 				if (zone != null) {
-					double rho = zone.getInhabitants()
-							/ zone.getGeometry().getArea() * 1000 * 1000;
+					double rho = zone.getPopulationDensity();
 					densityValues.put(v, rho);
 				}
 			}
@@ -81,8 +82,21 @@ public class PopDensityTask extends AbstractGraphAnalyzerTask {
 			else {
 				degree = (Degree)obj;
 			}
-			try {
-				Correlations.writeToFile(getCorrelation(degree.values(vertices), densityValues), "", "", "");
+			Correlations.writeToFile(getCorrelation(degree.values(vertices), densityValues), String.format("%1$s/k_rho.txt", getOutputDirectory()), "rho", "k_mean");
+			
+			DensityCorrelation rhoCorrelation;
+			obj = analyzers.get(DensityCorrelation.class.getCanonicalName());
+			if(obj == null)
+				rhoCorrelation = new DensityCorrelation();
+			else {
+				rhoCorrelation = (DensityCorrelation)obj;
+			}
+			Correlations.writeToFile(rhoCorrelation.densityCorrelation((SpatialGraph) graph, zones, 2000.0), String.format("%1$s/rho_rho.txt", getOutputDirectory()), "rho", "rho");
+			
+			double pearson = rhoCorrelation.pearsonCorrelation((SpatialGraph) graph, zones);
+			stats.put(POPDENSITY_PERARSON_CORRELATION, pearson);
+			logger.info(String.format("%1$s\t%2$.4f", POPDENSITY_PERARSON_CORRELATION, pearson));
+				
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -93,7 +107,17 @@ public class PopDensityTask extends AbstractGraphAnalyzerTask {
 		}
 	}
 
-	private TDoubleDoubleHashMap getCorrelation(TObjectDoubleHashMap<? extends Vertex> vValues, TObjectDoubleHashMap<? extends Vertex> dValues) {
-		return null;
+	private TDoubleDoubleHashMap getCorrelation(TObjectDoubleHashMap<Vertex> vValues, TObjectDoubleHashMap<SpatialVertex> dValues) {
+		double[] rhoValues = new double[dValues.size()];
+		double[] values = new double[rhoValues.length];
+		
+		TObjectDoubleIterator<SpatialVertex> it = dValues.iterator();
+		for(int i = 0; i < rhoValues.length; i++) {
+			it.advance();
+			rhoValues[i] = vValues.get(it.key());
+			values[i] = it.value();
+		}
+		
+		return Correlations.correlationMean(rhoValues, values);
 	}
 }

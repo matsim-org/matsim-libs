@@ -25,10 +25,10 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
-import playground.johannes.socialnetworks.graph.analysis.Degree;
 
 /**
  * @author illenberger
@@ -44,8 +44,8 @@ public class SampledDegree extends Degree {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public TObjectDoubleHashMap<? extends SampledVertex> values(Collection<? extends Vertex> vertices) {
-		return (TObjectDoubleHashMap<? extends SampledVertex>) super.values(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>) vertices));
+	public TObjectDoubleHashMap<Vertex> values(Collection<? extends Vertex> vertices) {
+		return (TObjectDoubleHashMap<Vertex>) super.values(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>) vertices));
 	}
 
 }

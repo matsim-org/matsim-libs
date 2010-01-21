@@ -41,12 +41,12 @@ import net.opengis.kml._2.PolygonType;
 import net.opengis.kml._2.StyleType;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.vis.kml.KMZWriter;
 
-import playground.johannes.socialnetworks.graph.social.util.ColorUtils;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 
 /**
@@ -101,7 +101,7 @@ public class SpatialGridKMLWriter {
 		StyleType[] polySytleTypes = new StyleType[(int) numBins];
 		for(int i = 0; i < numBins; i++) {
 			PolyStyleType polyStyleType = objectFactory.createPolyStyleType();
-			Color c = ColorUtils.getHeatmapColor(i/(double)numBins);
+			Color c = ColorUtils.getGRBColor(i/(double)numBins);
 			
 			polyStyleType.setColor(new byte[]{(byte)100, (byte)c.getBlue(), (byte)c.getGreen(), (byte)c.getRed()});
 			polyStyleType.setOutline(false);

@@ -36,12 +36,12 @@ import net.opengis.kml._2.PolygonType;
 import net.opengis.kml._2.StyleType;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.vis.kml.KMZWriter;
 
-import playground.johannes.socialnetworks.graph.social.util.ColorUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -73,7 +73,7 @@ public class ZoneLayerKMLWriter {
 		TDoubleObjectHashMap<StyleType> styles = new TDoubleObjectHashMap<StyleType>();
 		for(int i = 0; i < 100; i++) {
 			PolyStyleType polyStyleType = objectFactory.createPolyStyleType();
-			Color c = ColorUtils.getHeatmapColor(i/(double)100);
+			Color c = ColorUtils.getGRBColor(i/(double)100);
 			
 			polyStyleType.setColor(new byte[]{(byte)200, (byte)c.getBlue(), (byte)c.getGreen(), (byte)c.getRed()});
 			polyStyleType.setOutline(false);

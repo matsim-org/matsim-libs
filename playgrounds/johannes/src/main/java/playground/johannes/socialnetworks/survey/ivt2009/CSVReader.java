@@ -100,6 +100,9 @@ public class CSVReader {
 					data.put(userId, egoData);
 				}
 
+				String timeStamp = trimString(tokens[4]);
+				egoData.put("timeStamp", timeStamp);
+				
 				String param = trimString(tokens[PARAM_COL]);
 				if (!EMPTY.equalsIgnoreCase(param)) {
 					String value = trimString(tokens[VALUE_COL]);

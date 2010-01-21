@@ -22,12 +22,14 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 import java.io.IOException;
 
 import org.geotools.feature.Feature;
+import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
+import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphProjectionBuilder;
 
@@ -47,8 +49,9 @@ public class AnalyzerExe {
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialGraph graph = reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/graph/graph.graphml");
 		
-		SpatialAnalyzerTask task = new SpatialAnalyzerTask("/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/");
-		GraphAnalyzer.writeStats(GraphAnalyzer.analyze(graph, null, task), "/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/stats.txt");
+		ZoneLayer zones = ZoneLayerSHP.read("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/zones/Zones.shp");
+//		SpatialAnalyzerTask task = new SpatialAnalyzerTask("/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/", zones);
+//		GraphAnalyzer.writeStats(GraphAnalyzer.analyze(graph, null, task), "/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/stats.txt");
 
 		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/gemeindegrenzen2008.zip Folder/g1g08_shp_080606.zip Folder/G1L08.shp").iterator().next();
 		Geometry geometry = feature.getDefaultGeometry();
@@ -57,7 +60,7 @@ public class AnalyzerExe {
 		
 		SpatialGraph graphPrj = builder.decorate(graph, geometry);
 		
-		GraphAnalyzer.analyze(graphPrj, null, new SpatialAnalyzerTask(null));
+		GraphAnalyzer.analyze(graphPrj, null, new SpatialAnalyzerTask("/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/", zones));
 	}
 
 }

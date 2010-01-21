@@ -47,6 +47,7 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.kml.KMZWriter;
@@ -75,6 +76,8 @@ public class KMLWriter {
 	private KMLObjectDescriptor<Vertex> vertexDescriptor;
 	
 	private KMLObjectDescriptor<Edge> edgeDescriptor;
+	
+	private KMLPlacemarkCustomizable<SpatialVertex> placemarkCustomizable;
 	
 	protected ObjectFactory objectFactory;
 	
@@ -154,6 +157,15 @@ public class KMLWriter {
 		this.transformation = transformation;
 	}
 	
+	public KMLPlacemarkCustomizable<SpatialVertex> getPlacemarkCustomizable() {
+		return placemarkCustomizable;
+	}
+
+	public void setPlacemarkCustomizable(
+			KMLPlacemarkCustomizable<SpatialVertex> placemarkCustomizable) {
+		this.placemarkCustomizable = placemarkCustomizable;
+	}
+
 	public LinkType getVertexIconLink() {
 		return vertexIconLink;
 	}
@@ -184,7 +196,7 @@ public class KMLWriter {
 			FolderType vertexFolder = objectFactory.createFolderType();
 			vertexFolder.setName("Vertices");
 			
-			for(SpatialSparseVertex v : graph.getVertices()) {
+			for(SpatialVertex v : graph.getVertices()) {
 				/*
 				 * create a point geometry
 				 */
@@ -205,6 +217,8 @@ public class KMLWriter {
 					if(drawNames)
 						placemark.setName(vertexDescriptor.getName(v));
 				}
+				if(placemarkCustomizable != null)
+					placemarkCustomizable.customize(placemark, v);
 				/*
 				 * add placemark to vertex folder
 				 */
