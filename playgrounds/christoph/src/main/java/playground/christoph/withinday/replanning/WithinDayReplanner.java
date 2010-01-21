@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LeaveLinkReplanningModule.java
+ * WithinDayReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,40 +18,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.mobsim;
+package playground.christoph.withinday.replanning;
 
-import java.util.List;
-
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
-
-import playground.christoph.events.LinkReplanningMap;
-import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /*
- * Uses a LinkReplanningMap Object to determine which
- * Agents within a Simulation need a replanning of their
- * plans.
+ *	Marker Class
  */
-public class LeaveLinkReplanningModule {
-
-	public static int replanningCounter = 0;
+public abstract class WithinDayReplanner {
 	
-	protected ParallelLeaveLinkReplanner parallelLeaveLinkReplanner;
-	protected LinkReplanningMap linkReplanningMap;
+	protected double time;
+	protected DriverAgent driverAgent;
+	protected PlanAlgorithm planAlgorithm;
 	
-	public LeaveLinkReplanningModule(ParallelLeaveLinkReplanner parallelLeaveLinkReplanner, LinkReplanningMap linkReplanningMap)
+	public abstract boolean doReplanning();
+	
+	public void setTime(double time)
 	{
-		this.parallelLeaveLinkReplanner = parallelLeaveLinkReplanner;
-		this.linkReplanningMap = linkReplanningMap;
+		this.time = time;
 	}
 	
-	public void doLeaveLinkReplanning(double time)
+	public void setDriverAgent(DriverAgent driverAgent)
 	{
-		List<QueueVehicle> vehiclesToReplanLeaveLink = linkReplanningMap.getReplanningVehicles(time);
-		if (vehiclesToReplanLeaveLink.size() > 0)
-		{
-			replanningCounter = replanningCounter + vehiclesToReplanLeaveLink.size();
-			parallelLeaveLinkReplanner.run(vehiclesToReplanLeaveLink, time);
-		}
+		this.driverAgent = driverAgent;
+	}
+	
+	public void setReplanner(PlanAlgorithm planAlgorithm)
+	{
+		this.planAlgorithm = planAlgorithm;
 	}
 }

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.christoph.mobsim;
+package playground.christoph.withinday.mobsim;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.queuesim.AgentFactory;

@@ -49,8 +49,17 @@ public class MyLinkImpl extends LinkImpl{
 	private int[] linkLeaveCounts;
 	
 	private LinkedList<TripInfo> tripInfos = new LinkedList<TripInfo>();
-	private int storedTravelTimesWindow = 570;	// How long do we store TravelTimes?
-
+		
+	private boolean fadingTravelTimes = true;
+	private boolean binTravelTimes = false;
+	
+	private double fadingFactor = 1.0015;	// How much does the weight of a previous TravelTime decrease per SimStep?
+//	private double fadingFactor = 1.0025;	// How much does the weight of a previous TravelTime decrease per SimStep?
+	private double storedTravelTimes = 0.0;
+	private int addedTrips = 0;
+	
+	private double storedTravelTimesBinSize = 600;
+	
 	private double addedTravelTimes = 0.0;
 	private double sumTravelTimes = 0.0;	// We cache the sum of the TravelTimes
 	private double freeSpeedTravelTime = Double.MAX_VALUE;	// We cache the FreeSpeedTravelTimes
@@ -125,6 +134,49 @@ public class MyLinkImpl extends LinkImpl{
 	
 	public void updateMeanTravelTime(double time)
 	{
+		if (fadingTravelTimes)
+		{
+			calcFadingMeanTravelTimes(time);
+		}
+		else if (binTravelTimes)
+		{
+			calcBinTravelTime(time);
+		}
+	}
+	
+	private void calcFadingMeanTravelTimes(double time)
+	{
+		this.storedTravelTimes = this.storedTravelTimes / this.fadingFactor;
+		this.sumTravelTimes = this.sumTravelTimes / this.fadingFactor;
+		
+		/*
+		 * We don't need an update if no Trips have been added.
+		 */
+		if (this.addedTrips == 0) return;
+		
+		this.sumTravelTimes = this.sumTravelTimes + this.addedTravelTimes;
+		this.storedTravelTimes = this.storedTravelTimes + this.addedTrips;
+		
+		this.addedTravelTimes = 0.0;
+		this.addedTrips = 0;
+		
+		/* 
+		 * Ensure, that we don't allow TravelTimes shorter than the
+		 * FreeSpeedTravelTime.
+		 */
+		double meanTravelTime = freeSpeedTravelTime;
+		if (this.tripInfos.size() > 0) meanTravelTime = sumTravelTimes / this.storedTravelTimes;
+		
+		if (meanTravelTime * this.fadingFactor < freeSpeedTravelTime)
+		{
+			System.out.println("Warning: Mean TravelTime to short?");
+			this.setTravelTime(freeSpeedTravelTime);
+		}
+		else this.setTravelTime(meanTravelTime);
+	}
+	
+	private void calcBinTravelTime(double time)
+	{		
 		double removedTravelTimes = 0.0;
 				
 		// first remove old TravelTimes
@@ -144,7 +196,7 @@ public class MyLinkImpl extends LinkImpl{
 		TripInfo tripInfo;
 		while((tripInfo = this.tripInfos.peek()) != null)
 		{
-			if (tripInfo.leaveTime + this.storedTravelTimesWindow < time)
+			if (tripInfo.leaveTime + this.storedTravelTimesBinSize < time)
 			{
 				removedTravelTimes = removedTravelTimes + tripInfo.travelTime;
 				this.tripInfos.poll();
@@ -160,7 +212,7 @@ public class MyLinkImpl extends LinkImpl{
 		 */
 		if (removedTravelTimes == 0.0 && this.addedTravelTimes == 0.0) return;
 		
-		sumTravelTimes = sumTravelTimes - removedTravelTimes + this.addedTravelTimes;
+		this.sumTravelTimes = this.sumTravelTimes - removedTravelTimes + this.addedTravelTimes;
 		
 		this.addedTravelTimes = 0.0;
 		
@@ -187,6 +239,7 @@ public class MyLinkImpl extends LinkImpl{
 		this.tripInfos.add(tripInfo);
 		
 		this.addedTravelTimes = this.addedTravelTimes + travelTime;
+		this.addedTrips++;
 	}
 	
 	private class TripInfo

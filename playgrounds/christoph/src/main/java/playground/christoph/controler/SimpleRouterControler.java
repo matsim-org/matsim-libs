@@ -22,6 +22,7 @@ package playground.christoph.controler;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -35,11 +36,8 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
-import playground.christoph.mobsim.ReplanningManager;
-import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -47,10 +45,13 @@ import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomDijkstraRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
-import playground.christoph.router.costcalculators.OnlyDistanceDependentTravelCostCalculator;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.util.SimpleRouterFactory;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
+import playground.christoph.withinday.mobsim.InitialReplanningModule;
+import playground.christoph.withinday.mobsim.ReplanningManager;
+import playground.christoph.withinday.mobsim.ReplanningQueueSimulation;
+import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 
 /**
  * This Controler should give an Example what is needed to run
@@ -130,7 +131,7 @@ public class SimpleRouterControler extends Controler {
 	protected boolean useKnowledge = true;
 	
 	protected ParallelInitialReplanner parallelInitialReplanner;
-	protected ReplanningManager replanningManager;
+	protected ReplanningManager replanningManager = new ReplanningManager();
 	protected ReplanningQueueSimulation sim;
 
 	public SimpleRouterControler(String[] args)
@@ -199,12 +200,16 @@ public class SimpleRouterControler extends Controler {
 		this.parallelInitialReplanner.createReplannerArray();
 		this.parallelInitialReplanner.init();
 		this.parallelInitialReplanner.setRemoveKnowledge(true);
+		
+		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner, sim);
+		replanningManager.setInitialReplanningModule(initialReplanningModule);
 	}
 	
 	@Override
 	protected void runMobSim() 
 	{
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
+		sim.addQueueSimulationListeners(replanningManager);
 		
 		if (useKnowledge)
 		{
@@ -220,10 +225,7 @@ public class SimpleRouterControler extends Controler {
 
 		log.info("Set Replanners for each Person");
 		setReplanners();
-
-		log.info("do initial Replanning");
-		doInitialReplanning();	
-				
+		
 		sim.run();
 	}
 
@@ -237,9 +239,10 @@ public class SimpleRouterControler extends Controler {
 	{
 		for (Person p : this.getPopulation().getPersons().values()) {
 			Map<String, Object> customAttributes = p.getCustomAttributes();
-					
+			
 			double probability;
-			probability = MatsimRandom.getRandom().nextDouble();
+			Random random = MatsimRandom.getLocalInstance();
+			probability = random.nextDouble();
 			
 			double pRandomRouterLow = 0.0;
 			double pRandomRouterHigh = pRandomRouter;
@@ -299,6 +302,10 @@ public class SimpleRouterControler extends Controler {
 				customAttributes.put("initialReplanning", new Boolean(false));
 				noReplanningCounter++;
 			}
+
+			// (de)activate replanning if they are not needed
+			if (initialReplanningCounter == 0) replanningManager.doInitialReplanning(false);
+			else replanningManager.doInitialReplanning(true);
 		}
 		
 		log.info("Random Routing Probability: " + pRandomRouter);
@@ -317,26 +324,6 @@ public class SimpleRouterControler extends Controler {
 		log.info(noReplanningCounter + " persons don't replan their Plans ("+ noReplanningCounter / numPersons * 100.0 + "%)");
 		log.info(initialReplanningCounter + " persons replan their plans initially (" + initialReplanningCounter / numPersons * 100.0 + "%)");
 	}
-	
-	protected void doInitialReplanning()
-	{
-		ArrayList<Person> personsToReplan = new ArrayList<Person>();
-
-		for (Person person : this.getPopulation().getPersons().values()) {
-			boolean replanning = (Boolean) person.getCustomAttributes().get("initialReplanning");
-
-			if (replanning)
-			{
-				personsToReplan.add(person);
-			}
-		}
-
-		double time = 0.0;
-
-		// Run Replanner.
-		this.parallelInitialReplanner.run(personsToReplan, time);
-
-	} // doInitialReplanning
 
 	/*
 	 * How to store the known Nodes of the Agents?

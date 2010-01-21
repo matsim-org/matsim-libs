@@ -18,29 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.events.algorithms;
+package playground.christoph.withinday.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;
 import playground.christoph.network.util.SubNetworkTools;
+import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 
 /*
- * This is a EventHandler that replans the Route of a Person every time an
- * Activity has ended. Alternatively it can also be called "by Hand".
- * 
  * MATSim Routers use Plan as Input Data. To be able to use them, we have to create
  * a new Plan from the current Position to the location of the next Activity.
  * 
@@ -48,46 +42,12 @@ import playground.christoph.network.util.SubNetworkTools;
  * contains this and the next Activity and the Leg between them.
  */
 
-public class ActEndReplanner {
-	
-	protected PlanAlgorithm replanner;
-	protected QueueVehicle vehicle;
-	protected PersonImpl person;
-	protected ActivityImpl fromAct;
-	protected LegImpl betweenLeg;
-	protected ActivityImpl toAct;
-	protected double time;
-	
-	protected PopulationImpl population;
-	
+public class ActEndReplanner extends WithinDayDuringActivityReplanner{
+		
 	private static final Logger log = Logger.getLogger(ActEndReplanner.class);
 
-	public ActEndReplanner(ActivityImpl fromAct, QueueVehicle vehicle, double time, PlanAlgorithm replanner)
+	public ActEndReplanner()
 	{
-		this.fromAct = fromAct;
-		this.vehicle = vehicle;
-		this.person = (PersonImpl) vehicle.getDriver().getPerson();
-		this.time = time;
-		this.replanner = replanner;
-
-		Plan plan = person.getSelectedPlan();
-		this.betweenLeg = ((PlanImpl) plan).getNextLeg(fromAct);
-	
-		if(betweenLeg != null)
-		{
-			toAct = (ActivityImpl)((PlanImpl) plan).getNextActivity(betweenLeg);
-		}
-		else 
-		{
-			toAct = null;
-			log.error("An agents next activity is null - this should not happen! AgentId: " + this.person.getId());
-		}
-		
-		// calculate new Route
-		if(toAct != null && replanner != null)
-		{	
-			doReplanning();
-		}
 	}
 	
 	/*
@@ -107,17 +67,40 @@ public class ActEndReplanner {
 	 * due to the limited number of possible vehicles on a link at a time. An implementation
 	 * of such a functionality would be a problem due to the structure of MATSim...
 	 */
-//	protected void Routing(Act fromAct, Leg nextLeg)
-	protected void doReplanning()
+	public boolean doReplanning()
 	{	
+		// If we don't have a valid Replanner.
+		if (this.planAlgorithm == null) return false;
+		
+		// If we don't have a valid WithinDayPersonAgent
+		if (this.driverAgent == null) return false;
+		
+		WithinDayPersonAgent withinDayPersonAgent = null;
+		if (!(driverAgent instanceof WithinDayPersonAgent)) return false;
+		else
+		{
+			withinDayPersonAgent = (WithinDayPersonAgent) driverAgent;
+		}
+		
+		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
+		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
+		
+		// If we don't have a selected plan
+		if (selectedPlan == null) return false;
+		
+		Activity currentActivity = withinDayPersonAgent.getCurrentActivity();
+		
+		// If we don't have a current Activity
+		if (currentActivity == null) return false;
+		
+		Leg nextLeg = selectedPlan.getNextLeg(currentActivity);
+		Activity nextActivity = selectedPlan.getNextActivity(nextLeg);	
+				
 		// If it is not a car Leg we don't replan it.
-		if (!betweenLeg.getMode().equals(TransportMode.car)) return;
+		if (!nextLeg.getMode().equals(TransportMode.car)) return false;
 		
 		// Replace the EndTime with the current time - do we really need this?
 //		fromAct.setEndTime(time);
-		
-		// save currently selected plan
-		Plan currentPlan = person.getSelectedPlan();
 		
 		// Create new Plan and select it.
 		// This Plan contains only the just ended and the next Activity.
@@ -127,52 +110,43 @@ public class ActEndReplanner {
 		person.setSelectedPlan(newPlan);
 		
 		// Here we are at the moment.
-		newPlan.addActivity(fromAct);
+		newPlan.addActivity(currentActivity);
 		
-		Route originalRoute = betweenLeg.getRoute();
+		Route originalRoute = nextLeg.getRoute();
 			
 		// Current Route between fromAct and toAct - this Route shall be replanned.
-		newPlan.addLeg(betweenLeg);
+		newPlan.addLeg(nextLeg);
 		
 		// We still want to go there...
-		newPlan.addActivity(toAct);
+		newPlan.addActivity(nextActivity);
 							
 		// By doing the replanning the "betweenLeg" is replanned, so the changes are
 		// included in the previously selected plan, too!
-		replanner.run(newPlan);
+		planAlgorithm.run(newPlan);
 		
 		new SubNetworkTools().resetSubNetwork(person);
 		
 		// reactivate previously selected, replanned plan
-		person.setSelectedPlan(currentPlan);
+		person.setSelectedPlan(selectedPlan);
 		
 		// remove previously added new Plan
 		person.removePlan(newPlan);
 		
-//		double tt = betweenLeg.getTravelTime();
-//		if(tt > 2147483640)
-//		{
-//			log.warn("To long TravelTime??? " + ((long)tt));
-//		}
-
-		Route alternativeRoute = betweenLeg.getRoute();
+		Route alternativeRoute = nextLeg.getRoute();
 
 		// set VehicleId in original Route as well as in the alternative Route
-		((NetworkRouteWRefs)originalRoute).setVehicleId(this.vehicle.getId());
-		((NetworkRouteWRefs)alternativeRoute).setVehicleId(this.vehicle.getId());
+		((NetworkRouteWRefs)originalRoute).setVehicleId(withinDayPersonAgent.getVehicle().getId());
+		((NetworkRouteWRefs)alternativeRoute).setVehicleId(withinDayPersonAgent.getVehicle().getId());
+		
+//		if (alternativeRoute.getDistance() != originalRoute.getDistance())
+//		{
+//			log.info("Changed Route length! Id:" + this.person.getId() + " " + alternativeRoute.getDistance() + " vs. " + originalRoute.getDistance());
+//		}
 		
 		// create ReplanningEvent
 		QueueSimulation.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));
-		
-
-//		String newRouteString = "PersonId: " + person.getId();
-//		newRouteString = newRouteString + "; LinkCount: " + ((NetworkRoute)betweenLeg.getRoute()).getLinks().size() + ";";
-//		for (Link link : ((NetworkRoute)betweenLeg.getRoute()).getLinks())
-//		{
-//			newRouteString = newRouteString + " " + link.getId();
-//		}
-//		
-//		log.info(newRouteString);
+				
+		return true;
 	}
 	
 }

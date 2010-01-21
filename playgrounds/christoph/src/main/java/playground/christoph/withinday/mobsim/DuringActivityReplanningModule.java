@@ -18,40 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.mobsim;
+package playground.christoph.withinday.mobsim;
 
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 
-import playground.christoph.events.algorithms.ParallelActEndReplanner;
+import playground.christoph.withinday.replanning.parallel.ParallelActEndReplanner;
 
-public class ActEndReplanningModule {
+public class DuringActivityReplanningModule implements WithinDayReplanningModule{
 
-	private final static Logger log = Logger.getLogger(ActEndReplanningModule.class);
+	private final static Logger log = Logger.getLogger(DuringActivityReplanningModule.class);
 	
 	protected ReplanningQueueSimulation simulation;
 	protected ParallelActEndReplanner parallelActEndReplanner;
 	
 	public static int replanningCounter = 0;
 	
-	public ActEndReplanningModule(ParallelActEndReplanner parallelActEndReplanner, ReplanningQueueSimulation simulation)
+	public DuringActivityReplanningModule(ParallelActEndReplanner parallelActEndReplanner, ReplanningQueueSimulation simulation)
 	{
 		this.simulation = simulation;
 		this.parallelActEndReplanner = parallelActEndReplanner;
 	}
-		
-	public void doActEndReplanning(double time)
-	{	
+	
+	public void doReplanning(double time)
+	{
 		PriorityBlockingQueue<DriverAgent> queue = simulation.getActivityEndsList();
 		
 		for (DriverAgent driverAgent : queue)
-		{			
+		{	
 			// If the Agent will depart
 			if (driverAgent.getDepartureTime() <= time)
 			{	
-				this.parallelActEndReplanner.addScheduledActivityEnd(driverAgent);
+				this.parallelActEndReplanner.addAgentToReplan((WithinDayPersonAgent)driverAgent);
 				replanningCounter++;
 			}
 			
@@ -63,4 +63,5 @@ public class ActEndReplanningModule {
 		boolean runReplanning = (driverAgent != null && driverAgent.getDepartureTime() <= time);
 		if (runReplanning) this.parallelActEndReplanner.run(time);
 	}
+	
 }

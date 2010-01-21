@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.mobsim;
+package playground.christoph.withinday.mobsim;
 
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 
@@ -40,7 +39,8 @@ import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandle
  * should be separated somewhen but at the moment this seems
  * to be difficult so they remain here for now...
  */
-public class ReplanningQueueSimulation extends QueueSimulation{
+public class ReplanningQueueSimulation extends org.matsim.core.mobsim.queuesim.QueueSimulation{
+//public class ReplanningQueueSimulation extends org.matsim.ptproject.qsim.QueueSimulation{
 
 	private final static Logger log = Logger.getLogger(ReplanningQueueSimulation.class);
 	

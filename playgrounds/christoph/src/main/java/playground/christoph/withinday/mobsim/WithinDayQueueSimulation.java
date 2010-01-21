@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.mobsim;
+package playground.christoph.withinday.mobsim;
 
 import java.util.concurrent.PriorityBlockingQueue;
 

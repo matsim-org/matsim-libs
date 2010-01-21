@@ -8,9 +8,9 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
 
-import playground.christoph.mobsim.ActEndReplanningModule;
-import playground.christoph.mobsim.LeaveLinkReplanningModule;
 import playground.christoph.router.RandomCompassRoute;
+import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
+import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 
 public class BatchRun {
 	
@@ -235,8 +235,8 @@ public class BatchRun {
 			controler.run();
 			controler = null;
 			
-			log.info("Leave Link Replanning Counter: " + LeaveLinkReplanningModule.replanningCounter);
-			log.info("Act End Replanning Counter: " + ActEndReplanningModule.replanningCounter);
+			log.info("Leave Link Replanning Counter: " + DuringLegReplanningModule.replanningCounter);
+			log.info("Act End Replanning Counter: " + DuringActivityReplanningModule.replanningCounter);
 		}
 		
 	}

@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * TravelTimeCollector.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.replanning;
 
 import java.util.ArrayList;
@@ -5,7 +25,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -48,7 +69,8 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	/*
 	 * For parallel Execution
 	 */
-	private static AtomicInteger threadLock;
+	private CyclicBarrier startBarrier;
+	private CyclicBarrier endBarrier;
 	private UpdateMeanTravelTimesThread[] updateMeanTravelTimesThreads;
 	private int numOfThreads = 8;
 	
@@ -76,7 +98,6 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 		}
 	}
 	
-
 	public double getLinkTravelTime(Link link, double time)
 	{
 		MyLinkImpl myLink = (MyLinkImpl)link;
@@ -201,25 +222,23 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	{	
 		try
 		{
-			// lock threadLocker until wait() statement listens for the notifies
-			synchronized(threadLock) 
-			{
-				threadLock.set(this.numOfThreads);
-							
-				for (UpdateMeanTravelTimesThread updateMeanTravelTimesThread : updateMeanTravelTimesThreads) 
-				{
-					updateMeanTravelTimesThread.setTime(time);
-					synchronized(updateMeanTravelTimesThread)
-					{
-						updateMeanTravelTimesThread.notify();
-					}
-				}
-				threadLock.wait();
-			}		
-		} 
+			// set current Time
+			for (UpdateMeanTravelTimesThread updateMeanTravelTimesThread : updateMeanTravelTimesThreads) 
+			{				
+				updateMeanTravelTimesThread.setTime(time);
+			}
+			
+			this.startBarrier.await();
+				
+			this.endBarrier.await();		
+		}
 		catch (InterruptedException e)
 		{
 			Gbl.errorMsg(e);
+		}
+		catch (BrokenBarrierException e)
+		{
+	      	Gbl.errorMsg(e);
 		}
 	}
 	
@@ -260,9 +279,10 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	public void init(int numOfThreads)
 	{
 		this.numOfThreads = numOfThreads;
-		
-		threadLock = new AtomicInteger(0);
 
+		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
+		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
+		
 		createArrays();
 		
 		updateMeanTravelTimesThreads = new UpdateMeanTravelTimesThread[numOfThreads];
@@ -272,11 +292,32 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 		{
 			UpdateMeanTravelTimesThread updateMeanTravelTimesThread = new UpdateMeanTravelTimesThread();
 			updateMeanTravelTimesThread.setName("UpdateMeanTravelTimes" + i);
-			updateMeanTravelTimesThread.setMyLinkImplsArray(this.parallelArrays[i]);			
+			updateMeanTravelTimesThread.setMyLinkImplsArray(this.parallelArrays[i]);
+			updateMeanTravelTimesThread.setStartBarrier(this.startBarrier);
+			updateMeanTravelTimesThread.setEndBarrier(this.endBarrier);
 			updateMeanTravelTimesThread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			updateMeanTravelTimesThreads[i] = updateMeanTravelTimesThread;
 			
 			updateMeanTravelTimesThread.start();
+		}
+		
+		/*
+		 * After initialization the Threads are waiting at the
+		 * endBarrier. We trigger this Barrier once so 
+		 * they wait at the startBarrier what has to be
+		 * their state if the run() method is called.
+		 */
+		try
+		{
+			this.endBarrier.await();
+		} 
+		catch (InterruptedException e) 
+		{
+			Gbl.errorMsg(e);
+		} 
+		catch (BrokenBarrierException e)
+		{
+			Gbl.errorMsg(e);
 		}
 	}
 	/*
@@ -284,6 +325,9 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	 */
 	private static class UpdateMeanTravelTimesThread extends Thread
 	{
+		private CyclicBarrier startBarrier;
+		private CyclicBarrier endBarrier;
+		
 		private double time = 0.0;
 		private MyLinkImpl[] myLinks;
 		
@@ -291,6 +335,16 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 		{
 		}
 
+		public void setStartBarrier(CyclicBarrier cyclicBarrier)
+		{
+			this.startBarrier = cyclicBarrier;
+		}
+
+		public void setEndBarrier(CyclicBarrier cyclicBarrier)
+		{
+			this.endBarrier = cyclicBarrier;
+		}
+		
 		public void setMyLinkImplsArray(MyLinkImpl[] myLinks)
 		{
 			this.myLinks = myLinks;
@@ -309,25 +363,18 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 				try
 				{
 					/*
-					 * threadLocker.decCounter() and wait() have to be
-					 * executed in a synchronized block! Otherwise it could
-					 * happen, that the replanning ends and the replanning of
-					 * the next SimStep executes the notify command before
-					 * wait() is called -> we have a DeadLock!
+					 * The End of the Moving is synchronized with 
+					 * the endBarrier. If all Threads reach this Barrier
+					 * the main run() Thread can go on.
+					 * 
+					 * The Threads wait now at the startBarrier until
+					 * they are triggered again in the next TimeStep by the main run()
+					 * method.
 					 */
-					synchronized(this)
-					{
-						int activeThreads = threadLock.decrementAndGet();
-						if (activeThreads == 0)
-						{
-							synchronized(threadLock)
-							{
-								threadLock.notify();
-							}
-						}
-						wait();
-					}
-					
+					endBarrier.await();
+						
+					startBarrier.await();
+
 					for (MyLinkImpl myLink : myLinks)
 					{	
 						myLink.updateMeanTravelTime(this.time);
@@ -337,6 +384,10 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 				{
 					Gbl.errorMsg(e);
 				}
+	            catch (BrokenBarrierException e)
+	            {
+	            	Gbl.errorMsg(e);
+	            }
 			}
 		}	// run()
 		

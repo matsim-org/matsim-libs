@@ -18,11 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.events.algorithms;
+package playground.christoph.withinday.replanning.parallel;
 
 import java.util.ArrayList;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -39,11 +43,80 @@ public abstract class ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
 	
-	protected ArrayList<PlanAlgorithm> replanners;
 	protected int numOfThreads = 1;	// use by default only one thread
+	protected ArrayList<PlanAlgorithm> replanners;
 	protected PlanAlgorithm[][] replannerArray;
+	protected ReplanningThread[] replanningThreads;
+	protected int roundRobin = 0;	
+	protected CyclicBarrier timeStepStartBarrier;
+	protected CyclicBarrier timeStepEndBarrier;
 	
-	public abstract void init();
+	
+	public void init()
+	{
+		
+		this.timeStepStartBarrier = new CyclicBarrier(numOfThreads + 1);
+		this.timeStepEndBarrier = new CyclicBarrier(numOfThreads + 1);
+
+		// finalize Thread Setup
+		for (int i = 0; i < numOfThreads; i++)
+		{
+			ReplanningThread replanningThread = replanningThreads[i];
+			
+			replanningThread.setCyclicTimeStepStartBarrier(this.timeStepStartBarrier);
+			replanningThread.setCyclicTimeStepEndBarrier(this.timeStepEndBarrier);
+			replanningThread.setDaemon(true);
+			
+			replanningThread.start();
+		}
+
+		/*
+		 * After initialization the Threads are waiting at the
+		 * TimeStepEndBarrier. We trigger this Barrier once so
+		 * they wait at the TimeStepStartBarrier what has to be
+		 * their state if the run() method is called.
+		 */
+		try
+		{
+			this.timeStepEndBarrier.await();
+		}
+		catch (InterruptedException e)
+		{
+			Gbl.errorMsg(e);
+		}
+		catch (BrokenBarrierException e)
+		{
+			Gbl.errorMsg(e);
+		}
+	}
+	
+	/*
+	 * Typical Implementations should be able to use this Method
+	 * "as it is"...
+	 */
+	public void run(double time)
+	{
+		try
+		{
+			// set current Time
+			for (ReplanningThread replannerThread : replanningThreads)
+			{
+				replannerThread.setTime(time);
+			}
+				
+			this.timeStepStartBarrier.await();
+				
+			this.timeStepEndBarrier.await();		
+		}
+		catch (InterruptedException e)
+		{
+			Gbl.errorMsg(e);
+		}
+		catch (BrokenBarrierException e)
+		{
+	      	Gbl.errorMsg(e);
+		}
+	}
 	
 	/**
 	 * The Number of Threads must have been set before this call!
@@ -66,6 +139,12 @@ public abstract class ParallelReplanner {
 	public PlanAlgorithm[][] getReplannerArray()
 	{
 		return replannerArray;
+	}
+	
+	public void addAgentToReplan(DriverAgent driverAgent)
+	{
+		this.replanningThreads[this.roundRobin % this.numOfThreads].addAgentToReplan(driverAgent);
+		this.roundRobin++;	
 	}
 	
 	/* 
@@ -108,9 +187,7 @@ public abstract class ParallelReplanner {
 	}
 	
 	public void setNumberOfThreads(int numberOfThreads)
-	{
-//		int currentNumOfThreads = numOfThreads;
-		
+	{		
 		numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 		
 		log.info("Using " + numOfThreads + " parallel threads to replan routes.");

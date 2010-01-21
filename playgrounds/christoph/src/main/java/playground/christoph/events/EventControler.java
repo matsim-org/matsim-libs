@@ -45,9 +45,6 @@ import playground.christoph.analysis.wardrop.ActTimesCollector;
 import playground.christoph.analysis.wardrop.Wardrop;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.events.algorithms.LookupTableUpdater;
-import playground.christoph.events.algorithms.ParallelActEndReplanner;
-import playground.christoph.events.algorithms.ParallelInitialReplanner;
-import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
 import playground.christoph.knowledge.KMLPersonWriter;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
@@ -56,10 +53,6 @@ import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
 import playground.christoph.knowledge.nodeselection.SelectionReaderMatsim;
 import playground.christoph.knowledge.nodeselection.SelectionWriter;
-import playground.christoph.mobsim.ActEndReplanningModule;
-import playground.christoph.mobsim.LeaveLinkReplanningModule;
-import playground.christoph.mobsim.ReplanningManager;
-import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.network.SubNetwork;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
@@ -76,6 +69,14 @@ import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCa
 import playground.christoph.router.util.DijkstraWrapperFactory;
 import playground.christoph.router.util.SimpleRouterFactory;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
+import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
+import playground.christoph.withinday.mobsim.InitialReplanningModule;
+import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
+import playground.christoph.withinday.mobsim.ReplanningManager;
+import playground.christoph.withinday.mobsim.ReplanningQueueSimulation;
+import playground.christoph.withinday.replanning.parallel.ParallelActEndReplanner;
+import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
+import playground.christoph.withinday.replanning.parallel.ParallelLeaveLinkReplanner;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -275,6 +276,11 @@ public class EventControler extends Controler {
 		this.parallelLeaveLinkReplanner.setReplannerArrayList(replanners);
 		this.parallelLeaveLinkReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
 		this.parallelLeaveLinkReplanner.init();
+		
+		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner, sim);
+		// remove Knowledge after Replanning to save Memory
+		initialReplanningModule.setRemoveKnowledge(true);
+		replanningManager.setInitialReplanningModule(initialReplanningModule);
 	}
 
 	/*
@@ -336,6 +342,7 @@ public class EventControler extends Controler {
 //		foqsl.addQueueSimulationInitializedListener(lookupTableUpdater);
 //		foqsl.addQueueSimulationAfterSimStepListener(lookupTableUpdater);
 
+		foqsl.addQueueSimulationInitializedListener(replanningManager);
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
 
 		sim.addQueueSimulationListeners(foqsl);
@@ -402,8 +409,8 @@ public class EventControler extends Controler {
 
 //		lookupTableUpdater.addLookupTable(LookupTable lookupTable);
 
-		ActEndReplanningModule actEndReplanning = new ActEndReplanningModule(parallelActEndReplanner, sim);
-		LeaveLinkReplanningModule leaveLinkReplanning = new LeaveLinkReplanningModule(parallelLeaveLinkReplanner, linkReplanningMap);
+		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner, sim);
+		DuringLegReplanningModule leaveLinkReplanning = new DuringLegReplanningModule(parallelLeaveLinkReplanner, linkReplanningMap);
 
 		replanningManager.setActEndReplanningModule(actEndReplanning);
 		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
@@ -702,22 +709,21 @@ public class EventControler extends Controler {
 	} // setNodes()
 
 	protected void doInitialReplanning() {
-		ArrayList<Person> personsToReplan = new ArrayList<Person>();
 
+		boolean doRepanning = false;
+		
 		for (Person person : this.getPopulation().getPersons().values()) {
 			boolean replanning = (Boolean) person.getCustomAttributes().get("initialReplanning");
 
-			if (replanning) {
-				personsToReplan.add(person);
+			if (replanning)
+			{
+				doRepanning = true;
 			}
 		}
 
-		double time = 0.0;
-		// Remove Knowledge after replanning to save memory.
-		this.parallelInitialReplanner.setRemoveKnowledge(true);
-
-		// Run Replanner.
-		this.parallelInitialReplanner.run(personsToReplan, time);
+		// (de)activate replanning if they are not needed
+		if (!doRepanning) replanningManager.doInitialReplanning(false);
+		else replanningManager.doInitialReplanning(true);
 
 		// Number of Routes that could not be created...
 		log.info(RandomRoute.getErrorCounter() + " Routes could not be created by RandomRoute.");
@@ -725,17 +731,6 @@ public class EventControler extends Controler {
 		log.info(CompassRoute.getErrorCounter() + " Routes could not be created by CompassRoute.");
 		log.info(RandomCompassRoute.getErrorCounter() + " Routes could not be created by RandomCompassRoute.");
 		log.info(DijkstraWrapper.getErrorCounter() + " Routes could not be created by DijkstraWrapper.");
-
-		/*
-		 * for (Person person : this.getPopulation().getPersons().values()) {
-		 * boolean replanning =
-		 * (Boolean)person.getCustomAttributes().get("initialReplanning");
-		 *
-		 * if (replanning) { KnowledgePlansCalcRoute replanner =
-		 * (KnowledgePlansCalcRoute)replanners.get(1);
-		 * replanner.setPerson(person); replanner.run(person.getSelectedPlan());
-		 * } }
-		 */
 	} // doInitialReplanning
 
 	// removes all plans, that are currently not selectedS

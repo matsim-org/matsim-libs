@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayPersonAgent.java
+ * LastEventOfSimStep.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.christoph.mobsim;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.mobsim.queuesim.PersonAgent;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.population.PersonImpl;
+package playground.christoph.events.parallelEventsHandler;
 
-public class WithinDayPersonAgent extends PersonAgent{
+import org.matsim.core.events.EventImpl;
 
-	private static final Logger log = Logger.getLogger(WithinDayPersonAgent.class);
+/**
+ * Special event needed for synchronizing the threads.
+ *
+ * @author christoph dobler
+ */
+public class LastEventOfSimStep extends EventImpl {
 
-	public WithinDayPersonAgent(final PersonImpl p, final QueueSimulation simulation)
-	{
-		super(p, simulation);
+	public LastEventOfSimStep(final double time) {
+		super(time);
 	}
 
-	/*
-	 * Resets cached next Link. If a Person is in the Waiting Queue to leave a
-	 * Link he/she may replan his/her Route so the cached Link would be wrong.
-	 * 
-	 * This should be more efficient that resetting it in chooseNextLink()
-	 * because it can be called from the Replanning Module and isn't done for
-	 * every Agent even it is not necessary.
-	 */
-	public void ResetCachedNextLink()
-	{
-		super.cachedNextLinkId = null;
+	@Override
+	public String getEventType() {
+		return null;
 	}
+
+	public String getTextRepresentation() {
+		return "";
+	}
+
 }

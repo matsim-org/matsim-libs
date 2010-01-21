@@ -1,4 +1,4 @@
-package playground.christoph.events;
+package playground.christoph.population;
 
 import java.io.IOException;
 
@@ -20,10 +20,10 @@ import org.matsim.core.population.PopulationWriter;
  */
 public class PlansDumping {
 
-	private static String configFileName = "mysimulations/kt-zurich/config.xml";
-	private static String networkFile = "mysimulations/kt-zurich/input/network.xml";
-	private static String populationFile = "mysimulations/kt-zurich/input/plans.xml.gz";
-	private static String populationOutFile = "mysimulations/kt-zurich/input/out_plans.xml.gz";
+	private static String configFileName = "../matsim/mysimulations/kt-zurich/config.xml";
+	private static String networkFile = "../matsim/mysimulations/kt-zurich/input/network.xml";
+	private static String populationFile = "../matsim/mysimulations/kt-zurich/input/plans.xml.gz";
+	private static String populationOutFile = "../matsim/mysimulations/kt-zurich/input/out_plans.xml.gz";
 	private static final String dtdFileName = null;
 
 	private static final String separator = System.getProperty("file.separator");

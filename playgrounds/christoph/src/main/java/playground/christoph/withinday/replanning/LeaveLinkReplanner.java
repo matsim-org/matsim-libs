@@ -18,17 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.events.algorithms;
+package playground.christoph.withinday.replanning;
 
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
@@ -38,10 +39,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;
-import playground.christoph.mobsim.WithinDayPersonAgent;
+import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 
 /*
  * As the ActEndReplanner the LeaveLinkReplanner should be called when a
@@ -63,68 +63,18 @@ import playground.christoph.mobsim.WithinDayPersonAgent;
  * Links that already have been passed by the Person.
  */
 
-public class LeaveLinkReplanner {
+public class LeaveLinkReplanner extends WithinDayDuringLegReplanner{
 
-	protected ActivityImpl nextAct;
-	protected LegImpl leg;
-	protected double time;
-	protected PersonAgent personAgent;
-	protected PersonImpl person;
-	protected PlanImpl plan;
-	protected QueueVehicle vehicle;
-	private final Network network;
+	private Network network;
 
-	protected PlanAlgorithm replanner;
 
 	private static final Logger log = Logger.getLogger(LeaveLinkReplanner.class);
 
-	public LeaveLinkReplanner(QueueVehicle vehicle, double time, PlanAlgorithm replanner, Network network)
+	public LeaveLinkReplanner(Network network)
 	{
-		this.time = time;
-		this.vehicle = vehicle;
-		this.personAgent = (PersonAgent) vehicle.getDriver();
-		this.person = (PersonImpl) vehicle.getDriver().getPerson();
-		this.replanner = replanner;
 		this.network = network;
-
-		init();
 	}
-
-	public LeaveLinkReplanner(QueueVehicle vehicle, double time, Network network)
-	{
-		this.time = time;
-		this.vehicle = vehicle;
-		this.network = network;
-		this.personAgent = (PersonAgent) vehicle.getDriver();
-		this.person = (PersonImpl) vehicle.getDriver().getPerson();
-
-		replanner = (PlanAlgorithm)person.getCustomAttributes().get("Replanner");
-		if (replanner == null) log.error("No Replanner found in Person!");
-
-		init();
-
-	}	// Replanner(...)
-
-	protected void init()
-	{
-		Plan plan = person.getSelectedPlan();
-
-		leg = (LegImpl) personAgent.getCurrentLeg();
-
-		nextAct = ((PlanImpl) plan).getNextActivity(leg);
-
-		// if there is a next Activity...
-		if(nextAct != null)
-		{
-//			log.info("Id: " + person.getId());
-			routing();
-		}
-		else
-		{
-			log.error("An agents next activity is null - this should not happen! Id: " + person.getId());
-		}
-	}
-
+	
 	/*
 	 * Replan Route every time the End of a Link is reached.
 	 *
@@ -133,46 +83,67 @@ public class LeaveLinkReplanner {
 	 * - create a new Route from the current Location to the Destination
 	 * - merge already passed parts of the current Route with the new created Route
 	 */
-	protected void routing()
+	public boolean doReplanning()
 	{
+		// If we don't have a valid Replanner.
+		if (this.planAlgorithm == null) return false;
+		
+		// If we don't have a valid WithinDayPersonAgent
+		if (this.driverAgent == null) return false;
+		
+		WithinDayPersonAgent withinDayPersonAgent = null;
+		if (!(driverAgent instanceof WithinDayPersonAgent)) return false;
+		else
+		{
+			withinDayPersonAgent = (WithinDayPersonAgent) driverAgent;
+		}
+		
+		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
+		PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
+		
+		// If we don't have a selected plan
+		if (selectedPlan == null) return false;
+				
+		Leg currentLeg = driverAgent.getCurrentLeg();
+		Activity nextActivity = selectedPlan.getNextActivity(currentLeg);	
+				
 		// If it is not a car Leg we don't replan it.
-		if (!leg.getMode().equals(TransportMode.car)) return;
+		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 
 		/*
 		 * Get the index and the currently next Node on the route.
 		 * Entries with a lower index have already been visited!
 		 */
-		int currentNodeIndex = this.personAgent.getCurrentNodeIndex();
-		NetworkRouteWRefs route = (NetworkRouteWRefs) this.leg.getRoute();
+		int currentNodeIndex = withinDayPersonAgent.getCurrentNodeIndex();
+		NetworkRouteWRefs route = (NetworkRouteWRefs) currentLeg.getRoute();
 
+		QueueVehicle vehicle = withinDayPersonAgent.getVehicle();
+		
+		/* 
+		 * If the Vehicle is already on the destination Link we don't need any
+		 * further Replanning.
+		 */
+		if (vehicle.getCurrentLink().getId().equals(route.getEndLinkId())) return true;
+		
 		// set VehicleId - seems that it currently null?
-		route.setVehicleId(this.vehicle.getId());
+		route.setVehicleId(vehicle.getId());
 
 		// create dummy data for the "new" activities
 		String type = "w";
 		// This would be the "correct" Type - but it is slower and is not necessary
 		//String type = this.plan.getPreviousActivity(leg).getType();
 
-		ActivityImpl newFromAct = new ActivityImpl(type, this.vehicle.getCurrentLink().getToNode().getCoord(), this.vehicle.getCurrentLink());
+		ActivityImpl newFromAct = new ActivityImpl(type, vehicle.getCurrentLink().getToNode().getCoord(), vehicle.getCurrentLink());
 
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
 
-		NodeNetworkRouteImpl subRoute = new NodeNetworkRouteImpl(this.vehicle.getCurrentLink(), route.getEndLink());
-		/*
-		 * This can be used for debugging purposes. It copies the current
-		 * non-driven Parts of the Route to the new SubRoute which is
-		 * replanned afterwards. By doing this we can skip the replanning
-		 * and still have a correct SubRoute. In normal usage we don't need
-		 * this because the SubRoute is created new anyway.
-		 */
-		//subRoute.setNodes(this.vehicle.getCurrentLink(), route.getNodes().subList(currentNodeIndex - 1, route.getNodes().size()), route.getEndLink());
+		NodeNetworkRouteImpl subRoute = new NodeNetworkRouteImpl(vehicle.getCurrentLink(), route.getEndLink());
 
 		// put the new route in a new leg
-		LegImpl newLeg = new LegImpl(leg.getMode());
-		newLeg.setDepartureTime(leg.getDepartureTime());
-		newLeg.setTravelTime(leg.getTravelTime());
-		newLeg.setArrivalTime(leg.getArrivalTime());
+		Leg newLeg = new LegImpl(currentLeg.getMode());
+		newLeg.setDepartureTime(currentLeg.getDepartureTime());
+		newLeg.setTravelTime(currentLeg.getTravelTime());
 		newLeg.setRoute(subRoute);
 
 		// create new plan and select it
@@ -185,31 +156,44 @@ public class LeaveLinkReplanner {
 		newPlan.addLeg(newLeg);
 
 		// next Activity
-		newPlan.addActivity(nextAct);
+		newPlan.addActivity(nextActivity);
 
-		replanner.run(newPlan);
+		this.planAlgorithm.run(newPlan);
 
 		// get new calculated Route
 		NetworkRouteWRefs newRoute = (NetworkRouteWRefs) newLeg.getRoute();
 
 		// use VehicleId from existing Route
-		newRoute.setVehicleId(this.vehicle.getId());
+		newRoute.setVehicleId(vehicle.getId());
 
 		// get Nodes from the current Route
 		List<Node> nodesBuffer = RouteUtils.getNodes(route, this.network);
-
+				
 		// remove Nodes after the current Position in the Route
 		nodesBuffer.subList(currentNodeIndex - 1, nodesBuffer.size()).clear();
-
+		
 		// Merge already driven parts of the Route with the new routed parts.
-		// The changes will be made in the original list, so they will be directly in the Route.
 		nodesBuffer.addAll(RouteUtils.getNodes(newRoute, this.network));
 
+		// Update Route by replacing the Nodes.
+		route.setNodes(route.getStartLink(), nodesBuffer, route.getEndLink());
+
+		// Update Distance
+		double distance = 0.0;
+		for (Id id : route.getLinkIds())
+		{
+			distance = distance + this.network.getLinks().get(id).getLength();
+		}
+		distance = distance + this.network.getLinks().get(route.getEndLinkId()).getLength(); 
+		route.setDistance(distance);
+		
 		// finally reset the cached next Link of the PersonAgent - it may have changed!
-		((WithinDayPersonAgent)this.personAgent).ResetCachedNextLink();
+		withinDayPersonAgent.ResetCachedNextLink();
 
 		// create ReplanningEvent
 		QueueSimulation.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
+		
+		return true;
 	}
 
 	/*
@@ -245,4 +229,5 @@ public class LeaveLinkReplanner {
 
 		return true;
 	}
+	
 }
