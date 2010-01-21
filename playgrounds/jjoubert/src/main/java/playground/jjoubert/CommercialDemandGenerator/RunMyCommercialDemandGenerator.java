@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunMyCommercialDemandGenerator01.java
+ * RunMyCommercialDemandGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,7 +20,7 @@
 
 package playground.jjoubert.CommercialDemandGenerator;
 
-public class RunMyCommercialDemandGenerator01 {
+public class RunMyCommercialDemandGenerator {
 
 	/**
 	 * This is the old approach (first run at ETH). It will be replaced to run separate 
@@ -31,19 +31,31 @@ public class RunMyCommercialDemandGenerator01 {
 		/*===========================================================
 		 * Variables that must be set:
 		 */
-		String studyArea = "Temp";
 		String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+		String studyArea = "Gauteng";
+		String version = "20091202131951";
+		String threshold = "0300";
+		String sample = "Sample01";
+		double withinThreshold = 0.6;
+		MyCommercialDemandGeneratorStringBuilder sb = new MyCommercialDemandGeneratorStringBuilder(root, studyArea);
+
+		// Generate input matrices for conditional probabilities.
+		MyCommercialChainAnalyser mcca = new MyCommercialChainAnalyser(withinThreshold, 
+				sb.getVehicleStatsFilename(version, threshold, sample));
+		mcca.analyse(sb.getXmlSourceFolderName(version, threshold, sample), 20, 48);
+		mcca.writeMatrixFiles(sb.getMatrixFileLocation(version, threshold, sample), studyArea);	
+		
 
 		/*
-		 * This is where multiple sa,ples must be 'driven'.
+		 * This is where multiple samples must be 'driven'.
 		 */
 		
 		
-		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(root, studyArea, 0.9);
-		mcdg.buildVehicleLists();
-		
-		
-		mcdg.createPlans();
+//		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(root, studyArea, 0.9);
+//		mcdg.buildVehicleLists();
+//		
+//		
+//		mcdg.createPlans();
 
 	}
 	
