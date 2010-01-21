@@ -16,10 +16,11 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 
 package playground.david.otfvis.prefuse;
 
+import java.rmi.RemoteException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
@@ -36,23 +37,29 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
+import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 
 public class PopProviderServer implements PopulationProvider {
 
-	public static class QueryImpl implements OTFQuery {
+	public static class QueryImpl implements OTFQuery, OTFQueryResult {
 		public void draw(OTFDrawer drawer) {		}
 		public Type getType() {			return Type.OTHER;		}
 		public boolean isAlive() {			return false;		}
-		public OTFQuery query(QueueNetwork net, Population population, EventsManager events,				OTFServerQuad2 quad) {	return this;	}
+		public void query(QueueNetwork net, Population population, EventsManager events,				OTFServerQuad2 quad) {		}
 		public void remove() {		}
 		public void setId(String id) {		}
+		@Override
+		public OTFQueryResult query() throws RemoteException {
+			return this;
+		}
+		
 	}
 
 	public static class QueryIdSet extends QueryImpl {
 		private SortedSet<Integer> idSet;
 		
 		@Override
-		public OTFQuery query(QueueNetwork net, Population population, EventsManager events,
+		public void query(QueueNetwork net, Population population, EventsManager events,
 				OTFServerQuad2 quad) {
 			int max = population.getPersons().size();
 			Set<Id> ids = population.getPersons().keySet();
@@ -61,7 +68,6 @@ public class PopProviderServer implements PopulationProvider {
 				int i = Integer.parseInt(id.toString());
 				idSet.add(i);
 			}
-			return this;
 		}
 	}
 
@@ -73,20 +79,18 @@ public class PopProviderServer implements PopulationProvider {
 			this.id = id;
 		}
 		@Override
-		public OTFQuery query(QueueNetwork net, Population population, EventsManager events,
+		public void query(QueueNetwork net, Population population, EventsManager events,
 				OTFServerQuad2 quad) {
 			person  = population.getPersons().get(new IdImpl(id));
-			return this;
 		}
 	}
 
 	public static class QueryNet  extends QueryImpl {
 		private NetworkLayer net;
 		@Override
-		public OTFQuery query(QueueNetwork net, Population population, EventsManager events,
+		public void query(QueueNetwork net, Population population, EventsManager events,
 				OTFServerQuad2 quad) {
 			this.net = (NetworkLayer) net.getNetworkLayer();
-			return this;
 		}
 	}
 
@@ -95,12 +99,10 @@ public class PopProviderServer implements PopulationProvider {
 		public boolean fromNode=true;
 		public QueryIds(boolean fromNode){this.fromNode = fromNode;}
 		@Override
-		public OTFQuery query(QueueNetwork net, Population population, EventsManager events,
+		public void query(QueueNetwork net, Population population, EventsManager events,
 				OTFServerQuad2 quad) {
 			this.iId = fromNode ? net.getNetworkLayer().getNodes().keySet() : net.getNetworkLayer().getLinks().keySet();
 			this.iId = new HashSet(this.iId);
-
-			return this;
 		}
 	}
 
@@ -110,11 +112,10 @@ public class PopProviderServer implements PopulationProvider {
 		public boolean fromNode=true;
 		public QueryOb(Id id, boolean fromNode){this.iId = id;  this.fromNode = fromNode;}
 		@Override
-		public OTFQuery query(QueueNetwork net, Population population, EventsManager events,
+		public void query(QueueNetwork net, Population population, EventsManager events,
 				OTFServerQuad2 quad) {
 			this.ob = fromNode ? net.getNetworkLayer().getNodes().get(iId) : net.getNetworkLayer().getLinks().get(iId);
 			//System.out.println(ob.toString());
-			return this;
 		}
 	}
 
@@ -169,3 +170,4 @@ public class PopProviderServer implements PopulationProvider {
 
 }
 
+*/

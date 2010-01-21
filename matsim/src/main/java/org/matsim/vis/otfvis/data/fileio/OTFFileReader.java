@@ -42,6 +42,7 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 /**
  * The OTF has a file Reader and a file Writer part.
@@ -406,4 +407,10 @@ public class OTFFileReader implements OTFServerRemote {
 	public Collection<Double> getTimeSteps() {
 		return this.timesteps.keySet();
 	}
+
+	@Override
+	public void toggleShowParking() throws RemoteException {
+		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
+	}
+	
 }

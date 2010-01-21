@@ -30,14 +30,10 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 public class OTFVisQueueSim extends QueueSimulation {
 
-	private OTFVisQueueSimFeature queueSimulationFeature;
+	private final OTFVisQueueSimFeature queueSimulationFeature;
 
 	public OTFVisQueueSim(Scenario scenario, EventsManager events) {
 		super(scenario, events);
-		installFeature();
-	}
-
-	private void installFeature() {
 		queueSimulationFeature = new OTFVisQueueSimFeature(this);
 		super.addFeature(queueSimulationFeature);
 	}
@@ -52,6 +48,10 @@ public class OTFVisQueueSim extends QueueSimulation {
 
 	public void setConnectionManager(OTFConnectionManager connectionManager) {
 		queueSimulationFeature.setConnectionManager(connectionManager);
+	}
+
+	public OTFVisQueueSimFeature getQueueSimulationFeature() {
+		return queueSimulationFeature;
 	}
 	
 }

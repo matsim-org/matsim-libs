@@ -44,7 +44,7 @@ public class OTFLinkTravelTimesHandler extends OTFDefaultLinkHandler {
 		private static final long serialVersionUID = -7249785000303972319L;
 
 		{
-			LinkTravelTimeCounter.init(server.events, 1000000);
+			LinkTravelTimeCounter.init(server.getEvents(), 1000000);
 			count = LinkTravelTimeCounter.getInstance();
 		}
 
@@ -62,7 +62,7 @@ public class OTFLinkTravelTimesHandler extends OTFDefaultLinkHandler {
 		public OTFDataWriter<QueueLink> getWriter() {
 			if (count == null) 
 			{
-				LinkTravelTimeCounter.init(server.events, 1000000);
+				LinkTravelTimeCounter.init(server.getEvents(), 1000000);
 				count = LinkTravelTimeCounter.getInstance();
 			}
 			return new Writer();

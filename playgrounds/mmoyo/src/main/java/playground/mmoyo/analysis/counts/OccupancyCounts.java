@@ -28,11 +28,10 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -42,9 +41,9 @@ import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
 import org.xml.sax.SAXException;
 
-import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.analysis.RouteOccupancy;
 import playground.mrieser.pt.analysis.VehicleTracker;
 
@@ -55,8 +54,6 @@ public class OccupancyCounts {
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, (EventsManagerImpl) events);
-		sim.startOTFServer(SERVERNAME);
-		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
 	}
 
@@ -94,6 +91,7 @@ public class OccupancyCounts {
 		events.addHandler(analysis2);
 
 		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
+		sim.addFeature(new OTFVisQueueSimFeature(sim));
 		sim.run();
 
 		///////////show and save results/////////////////////

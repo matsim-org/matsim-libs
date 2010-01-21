@@ -8,6 +8,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
 
 //import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 //import org.matsim.run.OTFVis;
@@ -33,11 +34,8 @@ public class MMoyoTransitControler extends TransitControler {
 	@Override
 	protected void runMobSim() {
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
+		sim.addFeature(new OTFVisQueueSimFeature(sim));
 		sim.setUseUmlaeufe(true);
-		if (launchOTFDemo){
-			sim.startOTFServer("livesim");
-			OTFDemo.ptConnect("livesim", config);
-		}
 		sim.run();
 		/*
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);

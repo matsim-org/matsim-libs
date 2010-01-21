@@ -920,6 +920,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		if(queryHandler != null) this.queryHandler = queryHandler;
 	}
+	
+
+	public OTFQueryHandler getQueryHandler() {
+		return queryHandler;
+	}
+
 
 	public Point3f getOGLPos(int x, int y) {
 		return this.mouseMan.getOGLPos(x, y);

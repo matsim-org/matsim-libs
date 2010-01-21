@@ -76,6 +76,7 @@ public class OTFVisControlerListener implements StartupListener, ShutdownListene
 		for (SimulationListener l : e.getControler().getQueueSimulationListener()) {
 			sim.addQueueSimulationListeners(l);
 		}
+		otfserver.setSimulation(sim.getQueueSimulationFeature());
 		otfserver.setControllerStatus(RUNNING + e.getControler().getIteration());
 		sim.run();
 	}

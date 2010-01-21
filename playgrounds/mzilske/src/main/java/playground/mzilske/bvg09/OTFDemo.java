@@ -43,9 +43,9 @@ public class OTFDemo {
 		connect.add(FacilityDrawer.DataWriter_v1_0.class, FacilityDrawer.DataReader_v1_0.class);
 		connect.add(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
 		
-		connect.add(OTFTeleportAgentsDataWriter.class, OTFTeleportAgentsDataReader.class);
-		connect.add(OTFTeleportAgentsDataReader.class, OTFTeleportAgentsDrawer.class);
-		connect.add(OTFTeleportAgentsDrawer.class, OTFTeleportAgentsLayer.class);
+//		connect.add(OTFTeleportAgentsDataWriter.class, OTFTeleportAgentsDataReader.class);
+//		connect.add(OTFTeleportAgentsDataReader.class, OTFTeleportAgentsDrawer.class);
+//		connect.add(OTFTeleportAgentsDrawer.class, OTFTeleportAgentsLayer.class);
 		
 		OTFClientLive client = new OTFClientLive("rmi:127.0.0.1:4019:" + servername, connect);
 		client.setConfig(config.otfVis());

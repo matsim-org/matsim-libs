@@ -26,19 +26,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
+import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 /**
@@ -50,7 +50,27 @@ import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
  * @author dstrippgen
  *
  */
-public class QueryLinkId implements OTFQuery {
+public class QueryLinkId extends AbstractQuery {
+
+	public static class Result implements OTFQueryResult {
+
+		private static final long serialVersionUID = 1L;
+
+		public Map<CoordImpl, String> linkIds = new HashMap<CoordImpl, String>();
+
+		public void remove() {
+
+		}
+		
+		public boolean isAlive() {
+			return false;
+		}
+
+		public void draw(OTFDrawer drawer) {
+
+		}
+
+	}
 
 	private static final long serialVersionUID = -1389950511283282110L;
 	private final double sx;
@@ -58,7 +78,7 @@ public class QueryLinkId implements OTFQuery {
 	private double width = 0;
 	private double height = 0;
 	
-	public Map<CoordImpl, String> linkIds = new HashMap<CoordImpl, String>();
+	private Result result;
 
 	public QueryLinkId(double x,double y) {
 		this.sx = x;
@@ -77,9 +97,6 @@ public class QueryLinkId implements OTFQuery {
 		this.sy = rect.minY;
 		this.width = rect.maxX - sx;
 		this.height = rect.maxY - sy;
-	}
-
-	public void draw(OTFDrawer drawer) {
 	}
 
 	class AddIdStringExecutor implements Executor<OTFDataWriter> {
@@ -110,23 +127,23 @@ public class QueryLinkId implements OTFQuery {
 					double dist = Math.sqrt(xDist*xDist + yDist*yDist);
 					if(dist <= minDist){
 						// is this just about the same distance, then put both into account
-						if (minDist - dist > epsilon) linkIds.clear();
+						if (minDist - dist > epsilon) result.linkIds.clear();
 
 						minDist = dist;
 						Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
-						linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
+						result.linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
 					}
 
 				} else {
 					Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
-					linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
+					result.linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
 				}
 			}
 		}
 	}
 	
-	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
-		
+	public void installQuery(OTFVisQueueSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+		this.result = new Result();
 		// just look in a certain region around the actual point, 
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;
 		double regionHeight = (quad.getMaxNorthing()-quad.getMinNorthing())*0.1;
@@ -139,14 +156,6 @@ public class QueryLinkId implements OTFQuery {
 		if (width == 0) rect = new QuadTree.Rect(qsx-regionWidth, qsy-regionHeight, qsx+regionWidth, qsy+regionHeight);
 		else rect = new QuadTree.Rect(qsx,qsy,qsx+width, qsy+height);
 		quad.execute(rect, new AddIdStringExecutor(width == 0));
-		return this;
-	}
-
-	public void remove() {
-	}
-	
-	public boolean isAlive() {
-		return false;
 	}
 
 	public Type getType() {
@@ -154,7 +163,11 @@ public class QueryLinkId implements OTFQuery {
 	}
 
 	public void setId(String id) {
-		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public OTFQueryResult query() {
+		return result;
 	}
 
 }

@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 
 package playground.david.prefuse;
 
@@ -169,3 +169,4 @@ public class PopProviderServer implements PopulationProvider {
 
 }
 
+*/

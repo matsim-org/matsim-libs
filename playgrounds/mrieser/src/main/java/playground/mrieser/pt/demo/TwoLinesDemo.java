@@ -49,6 +49,7 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
 
 import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.analysis.RouteOccupancy;
@@ -318,9 +319,7 @@ public class TwoLinesDemo {
 		events.addHandler(analysis2);
 
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
-		sim.startOTFServer("two_lines_demo");
-		OTFDemo.ptConnect("two_lines_demo");
-
+		sim.addFeature(new OTFVisQueueSimFeature(sim));
 		sim.run();
 
 		System.out.println("stop\t#exitleaving\t#enter\t#inVehicle");

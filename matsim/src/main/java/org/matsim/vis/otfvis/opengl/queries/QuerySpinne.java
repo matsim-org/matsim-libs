@@ -58,10 +58,12 @@ import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.ptproject.qsim.QueueVehicle;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
+import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
@@ -76,19 +78,151 @@ import com.sun.opengl.util.BufferUtil;
  * @author dstrippgen
  *
  */
-public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
+public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemListener {
+
+	public class Result implements OTFQueryResult {
+
+		private static final long serialVersionUID = 1L;
+		
+		private transient FloatBuffer vert;
+		private transient ByteBuffer colors =  null;
+		private transient InfoText agentText = null;
+		private int[] count = null;
+		private boolean calcOffset = true;
+		private float[] vertex = null;
+		private String linkIdString;
+		
+		@Override
+		public void draw(OTFDrawer drawer) {
+			if(drawer instanceof OTFOGLDrawer) {
+				draw((OTFOGLDrawer)drawer);
+			}
+		}
+		
+		public void draw(OTFOGLDrawer drawer) {
+			if(this.vertex == null) return;
+
+			if( this.calcOffset == true) {
+				float east = (float)drawer.getQuad().offsetEast;
+				float north = (float)drawer.getQuad().offsetNorth;
+
+				this.calcOffset = false;
+				for(int i = 0; i < this.vertex.length; i+=2) {
+					this.vertex[i] -=east;
+					this.vertex[i+1] -= north;
+				}
+
+				int maxCount = 0;
+				for(int i= 0;i< this.count.length; i++) if (this.count[i] > maxCount) maxCount = this.count[i];
+
+				colorizer3 = new OTFOGLDrawer.FastColorizer(
+						new double[] { 0.0, maxCount}, new Color[] {
+								Color.WHITE, Color.BLUE});
+
+				this.colors = ByteBuffer.allocateDirect(this.count.length*4*2);
+
+				for (int i = 0; i< this.count.length; i++) {
+					Color mycolor = colorizer3.getColor(this.count[i]);
+					this.colors.put((byte)mycolor.getRed());
+					this.colors.put((byte)mycolor.getGreen());
+					this.colors.put((byte)mycolor.getBlue());
+					this.colors.put((byte)120);
+					this.colors.put((byte)mycolor.getRed());
+					this.colors.put((byte)mycolor.getGreen());
+					this.colors.put((byte)mycolor.getBlue());
+					this.colors.put((byte)120);
+				}
+
+				this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
+				this.agentText = InfoTextContainer.showTextPermanent(this.linkIdString, this.vertex[0], this.vertex[1], -0.0005f );
+			}
+
+			this.vert.position(0);
+			this.colors.position(0);
+
+			GL gl = drawer.getGL();
+			Color color = Color.ORANGE;
+			gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.3);
+			gl.glColor4d(1., 1.,1.,.3);
+			gl.glEnable(GL.GL_BLEND);
+			gl.glEnable(GL.GL_LINE_SMOOTH);
+			gl.glEnableClientState (GL.GL_COLOR_ARRAY);
+			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
+			gl.glLineWidth(2.f*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
+			gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
+			gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, this.colors);
+			gl.glDrawArrays (GL.GL_LINES, 0, this.vertex.length/2);
+			gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
+			gl.glDisableClientState (GL.GL_COLOR_ARRAY);
+			gl.glDisable(GL.GL_LINE_SMOOTH);
+			gl.glDisable(GL.GL_BLEND);
+			
+			drawCaption(drawer);
+		}
+
+		private void drawQuad(GL gl, double xs, double xe, double ys, double ye, Color color) {
+			gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,color.getAlpha()/255.);
+			double z = 0;
+			gl.glBegin(GL.GL_QUADS);
+			gl.glVertex3d(xs, ys, z);
+			gl.glVertex3d(xe, ys, z);
+			gl.glVertex3d(xe, ye, z);
+			gl.glVertex3d(xs, ye, z);
+			gl.glEnd();
+			
+		}
+		private void drawCaption(OTFOGLDrawer drawer) {
+			QuadTree.Rect bounds = drawer.getViewBounds();
+			
+			double maxX = bounds.minX + (bounds.maxX -bounds.minX)*0.22;
+			double minX = bounds.minX + (bounds.maxX -bounds.minX)*0.01;
+			double maxY = bounds.minY + (bounds.maxY -bounds.minY)*0.15;
+			double minY = bounds.minY + (bounds.maxY -bounds.minY)*0.01;
+			GL gl = drawer.getGL();
+			Color color = new Color(255,255,255,200);
+			gl.glEnable(GL.GL_BLEND);
+			drawQuad(gl, minX, maxX, minY, maxY, color);
+			double horOf = (maxY-minY)/12;
+			double verOf = (maxX-minX)/12;
+
+			int maxCount = 0;
+			for(int i= 0;i< this.count.length; i++) if (this.count[i] > maxCount) maxCount = this.count[i];
+
+			Color c1 = colorizer3.getColor(0.0);
+			Color c2 = colorizer3.getColor(maxCount/2.);
+			Color c3 = colorizer3.getColor(maxCount);
+
+			double a=1,b=4,c=1,d=3;
+			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
+			InfoTextContainer.showTextOnce ("Count: 0" , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
+			a=1;b=4;c=5;d=7;
+			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
+			InfoTextContainer.showTextOnce ("Count: " + (maxCount/2) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
+			a=1;b=4;c=9;d=11;
+			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
+			InfoTextContainer.showTextOnce ("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
+		}
+		
+		@Override
+		public void remove() {
+			if (this.agentText != null) InfoTextContainer.removeTextPermanent(this.agentText);
+		}
+		
+		@Override
+		public boolean isAlive() {
+			return false;
+		}
+		
+
+	}
 
 	private static final long serialVersionUID = -749787121253826794L;
 	protected Id queryLinkId;
 	private transient Map<Id, Integer> drivenLinks = null;
-	private float[] vertex = null;
-	private int[] count = null;
-	private boolean calcOffset = true;
+
 	private static boolean tripOnly = false;
 	private static boolean nowOnly = false;
-	private transient FloatBuffer vert;
-//	private transient FloatBuffer cnt;
-	private transient ByteBuffer colors =  null;
+
 	private transient OTFOGLDrawer.FastColorizer colorizer3;
 
 	public void itemStateChanged(ItemEvent e) {
@@ -100,6 +234,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		}	
 		
 	}
+	
 	public JComponent getOptionsGUI(JComponent mother) {
 		JPanel com = new JPanel();
 		com.setSize(500, 60);
@@ -168,19 +303,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		// TODO kai Despite the name, this collects links from the "leg", not from the trip.  kai, jun09
 		boolean addthis = false;
 		for (Plan plan : actPersons) {
-			for (PlanElement pe : plan.getPlanElements()) {
-
-//				if( i%2 == 0) {
-//					// handle act
-//					Activity act = (Activity)plan.getPlanElements().get(i);
-//					Id id2 = act.getLink().getId();
-//					if(id2.equals(this.linkId)) {
-//						// only if act is ON the link add +1 to linkcounter
-//						addLink(act.getLink());
-//						addthis = true;
-//					}
-// I don't think that it is very plausible to include this, and since it makes the code longer, I removed it. kai, jun09				
-				
+			for (PlanElement pe : plan.getPlanElements()) {				
 				if ( pe instanceof LegImpl ) {
 					LegImpl leg = (LegImpl) pe ;
 					RouteWRefs route = leg.getRoute();
@@ -197,9 +320,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 						addthis = false;
 					}
 				}
-
 			}
-
 		}
 	}
 
@@ -234,159 +355,38 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 	}
 	
 	@Override
-	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(OTFVisQueueSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+		QueueNetwork net = queueSimulation.getQueueSimulation().getNetwork();
+		Population plans = queueSimulation.getQueueSimulation().getPopulation();
+		this.result = new Result();
+		result.linkIdString = this.queryLinkId.toString();
 		this.drivenLinks = new HashMap<Id, Integer>();
-//		QueueLink link = net.getQueueLink(this.linkId);
-//		String start = link.getLink().getFromNode().getId().toString();
-//		String end = link.getLink().getToNode().getId().toString();
 		
 		List<Plan> actPersons = nowOnly ? getPersonsNOW(plans, net) : getPersons(plans, net);
 
 		if(tripOnly) collectLinksFromTrip(actPersons);
 		else collectLinks(actPersons);
 		
-		if(this.drivenLinks.size() == 0) return this;
+		if(this.drivenLinks.size() == 0) return;
 
 		// convert this to drawable info
-		this.vertex = new float[this.drivenLinks.size()*4];
-		this.count = new int[this.drivenLinks.size()];
+		result.vertex = new float[this.drivenLinks.size()*4];
+		result.count = new int[this.drivenLinks.size()];
 		int pos = 0;
 		for(Id linkId : this.drivenLinks.keySet()) {
 			Link link = net.getNetworkLayer().getLinks().get(linkId);
-			this.count[pos/4] = this.drivenLinks.get(link);
+			result.count[pos/4] = this.drivenLinks.get(link);
 			Node node = link.getFromNode();
-			this.vertex[pos++] = (float)node.getCoord().getX();
-			this.vertex[pos++] = (float)node.getCoord().getY();
+			result.vertex[pos++] = (float)node.getCoord().getX();
+			result.vertex[pos++] = (float)node.getCoord().getY();
 			node = link.getToNode();
-			this.vertex[pos++] = (float)node.getCoord().getX();
-			this.vertex[pos++] = (float)node.getCoord().getY();
-		}
-		return this;
-	}
-
-	@Override
-	public void draw(OTFDrawer drawer) {
-		if(drawer instanceof OTFOGLDrawer) {
-			draw((OTFOGLDrawer)drawer);
+			result.vertex[pos++] = (float)node.getCoord().getX();
+			result.vertex[pos++] = (float)node.getCoord().getY();
 		}
 	}
 
-	private transient InfoText agentText = null;
+	private Result result;
 
-	public void draw(OTFOGLDrawer drawer) {
-		if(this.vertex == null) return;
-
-		if( this.calcOffset == true) {
-			float east = (float)drawer.getQuad().offsetEast;
-			float north = (float)drawer.getQuad().offsetNorth;
-
-			this.calcOffset = false;
-			for(int i = 0; i < this.vertex.length; i+=2) {
-				this.vertex[i] -=east;
-				this.vertex[i+1] -= north;
-			}
-
-			int maxCount = 0;
-			for(int i= 0;i< this.count.length; i++) if (this.count[i] > maxCount) maxCount = this.count[i];
-
-			colorizer3 = new OTFOGLDrawer.FastColorizer(
-					new double[] { 0.0, maxCount}, new Color[] {
-							Color.WHITE, Color.BLUE});
-
-			this.colors = ByteBuffer.allocateDirect(this.count.length*4*2);
-
-			for (int i = 0; i< this.count.length; i++) {
-				Color mycolor = colorizer3.getColor(this.count[i]);
-				this.colors.put((byte)mycolor.getRed());
-				this.colors.put((byte)mycolor.getGreen());
-				this.colors.put((byte)mycolor.getBlue());
-				this.colors.put((byte)120);
-				this.colors.put((byte)mycolor.getRed());
-				this.colors.put((byte)mycolor.getGreen());
-				this.colors.put((byte)mycolor.getBlue());
-				this.colors.put((byte)120);
-			}
-
-			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
-			this.agentText = InfoTextContainer.showTextPermanent(this.queryLinkId.toString(), this.vertex[0], this.vertex[1], -0.0005f );
-		}
-
-		this.vert.position(0);
-		this.colors.position(0);
-
-		GL gl = drawer.getGL();
-		Color color = Color.ORANGE;
-		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.3);
-		gl.glColor4d(1., 1.,1.,.3);
-		gl.glEnable(GL.GL_BLEND);
-		gl.glEnable(GL.GL_LINE_SMOOTH);
-		gl.glEnableClientState (GL.GL_COLOR_ARRAY);
-		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
-		gl.glLineWidth(2.f*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
-		gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
-		gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, this.colors);
-		gl.glDrawArrays (GL.GL_LINES, 0, this.vertex.length/2);
-		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
-		gl.glDisableClientState (GL.GL_COLOR_ARRAY);
-		gl.glDisable(GL.GL_LINE_SMOOTH);
-		gl.glDisable(GL.GL_BLEND);
-		
-		drawCaption(drawer);
-	}
-
-	private void drawQuad(GL gl, double xs, double xe, double ys, double ye, Color color) {
-		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,color.getAlpha()/255.);
-		double z = 0;
-		gl.glBegin(GL.GL_QUADS);
-		gl.glVertex3d(xs, ys, z);
-		gl.glVertex3d(xe, ys, z);
-		gl.glVertex3d(xe, ye, z);
-		gl.glVertex3d(xs, ye, z);
-		gl.glEnd();
-		
-	}
-	private void drawCaption(OTFOGLDrawer drawer) {
-		QuadTree.Rect bounds = drawer.getViewBounds();
-		
-		double maxX = bounds.minX + (bounds.maxX -bounds.minX)*0.22;
-		double minX = bounds.minX + (bounds.maxX -bounds.minX)*0.01;
-		double maxY = bounds.minY + (bounds.maxY -bounds.minY)*0.15;
-		double minY = bounds.minY + (bounds.maxY -bounds.minY)*0.01;
-		GL gl = drawer.getGL();
-		Color color = new Color(255,255,255,200);
-		gl.glEnable(GL.GL_BLEND);
-		drawQuad(gl, minX, maxX, minY, maxY, color);
-		double horOf = (maxY-minY)/12;
-		double verOf = (maxX-minX)/12;
-
-		int maxCount = 0;
-		for(int i= 0;i< this.count.length; i++) if (this.count[i] > maxCount) maxCount = this.count[i];
-
-		Color c1 = colorizer3.getColor(0.0);
-		Color c2 = colorizer3.getColor(maxCount/2.);
-		Color c3 = colorizer3.getColor(maxCount);
-
-		double a=1,b=4,c=1,d=3;
-		drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
-		InfoTextContainer.showTextOnce ("Count: 0" , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
-		a=1;b=4;c=5;d=7;
-		drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
-		InfoTextContainer.showTextOnce ("Count: " + (maxCount/2) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
-		a=1;b=4;c=9;d=11;
-		drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
-		InfoTextContainer.showTextOnce ("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
-	}
-	
-	@Override
-	public void remove() {
-		if (this.agentText != null) InfoTextContainer.removeTextPermanent(this.agentText);
-	}
-	
-	@Override
-	public boolean isAlive() {
-		return false;
-	}
-	
 	@Override
 	public Type getType() {
 		return OTFQuery.Type.LINK;
@@ -397,4 +397,9 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		this.queryLinkId = new IdImpl(id);
 	}
 
+	@Override
+	public OTFQueryResult query() {
+		return result;
+	}
+	
 }

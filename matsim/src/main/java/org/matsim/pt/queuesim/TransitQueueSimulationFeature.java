@@ -1,9 +1,7 @@
 package org.matsim.pt.queuesim;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -12,11 +10,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
-import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.DepartureHandler;
 import org.matsim.ptproject.qsim.DriverAgent;
@@ -31,29 +27,36 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicle;
 import org.matsim.vehicles.BasicVehicles;
-import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataWriter;
-import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
-import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 /**
  * @author mrieser
  */
 public class TransitQueueSimulationFeature implements QueueSimulationFeature, DepartureHandler {
 
-	private static final Logger log = Logger.getLogger(TransitQueueSimulationFeature.class);
+	public static class TransitAgentTriesToTeleportException extends RuntimeException {
 
-	private OnTheFlyServer otfServer = null;
+		public TransitAgentTriesToTeleportException(String message) {
+			super(message);
+		}
+
+		private static final long serialVersionUID = 1L;
+		
+	}
+	
+	private static Logger log = Logger.getLogger(TransitQueueSimulationFeature.class);
+  
 	private QueueSimulation queueSimulation;
+	
 	private TransitSchedule schedule = null;
+	
 	protected final TransitStopAgentTracker agentTracker;
 
 	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
 
-	private OTFTeleportAgentsDataWriter teleportationWriter;
-	private LinkedHashMap<Id, TeleportationVisData> visTeleportationData;
 	private boolean useUmlaeufe = false;
+	
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
-
+	
 	public TransitQueueSimulationFeature(QueueSimulation queueSimulation) {
 		this.queueSimulation = queueSimulation;
 		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
@@ -66,32 +69,6 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 		queueSimulation.getNotTeleportedModes().add(TransportMode.pt);
 	}
 
-	public void startOTFServer(final String serverName) {
-		this.otfServer = OnTheFlyServer.createInstance(serverName, queueSimulation.getNetwork(), queueSimulation.getPopulation(), queueSimulation.getEvents(), false);
-		this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(queueSimulation.getNetwork().getNetworkLayer(),this.schedule, this.agentTracker));
-		this.teleportationWriter = new OTFTeleportAgentsDataWriter();
-		this.visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
-		this.otfServer.addAdditionalElement(this.teleportationWriter);
-		try {
-			this.otfServer.pause();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void beforeCleanupSim() {
-		if (this.otfServer != null) {
-			this.otfServer.cleanup();
-		}
-	}
-
-	public void afterAfterSimStep(final double time) {
-		if (this.otfServer != null) {
-			this.visualizeTeleportedAgents(time);
-			this.otfServer.updateStatus(time);
-		}
-	}
-
 	public void afterCreateAgents() {
 		TransitSchedule schedule = this.schedule;
 		TransitStopAgentTracker agentTracker = this.agentTracker;
@@ -100,6 +77,16 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 		} else {
 			createVehiclesAndDriversWithoutUmlaeufe(schedule, agentTracker);
 		}
+	}
+
+	@Override
+	public void afterAfterSimStep(double time) {
+		
+	}
+
+	@Override
+	public void beforeCleanupSim() {
+		
 	}
 
 	private void createVehiclesAndDriversWithUmlaeufe(TransitSchedule thisSchedule,
@@ -125,7 +112,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 				.getCurrentLeg().getRoute().getStartLinkId());
 		qlink.addParkedVehicle(veh);
 
-		this.queueSimulation.scheduleActivityEnd(driver);
+		this.queueSimulation.scheduleActivityEnd(driver, 0);
 		Simulation.incLiving();
 	}
 
@@ -146,7 +133,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 					QueueLink qlink = this.queueSimulation.getNetwork().getQueueLink(driver.getCurrentLeg().getRoute().getStartLinkId());
 					qlink.addParkedVehicle(veh);
 
-					this.queueSimulation.scheduleActivityEnd(driver);
+					this.queueSimulation.scheduleActivityEnd(driver, 0);
 					Simulation.incLiving();
 				}
 			}
@@ -154,15 +141,13 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 	}
 
 	public void beforeHandleAgentArrival(DriverAgent agent) {
-		if (this.otfServer != null) {
-			this.visTeleportationData.remove(agent.getPerson().getId());
-		}
+
 	}
 
-	private void handlePTDeparture(final DriverAgent agent, Leg leg) {
+	private void handlePTDeparture(final DriverAgent agent, Id linkId, Leg leg) {
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
-			TransitQueueSimulation.log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + agent.getPerson().getId().toString());
-			TransitQueueSimulation.log.info("route: "
+			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + agent.getPerson().getId().toString());
+			log.info("route: "
 							+ leg.getRoute().getClass().getCanonicalName()
 							+ " "
 							+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
@@ -175,38 +160,24 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 				// route could be calculated for it
 				Simulation.decLiving();
 				Simulation.incLost();
-				TransitQueueSimulation.log.error("Agent has bad transit route! agentId="
+				log.error("Agent has bad transit route! agentId="
 						+ agent.getPerson().getId() + " route="
 						+ route.getRouteDescription()
 						+ ". The agent is removed from the simulation.");
 			} else {
 				TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
-				this.agentTracker.addAgentToStop((PassengerAgent) agent, stop);
-			}
-		}
-	}
-
-	private void visualizeTeleportedAgents(double time) {
-		this.teleportationWriter.setSrc(this.visTeleportationData);
-		this.teleportationWriter.setTime(time);
-	}
-
-	private static int cnt = 0 ;
-	@Override
-	public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
-		if (this.otfServer != null) {
-			TeleportationVisData telData = new TeleportationVisData(now, agent, link, this.queueSimulation.getNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId()));
-			if (telData.getLength() != 0.0){
-				this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId())));
-			}
-			else {
-				if ( cnt < 1 ) {
-					cnt++ ;
-					log.warn("Not able to visualize teleport agent " + agent.getPerson().getId() + " because the teleportation coordinates are equal!");
-					log.warn(Gbl.ONLYONCE) ;
+				if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
+					this.agentTracker.addAgentToStop((PassengerAgent) agent, stop);
+				} else {
+					throw new TransitAgentTriesToTeleportException("Agent "+agent.getPerson().getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");
 				}
 			}
 		}
+	}
+
+	@Override
+	public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
+
 	}
 
 	@Override
@@ -217,8 +188,20 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 	@Override
 	public void handleDeparture(double now, DriverAgent agent, Id linkId, Leg leg) {
 		if (leg.getMode() == TransportMode.pt) {
-			handlePTDeparture(agent, leg);
+			handlePTDeparture(agent, linkId, leg);
 		}
+	}
+
+	
+	
+	@Override
+	public void afterActivityBegins(DriverAgent agent, int planElementIndex) {
+	
+	}
+
+	@Override
+	public void afterActivityEnds(DriverAgent agent, double time) {
+		
 	}
 
 	public TransitStopAgentTracker getAgentTracker() {
@@ -232,4 +215,5 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
 		this.stopHandlerFactory = stopHandlerFactory;
 	}
+	
 }

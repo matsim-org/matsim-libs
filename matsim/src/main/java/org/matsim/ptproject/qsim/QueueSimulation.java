@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -69,6 +70,7 @@ import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
+import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 
@@ -80,13 +82,12 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation{
+public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation {
 
   protected static final int INFO_PERIOD = 3600;
 	private int snapshotPeriod = 0;
 	private double snapshotTime = 0.0;
 	private double infoTime = 0;
-//	private Config config;
 	protected PopulationImpl population;
 	protected QueueNetwork network;
 	protected Network networkLayer;
@@ -118,7 +119,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
-  private QSimSnapshotWriterManager snapshotManager;
+	private QSimSnapshotWriterManager snapshotManager;
 
 	/**
 	 * Initialize the QueueSimulation 
@@ -529,8 +530,11 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 	 *
 	 * @see DriverAgent#getDepartureTime()
 	 */
-	public void scheduleActivityEnd(final DriverAgent agent) {
+	public void scheduleActivityEnd(final DriverAgent agent, int planElementIndex) {
 		this.activityEndsList.add(agent);
+		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
+			queueSimulationFeature.afterActivityBegins(agent, planElementIndex);
+		}
 	}
 
 	private void handleActivityEnds(final double time) {
@@ -539,6 +543,9 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
 				agent.activityEnds(time);
+				for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
+					queueSimulationFeature.afterActivityEnds(agent, time);
+				}
 			} else {
 				return;
 			}
@@ -556,7 +563,6 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 	public void agentDeparts(double now, final DriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
-		EventsManager e = events;
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, mode));
 		if (this.notTeleportedModes.contains(mode)){
 			this.handleKnownLegModeDeparture(now, agent, linkId, leg);

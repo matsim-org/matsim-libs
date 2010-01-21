@@ -25,15 +25,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.ptproject.qsim.SimulationTimer;
+import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
+import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
@@ -49,14 +49,14 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  * @author dstrippgen
  *
  */
-public class QueryAgentId implements OTFQuery {
+public class QueryAgentId extends AbstractQuery {
 
 	private static final long serialVersionUID = -4466967514266968254L;
 	private final double x;
 	private final double y;
 	private double width = 0;
 	private double height = 0;
-	public List<String> agentIds = new ArrayList<String>();
+	private Result result;
 
 	public QueryAgentId(double x,double y) {
 		this.x = x;
@@ -70,19 +70,16 @@ public class QueryAgentId implements OTFQuery {
 		this.height = rect.height;
 	}
 
-	public void draw(OTFDrawer drawer) {
-	}
 
-	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(OTFVisQueueSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+		this.result = new Result();
 		double minDist = Double.POSITIVE_INFINITY;
 		double dist = 0;
-		for( QueueLink qlink : net.getLinks().values()) {
+		for(QueueLink qlink : queueSimulation.getQueueSimulation().getNetwork().getLinks().values()) {
 			List<PositionInfo> positions = new LinkedList<PositionInfo>();
 			qlink.getVisData().getVehiclePositions(SimulationTimer.getTime(), positions);
 			for(AgentSnapshotInfo info : positions) {
-				
 				if ((info.getAgentState()== AgentState.AGENT_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
-
 				double xDist = info.getEasting() - this.x;
 				double yDist = info.getNorthing() - this.y;
 				if (this.width == 0) {
@@ -90,32 +87,51 @@ public class QueryAgentId implements OTFQuery {
 					dist = Math.sqrt(xDist*xDist + yDist*yDist);
 					if(dist < minDist){
 						minDist = dist;
-						this.agentIds.clear();
-						this.agentIds.add(info.getId().toString());
+						result.agentIds.clear();
+						result.agentIds.add(info.getId().toString());
 					}
 				} else {
 					// search for all agents in given RECT
 					if( (xDist < width) && (yDist < height) && (xDist >= 0) && (yDist >= 0) ) {
-						this.agentIds.add(info.getId().toString());
+						result.agentIds.add(info.getId().toString());
 					}
 				}
 			}
 		}
-		return this;
 	}
 
-	public void remove() {
-	}
 
-	public boolean isAlive() {
-		return false;
-	}
 
 	public Type getType() {
 		return OTFQuery.Type.OTHER;
 	}
 
 	public void setId(String id) {
+	}
+
+	@Override
+	public OTFQueryResult query() {
+		return result;
+	}
+	
+	public static class Result implements OTFQueryResult {
+
+		private static final long serialVersionUID = 1L;
+		
+		public List<String> agentIds = new ArrayList<String>();
+		
+		public void remove() {
+			
+		}
+
+		public boolean isAlive() {
+			return false;
+		}
+
+		public void draw(OTFDrawer drawer) {
+			
+		}
+		
 	}
 
 }

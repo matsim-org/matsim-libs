@@ -33,37 +33,32 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 	static final Logger log = Logger.getLogger(TransitQueueSimulation.class);
 	
-	private TransitQueueSimulationFeature queueSimulationFeature;
+	private TransitQueueSimulationFeature transitQueueSimulationFeature;
 
 	public TransitQueueSimulation(Scenario scenario, EventsManager events) {
 		super(scenario, events);
 		if (scenario.getConfig().getQSimConfigGroup() == null){
 		  scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		}
-		installFeature();
-		
+		installFeatures();
 	}
 
-	private void installFeature() {
-		queueSimulationFeature = new TransitQueueSimulationFeature(this);
-		super.addFeature(queueSimulationFeature);
-		super.addDepartureHandler(queueSimulationFeature);
-	}
-
-	public void startOTFServer(String serverName) {
-		queueSimulationFeature.startOTFServer(serverName);
+	private void installFeatures() {
+		transitQueueSimulationFeature = new TransitQueueSimulationFeature(this);
+		super.addFeature(transitQueueSimulationFeature);
+		super.addDepartureHandler(transitQueueSimulationFeature);
 	}
 
 	public TransitStopAgentTracker getAgentTracker() {
-		return queueSimulationFeature.getAgentTracker();
+		return transitQueueSimulationFeature.getAgentTracker();
 	}
 	
 	public void setUseUmlaeufe(boolean useUmlaeufe) {
-		queueSimulationFeature.setUseUmlaeufe(useUmlaeufe);
+		transitQueueSimulationFeature.setUseUmlaeufe(useUmlaeufe);
 	}
 	
 	public void setTransitStopHandlerFactory(TransitStopHandlerFactory stopHandlerFactory) {
-		queueSimulationFeature.setTransitStopHandlerFactory(stopHandlerFactory);
+		transitQueueSimulationFeature.setTransitStopHandlerFactory(stopHandlerFactory);
 	}
 	
 }

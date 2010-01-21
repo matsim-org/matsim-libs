@@ -22,6 +22,8 @@ package org.matsim.vis.otfvis.interfaces;
 
 import java.rmi.RemoteException;
 
+import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
+
 /**
  * If a OTFServer reports to be alive (by returning true in the method isLive()) it can savely be casted
  * to an OTFLiveServerRemote instance. This offers additional options only useful with
@@ -31,12 +33,17 @@ import java.rmi.RemoteException;
  *
  */
 public interface OTFLiveServerRemote extends OTFServerRemote {
-	public void pause() throws RemoteException;
-	public void play() throws RemoteException;
-	//is not needed as nothing happens when activated dg dez 09
-//	public boolean replace(String id, double x, double y, int index, Class clazz) throws RemoteException;
 	
-	public OTFQuery answerQuery(OTFQuery query) throws RemoteException;
+	public void pause() throws RemoteException;
+	
+	public void play() throws RemoteException;
+	
+	public OTFQueryRemote answerQuery(AbstractQuery query) throws RemoteException;
+	
 	public int getControllerStatus() throws RemoteException;
+	
 	public boolean requestControllerStatus(int status) throws RemoteException;
+
+	public void removeQueries() throws RemoteException;
+	
 }

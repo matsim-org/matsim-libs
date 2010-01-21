@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 
 package playground.david.otfivs.executables;
 
@@ -173,7 +173,7 @@ SimulationAfterSimStepListener<QueueSimulation> {
 
 	public void notifySimulationInitialized(SimulationInitializedEvent<QueueSimulation> e) {
 		QueueSimulation q = e.getQueueSimulation();
-		otfserver.events = QueueSimulation.getEvents();
+		otfserver.setEvents(QueueSimulation.getEvents());
 		otfserver.replaceQueueNetwork(q.getQueueNetwork());
 	}
 
@@ -257,9 +257,9 @@ SimulationAfterSimStepListener<QueueSimulation> {
     	deleteDir(new File("tmp_delete_this"));
     }
     
-	/**
+	*//**
 	 * @param args
-	 */
+	 *//*
 	public static void main(String[] args) {
 		String config;
 		if (args.length == 1) {
@@ -282,3 +282,4 @@ SimulationAfterSimStepListener<QueueSimulation> {
 
 }
 
+*/

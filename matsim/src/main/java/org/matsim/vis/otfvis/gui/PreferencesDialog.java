@@ -49,7 +49,6 @@ import javax.swing.event.ChangeListener;
 
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
-import org.matsim.vis.otfvis.opengl.queries.QueryToggleShowParking;
 
 /**
  * The class responsible for drawing the PreferencesDialog.
@@ -433,7 +432,11 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			cfg.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);
 			cfg.setShowParking(!cfg.isShowParking());
 			if (host != null) {
-				host.doQuery(new QueryToggleShowParking());
+				try {
+					host.getOTFHostControl().getOTFServer().toggleShowParking();
+				} catch (RemoteException e1) {
+					throw new RuntimeException(e1);
+				}
 				host.clearCaches();
 				host.redrawDrawers();
 			}

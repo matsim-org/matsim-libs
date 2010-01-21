@@ -52,6 +52,7 @@ import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
 
 import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.analysis.RouteTimeDiagram;
@@ -200,8 +201,7 @@ public class AccessEgressDemo {
 		// Transit vehicle drivers are created inside the TransitQueueSimulation, by the createAgents() method. That is, they exist
 		// as derivatives from the schedule, not as behavioral entities by themselves.  kai, oct'09
 		
-		sim.startOTFServer(SERVERNAME);
-		OTFDemo.ptConnect(SERVERNAME);
+		sim.addFeature(new OTFVisQueueSimFeature(sim));
 		sim.run();
 
 		System.out.println("TransitRouteAccessEgressAnalysis:");

@@ -21,11 +21,14 @@
 package org.matsim.vis.otfvis.interfaces;
 
 import java.io.Serializable;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 /**
  * An interface for the live version of the OTFVis.
  * Implementing this interface enables q query to be send to the actual simulation
@@ -40,7 +43,7 @@ import org.matsim.vis.otfvis.data.OTFServerQuad2;
  * is called to visualize whatever data has been collected.
  * @author dstrippgen
  */
-public interface OTFQuery extends Serializable{
+public interface OTFQuery extends Serializable {
 	
 	/**
 	 * Type of Ids that this query will deal with
@@ -60,19 +63,13 @@ public interface OTFQuery extends Serializable{
 	 */
 	public void setId(String id);
 	
-	/**
-	 * As long as this returns true, the query will be called every time step.
-	 * 
-	 * @return boolean indicated if query needs updating
-	 */
-	public boolean isAlive();
 	
 	/**
 	 * Is called by the OTFServer framework to issue a query into the simulation.
 	 * This method should extract the wanted knowledge from the given
 	 * sources of information 
 	 * 
-	 * @param net The QueueNetwork the simulation is running on.
+	 * @param net The simulation.
 	 * @param plans The Population the simulation fed from.
 	 * @param quad The quadtree with writer objects.
 	 * @return a query containing results, usually this, but not with live queries, as in 
@@ -80,25 +77,11 @@ public interface OTFQuery extends Serializable{
 	 * will actually only transport NEW objects. 
 	 * 
 	 */
-	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) ;
+	public void installQuery(OTFVisQueueSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad);
 	
-	/**
-	 * Remove is called when a query is removed, to give the query the option to
-	 * cleanup things.
-	 * 
-	 * @return boolean indicated if query needs updating
-	 */
-	public void remove();
+	public void uninstall();
 	
-	/**
-	 * Everytime the display needs to be refreshed this 
-	 * method is called for every active Query.
-	 * 
-	 * @param OTFDrawer drawer The drawer class responsible for 
-	 * refreshing the view. Use this to identify which drawing 
-	 * routines to use
-	 */
-	public void draw(OTFDrawer drawer);
+	
 	/**
 	 * Everytime the display needs to be refreshed this 
 	 * method is called for every active Query.

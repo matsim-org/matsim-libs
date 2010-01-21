@@ -37,4 +37,8 @@ public interface QueueSimulationFeature {
 
 	void afterCreateAgents();
 
+	void afterActivityBegins(DriverAgent agent, int planElementIndex);
+
+	void afterActivityEnds(DriverAgent agent, double time);
+
 }

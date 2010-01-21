@@ -21,6 +21,7 @@ import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
@@ -63,8 +64,7 @@ public class PlanRouter {
 		/**play scenario*/
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
-		sim.startOTFServer(SERVERNAME);
-		OTFDemo.ptConnect(SERVERNAME);
+		sim.addFeature(new OTFVisQueueSimFeature(sim));
 		sim.run();
 
 		writer.closeFile();

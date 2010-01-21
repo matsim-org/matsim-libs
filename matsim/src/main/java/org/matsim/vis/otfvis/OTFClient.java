@@ -135,8 +135,7 @@ public abstract class OTFClient extends Thread {
 	
 	protected void createHostControlBar() {
 		try {
-			this.hostControlBar = new OTFHostControlBar(this.url);
-			hostControlBar.frame = frame;
+			this.hostControlBar = new OTFHostControlBar(this.url, frame);
 			frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
 			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, OTFClientControl.getInstance().getOTFVisConfig(), hostControlBar);
 			preferencesDialog.buildMenu(frame, preferencesDialog, saver);

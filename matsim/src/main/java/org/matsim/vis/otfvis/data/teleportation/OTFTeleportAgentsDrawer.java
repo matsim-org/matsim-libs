@@ -53,7 +53,7 @@ public class OTFTeleportAgentsDrawer extends OTFGLDrawableImpl{
 		double zCoord = 1.0;
 		double offset = agentSize/2;
 		for (Point2D.Double p : positions.values()){
-//			log.error("drawing agent at : " + p.x + " " + p.y + " offsetN: " + OTFServerQuad.offsetNorth + " offsetE: " + OTFServerQuad.offsetEast);
+			log.error("drawing agent at : " + p.x + " " + p.y);
 			gl.glBegin(GL.GL_QUADS);
 				gl.glVertex3d(p.x - offset, p.y - offset, zCoord);
 				gl.glVertex3d(p.x - offset, p.y + offset, zCoord);

@@ -35,9 +35,8 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
  */
 public class OTFTeleportAgentsDataWriter extends OTFDataWriter<Map<Id, TeleportationVisData>> {
   
-	private static final Logger log = Logger.getLogger(OTFTeleportAgentsDataWriter.class);
-	
-	private double time;
+	// private static final Logger log = Logger.getLogger(OTFTeleportAgentsDataWriter.class);
+
 
 	public OTFTeleportAgentsDataWriter() {
 	}
@@ -53,7 +52,6 @@ public class OTFTeleportAgentsDataWriter extends OTFDataWriter<Map<Id, Teleporta
 			out.putInt(this.src.size());
 			for (TeleportationVisData d : this.src.values()){
 				ByteBufferUtils.putString(out, d.getId().toString());
-				d.calculatePosition(this.time);
 //				log.error("id: " + d.getId() + " x: " + d.getX() + " y: " + d.getY());
 				out.putDouble(d.getX());
 				out.putDouble(d.getY());
@@ -62,10 +60,6 @@ public class OTFTeleportAgentsDataWriter extends OTFDataWriter<Map<Id, Teleporta
 		else {
 			out.putInt(0);
 		}
-	}
-
-	public void setTime(double time) {
-		this.time = time;
 	}
 
 }
