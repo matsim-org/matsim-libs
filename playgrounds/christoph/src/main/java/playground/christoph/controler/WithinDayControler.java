@@ -33,7 +33,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.core.events.parallelEventsHandler.WithinDayParallelEventsManagerImpl;
+//import org.matsim.core.events.parallelEventsHandler.WithinDayParallelEventsManagerImpl;
 
 import playground.christoph.events.LinkReplanningMap;
 import playground.christoph.events.LinkVehiclesCounter2;
@@ -215,10 +215,10 @@ public class WithinDayControler extends Controler {
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 
 		createHandlersAndListeners();
-		if (this.events instanceof WithinDayParallelEventsManagerImpl)
-		{
-			foqsl.addQueueSimulationAfterSimStepListener((WithinDayParallelEventsManagerImpl)this.events);			
-		}
+//		if (this.events instanceof WithinDayParallelEventsManagerImpl)
+//		{
+//			foqsl.addQueueSimulationAfterSimStepListener((WithinDayParallelEventsManagerImpl)this.events);			
+//		}
 
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
