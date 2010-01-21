@@ -15,7 +15,9 @@ import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTValues;
@@ -65,7 +67,7 @@ public class PlanRouter {
 		popwriter.write(routedPlansFile) ;
 		System.out.println("done");
 	}
-
+	
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		double startTime = System.currentTimeMillis();
 
@@ -82,8 +84,18 @@ public class PlanRouter {
 		ScenarioImpl scenario = scenarioLoader.getScenario();
 		scenario.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		scenarioLoader.loadScenario();
-		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
+	
+		////////load transit schedule by config/////////////////
+		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().scenario().setUseVehicles(true);
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		new TransitScheduleReaderV1(schedule, scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
+		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+		/////////////////////////////////////
+		
+		
 		new PlanRouter(scenario);
 		System.out.println("total duration: " + (System.currentTimeMillis()-startTime));
 	}
+	
 }

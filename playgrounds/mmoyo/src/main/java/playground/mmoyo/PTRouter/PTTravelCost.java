@@ -18,8 +18,8 @@ public class PTTravelCost implements TravelCost{
 	////coefficients with original values set to count only travelTime///
 	double timeCoefficient = PTValues.timeCoefficient;
 	double distanceCoefficient= PTValues.distanceCoefficient;
+	double transferPenalty=PTValues.transferPenalty;
 
-	double transferPenalty=60;
 	double walkCoefficient= 1; 
 	//double waitCoefficient=0;
 	

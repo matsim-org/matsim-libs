@@ -38,6 +38,7 @@ public class AllRouter {
 		}
 		*/
 		
+		/*
 		PTValues.routerCalculator = 3;
 		for (double x= 0; x<=1; x = x + 0.1 ){
 			PTValues.distanceCoefficient= x;
@@ -54,10 +55,25 @@ public class AllRouter {
 			PTValues.scenario = coef + "big.xml";
 			System.out.println("Scenario:" + PTValues.scenario);
 			PlanRouter.main(new String[]{configFile});
-			
-		}
+		}*/
 		
-		 
+		PTValues.scenario = "BerlinBrandenburg";
+		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/config.xml";
+		
+		
+		PTValues.routerCalculator = 1;
+		PlanRouter.main(new String[]{configFile});
+		
+		PTValues.routerCalculator = 2;
+		PlanRouter.main(new String[]{configFile});
+		
+		PTValues.routerCalculator = 3;
+		PTValues.distanceCoefficient =0.95;
+		PTValues.timeCoefficient = 0.05;
+		PTValues.transferPenalty = 300.0;
+		PlanRouter.main(new String[]{configFile});
+		
+
 		
 	}
 
