@@ -21,23 +21,23 @@ package playground.johannes.socialnetworks.survey.ivt2009;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.SnowballAttributes;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
 
 /**
  * @author illenberger
  *
  */
-public class SampledEgo<P extends Person> extends Ego<P> implements SampledVertex {
+public class SampledEgo extends Ego implements SampledVertex {
 
 	private SnowballAttributes attributes;
 	
-	private SampledEgo<P> recruitedBy;
+	private SampledEgo recruitedBy;
 	
-	protected SampledEgo(P person) {
+	protected SampledEgo(SocialPerson person) {
 		super(person);
 		attributes = new SnowballAttributes();
 	}
@@ -50,8 +50,8 @@ public class SampledEgo<P extends Person> extends Ego<P> implements SampledVerte
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<? extends SampledEgo<P>> getNeighbours() {
-		return (List<? extends SampledEgo<P>>) super.getNeighbours();
+	public List<? extends SampledEgo> getNeighbours() {
+		return (List<? extends SampledEgo>) super.getNeighbours();
 	}
 
 	public void detect(int iteration) {
@@ -78,11 +78,11 @@ public class SampledEgo<P extends Person> extends Ego<P> implements SampledVerte
 		attributes.sample(iteration);
 	}
 
-	public void setRecruitedBy(SampledEgo<P> ego) {
+	public void setRecruitedBy(SampledEgo ego) {
 		recruitedBy = ego;
 	}
 	
-	public SampledEgo<P> getRecruitedBy() {
+	public SampledEgo getRecruitedBy() {
 		return recruitedBy;
 	}
 }

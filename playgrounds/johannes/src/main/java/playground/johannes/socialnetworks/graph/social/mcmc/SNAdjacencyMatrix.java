@@ -39,19 +39,19 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
  */
 public class SNAdjacencyMatrix<P extends Person> extends SpatialAdjacencyMatrix {
 
-	public SNAdjacencyMatrix(SocialNetwork<P> g) {
+	public SNAdjacencyMatrix(SocialNetwork g) {
 		super(g);
 	}
 
 	
 	@Override
-	public SocialNetwork<P> getGraph() {
-		SocialNetworkBuilder<P> builder = new SocialNetworkBuilder<P>();
-		SocialNetwork<P> g = new SocialNetwork<P>();
+	public SocialNetwork getGraph() {
+		SocialNetworkBuilder builder = new SocialNetworkBuilder();
+		SocialNetwork g = new SocialNetwork();
 
-		TIntObjectHashMap<Ego<P>> vertexIdx = new TIntObjectHashMap<Ego<P>>();
+		TIntObjectHashMap<Ego> vertexIdx = new TIntObjectHashMap<Ego>();
 		for(int i = 0; i < getVertexCount(); i++) {
-			Ego<P> ego = builder.addVertex(g, getVertex(i).getPerson());
+			Ego ego = builder.addVertex(g, getVertex(i).getPerson());
 			vertexIdx.put(i, ego);
 		}
 		
@@ -73,7 +73,7 @@ public class SNAdjacencyMatrix<P extends Person> extends SpatialAdjacencyMatrix 
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public Ego<P> getVertex(int i) {
-		return (Ego<P>) super.getVertex(i);
+	public Ego getVertex(int i) {
+		return (Ego) super.getVertex(i);
 	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AnalyzerExe.java
+ * GraphAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.analysis;
+package playground.johannes.socialnetworks.snowball2.spatial.analysis;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.feature.Feature;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
 import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
 
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
+import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.graph.analysis.DegreeTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraphProjectionBuilder;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.SampledDegree;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.SampledDistance;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -53,28 +51,34 @@ public class AnalyzerExe {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
+		String graphfile = args[0];
+		String output = args[1];
+		String zonesfile = args[2];
+		String boundaryfile = args[3];
+		
 		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/graph/graph.graphml");
-
+		SampledSpatialGraph graph = reader.readGraph(graphfile);
 		
-//		SpatialAnalyzerTask task = new SpatialAnalyzerTask("/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/");
-//		GraphAnalyzer.writeStats(GraphAnalyzer.analyze(graph, new SpatialGraphPropertyFactory(), task), "/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/stats.txt");
-
-		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/gemeindegrenzen2008.zip Folder/g1g08_shp_080606.zip Folder/G1L08.shp").iterator().next();
-		Geometry geometry = feature.getDefaultGeometry();
+		ZoneLayer zones = ZoneLayerSHP.read(zonesfile);
 		
-		SampledSpatialGraphProjectionBuilder<SampledSpatialGraph, SampledSpatialVertex, SampledSpatialEdge> builder = new SampledSpatialGraphProjectionBuilder<SampledSpatialGraph, SampledSpatialVertex, SampledSpatialEdge>();
-		
-		SpatialGraph graphPrj = builder.decorate(graph, geometry);
-		
-		GraphAnalyzerTaskComposite task = new StandardAnalyzerTask(null);
-		task.addTask(new DistanceTask(null));
+		SpatialAnalyzerTask task = new SpatialAnalyzerTask(output, zones);
 		
 		Map<String, Object> analyzers = new HashMap<String, Object>();
 		analyzers.put(DegreeTask.class.getCanonicalName(), new SampledDegree());
 		analyzers.put(DistanceTask.class.getCanonicalName(), new SampledDistance());
 		
- 		GraphAnalyzer.analyze(graphPrj, analyzers, task);
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, analyzers, task);
+		playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer.writeStats(stats, output + "/stats.txt");
+		
+		Geometry boundary = FeatureSHP.readFeatures(boundaryfile).iterator().next().getDefaultGeometry();
+		SampledSpatialGraph proj = new SampledSpatialGraphProjectionBuilder<SampledSpatialGraph, SampledSpatialVertex, SampledSpatialEdge>().decorate(graph, boundary);
+		
+		output = output + "/clip/";
+		new File(output).mkdirs();
+		task = new SpatialAnalyzerTask(output, zones);
+		task.addTask(new WaveSizeTask(output));
+		stats = GraphAnalyzer.analyze(proj, analyzers, task);
+		playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer.writeStats(stats, output + "/stats.txt");
 	}
 
 }

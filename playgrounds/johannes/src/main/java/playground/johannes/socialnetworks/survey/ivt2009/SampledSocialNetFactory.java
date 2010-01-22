@@ -21,28 +21,31 @@ package playground.johannes.socialnetworks.survey.ivt2009;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.GraphFactory;
+import org.matsim.core.population.PersonImpl;
+
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
 
 
 /**
  * @author illenberger
  *
  */
-public class SampledSocialNetFactory<P extends Person> implements GraphFactory<SampledSocialNet<P>, SampledEgo<P>, SampledSocialTie> {
+public class SampledSocialNetFactory implements GraphFactory<SampledSocialNet, SampledEgo, SampledSocialTie> {
 
 	public SampledSocialTie createEdge() {
 		return new SampledSocialTie(0);
 	}
 
-	public SampledSocialNet<P> createGraph() {
-		return new SampledSocialNet<P>();
+	public SampledSocialNet createGraph() {
+		return new SampledSocialNet();
 	}
 
-	public SampledEgo<P> createVertex() {
+	public SampledEgo createVertex() {
 		throw new UnsupportedOperationException();
 	}
 	
-	public SampledEgo<P> createVertex(P person) {
-		return new SampledEgo<P>(person);
+	public SampledEgo createVertex(Person person) {
+		return new SampledEgo(new SocialPerson((PersonImpl) person));
 	}
 
 }

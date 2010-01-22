@@ -28,8 +28,9 @@ public class StandardAnalyzerTask extends GraphAnalyzerTaskComposite {
 
 	public StandardAnalyzerTask(String output) {
 		super(output);
-		addTasks(new DegreeTask(getOutputDirectory()));
-		addTasks(new TransitivityTask(getOutputDirectory()));
+		addTask(new GraphSizeTask());
+		addTask(new DegreeTask(getOutputDirectory()));
+		addTask(new TransitivityTask(getOutputDirectory()));
 	}
 
 }

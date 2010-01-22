@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialGraphProjection.java
+ * SampledDegree.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,52 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial;
+package playground.johannes.socialnetworks.snowball2.spatial.analysis;
 
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.Collection;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.GraphProjection;
-import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.Degree;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+
 
 /**
  * @author illenberger
  *
  */
-public class SpatialGraphProjection<G extends SpatialGraph, V extends SpatialVertex, E extends SpatialEdge> extends GraphProjection<G, V, E> implements
-		SpatialGraph {
+public class SampledDegree extends Degree {
 
-	public SpatialGraphProjection(G delegate) {
-		super(delegate);
+	@SuppressWarnings("unchecked")
+	@Override
+	public Distribution distribution(Set<? extends Vertex> vertices) {
+		return super.distribution(SnowballPartitions.<SampledVertex>createSampledPartition((Set<SampledVertex>)vertices));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends SpatialEdgeDecorator<E>> getEdges() {
-		return (Set<? extends SpatialEdgeDecorator<E>>) super.getEdges();
+	public TObjectDoubleHashMap<Vertex> values(Collection<? extends Vertex> vertices) {
+		return (TObjectDoubleHashMap<Vertex>) super.values(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>) vertices));
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SpatialVertexDecorator<V>> getVertices() {
-		return (Set<? extends SpatialVertexDecorator<V>>) super.getVertices();
-	}
-
-	@Override
-	public SpatialEdgeDecorator<E> getEdge(SparseVertex v_i, SparseVertex v_j) {
-		return (SpatialEdgeDecorator<E>) super.getEdge(v_i, v_j);
-	}
-
-	@Override
-	public SpatialVertexDecorator<V> getVertex(V v) {
-		return (SpatialVertexDecorator<V>) super.getVertex(v);
-	}
-
-	@Override
-	public CoordinateReferenceSystem getCoordinateReferenceSysten() {
-		return getDelegate().getCoordinateReferenceSysten();
-	}
 }

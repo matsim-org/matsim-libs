@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnowballPartititions.java
+ * KMLSnowballDescriptor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2;
+package playground.johannes.socialnetworks.snowball2.spatial.io;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import net.opengis.kml._2.PlacemarkType;
 
-import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SnowballPartitions {
+public class KMLSnowballDescriptor implements KMLObjectDetail<SpatialVertex> {
 	
-	public static <V extends SampledVertex> Set<V> createSampledPartition(Collection<V> vertices) {
-		Set<V> partition = new HashSet<V>();
-		for(V vertex : vertices) {
-			if(vertex.isSampled())
-				partition.add(vertex);
-		}
-		return partition;
+	@Override
+	public void addDetail(PlacemarkType kmlPlacemark, SpatialVertex object) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Detected: ");
+		builder.append(String.valueOf(((SampledVertex)object).getIterationDetected()));
+		builder.append("<br>");
+		builder.append("Sampled: ");
+		builder.append(String.valueOf(((SampledVertex)object).getIterationSampled()));
+		
+		kmlPlacemark.setDescription(builder.toString());
+		
 	}
-	
-	public static Set<SampledVertex> createSampledPartition(SampledGraph g, int itertation) {
-		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
-		for(Object vertex : g.getVertices()) {
-			if(((SampledVertex) vertex).getIterationSampled() == itertation)
-				vertices.add((SampledVertex) vertex);
-		}
-		return vertices;
-	}
+
 }

@@ -42,7 +42,7 @@ import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.spatial.Reachability;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.ZoneLegacy;

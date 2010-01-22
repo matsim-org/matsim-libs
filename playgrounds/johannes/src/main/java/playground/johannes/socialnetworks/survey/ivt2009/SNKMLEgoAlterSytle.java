@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.ivtsurveys;
+package playground.johannes.socialnetworks.survey.ivt2009;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -43,20 +43,20 @@ import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectStyle;
  * @author illenberger
  *
  */
-public class SNKMLEgoAlterSytle<P extends Person> implements KMLObjectStyle<SocialNetwork<P>, Ego<P>> {
+public class SNKMLEgoAlterSytle<P extends Person> implements KMLObjectStyle<SocialNetwork, Ego> {
 
-	private Set<Ego<P>> sampledVertices;
+	private Set<Ego> sampledVertices;
 		
 	private ObjectFactory objectFactory = new ObjectFactory();
 	
 	private LinkType vertexIconLink;
 	
-	public SNKMLEgoAlterSytle(Set<Ego<P>> sampledVertices, LinkType vertexIconLink) {
+	public SNKMLEgoAlterSytle(Set<Ego> sampledVertices, LinkType vertexIconLink) {
 		this.sampledVertices = sampledVertices;
 		this.vertexIconLink = vertexIconLink;
 	}
 	
-	public List<StyleType> getObjectStyle(SocialNetwork<P> socialnet) {
+	public List<StyleType> getObjectStyle(SocialNetwork socialnet) {
 		
 		
 		List<StyleType> styleTypes = new ArrayList<StyleType>(2);
@@ -97,7 +97,7 @@ public class SNKMLEgoAlterSytle<P extends Person> implements KMLObjectStyle<Soci
 	}
 
 
-	public String getObjectSytleId(Ego<P> object) {
+	public String getObjectSytleId(Ego object) {
 		if(sampledVertices.contains(object))
 			return "sampled";
 		else

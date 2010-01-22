@@ -78,7 +78,7 @@ public class SNGraphMLWriter extends GraphMLWriter {
 	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
 		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
 		
-		Ego<?> e = (Ego<?>)v;
+		Ego e = (Ego)v;
 		attrs.add(new Tuple<String, String>(SNGraphML.PERSON_ID_TAG, e.getPerson().getId().toString()));
 		
 		return attrs;
@@ -91,7 +91,7 @@ public class SNGraphMLWriter extends GraphMLWriter {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
 			for(Object e : vertices) {
-				writer.write(((Ego<?>) e).getPerson().getId().toString());
+				writer.write(((Ego) e).getPerson().getId().toString());
 				writer.newLine();
 			}
 			writer.close();

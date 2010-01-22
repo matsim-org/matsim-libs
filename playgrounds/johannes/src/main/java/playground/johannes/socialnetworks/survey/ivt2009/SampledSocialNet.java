@@ -26,12 +26,13 @@ import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
 
 /**
  * @author illenberger
  *
  */
-public class SampledSocialNet<P extends Person> extends SocialNetwork<P> implements SampledGraph {
+public class SampledSocialNet extends SocialNetwork implements SampledGraph {
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -41,8 +42,8 @@ public class SampledSocialNet<P extends Person> extends SocialNetwork<P> impleme
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Set<? extends SampledEgo<P>> getVertices() {
-		return (Set<? extends SampledEgo<P>>) super.getVertices();
+	public Set<? extends SampledEgo> getVertices() {
+		return (Set<? extends SampledEgo>) super.getVertices();
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class SampledSocialNet<P extends Person> extends SocialNetwork<P> impleme
 	}
 
 	@Override
-	public SampledEgo<P> getEgo(P p) {
-		return (SampledEgo<P>) super.getEgo(p);
+	public SampledEgo getEgo(SocialPerson p) {
+		return (SampledEgo) super.getEgo(p);
 	}
 }

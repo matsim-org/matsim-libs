@@ -55,15 +55,15 @@ public class GraphBuilder {
 	
 	private Population population;
 	
-	private SampledSocialNetBuilder<Person> builder;
+	private SampledSocialNetBuilder builder;
 	
-	private SampledSocialNet<Person> socialnet;
+	private SampledSocialNet socialnet;
 	
-	private Map<Id, SampledEgo<Person>> idVertexMapping;
+	private Map<Id, SampledEgo> idVertexMapping;
 	
-	private Map<String, SampledEgo<Person>> userIdVertexMapping;
+	private Map<String, SampledEgo> userIdVertexMapping;
 
-	public SampledSocialNet<Person> buildSocialNet(String userDataFile, String snowballDataFile) {
+	public SampledSocialNet buildSocialNet(String userDataFile, String snowballDataFile) {
 		try {
 			CSVReader csvReader = new CSVReader();
 			Map<String, String[]> userData = csvReader.readUserData(userDataFile);
@@ -71,10 +71,10 @@ public class GraphBuilder {
 			
 			population = new ScenarioImpl().getPopulation();
 			keyGenerator = new KeyGenerator();
-			builder = new SampledSocialNetBuilder<Person>();
+			builder = new SampledSocialNetBuilder();
 			socialnet = builder.createGraph();
-			idVertexMapping = new HashMap<Id, SampledEgo<Person>>();
-			userIdVertexMapping = new HashMap<String, SampledEgo<Person>>();
+			idVertexMapping = new HashMap<Id, SampledEgo>();
+			userIdVertexMapping = new HashMap<String, SampledEgo>();
 			
 			buildEgoPersons(userData, snowballData);
 			buildAlters(snowballData);
@@ -127,7 +127,7 @@ public class GraphBuilder {
 						 * add other person attributes...
 						 */
 						population.addPerson(person);
-						SampledEgo<Person> ego = builder.addVertex(socialnet, person, iteration);
+						SampledEgo ego = builder.addVertex(socialnet, person, iteration);
 						ego.sample(iteration);
 						idVertexMapping.put(person.getId(), ego);
 						userIdVertexMapping.put(userId, ego);
@@ -174,7 +174,7 @@ public class GraphBuilder {
 		int invalid = 0;
 		
 		for (String userId : snowballData.keySet()) {
-			SampledEgo<Person> ego = userIdVertexMapping.get(userId);
+			SampledEgo ego = userIdVertexMapping.get(userId);
 			if (ego != null) {
 				Map<String, String> egoData = snowballData.get(userId);
 
@@ -214,12 +214,12 @@ public class GraphBuilder {
 				invalid));
 	}
 	
-	private boolean buildAlter(String alterKey, String name, String userId, SampledEgo<Person> ego, int counter, Map<String, String> egoData) {
+	private boolean buildAlter(String alterKey, String name, String userId, SampledEgo ego, int counter, Map<String, String> egoData) {
 		Id alterId = new IdImpl(name);
 		/*
 		 * check if we already sampled this vertex
 		 */
-		SampledEgo<Person> alter = idVertexMapping.get(alterId);
+		SampledEgo alter = idVertexMapping.get(alterId);
 		
 		if (alter == null) {
 			/*
@@ -307,7 +307,7 @@ public class GraphBuilder {
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		GraphBuilder builder = new GraphBuilder();
-		SampledSocialNet<Person> socialnet = builder.buildSocialNet(args[0], args[1]);
+		SampledSocialNet socialnet = builder.buildSocialNet(args[0], args[1]);
 		System.out.println(SampledGraphStatistics.degreeDistribution(socialnet).mean());
 		System.out.println(SampledGraphStatistics.localClusteringDistribution(socialnet).mean());
 		

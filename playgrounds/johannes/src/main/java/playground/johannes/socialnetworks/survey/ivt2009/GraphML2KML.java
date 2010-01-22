@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Visitor.java
+ * GraphML2KML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,41 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.interaction;
+import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
+import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
 
-import org.matsim.api.core.v01.Id;
+import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSampledComponents;
+import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSnowballDescriptor;
+
+
 
 /**
  * @author illenberger
  *
  */
-public class Visitor {
+public class GraphML2KML {
 
-	private Id personId;
-	
-	private double enterTime;
-	
-	private double leaveTime;
-	
-	Visitor(Id personId, double enterTime) {
-		this.personId = personId;
-		this.enterTime = enterTime;
-		this.leaveTime = Double.NaN;
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
+		SampledSpatialGraph graph = reader.readGraph(args[0]);
+
+		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
+		KMLSampledComponents components = new KMLSampledComponents();
+		writer.setKmlPartitition(components);
+		KMLIconVertexStyle vertexStyle = new KMLIconVertexStyle(graph);
+		vertexStyle.setVertexColorizer(components);
+		writer.addKMZWriterListener(vertexStyle);
+		writer.setKmlVertexStyle(vertexStyle);
+		writer.setKmlVertexDetail(new KMLSnowballDescriptor());
+		
+		writer.write(graph, args[1]);
 	}
-	
-	public Id getPersonId() {
-		return personId;
-	}
-	
-	public double getEnterTime() {
-		return enterTime;
-	}
-	
-	public double getLeaveTime() {
-		return leaveTime;
-	}
+
 }

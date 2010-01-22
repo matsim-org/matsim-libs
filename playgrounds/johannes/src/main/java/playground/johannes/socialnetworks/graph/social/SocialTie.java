@@ -50,8 +50,8 @@ public class SocialTie extends SpatialSparseEdge {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public Tuple<? extends Ego<?>, ? extends Ego<?>> getVertices() {
-		return (Tuple<? extends Ego<?>, ? extends Ego<?>>) super.getVertices();
+	public Tuple<? extends Ego, ? extends Ego> getVertices() {
+		return (Tuple<? extends Ego, ? extends Ego>) super.getVertices();
 	}
 
 	public int getCreated() {

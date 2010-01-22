@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDistance.java
+ * GraphSizeTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial;
+package playground.johannes.socialnetworks.graph.analysis;
 
-import java.util.Set;
+import java.util.Map;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
-
-import playground.johannes.socialnetworks.graph.spatial.Distance;
-import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
+public class GraphSizeTask implements GraphAnalyzerTask {
 
-	@SuppressWarnings("unchecked")
+	private static final Logger logger = Logger.getLogger(GraphSizeTask.class);
+	
+	public static final String NUM_VERTICES = "n_vertex";
+	
+	public static final String NUM_EDGES = "n_edge";
+	
 	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		/*
-		 * I think it makes no difference to directly calling super(vertices)
-		 * since each edge is only counted once. joh13/1/10
-		 */
-		return super.distribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	public void analyze(Graph graph, Map<String, Object> analyzers, Map<String, Double> stats) {
+		int n_vertex = graph.getVertices().size();
+		int n_edge = graph.getEdges().size();
+		stats.put(NUM_VERTICES, new Double(n_vertex));
+		stats.put(NUM_EDGES, new Double(n_edge));
+		logger.info(String.format("%1$s = %2$s, %3$s = %4$s", NUM_VERTICES, n_vertex, NUM_EDGES, n_edge));
 	}
 
 }

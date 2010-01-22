@@ -37,9 +37,9 @@ import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle;
  * @author illenberger
  *
  */
-public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<Person>, Ego<Person>> {
+public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork, Ego> {
 
-	private Map<Ego<?>, String> styleIds = new HashMap<Ego<?>, String>();
+	private Map<Ego, String> styleIds = new HashMap<Ego, String>();
 	
 //	private Distribution distribution = new Distribution();
 	
@@ -78,11 +78,11 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<Person>
 	}
 
 	@Override
-	protected TDoubleObjectHashMap<String> getValues(SocialNetwork<Person> graph) {
+	protected TDoubleObjectHashMap<String> getValues(SocialNetwork graph) {
 		TDoubleObjectHashMap<String> values = new TDoubleObjectHashMap<String>();
 	
-		for(Ego<Person> ego : graph.getVertices()) {
-			Person person = ego.getPerson();
+		for(Ego ego : graph.getVertices()) {
+			Person person = ego.getPerson().getPerson();
 			double sum = 0;
 			for(Plan plan : person.getPlans()) {
 				Double score = plan.getScore();
@@ -104,7 +104,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<Person>
 	}
 
 	@Override
-	public String getObjectSytleId(Ego<Person> object) {
+	public String getObjectSytleId(Ego object) {
 		return styleIds.get(object);
 	}
 	
@@ -132,7 +132,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<Person>
 	 * @see playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle#getValue(playground.johannes.socialnetworks.graph.Vertex)
 	 */
 	@Override
-	protected double getValue(Ego<Person> vertex) {
+	protected double getValue(Ego vertex) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

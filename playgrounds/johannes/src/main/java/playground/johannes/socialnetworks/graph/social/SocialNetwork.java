@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
@@ -37,9 +36,9 @@ import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
  * @author illenberger
  *
  */
-public class SocialNetwork<P extends Person> extends SpatialSparseGraph {
+public class SocialNetwork extends SpatialSparseGraph {
 	
-	private Map<P, Ego<P>> personEgoMapping = new HashMap<P, Ego<P>>();
+	private Map<SocialPerson, Ego> personEgoMapping = new HashMap<SocialPerson, Ego>();
 	
 	/**
 	 * @deprecated
@@ -48,40 +47,10 @@ public class SocialNetwork<P extends Person> extends SpatialSparseGraph {
 		super(CRSUtils.getCRS(21781)); //FIXME
 	}
 	
-//	@Deprecated
-//	public SocialNetwork(BasicPopulation<P> pop) {
-//		this();
-//		for(P p : pop.getPersons().values())
-//			addEgo(p);
-//	}
-//	
-//	@Deprecated
-//	public Ego<P> addEgo(P person) {
-//		Ego<P> e = new Ego<P>(person);
-//		if(insertVertex(e)) {
-//			return e;
-//		} else
-//			return null;
-//	}
-//	
-//	@Deprecated
-//	public SocialTie addEdge(Ego<P> e1, Ego<P> e2) {
-//		return this.addEdge(e1, e2, 0);
-//	}
-//	
-//	@Deprecated
-//	public SocialTie addEdge(Ego<P> e1, Ego<P> e2, int created) {
-//		SocialTie e = new SocialTie(e1, e2, created);
-//		if(insertEdge(e))
-//			return e;
-//		else
-//			return null;
-//	}
-	
 	@Override
 	@SuppressWarnings("unchecked")
-	public Set<? extends Ego<P>> getVertices() {
-		return (Set<? extends Ego<P>>) super.getVertices();
+	public Set<? extends Ego> getVertices() {
+		return (Set<? extends Ego>) super.getVertices();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -90,7 +59,7 @@ public class SocialNetwork<P extends Person> extends SpatialSparseGraph {
 		return (Set<? extends SocialTie>) super.getEdges();
 	}
 
-	public Ego<P> getEgo(P p) {
+	public Ego getEgo(SocialPerson p) {
 		return personEgoMapping.get(p);
 	}
 
@@ -98,20 +67,5 @@ public class SocialNetwork<P extends Person> extends SpatialSparseGraph {
 	public SocialTie getEdge(SparseVertex v1, SparseVertex v2) {
 		return (SocialTie) super.getEdge(v1, v2);
 	}
-
-//	@Override
-//	protected boolean insertEdge(SparseEdge e) {
-//		return super.insertEdge(e);
-//	}
-//
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	protected boolean insertVertex(SparseVertex v) {
-//		if(super.insertVertex(v)) {
-//			personEgoMapping.put(((Ego<P>)v).getPerson(), (Ego<P>)v);
-//			return true;
-//		} else
-//			return false;
-//	}
 
 }

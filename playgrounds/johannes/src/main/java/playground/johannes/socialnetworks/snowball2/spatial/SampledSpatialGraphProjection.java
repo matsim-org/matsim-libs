@@ -22,13 +22,13 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdgeDecorator;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraphProjection;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertexDecorator;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdgeDecorator;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphProjection;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertexDecorator;
 
 /**
  * @author illenberger

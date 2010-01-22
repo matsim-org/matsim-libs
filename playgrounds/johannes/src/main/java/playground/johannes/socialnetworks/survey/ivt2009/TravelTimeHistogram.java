@@ -36,7 +36,7 @@ import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 
-import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.ZoneLegacy;
 import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;

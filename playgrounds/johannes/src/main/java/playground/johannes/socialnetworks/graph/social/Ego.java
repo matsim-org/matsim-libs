@@ -28,9 +28,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -41,26 +39,26 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @author illenberger
  *
  */
-public class Ego<P extends Person> extends SpatialSparseVertex {
+public class Ego extends SpatialSparseVertex {
 
 	private static final Logger logger = Logger.getLogger(Ego.class);
-	private P person;
+	private SocialPerson person;
 	
 	private final static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 21781);
 	
-	protected Ego(P person) {
-		super(coord2Point(((Activity) person.getPlans().get(0).getPlanElements().get(0)).getCoord()));
+	protected Ego(SocialPerson person) {
+		super(coord2Point(((Activity) person.getPerson().getPlans().get(0).getPlanElements().get(0)).getCoord()));
 		this.person = person;
 	}
 	
-	public P getPerson() {
+	public SocialPerson getPerson() {
 		return person;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<? extends Ego<P>> getNeighbours() {
-		return (List<? extends Ego<P>>) super.getNeighbours();
+	public List<? extends Ego> getNeighbours() {
+		return (List<? extends Ego>) super.getNeighbours();
 	}
 	
 	private static Point coord2Point(Coord coord) {

@@ -37,6 +37,7 @@ import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.xml.sax.Attributes;
@@ -44,31 +45,32 @@ import org.xml.sax.Attributes;
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 import playground.johannes.socialnetworks.graph.social.SocialNetworkBuilder;
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.SocialTie;
 
 /**
  * @author illenberger
  *
  */
-public class SNGraphMLReader<P extends Person> extends AbstractGraphMLReader<SocialNetwork<P>, Ego<P>, SocialTie> {
+public class SNGraphMLReader extends AbstractGraphMLReader<SocialNetwork, Ego, SocialTie> {
 
 	private static final String WSPACE = " ";
 	
 	private Population population;
 	
-	private SocialNetworkBuilder<P> builder;
+	private SocialNetworkBuilder builder;
 	
 	public SNGraphMLReader(Population population) {
 		this.population = population;
 	}
 	
 	@Override
-	public SocialNetwork<P> readGraph(String file) {
+	public SocialNetwork readGraph(String file) {
 		return super.readGraph(file);
 	}
 
 	@Override
-	protected SocialTie addEdge(Ego<P> v1, Ego<P> v2,
+	protected SocialTie addEdge(Ego v1, Ego v2,
 			Attributes attrs) {
 		String created = attrs.getValue(SNGraphML.CREATED_TAG);
 		SocialTie e = builder.addEdge(getGraph(), v1, v2, Integer.parseInt(created));
@@ -83,42 +85,42 @@ public class SNGraphMLReader<P extends Person> extends AbstractGraphMLReader<Soc
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Ego<P> addVertex(Attributes attrs) {
+	protected Ego addVertex(Attributes attrs) {
 		String id = attrs.getValue(SNGraphML.PERSON_ID_TAG);
-		P person = (P) population.getPersons().get(new IdImpl(id));
+		PersonImpl person = (PersonImpl) population.getPersons().get(new IdImpl(id));
 		if(person == null)
 			throw new NullPointerException(String.format("Person with id %1$s not found!", id));
 		
-		return builder.addVertex(getGraph(), person);
+		return builder.addVertex(getGraph(), new SocialPerson(person));
 	}
 
 	@Override
-	protected SocialNetwork<P> newGraph(Attributes attrs) {
-		builder = new SocialNetworkBuilder<P>();
-		return new SocialNetwork<P>();
+	protected SocialNetwork newGraph(Attributes attrs) {
+		builder = new SocialNetworkBuilder();
+		return new SocialNetwork();
 	}
 
 	@SuppressWarnings("deprecation")
-	public static SocialNetwork<Person> loadFromConfig(String configFile, String socialnetFile) {
+	public static SocialNetwork loadFromConfig(String configFile, String socialnetFile) {
 		Config config = Gbl.createConfig(new String[]{configFile});
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadPopulation();
 		ScenarioImpl scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();
-		SNGraphMLReader<Person> reader = new SNGraphMLReader<Person>(population);
-		SocialNetwork<Person> g = reader.readGraph(socialnetFile);
+		SNGraphMLReader reader = new SNGraphMLReader(population);
+		SocialNetwork g = reader.readGraph(socialnetFile);
 		
 		return g;
 	}
 	
-	public static <P extends Person> Set<Ego<P>> readAnonymousVertices(SocialNetwork<P> socialnet, String filename) {
+	public static <P extends Person> Set<Ego> readAnonymousVertices(SocialNetwork socialnet, String filename) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
-			Set<Ego<P>> egos = new HashSet<Ego<P>>();
+			Set<Ego> egos = new HashSet<Ego>();
 			String line = null;
 			while((line = reader.readLine()) != null) {
 				boolean found = false;
-				for(Ego<P> e : socialnet.getVertices()) {
+				for(Ego e : socialnet.getVertices()) {
 					if(e.getPerson().getId().toString().equals(line)) {
 						egos.add(e);
 						found = true;

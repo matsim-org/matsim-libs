@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Interactor.java
+ * SocialVertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.graph.social;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.interaction;
+import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
-
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
 /**
  * @author illenberger
  *
  */
-public interface Interactor {
+public interface SocialVertex extends SpatialVertex {
 
-	public void interact(Person p1, Person p2, double startTime, double endTime);
+	public List<? extends SocialEdge> getEdges();
+	
+	public List<? extends SocialVertex> getNeighbours();
+	
+	public Person getPerson();
 	
 }

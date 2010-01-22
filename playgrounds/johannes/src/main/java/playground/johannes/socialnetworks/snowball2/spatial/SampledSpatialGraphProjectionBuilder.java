@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialGraphProjectionBuilder;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphProjectionBuilder;
 
 import com.vividsolutions.jts.geom.Geometry;
 

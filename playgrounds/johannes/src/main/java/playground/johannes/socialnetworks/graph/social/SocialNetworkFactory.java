@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social;
 
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.GraphFactory;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetworkFactory<P extends Person> implements GraphFactory<SocialNetwork<P>, Ego<P>, SocialTie>{
+public class SocialNetworkFactory implements GraphFactory<SocialNetwork, Ego, SocialTie>{
 
 	public SocialTie createEdge() {
 		return new SocialTie(0);
@@ -36,16 +35,16 @@ public class SocialNetworkFactory<P extends Person> implements GraphFactory<Soci
 		return new SocialTie(created);
 	}
 
-	public SocialNetwork<P> createGraph() {
-		return new SocialNetwork<P>();
+	public SocialNetwork createGraph() {
+		return new SocialNetwork();
 	}
 
-	public Ego<P> createVertex() {
+	public Ego createVertex() {
 		throw new UnsupportedOperationException();
 	}
 	
-	public Ego<P> createVertex(P person) {
-		return new Ego<P>(person);
+	public Ego createVertex(SocialPerson person) {
+		return new Ego(person);
 	}
 
 }

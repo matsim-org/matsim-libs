@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FreespeedTravelTimeCost.java
+ * SnowballPartititions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,26 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.snowball2.spatial.analysis;
 
-package playground.johannes.socialnetworks.ivtsurveys;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.router.util.TravelMinCost;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
-public class FreespeedTravelTime implements TravelMinCost, TravelTime {
-
-	public double getLinkTravelCost(Link link, double time) {
-		return (link.getLength() / link.getFreespeed(time));
+/**
+ * @author illenberger
+ *
+ */
+public class SnowballPartitions {
+	
+	public static <V extends SampledVertex> Set<V> createSampledPartition(Collection<V> vertices) {
+		Set<V> partition = new HashSet<V>();
+		for(V vertex : vertices) {
+			if(vertex.isSampled())
+				partition.add(vertex);
+		}
+		return partition;
 	}
-
-	public double getLinkTravelTime(Link link, double time) {
-		return link.getLength() / link.getFreespeed(time);
+	
+	public static <V extends SampledVertex> Set<V> createSampledPartition(Collection<V> vertices, int iteration) {
+		Set<V> partition = new HashSet<V>();
+		for(V vertex : vertices) {
+			if(vertex.getIterationSampled() == iteration)
+				vertices.add(vertex);
+		}
+		return partition;
 	}
-
-	public double getLinkMinimumTravelCost(Link link) {
-		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME));
+	
+	public static <V extends SampledVertex> Set<V> createDetectedPartition(Collection<V> vertices, int iteration) {
+		Set<V> partition = new HashSet<V>();
+		for(V vertex : vertices) {
+			if(vertex.getIterationDetected() == iteration)
+				vertices.add(vertex);
+		}
+		return partition;
 	}
-
 }

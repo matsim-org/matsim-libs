@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ShrinkPopulation.java
+ * SampledDistance.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.snowball2.spatial.analysis;
 
-/**
- *
- */
-package playground.johannes.socialnetworks.ivtsurveys;
+import java.util.Set;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
+
+import playground.johannes.socialnetworks.graph.spatial.Distance;
 
 /**
  * @author illenberger
  *
  */
-public class ShrinkPopulation {
+public class SampledDistance extends Distance {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-		loader.loadScenario();
-		ScenarioImpl data = loader.getScenario();
-//		loader.loadPopulation();
-		PopulationImpl population = data.getPopulation();
-		double sample = Double.parseDouble(args[2]);
-		PopulationWriter writer = new PopulationWriter(population, data.getNetwork(), sample);
-		writer.writeFile(args[1]);
+	@SuppressWarnings("unchecked")
+	@Override
+	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
+		/*
+		 * I think it makes no difference to directly calling super(vertices)
+		 * since each edge is only counted once. joh13/1/10
+		 */
+		return super.distribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
+		return super.vertexAccumulatedDistribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
 	}
 
 }

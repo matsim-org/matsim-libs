@@ -36,6 +36,7 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraphBuilder;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseGraph;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseVertex;
@@ -44,7 +45,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
-import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLTimeSpan;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -83,7 +83,7 @@ public class TXT2GraphML {
 		if(idIdx < 0 || longIdx < 0 || latIdx < 0 || statusIdx < 0)
 			throw new IllegalArgumentException("Header not found!");
 		
-		TIntObjectHashMap<SampledSpatialSparseVertex> vertexIds = new TIntObjectHashMap<SampledSpatialSparseVertex>();
+		TIntObjectHashMap<SampledSpatialSparseVertex> egoIds = new TIntObjectHashMap<SampledSpatialSparseVertex>();
 		
 		Map<Vertex, String> timeStamps = new HashMap<Vertex, String>();
 		Map<String, Map<String, String>> surveyData = new CSVReader().readSnowballData("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/tbl_surveydata.csv");
@@ -108,10 +108,14 @@ public class TXT2GraphML {
 							it = 1;
 						else if(id >= 10000)
 							it = 2;
+						if(it < 0)
+							System.err.println("Iteration less than 0");
 						v.sample(it);
 						v.detect(Math.max(0, it - 1));
-						if(vertexIds.put(id, v) != null)
+						if(egoIds.put(id, v) != null)
 							System.err.println("Overwriting ego with id " + id);
+						if(id == 10064)
+							System.err.println("alalla");
 						egocount++;
 						
 						Map<String, String> egoData = surveyData.get(tokens[2]);
@@ -138,16 +142,17 @@ public class TXT2GraphML {
 		int doubleedges = 0;
 //		int alterdropped = 0;
 		int nocoord = 0;
-		int alterIdCounter = 100000;
+		int alterIdCounter = 1000000;
 		int egoNotFound = 0;
 		
 		TIntIntHashMap egoDegree = new TIntIntHashMap();
-		TIntObjectIterator<SampledSpatialSparseVertex> it = vertexIds.iterator();
-		for(int i = 0; i< vertexIds.size(); i++) {
+		TIntObjectIterator<SampledSpatialSparseVertex> it = egoIds.iterator();
+		for(int i = 0; i< egoIds.size(); i++) {
 			it.advance();
 			egoDegree.put(it.key(), 0);
 		}
 		
+//		TIntObjectHashMap<SampledSpatialSparseVertex> alterIds = new TIntObjectHashMap<SampledSpatialSparseVertex>();
 		while((line = reader.readLine()) != null) {
 			tokens = line.split(TAB);
 			
@@ -156,11 +161,14 @@ public class TXT2GraphML {
 			String[] tokens2 = egoIdStr.split(" ");
 //			try {
 			int egoId = Integer.parseInt(tokens2[tokens2.length - 1]);
-			SampledSpatialSparseVertex ego = vertexIds.get(egoId);
+			SampledSpatialSparseVertex ego = egoIds.get(egoId);
 			if(ego == null) {
 				logger.warn(String.format("Ego with id %1$s not found!", egoId));
 				egoNotFound++;
 			} else {
+				if(!ego.isSampled())
+					System.err.println("ego not sampled! id =" + egoId);
+				else{
 				String idStr = tokens[idIdx];
 				if (!idStr.equalsIgnoreCase("#NV")) {// && !idStr.equalsIgnoreCase("")) {
 					int id;
@@ -169,14 +177,19 @@ public class TXT2GraphML {
 					else
 						id = Integer.parseInt(idStr);
 
-					SampledSpatialSparseVertex alter = vertexIds.get(id);
+					if(id == 10064)
+						System.err.println();
+					
+					SampledSpatialSparseVertex alter = egoIds.get(id);
 					if (alter == null) {
 						Coord c = getCoord(tokens, longIdx, latIdx);
 						if (c != null) {
 							alter = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(c.getX(), c.getY())));
 							alter.detect(Math.max(0, ego.getIterationSampled()));
+							if(ego.getIterationSampled() < 0)
+								System.err.println("Iteration less than 0");
 							timeStamps.put(alter, timeStamps.get(ego));
-							if(vertexIds.put(id, alter) != null)
+							if(egoIds.put(id, alter) != null)
 								System.err.println("Overwriting alter with id " + id);
 							altercount++;
 						} else {
@@ -200,6 +213,7 @@ public class TXT2GraphML {
 //				alterdropped++;
 //			}
 			}
+			}
 		}
 		
 		TIntIntIterator it2 = egoDegree.iterator();
@@ -207,7 +221,9 @@ public class TXT2GraphML {
 			it2.advance();
 			if(it2.value() == 0) {
 				logger.warn(String.format("Ego with id %1$s named no contacts. Marking as not sampled...", it2.key()));
-				vertexIds.get(it2.key()).sample(-1);
+				SampledSpatialSparseVertex v = egoIds.get(it2.key());
+				v.sample(-1);
+				builder.removeVertex(graph, v);
 			}
 		}
 		

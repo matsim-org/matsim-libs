@@ -32,9 +32,9 @@ public class SpatialAnalyzerTask extends GraphAnalyzerTaskComposite {
 
 	public SpatialAnalyzerTask(String output, ZoneLayer zones) {
 		super(output);
-		addTasks(new StandardAnalyzerTask(getOutputDirectory()));
-		addTasks(new DistanceTask(getOutputDirectory()));
-		addTasks(new PopDensityTask(getOutputDirectory(), zones));
+		addTask(new StandardAnalyzerTask(getOutputDirectory()));
+		addTask(new DistanceTask(getOutputDirectory()));
+		addTask(new PopDensityTask(getOutputDirectory(), zones));
 	}
 
 }

@@ -38,15 +38,12 @@ public class Distance {
 	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
 		Distribution distribution = new Distribution();
 		
-		Set<SpatialVertex> pending = new HashSet<SpatialVertex>(vertices);
+		Set<SpatialEdge> touched = new HashSet<SpatialEdge>();
 		for(SpatialVertex v : vertices) {
 			for(int i = 0; i < v.getEdges().size(); i++) {
-				SpatialVertex v_j = v.getNeighbours().get(i);
-				if(pending.contains(v_j))
+				if(touched.add(v.getEdges().get(i)))
 					distribution.add(v.getEdges().get(i).length());
 			}
-			
-			pending.remove(v);
 		}
 		
 		return distribution;

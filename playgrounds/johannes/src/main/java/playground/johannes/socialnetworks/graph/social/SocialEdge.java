@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDegree.java
+ * SocialEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2;
-
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Collection;
-import java.util.Set;
+package playground.johannes.socialnetworks.graph.social;
 
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDegree extends Degree {
+public interface SocialEdge extends SpatialEdge {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution distribution(Set<? extends Vertex> vertices) {
-		return super.distribution(SnowballPartitions.<SampledVertex>createSampledPartition((Set<SampledVertex>)vertices));
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public TObjectDoubleHashMap<Vertex> values(Collection<? extends Vertex> vertices) {
-		return (TObjectDoubleHashMap<Vertex>) super.values(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>) vertices));
-	}
-
+	public SocialVertex getOpposite(Vertex vertex);
+	
+	public Tuple<? extends SocialVertex, ? extends SocialVertex> getVertices();
+	
 }

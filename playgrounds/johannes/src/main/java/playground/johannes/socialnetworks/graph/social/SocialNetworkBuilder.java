@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social;
 
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
 
 
@@ -27,27 +26,27 @@ import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
  * @author illenberger
  *
  */
-public class SocialNetworkBuilder<P extends Person> extends AbstractSparseGraphBuilder<SocialNetwork<P>, Ego<P>, SocialTie>{
+public class SocialNetworkBuilder extends AbstractSparseGraphBuilder<SocialNetwork, Ego, SocialTie>{
 
 	public SocialNetworkBuilder() {
-		super(new SocialNetworkFactory<P>());
+		super(new SocialNetworkFactory());
 	}
 
 	@Override
-	public Ego<P> addVertex(SocialNetwork<P> graph) {
+	public Ego addVertex(SocialNetwork graph) {
 		throw new UnsupportedOperationException();
 	}
 	
-	public Ego<P> addVertex(SocialNetwork<P> graph, P person) {
-		Ego<P> ego = ((SocialNetworkFactory<P>)getFactory()).createVertex(person);
+	public Ego addVertex(SocialNetwork graph, SocialPerson person) {
+		Ego ego = ((SocialNetworkFactory)getFactory()).createVertex(person);
 		if(insertVertex(graph, ego))
 			return ego;
 		else
 			return null;
 	}
 	
-	public SocialTie addEdge(SocialNetwork<P> graph, Ego<P> vertex1, Ego<P> vertex2, int created) {
-		SocialTie edge = ((SocialNetworkFactory<P>)getFactory()).createEdge(created);
+	public SocialTie addEdge(SocialNetwork graph, Ego vertex1, Ego vertex2, int created) {
+		SocialTie edge = ((SocialNetworkFactory)getFactory()).createEdge(created);
 		if(insertEdge(graph, vertex1, vertex2, edge))
 			return edge;
 		else

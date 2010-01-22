@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Test.java
+ * SocialPerson.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,22 +17,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.graph.social;
 
-package playground.johannes.socialnetworks.ivtsurveys;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.population.PersonImpl;
 
-public class Test {
+/**
+ * @author illenberger
+ *
+ */
+public class SocialPerson {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		double x = 0;
-		for(int i=1; i< 1000000; i++) {
-			x += Math.pow(i/1.2, -2);
-		}
-		System.out.println(x);
-		
+	private PersonImpl person;
+	
+	private String name;
+	
+	private String citizenship;
+	
+	public SocialPerson(PersonImpl person) {
+		this.person = person;
 	}
-
+	
+	public Id getId() {
+		return person.getId();
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public int getAge() {
+		return person.getAge();
+	}
+	
+	public String getCitizenship() {
+		return citizenship;
+	}
+	
+	public void setCitizenship(String citizenship) {
+		this.citizenship = citizenship;
+	}
+	
+	public PersonImpl getPerson() {
+		return person;
+	}
 }
