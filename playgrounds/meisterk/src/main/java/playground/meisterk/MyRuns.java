@@ -142,7 +142,7 @@ public class MyRuns {
 					testee.getConfig().charyparNagelScoring().setLearningRate(learningRate);
 					
 					testee.setCreateGraphs(false);
-					testee.setWriteEventsInterval(0);
+					testee.setWriteEventsInterval(10);
 					testee.run();
 				}
 
