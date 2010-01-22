@@ -102,6 +102,8 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 			out.print("\t");
 			out.print(strategy.toString() + "_satisfied");
 		}
+		out.print("\t");
+		out.print("all_satisfied");
 		out.println();
 
 	}
@@ -270,21 +272,27 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 			CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
 
 		String str = new String();
+
+		Frequency overallFreq = new Frequency();
 		
 		for (String strategyName : personTreatment.keySet()) {
-			Frequency freq = new Frequency();
+			Frequency strategyFreq = new Frequency();
 			
 			Set<Person> persons = personTreatment.get(strategyName);
 			for (Person person : persons) {
 				boolean isSatisfied = this.isPersonSatisfied(person, charyparNagelScoringConfigGroup);
-				freq.addValue(isSatisfied ? 1 : 0);
+				strategyFreq.addValue(isSatisfied ? 1 : 0);
+				overallFreq.addValue(isSatisfied ? 1 : 0);
 			}
 
 			str = str.concat("\t");
-			str = str.concat(differenceFormat.format(freq.getPct(1)));
+			str = str.concat(differenceFormat.format(strategyFreq.getPct(1)));
 			
 		}
-		
+
+		str = str.concat("\t");
+		str = str.concat(differenceFormat.format(overallFreq.getPct(1)));
+
 		return str;
 	}
 

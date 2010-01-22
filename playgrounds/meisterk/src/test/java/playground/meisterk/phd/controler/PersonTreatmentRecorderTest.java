@@ -280,7 +280,7 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 		PersonTreatmentRecorder testee = 
 			new PersonTreatmentRecorder((PopulationConvergenceConfigGroup) this.sc.getConfig().getModule(PopulationConvergenceConfigGroup.GROUP_NAME));
 		String actualString = testee.getIsPersonSatisfiedString(personTreatment, this.sc.getConfig().charyparNagelScoring());
-		assertEquals("\t0\t0.5", actualString);
+		assertEquals("\t0\t0.5\t0.333", actualString);
 		
 	}
 	
