@@ -65,15 +65,15 @@ public class MyPlansToPlans {
 //		plansWriter.closeStreaming();
 
 		ScenarioLoader sl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader(
-				"../berlin-bvg09/pt/nullfall_alles/kai-config.xml") ;
+				"../berlin-bvg09/pt/nullfall_berlin_brandenburg/kai-config.xml") ;
 		Scenario sc = sl.loadScenario() ;
 		Population pop = sc.getPopulation();
 
-		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.car, FilterType.removeAllPlansWithMode ) ;
+		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.pt, FilterType.keepAllPlansWithMode ) ;
 		pf.run(pop) ;
 
 		PopulationWriter popwriter = new PopulationWriter(pop,sc.getNetwork()) ;
-		popwriter.write("./output/pop.xml.gz") ;
+		popwriter.write("/Users/nagel/kw/output/pop.xml.gz") ;
 
 		System.out.println("done.");
 	}
