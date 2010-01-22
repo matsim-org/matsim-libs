@@ -20,8 +20,7 @@
 
 package org.matsim.withinday.mobsim;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.withinday.WithindayAgentFactory;
@@ -40,9 +39,8 @@ public class WithindayQueueSimulation extends QueueSimulation {
 
 	private TrafficManagement trafficManagement;
 
-	public WithindayQueueSimulation(final Network net,
-			final Population plans, final EventsManager events, final WithindayControler controler) {
-		super(net, plans, events);
+	public WithindayQueueSimulation(final Scenario scenario, final EventsManager events, final WithindayControler controler) {
+		super(scenario, events);
 		this.controler = controler;
 		super.setAgentFactory(new WithindayAgentFactory(this, controler.getConfig().withinday(), this.controler.getAgentLogicFactory()));
 	}

@@ -119,11 +119,11 @@ public class WithindayControler extends Controler {
 	protected void runMobSim() {
 		List<Integer> withindayIterations = this.config.withinday().getWithindayIterations();
 		//check if withinday replanning should be enabled
-		if (withindayIterations.contains(getIteration())) {
+		if (withindayIterations.contains(this.getIterationNumber())) {
 			log.info("Starting withinday replanning iteration...");
 
 			//build the queuesim
-			WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
+			WithindayQueueSimulation sim = new WithindayQueueSimulation(this.scenarioData, this.events, this);
 			if (this.trafficManagement != null) {
 				sim.setTrafficManagement(this.trafficManagement);
 			}

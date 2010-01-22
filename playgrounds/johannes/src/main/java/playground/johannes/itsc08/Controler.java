@@ -114,7 +114,7 @@ public class Controler extends WithindayControler {
 		this.config.withinday().addParam("contentThreshold", "1");
 		this.config.withinday().addParam("replanningInterval", "1");
 
-		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
+		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.scenarioData, this.events, this);
 		this.trafficManagement = new TrafficManagement();
 		sim.setTrafficManagement(this.trafficManagement);
 		

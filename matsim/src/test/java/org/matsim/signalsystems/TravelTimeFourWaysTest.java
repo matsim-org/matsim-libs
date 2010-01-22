@@ -93,7 +93,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		
-		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
+		QueueSimulation sim = new QueueSimulation(data, events);
 		sim.setLaneDefinitions(data.getLaneDefinitions());
 		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemConfigurations());
 		sim.run();

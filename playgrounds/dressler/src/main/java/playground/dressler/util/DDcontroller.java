@@ -122,7 +122,7 @@ public class DDcontroller {
 			EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
 			events.addHandler(eventWriter);
 
-			QueueSimulation sim = new QueueSimulation(network, population, events);
+			QueueSimulation sim = new QueueSimulation(scenario, events);
 			sim.openNetStateWriter("./output/simout", netFilename, 10);
 			sim.run();
 

@@ -104,7 +104,7 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.run();
 		
-		sim = new QueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
+		sim = new QueueSimulation(scenario, events);
 		sim.run();
 	}
 

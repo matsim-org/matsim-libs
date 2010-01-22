@@ -92,7 +92,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 				SignalGroupSettings group = p.getGroupConfigs().get(id100);
 				group.setDropping(dropping);
 			}
-			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
+			QueueSimulation sim = new QueueSimulation(data, events);
 			sim.setLaneDefinitions(lanedefs);
 			sim.setSignalSystems(lssDefs, lssConfigs);
 			sim.run();
@@ -124,7 +124,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
-		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
+		QueueSimulation sim = new QueueSimulation(data, events);
 		sim.setLaneDefinitions(data.getLaneDefinitions());
 		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemConfigurations());
 		sim.run();
@@ -137,7 +137,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		MeasurementPoint qSim = eventHandler.beginningOfLink2;
 		eventHandler.reset(1);
 
-		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
+		new QueueSimulation(data, events).run();
 		if (eventHandler.beginningOfLink2 != null) {
 			log.debug("tF = 60s, "
 					+ eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure + ", "

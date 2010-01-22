@@ -34,11 +34,10 @@ import org.matsim.lanes.LaneDefinitionsFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestCase;
 
-
 /**
  * Test for QueueLane capacity calculations
- * @author dgrether
  *
+ * @author dgrether
  */
 public class QueueLaneTest extends MatsimTestCase {
 
@@ -111,9 +110,9 @@ public class QueueLaneTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		
-		Network network = this.initNetwork(scenario.getNetwork());
+		this.initNetwork(scenario.getNetwork());
 		
-		QueueSimulation queueSim = new QueueSimulation(network, null, null);
+		QueueSimulation queueSim = new QueueSimulation(scenario, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
 		QueueLink ql = queueNetwork.getQueueLink(id1);
 
@@ -125,10 +124,10 @@ public class QueueLaneTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
-		Network network = this.initNetwork(scenario.getNetwork());
+		this.initNetwork(scenario.getNetwork());
 		LaneDefinitions lanes = this.createOneLane(scenario, 1);
 		
-		QueueSimulation queueSim = new QueueSimulation(network, null, null);
+		QueueSimulation queueSim = new QueueSimulation(scenario, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQueueLink(id1);
 
@@ -158,10 +157,10 @@ public class QueueLaneTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
-		Network network = this.initNetwork(scenario.getNetwork());
+		this.initNetwork(scenario.getNetwork());
 		LaneDefinitions lanes = this.createOneLane(scenario, 2);
 		
-		QueueSimulation queueSim = new QueueSimulation(network, null, null);
+		QueueSimulation queueSim = new QueueSimulation(scenario, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQueueLink(id1);
 
@@ -193,10 +192,10 @@ public class QueueLaneTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
-		Network network = this.initNetwork(scenario.getNetwork());
+		this.initNetwork(scenario.getNetwork());
 		LaneDefinitions lanes = this.createLanes(scenario);
 		
-		QueueSimulation queueSim = new QueueSimulation(network, null, null);
+		QueueSimulation queueSim = new QueueSimulation(scenario, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQueueLink(id1);
 

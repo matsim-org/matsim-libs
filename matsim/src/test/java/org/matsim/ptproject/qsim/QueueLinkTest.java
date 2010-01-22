@@ -236,9 +236,10 @@ public class QueueLinkTest extends MatsimTestCase {
 	 */
 	public void testBuffer() {
 	  Config conf = Gbl.createConfig(null);
+	  ScenarioImpl scenario = new ScenarioImpl(conf);
 	  conf.setQSimConfigGroup(new QSimConfigGroup());
 	  
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1, 0));
@@ -251,7 +252,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		qlink.setSimEngine(simEngine);
 		qlink.finishInit();
 
-		QueueSimulation qsim = new QueueSimulation(network, null, new EventsManagerImpl());
+		QueueSimulation qsim = new QueueSimulation(scenario, new EventsManagerImpl());
 		QueueVehicleImpl v1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		PlanImpl plan = p.createAndAddPlan(true);

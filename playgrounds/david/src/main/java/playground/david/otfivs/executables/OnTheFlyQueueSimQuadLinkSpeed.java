@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
@@ -82,8 +83,8 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 
 	}
 
-	public OnTheFlyQueueSimQuadLinkSpeed(final NetworkLayer net, final PopulationImpl plans, final EventsManagerImpl events) {
-		super(net, plans, events);
+	public OnTheFlyQueueSimQuadLinkSpeed(final Scenario scenario, final EventsManagerImpl events) {
+		super(scenario, events);
 	}
 
 	public static void main(final String[] args) {
@@ -144,7 +145,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 
 		EventsManagerImpl events = new EventsManagerImpl();
 
-		OnTheFlyQueueSimQuadLinkSpeed sim = new OnTheFlyQueueSimQuadLinkSpeed(net, population, events);
+		OnTheFlyQueueSimQuadLinkSpeed sim = new OnTheFlyQueueSimQuadLinkSpeed(scenario, events);
 
 		config.simulation().setSnapshotFormat("none");// or just set the snapshotPeriod to zero ;-)
 
