@@ -32,8 +32,21 @@ public class MyVis {
 	public static void main(String[] args) {
 
 //		String otffile = "../matsim/test/input/playground/benjamin/BKickRouterTestIATBR/network.xml";
-		String otffile = BkPaths.RUNBASE + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
+//		String otffile = "../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
+//		String otffile = BkPaths.RUNBASE + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
 
+//	Für den interactiven Modus: Hier die config übergeben und in der config:
+//		1. QSim-Modul einschalten ("qsim" statt "simulation")!
+//		2. Snapshot-Period auf 0 setzen!
+		
+//	output-config kann benutzt werden. Dafür:
+//		1. obiges tun!
+//		2. Pfade zu output_network und zu den output_plans anpassen!
+//		3. in "simulation" noch "evacuationTime" und "timeout" auskommentieren!
+		
+//		String otffile = "../matsim/examples/tutorial/singleIteration.xml";
+		String otffile = BkPaths.RUNBASE + "run749/TestOTFVis_interactive/749.output_config.xml";
+		
 		OTFVis.main(new String[] {otffile});
 	}
 
