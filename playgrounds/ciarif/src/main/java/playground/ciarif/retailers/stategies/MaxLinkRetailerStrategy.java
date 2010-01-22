@@ -59,7 +59,8 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			for (int j=0; j<newlink_volumes.length;j=j+1) {
 				newlink_volume = newlink_volume + newlink_volumes[j];
 			}
-			Collection<Person> persons_actual = Utils.getPersonQuadTree().get(((ActivityFacilityImpl) f).getLink().getCoord().getX(),((ActivityFacilityImpl) f).getLink().getCoord().getY(),150);
+			Link fLink = this.controler.getNetwork().getLinks().get(f.getLinkId());
+			Collection<Person> persons_actual = Utils.getPersonQuadTree().get(fLink.getCoord().getX(), fLink.getCoord().getY(), 150);
 			Collection<Person> persons_new = Utils.getPersonQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),150);
 			Collection<ActivityFacility> facilities_actual = Utils.getFacilityQuadTree().get(f.getCoord().getX(),f.getCoord().getY(),150);
 			Collection<ActivityFacility> facilities_new = Utils.getFacilityQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),150);

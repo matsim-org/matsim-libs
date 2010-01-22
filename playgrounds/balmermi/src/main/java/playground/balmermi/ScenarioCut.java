@@ -135,7 +135,7 @@ public class ScenarioCut {
 		System.out.println("removing facilities that refer to removed links of the network... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			if (network.getLinks().get(f.getLink().getId()) == null) { toRemove.add(f.getId()); }
+			if (network.getLinks().get(f.getLinkId()) == null) { toRemove.add(f.getId()); }
 		}
 		System.out.println("=> "+toRemove.size()+" facilities to remove.");
 		for (Id id : toRemove) { facilities.getFacilities().remove(id); }

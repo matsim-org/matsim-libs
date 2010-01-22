@@ -88,7 +88,7 @@ public class FacilityMoveTest extends MatsimTestCase {
 		}
 		else { assertEquals(0,f.getUpMapping().size()); }
 		
-		if (world.getLayer(NetworkLayer.LAYER_TYPE) != null) { assertEquals(F_DOWN_LINKID[i],f.getLink().getId().toString()); }
+		if (world.getLayer(NetworkLayer.LAYER_TYPE) != null) { assertEquals(F_DOWN_LINKID[i],f.getLinkId().toString()); }
 		else { assertEquals(0,f.getDownMapping().size()); }
 	}
 	

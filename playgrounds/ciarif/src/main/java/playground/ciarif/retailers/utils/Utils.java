@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.World;
@@ -23,7 +24,7 @@ public abstract class Utils {
 		Coord coord = new CoordImpl(link.getCoord().getX()+vector[0]*EPSILON,link.getCoord().getY()+vector[1]*EPSILON);
 		f.moveTo(coord);
 
-		Link oldL = f.getLink();
+		Link oldL = ((NetworkLayer) world.getLayer(NetworkLayer.LAYER_TYPE)).getLinks().get(f.getLinkId());
 		if (oldL != null) {
 			world.removeMapping(f, (LinkImpl) oldL);
 		}

@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -48,7 +47,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		int intCount=0;
 		for (ActivityFacilityImpl af:retailerFacilities.values()){
 			
-			locations.put(intCount,af.getLink().getId().toString());
+			locations.put(intCount,af.getLinkId().toString());
 			intCount = intCount+1;
 			//log.info("The facility with Id: " + integer + " has been added");
 		}
@@ -186,11 +185,11 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		log.info("The optimized solution is: " + solution);
 		int count=0;
 		for (ActivityFacilityImpl af:this.retailerFacilities.values()) {
-			if (first.get(solution.get(count)) != (af.getLink().getId().toString())) {
+			if (first.get(solution.get(count)) != (af.getLinkId().toString())) {
 				Utils.moveFacility(af,controler.getNetwork().getLinks().get(new IdImpl(first.get(solution.get(count)))),this.controler.getWorld());
 				log.info("The facility " + af.getId() + " has been moved");
 				this.movedFacilities.put(af.getId(), af);
-				log.info("Link Id after = "+ af.getLink().getId());
+				log.info("Link Id after = "+ af.getLinkId());
 				count=count+1;
 				log.info("Count= " + count);
 			}
@@ -204,8 +203,8 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		
 		TreeMap<Id,LinkRetailersImpl> availableLinks = new TreeMap<Id,LinkRetailersImpl>();
 		for (ActivityFacilityImpl af: this.retailerFacilities.values()){
-			Id id = af.getLink().getId();
-			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().get(id),(NetworkLayer) controler.getNetwork());
+			Id id = af.getLinkId();
+			LinkRetailersImpl link = new LinkRetailersImpl(controler.getNetwork().getLinks().get(id),(NetworkLayer) controler.getNetwork());
 			availableLinks.put(link.getId(),link);
 		}
 		availableLinks.putAll(freeLinks);

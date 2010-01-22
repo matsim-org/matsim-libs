@@ -159,15 +159,10 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 		return this.activities;
 	}
 
-	@Deprecated // use getLinkId()
-	public final LinkImpl getLink() {
+	public Id getLinkId() {
 		if (this.down_mapping.isEmpty()) { return null; }
 		if (this.down_mapping.size() > 1) { Gbl.errorMsg("Something is wrong!!! A facility contains at most one Link (as specified for the moment)!"); }
-		return (LinkImpl)this.getDownMapping().get(this.down_mapping.firstKey());
-	}
-	
-	public Id getLinkId() {
-		return getLink().getId();
+		return this.getDownMapping().get(this.down_mapping.firstKey()).getId();
 	}
 
 	//////////////////////////////////////////////////////////////////////

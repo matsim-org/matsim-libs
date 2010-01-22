@@ -7,10 +7,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
@@ -120,7 +120,8 @@ public class LinksRetailerReader {
 		TreeMap<Id,LinkRetailersImpl> links =  new TreeMap<Id,LinkRetailersImpl>();
 		for (Retailer r:retailers.getRetailers().values()) {
 			for (ActivityFacility af: r.getFacilities().values()){
-				LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)((ActivityFacilityImpl) af).getLink(), (NetworkLayer) controler.getNetwork());
+				Link fLink = this.controler.getNetwork().getLinks().get(af.getLinkId());
+				LinkRetailersImpl link = new LinkRetailersImpl(fLink, (NetworkLayer) controler.getNetwork());
 				links.put(link.getId(),link);
 			}
 		}

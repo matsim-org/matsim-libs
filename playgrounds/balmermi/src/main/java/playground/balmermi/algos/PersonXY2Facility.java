@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -165,11 +165,11 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 				ActivityFacilityImpl f = qt.get(coord.getX(),coord.getY());
 				if (f == null) { throw new RuntimeException("Coordinates == null; something is wrong!"); }
 				
-				Link l = f.getLink();
-				if (l == null) { throw new RuntimeException("Link == null; something is wrong!"); }
+				Id lId = f.getLinkId();
+				if (lId == null) { throw new RuntimeException("Link == null; something is wrong!"); }
 				
 				act.setFacilityId(f.getId());
-				act.setLinkId(l.getId());
+				act.setLinkId(lId);
 				Coord coord_f = f.getCoord();
 				act.setCoord(coord_f);
 			}

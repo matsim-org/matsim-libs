@@ -144,7 +144,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 
 //				And replace the activity in the chain with it (only changes the facility)
 
-				if(!newAct.getLinkId().equals(fFromFacilities.getLink().getId())){
+				if(!newAct.getLinkId().equals(fFromFacilities.getLinkId())){
 					// If the first activity was chosen, make sure the last activity is also changed
 					if(newAct.getType() == ((PlanImpl) plan).getFirstActivity().getType() && newAct.getLinkId().equals(((PlanImpl) plan).getFirstActivity().getLinkId())){
 						ActivityImpl lastAct = (ActivityImpl) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);

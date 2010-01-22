@@ -120,7 +120,7 @@ public class PersonSetActToLinkWithNonNullFacility extends AbstractPersonAlgorit
 				}
 				act.setCoord(nearest_f.getCoord());
 				act.setLinkId(nearest_f.getLinkId());//JH
-				System.out.println("f link "+ nearest_f.getId()+" "+nearest_f.getLink().getId());
+				System.out.println("f link "+ nearest_f.getId()+" "+nearest_f.getLinkId());
 				System.out.println("  p_id=" + plan.getPerson().getId() + ", act=" + act.getType() + ": nearest dist=" + nearest_dist);
 			}
 		}

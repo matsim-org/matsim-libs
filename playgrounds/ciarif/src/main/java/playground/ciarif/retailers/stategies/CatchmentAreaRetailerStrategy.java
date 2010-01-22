@@ -7,7 +7,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
@@ -16,7 +15,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.ciarif.retailers.data.FacilityRetailersImpl;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.utils.Utils;
 
@@ -49,11 +47,11 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 				if (personQuadTree == null) { throw new RuntimeException("QuadTree not set!"); }
 				Collection<? extends Person> persons = personQuadTree.get(f.getCoord().getX(),f.getCoord().getY(),200);
 				log.info(" Persons living around the facility " + f.getId() + " are: " + persons.size());
-				Object[] links = controler.getNetwork().getLinks().values().toArray();
+//				Object[] links = controler.getNetwork().getLinks().values().toArray();
 				controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-					double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());
-					ArrayList<Link> newLinks = new ArrayList<Link>(); 
-					newLinks.add(f.getLink());
+					double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLinkId());
+					ArrayList<Id> newLinks = new ArrayList<Id>(); 
+					newLinks.add(f.getLinkId());
 					double currentlink_volume =0;
 					for (int j=0; j<currentlink_volumes.length;j=j+1) {
 						currentlink_volume = currentlink_volume + currentlink_volumes[j];
@@ -61,8 +59,8 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 					 
 					for (int i=1; i<alternatives;i++) {
 						int rd = MatsimRandom.getRandom().nextInt(allowedLinks.size());
-						newLinks.add((LinkRetailersImpl)allowedLinks.get(rd));
-						double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(newLinks.get(i).getId());
+						newLinks.add(allowedLinks.get(rd).getId());
+						double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(newLinks.get(i));
 						
 						double newlink_volume =0;
 						

@@ -173,7 +173,7 @@ public class WorldConnectLocations {
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write("fid\tlid\n");
 			for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-				bw.write(f.getId().toString()+"\t"+f.getLink().getId().toString()+"\n");
+				bw.write(f.getId().toString()+"\t"+f.getLinkId().toString()+"\n");
 			}
 			bw.close();
 			fw.close();

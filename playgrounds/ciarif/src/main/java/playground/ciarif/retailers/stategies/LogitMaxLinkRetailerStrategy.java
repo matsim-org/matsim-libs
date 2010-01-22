@@ -9,9 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 
 import playground.ciarif.retailers.data.FacilityRetailersImpl;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
@@ -28,7 +26,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	
 	public LogitMaxLinkRetailerStrategy (Controler controler) {
 		this.controler = controler;
-		String logitAlternatives = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_N_ALTERNATIVES);
+		String logitAlternatives = this.controler.getConfig().findParam(CONFIG_GROUP,CONFIG_N_ALTERNATIVES);
 		int alternatives = Integer.parseInt(logitAlternatives);
 		this.alternatives = alternatives;
 	}
@@ -43,11 +41,11 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			// facility relocations are performed, if this might not influence the results it is certainly a waste of memory
 			
 			double[] utils = new double[alternatives];
-			Object[] links = controler.getNetwork().getLinks().values().toArray();
+			Link[] links = controler.getNetwork().getLinks().values().toArray(new Link[controler.getNetwork().getLinks().size()]);
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLinkId());
-			ArrayList<Link> newLinks = new ArrayList<Link>(); 
-			newLinks.add(((ActivityFacilityImpl) f).getLink());
+			ArrayList<Id> newLinkIds = new ArrayList<Id>(); 
+			newLinkIds.add(f.getLinkId());
 			double currentlink_volume =0;
 			for (int j=0; j<currentlink_volumes.length;j=j+1) {
 				currentlink_volume = currentlink_volume + currentlink_volumes[j];
@@ -56,8 +54,8 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			// calc_utility method might be called at this point
 			for (int i=1; i<alternatives;i++) {
 				int rd = MatsimRandom.getRandom().nextInt(links.length);
-				newLinks.add((LinkImpl)links[rd]);
-				double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(newLinks.get(i).getId());
+				newLinkIds.add(links[rd].getId());
+				double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(newLinkIds.get(i));
 				
 				double newlink_volume =0;
 				
@@ -70,7 +68,8 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			double [] probs = calcLogitProbability(utils);
 			for (int k=0;k<probs.length;k++) {
 				if (r<=probs [k]) {
-					((ActivityFacilityImpl) f).moveTo(newLinks.get(k).getCoord());
+					Link l = this.controler.getNetwork().getLinks().get(newLinkIds.get(k));
+					((ActivityFacilityImpl) f).moveTo(l.getCoord());
 					this.movedFacilities.put(f.getId(),f);
 				}
 			}
