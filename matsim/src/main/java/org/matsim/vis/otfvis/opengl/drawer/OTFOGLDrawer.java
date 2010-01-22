@@ -363,6 +363,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			if (value < this.minVal) return this.fastValues[0];
 			return this.fastValues[(int)((value-this.minVal)*this.grain/this.valRange)];
 		}
+		public Color getColorZeroOne( double value ) {
+			if ( value >= 1. ) return this.fastValues[this.grain-1] ;
+			if ( value <= 0. ) return this.fastValues[0] ;
+			return this.fastValues[(int)(value*this.grain)] ;
+		}
 	}
 	
 	public static class RandomColorizer {

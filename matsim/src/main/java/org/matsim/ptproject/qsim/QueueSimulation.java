@@ -407,7 +407,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
 			double diffsim  = time - SimulationTimer.getSimStartTime();
 			int nofActiveLinks = this.simEngine.getNumberOfSimulatedLinks();
-			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
+			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 			Gbl.printMemoryUsage();
 		}

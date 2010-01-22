@@ -33,17 +33,17 @@ import java.util.Map;
 import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.RandomColorizer;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.Texture;
@@ -218,6 +218,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	}
 	
 	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver {
+		@Deprecated
 		public void setAgent(char[] id, float startX, float startY, int state, int userdefined, float color) {
 			if ( agentPointDrawerSetAgentCnt < 1 ) {
 				agentPointDrawerSetAgentCnt++ ;
@@ -227,6 +228,22 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, colorizer.getColor(color), true);
 			} else {
 				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, new Color(0.0f, 0.7f, 1.0f), true);
+			}
+		}
+		public void setAgent( AgentSnapshotInfo agInfo ) {
+			char[] id = agInfo.getId().toString().toCharArray();
+			if ( id[0]=='p' && id[1]=='t' ) { 
+				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
+			} else if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
+				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), colorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne()), true);
+			} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
+				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
+			} else if ( agInfo.getAgentState()==AgentState.PERSON_OTHER_MODE ) {
+				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.MAGENTA, true);
+			} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
+				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
+			} else {
+				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
 			}
 		}
 	
@@ -257,6 +274,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	public /*static*/ class NoAgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver  {
 		
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color){
+		}
+		public void setAgent( AgentSnapshotInfo agInfo ) {
 		}
 
 		public void onDraw(GL gl) {

@@ -132,7 +132,7 @@ public class FacilityDrawer {
 				stop.x = in.getDouble();
 				stop.y = in.getDouble();
 				if (this.drawer != null) {
-					this.drawer.stops.add(stop);
+//					this.drawer.stops.add(stop);
 				}
 			}
 			drawer.initTexts();

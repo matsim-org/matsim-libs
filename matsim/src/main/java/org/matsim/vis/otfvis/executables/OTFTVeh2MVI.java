@@ -39,6 +39,7 @@ import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
  * This is a standalone executable to convert T.veh.gz files to .mvi files.
@@ -95,8 +96,12 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 						//String type = result[7];
 //						ExtendedPositionInfo position = new ExtendedPositionInfo(new IdImpl(agent), easting, northing,
 //								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
-						ExtendedPositionInfo position = new ExtendedPositionInfo(new IdImpl(agent), easting, northing,
-								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
+						AgentSnapshotInfo position = new PositionInfo(new IdImpl(agent), easting, northing,
+								Double.parseDouble(elevation), Double.parseDouble(azimuth) ) ;
+						position.setColorValueBetweenZeroAndOne( Double.parseDouble(speed) ) ;
+						position.setAgentState( AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR ) ;
+						position.setType( Integer.parseInt(result[7]) ) ;
+						position.setUserDefined( Integer.parseInt(result[15]) );
 						addVehicle(Double.parseDouble(time), position);
 					}
 				}
@@ -109,7 +114,7 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 		finish();
 	}
 
-	private void addVehicle(double time, ExtendedPositionInfo position) {
+	private void addVehicle(double time, AgentSnapshotInfo position) {
 
 		// Init lastTime with first occurence of time!
 		if (this.lastTime == -1) this.lastTime = time;

@@ -77,9 +77,10 @@ public class OTFEvent2MVI extends OTFFileWriter {
 	@Override
 	public void addAgent(PositionInfo position) {
 		//drop all parking vehicles
-		if (position.getAgentState() == AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY) return;
+		if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) return;
 
-		this.writer.positions.add(new OTFAgentsListHandler.ExtendedPositionInfo(position, 0,0));
+//		this.writer.positions.add(new OTFAgentsListHandler.ExtendedPositionInfo(position, 0,0));
+		this.writer.positions.add( position );
 	}
 
 	@Override

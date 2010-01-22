@@ -283,7 +283,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, queueEnd/* + NetworkLayer.CELL_LENGTH*/,
-						lane, speed, AgentSnapshotInfo.AgentState.AGENT_MOVING,null);
+						lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR,null);
 				agent.linkPosition = queueEnd * this.ratioLengthToEuklideanDist;
 				positions.add(position);
 				queueEnd -= vehLen;
@@ -319,7 +319,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				int lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, this.link));
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/,
-						lane, speed, AgentSnapshotInfo.AgentState.AGENT_MOVING,null);
+						lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR,null);
 				positions.add(position);
 				agent.linkPosition = distanceOnLink * this.ratioLengthToEuklideanDist;
 				lastDistance = distanceOnLink;
@@ -331,7 +331,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			int lane = NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, this.link) + 1; // place them next to the link
 			for (EventAgent agent : this.waitingQueue) {
 				PositionInfo position = new PositionInfo(agent.id,
-						this.link, this.effectiveCellSize, lane, 0.0, AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY,null);
+						this.link, this.effectiveCellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY,null);
 				positions.add(position);
 			}
 
@@ -341,7 +341,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			lane = NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, this.link) + 2; // place them next to the link
 			for (EventAgent agent : this.parkingQueue) {
 				PositionInfo position = new PositionInfo(agent.id,
-						this.link, this.effectiveCellSize, lane, 0.0, AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY,null);
+						this.link, this.effectiveCellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY,null);
 				positions.add(position);
 			}
 		}
@@ -372,7 +372,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 					} else {
 						agent.speed = freespeed;
 					}
-					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
+					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
 					positions.add(position);
 					distFromFromNode -= cellSize;
 				}
@@ -387,7 +387,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 					} else {
 						agent.speed = freespeed;
 					}
-					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
+					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
 					positions.add(position);
 					distFromFromNode -= cellSize;
 				}
@@ -404,7 +404,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 					agent.lane = lane;
 					agent.linkPosition = distFromFromNode;
 					agent.speed = 0.0;
-					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY, null);
+					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY, null);
 					positions.add(position);
 					distFromFromNode -= cellSize;
 				}
@@ -421,7 +421,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 					agent.lane = lane;
 					agent.linkPosition = distFromFromNode;
 					agent.speed = 0.0;
-					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY, null);
+					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY, null);
 					positions.add(position);
 					distFromFromNode -= cellSize;
 				}

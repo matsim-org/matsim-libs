@@ -39,7 +39,7 @@ public class EvacuationLinksTeleporter implements PostProcessorI{
 	}
 
 	public void processPositionInfo(PositionInfo pos) {
-		if (pos.getSpeed() > TELEPORTATION_SPEED) {
+		if (pos.getColorValueBetweenZeroAndOne() > TELEPORTATION_SPEED) {
 			pos.setEasting(D_TELEPORTATION_X);
 			pos.setNorthing(D_TELEPORTATION_Y);
 		}

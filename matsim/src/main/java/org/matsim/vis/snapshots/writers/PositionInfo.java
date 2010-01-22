@@ -82,10 +82,10 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * @param link
 	 */
 	public PositionInfo( final Id agentId, final Link link ) {
-		this( agentId, link, 0.9*link.getLength(), 10, 0., AgentState.AGENT_AT_ACTIVITY, "") ;
+		this( agentId, link, 0.9*link.getLength(), 10, 0., AgentState.PERSON_AT_ACTIVITY, "") ;
 	}
 	public PositionInfo( final Id agentId, final Link link, int cnt ) {
-		this( agentId, link, 0.9*link.getLength(), 10+2*cnt, 0., AgentState.AGENT_AT_ACTIVITY, "") ;
+		this( agentId, link, 0.9*link.getLength(), 10+2*cnt, 0., AgentState.PERSON_AT_ACTIVITY, "") ;
 	}
 
 	/**
@@ -128,14 +128,17 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
 	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState, final String visualizerData) {
+		this( linkScale, agentId, link, distanceOnLink, lane ) ;
+		this.speed = speed;
+		this.vehicleState = vehicleState;
+	}
+	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane ) {
 		this.agentId = agentId;
 		this.link = link;
-		this.speed = speed;
 		this.distanceOnLink = distanceOnLink;
-		this.vehicleState = vehicleState;
-//		this.visualizerData = visualizerData;
 		this.calculatePosition(linkScale, lane);
 	}
+	
 	
 	/**
 	 * Creates a new PositionInfo with the specified position and speed.
@@ -150,16 +153,18 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
 	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final AgentState vehicleState, final String visualizerData) {
+		this( driverId, easting, northing, elevation, azimuth ) ;
+		this.speed = speed;
+		this.vehicleState = vehicleState;
+	}
+	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth ) {
 		this.agentId = driverId;
 		this.link = null;
 		this.easting = easting;
 		this.northing = northing;
 		this.elevation = elevation;
 		this.azimuth = azimuth;
-		this.speed = speed;
-		this.vehicleState = vehicleState;
 		this.distanceOnLink = 0.0; // is unknown
-//		this.visualizerData = visualizerData;
 	}
 
 	
@@ -218,10 +223,10 @@ public class PositionInfo implements AgentSnapshotInfo {
 		return this.azimuth;
 	}
 
-	public double getSpeed() {
+	public double getColorValueBetweenZeroAndOne() {
 		return this.speed;
 	}
-	public void setSpeed( double spd ) {
+	public void setColorValueBetweenZeroAndOne( double spd ) {
 		this.speed = spd ;
 	}
 

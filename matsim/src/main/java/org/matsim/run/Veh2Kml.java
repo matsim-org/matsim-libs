@@ -223,7 +223,7 @@ public class Veh2Kml {
 						String elevation = result[13];
 						String azimuth = result[14];
 						PositionInfo position = new PositionInfo(new IdImpl(agent), easting, northing,
-								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING,null);
+								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR,null);
 						addVehicle(Double.parseDouble(time), position);
 					}
 				}

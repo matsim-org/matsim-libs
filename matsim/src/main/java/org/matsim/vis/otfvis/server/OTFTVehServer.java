@@ -45,6 +45,7 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
  * OTFTVehServer is a Server that reads from the T.veh file format.
@@ -66,7 +67,7 @@ public class OTFTVehServer implements OTFServerRemote {
 	private final OTFServerQuad2 quad;
 
 	private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
-	private OTFAgentsListHandler.ExtendedPositionInfo readVehicle = null;
+	private AgentSnapshotInfo readVehicle = null;
 	private double time;
 	
 	public OTFTVehServer(String netFileName, String vehFileName) {
@@ -125,8 +126,14 @@ public class OTFTVehServer implements OTFServerRemote {
 
 					lineFound = true;
 					this.time = Double.parseDouble(time);
-					this.readVehicle = new OTFAgentsListHandler.ExtendedPositionInfo(new IdImpl(agent), easting, northing,
-							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
+//					this.readVehicle = new OTFAgentsListHandler.ExtendedPositionInfo(new IdImpl(agent), easting, northing,
+//							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
+					this.readVehicle = new PositionInfo(new IdImpl(agent), easting, northing,
+							Double.parseDouble(elevation), Double.parseDouble(azimuth) ) ;
+					this.readVehicle.setColorValueBetweenZeroAndOne( Double.parseDouble(speed) ) ;
+					this.readVehicle.setAgentState( AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR ) ;
+					this.readVehicle.setType( Integer.parseInt(result[7]) ) ;
+					this.readVehicle.setUserDefined( Integer.parseInt(result[15]) ) ;
 					return true;
 				}
 			}

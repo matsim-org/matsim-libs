@@ -23,6 +23,8 @@
  */
 package org.matsim.vis.otfvis.data;
 
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+
 public interface OTFDataSimpleAgentReceiver extends OTFDataReceiver{
 	
 	/**
@@ -39,6 +41,8 @@ public interface OTFDataSimpleAgentReceiver extends OTFDataReceiver{
 	 * be a newer one, with shorter signature.  kai, jan'10
 	 * </p>
 	 */
+	@Deprecated
 	public void setAgent(char[] id, float startX, float startY, int state, int userdefined, float color);
+	public void setAgent( AgentSnapshotInfo agInfo ) ;
 
 }

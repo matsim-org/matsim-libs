@@ -112,7 +112,11 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 				int count = readerClasses.size();
 				if (count != 1) {
 					// there must be exactly ONE Reader class corresponding to every Writer class
-					if (count > 1) log.fatal("For Writer class" + entry.from.getCanonicalName() + " there is more than ONE reader class defined");
+					if (count > 1) {
+						log.fatal("For Writer class" + entry.from.getCanonicalName() + " there is more than ONE reader class defined.  The readers are:\n"
+								+ readerClasses );
+						
+					}
 					else log.fatal("For Writer class" + entry.from.getCanonicalName() + " there is NO reader class defined");
 					throw new RuntimeException(); //System.exit(1);
 				}

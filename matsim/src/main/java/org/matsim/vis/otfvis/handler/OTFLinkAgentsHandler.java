@@ -30,6 +30,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.QueueLink;
@@ -40,6 +41,7 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -59,7 +61,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		OTFDataReader.setPreviousVersion(OTFLinkAgentsHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
 	}
 	
-	private final Logger log = Logger.getLogger(OTFLinkAgentsHandler.class);
+	private static final Logger log = Logger.getLogger(OTFLinkAgentsHandler.class);
 
 	private Class agentReceiverClass = null;
 
@@ -73,37 +75,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 		protected static final transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 
-		public void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
-			String id = pos.getId().toString();
-			ByteBufferUtils.putString(out, id);
-			out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
-			out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
-			if (pos.getAgentState()== AgentState.AGENT_AT_ACTIVITY) {
-				// What is the next legs mode?
-				QueueVehicle veh = src.getVehicle(pos.getId());
-				if (veh == null) {
-					out.putInt(1);
-				} else {
-					DriverAgent driver = veh.getDriver(); 
-					Leg leg = driver.getCurrentLeg();
-					if (leg != null) {
-						if(leg.getMode() == TransportMode.pt) {
-							out.putInt(2);
-						} else if(leg.getMode() == TransportMode.bus) {
-							out.putInt(3);
-						} else {
-							out.putInt(1);
-						}
-					} else {						
-						out.putInt(1);
-					}
-				}
-			} else {
-				out.putInt(0);
-			}
-			out.putFloat((float)pos.getSpeed());
-		}
-		
 		protected void writeAllAgents(ByteBuffer out) {
 			// Write additional agent data
 
@@ -119,12 +90,12 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			} else {
 				int valid = 0;
 				for (AgentSnapshotInfo pos : positions) {
-					if (pos.getAgentState() != AgentState.AGENT_AT_ACTIVITY) valid++;
+					if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY) valid++;
 				}
 				out.putInt(valid);
 
 				for (AgentSnapshotInfo pos : positions) {
-					if (pos.getAgentState() != AgentState.AGENT_AT_ACTIVITY) writeAgent(pos, out);
+					if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY) writeAgent(pos, out);
 				}
 			}
 
@@ -142,37 +113,111 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			return new Writer();
 		}
 
+		public void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
+			if ( OTFFileWriter.VERSION<=1 && OTFFileWriter.MINORVERSION<=6 ) {
+				// yyyy I think this can completely go.  kai, jan'10
+				String id = pos.getId().toString();
+				ByteBufferUtils.putString(out, id);
+				out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
+				out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
+				if (pos.getAgentState()== AgentState.PERSON_AT_ACTIVITY) {
+					// What is the next legs mode?
+					QueueVehicle veh = src.getVehicle(pos.getId());
+					if (veh == null) {
+						out.putInt(1);
+					} else {
+						DriverAgent driver = veh.getDriver(); 
+						Leg leg = driver.getCurrentLeg();
+						if (leg != null) {
+							if(leg.getMode() == TransportMode.pt) {
+								out.putInt(2);
+							} else if(leg.getMode() == TransportMode.bus) {
+								out.putInt(3);
+							} else {
+								out.putInt(1);
+							}
+						} else {						
+							out.putInt(1);
+						}
+					}
+				} else {
+					out.putInt(0);
+				}
+				out.putFloat((float)pos.getColorValueBetweenZeroAndOne());
+			} else {
+				if ( cnt < 1 ) {
+					cnt ++ ;
+					log.warn("here209348") ;
+				}
+				String id = pos.getId().toString();
+				ByteBufferUtils.putString(out, id);
+				out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
+				out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
+				out.putInt(pos.getUserDefined()) ;
+				out.putFloat((float)pos.getColorValueBetweenZeroAndOne()) ;
+				out.putInt(pos.getAgentState().ordinal());
+			}
+		}
+		
 	}
-	
-	
-	public void readAgent(ByteBuffer in, SceneGraph graph) {
-		String id = ByteBufferUtils.getString(in);
-//		int length = in.getInt();
-//		if(length > 100) {
-//			log.warn("Agent could not be read fully from stream");
-//			return;
-//		}
-//		
-//		char[] idBuffer = new char[length];
-//		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
-		float x = in.getFloat();
-		float y = in.getFloat();
-		int userdefined = in.getInt();
-		// Convert to km/h 
-		float color = in.getFloat()*3.6f;
-		// No agent receiver given, then we are finished
-		if (agentReceiverClass == null) return;
+	private static int cnt = 0 ;
 
-		OTFDataSimpleAgentReceiver drawer = null;
-		try {
-			drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(agentReceiverClass);
-			drawer.setAgent(id.toCharArray(), x, y, 0, userdefined, color);
-			agents.add(drawer);
-		} catch (InstantiationException e) {
-			log.warn("Agent drawer could not be instanciated");
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} //factoryAgent.getOne();
+	private static int cnt2 = 0 ;
+	public void readAgent(ByteBuffer in, SceneGraph graph) {
+		if ( cnt2 < 1 ) {
+			log.warn("here xcnv") ;
+		}
+		if ( OTFFileWriter.VERSION<=1 && OTFFileWriter.MINORVERSION<=6 ) {
+			// yyyy I think this can completely go.  kai, jan'10
+			String id = ByteBufferUtils.getString(in);
+			float x = in.getFloat();
+			float y = in.getFloat();
+			int userdefined = in.getInt();
+			// Convert to km/h 
+			float color = in.getFloat()*3.6f;
+			// No agent receiver given, then we are finished
+			if (agentReceiverClass == null) return;
+
+			try {
+				OTFDataSimpleAgentReceiver drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(agentReceiverClass);
+				drawer.setAgent(id.toCharArray(), x, y, 0, userdefined, color);
+				agents.add(drawer);
+			} catch (InstantiationException e) {
+				log.warn("Agent drawer could not be instanciated");
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} //factoryAgent.getOne();
+		} else {
+			if ( cnt2 < 1 ) {
+				cnt2++ ;
+				log.warn("here nwovnwov") ;
+			}
+			String id = ByteBufferUtils.getString(in) ;
+			float x = in.getFloat() ;
+			float y = in.getFloat();
+			int userdefined = in.getInt() ;
+			float colorValue = in.getFloat();
+			int state = in.getInt() ;
+			
+			AgentSnapshotInfo agInfo = new PositionInfo( new IdImpl(id), x, y, 0., 0. ) ;
+			agInfo.setColorValueBetweenZeroAndOne(colorValue) ;
+			agInfo.setUserDefined(userdefined) ;
+			agInfo.setAgentState( AgentState.values()[state] ) ;
+			
+			if (agentReceiverClass == null) return;
+
+			try {
+				OTFDataSimpleAgentReceiver drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(agentReceiverClass);
+				drawer.setAgent( agInfo ) ;
+				agents.add(drawer);
+			} catch (InstantiationException e) {
+				log.warn("Agent drawer could not be instanciated");
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} //factoryAgent.getOne();
+			
+		}
 
 	}
 	

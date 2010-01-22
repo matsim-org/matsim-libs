@@ -48,6 +48,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.pt.queuesim.TransitQueueLaneFeature;
+import org.matsim.pt.queuesim.TransitVehicle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -721,7 +722,7 @@ public class QueueLane {
 
 			List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
 			for (PositionInfo pos : positions) {
-				if (pos.getAgentState() == AgentSnapshotInfo.AgentState.AGENT_MOVING) {
+				if (pos.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR) {
 					AgentOnLink veh = new AgentOnLink();
 					veh.posInLink_m = pos.getDistanceOnLink();
 					vehs.add(veh);
@@ -733,6 +734,8 @@ public class QueueLane {
 
 		public Collection<PositionInfo> getVehiclePositions(double time, 
 				final Collection<PositionInfo> positions) {
+			log.warn( " entering getVehiclePositions ") ;
+
 			String snapshotStyle = Gbl.getConfig().getQSimConfigGroup().getSnapshotStyle();
 			if ("queue".equals(snapshotStyle)) {
 				getVehiclePositionsQueue(positions);
@@ -771,7 +774,7 @@ public class QueueLane {
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QueueLane.this.queueLink.getLink(),
-								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
+								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
 						positions.add(position);
 					}
 					distFromFromNode -= cellSize;
@@ -785,7 +788,7 @@ public class QueueLane {
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QueueLane.this.queueLink.getLink(),
-								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
+								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
 						positions.add(position);
 					}
 					distFromFromNode -= cellSize;
@@ -804,7 +807,7 @@ public class QueueLane {
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QueueLane.this.queueLink.getLink(),
-								distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY, null);
+								distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY, null);
 						positions.add(position);
 					}
 					distFromFromNode -= cellSize;
@@ -859,7 +862,7 @@ public class QueueLane {
 				final Collection<PositionInfo> positions, double now,
 				double queueEnd, Link link, double vehLen) {
 			for (QueueVehicle veh : QueueLane.this.buffer) {
-
+				
 				int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QueueLane.this.queueLink.getLink()));
 
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
@@ -867,7 +870,7 @@ public class QueueLane {
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI person : peopleInVehicle) {
 					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), link, queueEnd,
-							lane, speed, AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
+							lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
 					positions.add(position);
 				}
 				queueEnd -= vehLen;
@@ -922,7 +925,7 @@ public class QueueLane {
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI passenger : peopleInVehicle) {
 					PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
-							lane, speed, AgentSnapshotInfo.AgentState.AGENT_MOVING, null);
+							lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
 					positions.add(passengerPosition);
 				}
 				
@@ -955,7 +958,7 @@ public class QueueLane {
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI person : peopleInVehicle) {
 					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QueueLane.this.queueLink.getLink(),
-							/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY, null);
+							/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY, null);
 					positions.add(position);
 				}
 			}

@@ -57,7 +57,7 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 		ByteBufferUtils.putString(out, id);
 		out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
 		out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
-		if (pos.getAgentState()== AgentState.AGENT_AT_ACTIVITY) {
+		if (pos.getAgentState()== AgentState.PERSON_AT_ACTIVITY) {
 			// What is the next legs mode?
 			QueueVehicle veh = src.getVehicle(pos.getId());
 			if (veh == null) {
@@ -80,7 +80,7 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 		} else {
 			out.putInt(0);
 		}
-		out.putFloat((float)pos.getSpeed());
+		out.putFloat((float)pos.getColorValueBetweenZeroAndOne());
 	}
 	
 	protected void writeAllAgents(ByteBuffer out) {
@@ -98,12 +98,12 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 		} else {
 			int valid = 0;
 			for (AgentSnapshotInfo pos : positions) {
-				if (pos.getAgentState() != AgentState.AGENT_AT_ACTIVITY) valid++;
+				if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY) valid++;
 			}
 			out.putInt(valid);
 
 			for (AgentSnapshotInfo pos : positions) {
-				if (pos.getAgentState() != AgentState.AGENT_AT_ACTIVITY) writeAgent(pos, out);
+				if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY) writeAgent(pos, out);
 			}
 		}
 

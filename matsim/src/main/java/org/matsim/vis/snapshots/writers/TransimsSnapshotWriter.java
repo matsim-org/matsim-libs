@@ -63,7 +63,7 @@ public class TransimsSnapshotWriter implements SnapshotWriter {
 	public void addAgent(PositionInfo position) {
 		
 		//drop all parking vehicles 
-		if (position.getAgentState() == AgentSnapshotInfo.AgentState.AGENT_AT_ACTIVITY) return;
+		if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) return;
 		
 //		String visualizerData = 	position.getVisualizerData();
 //		if (visualizerData == null){
@@ -72,7 +72,7 @@ public class TransimsSnapshotWriter implements SnapshotWriter {
 		
 		String buffer = position.getId().toString()
 					    			+ "\t" + (int)this.currentTime
-		                + "\t0\t0\t1\t0\t" + position.getSpeed() // link(0), from node(0), lane(1), dist(0), speed
+		                + "\t0\t0\t1\t0\t" + position.getColorValueBetweenZeroAndOne() // link(0), from node(0), lane(1), dist(0), speed
 		                + "\t1\t0\t" + position.getId().toString()   // vehtype(1), acceleration(0), driver-id
 		                + "\t0\t" + position.getEasting()   // # of passengers(0), easting
 		                + "\t" + position.getNorthing() 

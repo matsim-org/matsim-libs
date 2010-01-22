@@ -52,6 +52,7 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 
 /**
@@ -427,6 +428,13 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			this.startY = startY;
 			this.color = color;
 			this.state = state;
+		}
+		public void setAgent( AgentSnapshotInfo agInfo ) {
+			this.id = agInfo.getId().toString().toCharArray();
+			this.startX = (float) agInfo.getEasting() ;
+			this.startY = (float) agInfo.getNorthing() ;
+			this.color = (float) agInfo.getColorValueBetweenZeroAndOne() ;
+			this.state = agInfo.getAgentState().ordinal() ;
 		}
 
 //		protected void setColor(Graphics2D display) {

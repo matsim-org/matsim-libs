@@ -21,9 +21,9 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 import playground.gregor.sim2d.otfdebug.readerwriter.Agent2DWriter;
@@ -232,7 +232,12 @@ public class Sim2D {
 				alpha /= TWO_PI;
 				alpha *= 360;
 				alpha += 90;
-				AgentSnapshotInfo pos = new OTFAgentsListHandler.ExtendedPositionInfo(agent.getId(),coord.x,coord.y,0,alpha,velocity,AgentState.AGENT_MOVING,Math.abs(agent.getId().hashCode())%10,1);
+//				AgentSnapshotInfo pos = new OTFAgentsListHandler.ExtendedPositionInfo(agent.getId(),coord.x,coord.y,0,alpha,velocity,AgentState.AGENT_MOVING,Math.abs(agent.getId().hashCode())%10,1);
+				AgentSnapshotInfo pos = new PositionInfo(agent.getId(),coord.x,coord.y,0.,alpha);
+				pos.setColorValueBetweenZeroAndOne(velocity);
+				pos.setAgentState(AgentState.PERSON_DRIVING_CAR) ;
+				pos.setType(Math.abs(agent.getId().hashCode())%10) ;
+				pos.setUserDefined(1);
 				this.agentData.add(pos);
 			}
 		}

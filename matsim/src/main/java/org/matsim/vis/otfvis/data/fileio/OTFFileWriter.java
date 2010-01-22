@@ -64,7 +64,7 @@ public class OTFFileWriter implements SnapshotWriter {
 	/**
 	 *  minor version increase does not break compatibility
 	 */
-	public static final int MINORVERSION = 6;
+	public static final int MINORVERSION = 7;
 	/**
 	 *  the version number should be increased to imply a compatibility break
 	 */

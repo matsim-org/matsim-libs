@@ -39,7 +39,7 @@ public class TableSnapshotWriter {
 		buff.append("\t");
 		buff.append(pos.getAzimuth());
 		buff.append("\t");
-		buff.append(pos.getSpeed());
+		buff.append(pos.getColorValueBetweenZeroAndOne());
 		buff.append("\n");
 		this.writer.append(buff.toString());
 		
