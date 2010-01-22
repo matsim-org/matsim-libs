@@ -8,6 +8,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -22,7 +23,6 @@ public class ReplanParkingSearchRoute implements LinkEnterEventHandler  {
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		// TODO Auto-generated method stub
 		System.out.println(event.toString());
 		Person person= controler.getPopulation().getPersons().get(event.getPersonId());
 		Plan originalPlan=person.getSelectedPlan();
@@ -35,7 +35,7 @@ public class ReplanParkingSearchRoute implements LinkEnterEventHandler  {
 		TravelTime travelTime=controler.getTravelTimeCalculator();
 		
 		
-		PlanAlgorithm algorithm=new PlansCalcRoute(controler.getNetwork(), travelCost, travelTime);
+		PlanAlgorithm algorithm=new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(), travelCost, travelTime, new DijkstraFactory()); // maybe better: controler.getRoutingAlgorithm();
 		algorithm.run(newPlan);
 		
 		

@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -101,11 +102,12 @@ public class PrimaryLocationDrawing {
 
 	}
 
-	public void run() {
+	public void run(Config config) {
 		HashMap<String,Feature> ftDist = getFeatures(this.districts);
 		ArrayList<Zone> zones = getZones();
 		PopulationImpl pop = getPopulation(ftDist,zones);
-		PlansCalcRoute router = new PlansCalcRoute(this.network,new FreespeedTravelTimeCost(),new FreespeedTravelTimeCost(), new DijkstraFactory());
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), this.network,timeCostCalc, timeCostCalc, new DijkstraFactory());
 		router.run(pop);
 		new PopulationWriter(pop, this.network).writeFile(this.demandFilename);
 	}
@@ -347,7 +349,7 @@ public class PrimaryLocationDrawing {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
-		new PrimaryLocationDrawing(network,zonesFilename,demandFilename,districts).run();
+		new PrimaryLocationDrawing(network,zonesFilename,demandFilename,districts).run(scenario.getConfig());
 	}
 
 

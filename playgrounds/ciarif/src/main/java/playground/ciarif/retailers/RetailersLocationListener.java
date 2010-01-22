@@ -11,7 +11,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.PreProcessLandmarks;
 
 import playground.ciarif.retailers.IO.FileRetailerReader;
 import playground.ciarif.retailers.IO.LinksRetailerReader;
@@ -19,7 +18,6 @@ import playground.ciarif.retailers.IO.RetailersSummaryWriter;
 import playground.ciarif.retailers.data.Retailer;
 import playground.ciarif.retailers.data.Retailers;
 import playground.ciarif.retailers.utils.CountFacilityCustomers;
-import playground.ciarif.retailers.utils.CountRetailerCustomers;
 import playground.ciarif.retailers.utils.ReRoutePersons;
 
 public class RetailersLocationListener implements StartupListener, IterationEndsListener, BeforeMobsimListener{
@@ -36,8 +34,6 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	
 	//private variables
 	
-	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private final boolean parallel = false;
 	private String facilityIdFile = null;
@@ -52,8 +48,8 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	public void notifyStartup(StartupEvent event) {
 		
 		this.controler = event.getControler();
-		preprocess.run(controler.getNetwork());
-		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(controler.getConfig().charyparNagelScoring());
+		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc));
 		
 		//The characteristics of retailers are read
 		this.facilityIdFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);

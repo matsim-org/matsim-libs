@@ -50,10 +50,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.PreProcessLandmarks;
 
 import playground.ciarif.retailers.IO.FileRetailerReader;
-import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
 import playground.ciarif.retailers.data.Retailer;
@@ -72,11 +70,9 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	public final static String CONFIG_SAMPLE_SHOPS = "samplingRateShops";
 	public final static String CONFIG_SAMPLE_PERSONS = "samplingRatePersons";
 	private Retailers retailers;
-	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
-	private final ArrayList<LinkRetailersImpl> retailersLinks = null;
+//	private final ArrayList<LinkRetailersImpl> retailersLinks = null;
 	private final RetailZones retailZones = new RetailZones();
 	private Map<Id,? extends ActivityFacility> controlerFacilities = null;
 	ArrayList<ActivityFacility> sampledShops = new ArrayList<ActivityFacility>();
@@ -91,8 +87,8 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 
 		this.controler = event.getControler();
 		this.controlerFacilities = controler.getFacilities().getFacilities();
-		preprocess.run(controler.getNetwork());
-		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(controler.getConfig().charyparNagelScoring());
+		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc));
 		
 		// Make a table with all shop activities listed  
 		/*String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
@@ -157,7 +153,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		// controlled by the controler (or actually added to the population)
 		log.info("There is (are) " + retailers.getRetailers().values().size() + " Retailer(s)");
 		//Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
-		if (controler.getIteration()%5==0 && controler.getIteration()>0){
+		if (controler.getIterationNumber()%5==0 && controler.getIterationNumber()>0){
 			// TODO could try to use a double ""for" cycle in order to avoid to use the getIteration method
 			// the first is 0...n where n is the number of times the gravity model needs to 
 			// be computed, the second is 0...k, where k is the number of iterations needed 

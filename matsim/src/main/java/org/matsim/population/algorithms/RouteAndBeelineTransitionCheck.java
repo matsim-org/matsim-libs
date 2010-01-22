@@ -28,12 +28,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.DijkstraFactory;
 
 /**
  * Checks if the fastest route between two activities ("beeline route") crosses a specific area.
@@ -56,8 +59,8 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 	public RouteAndBeelineTransitionCheck(final NetworkLayer net, final Set<Id> areaOfInterest) {
 		this.network = net;
 		this.aOI = areaOfInterest;
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		this.router = new PlansCalcRoute(this.network, timeCostCalc, timeCostCalc);
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+		this.router = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), this.network, timeCostCalc, timeCostCalc, new DijkstraFactory());
 		this.count = new int[4];
 	}
 

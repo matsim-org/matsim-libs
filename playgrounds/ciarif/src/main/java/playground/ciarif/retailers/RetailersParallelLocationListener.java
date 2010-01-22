@@ -54,7 +54,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.ciarif.retailers.IO.MakeATableFromXMLFacilities;
@@ -81,8 +80,6 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 	private PlansSummaryTable pst = null;
 	private MakeATableFromXMLFacilities txf = null;
 	//private LinksRetailerReader lrr = null;
-	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
 	private final ArrayList<LinkRetailersImpl> retailersLinks = new ArrayList<LinkRetailersImpl>();
@@ -96,8 +93,8 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 
 		Controler controler = event.getControler();
 		this.controlerFacilities = controler.getFacilities().getFacilities();
-		preprocess.run(controler.getNetwork());
-		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(controler.getConfig().charyparNagelScoring());
+		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc));
 		String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.pst = new PlansSummaryTable (popOutFile);

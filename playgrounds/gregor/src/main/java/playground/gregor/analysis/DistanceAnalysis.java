@@ -59,6 +59,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -120,13 +121,14 @@ public class DistanceAnalysis {
 	private static double CATCH_RADIUS;
 //	private TreeMap<Double, Feature> ft_tree;
 
-	public DistanceAnalysis(final FeatureSource features, final PopulationImpl population, final Network network) throws Exception {
+	public DistanceAnalysis(final FeatureSource features, final PopulationImpl population, final Network network, final Config config) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
 		this.network = network;
 		this.envelope  = this.featureSourcePolygon.getBounds();
 
-		this.router = new PlansCalcRoute(network, new TravelTimeDistanceCostCalculator(new FreespeedTravelTimeCost()), new FreespeedTravelTimeCost());
+		FreespeedTravelTimeCost ttCost = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		this.router = new PlansCalcRoute(config.plansCalcRoute(), network, new TravelTimeDistanceCostCalculator(ttCost, config.charyparNagelScoring()), ttCost, new DijkstraFactory());
 		this.geofac = new GeometryFactory();
 
 		initFeatureCollection();
@@ -385,14 +387,14 @@ public class DistanceAnalysis {
 		log.info("done.");
 
 		try {
-			new DistanceAnalysis(features,population,network);
+			new DistanceAnalysis(features,population,network,config);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		try {
-			new EgressAnalysis(features,population,network);
+			new EgressAnalysis(features,population,network,config);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

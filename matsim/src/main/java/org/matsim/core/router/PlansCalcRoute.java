@@ -88,24 +88,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
-	/**
-	 * Creates a rerouting strategy module using the rerouting of the factory
-	 * @deprecated use the constructor with the config group as argument
-	 */
-	@Deprecated
-	public PlansCalcRoute(final Network network, final TravelCost costCalculator,
-			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
-		this(null, network, costCalculator, timeCalculator, factory);
-	}
-	
-	/**
-	 * Creates a rerouting strategy module using dijkstra rerouting
-	 * @deprecated use the constructor with the config group as argument
-	 */
-	@Deprecated
-	public PlansCalcRoute(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
-		this(null, network, costCalculator, timeCalculator, new DijkstraFactory());
-	}
 	
 	/**Does the following (as far as I can see):<ul>
 	 * <li> sets routeAlgo to the path calculator defined by <tt>factory</tt>, using <tt>costCalculator</tt> and <tt>timeCalculator</tt> as arguments </li>

@@ -53,6 +53,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -192,7 +193,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 //				Reset the score to Undefined. Helps to see if the plan was really changed
 				newPlan.setScore(Double.NaN);
 				
-				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
+				new PersonPrepareForSim(new PlansCalcRoute(null, network, tcost, ttime, new DijkstraFactory()), network).run(newPlan.getPerson());
 
 //				Not needed with new change to Act --> Facility JH 7.2008
 //				k.getMentalMap().learnActsActivities(newAct,f.getActivity(factype));

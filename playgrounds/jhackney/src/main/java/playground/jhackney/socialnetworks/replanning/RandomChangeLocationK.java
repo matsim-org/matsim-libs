@@ -37,6 +37,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -179,7 +180,7 @@ public class RandomChangeLocationK  implements PlanAlgorithm{
 //				Reset the score.
 //old double score				newPlan.setScore(Plan.UNDEF_SCORE);
 
-				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), (NetworkLayer) network).run(newPlan.getPerson());
+				new PersonPrepareForSim(new PlansCalcRoute(null, network, tcost, ttime, new DijkstraFactory()), (NetworkLayer) network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 
 //				Not needed with new change to Act --> Facility JH 7.2008

@@ -58,6 +58,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -93,14 +94,15 @@ public class EgressAnalysis {
 
 
 	public EgressAnalysis(final FeatureSource features, final PopulationImpl population,
-			final Network network) throws Exception {
+			final Network network, final Config config) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
 		this.network = network;
 		this.geofac = new GeometryFactory();
 		this.gth = new GTH(this.geofac);
 		this.egressNodes = new HashMap<Id,EgressNode>();
-		this.router = new PlansCalcRoute(network, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());
+		FreespeedTravelTimeCost ttCost = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		this.router = new PlansCalcRoute(config.plansCalcRoute(), network, ttCost, ttCost, new DijkstraFactory());
 		initFeatureCollection();
 		initEgressNodes();
 		handlePlans();
@@ -260,7 +262,7 @@ public class EgressAnalysis {
 
 
 		try {
-			new EgressAnalysis(features,population,network);
+			new EgressAnalysis(features,population,network,config);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

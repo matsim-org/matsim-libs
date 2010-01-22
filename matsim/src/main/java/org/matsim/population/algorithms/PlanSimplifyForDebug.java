@@ -27,6 +27,8 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -34,6 +36,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.DijkstraFactory;
 
 /**
  * @author mrieser
@@ -77,8 +80,8 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		// this.eduActs.add("e0.5");
 		// this.eduActs.add("uni");
 
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		this.router = new PlansCalcRoute(network, timeCostCalc, timeCostCalc);
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
+		this.router = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, timeCostCalc, timeCostCalc, new DijkstraFactory());
 	}
 
 	// ////////////////////////////////////////////////////////////////////

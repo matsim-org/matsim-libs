@@ -25,13 +25,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -50,13 +50,11 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignToNetwork(final NetworkLayer network, final ActivityFacilities facilities) {
+	public PersonAssignToNetwork(final NetworkLayer network, final ActivityFacilities facilities, final Config config) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
-		preprocess.run(network);
-		this.router = new PlansCalcRoute(network, timeCostCalc,timeCostCalc, new AStarLandmarksFactory(preprocess));
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		this.router = new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc,timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc));
 		log.info("    done.");
 	}
 

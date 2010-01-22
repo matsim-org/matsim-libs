@@ -116,7 +116,7 @@ public class EmptyPlans {
 //		world.complete();
 
 		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-		PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
+		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getPlans().get(0);
