@@ -33,7 +33,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 
 public class TravelTimeHistogram3 {
