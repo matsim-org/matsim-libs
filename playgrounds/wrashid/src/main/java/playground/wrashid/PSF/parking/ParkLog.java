@@ -1,22 +1,22 @@
 package playground.wrashid.PSF.parking;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Activity;
-
-import playground.wrashid.PSF.energy.charging.ChargeLog;
+import org.matsim.api.core.v01.Id;
 
 public class ParkLog {
 
 	private static final Logger log = Logger.getLogger(ParkLog.class);
 	
-	private Activity activity;
+	private Id linkId;
+	private Id facilityId;
 
 	private double startParkingTime;
 	private double endParkingTime;
 
-	public ParkLog(Activity activity, double startParkingTime, double endParkingTime) {
+	public ParkLog(Id linkId, Id facilityId, double startParkingTime, double endParkingTime) {
 		super();
-		this.activity = activity;
+		this.linkId = linkId;
+		this.facilityId = facilityId;
 		this.startParkingTime = startParkingTime;
 		this.endParkingTime = endParkingTime;
 		
@@ -27,8 +27,12 @@ public class ParkLog {
 		}
 	}
 
-	public Activity getActivity() {
-		return activity;
+	public Id getLinkId() {
+		return this.linkId;
+	}
+
+	public Id getFacilityId() {
+		return this.facilityId;
 	}
 
 	public double getStartParkingTime() {

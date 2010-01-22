@@ -101,8 +101,8 @@ public class AnalyzeScores {
 		//Register scoring function and other events handlers
 		
 		System.out.println(" ... Instantiation of events overlap tracking done");
-		epp=new EventsMapStartEndTimes(plans);
-		teo=new MakeTimeWindowsFromEvents();
+		epp=new EventsMapStartEndTimes();
+		teo=new MakeTimeWindowsFromEvents(plans);
 		teo.makeTimeWindows(epp);
 		twm=teo.getTimeWindowMap();
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm,facilities);

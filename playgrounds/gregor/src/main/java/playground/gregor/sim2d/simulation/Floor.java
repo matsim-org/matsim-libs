@@ -325,14 +325,14 @@ public class Floor {
 
 	private void agentArrival(Agent2D agent,Id linkId) {
 		Event e1 = new AgentArrivalEventImpl(SimulationTimer.getTime(), agent.getId(), linkId, TransportMode.car);
-		Event e2 = new ActivityStartEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), agent.getAct().getFacilityId(), agent.getAct());
+		Event e2 = new ActivityStartEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), agent.getAct().getFacilityId(), agent.getAct().getType());
 		Sim2D.getEvents().processEvent(e1);
 		Sim2D.getEvents().processEvent(e2);
 	}
 	
 	private void agentDepart(Agent2D agent) {
 		Event e1 = new AgentDepartureEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), TransportMode.car);
-		Event e2 = new ActivityEndEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), null, agent.getOldAct());
+		Event e2 = new ActivityEndEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), null, agent.getOldAct().getType());
 		Sim2D.getEvents().processEvent(e2);
 		Sim2D.getEvents().processEvent(e1);
 		

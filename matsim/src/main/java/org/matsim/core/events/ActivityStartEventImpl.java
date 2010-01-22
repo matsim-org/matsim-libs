@@ -21,16 +21,11 @@
 package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 
 public class ActivityStartEventImpl extends ActivityEventImpl implements ActivityStartEvent {
 
 	public static final String EVENT_TYPE = "actstart";
-
-	public ActivityStartEventImpl(final double time, final Id agentId, final Id linkId, final Id facilityId, final Activity act) {
-		super(time, agentId, linkId, facilityId, act);
-	}
 
 	public ActivityStartEventImpl(final double time, final Id agentId, final Id linkId, final Id facilityId, final String acttype) {
 		super(time, agentId, linkId, facilityId, acttype);

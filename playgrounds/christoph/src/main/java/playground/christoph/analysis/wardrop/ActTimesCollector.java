@@ -21,25 +21,24 @@
 package playground.christoph.analysis.wardrop;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
 
 public class ActTimesCollector implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private static final Logger log = Logger.getLogger(ActTimesCollector.class);
+//	private static final Logger log = Logger.getLogger(ActTimesCollector.class);
 	
 	// <Person's Id, Person's EventData>
 	protected TreeMap<Id, EventData> data = new TreeMap<Id, EventData>();
@@ -49,6 +48,7 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 	
 	protected double startTime = 0.0;
 	protected double endTime = Double.MAX_VALUE;
+	private final Map<Id, Integer> agentActIndex = new HashMap<Id, Integer>();
 	
 	public void reset(int iteration) 
 	{
@@ -57,10 +57,12 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 		population = null;
 	}
 	
+	@Override
 	public void handleEvent(ActivityStartEvent event) 
 	{	
 		Id personId = event.getPersonId();
-		Id linkId = event.getLinkId();
+//		Id linkId = event.getLinkId();
+		Activity eventAct = getCurrentActivity(event.getPersonId());
 /*		
 		if (event.getPersonId() != null)
 		{
@@ -93,29 +95,31 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 		
 		EventData eventData = data.get(personId);
 				
-		if ((event instanceof ActivityStartEventImpl) && (((ActivityStartEventImpl)event).getAct() != null))
-		{
-			eventData.addStartActivityEvent(event.getTime(), ((ActivityStartEventImpl)event).getAct().getCoord());
-		}
-		else if (network != null)
-		{
-			Link link = network.getLinks().get(linkId);
-			//eventData.addStartActivityEvent(event.getTime(), link.getCenter());
-			eventData.addStartActivityEvent(event.getTime(), link.getCoord());
-		}
-		else
-		{
-			if ((startTime <= event.getTime()) && (event.getTime() >= endTime))
-			{
-				eventData.addStartActivityEvent(event.getTime(), linkId);
-			}
-		}
+//		if ((event instanceof ActivityStartEventImpl) && (((ActivityStartEventImpl)event).getAct() != null))
+//		{
+			eventData.addStartActivityEvent(event.getTime(), eventAct.getCoord());
+//		}
+//		else if (network != null)
+//		{
+//			Link link = network.getLinks().get(linkId);
+//			//eventData.addStartActivityEvent(event.getTime(), link.getCenter());
+//			eventData.addStartActivityEvent(event.getTime(), link.getCoord());
+//		}
+//		else
+//		{
+//			if ((startTime <= event.getTime()) && (event.getTime() >= endTime))
+//			{
+//				eventData.addStartActivityEvent(event.getTime(), linkId);
+//			}
+//		}
 	}
 
+	@Override
 	public void handleEvent(ActivityEndEvent event)
 	{
 		Id personId = event.getPersonId();
-		Id linkId = event.getLinkId();
+//		Id linkId = event.getLinkId();
+		Activity eventAct = getCurrentActivity(event.getPersonId());
 
 /*		
 		if (event.getPersonId() != null)
@@ -146,23 +150,23 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 		
 		EventData eventData = data.get(personId);
 		
-		if ((event instanceof ActivityEndEventImpl) && (((ActivityEndEventImpl)event).getAct() != null))
-		{
-			eventData.addEndActivityEvent(event.getTime(), ((ActivityEndEventImpl)event).getAct().getCoord());
-		}
-		else if (network != null)
-		{
-			Link link = network.getLinks().get(linkId);
-			eventData.addEndActivityEvent(event.getTime(), link.getCoord());
-			//eventData.addEndActivityEvent(event.time, link.getCenter());
-		}
-		else
-		{
-			if ((startTime <= event.getTime()) && (event.getTime() >= endTime))
-			{
-				eventData.addEndActivityEvent(event.getTime(), linkId);
-			}
-		}
+//		if ((event instanceof ActivityEndEventImpl) && (((ActivityEndEventImpl)event).getAct() != null))
+//		{
+			eventData.addEndActivityEvent(event.getTime(), eventAct.getCoord());
+//		}
+//		else if (network != null)
+//		{
+//			Link link = network.getLinks().get(linkId);
+//			eventData.addEndActivityEvent(event.getTime(), link.getCoord());
+//			//eventData.addEndActivityEvent(event.time, link.getCenter());
+//		}
+//		else
+//		{
+//			if ((startTime <= event.getTime()) && (event.getTime() >= endTime))
+//			{
+//				eventData.addEndActivityEvent(event.getTime(), linkId);
+//			}
+//		}
 	}
 	
 	public void getTrips(Id id)
@@ -387,6 +391,25 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;
+	}
+	
+	private Activity getNextActivity(final Id agentId) {
+		Integer idx = this.agentActIndex.get(agentId);
+		if (idx == null) {
+			idx = Integer.valueOf(1);
+		} else {
+			idx = Integer.valueOf(idx.intValue() + 2);
+		}
+		this.agentActIndex.put(agentId, idx);
+		return (Activity) this.population.getPersons().get(agentId).getSelectedPlan().getPlanElements().get(idx.intValue());
+	}
+	
+	private Activity getCurrentActivity(final Id agentId) {
+		Integer idx = this.agentActIndex.get(agentId);
+		if (idx == null) {
+			return null;
+		}
+		return (Activity) this.population.getPersons().get(agentId).getSelectedPlan().getPlanElements().get(idx.intValue());
 	}
 	
 }

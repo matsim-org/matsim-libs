@@ -169,13 +169,13 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
 
 		//teo = new TrackEventsOverlap();
-		epp=new EventsMapStartEndTimes(this.controler.getPopulation());
+		epp=new EventsMapStartEndTimes();
 
 //		this.controler.getEvents().addHandler(this.teo);
 		this.controler.getEvents().addHandler(this.epp);
 		
 		//TODO superfluous in 0th iteration and not necessary anymore except that scoring runction needs it (can null be passed?)
-		teo=new MakeTimeWindowsFromEvents();
+		teo=new MakeTimeWindowsFromEvents(this.controler.getPopulation());
 		teo.makeTimeWindows(epp);
 		twm=teo.getTimeWindowMap();
 		
@@ -210,7 +210,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.actStats.clear();
 		
 		Gbl.printMemoryUsage();
-		teo=new MakeTimeWindowsFromEvents();
+		teo=new MakeTimeWindowsFromEvents(this.controler.getPopulation());
 		teo.makeTimeWindows(epp);
 		twm= teo.getTimeWindowMap();
 

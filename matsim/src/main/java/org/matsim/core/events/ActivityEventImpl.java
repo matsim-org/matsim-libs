@@ -23,9 +23,7 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.events.ActivityEvent;
-import org.matsim.core.population.ActivityImpl;
 
 abstract class ActivityEventImpl extends PersonEventImpl implements ActivityEvent {
 
@@ -36,16 +34,6 @@ abstract class ActivityEventImpl extends PersonEventImpl implements ActivityEven
 	private final Id linkId;
 	private final Id facilityId;
 	private final String acttype;
-
-	private transient Activity act;
-
-	ActivityEventImpl(final double time, final Id agentId, final Id linkId, final Id facilityId, final Activity act) {
-		super(time, agentId);
-		this.act = act;
-		this.linkId = linkId;
-		this.facilityId = facilityId;
-		this.acttype = act.getType();
-	}
 
 	ActivityEventImpl(final double time, final Id agentId, final Id linkId, final Id facilityId, final String acttype) {
 		super(time, agentId);
@@ -76,11 +64,6 @@ abstract class ActivityEventImpl extends PersonEventImpl implements ActivityEven
 
 	public Id getFacilityId() {
 		return this.facilityId;
-	}
-	
-	@Deprecated // use getActType instead
-	public ActivityImpl getAct() {
-		return (ActivityImpl) this.act;
 	}
 
 }

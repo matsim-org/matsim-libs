@@ -55,8 +55,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.events.handler.AgentReplanEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
-import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -116,11 +114,7 @@ public class EventsManagerImpl implements EventsManager {
 	public EventsManagerImpl() {
 		this.builder = new EventsFactoryImpl();
 	}
-	
-	private EventsManagerImpl(EventsFactory builder) {
-		this.builder = builder;
-	}
-	
+
 	private HandlerData findHandler(final Class<?> evklass) {
 		for (HandlerData handler : this.handlerData) {
 			if (handler.eventklass == evklass) {
@@ -320,14 +314,8 @@ public class EventsManagerImpl implements EventsManager {
 		} else if (klass == AgentDepartureEvent.class) {
 			((AgentDepartureEventHandler)handler).handleEvent((AgentDepartureEvent)ev);
 			return true;
-		} else if (klass == ActivityEndEventImpl.class) {
-			((DeprecatedActivityEndEventHandler)handler).handleEvent((ActivityEndEventImpl)ev);
-			return true;
 		} else if (klass == ActivityEndEvent.class) {
 			((ActivityEndEventHandler)handler).handleEvent((ActivityEndEvent)ev);
-			return true;
-		} else if (klass == ActivityStartEventImpl.class) {
-			((DeprecatedActivityStartEventHandler)handler).handleEvent((ActivityStartEventImpl)ev);
 			return true;
 		} else if (klass == ActivityStartEvent.class) {
 			((ActivityStartEventHandler)handler).handleEvent((ActivityStartEvent)ev);

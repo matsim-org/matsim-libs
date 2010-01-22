@@ -74,7 +74,7 @@ public class AnalyzeTimeCorrelations {
 		// read in events
 		EventsManagerImpl events = new EventsManagerImpl();
 //		TrackEventsOverlap teo = new TrackEventsOverlap();
-		EventsMapStartEndTimes epp=new EventsMapStartEndTimes(plans);
+		EventsMapStartEndTimes epp=new EventsMapStartEndTimes();
 		//Fill timeWindowMap
 
 		System.out.println(" Initializing the events ...");
@@ -101,7 +101,7 @@ public class AnalyzeTimeCorrelations {
 //		new MakeTimeWindowsFromEvents(epp);
 		String out2=Scenario.getOut2();
 		String out1=Scenario.getOut1();
-		MakeTimeWindowsFromEvents teo= new MakeTimeWindowsFromEvents();
+		MakeTimeWindowsFromEvents teo= new MakeTimeWindowsFromEvents(plans);
 		teo.makeTimeWindows(epp);
 		new TimeWindowCalcTimeCorrelations(teo.getTimeWindowMap(), out2, out1, facilities);
 		System.out.println("Type\tId");

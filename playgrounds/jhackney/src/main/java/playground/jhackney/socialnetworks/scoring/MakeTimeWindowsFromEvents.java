@@ -32,10 +32,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
@@ -44,21 +44,24 @@ public class MakeTimeWindowsFromEvents {
 
 	LinkedHashMap<Id,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<Id,ArrayList<TimeWindow>>();
 	static final private Logger log = Logger.getLogger(MakeTimeWindowsFromEvents.class);
+	private final Population population;
 	
-	public MakeTimeWindowsFromEvents(){
+	public MakeTimeWindowsFromEvents(Population population){
+		this.population = population;
 	}
 	public void makeTimeWindows(EventsMapStartEndTimes epp){
-		LinkedHashMap<Person, ArrayList<ActivityStartEventImpl>> startMap = epp.startMap;
-		LinkedHashMap<Person, ArrayList<ActivityEndEventImpl>> endMap = epp.endMap;
-		Object[] persons = startMap.keySet().toArray();
+		LinkedHashMap<Id, ArrayList<ActivityStartEvent>> startMap = epp.startMap;
+		LinkedHashMap<Id, ArrayList<ActivityEndEvent>> endMap = epp.endMap;
+		Id[] persons = startMap.keySet().toArray(new Id[startMap.size()]);
 		for (int i=0;i<persons.length;i++){
 			//for each startEvent and endEvent
 			//
-			PersonImpl person=(PersonImpl) persons[i];
+			Id personId=persons[i];
 			ArrayList<TimeWindow> twList;
+			Person person = this.population.getPersons().get(personId);
 			Plan plan =person.getSelectedPlan();
-			ArrayList<ActivityStartEventImpl> startEvents =startMap.get(person);
-			ArrayList<ActivityEndEventImpl> endEvents = endMap.get(person);
+			ArrayList<ActivityStartEvent> startEvents =startMap.get(personId);
+			ArrayList<ActivityEndEvent> endEvents = endMap.get(personId);
 //30.12			for (int j=0;j<endEvents.size()+1;j++){
 			for (int j=0;j<endEvents.size();j++){
 				double startTime=0;

@@ -4,39 +4,36 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
-import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 
-public class EventsMapStartEndTimes implements DeprecatedActivityStartEventHandler, DeprecatedActivityEndEventHandler {
+public class EventsMapStartEndTimes implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	public LinkedHashMap<Person, ArrayList<ActivityStartEventImpl>> startMap = new LinkedHashMap<Person,ArrayList<ActivityStartEventImpl>>();
-	public LinkedHashMap<Person, ArrayList<ActivityEndEventImpl>> endMap = new LinkedHashMap<Person,ArrayList<ActivityEndEventImpl>>();
+	public LinkedHashMap<Id, ArrayList<ActivityStartEvent>> startMap = new LinkedHashMap<Id,ArrayList<ActivityStartEvent>>();
+	public LinkedHashMap<Id, ArrayList<ActivityEndEvent>> endMap = new LinkedHashMap<Id,ArrayList<ActivityEndEvent>>();
 	public double maxtime=0;
-	private Population plans;
 	static final private Logger log = Logger.getLogger(EventsMapStartEndTimes.class);
 
-	public EventsMapStartEndTimes(Population plans) {
+	public EventsMapStartEndTimes() {
 		super();
 //		makeTimeWindows();
-		this.plans=plans;
 		log.info(" Looking through plans and mapping social interactions for scoring");
 	}
 
-	public void handleEvent(ActivityStartEventImpl event) {
-		Person person = plans.getPersons().get(event.getPersonId());
-		ArrayList<ActivityStartEventImpl> startList;
-		if((startMap.get(person)==null)){
-			startList=new ArrayList<ActivityStartEventImpl>();
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		ArrayList<ActivityStartEvent> startList;
+		if((startMap.get(event.getPersonId())==null)){
+			startList=new ArrayList<ActivityStartEvent>();
 		}else{
-			startList=startMap.get(person);
+			startList=startMap.get(event.getPersonId());
 		}
 		startList.add(event);
-		startMap.remove(person);
-		startMap.put(person,startList);
+		startMap.remove(event.getPersonId());
+		startMap.put(event.getPersonId(),startList);
 		if(event.getTime()>=maxtime) maxtime=event.getTime();
 	}
 
@@ -46,17 +43,17 @@ public class EventsMapStartEndTimes implements DeprecatedActivityStartEventHandl
 
 	}
 
-	public void handleEvent(ActivityEndEventImpl event) {
-		Person person = plans.getPersons().get(event.getPersonId());
-		ArrayList<ActivityEndEventImpl> endList;
-		if((endMap.get(person)== null)){
-			endList=new ArrayList<ActivityEndEventImpl>();
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		ArrayList<ActivityEndEvent> endList;
+		if((endMap.get(event.getPersonId())== null)){
+			endList=new ArrayList<ActivityEndEvent>();
 		}else{
-			endList=endMap.get(person);
+			endList=endMap.get(event.getPersonId());
 		}
 		endList.add(event);
-		endMap.remove(person);
-		endMap.put(person,endList);
+		endMap.remove(event.getPersonId());
+		endMap.put(event.getPersonId(),endList);
 		if(event.getTime()>=maxtime) maxtime=event.getTime();
 	}
 	public double getMaxTime(){

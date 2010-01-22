@@ -3,13 +3,13 @@ package playground.wrashid.PSF.parking;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
-import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 
-public class LogParkingTimes implements DeprecatedActivityStartEventHandler, DeprecatedActivityEndEventHandler {
+public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	Controler controler;
 	HashMap<Id, ParkingTimes> parkingTimes = new HashMap<Id, ParkingTimes>();
@@ -19,7 +19,8 @@ public class LogParkingTimes implements DeprecatedActivityStartEventHandler, Dep
 		this.controler = controler;
 	}
 
-	public void handleEvent(ActivityStartEventImpl event) {
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
 		// log the (start) time when the car departs
 		Id personId = event.getPersonId();
 		if (event.getActType().equalsIgnoreCase("parkingDeparture")) {
@@ -30,7 +31,7 @@ public class LogParkingTimes implements DeprecatedActivityStartEventHandler, Dep
 				 * this is not the first time we are departing, which means that
 				 * the car was parked before
 				 */
-				pTime.addParkLog(new ParkLog(event.getAct(), pTime.getLastParkingArrivalTime(), event.getTime()));
+				pTime.addParkLog(new ParkLog(event.getLinkId(), event.getFacilityId(), pTime.getLastParkingArrivalTime(), event.getTime()));
 			} else {
 				/*
 				 * this means, that this is the first time the car departs (e.g.
@@ -47,11 +48,13 @@ public class LogParkingTimes implements DeprecatedActivityStartEventHandler, Dep
 		}
 	}
 
+	@Override
 	public void reset(int iteration) {
 		parkingTimes = new HashMap<Id, ParkingTimes>();
 	}
 
-	public void handleEvent(ActivityEndEventImpl event) {
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
 		// log the (end) time when the car has been parked
 		Id personId = event.getPersonId();
 		if (event.getActType().equalsIgnoreCase("parkingArrival")) {
@@ -71,7 +74,8 @@ public class LogParkingTimes implements DeprecatedActivityStartEventHandler, Dep
 			 */
 			pTime.setCarLastTimeParked(event.getTime());
 
-			pTime.setCarLastTimeParkedActivity(event.getAct());
+			pTime.setCarLastTimeParkedLink(event.getLinkId());
+			pTime.setCarLastTimeParkedFacility(event.getFacilityId());
 		}
 	}
 

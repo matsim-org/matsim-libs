@@ -327,10 +327,10 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 	private void setupSNScoring() {
 		// 
 		this.log.info("   Instantiating a new social network scoring factory with new Event Tracker");
-		epp=new EventsMapStartEndTimes(this.controler.getPopulation());
+		epp=new EventsMapStartEndTimes();
 		this.controler.getEvents().addHandler(this.epp);
 		//TODO null in 0th iteration. Scoring function needs to know the memory address (can null be passed and still set up the right memory address?)
-		teo=new MakeTimeWindowsFromEvents();
+		teo=new MakeTimeWindowsFromEvents(this.controler.getPopulation());
 		teo.makeTimeWindows(epp);
 		twm=teo.getTimeWindowMap();
 		this.log.info("... done");

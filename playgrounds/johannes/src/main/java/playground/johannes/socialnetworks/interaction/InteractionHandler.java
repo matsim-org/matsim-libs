@@ -33,12 +33,12 @@ import java.util.Map;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
-import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -46,8 +46,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author illenberger
  *
  */
-public class InteractionHandler implements DeprecatedActivityStartEventHandler,
-DeprecatedActivityEndEventHandler {
+public class InteractionHandler implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private final InteractionSelector selector;
 	
@@ -71,8 +70,8 @@ DeprecatedActivityEndEventHandler {
 		}
 	}
 	
-	public void handleEvent(ActivityStartEventImpl event) {
-		PhysicalFacility pf = pfacilities.get(event.getAct().getFacilityId());
+	public void handleEvent(ActivityStartEvent event) {
+		PhysicalFacility pf = pfacilities.get(event.getFacilityId());
 //		if(pf == null) {
 //			pf = new PhysicalFacility();
 //			facilities.put(f, pf);
@@ -86,9 +85,9 @@ DeprecatedActivityEndEventHandler {
 			pf.reset();
 	}
 
-	public void handleEvent(ActivityEndEventImpl event) {
+	public void handleEvent(ActivityEndEvent event) {
 		if(!event.getActType().equalsIgnoreCase("home")) {
-		PhysicalFacility pf = pfacilities.get(event.getAct().getFacilityId());
+		PhysicalFacility pf = pfacilities.get(event.getFacilityId());
 		
 		if(pf == null)
 			 throw new RuntimeException("Tried to remove a visitor from a non-existing physical facility!");

@@ -4,15 +4,14 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 
+import playground.wrashid.PSF.energy.charging.ChargeLog;
+import playground.wrashid.PSF.energy.charging.ChargingTimes;
+import playground.wrashid.PSF.energy.charging.EnergyChargingPriceInfo;
 import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
 import playground.wrashid.PSF.energy.consumption.LinkEnergyConsumptionLog;
 import playground.wrashid.PSF.parking.ParkLog;
 import playground.wrashid.PSF.parking.ParkingTimes;
-import playground.wrashid.PSF.energy.charging.ChargeLog;
-import playground.wrashid.PSF.energy.charging.ChargingTimes;
-import playground.wrashid.PSF.energy.charging.EnergyChargingPriceInfo;
 
 public class EnergyBalance {
 
@@ -47,7 +46,7 @@ public class EnergyBalance {
 		// prepare parking times
 		parkingTimes = (LinkedList<ParkLog>) parkTimes.getParkingTimes().clone();
 		// add the last parking event of the day to the queue
-		parkingTimes.add(new ParkLog(parkTimes.getCarLastTimeParkedActivity(), parkTimes.getLastParkingArrivalTime(), parkTimes
+		parkingTimes.add(new ParkLog(parkTimes.getCarLastTimeParkedLink(), parkTimes.getCarLastTimeParkedFacility(), parkTimes.getLastParkingArrivalTime(), parkTimes
 				.getFirstParkingDepartTime()));
 
 		int maxIndex = parkingTimes.size();
@@ -155,12 +154,12 @@ public class EnergyBalance {
 		double tempPrice;
 		for (int j = 0; j < maxTimeSlotNumber - minTimeSlotNumber; j++) {
 			double time = Math.floor(startTime / 900) * 900 + j * 900;
-			tempPrice = EnergyChargingPriceInfo.getEnergyPrice(time, parkingTimes.get(parkingIndex).getActivity().getLinkId());
+			tempPrice = EnergyChargingPriceInfo.getEnergyPrice(time, parkingTimes.get(parkingIndex).getLinkId());
 
 			FacilityChargingPrice tempFacilityChPrice = new FacilityChargingPrice(tempPrice, minTimeSlotNumber + j, parkingIndex,
-					time, parkingTimes.get(parkingIndex).getActivity().getFacilityId(), parkingTimes.get(parkingIndex)
+					time, parkingTimes.get(parkingIndex).getFacilityId(), parkingTimes.get(parkingIndex)
 							.getStartParkingTime(), parkingTimes.get(parkingIndex).getEndParkingTime(), parkingTimes.get(
-							parkingIndex).getActivity().getLinkId());
+							parkingIndex).getLinkId());
 			chargingPrice.add(tempFacilityChPrice);
 		}
 	}

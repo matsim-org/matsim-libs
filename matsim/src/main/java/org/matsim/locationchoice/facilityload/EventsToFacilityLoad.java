@@ -25,20 +25,19 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
-import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 import org.matsim.core.facilities.ActivityOptionImpl;
 
-/*
+/**
  * @author anhorni
  * Uses FacilityPenalty to manage the facililities' loads by taking care of activity start and end events.
  */
-
-public class EventsToFacilityLoad implements DeprecatedActivityStartEventHandler, DeprecatedActivityEndEventHandler {
+public class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
@@ -63,24 +62,24 @@ public class EventsToFacilityLoad implements DeprecatedActivityStartEventHandler
 		}
 	}
 	
-	/*
+	/**
 	 * Add an arrival event in "FacilityLoad" for every start of an activity
 	 * Home activities are excluded.
 	 */
-	public void handleEvent(final ActivityStartEventImpl event) {
+	public void handleEvent(final ActivityStartEvent event) {
 		if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
-			Id facilityId = event.getAct().getFacilityId();
+			Id facilityId = event.getFacilityId();
 			this.facilityPenalties.get(facilityId).getFacilityLoad().addArrival(event.getTime());
 		}
 	}
 
-	/*
+	/**
 	 * Add a departure event in "FacilityLoad" for every ending of an activity
 	 * Home activities are excluded
 	 */
-	public void handleEvent(final ActivityEndEventImpl event) {
+	public void handleEvent(final ActivityEndEvent event) {
 		if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
-			Id facilityId = event.getAct().getFacilityId();
+			Id facilityId = event.getFacilityId();
 			this.facilityPenalties.get(facilityId).getFacilityLoad().addDeparture(event.getTime());
 		}
 	}

@@ -3,8 +3,6 @@ package playground.wrashid.PSF.parking;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.PSF.ParametersPSF;
 
@@ -16,10 +14,11 @@ public class ParkingTimes {
 	private LinkedList<ParkLog> parkingTimes=new LinkedList<ParkLog>();
 	private double firstParkingDepartTime=0;
 	private double lastParkingArrivalTime=0;
-	private Activity activity;
+	private Id facilityId = null;
+	private Id linkId = null;
 	
 	public void addParkLog(ParkLog parkLog){
-		// just for debuggin
+		// just for debugging
 		if (parkLog.getStartParkingTime()>86400){
 			System.out.println();
 		}
@@ -39,14 +38,22 @@ public class ParkingTimes {
 		this.lastParkingArrivalTime = carLastTimeParked;
 	}
 
-	public Activity getCarLastTimeParkedActivity() {
-		return activity;
+	public Id getCarLastTimeParkedFacility() {
+		return this.facilityId;
 	}
 
-	public void setCarLastTimeParkedActivity(Activity activity) {
-		this.activity = activity;
+	public void setCarLastTimeParkedFacility(Id facilityId) {
+		this.facilityId = facilityId;
 	}
 
+	public Id getCarLastTimeParkedLink() {
+		return this.linkId;
+	}
+	
+	public void setCarLastTimeParkedLink(Id linkId) {
+		this.linkId = linkId;
+	}
+	
 	public double getFirstParkingDepartTime() {
 		return firstParkingDepartTime;
 	}
@@ -76,7 +83,7 @@ public class ParkingTimes {
 			int endIndex = Math.round((float) Math.floor(( curParkLog.getEndParkingTime() / 900)));
 			
 			for (int i=startIndex;i<endIndex;i++){
-				parkedAtHub[i][ParametersPSF.getHubLinkMapping().getHubNumber(curParkLog.getActivity().getLinkId().toString())]=true;
+				parkedAtHub[i][ParametersPSF.getHubLinkMapping().getHubNumber(curParkLog.getLinkId().toString())]=true;
 			}
 	
 		}

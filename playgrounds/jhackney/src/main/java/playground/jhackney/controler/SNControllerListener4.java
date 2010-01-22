@@ -137,11 +137,11 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		this.log.info("... done");
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
-		epp=new EventsMapStartEndTimes(this.controler.getPopulation());
+		epp=new EventsMapStartEndTimes();
 		this.controler.getEvents().addHandler(this.epp);
 
 		//TODO scoring function needs it (can null be passed?)
-		teo=new MakeTimeWindowsFromEvents();
+		teo=new MakeTimeWindowsFromEvents(this.controler.getPopulation());
 		teo.makeTimeWindows(epp);
 		controler.setTwm(teo.getTimeWindowMap());
 
