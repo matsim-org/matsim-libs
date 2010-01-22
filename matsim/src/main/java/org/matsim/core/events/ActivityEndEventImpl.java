@@ -28,12 +28,12 @@ public class ActivityEndEventImpl extends ActivityEventImpl implements ActivityE
 
 	public static final String EVENT_TYPE = "actend";
 
-	public ActivityEndEventImpl(final double time, final Id agentId, final Id linkId, final Activity act) {
-		super(time, agentId, linkId, act);
+	public ActivityEndEventImpl(final double time, final Id agentId, final Id linkId, final Id facilityId, final Activity act) {
+		super(time, agentId, linkId, facilityId, act);
 	}
 
-	public ActivityEndEventImpl(final double time, final Id agentId, final Id linkId, final String acttype) {
-		super(time, agentId, linkId, acttype);
+	public ActivityEndEventImpl(final double time, final Id agentId, final Id linkId, final Id facilityId, final String acttype) {
+		super(time, agentId, linkId, facilityId, acttype);
 	}
 
 	@Override

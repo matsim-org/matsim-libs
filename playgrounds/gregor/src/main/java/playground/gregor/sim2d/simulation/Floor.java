@@ -1,7 +1,6 @@
 package playground.gregor.sim2d.simulation;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,14 +19,10 @@ import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.gregor.sim2d.controller.Sim2DConfig;
-import playground.gregor.sim2d.gisdebug.GisDebugger;
 import playground.gregor.sim2d.simulation.Agent2D.AgentState;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -330,14 +325,14 @@ public class Floor {
 
 	private void agentArrival(Agent2D agent,Id linkId) {
 		Event e1 = new AgentArrivalEventImpl(SimulationTimer.getTime(), agent.getId(), linkId, TransportMode.car);
-		Event e2 = new ActivityStartEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), agent.getAct());
+		Event e2 = new ActivityStartEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), agent.getAct().getFacilityId(), agent.getAct());
 		Sim2D.getEvents().processEvent(e1);
 		Sim2D.getEvents().processEvent(e2);
 	}
 	
 	private void agentDepart(Agent2D agent) {
 		Event e1 = new AgentDepartureEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), TransportMode.car);
-		Event e2 = new ActivityEndEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), agent.getOldAct());
+		Event e2 = new ActivityEndEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), null, agent.getOldAct());
 		Sim2D.getEvents().processEvent(e2);
 		Sim2D.getEvents().processEvent(e1);
 		

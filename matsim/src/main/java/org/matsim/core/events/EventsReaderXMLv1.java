@@ -69,11 +69,13 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			this.events.processEvent(this.builder.createActivityEndEvent(time,
 					new IdImpl(atts.getValue(ActivityEndEventImpl.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(ActivityEndEventImpl.ATTRIBUTE_LINK)),
+					atts.getValue(ActivityEndEventImpl.ATTRIBUTE_FACILITY) == null ? null : new IdImpl(atts.getValue(ActivityEndEventImpl.ATTRIBUTE_FACILITY)),
 					atts.getValue(ActivityEndEventImpl.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEventImpl.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createActivityStartEvent(time,
 					new IdImpl(atts.getValue(ActivityStartEventImpl.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(ActivityStartEventImpl.ATTRIBUTE_LINK)),
+					atts.getValue(ActivityStartEventImpl.ATTRIBUTE_FACILITY) == null ? null : new IdImpl(atts.getValue(ActivityStartEventImpl.ATTRIBUTE_FACILITY)),
 					atts.getValue(ActivityStartEventImpl.ATTRIBUTE_ACTTYPE)));
 		} else if (AgentArrivalEventImpl.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_LEGMODE);

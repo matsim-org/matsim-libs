@@ -43,9 +43,9 @@ public interface EventsFactory extends MatsimFactory {
 
 	AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
 
-	ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype);
+	ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, final Id facilityId, String acttype);
 
-	ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype);
+	ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, final Id facilityId, String acttype);
 
 	AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
 

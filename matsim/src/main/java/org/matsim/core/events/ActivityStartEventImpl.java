@@ -28,12 +28,12 @@ public class ActivityStartEventImpl extends ActivityEventImpl implements Activit
 
 	public static final String EVENT_TYPE = "actstart";
 
-	public ActivityStartEventImpl(final double time, final Id agentId, final Id linkId, final Activity act) {
-		super(time, agentId, linkId, act);
+	public ActivityStartEventImpl(final double time, final Id agentId, final Id linkId, final Id facilityId, final Activity act) {
+		super(time, agentId, linkId, facilityId, act);
 	}
 
-	public ActivityStartEventImpl(final double time, final Id agentId, final Id linkId, final String acttype) {
-		super(time, agentId, linkId, acttype);
+	public ActivityStartEventImpl(final double time, final Id agentId, final Id linkId, final Id facilityId, final String acttype) {
+		super(time, agentId, linkId, facilityId, acttype);
 	}
 
 	@Override

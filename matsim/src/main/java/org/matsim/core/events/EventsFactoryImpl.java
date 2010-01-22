@@ -39,12 +39,12 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
  */
 public class EventsFactoryImpl implements EventsFactory {
 
-	public ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype) {
-		return new ActivityEndEventImpl(time, agentId, linkId, acttype);
+	public ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, Id facilityId, String acttype) {
+		return new ActivityEndEventImpl(time, agentId, linkId, facilityId, acttype);
 	}
 
-	public ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype) {
-		return new ActivityStartEventImpl(time, agentId, linkId, acttype);
+	public ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, Id facilityId, String acttype) {
+		return new ActivityStartEventImpl(time, agentId, linkId, facilityId, acttype);
 	}
 
 	public AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final TransportMode legMode) {

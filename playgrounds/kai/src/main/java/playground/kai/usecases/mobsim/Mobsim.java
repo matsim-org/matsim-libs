@@ -35,10 +35,11 @@ public class Mobsim {
 
 		Id agentId = sc.createId("agentId");
 		Id linkId = sc.createId("linkId");
+		Id facilityId = sc.createId("facilityId");
 		TransportMode legMode = TransportMode.car;
 		double time = 1. ;
 		
-		ActivityEndEvent aee = eb.createActivityEndEvent( time, agentId, linkId, "actType" ) ; 
+		ActivityEndEvent aee = eb.createActivityEndEvent( time, agentId, linkId, facilityId, "actType" ) ; 
 		ev.processEvent( aee ) ;
 
 		AgentDepartureEvent ade = eb.createAgentDepartureEvent( time, agentId, linkId, legMode ) ;
@@ -51,7 +52,7 @@ public class Mobsim {
 
 		AgentArrivalEvent aae = eb.createAgentArrivalEvent( time, agentId, linkId, legMode ) ;
 
-		ActivityStartEvent ase = eb.createActivityStartEvent( time, agentId, linkId, "acttype" ) ;
+		ActivityStartEvent ase = eb.createActivityStartEvent( time, agentId, linkId, facilityId, "acttype" ) ;
 
 		// TODO: None of this is behind interfaces.  Needed if we want to accept "external" mobsims.  Do we want that?
 		// If so, we would need to be sure that we want to maintain the create methods.

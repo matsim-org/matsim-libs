@@ -29,4 +29,6 @@ public interface ActivityEvent extends PersonEvent {
 
 	public Id getLinkId();
 
+	public Id getFacilityId();
+	
 }

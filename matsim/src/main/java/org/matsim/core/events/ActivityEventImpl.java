@@ -30,23 +30,27 @@ import org.matsim.core.population.ActivityImpl;
 abstract class ActivityEventImpl extends PersonEventImpl implements ActivityEvent {
 
 	public static final String ATTRIBUTE_LINK = "link";
+	public static final String ATTRIBUTE_FACILITY = "facility";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
 
 	private final Id linkId;
+	private final Id facilityId;
 	private final String acttype;
 
 	private transient Activity act;
 
-	ActivityEventImpl(final double time, final Id agentId, final Id linkId, final Activity act) {
+	ActivityEventImpl(final double time, final Id agentId, final Id linkId, final Id facilityId, final Activity act) {
 		super(time, agentId);
 		this.act = act;
 		this.linkId = linkId;
+		this.facilityId = facilityId;
 		this.acttype = act.getType();
 	}
 
-	ActivityEventImpl(final double time, final Id agentId, final Id linkId, final String acttype) {
+	ActivityEventImpl(final double time, final Id agentId, final Id linkId, final Id facilityId, final String acttype) {
 		super(time, agentId);
 		this.linkId = linkId;
+		this.facilityId = facilityId;
 		this.acttype = acttype == null ? "" : acttype;
 	}
 
@@ -55,6 +59,9 @@ abstract class ActivityEventImpl extends PersonEventImpl implements ActivityEven
 		Map<String, String> attr = super.getAttributes();
 
 		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		if (this.facilityId != null) {
+			attr.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
+		}
 		attr.put(ATTRIBUTE_ACTTYPE, this.acttype);
 		return attr;
 	}
@@ -67,6 +74,10 @@ abstract class ActivityEventImpl extends PersonEventImpl implements ActivityEven
 		return this.linkId;
 	}
 
+	public Id getFacilityId() {
+		return this.facilityId;
+	}
+	
 	@Deprecated // use getActType instead
 	public ActivityImpl getAct() {
 		return (ActivityImpl) this.act;

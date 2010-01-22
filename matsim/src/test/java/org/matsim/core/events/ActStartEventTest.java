@@ -21,7 +21,6 @@
 package org.matsim.core.events;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -31,10 +30,11 @@ public class ActStartEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final ActivityStartEventImpl event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
-				new ActivityStartEventImpl(5668.27, new IdImpl("a92"), new IdImpl("l081"), "work"));
+				new ActivityStartEventImpl(5668.27, new IdImpl("a92"), new IdImpl("l081"), new IdImpl("f792"), "work"));
 		assertEquals(5668.27, event.getTime(), EPSILON);
 		assertEquals("a92", event.getPersonId().toString());
 		assertEquals(new IdImpl("l081"), event.getLinkId());
+		assertEquals(new IdImpl("f792"), event.getFacilityId());
 		assertEquals("work", event.getActType());
 	}
 }

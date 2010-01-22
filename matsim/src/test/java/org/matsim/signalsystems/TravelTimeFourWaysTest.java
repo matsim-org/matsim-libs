@@ -53,17 +53,17 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
 		conf.setQSimConfigGroup(new QSimConfigGroup());
-		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
+		ScenarioImpl scenario = new ScenarioImpl(conf);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 		
 		String eventsOut = this.getOutputDirectory() + EVENTSFILE;
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
-		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
-		sim.setLaneDefinitions(data.getLaneDefinitions());
-		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemConfigurations());
+		QueueSimulation sim = new QueueSimulation(scenario, events);
+		sim.setLaneDefinitions(scenario.getLaneDefinitions());
+		sim.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
 		sim.run();
 		eventsXmlWriter.closeFile();
 		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
