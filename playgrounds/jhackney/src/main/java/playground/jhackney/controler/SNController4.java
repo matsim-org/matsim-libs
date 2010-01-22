@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -14,7 +13,6 @@ import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
 
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 import playground.jhackney.socialnetworks.replanning.SNPickFacilityFromAlter;
@@ -52,16 +50,14 @@ public class SNController4 extends Controler {
 		
 		// Adjust activity start times by social network and time windows
 		PlanStrategy strategy1 = new PlanStrategy(new RandomPlanSelector());// only facilities visited in last iteration are in time window hastable
-		PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(this.getConfig(), this.network,this.travelCostCalculator,this.travelTimeCalculator, ((ScenarioImpl)this.getScenario()).getKnowledges());
+		PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(this.getConfig(), this.network,this.travelCostCalculator,this.travelTimeCalculator, (this.getScenario()).getKnowledges());
 		strategy1.addStrategyModule(socialNetStrategyModule);
 		manager.addStrategy(strategy1, 0.15);
 		this.log.info("  added strategy SNCoordinateArrivalTimes with probability 0.15");
 
 		// Adjust activity route
-		PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-		preProcessRoutingData.run(this.getNetwork());
 		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
-		strategy2.addStrategyModule(new ReRouteLandmarks(this.getConfig(), this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator(), preProcessRoutingData));
+		strategy2.addStrategyModule(new ReRouteLandmarks(this.getConfig(), this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator(), new FreespeedTravelTimeCost(config.charyparNagelScoring())));
 		manager.addStrategy(strategy2,0.15);
 		this.log.info("  added strategy ReRouteLandmarks with probability 0.15");
 

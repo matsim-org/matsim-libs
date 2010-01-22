@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -50,7 +49,6 @@ import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.LocationChoice;
@@ -109,18 +107,14 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
 			} else if (classname.equals("ReRoute_Landmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
-				preProcessRoutingData.run(network);
-				strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+				strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
 			} else if (classname.equals("TimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
 			} else if (classname.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new TimeAllocationMutator(config, 7200));
-				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
-				preProcessRoutingData.run(network);
-				strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+				strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
 			} else if (classname.equals("ExternalModule")) {
 				externalCounter++;
 				strategy = new PlanStrategy(new RandomPlanSelector());
@@ -157,7 +151,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				// JH
 			} else if (classname.equals("KSecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(config, network, travelCostCalc, travelTimeCalc, ((ScenarioImpl)controler.getScenario()).getKnowledges());
+				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(config, network, travelCostCalc, travelTimeCalc, (controler.getScenario()).getKnowledges());
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} else if (classname.equals("FSecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
@@ -165,12 +159,12 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} else if (classname.equals("SSecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(config, network,travelCostCalc,travelTimeCalc, ((ScenarioImpl)controler.getScenario()).getKnowledges());
+				PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(config, network,travelCostCalc,travelTimeCalc, (controler.getScenario()).getKnowledges());
 				strategy.addStrategyModule(socialNetStrategyModule);
 				// JH
 			} else if (classname.equals("LocationChoice")) {
 	    	strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
-	    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenario()).getKnowledges()));
+	    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenario()).getKnowledges()));
 	    	strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
 			}

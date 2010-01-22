@@ -14,7 +14,6 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
 
 import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
@@ -56,10 +55,8 @@ public class SNController3 extends Controler {
 		this.log.info("  added strategy SNCoordinateArrivalTimes with probability 0.15");
 
 		// Adjust activity route
-		PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-		preProcessRoutingData.run(this.getNetwork());
 		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
-		strategy2.addStrategyModule(new ReRouteLandmarks(this.getConfig(), this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator(), preProcessRoutingData));
+		strategy2.addStrategyModule(new ReRouteLandmarks(this.getConfig(), this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator(), new FreespeedTravelTimeCost(config.charyparNagelScoring())));
 		manager.addStrategy(strategy2,0.15);
 		this.log.info("  added strategy ReRouteLandmarks with probability 0.15");
 

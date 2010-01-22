@@ -45,7 +45,6 @@ import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.LocationChoice;
@@ -123,9 +122,7 @@ public class StrategyManagerConfigLoader {
 			strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
 		} else if (name.equals("ReRoute_Landmarks")) {
 			strategy = new PlanStrategy(new RandomPlanSelector());
-			PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
-			preProcessRoutingData.run(network);
-			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
 		} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
 			strategy = new PlanStrategy(new RandomPlanSelector());
 			TimeAllocationMutator tam = new TimeAllocationMutator(config);
@@ -134,9 +131,7 @@ public class StrategyManagerConfigLoader {
 		} else if (name.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 			strategy = new PlanStrategy(new RandomPlanSelector());
 			strategy.addStrategyModule(new TimeAllocationMutator(config, 7200));
-			PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
-			preProcessRoutingData.run(network);
-			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
 		} else if (name.equals("ExternalModule")) {
 			externalCounter++;
 			strategy = new PlanStrategy(new RandomPlanSelector());

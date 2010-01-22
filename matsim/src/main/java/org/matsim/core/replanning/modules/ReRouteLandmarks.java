@@ -22,12 +22,11 @@ package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -36,20 +35,10 @@ public class ReRouteLandmarks extends ReRouteDijkstra {
 	private final AStarLandmarksFactory factory;
 	private PlansCalcRouteConfigGroup configGroup = null;
 
-	/**
-	 * @deprecated use other constructor and give the PlansCalcRouteConfigGroup
-	 * as argument 
-	 */
-	@Deprecated
-	public ReRouteLandmarks(GlobalConfigGroup globalConfigGroup, Network network, TravelCost costCalculator,
-			TravelTime timeCalculator, PreProcessLandmarks commonRouterData) {
-		super(globalConfigGroup, network, costCalculator, timeCalculator);
-		this.factory = new AStarLandmarksFactory(commonRouterData);
-	}
-	
 	public ReRouteLandmarks(Config config, Network network, TravelCost costCalculator,
-			TravelTime timeCalculator, PreProcessLandmarks commonRouterData) {
-		this(config.global(), network, costCalculator, timeCalculator, commonRouterData);
+			TravelTime timeCalculator, TravelMinCost minCostCalculator) {
+		super(config, network, costCalculator, timeCalculator);
+		this.factory = new AStarLandmarksFactory(network, minCostCalculator);
 		this.configGroup = config.plansCalcRoute();
 	}
 	

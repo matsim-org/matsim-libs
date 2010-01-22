@@ -50,7 +50,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -259,9 +258,7 @@ public class ScenarioCut {
 
 		System.out.println("re-initializing initial routes...");
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
-		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(timeCostCalc);
-		preProcessLandmarks.run(scenario.getNetwork());
-		ReRouteLandmarks router = new ReRouteLandmarks(scenario.getConfig(), scenario.getNetwork(),timeCostCalc,timeCostCalc,preProcessLandmarks);
+		ReRouteLandmarks router = new ReRouteLandmarks(scenario.getConfig(), scenario.getNetwork(),timeCostCalc,timeCostCalc,timeCostCalc);
 		router.prepareReplanning();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {

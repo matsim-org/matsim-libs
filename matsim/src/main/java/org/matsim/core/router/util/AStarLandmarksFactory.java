@@ -37,14 +37,6 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 				this.preProcessData.run(network);
 		}
 	}
-	/**
-	 * @deprecated Use other constructor of this class
-	 * @param preProcessData
-	 */
-	@Deprecated
-	public AStarLandmarksFactory(final PreProcessLandmarks preProcessData){
-		this.preProcessData = preProcessData;
-	}
 	
 	public LeastCostPathCalculator createPathCalculator(Network network,
 			TravelCost travelCosts, TravelTime travelTimes) {

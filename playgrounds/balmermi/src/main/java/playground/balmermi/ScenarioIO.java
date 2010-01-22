@@ -36,7 +36,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.balmermi.modules.PersonFacility2Link;
@@ -139,9 +138,7 @@ public class ScenarioIO {
 		new PersonFacility2Link(af).run(population);
 		Gbl.printMemoryUsage();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
-		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(timeCostCalc);
-		preProcessLandmarks.run(network);
-		ReRouteLandmarks router = new ReRouteLandmarks(config, network,timeCostCalc,timeCostCalc,preProcessLandmarks);
+		ReRouteLandmarks router = new ReRouteLandmarks(config, network,timeCostCalc,timeCostCalc,timeCostCalc);
 		router.prepareReplanning();
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
