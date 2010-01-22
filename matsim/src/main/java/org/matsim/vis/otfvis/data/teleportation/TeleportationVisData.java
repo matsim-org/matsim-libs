@@ -29,21 +29,21 @@ import org.matsim.ptproject.qsim.DriverAgent;
  *
  */
 public class TeleportationVisData {
-	
-//	private static final Logger log = Logger.getLogger(TeleportationVisData.class);
-	
+
+	//	private static final Logger log = Logger.getLogger(TeleportationVisData.class);
+
 	private double stepsize;
 	private double startX;
 	private double startY;
 	private double normalX;
 	private double normalY;
-  private double currentX;
-  private double currentY;
+	private double currentX;
+	private double currentY;
 	private double starttime;
 	private Id id;
 
 	private double length;
-	
+
 	public TeleportationVisData(double now, DriverAgent agent, Link fromLink, Link toLink) {
 		this.starttime = now;
 		this.id = agent.getPerson().getId();
@@ -60,15 +60,15 @@ public class TeleportationVisData {
 		this.normalY = dY / length;
 		this.currentX = startX;
 		this.currentY = startY;
-//		log.error("offset north: "  + OTFServerQuad.offsetNorth);
-//		log.error("startX " + startX);
-//		log.error("startY " + startY);
-//		log.error("endX " + endX);
-//		log.error("endY " + endY);
-//		log.error("length " + length);
-//		log.error("stepsize " + stepsize);
-//		log.error("currentX " + currentX);
-//		log.error("currentY " + currentY);
+		//		log.error("offset north: "  + OTFServerQuad.offsetNorth);
+		//		log.error("startX " + startX);
+		//		log.error("startY " + startY);
+		//		log.error("endX " + endX);
+		//		log.error("endY " + endY);
+		//		log.error("length " + length);
+		//		log.error("stepsize " + stepsize);
+		//		log.error("currentX " + currentX);
+		//		log.error("currentY " + currentY);
 	}
 
 	public double getX() {
@@ -82,16 +82,16 @@ public class TeleportationVisData {
 	public Id getId(){
 		return this.id;
 	}
-	
+
 	public double getLength(){
 		return this.length;
 	}
-	
+
 	public void calculatePosition(double time) {
-//		log.error("calc pos time: " + time);
+		//		log.error("calc pos time: " + time);
 		double step = (time - starttime) * this.stepsize;
 		this.currentX = this.startX + (step * this.normalX);
 		this.currentY = this.startY  + (step * this.normalY);
-//		log.error("currentx: " + this.currentX + " currenty: "+ this.currentY);
+		//		log.error("currentx: " + this.currentX + " currenty: "+ this.currentY);
 	}
 }
