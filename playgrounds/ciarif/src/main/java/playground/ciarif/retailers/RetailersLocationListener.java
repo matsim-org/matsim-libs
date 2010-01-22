@@ -15,8 +15,11 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 
 import playground.ciarif.retailers.IO.FileRetailerReader;
 import playground.ciarif.retailers.IO.LinksRetailerReader;
+import playground.ciarif.retailers.IO.RetailersSummaryWriter;
 import playground.ciarif.retailers.data.Retailer;
 import playground.ciarif.retailers.data.Retailers;
+import playground.ciarif.retailers.utils.CountFacilityCustomers;
+import playground.ciarif.retailers.utils.CountRetailerCustomers;
 import playground.ciarif.retailers.utils.ReRoutePersons;
 
 public class RetailersLocationListener implements StartupListener, IterationEndsListener, BeforeMobsimListener{
@@ -41,6 +44,8 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	private Retailers retailers;
 	private Controler controler;
 	private LinksRetailerReader lrr;
+	private RetailersSummaryWriter rsw;
+	private CountFacilityCustomers cfc;
 	
 	// public methods
 	
@@ -82,10 +87,22 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 		//if (controler.getIteration()%gravityModelIter ==0 && controler.getIteration()>0){
 		if (controler.getIteration()==gravityModelIter){
 			// TODO maybe need to add if sequential statement
+			this.rsw = new RetailersSummaryWriter("../matsim/output/RetailersSummary"); 
+			this.cfc = new CountFacilityCustomers(controler.getPopulation().getPersons());
+			
 			for (Retailer r : this.retailers.getRetailers().values()) {
+				
+				rsw.write(r, controler.getIteration(), cfc);
 				r.runStrategy(lrr.getFreeLinks());
 				lrr.updateFreeLinks();
 				new ReRoutePersons().run(r.getMovedFacilities(), controler.getNetwork(), controler.getPopulation().getPersons(), pcrl, controler.getFacilities());  
+			}
+		}
+		
+		if (controler.getIteration()== controler.getLastIteration()) {
+			for (Retailer r : this.retailers.getRetailers().values()) {
+				rsw.write(r, controler.getIteration(),cfc);
+				  
 			}
 		}
 	}

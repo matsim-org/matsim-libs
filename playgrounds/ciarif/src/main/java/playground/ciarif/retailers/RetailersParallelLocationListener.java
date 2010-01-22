@@ -210,7 +210,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 			}
 			
 			int iter = controler.getIterationNumber();
-			this.rs.write(this.retailers);
+			this.rs.write(this.retailers, iter);
 			
 			for (Person p : controler.getPopulation().getPersons().values()) {
 				pst.run(p,iter);

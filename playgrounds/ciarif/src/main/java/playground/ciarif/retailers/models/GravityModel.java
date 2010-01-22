@@ -235,10 +235,7 @@ public double computePotential(ArrayList<Integer> solution){
 		log.info("Min y = " + miny );
 		log.info("Max x = " + maxx );
 		log.info("Max y = " + maxy );
-		/*minx= minx*0.75;
-		miny= miny*0.75;
-		maxx= maxx*0.75;
-		maxy= maxy*0.75;*/
+		
 		double x_width = (maxx - minx)/n;
 		double y_width = (maxy - miny)/n;
 		int a = 0;

@@ -125,7 +125,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	public Map<Id, ActivityFacilityImpl> moveFacilities(
 			Map<Id, ActivityFacilityImpl> retailerFacilities,
 			TreeMap<Id, LinkRetailersImpl> freeLinks) {
-		// TODO Auto-generated method stub
+		
 		this.retailerFacilities = retailerFacilities;
 		GravityModel gm = new GravityModel(this.controler, retailerFacilities); 
 		gm.init();
@@ -149,7 +149,10 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 				ArrayList<Person> persons = rz.getPersons();
 				
 				for (Person p:persons) {
-					boolean first_shop = true;
+					boolean first_shop = true; 
+					/* this way a person going twice in the shop is not counted twice. This is consistent with the definition of customers but
+					this is a lost of information, maybe a weight for the person could be introduced in the Consumer class
+					*/
 					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
 						
 						if (pe2 instanceof ActivityImpl) {
