@@ -330,8 +330,6 @@ public class CompareScenarios {
 			NetworkLayer network = scenario.getNetwork();
 			new MatsimNetworkReader(scenario).readFile(this.networkInputFilenames.get(scenarioName));
 			scenarioNetworks.put(scenarioName, network);
-			world.setNetworkLayer(network);
-			world.complete();
 
 			//Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null, network);
 			PopulationImpl plans = scenario.getPopulation();
@@ -401,9 +399,6 @@ public class CompareScenarios {
 
 			ArrayList<CaseStudyResult> results = new ArrayList<CaseStudyResult>();
 			for (String scenarioName : this.scenarioNames) {
-
-				// choose right network
-				world.setNetworkLayer(scenarioNetworks.get(scenarioName));
 
 				ScenarioImpl subScenario = new ScenarioImpl();
 				subScenario.setNetwork(scenarioNetworks.get(scenarioName));
