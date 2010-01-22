@@ -6,12 +6,12 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -23,9 +23,6 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
-import playground.mmoyo.PTRouter.PTActWriter;
-import playground.mmoyo.PTRouter.PTRouter;
-import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.Validators.TransitRouteValidator;
 import playground.mmoyo.analysis.TravParameterAnalysis;
 
@@ -50,14 +47,14 @@ public class Main {
 		netWorkFile = "examples/equil/network.xml"; 
 		transitScheduleFile  = 	"src/playground/marcel/pt/demo/equilnet/transitSchedule.xml";
 		*/
-		
-		NetworkLayer network= new NetworkLayer(new NetworkFactoryImpl());
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		PTActWriter ptActWriter;
 		
-		/***************reads the transitSchedule file**********/
-		new MatsimNetworkReader(network).readFile(netWorkFile);
+		/* **************reads the transitSchedule file********* */
+		new MatsimNetworkReader(scenario).readFile(netWorkFile);
 		try {
 			new TransitScheduleReaderV1(transitSchedule, network).readFile(transitScheduleFile);
 		} catch (SAXException e){

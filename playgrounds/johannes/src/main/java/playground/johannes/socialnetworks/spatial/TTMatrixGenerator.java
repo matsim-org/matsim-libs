@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.EventsManagerImpl;
@@ -77,8 +78,9 @@ public class TTMatrixGenerator {
 		/*
 		 * read network
 		 */
-		NetworkLayer network = new NetworkLayer();
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
 		reader.parse(args[0]);
 		/*
 		 * load events
@@ -186,7 +188,7 @@ public class TTMatrixGenerator {
 									break;
 							}
 						}
-						double tt = ttSum/(double)i;
+						double tt = ttSum/i;
 						if(Double.isInfinite(tt)) {
 							tt = 0.0;
 							logger.warn("Travel time was infinity, set to zero.");

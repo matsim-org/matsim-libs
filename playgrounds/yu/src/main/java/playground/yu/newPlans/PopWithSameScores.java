@@ -77,7 +77,7 @@ public class PopWithSameScores extends NewPopulation {
 		Scenario sc = new ScenarioImpl();
 
 		NetworkImpl net = (NetworkImpl) sc.getNetwork();
-		new MatsimNetworkReader(net).readFile(netFilename);
+		new MatsimNetworkReader(sc).readFile(netFilename);
 
 		Population pop = sc.getPopulation();
 		new MatsimPopulationReader(sc).readFile(popFilename);

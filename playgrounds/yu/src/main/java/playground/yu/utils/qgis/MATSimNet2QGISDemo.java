@@ -24,7 +24,7 @@
 package playground.yu.utils.qgis;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -63,13 +63,13 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		// String coordinateSys = ch1903;
 		String coordinateSys = "DHDN_GK4";
 //		String coordinateSys = "Atlantis";
-		Gbl.createConfig(null);
-		Gbl.getConfig().global().setCoordinateSystem(coordinateSys);
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().global().setCoordinateSystem(coordinateSys);
 
 		Logger log = Logger.getLogger(Links2ESRIShape.class);
 		log.info("loading network from " + netfile);
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netfile);
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);

@@ -57,6 +57,7 @@ import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -1445,7 +1446,9 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToTXT() {
 
-		ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005");
+		ScenarioImpl scenario = new ScenarioImpl();
+		ActivityFacilitiesImpl shopsOf2005 = scenario.getActivityFacilities();
+		shopsOf2005.setName("shopsOf2005");
 		ArrayList<String> txtLines = new ArrayList<String>();
 		ShopId shopId = null;
 		String aShopLine = null;
@@ -1478,15 +1481,15 @@ public class ShopsOf2005ToFacilities {
 		txtLines.add(aShopLine);
 
 		System.out.println("Reading facilities xml file... ");
-		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(shopsOf2005);
+		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(scenario);
 		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
 		System.out.println("Reading facilities xml file...done.");
 
-		Iterator facilityIterator = shopsOf2005.getFacilities().values().iterator();
+		Iterator<ActivityFacilityImpl> facilityIterator = shopsOf2005.getFacilities().values().iterator();
 
 		while (facilityIterator.hasNext()) {
 
-			ActivityFacilityImpl facility = (ActivityFacilityImpl) facilityIterator.next();
+			ActivityFacilityImpl facility = facilityIterator.next();
 			facilityId = facility.getId().toString();
 			System.out.println(facilityId);
 
@@ -1603,10 +1606,12 @@ public class ShopsOf2005ToFacilities {
 
 		ActivityFacilitiesImpl facilities = null;
 		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
-			facilities = new ActivityFacilitiesImpl(shopsNames.get(new Integer(dataSetIndex)));
+			ScenarioImpl scenario = new ScenarioImpl();
+			facilities = scenario.getActivityFacilities();
+			facilities.setName(shopsNames.get(Integer.valueOf(dataSetIndex)));
 
 			System.out.println("Reading facilities xml file... ");
-			FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities);
+			FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(scenario);
 			facilities_reader.readFile(facilitiesInputFilenames.get(new Integer(dataSetIndex)));
 			System.out.println("Reading facilities xml file...done.");
 
@@ -1617,7 +1622,6 @@ public class ShopsOf2005ToFacilities {
 			try {
 				jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
 			} catch (JAXBException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -1707,14 +1711,16 @@ public class ShopsOf2005ToFacilities {
 
 	private static void applyOpentimesToEnterpriseCensus(Config config) {
 
-		ActivityFacilitiesImpl facilities_input = new ActivityFacilitiesImpl("Switzerland based on Enterprise census 2000.");
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		ActivityFacilitiesImpl facilities_input = scenario.getActivityFacilities();
+		facilities_input.setName("Switzerland based on Enterprise census 2000.");
 
 		// init algorithms
 		FacilitiesOpentimesKTIYear2 facilitiesOpentimesKTIYear2 = new FacilitiesOpentimesKTIYear2();
 		facilitiesOpentimesKTIYear2.init();
 
 		System.out.println("Reading Facilities KTI Year 2 file...");
-		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities_input);
+		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(scenario);
 		facilities_reader.setValidating(false);
 		facilities_reader.readFile(config.facilities().getInputFile());
 		System.out.println("Processing Facilities KTI Year 2 file...");

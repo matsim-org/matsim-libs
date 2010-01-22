@@ -366,13 +366,13 @@ public class TravelTimeComparer {
 				final String facilitiesFilename = "./plans/facilities.xml";
 		*/
 				ScenarioImpl scenarioOrig = new ScenarioImpl();
-				new MatsimNetworkReader(scenarioOrig.getNetwork()).readFile(networkFilename);
-				new MatsimFacilitiesReader(scenarioOrig.getActivityFacilities()).readFile(facilitiesFilename);
+				new MatsimNetworkReader(scenarioOrig).readFile(networkFilename);
+				new MatsimFacilitiesReader(scenarioOrig).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioOrig).readFile(populationFilenameOrig);
 				
 				ScenarioImpl scenarioNew = new ScenarioImpl();
 				scenarioNew.setNetwork(scenarioOrig.getNetwork());
-				new MatsimFacilitiesReader(scenarioNew.getActivityFacilities()).readFile(facilitiesFilename);
+				new MatsimFacilitiesReader(scenarioNew).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioNew).readFile(populationFilenameNew);
 								
 				TravelTimeComparer ttc = new TravelTimeComparer(scenarioOrig.getPopulation(), scenarioNew.getPopulation());

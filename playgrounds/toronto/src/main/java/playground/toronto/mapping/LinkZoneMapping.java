@@ -22,6 +22,7 @@ package playground.toronto.mapping;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -46,8 +47,9 @@ public class LinkZoneMapping {
 	}
 	
 	public void run(final String inputNetworkFile, final String outputMappingFile) {
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(inputNetworkFile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 		new NetworkCreateL2ZMapping(outputMappingFile).run(network);
 	}
 	

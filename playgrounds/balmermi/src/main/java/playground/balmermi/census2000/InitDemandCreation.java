@@ -74,7 +74,7 @@ public class InitDemandCreation {
 		World world = scenario.getWorld();
 
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(world).readFile(config.world().getInputFile());
+		new MatsimWorldReader(scenario).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
@@ -84,7 +84,7 @@ public class InitDemandCreation {
 
 		System.out.println("  reading matrices xml file... ");
 		Matrices matrices = new Matrices();
-		MatsimMatricesReader reader = new MatsimMatricesReader(matrices, world);
+		MatsimMatricesReader reader = new MatsimMatricesReader(matrices, scenario);
 		reader.readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 

@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Layer;
@@ -69,7 +68,7 @@ public class Matrix {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	protected final Entry createEntry(final String fromLocId, final String toLocId, final double value) {
+	protected final Entry createEntry(final Id fromLocId, final Id toLocId, final double value) {
 		// get the from location
 		Location f_loc = this.worldLayer.getLocation(fromLocId);
 		if (f_loc == null) {

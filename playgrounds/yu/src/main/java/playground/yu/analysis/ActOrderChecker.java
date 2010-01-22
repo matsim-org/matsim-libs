@@ -75,7 +75,7 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 //		Gbl.createConfig(null);
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl populationA = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilenameA);

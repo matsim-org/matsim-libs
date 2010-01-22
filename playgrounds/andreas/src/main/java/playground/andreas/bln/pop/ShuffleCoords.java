@@ -97,7 +97,7 @@ public class ShuffleCoords extends NewPopulation {
 		String outPlansFile = "./plan_korridor_50x_sc.xml.gz";
 
 		NetworkLayer net = sc.getNetwork();
-		new MatsimNetworkReader(net).readFile(networkFile);
+		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		PopulationImpl inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

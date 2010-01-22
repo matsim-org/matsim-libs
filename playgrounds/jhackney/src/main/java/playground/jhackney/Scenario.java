@@ -160,7 +160,7 @@ public abstract class Scenario {
 //	}
 	public static final World readWorld() {
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(scenario.getWorld()).readFile(scenario.getConfig().world().getInputFile());
+		new MatsimWorldReader(scenario).readFile(scenario.getConfig().world().getInputFile());
 		System.out.println("  done.");
 		return scenario.getWorld();
 	}
@@ -168,7 +168,7 @@ public abstract class Scenario {
 	public static final ActivityFacilitiesImpl readFacilities() {
 		System.out.println("  reading facilities xml file... ");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(scenario.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(scenario).readFile(scenario.getConfig().facilities().getInputFile());
 		System.out.println("  done.");
 		return facilities;
 	}
@@ -177,7 +177,7 @@ public abstract class Scenario {
 		System.out.println("  reading the network xml file...");
 		System.out.println(scenario.getConfig().network().getInputFile());
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		System.out.println("  done.");
 		return network;
 	}

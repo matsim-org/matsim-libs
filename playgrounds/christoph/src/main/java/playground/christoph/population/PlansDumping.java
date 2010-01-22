@@ -49,7 +49,7 @@ public class PlansDumping {
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFile);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(populationFile);

@@ -24,9 +24,9 @@ import java.io.IOException;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.world.ZoneLayer;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -48,7 +48,7 @@ public class ShapeFile2ZoneLayer {
 				throw new IllegalArgumentException("There is at least one feature that does not have an ID set.");
 			}
 			
-			layer.createZone(id.toString(), Double.toString(c.x), Double.toString(c.y), null, null, null, null, area == null ? null : area.toString(), name == null ? null : name.toString());
+			layer.createZone(new IdImpl(id.toString()), Double.toString(c.x), Double.toString(c.y), null, null, null, null, area == null ? null : area.toString(), name == null ? null : name.toString());
 		}
 	}
 	

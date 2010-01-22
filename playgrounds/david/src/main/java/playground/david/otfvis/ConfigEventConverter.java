@@ -20,13 +20,11 @@
 
 package playground.david.otfvis;
 
-import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.run.OTFVis;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
-import org.matsim.world.World;
 
 //Usage ConfigEventConverter event-file config-file mvi-file
 public class ConfigEventConverter {
@@ -36,15 +34,14 @@ public class ConfigEventConverter {
 			System.exit(0);
 		}
 		
-		Gbl.createConfig(new String[]{args[1]});
+		Scenario scenario = new ScenarioLoaderImpl(args[1]).getScenario();
 
-		String netFileName = Gbl.getConfig().getParam("network","inputNetworkFile");
-		Double period = Gbl.getConfig().simulation().getSnapshotPeriod();
+		String netFileName = scenario.getConfig().network().getInputFile();
+		Double period = scenario.getConfig().simulation().getSnapshotPeriod();
 		if(period == 0.0) period = 600.; // in the movie writing a period of zero does not make sense, use default value 
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(netFileName);
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		OTFEvent2MVI converter = new OTFEvent2MVI(new QueueNetwork(net), args[0], args[2], period);
+		OTFEvent2MVI converter = new OTFEvent2MVI(new QueueNetwork(scenario.getNetwork()), args[0], args[2], period);
 		converter.convert();
 
 	}

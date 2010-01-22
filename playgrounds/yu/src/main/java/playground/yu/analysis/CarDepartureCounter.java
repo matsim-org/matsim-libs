@@ -71,7 +71,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		final String outputFilename = "../runs/run628/it.500/500.carDeparture.txt";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		System.out.println("->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);

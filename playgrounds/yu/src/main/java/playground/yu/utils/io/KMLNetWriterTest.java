@@ -28,6 +28,7 @@ import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -47,8 +48,9 @@ public class KMLNetWriterTest {
 		// final String kmzFilename = "./test/yu/ivtch/output/testEquil.kmz";
 		final String kmzFilename = "./test/yu/ivtch/output/testZrh.kmz";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 

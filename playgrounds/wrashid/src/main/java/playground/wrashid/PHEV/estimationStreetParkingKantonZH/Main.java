@@ -9,6 +9,7 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -250,13 +251,15 @@ public class Main {
 
 
 	public static void readAllDataFiles(){
+		ScenarioImpl scenario = new ScenarioImpl();
+
 		// read data about communities
 		communityData=GG25Data.readGG25Data("C:\\data\\SandboxCVS\\ivt\\studies\\switzerland\\world\\gg25_2001_infos.txt");
 		
 		
 		// read world data
-		world=new World();
-		MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		world=scenario.getWorld();
+		MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader .readFile("C:\\data\\SandboxCVS\\ivt\\studies\\switzerland\\world\\world.xml");
 		//Layer layer = world.getLayer("municipality");
 
@@ -270,8 +273,8 @@ public class Main {
 		
 		
 		// read network layer
-		network = new NetworkLayer();
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(network);
+		network = scenario.getNetwork();
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(scenario);
 		//nr.readFile("C:\\data\\SandboxCVS\\ivt\\studies\\switzerland\\networks\\navteq\\network.xml\\network.xml");
 		nr.readFile("C:\\data\\SandboxCVS\\ivt\\studies\\switzerland\\networks\\ivtch\\network.xml");
 		

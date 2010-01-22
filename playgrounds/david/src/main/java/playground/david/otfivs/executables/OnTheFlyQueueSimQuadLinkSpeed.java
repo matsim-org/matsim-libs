@@ -26,7 +26,6 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
 
 /**
@@ -131,13 +130,12 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		if (worldFileName != null) {
-			World world = scenario.getWorld();
-			MatsimWorldReader world_parser = new MatsimWorldReader(world);
+			MatsimWorldReader world_parser = new MatsimWorldReader(scenario);
 			world_parser.readFile(worldFileName);
 		}
 
 		NetworkLayer net = scenario.getNetwork();
-		new MatsimNetworkReader(net).readFile(netFileName);
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		PopulationImpl population = scenario.getPopulation();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);

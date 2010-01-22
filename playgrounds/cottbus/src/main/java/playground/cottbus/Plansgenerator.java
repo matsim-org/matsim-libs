@@ -21,19 +21,18 @@
 package playground.cottbus;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
@@ -52,19 +51,19 @@ public class Plansgenerator {
 
 	private static final String plansOut = "./input/denver/plans.xml";
 
-	private NetworkLayer network;
-	private PopulationImpl plans;
+	private Scenario scenario;
+	private Network network;
+	private Population plans;
 
 	private void init() {
-		Config config = Gbl.createConfig(null);
-		config.addCoreModules();
-
-		this.network = this.loadNetwork(networkFilename);
+		Scenario scenario = new ScenarioImpl();
+		this.network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 	}
 
 	private void createPlans() throws Exception {
 		init();
-		this.plans = new ScenarioImpl().getPopulation();
+		this.plans = this.scenario.getPopulation();
 		final int HOME_END_TIME = 6 * 3600; // time to start
 
 		createDenverStraight(HOME_END_TIME);
@@ -187,8 +186,8 @@ public class Plansgenerator {
 	 */
 	private int addCommodity(final String HOME_LINK, final String TARGET_LINK, final int START_TIME, final int DURATION, final int CARS_PER_HOUR, final String ROUTE, int CURRENT_ID){
 		int homeEndtime = 0;
-		final LinkImpl start = network.getLinks().get(new IdImpl(HOME_LINK));
-		final LinkImpl target = network.getLinks().get(new IdImpl(TARGET_LINK));
+		final Link start = network.getLinks().get(new IdImpl(HOME_LINK));
+		final Link target = network.getLinks().get(new IdImpl(TARGET_LINK));
 		final Coord homeCoord = new CoordImpl(-25000, 0);
 		final Coord workCoord = new CoordImpl(10000, 0);
 
@@ -223,19 +222,6 @@ public class Plansgenerator {
 	}
 
 
-	protected NetworkLayer loadNetwork(final String filename) {
-		// - read network: which buildertype??
-		NetworkLayer network = new NetworkLayer();
-
-		new MatsimNetworkReader(network).readFile(filename);
-
-		return network;
-	}
-
-
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		try {
 			new Plansgenerator().createPlans();

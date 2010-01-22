@@ -39,7 +39,7 @@ public class GeneralLib {
 		Population population = scenario.getPopulation();
 
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFile);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(plansFile);
@@ -74,8 +74,9 @@ public class GeneralLib {
 	}
 
 	public static ActivityFacilitiesImpl readActivityFacilities(String facilitiesFile) {
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(facilitiesFile);
+		ScenarioImpl scenario = new ScenarioImpl(); 
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		return facilities;
 	}
 

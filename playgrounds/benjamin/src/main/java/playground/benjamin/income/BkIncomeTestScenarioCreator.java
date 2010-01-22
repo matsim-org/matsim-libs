@@ -52,13 +52,13 @@ public class BkIncomeTestScenarioCreator {
 
 	private static final Logger log = Logger.getLogger(BkIncomeTestScenarioCreator.class);
 
-	private Id id1 = new IdImpl(1);
-	private Id id2 = new IdImpl(2);
-	private Id id3 = new IdImpl(3);
-	private Id id4 = new IdImpl(4);
-	private Id id5 = new IdImpl(5);
-	private Id id6 = new IdImpl(6);
-	private Id id7 = new IdImpl(7);
+	private final Id id1 = new IdImpl(1);
+	private final Id id2 = new IdImpl(2);
+	private final Id id3 = new IdImpl(3);
+	private final Id id4 = new IdImpl(4);
+	private final Id id5 = new IdImpl(5);
+	private final Id id6 = new IdImpl(6);
+	private final Id id7 = new IdImpl(7);
 
 	private final NetworkImpl uselessNetwork;
 	private final ScenarioImpl scenario;
@@ -174,7 +174,7 @@ public class BkIncomeTestScenarioCreator {
 		String outfile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/plans.xml";
 		String networkFile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/network.xml";
 		NetworkImpl uselessNetwork = scenario.getNetwork();
-		new MatsimNetworkReader(uselessNetwork).readFile(networkFile);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		BkIncomeTestScenarioCreator pc = new BkIncomeTestScenarioCreator(scenario);
 		Population pop = pc.createPlans();

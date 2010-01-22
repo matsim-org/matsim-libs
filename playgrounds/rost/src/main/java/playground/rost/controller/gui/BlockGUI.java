@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
@@ -131,8 +132,9 @@ public class BlockGUI extends AbstractBasicMapGUIImpl {
 	public static BlockGUI createBlocksAndShowGUI()
 	{
 		// TODO Auto-generated method stub
-		NetworkLayer network = new NetworkLayer();
-		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
 		try {
 			nReader.parse(PathTracker.resolve("matExtract"));
 			return(new BlockGUI(network));

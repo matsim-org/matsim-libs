@@ -89,7 +89,7 @@ public abstract class CMCFRouter implements NetworkReader{
 		this.network = scenario.getNetwork();
 		MatsimNetworkReader reader = null;
 		try {
-			reader = new MatsimNetworkReader( this.network );
+			reader = new MatsimNetworkReader(scenario);
 			reader.parse(this.networkFile);
 			this.network.connect();
 		} catch (SAXException e) {

@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -154,12 +154,10 @@ public class DistanceCalculator {
 		String outfile = "./padang/demand_generation/routed.csv";
 		String netfile = "./networks/padang_net_v20080618.xml";
 		
-		
-		Gbl.createConfig(null);
-		
 		log.info("loading network layer...");
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netfile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 		
 		new DistanceCalculator(network,infile,outfile).run();

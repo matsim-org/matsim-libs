@@ -63,8 +63,9 @@ public class CompareSelectedPlansTable {
 
 	private void init(final String networkPath) {
 		System.out.println("  reading the network...");
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(this.network).readFile(networkPath);
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkPath);
 	}
 
 	private void readFiles(final String plansfilePath0,

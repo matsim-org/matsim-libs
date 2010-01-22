@@ -35,6 +35,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -242,8 +243,10 @@ public class NetworkClearanceAnalysis {
 		String eventsFile2 = INPUT_BASE + "output_100m/ITERS/it.0/0.events.txt.gz";
 		String network = "../../inputs/networks/padang_net_evac_v20080618.xml";
 		String outfile = INPUT_BASE + "output_100m_so/analysis/runComp.shp";
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(network);
+
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(network);
 		
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
 		new NetworkClearanceAnalysis(eventsFile1, eventsFile2, net, outfile, crs).run();

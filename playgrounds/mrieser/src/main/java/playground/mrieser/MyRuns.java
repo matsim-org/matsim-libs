@@ -632,7 +632,7 @@ public class MyRuns {
 		Logger log = Logger.getLogger(MyRuns.class);
 		try {
 			log.info("reading network");
-			new MatsimNetworkReader(scenario.getNetwork()).parse("/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml");
+			new MatsimNetworkReader(scenario).parse("/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml");
 			log.info("reading plans");
 			new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch10pct.dilZh30km.xml.gz");
 			scenario.getPopulation().printPlansCount();

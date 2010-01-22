@@ -27,7 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -72,16 +75,18 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 
 	public void testNetworkBased() {
 		Config config = loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		Scenario scenario = new ScenarioImpl(config);
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
-		this.runDemo(network, config.planomat());
+		this.runDemo((NetworkLayer) network, config.planomat());
 	}
 	
 	public void testFacilitiesBased() {
 		Config config = loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility);
 		this.runDemo(facilities, config.planomat());
 	}

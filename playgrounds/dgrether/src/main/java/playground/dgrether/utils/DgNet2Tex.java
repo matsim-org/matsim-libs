@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -153,17 +154,15 @@ public class DgNet2Tex {
 	
 	
 	public void convert(String net, String texnet) {
-		NetworkLayer network = new NetworkLayer();
-		MatsimNetworkReader reader = new MatsimNetworkReader(network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
 		reader.readFile(net);
 		this.convert(network, texnet);
 	}
 
 	
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String net, texnet;
 //		net = args[0];

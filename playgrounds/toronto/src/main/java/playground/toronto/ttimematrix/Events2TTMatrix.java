@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
@@ -105,13 +106,12 @@ public class Events2TTMatrix {
 		System.out.println();
 		
 		// reading the network
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkfile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkfile);
 
-		if (Gbl.getConfig() == null) { Gbl.createConfig(null); }
-
-		TravelTimeCalculator ttc = new TravelTimeCalculator(network,3600,30*3600, Gbl.getConfig().travelTimeCalculator());
-		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc));
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network,3600,30*3600, scenario.getConfig().travelTimeCalculator());
+		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig().charyparNagelScoring()));
 		TTimeMatrixCalculator ttmc = new TTimeMatrixCalculator(parseL2ZMapping(mapfile),hours,st,network);
 
 		// creating events object and assign handlers

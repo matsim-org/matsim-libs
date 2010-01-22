@@ -133,7 +133,7 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 //		Gbl.createConfig(null);
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 		
 		PopulationImpl population = scenario.getPopulation();
 

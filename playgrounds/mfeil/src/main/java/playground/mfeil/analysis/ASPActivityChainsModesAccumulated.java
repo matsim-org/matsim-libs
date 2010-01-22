@@ -99,8 +99,8 @@ public class ASPActivityChainsModesAccumulated extends ASPActivityChainsModes{
 //		final String outputDir = "./plans";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		ASPActivityChainsModesAccumulated sp = new ASPActivityChainsModesAccumulated(scenario.getPopulation(), scenario.getKnowledges(), outputDir);

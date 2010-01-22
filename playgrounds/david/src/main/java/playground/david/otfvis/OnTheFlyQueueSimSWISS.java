@@ -25,6 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QueueSimulation;
 
@@ -41,12 +42,12 @@ public class OnTheFlyQueueSimSWISS {
 
 		String netFileName = "../../tmp/network.xml.gz";
 
-		Config config = Gbl.createConfig(args);
 		Gbl.startMeasurement();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
+		Config config = scenario.getConfig();
 		config.setParam("global", "localDTDBase", "dtd/");
-		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		Gbl.printElapsedTime();
 
@@ -62,8 +63,6 @@ public class OnTheFlyQueueSimSWISS {
 		sim.run();
 
 		Gbl.printElapsedTime();
-
 	}
-
 
 }

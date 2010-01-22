@@ -23,18 +23,19 @@ package playground.rost.eaflow.ea_flow;
 
 //import java.util.Map;
 
-import org.matsim.core.network.*;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NodeImpl;
 
 public class ReadNetwork {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		 System.out.println("Ich lebe");
-		 NetworkLayer network = new NetworkLayer();
-		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(network);
+		 ScenarioImpl scenario = new ScenarioImpl();
+		 NetworkLayer network = scenario.getNetwork();
+		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario);
 		 
 		 networkReader.readFile("./examples/equil/network.xml");
 		 		 

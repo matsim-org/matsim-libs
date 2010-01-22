@@ -28,14 +28,14 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -50,7 +50,7 @@ public class SpanningTree {
 
 	private final static Logger log = Logger.getLogger(SpanningTree.class);
 	
-	private NodeImpl origin = null;
+	private Node origin = null;
 	private double dTime = Time.UNDEFINED_TIME;
 	
 	private final TravelTime ttFunction;
@@ -104,7 +104,7 @@ public class SpanningTree {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void setOrigin(NodeImpl origin) {
+	public final void setOrigin(Node origin) {
 		this.origin = origin;
 	}
 
@@ -158,7 +158,7 @@ public class SpanningTree {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 
 		nodeData = new HashMap<Id,NodeData>((int)(network.getNodes().size()*1.1),0.95f);
 		NodeData d = new NodeData();
@@ -180,13 +180,13 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(String[] args) {
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile("../../input/network.xml");
-		Config conf = Gbl.getConfig();
-		if (conf == null) { conf = Gbl.createConfig(null); }
+		Scenario scenario = new ScenarioImpl();
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
+		Config conf = scenario.getConfig();
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, conf.travelTimeCalculator());
 		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc));
-		NodeImpl origin = network.getNodes().get(new IdImpl(1));
+		Node origin = network.getNodes().get(new IdImpl(1));
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);
 		st.run(network);

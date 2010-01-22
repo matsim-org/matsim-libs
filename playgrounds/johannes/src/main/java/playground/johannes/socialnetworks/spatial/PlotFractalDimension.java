@@ -39,6 +39,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.Vertex;
@@ -76,8 +77,9 @@ public class PlotFractalDimension {
 		/*
 		 * read network file
 		 */
-		NetworkLayer network = new NetworkLayer();
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
 		reader.parse("/Users/fearonni/vsp-work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-changed-with-GTF.xml");
 		/*
 		 * read travel time matrix
@@ -120,9 +122,9 @@ public class PlotFractalDimension {
 		logger.info("Caching nearest nodes...");
 		for(SpatialVertex v : graph.getVertices()) {
 			Node n = getNearestNode(v.getCoordinate(), nodes);
-			nearestNodes.put((Vertex) v, n);
+			nearestNodes.put(v, n);
 			int i = node2Idx.get(n);
-			vertex2Idx.put((Vertex) v, i);
+			vertex2Idx.put(v, i);
 			
 			count++;
 			if(count % 1000 == 0) {
@@ -139,7 +141,7 @@ public class PlotFractalDimension {
 				
 				for (SpatialVertex v_j : graph.getVertices()) {
 					int i = vertex2Idx.get(v);
-					int j = vertex2Idx.get((Vertex) v_j);
+					int j = vertex2Idx.get(v_j);
 
 					int tt = ttmatrix[i][j];
 					tt = (int) Math.ceil(tt / normDescretization);

@@ -6,6 +6,7 @@ package playground.yu.counts;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -27,8 +28,9 @@ public class CountsConverter {
 	 */
 	public static void main(String[] args) {
 		// ------------READ MATSIM NETWORK-----------------
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network)
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario)
 				.readFile("../berlin data/old_wip/wip_net.xml");
 		// ------------READ .ATT COUNTSFILE----------------
 		SimpleReader sr = new SimpleReader(

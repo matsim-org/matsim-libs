@@ -88,8 +88,9 @@ public class MergePlans {
 		Config config = Gbl.createConfig(null);
 		config.plans().setOutputFile(outputPlansFilename);
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		ScenarioImpl scenarioA = new ScenarioImpl();
 		scenarioA.setNetwork(network);

@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -169,11 +170,13 @@ public class TeleatlasIvtcheuMerger {
 		String il2deletefile = args[3].trim();
 		String outNetFile = args[4].trim();
 		
-		NetworkLayer networkTeleatlas = new NetworkLayer();
-		new MatsimNetworkReader(networkTeleatlas).readFile(teleatlasfile);
+		ScenarioImpl taScenario = new ScenarioImpl();
+		NetworkLayer networkTeleatlas = taScenario.getNetwork();
+		new MatsimNetworkReader(taScenario).readFile(teleatlasfile);
 
-		NetworkLayer networkIvtcheu = new NetworkLayer();
-		new MatsimNetworkReader(networkIvtcheu).readFile(ivtcheufile);
+		ScenarioImpl ivtcheuScenario = new ScenarioImpl();
+		NetworkLayer networkIvtcheu = ivtcheuScenario.getNetwork();
+		new MatsimNetworkReader(ivtcheuScenario).readFile(ivtcheufile);
 		
 		deleteLinks(networkIvtcheu,il2deletefile);
 		mergeNetworks(networkTeleatlas,networkIvtcheu,i2tmappingfile);

@@ -42,7 +42,7 @@ public class CreatePlans {
 
 		// read facilities
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/facilities/facilities.xml");
+		new MatsimFacilitiesReader(scenario).readFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/facilities/facilities.xml");
 
 
 		// get home and work activity

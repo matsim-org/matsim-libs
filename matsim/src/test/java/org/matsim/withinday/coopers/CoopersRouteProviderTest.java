@@ -24,9 +24,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -40,7 +43,6 @@ import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
 
-
 /**
  * @author dgrether
  */
@@ -49,7 +51,7 @@ public class CoopersRouteProviderTest extends MatsimTestCase {
 	private static final String networkFile = "./test/input/org/matsim/withinday/network.xml";
 
 	private NetworkLayer network;
-
+	
 	private NetworkRouteWRefs route1;
 
 	private NetworkRouteWRefs route2;
@@ -57,8 +59,10 @@ public class CoopersRouteProviderTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		super.loadConfig(null);
-		this.network = this.loadNetwork(networkFile);
+		Config config = super.loadConfig(null);
+		Scenario scenario = new ScenarioImpl(config);
+		this.network = (NetworkLayer) scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 	}
 
 	@Override
@@ -67,13 +71,6 @@ public class CoopersRouteProviderTest extends MatsimTestCase {
 		this.route1 = null;
 		this.route2 = null;
 		super.tearDown();
-	}
-
-	private NetworkLayer loadNetwork(final String filename) {
-		NetworkLayer network = new NetworkLayer();
-		MatsimNetworkReader parser = new MatsimNetworkReader(network);
-		parser.readFile(filename);
-		return network;
 	}
 
 	private VDSSign createSign() {

@@ -148,8 +148,9 @@ public class CMCFPopulationConverter {
 			outfile = args[3];
 		}
 		try {
-			NetworkLayer network = new NetworkLayer();
-			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(network);
+			ScenarioImpl scenario = new ScenarioImpl();
+			NetworkLayer network = scenario.getNetwork();
+			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(scenario);
 			netreader.parse(netfile);
 			PopulationImpl population = readCMCFDemands(inputfile,network,coordinates);
 			new PopulationWriter(population, network).writeFile(outfile);

@@ -99,7 +99,7 @@ public class AnalysisTest4Bln {
 
 		ScenarioImpl sc = new ScenarioImpl();
 		NetworkLayer network = sc.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(sc).readFile(netFilename);
 
 		// toll
 		RoadPricingScheme toll = null;

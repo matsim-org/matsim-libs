@@ -263,7 +263,7 @@ public class ModdedConverter {
 
 	private Coord getRandomCoordInZone(final String zoneId) {
 		return WorldUtils.getRandomCoordInZone(
-				(Zone) this.zones.getLocation(zoneId), this.zones);
+				(Zone) this.zones.getLocation(new IdImpl(zoneId)), this.zones);
 	}
 
 	public void createZones() {
@@ -274,7 +274,7 @@ public class ModdedConverter {
 	}
 
 	public void createZone(final ZoneXY zxy) {
-		this.zones.createZone(zxy.getZoneId(), zxy.getX(), zxy.getY(), null, null,
+		this.zones.createZone(new IdImpl(zxy.getZoneId()), zxy.getX(), zxy.getY(), null, null,
 				null, null, null, null);
 	}
 

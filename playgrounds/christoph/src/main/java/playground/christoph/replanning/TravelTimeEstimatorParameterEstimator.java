@@ -30,10 +30,10 @@ import org.matsim.core.population.MatsimPopulationReader;
  */
 public class TravelTimeEstimatorParameterEstimator implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler{
 
-	private Population population;
-	private Network network;
-	private int travelTimeBinSize;
-	private int numSlots;
+	private final Population population;
+	private final Network network;
+	private final int travelTimeBinSize;
+	private final int numSlots;
 	
 	private Map<Id, float[]> linkVehicleCounts; // LinkId
 	private Map<Id, int[]> linkEnterCounts;	//	LinkId
@@ -51,7 +51,7 @@ public class TravelTimeEstimatorParameterEstimator implements LinkEnterEventHand
 		// Load Network
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFile);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		
 		// Load Population
 		new MatsimPopulationReader(scenario).readFile(populationFile);

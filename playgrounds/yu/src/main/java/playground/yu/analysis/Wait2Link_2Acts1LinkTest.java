@@ -39,7 +39,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -198,8 +197,7 @@ public class Wait2Link_2Acts1LinkTest {
 		final String outputFilename = "../data/ivtch/Wait2Links_2Acts1Link.txt.gz";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);

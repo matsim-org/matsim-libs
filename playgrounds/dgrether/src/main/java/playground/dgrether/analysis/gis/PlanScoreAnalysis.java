@@ -139,8 +139,9 @@ public class PlanScoreAnalysis {
 	}
 
 	private void doAnalysis() {
-		NetworkLayer net = new NetworkLayer();
-		MatsimNetworkReader netReader = new MatsimNetworkReader(net);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer net = scenario.getNetwork();
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(NETWORK);
 //		Gbl.getWorld().setNetworkLayer(net);
 //		Gbl.getWorld().complete();

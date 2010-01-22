@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -34,7 +35,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -156,8 +156,8 @@ public class TimeWriter implements AgentDepartureEventHandler,
 		final String outputFilename = "./test/yu/test/output/7-9-6.times.txt.gz";
 		final String chartFilename = "./test/yu/test/output/7-9-6.times.png";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 

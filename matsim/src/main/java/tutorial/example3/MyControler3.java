@@ -37,7 +37,7 @@ public class MyControler3 {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl("./examples/tutorial/myConfig.xml");
 		ScenarioImpl scenario = loader.getScenario();
 
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();

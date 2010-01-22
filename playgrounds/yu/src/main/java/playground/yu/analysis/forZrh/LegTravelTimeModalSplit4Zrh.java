@@ -29,8 +29,8 @@ import playground.yu.utils.io.SimpleWriter;
  */
 public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 
-	private double[] throughTravelTimes;
-	private int[] throughArrCount;
+	private final double[] throughTravelTimes;
+	private final int[] throughArrCount;
 
 	public LegTravelTimeModalSplit4Zrh(int binSize, int nofBins,
 			PopulationImpl plans) {
@@ -95,19 +95,19 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 			sw.writeln(Time.writeTime(i * this.binSize) + "\t"
 					+ i * this.binSize + "\t" + this.travelTimes[i] + "\t"
 					+ this.arrCount[i] + "\t"
-					+ this.travelTimes[i] / (double) this.arrCount[i] + "\t"
+					+ this.travelTimes[i] / this.arrCount[i] + "\t"
 					+ this.carTravelTimes[i] + "\t" + this.carArrCount[i]
 					+ "\t"
-					+ this.carTravelTimes[i] / (double) this.carArrCount[i]
+					+ this.carTravelTimes[i] / this.carArrCount[i]
 					+ "\t" + this.ptTravelTimes[i] + "\t" + this.ptArrCount[i]
 					+ "\t"
-					+ this.ptTravelTimes[i] / (double) this.ptArrCount[i]
+					+ this.ptTravelTimes[i] / this.ptArrCount[i]
 					+ this.wlkTravelTimes[i] + "\t" + this.wlkArrCount[i]
 					+ "\t" + this.wlkTravelTimes[i]
-					/ (double) this.wlkArrCount[i] + this.throughTravelTimes[i]
+					/ this.wlkArrCount[i] + this.throughTravelTimes[i]
 					+ "\t" + this.throughArrCount[i] + "\t"
 					+ this.throughTravelTimes[i]
-					/ (double) this.throughArrCount[i]);
+					/ this.throughArrCount[i]);
 		sw.write("----------------------------------------\n");
 		double ttSum = 0.0, carTtSum = 0.0, ptTtSum = 0.0, wlkTtSum = 0.0, otherTtSum = 0.0;
 		int nTrips = 0, nCarTrips = 0, nPtTrips = 0, nWlkTrips = 0, nOtherTrips = 0;
@@ -170,7 +170,7 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);

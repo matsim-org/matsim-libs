@@ -44,13 +44,13 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class ActivityTypeDetector extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
-	private Map<String, Double> shortestDurs = new HashMap<String, Double>();
-	private Map<String, Double> longestDurs = new HashMap<String, Double>();
-	private Map<String, Double> earlistEndTimes = new HashMap<String, Double>();
-	private Map<String, Double> latestEndTimes = new HashMap<String, Double>();
-	private Map<String, Double> earlistStartTimes = new HashMap<String, Double>();
-	private Map<String, Double> latestStartTimes = new HashMap<String, Double>();
-	private Map<String, Tuple<Integer, Double>> avgDurs = new HashMap<String, Tuple<Integer, Double>>();
+	private final Map<String, Double> shortestDurs = new HashMap<String, Double>();
+	private final Map<String, Double> longestDurs = new HashMap<String, Double>();
+	private final Map<String, Double> earlistEndTimes = new HashMap<String, Double>();
+	private final Map<String, Double> latestEndTimes = new HashMap<String, Double>();
+	private final Map<String, Double> earlistStartTimes = new HashMap<String, Double>();
+	private final Map<String, Double> latestStartTimes = new HashMap<String, Double>();
+	private final Map<String, Tuple<Integer, Double>> avgDurs = new HashMap<String, Tuple<Integer, Double>>();
 
 	@Override
 	public void run(Person person) {
@@ -151,7 +151,7 @@ public class ActivityTypeDetector extends AbstractPersonAlgorithm implements
 	public static void main(String[] args) {
 		ScenarioImpl s = new ScenarioImpl();
 
-		new MatsimNetworkReader(s.getNetwork())
+		new MatsimNetworkReader(s)
 				.readFile("D:/fromNB04/wm/Toronto/toronto/networks/changedNetworkWithManeuvers/network.xml");
 
 		new MatsimPopulationReader(s)

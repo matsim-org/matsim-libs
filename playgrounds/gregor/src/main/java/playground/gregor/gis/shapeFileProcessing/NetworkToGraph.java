@@ -34,7 +34,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
-
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -109,8 +109,8 @@ public class NetworkToGraph {
 		double xdiff = to.x - from.x;
 		double ydiff = to.y - from.y;
 
-		double distA = from.distance(zero);
-		double distB = to.distance(zero);
+//		double distA = from.distance(zero);
+//		double distB = to.distance(zero);
 
 		double ogradient = Double.MAX_VALUE;
 		if (ydiff != 0)
@@ -133,8 +133,9 @@ public class NetworkToGraph {
 	
 	public static void main(String [] args) throws FactoryException, FactoryRegistryException, SchemaException, IllegalAttributeException, IOException {
 		String netfile = "./networks/padang_net_v20080618.xml";
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netfile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netfile);
 		CoordinateReferenceSystem crs = CRS.parseWKT(WGS84_UTM47S);
 		Collection<Feature> ft = new NetworkToGraph(network,crs).generateFromNet();
 		ShapeFileWriter.writeGeometries(ft, "./padang/network_v20080618.shp");

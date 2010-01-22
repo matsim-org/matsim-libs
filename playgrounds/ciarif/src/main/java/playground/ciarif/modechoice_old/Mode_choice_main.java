@@ -57,7 +57,7 @@ public class Mode_choice_main {
 		World world = scenario.getWorld();
 		final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
@@ -66,7 +66,7 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println();

@@ -134,7 +134,7 @@ public class NewDemandWithFacilities4Zrh {
 		ScenarioImpl scenario = new ScenarioImpl();
 
 		NetworkLayer net = scenario.getNetwork();
-		new MatsimNetworkReader(net).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Knowledges knowledges = scenario.getKnowledges();
 

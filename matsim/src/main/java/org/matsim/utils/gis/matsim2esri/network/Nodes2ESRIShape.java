@@ -34,10 +34,11 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -57,11 +58,11 @@ public class Nodes2ESRIShape {
 	
 	private final static Logger log = Logger.getLogger(Nodes2ESRIShape.class);
 	
-	private NetworkLayer network;
-	private String filename;
+	private final Network network;
+	private final String filename;
 	private FeatureType featureType;
 
-	public Nodes2ESRIShape(final NetworkLayer network, final String filename) {
+	public Nodes2ESRIShape(final Network network, final String filename) {
 		this.network = network;
 		this.filename = filename;
 		initFeatureType();
@@ -69,7 +70,7 @@ public class Nodes2ESRIShape {
 	
 	public void write() {
 		Collection<Feature> features = new ArrayList<Feature>();
-		for (NodeImpl node : this.network.getNodes().values()) {
+		for (Node node : this.network.getNodes().values()) {
 			features.add(getFeature(node));
 		}
 		try {
@@ -80,7 +81,7 @@ public class Nodes2ESRIShape {
 	
 	}
 
-	private Feature getFeature(NodeImpl node) {
+	private Feature getFeature(Node node) {
 		Point p = MGC.coord2Point(node.getCoord());
 		try {
 			return this.featureType.create(new Object[]{p,node.getId().toString()});
@@ -127,7 +128,7 @@ public class Nodes2ESRIShape {
 
 		log.info("loading network from " + netfile);
 		final NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netfile);
+		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 		
 		new Nodes2ESRIShape(network,outputFile).write();

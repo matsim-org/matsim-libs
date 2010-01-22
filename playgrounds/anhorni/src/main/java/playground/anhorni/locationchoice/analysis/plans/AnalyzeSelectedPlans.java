@@ -46,7 +46,7 @@ public class AnalyzeSelectedPlans {
 	private final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 	private final NetworkImpl network = scenario.getNetwork();
 	private String outfile = "output/plans/plan_analysis.txt";	
-	private TripAnalyzer tripAnalyzer = new TripAnalyzer();	
+	private final TripAnalyzer tripAnalyzer = new TripAnalyzer();	
 	private double normalizedWeightFactor = 1.0;	
 	String plansfilePath;
 		
@@ -76,11 +76,11 @@ public class AnalyzeSelectedPlans {
 		
 		if (facilitiesfilePath.length() > 1) {
 			log.info("reading the facilities ...");
-			new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
+			new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesfilePath);
 		}
 			
 		log.info("reading the network ...");
-		new MatsimNetworkReader(this.network).readFile(networkfilePath);
+		new MatsimNetworkReader(this.scenario).readFile(networkfilePath);
 		
 		log.info("  reading file " + plansfilePath);
 		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);

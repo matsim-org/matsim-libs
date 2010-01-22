@@ -110,7 +110,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 		final String plansFilename = "./equil/equil_plans.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);

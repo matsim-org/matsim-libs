@@ -25,7 +25,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		ScenarioImpl sc = new ScenarioImpl();
 		new ConfigReaderMatsimV1(sc.getConfig()).readFile(config);
 		
-		new MatsimNetworkReader(sc.getNetwork()).readFile(sc.getConfig().network().getInputFile());
+		new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
 			
 		double offsetEast = sc.getConfig().evacuation().getSWWOffsetEast();
 		double offsetNorth = sc.getConfig().evacuation().getSWWOffsetNorth();

@@ -20,9 +20,10 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
@@ -37,12 +38,11 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
 		
-		
-		Gbl.createConfig(null);
-		Gbl.getConfig().global().setCoordinateSystem("DHDN_GK4");
+		Scenario scenario = new ScenarioImpl();
+		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		final Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
@@ -64,12 +64,11 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
 		
-		
-		Gbl.createConfig(null);
-		Gbl.getConfig().global().setCoordinateSystem("DHDN_GK4");
+		Scenario scenario = new ScenarioImpl();
+		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		final Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
@@ -89,12 +88,11 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
 		
-		
-		Gbl.createConfig(null);
-		Gbl.getConfig().global().setCoordinateSystem("DHDN_GK4");
+		Scenario scenario = new ScenarioImpl();
+		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		final Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
@@ -116,12 +114,11 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String refShp = getInputDirectory() + "./network.shp";
 //		String refDbf = getInputDirectory() + "./network.dbf";
 		
-		
-		Gbl.createConfig(null);
-		Gbl.getConfig().global().setCoordinateSystem("DHDN_GK4");
+		Scenario scenario = new ScenarioImpl();
+		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		final Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
@@ -149,12 +146,11 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String refShp = getInputDirectory() + "./network.shp";
 //		String refDbf = getInputDirectory() + "./network.dbf";
 		
-		
-		Gbl.createConfig(null);
-		Gbl.getConfig().global().setCoordinateSystem("DHDN_GK4");
+		Scenario scenario = new ScenarioImpl();
+		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		final Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		new Nodes2ESRIShape(network,outputFileShp).write();	
 		

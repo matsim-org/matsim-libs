@@ -35,7 +35,7 @@ public class MyControler2 {
 		final String plansFilename = "./examples/equil/plans100.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 

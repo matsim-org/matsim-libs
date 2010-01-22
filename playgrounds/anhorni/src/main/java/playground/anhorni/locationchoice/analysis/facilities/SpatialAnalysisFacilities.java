@@ -8,6 +8,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -59,8 +60,9 @@ public class SpatialAnalysisFacilities {
 	}
 	
 	private TreeMap<Id,ActivityFacilityImpl> readAndFilterFacilities(String facilitiesFile) {
-		ActivityFacilitiesImpl facilities  = new ActivityFacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new FacilitiesReaderMatsimV1(facilities).readFile(facilitiesFile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		ActivityFacilitiesImpl facilities  = scenario.getActivityFacilities();
+		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFile);
 		
 		TreeMap<Id,ActivityFacilityImpl> shop_facilities = new TreeMap<Id,ActivityFacilityImpl>();
 		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_gt2500sqm"));

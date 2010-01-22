@@ -50,18 +50,18 @@ public class ScenarioCreation {
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario.getWorld());
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");
 		Matrices matrices = new Matrices();
-		MatsimMatricesReader reader = new MatsimMatricesReader(matrices, scenario.getWorld());
+		MatsimMatricesReader reader = new MatsimMatricesReader(matrices, scenario);
 		reader.readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 

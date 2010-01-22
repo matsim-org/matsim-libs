@@ -73,8 +73,9 @@ public class PopulationCreation {
 		System.out.println("done. (census population)");
 
 		System.out.println("loading datapuls facilities...");
-		ActivityFacilitiesImpl datapulsFacilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(datapulsFacilities).readFile(args[1]);
+		ScenarioImpl datapulsScenario = new ScenarioImpl();
+		ActivityFacilitiesImpl datapulsFacilities = datapulsScenario.getActivityFacilities();
+		new MatsimFacilitiesReader(datapulsScenario).readFile(args[1]);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading datapuls facilities).");
 

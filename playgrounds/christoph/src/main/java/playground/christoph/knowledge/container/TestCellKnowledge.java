@@ -131,7 +131,7 @@ public class TestCellKnowledge {
 	
 	private void loadNetwork()
 	{
-		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFile);
+		new MatsimNetworkReader(this.scenario).readFile(networkFile);
 		log.info("Loading Network ... done");
 	}
 	

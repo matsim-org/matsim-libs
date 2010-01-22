@@ -107,8 +107,7 @@ public class NewMultiModalNetworkWithoutBusLink {
 		scenario.getConfig().scenario().setUseTransit(true);
 
 		NetworkLayer multiModalNetwork = scenario.getNetwork();
-		new MatsimNetworkReader(multiModalNetwork)
-				.readFile(multiModalNetworkFile);
+		new MatsimNetworkReader(scenario).readFile(multiModalNetworkFile);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		try {

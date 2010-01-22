@@ -18,12 +18,8 @@
  * *********************************************************************** */
 
 package playground.duncan.archive;
-/*
- * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
- */
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -35,8 +31,8 @@ public class ConnectHomesAndWorkplacesSimple {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities() ;
-		MatsimFacilitiesReader fr = new MatsimFacilitiesReader( facilities ) ;
+//		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities() ;
+		MatsimFacilitiesReader fr = new MatsimFacilitiesReader(scenario) ;
 		fr.readFile( "lsfd" ) ;
 
 		PopulationImpl population = scenario.getPopulation() ;

@@ -69,7 +69,7 @@ public class CreateTransimsNetwork {
 
 		System.out.println("reading network from " + this.networkFileName);
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(this.networkFileName);
+		new MatsimNetworkReader(scenario).readFile(this.networkFileName);
 
 		if (network.getNodes().get(new IdImpl("0")) != null) {
 			Logger.getLogger(CreateTransimsNetwork.class).error("The network contains a node with id 0. Transims is likely to have problems with that!");

@@ -31,7 +31,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -82,8 +81,8 @@ public class ActivityDurationAnalyser {
 
 		ScenarioImpl scenario = new ScenarioImpl(this.config);
 		//reading network
-		NetworkLayer net = scenario.getNetwork();
-		MatsimNetworkReader reader = new MatsimNetworkReader(net);
+//		NetworkLayer net = scenario.getNetwork();
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
 		reader.readFile(network);
 
 		//reading road pricing scheme for filtering

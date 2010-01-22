@@ -24,11 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.ptproject.qsim.SimulationTimer;
@@ -47,7 +49,7 @@ public class VDSSignTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(VDSSignTest.class);
 
-	private NetworkLayer network;
+	private Network network;
 	private NetworkRouteWRefs route2;
 	private NetworkRouteWRefs route1;
 	private EmptyControlInputImpl controlInput;
@@ -57,19 +59,22 @@ public class VDSSignTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		super.loadConfig(null);
-		this.network = this.loadNetwork(networkFile);
+		Scenario scenario = new ScenarioImpl(super.loadConfig(null));
+		this.network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		SimulationTimer.reset();
 		this.systemTime = (int) SimulationTimer.getTime();
 	}
 
-	private NetworkLayer loadNetwork(final String filename) {
-		NetworkLayer network = new NetworkLayer();
-		MatsimNetworkReader parser = new MatsimNetworkReader(network);
-		parser.readFile(filename);
-		return network;
+	@Override
+	protected void tearDown() throws Exception {
+		this.controlInput = null;
+		this.network = null;
+		this.route1 = null;
+		this.route2 = null;
+		super.tearDown();
 	}
-
+	
 	private VDSSign createSign() {
 		VDSSign sign = new VDSSign();
 		sign.setSignLink(this.network.getLinks().get(new IdImpl("2")));

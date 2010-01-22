@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,8 +44,9 @@ public class ReadingEventsFile {
 		try {
 			bw = new BufferedWriter(new FileWriter(new File( outputCommercialActivityDensityFilename )));
 			try{
-				NetworkLayer nl = new NetworkLayer();
-				MatsimNetworkReader nr = new MatsimNetworkReader(nl);
+				ScenarioImpl scenario = new ScenarioImpl();
+				NetworkLayer nl = scenario.getNetwork();
+				MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
 				nr.readFile(networkFilename);
 				
 				String input = root + "/Output/Run06/it.100-7699/100.events.txt.gz";

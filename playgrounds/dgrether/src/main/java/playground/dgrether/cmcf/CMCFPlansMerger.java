@@ -20,6 +20,7 @@ package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -56,7 +57,9 @@ public class CMCFPlansMerger {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		NetworkLayer net = MatsimIo.loadNetwork(DgPaths.IVTCHNET);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer net = scenario.getNetwork();
+		MatsimIo.loadNetwork(DgPaths.IVTCHNET, scenario);
 		PopulationImpl plansCmcf = MatsimIo.loadPlans(cmcfPlansFile, net);
 		PopulationImpl plans = MatsimIo.loadPlans(plansFile, net);
 

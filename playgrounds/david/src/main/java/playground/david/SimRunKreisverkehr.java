@@ -32,6 +32,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.netvis.NetVis;
 
@@ -43,21 +44,18 @@ public class SimRunKreisverkehr {
 		String netFileName = "..\\..\\tmp\\studies\\berlin-wip\\network\\wip_net.xml";
 
 		String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\kutter010Jakob-Kaiser-RingONLY.plans.v4.xml";
-		String arg0 = "..\\..\\tmp\\studies\\berlin-wip\\config_ds.xml";
 
-		String[] args2 = {arg0, "E:/Development/tmp/dtd/config_v1.dtd"};
 		Gbl.startMeasurement();
-		Config config = Gbl.createConfig(null);
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
+		Config config = scenario.getConfig();
 		String localDtdBase = "./dtd/";
 		config.global().setLocalDtdBase(localDtdBase);
 		
-		ScenarioImpl scenario = new ScenarioImpl(config);
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		int cellcount = 0;
 		int cellcount2 = 0;
-		int count3 = 0;
 		for (LinkImpl link : network.getLinks().values()) {
 			double length = link.getLength()*NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, link);
 			cellcount += Math.ceil(length/7.5);

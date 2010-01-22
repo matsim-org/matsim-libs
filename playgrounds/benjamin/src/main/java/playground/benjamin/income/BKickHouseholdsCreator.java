@@ -75,7 +75,7 @@ public class BKickHouseholdsCreator {
 		
 		ScenarioImpl sc = new ScenarioImpl();
 		NetworkImpl network = sc.getNetwork();
-		MatsimNetworkReader netreader = new MatsimNetworkReader(network);
+		MatsimNetworkReader netreader = new MatsimNetworkReader(sc);
 		netreader.readFile(networkFile);
 		
     PopulationImpl pop = sc.getPopulation();

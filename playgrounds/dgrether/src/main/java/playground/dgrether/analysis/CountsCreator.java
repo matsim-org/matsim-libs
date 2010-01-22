@@ -23,8 +23,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -37,7 +38,6 @@ import org.matsim.counts.CountsWriter;
 
 /**
  * @author dgrether
- *
  */
 public class CountsCreator {
 
@@ -56,10 +56,12 @@ public class CountsCreator {
 	 */
 
 	public CountsCreator(String networkPath) {
-		Config config = Gbl.createConfig(null);
+		ScenarioImpl scenario = new ScenarioImpl();
+		Config config = scenario.getConfig();
 		config.simulation().setFlowCapFactor(0.13);
 		config.simulation().setStorageCapFactor(0.13);
-		this.network = loadNetwork(networkPath);
+		this.network = scenario.getNetwork();
+		loadNetwork(networkPath, scenario);
 		log.info("  creating routes...");
 		NetworkRouteWRefs r1 = new NodeNetworkRouteImpl();
 		//the nodes of carls master thesis main route
@@ -123,21 +125,10 @@ public class CountsCreator {
 		log.info("counts written successfully to: ./output/counts.xml");
 	}
 
-	/**
-	 * load the network
-	 *
-	 * @return the network layer
-	 */
-	protected NetworkLayer loadNetwork(final String networkFile) {
-		// - read network: which buildertype??
-		log.info("  creating network layer... ");
-		NetworkLayer network = new NetworkLayer();
-		log.info("   done");
-
+	protected void loadNetwork(final String networkFile, Scenario scenario) {
 		log.info("    reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(networkFile);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		log.info("   done");
-		return network;
 	}
 
 	/**

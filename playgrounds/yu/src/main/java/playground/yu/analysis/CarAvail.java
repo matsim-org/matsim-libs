@@ -131,7 +131,7 @@ public class CarAvail extends AbstractPersonAlgorithm {
 		final String outputFilename = "../runs_SVN/run669/it.1000/CarAvail.txt";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		CarAvail ca = new CarAvail();
 

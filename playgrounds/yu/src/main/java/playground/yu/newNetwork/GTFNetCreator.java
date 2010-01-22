@@ -26,6 +26,7 @@ package playground.yu.newNetwork;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -39,14 +40,13 @@ import playground.yu.utils.io.GTFParser;
  * 
  */
 public class GTFNetCreator {
-	/**
-	 * @param args
-	 */
+
 	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch-changed.xml";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		GTFParser g = new GTFParser(
 				new TreeMap<String, HashMap<Double, Double>>());

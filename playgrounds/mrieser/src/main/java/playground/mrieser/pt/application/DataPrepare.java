@@ -143,11 +143,13 @@ public class DataPrepare {
 	}
 
 	protected void mergeNetworks() {
-		NetworkLayer transitNetwork = new NetworkLayer();
-		NetworkLayer streetNetwork = new NetworkLayer();
+		ScenarioImpl transitScenario = new ScenarioImpl();
+		NetworkLayer transitNetwork = transitScenario.getNetwork();
+		ScenarioImpl streetScenario = new ScenarioImpl();
+		NetworkLayer streetNetwork = streetScenario.getNetwork();
 		try {
-			new MatsimNetworkReader(transitNetwork).parse(TRANSIT_NETWORK_FILE);
-			new MatsimNetworkReader(streetNetwork).parse(NETWORK_FILE);
+			new MatsimNetworkReader(transitScenario).parse(TRANSIT_NETWORK_FILE);
+			new MatsimNetworkReader(streetScenario).parse(NETWORK_FILE);
 			MergeNetworks.merge(streetNetwork, "", transitNetwork, "", this.scenario.getNetwork());
 			new NetworkWriter(this.scenario.getNetwork()).writeFile(MULTIMODAL_NETWORK_FILE);
 		} catch (SAXException e) {

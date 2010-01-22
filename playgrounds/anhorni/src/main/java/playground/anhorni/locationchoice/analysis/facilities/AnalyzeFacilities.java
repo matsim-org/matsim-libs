@@ -48,7 +48,7 @@ public class AnalyzeFacilities {
 		
 		log.info("reading the facilities ...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new FacilitiesReaderMatsimV1(facilities).readFile("input/facilities/facilities_KTIYear2.xml.gz");
+		new FacilitiesReaderMatsimV1(scenario).readFile("input/facilities/facilities_KTIYear2.xml.gz");
 				
 		final AnalyzeFacilities analyzer = new AnalyzeFacilities();
 		analyzer.run(facilities);

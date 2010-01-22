@@ -528,7 +528,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		try {

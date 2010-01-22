@@ -328,7 +328,7 @@ public class CompareScenarios {
 
 			ScenarioImpl scenario = new ScenarioImpl();
 			NetworkLayer network = scenario.getNetwork();
-			new MatsimNetworkReader(network).readFile(this.networkInputFilenames.get(scenarioName));
+			new MatsimNetworkReader(scenario).readFile(this.networkInputFilenames.get(scenarioName));
 			scenarioNetworks.put(scenarioName, network);
 			world.setNetworkLayer(network);
 			world.complete();

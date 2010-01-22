@@ -21,10 +21,10 @@
 package org.matsim.core.network.algorithms;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -50,7 +50,7 @@ public class NetworkSummary implements NetworkRunnable {
 		int max_link_id = Integer.MIN_VALUE;
 		int link_cnt = 0;
 
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			node_cnt++;
 			int node_getID = Integer.parseInt(node.getId().toString());
 			if (min_node_id > node_getID) { min_node_id = node_getID; }
@@ -63,7 +63,7 @@ public class NetworkSummary implements NetworkRunnable {
 			if (y < this.minY) { this.minY = y; }
 		}
 
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			link_cnt++;
 			int link_getID = Integer.parseInt(link.getId().toString());
 			if (min_link_id > link_getID) { min_link_id = link_getID; }

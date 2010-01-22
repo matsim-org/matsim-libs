@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -28,18 +29,19 @@ public class RingCollapser {
 	private int maxNodeId;
 
 	public RingCollapser(String inFile, String outFile) {
-		this.network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.network = scenario.getNetwork();
 		this.inFile = inFile;
 		this.outFile = outFile;
-		new MatsimNetworkReader(network).readFile(this.inFile);
+		new MatsimNetworkReader(scenario).readFile(this.inFile);
 		new NetworkSummary().run(network);
-		this.capPeriod = (double)network.getCapacityPeriod();
+		this.capPeriod = network.getCapacityPeriod();
 	}
 	
 	//constructor when class gets called to go to work on existing networklayer
 	public RingCollapser(NetworkLayer network){
 		this.network = network;
-		this.capPeriod = (double)network.getCapacityPeriod();
+		this.capPeriod = network.getCapacityPeriod();
 	}
 
 	public void run(){

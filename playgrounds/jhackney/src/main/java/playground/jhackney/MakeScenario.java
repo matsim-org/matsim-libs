@@ -57,13 +57,13 @@ public class MakeScenario {
 
 		System.out.println("  reading facilities xml file... ");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading the network xml file...");
 //		NetworkLayer network = null;
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		//		System.out.println("  reading matrices xml file... ");

@@ -46,7 +46,6 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
@@ -76,8 +75,8 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		this.initializer.init(this); 
 		
 		this.scenario_input = new ScenarioImpl();
-		new MatsimNetworkReader(this.scenario_input.getNetwork()).readFile(this.initializer.getControler().getConfig().network().getInputFile());
-		new MatsimFacilitiesReader(this.scenario_input.getActivityFacilities()).readFile(this.initializer.getControler().getConfig().facilities().getInputFile());
+		new MatsimNetworkReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().network().getInputFile());
+		new MatsimFacilitiesReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().facilities().getInputFile());
 		new MatsimPopulationReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().plans().getInputFile());
 		
 		/*ScenarioLoader loader = new ScenarioLoader(this.initializer.getControler().getConfig());
@@ -96,7 +95,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 		
-		this.estimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+		this.estimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				((PersonImpl)(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)))).getSelectedPlan(),
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,

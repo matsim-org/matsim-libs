@@ -150,8 +150,8 @@ public class EstimationValidation {
 				final String outputFile = "/home/baug/mfeil/data/largeSet/it0/estimation_val093.xls";
 	
 				ScenarioImpl scenarioOrig = new ScenarioImpl();
-				new MatsimNetworkReader(scenarioOrig.getNetwork()).readFile(networkFilename);
-				new MatsimFacilitiesReader(scenarioOrig.getActivityFacilities()).readFile(facilitiesFilename);
+				new MatsimNetworkReader(scenarioOrig).readFile(networkFilename);
+				new MatsimFacilitiesReader(scenarioOrig).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioOrig).readFile(populationFilename);
 								
 				EstimationValidation ev = new EstimationValidation(scenarioOrig.getPopulation());

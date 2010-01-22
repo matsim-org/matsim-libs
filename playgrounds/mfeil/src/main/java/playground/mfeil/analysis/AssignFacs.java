@@ -65,8 +65,8 @@ public class AssignFacs {
 		final String outputDir = "/home/baug/mfeil/data/mz/plans_fac.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		new AssignFacs(scenario.getActivityFacilities(), scenario.getPopulation(), outputDir);

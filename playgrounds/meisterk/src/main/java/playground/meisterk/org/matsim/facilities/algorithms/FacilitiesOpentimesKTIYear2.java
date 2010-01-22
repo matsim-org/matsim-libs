@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -48,7 +49,8 @@ import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
  */
 public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
-	private final ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005");
+	private final ScenarioImpl scenario;
+	private final ActivityFacilitiesImpl shopsOf2005;
 
 	private final String shopsOf2005Filename = "/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/facilities_shopsOf2005.xml";
 
@@ -56,12 +58,15 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
 	public FacilitiesOpentimesKTIYear2() {
 		super();
+		this.scenario = new ScenarioImpl();
+		this.shopsOf2005 = scenario.getActivityFacilities();
+		this.shopsOf2005.setName("shopsOf2005");
 	}
 
 	public void init() {
 
 		System.out.println("Reading shops Of 2005 xml file... ");
-		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.shopsOf2005);
+		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.scenario);
 		facilities_reader.readFile(this.shopsOf2005Filename);
 		System.out.println("Reading shops Of 2005 xml file...done.");
 

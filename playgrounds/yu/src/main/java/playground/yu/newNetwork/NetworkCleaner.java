@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -53,8 +54,9 @@ public class NetworkCleaner {
 		final String outputNetFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.xml";
 		String logFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.log";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(inputNetFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(inputNetFilename);
 		Set<Node> nodesToRemove = new HashSet<Node>();
 		for (Node n : network.getNodes().values())
 			if (((NodeImpl) n).getIncidentLinks().isEmpty())

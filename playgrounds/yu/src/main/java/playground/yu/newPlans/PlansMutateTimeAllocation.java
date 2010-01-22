@@ -44,7 +44,7 @@ public class PlansMutateTimeAllocation {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network)
+		new MatsimNetworkReader(scenario)
 				.readFile("D:/fromNB04/wm/Toronto/toronto/networks/changedNetworkWithManeuvers/network.xml");
 
 		PopulationImpl population = scenario.getPopulation();

@@ -21,7 +21,6 @@
 package playground.dgrether.visualization;
 
 import java.io.IOException;
-import java.util.Date;
 
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
@@ -30,6 +29,8 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -58,8 +59,9 @@ public class KmlNetworkVisualizer {
 
 	private KMZWriter writer;
 	public KmlNetworkVisualizer(final String networkFile, final String outputPath) {
-		Gbl.createConfig(null);
-		this.networkLayer = loadNetwork(networkFile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.networkLayer = scenario.getNetwork();
+		loadNetwork(networkFile, scenario);
 		this.write(outputPath);
 	}
 
@@ -96,55 +98,11 @@ public class KmlNetworkVisualizer {
 		log.info("Network written to kmz!");
 	}
 
-	/**
-	 * load the network
-	 *
-	 * @return the network layer
-	 */
-	protected NetworkLayer loadNetwork(final String networkFile) {
-		// - read network: which buildertype??
-		printNote("", "  creating network layer... ");
-		NetworkLayer network = new NetworkLayer(); //(NetworkLayer) Gbl.getWorld().createLayer(
-//				NetworkLayer.LAYER_TYPE, null);
-		printNote("", "  done");
-
-		printNote("", "  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(networkFile);
-		printNote("", "  done");
-
-		return network;
+	protected void loadNetwork(final String networkFile, Scenario scenario) {
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 	}
 
-	/**
-	 * an internal routine to generated some (nicely?) formatted output. This
-	 * helps that status output looks about the same every time output is written.
-	 *
-	 * @param header
-	 *          the header to print, e.g. a module-name or similar. If empty
-	 *          <code>""</code>, no header will be printed at all
-	 * @param action
-	 *          the status message, will be printed together with a timestamp
-	 */
-	private final void printNote(final String header, final String action) {
-		if (header != "") {
-			System.out.println();
-			System.out
-					.println("===============================================================");
-			System.out.println("== " + header);
-			System.out
-					.println("===============================================================");
-		}
-		if (action != "") {
-			System.out.println("== " + action + " at " + (new Date()));
-		}
-		if (header != "") {
-			System.out.println();
-		}
-	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		if (args.length != 2) {
 			printHelp();

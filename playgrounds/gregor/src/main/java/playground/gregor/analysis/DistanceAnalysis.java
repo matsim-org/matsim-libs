@@ -363,7 +363,7 @@ public class DistanceAnalysis {
 		NetworkLayer network = scenario.getNetwork();
 		network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		log.info("done.");
 
 

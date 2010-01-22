@@ -50,7 +50,7 @@ public class IteratePopSimTest {
 
 		NetworkLayer network = scenario.getNetwork();
 				// Read network file with special Reader Implementation
-		new MatsimNetworkReader(network).readFile(netFileName);
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 		PopulationImpl population = scenario.getPopulation();
 		// Read plans file with special Reader Implementation
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);

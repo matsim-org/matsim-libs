@@ -90,13 +90,13 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading world xml file...");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(config.world().getInputFile());
 		log.info("  done.");
 
 		log.info("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		world.complete();
 		log.info("  done.");
 

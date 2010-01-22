@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -91,8 +92,9 @@ public class OutFlowCapacity {
 		 String netfile = "./networks/padang_net_evac_v20080618.xml";
 		 
 			log.info("loading network from " + netfile);
-			final NetworkLayer network = new NetworkLayer();
-			new MatsimNetworkReader(network).readFile(netfile);
+			ScenarioImpl scenario = new ScenarioImpl();
+			NetworkLayer network = scenario.getNetwork();
+			new MatsimNetworkReader(scenario).readFile(netfile);
 //			world.setNetworkLayer(network);
 //			world.complete();
 			log.info("done.");

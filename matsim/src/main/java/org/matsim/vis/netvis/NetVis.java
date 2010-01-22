@@ -35,6 +35,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileFilter;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -67,7 +69,7 @@ public class NetVis {
 
     /*package*/ NetVisScrollPane networkScrollPane;
 
-    private NetJComponent networkComponent;
+    private final NetJComponent networkComponent;
 
     /*package*/ ControlToolbar buttonComponent;
 
@@ -80,8 +82,9 @@ public class NetVis {
 
     	System.out.println("loading network file");
 
-    	NetworkLayer networkLayer = new NetworkLayer();
-    	new MatsimNetworkReader(networkLayer).readFile(generalConfig.getNetFileName());
+    	Scenario scenario = new ScenarioImpl();
+    	NetworkLayer networkLayer = (NetworkLayer) scenario.getNetwork();
+    	new MatsimNetworkReader(scenario).readFile(generalConfig.getNetFileName());
 
     	System.out.println("composing network");
 

@@ -166,7 +166,7 @@ public class LegCountTest2 {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 

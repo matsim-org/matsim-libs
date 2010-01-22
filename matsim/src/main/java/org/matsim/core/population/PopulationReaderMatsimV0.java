@@ -28,10 +28,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -66,6 +66,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private PersonImpl currperson = null;
 	private PlanImpl currplan = null;
 	private LegImpl currleg = null;
+	private final Scenario scenario;
 	private NetworkRouteWRefs currroute = null;
 
 	private ActivityImpl prevAct = null;
@@ -73,9 +74,10 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 
 	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
 
-	protected PopulationReaderMatsimV0(final Population plans, final Network network) {
-		this.plans = plans;
-		this.network = network;
+	protected PopulationReaderMatsimV0(final Scenario scenario) {
+		this.plans = scenario.getPopulation();
+		this.network = scenario.getNetwork();
+		this.scenario = scenario;
 	}
 
 	@Override
@@ -134,7 +136,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new PersonImpl(new IdImpl(atts.getValue("id")));
+		this.currperson = new PersonImpl(this.scenario.createId(atts.getValue("id")));
 	}
 
 	private void startPlan(final Attributes atts) {
@@ -168,7 +170,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		Coord coord = null;
 		ActivityImpl act;
 		if (atts.getValue("link") != null) {
-			Id linkId = new IdImpl(atts.getValue("link"));
+			Id linkId = this.scenario.createId(atts.getValue("link"));
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
 			if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
 				coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));

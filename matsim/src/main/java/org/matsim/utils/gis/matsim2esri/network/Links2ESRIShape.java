@@ -103,7 +103,7 @@ public class Links2ESRIShape {
 
 		log.info("loading network from " + netfile);
 		final NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netfile);
+		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);

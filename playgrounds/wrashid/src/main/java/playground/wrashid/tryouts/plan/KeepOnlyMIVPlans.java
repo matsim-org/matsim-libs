@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -37,14 +36,12 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 		//String networkFile = "./test/scenarios/chessboard/network.xml";
 		//String facilitiesPath = "./test/scenarios/chessboard/facilities.xml";
 
-
-		ActivityFacilitiesImpl facilities = sc.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(facilitiesPath);
+		new MatsimFacilitiesReader(sc).readFile(facilitiesPath);
 
 		PopulationImpl inPop = sc.getPopulation();
 
 		NetworkLayer net = sc.getNetwork();
-		new MatsimNetworkReader(net).readFile(networkFile);
+		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inputPlansFile);

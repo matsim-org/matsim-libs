@@ -281,7 +281,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 
 		log.info("loading network from " + config.network().getInputFile());
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		world.complete();
 		log.info("done.");
 

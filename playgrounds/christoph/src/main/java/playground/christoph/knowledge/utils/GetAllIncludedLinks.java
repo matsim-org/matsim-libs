@@ -51,7 +51,7 @@ public class GetAllIncludedLinks {
 	 * @return A link from the network is included in the returned ArrayList, if its
 	 * start- and end node are included in the includedNodes ArrayList.
 	 */
-	public ArrayList<Link> getAllLinks(NetworkLayer network, ArrayList<Node> includedNodes)
+	public ArrayList<Link> getAllLinks(Network network, ArrayList<Node> includedNodes)
 	{
 		ArrayList<Link> includedLinks = new ArrayList<Link>();
 		getAllLinks(network, includedNodes, includedLinks);

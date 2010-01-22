@@ -1,25 +1,16 @@
 package playground.wrashid.parkingSearch;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import playground.christoph.router.KnowledgePlansCalcRoute;
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-
 
 public class ReplanParkingSearchRoute implements LinkEnterEventHandler  {
 
@@ -37,8 +28,6 @@ public class ReplanParkingSearchRoute implements LinkEnterEventHandler  {
 		Plan originalPlan=person.getSelectedPlan();
 		PlanImpl newPlan = new PlanImpl(person);
 		Activity homeAct= (Activity) originalPlan.getPlanElements().get(0);
-		
-	
 		
 		
 		

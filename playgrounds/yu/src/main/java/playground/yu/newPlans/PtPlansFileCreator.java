@@ -177,7 +177,7 @@ public class PtPlansFileCreator {
 
 		PtPlansFileCreator pfc = new PtPlansFileCreator();
 		pfc.setNetwork(scenario.getNetwork());
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		pfc.setPop(scenario.getPopulation());
 		pfc.createPersons();

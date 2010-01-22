@@ -73,7 +73,7 @@ public class EventFilterTestAveTraSpeCalOrPersonSpecificWithToll {
 		// network
 		System.out.println("  reading network file... ");
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network()
+		new MatsimNetworkReader(scenario).readFile(config.network()
 				.getInputFile());
 		System.out.println("  done.");
 

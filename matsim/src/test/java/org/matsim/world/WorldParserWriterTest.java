@@ -20,6 +20,7 @@
 
 package org.matsim.world;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -28,8 +29,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class WorldParserWriterTest extends MatsimTestCase {
@@ -95,8 +96,9 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("running testParserWriter1()...");
 
 		System.out.println("  reading world xml file... ");
-		World world = new World();
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		World world = scenario.getWorld();
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
@@ -117,19 +119,19 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("running testParserWriter2()...");
 
 		System.out.println("  reading world xml file... ");
-		World world = new World();
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(this.config.world().getInputFile());
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		World world = scenario.getWorld();
+		new MatsimWorldReader(scenario).readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file as a layer of the world...");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 
 		this.runModules(world);
@@ -153,19 +155,19 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("running testParserWriter3()...");
 
 		System.out.println("  reading world xml file... ");
-		World world = new World();
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(this.config.world().getInputFile());
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		World world = scenario.getWorld();
+		new MatsimWorldReader(scenario).readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file as a layer of the world...");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		this.runModules(world);
@@ -188,21 +190,21 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("running testParserWriter4()...");
 
-		World world = new World();
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		World world = scenario.getWorld();
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(this.config.world().getInputFile());
+		new MatsimWorldReader(scenario).readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file as a layer of the world...");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 
 		this.runModules(world);
@@ -225,20 +227,21 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("running testParserWriter5()...");
 
-		World world = new World();
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		World world = scenario.getWorld();
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file as a layer of the world...");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
@@ -262,21 +265,22 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("running testParserWriter6()...");
 
-		World world = new World();
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		World world = scenario.getWorld();
 
 		System.out.println("  reading network xml file as a layer of the world...");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		this.runModules(world);
@@ -299,20 +303,21 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("running testParserWriter7()...");
 
-		World world = new World();
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		World world = scenario.getWorld();
 
 		System.out.println("  reading network xml file as a layer of the world...");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 

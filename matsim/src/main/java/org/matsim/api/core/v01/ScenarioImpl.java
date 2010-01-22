@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.api.core.v01;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -56,10 +58,12 @@ public class ScenarioImpl implements Scenario {
 	private static final String NON_ENABLED_ATTRIBUTE_WARNING = "Trying to retrieve not enabled scenario feature, have you enabled the feature in ScenarioConfigGroup?";
 	
 	//mandatory attributes 
-	private Config config;
+	private final Config config;
 	private NetworkImpl network;
 	private PopulationImpl population;
 	private ActivityFacilitiesImpl facilities;
+	
+	private final ConcurrentHashMap<String, Id> idMap = new ConcurrentHashMap<String, Id>();
 	
 	//non-mandatory attributes
 	private LaneDefinitions laneDefinitions;
@@ -170,7 +174,12 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	public Id createId(final String string) {
-		return new IdImpl( string) ;
+		Id id = this.idMap.get(string);
+		if (id == null) {
+			id = new IdImpl(string);
+			this.idMap.put(string, id);
+		}
+		return id;
 	}
 
 	public Config getConfig() {

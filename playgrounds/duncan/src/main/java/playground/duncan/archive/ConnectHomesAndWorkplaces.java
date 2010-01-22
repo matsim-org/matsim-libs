@@ -28,10 +28,8 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -68,19 +66,17 @@ public class ConnectHomesAndWorkplaces {
 		// there is no logical reason why it is necessary. Kai)
 
 		// create/read the network:
-		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 
 		// create/read the world (probably empty input file)
 		final World world = scenario.getWorld();
 		if (this.config.world().getInputFile() != null) {
-			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+			final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 			worldReader.readFile(this.config.world().getInputFile());
 		}
 		world.complete();
 
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities() ;
-		MatsimFacilitiesReader fr = new MatsimFacilitiesReader( facilities ) ;
+		MatsimFacilitiesReader fr = new MatsimFacilitiesReader(scenario) ;
 		fr.readFile( this.config.facilities().getInputFile() ) ;
 
 		// create the locachoice object:

@@ -28,7 +28,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -168,11 +167,6 @@ public class LayerImpl implements Serializable, Layer {
 
 	public final MappedLocation getLocation(final Id location_id) {
 		return this.locations.get(location_id);
-	}
-
-	@Deprecated // string-based methods are discouraged
-	public final Location getLocation(final String location_id) {
-		return this.locations.get(new IdImpl(location_id));
 	}
 
 	/**

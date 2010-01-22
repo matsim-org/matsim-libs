@@ -23,6 +23,7 @@
  */
 package playground.yu.newNetwork;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -37,16 +38,14 @@ import org.matsim.core.network.NetworkWriter;
  */
 public class NetworkFreeSpeedAdapter {
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		final String inputNetFilename = "input/Toronto/connector_netclean.xml";
 		final String outputNetFilename = "output/Toronto/connector_netclean_freeSpeed_modified.xml.gz";
 		// String logFilename = "output/Toronto/FreeSpeedAdaptor.log";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(inputNetFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(inputNetFilename);
 
 		// try {
 		// BufferedWriter writer = IOUtils.getBufferedWriter(logFilename);

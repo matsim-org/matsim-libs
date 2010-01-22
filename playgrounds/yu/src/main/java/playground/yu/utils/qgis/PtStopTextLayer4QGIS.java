@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
 import org.matsim.transitSchedule.api.TransitStopFacility;
@@ -68,15 +67,14 @@ public class PtStopTextLayer4QGIS extends TextLayer4QGIS {
 		String scheduleFilename = "../berlin-bvg09/pt/nullfall_M44_344/transitSchedule.xml";
 		String txtFilename = "../berlin-bvg09/pt/nullfall_M44_344/QGIS/stops.txt";
 
-		ScenarioImpl senario = new ScenarioImpl();
-		senario.getConfig().scenario().setUseTransit(true);
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().scenario().setUseTransit(true);
 
-		NetworkImpl net = senario.getNetwork();
-		new MatsimNetworkReader(net).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		TransitSchedule schedule = senario.getTransitSchedule();
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		try {
-			new TransitScheduleReader(senario).readFile(scheduleFilename);
+			new TransitScheduleReader(scenario).readFile(scheduleFilename);
 			PtStopTextLayer4QGIS pst4q = new PtStopTextLayer4QGIS(txtFilename);
 			for (TransitStopFacility stop : schedule.getFacilities().values()) {
 				Coord coord = stop.getCoord();

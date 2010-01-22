@@ -5,6 +5,7 @@ package playground.yu.analysis;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -22,8 +23,9 @@ public class QvDiagram {
 		final String eventsFilename = "../runs/run628/it.500/500.events.txt.gz";
 		final String picFilename = "../runs/run628/it.500/500.qv/";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 		VolumesAnalyzer va = new VolumesAnalyzer(300, 24 * 3600 - 1, network);

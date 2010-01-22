@@ -21,6 +21,7 @@
 
 package playground.rost.eaflow.ea_flow;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -104,8 +105,9 @@ public class NetworkRounder {
 	
 	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor, boolean forEAF){
 		//read network
-		NetworkLayer network = new NetworkLayer();
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);		
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);		
 		networkReader.readFile(filename);
 		System.out.println("Network stats: Nodes = " + network.getNodes().size() + ", Edges = " + network.getLinks().size());
 		roundNetwork(network, newcap, flowCapacityFactor, lengthFactor, forEAF);

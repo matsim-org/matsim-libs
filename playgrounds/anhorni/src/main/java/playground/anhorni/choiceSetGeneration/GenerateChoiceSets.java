@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -41,9 +43,10 @@ public class GenerateChoiceSets {
 
 	//private static int idOffset = 20000000;
 	//private final static double epsilon = 0.01;
-	private PopulationImpl choiceSetPopulation = new ScenarioImpl().getPopulation();
+	private Scenario scenario = new ScenarioImpl();
+	private Population choiceSetPopulation = scenario.getPopulation();
 
-	private final NetworkLayer network = new NetworkLayer();
+	private final NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 	//private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
 
 	private ZHFacilities zhFacilities;
@@ -280,7 +283,7 @@ public class GenerateChoiceSets {
 	}
 
 	private void createChoiceSetFacilities() {
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(this.network);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(this.scenario);
 		networkReader.readFile(Gbl.getConfig().network().getInputFile());
 
 		ZHFacilitiesReader zhFacilitiesReader = new ZHFacilitiesReader(this.network);

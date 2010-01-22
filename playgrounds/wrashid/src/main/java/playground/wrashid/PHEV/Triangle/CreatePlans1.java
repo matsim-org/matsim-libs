@@ -20,7 +20,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.world.World;
 
 public class CreatePlans1 {
 
@@ -38,11 +37,10 @@ public class CreatePlans1 {
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		PopulationImpl plans = scenario.getPopulation();
 		Knowledges knowledges = scenario.getKnowledges();
-		final World world = scenario.getWorld();
 
 		// read facilities
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile("C:/data/SandboxCVS/ivt/studies/triangle/facilities/facilities.xml");
+		new MatsimFacilitiesReader(scenario).readFile("C:/data/SandboxCVS/ivt/studies/triangle/facilities/facilities.xml");
 
 
 		// get home and work activity

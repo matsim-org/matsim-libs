@@ -18,14 +18,14 @@ import org.matsim.core.population.PopulationWriter;
 
 public class AssignShopAndLeisure {
 	private final ScenarioImpl scenario = new ScenarioImpl();
-	private PopulationImpl plans = scenario.getPopulation();
-	private ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-	private NetworkImpl network = scenario.getNetwork();
+	private final PopulationImpl plans = scenario.getPopulation();
+	private final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+	private final NetworkImpl network = scenario.getNetwork();
 
 	private String plansfilePath;
 	private String facilitiesfilePath;
 	private String networkfilePath;
-	private String outpath = "output/plans/";
+	private final String outpath = "output/plans/";
 
 	private final static Logger log = Logger.getLogger(AssignShopAndLeisure.class);
 
@@ -71,10 +71,10 @@ public class AssignShopAndLeisure {
 		this.readInputFile(pathsFile);
 
 		log.info("reading the facilities ...");
-		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
+		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesfilePath);
 
 		log.info("reading the network ...");
-		new MatsimNetworkReader(this.network).readFile(networkfilePath);
+		new MatsimNetworkReader(this.scenario).readFile(networkfilePath);
 
 		log.info("  reading file " + plansfilePath);
 		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);

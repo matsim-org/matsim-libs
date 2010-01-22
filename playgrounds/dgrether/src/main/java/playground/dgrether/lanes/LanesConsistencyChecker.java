@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -78,7 +79,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 			}
 			
 			//check toLinks
-			for (Lane lane : l2l.getLanesList()) {
+			for (Lane lane : l2l.getLanes().values()) {
 				Map<Id, Lane> toLinkIdToLaneMap = new HashMap<Id, Lane>();
 				//check availability of toLink in network
 				for (Id toLinkId : lane.getToLinkIds()) {
@@ -126,9 +127,9 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 	public static void main(String[] args) {
 		String netFile = DgPaths.IVTCHBASE + "baseCase/network/ivtch-osm.xml";
 		String lanesFile = DgPaths.STUDIESDG + "signalSystemsZh/laneDefinitions.xml";
-		NetworkLayer net = new NetworkLayer();
-		MatsimNetworkReader netReader = new MatsimNetworkReader(net);
-		netReader.readFile(netFile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFile);
 	  log.info("read network");
 	  
 	  
@@ -136,7 +137,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 		MatsimLaneDefinitionsReader laneReader = new MatsimLaneDefinitionsReader(laneDefs );
 	  laneReader.readFile(lanesFile);
 	  
-	  LanesConsistencyChecker lcc = new LanesConsistencyChecker((Network)net, laneDefs);
+	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, laneDefs);
 		lcc.setRemoveMalformed(true);
 		lcc.checkConsistency();
 		

@@ -27,10 +27,11 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.api.Departure;
@@ -54,8 +55,9 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 	public void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
 		final String inputDir = getClassInputDirectory();
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
+		Scenario scenario = new ScenarioImpl();
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
@@ -91,7 +93,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
 
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
+		new MatsimNetworkReader(scenario).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
 		new TransitScheduleReader(scenario).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 

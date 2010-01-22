@@ -6,6 +6,8 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -83,7 +85,7 @@ public class OSM2MATSim {
 //		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 5); // Potsdam
 //		osmReader.setHierarchyLayer(52.56, 13.13, 52.51, 13.21, 5); // Spandau
 
-//		osmReader.setHierarchyLayer(52.494, 13.413, 52.461, 13.440, 6); // Hermannstra�e
+//		osmReader.setHierarchyLayer(52.494, 13.413, 52.461, 13.440, 6); // Hermannstrasse
 		osmReader.setHierarchyLayer(52.51, 13.37, 52.38, 13.54, 5); // M44/344 weitere Umgebung
 		osmReader.setHierarchyLayer(52.495, 13.410, 52.407, 13.465, 6); // M44/344 komplett		
 		
@@ -124,8 +126,9 @@ public class OSM2MATSim {
 		System.out.println("NetworkCleaner...done");
 
 		// Simplifier
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(outputFile + "_cl.xml.gz");
+		Scenario scenario = new ScenarioImpl();
+		network = (NetworkLayer) scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(outputFile + "_cl.xml.gz");
 
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();

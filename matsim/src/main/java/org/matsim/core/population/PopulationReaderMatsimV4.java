@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -78,6 +77,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final static String LEG = "leg";
 	private final static String ROUTE = "route";
 
+	private final Scenario scenario;
 	private final Population plans;
 	private final Network network;
 	private final ActivityFacilities facilities;
@@ -102,6 +102,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private int warnPlanTypeCount = 0;
 
 	public PopulationReaderMatsimV4(final Scenario scenario) {
+		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
 		if (scenario instanceof ScenarioImpl) {
@@ -217,7 +218,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		int age = Integer.MIN_VALUE;
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
-		this.currperson = new PersonImpl(new IdImpl(atts.getValue("id")));
+		this.currperson = new PersonImpl(this.scenario.createId(atts.getValue("id")));
 		this.currperson.setSex(atts.getValue("sex"));
 		this.currperson.setAge(age);
 		this.currperson.setLicence(atts.getValue("license"));
@@ -261,7 +262,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		if ((x != null) || (y != null)) { log.info("NEW: coords in <location> will be ignored!"); }
 		if (freq != null) { log.info("NEW: Attribute freq in <location> is not supported at the moment!"); }
 
-		this.currfacility = this.facilities.getFacilities().get(new IdImpl(id));
+		this.currfacility = this.facilities.getFacilities().get(this.scenario.createId(id));
 		if (this.currfacility == null) { Gbl.errorMsg("facility id=" + id + " does not exist!"); }
 		this.curractivity = this.currfacility.getActivityOptions().get(this.curracttype);
 		if (this.curractivity == null) { Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!"); }
@@ -321,7 +322,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private void startAct(final Attributes atts) {
 		Coord coord = null;
 		if (atts.getValue("link") != null) {
-			Id linkId = new IdImpl(atts.getValue("link"));
+			Id linkId = this.scenario.createId(atts.getValue("link"));
 			this.curract = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
@@ -338,7 +339,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
 		String fId = atts.getValue("facility");
 		if (fId != null) {
-			ActivityFacility f = this.facilities.getFacilities().get(new IdImpl(fId));
+			ActivityFacility f = this.facilities.getFacilities().get(this.scenario.createId(fId));
 			if (f == null) {
 				Gbl.errorMsg("facility id=" + fId + " does not exist!");
 			}

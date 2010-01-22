@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
@@ -28,19 +29,21 @@ public class ShortLinkFuser {
 	private int twoWayLinkJointCount;
 
 	public ShortLinkFuser(String inFile, String outFile) {
-		this.network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.network = scenario.getNetwork();
 		this.inFile = inFile;
 		this.outFile = outFile;
-		new MatsimNetworkReader(network).readFile(this.inFile);
+		new MatsimNetworkReader(scenario).readFile(this.inFile);
 		new NetworkSummary().run(network);
 		this.minLength = 1000;
 	}
 
 	public ShortLinkFuser(String inFile, String outFile, double minLength) {
-		this.network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.network = scenario.getNetwork();
 		this.inFile = inFile;
 		this.outFile = outFile;
-		new MatsimNetworkReader(network).readFile(this.inFile);
+		new MatsimNetworkReader(scenario).readFile(this.inFile);
 		new NetworkSummary().run(network);
 		this.minLength = minLength;
 	}

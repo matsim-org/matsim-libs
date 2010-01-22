@@ -30,6 +30,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -153,8 +154,9 @@ public class GeneratePathSets {
 		log.info("inputODFile:       "+inputODFile);
 		log.info("outputPathSetFile: "+outputPathSetFile);
 		
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(inputNetworkFile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 		
 		Gbl.printMemoryUsage();
 

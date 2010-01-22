@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
@@ -52,8 +53,9 @@ public class GenerateZuerrichOutput {
 	private 	boolean removeDuplicates = false;
 	
 	public GenerateZuerrichOutput() {
-		Network net = new NetworkLayer();
-		MatsimNetworkReader netReader = new MatsimNetworkReader((NetworkLayer) net);
+		Scenario scenario = new ScenarioImpl();
+		Network net = scenario.getNetwork();
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(DgPaths.IVTCHNET);
 		
 		Map<Integer, Map<Integer,  List<Integer>>> knotenVonSpurNachSpurMap = null;

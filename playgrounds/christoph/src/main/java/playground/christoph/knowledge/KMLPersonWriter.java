@@ -43,9 +43,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -76,7 +74,7 @@ public class KMLPersonWriter {
 	protected boolean writeNetwork = false;
 
 	private MatsimKmlStyleFactory styleFactory;
-	private ObjectFactory kmlObjectFactory = new ObjectFactory();
+	private final ObjectFactory kmlObjectFactory = new ObjectFactory();
 	private StyleType networkLinkStyle;
 	private NetworkFeatureFactory networkFeatureFactory;
 	private StyleType networkNodeStyle;
@@ -399,12 +397,6 @@ public class KMLPersonWriter {
 	public void setNetwork(NetworkImpl network)
 	{
 		this.network = network;
-	}
-
-	public void loadNetwork(String netFileName)
-	{
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
 	}
 
 	public void setCoordinateTransformation(CoordinateTransformation coordinateTransform)

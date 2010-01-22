@@ -48,6 +48,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 class EventHH implements LinkEnterEventHandler {
@@ -186,11 +187,11 @@ public class ReducePopulationExe {
 		String popFileName = "../../tmp/studies/ivtch/Diss/input/plans_all_187k.xml";
 		String outnetFileName = "../../tmp/studies/ivtch/Diss/input/ivtch_red100.xml";
 
-		Config config = Gbl.createConfig(args);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
+		Config config = scenario.getConfig();
 
 		network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		relevantPopulation = new ScenarioImpl().getPopulation();
 		relevantPopulation.setIsStreaming(true);

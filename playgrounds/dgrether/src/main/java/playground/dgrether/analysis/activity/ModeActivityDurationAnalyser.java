@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -72,8 +71,7 @@ public class ModeActivityDurationAnalyser {
 		File f = new File("test.txt");
 		System.out.println(f.getAbsolutePath());
 		
-		NetworkLayer net = scenario.getNetwork();
-		MatsimNetworkReader reader = new MatsimNetworkReader(net);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
 		reader.readFile(NETWORK);
 
 		PopulationImpl plans = scenario.getPopulation();

@@ -27,6 +27,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QueueSimulation;
 
@@ -46,13 +47,13 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 
 		Gbl.printSystemInfo();
 
-		args = new String [] {"../../tmp/studies/ivtch/config.xml"};
-		Config config = Gbl.createConfig(args);
+		String configFile = "../../tmp/studies/ivtch/config.xml";
+		ScenarioImpl scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		Config config = scenario.getConfig();
 		Gbl.startMeasurement();
 		config.setParam("global", "localDTDBase", "dtd/");
 
-		ScenarioImpl scenario = new ScenarioImpl(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		Gbl.printElapsedTime();
 

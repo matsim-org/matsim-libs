@@ -1,14 +1,15 @@
 package playground.andreas.bln.pop.generate;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -35,11 +36,11 @@ public class GeoFilterPersonPlan extends NewPopulation {
 
 	private int planswritten = 0;
 	private int personshandled = 0;
-	private NetworkLayer targetNet;
-	private Population origPop;
+	private final Network targetNet;
+	private final Population origPop;
 
 
-	public GeoFilterPersonPlan(Population plans, String filename, Population origPop, NetworkLayer targetNet) {
+	public GeoFilterPersonPlan(Population plans, String filename, Population origPop, Network targetNet) {
 		super(targetNet, plans, filename);
 		this.targetNet = targetNet;
 		this.origPop = origPop;
@@ -93,11 +94,11 @@ public class GeoFilterPersonPlan extends NewPopulation {
 		String inPlansFile = "./0.plans.xml.gz";
 		String outPlansFile = "./plan_hundekopf2.xml.gz";
 
-		NetworkLayer bigNet = bigNetScenario.getNetwork();
-		new MatsimNetworkReader(bigNet).readFile(bigNetworkFile);
+		new MatsimNetworkReader(bigNetScenario).readFile(bigNetworkFile);
 
-		NetworkLayer targetNet = new NetworkLayer();
-		new MatsimNetworkReader(targetNet).readFile(targetNetworkFile);
+		Scenario targetScenario = new ScenarioImpl();
+		Network targetNet = targetScenario.getNetwork();
+		new MatsimNetworkReader(targetScenario).readFile(targetNetworkFile);
 
 		PopulationImpl inPop = new ScenarioImpl().getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, inPop));

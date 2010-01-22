@@ -28,6 +28,7 @@ import java.io.IOException;
 import javax.swing.JButton;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.xml.sax.SAXException;
@@ -95,8 +96,9 @@ public class SelectAreaGUI extends AbstractBasicMapGUIImpl {
 	public static SelectAreaGUI readNetworkAndShowGUI()
 	{
 		// TODO Auto-generated method stub
-		NetworkLayer network = new NetworkLayer();
-		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
 		try {
 			nReader.parse(PathTracker.resolve("matMap"));
 			return (new SelectAreaGUI(network));

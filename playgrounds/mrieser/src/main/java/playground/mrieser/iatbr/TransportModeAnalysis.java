@@ -93,7 +93,7 @@ public class TransportModeAnalysis extends AbstractPersonAlgorithm {
 		Logger log = Logger.getLogger(TransportModeAnalysis.class);
 		try {
 			log.info("reading network");
-			new MatsimNetworkReader(scenario.getNetwork()).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_network.xml.gz");
+			new MatsimNetworkReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_network.xml.gz");
 			log.info("analyzing plans");
 			BufferedWriter infoFile = IOUtils.getBufferedWriter("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/coords.txt");
 			infoFile.write("X\tY\tID\tTYPE\n");

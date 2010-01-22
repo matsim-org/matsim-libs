@@ -27,9 +27,8 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -49,12 +48,12 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	private final static String CAPACITY = "capacity";
 	private final static String OPENTIME = "opentime";
 
-	private final ActivityFacilitiesImpl facilities;
+	private final ScenarioImpl scenario;
 	private ActivityFacilityImpl currfacility = null;
 	private ActivityOptionImpl curractivity = null;
 	
-	public FacilitiesReaderMatsimV1(final ActivityFacilitiesImpl facilities) {
-		this.facilities = facilities;
+	public FacilitiesReaderMatsimV1(final ScenarioImpl scenario) {
+		this.scenario = scenario;
 	}
 
 	@Override
@@ -82,14 +81,15 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startFacilities(final Attributes atts) {
-		this.facilities.setName(atts.getValue("name"));
+		this.scenario.getActivityFacilities().setName(atts.getValue("name"));
 		if (atts.getValue("aggregation_layer") != null) {
 			Logger.getLogger(FacilitiesReaderMatsimV1.class).warn("aggregation_layer is deprecated.");
 		}
 	}
 	
 	private void startFacility(final Attributes atts) {
-		this.currfacility = this.facilities.createFacility(new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"),atts.getValue("y")));
+		this.currfacility = this.scenario.getActivityFacilities().createFacility(this.scenario.createId(atts.getValue("id")), 
+		this.scenario.createCoord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))));
 		this.currfacility.setDesc(atts.getValue("desc"));
 	}
 	

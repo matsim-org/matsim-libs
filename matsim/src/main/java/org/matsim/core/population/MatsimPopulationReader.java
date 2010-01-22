@@ -27,12 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.knowledges.Knowledges;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -49,26 +44,13 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final static String PLANS_V1 = "plans_v1.dtd";
 	private final static String PLANS_V4 = "plans_v4.dtd";
 	
-	private final Population plans;
-	private final Network network;
-	private final ActivityFacilities facilities;
 	private MatsimXmlParser delegate = null;
-	private Knowledges knowledges;
 	private final Scenario scenario;
 
 	private static final Logger log = Logger.getLogger(MatsimPopulationReader.class);
 	
 	public MatsimPopulationReader(final Scenario scenario) {
 		this.scenario = scenario;
-		this.plans = scenario.getPopulation();
-		this.network = scenario.getNetwork();
-		if (scenario instanceof ScenarioImpl) {
-		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
-		this.knowledges = ((ScenarioImpl) scenario).getKnowledges();
-		} else {
-			this.facilities = null;
-			this.knowledges = null;
-		}
 	}
 
 	@Override
@@ -107,10 +89,10 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 			log.info("using plans_v4-reader.");
 		} 
 		else if (PLANS_V1.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV1(this.plans, this.network);
+			this.delegate = new PopulationReaderMatsimV1(this.scenario);
 			log.info("using plans_v1-reader.");
 		} else if (PLANS_V0.equals(doctype) || PLANS.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV0(this.plans, this.network);
+			this.delegate = new PopulationReaderMatsimV0(this.scenario);
 			log.info("using plans_v0-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

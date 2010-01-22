@@ -25,6 +25,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -86,8 +88,9 @@ public class InitDemandCreation {
 
 
 	private void readNetwork() {
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(this.network).readFile(Config.networkFile);
+		Scenario scenario = new ScenarioImpl();
+		this.network = (NetworkLayer) scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(Config.networkFile);
 
 		// running Network adaptation algorithms
 		new NetworkSummary().run(this.network);

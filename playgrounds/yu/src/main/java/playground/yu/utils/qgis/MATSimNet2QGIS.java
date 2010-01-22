@@ -90,7 +90,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public MATSimNet2QGIS(String netFilename, String coordRefSys) {
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 		crs = MGC.getCRS(coordRefSys);
 		n2g = new Network2PolygonGraph(scenario.getNetwork(), crs);
 	}

@@ -78,7 +78,7 @@ public class RandomPlansGenerator {
 		this();
 		this.setNetworkFile(s);
 		try {
-			this.read();
+			this.read(new ScenarioImpl());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -99,9 +99,9 @@ public class RandomPlansGenerator {
 		this.networkFile = networkFile;
 	}
 
-	public void read() throws IOException {
-		this.network = new NetworkLayer();
-		MatsimNetworkReader netReader = new MatsimNetworkReader( this.network );
+	public void read(ScenarioImpl scenario) throws IOException {
+		this.network = scenario.getNetwork();
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		try {
 			netReader.parse(this.networkFile);
 			this.network.connect();

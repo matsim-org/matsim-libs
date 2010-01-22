@@ -42,7 +42,7 @@ import org.matsim.core.population.PopulationReader;
 public class DoublePop extends NewPopulation {
 	// private String newPersonId;
 	private Person tmpPerson = null;
-	private int n = 0;
+	private final int n = 0;
 
 	/**
 	 * Construcktor
@@ -103,7 +103,7 @@ public class DoublePop extends NewPopulation {
 		ScenarioImpl s = new ScenarioImpl();
 
 		NetworkLayer network = s.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		new MatsimNetworkReader(s).readFile(networkFilename);
 
 		PopulationImpl population = s.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(s);

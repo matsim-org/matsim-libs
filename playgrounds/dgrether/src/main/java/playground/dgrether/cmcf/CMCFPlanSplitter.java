@@ -51,7 +51,9 @@ public class CMCFPlanSplitter {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		NetworkLayer net = MatsimIo.loadNetwork(DgPaths.IVTCHNET);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer net = scenario.getNetwork();
+		MatsimIo.loadNetwork(DgPaths.IVTCHNET, scenario);
 //		Plans plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
 		Population plans = MatsimIo.loadPlans(plansFile, net);
 		Population plansOne = new ScenarioImpl().getPopulation();

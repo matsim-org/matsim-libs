@@ -263,7 +263,7 @@ public class SelectedPlans2ESRIShape {
 		final String outputDir = "./plans/";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");

@@ -61,7 +61,7 @@ public class MyOTFEvents2Mvi {
 		Scenario s = new ScenarioImpl();
 
 		NetworkImpl net = (NetworkImpl) s.getNetwork();
-		new MatsimNetworkReader(net).readFile(args[0]);
+		new MatsimNetworkReader(s).readFile(args[0]);
 // important?
 		QSimConfigGroup qscfg = new QSimConfigGroup();
 		qscfg.setFlowCapFactor(0.1);

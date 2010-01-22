@@ -11,6 +11,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.sna.graph.Graph;
@@ -40,8 +41,9 @@ public class TTMatrixGenerator {
 		/*
 		 * read network file
 		 */
-		NetworkLayer network = new NetworkLayer();
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
 		reader.parse("/Users/fearonni/vsp-work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-changed-with-GTF.xml");
 		/*
 		 * load swiss boundary

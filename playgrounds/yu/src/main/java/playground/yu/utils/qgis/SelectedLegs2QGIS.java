@@ -67,7 +67,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 		final String outputDir = "../runs_SVN/run674/it.1000/1000.analysis/";
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario)

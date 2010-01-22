@@ -21,6 +21,7 @@
 package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 
@@ -82,7 +83,7 @@ public class FacilitiesProductionKTI {
 		
 		log.info("Adding and running facilities algorithms...");
 		new FacilitiesAllActivitiesFTE(ktiYear).run(facilities);
-		AddOpentimes addOpentimes = new AddOpentimes();
+		AddOpentimes addOpentimes = new AddOpentimes(new ScenarioImpl());
 		addOpentimes.init();
 		addOpentimes.run(facilities);
 //		new FacilitiesRandomizeHectareCoordinates().run(facilities);

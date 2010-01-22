@@ -15,11 +15,11 @@ import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -59,11 +59,7 @@ public class NetworkThinning {
 	int idCounter = 0;
 
 	public static void main(String[] args) {
-		// create Config
-		Config config = new Config();
-		config.addCoreModules();
-		config.checkConsistency();
-		Gbl.setConfig(config);
+		ScenarioImpl scenario = new ScenarioImpl();
 
 		// load Network
 		String networkFile = "mysimulations/kt-zurich/input/network.xml";
@@ -71,8 +67,8 @@ public class NetworkThinning {
 		// String networkFile = "test/scenarios/berlin/network.xml.gz";
 		// String networkFile = "test/scenarios/chessboard/network.xml";
 
-		NetworkLayer nw = new NetworkLayer();
-		new MatsimNetworkReader(nw).readFile(networkFile);
+		NetworkLayer nw = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		log.info("Network has " + nw.getNodes().size() + " Nodes.");
 		log.info("Network has " + nw.getLinks().size() + " Links.");

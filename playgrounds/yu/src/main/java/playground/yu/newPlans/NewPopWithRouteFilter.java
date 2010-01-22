@@ -78,7 +78,7 @@ public class NewPopWithRouteFilter extends NewPopulation {
 		Scenario s = new ScenarioImpl();
 
 		NetworkLayer network = (NetworkLayer) s.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(s).readFile(netFilename);
 
 		Population population = s.getPopulation();
 		new MatsimPopulationReader(s).readFile(plansFilename);

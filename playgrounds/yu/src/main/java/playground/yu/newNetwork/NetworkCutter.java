@@ -96,7 +96,7 @@ public class NetworkCutter {
 			final String outputNetworkFile) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(inputNetworkFile);
+		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 
 		final PopulationImpl pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFile);

@@ -40,7 +40,7 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario)

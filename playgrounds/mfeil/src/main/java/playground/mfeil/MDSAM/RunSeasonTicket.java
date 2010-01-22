@@ -77,8 +77,8 @@ public class RunSeasonTicket {
 
 		// Load scenario and population
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 		// load income information
 		adder.loadIncomeData(scenario);

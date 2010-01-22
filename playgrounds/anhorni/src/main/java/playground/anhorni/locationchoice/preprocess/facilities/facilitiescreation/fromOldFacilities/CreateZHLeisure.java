@@ -1,6 +1,7 @@
 package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromOldFacilities;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -14,7 +15,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CreateZHLeisure {
 	
-	private ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+	private final ScenarioImpl scenario = new ScenarioImpl();
+	private ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 	private final static Logger log = Logger.getLogger(CreateZHLeisure.class);
 	
 	public static void main(final String[] args) {
@@ -27,7 +29,7 @@ public class CreateZHLeisure {
 	public void run() {
 		log.info("reading facilities ...");
 				
-		new FacilitiesReaderMatsimV1(facilities).readFile("input/facilities/facilities.xml.gz");
+		new FacilitiesReaderMatsimV1(scenario).readFile("input/facilities/facilities.xml.gz");
 		this.createNewFacilities();
 		this.writeFacilities();
 		log.info("finished");

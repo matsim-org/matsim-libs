@@ -60,7 +60,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 	 */
 	private Map<String, String> ssLinks = new TreeMap<String, String>();
 
-	private DataOutputStream out;
+	private final DataOutputStream out;
 
 	/** Counter of "old" links */
 	private int oldLinksNr;
@@ -173,7 +173,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 		ScenarioImpl scenario = new ScenarioImpl();
 		System.out.println("  reading the network...");
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network()
+		new MatsimNetworkReader(scenario).readFile(config.network()
 				.getInputFile());
 		System.out.println("  done.");
 

@@ -60,7 +60,7 @@ public class AnalyzePlans {
 	
 	String plansfilePath;
 		
-	private DecimalFormat formatter = new DecimalFormat("0.0");
+	private final DecimalFormat formatter = new DecimalFormat("0.0");
 	private final static Logger log = Logger.getLogger(AnalyzePlans.class);
 	
 	
@@ -92,10 +92,10 @@ public class AnalyzePlans {
 	private void init(String networkfilePath, String facilitiesfilePath, String plansfilePath) {
 		
 		log.info("reading the facilities ...");
-		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
+		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesfilePath);
 			
 		log.info("reading the network ...");
-		new MatsimNetworkReader(this.network).readFile(networkfilePath);
+		new MatsimNetworkReader(this.scenario).readFile(networkfilePath);
 		
 		log.info("  reading file " + plansfilePath);
 		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);
@@ -422,10 +422,10 @@ public class AnalyzePlans {
 		int walkMaxDistance = 20 * 1000;
 		
 		TreeMap<String, BinsOld> distanceBins = new TreeMap<String, BinsOld>();
-		distanceBins.put("car", new BinsOld((int)(carDistanceUnit), carMaxDistance));			
-		distanceBins.put("pt", new BinsOld((int)(ptDistanceUnit), ptMaxDistance));
-		distanceBins.put("bike", new BinsOld((int)(bikeDistanceUnit), bikeMaxDistance));
-		distanceBins.put("walk", new BinsOld((int)(walkDistanceUnit), walkMaxDistance));
+		distanceBins.put("car", new BinsOld((carDistanceUnit), carMaxDistance));			
+		distanceBins.put("pt", new BinsOld((ptDistanceUnit), ptMaxDistance));
+		distanceBins.put("bike", new BinsOld((bikeDistanceUnit), bikeMaxDistance));
+		distanceBins.put("walk", new BinsOld((walkDistanceUnit), walkMaxDistance));
 								
 		Iterator<? extends Person> person_iter = this.plans.getPersons().values().iterator();
 		while (person_iter.hasNext()) {

@@ -9,9 +9,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
-import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
-import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class NetworkAndMore2ESRI extends Links2ESRIShape{
@@ -50,8 +48,8 @@ public class NetworkAndMore2ESRI extends Links2ESRIShape{
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		log.info("loading network from " + netfile);
-		final NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netfile);
+		final NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);

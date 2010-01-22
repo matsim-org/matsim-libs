@@ -46,8 +46,6 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
 import org.xml.sax.SAXException;
 
-import playground.mrieser.OTFDemo;
-
 public class PseudoNetworkDemo {
 
 	private static final String SERVERNAME = "pseudoNetworkDemo";
@@ -77,7 +75,7 @@ public class PseudoNetworkDemo {
 		network.setCapacityPeriod(3600.0);
 		if (networkFile != null) {
 			try {
-				new MatsimNetworkReader(network).parse(networkFile);
+				new MatsimNetworkReader(scenario).parse(networkFile);
 			} catch (SAXException e) {
 				e.printStackTrace();
 			} catch (ParserConfigurationException e) {

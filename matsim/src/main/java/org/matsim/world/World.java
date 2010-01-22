@@ -207,7 +207,7 @@ public class World {
 		if (this.layers.containsKey(type)) {
 			throw new IllegalArgumentException("Layer type=" + type + " already exixts.");
 		}
-		if (type.equals(ActivityFacilitiesImpl.LAYER_TYPE)) { return (ActivityFacilitiesImpl) this.createFacilityLayer(); }
+		if (type.equals(ActivityFacilitiesImpl.LAYER_TYPE)) { return this.createFacilityLayer(); }
 		if (type.equals(NetworkLayer.LAYER_TYPE)) { return this.createNetworkLayer(); }
 		return this.createZoneLayer(type,name);
 	}
@@ -287,7 +287,7 @@ public class World {
 	}
 
 	@Deprecated
-	protected final void addMapping(final MappingRule mapping_rule, final String down_zone_id, final String up_zone_id) {
+	protected final void addMapping(final MappingRule mapping_rule, final Id down_zone_id, final Id up_zone_id) {
 		Zone down_zone = (Zone)mapping_rule.getDownLayer().getLocation(down_zone_id);
 		Zone up_zone   = (Zone)mapping_rule.getUpLayer().getLocation(up_zone_id);
 		if (down_zone == null) {

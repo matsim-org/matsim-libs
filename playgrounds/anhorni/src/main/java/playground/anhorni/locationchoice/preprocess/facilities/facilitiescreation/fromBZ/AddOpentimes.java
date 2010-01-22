@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -46,17 +47,21 @@ import org.matsim.world.MappedLocation;
  */
 public class AddOpentimes extends AbstractFacilityAlgorithm {
 
-	private final ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005");
+	private final ScenarioImpl scenario;
+	private final ActivityFacilitiesImpl shopsOf2005;
 	private final String shopsOf2005Filename = "input/facilities/facilities_shopsOf2005.xml";
 	private static final Logger log = Logger.getLogger(AddOpentimes.class);
 
-	public AddOpentimes() {
+	public AddOpentimes(final ScenarioImpl scenario) {
 		super();
+		this.scenario = scenario;
+		this.shopsOf2005 = this.scenario.getActivityFacilities();
+		this.shopsOf2005.setName("shopsOf2005");
 	}
 
 	public void init() {
 		log.info("Reading shops Of 2005 xml file... ");
-		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.shopsOf2005);
+		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.scenario);
 		facilities_reader.readFile(this.shopsOf2005Filename);
 		log.info("Reading shops Of 2005 xml file...done.");
 	}

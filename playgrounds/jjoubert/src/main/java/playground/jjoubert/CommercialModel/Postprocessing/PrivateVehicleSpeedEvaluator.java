@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
@@ -84,8 +85,9 @@ public class PrivateVehicleSpeedEvaluator {
 		MyGapReader mgr = new MyGapReader(province, shapefile);
 
 		String networkFile = root + "Commercial/Input/network" + province + ".xml";
-		NetworkLayer nl = new NetworkLayer();
-		MatsimNetworkReader nr = new MatsimNetworkReader(nl);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer nl = scenario.getNetwork();
+		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
 		nr.readFile(networkFile);
 
 		log.info("Building a (Hash)Map of the mesozones associated with each link, this may take a while.");
@@ -239,7 +241,7 @@ public class PrivateVehicleSpeedEvaluator {
 		double divider;
 		String outputFile;
 		if(simulated){
-			divider = (double) runs.length;
+			divider = runs.length;
 			outputFile = root + "Commercial/PostProcess/AveragePrivateVehicleSpeed-" + ds.toString() + ".txt";			
 		} else{
 			divider = 1;

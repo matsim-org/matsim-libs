@@ -23,7 +23,7 @@ public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCas
 
 		ScenarioImpl scenario = new ScenarioImpl(c);
 		NetworkLayer net = scenario.getNetwork();
-		new MatsimNetworkReader(net).readFile(c.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(c.network().getInputFile());
 
 		PopulationImpl pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(c.plans().getInputFile());

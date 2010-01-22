@@ -5,17 +5,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
@@ -37,7 +35,7 @@ public class Controller {
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		
 		/***************reads the transitSchedule file**********/
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK);
+		new MatsimNetworkReader(scenario).readFile(NETWORK);
 		try {
 			new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork()).readFile(TRANSITSCHEDULEFILE);
 		} catch (SAXException e){

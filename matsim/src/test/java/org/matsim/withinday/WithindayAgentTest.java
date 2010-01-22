@@ -25,14 +25,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -60,6 +62,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 
 	private static final String networkFile = "./test/input/org/matsim/withinday/network.xml";
 
+	private Scenario scenario = null;
 	private NetworkLayer network = null;
 	private NetworkRouteWRefs route1 = null;
 	private NetworkRouteWRefs route2 = null;
@@ -73,15 +76,16 @@ public class WithindayAgentTest extends MatsimTestCase {
 		super.setUp();
 		Config c = super.loadConfig(null);
 		c.setQSimConfigGroup(new QSimConfigGroup());
-		this.network = new NetworkLayer();
-		MatsimNetworkReader parser = new MatsimNetworkReader(this.network);
-		parser.readFile(networkFile);
+		this.scenario = new ScenarioImpl(c);
+		this.network = (NetworkLayer) this.scenario.getNetwork();
+		new MatsimNetworkReader(this.scenario).readFile(networkFile);
 		this.createRoutes();
-		this.simulation = new QueueSimulation(this.network, null, new EventsManagerImpl());
+		this.simulation = new QueueSimulation(this.scenario, new EventsManagerImpl());
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
+		this.scenario = null;
 		this.agentRoute = null;
 		this.leg = null;
 		this.network = null;
@@ -93,8 +97,8 @@ public class WithindayAgentTest extends MatsimTestCase {
 	}
 
 	private void createRoutes() {
-		LinkImpl startLink = this.network.getLinks().get(new IdImpl("2"));
-		LinkImpl endLink = this.network.getLinks().get(new IdImpl("7"));
+		Link startLink = this.network.getLinks().get(new IdImpl("2"));
+		Link endLink = this.network.getLinks().get(new IdImpl("7"));
 		this.route1 = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
 		this.route2 = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
 		this.agentRoute = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
@@ -159,7 +163,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		List<VDSSign> signs = new LinkedList<VDSSign>();
 		signs.add(createSign());
 		//... the scoring function
-		CharyparNagelScoringConfigGroup scoringFunctionConfig = Gbl.getConfig().charyparNagelScoring();
+		CharyparNagelScoringConfigGroup scoringFunctionConfig = this.scenario.getConfig().charyparNagelScoring();
 		scoringFunctionConfig.addParam("activityType_0", "h");
 		scoringFunctionConfig.addParam("activityPriority_0", "1");
 		scoringFunctionConfig.addParam("activityTypicalDuration_0", "01:00");

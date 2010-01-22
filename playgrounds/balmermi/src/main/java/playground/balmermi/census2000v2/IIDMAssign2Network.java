@@ -82,12 +82,12 @@ public class IIDMAssign2Network {
 
 		log.info("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		world.complete();
 		System.out.println("  done.");
 

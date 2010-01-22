@@ -74,8 +74,8 @@ public class RunUtilFunctionEstimation {
 		String munType			= "yes";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 		
 //		MDSAM mdsam = new MDSAM(scenario.getPopulation());				

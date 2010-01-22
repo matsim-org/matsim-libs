@@ -23,15 +23,15 @@ package org.matsim.population;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -44,18 +44,19 @@ public class PopulationReaderKutter implements PopulationReader {
 
 	private final static double ANTEIL = 10; // (1/ANTEIL) of the kutter-data will be used; 1 = 100%, 2 = 50%, 10 = 10%
 
-	/*package*/ final PopulationImpl population;
-	private final PersonRowHandler rowHandler = new PersonRowHandler();
+	/*package*/ final Population population;
+	private final PersonRowHandler rowHandler;
 	private final TabularFileParser parser = new TabularFileParser();
 	private final TabularFileParserConfig parserConfig = new TabularFileParserConfig();
 	private long totalcnt = 0;
 	private double totalsum = 0.0;
 	/*package*/ final Layer tvzLayer; // ZoneLayer containing 'tvz' (traffic analysis zones)
 
-	public PopulationReaderKutter(final PopulationImpl plans, final Layer tvzLayer) {
-		this.population = plans;
+	public PopulationReaderKutter(final Scenario scenario, final Layer tvzLayer) {
+		this.population = scenario.getPopulation();
 		this.tvzLayer = tvzLayer;
 		this.parserConfig.setDelimiterRegex("\t");
+		this.rowHandler = new PersonRowHandler(scenario);
 	}
 
 	public final void readFile(final String dirname) {
@@ -169,8 +170,10 @@ public class PopulationReaderKutter implements PopulationReader {
 		private PlanImpl currPlan = null;
 		private Coord currHome = null;
 		private int currTime = 0;
+		private final Scenario scenario;
 
-		public PersonRowHandler() {
+		public PersonRowHandler(final Scenario scenario) {
+			this.scenario = scenario;
 			this.idCnt = 0;
 		}
 
@@ -196,7 +199,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			this.idCnt++;
 			this.cnt++;
 			int age = this.pgMinAge[this.pg_] + (int)Math.round(MatsimRandom.getRandom().nextDouble()*(this.pgMaxAge[this.pg_]+1 - this.pgMinAge[this.pg_]));
-			PersonImpl p = new PersonImpl(new IdImpl(id));
+			PersonImpl p = new PersonImpl(this.scenario.createId(id));
 			p.setSex(this.pgSex[this.pg_]);
 			p.setAge(age);
 			p.setLicence(this.pgLicense[this.pg_]);
@@ -211,7 +214,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			int arrTime = this.currTime;
 			int travTime = 0;
 
-			Zone zone = (Zone)tvzLayer.getLocation(new IdImpl(cellid));
+			Zone zone = (Zone)tvzLayer.getLocation(this.scenario.createId(Integer.toString(cellid)));
 			Coord coord = WorldUtils.getRandomCoordInZone(zone, tvzLayer);
 			String activity = "";
 			int duration = 0;
@@ -248,7 +251,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			this.currPlan = this.currPerson.createAndAddPlan(true);
 
 			String homeCell = row[1];
-			Zone zone = (Zone)tvzLayer.getLocation(homeCell);
+			Zone zone = (Zone)tvzLayer.getLocation(new IdImpl(homeCell));
 			this.currHome = WorldUtils.getRandomCoordInZone(zone, tvzLayer);
 
 			// read values of first not-home activity

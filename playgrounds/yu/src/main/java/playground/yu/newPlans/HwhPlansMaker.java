@@ -44,7 +44,7 @@ import org.matsim.population.algorithms.PlanSimplifyForDebug;
 public class HwhPlansMaker extends PlanSimplifyForDebug {
 
 	protected PopulationWriter pw;
-	private Config config;
+	private final Config config;
 
 	public HwhPlansMaker(NetworkLayer network, Config config, PopulationImpl plans) {
 		super(network);
@@ -86,7 +86,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 
 		ScenarioImpl scenario = sl.getScenario();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 

@@ -41,8 +41,8 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  * 
  */
 public class PopPruner extends NewPopulation {
-	private int maxPlansPerAgent;
-	private WorstPlanForRemovalSelector worstPlanSelector;
+	private final int maxPlansPerAgent;
+	private final WorstPlanForRemovalSelector worstPlanSelector;
 
 	public PopPruner(Network net, Population population, String filename,
 			int maxPlansPerAgent) {
@@ -69,7 +69,7 @@ public class PopPruner extends NewPopulation {
 		Scenario s = new ScenarioImpl();
 
 		NetworkImpl net = (NetworkImpl) s.getNetwork();
-		new MatsimNetworkReader(net).readFile(netFilename);
+		new MatsimNetworkReader(s).readFile(netFilename);
 
 		Population pop = s.getPopulation();
 		new MatsimPopulationReader(s).readFile(oldPopFilename);

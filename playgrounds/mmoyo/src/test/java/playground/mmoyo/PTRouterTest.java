@@ -7,10 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -45,9 +42,10 @@ public class PTRouterTest extends MatsimTestCase {
 		final String TRANSITSCHEDULE= PATH + "simple1TransitSchedule.xml";
 		final String PLANFILE = PATH +  "output_plans.xml";
 		
-		/**read transit schedule, plain net create logic elements */
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(NETWORK);
+		/* read transit schedule, plain net create logic elements */
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(NETWORK);
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(transitSchedule, network).readFile(TRANSITSCHEDULE);
@@ -86,10 +84,10 @@ public class PTRouterTest extends MatsimTestCase {
 
 		/**tests TransitRouteFinder class*/
 		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
-		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.setNetwork(network);
-		PopulationImpl population = scenario.getPopulation();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+		ScenarioImpl scenario2 = new ScenarioImpl();
+		scenario2.setNetwork(network);
+		PopulationImpl population = scenario2.getPopulation();
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario2);
 		plansReader.readFile(PLANFILE);
 		Person person = population.getPersons().get(new IdImpl("1")); 
 		Plan plan = person.getPlans().get(0);

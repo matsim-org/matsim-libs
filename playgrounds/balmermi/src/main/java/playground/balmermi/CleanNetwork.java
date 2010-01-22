@@ -20,6 +20,7 @@
 
 package playground.balmermi;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -45,8 +46,9 @@ public class CleanNetwork {
 
 	public static void cleanNetwork(final String[] args) {
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile("../../input/network.xml.gz");
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile("../../input/network.xml.gz");
 		
 		Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile("../../input/counts.xml.gz");

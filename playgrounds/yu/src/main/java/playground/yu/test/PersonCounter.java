@@ -73,7 +73,7 @@ public class PersonCounter extends AbstractPersonAlgorithm {
 		new MatsimConfigReader(scenario.getConfig()).readFile("./test/yu/test/configTest.xml");
 
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);

@@ -26,10 +26,6 @@ public interface Layer {
 
 	public MappedLocation getLocation(final Id location_id);
 
-	@Deprecated
-	// string-based methods are discouraged
-	public Location getLocation(final String location_id);
-
 	/**
 	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in 
 	 * most cases.

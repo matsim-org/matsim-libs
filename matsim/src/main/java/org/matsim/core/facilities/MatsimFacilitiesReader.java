@@ -26,10 +26,10 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import org.matsim.core.utils.io.MatsimXmlParser;
 
 /**
  * A reader for facilities-files of MATSim. This reader recognizes the format of the facilities-file and uses
@@ -60,7 +60,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
 	
-	private final ActivityFacilitiesImpl facilities;
+	private final ScenarioImpl scenario;
 	private MatsimXmlParser delegate = null;
 
 	/**
@@ -68,8 +68,8 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 	 *
 	 * @param facilities The Facilities-object to store the facilities in.
 	 */
-	public MatsimFacilitiesReader(final ActivityFacilitiesImpl facilities) {
-		this.facilities = facilities;
+	public MatsimFacilitiesReader(final ScenarioImpl scenario) {
+		this.scenario = scenario;
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 		super.setDoctype(doctype);
 		// Currently the only facilities-type is v1
 		if (FACILITIES_V1.equals(doctype)) {
-			this.delegate = new FacilitiesReaderMatsimV1(this.facilities);
+			this.delegate = new FacilitiesReaderMatsimV1(this.scenario);
 			log.info("using facilities_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

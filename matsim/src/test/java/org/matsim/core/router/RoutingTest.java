@@ -111,7 +111,7 @@ public class RoutingTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		NetworkImpl network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 
 		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		PopulationImpl population = scenario.getPopulation();

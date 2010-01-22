@@ -136,7 +136,7 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 
 		System.out.println("Reading network " + wholeBigNetworkFile);
 		NetworkLayer wholeBigNet = bigScenario.getNetwork();
-		new MatsimNetworkReader(wholeBigNet).readFile(wholeBigNetworkFile);
+		new MatsimNetworkReader(bigScenario).readFile(wholeBigNetworkFile);
 
 		System.out.println("Reading routed population: " + wholeRoutedPlansFile);
 		PopulationImpl wholeRoutedPop = new ScenarioImpl().getPopulation();

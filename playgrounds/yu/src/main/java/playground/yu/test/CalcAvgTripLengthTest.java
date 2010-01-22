@@ -38,7 +38,7 @@ public class CalcAvgTripLengthTest {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer net = scenario.getNetwork();
-		new MatsimNetworkReader(net).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(popFilename);

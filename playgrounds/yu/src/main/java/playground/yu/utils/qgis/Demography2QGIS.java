@@ -80,7 +80,7 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 
 	private void init(final String networkPath) {
 		System.out.println("  reading the network...");
-		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkPath);
+		new MatsimNetworkReader(this.scenario).readFile(networkPath);
 	}
 
 	private void readFiles(final String plansfilePath) {

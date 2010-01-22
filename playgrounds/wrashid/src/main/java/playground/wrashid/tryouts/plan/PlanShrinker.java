@@ -26,7 +26,7 @@ public class PlanShrinker {
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		PopulationImpl population = scenario.getPopulation();

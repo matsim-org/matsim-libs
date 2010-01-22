@@ -28,7 +28,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.world.World;
 
 
 
@@ -43,7 +42,6 @@ public class ModeChoiceNavteqMain {
 
 	public static void testRun01(Config config) {
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		World world = scenario.getWorld();
 
 //		System.out.println("TEST RUN 01:");
 //		System.out.println("  reading world xml file... ");
@@ -53,7 +51,7 @@ public class ModeChoiceNavteqMain {
 
 		System.out.println("  reading network xml file... ");
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 //		System.out.println();

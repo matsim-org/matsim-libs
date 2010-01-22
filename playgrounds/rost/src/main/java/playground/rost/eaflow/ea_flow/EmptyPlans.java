@@ -90,7 +90,7 @@ public class EmptyPlans {
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
 		NetworkLayer network = scenario.getNetwork();
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(networkfile);
 	//	Node sink = network.getNode(sinkid);
 

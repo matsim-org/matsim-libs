@@ -168,7 +168,7 @@ public class MZComparisonDataIO implements TabularFileHandler {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
 		try {

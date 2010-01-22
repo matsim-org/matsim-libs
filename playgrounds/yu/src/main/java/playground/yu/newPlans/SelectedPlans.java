@@ -62,7 +62,7 @@ public class SelectedPlans extends NewPopulation {
 		final String plansFilename = "../data/schweiz/input/459.100.plans.xml.gz";
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);

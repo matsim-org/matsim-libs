@@ -38,6 +38,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class StandaloneSimTest {
@@ -55,15 +56,14 @@ public class StandaloneSimTest {
 		String netFileName = "../../tmp/studies/ivtch/Diss/input/ivtch-osm.xml";
 		String popFileName = "../../tmp/studies/ivtch/Diss/input/plans1p.xml";
 
-		final Config config = Gbl.createConfig(args);
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
+		Config config = scenario.getConfig();
 
 		String localDtdBase = "./dtd/";
 		config.global().setLocalDtdBase(localDtdBase);
 
-
-		ScenarioImpl scenario = new ScenarioImpl(config);
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		PopulationImpl population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);

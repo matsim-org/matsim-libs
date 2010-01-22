@@ -25,10 +25,12 @@ import java.util.List;
 import java.util.Locale;
 
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
@@ -138,13 +140,14 @@ public class CountsAnalyser {
 	 * @throws Exception
 	 */
 	private void readConfig(final String configFile) throws Exception {
-		Config config = Gbl.createConfig(new String[] { configFile, "config_v1.dtd" });
+		ScenarioImpl scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		Config config = scenario.getConfig();
 		System.out.println("  reading counts xml file... ");
 		MatsimCountsReader counts_parser = new MatsimCountsReader(counts);
 		counts_parser.readFile(config.counts().getCountsFileName());
 		System.out.println("  reading counts done.");
 		System.out.println("  reading network...");
-		this.network = loadNetwork();
+		loadNetwork(scenario);
 		System.out.println("  done.");
 		// reading config parameters
 		System.out.println("Reading parameters...");
@@ -220,22 +223,11 @@ public class CountsAnalyser {
 		tableWriter.writeFile(filename + "errortable.txt");
 	}
 
-	/**
-	 * load the network
-	 *
-	 * @return the network layer
-	 */
-	protected NetworkLayer loadNetwork() {
-		// - read network: which buildertype??
-		printNote("", "  creating network layer... ");
-		NetworkLayer network = new NetworkLayer();
-		printNote("", "  done");
-
+	protected void loadNetwork(ScenarioImpl scenario) {
 		printNote("", "  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		printNote("", "  done");
-
-		return network;
+		this.network = scenario.getNetwork();
 	}
 
 	/**

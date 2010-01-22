@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -120,9 +121,9 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 		String lanesFile = DgPaths.STUDIESDG + "signalSystemsZh/laneDefinitions.xml";
 		String signalSystemsFile = DgPaths.STUDIESDG + "signalSystemsZh/signalSystems.xml";
 		String signalSystemsConfigFile = DgPaths.STUDIESDG + "signalSystemsZh/signalSystemsConfig.xml";
-		NetworkLayer net = new NetworkLayer();
-		MatsimNetworkReader netReader = new MatsimNetworkReader(net);
-		netReader.readFile(netFile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFile);
 	  log.info("read network");
 	  
 	  
@@ -138,7 +139,7 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 	  MatsimSignalSystemConfigurationsReader signalConfigReader = new MatsimSignalSystemConfigurationsReader(signalConfig);
 	  signalConfigReader.readFile(signalSystemsConfigFile);
 	  
-	  SignalSystemsConfigurationConsistencyChecker sscc = new SignalSystemsConfigurationConsistencyChecker((Network)net, laneDefs, signals, signalConfig);
+	  SignalSystemsConfigurationConsistencyChecker sscc = new SignalSystemsConfigurationConsistencyChecker(net, laneDefs, signals, signalConfig);
 		sscc.setRemoveMalformed(true);
 		sscc.checkConsistency();
 

@@ -32,12 +32,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
@@ -53,11 +54,11 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class BusStopAllocator {
-	private NetworkImpl network;
-	private Collection<TransitStopFacility> stops;
-	private Map<Id, Id> resultIds = new HashMap<Id, Id>();
-	private Map<Id, String> resultIsToNodes = new HashMap<Id, String>();
-	private String outputFile;
+	private final NetworkImpl network;
+	private final Collection<TransitStopFacility> stops;
+	private final Map<Id, Id> resultIds = new HashMap<Id, Id>();
+	private final Map<Id, String> resultIsToNodes = new HashMap<Id, String>();
+	private final String outputFile;
 
 	/**
 	 * @param network
@@ -151,10 +152,7 @@ public class BusStopAllocator {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
-
-		NetworkImpl multiModalNetwork = scenario.getNetwork();
-		new MatsimNetworkReader(multiModalNetwork)
-				.readFile(multiModalNetworkFile);
+		new MatsimNetworkReader(scenario).readFile(multiModalNetworkFile);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		try {
@@ -167,10 +165,11 @@ public class BusStopAllocator {
 			e.printStackTrace();
 		}
 
-		NetworkLayer carNetwork = new NetworkLayer();
-		new MatsimNetworkReader(carNetwork).readFile(carNetworkFile);
+		Scenario carScenario = new ScenarioImpl();
+		Network carNetwork = carScenario.getNetwork();
+		new MatsimNetworkReader(carScenario).readFile(carNetworkFile);
 
-		BusStopAllocator stopAllocator = new BusStopAllocator(carNetwork,
+		BusStopAllocator stopAllocator = new BusStopAllocator((NetworkImpl) carNetwork,
 				schedule.getFacilities().values(), outputFile);
 		stopAllocator.run2();
 	}

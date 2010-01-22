@@ -153,8 +153,8 @@ public class ASPTimingsModes extends ASPActivityChains {
 		final String outputDir = "./plans/";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		ASPTimingsModes sp = new ASPTimingsModes(scenario.getPopulation(), scenario.getKnowledges(), outputDir);

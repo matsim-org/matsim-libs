@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -54,8 +55,9 @@ public class CountsCutter {
 
 		int validCountsstationNo = 0;
 
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(networkFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		distanceFilterCenterNodeCoord = net.getNodes().get(new IdImpl(distanceFilterCenterNodeId))
 				.getCoord();
 

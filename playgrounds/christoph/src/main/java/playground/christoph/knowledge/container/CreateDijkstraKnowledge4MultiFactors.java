@@ -147,7 +147,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		 */
 		network.getFactory().setLinkFactory(new MyLinkFactoryImpl());
 		
-		new MatsimNetworkReader(network).readFile(networkFile);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		
 		/*
 		 * Now calculate the TravelCosts for each link. By doing this the
@@ -165,7 +165,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	private void loadFacilities()
 	{
 		facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(facilitiesFile);
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		
 		log.info("Loading Facilities ... done");
 	}

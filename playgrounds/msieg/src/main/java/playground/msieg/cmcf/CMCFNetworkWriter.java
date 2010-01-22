@@ -8,12 +8,12 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReader;
 import org.matsim.core.network.NodeImpl;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -35,8 +35,9 @@ public class CMCFNetworkWriter implements NetworkReader {
 	public CMCFNetworkWriter(String netFile) {
 		super();
 		this.netFile = netFile;
-		this.netLayer = new NetworkLayer();
-		this.netReader = new MatsimNetworkReader( this.netLayer );
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.netLayer = scenario.getNetwork();
+		this.netReader = new MatsimNetworkReader(scenario);
 		this.netName = "unspecified";
 	}
 

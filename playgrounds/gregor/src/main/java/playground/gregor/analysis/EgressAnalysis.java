@@ -239,7 +239,7 @@ public class EgressAnalysis {
 
 		log.info("loading network from " + config.network().getInputFile());
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		log.info("done.");
 
 		log.info("loading shape file from " + district_shape_file);

@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -125,9 +126,9 @@ public class SignalSystemsConsistencyChecker implements ConsistencyChecker {
 		String netFile = DgPaths.IVTCHBASE + "baseCase/network/ivtch-osm.xml";
 		String lanesFile = DgPaths.STUDIESDG + "signalSystemsZh/laneDefinitions.xml";
 		String signalSystemsFile = DgPaths.STUDIESDG + "signalSystemsZh/signalSystems.xml";
-		NetworkLayer net = new NetworkLayer();
-		MatsimNetworkReader netReader = new MatsimNetworkReader(net);
-		netReader.readFile(netFile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFile);
 	  log.info("read network");
 	  
 	  
@@ -139,7 +140,7 @@ public class SignalSystemsConsistencyChecker implements ConsistencyChecker {
 	  MatsimSignalSystemsReader signalReader = new MatsimSignalSystemsReader(signals);
 	  signalReader.readFile(signalSystemsFile);
 	  
-	  SignalSystemsConsistencyChecker sscc = new SignalSystemsConsistencyChecker((Network)net, laneDefs, signals);
+	  SignalSystemsConsistencyChecker sscc = new SignalSystemsConsistencyChecker(net, laneDefs, signals);
 		sscc.setRemoveMalformed(true);
 		sscc.checkConsistency();
 

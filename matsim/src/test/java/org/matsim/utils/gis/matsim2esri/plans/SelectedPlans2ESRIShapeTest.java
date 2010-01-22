@@ -49,7 +49,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 		ScenarioImpl scenario = new ScenarioImpl(super.loadConfig(null));
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
@@ -86,7 +86,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 		ScenarioImpl scenario = new ScenarioImpl(super.loadConfig(null));
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(populationFilename);

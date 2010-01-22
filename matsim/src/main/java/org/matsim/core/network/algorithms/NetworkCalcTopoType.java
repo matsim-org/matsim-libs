@@ -23,9 +23,10 @@ package org.matsim.core.network.algorithms;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 
 /** See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
@@ -42,9 +43,9 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 	public final static Integer END1WAY      = Integer.valueOf(7);
 	public final static Integer INTERSECTION = Integer.valueOf(8);
 
-	private final Map<NodeImpl, Integer> topoTypePerNode = new HashMap<NodeImpl, Integer>();
+	private final Map<Node, Integer> topoTypePerNode = new HashMap<Node, Integer>();
 	
-	public void run(final NetworkLayer network) {
+	public void run(final NetworkImpl network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		for (NodeImpl n : network.getNodes().values()) {
@@ -67,7 +68,7 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 		}
 
 		int [] cnt = {0,0,0,0,0,0,0,0,0};
-		for (NodeImpl n : network.getNodes().values()) {
+		for (Node n : network.getNodes().values()) {
 			cnt[getTopoType(n)]++;
 		}
 
@@ -89,7 +90,7 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 		this.topoTypePerNode.put(node, topoType);
 	}
 	
-	public int getTopoType(final NodeImpl node) {
+	public int getTopoType(final Node node) {
 		Integer i = this.topoTypePerNode.get(node);
 		if (i == null) {
 			return Integer.MIN_VALUE;

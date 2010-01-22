@@ -29,6 +29,8 @@ import java.util.Vector;
 
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -204,11 +206,12 @@ public class LinkStatsAnalyser {
 	 */
 	protected NetworkLayer loadNetwork() {
 		printNote("", "  creating network layer... ");
-		NetworkLayer network = new NetworkLayer();
+		Scenario scenario = new ScenarioImpl();
+		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 		printNote("", "  done");
 
 		printNote("", "  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(this.networkFilename);
+		new MatsimNetworkReader(scenario).readFile(this.networkFilename);
 		printNote("", "  done");
 
 		return network;

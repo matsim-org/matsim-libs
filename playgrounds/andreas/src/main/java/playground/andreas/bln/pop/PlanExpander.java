@@ -33,7 +33,7 @@ public class PlanExpander {
 		ScenarioImpl sc = new ScenarioImpl();
 
 		NetworkLayer net = sc.getNetwork();
-		new MatsimNetworkReader(net).readFile(networkFile);
+		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		PopulationImpl inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

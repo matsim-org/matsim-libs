@@ -54,10 +54,10 @@ public class PlanomatModuleTest extends MatsimTestCase {
 
 	public void testGenerateRandomDemand() {
 
-		Config config = scenario.getConfig();
+		Config config = this.scenario.getConfig();
 
-		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(config.facilities().getInputFile());
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
+		new MatsimFacilitiesReader(this.scenario).readFile(config.facilities().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());
 
 		final int TEST_PLAN_NR = 0;

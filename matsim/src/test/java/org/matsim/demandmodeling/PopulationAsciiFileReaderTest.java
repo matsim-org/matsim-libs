@@ -42,8 +42,8 @@ public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 	public void testReadFile() throws IOException {
 		World world = new World();
 		ZoneLayer zoneLayer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "noUseForAName");
-	  zoneLayer.createZone("1", "3", "3", "1", "1", "6", "6", "25", "name");
-	  zoneLayer.createZone("2", "3", "3", "1", "1", "6", "6", "25", "name");
+	  zoneLayer.createZone(new IdImpl("1"), "3", "3", "1", "1", "6", "6", "25", "name");
+	  zoneLayer.createZone(new IdImpl("2"), "3", "3", "1", "1", "6", "6", "25", "name");
 
 		String f = this.getClassInputDirectory() + filename;
 		PopulationAsciiFileReader p = new PopulationAsciiFileReader(zoneLayer);

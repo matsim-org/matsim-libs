@@ -142,13 +142,13 @@ public class TravelStatsMZMATSim {
 				final String outputFile = "/home/baug/mfeil/data/largeSet/it1/trip_stats0216.xls";
 	
 				ScenarioImpl scenarioMZ = new ScenarioImpl();
-				new MatsimNetworkReader(scenarioMZ.getNetwork()).readFile(networkFilename);
-				new MatsimFacilitiesReader(scenarioMZ.getActivityFacilities()).readFile(facilitiesFilename);
+				new MatsimNetworkReader(scenarioMZ).readFile(networkFilename);
+				new MatsimFacilitiesReader(scenarioMZ).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
 				
 				ScenarioImpl scenarioMATSim = new ScenarioImpl();
 				scenarioMATSim.setNetwork(scenarioMZ.getNetwork());
-				new MatsimFacilitiesReader(scenarioMATSim.getActivityFacilities()).readFile(facilitiesFilename);
+				new MatsimFacilitiesReader(scenarioMATSim).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioMATSim).readFile(populationFilenameMATSim);
 								
 				TravelStatsMZMATSim ts = new TravelStatsMZMATSim(scenarioMZ.getPopulation(), scenarioMATSim.getPopulation());

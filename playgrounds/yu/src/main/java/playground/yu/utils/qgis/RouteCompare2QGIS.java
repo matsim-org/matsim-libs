@@ -149,8 +149,9 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		final String populationFilenameB = args[2];
 		final String outputDir = args[3];
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		// ------------------------RouteSummaryA--------------------------------
 		ScenarioImpl scenarioA = new ScenarioImpl();
 		scenarioA.setNetwork(network);

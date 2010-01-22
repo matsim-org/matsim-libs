@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
@@ -39,7 +39,7 @@ import playground.christoph.knowledge.utils.GetAllIncludedLinks;
 
 public class TestNodeSelection {
 	
-	NetworkLayer network;
+	NetworkImpl network;
 	Map<Id, Node> selectedNodesMap;
 	
 	//final String networkFile = "C:/Master_Thesis_HLI/Workspace/TestNetz/network.xml";
@@ -52,10 +52,10 @@ public class TestNodeSelection {
 		selectedNodesMap = new TreeMap<Id, Node>();
 	}
 	
-	protected void loadNetwork()
+	protected void loadNetwork(Scenario scenario)
 	{
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFile);
+		network = (NetworkImpl) scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 	}
 	
 	protected void testDijkstraSelector()
@@ -87,17 +87,17 @@ public class TestNodeSelection {
 	// nicht selektierte Nodes aus dem Netzwerk entfernen
 	protected void removeOtherNodes()
 	{
-		Map<Id, NodeImpl> nodesToRemove = new TreeMap<Id, NodeImpl>();
+		Map<Id, Node> nodesToRemove = new TreeMap<Id, Node>();
 		
 		// iterate over Array or Iteratable 
-		for (NodeImpl node : network.getNodes().values())
+		for (Node node : network.getNodes().values())
 		{
 			if(!selectedNodesMap.containsKey(node.getId())) nodesToRemove.put(node.getId(), node);
 		}
 
-		for (NodeImpl node : nodesToRemove.values()) 
+		for (Node node : nodesToRemove.values()) 
 		{
-			network.removeNode(node);
+			(network).removeNode(node);
 		}
 	}
 	
@@ -127,11 +127,11 @@ public class TestNodeSelection {
 	
 	public static void main(String[] args)
 	{
-		Gbl.createConfig(null);
+		Scenario scenario = new ScenarioImpl();
 		
 		TestNodeSelection tns = new TestNodeSelection();
 		tns.init();
-		tns.loadNetwork();
+		tns.loadNetwork(scenario);
 		tns.testDijkstraSelector();
 		//tns.testCircularSelector();
 		tns.getIncludedLinks();

@@ -28,10 +28,10 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.StringUtils;
@@ -52,12 +52,14 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	private final static String LINK = "link";
 
 	private final NetworkImpl network;
+	private final Scenario scenario;
 
 	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
 
-	public NetworkReaderMatsimV1(final NetworkImpl network) {
+	public NetworkReaderMatsimV1(final Scenario scenario) {
 		super();
-		this.network = network;
+		this.scenario = scenario;
+		this.network = (NetworkImpl) scenario.getNetwork();
 	}
 
 	@Override
@@ -147,7 +149,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startNode(final Attributes atts) {
 		//TODO dg refactor network to support factory and remove cast
-		Node node = ((NetworkLayer)this.network).createAndAddNode( new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+		Node node = ((NetworkLayer)this.network).createAndAddNode(this.scenario.createId(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
 		((NodeImpl) node).setType(atts.getValue("type"));
 		if (atts.getValue("origid") != null) {
 			((NodeImpl) node).setOrigId(atts.getValue("origid"));
@@ -157,7 +159,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	private void startLink(final Attributes atts) {
 		//TODO dg refactor network to support factory/builder and remove cast
 		
-		Link l = this.network.getFactory().createLink(new IdImpl(atts.getValue("id")), new IdImpl(atts.getValue("from")), new IdImpl(atts.getValue("to")));
+		Link l = this.network.getFactory().createLink(this.scenario.createId(atts.getValue("id")), this.scenario.createId(atts.getValue("from")), this.scenario.createId(atts.getValue("to")));
 		l.setLength(Double.parseDouble(atts.getValue("length")));
 		l.setFreespeed(Double.parseDouble(atts.getValue("freespeed")));
 		l.setCapacity(Double.parseDouble(atts.getValue("capacity")));

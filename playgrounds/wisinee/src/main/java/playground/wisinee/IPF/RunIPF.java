@@ -60,11 +60,15 @@ import java.util.Properties;
 //				runIpfCal(testPropertyFile);
 //			}
 			
-			public void runIpfCal(String PropFile){	
+			public void runIpfCal(String propFile){	
 	
 				Properties props = new Properties();
 				try{
-					props.loadFromXML( new FileInputStream(PropFile) );
+					if (new File(propFile).exists()) {
+						props.loadFromXML( new FileInputStream(propFile) );
+					} else {
+						props.loadFromXML(RunIPF.class.getClassLoader().getResourceAsStream(propFile));
+					}
 					householdFile = props.getProperty("household File");
 					surveyFile = props.getProperty("survey File");
 					distributionFile = props.getProperty("distribution File");

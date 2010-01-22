@@ -7,13 +7,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
@@ -33,7 +33,7 @@ public class NetworkThiningForDijkstra {
 	private double time = Time.UNDEFINED_TIME;
 	
 	// CostCalculator for the Dijkstra Algorithm
-	private TravelCost costCalculator = new FreespeedTravelTimeCost();
+	private TravelCost costCalculator = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
 	private DijkstraForSelectNodes dijkstra;
 	
 	private Map<Id, Link> notUsedLinks;
@@ -42,17 +42,13 @@ public class NetworkThiningForDijkstra {
 	
 	public static void main(String[] args)
 	{
-		// create Config
-		Config config = new Config();
-		config.addCoreModules();
-		config.checkConsistency();
-		Gbl.setConfig(config);
+		Scenario scenario = new ScenarioImpl();
 		
 		// load Network
 		//String networkFile = "mysimulations/kt-zurich/input/network.xml";
 		String networkFile = "mysimulations/kt-zurich-cut/network.xml";
-		NetworkLayer nw = new NetworkLayer();
-		new MatsimNetworkReader(nw).readFile(networkFile);
+		Network nw = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		
 		log.info("Network has " + nw.getLinks().size() + " Links.");
 		log.info("Network has " + nw.getNodes().size() + " Nodes.");
@@ -219,10 +215,9 @@ public class NetworkThiningForDijkstra {
 	 */
 	private static class ThinningThread extends Thread
 	{
-		private Network network;
 		
 		// CostCalculator for the Dijkstra Algorithm
-		private TravelCost costCalculator = new FreespeedTravelTimeCost();
+		private TravelCost costCalculator = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());
 		private DijkstraForSelectNodes dijkstra;
 		
 		private Map<Id, Link> notUsedLinks;
@@ -235,7 +230,6 @@ public class NetworkThiningForDijkstra {
 		
 		public ThinningThread(Network network, List<Node> nodes)
 		{
-			this.network = network;
 			this.nodes = nodes;
 			this.thread = threadCounter++;
 			

@@ -22,7 +22,8 @@ package org.matsim.world;
 
 import java.util.Stack;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -39,14 +40,16 @@ public class WorldReaderMatsimV0 extends MatsimXmlParser {
 	private final static String MUNICIPALITY = "municipality";
 	private final static String HEKTAR = "hektar";
 
+	private Scenario scenario;
 	private World world;
 	private ZoneLayer hektar_layer = null;
 	private ZoneLayer currLayer = null;
 	private Zone currZone = null;
 	private int hektar_cnt;
 
-	public WorldReaderMatsimV0(final World world) {
-		this.world = world;
+	public WorldReaderMatsimV0(final ScenarioImpl scenario) {
+		this.scenario = scenario;
+		this.world = scenario.getWorld();
 		this.hektar_cnt = 1;
 	}
 
@@ -78,21 +81,21 @@ public class WorldReaderMatsimV0 extends MatsimXmlParser {
 
 	private void startWorld(final Attributes atts) {
 		this.world.setName(atts.getValue("name"));
-		this.hektar_layer = (ZoneLayer)this.world.createLayer(new IdImpl("hektar"), "created by " + this.getClass().getName() + " from a world_v0-file");
-		this.currLayer = (ZoneLayer)this.world.createLayer(new IdImpl("municipality"), "created by " + this.getClass().getName() + " from a world_v0-file");
+		this.hektar_layer = (ZoneLayer)this.world.createLayer(scenario.createId("hektar"), "created by " + this.getClass().getName() + " from a world_v0-file");
+		this.currLayer = (ZoneLayer)this.world.createLayer(scenario.createId("municipality"), "created by " + this.getClass().getName() + " from a world_v0-file");
 		this.world.createMappingRule("hektar[+]-[1]municipality");
 	}
 
 	private void startZone(final Attributes atts) {
 		this.currZone =
-			this.currLayer.createZone(atts.getValue("id"),null,null,null,null,null,null,null,atts.getValue("name"));
+			this.currLayer.createZone(scenario.createId(atts.getValue("id")),null,null,null,null,null,null,null,atts.getValue("name"));
 	}
 
 	private void startRef(final Attributes meta) {
 		int x_min = Integer.parseInt(meta.getValue("x100"));
 		int y_min = Integer.parseInt(meta.getValue("y100"));
 		Zone hektar_zone =
-			this.hektar_layer.createZone(Integer.toString(this.hektar_cnt), Integer.toString(x_min+50), Integer.toString(y_min+50),
+			this.hektar_layer.createZone(scenario.createId(Integer.toString(this.hektar_cnt)), Integer.toString(x_min+50), Integer.toString(y_min+50),
 																	 Integer.toString(x_min), Integer.toString(y_min), Integer.toString(x_min+100), Integer.toString(y_min+100),
 																	 Integer.toString(10000), "hektar of " + this.currZone.getName());
 		this.hektar_cnt++;

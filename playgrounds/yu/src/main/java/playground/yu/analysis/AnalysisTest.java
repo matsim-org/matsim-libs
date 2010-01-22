@@ -93,7 +93,7 @@ public class AnalysisTest {
 
 		ScenarioImpl scenario2 = new ScenarioImpl();
 		Network network = scenario2.getNetwork();
-		new MatsimNetworkReader(scenario2.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario2).readFile(netFilename);
 
 		// toll
 		RoadPricingScheme toll = null;

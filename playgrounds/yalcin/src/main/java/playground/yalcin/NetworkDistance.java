@@ -31,6 +31,7 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -65,8 +66,9 @@ public class NetworkDistance {
 	private final static String networkKmzFilename = "../mystudies/yalcin/berlin_wipnet.kmz";
 
 	public static void exportNetwork() {
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
 
@@ -100,8 +102,9 @@ public class NetworkDistance {
 	}
 
 	public static void convertNetwork() {
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
 		new NetworkTransform(ct).run(network);
@@ -109,8 +112,9 @@ public class NetworkDistance {
 	}
 
 	public static void findDistances() {
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(wgs84NetworkFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(wgs84NetworkFilename);
 
 		// set the config to only look at distance costs, not travel time costs
 		Config config = Gbl.createConfig(null);

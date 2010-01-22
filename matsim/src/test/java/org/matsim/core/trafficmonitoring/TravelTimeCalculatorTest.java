@@ -28,8 +28,10 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
@@ -96,7 +98,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		String eventsFile = getClassInputDirectory() + "link10_events.txt";
 
 		NetworkImpl network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFile);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
@@ -215,11 +217,10 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		String eventsFilename = getClassInputDirectory() + "link10_events.txt";
 		String networkFile = "test/scenarios/equil/network.xml";
 		
-		Config config = new Config();
-		config.addCoreModules();
-		
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).parse(networkFile);
+		Scenario scenario = new ScenarioImpl();
+		Config config = scenario.getConfig();
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).parse(networkFile);
 		
 		EventsManagerImpl events = new EventsManagerImpl(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
 		
@@ -228,7 +229,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		
 		new MatsimEventsReader(events).readFile(eventsFilename);
 		
-		LinkImpl link10 = network.getLinks().get(new IdImpl("10"));
+		Link link10 = network.getLinks().get(new IdImpl("10"));
 		
 		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTime(link10, 6.0 * 3600), EPSILON);
 		assertEquals("wrong link travel time at 06:15.", 359.9712023038157, ttCalc.getLinkTravelTime(link10, 6.25 * 3600), EPSILON);

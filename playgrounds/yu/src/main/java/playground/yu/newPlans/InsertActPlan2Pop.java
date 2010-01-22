@@ -29,7 +29,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  */
 public class InsertActPlan2Pop extends NewPopulation implements PlanAlgorithm {
-	private Random r = MatsimRandom.getLocalInstance();
+	private final Random r = MatsimRandom.getLocalInstance();
 
 	/**
 	 * @param population
@@ -66,7 +66,7 @@ public class InsertActPlan2Pop extends NewPopulation implements PlanAlgorithm {
 		ScenarioImpl s = new ScenarioImpl();
 
 		NetworkLayer network = s.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(s).readFile(netFilename);
 
 		PopulationImpl population = s.getPopulation();
 		new MatsimPopulationReader(s).readFile(plansFilename);

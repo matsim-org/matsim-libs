@@ -57,12 +57,12 @@ public class DeriveSmallScenarioFromBigOne {
 		ScenarioImpl bigNetScenario = new ScenarioImpl();
 		log.info("Reading network " + bigNetworkFile);
 		NetworkLayer bigNet = bigNetScenario.getNetwork();
-		new MatsimNetworkReader(bigNet).readFile(bigNetworkFile);
+		new MatsimNetworkReader(bigNetScenario).readFile(bigNetworkFile);
 
 		ScenarioImpl smallNetScenario = new ScenarioImpl();
 		log.info("Reading network " + smallNetworkFile);
 		NetworkLayer smallNet = smallNetScenario.getNetwork();
-		new MatsimNetworkReader(smallNet).readFile(smallNetworkFile);
+		new MatsimNetworkReader(smallNetScenario).readFile(smallNetworkFile);
 
 		log.info("Reading routed population: " + wholeRoutedPlansFile);
 		PopulationImpl wholeRoutedPop = new ScenarioImpl().getPopulation();

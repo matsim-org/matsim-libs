@@ -61,7 +61,7 @@ public class ZurichSignalVis {
 		//this is hack
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFile);
+		new MatsimNetworkReader(scenario).readFile(netFile);
 		new MatsimPopulationReader(scenario).readFile(popFile);
 
 		EventsManagerImpl events = new EventsManagerImpl();

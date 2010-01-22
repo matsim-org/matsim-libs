@@ -21,6 +21,9 @@
 package org.matsim.core.network;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -108,37 +111,13 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		final World world = new World();
 
 		log.info("  reading network xml file independent of the world...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		Scenario scenario = new ScenarioImpl(this.config);
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		world.complete();
 		log.info("  done.");
 
-		this.runModules(network, world);
-
-		TriangleScenario.writeConfig(this.config);
-		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeWorld(world);
-
-		this.compareOutputNetwork();
-		this.checkEmptyOutputWorld();
-
-		log.info("done.");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	public void testParserWriter_asWorldLayer() {
-		log.info("running testParserWriter2()...");
-
-		final World world = new World();
-
-		log.info("  reading network xml file as a layer of the world...");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-		world.complete();
-		log.info("  done.");
-
-		this.runModules(network, world);
+		this.runModules((NetworkLayer) network, world);
 
 		TriangleScenario.writeConfig(this.config);
 		TriangleScenario.writeNetwork(network);
@@ -155,10 +134,11 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 	public void testParserWriter_withWorld_readWorldFirst() {
 		log.info("running testParserWriter3()...");
 
-		final World world = new World();
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		final World world = scenario.getWorld();
 
 		log.info("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
 		world.complete();
 		log.info("  done.");
@@ -168,8 +148,8 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  reading network xml file as a layer of the world... ");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		world.complete();
 		log.info("  done.");
 
@@ -190,18 +170,19 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 	public void testParserWriter_withWorld_readNetworkFirst() {
 		log.info("running testParserWriter4()...");
 
-		final World world = new World();
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		final World world = scenario.getWorld();
 
 		log.info("  reading network xml file as a layer of the world... ");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		world.complete();
 		log.info("  done.");
 
 		this.runModules(network, world);
 
 		log.info("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
 		world.complete();
 		log.info("  done.");

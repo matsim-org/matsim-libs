@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -48,14 +49,16 @@ public class CountsIdUpdater {
 
 		int cnt = 0;
 
-		NetworkLayer oldNet = new NetworkLayer();
-		new MatsimNetworkReader(oldNet).readFile(oldNetFile);
+		ScenarioImpl oldScenario = new ScenarioImpl();
+		NetworkLayer oldNet = oldScenario.getNetwork();
+		new MatsimNetworkReader(oldScenario).readFile(oldNetFile);
 
 		Counts oldCounts = new Counts();
 		new MatsimCountsReader(oldCounts).readFile(oldCountsFile);
 
-		NetworkLayer newNet = new NetworkLayer();
-		new MatsimNetworkReader(newNet).readFile(newNetFile);
+		ScenarioImpl newScenario = new ScenarioImpl();
+		NetworkLayer newNet = newScenario.getNetwork();
+		new MatsimNetworkReader(newScenario).readFile(newNetFile);
 
 		Counts newCounts = new Counts();
 		newCounts.setYear(2000);

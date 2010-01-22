@@ -63,7 +63,7 @@ public class PlansPrepare {
 
 	public void loadNetwork(final String filename) {
 		log.info("reading network: " + filename);
-		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(filename);
+		new MatsimNetworkReader(this.scenario).readFile(filename);
 		log.info("network-statistics:");
 		log.info("  # nodes = " + this.scenario.getNetwork().getNodes().size());
 		log.info("  # links = " + this.scenario.getNetwork().getLinks().size());

@@ -162,8 +162,7 @@ public class MergeCoord {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		log.info("Start reading file " + plansFilename);
-		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		log.info("Start reading file " + plansFilename);
 		PopulationImpl population = scenario.getPopulation();
@@ -242,7 +241,7 @@ public class MergeCoord {
 		ScenarioImpl scenario = new ScenarioImpl();
 		log.info("Start reading file " + plansFilename);
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		log.info("Start reading file " + plansFilename);
 		PopulationImpl population = scenario.getPopulation();

@@ -235,14 +235,14 @@ public class MyRuns {
 		// - network
 		logger.info("Reading network xml file...");
 		NetworkImpl network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		logger.info("Reading network xml file...done.");
 
 		// - facilities
 		logger.info("Reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		try {
-			new MatsimFacilitiesReader(facilities).parse(config.facilities().getInputFile());
+			new MatsimFacilitiesReader(scenario).parse(config.facilities().getInputFile());
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -396,7 +396,7 @@ public class MyRuns {
 		// - network
 		logger.info("Reading network xml file...");
 		NetworkImpl network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		logger.info("Reading network xml file...done.");
 		// - population
 		PersonAlgorithm pa = new PersonAnalyseTimesByActivityType(TIME_BIN_SIZE);

@@ -50,7 +50,7 @@ public class EventFilterTestLaerm {
 		System.out.println("  done.");
 
 		System.out.println("  reading network file... ");
-		new MatsimNetworkReader(network).readFile(config.network()
+		new MatsimNetworkReader(scenario).readFile(config.network()
 				.getInputFile());
 		System.out.println("  done.");
 		// plans

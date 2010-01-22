@@ -26,6 +26,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -42,16 +43,16 @@ public class MatsimWorldReader extends MatsimXmlParser {
 	private final static String WORLD_V1 = "world_v1.dtd";
 	private final static String WORLD_V2 = "world_v2.dtd";
 
-	private final World world;
+	private final ScenarioImpl scenario;
 	private MatsimXmlParser delegate = null;
 
 	/**
 	 * Creates a new reader for MATSim world files.
 	 *
-	 * @param world The World-object to store the data in.
+	 * @param scenario The Scenario-object to store the world in.
 	 */
-	public MatsimWorldReader(final World world) {
-		this.world = world;
+	public MatsimWorldReader(final ScenarioImpl scenario) {
+		this.scenario = scenario;
 	}
 
 	@Override
@@ -86,13 +87,13 @@ public class MatsimWorldReader extends MatsimXmlParser {
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
 		if (WORLD_V0.equals(doctype)) {
-			this.delegate = new WorldReaderMatsimV0(this.world);
+			this.delegate = new WorldReaderMatsimV0(this.scenario);
 			Logger.getLogger(MatsimWorldReader.class).info("using world_v0-reader.");
 		} else if (WORLD_V1.equals(doctype)) {
-			this.delegate = new WorldReaderMatsimV1(this.world);
+			this.delegate = new WorldReaderMatsimV1(this.scenario);
 			Logger.getLogger(MatsimWorldReader.class).info("using world_v1-reader.");
 		} else if (WORLD_V2.equals(doctype)) {
-			this.delegate = new WorldReaderMatsimV2(this.world);
+			this.delegate = new WorldReaderMatsimV2(this.scenario);
 			Logger.getLogger(MatsimWorldReader.class).info("using world_v2-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

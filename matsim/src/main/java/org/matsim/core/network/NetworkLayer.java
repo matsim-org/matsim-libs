@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
@@ -106,7 +107,7 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 
 	@Deprecated
 	public Location getLocation(String location_id) {
-		return layerDelegate.getLocation(location_id);
+		return layerDelegate.getLocation(new IdImpl(location_id));
 	}
 
 	public TreeMap<Id, ? extends MappedLocation> getLocations() {

@@ -29,14 +29,15 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
@@ -207,7 +208,7 @@ public class OTFVis {
 	public static final void playNetwork(final String[] args) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
+		new MatsimNetworkReader(scenario).readFile(args[0]);
 		EventsManagerImpl events = new EventsManagerImpl();
 		OTFVisQueueSim queueSimulation = new OTFVisQueueSim(scenario, events);
 		queueSimulation.run();
@@ -226,8 +227,9 @@ public class OTFVis {
 		if (args.length == 5) {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(networkFile);
+		Scenario scenario = new ScenarioImpl();
+		Network net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		OTFEvent2MVI converter = new OTFEvent2MVI(new QueueNetwork(net), eventFile, mviFile, snapshotPeriod);
 		converter.convert();
 	}

@@ -22,7 +22,8 @@ package org.matsim.world;
 
 import java.util.Stack;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -41,12 +42,14 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	private final static String ZONE = "zone";
 	private final static String REF = "ref";
 
+	private Scenario scenario;
 	private World world;
 	private ZoneLayer currLayer = null;
 	private MappingRule currMappingRule = null;
 
-	public WorldReaderMatsimV2(final World world) {
-		this.world = world;
+	public WorldReaderMatsimV2(final ScenarioImpl scenario) {
+		this.scenario = scenario;
+		this.world = scenario.getWorld();
 	}
 
 	@Override
@@ -83,11 +86,11 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	}
 
 	private void startLayer(final Attributes meta) {
-		this.currLayer = (ZoneLayer)this.world.createLayer(new IdImpl(meta.getValue("type")),meta.getValue("name"));
+		this.currLayer = (ZoneLayer)this.world.createLayer(scenario.createId(meta.getValue("type")),meta.getValue("name"));
 	}
 
 	private void startZone(final Attributes atts) {
-		this.currLayer.createZone(atts.getValue("id"), atts.getValue("center_x"), atts.getValue("center_y"), atts.getValue("min_x"), atts.getValue("min_y"),
+		this.currLayer.createZone(scenario.createId(atts.getValue("id")), atts.getValue("center_x"), atts.getValue("center_y"), atts.getValue("min_x"), atts.getValue("min_y"),
 				 atts.getValue("max_x"), atts.getValue("max_y"), atts.getValue("area"), atts.getValue("name"));
 	}
 
@@ -96,7 +99,7 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	}
 
 	private void startRef(final Attributes atts) {
-		this.world.addMapping(this.currMappingRule, atts.getValue("down_zone_id"), atts.getValue("up_zone_id"));
+		this.world.addMapping(this.currMappingRule, scenario.createId(atts.getValue("down_zone_id")), scenario.createId(atts.getValue("up_zone_id")));
 	}
 
 }

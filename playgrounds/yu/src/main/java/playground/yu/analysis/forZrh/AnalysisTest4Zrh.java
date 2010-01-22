@@ -31,7 +31,6 @@ import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -116,12 +115,10 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 		ScenarioImpl s = new ScenarioImpl();
 
 		NetworkLayer network = s.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(s).readFile(netFilename);
 		// facilities
-		ActivityFacilitiesImpl af = null;
 		if (facilitiesFilename != null) {
-			af = s.getActivityFacilities();
-			new MatsimFacilitiesReader(af).readFile(facilitiesFilename);
+			new MatsimFacilitiesReader(s).readFile(facilitiesFilename);
 		}
 		// toll
 		RoadPricingScheme toll = null;

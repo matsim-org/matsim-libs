@@ -69,7 +69,7 @@ public class DDcontroller {
 		ScenarioImpl scenario = new ScenarioImpl();
 
 		NetworkImpl network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);

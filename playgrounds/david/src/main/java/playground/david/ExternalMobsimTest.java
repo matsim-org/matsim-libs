@@ -38,7 +38,7 @@ public class ExternalMobsimTest {
 		Config config = Gbl.createConfig(defaultArgs);
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("e:/Development/tmp/studies/equil//equil_netENG.xml");
+		new MatsimNetworkReader(scenario).readFile("e:/Development/tmp/studies/equil//equil_netENG.xml");
 
 		System.out.println("[External MOBSIM called"  + "]");
 

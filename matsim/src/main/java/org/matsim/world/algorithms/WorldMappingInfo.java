@@ -23,7 +23,6 @@ package org.matsim.world.algorithms;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.world.Layer;
 import org.matsim.world.MappedLocation;
 import org.matsim.world.MappingRule;
@@ -65,11 +64,16 @@ public class WorldMappingInfo {
 		int minmap = Integer.MAX_VALUE;
 		int maxmap = Integer.MIN_VALUE;
 		Iterator<? extends MappedLocation> ul_it = up_layer.getLocations().values().iterator();
-		while (ul_it.hasNext()) {
-			MappedLocation ul = ul_it.next();
-			int map = ul.getDownMapping().size();
-			if (minmap > map) { minmap = map; }
-			if (maxmap < map) { maxmap = map; }
+		if (ul_it.hasNext()) {
+			while (ul_it.hasNext()) {
+				MappedLocation ul = ul_it.next();
+				int map = ul.getDownMapping().size();
+				if (minmap > map) { minmap = map; }
+				if (maxmap < map) { maxmap = map; }
+			}
+		} else {
+			minmap = 0;
+			maxmap = 0;
 		}
 		range = range + "(" + minmap + "..." + maxmap +")-";
 		char curr_down_cardinality = Character.UNASSIGNED;
@@ -80,18 +84,23 @@ public class WorldMappingInfo {
 		else if ((minmap == 1) && (maxmap > 1)) { curr_down_cardinality = '+'; }
 		else if ((minmap > 1) && (maxmap > 1)) { curr_down_cardinality = '+'; }
 		else {
-			throw new RuntimeException("invalid.");
+			throw new RuntimeException("invalid. minmap="+minmap+", maxmap="+maxmap);
 		}
 
 		// calculate current up cardinality
 		minmap = Integer.MAX_VALUE;
 		maxmap = Integer.MIN_VALUE;
 		Iterator<? extends MappedLocation> dl_it = down_layer.getLocations().values().iterator();
-		while (dl_it.hasNext()) {
-			MappedLocation dl = dl_it.next();
-			int map = dl.getUpMapping().size();
-			if (minmap > map) { minmap = map; }
-			if (maxmap < map) { maxmap = map; }
+		if (dl_it.hasNext()) {
+			while (dl_it.hasNext()) {
+				MappedLocation dl = dl_it.next();
+				int map = dl.getUpMapping().size();
+				if (minmap > map) { minmap = map; }
+				if (maxmap < map) { maxmap = map; }
+			}
+		} else {
+			minmap = 0;
+			maxmap = 0;
 		}
 		range = range + "(" + minmap + "..." + maxmap +")" + up_layer.getType().toString();
 		char curr_up_cardinality = Character.UNASSIGNED;

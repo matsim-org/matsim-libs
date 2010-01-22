@@ -26,12 +26,15 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -65,7 +68,7 @@ public class RouterVis {
 	 * @param timeCalculator
 	 * @param router 
 	 */
-	public RouterVis(final NetworkLayer network, final TravelCost costCalculator,
+	public RouterVis(final Network network, final TravelCost costCalculator,
 			final TravelTime timeCalculator, final Class<? extends VisLeastCostPathCalculator> router){
 		this.writer = getNetStateWriter(network);
 		final Class[] prototypeConstructor = { NetworkLayer.class,
@@ -108,7 +111,7 @@ public class RouterVis {
  *
  * @return route
  */
-	public Path runRouter(final NodeImpl fromNode, final NodeImpl toNode, final double time){
+	public Path runRouter(final Node fromNode, final Node toNode, final double time){
 		final Path path = this.router.calcLeastCostPath(fromNode, toNode, time);
 
 		try {
@@ -119,7 +122,7 @@ public class RouterVis {
 		return path;
 	}
 
-	private RouterNetStateWriter getNetStateWriter(final NetworkLayer network) {
+	private RouterNetStateWriter getNetStateWriter(final Network network) {
 		final String snapshotFile = Gbl.getConfig().controler().getOutputDirectory() + "/Snapshot";
 
 		final Config config = Gbl.getConfig();
@@ -182,9 +185,9 @@ public class RouterVis {
 		config.controler().setOutputDirectory(config.controler().getOutputDirectory() + outputDirSuffix);
 
 		log.info("  reading the network...");
-		NetworkLayer network = null;
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		Scenario scenario = new ScenarioImpl();
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		log.info("  done.");
 
 		log.info("  creating output dir if needed");
@@ -204,8 +207,8 @@ public class RouterVis {
 		log.info("  done.");
 
 		log.info("  running RouterVis.");
-		final NodeImpl fromNode = network.getNodes().get(new IdImpl(fromNodeId.toString()));
-		final NodeImpl toNode = network.getNodes().get(new IdImpl(toNodeId.toString()));
+		final Node fromNode = network.getNodes().get(new IdImpl(fromNodeId.toString()));
+		final Node toNode = network.getNodes().get(new IdImpl(toNodeId.toString()));
 		vis.runRouter(fromNode, toNode,0.0);
 		log.info("  done.");
 

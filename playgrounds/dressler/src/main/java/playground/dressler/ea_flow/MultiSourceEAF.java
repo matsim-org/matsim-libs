@@ -444,7 +444,7 @@ public class MultiSourceEAF {
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
 		NetworkLayer network = scenario.getNetwork();
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(networkfile);
 		Node sink = network.getNodes().get(new IdImpl(sinkid));
 

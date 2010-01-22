@@ -28,10 +28,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -60,6 +60,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 
 	private final Population plans;
 	private final Network network;
+	private final Scenario scenario;
 
 	private PersonImpl currperson = null;
 
@@ -72,9 +73,10 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 
 	private ActivityImpl prevAct = null;
 
-	public PopulationReaderMatsimV1(final Population plans, final Network network) {
-		this.plans = plans;
-		this.network = network;
+	public PopulationReaderMatsimV1(final Scenario scenario) {
+		this.plans = scenario.getPopulation();
+		this.network = scenario.getNetwork();
+		this.scenario = scenario;
 	}
 
 	@Override
@@ -152,7 +154,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new PersonImpl(new IdImpl(atts.getValue("id")));
+		this.currperson = new PersonImpl(this.scenario.createId(atts.getValue("id")));
 		this.currperson.setSex(atts.getValue("sex"));
 		this.currperson.setAge(Integer.parseInt(atts.getValue("age")));
 		this.currperson.setLicence(atts.getValue("license"));
@@ -189,7 +191,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		Coord coord = null;
 		ActivityImpl act = null;
 		if (atts.getValue("link") != null) {
-			linkId = new IdImpl(atts.getValue("link"));
+			linkId = this.scenario.createId(atts.getValue("link"));
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
 			if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
 				coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));

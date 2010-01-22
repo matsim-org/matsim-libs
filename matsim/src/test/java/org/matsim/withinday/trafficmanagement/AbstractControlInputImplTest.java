@@ -20,11 +20,13 @@
 
 package org.matsim.withinday.trafficmanagement;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -36,9 +38,9 @@ import org.matsim.testcases.MatsimTestCase;
 public class AbstractControlInputImplTest extends MatsimTestCase {
 
 	public void testAbstractControlInputImpl() {
-		super.loadConfig(null);
-		NetworkLayer network = new NetworkLayer();
-		MatsimNetworkReader parser = new MatsimNetworkReader(network);
+		Scenario scenario = new ScenarioImpl(super.loadConfig(null));
+		Network network = scenario.getNetwork();
+		MatsimNetworkReader parser = new MatsimNetworkReader(scenario);
 		parser.readFile(getInputDirectory() + "network.xml");
 
 		NetworkRouteWRefs route1 = new NodeNetworkRouteImpl();

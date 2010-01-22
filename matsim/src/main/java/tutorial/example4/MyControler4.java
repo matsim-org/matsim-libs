@@ -44,7 +44,7 @@ public class MyControler4 {
 		ScenarioImpl scenario = loader.getScenario();
 		Config config = scenario.getConfig();
 
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();

@@ -37,7 +37,7 @@ import playground.yu.utils.io.SimpleWriter;
 public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	private RoadPricingScheme toll = null;
-	private SimpleWriter sw;
+	private final SimpleWriter sw;
 	private double w2hLinearDist = 0.0, legLinearDist = 0.0;
 	private int w2hCnt = 0, legCnt = 0, personCnt = 0;
 
@@ -79,8 +79,8 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 	}
 
 	public void write() {
-		double avgW2hLD = w2hLinearDist / (double) w2hCnt;
-		double avgLegLD = legLinearDist / (double) legCnt;
+		double avgW2hLD = w2hLinearDist / w2hCnt;
+		double avgLegLD = legLinearDist / legCnt;
 		sw.writeln("avg. Work2home\t" + avgW2hLD + "\t" + avgW2hLD / 1000.0);
 		sw.writeln("avg. Leg\t" + avgLegLD + "\t" + avgLegLD / 1000.0);
 		sw.writeln("\npersons :\t" + personCnt + "\tlegs :\t" + legCnt
@@ -101,7 +101,7 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);

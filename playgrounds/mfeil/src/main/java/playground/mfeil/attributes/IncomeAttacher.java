@@ -88,10 +88,10 @@ public class IncomeAttacher {
 		*/
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(network);
-		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilities);
+		new MatsimNetworkReader(scenario).readFile(network);
+		new MatsimFacilitiesReader(scenario).readFile(facilities);
 		new MatsimPopulationReader(scenario).readFile(populationInput);
-		new MatsimWorldReader(scenario.getWorld()).readFile(world);
+		new MatsimWorldReader(scenario).readFile(world);
 
 		IncomeAttacher att = new IncomeAttacher(scenario);
 		att.run(municipalityIncome, agentsEducation, haushalte, zielpersonen);
@@ -102,7 +102,7 @@ public class IncomeAttacher {
 	}
 
 	private static final Logger log = Logger.getLogger(IncomeAttacher.class);
-	private ScenarioImpl scenario;
+	private final ScenarioImpl scenario;
 	private Municipalities municipalities;
 	private Map<Id, Integer> education;					// stores an agent's education level
 	private Map<Integer, double[]> incomePerEducation;	// stores the average income and the average income difference from overall's income for the education levels

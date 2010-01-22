@@ -858,7 +858,7 @@ public class BusLineAllocator {
 		scenario.getConfig().scenario().setUseTransit(true);
 
 		NetworkImpl multiModalNetwork = scenario.getNetwork();
-		new MatsimNetworkReader(multiModalNetwork)
+		new MatsimNetworkReader(scenario)
 				.readFile(multiModalNetworkFile);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
@@ -872,8 +872,9 @@ public class BusLineAllocator {
 			e.printStackTrace();
 		}
 
-		NetworkLayer carNet = new NetworkLayer();
-		new MatsimNetworkReader(carNet).readFile(carNetFile);
+		ScenarioImpl carScenario = new ScenarioImpl();
+		NetworkLayer carNet = carScenario.getNetwork();
+		new MatsimNetworkReader(carScenario).readFile(carNetFile);
 
 		BusLineAllocator busLineAllocator = new BusLineAllocator(carNet,
 				multiModalNetwork, schedule, outputFile);

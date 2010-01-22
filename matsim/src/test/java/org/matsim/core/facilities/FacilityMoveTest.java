@@ -52,11 +52,11 @@ public class FacilityMoveTest extends MatsimTestCase {
 	private final World buildWorld() {
 		World world = new World();
 		ZoneLayer zones = (ZoneLayer)world.createLayer(ZONE_ID,null);
-		zones.createZone("z00","0.5","0.5","0.0","0.0","1.0","1.0","1","z00");
-		zones.createZone("z01","1.5","0.5","1.0","0.0","2.0","1.0","1","z01");
-		zones.createZone("z10","0.5","1.5","0.0","1.0","1.0","2.0","1","z10");
-		zones.createZone("z11","1.5","1.5","1.0","1.0","2.0","2.0","1","z11");
-		zones.createZone("z","1.0","1.0","0.5","0.5","1.5","1.5","1","z");
+		zones.createZone(new IdImpl("z00"),"0.5","0.5","0.0","0.0","1.0","1.0","1","z00");
+		zones.createZone(new IdImpl("z01"),"1.5","0.5","1.0","0.0","2.0","1.0","1","z01");
+		zones.createZone(new IdImpl("z10"),"0.5","1.5","0.0","1.0","1.0","2.0","1","z10");
+		zones.createZone(new IdImpl("z11"),"1.5","1.5","1.0","1.0","2.0","2.0","1","z11");
+		zones.createZone(new IdImpl("z"),"1.0","1.0","0.5","0.5","1.5","1.5","1","z");
 		return world;
 	}
 	

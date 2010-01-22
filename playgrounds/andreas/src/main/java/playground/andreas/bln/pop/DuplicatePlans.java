@@ -21,7 +21,7 @@ import org.matsim.core.population.PopulationReader;
  */
 public class DuplicatePlans extends NewPopulation {
 
-	private int numberOfCopies;
+	private final int numberOfCopies;
 
 	public DuplicatePlans(Network network, Population plans, String filename, int numberOfCopies) {
 		super(network, plans, filename);
@@ -53,7 +53,7 @@ public class DuplicatePlans extends NewPopulation {
 		String outPlansFile = "./plan_korridor_50x.xml.gz";
 
 		NetworkLayer net = sc.getNetwork();
-		new MatsimNetworkReader(net).readFile(networkFile);
+		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		PopulationImpl inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

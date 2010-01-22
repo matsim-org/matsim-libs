@@ -24,30 +24,39 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 
 public class CountsFixture {
 
-	private NetworkLayer network;
+	private Network network;
+	private Scenario scenario;
 	public final Counts counts = new Counts();
 
-	public NetworkLayer getNetwork() {
+	public Scenario getScenario() {
+		return this.scenario;
+	}
+	
+	public Network getNetwork() {
 		return this.network;
 	}
 
 	public void setUp() {
-		String[] args = {"test/input/org/matsim/counts/config.xml"};
-		org.matsim.core.config.Config config = Gbl.createConfig(args);
-
+		String configFile = "test/input/org/matsim/counts/config.xml";
+		
+		Scenario scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		Config config = scenario.getConfig();
+		
 		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
 		counts_parser.readFile(config.counts().getCountsFileName());
 
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(this.network).readFile(config.network().getInputFile());
+		this.network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 	}
 
 	public CountsComparisonAlgorithm getCCA() {

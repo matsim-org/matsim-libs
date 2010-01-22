@@ -13,6 +13,7 @@ import net.opengis.kml._2.LinkType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.Graph;
@@ -52,8 +53,9 @@ public class KMLTravelTimeStyle extends KMLVertexColorStyle<Graph, Vertex> {
 		/*
 		 * read network file
 		 */
-		NetworkLayer network = new NetworkLayer();
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(network);
+			ScenarioImpl scenario = new ScenarioImpl();
+			NetworkLayer network = scenario.getNetwork();
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
 		reader.parse("/Users/fearonni/vsp-work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-changed-with-GTF.xml");
 		/*
 		 * read travel time matrix

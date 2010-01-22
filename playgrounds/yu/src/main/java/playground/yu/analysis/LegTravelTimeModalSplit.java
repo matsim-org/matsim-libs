@@ -207,22 +207,22 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			sw.writeln(Time.writeTime(i * this.binSize) + "\t"
 					+ i * this.binSize + "\t" + this.travelTimes[i] + "\t"
 					+ this.arrCount[i] + "\t"
-					+ this.travelTimes[i] / (double) this.arrCount[i] + "\t"
+					+ this.travelTimes[i] / this.arrCount[i] + "\t"
 					+ this.carTravelTimes[i] + "\t" + this.carArrCount[i]
 					+ "\t"
-					+ this.carTravelTimes[i] / (double) this.carArrCount[i]
+					+ this.carTravelTimes[i] / this.carArrCount[i]
 					+ "\t" + this.ptTravelTimes[i] + "\t" + this.ptArrCount[i]
 					+ "\t"
-					+ this.ptTravelTimes[i] / (double) this.ptArrCount[i]
+					+ this.ptTravelTimes[i] / this.ptArrCount[i]
 					+ "\t" + this.wlkTravelTimes[i] + "\t"
 					+ this.wlkArrCount[i] + "\t" + this.wlkTravelTimes[i]
-					/ (double) this.wlkArrCount[i] + "\t"
+					/ this.wlkArrCount[i] + "\t"
 					+ this.bikeTravelTimes[i] + "\t" + this.bikeArrCount[i]
 					+ "\t" + this.bikeTravelTimes[i]
-					/ (double) this.bikeArrCount[i] + "\t"
+					/ this.bikeArrCount[i] + "\t"
 					+ this.othersTravelTimes[i] + "\t" + this.othersArrCount[i]
 					+ "\t" + this.othersTravelTimes[i]
-					/ (double) this.othersArrCount[i]);
+					/ this.othersArrCount[i]);
 
 		sw.write("----------------------------------------\n");
 		sw
@@ -339,7 +339,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);

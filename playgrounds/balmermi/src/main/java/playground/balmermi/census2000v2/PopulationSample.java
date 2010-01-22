@@ -76,14 +76,14 @@ public class PopulationSample {
 
 		log.info("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		world.complete();
 		Gbl.printMemoryUsage();
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		world.complete();
 		Gbl.printMemoryUsage();
 		System.out.println("  done.");

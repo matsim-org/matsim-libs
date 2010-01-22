@@ -6,11 +6,11 @@ import java.util.SortedSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 
 public class ReadKonradFacilities {
@@ -21,8 +21,9 @@ public class ReadKonradFacilities {
 		
 		List<ZHFacilityComposed> zhfacilities = new Vector<ZHFacilityComposed>();
 		
-		ActivityFacilitiesImpl facilities=new ActivityFacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new FacilitiesReaderMatsimV1(facilities).readFile(file);
+		ScenarioImpl scenario = new ScenarioImpl();
+		ActivityFacilitiesImpl facilities=scenario.getActivityFacilities();
+		new FacilitiesReaderMatsimV1(scenario).readFile(file);
 		
 		Iterator<? extends ActivityFacilityImpl> facilities_it = facilities.getFacilities().values().iterator();
 		while (facilities_it.hasNext()) {

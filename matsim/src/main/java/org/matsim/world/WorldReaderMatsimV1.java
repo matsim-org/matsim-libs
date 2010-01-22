@@ -22,7 +22,8 @@ package org.matsim.world;
 
 import java.util.Stack;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -39,13 +40,15 @@ public class WorldReaderMatsimV1 extends MatsimXmlParser {
 	private final static String ZONE = "zone";
 	private final static String REF = "ref";
 
+	private Scenario scenario;
 	private World world;
 	private ZoneLayer currLayer = null;
 	private Zone currZone = null;
 	private MappingRule currMappingrule = null;
 
-	public WorldReaderMatsimV1(final World world) {
-		this.world = world;
+	public WorldReaderMatsimV1(final ScenarioImpl scenario) {
+		this.scenario = scenario;
+		this.world = scenario.getWorld();
 	}
 
 	@Override
@@ -80,10 +83,10 @@ public class WorldReaderMatsimV1 extends MatsimXmlParser {
 		this.currLayer = (ZoneLayer)this.world.getLayer(atts.getValue("type"));
 		if (this.currLayer==null) {
 			this.currLayer =
-				(ZoneLayer)this.world.createLayer(new IdImpl(atts.getValue("type")),"created by "+this.getClass().getName()+" by zone (id="+atts.getValue("id")+")");
+				(ZoneLayer)this.world.createLayer(scenario.createId(atts.getValue("type")),"created by "+this.getClass().getName()+" by zone (id="+atts.getValue("id")+")");
 		}
 		this.currZone =
-			this.currLayer.createZone(atts.getValue("id"), atts.getValue("center_x"), atts.getValue("center_y"), atts.getValue("min_x"), atts.getValue("min_y"),
+			this.currLayer.createZone(scenario.createId(atts.getValue("id")), atts.getValue("center_x"), atts.getValue("center_y"), atts.getValue("min_x"), atts.getValue("min_y"),
 																 atts.getValue("max_x"), atts.getValue("max_y"), atts.getValue("area"), atts.getValue("name"));
 	}
 
@@ -91,7 +94,7 @@ public class WorldReaderMatsimV1 extends MatsimXmlParser {
 		ZoneLayer other_layer = (ZoneLayer)this.world.getLayer(meta.getValue("type"));
 		if (other_layer != null) {
 			// that layer was already read in. so the zone of that layer must exist
-			Zone other_zone = (Zone)other_layer.getLocation(meta.getValue("id"));
+			Zone other_zone = (Zone)other_layer.getLocation(scenario.createId(meta.getValue("id")));
 			if (other_zone != null) {
 				// we found the zone in the other layer
 				// check for the four different mapping situations:

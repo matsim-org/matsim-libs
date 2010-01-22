@@ -25,7 +25,7 @@ import playground.yu.analysis.PlanModeJudger;
  */
 public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 	private Person person = null;
-	private List<Plan> tmpPersonPlans = new ArrayList<Plan>();
+	private final List<Plan> tmpPersonPlans = new ArrayList<Plan>();
 
 	/**
 	 * @param plans
@@ -72,7 +72,7 @@ public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		population.setIsStreaming(true);

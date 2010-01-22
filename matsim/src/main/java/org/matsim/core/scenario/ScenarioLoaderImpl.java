@@ -65,9 +65,9 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 
 	private static final Logger log = Logger.getLogger(ScenarioLoaderImpl.class);
 
-	private Config config;
+	private final Config config;
 
-	private Scenario scenario;
+	private final Scenario scenario;
 
 	public ScenarioLoaderImpl(Config config) {
 		this.config = config;
@@ -132,7 +132,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 			}
 				if (network instanceof NetworkLayer) {
 					try {
-						new MatsimNetworkReader(network).parse(networkFileName);
+						new MatsimNetworkReader(this.scenario).parse(networkFileName);
 					} catch (SAXException e) {
 						throw new RuntimeException(e);
 					} catch (ParserConfigurationException e) {
@@ -232,7 +232,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		if (worldFileName != null) {
 			log.info("loading world from " + worldFileName);
 			try {
-				new MatsimWorldReader(getScenario().getWorld()).parse(worldFileName);
+				new MatsimWorldReader(getScenario()).parse(worldFileName);
 			} catch (SAXException e) {
 				throw new RuntimeException(e);
 			} catch (ParserConfigurationException e) {
@@ -251,7 +251,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
 			try {
-				new MatsimFacilitiesReader(this.getScenario().getActivityFacilities()).parse(facilitiesFileName);
+				new MatsimFacilitiesReader(this.getScenario()).parse(facilitiesFileName);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

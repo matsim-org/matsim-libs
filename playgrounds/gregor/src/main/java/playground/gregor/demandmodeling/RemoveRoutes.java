@@ -19,7 +19,7 @@ public class RemoveRoutes {
 		String cf = "../../inputs/configs/eafEvac.xml";
 		ScenarioImpl sc = new ScenarioLoaderImpl(cf).getScenario();
 		NetworkLayer net = sc.getNetwork();
-		new MatsimNetworkReader(net).readFile(sc.getConfig().network().getInputFile());
+		new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
 
 		new PopulationReaderMatsimV4(sc).readFile(sc.getConfig().plans().getInputFile());
 		PopulationImpl pop = sc.getPopulation();

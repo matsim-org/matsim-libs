@@ -33,6 +33,8 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -43,7 +45,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -328,8 +329,9 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		final String eventsFilename = args[1];
 		final String outputPath = args[2];
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		Scenario scenario = new ScenarioImpl();
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, 900);
@@ -367,8 +369,9 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		final String roadPricingFilename = args[2];
 		final String outputPath = args[3];
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		Scenario scenario = new ScenarioImpl();
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 

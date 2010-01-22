@@ -26,8 +26,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -58,21 +59,22 @@ public class ReNumberNetwork {
 	
 	public static void main(String[] args)
 	{
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		
 		mapping = new HashMap<Id, Id>();
 		
-		List<NodeImpl> newNodes = new ArrayList<NodeImpl>();
-		List<NodeImpl> oldNodes = new ArrayList<NodeImpl>();
+		List<Node> newNodes = new ArrayList<Node>();
+		List<Node> oldNodes = new ArrayList<Node>();
 				
-		for (NodeImpl node : network.getNodes().values())
+		for (Node node : network.getNodes().values())
 		{
-			Id newId = new IdImpl(startNumber);
+			Id newId = scenario.createId(Integer.toString(startNumber));
 			NodeImpl newNode = new NodeImpl(newId);
 			newNode.setCoord(node.getCoord());
-			newNode.setOrigId(node.getOrigId());	// Put original Id here?
-			newNode.setType(node.getType());
+//			newNode.setOrigId(node.getOrigId());	// Put original Id here?
+//			newNode.setType(node.getType());
 			
 			for (Link link : node.getInLinks().values())
 			{
@@ -92,8 +94,8 @@ public class ReNumberNetwork {
 			startNumber++;
 		}
 		
-		for (NodeImpl node : newNodes) network.addNode(node);
-		for (NodeImpl node : oldNodes) network.getNodes().remove(node.getId());
+		for (Node node : newNodes) network.addNode(node);
+		for (Node node : oldNodes) network.getNodes().remove(node.getId());
 		
 		new NetworkWriter(network).writeFile(outputNetworkFile);
 			

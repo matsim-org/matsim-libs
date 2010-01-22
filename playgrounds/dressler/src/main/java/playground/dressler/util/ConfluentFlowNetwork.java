@@ -21,12 +21,20 @@
 
 package playground.dressler.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.*;
-
-import java.io.*;
-import java.util.HashMap;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 /**
  * @author Daniel Dressler, Manuel Schneider
@@ -102,8 +110,9 @@ public class ConfluentFlowNetwork {
 	
 	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor){
 		//read network
-		NetworkLayer network = new NetworkLayer();
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);		
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);		
 		networkReader.readFile(filename);
 		System.out.println("Network stats: Nodes = " + network.getNodes().size() + ", Edges = " + network.getLinks().size());
 		roundNetwork(network, newcap, flowCapacityFactor, lengthFactor);

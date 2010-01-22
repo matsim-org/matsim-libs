@@ -38,7 +38,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 	public void testWriteGenericRoute() {
 		ScenarioImpl scenario = new ScenarioImpl(super.loadConfig(null));
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
+		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
 		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
 		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
 

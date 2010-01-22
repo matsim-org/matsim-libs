@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
@@ -37,9 +38,10 @@ public class PlansCalcRouteKtiInfo {
 		}
 
 		// municipality layer from world file
-		this.localWorld = new World();
+		ScenarioImpl localScenario = new ScenarioImpl();
+		this.localWorld = localScenario.getWorld();
 		try {
-			new MatsimWorldReader(localWorld).parse(ktiConfigGroup.getWorldInputFilename());
+			new MatsimWorldReader(localScenario).parse(ktiConfigGroup.getWorldInputFilename());
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {

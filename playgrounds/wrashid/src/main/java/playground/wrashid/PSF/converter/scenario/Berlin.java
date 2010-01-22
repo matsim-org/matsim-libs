@@ -18,7 +18,7 @@ public class Berlin {
 		String networkFile = basePathOfData+  "network.xml.gz";
 		
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		new MatsimPopulationReader(scenario).readFile(basePathOfData + "plans_hwh_1pct.xml.gz");
 
 		// generate parking facilities

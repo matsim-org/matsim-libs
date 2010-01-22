@@ -25,10 +25,14 @@ import java.util.EnumSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -44,16 +48,17 @@ import org.xml.sax.SAXException;
  */
 public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase {
 	
-	protected abstract LeastCostPathCalculator getLeastCostPathCalculator(final NetworkLayer network);
+	protected abstract LeastCostPathCalculator getLeastCostPathCalculator(final Network network);
 
 	private static final String MODE_RESTRICTION_NOT_SUPPORTED = "Router algo does not support mode restrictions. ";
 	
 	public void testCalcLeastCostPath_Normal() throws SAXException, ParserConfigurationException, IOException {
-		loadConfig(null);
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
-		NodeImpl node12 = network.getNodes().get(new IdImpl("12"));
-		NodeImpl node15 = network.getNodes().get(new IdImpl("15"));
+		Config config = loadConfig(null);
+		Scenario scenario = new ScenarioImpl(config);
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
+		Node node12 = network.getNodes().get(new IdImpl("12"));
+		Node node15 = network.getNodes().get(new IdImpl("15"));
 
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node15, 8.0*3600);
@@ -70,10 +75,10 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 	}
 
 	public void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
-		loadConfig(null);
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
-		NodeImpl node12 = network.getNodes().get(new IdImpl("12"));
+		Scenario scenario = new ScenarioImpl(loadConfig(null));
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
+		Node node12 = network.getNodes().get(new IdImpl("12"));
 		
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node12, 8.0*3600);

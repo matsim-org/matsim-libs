@@ -30,11 +30,11 @@ import playground.andreas.bln.pop.NewPopulation;
  *
  */
 public class CreateHistogrammFileFromPlan extends NewPopulation {
-	private int planswritten = 0;
+	private final int planswritten = 0;
 	private int personshandled = 0;
 
-	private LinkedList<Integer> group1 = new LinkedList<Integer>();
-	private LinkedList<Integer> group2 = new LinkedList<Integer>();
+	private final LinkedList<Integer> group1 = new LinkedList<Integer>();
+	private final LinkedList<Integer> group2 = new LinkedList<Integer>();
 
 	private TreeMap<Integer, Integer> group1Count = new TreeMap<Integer, Integer>();
 	private TreeMap<Integer, Integer> group2Count = new TreeMap<Integer, Integer>();
@@ -171,7 +171,7 @@ public class CreateHistogrammFileFromPlan extends NewPopulation {
 		String outPlansFile = "./baseplan_car_pt_only.xml.gz";
 
 		NetworkLayer net = sc.getNetwork();
-		new MatsimNetworkReader(net).readFile(networkFile);
+		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		PopulationImpl inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

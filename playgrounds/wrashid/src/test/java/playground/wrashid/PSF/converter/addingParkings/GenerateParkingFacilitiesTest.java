@@ -17,7 +17,7 @@ public class GenerateParkingFacilitiesTest extends MatsimTestCase {
 		String networkFile = "test/scenarios/berlin/network.xml.gz";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
 		
 		GenerateParkingFacilities.generateParkingFacilties(scenario);

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -77,8 +78,9 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		// load data
 		log.info("Reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 
 		// run
@@ -90,8 +92,9 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		// load data
 		log.info("Reading network xml file...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("Reading network xml file...done.");
 
 		// config
@@ -401,8 +404,9 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		
 		// load data
 		log.info("Reading network xml file...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("Reading network xml file...done.");
 
 		// config

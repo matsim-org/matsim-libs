@@ -110,7 +110,7 @@ public class CreateSelectedPlansTables {
 		this.plans1=new ScenarioImpl().getPopulation();
 
 		System.out.println("  reading the network...");
-		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkPath);
+		new MatsimNetworkReader(this.scenario).readFile(networkPath);
 	}
 
 	private void readPlansFile(final String plansfilePath, final PopulationImpl plans) {
@@ -313,7 +313,7 @@ public class CreateSelectedPlansTables {
 	private static class PseudoScenario extends ScenarioImpl {
 		
 		private final ScenarioImpl scenario;
-		private PopulationImpl myPopulation;
+		private final PopulationImpl myPopulation;
 		
 		public PseudoScenario(final ScenarioImpl scenario, final PopulationImpl population) {
 			this.scenario = scenario;

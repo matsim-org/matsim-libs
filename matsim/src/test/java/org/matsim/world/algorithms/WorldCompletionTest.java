@@ -23,9 +23,9 @@ package org.matsim.world.algorithms;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -102,19 +102,19 @@ public class WorldCompletionTest extends MatsimTestCase {
 		HashSet<String> excludingLinkTypes = new HashSet<String>();
 		
 		log.info("  reading world xml file... ");
-		World world = new World();
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(this.config.world().getInputFile());
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		World world = scenario.getWorld();
+		new MatsimWorldReader(scenario).readFile(this.config.world().getInputFile());
 		log.info("  done.");
 
 		log.info("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		log.info("  done.");
 
 		log.info("  reading network xml file as a layer of the world...");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("  done.");
 
 		log.info("  running WorldBottom2TopCompletion module without excludingLinkTypes... ");

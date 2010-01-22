@@ -52,7 +52,7 @@ public class StripPersonPlan extends NewPopulation {
 		String outPlansFile = "./plans3_stripped.xml.gz";
 
 		NetworkLayer net = sc.getNetwork();
-		new MatsimNetworkReader(net).readFile(networkFile);
+		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		PopulationImpl inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

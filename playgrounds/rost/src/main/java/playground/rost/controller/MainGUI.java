@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.xml.sax.SAXException;
@@ -211,8 +212,9 @@ public class MainGUI extends JFrame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		NetworkLayer network = new NetworkLayer();
-		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
 		try {
 			nReader.parse(PathTracker.resolve("matExtract"));
 		} catch (SAXException e) {

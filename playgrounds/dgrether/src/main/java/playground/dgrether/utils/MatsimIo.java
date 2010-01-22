@@ -23,6 +23,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -65,12 +66,8 @@ public class MatsimIo {
 		new ConfigWriter(config).writeFile(filename);
 	}
 
-	public static NetworkLayer loadNetwork(final String filename) {
-		NetworkLayer network = new NetworkLayer();
-//		Gbl.getWorld().setNetworkLayer(network);
-		new MatsimNetworkReader(network).readFile(filename);
-//		Gbl.getWorld().complete();
-		return network;
+	public static void loadNetwork(final String filename, final Scenario scenario) {
+		new MatsimNetworkReader(scenario).readFile(filename);
 	}
 
 

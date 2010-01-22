@@ -51,7 +51,7 @@ public class ZurichVisNetworkOnly {
 		//this is hack
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFile);
+		new MatsimNetworkReader(scenario).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();
 		EventsManagerImpl events = new EventsManagerImpl();
 		

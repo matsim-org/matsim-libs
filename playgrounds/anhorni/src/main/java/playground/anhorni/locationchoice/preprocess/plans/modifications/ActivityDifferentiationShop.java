@@ -47,7 +47,7 @@ public class ActivityDifferentiationShop {
 		
 		log.info("reading facilitiesActDiff ...");
 		this.facilitiesActDiff = this.scenario.getActivityFacilities();
-		new FacilitiesReaderMatsimV1(this.facilitiesActDiff).readFile(facilitiesActDifffilePath);		
+		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesActDifffilePath);		
 	}
 	
 	private int getNumberOfShopActs() {

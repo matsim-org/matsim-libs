@@ -24,6 +24,7 @@
 package playground.johannes.socialnetworks.ivtsurveys;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -55,8 +56,9 @@ public class TravelTimeMatrix {
 	public static void main(String[] args) {
 		String networkfile = args[0];
 		String outputfile = args[1];
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkfile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkfile);
 
 		
 		SpatialGrid<NodeImpl> grid = new SpatialGrid<NodeImpl>(xmin, ymin, xmax, ymax, resolution);

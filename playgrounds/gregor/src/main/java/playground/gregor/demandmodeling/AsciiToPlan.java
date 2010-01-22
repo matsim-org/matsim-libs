@@ -64,7 +64,7 @@ public class AsciiToPlan {
 
 		//ffnen des Szenarios
 		ScenarioImpl sc = new ScenarioImpl();
-		new MatsimNetworkReader(sc.getNetwork()).readFile(NET_FILE);
+		new MatsimNetworkReader(sc).readFile(NET_FILE);
 		org.matsim.core.population.PopulationImpl pop = sc.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 

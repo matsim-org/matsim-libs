@@ -162,7 +162,7 @@ public class CutNetwork {
 
 		NetworkLayer net = scenario.getNetwork();
 		net.getFactory().setLinkFactory(new TimeVariantLinkFactory());
-		new MatsimNetworkReader(net).readFile(c.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(c.network().getInputFile());
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(net);
 		try {
 			parser.parse(c.network().getChangeEventsInputFile());

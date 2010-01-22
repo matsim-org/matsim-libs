@@ -59,13 +59,13 @@ public class FacilitiesCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading world xml file...");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario.getWorld());
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		scenario.getWorld().complete();
 		System.out.println("  done.");
 

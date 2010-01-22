@@ -26,8 +26,8 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.world.World;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -45,17 +45,17 @@ public class MatsimMatricesReader extends MatsimXmlParser {
 
 	private final Matrices matrices;
 	private MatsimXmlParser delegate = null;
-	private final World world;
+	private final ScenarioImpl scenario;
 
 	/**
 	 * Creates a new reader for MATSim matrices files.
 	 *
 	 * @param matrices The Matrices-object to store the data in.
-	 * @param world The world containing the layers the matrices reference to.
+	 * @param scenario The scenario containing the world/layers the matrices reference to.
 	 */
-	public MatsimMatricesReader(final Matrices matrices, final World world) {
+	public MatsimMatricesReader(final Matrices matrices, final ScenarioImpl scenario) {
 		this.matrices = matrices;
-		this.world = world;
+		this.scenario = scenario;
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class MatsimMatricesReader extends MatsimXmlParser {
 		super.setDoctype(doctype);
 		// Currently the only matrices-type is v1
 		if (MATRICES_V1.equals(doctype)) {
-			this.delegate = new MatricesReaderMatsimV1(this.matrices, this.world);
+			this.delegate = new MatricesReaderMatsimV1(this.matrices, this.scenario);
 			log.info("using matrices_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

@@ -22,6 +22,8 @@ package org.matsim.matrices;
 
 import java.util.Stack;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.world.World;
@@ -39,13 +41,15 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 	private final static String MATRIX = "matrix";
 	private final static String ENTRY = "entry";
 
+	private final Scenario scenario;
 	private Matrices matrices;
 	private Matrix currMatrix = null;
 	private final World world;
 
-	public MatricesReaderMatsimV1(final Matrices matrices, final World world) {
+	public MatricesReaderMatsimV1(final Matrices matrices, final ScenarioImpl scenario) {
 		this.matrices = matrices;
-		this.world = world;
+		this.world = scenario.getWorld();
+		this.scenario = scenario;
 	}
 
 	@Override
@@ -80,7 +84,7 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startEntry(final Attributes  atts) {
-		this.currMatrix.createEntry(atts.getValue("from_id"), atts.getValue("to_id"), Double.parseDouble(atts.getValue("value")));
+		this.currMatrix.createEntry(scenario.createId(atts.getValue("from_id")), scenario.createId(atts.getValue("to_id")), Double.parseDouble(atts.getValue("value")));
 	}
 
 }

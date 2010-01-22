@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Scenario;
 import org.xml.sax.SAXException;
 
 /**
@@ -37,8 +38,8 @@ public class NetworkWriterReaderV1Test extends AbstractNetworkWriterReaderTest {
 	}
 	
 	@Override
-	protected void readNetwork(final NetworkLayer network, final String filename) {
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(network);
+	protected void readNetwork(final Scenario scenario, final String filename) {
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
 		try {
 			reader.parse(filename);
 		} catch (SAXException e) {

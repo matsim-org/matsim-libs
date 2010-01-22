@@ -55,9 +55,8 @@ public class CMCFPopulationConverter {
 
 
 	@SuppressWarnings("unchecked")
-	public static PopulationImpl readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
-		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.setNetwork(network);
+	public static PopulationImpl readCMCFDemands(String filename, ScenarioImpl scenario, boolean coordinates) throws JDOMException, IOException{
+		NetworkLayer network = scenario.getNetwork();
 		PopulationImpl result = scenario.getPopulation();
 		PopulationFactory pb = result.getFactory() ;
 		SAXBuilder builder = new SAXBuilder();
@@ -150,10 +149,11 @@ public class CMCFPopulationConverter {
 			outfile = args[3];
 		}
 		try {
-			NetworkLayer network = new NetworkLayer();
-			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(network);
+			ScenarioImpl scenario = new ScenarioImpl();
+			NetworkLayer network = scenario.getNetwork();
+			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(scenario);
 			netreader.parse(netfile);
-			PopulationImpl population = readCMCFDemands(inputfile,network,coordinates);
+			PopulationImpl population = readCMCFDemands(inputfile,scenario,coordinates);
 			new PopulationWriter(population, network).writeFile(outfile);
 //			PopulationWriterV5 writer = new PopulationWriterV5( population);
 			System.out.println(inputfile+"conveted "+"output written in :"+outfile);

@@ -25,10 +25,11 @@ import java.util.List;
 import java.util.Locale;
 
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
@@ -84,6 +85,8 @@ public class CountsAnalyser {
 	 * name of the distancefilterCenterNode parameter in config
 	 */
 	public static final String DISTANCEFITLERCENTERNODE = "distanceFilterCenterNode";
+	
+	private Scenario scenario;
 	/**
 	 * the network
 	 */
@@ -142,7 +145,8 @@ public class CountsAnalyser {
 	 * @throws Exception
 	 */
 	private void readConfig(final String configFile) throws Exception {
-		Config config = Gbl.createConfig(new String[] { configFile, "config_v1.dtd" });
+		this.scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		Config config = this.scenario.getConfig();
 		System.out.println("  reading counts xml file... ");
 		MatsimCountsReader counts_parser = new MatsimCountsReader(counts);
 		counts_parser.readFile(config.counts().getCountsFileName());
@@ -184,7 +188,7 @@ public class CountsAnalyser {
 				counts, this.network);
 		if ((this.distanceFilter != null) && (this.distanceFilterCenterNode != null))
 			cca.setDistanceFilter(this.distanceFilter, this.distanceFilterCenterNode);
-		cca.setCountsScaleFactor(Gbl.getConfig().counts().getCountsScaleFactor());
+		cca.setCountsScaleFactor(this.scenario.getConfig().counts().getCountsScaleFactor());
 		cca.run();
 		return cca.getComparison();
 	}
@@ -242,7 +246,7 @@ public class CountsAnalyser {
 		printNote("", "  done");
 
 		printNote("", "  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(this.scenario).readFile(this.scenario.getConfig().network().getInputFile());
 		printNote("", "  done");
 
 		return network;

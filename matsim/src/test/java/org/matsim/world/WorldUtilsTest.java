@@ -25,10 +25,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.World;
-import org.matsim.world.WorldUtils;
-import org.matsim.world.Zone;
-import org.matsim.world.ZoneLayer;
 
 public class WorldUtilsTest extends MatsimTestCase {
 
@@ -74,8 +70,8 @@ public class WorldUtilsTest extends MatsimTestCase {
 		final int[] areaCounters = new int[9];
 		final World world = new World();
 		ZoneLayer layer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "zones for test");
-		Zone zone = layer.createZone("1", "4.5", "9", "0", "0", "9", "18", null, "center zone");
-		layer.createZone("2", "30", "15", "9", "0", "51", "30", null, "another zone");
+		Zone zone = layer.createZone(new IdImpl("1"), "4.5", "9", "0", "0", "9", "18", null, "center zone");
+		layer.createZone(new IdImpl("2"), "30", "15", "9", "0", "51", "30", null, "another zone");
 
 		for (int i = 0; i < 900; i++) {
 			Coord c = WorldUtils.getRandomCoordInZone(zone, layer);
@@ -107,8 +103,8 @@ public class WorldUtilsTest extends MatsimTestCase {
 		final int[] areaCounters = new int[11]; // radius from center in %: 0-10, 10-20, 20- ... -90, 90-100, 100+.
 		final World world = new World();
 		ZoneLayer layer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "zones for test");
-		Zone zone = layer.createZone("1", "4.5", "9", null, null, null, null, null, "center zone");
-		Zone zone2 = layer.createZone("2", "30", "15", "9", null, null, null, null, "another zone");
+		Zone zone = layer.createZone(new IdImpl("1"), "4.5", "9", null, null, null, null, null, "center zone");
+		Zone zone2 = layer.createZone(new IdImpl("2"), "30", "15", "9", null, null, null, null, "another zone");
 		Coord center = zone.getCoord();
 		final double distance = CoordUtils.calcDistance(center, zone2.getCoord());
 

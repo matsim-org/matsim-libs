@@ -216,7 +216,7 @@ public abstract class ScenarioConfig {
 	public static final World readWorld() {
 		System.out.println("  reading world xml file... ");
 //		new MatsimWorldReader(Gbl.getWorld()).readFile(Gbl.getConfig().world().getInputFile());
-		new MatsimWorldReader(scenario.getWorld()).readFile(worldFileName);
+		new MatsimWorldReader(scenario).readFile(worldFileName);
 		System.out.println("  done.");
 		return scenario.getWorld();
 	}
@@ -225,7 +225,7 @@ public abstract class ScenarioConfig {
 		System.out.println("  reading facilities xml file... ");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 //		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		new MatsimFacilitiesReader(facilities).readFile(facsFileName);
+		new MatsimFacilitiesReader(scenario).readFile(facsFileName);
 		System.out.println("  done.");
 		return facilities;
 	}
@@ -235,7 +235,7 @@ public abstract class ScenarioConfig {
 		System.out.println(scenario.getConfig().network().getInputFile());
 		NetworkLayer network = scenario.getNetwork();
 //		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		new MatsimNetworkReader(network).readFile(netFileName);
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 		System.out.println("  done.");
 		return network;
 	}

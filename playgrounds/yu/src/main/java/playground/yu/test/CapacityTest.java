@@ -24,31 +24,30 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
 public class CapacityTest {
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch-osm-wu.xml";
 		final String outputFilename = "test/yu/test/captest.txt";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		Scenario scenario = new ScenarioImpl();
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outputFilename);
-			for (LinkImpl link : network.getLinks().values()) {
-				out
-						.write(link.getId()
+			for (Link link : network.getLinks().values()) {
+				out.write(link.getId()
 								+ "\t"
-								+ link
-										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+								+ link.getCapacity(Time.UNDEFINED_TIME)
 								+ "\n");
 				out.flush();
 			}

@@ -607,7 +607,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		// RoadPricingReaderXMLv1 tollReader = new
 		// RoadPricingReaderXMLv1(network);

@@ -24,8 +24,11 @@ import java.io.File;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -55,7 +58,8 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	 * @param network
 	 * @param filename
 	 */
-	protected abstract void readNetwork(final NetworkLayer network, final String filename);	
+	protected abstract void readNetwork(final Scenario scenario, final String filename);
+
 	public void testAllowedModes_multipleModes() {
 		doTestAllowedModes(EnumSet.of(TransportMode.bus, TransportMode.train), 
 				getOutputDirectory() + "network.xml");
@@ -84,10 +88,11 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 		assertTrue("written network file doesn't exist.", networkFile.exists());
 		assertTrue("written network file seems to be empty.", networkFile.length() > 0);
 		
-		NetworkLayer network2 = new NetworkLayer();
-		readNetwork(network2, filename);
+		Scenario scenario2 = new ScenarioImpl();
+		Network network2 = scenario2.getNetwork();
+		readNetwork(scenario2, filename);
 		
-		LinkImpl link1 = network2.getLinks().get(new IdImpl("1"));
+		Link link1 = network2.getLinks().get(new IdImpl("1"));
 		assertNotNull("link not found in read-in network.", link1);
 		
 		Set<TransportMode> modes2 = link1.getAllowedModes();

@@ -56,19 +56,19 @@ public class CreateKnowledgeForDatabase {
 
 	private final static Logger log = Logger.getLogger(CreateKnowledgeForDatabase.class);
 	
-	private ScenarioImpl scenario;
+	private final ScenarioImpl scenario;
 	private NetworkImpl network;
 	private PopulationImpl population;
 	private ActivityFacilitiesImpl facilities;
 	private ArrayList<SelectNodes> nodeSelectors;
 	
-	private double dijkstraCostFactor = 1.0;
-	private double[] dijkstraCostFactors = {1.05, 1.1, 1.15, 1.2, 1.3, 1.35, 1.4, 1.45};
+	private final double dijkstraCostFactor = 1.0;
+	private final double[] dijkstraCostFactors = {1.05, 1.1, 1.15, 1.2, 1.3, 1.35, 1.4, 1.45};
 //	private double[] dijkstraCostFactors = {1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0};
 //	private double[] dijkstraCostFactors = {1.0};
 	private TravelCost costCalculator;
 	
-	private int parallelThreads = 8;
+	private final int parallelThreads = 8;
 		
 	private final String separator = System.getProperty("file.separator");
 
@@ -77,7 +77,7 @@ public class CreateKnowledgeForDatabase {
 	private String configFileName = "test/scenarios/berlin/config.xml";
 	private String networkFile = "test/scenarios/berlin/network.xml.gz";
 	private String populationFile = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-	private String facilitiesFile = null;
+	private final String facilitiesFile = null;
 
 /*
 	private String configFileName = "mysimulations/kt-zurich/config.xml";
@@ -276,7 +276,7 @@ public class CreateKnowledgeForDatabase {
 		network = scenario.getNetwork();
 		network.getFactory().setLinkFactory(new MyLinkFactoryImpl());
 
-		new MatsimNetworkReader(network).readFile(networkFile);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		log.info("Loading Network ... done");
 	}
 	
@@ -295,7 +295,7 @@ public class CreateKnowledgeForDatabase {
 	private void loadFacilities()
 	{
 		facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(facilitiesFile);
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		
 		log.info("Loading Facilities ... done");
 	}

@@ -25,7 +25,6 @@ import java.io.IOException;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 
 import playground.yu.analysis.PtCheck2;
@@ -40,8 +39,7 @@ public class PtCheckTest {
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimConfigReader(scenario.getConfig()).readFile("./test/yu/test/configPtcheckTest.xml");
 		
-		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		try {
 

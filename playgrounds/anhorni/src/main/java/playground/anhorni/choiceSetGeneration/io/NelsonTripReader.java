@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -31,8 +32,8 @@ public class NelsonTripReader {
 	private List<ChoiceSet> choiceSets;
 	private final static Logger log = Logger.getLogger(NelsonTripReader.class);
 	private TreeMap<Id, MZTrip> mzTrips = null; 
-	private NetworkLayer network = null;
-	private ZHFacilities facilities;
+	private final NetworkLayer network;
+	private final ZHFacilities facilities;
 		
 	public NelsonTripReader(NetworkLayer network, ZHFacilities facilities) {
 		this.network = network;

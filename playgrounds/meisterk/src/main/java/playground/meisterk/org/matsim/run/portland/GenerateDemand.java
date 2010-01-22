@@ -54,12 +54,12 @@ public class GenerateDemand {
 
 		System.out.println("Reading network...");
 		NetworkLayer networkLayer = scenario.getNetwork();
-		new MatsimNetworkReader(networkLayer).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		System.out.println("Reading network...done.");
 
 		System.out.println("Reading facilities...");
 		ActivityFacilitiesImpl facilityLayer = scenario.getActivityFacilities();
-		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilityLayer);
+		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(scenario);
 		//facilities_reader.setValidating(false);
 		facilities_reader.readFile(config.facilities().getInputFile());
 		facilityLayer.printFacilitiesCount();

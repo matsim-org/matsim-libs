@@ -23,10 +23,12 @@ package org.matsim.vis.otfvis.executables;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.ptproject.qsim.QueueNetwork;
@@ -160,8 +162,9 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 
 		Gbl.createConfig(null);
 
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(netFileName);
+		Scenario scenario = new ScenarioImpl();
+		Network net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFileName);
 		QueueNetwork qnet = new QueueNetwork(net);
 
 		new OTFTVeh2MVI(qnet, vehFileName, intervall_s, outFileName).convert();

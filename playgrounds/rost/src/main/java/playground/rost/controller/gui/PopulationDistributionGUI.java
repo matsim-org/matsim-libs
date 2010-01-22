@@ -35,6 +35,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -230,8 +231,9 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 	
 	public static PopulationDistributionGUI parseNetworkAndBlocksAndShowGUI()
 	{
-		NetworkLayer network = new NetworkLayer();
-		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
 		try {
 			nReader.parse(PathTracker.resolve("flatNetwork"));
 		} catch (SAXException e) {

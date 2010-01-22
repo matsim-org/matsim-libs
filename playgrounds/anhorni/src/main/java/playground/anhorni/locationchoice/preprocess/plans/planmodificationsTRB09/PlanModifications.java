@@ -92,12 +92,12 @@ public class PlanModifications {
 
 
 		this.network = scenario.getNetwork();
-		new MatsimNetworkReader(this.network).readFile(networkfilePath);
+		new MatsimNetworkReader(scenario).readFile(networkfilePath);
 		log.info("network reading done");
 
 		//this.facilities=new Facilities();
 		this.facilities = scenario.getActivityFacilities();
-		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
+		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
 
 		world.complete();

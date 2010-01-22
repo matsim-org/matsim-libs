@@ -113,17 +113,17 @@ public class TriangleTest extends MatsimTestCase {
 		final World world = scenario.getWorld();
 
 		log.info("  reading world xml file... ");
-		new MatsimWorldReader(world).readFile(this.config.world().getInputFile());
+		new MatsimWorldReader(scenario).readFile(this.config.world().getInputFile());
 		log.info("  done.");
 
 		log.info("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		log.info("  done.");
 
 		log.info("  reading network xml file... ");
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		world.complete();
 		log.info("  done.");
 

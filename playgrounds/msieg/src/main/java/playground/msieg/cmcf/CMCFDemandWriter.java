@@ -50,6 +50,7 @@ public class CMCFDemandWriter{
 	private final NetworkLayer network;
 	private final PopulationImpl plans;
 	private final PopulationReader popReader;
+	private final ScenarioImpl scenario;
 	//The input tag has to be specified before converting starts,
 	//it must equal the network name, otherwise CMCF won't run.
 	private String inputNetwork = "notspecified";
@@ -72,7 +73,7 @@ public class CMCFDemandWriter{
 		this.networkPath = networkPath == null ? Gbl.getConfig().network().getInputFile(): networkPath;
 		this.plansPath = plansPath == null ? Gbl.getConfig().plans().getInputFile(): plansPath;
 
-		ScenarioImpl scenario = new ScenarioImpl();
+		this.scenario = new ScenarioImpl();
 		this.network = scenario.getNetwork();
 		this.plans = scenario.getPopulation();
 		this.popReader = new MatsimPopulationReader(scenario);
@@ -82,7 +83,7 @@ public class CMCFDemandWriter{
 
 	private void init(){
 		try {
-			new MatsimNetworkReader(this.network).parse(this.networkPath);
+			new MatsimNetworkReader(this.scenario).parse(this.networkPath);
 			this.network.connect();
 			this.popReader.readFile(this.plansPath);
 		} catch (SAXException e) {

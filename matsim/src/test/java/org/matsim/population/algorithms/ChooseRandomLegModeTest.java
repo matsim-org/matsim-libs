@@ -26,7 +26,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -139,17 +142,19 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	
 	public void testSubTourMutationNetworkBased() {
 		Config config = loadConfig(CONFIGFILE);
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		Scenario scenario = new ScenarioImpl(config);
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
-		this.testSubTourMutationToCar(network, config.planomat());
-		this.testSubTourMutationToPt(network, config.planomat());
+		this.testSubTourMutationToCar((NetworkLayer) network, config.planomat());
+		this.testSubTourMutationToPt((NetworkLayer) network, config.planomat());
 	}
 	
 	public void testSubTourMutationFacilitiesBased() {
 		Config config = loadConfig(CONFIGFILE);
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility);
 		this.testSubTourMutationToCar(facilities, config.planomat());
 		this.testSubTourMutationToPt(facilities, config.planomat());
@@ -157,11 +162,12 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	
 	public void testCarDoesntTeleportFromHome() {
 		Config config = loadConfig(CONFIGFILE);
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		Scenario scenario = new ScenarioImpl(config);
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
-		testCarDoesntTeleport(network, config.planomat(), TransportMode.car, TransportMode.pt);
-		testCarDoesntTeleport(network, config.planomat(), TransportMode.pt, TransportMode.car);
+		testCarDoesntTeleport((NetworkLayer) network, config.planomat(), TransportMode.car, TransportMode.pt);
+		testCarDoesntTeleport((NetworkLayer) network, config.planomat(), TransportMode.pt, TransportMode.car);
 	}
 	
 	public void testSubTourMutationToCar(Layer layer, PlanomatConfigGroup planomatConfigGroup) {

@@ -21,7 +21,7 @@
 package org.matsim.counts;
 
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 import org.xml.sax.helpers.AttributesImpl;
 
 public class AttributeFactory {
@@ -71,7 +71,7 @@ public class AttributeFactory {
 		return meta;
 	}
 
-	public CalcLinkStats createLinkStats(NetworkLayer network) {
+	public CalcLinkStats createLinkStats(Network network) {
 		CalcLinkStats linkStats = new CalcLinkStats(network);
 		linkStats.readFile("./test/input/org/matsim/counts/linkstats.att");
 		return linkStats;

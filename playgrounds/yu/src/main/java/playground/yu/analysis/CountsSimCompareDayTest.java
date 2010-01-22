@@ -10,6 +10,7 @@ import java.io.IOException;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
@@ -39,8 +40,9 @@ public class CountsSimCompareDayTest {
 		double countsScaleFactor = 10.0;
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		System.out.println("  reading the counts...");
 		final Counts counts = new Counts();

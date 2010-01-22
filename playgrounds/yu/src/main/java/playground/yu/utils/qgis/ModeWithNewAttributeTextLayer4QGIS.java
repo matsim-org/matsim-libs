@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -77,8 +76,8 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		writer.writeln("pt6h :\t" + pt6hCount + "\t" + (double) pt6hCount
 				/ (double) count + "%");
 		writer.writeln("am6h_travelTime :\t" + am6hTravelTime
-				/ (double) (car6hCount + pt6hCount) + "\t[s]/[min]");
-		writer.writeln("all_travelTime :\t" + travelTime / (double) count
+				/ (car6hCount + pt6hCount) + "\t[s]/[min]");
+		writer.writeln("all_travelTime :\t" + travelTime / count
 				+ "\t[s]/[min]");
 		super.close();
 	}
@@ -100,8 +99,7 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		final String textFilename = "../matsimTests/timeAllocationMutatorTest/it.100/mode_1.endTime.txt";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);

@@ -13,7 +13,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -22,7 +21,6 @@ import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -43,10 +41,11 @@ import playground.yu.utils.io.SimpleWriter;
 public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler {
 	/* Map<vehId,No.ofInstantaneousOccupancies> */
-	private Map<Id, Integer> occups = new HashMap<Id, Integer>(), routeOccups;
+	private final Map<Id, Integer> occups = new HashMap<Id, Integer>();
+	private Map<Id, Integer> routeOccups;
 	/* Map<vehId,Map<time,NO.ofOccupancies */
-	private Map<Id, Map<Double, Integer>> timeOccups = new HashMap<Id, Map<Double, Integer>>(),
-			routeTimeOccups;
+	private final Map<Id, Map<Double, Integer>> timeOccups = new HashMap<Id, Map<Double, Integer>>();
+	private Map<Id, Map<Double, Integer>> routeTimeOccups;
 	private TransitSchedule schedule = null;
 	/* Map<vehId,routeId>, Map<routeId,transitLineId> */
 	private Map<Id, Id> vehRouteIds, routeLineIds;
@@ -222,8 +221,7 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		ScenarioImpl s = new ScenarioImpl();
 		s.getConfig().scenario().setUseTransit(true);
 
-		Network net = s.getNetwork();
-		new MatsimNetworkReader((NetworkImpl) net).readFile(netFilename);
+		new MatsimNetworkReader(s).readFile(netFilename);
 
 		TransitSchedule schedule = s.getTransitSchedule();
 		try {

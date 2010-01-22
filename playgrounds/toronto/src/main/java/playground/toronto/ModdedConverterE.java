@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -152,12 +153,12 @@ public class ModdedConverterE {
 						if ((tabs[4].equals("H"))&&this.tmpGotH) { //if the trip starts at home and home coordinate has been set
 							tmpCoord = this.tmpHome;
 						}else if((tabs[4].equals("H"))&&!this.tmpGotH){ // if the trip starts at home but home coordinate hasn't been set
-							tmpCoord = getRandomCoordInZone(tabs[6]);
+							tmpCoord = getRandomCoordInZone(new IdImpl(tabs[6]));
 							this.tmpHome = tmpCoord;
 							this.tmpGotH = true;
 						}
 						else{ //if the trip starts away from home
-							tmpCoord = getRandomCoordInZone(tabs[6]);
+							tmpCoord = getRandomCoordInZone(new IdImpl(tabs[6]));
 						}
 						this.tmpType = tabs[7];
 						ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[4], tmpCoord);
@@ -180,11 +181,11 @@ public class ModdedConverterE {
 							if ((this.tmpTabs[7].equals("H"))&&this.tmpGotH) { // the person's last trip ends at home and home coordinate has already been set
 								tmpCoord2 = this.tmpHome;
 							}else if ((this.tmpTabs[7].equals("H"))&&!this.tmpGotH){ // the person's last trip ends at home but home coordinate hasn't been set
-								tmpCoord2 = getRandomCoordInZone(this.tmpTabs[9]);
+								tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
 								this.tmpHome = tmpCoord2;
 								this.tmpGotH = true;
 							}else{ //the person's last trip does not end at home
-								tmpCoord2 = getRandomCoordInZone(this.tmpTabs[9]);
+								tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
 								this.count2+=1;
 								System.out.println(this.tmpPersonId);
 							}
@@ -199,19 +200,19 @@ public class ModdedConverterE {
 						this.tmpType = tabs[4];
 						Coord tmpCoord3;
 						if (!this.tmpHhldId.equals(hhldId)&&this.tmpType.equals("H")) {  //1st person of a household start first trip from home
-							this.tmpHome = getRandomCoordInZone(tabs[6]);
+							this.tmpHome = getRandomCoordInZone(new IdImpl(tabs[6]));
 							tmpCoord3 = this.tmpHome;
 							this.tmpGotH = true;
 						}else if (this.tmpHhldId.equals(hhldId)&&this.tmpType.equals("H")){ //other people of the same household start first trip from home
 							tmpCoord3 = this.tmpHome;
 							this.tmpGotH = true;
 						}else if (this.tmpHhldId.equals(hhldId)&&!this.tmpType.equals("H")){ //other people of the same household start first trip away from home
-							tmpCoord3 = getRandomCoordInZone(tabs[6]);
+							tmpCoord3 = getRandomCoordInZone(new IdImpl(tabs[6]));
 							this.tmpGotH = true;
 							this.count1 += 1;
 							System.out.println(personId);
 						}else{ //1st person of a household start first trip away from home
-							tmpCoord3 = getRandomCoordInZone(tabs[6]);
+							tmpCoord3 = getRandomCoordInZone(new IdImpl(tabs[6]));
 							this.tmpGotH = false;
 							this.count1 += 1;
 							System.out.println(personId);
@@ -251,11 +252,11 @@ public class ModdedConverterE {
 			if ((this.tmpTabs[7].equals("H"))&&this.tmpGotH) {
 				tmpCoord2 = this.tmpHome;
 			}else if ((this.tmpTabs[7].equals("H"))&&!this.tmpGotH){
-				tmpCoord2 = getRandomCoordInZone(this.tmpTabs[9]);
+				tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
 				this.tmpHome = tmpCoord2;
 				this.tmpGotH = true;
 			}else{
-				tmpCoord2 = getRandomCoordInZone(this.tmpTabs[9]);
+				tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
 				this.count2+=1;
 				System.out.println(this.tmpPersonId);
 			}
@@ -265,7 +266,7 @@ public class ModdedConverterE {
 		}
 	}
 
-	private Coord getRandomCoordInZone(final String zoneId) {
+	private Coord getRandomCoordInZone(final Id zoneId) {
 		return WorldUtils.getRandomCoordInZone(
 				(Zone) this.zones.getLocation(zoneId), this.zones);
 	}
@@ -278,7 +279,7 @@ public class ModdedConverterE {
 	}
 
 	public void createZone(final ZoneXY zxy) {
-		this.zones.createZone(zxy.getZoneId(), zxy.getX(), zxy.getY(), null, null,
+		this.zones.createZone(new IdImpl(zxy.getZoneId()), zxy.getX(), zxy.getY(), null, null,
 				null, null, null, null);
 	}
 

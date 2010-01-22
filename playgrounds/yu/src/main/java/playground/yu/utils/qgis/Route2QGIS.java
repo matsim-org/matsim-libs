@@ -167,7 +167,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(networkFilename);
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 

@@ -22,6 +22,7 @@ package playground.yu.newNetwork;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -81,8 +82,9 @@ public class OSMNetCreator {
 		final String outputNetFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
 		// final String outputNetFilename = "test/yu/utils/ivtch-osm.1.3.xml";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 		// (1) -----------links in Circle---------------------------
 		Set<String> linkIdsInCircle = new NetworkLinkIdsInCircle(network)
 				.getLinks(682845.0, 247388.0, 4000.0);

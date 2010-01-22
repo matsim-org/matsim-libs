@@ -213,7 +213,7 @@ public class EventFilesEvacuationTimeCompare {
 		String network = "../../inputs/networks/padang_net_evac_v20080618.xml";
 		String outfile = MY_STATIC_STUFF.RUNS_SVN + "run320/analysis/etimcomp.shp";
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(network);
+		new MatsimNetworkReader(scenario).readFile(network);
 		
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
 		new EventFilesEvacuationTimeCompare(eventsFile1, eventsFile2, crs, scenario.getNetwork(), outfile).run();

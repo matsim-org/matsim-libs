@@ -36,7 +36,7 @@ public class PlanFileCompare {
 		ScenarioImpl scenario1 = new ScenarioImpl();
 		
 		NetworkLayer network = scenario1.getNetwork();
-		MatsimNetworkReader netReader = new MatsimNetworkReader(network);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario1);
 		netReader.readFile(networkFile);
 
 		Population pop1 = scenario1.getPopulation();

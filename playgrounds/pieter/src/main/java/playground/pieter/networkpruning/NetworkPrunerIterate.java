@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
@@ -30,10 +31,11 @@ public class NetworkPrunerIterate {
 	private double shortLeafLength = 1000;
 
 	public NetworkPrunerIterate(String inFile, String outFile) {
-		this.network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.network = scenario.getNetwork();
 		this.inFile = inFile;
 		this.outFile = outFile;
-		new MatsimNetworkReader(network).readFile(this.inFile);
+		new MatsimNetworkReader(scenario).readFile(this.inFile);
 		new NetworkSummary().run(network);
 	}
 

@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -43,8 +44,9 @@ public class CountsCapacityComparison {
 		final String countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml";
 		final String outputFilename = "../matsimTests/countsCapacityComparison/output_zurich.txt";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(countsFilename);
@@ -53,7 +55,7 @@ public class CountsCapacityComparison {
 		sw.writeln("linkId\tx\ty\tCapacity [veh/h]\tmax Value of Counts");
 
 		Coord center = network.getNodes().get(new IdImpl("2531")).getCoord();
-		double capPeriod = ((double) network.getCapacityPeriod()) / 3600.0 * 0.97;
+		double capPeriod = (network.getCapacityPeriod()) / 3600.0 * 0.97;
 		int n_countStations = 0;
 
 		for (Id linkId : counts.getCounts().keySet()) {

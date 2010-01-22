@@ -61,7 +61,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		// prepare data like world and network
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).parse(NETWORK_FILE);
+		new MatsimNetworkReader(scenario).parse(NETWORK_FILE);
 
 		// create one person with missing link in act
 		PopulationImpl population = new ScenarioImpl().getPopulation();
