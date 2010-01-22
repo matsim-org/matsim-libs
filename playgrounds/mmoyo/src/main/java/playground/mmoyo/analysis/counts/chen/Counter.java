@@ -1,6 +1,6 @@
 package playground.mmoyo.analysis.counts.chen;
 
-import playground.yu.run.TrCtl;
+//import playground.yu.run.TrCtl;
 
 public class Counter {
 
@@ -9,7 +9,8 @@ public class Counter {
 
 		//run Chen controler
 		//TrCtl trControler = new TrCtl(new String[]{configFile}); 
-		new TrCtl(new String[]{configFile});
+//		new TrCtl(new String[]{configFile});
+		// to use Code from other playgrounds, please see http://matsim.org/docs/devguide/adding-a-dependency
 		
 	}
 }
