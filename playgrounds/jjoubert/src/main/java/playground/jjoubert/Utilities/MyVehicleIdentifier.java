@@ -61,7 +61,7 @@ public class MyVehicleIdentifier {
 	 * IDs based on activity percentages from a vehicle statistics file, usually created 
 	 * from running the <tt>playground.jjoubert.CommercialTraffic.ActivityLocations</tt> 
 	 * class.
-	 * @param a single threshold of type <code>double</code>, indicating the highest 
+	 * @param threshold a single threshold of type <code>double</code>, indicating the highest 
 	 * 		percentage (inclusive) of vehicle activity that will be considered as a
 	 * 		'through' traffic vehicle. Any activity percentage higher will be considered
 	 * 		a 'within' traffic vehicle.
@@ -186,6 +186,10 @@ public class MyVehicleIdentifier {
 					if(percentage > threshold){
 						withinList.add(vehicleId);
 					} else if(percentage > 0){
+						/* 
+						 * Vehicles with 0% activities are not considered. They will (probably)
+						 * be considered pure within vehicles elsewhere.
+						 */	
 						throughList.add(vehicleId);
 					}
 				} else{
