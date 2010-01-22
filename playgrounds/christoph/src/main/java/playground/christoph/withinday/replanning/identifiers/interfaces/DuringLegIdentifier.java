@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentsToReplanIdentifier.java
+ * DuringLegIdentifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,16 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.mobsim;
-
-import java.util.List;
+package playground.christoph.withinday.replanning.identifiers.interfaces;
 
 
-/*
- * Identify Agents that need a Replanning of their scheduled
- * plan.
- */
-public interface AgentsToReplanIdentifier {
-	
-	public List<WithinDayPersonAgent> getAgentsToReplan();
+public abstract class DuringLegIdentifier extends AgentsToReplanIdentifier{
+
 }

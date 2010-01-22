@@ -20,48 +20,42 @@
 
 package playground.christoph.withinday.mobsim;
 
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 
-import playground.christoph.withinday.replanning.parallel.ParallelActEndReplanner;
+import playground.christoph.withinday.replanning.ReplanningTask;
+import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.WithinDayReplanner;
+import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
+import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 
-public class DuringActivityReplanningModule implements WithinDayReplanningModule{
-
-	private final static Logger log = Logger.getLogger(DuringActivityReplanningModule.class);
-	
-	protected ReplanningQueueSimulation simulation;
-	protected ParallelActEndReplanner parallelActEndReplanner;
-	
-	public static int replanningCounter = 0;
-	
-	public DuringActivityReplanningModule(ParallelActEndReplanner parallelActEndReplanner, ReplanningQueueSimulation simulation)
+public class DuringActivityReplanningModule extends WithinDayReplanningModule{
+		
+	public DuringActivityReplanningModule(ParallelDuringActivityReplanner parallelDuringActivityReplanner)
 	{
-		this.simulation = simulation;
-		this.parallelActEndReplanner = parallelActEndReplanner;
+		this.parallelReplanner = parallelDuringActivityReplanner;
 	}
 	
 	public void doReplanning(double time)
 	{
-		PriorityBlockingQueue<DriverAgent> queue = simulation.getActivityEndsList();
-		
-		for (DriverAgent driverAgent : queue)
-		{	
-			// If the Agent will depart
-			if (driverAgent.getDepartureTime() <= time)
-			{	
-				this.parallelActEndReplanner.addAgentToReplan((WithinDayPersonAgent)driverAgent);
-				replanningCounter++;
+		for (WithinDayReplanner replanner : this.parallelReplanner.getWithinDayReplanners())
+		{
+			if(replanner instanceof WithinDayDuringActivityReplanner)
+			{
+				List<AgentsToReplanIdentifier> identifiers = replanner.getAgentsToReplanIdentifers();
+				
+				for (AgentsToReplanIdentifier identifier : identifiers)
+				{
+					for (DriverAgent driverAgent : identifier.getAgentsToReplan(time, replanner))
+					{
+						ReplanningTask replanningTask = new ReplanningTask(driverAgent, replanner.getId());
+						this.parallelReplanner.addReplanningTask(replanningTask);
+					}
+				}
 			}
-			
-			// It's a priority Queue -> no further Agents will be found
-			else break;
-		}		
+		}
 		
-		DriverAgent driverAgent = queue.peek();
-		boolean runReplanning = (driverAgent != null && driverAgent.getDepartureTime() <= time);
-		if (runReplanning) this.parallelActEndReplanner.run(time);
+		this.parallelReplanner.run(time);
 	}
-	
 }

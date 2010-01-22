@@ -23,16 +23,22 @@ package playground.christoph.controler;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.population.algorithms.PlanAlgorithm;
 //import org.matsim.core.events.parallelEventsHandler.WithinDayParallelEventsManagerImpl;
 
 import playground.christoph.events.LinkReplanningMap;
@@ -53,9 +59,23 @@ import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.ReplanningQueueSimulation;
-import playground.christoph.withinday.replanning.parallel.ParallelActEndReplanner;
+import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
+import playground.christoph.withinday.replanning.CurrentLegReplanner;
+import playground.christoph.withinday.replanning.InitialReplanner;
+import playground.christoph.withinday.replanning.NextLegReplanner;
+import playground.christoph.withinday.replanning.ReplanningIdGenerator;
+import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
+import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
+import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
+import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifier;
+import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImpl;
+import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier;
+import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
-import playground.christoph.withinday.replanning.parallel.ParallelLeaveLinkReplanner;
+import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 
 /**
  * This Controler should give an Example what is needed to run
@@ -73,7 +93,6 @@ import playground.christoph.withinday.replanning.parallel.ParallelLeaveLinkRepla
 
 public class WithinDayControler extends Controler {
 
-	protected ArrayList<PlanAlgorithm> replanners;
 	protected ArrayList<SelectNodes> nodeSelectors;
 
 	/*
@@ -81,14 +100,9 @@ public class WithinDayControler extends Controler {
 	 * Replanning Strategy. It is possible to assign
 	 * multiple Strategies to the Agents.
 	 */
-	protected double pInitialReplanning = 1.0;
+	protected double pInitialReplanning = 0.0;
 	protected double pActEndReplanning = 0.0;
 	protected double pLeaveLinkReplanning = 0.0;
-
-	protected int noReplanningCounter = 0;
-	protected int initialReplanningCounter = 0;
-	protected int actEndReplanningCounter = 0;
-	protected int leaveLinkReplanningCounter = 0;
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -96,9 +110,17 @@ public class WithinDayControler extends Controler {
 	protected int numReplanningThreads = 8;
 
 	protected TravelTime travelTime;
+	
 	protected ParallelInitialReplanner parallelInitialReplanner;
-	protected ParallelActEndReplanner parallelActEndReplanner;
-	protected ParallelLeaveLinkReplanner parallelLeaveLinkReplanner;
+	protected ParallelDuringActivityReplanner parallelActEndReplanner;
+	protected ParallelDuringLegReplanner parallelLeaveLinkReplanner;
+	protected InitialIdentifier initialIdentifier;
+	protected DuringActivityIdentifier duringActivityIdentifier;
+	protected DuringLegIdentifier duringLegIdentifier;
+	protected WithinDayInitialReplanner initialReplanner;
+	protected WithinDayDuringActivityReplanner duringActivityReplanner;
+	protected WithinDayDuringLegReplanner duringLegReplanner;
+	
 	protected LinkVehiclesCounter2 linkVehiclesCounter;
 	protected LinkReplanningMap linkReplanningMap;
 	protected ReplanningManager replanningManager;
@@ -140,7 +162,6 @@ public class WithinDayControler extends Controler {
 	 * By doing this every person can use a personalised Router.
 	 */
 	protected void initReplanningRouter() {
-		replanners = new ArrayList<PlanAlgorithm>();
 
 		/*
 		 * Calculate the TravelTime based on the actual load of the links. Use only
@@ -169,33 +190,36 @@ public class WithinDayControler extends Controler {
 
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime, new FastDijkstraFactory());
 //		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
-		replanners.add(dijkstraRouter);
+		
+		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
+		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.initialReplanner.setReplanner(dijkstraRouter);
+		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
+		
+		this.duringActivityIdentifier = new ActivityEndIdentifier(this.sim);
+		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId());
+		this.duringActivityReplanner.setReplanner(dijkstraRouter);
+		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
+		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
+		
+		this.duringLegIdentifier = new LeaveLinkIdentifier(this.linkReplanningMap);
+		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.network);
+		this.duringLegReplanner.setReplanner(dijkstraRouter);
+		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
+		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
 	}
 
 	/*
-	 * Hands over the ArrayList to the ParallelReplannerModules
+	 * Initializes the ParallelReplannerModules
 	 */
 	protected void initParallelReplanningModules()
-	{
-		this.parallelInitialReplanner = new ParallelInitialReplanner();
-		this.parallelInitialReplanner.setNumberOfThreads(numReplanningThreads);
-		this.parallelInitialReplanner.setReplannerArrayList(replanners);
-		this.parallelInitialReplanner.createReplannerArray();
-		this.parallelInitialReplanner.init();
-
-		this.parallelActEndReplanner = new ParallelActEndReplanner();
-		this.parallelActEndReplanner.setNumberOfThreads(numReplanningThreads);
-		this.parallelActEndReplanner.setReplannerArrayList(replanners);
-		this.parallelActEndReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
-		this.parallelActEndReplanner.init();
-
-		this.parallelLeaveLinkReplanner = new ParallelLeaveLinkReplanner(network);
-		this.parallelLeaveLinkReplanner.setNumberOfThreads(numReplanningThreads);
-		this.parallelLeaveLinkReplanner.setReplannerArrayList(replanners);
-		this.parallelLeaveLinkReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
-		this.parallelLeaveLinkReplanner.init();
+	{		
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
+		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
+		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
 	}
-
+	
 	/*
 	 * Creates the Handler and Listener Object so that they can be handed over to the Within Day
 	 * Replanning Modules (TravelCostWrapper, etc).
@@ -212,9 +236,13 @@ public class WithinDayControler extends Controler {
 	@Override
 	protected void runMobSim()
 	{	
-		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
-
 		createHandlersAndListeners();
+		
+		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
+	
+		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
+		foqsl.addQueueSimulationInitializedListener(rfi);
+				
 //		if (this.events instanceof WithinDayParallelEventsManagerImpl)
 //		{
 //			foqsl.addQueueSimulationAfterSimStepListener((WithinDayParallelEventsManagerImpl)this.events);			
@@ -233,24 +261,15 @@ public class WithinDayControler extends Controler {
 		linkReplanningMap.setQueueNetwork(sim.getQueueNetwork());
 		this.events.addHandler(linkReplanningMap);
 
+		log.info("Initialize Parallel Replanning Modules");
+		initParallelReplanningModules();
+		
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
 
-		log.info("Initialize Parallel Replanning Modules");
-		initParallelReplanningModules();
-
-		log.info("Set Replanning flags");
-		setReplanningFlags();
-
-		log.info("Set Replanners for each Person");
-		setReplanners();
-
-		log.info("do initial Replanning");
-		doInitialReplanning();
-
-		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner, sim);
-		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner, sim);
-		DuringLegReplanningModule leaveLinkReplanning = new DuringLegReplanningModule(parallelLeaveLinkReplanner, linkReplanningMap);
+		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
+		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner);
+		DuringLegReplanningModule leaveLinkReplanning = new DuringLegReplanningModule(parallelLeaveLinkReplanner);
 
 		replanningManager.setInitialReplanningModule(initialReplanningModule);
 		replanningManager.setActEndReplanningModule(actEndReplanning);
@@ -258,117 +277,6 @@ public class WithinDayControler extends Controler {
 
 		sim.run();
 	}
-
-	/*
-	 * Add three boolean variables to each Person. They are used to indicate, if
-	 * the plans of this person should be replanned each time if an activity
-	 * ends, each time a link is left, before the simulation starts or never
-	 * during an iteration.
-	 */
-	protected void setReplanningFlags() {
-		noReplanningCounter = 0;
-		initialReplanningCounter = 0;
-		actEndReplanningCounter = 0;
-		leaveLinkReplanningCounter = 0;
-
-		Random random = MatsimRandom.getLocalInstance();
-		
-		for (Person person : this.getPopulation().getPersons().values())
-		{
-			// get Person's Custom Attributes
-			Map<String, Object> customAttributes = person.getCustomAttributes();
-
-			double probability;
-			boolean noReplanning = true;
-
-			probability = random.nextDouble();
-			if (probability > pInitialReplanning)customAttributes.put("initialReplanning", new Boolean(false));
-			else
-			{
-				customAttributes.put("initialReplanning", new Boolean(true));
-				noReplanning = false;
-				initialReplanningCounter++;
-			}
-
-			// No Replanning
-			probability = random.nextDouble();
-			if (probability > pActEndReplanning) customAttributes.put("endActivityReplanning", new Boolean(false));
-			else
-			{
-				customAttributes.put("endActivityReplanning", new Boolean(true));
-				noReplanning = false;
-				actEndReplanningCounter++;
-			}
-
-			// No Replanning
-			probability = random.nextDouble();
-			if (probability > pLeaveLinkReplanning) customAttributes.put("leaveLinkReplanning", new Boolean(false));
-			else
-			{
-				customAttributes.put("leaveLinkReplanning", new Boolean(true));
-				noReplanning = false;
-				leaveLinkReplanningCounter++;
-			}
-
-			// if non of the Replanning Modules was activated
-			if (noReplanning) noReplanningCounter++;
-
-			// (de)activate replanning if they are not needed
-			if (initialReplanningCounter == 0) replanningManager.doInitialReplanning(false);
-			else replanningManager.doInitialReplanning(true);
-			
-			if (actEndReplanningCounter == 0) replanningManager.doActEndReplanning(false);
-			else replanningManager.doActEndReplanning(true);
-
-			if (leaveLinkReplanningCounter == 0) replanningManager.doLeaveLinkReplanning(false);
-			else replanningManager.doLeaveLinkReplanning(true);
-		}
-
-		log.info("Initial Replanning Probability: " + pInitialReplanning);
-		log.info("Act End Replanning Probability: " + pActEndReplanning);
-		log.info("Leave Link Replanning Probability: " + pLeaveLinkReplanning);
-
-		double numPersons = this.population.getPersons().size();
-		log.info(noReplanningCounter + " persons don't replan their Plans ("+ noReplanningCounter / numPersons * 100.0 + "%)");
-		log.info(initialReplanningCounter + " persons replan their plans initially (" + initialReplanningCounter / numPersons * 100.0 + "%)");
-		log.info(actEndReplanningCounter + " persons replan their plans after an activity (" + actEndReplanningCounter / numPersons * 100.0 + "%)");
-		log.info(leaveLinkReplanningCounter + " persons replan their plans at each node (" + leaveLinkReplanningCounter / numPersons * 100.0 + "%)");
-	}
-
-	/*
-	 * Assigns a replanner to every Person of the population.
-	 *
-	 * At the moment: Replanning Modules are assigned hard coded. Later: Modules
-	 * are assigned based on probabilities from config files.
-	 */
-	protected void setReplanners()
-	{
-		for (Person p : this.getPopulation().getPersons().values()) {
-			Map<String, Object> customAttributes = p.getCustomAttributes();
-			customAttributes.put("Replanner", replanners.get(0));
-		}
-	}
-
-	protected void doInitialReplanning()
-	{
-//		ArrayList<Person> personsToReplan = new ArrayList<Person>();
-//
-//		for (Person person : this.getPopulation().getPersons().values()) {
-//			boolean replanning = (Boolean) person.getCustomAttributes().get("initialReplanning");
-//
-//			if (replanning)
-//			{
-//				personsToReplan.add(person);
-//			}
-//		}
-//
-//		double time = 0.0;
-//
-//		// Run Replanner.
-//		
-//		this.parallelInitialReplanner.run(personsToReplan, time);
-
-	} // doInitialReplanning
 
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
@@ -380,11 +288,120 @@ public class WithinDayControler extends Controler {
 		return manager;
 	}
 
+
+	public static class ReplanningFlagInitializer implements SimulationInitializedListener{
+
+		protected WithinDayControler withinDayControler;
+		protected Map<Id, WithinDayPersonAgent> withinDayPersonAgents;
+				
+		protected int noReplanningCounter = 0;
+		protected int initialReplanningCounter = 0;
+		protected int actEndReplanningCounter = 0;
+		protected int leaveLinkReplanningCounter = 0;
+		
+		public ReplanningFlagInitializer(WithinDayControler controler)
+		{
+			this.withinDayControler = controler;
+		}
+		
+		@Override
+		public void notifySimulationInitialized(SimulationInitializedEvent e)
+		{
+			collectAgents((QueueSimulation)e.getQueueSimulation());
+			setReplanningFlags();
+			
+		}
+		
+		protected void setReplanningFlags()
+		{
+			noReplanningCounter = 0;
+			initialReplanningCounter = 0;
+			actEndReplanningCounter = 0;
+			leaveLinkReplanningCounter = 0;
+
+			Random random = MatsimRandom.getLocalInstance();
+			
+			for (WithinDayPersonAgent withinDayPersonAgent : this.withinDayPersonAgents.values())
+			{
+				double probability;
+				boolean noReplanning = true;
+
+				probability = random.nextDouble();
+				if (probability > withinDayControler.pInitialReplanning) ;
+				else
+				{
+					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.initialReplanner);
+					noReplanning = false;
+					initialReplanningCounter++;
+				}
+
+				// No Replanning
+				probability = random.nextDouble();
+				if (probability > withinDayControler.pActEndReplanning) ;
+				else
+				{
+					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.duringActivityReplanner);
+					noReplanning = false;
+					actEndReplanningCounter++;
+				}
+
+				// No Replanning
+				probability = random.nextDouble();
+				if (probability > withinDayControler.pLeaveLinkReplanning) ;
+				else
+				{
+					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.duringLegReplanner);
+					noReplanning = false;
+					leaveLinkReplanningCounter++;
+				}
+
+				// if non of the Replanning Modules was activated
+				if (noReplanning) noReplanningCounter++;
+
+				// (de)activate replanning if they are not needed
+				if (initialReplanningCounter == 0) withinDayControler.replanningManager.doInitialReplanning(false);
+				else withinDayControler.replanningManager.doInitialReplanning(true);
+				
+				if (actEndReplanningCounter == 0) withinDayControler.replanningManager.doActEndReplanning(false);
+				else withinDayControler.replanningManager.doActEndReplanning(true);
+
+				if (leaveLinkReplanningCounter == 0) withinDayControler.replanningManager.doLeaveLinkReplanning(false);
+				else withinDayControler.replanningManager.doLeaveLinkReplanning(true);
+			}
+
+			log.info("Initial Replanning Probability: " + withinDayControler.pInitialReplanning);
+			log.info("Act End Replanning Probability: " + withinDayControler.pActEndReplanning);
+			log.info("Leave Link Replanning Probability: " + withinDayControler.pLeaveLinkReplanning);
+
+			double numPersons = withinDayControler.population.getPersons().size();
+			log.info(noReplanningCounter + " persons don't replan their Plans ("+ noReplanningCounter / numPersons * 100.0 + "%)");
+			log.info(initialReplanningCounter + " persons replan their plans initially (" + initialReplanningCounter / numPersons * 100.0 + "%)");
+			log.info(actEndReplanningCounter + " persons replan their plans after an activity (" + actEndReplanningCounter / numPersons * 100.0 + "%)");
+			log.info(leaveLinkReplanningCounter + " persons replan their plans at each node (" + leaveLinkReplanningCounter / numPersons * 100.0 + "%)");
+		}
+		
+		protected void collectAgents(QueueSimulation sim)
+		{
+			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
+			
+			for (QueueLink queueLink : sim.getQueueNetwork().getLinks().values())
+			{
+				for (QueueVehicle queueVehicle : queueLink.getAllVehicles())
+				{
+					WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) queueVehicle.getDriver();
+					this.withinDayPersonAgents.put(withinDayPersonAgent.getPerson().getId(), withinDayPersonAgent);
+				}
+			}
+		}
+		
+	}
+	
 	/*
-	 * =================================================================== main
+	 * ===================================================================
+	 * main
 	 * ===================================================================
 	 */
-
+	
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");

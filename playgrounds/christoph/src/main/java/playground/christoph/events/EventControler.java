@@ -74,9 +74,9 @@ import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.ReplanningQueueSimulation;
-import playground.christoph.withinday.replanning.parallel.ParallelActEndReplanner;
+import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
-import playground.christoph.withinday.replanning.parallel.ParallelLeaveLinkReplanner;
+import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -124,8 +124,8 @@ public class EventControler extends Controler {
 	protected KnowledgeTravelTimeCalculator knowledgeTravelTime;
 
 	protected ParallelInitialReplanner parallelInitialReplanner;
-	protected ParallelActEndReplanner parallelActEndReplanner;
-	protected ParallelLeaveLinkReplanner parallelLeaveLinkReplanner;
+	protected ParallelDuringActivityReplanner parallelActEndReplanner;
+	protected ParallelDuringLegReplanner parallelLeaveLinkReplanner;
 	protected LinkVehiclesCounter2 linkVehiclesCounter;
 	protected LinkReplanningMap linkReplanningMap;
 	protected LookupTableUpdater lookupTableUpdater;
@@ -259,25 +259,12 @@ public class EventControler extends Controler {
 	 */
 	protected void initParallelReplanningModules()
 	{
-		this.parallelInitialReplanner = new ParallelInitialReplanner();
-		this.parallelInitialReplanner.setNumberOfThreads(numReplanningThreads);
-		this.parallelInitialReplanner.setReplannerArrayList(replanners);
-		this.parallelInitialReplanner.createReplannerArray();
-		this.parallelInitialReplanner.init();
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
+		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
+		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
 
-		this.parallelActEndReplanner = new ParallelActEndReplanner();
-		this.parallelActEndReplanner.setNumberOfThreads(numReplanningThreads);
-		this.parallelActEndReplanner.setReplannerArrayList(replanners);
-		this.parallelActEndReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
-		this.parallelActEndReplanner.init();
-
-		this.parallelLeaveLinkReplanner = new ParallelLeaveLinkReplanner(network);
-		this.parallelLeaveLinkReplanner.setNumberOfThreads(numReplanningThreads);
-		this.parallelLeaveLinkReplanner.setReplannerArrayList(replanners);
-		this.parallelLeaveLinkReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
-		this.parallelLeaveLinkReplanner.init();
 		
-		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner, sim);
+		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
 		// remove Knowledge after Replanning to save Memory
 		initialReplanningModule.setRemoveKnowledge(true);
 		replanningManager.setInitialReplanningModule(initialReplanningModule);
@@ -409,8 +396,8 @@ public class EventControler extends Controler {
 
 //		lookupTableUpdater.addLookupTable(LookupTable lookupTable);
 
-		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner, sim);
-		DuringLegReplanningModule leaveLinkReplanning = new DuringLegReplanningModule(parallelLeaveLinkReplanner, linkReplanningMap);
+		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner);
+		DuringLegReplanningModule leaveLinkReplanning = new DuringLegReplanningModule(parallelLeaveLinkReplanner);
 
 		replanningManager.setActEndReplanningModule(actEndReplanning);
 		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);

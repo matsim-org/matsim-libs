@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActEndReplanner.java
+ * NextLegReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,10 +21,12 @@
 package playground.christoph.withinday.replanning;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -35,19 +37,18 @@ import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 
 /*
- * MATSim Routers use Plan as Input Data. To be able to use them, we have to create
- * a new Plan from the current Position to the location of the next Activity.
- * 
- * If a Person had just ended one Activity (ActEndEvent), a new Plan is created which 
- * contains this and the next Activity and the Leg between them.
+ * The NextLegReplanner can be used while an Agent is performing an Activity. The
+ * Replanner creates a new Route from the current Activity to the next one in
+ * the Agent's Plan.
  */
 
-public class ActEndReplanner extends WithinDayDuringActivityReplanner{
+public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 		
-	private static final Logger log = Logger.getLogger(ActEndReplanner.class);
+	private static final Logger log = Logger.getLogger(NextLegReplanner.class);
 
-	public ActEndReplanner()
+	public NextLegReplanner(Id id)
 	{
+		super(id);
 	}
 	
 	/*
@@ -67,13 +68,13 @@ public class ActEndReplanner extends WithinDayDuringActivityReplanner{
 	 * due to the limited number of possible vehicles on a link at a time. An implementation
 	 * of such a functionality would be a problem due to the structure of MATSim...
 	 */
-	public boolean doReplanning()
+	public boolean doReplanning(DriverAgent driverAgent)
 	{	
 		// If we don't have a valid Replanner.
 		if (this.planAlgorithm == null) return false;
 		
 		// If we don't have a valid WithinDayPersonAgent
-		if (this.driverAgent == null) return false;
+		if (driverAgent == null) return false;
 		
 		WithinDayPersonAgent withinDayPersonAgent = null;
 		if (!(driverAgent instanceof WithinDayPersonAgent)) return false;
@@ -149,4 +150,12 @@ public class ActEndReplanner extends WithinDayDuringActivityReplanner{
 		return true;
 	}
 	
+	public NextLegReplanner clone()
+	{
+		NextLegReplanner clone = new NextLegReplanner(this.id);
+		
+		super.cloneBasicData(clone);
+		
+		return clone;
+	}
 }

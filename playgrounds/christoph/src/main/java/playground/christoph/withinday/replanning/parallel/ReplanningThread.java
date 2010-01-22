@@ -20,16 +20,18 @@
 
 package playground.christoph.withinday.replanning.parallel;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.withinday.replanning.ReplanningTask;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 
 /*
@@ -44,21 +46,22 @@ public abstract class ReplanningThread extends Thread{
 	protected double time = 0.0;
 	protected boolean simulationRunning = true;
 	
-	protected int threadId;
-	protected ArrayList<PlanAlgorithm> replanners;
-	protected PlanAlgorithm[][] replannerArray;
-	protected LinkedList<DriverAgent> agentsToReplan = new LinkedList<DriverAgent>();
+	/*
+	 *  The original WithinDayReplanners are initialized and assigned
+	 *  to the Agents. They are cloned to run on parallel replanning
+	 *  Threads. Each agents has references to the original Replanners,
+	 *  so we have to identify the corresponding clone! 
+	 */
+	protected Map<Id, WithinDayReplanner> withinDayReplanners = new TreeMap<Id, WithinDayReplanner>();
+	
+	protected LinkedList<ReplanningTask> replanningTasks = new LinkedList<ReplanningTask>();
 	protected WithinDayReplanner withinDayReplanner;
 	
 	protected CyclicBarrier timeStepStartBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
 	
-	public ReplanningThread(int threadId, PlanAlgorithm replannerArray[][], ArrayList<PlanAlgorithm> replanners)
+	public ReplanningThread()
 	{
-		this.threadId = threadId;
-		this.replannerArray = replannerArray;
-		this.replanners = replanners;
-		this.withinDayReplanner = null;
 	}
 	
 	public void setTime(double time)
@@ -81,9 +84,14 @@ public abstract class ReplanningThread extends Thread{
 		this.timeStepEndBarrier = barrier;
 	}
 
-	public void addAgentToReplan(DriverAgent driverAgent)
+	public void addReplanningTask(ReplanningTask replanningTask)
 	{			
-		agentsToReplan.add(driverAgent);
+		replanningTasks.add(replanningTask);
+	}
+	
+	public void addWithinDayReplanner(WithinDayReplanner withinDayReplanner)
+	{
+		this.withinDayReplanners.put(withinDayReplanner.getId(), withinDayReplanner);
 	}
 	
 	/*
@@ -92,24 +100,38 @@ public abstract class ReplanningThread extends Thread{
 	 */
 	protected void doReplanning()
 	{
-		DriverAgent driverAgent;
-		while((driverAgent = agentsToReplan.poll()) != null)
+		ReplanningTask replanningTask;
+		while((replanningTask = replanningTasks.poll()) != null)
 		{
-			// replanner of the person
-			PlanAlgorithm replanner = (PlanAlgorithm)driverAgent.getPerson().getCustomAttributes().get("Replanner");
+			Id id = replanningTask.getWithinDayReplannerId();
+			DriverAgent driverAgent = replanningTask.getAgentToReplan();
 			
-			// get the index of the Replanner in the replanners Array
-			int index = replanners.indexOf(replanner);
+			if (id == null)
+			{
+				log.error("WithinDayReplanner Id is null!");
+				return;
+			}
+			
+			if (driverAgent == null)
+			{
+				log.error("DriverAgent is null!");
+				return;
+			}
+			
+			WithinDayReplanner withinDayReplanner = this.withinDayReplanners.get(id);
+			
+			if (withinDayReplanner != null)
+			{
+				withinDayReplanner.setTime(time);
+				boolean replanningSuccessful = withinDayReplanner.doReplanning(driverAgent);
 				
-			// get the replanner or a clone if it, if it's not the first running thread
-			replanner = this.replannerArray[index][threadId];		
-			
-			withinDayReplanner.setTime(time);
-			withinDayReplanner.setDriverAgent(driverAgent);
-			withinDayReplanner.setReplanner(replanner);
-			boolean replanningSuccessful = withinDayReplanner.doReplanning();
-			
-			if (!replanningSuccessful) log.error("Replanning was not successful!");
+				if (!replanningSuccessful) log.error("Replanning was not successful!");
+			}
+			else
+			{
+				log.error("WithinDayReplanner is null!");
+			}
+
 		}
 	}
 	

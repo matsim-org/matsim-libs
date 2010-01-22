@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayReplanningModule.java
+ * ReplanningIdGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,13 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.mobsim;
+package playground.christoph.withinday.replanning;
 
-import playground.christoph.withinday.replanning.parallel.ParallelReplanner;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
-public abstract class WithinDayReplanningModule {
-
-	protected ParallelReplanner parallelReplanner;
-
-	public abstract void doReplanning(double time); 
+public class ReplanningIdGenerator {
+	
+	private static int idCount = 0;
+	
+	public static Id getNextId()
+	{
+		Id id = new IdImpl(idCount);
+		idCount++;
+		
+		return id;
+	}
 }

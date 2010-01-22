@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.events.EventControler;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
@@ -17,7 +19,6 @@ import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.util.DijkstraWrapperFactory;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
-import playground.johannes.socialnetworks.ivtsurveys.FreespeedTravelTime;
 
 public class IterativeKnowledgeControler extends Controler{
 
@@ -68,7 +69,7 @@ public class IterativeKnowledgeControler extends Controler{
 		
 		// Use a Wrapper - by doing this, already available MATSim
 		// CostCalculators can be used
-		FreespeedTravelTime travelTime = new FreespeedTravelTime();
+		TravelTime travelTime = new FreespeedTravelTimeCost();
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);

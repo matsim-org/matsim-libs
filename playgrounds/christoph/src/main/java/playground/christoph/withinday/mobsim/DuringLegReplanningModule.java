@@ -22,41 +22,40 @@ package playground.christoph.withinday.mobsim;
 
 import java.util.List;
 
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 
-import playground.christoph.events.LinkReplanningMap;
-import playground.christoph.withinday.replanning.parallel.ParallelLeaveLinkReplanner;
+import playground.christoph.withinday.replanning.ReplanningTask;
+import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
+import playground.christoph.withinday.replanning.WithinDayReplanner;
+import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
+import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 
-/*
- * Uses a LinkReplanningMap Object to determine which
- * Agents within a Simulation need a replanning of their
- * plans.
- */
-public class DuringLegReplanningModule implements WithinDayReplanningModule{
-
-	public static int replanningCounter = 0;
-	
-	protected ParallelLeaveLinkReplanner parallelLeaveLinkReplanner;
-	protected LinkReplanningMap linkReplanningMap;
-	
-	public DuringLegReplanningModule(ParallelLeaveLinkReplanner parallelLeaveLinkReplanner, LinkReplanningMap linkReplanningMap)
+public class DuringLegReplanningModule extends WithinDayReplanningModule{
+		
+	public DuringLegReplanningModule(ParallelDuringLegReplanner parallelDuringLegReplanner)
 	{
-		this.parallelLeaveLinkReplanner = parallelLeaveLinkReplanner;
-		this.linkReplanningMap = linkReplanningMap;
+		this.parallelReplanner = parallelDuringLegReplanner;
 	}
 	
 	public void doReplanning(double time)
 	{
-		List<QueueVehicle> vehiclesToReplanLeaveLink = linkReplanningMap.getReplanningVehicles(time);
-		for (QueueVehicle queueVehicle : vehiclesToReplanLeaveLink)
+		for (WithinDayReplanner replanner : this.parallelReplanner.getWithinDayReplanners())
 		{
-			parallelLeaveLinkReplanner.addAgentToReplan(queueVehicle.getDriver());
+			if(replanner instanceof WithinDayDuringLegReplanner)
+			{
+				List<AgentsToReplanIdentifier> identifiers = replanner.getAgentsToReplanIdentifers();
+				
+				for (AgentsToReplanIdentifier identifier : identifiers)
+				{
+					for (DriverAgent driverAgent : identifier.getAgentsToReplan(time, replanner))
+					{
+						ReplanningTask replanningTask = new ReplanningTask(driverAgent, replanner.getId());
+						this.parallelReplanner.addReplanningTask(replanningTask);
+					}
+				}
+			}
 		}
-		if (vehiclesToReplanLeaveLink.size() > 0)
-		{
-			replanningCounter = replanningCounter + vehiclesToReplanLeaveLink.size();
-			parallelLeaveLinkReplanner.run(time);
-		}
+		
+		this.parallelReplanner.run(time);
 	}
-
 }

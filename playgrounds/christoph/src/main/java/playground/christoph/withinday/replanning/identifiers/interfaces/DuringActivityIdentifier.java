@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayReplanningModule.java
+ * DuringActivityIdentifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,13 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.mobsim;
+package playground.christoph.withinday.replanning.identifiers.interfaces;
 
-import playground.christoph.withinday.replanning.parallel.ParallelReplanner;
 
-public abstract class WithinDayReplanningModule {
+public abstract class DuringActivityIdentifier extends AgentsToReplanIdentifier {
 
-	protected ParallelReplanner parallelReplanner;
-
-	public abstract void doReplanning(double time); 
 }

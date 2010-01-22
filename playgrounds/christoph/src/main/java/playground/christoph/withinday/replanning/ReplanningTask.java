@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayReplanningModule.java
+ * ReplanningTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,13 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.mobsim;
+package playground.christoph.withinday.replanning;
 
-import playground.christoph.withinday.replanning.parallel.ParallelReplanner;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 
-public abstract class WithinDayReplanningModule {
+public class ReplanningTask {
 
-	protected ParallelReplanner parallelReplanner;
-
-	public abstract void doReplanning(double time); 
+	protected DriverAgent driverToReplan;
+	protected Id withinDayReplannerId;
+	
+	public ReplanningTask(DriverAgent driverToReplan, Id withinDayReplannerId)
+	{
+		this.driverToReplan = driverToReplan;
+		this.withinDayReplannerId = withinDayReplannerId;
+	}
+	
+	public DriverAgent getAgentToReplan()
+	{
+		return this.driverToReplan;
+	}
+	
+	public Id getWithinDayReplannerId()
+	{
+		return this.withinDayReplannerId;
+	}
 }

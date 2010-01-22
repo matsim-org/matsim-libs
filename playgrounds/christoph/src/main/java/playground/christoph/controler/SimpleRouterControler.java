@@ -23,19 +23,28 @@ package playground.christoph.controler;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.controler.WithinDayControler.ReplanningFlagInitializer;
+import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
@@ -51,6 +60,16 @@ import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.ReplanningQueueSimulation;
+import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
+import playground.christoph.withinday.replanning.CurrentLegReplanner;
+import playground.christoph.withinday.replanning.InitialReplanner;
+import playground.christoph.withinday.replanning.NextLegReplanner;
+import playground.christoph.withinday.replanning.ReplanningIdGenerator;
+import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
+import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifier;
+import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImpl;
+import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier;
+import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 
 /**
@@ -108,6 +127,14 @@ public class SimpleRouterControler extends Controler {
 	protected int randomCompassRouterCounter = 0;
 	protected int randomDijkstraRouterCounter = 0;
 	
+	protected InitialIdentifier initialIdentifier;
+	protected WithinDayInitialReplanner randomReplanner;
+	protected WithinDayInitialReplanner tabuReplanner;
+	protected WithinDayInitialReplanner compassReplanner;
+	protected WithinDayInitialReplanner randomCompassReplanner;
+	protected WithinDayInitialReplanner randomDijkstraReplanner;
+	
+	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
 	/*
 	 * TravelTime and TravelCost for the Dijkstra Router
 	 */
@@ -167,26 +194,42 @@ public class SimpleRouterControler extends Controler {
 	 * By doing this every person can use a personalised Router.
 	 */
 	protected void initReplanningRouter() {
-		replanners = new ArrayList<PlanAlgorithm>();
+		
+		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 		
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
 		KnowledgePlansCalcRoute randomRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomRoute(this.network)));
-		replanners.add(randomRouter);
+		this.randomReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.randomReplanner.setReplanner(randomRouter);
+		this.randomReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.parallelInitialReplanner.addWithinDayReplanner(this.randomReplanner);
 
 		KnowledgePlansCalcRoute tabuRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new TabuRoute(this.network)));
-		replanners.add(tabuRouter);
+		this.tabuReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.tabuReplanner.setReplanner(tabuRouter);
+		this.tabuReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.parallelInitialReplanner.addWithinDayReplanner(this.tabuReplanner);
 
 		KnowledgePlansCalcRoute compassRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new CompassRoute(this.network)));
-		replanners.add(compassRouter);
+		this.compassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.compassReplanner.setReplanner(compassRouter);
+		this.compassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.parallelInitialReplanner.addWithinDayReplanner(this.compassReplanner);
 
 		KnowledgePlansCalcRoute randomCompassRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomCompassRoute(this.network)));
-		replanners.add(randomCompassRouter);
+		this.randomCompassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.randomCompassReplanner.setReplanner(randomCompassRouter);
+		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.parallelInitialReplanner.addWithinDayReplanner(this.randomCompassReplanner);
 
 		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime);
 		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
 		KnowledgePlansCalcRoute randomDijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(randomDijkstraRoute));
-		replanners.add(randomDijkstraRouter);
+		this.randomDijkstraReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.randomDijkstraReplanner.setReplanner(randomDijkstraRouter);
+		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.parallelInitialReplanner.addWithinDayReplanner(this.randomDijkstraReplanner);
 	}
 
 	/*
@@ -194,14 +237,10 @@ public class SimpleRouterControler extends Controler {
 	 */
 	protected void initParallelReplanningModules()
 	{	
-		this.parallelInitialReplanner = new ParallelInitialReplanner();
-		this.parallelInitialReplanner.setNumberOfThreads(numReplanningThreads);
-		this.parallelInitialReplanner.setReplannerArrayList(replanners);
-		this.parallelInitialReplanner.createReplannerArray();
-		this.parallelInitialReplanner.init();
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
 		this.parallelInitialReplanner.setRemoveKnowledge(true);
 		
-		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner, sim);
+		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
 		replanningManager.setInitialReplanningModule(initialReplanningModule);
 	}
 	
@@ -210,6 +249,15 @@ public class SimpleRouterControler extends Controler {
 	{
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 		sim.addQueueSimulationListeners(replanningManager);
+		
+		/*
+		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
+		 * ensure that they are started in the needed order.
+		 */
+		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
+		foqsl.addQueueSimulationInitializedListener(rfi);
+		foqsl.addQueueSimulationInitializedListener(replanningManager);
+		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
 		
 		if (useKnowledge)
 		{
@@ -222,107 +270,8 @@ public class SimpleRouterControler extends Controler {
 
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();
-
-		log.info("Set Replanners for each Person");
-		setReplanners();
 		
 		sim.run();
-	}
-
-	/*
-	 * Assigns a replanner to every Person of the population. 
-	 * 
-	 * At the moment: Replanning Modules are assigned hard coded. Later: Modules
-	 * are assigned based on probabilities from config files.
-	 */
-	protected void setReplanners() 
-	{
-		for (Person p : this.getPopulation().getPersons().values()) {
-			Map<String, Object> customAttributes = p.getCustomAttributes();
-			
-			double probability;
-			Random random = MatsimRandom.getLocalInstance();
-			probability = random.nextDouble();
-			
-			double pRandomRouterLow = 0.0;
-			double pRandomRouterHigh = pRandomRouter;
-			double pTabuRouterLow = pRandomRouter;
-			double pTabuRouterHigh = pRandomRouter + pTabuRouter;
-			double pCompassRouterLow = pRandomRouter + pTabuRouter;
-			double pCompassRouterHigh = pRandomRouter + pTabuRouter + pCompassRouter;
-			double pRandomCompassRouterLow = pRandomRouter + pTabuRouter + pCompassRouter;
-			double pRandomCompassRouterHigh = pRandomRouter + pTabuRouter + pCompassRouter + pRandomCompassRouter;
-			double pRandomDijkstraRouterLow = pRandomRouter + pTabuRouter + pCompassRouter + pRandomCompassRouter;
-			double pRandomDijkstraRouterHigh = pRandomRouter + pTabuRouter + pCompassRouter + pRandomCompassRouter + pRandomDijkstraRouter;
-
-			
-			// Random Router
-			if (pRandomRouterLow <= probability && probability < pRandomRouterHigh)
-			{
-				customAttributes.put("Replanner", replanners.get(0)); // Random
-				customAttributes.put("initialReplanning", new Boolean(true));
-				initialReplanningCounter++;
-				randomRouterCounter++;
-			}
-			// Tabu Router
-			else if (pTabuRouterLow <= probability && probability < pTabuRouterHigh)
-			{
-				customAttributes.put("Replanner", replanners.get(1)); // Tabu
-				customAttributes.put("initialReplanning", new Boolean(true));
-				initialReplanningCounter++;
-				tabuRouterCounter++;
-			}
-			// Compass Router
-			else if (pCompassRouterLow <= probability && probability < pCompassRouterHigh)
-			{
-				customAttributes.put("Replanner", replanners.get(2)); // Compass
-				customAttributes.put("initialReplanning", new Boolean(true));
-				initialReplanningCounter++;
-				compassRouterCounter++;
-			}
-			// Random Compass Router
-			else if (pRandomCompassRouterLow <= probability && probability < pRandomCompassRouterHigh)
-			{
-				customAttributes.put("Replanner", replanners.get(3)); // RandomCompass
-				customAttributes.put("initialReplanning", new Boolean(true));
-				initialReplanningCounter++;
-				randomCompassRouterCounter++;
-			}
-			// Random Dijkstra Router
-			else if (pRandomDijkstraRouterLow <= probability && probability <= pRandomDijkstraRouterHigh)
-			{
-				customAttributes.put("Replanner", replanners.get(4)); // RandomDijkstra
-				customAttributes.put("initialReplanning", new Boolean(true));
-				initialReplanningCounter++;
-				randomDijkstraRouterCounter++;
-			}
-			// No Router
-			else
-			{
-				customAttributes.put("initialReplanning", new Boolean(false));
-				noReplanningCounter++;
-			}
-
-			// (de)activate replanning if they are not needed
-			if (initialReplanningCounter == 0) replanningManager.doInitialReplanning(false);
-			else replanningManager.doInitialReplanning(true);
-		}
-		
-		log.info("Random Routing Probability: " + pRandomRouter);
-		log.info("Tabu Routing Probability: " + pTabuRouter);
-		log.info("Compass Routing Probability: " + pCompassRouter);
-		log.info("Random Compass Routing Probability: " + pRandomCompassRouter);
-		log.info("Random Dijkstra Routing Probability: " + pRandomDijkstraRouter);
-
-		double numPersons = this.population.getPersons().size();
-		log.info(randomRouterCounter + " persons use a Random Router (" + randomRouterCounter / numPersons * 100.0 + "%)");
-		log.info(tabuRouterCounter + " persons use a Tabu Router (" + tabuRouterCounter / numPersons * 100.0 + "%)");
-		log.info(compassRouterCounter + " persons use a Compass Router (" + compassRouterCounter / numPersons * 100.0 + "%)");
-		log.info(randomCompassRouterCounter + " persons use a Random Compass Router (" + randomCompassRouterCounter / numPersons * 100.0 + "%)");
-		log.info(randomDijkstraRouterCounter + " persons use a Random Dijkstra Router (" + randomDijkstraRouterCounter / numPersons * 100.0 + "%)");
-		
-		log.info(noReplanningCounter + " persons don't replan their Plans ("+ noReplanningCounter / numPersons * 100.0 + "%)");
-		log.info(initialReplanningCounter + " persons replan their plans initially (" + initialReplanningCounter / numPersons * 100.0 + "%)");
 	}
 
 	/*
@@ -355,9 +304,144 @@ public class SimpleRouterControler extends Controler {
 		MyStrategyManagerConfigLoader.load(this, this.config, manager);
 		return manager;
 	}
+	
+	public static class ReplanningFlagInitializer implements SimulationInitializedListener{
+
+		protected SimpleRouterControler simpleRouterControler;
+		protected Map<Id, WithinDayPersonAgent> withinDayPersonAgents;
+				
+		protected int noReplanningCounter = 0;
+		protected int initialReplanningCounter = 0;
+		protected int actEndReplanningCounter = 0;
+		protected int leaveLinkReplanningCounter = 0;
+		
+		public ReplanningFlagInitializer(SimpleRouterControler controler)
+		{
+			this.simpleRouterControler = controler;
+		}
+		
+		@Override
+		public void notifySimulationInitialized(SimulationInitializedEvent e)
+		{
+			collectAgents((QueueSimulation)e.getQueueSimulation());
+			setReplanningFlags();
+			
+		}
+		
+		/*
+		 * Assigns a replanner to every Person of the population. 
+		 * 
+		 * At the moment: Replanning Modules are assigned hard coded. Later: Modules
+		 * are assigned based on probabilities from config files.
+		 */
+		protected void setReplanningFlags() 
+		{
+			for (WithinDayPersonAgent withinDayPersonAgent : this.withinDayPersonAgents.values())
+			{
+				double probability;
+				Random random = MatsimRandom.getLocalInstance();
+				probability = random.nextDouble();
+				
+				double pRandomRouterLow = 0.0;
+				double pRandomRouterHigh = simpleRouterControler.pRandomRouter;
+				double pTabuRouterLow = simpleRouterControler.pRandomRouter;
+				double pTabuRouterHigh = simpleRouterControler.pRandomRouter + simpleRouterControler.pTabuRouter;
+				double pCompassRouterLow = simpleRouterControler.pRandomRouter + simpleRouterControler.pTabuRouter;
+				double pCompassRouterHigh = simpleRouterControler.pRandomRouter + simpleRouterControler.pTabuRouter + 
+						simpleRouterControler.pCompassRouter;
+				double pRandomCompassRouterLow = simpleRouterControler.pRandomRouter + 
+						simpleRouterControler.pTabuRouter + simpleRouterControler.pCompassRouter;
+				double pRandomCompassRouterHigh = simpleRouterControler.pRandomRouter + simpleRouterControler.pTabuRouter + 
+						simpleRouterControler.pCompassRouter + simpleRouterControler.pRandomCompassRouter;
+				double pRandomDijkstraRouterLow = simpleRouterControler.pRandomRouter + simpleRouterControler.pTabuRouter + 
+						simpleRouterControler.pCompassRouter + simpleRouterControler.pRandomCompassRouter;
+				double pRandomDijkstraRouterHigh = simpleRouterControler.pRandomRouter + simpleRouterControler.pTabuRouter + 
+						simpleRouterControler.pCompassRouter + simpleRouterControler.pRandomCompassRouter + 
+						simpleRouterControler.pRandomDijkstraRouter;
+
+				
+				// Random Router
+				if (pRandomRouterLow <= probability && probability < pRandomRouterHigh)
+				{
+					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.randomReplanner);
+					initialReplanningCounter++;
+					simpleRouterControler.randomRouterCounter++;
+				}
+				// Tabu Router
+				else if (pTabuRouterLow <= probability && probability < pTabuRouterHigh)
+				{
+					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.tabuReplanner);
+					initialReplanningCounter++;
+					simpleRouterControler.tabuRouterCounter++;
+				}
+				// Compass Router
+				else if (pCompassRouterLow <= probability && probability < pCompassRouterHigh)
+				{
+					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.compassReplanner);
+					initialReplanningCounter++;
+					simpleRouterControler.compassRouterCounter++;
+				}
+				// Random Compass Router
+				else if (pRandomCompassRouterLow <= probability && probability < pRandomCompassRouterHigh)
+				{
+					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.randomCompassReplanner);
+					initialReplanningCounter++;
+					simpleRouterControler.randomCompassRouterCounter++;
+				}
+				// Random Dijkstra Router
+				else if (pRandomDijkstraRouterLow <= probability && probability <= pRandomDijkstraRouterHigh)
+				{
+					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.randomDijkstraReplanner);
+					initialReplanningCounter++;
+					simpleRouterControler.randomDijkstraRouterCounter++;
+				}
+				// No Router
+				else
+				{
+					noReplanningCounter++;
+				}
+
+				// (de)activate replanning if they are not needed
+				if (initialReplanningCounter == 0) simpleRouterControler.replanningManager.doInitialReplanning(false);
+				else simpleRouterControler.replanningManager.doInitialReplanning(true);
+			}
+			
+			log.info("Random Routing Probability: " + simpleRouterControler.pRandomRouter);
+			log.info("Tabu Routing Probability: " + simpleRouterControler.pTabuRouter);
+			log.info("Compass Routing Probability: " + simpleRouterControler.pCompassRouter);
+			log.info("Random Compass Routing Probability: " + simpleRouterControler.pRandomCompassRouter);
+			log.info("Random Dijkstra Routing Probability: " + simpleRouterControler.pRandomDijkstraRouter);
+
+			double numPersons = simpleRouterControler.population.getPersons().size();
+			log.info(simpleRouterControler.randomRouterCounter + " persons use a Random Router (" + simpleRouterControler.randomRouterCounter / numPersons * 100.0 + "%)");
+			log.info(simpleRouterControler.tabuRouterCounter + " persons use a Tabu Router (" + simpleRouterControler.tabuRouterCounter / numPersons * 100.0 + "%)");
+			log.info(simpleRouterControler.compassRouterCounter + " persons use a Compass Router (" + simpleRouterControler.compassRouterCounter / numPersons * 100.0 + "%)");
+			log.info(simpleRouterControler.randomCompassRouterCounter + " persons use a Random Compass Router (" + simpleRouterControler.randomCompassRouterCounter / numPersons * 100.0 + "%)");
+			log.info(simpleRouterControler.randomDijkstraRouterCounter + " persons use a Random Dijkstra Router (" + simpleRouterControler.randomDijkstraRouterCounter / numPersons * 100.0 + "%)");
+			
+			log.info(noReplanningCounter + " persons don't replan their Plans ("+ noReplanningCounter / numPersons * 100.0 + "%)");
+			log.info(initialReplanningCounter + " persons replan their plans initially (" + initialReplanningCounter / numPersons * 100.0 + "%)");
+		}
+				
+		protected void collectAgents(QueueSimulation sim)
+		{
+			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
+			
+			for (QueueLink queueLink : sim.getQueueNetwork().getLinks().values())
+			{
+				for (QueueVehicle queueVehicle : queueLink.getAllVehicles())
+				{
+					WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) queueVehicle.getDriver();
+					this.withinDayPersonAgents.put(withinDayPersonAgent.getPerson().getId(), withinDayPersonAgent);
+				}
+			}
+		}
+		
+	}
 
 	/*
-	 * =================================================================== main
+	 * ===================================================================
+	 * main
 	 * ===================================================================
 	 */
 

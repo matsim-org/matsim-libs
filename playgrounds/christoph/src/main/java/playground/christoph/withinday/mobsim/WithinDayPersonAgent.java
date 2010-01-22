@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.christoph.withinday.mobsim;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -27,16 +29,16 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+
+import playground.christoph.withinday.replanning.WithinDayReplanner;
+import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 
 public class WithinDayPersonAgent extends PersonAgent{
 
 	private static final Logger log = Logger.getLogger(WithinDayPersonAgent.class);
 
-	private boolean initialReplanning = false;
-	private boolean endActivityReplanning = false;
-	private boolean leaveLinkReplanning = false;
+	private List<WithinDayReplanner> withinDayReplanner = new ArrayList<WithinDayReplanner>();
 	
 	public WithinDayPersonAgent(final PersonImpl p, final QueueSimulation simulation)
 	{
@@ -94,27 +96,18 @@ public class WithinDayPersonAgent extends PersonAgent{
 		return currentActivity;
 	}
 	
-	public boolean isInitialReplanning() {
-		return initialReplanning;
+	public boolean addWithinDayReplanner(WithinDayReplanner replanner)
+	{
+		return this.withinDayReplanner.add(replanner);
 	}
-
-	public void setInitialReplanning(boolean initialReplanning) {
-		this.initialReplanning = initialReplanning;
+	
+	public boolean removeWithinDayReplanner(WithinDayReplanner replanner)
+	{
+		return this.withinDayReplanner.remove(replanner);
 	}
-
-	public boolean isEndActivityReplanning() {
-		return endActivityReplanning;
-	}
-
-	public void setEndActivityReplanning(boolean endActivityReplanning) {
-		this.endActivityReplanning = endActivityReplanning;
-	}
-
-	public boolean isLeaveLinkReplanning() {
-		return leaveLinkReplanning;
-	}
-
-	public void setLeaveLinkReplanning(boolean leaveLinkReplanning) {
-		this.leaveLinkReplanning = leaveLinkReplanning;
+	
+	public List<WithinDayReplanner> getWithinDayReplanners()
+	{
+		return Collections.unmodifiableList(withinDayReplanner);
 	}
 }

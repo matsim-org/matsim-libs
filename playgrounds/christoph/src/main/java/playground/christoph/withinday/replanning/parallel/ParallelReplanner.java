@@ -21,15 +21,16 @@
 package playground.christoph.withinday.replanning.parallel;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.router.KnowledgePlansCalcRoute;
+import playground.christoph.withinday.replanning.ReplanningTask;
+import playground.christoph.withinday.replanning.WithinDayReplanner;
 
 /*
  * Abstract class that contains the basic elements that are needed 
@@ -44,17 +45,20 @@ public abstract class ParallelReplanner {
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
 	
 	protected int numOfThreads = 1;	// use by default only one thread
-	protected ArrayList<PlanAlgorithm> replanners;
-	protected PlanAlgorithm[][] replannerArray;
+	protected List<WithinDayReplanner> originalReplanners = new ArrayList<WithinDayReplanner>();
 	protected ReplanningThread[] replanningThreads;
-	protected int roundRobin = 0;	
+	protected int roundRobin = 0;
+	private int lastRoundRobin = 0;
 	protected CyclicBarrier timeStepStartBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
 	
-	
-	public void init()
+	public ParallelReplanner(int numOfThreads)
 	{
-		
+		this.setNumberOfThreads(numOfThreads);
+	}
+	
+	protected void init()
+	{		
 		this.timeStepStartBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.timeStepEndBarrier = new CyclicBarrier(numOfThreads + 1);
 
@@ -96,6 +100,10 @@ public abstract class ParallelReplanner {
 	 */
 	public void run(double time)
 	{
+		// no Agents to Replan
+		if (lastRoundRobin == roundRobin) return;
+		else lastRoundRobin = roundRobin;
+		
 		try
 		{
 			// set current Time
@@ -118,86 +126,34 @@ public abstract class ParallelReplanner {
 		}
 	}
 	
-	/**
-	 * The Number of Threads must have been set before this call!
-	 * @param replannerArrayList
-	 */
-	// Set the Replanners ArrayList here - this can be done once from the Controler
-	public void setReplannerArrayList(ArrayList<PlanAlgorithm> replannerArrayList)
+	public void addWithinDayReplanner(WithinDayReplanner replanner)
 	{
-		replanners = replannerArrayList;
-	}
-	
-	/*
-	 * We also can use the same Array in different Replanners. 
-	 */
-	public void setReplannerArray(PlanAlgorithm[][] array)
-	{
-		this.replannerArray = array;
-	}
-	
-	public PlanAlgorithm[][] getReplannerArray()
-	{
-		return replannerArray;
-	}
-	
-	public void addAgentToReplan(DriverAgent driverAgent)
-	{
-		this.replanningThreads[this.roundRobin % this.numOfThreads].addAgentToReplan(driverAgent);
-		this.roundRobin++;	
-	}
-	
-	/* 
-	 * Creates an Array that contains the Replanners that were initialized in the Controler
-	 * and clone of them for every additional replanning thread.
-	 * 1 replanning thread -> uses existing replanners
-	 * 2 replanning thread -> uses existing replanners and one clone of each
-	 * 
-	 * If the Replanners from the replanners ArrayList have changed, an update of the
-	 * ArrayList can be initiated by using this method.
-	 */
-	public void createReplannerArray()
-	{	
-		// create and fill Array of PlanAlgorithms used in the threads
-		replannerArray = new PlanAlgorithm[replanners.size()][numOfThreads];
+		this.originalReplanners.add(replanner);
 		
-		for(int i = 0; i < replanners.size(); i++)
+		for (ReplanningThread replanningThread : this.replanningThreads)
 		{
-			PlanAlgorithm replanner = replanners.get(i);
-		
-			// fill first row with already defined selectors
-			replannerArray[i][0] = replanner;
-			
-			// fill the other fields in the current row with clones
-			for(int j = 1; j < numOfThreads; j++)
-			{
-				// insert clone
-				if (replanner instanceof KnowledgePlansCalcRoute)
-				{
-					replannerArray[i][j] = ((KnowledgePlansCalcRoute)replanner).clone();
-				}
-				else
-				{
-					log.error("replanner class " + replanner.getClass());
-					log.error("Could not clone the Replanner - use reference to the existing Replanner and hope the best...");
-					replannerArray[i][j] = replanner;
-				}	
-			}
+			WithinDayReplanner clone = replanner.clone();
+			replanningThread.addWithinDayReplanner(clone);
 		}
 	}
 	
-	public void setNumberOfThreads(int numberOfThreads)
+	public List<WithinDayReplanner> getWithinDayReplanners()
+	{
+		return Collections.unmodifiableList(this.originalReplanners);
+	}
+		
+	public void addReplanningTask(ReplanningTask replanningTask)
+	{
+		this.replanningThreads[this.roundRobin % this.numOfThreads].addReplanningTask(replanningTask);
+		this.roundRobin++;
+	}
+		
+	private void setNumberOfThreads(int numberOfThreads)
 	{		
 		numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 		
 		log.info("Using " + numOfThreads + " parallel threads to replan routes.");
-		
-//		// if the number of used threads has changed -> PlanAlgorithms Array has to be recreated
-//		if (numOfThreads != currentNumOfThreads)
-//		{
-//			createReplannerArray();
-//		}
-		
+				
 		/*
 		 *  Throw error message if the number of threads is bigger than the number of available CPUs.
 		 *  This should not speed up calculation anymore.

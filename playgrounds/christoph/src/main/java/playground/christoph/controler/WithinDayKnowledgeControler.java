@@ -36,6 +36,13 @@ import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.util.DijkstraWrapperFactory;
+import playground.christoph.withinday.replanning.CurrentLegReplanner;
+import playground.christoph.withinday.replanning.InitialReplanner;
+import playground.christoph.withinday.replanning.NextLegReplanner;
+import playground.christoph.withinday.replanning.ReplanningIdGenerator;
+import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifier;
+import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImpl;
+import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier;
 
 /**
  * This Controler should give an Example what is needed to run
@@ -87,7 +94,6 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 	 */
 	@Override
 	protected void initReplanningRouter() {
-		replanners = new ArrayList<PlanAlgorithm>();
 		
 		/*
 		 * Calculate the TravelTime based on the actual load of the links. Use only 
@@ -103,7 +109,24 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
 				travelCostWrapper, travelTimeWrapper, new DijkstraWrapperFactory());
-		replanners.add(dijkstraRouter);
+		
+		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
+		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.initialReplanner.setReplanner(dijkstraRouter);
+		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
+		
+		this.duringActivityIdentifier = new ActivityEndIdentifier(this.sim);
+		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId());
+		this.duringActivityReplanner.setReplanner(dijkstraRouter);
+		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
+		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
+		
+		this.duringLegIdentifier = new LeaveLinkIdentifier(this.linkReplanningMap);
+		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.network);
+		this.duringLegReplanner.setReplanner(dijkstraRouter);
+		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
+		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
 	}
 
 	/*

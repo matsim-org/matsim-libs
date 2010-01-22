@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LeaveLinkReplanner.java
+ * CurrentLegReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -25,11 +25,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
@@ -44,13 +44,9 @@ import playground.christoph.events.ExtendedAgentReplanEventImpl;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 
 /*
- * As the ActEndReplanner the LeaveLinkReplanner should be called when a
- * LeaveLinkEvent is thrown. At the moment this does not work because
- * such an Event is thrown AFTER a Person left a link and entered a new link.
- *
- * The current solution is to call the method by hand in the MyQueueNode class
- * when a Person is at the End of a Link but before leaving the link.
- *
+ * The CurrentLegReplanner can be used while an Agent travels from
+ * one Activity to another one.
+ * 
  * MATSim Routers use Plan as Input Data. To be able to use them, we have to create
  * a new Plan from the current Position to the location of the next Activity.
  *
@@ -63,15 +59,15 @@ import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
  * Links that already have been passed by the Person.
  */
 
-public class LeaveLinkReplanner extends WithinDayDuringLegReplanner{
+public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 
 	private Network network;
 
+	private static final Logger log = Logger.getLogger(CurrentLegReplanner.class);
 
-	private static final Logger log = Logger.getLogger(LeaveLinkReplanner.class);
-
-	public LeaveLinkReplanner(Network network)
+	public CurrentLegReplanner(Id id, Network network)
 	{
+		super(id);
 		this.network = network;
 	}
 	
@@ -83,13 +79,13 @@ public class LeaveLinkReplanner extends WithinDayDuringLegReplanner{
 	 * - create a new Route from the current Location to the Destination
 	 * - merge already passed parts of the current Route with the new created Route
 	 */
-	public boolean doReplanning()
+	public boolean doReplanning(DriverAgent driverAgent)
 	{
 		// If we don't have a valid Replanner.
 		if (this.planAlgorithm == null) return false;
 		
 		// If we don't have a valid WithinDayPersonAgent
-		if (this.driverAgent == null) return false;
+		if (driverAgent == null) return false;
 		
 		WithinDayPersonAgent withinDayPersonAgent = null;
 		if (!(driverAgent instanceof WithinDayPersonAgent)) return false;
@@ -195,39 +191,13 @@ public class LeaveLinkReplanner extends WithinDayDuringLegReplanner{
 		
 		return true;
 	}
-
-	/*
-	 * Checks, whether a new created Route is valid or not.
-	 */
-	protected boolean checkRoute(NetworkRouteWRefs route)
-	{
-		List<Node> nodes = RouteUtils.getNodes(route, this.network);
-
-		if(nodes.size() == 0) return true;
-
-		Node currentNode;
-		Node nextNode;
-
-		for (int i = 1; i < nodes.size() - 1; i++)
-		{
-			currentNode = nodes.get(i);
-			nextNode = nodes.get(i + 1);
-
-			boolean foundLink = false;
-
-			for (Link link : currentNode.getOutLinks().values())
-			{
-				if (link.getToNode() == nextNode)
-				{
-					foundLink = true;
-					break;
-				}
-			}
-
-			if (!foundLink) return false;
-		}
-
-		return true;
-	}
 	
+	public CurrentLegReplanner clone()
+	{
+		CurrentLegReplanner clone = new CurrentLegReplanner(this.id, this.network);
+		
+		super.cloneBasicData(clone);
+		
+		return clone;
+	}
 }

@@ -21,20 +21,27 @@
 package playground.christoph.withinday.replanning;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 
 import playground.christoph.router.util.KnowledgeTools;
+
+/*
+ * The InitialReplanner can be used when the Simulations is initialized but
+ * has not started yet.
+ */
 
 public class InitialReplanner extends WithinDayInitialReplanner{
 		
 	private static final Logger log = Logger.getLogger(InitialReplanner.class);
 
-	private KnowledgeTools knowledgeTools;
+	private KnowledgeTools knowledgeTools = new KnowledgeTools();
 	private boolean removeKnowledge = true;
 	
-	public InitialReplanner()
+	public InitialReplanner(Id id)
 	{
-		this.knowledgeTools = new KnowledgeTools();
+		super(id);
 	}
 	
 	public void setRemoveKnowledge(boolean removeKnowledge)
@@ -42,13 +49,13 @@ public class InitialReplanner extends WithinDayInitialReplanner{
 		this.removeKnowledge = removeKnowledge;
 	}
 	
-	public boolean doReplanning()
+	public boolean doReplanning(DriverAgent driverAgent)
 	{	
 		// If we don't have a valid Replanner.
 		if (this.planAlgorithm == null) return false;
 		
 		// If we don't have a valid WithinDayPersonAgent
-		if (this.driverAgent == null) return false;
+		if (driverAgent == null) return false;
 		
 		Person person = driverAgent.getPerson();
 		
@@ -62,6 +69,16 @@ public class InitialReplanner extends WithinDayInitialReplanner{
 		}
 		
 		return true;
+	}
+	
+	public InitialReplanner clone()
+	{
+		InitialReplanner clone = new InitialReplanner(this.id);
+		clone.setRemoveKnowledge(this.removeKnowledge);
+		
+		super.cloneBasicData(clone);
+		
+		return clone;
 	}
 	
 }

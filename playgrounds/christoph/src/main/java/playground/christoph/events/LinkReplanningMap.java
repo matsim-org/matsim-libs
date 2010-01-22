@@ -145,12 +145,12 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 			{
 				// check whether the replanning flag is set - if not, skip the person
 				QueueVehicle vehicle = this.queueNetwork.getQueueLink(linkId).getVehicle(personId);
-				boolean replanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
-				if(!replanning)
-				{
-					entries.remove();
-					continue;
-				}
+//				boolean replanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
+//				if(!replanning)
+//				{
+//					entries.remove();
+//					continue;
+//				}
 				
 				// Repeated Replanning per Link possible? 
 				if (repeatedReplanning) entry.setValue(new Tuple<Id,Double>(linkId, time + this.replanningInterval));

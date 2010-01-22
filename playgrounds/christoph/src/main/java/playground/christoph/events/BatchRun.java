@@ -235,8 +235,8 @@ public class BatchRun {
 			controler.run();
 			controler = null;
 			
-			log.info("Leave Link Replanning Counter: " + DuringLegReplanningModule.replanningCounter);
-			log.info("Act End Replanning Counter: " + DuringActivityReplanningModule.replanningCounter);
+//			log.info("Leave Link Replanning Counter: " + DuringLegReplanningModule.replanningCounter);
+//			log.info("Act End Replanning Counter: " + DuringActivityReplanningModule.replanningCounter);
 		}
 		
 	}

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayReplanningModule.java
+ * AgentsToReplanIdentifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,13 +18,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday.mobsim;
+package playground.christoph.withinday.replanning.identifiers.interfaces;
 
-import playground.christoph.withinday.replanning.parallel.ParallelReplanner;
+import java.util.List;
 
-public abstract class WithinDayReplanningModule {
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 
-	protected ParallelReplanner parallelReplanner;
+import playground.christoph.withinday.replanning.WithinDayReplanner;
 
-	public abstract void doReplanning(double time); 
+/*
+ * Identify Agents that need a Replanning of their scheduled
+ * plan.
+ */
+public abstract class AgentsToReplanIdentifier implements Cloneable{
+	
+	protected boolean checkAllAgents = true;
+	
+	
+	public abstract List<DriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner);
+	
+	
+	public boolean checkAllAgents()
+	{
+		return this.checkAllAgents;
+	}
+	
+	public void checkAllAgents(boolean checkAllAgents)
+	{
+		this.checkAllAgents = checkAllAgents;
+	}
+	
+	@Override
+	public abstract AgentsToReplanIdentifier clone();
+	
+	protected void cloneBasicData(AgentsToReplanIdentifier clone)
+	{
+		clone.checkAllAgents = this.checkAllAgents;
+	}
 }

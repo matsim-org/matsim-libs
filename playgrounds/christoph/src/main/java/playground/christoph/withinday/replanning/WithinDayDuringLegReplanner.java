@@ -18,8 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package playground.christoph.withinday.replanning;
+
+import org.matsim.api.core.v01.Id;
 
 /*
  * Replans only Agents that are currently performing
@@ -27,4 +28,10 @@ package playground.christoph.withinday.replanning;
  */
 public abstract class WithinDayDuringLegReplanner extends WithinDayReplanner {
 
+	public WithinDayDuringLegReplanner(Id id)
+	{
+		super(id);
+	}
+	
+	public abstract WithinDayDuringLegReplanner clone();
 }

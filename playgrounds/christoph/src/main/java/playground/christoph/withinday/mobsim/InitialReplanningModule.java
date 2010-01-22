@@ -20,54 +20,47 @@
 
 package playground.christoph.withinday.mobsim;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import java.util.List;
 
+import org.matsim.core.mobsim.queuesim.DriverAgent;
+
+import playground.christoph.withinday.replanning.ReplanningTask;
+import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
+import playground.christoph.withinday.replanning.WithinDayReplanner;
+import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 
-public class InitialReplanningModule implements WithinDayReplanningModule{
-
-	private final static Logger log = Logger.getLogger(InitialReplanningModule.class);
+public class InitialReplanningModule extends WithinDayReplanningModule{
 	
-	protected ReplanningQueueSimulation simulation;
-	protected ParallelInitialReplanner parallelInitialReplanner;
-	
-	public static int replanningCounter = 0;
-	
-	public InitialReplanningModule(ParallelInitialReplanner parallelInitialReplanner, ReplanningQueueSimulation simulation)
+	public InitialReplanningModule(ParallelInitialReplanner parallelInitialReplanner)
 	{
-		this.simulation = simulation;
-		this.parallelInitialReplanner = parallelInitialReplanner;
+		this.parallelReplanner = parallelInitialReplanner;
 	}
 	
+	public void setRemoveKnowledge(boolean value)
+	{
+		((ParallelInitialReplanner)this.parallelReplanner).setRemoveKnowledge(value);
+	}
+
 	public void doReplanning(double time)
 	{
-		int replanningCounter = 0;
-		for (QueueLink queueLink : simulation.getQueueNetwork().getLinks().values())
+		for (WithinDayReplanner replanner : this.parallelReplanner.getWithinDayReplanners())
 		{
-			for (QueueVehicle vehicle : queueLink.getAllVehicles())
+			if(replanner instanceof WithinDayInitialReplanner)
 			{
-				DriverAgent driverAgent = vehicle.getDriver();
+				List<AgentsToReplanIdentifier> identifiers = replanner.getAgentsToReplanIdentifers();
 				
-				boolean replanning = (Boolean) driverAgent.getPerson().getCustomAttributes().get("initialReplanning");
-				
-				if (replanning)
+				for (AgentsToReplanIdentifier identifier : identifiers)
 				{
-					this.parallelInitialReplanner.addAgentToReplan(driverAgent);
-					replanningCounter++;
+					for (DriverAgent driverAgent : identifier.getAgentsToReplan(time, replanner))
+					{
+						ReplanningTask replanningTask = new ReplanningTask(driverAgent, replanner.getId());
+						this.parallelReplanner.addReplanningTask(replanningTask);
+					}
 				}
 			}
 		}
 		
-		boolean runReplanning = replanningCounter > 0;
-		if (runReplanning) this.parallelInitialReplanner.run(time);
+		this.parallelReplanner.run(time);
 	}
-
-	public void setRemoveKnowledge(boolean value)
-	{
-		this.parallelInitialReplanner.setRemoveKnowledge(value);
-	}
-
 }

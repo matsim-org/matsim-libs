@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParallelLeaveLinkReplanner.java
+ * ParallelDuringActivityReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,57 +20,52 @@
 
 package playground.christoph.withinday.replanning.parallel;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.withinday.replanning.LeaveLinkReplanner;
+import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
 
 /**
- * A class for running {@link LeaveLinkReplanner} in parallel using threads.
+ * A class for running {@link WithinDayDuringActivityReplanner} in parallel using threads.
  *
  * @author Christoph Dobler
  */
-public class ParallelLeaveLinkReplanner extends ParallelReplanner {
-
-	private final static Logger log = Logger.getLogger(ParallelLeaveLinkReplanner.class);
-
-	private Network network;
-
-	public ParallelLeaveLinkReplanner(Network network)
+public class ParallelDuringActivityReplanner extends ParallelReplanner {
+	
+	private final static Logger log = Logger.getLogger(ParallelDuringActivityReplanner.class);
+	
+	public ParallelDuringActivityReplanner(int numOfThreads)
 	{
-		this.network = network;
+		super(numOfThreads);
+		this.init();
 	}
-
+	
 	@Override
-	public void init()
-	{
+	protected void init()
+	{	
 		replanningThreads = new InternalReplanningThread[numOfThreads];
 
 		// Do initial Setup of the Threads
 		for (int i = 0; i < numOfThreads; i++)
 		{
-			ReplanningThread replanningThread = new InternalReplanningThread(i, replannerArray, replanners, this.network);
-			replanningThread.setName("ParallelLeaveLinkReplanner" + i);
+			ReplanningThread replanningThread = new InternalReplanningThread();
+			replanningThread.setName("ParallelDuringActivityReplanner" + i);
 			replanningThreads[i] = replanningThread;
 		}
 
 		// Do all other Initialization Operations in the super Class.
 		super.init();
 	}
-
+	
 	/*
 	 * The thread class that really handles the replanning.
 	 */
 	private static class InternalReplanningThread extends ReplanningThread
-	{
-		public InternalReplanningThread(int i, PlanAlgorithm replannerArray[][], ArrayList<PlanAlgorithm> replanners, Network network)
+	{		
+		public InternalReplanningThread()
 		{
-			super(i, replannerArray, replanners);
-			this.withinDayReplanner = new LeaveLinkReplanner(network);
+			super();
 		}
-	}
+				
+	}	// ReplannerThread
 	
 }
