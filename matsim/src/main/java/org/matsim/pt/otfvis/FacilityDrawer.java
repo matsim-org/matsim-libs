@@ -37,6 +37,7 @@ import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.pt.queuesim.TransitStopAgentTracker;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -132,7 +133,7 @@ public class FacilityDrawer {
 				stop.x = in.getDouble();
 				stop.y = in.getDouble();
 				if (this.drawer != null) {
-//					this.drawer.stops.add(stop);
+					this.drawer.stops.add(stop);
 				}
 			}
 			drawer.initTexts();
@@ -152,15 +153,18 @@ public class FacilityDrawer {
 		/*package*/ final List<VisBusStop> stops = new LinkedList<VisBusStop>();
 		
 		public void onDraw(GL gl) {
-			for (VisBusStop stop : this.stops) {
-				DrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);			
+			if (OTFClientControl.getInstance().getOTFVisConfig().drawTransitFacilities()) {
+				for (VisBusStop stop : this.stops) {
+					DrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);			
+				}
+				initTexts();
 			}
 		}
 
 		public void initTexts() {
 			for (VisBusStop stop : this.stops) {
 				if ( stop.linkId!=null ) {
-					stop.stopText = InfoTextContainer.showTextPermanent(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f, 2.0f);
+					stop.stopText = InfoTextContainer.showTextOnce(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f, 2.0f);
 					stop.stopText.setLinkId(new IdImpl(stop.linkId));
 				}
 			}

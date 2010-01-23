@@ -38,7 +38,7 @@ import org.matsim.vis.otfvis.opengl.gl.Point3f;
  *
  */
 public class OTFVisConfig extends Module {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	public static final String GROUP_NAME = "otfvis";
 
@@ -52,8 +52,7 @@ public class OTFVisConfig extends Module {
 
   public static final String BIG_TIME_STEP = "bigTimeStep";
   public static final String SHOW_TELEPORTATION = "showTeleportation";
-//  public static final String TIME_STEP = "timeStep";
-
+  
   private  float agentSize = 120.f;
   private  String middleMouseFunc = "Pan";
   private  String leftMouseFunc = "Zoom";
@@ -62,7 +61,6 @@ public class OTFVisConfig extends Module {
   private int fileMinorVersion = OTFFileWriter.MINORVERSION;
 
   private int bigTimeStep = 600;
-//  private final int timeStep = 1;
   private String queryType = "agentPlan";
   private boolean multipleSelect = false;
   private boolean showParking = false;
@@ -72,6 +70,7 @@ public class OTFVisConfig extends Module {
   private boolean drawLinkIds = false;
   private boolean drawTime = false;
   private boolean drawOverlays = true;
+  private boolean drawTransitFacilities = true;
   private boolean renderImages = false;
   private boolean modified = false;
   private boolean cachingAllowed = true;
@@ -409,6 +408,13 @@ public class OTFVisConfig extends Module {
 	public void setShowTeleportedAgents(boolean showTeleportation){
 		this.showTeleportedAgents = showTeleportation;
 	}
-	
+
+	public void setDrawTransitFacilities(boolean drawTransitFacilities) {
+		this.drawTransitFacilities = drawTransitFacilities;
+	}
+
+	public boolean drawTransitFacilities() {
+		return drawTransitFacilities;
+	}
 
 }

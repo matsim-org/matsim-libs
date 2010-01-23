@@ -33,10 +33,11 @@ public class InfoTextContainer {
 	private static LinkedList<InfoText> elements = new LinkedList<InfoText>(); 
 	private static Set<InfoText> elementsPermanent = new HashSet<InfoText>(); 
 
-	public static void showTextOnce(String text, float x, float y, float size) {
+	public static InfoText showTextOnce(String text, float x, float y, float size) {
 		InfoText tt = new InfoText(text, x,y,0,size);
 		tt.setDecorated(false);
 		elements.addFirst(tt);
+		return tt;
 	}
 
 	public static InfoText showTextPermanent(String text, float x, float y, float size) {

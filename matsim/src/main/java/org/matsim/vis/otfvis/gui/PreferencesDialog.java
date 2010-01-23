@@ -80,7 +80,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	private void initGUI() {
 		getContentPane().setLayout(null);
 		this.setResizable(false);
-		setSize(480, 340);
+		setSize(480, 400);
 
 		// Mouse Buttons
 		{
@@ -135,72 +135,63 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			JPanel panel = new JPanel(null);
 			getContentPane().add(panel);
 			panel.setBorder(BorderFactory.createTitledBorder("Switches"));
-			panel.setBounds(250, 130, 220, 160);
+			panel.setBounds(250, 130, 220, 200);
 
-			JCheckBox SynchBox; 
+			JCheckBox synchBox; 
 			if(host.getOTFHostControl().isLiveHost()) {
-				SynchBox = new JCheckBox("show parked vehicles");
-//				SynchBox.setMnemonic(KeyEvent.VK_M);
-				SynchBox.setSelected(cfg.isShowParking());
-				SynchBox.addItemListener(this);
-				SynchBox.setBounds(10, 20, 200, 31);
-				SynchBox.setVisible(true);
-				//SynchBox.setMaximumSize(new Dimension(250,60));
-				panel.add(SynchBox);
+				synchBox = new JCheckBox("show parked vehicles");
+				synchBox.setSelected(cfg.isShowParking());
+				synchBox.addItemListener(this);
+				synchBox.setBounds(10, 20, 200, 31);
+				synchBox.setVisible(true);
+				panel.add(synchBox);
 			}
 			if((host.getOTFHostControl().isLiveHost())||((cfg.getFileVersion()>=1) &&(cfg.getFileMinorVersion()>=4))) {
-				SynchBox = new JCheckBox("show link Ids");
-//				SynchBox.setMnemonic(KeyEvent.VK_M);
-				SynchBox.setSelected(cfg.drawLinkIds());
-				SynchBox.addItemListener(this);
-				SynchBox.setBounds(10, 40, 200, 31);
-				SynchBox.setVisible(true);
-				//SynchBox.setMaximumSize(new Dimension(250,60));
-				panel.add(SynchBox);
+				synchBox = new JCheckBox("show link Ids");
+				synchBox.setSelected(cfg.drawLinkIds());
+				synchBox.addItemListener(this);
+				synchBox.setBounds(10, 40, 200, 31);
+				synchBox.setVisible(true);
+				panel.add(synchBox);
 			}
 
-			SynchBox = new JCheckBox("show overlays");
-//			SynchBox.setMnemonic(KeyEvent.VK_M);3
-			SynchBox.setSelected(cfg.drawOverlays());
-			SynchBox.addItemListener(this);
-			SynchBox.setBounds(10, 60, 200, 31);
-			SynchBox.setVisible(true);
-			//SynchBox.setMaximumSize(new Dimension(250,60));
-			panel.add(SynchBox);
+			synchBox = new JCheckBox("show overlays");
+			synchBox.setSelected(cfg.drawOverlays());
+			synchBox.addItemListener(this);
+			synchBox.setBounds(10, 60, 200, 31);
+			synchBox.setVisible(true);
+			panel.add(synchBox);
 
-			SynchBox = new JCheckBox("show time GL");
-//			SynchBox.setMnemonic(KeyEvent.VK_M);
-			SynchBox.setSelected(cfg.drawTime());
-			SynchBox.addItemListener(this);
-			SynchBox.setBounds(10, 80, 200, 31);
-			//SynchBox.setVisible(true);
-			//SynchBox.setMaximumSize(new Dimension(250,60));
-			panel.add(SynchBox);
+			synchBox = new JCheckBox("show time GL");
+			synchBox.setSelected(cfg.drawTime());
+			synchBox.addItemListener(this);
+			synchBox.setBounds(10, 80, 200, 31);
+			panel.add(synchBox);
 
-			SynchBox = new JCheckBox("save jpg frames");
-//			SynchBox.setMnemonic(KeyEvent.VK_M);
-			SynchBox.setSelected(cfg.renderImages());
-			SynchBox.addItemListener(this);
-			SynchBox.setBounds(10, 100, 200, 31);
-			//SynchBox.setVisible(true);
-			//SynchBox.setMaximumSize(new Dimension(250,60));
-			panel.add(SynchBox);
-			SynchBox = new JCheckBox("allow caching");
-//			SynchBox.setMnemonic(KeyEvent.VK_M);
-			SynchBox.setSelected(cfg.isCachingAllowed());
-			SynchBox.addItemListener(this);
-			SynchBox.setBounds(10, 120, 200, 31);
-			//SynchBox.setVisible(true);
-			//SynchBox.setMaximumSize(new Dimension(250,60));
-			panel.add(SynchBox);
-			SynchBox = new JCheckBox("show scale bar");
-//			SynchBox.setMnemonic(KeyEvent.VK_M);
-			SynchBox.setSelected(cfg.drawScaleBar());
-			SynchBox.addItemListener(this);
-			SynchBox.setBounds(10, 140, 200, 31);
-			SynchBox.setVisible(true);
-			//SynchBox.setMaximumSize(new Dimension(250,60));
-			panel.add(SynchBox);
+			synchBox = new JCheckBox("save jpg frames");
+			synchBox.setSelected(cfg.renderImages());
+			synchBox.addItemListener(this);
+			synchBox.setBounds(10, 100, 200, 31);
+			panel.add(synchBox);
+			synchBox = new JCheckBox("allow caching");
+			synchBox.setSelected(cfg.isCachingAllowed());
+			synchBox.addItemListener(this);
+			synchBox.setBounds(10, 120, 200, 31);
+			panel.add(synchBox);
+			synchBox = new JCheckBox("show scale bar");
+			synchBox.setSelected(cfg.drawScaleBar());
+			synchBox.addItemListener(this);
+			synchBox.setBounds(10, 140, 200, 31);
+			synchBox.setVisible(true);
+			panel.add(synchBox);
+			if (host.getOTFHostControl().isLiveHost()) {
+				synchBox = new JCheckBox("show transit facilities");
+				synchBox.setSelected(cfg.drawTransitFacilities());
+				synchBox.addItemListener(this);
+				synchBox.setBounds(10, 160, 200, 31);
+				synchBox.setVisible(true);
+				panel.add(synchBox);
+			}
 		}
 		
 		
@@ -315,6 +306,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	}
 
 
+	@SuppressWarnings("serial")
 	public void buildMenu(final OTFFrame frame, final PreferencesDialog preferencesDialog, 
 	    final OTFSettingsSaver save) {
 		JMenuBar menuBar = new JMenuBar();
@@ -458,6 +450,9 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		} else if (source.getText().equals("show scale bar")) {
 			// toggle draw Overlays
 			cfg.setDrawScaleBar(!cfg.drawScaleBar());
+		} else if (source.getText().equals("show transit facilities")) {
+			// toggle draw Overlays
+			cfg.setDrawTransitFacilities(!cfg.drawTransitFacilities());
 		} 
 		}
 	
