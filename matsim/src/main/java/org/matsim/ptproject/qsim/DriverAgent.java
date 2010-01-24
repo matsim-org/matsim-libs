@@ -36,6 +36,8 @@ public interface DriverAgent extends PersonAgentI {
 
 
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
+
+	// "Teleportation" certainly does NOT belong into a vehicle.  Might go directly into the person.  kai, jan'10
 	public void teleportToLink(final Id linkId);
 
 	public void moveOverNode();
