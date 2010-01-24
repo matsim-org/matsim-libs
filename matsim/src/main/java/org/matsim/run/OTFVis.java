@@ -229,6 +229,7 @@ public class OTFVis {
 		}
 		Scenario scenario = new ScenarioImpl();
 		Network net = scenario.getNetwork();
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		OTFEvent2MVI converter = new OTFEvent2MVI(new QueueNetwork(net), eventFile, mviFile, snapshotPeriod);
 		converter.convert();
