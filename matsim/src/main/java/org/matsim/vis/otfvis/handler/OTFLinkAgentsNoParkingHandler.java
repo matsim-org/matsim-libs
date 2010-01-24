@@ -34,9 +34,10 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  * see parked vehicles or not.
  * 
  * @author david
- *
+ * 
  */
 public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
+	// yyyy is this ever used?  kai, jan'10
 	
 	static public class Writer extends  OTFLinkAgentsHandler.Writer {
 		private static final long serialVersionUID = 6541770536927233851L;
