@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.pt.queuesim.TransitStopAgentTracker;
+import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.otfvis.OTFClientControl;
