@@ -27,6 +27,15 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 	private Id l0;
 	private LinkImpl link0;
 	
+	@Override
+	protected void tearDown() throws Exception {
+		this.sc = null;
+		this.agents = null;
+		this.network = null;
+		this.l0 = null;
+		this.link0 = null;
+		super.tearDown();
+	}
 	
 	public void testSocialCostCalculatorSingleLinkZeroCost() {
 	
@@ -156,17 +165,11 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		this.l0 = this.sc.createId("0");
 		Id n0 = this.sc.createId("0");
 		Id n1 = this.sc.createId("1");
-
 		
 		Node node0 = (this.network).createAndAddNode(n0, this.sc.createCoord(0,0));
 		Node node1 = (this.network).createAndAddNode(n1, this.sc.createCoord(10,0));
 		
-		
-		
 		this.link0 = (LinkImpl) (this.network).createAndAddLink(this.l0,node0,node1,100,10,1,1);
-		
-		
-		
 	}
 
 
@@ -178,8 +181,6 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		}
 
 		public void reset(int iteration) {
-			// TODO Auto-generated method stub
-			
 		}
 		
 	}

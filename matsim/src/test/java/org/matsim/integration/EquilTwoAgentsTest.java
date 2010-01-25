@@ -48,7 +48,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 	/*package*/ final static Logger log = Logger.getLogger(EquilTwoAgentsTest.class);
 
-	/*package*/ EventsToScore planScorer = null;
+	protected EventsToScore planScorer = null;
 
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
@@ -59,6 +59,12 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 	/*package*/ final static Id id22 = new IdImpl("22");
 	/*package*/ final static Id id23 = new IdImpl("23");
 
+	@Override
+	protected void tearDown() throws Exception {
+		this.planScorer = null;
+		super.tearDown();
+	}
+	
 	public void testSingleIterationPlansV4() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + "config.xml");
 		String netFileName = "test/scenarios/equil/network.xml";

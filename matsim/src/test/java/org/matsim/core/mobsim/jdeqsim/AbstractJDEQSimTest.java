@@ -47,6 +47,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	protected void tearDown() throws Exception {
 		this.eventsByPerson = null;
 		this.allEvents = null;
+		SimulationParameters.reset(); // SimulationParameter contains a Map containing Links which refer to the Network, give that free for GC
 		super.tearDown();
 	}
 	
