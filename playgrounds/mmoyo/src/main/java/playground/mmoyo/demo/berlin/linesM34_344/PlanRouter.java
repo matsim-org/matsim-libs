@@ -16,7 +16,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
@@ -63,7 +63,7 @@ public class PlanRouter {
 
 		/**play scenario*/
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
+		final TransitQSimulation sim = new TransitQSimulation(scenario, events);
 		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.run();
 

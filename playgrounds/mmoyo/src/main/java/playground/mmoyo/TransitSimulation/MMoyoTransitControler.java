@@ -7,7 +7,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 
 //import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
@@ -33,7 +33,7 @@ public class MMoyoTransitControler extends TransitControler {
 	
 	@Override
 	protected void runMobSim() {
-		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
+		TransitQSimulation sim = new TransitQSimulation(this.scenarioData, this.events);
 		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.setUseUmlaeufe(true);
 		sim.run();

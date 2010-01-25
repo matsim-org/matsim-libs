@@ -40,7 +40,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -318,7 +318,7 @@ public class TwoLinesDemo {
 		events.addHandler(analysis1);
 		events.addHandler(analysis2);
 
-		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
+		TransitQSimulation sim = new TransitQSimulation(this.scenario, events);
 		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.run();
 

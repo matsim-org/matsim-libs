@@ -39,7 +39,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -197,7 +197,7 @@ public class AccessEgressDemo {
 		RouteTimeDiagram diagram = new RouteTimeDiagram();
 		events.addHandler(diagram);
 
-		final TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
+		final TransitQSimulation sim = new TransitQSimulation(this.scenario, events);
 		// Transit vehicle drivers are created inside the TransitQueueSimulation, by the createAgents() method. That is, they exist
 		// as derivatives from the schedule, not as behavioral entities by themselves.  kai, oct'09
 		

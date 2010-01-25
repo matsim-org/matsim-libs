@@ -35,7 +35,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
@@ -53,7 +53,7 @@ public class OccupancyCounts {
 
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, (EventsManagerImpl) events);
+		final TransitQSimulation sim = new TransitQSimulation(scenario, (EventsManagerImpl) events);
 		sim.run();
 	}
 
@@ -90,7 +90,7 @@ public class OccupancyCounts {
 		events.addHandler(analysis1);
 		events.addHandler(analysis2);
 
-		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
+		TransitQSimulation sim = new TransitQSimulation(scenario, events);
 		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.run();
 

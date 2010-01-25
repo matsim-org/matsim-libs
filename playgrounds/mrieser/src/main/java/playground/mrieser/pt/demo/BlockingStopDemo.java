@@ -44,7 +44,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -75,7 +75,7 @@ public class BlockingStopDemo {
 	private final ScenarioImpl scenario = new ScenarioImpl();
 	private final Id[] ids = new Id[nOfLinks * 2 + 2];
 
-	private TransitQueueSimulation sim = null;
+	private TransitQSimulation sim = null;
 
 	private void createIds() {
 		for (int i = 0; i < this.ids.length; i++) {
@@ -301,7 +301,7 @@ public class BlockingStopDemo {
 		TravelTimeCalculator ttc = new TravelTimeCalculator(this.scenario.getNetwork(), 120, 7*3600+1800, new TravelTimeCalculatorConfigGroup());
 		events.addHandler(ttc);
 
-		this.sim = new TransitQueueSimulation(this.scenario, events);
+		this.sim = new TransitQSimulation(this.scenario, events);
 		sim.addFeature(new OTFVisQSimFeature(sim));
 		this.sim.run();
 

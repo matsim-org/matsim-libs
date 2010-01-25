@@ -37,7 +37,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
@@ -123,7 +123,7 @@ public class PseudoNetworkDemo {
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 
-		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
+		final TransitQSimulation sim = new TransitQSimulation(scenario, events);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.run();

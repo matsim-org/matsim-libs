@@ -22,8 +22,8 @@ package playground.mrieser.pt;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.fakes.FakePassengerAgent;
-import org.matsim.pt.queuesim.TransitQueueVehicle;
-import org.matsim.pt.queuesim.TransitVehicle;
+import org.matsim.pt.qsim.TransitQVehicle;
+import org.matsim.pt.qsim.TransitVehicle;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleCapacityImpl;
@@ -42,7 +42,7 @@ public class VehicleImplTest extends MatsimTestCase {
 		capacity.setSeats(Integer.valueOf(4));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		TransitVehicle vehicle = new TransitQueueVehicle(new BasicVehicleImpl(new IdImpl(10), vehicleType), 5);
+		TransitVehicle vehicle = new TransitQVehicle(new BasicVehicleImpl(new IdImpl(10), vehicleType), 5);
 
 		vehicle.addPassenger(passenger1);
 		assertEquals("there should be 1 passenger in vehicle.", 1, vehicle.getPassengers().size());
@@ -64,7 +64,7 @@ public class VehicleImplTest extends MatsimTestCase {
 		capacity.setSeats(Integer.valueOf(4));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		TransitVehicle vehicle = new TransitQueueVehicle(new BasicVehicleImpl(new IdImpl(55), vehicleType), 5);
+		TransitVehicle vehicle = new TransitQVehicle(new BasicVehicleImpl(new IdImpl(55), vehicleType), 5);
 
 		vehicle.addPassenger(passenger1);
 		vehicle.addPassenger(passenger2);

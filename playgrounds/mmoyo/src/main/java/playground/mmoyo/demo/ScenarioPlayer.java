@@ -34,7 +34,7 @@ import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
@@ -54,7 +54,7 @@ public class ScenarioPlayer {
 
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, (EventsManagerImpl) events);
+		final TransitQSimulation sim = new TransitQSimulation(scenario, (EventsManagerImpl) events);
 		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.run();
 	}

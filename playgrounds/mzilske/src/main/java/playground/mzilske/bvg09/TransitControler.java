@@ -41,7 +41,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
@@ -107,7 +107,7 @@ public class TransitControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
+		TransitQSimulation sim = new TransitQSimulation(this.scenarioData, this.events);
 		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.setUseUmlaeufe(true);
 		sim.run();

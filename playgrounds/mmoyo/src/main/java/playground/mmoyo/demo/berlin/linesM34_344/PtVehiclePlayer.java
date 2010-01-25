@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
@@ -31,7 +31,7 @@ public class PtVehiclePlayer {
 		eventManager.addHandler(eventWriter);
 
 		//run simulation with OTFDemo
-		final TransitQueueSimulation trSimulation = new TransitQueueSimulation(scenario, eventManager);
+		final TransitQSimulation trSimulation = new TransitQSimulation(scenario, eventManager);
 		trSimulation.addFeature(new OTFVisQSimFeature(trSimulation));
 		new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getVehicles()).run();
 		trSimulation.run();
