@@ -46,14 +46,25 @@ public class QueueNetwork {
 	private final Map<Id, QueueNode> nodes;
 
 	private final Network networkLayer;
+	
+	private final QueueSimulation qSim ;
 
 	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
-
-	public QueueNetwork(final Network networkLayer2) {
-		this(networkLayer2, new DefaultQueueNetworkFactory());
+	
+	public QueueNetwork(final QueueSimulation qs) {
+		this( qs, qs.getScenario().getNetwork(), new DefaultQueueNetworkFactory() ) ; 
 	}
-
-	public QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
+	public QueueNetwork(final Network networkLayer2) {
+		this(null, networkLayer2, new DefaultQueueNetworkFactory());
+	}
+	public QueueNetwork(final QueueSimulation qs, final QueueNetworkFactory<QueueNode, QueueLink> factory ) {
+		this( qs, qs.getScenario().getNetwork(), factory ) ;
+	}
+	public QueueNetwork(final Network network, final QueueNetworkFactory<QueueNode, QueueLink> factory ) {
+		this( null, network, factory ) ;
+	}
+	private QueueNetwork(final QueueSimulation qs, final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
+		this.qSim = qs ;
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
 		this.links = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
@@ -68,7 +79,7 @@ public class QueueNetwork {
 			n.init();
 		}
 	}
-
+	
   public Network getNetworkLayer() {
 		return this.networkLayer;
 	}
@@ -99,6 +110,9 @@ public class QueueNetwork {
 
 	public QueueNode getQueueNode(final Id id) {
 		return this.nodes.get(id);
+	}
+	public QueueSimulation getQSim() {
+		return qSim;
 	}
 	
 }

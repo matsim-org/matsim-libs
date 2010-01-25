@@ -81,10 +81,15 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
  */
 public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation {
 
-  protected static final int INFO_PERIOD = 3600;
-	private int snapshotPeriod = 0;
+	
+	/* time since last snapshot */
 	private double snapshotTime = 0.0;
+	private int snapshotPeriod = 0;
+	
+	/* time since last "info" */
 	private double infoTime = 0;
+	protected static final int INFO_PERIOD = 3600;
+
 	protected PopulationImpl population;
 	protected QueueNetwork network;
 	protected Network networkLayer;
@@ -146,10 +151,12 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
         throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
       }
       this.setLaneDefinitions(((ScenarioImpl)sc).getLaneDefinitions());
-      this.network = new QueueNetwork(this.networkLayer, new QLanesNetworkFactory(new DefaultQueueNetworkFactory()));
+//      this.network = new QueueNetwork(this.networkLayer, new QLanesNetworkFactory(new DefaultQueueNetworkFactory()));
+      this.network = new QueueNetwork(this, new QLanesNetworkFactory(new DefaultQueueNetworkFactory()));
     }
     else {
-      this.network = new QueueNetwork(this.networkLayer);
+//        this.network = new QueueNetwork(this.networkLayer);
+        this.network = new QueueNetwork(this);
     }
     if (config.scenario().isUseSignalSystems()) {
       if ((((ScenarioImpl)sc).getSignalSystems() == null)
@@ -651,6 +658,10 @@ public class QueueSimulation implements org.matsim.core.mobsim.framework.IOSimul
 
 	public void setControlerIO(ControlerIO controlerIO) {
 		this.controlerIO = controlerIO;
+	}
+	
+	public double getTimeOfDay() {
+		return SimulationTimer.getTime() ;
 	}
 
 }
