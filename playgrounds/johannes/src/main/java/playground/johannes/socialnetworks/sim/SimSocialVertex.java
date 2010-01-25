@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.graph.social;
+package playground.johannes.socialnetworks.sim;
 
 import java.util.List;
 
@@ -29,6 +29,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -39,14 +42,14 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @author illenberger
  *
  */
-public class Ego extends SpatialSparseVertex {
+public class SimSocialVertex extends SpatialSparseVertex implements SocialVertex {
 
-	private static final Logger logger = Logger.getLogger(Ego.class);
+	private static final Logger logger = Logger.getLogger(SimSocialVertex.class);
 	private SocialPerson person;
 	
 	private final static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 21781);
 	
-	protected Ego(SocialPerson person) {
+	protected SimSocialVertex(SocialPerson person) {
 		super(coord2Point(((Activity) person.getPerson().getPlans().get(0).getPlanElements().get(0)).getCoord()));
 		this.person = person;
 	}
@@ -57,10 +60,16 @@ public class Ego extends SpatialSparseVertex {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<? extends Ego> getNeighbours() {
-		return (List<? extends Ego>) super.getNeighbours();
+	public List<? extends SimSocialVertex> getNeighbours() {
+		return (List<? extends SimSocialVertex>) super.getNeighbours();
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<? extends SimSocialEdge> getEdges() {
+		return (List<? extends SimSocialEdge>) super.getEdges();
+	}
+
 	private static Point coord2Point(Coord coord) {
 		logger.warn("Assuming CH1903LV03 coordinate referenc system.");
 		return geometryFactory.createPoint(new Coordinate(coord.getX(), coord.getY()));

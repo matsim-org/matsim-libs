@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialNetwork.java
+ * SocialNetworkBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,55 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.sim;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.social;
+import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
 
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetwork extends SpatialSparseGraph {
-	
-	private Map<SocialPerson, Ego> personEgoMapping = new HashMap<SocialPerson, Ego>();
-	
-	/**
-	 * @deprecated
-	 */
-	public SocialNetwork() {
-		super(CRSUtils.getCRS(21781)); //FIXME
-	}
-	
-	@Override
-	@SuppressWarnings("unchecked")
-	public Set<? extends Ego> getVertices() {
-		return (Set<? extends Ego>) super.getVertices();
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SocialTie> getEdges() {
-		return (Set<? extends SocialTie>) super.getEdges();
-	}
+public class SimSocialGraphBuilder extends AbstractSparseGraphBuilder<SimSocialGraph, SimSocialVertex, SimSocialEdge>{
 
-	public Ego getEgo(SocialPerson p) {
-		return personEgoMapping.get(p);
+	public SimSocialGraphBuilder() {
+		super(new SimSocialGraphFactory());
 	}
 
 	@Override
-	public SocialTie getEdge(SparseVertex v1, SparseVertex v2) {
-		return (SocialTie) super.getEdge(v1, v2);
+	public SimSocialVertex addVertex(SimSocialGraph graph) {
+		throw new UnsupportedOperationException();
 	}
-
+	
+	public SimSocialVertex addVertex(SimSocialGraph graph, SocialPerson person) {
+		SimSocialVertex ego = ((SimSocialGraphFactory)getFactory()).createVertex(person);
+		if(insertVertex(graph, ego))
+			return ego;
+		else
+			return null;
+	}
+	
+	public SimSocialEdge addEdge(SimSocialGraph graph, SimSocialVertex vertex1, SimSocialVertex vertex2, int created) {
+		SimSocialEdge edge = ((SimSocialGraphFactory)getFactory()).createEdge(created);
+		if(insertEdge(graph, vertex1, vertex2, edge))
+			return edge;
+		else
+			return null;
+	}
 }

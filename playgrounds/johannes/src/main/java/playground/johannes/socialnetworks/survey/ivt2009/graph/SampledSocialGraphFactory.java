@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.GraphFactory;
@@ -25,27 +25,29 @@ import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 
+import com.vividsolutions.jts.geom.Point;
+
 
 /**
  * @author illenberger
  *
  */
-public class SampledSocialNetFactory implements GraphFactory<SampledSocialNet, SampledEgo, SampledSocialTie> {
+public class SampledSocialGraphFactory implements GraphFactory<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> {
 
-	public SampledSocialTie createEdge() {
-		return new SampledSocialTie(0);
+	public SampledSocialEdge createEdge() {
+		return new SampledSocialEdge();
 	}
 
-	public SampledSocialNet createGraph() {
-		return new SampledSocialNet();
+	public SampledSocialGraph createGraph() {
+		return new SampledSocialGraph(null);
 	}
 
-	public SampledEgo createVertex() {
+	public SampledSocialVertex createVertex() {
 		throw new UnsupportedOperationException();
 	}
 	
-	public SampledEgo createVertex(Person person) {
-		return new SampledEgo(new SocialPerson((PersonImpl) person));
+	public SampledSocialVertex createVertex(Person person, Point point) {
+		return new SampledSocialVertex(new SocialPerson((PersonImpl) person), point);
 	}
 
 }

@@ -28,10 +28,10 @@ import gnu.trove.TIntObjectHashMap;
 
 import org.matsim.api.core.v01.population.Person;
 
-import playground.johannes.socialnetworks.graph.social.Ego;
-import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.SocialNetworkBuilder;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
+import playground.johannes.socialnetworks.sim.SimSocialGraph;
+import playground.johannes.socialnetworks.sim.SimSocialGraphBuilder;
+import playground.johannes.socialnetworks.sim.SimSocialVertex;
 
 /**
  * @author illenberger
@@ -39,19 +39,19 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
  */
 public class SNAdjacencyMatrix<P extends Person> extends SpatialAdjacencyMatrix {
 
-	public SNAdjacencyMatrix(SocialNetwork g) {
+	public SNAdjacencyMatrix(SimSocialGraph g) {
 		super(g);
 	}
 
 	
 	@Override
-	public SocialNetwork getGraph() {
-		SocialNetworkBuilder builder = new SocialNetworkBuilder();
-		SocialNetwork g = new SocialNetwork();
+	public SimSocialGraph getGraph() {
+		SimSocialGraphBuilder builder = new SimSocialGraphBuilder();
+		SimSocialGraph g = new SimSocialGraph();
 
-		TIntObjectHashMap<Ego> vertexIdx = new TIntObjectHashMap<Ego>();
+		TIntObjectHashMap<SimSocialVertex> vertexIdx = new TIntObjectHashMap<SimSocialVertex>();
 		for(int i = 0; i < getVertexCount(); i++) {
-			Ego ego = builder.addVertex(g, getVertex(i).getPerson());
+			SimSocialVertex ego = builder.addVertex(g, getVertex(i).getPerson());
 			vertexIdx.put(i, ego);
 		}
 		
@@ -73,7 +73,7 @@ public class SNAdjacencyMatrix<P extends Person> extends SpatialAdjacencyMatrix 
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public Ego getVertex(int i) {
-		return (Ego) super.getVertex(i);
+	public SimSocialVertex getVertex(int i) {
+		return (SimSocialVertex) super.getVertex(i);
 	}
 }

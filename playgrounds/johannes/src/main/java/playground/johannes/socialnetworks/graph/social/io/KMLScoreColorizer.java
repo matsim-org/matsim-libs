@@ -29,17 +29,17 @@ import net.opengis.kml._2.LinkType;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.johannes.socialnetworks.graph.social.Ego;
-import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle;
+import playground.johannes.socialnetworks.sim.SimSocialGraph;
+import playground.johannes.socialnetworks.sim.SimSocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork, Ego> {
+public class KMLScoreColorizer extends KMLVertexColorStyle<SimSocialGraph, SimSocialVertex> {
 
-	private Map<Ego, String> styleIds = new HashMap<Ego, String>();
+	private Map<SimSocialVertex, String> styleIds = new HashMap<SimSocialVertex, String>();
 	
 //	private Distribution distribution = new Distribution();
 	
@@ -78,10 +78,10 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork, Ego> {
 	}
 
 	@Override
-	protected TDoubleObjectHashMap<String> getValues(SocialNetwork graph) {
+	protected TDoubleObjectHashMap<String> getValues(SimSocialGraph graph) {
 		TDoubleObjectHashMap<String> values = new TDoubleObjectHashMap<String>();
 	
-		for(Ego ego : graph.getVertices()) {
+		for(SimSocialVertex ego : graph.getVertices()) {
 			Person person = ego.getPerson().getPerson();
 			double sum = 0;
 			for(Plan plan : person.getPlans()) {
@@ -104,7 +104,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork, Ego> {
 	}
 
 	@Override
-	public String getObjectSytleId(Ego object) {
+	public String getObjectSytleId(SimSocialVertex object) {
 		return styleIds.get(object);
 	}
 	
@@ -132,7 +132,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork, Ego> {
 	 * @see playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle#getValue(playground.johannes.socialnetworks.graph.Vertex)
 	 */
 	@Override
-	protected double getValue(Ego vertex) {
+	protected double getValue(SimSocialVertex vertex) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

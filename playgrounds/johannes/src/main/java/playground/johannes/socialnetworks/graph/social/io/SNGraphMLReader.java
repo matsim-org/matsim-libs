@@ -42,38 +42,38 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.xml.sax.Attributes;
 
-import playground.johannes.socialnetworks.graph.social.Ego;
-import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.SocialNetworkBuilder;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
-import playground.johannes.socialnetworks.graph.social.SocialTie;
+import playground.johannes.socialnetworks.sim.SimSocialEdge;
+import playground.johannes.socialnetworks.sim.SimSocialGraph;
+import playground.johannes.socialnetworks.sim.SimSocialGraphBuilder;
+import playground.johannes.socialnetworks.sim.SimSocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SNGraphMLReader extends AbstractGraphMLReader<SocialNetwork, Ego, SocialTie> {
+public class SNGraphMLReader extends AbstractGraphMLReader<SimSocialGraph, SimSocialVertex, SimSocialEdge> {
 
 	private static final String WSPACE = " ";
 	
 	private Population population;
 	
-	private SocialNetworkBuilder builder;
+	private SimSocialGraphBuilder builder;
 	
 	public SNGraphMLReader(Population population) {
 		this.population = population;
 	}
 	
 	@Override
-	public SocialNetwork readGraph(String file) {
+	public SimSocialGraph readGraph(String file) {
 		return super.readGraph(file);
 	}
 
 	@Override
-	protected SocialTie addEdge(Ego v1, Ego v2,
+	protected SimSocialEdge addEdge(SimSocialVertex v1, SimSocialVertex v2,
 			Attributes attrs) {
 		String created = attrs.getValue(SNGraphML.CREATED_TAG);
-		SocialTie e = builder.addEdge(getGraph(), v1, v2, Integer.parseInt(created));
+		SimSocialEdge e = builder.addEdge(getGraph(), v1, v2, Integer.parseInt(created));
 		
 		String usage = attrs.getValue(SNGraphML.USAGE_TAG);
 		for(String token : usage.split(WSPACE)) {
@@ -85,7 +85,7 @@ public class SNGraphMLReader extends AbstractGraphMLReader<SocialNetwork, Ego, S
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Ego addVertex(Attributes attrs) {
+	protected SimSocialVertex addVertex(Attributes attrs) {
 		String id = attrs.getValue(SNGraphML.PERSON_ID_TAG);
 		PersonImpl person = (PersonImpl) population.getPersons().get(new IdImpl(id));
 		if(person == null)
@@ -95,32 +95,32 @@ public class SNGraphMLReader extends AbstractGraphMLReader<SocialNetwork, Ego, S
 	}
 
 	@Override
-	protected SocialNetwork newGraph(Attributes attrs) {
-		builder = new SocialNetworkBuilder();
-		return new SocialNetwork();
+	protected SimSocialGraph newGraph(Attributes attrs) {
+		builder = new SimSocialGraphBuilder();
+		return new SimSocialGraph();
 	}
 
 	@SuppressWarnings("deprecation")
-	public static SocialNetwork loadFromConfig(String configFile, String socialnetFile) {
+	public static SimSocialGraph loadFromConfig(String configFile, String socialnetFile) {
 		Config config = Gbl.createConfig(new String[]{configFile});
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadPopulation();
 		ScenarioImpl scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();
 		SNGraphMLReader reader = new SNGraphMLReader(population);
-		SocialNetwork g = reader.readGraph(socialnetFile);
+		SimSocialGraph g = reader.readGraph(socialnetFile);
 		
 		return g;
 	}
 	
-	public static <P extends Person> Set<Ego> readAnonymousVertices(SocialNetwork socialnet, String filename) {
+	public static <P extends Person> Set<SimSocialVertex> readAnonymousVertices(SimSocialGraph socialnet, String filename) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
-			Set<Ego> egos = new HashSet<Ego>();
+			Set<SimSocialVertex> egos = new HashSet<SimSocialVertex>();
 			String line = null;
 			while((line = reader.readLine()) != null) {
 				boolean found = false;
-				for(Ego e : socialnet.getVertices()) {
+				for(SimSocialVertex e : socialnet.getVertices()) {
 					if(e.getPerson().getId().toString().equals(line)) {
 						egos.add(e);
 						found = true;

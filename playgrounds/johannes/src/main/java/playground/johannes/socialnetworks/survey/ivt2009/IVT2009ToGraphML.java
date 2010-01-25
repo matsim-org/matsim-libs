@@ -54,14 +54,14 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.social.Ego;
-import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.SocialNetworkBuilder;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
+import playground.johannes.socialnetworks.sim.SimSocialGraph;
+import playground.johannes.socialnetworks.sim.SimSocialGraphBuilder;
+import playground.johannes.socialnetworks.sim.SimSocialVertex;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
@@ -116,11 +116,11 @@ public class IVT2009ToGraphML {
 		 * create an empty population and social network
 		 */
 		Population population = new ScenarioImpl().getPopulation();
-		SocialNetwork socialnet = new SocialNetwork();
-		SocialNetworkBuilder builder = new SocialNetworkBuilder();
+		SimSocialGraph socialnet = new SimSocialGraph();
+		SimSocialGraphBuilder builder = new SimSocialGraphBuilder();
 		
-		Set<Ego> alters = new HashSet<Ego>();
-		Set egoSet = new HashSet<Ego>();
+		Set<SimSocialVertex> alters = new HashSet<SimSocialVertex>();
+		Set egoSet = new HashSet<SimSocialVertex>();
 		/*
 		 * go through all user ids
 		 */
@@ -167,7 +167,7 @@ public class IVT2009ToGraphML {
 					 */
 					Person egoPerson = createPerson(id, coord, age, population);
 					population.addPerson(egoPerson);
-					Ego ego = builder.addVertex(socialnet, new SocialPerson((PersonImpl) egoPerson));
+					SimSocialVertex ego = builder.addVertex(socialnet, new SocialPerson((PersonImpl) egoPerson));
 					numEgos++;
 					egoSet.add(ego);
 					/*
@@ -177,7 +177,7 @@ public class IVT2009ToGraphML {
 						Person alterPerson = createAlter(ALTER_1_KEY, i, egoData, id, population);
 						if(alterPerson != null) {
 							population.addPerson(alterPerson);
-							Ego alter = builder.addVertex(socialnet, new SocialPerson((PersonImpl) alterPerson));
+							SimSocialVertex alter = builder.addVertex(socialnet, new SocialPerson((PersonImpl) alterPerson));
 							builder.addEdge(socialnet, ego, alter);
 							numAlters++;
 							alters.add(alter);
@@ -189,7 +189,7 @@ public class IVT2009ToGraphML {
 						Person alterPerson = createAlter(ALTER_2_KEY, i, egoData, id, population);
 						if(alterPerson != null) {
 							population.addPerson(alterPerson);
-							Ego alter = builder.addVertex(socialnet, new SocialPerson((PersonImpl) alterPerson));
+							SimSocialVertex alter = builder.addVertex(socialnet, new SocialPerson((PersonImpl) alterPerson));
 							builder.addEdge(socialnet, ego, alter);
 							numAlters++;
 							alters.add(alter);
@@ -214,7 +214,7 @@ public class IVT2009ToGraphML {
 		graphWriter.write(socialnet, output + "ivt2009.graphml");
 		
 		KMLWriter kmlwriter = new KMLWriter();
-		KMLObjectStyle<SocialNetwork, Ego> vertexStyle = new SNKMLEgoAlterSytle(egoSet, kmlwriter.getVertexIconLink());
+		KMLObjectStyle<SimSocialGraph, SimSocialVertex> vertexStyle = new SNKMLEgoAlterSytle(egoSet, kmlwriter.getVertexIconLink());
 		kmlwriter.setVertexStyle(vertexStyle);
 		kmlwriter.setCoordinateTransformation(new CH1903LV03toWGS84());
 		kmlwriter.write(socialnet, output+"socialnet.kmz");

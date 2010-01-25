@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialNetFactory.java
+ * SampledSocialNet.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
-import org.matsim.core.population.PersonImpl;
+import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
 
 /**
  * @author illenberger
  *
  */
-public class SampledSocialNetBuilder extends AbstractSparseGraphBuilder<SampledSocialNet, SampledEgo, SampledSocialTie> {
+public class SampledSocialGraph extends SpatialSparseGraph implements SocialGraph, SampledGraph {
 
-	public SampledSocialNetBuilder() {
-		super(new SampledSocialNetFactory());
+	public SampledSocialGraph(CoordinateReferenceSystem crs) {
+		super(crs);
 	}
 
 	@Override
-	public SampledEgo addVertex(SampledSocialNet g) {
-		throw new UnsupportedOperationException("Don't know what to with that...");
-	}
-	
-	public SampledEgo addVertex(SampledSocialNet g, Person person, int iteration) {
-		SampledEgo ego = new SampledEgo(new SocialPerson((PersonImpl) person));
-		ego.detect(iteration);
-		if(insertVertex(g, ego))
-			return ego;
-		else
-			return null;
+	@SuppressWarnings("unchecked")
+	public Set<? extends SampledSocialEdge> getEdges() {
+		return (Set<? extends SampledSocialEdge>) super.getEdges();
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public Set<? extends SampledSocialVertex> getVertices() {
+		return (Set<? extends SampledSocialVertex>) super.getVertices();
+	}
+
+	@Override
+	public SampledSocialEdge getEdge(SparseVertex v1, SparseVertex v2) {
+		return (SampledSocialEdge) super.getEdge(v1, v2);
+	}
+
+	
 }

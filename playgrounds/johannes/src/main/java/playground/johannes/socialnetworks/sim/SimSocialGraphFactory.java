@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialNetworkBuilder.java
+ * SocialNetworkFactory2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,39 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.social;
+package playground.johannes.socialnetworks.sim;
 
-import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
+import org.matsim.contrib.sna.graph.GraphFactory;
 
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetworkBuilder extends AbstractSparseGraphBuilder<SocialNetwork, Ego, SocialTie>{
+public class SimSocialGraphFactory implements GraphFactory<SimSocialGraph, SimSocialVertex, SimSocialEdge>{
 
-	public SocialNetworkBuilder() {
-		super(new SocialNetworkFactory());
+	public SimSocialEdge createEdge() {
+		return new SimSocialEdge(0);
+	}
+	
+	public SimSocialEdge createEdge(int created) {
+		return new SimSocialEdge(created);
 	}
 
-	@Override
-	public Ego addVertex(SocialNetwork graph) {
+	public SimSocialGraph createGraph() {
+		return new SimSocialGraph();
+	}
+
+	public SimSocialVertex createVertex() {
 		throw new UnsupportedOperationException();
 	}
 	
-	public Ego addVertex(SocialNetwork graph, SocialPerson person) {
-		Ego ego = ((SocialNetworkFactory)getFactory()).createVertex(person);
-		if(insertVertex(graph, ego))
-			return ego;
-		else
-			return null;
+	public SimSocialVertex createVertex(SocialPerson person) {
+		return new SimSocialVertex(person);
 	}
-	
-	public SocialTie addEdge(SocialNetwork graph, Ego vertex1, Ego vertex2, int created) {
-		SocialTie edge = ((SocialNetworkFactory)getFactory()).createEdge(created);
-		if(insertEdge(graph, vertex1, vertex2, edge))
-			return edge;
-		else
-			return null;
-	}
+
 }

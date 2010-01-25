@@ -23,6 +23,10 @@
  */
 package playground.johannes.socialnetworks.graph.social;
 
+import playground.johannes.socialnetworks.sim.SimSocialEdge;
+import playground.johannes.socialnetworks.sim.SimSocialGraph;
+import playground.johannes.socialnetworks.sim.SimSocialVertex;
+
 
 
 
@@ -33,14 +37,14 @@ package playground.johannes.socialnetworks.graph.social;
  */
 public class SocialNetworkStatistics {
 	
-	public static double ageCorrelation(SocialNetwork g) {
+	public static double ageCorrelation(SimSocialGraph g) {
 		double product = 0;
 		double sum = 0;
 		double squareSum = 0;
 
-		for (SocialTie e : g.getEdges()) {
-			Ego v1 = (Ego) e.getVertices().getFirst();
-			Ego v2 = (Ego) e.getVertices().getSecond();
+		for (SimSocialEdge e : g.getEdges()) {
+			SimSocialVertex v1 = (SimSocialVertex) e.getVertices().getFirst();
+			SimSocialVertex v2 = (SimSocialVertex) e.getVertices().getSecond();
 			int age1 = v1.getPerson().getAge();
 			int age2 = v2.getPerson().getAge();
 

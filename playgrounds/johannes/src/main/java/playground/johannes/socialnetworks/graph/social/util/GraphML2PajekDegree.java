@@ -27,12 +27,12 @@ import java.io.IOException;
 
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekDegreeColorizer;
-import playground.johannes.socialnetworks.graph.social.Ego;
-import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.SocialTie;
 import playground.johannes.socialnetworks.graph.social.io.SNGraphMLReader;
 import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorizer;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
+import playground.johannes.socialnetworks.sim.SimSocialEdge;
+import playground.johannes.socialnetworks.sim.SimSocialGraph;
+import playground.johannes.socialnetworks.sim.SimSocialVertex;
 
 /**
  * @author illenberger
@@ -45,10 +45,10 @@ public class GraphML2PajekDegree {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SocialNetwork socialNet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
+		SimSocialGraph socialNet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
 		
-		PajekDegreeColorizer<Ego, SocialTie> colorizer1 = new PajekDegreeColorizer<Ego, SocialTie>(socialNet, false);
-		PajekClusteringColorizer<Ego, SocialTie> colorizer2 = new PajekClusteringColorizer<Ego, SocialTie>(socialNet);
+		PajekDegreeColorizer<SimSocialVertex, SimSocialEdge> colorizer1 = new PajekDegreeColorizer<SimSocialVertex, SimSocialEdge>(socialNet, false);
+		PajekClusteringColorizer<SimSocialVertex, SimSocialEdge> colorizer2 = new PajekClusteringColorizer<SimSocialVertex, SimSocialEdge>(socialNet);
 		PajekDistanceColorizer colorizer3 = new PajekDistanceColorizer(socialNet, false);
 		SpatialPajekWriter pwriter = new SpatialPajekWriter();
 		pwriter.write(socialNet, colorizer1, args[2] + "socialnet.degree.net");

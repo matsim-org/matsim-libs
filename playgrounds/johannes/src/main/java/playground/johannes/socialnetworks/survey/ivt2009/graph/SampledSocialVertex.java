@@ -17,41 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
 import java.util.List;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.SnowballAttributes;
 
-import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class SampledEgo extends Ego implements SampledVertex {
+public class SampledSocialVertex extends SpatialSparseVertex implements SocialVertex, SampledVertex {
 
+	private SocialPerson person;
+	
 	private SnowballAttributes attributes;
 	
-	private SampledEgo recruitedBy;
+	private SampledSocialVertex recruitedBy;
 	
-	protected SampledEgo(SocialPerson person) {
-		super(person);
+	protected SampledSocialVertex(SocialPerson person, Point point) {
+		super(point);
+		this.person = person;
 		attributes = new SnowballAttributes();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<? extends SampledSocialTie> getEdges() {
-		return (List<? extends SampledSocialTie>) super.getEdges();
+	public List<? extends SampledSocialEdge> getEdges() {
+		return (List<? extends SampledSocialEdge>) super.getEdges();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<? extends SampledEgo> getNeighbours() {
-		return (List<? extends SampledEgo>) super.getNeighbours();
+	public List<? extends SampledSocialVertex> getNeighbours() {
+		return (List<? extends SampledSocialVertex>) super.getNeighbours();
 	}
 
 	public void detect(int iteration) {
@@ -78,11 +84,16 @@ public class SampledEgo extends Ego implements SampledVertex {
 		attributes.sample(iteration);
 	}
 
-	public void setRecruitedBy(SampledEgo ego) {
+	public void setRecruitedBy(SampledSocialVertex ego) {
 		recruitedBy = ego;
 	}
 	
-	public SampledEgo getRecruitedBy() {
+	public SampledSocialVertex getRecruitedBy() {
 		return recruitedBy;
+	}
+
+	@Override
+	public SocialPerson getPerson() {
+		return person;
 	}
 }

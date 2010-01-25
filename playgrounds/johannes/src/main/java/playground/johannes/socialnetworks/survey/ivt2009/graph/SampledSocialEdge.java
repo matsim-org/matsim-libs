@@ -17,20 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.snowball.SampledEdge;
+import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.social.SocialTie;
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
 
 /**
  * @author illenberger
  *
  */
-public class SampledSocialTie extends SocialTie implements SampledEdge {
+public class SampledSocialEdge extends SpatialSparseEdge implements SocialEdge, SampledEdge {
 
-	protected SampledSocialTie(int created) {
-		super(created);
+	@Override
+	public SampledSocialVertex getOpposite(Vertex v) {
+		return (SampledSocialVertex) super.getOpposite(v);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Tuple<? extends SampledSocialVertex, ? extends SampledSocialVertex> getVertices() {
+		return (Tuple<? extends SampledSocialVertex, ? extends SampledSocialVertex>) super.getVertices();
 	}
 
 }

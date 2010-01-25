@@ -35,28 +35,28 @@ import net.opengis.kml._2.StyleType;
 
 import org.matsim.api.core.v01.population.Person;
 
-import playground.johannes.socialnetworks.graph.social.Ego;
-import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectStyle;
+import playground.johannes.socialnetworks.sim.SimSocialGraph;
+import playground.johannes.socialnetworks.sim.SimSocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SNKMLEgoAlterSytle<P extends Person> implements KMLObjectStyle<SocialNetwork, Ego> {
+public class SNKMLEgoAlterSytle<P extends Person> implements KMLObjectStyle<SimSocialGraph, SimSocialVertex> {
 
-	private Set<Ego> sampledVertices;
+	private Set<SimSocialVertex> sampledVertices;
 		
 	private ObjectFactory objectFactory = new ObjectFactory();
 	
 	private LinkType vertexIconLink;
 	
-	public SNKMLEgoAlterSytle(Set<Ego> sampledVertices, LinkType vertexIconLink) {
+	public SNKMLEgoAlterSytle(Set<SimSocialVertex> sampledVertices, LinkType vertexIconLink) {
 		this.sampledVertices = sampledVertices;
 		this.vertexIconLink = vertexIconLink;
 	}
 	
-	public List<StyleType> getObjectStyle(SocialNetwork socialnet) {
+	public List<StyleType> getObjectStyle(SimSocialGraph socialnet) {
 		
 		
 		List<StyleType> styleTypes = new ArrayList<StyleType>(2);
@@ -97,7 +97,7 @@ public class SNKMLEgoAlterSytle<P extends Person> implements KMLObjectStyle<Soci
 	}
 
 
-	public String getObjectSytleId(Ego object) {
+	public String getObjectSytleId(SimSocialVertex object) {
 		if(sampledVertices.contains(object))
 			return "sampled";
 		else

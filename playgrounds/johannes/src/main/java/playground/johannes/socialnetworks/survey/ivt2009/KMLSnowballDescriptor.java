@@ -20,15 +20,16 @@
 package playground.johannes.socialnetworks.survey.ivt2009;
 
 import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectDescriptor;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
 
 
 /**
  * @author illenberger
  *
  */
-public class KMLSnowballDescriptor implements KMLObjectDescriptor<SampledEgo> {
+public class KMLSnowballDescriptor implements KMLObjectDescriptor<SampledSocialVertex> {
 
-	public String getDescription(SampledEgo object) {
+	public String getDescription(SampledSocialVertex object) {
 		StringBuilder builder = new StringBuilder();
 		
 		builder.append("Name: ");
@@ -41,7 +42,7 @@ public class KMLSnowballDescriptor implements KMLObjectDescriptor<SampledEgo> {
 		builder.append(String.valueOf(object.getIterationDetected()));
 		builder.append("<br>");
 		builder.append("Recruited by: ");
-		SampledEgo name = object.getRecruitedBy();
+		SampledSocialVertex name = object.getRecruitedBy();
 		if(name == null)
 			builder.append("seed");
 		else
@@ -50,7 +51,7 @@ public class KMLSnowballDescriptor implements KMLObjectDescriptor<SampledEgo> {
 		return builder.toString();
 	}
 
-	public String getName(SampledEgo object) {
+	public String getName(SampledSocialVertex object) {
 		return object.getPerson().getId().toString();
 	}
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialNet.java
+ * SocialTie.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,42 +17,65 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
 
-import java.util.Set;
+/**
+ * 
+ */
+package playground.johannes.socialnetworks.sim;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.snowball.SampledGraph;
+import gnu.trove.TIntArrayList;
 
-import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
+import org.matsim.core.utils.collections.Tuple;
+
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
+
 
 /**
  * @author illenberger
  *
  */
-public class SampledSocialNet extends SocialNetwork implements SampledGraph {
+public class SimSocialEdge extends SpatialSparseEdge implements SocialEdge {
 
-	@Override
+	private int created;
+	
+	private TIntArrayList usage;
+	
+	private int lastUsed;
+	
+	protected SimSocialEdge(int created) {
+		this.created = created;
+		usage = new TIntArrayList();
+		usage.add(created);
+		lastUsed = created;
+	}
+	
 	@SuppressWarnings("unchecked")
-	public Set<? extends SampledSocialTie> getEdges() {
-		return (Set<? extends SampledSocialTie>) super.getEdges();
+	@Override
+	public Tuple<? extends SimSocialVertex, ? extends SimSocialVertex> getVertices() {
+		return (Tuple<? extends SimSocialVertex, ? extends SimSocialVertex>) super.getVertices();
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Set<? extends SampledEgo> getVertices() {
-		return (Set<? extends SampledEgo>) super.getVertices();
+	public SimSocialVertex getOpposite(Vertex v) {
+		return (SimSocialVertex) super.getOpposite(v);
 	}
 
-	@Override
-	public SampledSocialTie getEdge(SparseVertex v1, SparseVertex v2) {
-		return (SampledSocialTie) super.getEdge(v1, v2);
+	public int getCreated() {
+		return created;
+	}
+	
+	public int getLastUsed() {
+		return lastUsed;
+	}
+	
+	public TIntArrayList getUsage() {
+		return usage;
 	}
 
-	@Override
-	public SampledEgo getEgo(SocialPerson p) {
-		return (SampledEgo) super.getEgo(p);
+	public void use(int iteration) {
+		usage.add(iteration);
+		lastUsed = iteration;
 	}
 }

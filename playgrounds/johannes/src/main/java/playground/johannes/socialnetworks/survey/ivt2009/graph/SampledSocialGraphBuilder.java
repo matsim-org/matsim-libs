@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialNetworkFactory2.java
+ * SampledSocialNetFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,34 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.social;
+package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
-import org.matsim.contrib.sna.graph.GraphFactory;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
+import org.matsim.core.population.PersonImpl;
+
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
+
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetworkFactory implements GraphFactory<SocialNetwork, Ego, SocialTie>{
+public class SampledSocialGraphBuilder extends AbstractSparseGraphBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> {
 
-	public SocialTie createEdge() {
-		return new SocialTie(0);
+	public SampledSocialGraphBuilder() {
+		super(new SampledSocialGraphFactory());
+	}
+
+	@Override
+	public SampledSocialVertex addVertex(SampledSocialGraph g) {
+		throw new UnsupportedOperationException("Don't know what to with that...");
 	}
 	
-	public SocialTie createEdge(int created) {
-		return new SocialTie(created);
-	}
-
-	public SocialNetwork createGraph() {
-		return new SocialNetwork();
-	}
-
-	public Ego createVertex() {
-		throw new UnsupportedOperationException();
-	}
-	
-	public Ego createVertex(SocialPerson person) {
-		return new Ego(person);
+	public SampledSocialVertex addVertex(SampledSocialGraph g, Person person, int iteration) {
+		SampledSocialVertex ego = new SampledSocialVertex(new SocialPerson((PersonImpl) person), null);
+		ego.detect(iteration);
+		if(insertVertex(g, ego))
+			return ego;
+		else
+			return null;
 	}
 
 }

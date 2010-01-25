@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialTie.java
+ * SocialNetwork.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,53 +21,54 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.graph.social;
+package playground.johannes.socialnetworks.sim;
 
-import gnu.trove.TIntArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.core.utils.collections.Tuple;
+import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
 
 
 /**
  * @author illenberger
  *
  */
-public class SocialTie extends SpatialSparseEdge {
-
-	private int created;
+public class SimSocialGraph extends SpatialSparseGraph implements SocialGraph {
 	
-	private TIntArrayList usage;
+	private Map<SocialPerson, SimSocialVertex> personEgoMapping = new HashMap<SocialPerson, SimSocialVertex>();
 	
-	private int lastUsed;
+	/**
+	 * @deprecated
+	 */
+	public SimSocialGraph() {
+		super(CRSUtils.getCRS(21781)); //FIXME
+	}
 	
-	protected SocialTie(int created) {
-		this.created = created;
-		usage = new TIntArrayList();
-		usage.add(created);
-		lastUsed = created;
+	@Override
+	@SuppressWarnings("unchecked")
+	public Set<? extends SimSocialVertex> getVertices() {
+		return (Set<? extends SimSocialVertex>) super.getVertices();
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public Tuple<? extends Ego, ? extends Ego> getVertices() {
-		return (Tuple<? extends Ego, ? extends Ego>) super.getVertices();
+	public Set<? extends SimSocialEdge> getEdges() {
+		return (Set<? extends SimSocialEdge>) super.getEdges();
 	}
 
-	public int getCreated() {
-		return created;
-	}
-	
-	public int getLastUsed() {
-		return lastUsed;
-	}
-	
-	public TIntArrayList getUsage() {
-		return usage;
+	public SimSocialVertex getEgo(SocialPerson p) {
+		return personEgoMapping.get(p);
 	}
 
-	public void use(int iteration) {
-		usage.add(iteration);
-		lastUsed = iteration;
+	@Override
+	public SimSocialEdge getEdge(SparseVertex v1, SparseVertex v2) {
+		return (SimSocialEdge) super.getEdge(v1, v2);
 	}
+
 }

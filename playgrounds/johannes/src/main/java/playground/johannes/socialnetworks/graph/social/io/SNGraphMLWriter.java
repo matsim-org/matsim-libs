@@ -35,9 +35,9 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.io.GraphMLWriter;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.social.Ego;
-import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.SocialTie;
+import playground.johannes.socialnetworks.sim.SimSocialEdge;
+import playground.johannes.socialnetworks.sim.SimSocialGraph;
+import playground.johannes.socialnetworks.sim.SimSocialVertex;
 
 /**
  * @author illenberger
@@ -49,7 +49,7 @@ public class SNGraphMLWriter extends GraphMLWriter {
 
 	@Override
 	public void write(Graph graph, String filename) throws IOException {
-		if(graph instanceof SocialNetwork)
+		if(graph instanceof SimSocialGraph)
 			super.write(graph, filename);
 		else
 			throw new ClassCastException("Graph must be of type SocialNetwork.");
@@ -59,7 +59,7 @@ public class SNGraphMLWriter extends GraphMLWriter {
 	protected List<Tuple<String, String>> getEdgeAttributes(Edge e) {
 		List<Tuple<String, String>> attrs = super.getEdgeAttributes(e);
 		
-		SocialTie tie = (SocialTie)e;
+		SimSocialEdge tie = (SimSocialEdge)e;
 		attrs.add(new Tuple<String, String>(SNGraphML.CREATED_TAG, String.valueOf(tie.getCreated())));
 		
 		int cnt = tie.getUsage().size();
@@ -78,7 +78,7 @@ public class SNGraphMLWriter extends GraphMLWriter {
 	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
 		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
 		
-		Ego e = (Ego)v;
+		SimSocialVertex e = (SimSocialVertex)v;
 		attrs.add(new Tuple<String, String>(SNGraphML.PERSON_ID_TAG, e.getPerson().getId().toString()));
 		
 		return attrs;
@@ -91,7 +91,7 @@ public class SNGraphMLWriter extends GraphMLWriter {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
 			for(Object e : vertices) {
-				writer.write(((Ego) e).getPerson().getId().toString());
+				writer.write(((SimSocialVertex) e).getPerson().getId().toString());
 				writer.newLine();
 			}
 			writer.close();
