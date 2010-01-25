@@ -139,7 +139,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 			JCheckBox synchBox; 
 			if(host.getOTFHostControl().isLiveHost()) {
-				synchBox = new JCheckBox("show parked vehicles");
+				synchBox = new JCheckBox("show non-moving items");
 				synchBox.setSelected(cfg.isShowParking());
 				synchBox.addItemListener(this);
 				synchBox.setBounds(10, 20, 200, 31);
@@ -420,7 +420,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
-		if (source.getText().equals("show parked vehicles")) {
+		if (source.getText().equals("show non-moving items")) {
 			cfg.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);
 			cfg.setShowParking(!cfg.isShowParking());
 			if (host != null) {
