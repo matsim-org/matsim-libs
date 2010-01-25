@@ -38,7 +38,7 @@ import org.matsim.vis.otfvis.opengl.gl.Point3f;
  *
  */
 public class OTFVisConfig extends Module {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "otfvis";
 
