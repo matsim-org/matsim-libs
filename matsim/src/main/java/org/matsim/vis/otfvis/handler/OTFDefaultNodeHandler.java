@@ -23,7 +23,7 @@ package org.matsim.vis.otfvis.handler;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.ptproject.qsim.QueueNode;
+import org.matsim.ptproject.qsim.QNode;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -42,7 +42,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 public class OTFDefaultNodeHandler extends OTFDataReader   {
 	private OTFDataXYCoordReceiver xyReceiver = null;
 
-	static public class Writer extends  OTFDataWriter<QueueNode> implements OTFWriterFactory<QueueNode> {
+	static public class Writer extends  OTFDataWriter<QNode> implements OTFWriterFactory<QNode> {
 
 		private static final long serialVersionUID = 8011757932341886429L;
 
@@ -56,7 +56,7 @@ public class OTFDefaultNodeHandler extends OTFDataReader   {
 		public void writeDynData(ByteBuffer out) throws IOException {
 		}
 
-		public OTFDataWriter<QueueNode> getWriter() {
+		public OTFDataWriter<QNode> getWriter() {
 			return new Writer();
 		}
 	}

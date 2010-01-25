@@ -31,9 +31,9 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
+import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -112,8 +112,8 @@ public class QueryLinkId extends AbstractQuery {
 		
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Object src = writer.getSrc();
-			if(src instanceof QueueLink) {
-				Link link = ((QueueLink)src).getLink();
+			if(src instanceof QLink) {
+				Link link = ((QLink)src).getLink();
 				double alpha = 0.6;
 				double fromX = link.getFromNode().getCoord().getX();
 				double fromY = link.getFromNode().getCoord().getY();
@@ -142,7 +142,7 @@ public class QueryLinkId extends AbstractQuery {
 		}
 	}
 	
-	public void installQuery(OTFVisQueueSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.result = new Result();
 		// just look in a certain region around the actual point, 
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;

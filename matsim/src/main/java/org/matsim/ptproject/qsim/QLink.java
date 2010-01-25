@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public interface QueueLink {
+public interface QLink {
 
   /**
    *  Is called after link has been read completely 
@@ -34,7 +34,7 @@ public interface QueueLink {
   @Deprecated
   public void finishInit();
 
-  public void setSimEngine(final QueueSimEngine simEngine);
+  public void setSimEngine(final QSimEngine simEngine);
 
   public void activateLink();
 
@@ -43,18 +43,18 @@ public interface QueueLink {
   
   /**
    * Adds a vehicle to the link, called by
-   * {@link QueueNode#moveVehicleOverNode(QueueVehicle, QueueLane, double)}.
+   * {@link QNode#moveVehicleOverNode(QVehicle, QueueLane, double)}.
    *
    * @param veh
    *          the vehicle
    */
-  public void add(final QueueVehicle veh);
+  public void add(final QVehicle veh);
 
-  public void addParkedVehicle(QueueVehicle vehicle);
+  public void addParkedVehicle(QVehicle vehicle);
 
-  public QueueVehicle getVehicle(Id vehicleId);
+  public QVehicle getVehicle(Id vehicleId);
 
-  public Collection<QueueVehicle> getAllVehicles();
+  public Collection<QVehicle> getAllVehicles();
   
   public void recalcTimeVariantAttributes(double time);
 
@@ -63,7 +63,7 @@ public interface QueueLink {
    */
   public double getSpaceCap();
   
-  public LinkedList<QueueVehicle> getVehQueue();
+  public LinkedList<QVehicle> getVehQueue();
 
 //  public Queue<QueueVehicle> getVehiclesInBuffer();
 
@@ -83,9 +83,9 @@ public interface QueueLink {
   // methods that have been marked as package or protected
   // before the interface was introduced
   
-  public QueueNode getToQueueNode();
+  public QNode getToQueueNode();
   
-  public QueueNetwork getQueueNetwork();
+  public QNetwork getQueueNetwork();
 
   public boolean hasSpace();
  
@@ -95,7 +95,7 @@ public interface QueueLink {
   
   public boolean moveLink(double now);
   
-  public QueueVehicle removeParkedVehicle(Id vehicleId);
+  public QVehicle removeParkedVehicle(Id vehicleId);
   
   /**
    * @deprecated can be removed see implementation
@@ -103,7 +103,7 @@ public interface QueueLink {
    * @param veh
    */
   @Deprecated
-  public void processVehicleArrival(final double now, final QueueVehicle veh);
+  public void processVehicleArrival(final double now, final QVehicle veh);
   
-  public void addDepartingVehicle(QueueVehicle vehicle);
+  public void addDepartingVehicle(QVehicle vehicle);
 }

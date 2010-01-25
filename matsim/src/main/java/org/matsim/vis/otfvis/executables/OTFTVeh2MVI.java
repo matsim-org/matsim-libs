@@ -31,7 +31,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
@@ -52,7 +52,7 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	public OTFTVeh2MVI(QueueNetwork net, String vehFileName, double interval_s, String outFileName) {
+	public OTFTVeh2MVI(QNetwork net, String vehFileName, double interval_s, String outFileName) {
 		super(interval_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterQSimConnectionManagerFactory());
 		this.vehFileName = vehFileName;
 	}
@@ -170,7 +170,7 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 		Scenario scenario = new ScenarioImpl();
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
-		QueueNetwork qnet = new QueueNetwork(net);
+		QNetwork qnet = new QNetwork(net);
 
 		new OTFTVeh2MVI(qnet, vehFileName, intervall_s, outFileName).convert();
 	}

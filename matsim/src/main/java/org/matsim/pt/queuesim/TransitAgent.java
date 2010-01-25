@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.PersonAgent;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -38,7 +38,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
  */
 public class TransitAgent extends PersonAgent implements PassengerAgent {
 
-	public TransitAgent(final Person p, final QueueSimulation simulation) {
+	public TransitAgent(final Person p, final QSim simulation) {
 		super(p, simulation);
 	}
 

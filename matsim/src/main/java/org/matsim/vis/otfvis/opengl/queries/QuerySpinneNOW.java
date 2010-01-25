@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.ptproject.qsim.QueueVehicle;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QVehicle;
 
 /**
  * QuerySpinneNOW is a special case of QuerySpinne, where not all agents passing the link are 
@@ -20,11 +20,11 @@ import org.matsim.ptproject.qsim.QueueVehicle;
 public class QuerySpinneNOW extends QuerySpinne {
 
 	@Override
-	protected List<Plan> getPersons(Population plans, QueueNetwork net) {
+	protected List<Plan> getPersons(Population plans, QNetwork net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
-		QueueLink link = net.getLinks().get(queryLinkId);
-		Collection<QueueVehicle> vehs = link.getAllVehicles();
-		for( QueueVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
+		QLink link = net.getLinks().get(queryLinkId);
+		Collection<QVehicle> vehs = link.getAllVehicles();
+		for( QVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
 		
 		return actPersons;
 	}

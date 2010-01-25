@@ -39,7 +39,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -86,7 +86,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QueueSimulation sim = new QueueSimulation(scenario, new EventsManagerImpl());
+		QSim sim = new QSim(scenario, new EventsManagerImpl());
 		TransitAgent agent = new TransitAgent(person, sim);
 		agent.initialize();
 		agent.activityEnds(10);
@@ -124,7 +124,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QueueSimulation sim = new QueueSimulation(scenario, new EventsManagerImpl());
+		QSim sim = new QSim(scenario, new EventsManagerImpl());
 		TransitAgent agent = new TransitAgent(person, sim);
 		agent.initialize();
 		agent.activityEnds(10);

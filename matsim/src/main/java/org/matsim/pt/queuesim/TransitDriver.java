@@ -26,7 +26,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -47,7 +47,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	final double departureTime;
 	private final LegImpl currentLeg = new LegImpl(TransportMode.car);
 
-	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final QueueSimulation sim, final TransitStopHandler stopHandler) {
+	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final QSim sim, final TransitStopHandler stopHandler) {
 		super(createDummyPerson(line, route, departure), sim, stopHandler, agentTracker);
 		this.departureTime = departure.getDepartureTime();
 		this.transitLine = line;

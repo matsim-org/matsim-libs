@@ -1,6 +1,7 @@
 /* *********************************************************************** *
- * project: org.matsim																																							 *
- *                               																			                                         *
+ * project: org.matsim.*
+ * SimVehicle.java
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2009 by the members listed in the COPYING,        *
@@ -17,28 +18,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package org.matsim.ptproject.qsim;
 
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.BasicVehicle;
 
+public interface QVehicle extends Identifiable {
 
-public interface QueueSimulationFeature {
+	public DriverAgent getDriver();
 
-	void afterPrepareSim();
+	public void setDriver(final DriverAgent driver);
+	
+	public Link getCurrentLink();
+	
+	public void setCurrentLink(final Link link);
+	
+	public double getSizeInEquivalents();
+	
+	public double getLinkEnterTime();
+	
+	public void setLinkEnterTime(final double time);
 
-	void beforeCleanupSim();
+	public double getEarliestLinkExitTime();
 
-	void beforeHandleAgentArrival(DriverAgent agent);
+	public void setEarliestLinkExitTime(final double time);
 
-	void afterAfterSimStep(double time);
-
-	void beforeHandleUnknownLegMode(double now, DriverAgent agent, Link link);
-
-	void afterCreateAgents();
-
-	void afterActivityBegins(DriverAgent agent, int planElementIndex);
-
-	void afterActivityEnds(DriverAgent agent, double time);
+	/**
+	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
+	 */
+	public BasicVehicle getBasicVehicle();
 
 }

@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
@@ -46,9 +46,9 @@ public class OTFEvent2MVI extends OTFFileWriter {
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	private QueueNetwork network;
+	private QNetwork network;
 
-	public OTFEvent2MVI(QueueNetwork net, String eventFileName, String outFileName, double interval_s) {
+	public OTFEvent2MVI(QNetwork net, String eventFileName, String outFileName, double interval_s) {
 		super(interval_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterQSimConnectionManagerFactory());
 		this.network = net;
 		this.eventFileName = eventFileName;

@@ -32,7 +32,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
-import org.matsim.ptproject.qsim.SimulationTimer;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 
 /**
@@ -109,7 +109,7 @@ public class VDSSign {
 	 *
 	 */
 	public void simulationPrepared() {
-		this.nextUpdate = SimulationTimer.getTime();
+		this.nextUpdate = QSimTimer.getTime();
 	}
 
 	private double calculateDisbenefitValue(final double nashTime) {
@@ -256,7 +256,7 @@ public class VDSSign {
 	 * @return current route
 	 */
 	public NetworkRouteWRefs requestRoute() {
-		double time = SimulationTimer.getTime();
+		double time = QSimTimer.getTime();
 		double trust = MatsimRandom.getRandom().nextDouble();
 		if (time > this.nextUpdate) {
 			throw new RuntimeException(

@@ -45,10 +45,10 @@ public class PersonAgent implements DriverAgent {
 	private static final Logger log = Logger.getLogger(PersonAgent.class);
 
 	private final Person person;
-	private QueueVehicle vehicle;
+	private QVehicle vehicle;
 	protected Id cachedNextLinkId = null;
 
-	private final QueueSimulation simulation;
+	private final QSim simulation;
 
 	private double activityDepartureTime = Time.UNDEFINED_TIME;
 
@@ -63,7 +63,7 @@ public class PersonAgent implements DriverAgent {
 
 	private int currentNodeIndex;
 
-	public PersonAgent(final Person p, final QueueSimulation simulation) {
+	public PersonAgent(final Person p, final QSim simulation) {
 		this.person = p;
 		this.simulation = simulation;
 	}
@@ -80,11 +80,11 @@ public class PersonAgent implements DriverAgent {
 		return this.person.getSelectedPlan().getPlanElements();
 	}
 
-	public void setVehicle(final QueueVehicle veh) {
+	public void setVehicle(final QVehicle veh) {
 		this.vehicle = veh;
 	}
 
-	public QueueVehicle getVehicle() {
+	public QVehicle getVehicle() {
 		return this.vehicle;
 	}
 

@@ -33,9 +33,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.ptproject.qsim.DriverAgent;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueVehicle;
-import org.matsim.ptproject.qsim.SimulationTimer;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
@@ -79,7 +79,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			// Write additional agent data
 
 			positions.clear();
-			src.getVisData().getVehiclePositions(SimulationTimer.getTime(), positions);
+			src.getVisData().getVehiclePositions(QSimTimer.getTime(), positions);
 
 			if (showParked) {
 				out.putInt(positions.size());
@@ -109,7 +109,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		}
 
 		@Override
-		public OTFDataWriter<QueueLink> getWriter() {
+		public OTFDataWriter<QLink> getWriter() {
 			return new Writer();
 		}
 
@@ -122,7 +122,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 				out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
 				if (pos.getAgentState()== AgentState.PERSON_AT_ACTIVITY) {
 					// What is the next legs mode?
-					QueueVehicle veh = src.getVehicle(pos.getId());
+					QVehicle veh = src.getVehicle(pos.getId());
 					if (veh == null) {
 						out.putInt(1);
 					} else {

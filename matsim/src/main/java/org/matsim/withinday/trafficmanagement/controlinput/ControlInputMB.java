@@ -39,7 +39,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.SimulationTimer;
+import org.matsim.ptproject.qsim.QSimTimer;
 
 /**
  * @author abergsten and dzetterberg
@@ -134,7 +134,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 			Link l = this.network.getLinks().get(linkId);
 			if (!this.capacities.containsKey(linkId)) {
 				double capacity = ((LinkImpl)l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
-						/ SimulationTimer.getSimTickTime();
+						/ QSimTimer.getSimTickTime();
 				this.capacities.put(l.getId(), capacity);
 			}
 
@@ -191,7 +191,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 			if (!this.capacities.containsKey(linkId)) {
 				double capacity = ((LinkImpl)l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
-						/ SimulationTimer.getSimTickTime();
+						/ QSimTimer.getSimTickTime();
 				this.capacities.put(linkId, capacity);
 			}
 
@@ -332,7 +332,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 	private double getPredictedTravelTime(final NetworkRouteWRefs route, final Link bottleNeck) {
 
 		log.trace("");
-		log.trace("Sim time: " + SimulationTimer.getTime());
+		log.trace("Sim time: " + QSimTimer.getTime());
 		double predictedTT;
 		List<Id> routeLinkIds = route.getLinkIds();
 		boolean searchForBottleNecks = true;
@@ -346,7 +346,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		}
 
 		// boolean queueFound = true;
-		if (SimulationTimer.getTime() % this.resetbottleneckintervall == 0) {
+		if (QSimTimer.getTime() % this.resetbottleneckintervall == 0) {
 			bottleNeckList.clear();
 
 			for (int i = routeLinkIds.size() - 1; i >= 0; i--) {
@@ -375,8 +375,8 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 		if (bottleNeckList.isEmpty()) {
 			double agentsOnRoute = getAgents(route);
-			double currentBottleNeckCapacity = ((LinkImpl)bottleNeck).getFlowCapacity(SimulationTimer.getTime()) * this.simulationConfig.getFlowCapFactor()
-			/ SimulationTimer.getSimTickTime();
+			double currentBottleNeckCapacity = ((LinkImpl)bottleNeck).getFlowCapacity(QSimTimer.getTime()) * this.simulationConfig.getFlowCapFactor()
+			/ QSimTimer.getSimTickTime();
 			double ttQueue = agentsOnRoute / currentBottleNeckCapacity;
 			double ttFreeSpeed = getFreeSpeedRouteTravelTime(route);
 			if (ttQueue > ttFreeSpeed) {

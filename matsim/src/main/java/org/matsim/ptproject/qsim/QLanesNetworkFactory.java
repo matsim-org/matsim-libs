@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OnTheFlyQueueSimQuad.java
+ * QLanesNetworkFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.ptproject.qsim;
 
-package org.matsim.vis.otfvis;
-
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.ptproject.qsim.QueueSimulation;
-import org.matsim.vis.otfvis.server.OnTheFlyServer;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 
-public class OTFVisQueueSim extends QueueSimulation {
+public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLink> {
 
-	private final OTFVisQueueSimFeature queueSimulationFeature;
+  private QNetworkFactory<QNode, QLink> delegate;
 
-	public OTFVisQueueSim(Scenario scenario, EventsManager events) {
-		super(scenario, events);
-		queueSimulationFeature = new OTFVisQueueSimFeature(this);
-		super.addFeature(queueSimulationFeature);
-	}
+  public QLanesNetworkFactory(QNetworkFactory<QNode, QLink> delegate){
+    this.delegate = delegate;
+  }
+  
+  @Override
+  public QLinkLanesImpl newQueueLink(Link link, QNetwork queueNetwork,
+      QNode queueNode) {
+    return new QLinkLanesImpl(link, queueNetwork, queueNode);
+  }
 
-	public void setServer(OnTheFlyServer server) {
-		queueSimulationFeature.setServer(server);
-	}
+  @Override
+  public QNode newQueueNode(Node node, QNetwork queueNetwork) {
+    return new QLaneNode(node, queueNetwork);
+  }
 
-	public void setVisualizeTeleportedAgents(boolean active) {
-		queueSimulationFeature.setVisualizeTeleportedAgents(active);
-	}
-
-	public OTFVisQueueSimFeature getQueueSimulationFeature() {
-		return queueSimulationFeature;
-	}
-	
 }
-

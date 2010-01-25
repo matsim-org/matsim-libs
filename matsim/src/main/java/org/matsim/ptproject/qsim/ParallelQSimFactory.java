@@ -38,7 +38,7 @@ public class ParallelQSimFactory implements MobsimFactory {
   @Override
   public IOSimulation createMobsim(Scenario sc, EventsManager eventsManager) {
 	  SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
-	  ParallelQueueSimulation sim = new ParallelQueueSimulation(sc, em);
+	  ParallelQSimulation sim = new ParallelQSimulation(sc, em);
 	  
 	  // Get number of parallel Threads
 	  QSimConfigGroup conf = (QSimConfigGroup) sc.getConfig().getModule(QSimConfigGroup.GROUP_NAME);

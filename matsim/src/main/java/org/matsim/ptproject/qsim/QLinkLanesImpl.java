@@ -100,11 +100,11 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * of its QueueLanes is active.</li>
  * </ul>
  */
-public class QLinkLanesImpl implements QueueLink {
+public class QLinkLanesImpl implements QLink {
 
 	final private static Logger log = Logger.getLogger(QLinkLanesImpl.class);
 
-	final private static QueueLane.FromLinkEndComparator fromLinkEndComparator = new QueueLane.FromLinkEndComparator();
+	final private static QLane.FromLinkEndComparator fromLinkEndComparator = new QLane.FromLinkEndComparator();
 	
 	/**
 	 * The Link instance containing the data
@@ -113,19 +113,19 @@ public class QLinkLanesImpl implements QueueLink {
 	/**
 	 * Reference to the QueueNetwork instance this link belongs to.
 	 */
-	private final QueueNetwork queueNetwork;
+	private final QNetwork queueNetwork;
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
-	private final QueueNode toQueueNode;
+	private final QNode toQueueNode;
 	/**
 	 * The QueueLane instance which always exists.
 	 */
-	private QueueLane originalLane;
+	private QLane originalLane;
 	/**
 	 * A List holding all QueueLane instances of the QueueLink
 	 */
-	private List<QueueLane> queueLanes;
+	private List<QLane> queueLanes;
 
 	/** set to <code>true</code> if there is more than one lane (the originalLane). */
 	private boolean hasLanes = false;
@@ -134,30 +134,30 @@ public class QLinkLanesImpl implements QueueLink {
 	 * If more than one QueueLane exists this list holds all QueueLanes connected to 
 	 * the (To)QueueNode of the QueueLink
 	 */
-	private List<QueueLane> toNodeQueueLanes = null;
+	private List<QLane> toNodeQueueLanes = null;
 	
 	private boolean active = false;
 
-	private final Map<Id, QueueVehicle> parkedVehicles = new LinkedHashMap<Id, QueueVehicle>(10);
+	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
 	
-	private QueueSimEngine simEngine = null;
+	private QSimEngine simEngine = null;
 	
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param link2
 	 * @param queueNetwork
 	 * @param toNode
-	 * @see QueueLink#createLanes(List)
+	 * @see QLink#createLanes(List)
 	 */
-	public QLinkLanesImpl(final Link link2, final QueueNetwork queueNetwork, final QueueNode toNode) {
+	public QLinkLanesImpl(final Link link2, final QNetwork queueNetwork, final QNode toNode) {
 		this.link = link2;
 		this.queueNetwork = queueNetwork;
 		this.toQueueNode = toNode;
 
-		this.originalLane = new QueueLane(this, null);
-		this.queueLanes = new ArrayList<QueueLane>();
+		this.originalLane = new QLane(this, null);
+		this.queueLanes = new ArrayList<QLane>();
 		this.queueLanes.add(this.originalLane);
 	}
 
@@ -174,8 +174,8 @@ public class QLinkLanesImpl implements QueueLink {
 			if (signalLane.getLength() > this.link.getLength()) {
 				throw new IllegalStateException("Link Id " + this.link.getId() + " is shorter than Lane Id " + signalLane.getId() + " on this link!");
 			}
-			QueueLane lane = null;
-			lane = new QueueLane(this, signalLane);
+			QLane lane = null;
+			lane = new QLane(this, signalLane);
 			lane.setMetersFromLinkEnd(0.0);
 			lane.setLaneLength(signalLane.getLength());
 			lane.calculateCapacities();
@@ -207,7 +207,7 @@ public class QLinkLanesImpl implements QueueLink {
 		addUTurn();
 	}
 
-	public List<QueueLane> getToNodeQueueLanes() {
+	public List<QLane> getToNodeQueueLanes() {
 		if ((this.toNodeQueueLanes == null) && (this.queueLanes.size() == 1)){
 			return this.queueLanes;
 		}
@@ -215,7 +215,7 @@ public class QLinkLanesImpl implements QueueLink {
 	}
 	
 	protected void addSignalGroupDefinition(SignalGroupDefinition signalGroupDefinition) {
-		for (QueueLane lane : this.toNodeQueueLanes) {
+		for (QLane lane : this.toNodeQueueLanes) {
 			lane.addSignalGroupDefinition(signalGroupDefinition);
 		}				
 	}
@@ -226,9 +226,9 @@ public class QLinkLanesImpl implements QueueLink {
 	 * @param lane
 	 * @param toLinkIds
 	 */
-	private void setToLinks(QueueLane lane, List<Id> toLinkIds) {
+	private void setToLinks(QLane lane, List<Id> toLinkIds) {
 		for (Id linkId : toLinkIds) {
-			QueueLink link = this.getQueueNetwork().getQueueLink(linkId);
+			QLink link = this.getQueueNetwork().getQueueLink(linkId);
 			if (link == null) {
 				String message = "Cannot find Link with Id: " + linkId + " in network. ";
 				log.error(message);
@@ -241,7 +241,7 @@ public class QLinkLanesImpl implements QueueLink {
 	
 	private void findLayout(){
 		SortedMap<Double, Link> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
-		for (QueueLane lane : this.queueLanes) {
+		for (QLane lane : this.queueLanes) {
 			int laneNumber = 1;
 			for (Link l : result.values()) {
 				if (lane.getDestinationLinkIds().contains(l.getId())){
@@ -256,7 +256,7 @@ public class QLinkLanesImpl implements QueueLink {
 	private void addUTurn() {
 		for (Link outLink : this.getLink().getToNode().getOutLinks().values()) {
 			if ((outLink.getToNode().equals(this.getLink().getFromNode()))) {
-				for (QueueLane l : this.toNodeQueueLanes) {
+				for (QLane l : this.toNodeQueueLanes) {
 					if ((l.getVisualizerLane() == 1) && (l.getMeterFromLinkEnd() == 0)){
 						l.addDestinationLink(outLink.getId());
 						this.originalLane.addDestinationLink(outLink.getId());
@@ -267,8 +267,8 @@ public class QLinkLanesImpl implements QueueLink {
 	}
 
 	private void initToNodeQueueLanes() {
-		this.toNodeQueueLanes = new ArrayList<QueueLane>();
-		for (QueueLane l : this.queueLanes) {
+		this.toNodeQueueLanes = new ArrayList<QLane>();
+		for (QLane l : this.queueLanes) {
 			if (l.getMeterFromLinkEnd() == 0.0) {
 				this.toNodeQueueLanes.add(l);
 			}
@@ -280,7 +280,7 @@ public class QLinkLanesImpl implements QueueLink {
 		this.active = false;
 	}
 
-	public void setSimEngine(final QueueSimEngine simEngine) {
+	public void setSimEngine(final QSimEngine simEngine) {
 		this.simEngine = simEngine;
 	}
 	
@@ -293,42 +293,42 @@ public class QLinkLanesImpl implements QueueLink {
 
 	/**
 	 * Adds a vehicle to the link, called by
-	 * {@link QueueNode#moveVehicleOverNode(QueueVehicle, QueueLane, double)}.
+	 * {@link QNode#moveVehicleOverNode(QVehicle, QLane, double)}.
 	 *
 	 * @param veh
 	 *          the vehicle
 	 */
-	public void add(final QueueVehicle veh) {
-		double now = SimulationTimer.getTime();
+	public void add(final QVehicle veh) {
+		double now = QSimTimer.getTime();
 		activateLink();
 		this.originalLane.add(veh, now);
 		veh.setCurrentLink(this.getLink());
-		QueueSimulation.getEvents().processEvent(
+		QSim.getEvents().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
 						this.getLink().getId()));
 	}
 	
 	public void clearVehicles() {
 		this.parkedVehicles.clear();
-		for (QueueLane lane : this.queueLanes){
+		for (QLane lane : this.queueLanes){
 			lane.clearVehicles();
 		}
 	}
 
-	public void addParkedVehicle(QueueVehicle vehicle) {
+	public void addParkedVehicle(QVehicle vehicle) {
 		this.parkedVehicles.put(vehicle.getId(), vehicle);
 		vehicle.setCurrentLink(this.link);
 	}
 
-	/*package*/ QueueVehicle getParkedVehicle(Id vehicleId) {
+	/*package*/ QVehicle getParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
-	public QueueVehicle removeParkedVehicle(Id vehicleId) {
+	public QVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 	
-	public void addDepartingVehicle(QueueVehicle vehicle) {
+	public void addDepartingVehicle(QVehicle vehicle) {
 		this.originalLane.waitingList.add(vehicle);
 		this.activateLink();
 	}
@@ -336,7 +336,7 @@ public class QLinkLanesImpl implements QueueLink {
 	public boolean moveLink(double now) {
 		boolean ret = false;	
 		if (this.hasLanes) { // performance optimization: "if" is faster then "for(queueLanes)" with only one lane
-			for (QueueLane lane : this.queueLanes){
+			for (QLane lane : this.queueLanes){
 				if (lane.moveLane(now)){
 					ret = true;
 				}
@@ -348,7 +348,7 @@ public class QLinkLanesImpl implements QueueLink {
 		return ret;
 	}
 
-	public void processVehicleArrival(final double now, final QueueVehicle veh) {
+	public void processVehicleArrival(final double now, final QVehicle veh) {
 //		QueueSimulation.getEvents().processEvent(
 //				new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
 //						this.getLink(), veh.getDriver().getCurrentLeg()));
@@ -364,7 +364,7 @@ public class QLinkLanesImpl implements QueueLink {
 			return this.originalLane.bufferIsEmpty();
 		}
 		//otherwise we have to do a bit more work
-		for (QueueLane lane : this.toNodeQueueLanes){
+		for (QLane lane : this.toNodeQueueLanes){
 			if (!lane.bufferIsEmpty()){
 				return false;
 			}
@@ -377,17 +377,17 @@ public class QLinkLanesImpl implements QueueLink {
 	}
 
 	public void recalcTimeVariantAttributes(double time) {
-		for (QueueLane ql : this.queueLanes){
+		for (QLane ql : this.queueLanes){
 			ql.recalcTimeVariantAttributes(time);
 		}
 	}
 
-	public QueueVehicle getVehicle(Id vehicleId) {
-		QueueVehicle ret = getParkedVehicle(vehicleId);
+	public QVehicle getVehicle(Id vehicleId) {
+		QVehicle ret = getParkedVehicle(vehicleId);
 		if (ret != null) {
 			return ret;
 		}
-		for (QueueLane lane : this.queueLanes){
+		for (QLane lane : this.queueLanes){
 			ret = lane.getVehicle(vehicleId);
 			if (ret != null) {
 				return ret;
@@ -396,9 +396,9 @@ public class QLinkLanesImpl implements QueueLink {
 		return ret;
 	}
 
-	public Collection<QueueVehicle> getAllVehicles() {
-		Collection<QueueVehicle> ret = new ArrayList<QueueVehicle>(this.parkedVehicles.values());
-		for  (QueueLane lane : this.queueLanes){
+	public Collection<QVehicle> getAllVehicles() {
+		Collection<QVehicle> ret = new ArrayList<QVehicle>(this.parkedVehicles.values());
+		for  (QLane lane : this.queueLanes){
 			ret.addAll(lane.getAllVehicles());
 		}
 		return ret;
@@ -410,7 +410,7 @@ public class QLinkLanesImpl implements QueueLink {
 	public double getSpaceCap() {
 		double total = this.originalLane.getStorageCapacity();
 		if (this.hasLanes) {
-			for (QueueLane ql : this.getToNodeQueueLanes()) {
+			for (QLane ql : this.getToNodeQueueLanes()) {
 				total += ql.getStorageCapacity();
 			}
 		}
@@ -428,7 +428,7 @@ public class QLinkLanesImpl implements QueueLink {
 	 */
 	protected int vehOnLinkCount() {
 		int count = 0;
-		for (QueueLane ql : this.queueLanes){
+		for (QLane ql : this.queueLanes){
 			count += ql.vehOnLinkCount();
 		}
 		return count;
@@ -438,11 +438,11 @@ public class QLinkLanesImpl implements QueueLink {
 		return this.link;
 	}
 	
-	public QueueNetwork getQueueNetwork() {
+	public QNetwork getQueueNetwork() {
 		return this.queueNetwork;
 	}
 
-	public QueueNode getToQueueNode() {
+	public QNode getToQueueNode() {
 		return this.toQueueNode;
 	}
 
@@ -461,7 +461,7 @@ public class QLinkLanesImpl implements QueueLink {
 	/**
 	 * @return the QueueLanes of this QueueLink
 	 */
-	public List<QueueLane> getQueueLanes(){
+	public List<QLane> getQueueLanes(){
 		return this.queueLanes;
 	}
 	
@@ -469,14 +469,14 @@ public class QLinkLanesImpl implements QueueLink {
 		return this.visdata;
 	}
 	
-	public QueueLane getOriginalLane(){
+	public QLane getOriginalLane(){
 		return this.originalLane;
 	}
 	
   @Override
-  public LinkedList<QueueVehicle> getVehQueue() {
-    LinkedList<QueueVehicle> ll = this.originalLane.getVehQueue();
-    for (QueueLane l : this.getToNodeQueueLanes()){
+  public LinkedList<QVehicle> getVehQueue() {
+    LinkedList<QVehicle> ll = this.originalLane.getVehQueue();
+    for (QLane l : this.getToNodeQueueLanes()){
       ll.addAll(l.getVehQueue());
     }
     return ll;
@@ -499,7 +499,7 @@ public class QLinkLanesImpl implements QueueLink {
 
 		public Collection<PositionInfo> getVehiclePositions(double time, final Collection<PositionInfo> positions) {
 			log.warn( " entering getVehiclePositions ") ;
-			for (QueueLane lane : QLinkLanesImpl.this.getQueueLanes()) {
+			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 				lane.visdata.getVehiclePositions(time, positions);
 			}
 //			originalLane.visdata.getVehiclePositions(positions);
@@ -524,7 +524,7 @@ public class QLinkLanesImpl implements QueueLink {
 	
 				// add the parked vehicles
 				int cnt2 = 0 ;
-				for (QueueVehicle veh : parkedVehicles.values()) {
+				for (QVehicle veh : parkedVehicles.values()) {
 					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(), cnt2 ) ;
 //							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
 //					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(),

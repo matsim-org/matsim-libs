@@ -41,10 +41,10 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQSim;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
@@ -199,7 +199,7 @@ public class OTFVis {
 		ScenarioImpl scenario = loader.getScenario();
 		EventsManagerImpl events = new EventsManagerImpl();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
-		OTFVisQueueSim queueSimulation = new OTFVisQueueSim(scenario, events);
+		OTFVisQSim queueSimulation = new OTFVisQSim(scenario, events);
 		queueSimulation.setControlerIO(controlerIO);
 		queueSimulation.setIterationNumber(scenario.getConfig().controler().getLastIteration());
 		queueSimulation.run();
@@ -210,7 +210,7 @@ public class OTFVis {
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 		EventsManagerImpl events = new EventsManagerImpl();
-		OTFVisQueueSim queueSimulation = new OTFVisQueueSim(scenario, events);
+		OTFVisQSim queueSimulation = new OTFVisQSim(scenario, events);
 		queueSimulation.run();
 	}
 
@@ -231,7 +231,7 @@ public class OTFVis {
 		Network net = scenario.getNetwork();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
-		OTFEvent2MVI converter = new OTFEvent2MVI(new QueueNetwork(net), eventFile, mviFile, snapshotPeriod);
+		OTFEvent2MVI converter = new OTFEvent2MVI(new QNetwork(net), eventFile, mviFile, snapshotPeriod);
 		converter.convert();
 	}
 	

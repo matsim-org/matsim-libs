@@ -35,32 +35,32 @@ import org.matsim.core.gbl.Gbl;
 /**
  * Represents a node in the QueueSimulation.
  */
-public class QueueNode {
+public class QNode {
 
-	private static final Logger log = Logger.getLogger(QueueNode.class);
+	private static final Logger log = Logger.getLogger(QNode.class);
 
 	private static final QueueLinkIdComparator qlinkIdComparator = new QueueLinkIdComparator();
 
-	protected final QueueLink[] inLinksArrayCache;
-	private final QueueLink[] tempLinks;
+	protected final QLink[] inLinksArrayCache;
+	private final QLink[] tempLinks;
 
 	private boolean active = false;
 
 	private final Node node;
 
-	public QueueNetwork queueNetwork;
+	public QNetwork queueNetwork;
 	/**
 	 * Indicates whether this node is signalized or not
 	 */
 	private boolean signalized = false;
 
-	public QueueNode(final Node n, final QueueNetwork queueNetwork) {
+	public QNode(final Node n, final QNetwork queueNetwork) {
 		this.node = n;
 		this.queueNetwork = queueNetwork;
 
 		int nofInLinks = this.node.getInLinks().size();
-		this.inLinksArrayCache = new QueueLink[nofInLinks];
-		this.tempLinks = new QueueLink[nofInLinks];
+		this.inLinksArrayCache = new QLink[nofInLinks];
+		this.tempLinks = new QLink[nofInLinks];
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class QueueNode {
 		/* As the order of nodes has an influence on the simulation results,
 		 * the nodes are sorted to avoid indeterministic simulations. dg[april08]
 		 */
-		Arrays.sort(this.inLinksArrayCache, QueueNode.qlinkIdComparator);
+		Arrays.sort(this.inLinksArrayCache, QNode.qlinkIdComparator);
 	}
 
 	public Node getNode() {
@@ -112,12 +112,12 @@ public class QueueNode {
 	public void moveNode(final double now, final Random random) {
 		/* called by the framework, do all necessary action for node movement here */
 		if (this.signalized) {
-			for (QueueLink link : this.inLinksArrayCache){
-				for (QueueLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
+			for (QLink link : this.inLinksArrayCache){
+				for (QLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
 					lane.updateGreenState(now);
 					if (lane.isThisTimeStepGreen()){
 		        while (!lane.bufferIsEmpty()) {
-		          QueueVehicle veh = lane.getFirstFromBuffer();
+		          QVehicle veh = lane.getFirstFromBuffer();
 		          if (!moveVehicleOverNode(veh, lane, now)) {
 		            break;
 		          }
@@ -130,7 +130,7 @@ public class QueueNode {
 			int inLinksCounter = 0;
 			double inLinksCapSum = 0.0;
 			// Check all incoming links for buffered agents
-			for (QueueLink link : this.inLinksArrayCache) {
+			for (QLink link : this.inLinksArrayCache) {
 				if (!link.bufferIsEmpty()) {
 					this.tempLinks[inLinksCounter] = link;
 					inLinksCounter++;
@@ -149,7 +149,7 @@ public class QueueNode {
 				double rndNum = random.nextDouble() * inLinksCapSum;
 				double selCap = 0.0;
 				for (int i = 0; i < inLinksCounter; i++) {
-					QueueLink link = this.tempLinks[i];
+					QLink link = this.tempLinks[i];
 					if (link == null)
 						continue;
 					selCap += link.getLink().getCapacity(now);
@@ -166,19 +166,19 @@ public class QueueNode {
 		}
 	}
 	
-  protected void clearLinkBuffer(final QueueLink link, final double now){
-    if (link instanceof QueueLinkImpl){
+  protected void clearLinkBuffer(final QLink link, final double now){
+    if (link instanceof QLinkImpl){
       while (!link.bufferIsEmpty()) {
-        QueueVehicle veh = ((QueueLinkImpl) link).getFirstFromBuffer();
-        if (!moveVehicleOverNode(veh, (QueueLinkImpl) link, now)) {
+        QVehicle veh = ((QLinkImpl) link).getFirstFromBuffer();
+        if (!moveVehicleOverNode(veh, (QLinkImpl) link, now)) {
           break;
         }
       }
     }
     else {
-      for (QueueLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
+      for (QLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
         while (!lane.bufferIsEmpty()) {
-          QueueVehicle veh = lane.getFirstFromBuffer();
+          QVehicle veh = lane.getFirstFromBuffer();
           if (!moveVehicleOverNode(veh, lane, now)) {
             break;
           }
@@ -187,7 +187,7 @@ public class QueueNode {
     }
   }
 	
-	protected boolean moveVehicleOverNode(QueueVehicle veh, QueueLane lane,
+	protected boolean moveVehicleOverNode(QVehicle veh, QLane lane,
       double now) {
 	  throw new UnsupportedOperationException("Must be subclassed to use this method!");
 	};
@@ -202,7 +202,7 @@ public class QueueNode {
    * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
    * otherwise (e.g. in case where the next link is jammed)
    */
-  protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLinkImpl currentLane, final double now) {
+  protected boolean moveVehicleOverNode(final QVehicle veh, final QLinkImpl currentLane, final double now) {
     Id nextLinkId = veh.getDriver().chooseNextLinkId();
     Link currentLink = currentLane.getLink();
 
@@ -215,7 +215,7 @@ public class QueueNode {
             " from link " + currentLink.getId() + " to link " + nextLinkId);
       }
       
-      QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
+      QLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
 
       if (nextQueueLink.hasSpace()) {
         (currentLane).popFirstFromBuffer();
@@ -235,7 +235,7 @@ public class QueueNode {
           currentLane.popFirstFromBuffer();
           Simulation.decLiving();
           Simulation.incLost();
-          QueueSimulation.getEvents().processEvent(
+          QSim.getEvents().processEvent(
               new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
         } else {
           currentLane.popFirstFromBuffer();
@@ -266,9 +266,9 @@ public class QueueNode {
 		return this.signalized;
 	}
 
-	protected static class QueueLinkIdComparator implements Comparator<QueueLink>, Serializable {
+	protected static class QueueLinkIdComparator implements Comparator<QLink>, Serializable {
 		private static final long serialVersionUID = 1L;
-		public int compare(final QueueLink o1, final QueueLink o2) {
+		public int compare(final QLink o1, final QLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}
 	}

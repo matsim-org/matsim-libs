@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VehicleDepartureTimeComparator.java
+ * ParallelQueueSimulation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,29 +20,25 @@
 
 package org.matsim.ptproject.qsim;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
 
-/**
- * @author dstrippgen
- *
- * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
- * according to their departure time
- */
-public class QueueVehicleEarliestLinkExitTimeComparator implements Comparator<QueueVehicle>,
-		Serializable {
+public class ParallelQSimulation extends QSim{
 
-	private static final long serialVersionUID = 1L;
-
-	public int compare(final QueueVehicle veh1, final QueueVehicle veh2) {
-		if (veh1.getEarliestLinkExitTime() > veh2.getEarliestLinkExitTime()) {
-			return 1;
-		}
-		if (veh1.getEarliestLinkExitTime() < veh2.getEarliestLinkExitTime()) {
-			return -1;
-		}
-
-		// Both depart at the same time -> let the one with the larger id be first
-		return veh2.getId().compareTo(veh1.getId());
+	/*
+	 * We just use a ParallelQueueSimEngine.
+	 */
+	public ParallelQSimulation(final Scenario scenario, final EventsManager eventsManager)
+	{
+	  super(scenario, eventsManager);
+	  
+	  // Get number of parallel Threads
+	  QSimConfigGroup conf = (QSimConfigGroup) scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
+	  int numOfThreads = conf.getNumberOfThreads();
+	  
+	  // use the ParallelQueueSimEngine
+	  this.simEngine = new ParallelQSimEngine(this.network, MatsimRandom.getRandom(), numOfThreads);
 	}
 }

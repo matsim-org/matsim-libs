@@ -44,7 +44,7 @@ public class ParallelMoveLinks {
 	/* 
 	 * This is the collection of links that have to be moved in the simulation
 	 */
-	private List<List<QueueLink>> parallelSimLinksLists;
+	private List<List<QLink>> parallelSimLinksLists;
 		
 	public ParallelMoveLinks(boolean simulateAllLinks)
 	{
@@ -85,7 +85,7 @@ public class ParallelMoveLinks {
 		}
 	}
 		
-	public void init(List<QueueLink> allLinks, int numOfThreads)
+	public void init(List<QLink> allLinks, int numOfThreads)
 	{		
 		this.numOfThreads = numOfThreads;
 
@@ -133,13 +133,13 @@ public class ParallelMoveLinks {
 	/*
 	 * Create the Lists of QueueLinks that are handled on parallel Threads.
 	 */
-	private void createLinkLists(List<QueueLink> allLinks)
+	private void createLinkLists(List<QLink> allLinks)
 	{
-		parallelSimLinksLists = new ArrayList<List<QueueLink>>();
+		parallelSimLinksLists = new ArrayList<List<QLink>>();
 		
 		for (int i = 0; i < numOfThreads; i++)
 		{
-			parallelSimLinksLists.add(new ArrayList<QueueLink>());
+			parallelSimLinksLists.add(new ArrayList<QLink>());
 		}
 		
 		/*
@@ -148,7 +148,7 @@ public class ParallelMoveLinks {
 		if (simulateAllLinks) 
 		{
 			int roundRobin = 0;
-			for(QueueLink link : allLinks)
+			for(QLink link : allLinks)
 			{
 				parallelSimLinksLists.get(roundRobin % numOfThreads).add(link);
 				roundRobin++;
@@ -166,13 +166,13 @@ public class ParallelMoveLinks {
 	 * of Links is high enough statistically the difference shouldn't
 	 * be to significant.
 	 */	
-	/*package*/ void reactivateLinks(List<QueueLink> simActivateThis) 
+	/*package*/ void reactivateLinks(List<QLink> simActivateThis) 
 	{
 		if (!simulateAllLinks)
 		{
 			if (!simActivateThis.isEmpty())
 			{
-				for(QueueLink link : simActivateThis)
+				for(QLink link : simActivateThis)
 				{
 					parallelSimLinksLists.get(distributor % numOfThreads).add(link);
 					distributor++;
@@ -206,7 +206,7 @@ public class ParallelMoveLinks {
 		private boolean simulationRunning = true;
 		private boolean simulateAllLinks = false;
 		
-		private List<QueueLink> links = new ArrayList<QueueLink>();
+		private List<QLink> links = new ArrayList<QLink>();
 		
 		private CyclicBarrier startBarrier;
 		private CyclicBarrier endBarrier;
@@ -231,7 +231,7 @@ public class ParallelMoveLinks {
 			this.endBarrier = cyclicBarrier;
 		}
 		
-		public void handleLinks(List<QueueLink> links)
+		public void handleLinks(List<QLink> links)
 		{
 			this.links = links;
 		}
@@ -256,8 +256,8 @@ public class ParallelMoveLinks {
 						
 					startBarrier.await();
 					
-					ListIterator<QueueLink> simLinks = this.links.listIterator();
-					QueueLink link;
+					ListIterator<QLink> simLinks = this.links.listIterator();
+					QLink link;
 					boolean isActive;
 
 					while (simLinks.hasNext()) 

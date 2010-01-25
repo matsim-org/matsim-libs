@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.WithindayConfigGroup;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.PersonAgent;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 
 /**
  * Factory for withinday replanning agents
@@ -36,7 +36,7 @@ public class WithindayAgentFactory extends AgentFactory {
 	private final WithindayConfigGroup withindayConfigGroup;
 	private final WithindayAgentLogicFactory agentLogicFactory;
 
-	public WithindayAgentFactory(final QueueSimulation simulation, final WithindayConfigGroup withindayConfig,
+	public WithindayAgentFactory(final QSim simulation, final WithindayConfigGroup withindayConfig,
 			final WithindayAgentLogicFactory agentLogicFactory) {
 		super(simulation);
 		this.withindayConfigGroup = withindayConfig;

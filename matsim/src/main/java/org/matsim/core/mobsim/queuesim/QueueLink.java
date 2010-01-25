@@ -40,7 +40,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.QueueLane;
+import org.matsim.ptproject.qsim.QLane;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -164,7 +164,7 @@ public class QueueLink {
 
   /**
    * Adds a vehicle to the link, called by
-   * {@link QueueNode#moveVehicleOverNode(QueueVehicle, QueueLane, double)}.
+   * {@link QueueNode#moveVehicleOverNode(QueueVehicle, QueueLink, double)}.
    *
    * @param veh
    *          the vehicle

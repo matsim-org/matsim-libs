@@ -15,9 +15,9 @@ import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
 import org.matsim.ptproject.qsim.DriverAgent;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueSimulation;
-import org.matsim.ptproject.qsim.QueueSimulationFeature;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QSimFeature;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.layer.OTFSignalLayer;
@@ -30,18 +30,18 @@ import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsLayer;
 import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
-public class OTFVisQueueSimFeature implements QueueSimulationFeature {
+public class OTFVisQSimFeature implements QSimFeature {
 	
 	protected OnTheFlyServer otfServer = null;
 	private boolean ownServer = true;
 	private boolean doVisualizeTeleportedAgents = false;
 	private OTFConnectionManager connectionManager = new DefaultConnectionManagerFactory().createConnectionManager();
 	private OTFTeleportAgentsDataWriter teleportationWriter;
-	private QueueSimulation queueSimulation;
+	private QSim queueSimulation;
 	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 	private final LinkedHashMap<Id, Integer> currentActivityNumbers = new LinkedHashMap<Id, Integer>();
 	
-	public OTFVisQueueSimFeature(QueueSimulation queueSimulation) {
+	public OTFVisQSimFeature(QSim queueSimulation) {
 		this.queueSimulation = queueSimulation;
 	}
 	
@@ -73,7 +73,7 @@ public class OTFVisQueueSimFeature implements QueueSimulationFeature {
       if (this.queueSimulation.getScenario().getConfig().scenario().isUseLanes() 
           && (!this.queueSimulation.getScenario().getConfig().scenario().isUseSignalSystems())) {
         // data source to writer
-        this.connectionManager.add(QueueLink.class, OTFLaneWriter.class);
+        this.connectionManager.add(QLink.class, OTFLaneWriter.class);
         // writer -> reader: from server to client
         this.connectionManager.add(OTFLaneWriter.class, OTFLaneReader.class);
         // reader to drawer (or provider to receiver)
@@ -84,7 +84,7 @@ public class OTFVisQueueSimFeature implements QueueSimulationFeature {
       else if (this.queueSimulation.getScenario().getConfig().scenario().isUseLanes() 
           && (this.queueSimulation.getScenario().getConfig().scenario().isUseSignalSystems())) {
         // data source to writer
-        this.connectionManager.add(QueueLink.class, OTFSignalWriter.class);
+        this.connectionManager.add(QLink.class, OTFSignalWriter.class);
         // writer -> reader: from server to client
         this.connectionManager.add(OTFSignalWriter.class, OTFSignalReader.class);
         // reader to drawer (or provider to receiver)
@@ -164,7 +164,7 @@ public class OTFVisQueueSimFeature implements QueueSimulationFeature {
 		currentActivityNumbers.remove(agent.getPerson().getId());
 	}
 
-	public QueueSimulation getQueueSimulation() {
+	public QSim getQueueSimulation() {
 		return queueSimulation;
 	}
 

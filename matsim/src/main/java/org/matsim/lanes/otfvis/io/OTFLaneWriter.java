@@ -32,8 +32,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.QLane;
 import org.matsim.ptproject.qsim.QLinkLanesImpl;
-import org.matsim.ptproject.qsim.QueueLane;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
@@ -108,7 +108,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 		//only write further lane information if there is more than one lane
 		else  {
 			//write position of branchPoint
-			QueueLane ql = this.src.getOriginalLane();
+			QLane ql = this.src.getOriginalLane();
 			double meterFromLinkEnd = ql.getMeterFromLinkEnd();
 			
 			Point2D.Double branchPoint = new Point2D.Double(mscaledLinkStart.x + ((linkLength - meterFromLinkEnd) * linkScale * deltaLinkNorm.x),
@@ -124,7 +124,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 			
 			double laneEndPointX, laneEndPointY;
 			int laneIncrement = 1;
-			for (QueueLane l : this.src.getToNodeQueueLanes()){
+			for (QLane l : this.src.getToNodeQueueLanes()){
 				ByteBufferUtils.putString(out, l.getLaneId().toString());
 				laneEndPointX = scaledLinkEnd.x + (normalizedOrthogonal.x * distanceBtwLanes * laneIncrement);
 				laneEndPointY = scaledLinkEnd.y + (normalizedOrthogonal.y * distanceBtwLanes * laneIncrement);

@@ -10,13 +10,13 @@ public class CarDepartureHandler implements DepartureHandler {
 	
 	private static Logger log = Logger.getLogger(CarDepartureHandler.class);
 	
-	private final QueueSimulation queueSimulation;
+	private final QSim queueSimulation;
 	
 	private boolean teleportVehicles = true;
 	
 	private int cntTeleportVehicle = 0;
 	
-	public CarDepartureHandler(QueueSimulation queueSimulation) {
+	public CarDepartureHandler(QSim queueSimulation) {
 		this.queueSimulation = queueSimulation;
 	}
 
@@ -35,8 +35,8 @@ public class CarDepartureHandler implements DepartureHandler {
 		if (vehicleId == null) {
 			vehicleId = agent.getPerson().getId(); // backwards-compatibility
 		}
-		QueueLink qlink = queueSimulation.network.getQueueLink(linkId);
-		QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
+		QLink qlink = queueSimulation.network.getQueueLink(linkId);
+		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
 			// try to fix it somehow
 			if (teleportVehicles) {
@@ -50,7 +50,7 @@ public class CarDepartureHandler implements DepartureHandler {
 								log.info("No more occurrences of teleported vehicles will be reported.");
 							}
 						}
-						QueueLink qlinkOld = queueSimulation.network.getQueueLink(vehicle.getCurrentLink().getId());
+						QLink qlinkOld = queueSimulation.network.getQueueLink(vehicle.getCurrentLink().getId());
 						qlinkOld.removeParkedVehicle(vehicle.getId());
 					}
 				}

@@ -43,9 +43,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QueueVehicleImpl;
-import org.matsim.ptproject.qsim.SimulationTimer;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
@@ -69,7 +69,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 	private NetworkRouteWRefs agentRoute = null;
 	private PlanImpl plan = null;
 	private LegImpl leg = null;
-	private QueueSimulation simulation = null;
+	private QSim simulation = null;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -80,7 +80,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		this.network = (NetworkLayer) this.scenario.getNetwork();
 		new MatsimNetworkReader(this.scenario).readFile(networkFile);
 		this.createRoutes();
-		this.simulation = new QueueSimulation(this.scenario, new EventsManagerImpl());
+		this.simulation = new QSim(this.scenario, new EventsManagerImpl());
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		sign.setControlInput(controlInput);
 		sign.setupIteration();
 		sign.simulationPrepared();
-		sign.calculateOutput(SimulationTimer.getTime());
+		sign.calculateOutput(QSimTimer.getTime());
 		return sign;
 	}
 

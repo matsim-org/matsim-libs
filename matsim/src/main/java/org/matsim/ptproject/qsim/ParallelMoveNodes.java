@@ -84,7 +84,7 @@ public class ParallelMoveNodes {
 	/*
 	 * Create equal sized Arrays.
 	 */
-	private void createArrays(QueueNode[] simNodesArray)
+	private void createArrays(QNode[] simNodesArray)
 	{	
 		List<List<ExtendedQueueNode>> nodes = new ArrayList<List<ExtendedQueueNode>>();
 		for (int i = 0; i < numOfThreads; i++)
@@ -93,7 +93,7 @@ public class ParallelMoveNodes {
 		}
 		
 		int roundRobin = 0;
-		for (QueueNode queueNode : simNodesArray)
+		for (QNode queueNode : simNodesArray)
 		{
 			ExtendedQueueNode extendedQueueNode = new ExtendedQueueNode(queueNode, MatsimRandom.getLocalInstance());
 			nodes.get(roundRobin % numOfThreads).add(extendedQueueNode);
@@ -115,7 +115,7 @@ public class ParallelMoveNodes {
 		}
 	}
 		
-	public void init(QueueNode[] simNodesArray, int numOfThreads)
+	public void init(QNode[] simNodesArray, int numOfThreads)
 	{
 		this.numOfThreads = numOfThreads;
 		
@@ -168,16 +168,16 @@ public class ParallelMoveNodes {
 	 */
 	private static class ExtendedQueueNode
 	{
-		private QueueNode queueNode;
+		private QNode queueNode;
 		private Random random;
 		
-		public ExtendedQueueNode(QueueNode queueNode, Random random)
+		public ExtendedQueueNode(QNode queueNode, Random random)
 		{
 			this.queueNode = queueNode;
 			this.random = random;
 		}
 		
-		public QueueNode getQueueNode()
+		public QNode getQueueNode()
 		{
 			return this.queueNode;
 		}
@@ -247,7 +247,7 @@ public class ParallelMoveNodes {
 					
 					for (ExtendedQueueNode extendedQueueNode : queueNodes)
 					{							
-						QueueNode node = extendedQueueNode.getQueueNode();
+						QNode node = extendedQueueNode.getQueueNode();
 						if (node.isActive() || node.isSignalized() || simulateAllNodes)
 						{
 							node.moveNode(time, extendedQueueNode.getRandom());

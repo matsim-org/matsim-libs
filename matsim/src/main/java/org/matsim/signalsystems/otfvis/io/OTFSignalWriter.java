@@ -25,8 +25,8 @@ import java.nio.ByteBuffer;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
+import org.matsim.ptproject.qsim.QLane;
 import org.matsim.ptproject.qsim.QLinkLanesImpl;
-import org.matsim.ptproject.qsim.QueueLane;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 
 
@@ -49,7 +49,7 @@ public class OTFSignalWriter extends OTFLaneWriter {
 		int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
 		out.putInt(numberOfToNodeQueueLanes);
 		if (numberOfToNodeQueueLanes > 1) {
-			for (QueueLane ql : this.src.getToNodeQueueLanes()){
+			for (QLane ql : this.src.getToNodeQueueLanes()){
 				ByteBufferUtils.putString(out, ql.getLaneId().toString());
 				if (ql.isThisTimeStepGreen()) {
 					out.putInt(1);

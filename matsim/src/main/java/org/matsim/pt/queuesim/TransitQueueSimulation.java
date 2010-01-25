@@ -25,11 +25,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 
 
 
-public class TransitQueueSimulation extends QueueSimulation {
+public class TransitQueueSimulation extends QSim {
 
 	static final Logger log = Logger.getLogger(TransitQueueSimulation.class);
 	

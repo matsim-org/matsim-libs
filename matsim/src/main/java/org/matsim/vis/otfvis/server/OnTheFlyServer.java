@@ -46,8 +46,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
+import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -118,7 +118,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private double stepToTime = 0;
 
-	private OTFVisQueueSimFeature otfVisQueueSimFeature;
+	private OTFVisQSimFeature otfVisQueueSimFeature;
 
 	private OnTheFlyServer(RMIClientSocketFactory clientSocketFactory, RMIServerSocketFactory serverSocketFactory) throws RemoteException {
 		super(0, new SslRMIClientSocketFactory(), new SslRMIServerSocketFactory());
@@ -129,13 +129,13 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		super(0);
 	}
 	
-	private void init(QueueNetwork network, Population population, EventsManager events){
+	private void init(QNetwork network, Population population, EventsManager events){
 		this.quadBuilder = new OTFQSimServerQuadBuilder(network);
 		this.setEvents(events);
 	}
 	
 	
-	public static OnTheFlyServer createInstance(String readableName, QueueNetwork network, Population population, EventsManager events, boolean useSSL) {
+	public static OnTheFlyServer createInstance(String readableName, QNetwork network, Population population, EventsManager events, boolean useSSL) {
 		registry = getRegistry(useSSL);
 		try {
 			// Register with RMI to be seen from client
@@ -427,7 +427,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		return events;
 	}
 
-	public void setSimulation(OTFVisQueueSimFeature otfVisQueueSimFeature) {
+	public void setSimulation(OTFVisQSimFeature otfVisQueueSimFeature) {
 		this.otfVisQueueSimFeature = otfVisQueueSimFeature;
 	}
 	

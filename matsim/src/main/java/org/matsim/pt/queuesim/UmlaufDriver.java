@@ -11,7 +11,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufStueckI;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -24,14 +24,14 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	private Iterator<UmlaufStueckI> iUmlaufStueck;
 	private NetworkRouteWRefs carRoute;
 	private double departureTime;
-	private final QueueSimulation sim;
+	private final QSim sim;
 	private final LegImpl currentLeg = new LegImpl(TransportMode.car);
 	private TransitLine transitLine;
 	private TransitRoute transitRoute;
 
 	public UmlaufDriver(Umlauf umlauf,
 			TransitStopAgentTracker thisAgentTracker,
-			QueueSimulation transitQueueSimulation,
+			QSim transitQueueSimulation,
 			TransitStopHandler stopHandler) {
 		super(createDummyPerson(umlauf), transitQueueSimulation, stopHandler, thisAgentTracker);
 		this.umlauf = umlauf;

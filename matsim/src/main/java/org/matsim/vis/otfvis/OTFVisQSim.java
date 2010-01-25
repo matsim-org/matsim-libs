@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParallelQueueSimulation.java
+ * OnTheFlyQueueSimQuad.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim;
+package org.matsim.vis.otfvis;
+
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
-public class ParallelQueueSimulation extends QueueSimulation{
 
-	/*
-	 * We just use a ParallelQueueSimEngine.
-	 */
-	public ParallelQueueSimulation(final Scenario scenario, final EventsManager eventsManager)
-	{
-	  super(scenario, eventsManager);
-	  
-	  // Get number of parallel Threads
-	  QSimConfigGroup conf = (QSimConfigGroup) scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
-	  int numOfThreads = conf.getNumberOfThreads();
-	  
-	  // use the ParallelQueueSimEngine
-	  this.simEngine = new ParallelQueueSimEngine(this.network, MatsimRandom.getRandom(), numOfThreads);
+public class OTFVisQSim extends QSim {
+
+	private final OTFVisQSimFeature queueSimulationFeature;
+
+	public OTFVisQSim(Scenario scenario, EventsManager events) {
+		super(scenario, events);
+		queueSimulationFeature = new OTFVisQSimFeature(this);
+		super.addFeature(queueSimulationFeature);
 	}
+
+	public void setServer(OnTheFlyServer server) {
+		queueSimulationFeature.setServer(server);
+	}
+
+	public void setVisualizeTeleportedAgents(boolean active) {
+		queueSimulationFeature.setVisualizeTeleportedAgents(active);
+	}
+
+	public OTFVisQSimFeature getQueueSimulationFeature() {
+		return queueSimulationFeature;
+	}
+	
 }
+

@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.SimulationTimer;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
@@ -59,7 +59,7 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 		return quadReceiver;
 	}
 
-	static public class Writer extends  OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink> {
+	static public class Writer extends  OTFDataWriter<QLink> implements OTFWriterFactory<QLink> {
 
 		private static final long serialVersionUID = 2827811927720044709L;
 
@@ -85,10 +85,10 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(SimulationTimer.getTime()));
+			out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(QSimTimer.getTime()));
 		}
 
-		public OTFDataWriter<QueueLink> getWriter() {
+		public OTFDataWriter<QLink> getWriter() {
 			return new Writer();
 		}
 	}

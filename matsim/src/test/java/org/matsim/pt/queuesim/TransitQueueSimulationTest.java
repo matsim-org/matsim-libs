@@ -71,7 +71,7 @@ import org.matsim.pt.queuesim.TransitQueueSimulationFeature.TransitAgentTriesToT
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.DriverAgent;
-import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
@@ -549,7 +549,7 @@ public class TransitQueueSimulationTest {
 			veh.setDriver(this.driver);
 			this.driver.setVehicle(veh);
 			this.departure.setVehicleId(veh.getBasicVehicle().getId());
-			QueueLink qlink = this.network.getQueueLink(this.driver.getCurrentLeg().getRoute().getStartLinkId());
+			QLink qlink = this.network.getQueueLink(this.driver.getCurrentLeg().getRoute().getStartLinkId());
 			qlink.addParkedVehicle(veh);
 
 			this.scheduleActivityEnd(this.driver, 0);

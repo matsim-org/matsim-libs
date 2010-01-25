@@ -38,9 +38,9 @@ import org.apache.log4j.Logger;
  * QueueSimulation does, the Results will slightly vary between
  * the Simulations!
  */
-public class ParallelQueueSimEngine extends QueueSimEngine{
+public class ParallelQSimEngine extends QSimEngine{
 
-	private static final Logger log = Logger.getLogger(ParallelQueueSimEngine.class);
+	private static final Logger log = Logger.getLogger(ParallelQSimEngine.class);
 
 	private ParallelMoveLinks parallelMoveLinks;
 	private ParallelMoveNodes parallelMoveNodes;
@@ -54,7 +54,7 @@ public class ParallelQueueSimEngine extends QueueSimEngine{
 	 * 
 	 * TODO discuss which implementation should be preferred
 	 */
-	ParallelQueueSimEngine(Collection<QueueLink> links, Collection<QueueNode> nodes, Random random, int numOfThreads)
+	ParallelQSimEngine(Collection<QLink> links, Collection<QNode> nodes, Random random, int numOfThreads)
 	{
 		super(links, nodes, random);
 				
@@ -77,7 +77,7 @@ public class ParallelQueueSimEngine extends QueueSimEngine{
 		parallelMoveNodesAndLinks.initNodesAndLinks(simNodesArray, allLinks, simActivateThis, numOfThreads);
 	}
 
-	public ParallelQueueSimEngine(final QueueNetwork network, final Random random, int numOfThreads)
+	public ParallelQSimEngine(final QNetwork network, final Random random, int numOfThreads)
 	{
 		this(network.getLinks().values(), network.getNodes().values(), random, numOfThreads);
 	}
@@ -99,7 +99,7 @@ public class ParallelQueueSimEngine extends QueueSimEngine{
 	 * from the main Thread to avoid this?
 	 */
 	@Override
-	protected synchronized void activateLink(final QueueLink link)
+	protected synchronized void activateLink(final QLink link)
 	{
 		super.activateLink(link);
 	}

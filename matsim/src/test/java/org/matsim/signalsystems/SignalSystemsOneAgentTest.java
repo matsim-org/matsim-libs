@@ -30,7 +30,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.LaneDefinitions;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.SignalGroupSettings;
 import org.matsim.signalsystems.config.SignalSystemConfiguration;
@@ -101,10 +101,10 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 			group.setDropping(60);
 		}
 
-		QueueSimulation sim = new QueueSimulation(scenario, events);
+		QSim sim = new QSim(scenario, events);
 		sim.run();
 		
-		sim = new QueueSimulation(scenario, events);
+		sim = new QSim(scenario, events);
 		sim.run();
 	}
 

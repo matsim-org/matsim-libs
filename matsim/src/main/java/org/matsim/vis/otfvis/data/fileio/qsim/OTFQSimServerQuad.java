@@ -24,9 +24,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.ptproject.qsim.QueueNode;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QNode;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -43,11 +43,11 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
 	
   private static final Logger log = Logger.getLogger(OTFQSimServerQuad.class);
 	
-  transient private QueueNetwork net;
+  transient private QNetwork net;
   /**
 	 * 
 	 */
-	public OTFQSimServerQuad(QueueNetwork net) {
+	public OTFQSimServerQuad(QNetwork net) {
 		super(net.getNetworkLayer());
 		this.net = net;
 	}
@@ -59,22 +59,22 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
 
 	private void createFactoriesAndFillQuadTree(OTFConnectionManager connect) {
 		// Get the writer Factories from connect
-		Collection<Class> nodeFactories = connect.getToEntries(QueueNode.class);
-		Collection<Class> linkFactories =  connect.getToEntries(QueueLink.class);
-		List<OTFWriterFactory<QueueLink>> linkWriterFactoryObjects = new ArrayList<OTFWriterFactory<QueueLink>>(linkFactories.size());
-		List<OTFWriterFactory<QueueNode>> nodeWriterFractoryObjects = new ArrayList<OTFWriterFactory<QueueNode>>(nodeFactories.size());
+		Collection<Class> nodeFactories = connect.getToEntries(QNode.class);
+		Collection<Class> linkFactories =  connect.getToEntries(QLink.class);
+		List<OTFWriterFactory<QLink>> linkWriterFactoryObjects = new ArrayList<OTFWriterFactory<QLink>>(linkFactories.size());
+		List<OTFWriterFactory<QNode>> nodeWriterFractoryObjects = new ArrayList<OTFWriterFactory<QNode>>(nodeFactories.size());
 		try {
-			OTFWriterFactory<QueueLink> linkWriterFac = null;			
+			OTFWriterFactory<QLink> linkWriterFac = null;			
 			for (Class linkFactory : linkFactories ) {
 				if(linkFactory != Object.class) {
-					linkWriterFac = (OTFWriterFactory<QueueLink>)linkFactory.newInstance();
+					linkWriterFac = (OTFWriterFactory<QLink>)linkFactory.newInstance();
 					linkWriterFactoryObjects.add(linkWriterFac);
 				}
 			}
-			OTFWriterFactory<QueueNode> nodeWriterFac = null;
+			OTFWriterFactory<QNode> nodeWriterFac = null;
 			for (Class nodeFactory : nodeFactories) {
 				if(nodeFactory != Object.class) {
-					nodeWriterFac = (OTFWriterFactory<QueueNode>)nodeFactory.newInstance();
+					nodeWriterFac = (OTFWriterFactory<QNode>)nodeFactory.newInstance();
 					nodeWriterFractoryObjects.add(nodeWriterFac);
 				}
 			}
@@ -87,9 +87,9 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
 
     	if(!nodeWriterFractoryObjects.isEmpty()) {
     		boolean first = true;
-    		for (QueueNode node : this.net.getNodes().values()) {
-    			for (OTFWriterFactory<QueueNode> fac : nodeWriterFractoryObjects) {
-    				OTFDataWriter<QueueNode> writer = fac.getWriter();
+    		for (QNode node : this.net.getNodes().values()) {
+    			for (OTFWriterFactory<QNode> fac : nodeWriterFractoryObjects) {
+    				OTFDataWriter<QNode> writer = fac.getWriter();
     				if (writer != null) {
     					writer.setSrc(node);
     					if (first){
@@ -104,12 +104,12 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
 
     	if(!linkWriterFactoryObjects.isEmpty()) {
     		boolean first = true;
-    		for (QueueLink link : this.net.getLinks().values()) {
+    		for (QLink link : this.net.getLinks().values()) {
     			double middleEast = (link.getLink().getToNode().getCoord().getX() + link.getLink().getFromNode().getCoord().getX())*0.5 - this.minEasting;
     			double middleNorth = (link.getLink().getToNode().getCoord().getY() + link.getLink().getFromNode().getCoord().getY())*0.5 - this.minNorthing;
 
-    			for (OTFWriterFactory<QueueLink> fac : linkWriterFactoryObjects) {
-    				OTFDataWriter<QueueLink> writer = fac.getWriter();
+    			for (OTFWriterFactory<QLink> fac : linkWriterFactoryObjects) {
+    				OTFDataWriter<QLink> writer = fac.getWriter();
     				// null means take the default handler
     				if (writer != null) {
     					writer.setSrc(link);
@@ -124,23 +124,23 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
    	}
 	}
 
-	public void replaceSrc(QueueNetwork newNet) {
+	public void replaceSrc(QNetwork newNet) {
 		//int colls = 
 		this.execute(0.,0.,this.easting, this.northing,
 				new ReplaceSourceExecutor(newNet));
 	}
 	
 	private static class ReplaceSourceExecutor implements Executor<OTFDataWriter> {
-		public final QueueNetwork q;
+		public final QNetwork q;
 
-		public ReplaceSourceExecutor(QueueNetwork newNet) {
+		public ReplaceSourceExecutor(QNetwork newNet) {
 			this.q = newNet;
 		}
 
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Object src = writer.getSrc();
-			if(src instanceof QueueLink) {
-				QueueLink link = this.q.getLinks().get(((QueueLink) src).getLink().getId());
+			if(src instanceof QLink) {
+				QLink link = this.q.getLinks().get(((QLink) src).getLink().getId());
 				writer.setSrc(link);
 //			} else if(src instanceof QueueNode) {
 //				

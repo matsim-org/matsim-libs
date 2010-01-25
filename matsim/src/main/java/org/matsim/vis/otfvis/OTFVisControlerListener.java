@@ -31,7 +31,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
@@ -52,13 +52,13 @@ public class OTFVisControlerListener implements StartupListener, ShutdownListene
 	public static final int ALL_FLAGS = 0xff000000;
 
 	
-	private QueueNetwork queueNetwork;
+	private QNetwork queueNetwork;
 	private OnTheFlyServer otfserver;
 
 	public void notifyStartup(StartupEvent e) {
 		UUID idOne = UUID.randomUUID();
 		Scenario sc = e.getControler().getScenario();
-		this.queueNetwork = new QueueNetwork(sc.getNetwork());
+		this.queueNetwork = new QNetwork(sc.getNetwork());
 		this.otfserver = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, sc.getPopulation(), e.getControler().getEvents(), false);
 		otfserver.setControllerStatus(STARTUP);
 		OTFClientLive client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), new DefaultConnectionManagerFactory().createConnectionManager());
@@ -68,7 +68,7 @@ public class OTFVisControlerListener implements StartupListener, ShutdownListene
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent e) {
 		Scenario sc = e.getControler().getScenario();
-		OTFVisQueueSim sim = new OTFVisQueueSim(sc, e.getControler().getEvents());
+		OTFVisQSim sim = new OTFVisQSim(sc, e.getControler().getEvents());
 		// overwrite network
 		sim.setQueueNetwork(this.queueNetwork);
 		sim.setServer(otfserver);

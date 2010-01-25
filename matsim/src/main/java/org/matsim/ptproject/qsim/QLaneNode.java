@@ -33,7 +33,7 @@ import org.matsim.core.gbl.Gbl;
  * @author dgrether
  *
  */
-public class QLaneNode extends QueueNode {
+public class QLaneNode extends QNode {
   
   private static final Logger log = Logger.getLogger(QLaneNode.class);
   
@@ -41,7 +41,7 @@ public class QLaneNode extends QueueNode {
    * @param n
    * @param queueNetwork
    */
-  public QLaneNode(Node n, QueueNetwork queueNetwork) {
+  public QLaneNode(Node n, QNetwork queueNetwork) {
     super(n, queueNetwork);
   }
   
@@ -50,12 +50,12 @@ public class QLaneNode extends QueueNode {
   public void moveNode(final double now, final Random random) {
     /* called by the framework, do all necessary action for node movement here */
     if (this.isSignalized()) {
-      for (QueueLink link : this.inLinksArrayCache){
-        for (QueueLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
+      for (QLink link : this.inLinksArrayCache){
+        for (QLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
           lane.updateGreenState(now);
           if (lane.isThisTimeStepGreen()){
             while (!lane.bufferIsEmpty()) {
-              QueueVehicle veh = lane.getFirstFromBuffer();
+              QVehicle veh = lane.getFirstFromBuffer();
               if (!moveVehicleOverNode(veh, lane, now)) {
                 break;
               }
@@ -80,7 +80,7 @@ public class QLaneNode extends QueueNode {
    * otherwise (e.g. in case where the next link is jammed)
    */
   @Override
-  protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
+  protected boolean moveVehicleOverNode(final QVehicle veh, final QLane currentLane, final double now) {
     Id nextLinkId = veh.getDriver().chooseNextLinkId();
     Link currentLink = currentLane.getQueueLink().getLink();
 
@@ -105,7 +105,7 @@ public class QLaneNode extends QueueNode {
         throw new IllegalStateException(b.toString());
       }
       
-      QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
+      QLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
 
       if (nextQueueLink.hasSpace()) {
         currentLane.popFirstFromBuffer();
@@ -125,7 +125,7 @@ public class QLaneNode extends QueueNode {
           currentLane.popFirstFromBuffer();
           Simulation.decLiving();
           Simulation.incLost();
-          QueueSimulation.getEvents().processEvent(
+          QSim.getEvents().processEvent(
               new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
         } else {
           currentLane.popFirstFromBuffer();

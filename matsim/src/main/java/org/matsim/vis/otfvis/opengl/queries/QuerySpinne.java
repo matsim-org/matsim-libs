@@ -54,11 +54,11 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.ptproject.qsim.QueueVehicle;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
+import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -258,16 +258,16 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		else  this.drivenLinks.put(linkId, count + 1);
 	}
 
-	protected List<Plan> getPersonsNOW(Population plans, QueueNetwork net) {
+	protected List<Plan> getPersonsNOW(Population plans, QNetwork net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
-		QueueLink link = net.getLinks().get(this.queryLinkId);
-		Collection<QueueVehicle> vehs = link.getAllVehicles();
-		for( QueueVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
+		QLink link = net.getLinks().get(this.queryLinkId);
+		Collection<QVehicle> vehs = link.getAllVehicles();
+		for( QVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
 		
 		return actPersons;
 	}
 
-	protected List<Plan> getPersons(Population plans, QueueNetwork net) {
+	protected List<Plan> getPersons(Population plans, QNetwork net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
 
 		for (Person person : plans.getPersons().values()) {
@@ -355,8 +355,8 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	}
 	
 	@Override
-	public void installQuery(OTFVisQueueSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
-		QueueNetwork net = queueSimulation.getQueueSimulation().getNetwork();
+	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+		QNetwork net = queueSimulation.getQueueSimulation().getNetwork();
 		Population plans = queueSimulation.getQueueSimulation().getPopulation();
 		this.result = new Result();
 		result.linkIdString = this.queryLinkId.toString();

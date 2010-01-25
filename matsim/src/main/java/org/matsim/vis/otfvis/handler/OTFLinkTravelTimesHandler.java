@@ -23,7 +23,7 @@ package org.matsim.vis.otfvis.handler;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QLink;
 import org.matsim.core.trafficmonitoring.LinkTravelTimeCounter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -59,7 +59,7 @@ public class OTFLinkTravelTimesHandler extends OTFDefaultLinkHandler {
 		}
 
 		@Override
-		public OTFDataWriter<QueueLink> getWriter() {
+		public OTFDataWriter<QLink> getWriter() {
 			if (count == null) 
 			{
 				LinkTravelTimeCounter.init(server.getEvents(), 1000000);

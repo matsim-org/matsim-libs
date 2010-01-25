@@ -47,10 +47,10 @@ import org.matsim.signalsystems.systems.SignalSystemDefinition;
 import org.matsim.signalsystems.systems.SignalSystems;
 
 
-public class QueueSimSignalEngine implements SignalEngine {
+public class QSimSignalEngine implements SignalEngine {
 	
 	
-	private static final Logger log = Logger.getLogger(QueueSimSignalEngine.class);
+	private static final Logger log = Logger.getLogger(QSimSignalEngine.class);
 
 	/**
 	 * The SignalSystemDefinitions accessible by their Id
@@ -71,16 +71,16 @@ public class QueueSimSignalEngine implements SignalEngine {
 
 	private SignalSystemConfigurations signalSystemsConfig;
 
-	private QueueNetwork network;
+	private QNetwork network;
 
-	private QueueSimulation simulation;
+	private QSim simulation;
 
 	private EventsManager events;
 
-	public QueueSimSignalEngine(QueueSimulation sim) {
+	public QSimSignalEngine(QSim sim) {
 		this.simulation = sim;
 		this.network = sim.getQueueNetwork();
-		this.events = QueueSimulation.getEvents();
+		this.events = QSim.getEvents();
 	}
 
 	public void setSignalSystems(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
@@ -123,7 +123,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 		//init the signalGroupDefinitions
 		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<SignalGroupDefinition>>();
 		for (SignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions().values()) {
-			QueueLink queueLink = this.network.getQueueLink(signalGroupDefinition.getLinkRefId());
+			QLink queueLink = this.network.getQueueLink(signalGroupDefinition.getLinkRefId());
 			if (queueLink == null) {
 				throw new IllegalStateException("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is set to non existing Link with Id: " + signalGroupDefinition.getLinkRefId());
 			}

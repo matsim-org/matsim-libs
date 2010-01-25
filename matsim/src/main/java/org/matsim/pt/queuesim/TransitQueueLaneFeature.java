@@ -12,9 +12,9 @@ import java.util.Queue;
 
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.PersonAgentI;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueVehicle;
-import org.matsim.ptproject.qsim.QueueVehicleEarliestLinkExitTimeComparator;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -23,17 +23,17 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
 
 public class TransitQueueLaneFeature {
 	
-	private static final Comparator<QueueVehicle> VEHICLE_EXIT_COMPARATOR = new QueueVehicleEarliestLinkExitTimeComparator();
+	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 	
 	/**
 	 * A list containing all transit vehicles that are at a stop but not
 	 * blocking other traffic on the lane.
 	 */
-	private final Queue<QueueVehicle> transitVehicleStopQueue = new PriorityQueue<QueueVehicle>(5, VEHICLE_EXIT_COMPARATOR);
+	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
-	private final QueueLink queueLane;
+	private final QLink queueLane;
 	
-	public TransitQueueLaneFeature(QueueLink queueLane) {
+	public TransitQueueLaneFeature(QLink queueLane) {
 		this.queueLane = queueLane;
 	}
 
@@ -41,34 +41,34 @@ public class TransitQueueLaneFeature {
 		return !this.transitVehicleStopQueue.isEmpty();
 	}
 	
-	public Collection<QueueVehicle> getFeatureVehicles() {
+	public Collection<QVehicle> getFeatureVehicles() {
 		return this.transitVehicleStopQueue;
 	}
 	
 	public void beforeMoveLaneToBuffer(final double now) {
-		QueueVehicle veh;
+		QVehicle veh;
 		// handle transit traffic in stop queue
-		List<QueueVehicle> departingTransitVehicles = null;
+		List<QVehicle> departingTransitVehicles = null;
 		while ((veh = this.transitVehicleStopQueue.peek()) != null) {
 			// there is a transit vehicle.
 			if (veh.getEarliestLinkExitTime() > now) {
 				break;
 			}
 			if (departingTransitVehicles == null) {
-				departingTransitVehicles = new LinkedList<QueueVehicle>();
+				departingTransitVehicles = new LinkedList<QVehicle>();
 			}
 			departingTransitVehicles.add(this.transitVehicleStopQueue.poll());
 		}
 		if (departingTransitVehicles != null) {
 			// add all departing transit vehicles at the front of the vehQueue
-			ListIterator<QueueVehicle> iter = departingTransitVehicles.listIterator(departingTransitVehicles.size());
+			ListIterator<QVehicle> iter = departingTransitVehicles.listIterator(departingTransitVehicles.size());
 			while (iter.hasPrevious()) {
 				queueLane.getVehQueue().addFirst(iter.previous());
 			}
 		}
 	}
 	
-	public boolean handleMoveLaneToBuffer(final double now, QueueVehicle veh,
+	public boolean handleMoveLaneToBuffer(final double now, QVehicle veh,
 			DriverAgent driver) {
 		boolean handled = false;
 		// handle transit driver if necessary
@@ -93,7 +93,7 @@ public class TransitQueueLaneFeature {
 		return handled;
 	}
 
-	public boolean handleMoveWaitToBuffer(final double now, QueueVehicle veh) {
+	public boolean handleMoveWaitToBuffer(final double now, QVehicle veh) {
 		if (veh.getDriver() instanceof TransitDriverAgent) {
 			// yyyy The way I understand the code, this can only happen at the start of a pt run, when the vehicle
 			// with the driver enters the traffic for the first time.  In contrast, pt vehicles at stops
@@ -123,7 +123,7 @@ public class TransitQueueLaneFeature {
 		if (this.transitVehicleStopQueue.size() > 0) {
 			lane++; // place them one lane further away
 			double vehPosition = queueLane.getLink().getLength();
-			for (QueueVehicle veh : this.transitVehicleStopQueue) {
+			for (QVehicle veh : this.transitVehicleStopQueue) {
 				PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, veh.getDriver().getPerson().getId(), queueLane.getLink(),
 						vehPosition, lane, 0.0, 	AgentSnapshotInfo.AgentState.TRANSIT_DRIVER, null);
 				positions.add(position);
@@ -133,7 +133,7 @@ public class TransitQueueLaneFeature {
 	}
 
 	public Collection<PersonAgentI> getPassengers(
-			QueueVehicle queueVehicle) {
+			QVehicle queueVehicle) {
 			if (queueVehicle instanceof TransitVehicle) {
 				Collection<PersonAgentI> passengers = new ArrayList<PersonAgentI>();
 				for (PassengerAgent passenger : ((TransitVehicle) queueVehicle).getPassengers()) {

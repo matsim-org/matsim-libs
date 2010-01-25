@@ -22,7 +22,7 @@ package org.matsim.withinday.mobsim;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.withinday.WithindayAgentFactory;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
@@ -33,7 +33,7 @@ import org.matsim.withinday.trafficmanagement.TrafficManagement;
  * @author dgrether
  *
  */
-public class WithindayQueueSimulation extends QueueSimulation {
+public class WithindayQueueSimulation extends QSim {
 
 	private final WithindayControler controler;
 

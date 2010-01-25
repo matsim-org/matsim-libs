@@ -26,9 +26,9 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class AgentFactory {
 
-	protected final QueueSimulation simulation;
+	protected final QSim simulation;
 
-	public AgentFactory(final QueueSimulation simulation) {
+	public AgentFactory(final QSim simulation) {
 		this.simulation = simulation;
 	}
 

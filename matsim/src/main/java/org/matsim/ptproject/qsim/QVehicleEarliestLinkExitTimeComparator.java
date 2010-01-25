@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QLanesNetworkFactory
+ * VehicleDepartureTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.ptproject.qsim.lanes;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.ptproject.qsim.QLaneNode;
-import org.matsim.ptproject.qsim.QLinkLanesImpl;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.ptproject.qsim.QueueNetworkFactory;
-import org.matsim.ptproject.qsim.QueueNode;
+package org.matsim.ptproject.qsim;
 
+import java.io.Serializable;
+import java.util.Comparator;
 
-public class QLanesNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
+/**
+ * @author dstrippgen
+ *
+ * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
+ * according to their departure time
+ */
+public class QVehicleEarliestLinkExitTimeComparator implements Comparator<QVehicle>,
+		Serializable {
 
-  private QueueNetworkFactory<QueueNode, QueueLink> delegate;
+	private static final long serialVersionUID = 1L;
 
-  public QLanesNetworkFactory(QueueNetworkFactory<QueueNode, QueueLink> delegate){
-    this.delegate = delegate;
-  }
-  
-  @Override
-  public QLinkLanesImpl newQueueLink(Link link, QueueNetwork queueNetwork,
-      QueueNode queueNode) {
-    return new QLinkLanesImpl(link, queueNetwork, queueNode);
-  }
+	public int compare(final QVehicle veh1, final QVehicle veh2) {
+		if (veh1.getEarliestLinkExitTime() > veh2.getEarliestLinkExitTime()) {
+			return 1;
+		}
+		if (veh1.getEarliestLinkExitTime() < veh2.getEarliestLinkExitTime()) {
+			return -1;
+		}
 
-  @Override
-  public QueueNode newQueueNode(Node node, QueueNetwork queueNetwork) {
-    return new QLaneNode(node, queueNetwork);
-  }
-
+		// Both depart at the same time -> let the one with the larger id be first
+		return veh2.getId().compareTo(veh1.getId());
+	}
 }

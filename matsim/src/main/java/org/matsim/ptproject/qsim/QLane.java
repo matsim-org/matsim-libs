@@ -67,9 +67,9 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * @author aneumann
  * @author mrieser
  */
-public class QueueLane {
+public class QLane {
 
-	private static final Logger log = Logger.getLogger(QueueLane.class);
+	private static final Logger log = Logger.getLogger(QLane.class);
 
 	private static int spaceCapWarningCount = 0;
 
@@ -78,18 +78,18 @@ public class QueueLane {
 	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
-	/*package*/ final Queue<QueueVehicle> waitingList = new LinkedList<QueueVehicle>();
+	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
 
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	/*package*/ private final LinkedList<QueueVehicle> vehQueue = new LinkedList<QueueVehicle>();
+	/*package*/ private final LinkedList<QVehicle> vehQueue = new LinkedList<QVehicle>();
 
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	/*package*/ final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
+	/*package*/ final Queue<QVehicle> buffer = new LinkedList<QVehicle>();
 
 	private double storageCapacity;
 
@@ -122,12 +122,12 @@ public class QueueLane {
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	/*package*/ double bufferLastMovedTime = Time.UNDEFINED_TIME;
 
-	private final QueueLink queueLink;
+	private final QLink queueLink;
 	/**
 	 * This collection contains all Lanes downstream, if null it is the last lane
 	 * within a QueueLink.
 	 */
-	private List<QueueLane> toLanes = null;
+	private List<QLane> toLanes = null;
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
@@ -168,7 +168,7 @@ public class QueueLane {
 	
 	private final TransitQueueLaneFeature transitQueueLaneFeature;
 
-	/*package*/ QueueLane(final QueueLink ql, Lane laneData) {
+	/*package*/ QLane(final QLink ql, Lane laneData) {
 		this.queueLink = ql;
 		this.transitQueueLaneFeature = new TransitQueueLaneFeature(this.getQueueLink());
 		this.originalLane = (laneData == null) ? true : false;
@@ -229,7 +229,7 @@ public class QueueLane {
 				* this.laneData.getNumberOfRepresentedLanes();
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * SimulationTimer.getSimTickTime() * Gbl.getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * QSimTimer.getSimTickTime() * Gbl.getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
@@ -338,12 +338,12 @@ public class QueueLane {
 	 */
 	private void moveWaitToBuffer(final double now) {
 		while (hasBufferSpace()) {
-			QueueVehicle veh = this.waitingList.poll();
+			QVehicle veh = this.waitingList.poll();
 			if (veh == null) {
 				return;
 			}
 
-			QueueSimulation.getEvents().processEvent(
+			QSim.getEvents().processEvent(
 			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 			boolean handled = transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 
@@ -362,7 +362,7 @@ public class QueueLane {
 	 *          The current time.
 	 */
 	protected void moveLaneToBuffer(final double now) {
-		QueueVehicle veh;
+		QVehicle veh;
 
 		transitQueueLaneFeature.beforeMoveLaneToBuffer(now);
 
@@ -451,10 +451,10 @@ public class QueueLane {
 		// lanes on the same link.  kai, nov'09
 		boolean moveOn = true;
 		while (moveOn && !this.bufferIsEmpty() && (this.toLanes != null)) {
-			QueueVehicle veh = this.buffer.peek();
+			QVehicle veh = this.buffer.peek();
 			Id nextLinkId = veh.getDriver().chooseNextLinkId();
-			QueueLane toQueueLane = null;
-			for (QueueLane l : this.toLanes) {
+			QLane toQueueLane = null;
+			for (QLane l : this.toLanes) {
 				if (l.getDestinationLinkIds().contains(nextLinkId)) {
 					toQueueLane = l;
 				}
@@ -462,7 +462,7 @@ public class QueueLane {
 			if (toQueueLane != null) {
 				if (toQueueLane.hasSpace()) {
 					this.buffer.poll();
-					QueueSimulation.getEvents().processEvent(
+					QSim.getEvents().processEvent(
 					new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
 					toQueueLane.add(veh, now);
 				}
@@ -500,11 +500,11 @@ public class QueueLane {
 	 * @param veh
 	 * @param now the current time
 	 */
-	/*package*/ void add(final QueueVehicle veh, final double now) {
+	/*package*/ void add(final QVehicle veh, final double now) {
 		this.vehQueue.add(veh);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		if (this.isFireLaneEvents()) {
-			QueueSimulation.getEvents().processEvent(new LaneEnterEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
+			QSim.getEvents().processEvent(new LaneEnterEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
 		}
 		double departureTime;
 		if (this.originalLane) {
@@ -529,7 +529,7 @@ public class QueueLane {
 		veh.setEarliestLinkExitTime(departureTime);
 	}
 
-	private void addToBuffer(final QueueVehicle veh, final double now) {
+	private void addToBuffer(final QVehicle veh, final double now) {
 		if (this.bufferCap >= 1.0) {
 			this.bufferCap--;
 		}
@@ -554,14 +554,14 @@ public class QueueLane {
 				|| (this.buffercap_accumulate >= 1.0)));
 	}
 
-	/*package*/ QueueVehicle popFirstFromBuffer() {
-		double now = SimulationTimer.getTime();
-		QueueVehicle veh = this.buffer.poll();
+	/*package*/ QVehicle popFirstFromBuffer() {
+		double now = QSimTimer.getTime();
+		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.isFireLaneEvents()) {
-			QueueSimulation.getEvents().processEvent(new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
+			QSim.getEvents().processEvent(new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
 		}
-		QueueSimulation.getEvents().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId()));
+		QSim.getEvents().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId()));
 		return veh;
 	}
 
@@ -577,11 +577,11 @@ public class QueueLane {
 		return this.simulatedFlowCapacity;
 	}
 
-	QueueVehicle getFirstFromBuffer() {
+	QVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
 
-	public Queue<QueueVehicle> getVehiclesInBuffer() {
+	public Queue<QVehicle> getVehiclesInBuffer() {
 		return this.buffer;
 	}
 	
@@ -610,26 +610,26 @@ public class QueueLane {
 	}
 
 	void clearVehicles() {
-		double now = SimulationTimer.getTime();
+		double now = QSimTimer.getTime();
 
-		for (QueueVehicle veh : this.waitingList) {
-			QueueSimulation.getEvents().processEvent(
+		for (QVehicle veh : this.waitingList) {
+			QSim.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		Simulation.decLiving(this.waitingList.size());
 		Simulation.incLost(this.waitingList.size());
 		this.waitingList.clear();
 
-		for (QueueVehicle veh : this.vehQueue) {
-			QueueSimulation.getEvents().processEvent(
+		for (QVehicle veh : this.vehQueue) {
+			QSim.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		Simulation.decLiving(this.vehQueue.size());
 		Simulation.incLost(this.vehQueue.size());
 		this.vehQueue.clear();
 
-		for (QueueVehicle veh : this.buffer) {
-			QueueSimulation.getEvents().processEvent(
+		for (QVehicle veh : this.buffer) {
+			QSim.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		Simulation.decLiving(this.buffer.size());
@@ -638,16 +638,16 @@ public class QueueLane {
 	}
 
 	// search for vehicleId..
-	/*package*/ QueueVehicle getVehicle(final Id id) {
-		for (QueueVehicle veh : this.vehQueue) {
+	/*package*/ QVehicle getVehicle(final Id id) {
+		for (QVehicle veh : this.vehQueue) {
 			if (veh.getId().equals(id))
 				return veh;
 		}
-		for (QueueVehicle veh : this.buffer) {
+		for (QVehicle veh : this.buffer) {
 			if (veh.getId().equals(id))
 				return veh;
 		}
-		for (QueueVehicle veh : this.waitingList) {
+		for (QVehicle veh : this.waitingList) {
 			if (veh.getId().equals(id))
 				return veh;
 		}
@@ -658,8 +658,8 @@ public class QueueLane {
 	 * @return Returns a collection of all vehicles (driving, parking, in buffer,
 	 *         ...) on the link.
 	 */
-	public Collection<QueueVehicle> getAllVehicles() {
-		Collection<QueueVehicle> vehicles = new ArrayList<QueueVehicle>();
+	public Collection<QVehicle> getAllVehicles() {
+		Collection<QVehicle> vehicles = new ArrayList<QVehicle>();
 
 		vehicles.addAll(transitQueueLaneFeature.getFeatureVehicles());
 		vehicles.addAll(this.waitingList);
@@ -692,7 +692,7 @@ public class QueueLane {
 		 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
 		 */
 		public double getDisplayableSpaceCapValue() {
-			return (QueueLane.this.buffer.size() + QueueLane.this.vehQueue.size()) / QueueLane.this.storageCapacity;
+			return (QLane.this.buffer.size() + QLane.this.vehQueue.size()) / QLane.this.storageCapacity;
 		}
 
 		/**
@@ -704,14 +704,14 @@ public class QueueLane {
 		 * @return A measure for the number of vehicles being delayed on this link.
 		 */
 		public double getDisplayableTimeCapValue(double time) {
-			int count = QueueLane.this.buffer.size();
-			for (QueueVehicle veh : QueueLane.this.vehQueue) {
+			int count = QLane.this.buffer.size();
+			for (QVehicle veh : QLane.this.vehQueue) {
 				// Check if veh has reached destination
 				if (veh.getEarliestLinkExitTime() <= time) {
 					count++;
 				}
 			}
-			return count * 2.0 / QueueLane.this.storageCapacity;
+			return count * 2.0 / QLane.this.storageCapacity;
 		}
 
 
@@ -758,22 +758,22 @@ public class QueueLane {
 		 *          A collection where the calculated positions can be stored.
 		 */
 		private void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
-			double time = SimulationTimer.getTime();
-			int cnt = QueueLane.this.buffer.size() + QueueLane.this.vehQueue.size();
-			int nLanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QueueLane.this.queueLink.getLink());
+			double time = QSimTimer.getTime();
+			int cnt = QLane.this.buffer.size() + QLane.this.vehQueue.size();
+			int nLanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QLane.this.queueLink.getLink());
 			if (cnt > 0) {
-				double cellSize = QueueLane.this.queueLink.getLink().getLength() / cnt;
-				double distFromFromNode = QueueLane.this.queueLink.getLink().getLength() - cellSize / 2.0;
-				double freespeed = QueueLane.this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
+				double cellSize = QLane.this.queueLink.getLink().getLength() / cnt;
+				double distFromFromNode = QLane.this.queueLink.getLink().getLength() - cellSize / 2.0;
+				double freespeed = QLane.this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
 				// the cars in the buffer
-				for (QueueVehicle veh : QueueLane.this.buffer) {
+				for (QVehicle veh : QLane.this.buffer) {
 					int lane = 1 + (veh.getId().hashCode() % nLanes);
-					int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
+					int cmp = (int) (veh.getEarliestLinkExitTime() + QLane.this.inverseSimulatedFlowCapacity + 2.0);
 					double speed = (time > cmp ? 0.0 : freespeed);
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
-						PositionInfo position = new PositionInfo(person.getPerson().getId(), QueueLane.this.queueLink.getLink(),
+						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLane.this.queueLink.getLink(),
 								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
 						positions.add(position);
 					}
@@ -781,13 +781,13 @@ public class QueueLane {
 				}
 
 				// the cars in the drivingQueue
-				for (QueueVehicle veh : QueueLane.this.vehQueue) {
+				for (QVehicle veh : QLane.this.vehQueue) {
 					int lane = 1 + (veh.getId().hashCode() % nLanes);
-					int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
+					int cmp = (int) (veh.getEarliestLinkExitTime() + QLane.this.inverseSimulatedFlowCapacity + 2.0);
 					double speed = (time > cmp ? 0.0 : freespeed);
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
-						PositionInfo position = new PositionInfo(person.getPerson().getId(), QueueLane.this.queueLink.getLink(),
+						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLane.this.queueLink.getLink(),
 								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
 						positions.add(position);
 					}
@@ -798,15 +798,15 @@ public class QueueLane {
 			// the cars in the waitingQueue
 			// the actual position doesn't matter, so they're just placed next to the
 			// link at the end
-			cnt = QueueLane.this.waitingList.size();
+			cnt = QLane.this.waitingList.size();
 			if (cnt > 0) {
 				int lane = nLanes + 2;
-				double cellSize = Math.min(7.5, QueueLane.this.queueLink.getLink().getLength() / cnt);
-				double distFromFromNode = QueueLane.this.queueLink.getLink().getLength() - cellSize / 2.0;
-				for (QueueVehicle veh : QueueLane.this.waitingList) {
+				double cellSize = Math.min(7.5, QLane.this.queueLink.getLink().getLength() / cnt);
+				double distFromFromNode = QLane.this.queueLink.getLink().getLength() - cellSize / 2.0;
+				for (QVehicle veh : QLane.this.waitingList) {
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
-						PositionInfo position = new PositionInfo(person.getPerson().getId(), QueueLane.this.queueLink.getLink(),
+						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLane.this.queueLink.getLink(),
 								distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY, null);
 						positions.add(position);
 					}
@@ -827,11 +827,11 @@ public class QueueLane {
 		 *          A collection where the calculated positions can be stored.
 		 */
 		private void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
-			double now = SimulationTimer.getTime();
-			Link link = QueueLane.this.queueLink.getLink();
+			double now = QSimTimer.getTime();
+			Link link = QLane.this.queueLink.getLink();
 			double queueEnd = getInitialQueueEnd();
 			double storageCapFactor = Gbl.getConfig().getQSimConfigGroup().getStorageCapFactor();
-			double cellSize = ((NetworkImpl)QueueLane.this.queueLink.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
+			double cellSize = ((NetworkImpl)QLane.this.queueLink.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
 			double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
 			queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
 			positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);
@@ -842,14 +842,14 @@ public class QueueLane {
 		private double calculateVehicleLength(Link link,
 				double storageCapFactor, double cellSize) {
 			double vehLen = Math.min( // the length of a vehicle in visualization
-					link.getLength() / (QueueLane.this.storageCapacity + QueueLane.this.bufferStorageCapacity), // all vehicles must have place on the link
+					link.getLength() / (QLane.this.storageCapacity + QLane.this.bufferStorageCapacity), // all vehicles must have place on the link
 					cellSize / storageCapFactor); // a vehicle should not be larger than it's actual size
 			return vehLen;
 		}
 
 		private double getInitialQueueEnd() {
-			double queueEnd = QueueLane.this.queueLink.getLink().getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
-			if ((QueueLane.this.signalGroups != null) ){ 
+			double queueEnd = QLane.this.queueLink.getLink().getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
+			if ((QLane.this.signalGroups != null) ){ 
 				queueEnd -= 35.0;
 			}
 			return queueEnd;
@@ -861,11 +861,11 @@ public class QueueLane {
 		private double positionVehiclesFromBuffer(
 				final Collection<PositionInfo> positions, double now,
 				double queueEnd, Link link, double vehLen) {
-			for (QueueVehicle veh : QueueLane.this.buffer) {
+			for (QVehicle veh : QLane.this.buffer) {
 				
-				int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QueueLane.this.queueLink.getLink()));
+				int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QLane.this.queueLink.getLink()));
 
-				int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
+				int cmp = (int) (veh.getEarliestLinkExitTime() + QLane.this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : link.getFreespeed(Time.UNDEFINED_TIME);
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI person : peopleInVehicle) {
@@ -890,7 +890,7 @@ public class QueueLane {
 				double queueEnd, Link link, double vehLen) {
 			double lastDistance = Integer.MAX_VALUE;
 			double ttfs = link.getLength() / link.getFreespeed(now);
-			for (QueueVehicle veh : QueueLane.this.vehQueue) {
+			for (QVehicle veh : QLane.this.vehQueue) {
 				double travelTime = now - veh.getLinkEnterTime();
 				double distanceOnLink = (ttfs == 0.0 ? 0.0
 						: ((travelTime / ttfs) * link.getLength()));
@@ -912,7 +912,7 @@ public class QueueLane {
 					if (distanceOnLink < 0)
 						distanceOnLink = 0.0;
 				}
-				int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
+				int cmp = (int) (veh.getEarliestLinkExitTime() + QLane.this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
 				int tmpLane ;
 				try {
@@ -933,7 +933,7 @@ public class QueueLane {
 			}
 		}
 
-		private Collection<PersonAgentI> getPeopleInVehicle(QueueVehicle vehicle) {
+		private Collection<PersonAgentI> getPeopleInVehicle(QVehicle vehicle) {
 			Collection<PersonAgentI> passengers = transitQueueLaneFeature.getPassengers(vehicle);
 			if (passengers.isEmpty()) {
 				return Collections.singletonList((PersonAgentI) vehicle.getDriver());
@@ -954,10 +954,10 @@ public class QueueLane {
 				final Collection<PositionInfo> positions, Link link,
 				double cellSize) {
 			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
-			for (QueueVehicle veh : QueueLane.this.waitingList) {
+			for (QVehicle veh : QLane.this.waitingList) {
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI person : peopleInVehicle) {
-					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QueueLane.this.queueLink.getLink(),
+					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLane.this.queueLink.getLink(),
 							/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY, null);
 					positions.add(position);
 				}
@@ -984,9 +984,9 @@ public class QueueLane {
 		}
 	}
 
-	 protected void addToLane(final QueueLane lane) {
+	 protected void addToLane(final QLane lane) {
 		if (this.toLanes == null) {
-			this.toLanes = new LinkedList<QueueLane>();
+			this.toLanes = new LinkedList<QLane>();
 		}
 		this.toLanes.add(lane);
 	}
@@ -1007,9 +1007,9 @@ public class QueueLane {
 		this.visualizerLane = visualizerLane;
 	}
 
-	public static class FromLinkEndComparator implements Comparator<QueueLane>, Serializable {
+	public static class FromLinkEndComparator implements Comparator<QLane>, Serializable {
 		private static final long serialVersionUID = 1L;
-		public int compare(final QueueLane o1, final QueueLane o2) {
+		public int compare(final QLane o1, final QLane o2) {
 			if (o1.getMeterFromLinkEnd() < o2.getMeterFromLinkEnd()) {
 				return -1;
 			} else if (o1.getMeterFromLinkEnd() > o2.getMeterFromLinkEnd()) {
@@ -1024,11 +1024,11 @@ public class QueueLane {
 		return signalGroups;
 	}
 
-	public LinkedList<QueueVehicle> getVehQueue() {
+	public LinkedList<QVehicle> getVehQueue() {
 		return vehQueue;
 	}
 
-	public QueueLink getQueueLink() {
+	public QLink getQueueLink() {
 		return queueLink;
 	}
 }

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.data;
 
-import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
@@ -40,7 +40,7 @@ public class DefaultConnectionManagerFactory implements OTFConnectionManagerFact
 	public OTFConnectionManager createConnectionManager(){
 		OTFConnectionManager connect = new OTFConnectionManager();
 	// data source to writer
-		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		connect.add(QLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		//writer -> reader
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		//reader -> drawer

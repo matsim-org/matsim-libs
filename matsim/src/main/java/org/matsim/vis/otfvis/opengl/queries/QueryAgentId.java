@@ -26,9 +26,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.SimulationTimer;
-import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QSimTimer;
+import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -71,13 +71,13 @@ public class QueryAgentId extends AbstractQuery {
 	}
 
 
-	public void installQuery(OTFVisQueueSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.result = new Result();
 		double minDist = Double.POSITIVE_INFINITY;
 		double dist = 0;
-		for(QueueLink qlink : queueSimulation.getQueueSimulation().getNetwork().getLinks().values()) {
+		for(QLink qlink : queueSimulation.getQueueSimulation().getNetwork().getLinks().values()) {
 			List<PositionInfo> positions = new LinkedList<PositionInfo>();
-			qlink.getVisData().getVehiclePositions(SimulationTimer.getTime(), positions);
+			qlink.getVisData().getVehiclePositions(QSimTimer.getTime(), positions);
 			for(AgentSnapshotInfo info : positions) {
 				if ((info.getAgentState()== AgentState.PERSON_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
 				double xDist = info.getEasting() - this.x;

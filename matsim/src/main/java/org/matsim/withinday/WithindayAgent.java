@@ -43,8 +43,8 @@ import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.PersonAgent;
-import org.matsim.ptproject.qsim.QueueSimulation;
-import org.matsim.ptproject.qsim.SimulationTimer;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.withinday.beliefs.AgentBeliefs;
 import org.matsim.withinday.contentment.AgentContentment;
 import org.matsim.withinday.percepts.AgentPercepts;
@@ -81,7 +81,7 @@ public class WithindayAgent extends PersonAgent {
 
 	private final Network network;
 
-	public WithindayAgent(final Person person, final QueueSimulation simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
+	public WithindayAgent(final Person person, final QSim simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
 		super(person, simulation);
 		this.network = simulation.getNetwork().getNetworkLayer();
 //		this.person = person;
@@ -112,7 +112,7 @@ public class WithindayAgent extends PersonAgent {
 
 	public void replan() {
 		//check if replanning is allowed
-		if (SimulationTimer.getTime() >= (this.replanningInterval + this.lastReplaningTimeStep)) {
+		if (QSimTimer.getTime() >= (this.replanningInterval + this.lastReplaningTimeStep)) {
 			if (log.isTraceEnabled()) {
 				log.trace("Agent " + this.getPerson().getId() + " requested to replan...");
 			}
@@ -147,14 +147,14 @@ public class WithindayAgent extends PersonAgent {
 			log.trace("Starting agent's rerouting...");
 			log.trace("agent nr.: " + this.getPerson().getId());
 			log.trace("agentposition link: " + this.getCurrentLinkId());
-			int hours = (int)SimulationTimer.getTime() / 3600;
-			int min = (int) ((SimulationTimer.getTime() - (hours * 60)) / 60);
+			int hours = (int)QSimTimer.getTime() / 3600;
+			int min = (int) ((QSimTimer.getTime() - (hours * 60)) / 60);
 			log.trace("time: " + hours + ":" + min);
 		}
 		Link currentLink = this.network.getLinks().get(this.getCurrentLinkId());
 		ActivityImpl nextAct = ((PlanImpl) this.getPerson().getSelectedPlan()).getNextActivity(this.getCurrentLeg());
 		Link destinationLink = this.network.getLinks().get(nextAct.getLinkId());
-		NetworkRouteWRefs alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
+		NetworkRouteWRefs alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, QSimTimer.getTime());
 		Plan oldPlan = this.getPerson().getSelectedPlan();
 		LegImpl currentLeg = (LegImpl) this.getCurrentLeg();
 		RouteWRefs oldRoute = currentLeg.getRoute();
@@ -218,7 +218,7 @@ public class WithindayAgent extends PersonAgent {
     	((PersonImpl)this.getPerson()).exchangeSelectedPlan(newPlan, false);
     	this.exchangeCurrentLeg(newLeg);
 
-    	QueueSimulation.getEvents().processEvent(new AgentReplanEventImpl(SimulationTimer.getTime(), this.getPerson().getId(), alternativeRoute));
+    	QSim.getEvents().processEvent(new AgentReplanEventImpl(QSimTimer.getTime(), this.getPerson().getId(), alternativeRoute));
     }
 	}
 
@@ -250,7 +250,7 @@ public class WithindayAgent extends PersonAgent {
 	 *         <tt>false</tt> otherwise.
 	 */
 	public boolean isEnRoute() {
-		if (this.getVehicle().getEarliestLinkExitTime() > SimulationTimer.getTime()) {
+		if (this.getVehicle().getEarliestLinkExitTime() > QSimTimer.getTime()) {
 			//TODO [dg] remove if exception never thrown (dg oct2007)
 			throw new RuntimeException("This should never happen in the new implementation!");
 		}

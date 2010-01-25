@@ -48,7 +48,7 @@ public class QSimSnapshotWriterManager {
   
   private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
   
-  void createSnapshotwriter(QueueNetwork network, Scenario scenario, int snapshotPeriod, 
+  void createSnapshotwriter(QNetwork network, Scenario scenario, int snapshotPeriod, 
       Integer iterationNumber, ControlerIO controlerIO) {
     // A snapshot period of 0 or less indicates that there should be NO snapshot written
     if (snapshotPeriod > 0 ) {

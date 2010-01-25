@@ -50,7 +50,7 @@ import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.SignalGroupSettings;
 import org.matsim.signalsystems.config.SignalSystemConfiguration;
@@ -236,7 +236,7 @@ public class MixedLaneTest extends TestCase {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
 		((EventsManagerImpl)events).addHandler(handler);
 		
-		QueueSimulation qsim = new QueueSimulation(this.sc, events);
+		QSim qsim = new QSim(this.sc, events);
 		qsim.setLaneDefinitions(this.sc.getLaneDefinitions());
 		qsim.run();
 		
@@ -252,7 +252,7 @@ public class MixedLaneTest extends TestCase {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
 		((EventsManagerImpl)events).addHandler(handler);
 		
-		QueueSimulation qsim = new QueueSimulation(this.sc, events);
+		QSim qsim = new QSim(this.sc, events);
 		qsim.setLaneDefinitions(this.sc.getLaneDefinitions());
 		qsim.setSignalSystems(this.sc.getSignalSystems(), this.sc.getSignalSystemConfigurations());
 		qsim.run();

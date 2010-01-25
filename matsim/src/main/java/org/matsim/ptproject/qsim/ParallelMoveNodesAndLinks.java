@@ -41,7 +41,7 @@ public class ParallelMoveNodesAndLinks {
 	private int numOfThreads;
 	
 	private ExtendedQueueNode[][] parallelNodesArrays;
-	private List<List<QueueLink>> parallelSimLinksLists;
+	private List<List<QLink>> parallelSimLinksLists;
 	
 	private CyclicBarrier separationBarrier;	// separates moveNodes and moveLinks
 	private CyclicBarrier startBarrier;
@@ -87,7 +87,7 @@ public class ParallelMoveNodesAndLinks {
 		}
 	}
 		
-	public void initNodesAndLinks(QueueNode[] simNodesArray, List<QueueLink> allLinks, List<QueueLink> simActivateThis, int numOfThreads)
+	public void initNodesAndLinks(QNode[] simNodesArray, List<QLink> allLinks, List<QLink> simActivateThis, int numOfThreads)
 	{	
 		this.numOfThreads = numOfThreads;
 
@@ -143,7 +143,7 @@ public class ParallelMoveNodesAndLinks {
 	/*
 	 * Create equal sized Nodes Arrays.
 	 */
-	private void createNodesArrays(QueueNode[] simNodesArray)
+	private void createNodesArrays(QNode[] simNodesArray)
 	{	
 		List<List<ExtendedQueueNode>> nodes = new ArrayList<List<ExtendedQueueNode>>();
 		for (int i = 0; i < numOfThreads; i++)
@@ -152,7 +152,7 @@ public class ParallelMoveNodesAndLinks {
 		}
 		
 		int roundRobin = 0;
-		for (QueueNode queueNode : simNodesArray)
+		for (QNode queueNode : simNodesArray)
 		{
 			ExtendedQueueNode extendedQueueNode = new ExtendedQueueNode(queueNode, MatsimRandom.getLocalInstance());
 			nodes.get(roundRobin % numOfThreads).add(extendedQueueNode);
@@ -177,13 +177,13 @@ public class ParallelMoveNodesAndLinks {
 	/*
 	 * Create the Lists of QueueLinks that are handled on parallel Threads.
 	 */
-	private void createLinkLists(List<QueueLink> allLinks)
+	private void createLinkLists(List<QLink> allLinks)
 	{
-		parallelSimLinksLists = new ArrayList<List<QueueLink>>();
+		parallelSimLinksLists = new ArrayList<List<QLink>>();
 		
 		for (int i = 0; i < numOfThreads; i++)
 		{
-			parallelSimLinksLists.add(new ArrayList<QueueLink>());
+			parallelSimLinksLists.add(new ArrayList<QLink>());
 		}
 		
 		/*
@@ -192,7 +192,7 @@ public class ParallelMoveNodesAndLinks {
 		if (simulateAllLinks) 
 		{
 			int roundRobin = 0;
-			for(QueueLink link : allLinks)
+			for(QLink link : allLinks)
 			{
 				parallelSimLinksLists.get(roundRobin % numOfThreads).add(link);
 				roundRobin++;
@@ -228,12 +228,12 @@ public class ParallelMoveNodesAndLinks {
 	 */	
 	private static class LinkReActivator implements Runnable
 	{
-		private List<QueueLink> simActivateThis;
-		private List<List<QueueLink>> parallelSimLinksLists;
+		private List<QLink> simActivateThis;
+		private List<List<QLink>> parallelSimLinksLists;
 		private int numOfThreads;
 		private int distributor = 0;
 		
-		public LinkReActivator(List<QueueLink> simActivateThis, List<List<QueueLink>> parallelSimLinksLists, int numOfThreads)
+		public LinkReActivator(List<QLink> simActivateThis, List<List<QLink>> parallelSimLinksLists, int numOfThreads)
 		{
 			this.simActivateThis = simActivateThis;
 			this.parallelSimLinksLists = parallelSimLinksLists;
@@ -244,7 +244,7 @@ public class ParallelMoveNodesAndLinks {
 		{
 			if (!simActivateThis.isEmpty())
 			{
-				for(QueueLink link : simActivateThis)
+				for(QLink link : simActivateThis)
 				{
 					parallelSimLinksLists.get(distributor % numOfThreads).add(link);
 					distributor++;
@@ -263,16 +263,16 @@ public class ParallelMoveNodesAndLinks {
 	 */
 	private static class ExtendedQueueNode
 	{
-		private QueueNode queueNode;
+		private QNode queueNode;
 		private Random random;
 		
-		public ExtendedQueueNode(QueueNode queueNode, Random random)
+		public ExtendedQueueNode(QNode queueNode, Random random)
 		{
 			this.queueNode = queueNode;
 			this.random = random;
 		}
 		
-		public QueueNode getQueueNode()
+		public QNode getQueueNode()
 		{
 			return this.queueNode;
 		}
@@ -297,7 +297,7 @@ public class ParallelMoveNodesAndLinks {
 		private CyclicBarrier endBarrier;
 				
 		private ExtendedQueueNode[] queueNodes;
-		private List<QueueLink> links = new ArrayList<QueueLink>();
+		private List<QLink> links = new ArrayList<QLink>();
 					
 		public MoveThread(boolean simulateAllNodes)
 		{
@@ -324,7 +324,7 @@ public class ParallelMoveNodesAndLinks {
 			this.queueNodes = queueNodes;
 		}
 		
-		public void handleLinks(List<QueueLink> links)
+		public void handleLinks(List<QLink> links)
 		{
 			this.links = links;
 		}
@@ -359,7 +359,7 @@ public class ParallelMoveNodesAndLinks {
 					 */
 					for (ExtendedQueueNode extendedQueueNode : queueNodes)
 					{							
-						QueueNode node = extendedQueueNode.getQueueNode();
+						QNode node = extendedQueueNode.getQueueNode();
 //						synchronized(node)
 //						{
 							if (node.isActive() || node.isSignalized() || simulateAllNodes)
@@ -379,8 +379,8 @@ public class ParallelMoveNodesAndLinks {
 					/*
 					 * Move Links
 					 */
-					ListIterator<QueueLink> simLinks = this.links.listIterator();
-					QueueLink link;
+					ListIterator<QLink> simLinks = this.links.listIterator();
+					QLink link;
 					boolean isActive;
 					
 					while (simLinks.hasNext()) 

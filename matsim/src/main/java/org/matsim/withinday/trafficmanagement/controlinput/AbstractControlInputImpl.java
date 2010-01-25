@@ -42,7 +42,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.SimulationTimer;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**
@@ -139,9 +139,9 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	public double getNashTime() {
 		try {
-			this.writer.writeTravelTimesMainRoute(SimulationTimer.getTime(),
+			this.writer.writeTravelTimesMainRoute(QSimTimer.getTime(),
 					this.lastTimeMainRoute, this.getPredictedNashTime(this.mainRoute));
-			this.writer.writeTravelTimesAlternativeRoute(SimulationTimer.getTime(),
+			this.writer.writeTravelTimesAlternativeRoute(QSimTimer.getTime(),
 					this.lastTimeAlternativeRoute, this
 							.getPredictedNashTime(this.alternativeRoute));
 		} catch (IOException e) {

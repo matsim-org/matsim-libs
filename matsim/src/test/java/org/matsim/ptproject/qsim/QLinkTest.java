@@ -50,7 +50,7 @@ import org.matsim.vehicles.BasicVehicleTypeImpl;
  * @author dgrether
  * @author mrieser
  */
-public class QueueLinkTest extends MatsimTestCase {
+public class QLinkTest extends MatsimTestCase {
 
 	@Override
 	protected void setUp() throws Exception {
@@ -95,8 +95,8 @@ public class QueueLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles driving on a link are found with {@link QueueLink#getVehicle(Id)}
-	 * and {@link QueueLink#getAllVehicles()}. 
+	 * Tests that vehicles driving on a link are found with {@link QLink#getVehicle(Id)}
+	 * and {@link QLink#getAllVehicles()}. 
 	 * 
 	 * @author mrieser 
 	 */
@@ -104,9 +104,9 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsManagerImpl());
+		QSim qsim = new QSim(f.scenario, new EventsManagerImpl());
 
-		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
+		QVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(23));
 		veh.setDriver(new PersonAgent(p, qsim));
 
@@ -141,8 +141,8 @@ public class QueueLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles parked on a link are found with {@link QueueLink#getVehicle(Id)}
-	 * and {@link QueueLink#getAllVehicles()}.
+	 * Tests that vehicles parked on a link are found with {@link QLink#getVehicle(Id)}
+	 * and {@link QLink#getAllVehicles()}.
 	 *  
 	 * @author mrieser 
 	 */
@@ -150,9 +150,9 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsManagerImpl());
+		QSim qsim = new QSim(f.scenario, new EventsManagerImpl());
 
-		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
+		QVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(42));
 		veh.setDriver(new PersonAgent(p, qsim));
 
@@ -176,8 +176,8 @@ public class QueueLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles departing on a link are found with {@link QueueLink#getVehicle(Id)}
-	 * and {@link QueueLink#getAllVehicles()}.
+	 * Tests that vehicles departing on a link are found with {@link QLink#getVehicle(Id)}
+	 * and {@link QLink#getAllVehicles()}.
 	 * 
 	 * @author mrieser 
 	 */
@@ -185,9 +185,9 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsManagerImpl());
+		QSim qsim = new QSim(f.scenario, new EventsManagerImpl());
 
-		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
+		QVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl pers = new PersonImpl(new IdImpl(80));
 		Plan plan = new PlanImpl();
 		pers.addPlan(plan);
@@ -246,13 +246,13 @@ public class QueueLinkTest extends MatsimTestCase {
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2, 0));
 		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
-		QueueNetwork queueNetwork = new QueueNetwork(network);
-		QueueSimEngine simEngine = new QueueSimEngine(queueNetwork, MatsimRandom.getRandom());
-		QueueLinkImpl qlink = (QueueLinkImpl) queueNetwork.getQueueLink(new IdImpl("1"));
+		QNetwork queueNetwork = new QNetwork(network);
+		QSimEngine simEngine = new QSimEngine(queueNetwork, MatsimRandom.getRandom());
+		QLinkImpl qlink = (QLinkImpl) queueNetwork.getQueueLink(new IdImpl("1"));
 		qlink.setSimEngine(simEngine);
 		qlink.finishInit();
 
-		QueueSimulation qsim = new QueueSimulation(scenario, new EventsManagerImpl());
+		QSim qsim = new QSim(scenario, new EventsManagerImpl());
 		QueueVehicleImpl v1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		PlanImpl plan = p.createAndAddPlan(true);
@@ -318,14 +318,14 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
 		PersonImpl p = new PersonImpl(new IdImpl(5));
-		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsManagerImpl());
+		QSim qsim = new QSim(f.scenario, new EventsManagerImpl());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QueueVehicle veh1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(1), vehType));
+		QVehicle veh1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(1), vehType));
 		veh1.setDriver(new PersonAgent(p, qsim));
-		QueueVehicle veh25 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(2), vehType), 2.5);
+		QVehicle veh25 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(2), vehType), 2.5);
 		veh25.setDriver(new PersonAgent(p, null));
-		QueueVehicle veh5 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(3), vehType), 5);
+		QVehicle veh5 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(3), vehType), 5);
 		veh5.setDriver(new PersonAgent(p, null));
 		
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);
@@ -366,9 +366,9 @@ public class QueueLinkTest extends MatsimTestCase {
 		/*package*/ final ScenarioImpl scenario;
 		/*package*/ final Link link1;
 		/*package*/ final Link link2;
-		/*package*/ final QueueNetwork queueNetwork;
-		/*package*/ final QueueLinkImpl qlink1;
-		/*package*/ final QueueLinkImpl qlink2;
+		/*package*/ final QNetwork queueNetwork;
+		/*package*/ final QLinkImpl qlink1;
+		/*package*/ final QLinkImpl qlink2;
 		/*package*/ final BasicVehicle basicVehicle;
 
 		/*package*/ Fixture() {
@@ -381,12 +381,12 @@ public class QueueLinkTest extends MatsimTestCase {
 			Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1001, 0));
 			this.link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 			this.link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
-			this.queueNetwork = new QueueNetwork(network);
-			QueueSimEngine engine = new QueueSimEngine(this.queueNetwork, MatsimRandom.getRandom());
-			this.qlink1 = (QueueLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("1"));
+			this.queueNetwork = new QNetwork(network);
+			QSimEngine engine = new QSimEngine(this.queueNetwork, MatsimRandom.getRandom());
+			this.qlink1 = (QLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("1"));
 			this.qlink1.setSimEngine(engine);
 			this.qlink1.finishInit();
-			this.qlink2 = (QueueLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("2"));
+			this.qlink2 = (QLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("2"));
 			this.qlink2.setSimEngine(engine);
 			this.qlink2.finishInit();
 			

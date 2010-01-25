@@ -24,7 +24,7 @@ import java.awt.BorderLayout;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
-import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
@@ -68,7 +68,7 @@ public class OTFClientFile extends OTFClient {
 		 * get otfvis running with the current matsim version. The other entries added
 		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
 		 */
-		this.connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		this.connect.add(QLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		this.connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);

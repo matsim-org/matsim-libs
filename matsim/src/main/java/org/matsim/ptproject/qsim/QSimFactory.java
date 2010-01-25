@@ -36,7 +36,7 @@ public class QSimFactory implements MobsimFactory {
   
   @Override
   public IOSimulation createMobsim(Scenario sc, EventsManager eventsManager) {
-    QueueSimulation sim = new QueueSimulation(sc, eventsManager);
+    QSim sim = new QSim(sc, eventsManager);
     return sim;
   }
 

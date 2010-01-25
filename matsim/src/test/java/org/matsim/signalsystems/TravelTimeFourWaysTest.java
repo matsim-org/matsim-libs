@@ -27,7 +27,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -61,7 +61,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
-		QueueSimulation sim = new QueueSimulation(scenario, events);
+		QSim sim = new QSim(scenario, events);
 		sim.setLaneDefinitions(scenario.getLaneDefinitions());
 		sim.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
 		sim.run();
@@ -93,7 +93,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		
-		QueueSimulation sim = new QueueSimulation(data, events);
+		QSim sim = new QSim(data, events);
 		sim.setLaneDefinitions(data.getLaneDefinitions());
 		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemConfigurations());
 		sim.run();

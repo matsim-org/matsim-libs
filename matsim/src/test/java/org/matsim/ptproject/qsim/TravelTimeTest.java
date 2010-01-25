@@ -64,7 +64,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(this);
 
-		new QueueSimulation(data, events).run();
+		new QSim(data, events).run();
 
 		Map<Id, Double> travelTimes = this.agentTravelTimes.get(new IdImpl("1"));
 		assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), EPSILON);
@@ -89,7 +89,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(this);
 
-		new QueueSimulation(data, events).run();
+		new QSim(data, events).run();
 
 		Map<Id, Double> travelTimes = this.agentTravelTimes.get(new IdImpl("1"));
 		assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), EPSILON);

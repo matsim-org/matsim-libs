@@ -16,9 +16,9 @@ import org.matsim.pt.Umlauf;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.DepartureHandler;
 import org.matsim.ptproject.qsim.DriverAgent;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueSimulation;
-import org.matsim.ptproject.qsim.QueueSimulationFeature;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QSimFeature;
 import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -31,7 +31,7 @@ import org.matsim.vehicles.BasicVehicles;
 /**
  * @author mrieser
  */
-public class TransitQueueSimulationFeature implements QueueSimulationFeature, DepartureHandler {
+public class TransitQueueSimulationFeature implements QSimFeature, DepartureHandler {
 
 	public static class TransitAgentTriesToTeleportException extends RuntimeException {
 
@@ -45,7 +45,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 	
 	private static Logger log = Logger.getLogger(TransitQueueSimulationFeature.class);
   
-	private QueueSimulation queueSimulation;
+	private QSim queueSimulation;
 	
 	private TransitSchedule schedule = null;
 	
@@ -57,7 +57,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 	
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 	
-	public TransitQueueSimulationFeature(QueueSimulation queueSimulation) {
+	public TransitQueueSimulationFeature(QSim queueSimulation) {
 		this.queueSimulation = queueSimulation;
 		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
 		this.agentTracker = new TransitStopAgentTracker();
@@ -108,7 +108,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 		TransitQueueVehicle veh = new TransitQueueVehicle(vehicle, 5);
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
-		QueueLink qlink = this.queueSimulation.getNetwork().getQueueLink(driver
+		QLink qlink = this.queueSimulation.getNetwork().getQueueLink(driver
 				.getCurrentLeg().getRoute().getStartLinkId());
 		qlink.addParkedVehicle(veh);
 
@@ -130,7 +130,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 					TransitQueueVehicle veh = new TransitQueueVehicle(vehicles.getVehicles().get(departure.getVehicleId()), 5);
 					veh.setDriver(driver);
 					driver.setVehicle(veh);
-					QueueLink qlink = this.queueSimulation.getNetwork().getQueueLink(driver.getCurrentLeg().getRoute().getStartLinkId());
+					QLink qlink = this.queueSimulation.getNetwork().getQueueLink(driver.getCurrentLeg().getRoute().getStartLinkId());
 					qlink.addParkedVehicle(veh);
 
 					this.queueSimulation.scheduleActivityEnd(driver, 0);

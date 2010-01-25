@@ -3,7 +3,7 @@ package org.matsim.vis.otfvis.handler;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
@@ -16,13 +16,13 @@ import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler.Writer;
  *
  */
 public class OTFNoDynDataLinkHandler extends OTFDefaultLinkHandler {
-	static public class Writer extends  OTFDefaultLinkHandler.Writer implements OTFWriterFactory<QueueLink> {
+	static public class Writer extends  OTFDefaultLinkHandler.Writer implements OTFWriterFactory<QLink> {
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
 			// do nothing
 		}
 		@Override
-		public OTFDataWriter<QueueLink> getWriter() {
+		public OTFDataWriter<QLink> getWriter() {
 			return new Writer();
 		}
 	}

@@ -34,7 +34,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.ptproject.qsim.SimulationTimer;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.withinday.WithindayAgent;
 
 /**
@@ -97,7 +97,7 @@ public class PlanScore implements AgentContentment {
 	// =====================================================================
 
 	public double getContentment() {
-		double time = SimulationTimer.getTime();
+		double time = QSimTimer.getTime();
 		if (time > this.lastCallTime) {
 			if (this.agent.isEnRoute()) {
 				Leg leg = this.agent.getVehicle().getDriver().getCurrentLeg();

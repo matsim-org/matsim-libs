@@ -39,7 +39,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.SimulationTimer;
+import org.matsim.ptproject.qsim.QSimTimer;
 
 /**
  * @author abergsten and dzetterberg
@@ -139,7 +139,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 			Link l = this.network.getLinks().get(linkId);
 			if (!this.capacities.containsKey(linkId)) {
 				double capacity = ((LinkImpl)l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
-						/ SimulationTimer.getSimTickTime();
+						/ QSimTimer.getSimTickTime();
 				this.capacities.put(linkId, capacity);
 			}
 
@@ -196,7 +196,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 			Link l = this.network.getLinks().get(linkId);
 			if (!this.capacities.containsKey(linkId)) {
 				double capacity = ((LinkImpl) l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
-						/ SimulationTimer.getSimTickTime();
+						/ QSimTimer.getSimTickTime();
 				this.capacities.put(linkId, capacity);
 			}
 
@@ -360,7 +360,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 					// do not check links before current bottleneck
 					break;
 				}
-				else if (SimulationTimer.getTime() % RESETBOTTLENECKINTERVALL == 0) {
+				else if (QSimTimer.getTime() % RESETBOTTLENECKINTERVALL == 0) {
 					this.currentBNCapacityAlternativeRoute = getCapacity(this.altRouteNaturalBottleNeckId);
 					this.currentBNCapacityMainRoute = getCapacity(this.mainRouteNaturalBottleNeckId);
 					this.currentBottleNeckAlternativeRoute = this.altRouteNaturalBottleNeckId;
@@ -372,8 +372,8 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		else if (!this.incidentDetectionActive) {
 			currentBottleNeckId = bottleNeck.getId();
 			Link currentBottleNeck = this.network.getLinks().get(currentBottleNeckId);
-			currentBottleNeckCapacity = ((LinkImpl)currentBottleNeck).getFlowCapacity(SimulationTimer.getTime()) * this.simulationConfig.getFlowCapFactor()
-					/ SimulationTimer.getSimTickTime();
+			currentBottleNeckCapacity = ((LinkImpl)currentBottleNeck).getFlowCapacity(QSimTimer.getTime()) * this.simulationConfig.getFlowCapFactor()
+					/ QSimTimer.getSimTickTime();
 
 		}
 

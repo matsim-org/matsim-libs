@@ -39,43 +39,43 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * @author mrieser
  * @author dgrether
  */
-public class QueueNetwork {
+public class QNetwork {
 
-	private final Map<Id, QueueLink> links;
+	private final Map<Id, QLink> links;
 
-	private final Map<Id, QueueNode> nodes;
+	private final Map<Id, QNode> nodes;
 
 	private final Network networkLayer;
 	
-	private final QueueSimulation qSim ;
+	private final QSim qSim ;
 
-	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
+	private final QNetworkFactory<QNode, QLink> queueNetworkFactory;
 	
-	public QueueNetwork(final QueueSimulation qs) {
+	public QNetwork(final QSim qs) {
 		this( qs, qs.getScenario().getNetwork(), new DefaultQueueNetworkFactory() ) ; 
 	}
-	public QueueNetwork(final Network networkLayer2) {
+	public QNetwork(final Network networkLayer2) {
 		this(null, networkLayer2, new DefaultQueueNetworkFactory());
 	}
-	public QueueNetwork(final QueueSimulation qs, final QueueNetworkFactory<QueueNode, QueueLink> factory ) {
+	public QNetwork(final QSim qs, final QNetworkFactory<QNode, QLink> factory ) {
 		this( qs, qs.getScenario().getNetwork(), factory ) ;
 	}
-	public QueueNetwork(final Network network, final QueueNetworkFactory<QueueNode, QueueLink> factory ) {
+	public QNetwork(final Network network, final QNetworkFactory<QNode, QLink> factory ) {
 		this( null, network, factory ) ;
 	}
-	private QueueNetwork(final QueueSimulation qs, final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
+	private QNetwork(final QSim qs, final Network networkLayer, final QNetworkFactory<QNode, QLink> factory) {
 		this.qSim = qs ;
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
-		this.links = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
-		this.nodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.links = new LinkedHashMap<Id, QLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.nodes = new LinkedHashMap<Id, QNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.newQueueNode(n, this));
 		}
 		for (Link l : networkLayer.getLinks().values()) {
 			this.links.put(l.getId(), this.queueNetworkFactory.newQueueLink(l, this, this.nodes.get(l.getToNode().getId())));
 		}
-		for (QueueNode n : this.nodes.values()) {
+		for (QNode n : this.nodes.values()) {
 			n.init();
 		}
 	}
@@ -90,28 +90,28 @@ public class QueueNetwork {
 	 */
 	public Collection<PositionInfo> getVehiclePositions(double time) {
 		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
-		for (QueueLink link : this.links.values()) {
+		for (QLink link : this.links.values()) {
 			link.getVisData().getVehiclePositions(time, positions);
 		}
 		return positions;
 	}
 
-	public Map<Id, QueueLink> getLinks() {
+	public Map<Id, QLink> getLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
-	public Map<Id, QueueNode> getNodes() {
+	public Map<Id, QNode> getNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
-	public QueueLink getQueueLink(final Id id) {
+	public QLink getQueueLink(final Id id) {
 		return this.links.get(id);
 	}
 
-	public QueueNode getQueueNode(final Id id) {
+	public QNode getQueueNode(final Id id) {
 		return this.nodes.get(id);
 	}
-	public QueueSimulation getQSim() {
+	public QSim getQSim() {
 		return qSim;
 	}
 	
