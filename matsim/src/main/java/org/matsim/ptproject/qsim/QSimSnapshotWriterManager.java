@@ -88,6 +88,7 @@ public class QSimSnapshotWriterManager {
         if (scenario.getConfig().scenario().isUseLanes() && (!scenario.getConfig().scenario().isUseSignalSystems())) {
           connectionManagerFactory = new OTFLanesConnectionManagerFactory(connectionManagerFactory);
         }
+        // this is not working as otfvis is not working out of the box with dyn data writers/readers
 //        else if (scenario.getConfig().scenario().isUseLanes() && scenario.getConfig().scenario().isUseSignalSystems()){
 //          connectionManagerFactory = new OTFSignalsConnectionManagerFactory(connectionManagerFactory);
 //        }
