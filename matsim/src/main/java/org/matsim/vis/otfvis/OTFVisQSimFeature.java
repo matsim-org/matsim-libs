@@ -13,7 +13,7 @@ import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QSim;
@@ -63,10 +63,10 @@ public class OTFVisQSimFeature implements QSimFeature {
 				this.connectionManager.add(OTFTeleportAgentsDrawer.class, OTFTeleportAgentsLayer.class);
 				
 			}
-			if (queueSimulation instanceof TransitQueueSimulation) {
+			if (queueSimulation instanceof TransitQSimulation) {
 				this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
 						queueSimulation.getNetwork().getNetworkLayer(), ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule(),
-						((TransitQueueSimulation) queueSimulation).getAgentTracker()));
+						((TransitQSimulation) queueSimulation).getAgentTracker()));
 				this.connectionManager.add(FacilityDrawer.DataWriter_v1_0.class, FacilityDrawer.DataReader_v1_0.class);
 				this.connectionManager.add(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
 			}

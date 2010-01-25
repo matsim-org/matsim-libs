@@ -38,6 +38,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.qsim.TransitAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;

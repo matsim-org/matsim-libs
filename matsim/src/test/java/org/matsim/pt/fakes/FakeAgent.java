@@ -29,7 +29,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.pt.queuesim.PassengerAgent;
+import org.matsim.pt.qsim.PassengerAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.transitSchedule.api.TransitLine;

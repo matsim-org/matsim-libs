@@ -46,6 +46,11 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.pt.fakes.FakeAgent;
+import org.matsim.pt.qsim.SimpleTransitStopHandler;
+import org.matsim.pt.qsim.TransitDriver;
+import org.matsim.pt.qsim.TransitQSimulation;
+import org.matsim.pt.qsim.TransitQVehicle;
+import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.ptproject.qsim.PersonAgent;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QLinkImpl;
@@ -963,7 +968,7 @@ public class TransitQueueNetworkTest extends TestCase {
 	protected static class Fixture {
 		public final TestSimEngine simEngine;
 		public final QLinkImpl qlink1, qlink2, qlink3;
-		public final TransitQueueVehicle transitVehicle;
+		public final TransitQVehicle transitVehicle;
 		public final QVehicle normalVehicle, normalVehicle2;
 
 		/**
@@ -1041,7 +1046,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			Departure dep = builder.createDeparture(id1, 100);
 
 			// setup: simulation
-			TransitQueueSimulation qsim = new TransitQueueSimulation(scenario, new EventsManagerImpl());
+			TransitQSimulation qsim = new TransitQSimulation(scenario, new EventsManagerImpl());
 			QNetwork qnet = qsim.getQueueNetwork();
 			this.qlink1 = (QLinkImpl) qnet.getQueueLink(id1);
 			this.qlink2 = (QLinkImpl) qnet.getQueueLink(id2);
@@ -1062,7 +1067,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			vehicleType.setCapacity(capacity);
 
 			TransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, qsim);
-			this.transitVehicle = new TransitQueueVehicle(new BasicVehicleImpl(tDriver.getPerson().getId(), vehicleType), 1.0);
+			this.transitVehicle = new TransitQVehicle(new BasicVehicleImpl(tDriver.getPerson().getId(), vehicleType), 1.0);
 			this.qlink1.addParkedVehicle(this.transitVehicle);
 			this.transitVehicle.setEarliestLinkExitTime(100);
 			this.transitVehicle.setDriver(tDriver);
@@ -1118,7 +1123,7 @@ public class TransitQueueNetworkTest extends TestCase {
 	private static class FakeTransitDriver extends TransitDriver {
 
 		public FakeTransitDriver(final TransitLine line, final TransitRoute route, final Departure departure,
-				final TransitStopAgentTracker agentTracker, final TransitQueueSimulation sim) {
+				final TransitStopAgentTracker agentTracker, final TransitQSimulation sim) {
 			super(line, route, departure, agentTracker, sim, new SimpleTransitStopHandler());
 		}
 

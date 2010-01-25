@@ -47,8 +47,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
-import org.matsim.pt.queuesim.TransitQueueLaneFeature;
-import org.matsim.pt.queuesim.TransitVehicle;
+import org.matsim.pt.qsim.TransitQLaneFeature;
+import org.matsim.pt.qsim.TransitVehicle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -166,11 +166,11 @@ public class QLane {
 	 */
 	private boolean fireLaneEvents = false;
 	
-	private final TransitQueueLaneFeature transitQueueLaneFeature;
+	private final TransitQLaneFeature transitQueueLaneFeature;
 
 	/*package*/ QLane(final QLink ql, Lane laneData) {
 		this.queueLink = ql;
-		this.transitQueueLaneFeature = new TransitQueueLaneFeature(this.getQueueLink());
+		this.transitQueueLaneFeature = new TransitQLaneFeature(this.getQueueLink());
 		this.originalLane = (laneData == null) ? true : false;
 		this.laneData = laneData;
 		this.length = ql.getLink().getLength();

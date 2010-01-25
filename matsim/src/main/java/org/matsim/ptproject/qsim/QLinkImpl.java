@@ -44,7 +44,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.queuesim.TransitQueueLaneFeature;
+import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -134,7 +134,7 @@ public class QLinkImpl implements QLink {
 	 */
 	private double buffercap_accumulate = 1.0;
 
-	private final TransitQueueLaneFeature transitQueueLaneFeature = new TransitQueueLaneFeature(this);
+	private final TransitQLaneFeature transitQueueLaneFeature = new TransitQLaneFeature(this);
 
 
 	/**

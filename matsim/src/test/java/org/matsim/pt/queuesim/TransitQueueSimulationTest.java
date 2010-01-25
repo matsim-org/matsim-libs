@@ -67,7 +67,13 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.queuesim.TransitQueueSimulationFeature.TransitAgentTriesToTeleportException;
+import org.matsim.pt.qsim.SimpleTransitStopHandler;
+import org.matsim.pt.qsim.TransitDriver;
+import org.matsim.pt.qsim.TransitDriverAgent;
+import org.matsim.pt.qsim.TransitQSimulation;
+import org.matsim.pt.qsim.TransitQVehicle;
+import org.matsim.pt.qsim.TransitStopAgentTracker;
+import org.matsim.pt.qsim.TransitQSimFeature.TransitAgentTriesToTeleportException;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.DriverAgent;
@@ -215,7 +221,7 @@ public class TransitQueueSimulationTest {
 		assertEquals(9.0*3600, ((TransitDriverAgent) agents.get(4)).getDepartureTime(), MatsimTestCase.EPSILON);
 	}
 
-	protected static class TestCreateAgentsSimulation extends TransitQueueSimulation {
+	protected static class TestCreateAgentsSimulation extends TransitQSimulation {
 		public final List<DriverAgent> createdAgents = new ArrayList<DriverAgent>();
 		public TestCreateAgentsSimulation(final ScenarioImpl scenario, final EventsManagerImpl events) {
 			super(scenario, events);
@@ -280,7 +286,7 @@ public class TransitQueueSimulationTest {
 
 		// run simulation
 		EventsManagerImpl events = new EventsManagerImpl();
-		TransitQueueSimulation simulation = new TransitQueueSimulation(scenario, events);
+		TransitQSimulation simulation = new TransitQSimulation(scenario, events);
 		simulation.run();
 
 		// check everything
@@ -348,7 +354,7 @@ public class TransitQueueSimulationTest {
 
 		// run simulation
 		EventsManagerImpl events = new EventsManagerImpl();
-		TransitQueueSimulation simulation = new TransitQueueSimulation(scenario, events);
+		TransitQSimulation simulation = new TransitQSimulation(scenario, events);
 		simulation.run();
 	}
 
@@ -516,7 +522,7 @@ public class TransitQueueSimulationTest {
 		link.setNumberOfLanes(1);
 	}
 
-	protected static class TestHandleStopSimulation extends TransitQueueSimulation {
+	protected static class TestHandleStopSimulation extends TransitQSimulation {
 		protected SpyDriver driver = null;
 		private final TransitLine line;
 		private final TransitRoute route;
@@ -545,7 +551,7 @@ public class TransitQueueSimulationTest {
 			capacity.setStandingRoom(Integer.valueOf(0));
 			vehicleType.setCapacity(capacity);
 
-			TransitQueueVehicle veh = new TransitQueueVehicle(new BasicVehicleImpl(this.driver.getPerson().getId(), vehicleType), 5);
+			TransitQVehicle veh = new TransitQVehicle(new BasicVehicleImpl(this.driver.getPerson().getId(), vehicleType), 5);
 			veh.setDriver(this.driver);
 			this.driver.setVehicle(veh);
 			this.departure.setVehicleId(veh.getBasicVehicle().getId());
@@ -562,7 +568,7 @@ public class TransitQueueSimulationTest {
 		public final List<SpyHandleStopData> spyData = new ArrayList<SpyHandleStopData>();
 
 		public SpyDriver(final TransitLine line, final TransitRoute route, final Departure departure,
-				final TransitStopAgentTracker agentTracker, final TransitQueueSimulation sim) {
+				final TransitStopAgentTracker agentTracker, final TransitQSimulation sim) {
 			super(line, route, departure, agentTracker, sim, new SimpleTransitStopHandler());
 		}
 
@@ -649,7 +655,7 @@ public class TransitQueueSimulationTest {
 		events.addHandler(collector);
 
 		// first test without special settings
-		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
+		TransitQSimulation sim = new TransitQSimulation(scenario, events);
 		sim.run();
 		assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -658,7 +664,7 @@ public class TransitQueueSimulationTest {
 		// second test with special start/end times
 		config.getQSimConfigGroup().setStartTime(depTime + 20.0);
 		config.getQSimConfigGroup().setEndTime(depTime + 90.0);
-		sim = new TransitQueueSimulation(scenario, events);
+		sim = new TransitQSimulation(scenario, events);
 		sim.run();
 		assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -773,7 +779,7 @@ public class TransitQueueSimulationTest {
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
-		new TransitQueueSimulation(scenario, events).run();
+		new TransitQSimulation(scenario, events).run();
 		List<Event> allEvents = collector.getEvents();
 
 		for (Event event : allEvents) {

@@ -21,8 +21,8 @@
 package org.matsim.pt.queuesim;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.pt.queuesim.TransitQueueVehicle;
-import org.matsim.pt.queuesim.TransitVehicle;
+import org.matsim.pt.qsim.TransitQVehicle;
+import org.matsim.pt.qsim.TransitVehicle;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.BasicVehicle;
 import org.matsim.vehicles.BasicVehicleCapacity;
@@ -38,7 +38,7 @@ public class TransitQueueVehicleTest extends AbstractTransitVehicleTest {
 
 	@Override
 	protected TransitVehicle createTransitVehicle(final BasicVehicle vehicle) {
-		return new TransitQueueVehicle(vehicle, 1);
+		return new TransitQVehicle(vehicle, 1);
 	}
 
 	public void testSizeInEquivalents() {
@@ -47,9 +47,9 @@ public class TransitQueueVehicleTest extends AbstractTransitVehicleTest {
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
-		TransitQueueVehicle veh = new TransitQueueVehicle(vehicle, 1.0);
+		TransitQVehicle veh = new TransitQVehicle(vehicle, 1.0);
 		assertEquals(1.0, veh.getSizeInEquivalents(), MatsimTestCase.EPSILON);
-		veh = new TransitQueueVehicle(vehicle, 2.5);
+		veh = new TransitQVehicle(vehicle, 2.5);
 		assertEquals(2.5, veh.getSizeInEquivalents(), MatsimTestCase.EPSILON);
 	}
 }
