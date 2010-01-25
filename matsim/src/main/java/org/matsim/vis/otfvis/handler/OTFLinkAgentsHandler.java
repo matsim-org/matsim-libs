@@ -145,10 +145,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 				}
 				out.putFloat((float)pos.getColorValueBetweenZeroAndOne());
 			} else {
-				if ( cnt < 1 ) {
-					cnt ++ ;
-					log.warn("here209348") ;
-				}
+
 				String id = pos.getId().toString();
 				ByteBufferUtils.putString(out, id);
 				out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
@@ -156,17 +153,13 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 				out.putInt(pos.getUserDefined()) ;
 				out.putFloat((float)pos.getColorValueBetweenZeroAndOne()) ;
 				out.putInt(pos.getAgentState().ordinal());
+				
 			}
 		}
 		
 	}
-	private static int cnt = 0 ;
 
-	private static int cnt2 = 0 ;
 	public void readAgent(ByteBuffer in, SceneGraph graph) {
-		if ( cnt2 < 1 ) {
-			log.warn("here xcnv") ;
-		}
 		if ( OTFFileWriter.VERSION<=1 && OTFFileWriter.MINORVERSION<=6 ) {
 			// yyyy I think this can completely go.  kai, jan'10
 			String id = ByteBufferUtils.getString(in);
@@ -188,10 +181,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 				e.printStackTrace();
 			} //factoryAgent.getOne();
 		} else {
-			if ( cnt2 < 1 ) {
-				cnt2++ ;
-				log.warn("here nwovnwov") ;
-			}
 			String id = ByteBufferUtils.getString(in) ;
 			float x = in.getFloat() ;
 			float y = in.getFloat();
