@@ -32,6 +32,9 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
@@ -167,7 +170,7 @@ public class QueueLinkImpl implements QueueLink {
 	}
 
 	/**
-	 * Adds a vehicle to the link, called by
+	 * Adds a vehicle to the link (i.e. the "queue"), called by
 	 * {@link QueueNode#moveVehicleOverNode(QueueVehicle, QueueLane, double)}.
 	 *
 	 * @param veh
@@ -190,6 +193,7 @@ public class QueueLinkImpl implements QueueLink {
 	 * @param now the current time
 	 */
 	/*package*/ void add(final QueueVehicle veh, final double now) {
+		// yyyy only called by "add(veh)", i.e. they can be consolidated. kai, jan'10
 		this.vehQueue.add(veh);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		double departureTime;
@@ -569,6 +573,7 @@ public class QueueLinkImpl implements QueueLink {
 	}
 
 	private static int getVehPosCnt = 0 ;
+	private static int qSimAccessCnt = 0 ;
 	/**
 	 * Inner class to capsulate visualization methods
 	 * @author dgrether
@@ -615,35 +620,63 @@ public class QueueLinkImpl implements QueueLink {
 			} else {
 				log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
 			}
-			int cnt = parkedVehicles.size();
-			if (cnt > 0) {
-				int nLanes = Math.round((float)Math.max(getLink().getNumberOfLanes(Time.UNDEFINED_TIME),1.0d));
-				int lane = nLanes + 4;
+//			int cnt = parkedVehicles.size();
+//			if (cnt > 0) {
+//				int nLanes = Math.round((float)Math.max(getLink().getNumberOfLanes(Time.UNDEFINED_TIME),1.0d));
+//				int lane = nLanes + 4;
+//
+//				double cellSize = 7.5;
+//				double distFromFromNode = getLink().getLength();
+//				if ("queue".equals(snapshotStyle)) {
+//					cellSize = Math.min(7.5, getLink().getLength() / cnt);
+//					distFromFromNode = getLink().getLength() - cellSize / 2.0;
+//				} else if ("equiDist".equals(snapshotStyle)) {
+//					cellSize = link.getLength() / cnt;
+//					distFromFromNode = link.getLength() - cellSize / 2.0;
+//				} else {
+//					log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
+//				}
 
-				double cellSize = 7.5;
-				double distFromFromNode = getLink().getLength();
-				if ("queue".equals(snapshotStyle)) {
-					cellSize = Math.min(7.5, getLink().getLength() / cnt);
-					distFromFromNode = getLink().getLength() - cellSize / 2.0;
-				} else if ("equiDist".equals(snapshotStyle)) {
-					cellSize = link.getLength() / cnt;
-					distFromFromNode = link.getLength() - cellSize / 2.0;
-				} else {
-					log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
-				}
-
-				// add the parked vehicles
 				int cnt2 = 0 ;
-				for (QueueVehicle veh : parkedVehicles.values()) {
-					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(), cnt2 ) ;
-					//							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
-					//					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(),
-					//							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
-					position.setAgentState(AgentState.PERSON_AT_ACTIVITY) ;
-					positions.add(position);
-					distFromFromNode -= cellSize; cnt2++ ;
+
+//				// add the parked vehicles
+//				for (QueueVehicle veh : parkedVehicles.values()) {
+//					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(), cnt2 ) ;
+//					//							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+//					//					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(),
+//					//							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+//					position.setAgentState(AgentState.PERSON_AT_ACTIVITY) ;
+//					positions.add(position);
+////					distFromFromNode -= cellSize; 
+//					cnt2++ ;
+//				}
+				
+				// add the persons at activities:
+				QueueSimulation qs = queueNetwork.getQSim() ;
+				if ( qs==null && qSimAccessCnt < 1 ) {
+					qSimAccessCnt++ ;
+					log.warn( "QueueNetwork.getQSim() returns null; agents at activities will not be visualized." ) ;
+					log.warn( Gbl.ONLYONCE ) ;
 				}
-			}
+				for ( DriverAgent da : queueNetwork.getQSim().activityEndsList ) {
+					if ( da instanceof PersonAgent ) {
+						PersonAgent pa = (PersonAgent) da ;
+						PlanElement pe = pa.getCurrentPlanElement() ;
+						if ( pe instanceof Leg ) {
+							log.warn("I don't understand") ;
+						} else {
+							Activity act = (Activity) pe ;
+							if( act.getLinkId().equals( getLink().getId() )) {
+								PositionInfo agInfo = new PositionInfo( da.getPerson().getId(), getLink(), cnt2 ) ;
+								agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
+								positions.add(agInfo) ;
+								cnt2++ ;
+							}
+						}
+					}
+				}
+			
+//			}
 			return positions;
 		}
 
