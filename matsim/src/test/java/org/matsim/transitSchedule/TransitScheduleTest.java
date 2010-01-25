@@ -126,4 +126,28 @@ public class TransitScheduleTest extends MatsimTestCase {
 		assertEquals(stop1a, schedule.getFacilities().get(stop1a.getId()));
 	}
 
+	public void testGetTransitLinesImmutable() {
+		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
+		TransitLine line1 = new TransitLineImpl(new IdImpl(1));
+		try {
+			schedule.getTransitLines().put(line1.getId(), line1);
+			fail("missing exception.");
+		}
+		catch (UnsupportedOperationException e) {
+			log.info("catched expected exception.", e);
+		}
+	}
+	
+	public void testGetFacilitiesImmutable() {
+		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
+		TransitStopFacility stop1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0), false);
+		try {
+			schedule.getFacilities().put(stop1.getId(), stop1);
+			fail("missing exception.");
+		}
+		catch (UnsupportedOperationException e) {
+			log.info("catched expected exception.", e);
+		}
+	}
+	
 }
