@@ -50,7 +50,7 @@ public class MyCommercialChainAnalyserTest extends MatsimTestCase{
 	
 	public void testMyCommercialChainAnalyserConstructor(){
 		createTestVehicles("Temp");
-		MyCommercialChainAnalyser mcca = new MyCommercialChainAnalyser(0.6, 
+		MyCommercialChainAnalyser mcca = new MyCommercialChainAnalyser("Temp", 0.6, 
 				getOutputDirectory() + "Temp_VehicleStats.txt");
 		assertEquals("Wrong number of 'through' vehicles", 1, mcca.getThroughList().size());
 		assertEquals("Wrong 'through' vehicle", 1, mcca.getThroughList().get(0).intValue());
@@ -60,9 +60,9 @@ public class MyCommercialChainAnalyserTest extends MatsimTestCase{
 	
 	public void testAnalyse(){
 		createTestVehicles("Temp");	
-		MyCommercialChainAnalyser mcca = new MyCommercialChainAnalyser(0.6, 
+		MyCommercialChainAnalyser mcca = new MyCommercialChainAnalyser("Temp", 0.6, 
 				getOutputDirectory() + "Temp_VehicleStats.txt");
-		mcca.analyse(getOutputDirectory(), 20, 48);
+		mcca.analyse(getOutputDirectory(), getOutputDirectory(), 20, 48);
 		assertEquals("Wrong withinMatrix entry.", 2, (int)mcca.getWithinMatrix().getQuick(1, 2, 2));
 		assertEquals("Wrong throughMatrix entry.", 1, (int)mcca.getThroughMatrix().get(1, 4, 4));
 	}
@@ -74,9 +74,9 @@ public class MyCommercialChainAnalyserTest extends MatsimTestCase{
 	 */
 	public void testWriteMatrixFiles(){
 		createTestVehicles("Temp");
-		MyCommercialChainAnalyser mcca = new MyCommercialChainAnalyser(0.6, 
+		MyCommercialChainAnalyser mcca = new MyCommercialChainAnalyser("Temp", 0.6, 
 				getOutputDirectory() + "Temp_VehicleStats.txt");
-		mcca.analyse(getOutputDirectory(), 20, 48);
+		mcca.analyse(getOutputDirectory(), getOutputDirectory(), 20, 48);
 		mcca.writeMatrixFiles(getOutputDirectory(), "Temp");
 		
 		try {
@@ -132,12 +132,12 @@ public class MyCommercialChainAnalyserTest extends MatsimTestCase{
 
 	public void testReadMatrixFiles(){
 		createTestVehicles("Temp");
-		MyCommercialChainAnalyser m1 = new MyCommercialChainAnalyser(0.6, 
+		MyCommercialChainAnalyser m1 = new MyCommercialChainAnalyser("Temp", 0.6, 
 				getOutputDirectory() + "Temp_VehicleStats.txt");
-		m1.analyse(getOutputDirectory(), 20, 48);
+		m1.analyse(getOutputDirectory(), getOutputDirectory(), 20, 48);
 		m1.writeMatrixFiles(getOutputDirectory(), "Temp");
 		
-		MyCommercialChainAnalyser m2 = new MyCommercialChainAnalyser(0.6, 
+		MyCommercialChainAnalyser m2 = new MyCommercialChainAnalyser("Temp", 0.6, 
 				getOutputDirectory() + "Temp_VehicleStats.txt");
 		m2.readMatrixFiles(getOutputDirectory(), "Temp");
 		

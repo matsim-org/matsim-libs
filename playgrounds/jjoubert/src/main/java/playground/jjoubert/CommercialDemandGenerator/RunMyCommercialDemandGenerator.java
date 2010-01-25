@@ -40,10 +40,10 @@ public class RunMyCommercialDemandGenerator {
 		MyCommercialDemandGeneratorStringBuilder sb = new MyCommercialDemandGeneratorStringBuilder(root, studyArea);
 
 		// Generate input matrices for conditional probabilities.
-		MyCommercialChainAnalyser mcca = new MyCommercialChainAnalyser(withinThreshold, 
-				sb.getVehicleStatsFilename(version, threshold, sample));
-		mcca.analyse(sb.getXmlSourceFolderName(version, threshold, sample), 20, 48);
-		mcca.writeMatrixFiles(sb.getMatrixFileLocation(version, threshold, sample), studyArea);	
+		MyCommercialChainAnalyser mcca = new MyCommercialChainAnalyser(studyArea, withinThreshold, 
+				sb.getVehicleStatsFilename(version, threshold, sample));		
+		mcca.analyse(sb.getXmlSourceFolderName(version, threshold, sample), 
+				sb.getMatrixFileLocation(version, threshold, sample), 20, 48);
 		
 
 		/*

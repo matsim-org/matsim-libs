@@ -36,7 +36,7 @@ public class MyCommercialDemandGeneratorStringBuilder {
 
 	public String getXmlSourceFolderName(String version, String threshold, String sample) {
 		return root + "DigiCore/XML/" + version + "/" + threshold + "/" + 
-		sample + "/Activities/" + studyAreaName + "_VehicleStats.txt";
+		sample + "/";
 	}
 
 	public String getMatrixFileLocation(String version, String threshold, String sample) {
