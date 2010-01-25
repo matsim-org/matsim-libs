@@ -33,16 +33,13 @@ public class Ipf {
 	double[][]finalRij;
 	
 	public void setFixRow(double[] r,int nr){
-		fixedR = new double[nr];
-		fixedR = r; 
+		fixedR = r.clone(); 
 	}
 	public void setFixColumn(double[] c,int nc){
-		fixedC = new double[nc];
-		fixedC = c; 
+		fixedC = c.clone(); 
 	}
 	public void setInitialMatrix(double[][] rij,int nr, int nc){
-		initialRij = new double[nr][nc];
-		initialRij = rij; 
+		initialRij = rij.clone(); 
 	}
 	public double[][] ipfcal(int nr, int nc, double convSet, int maxItn){
 		int k = 1, k1 = 0;

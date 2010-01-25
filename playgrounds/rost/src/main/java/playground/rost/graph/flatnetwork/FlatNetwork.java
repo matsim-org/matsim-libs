@@ -217,7 +217,7 @@ public class FlatNetwork {
 			{
 				splitLink(fL, p, intersectionNode);
 				//update information, that this node was created due to this link
-				Set<Id> idSet = newlyCreatedNodes.get(fL.link);
+				Set<Id> idSet = newlyCreatedNodes.get(fL.link.getId());
 				if(idSet != null)
 				{
 					idSet.add(id);

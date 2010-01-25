@@ -91,7 +91,7 @@ public class NewMultiModalNetworkWithoutBusLink {
 		for (Link link : tmpSet) {
 			for (TransportMode mode : link.getAllowedModes()) {
 				if (!modes.contains(mode)) {
-					busLinks2delete.remove(link.getId());
+					busLinks2delete.remove(link);
 					break;
 				}
 			}

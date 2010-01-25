@@ -38,10 +38,6 @@ public class CountsFixture {
 	private Scenario scenario;
 	public final Counts counts = new Counts();
 
-	public Scenario getScenario() {
-		return this.scenario;
-	}
-	
 	public Network getNetwork() {
 		return this.network;
 	}
@@ -49,7 +45,7 @@ public class CountsFixture {
 	public void setUp() {
 		String configFile = "test/input/org/matsim/counts/config.xml";
 		
-		Scenario scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		this.scenario = new ScenarioLoaderImpl(configFile).getScenario();
 		Config config = scenario.getConfig();
 		
 		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);

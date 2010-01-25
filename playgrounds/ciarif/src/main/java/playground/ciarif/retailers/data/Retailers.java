@@ -1,6 +1,7 @@
 package playground.ciarif.retailers.data;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
@@ -24,7 +25,11 @@ public class Retailers {
 		int i = (this.retailers.values().size()-1);
 		if (i==0){return null;} //the container is empty
 		else {
-			return this.retailers.get(i);
+			return this.retailers.get(i);// THIS WILL NOT WORK! mrieser, 25jan2010
+			// retailers is a Map. a Map can only be queried with get(key), not get(index)
+			// because a map is not sorted, so the "last" element is not specified
+			// what the code above actually does, is it looks for a retailer in the Map
+			// with the id = new Integer(i), which will always return null!
 		}
 	}
 }

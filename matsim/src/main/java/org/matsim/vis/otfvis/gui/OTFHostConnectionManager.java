@@ -60,6 +60,7 @@ public class OTFHostConnectionManager {
 		return this.host;
 	}
 	private void openAddress(final String address) throws RemoteException, InterruptedException, NotBoundException {
+		this.address = address;
 		this.host = new OTFHostConnectionBuilder().createRemoteServerConnection(address);
 		if (host != null) {
 			if (host.isLive()){
@@ -69,9 +70,6 @@ public class OTFHostConnectionManager {
 		}
 	}
 
-	/**
-	 * @return the liveHost
-	 */
 	public boolean isLiveHost() {
 		return liveHost != null;
 	}
@@ -140,7 +138,7 @@ public class OTFHostConnectionManager {
 				while (hasNext && !(timeLine.isCancelCaching)) {
 					synchronized(blockReading) {
 						// remember time the block had before caching next step
-						int	origtime = getOTFServer().getLocalTime();
+//						int	origtime = getOTFServer().getLocalTime();
 						time = getOTFServer().getLocalTime() + 1;
 						hasNext = preCacheCurrentTime(time,timeLine);
 						time = getOTFServer().getLocalTime();
@@ -151,7 +149,6 @@ public class OTFHostConnectionManager {
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 

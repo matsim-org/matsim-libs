@@ -55,6 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -85,7 +86,6 @@ import org.matsim.vis.netvis.renderers.ValueColorizer;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFClientQuad.ClassCountExecutor;
 import org.matsim.vis.otfvis.gui.ZoomEntry;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -540,7 +540,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		Rectangle2D test = InfoText.getBoundsOf(testText);
 		Map<Coord, Boolean> xymap = new HashMap<Coord, Boolean>(); // Why is here a Map used, and not a Set?
 		double xRaster = test.getWidth(), yRaster = test.getHeight();
-		for( Coord coord : linkIds.keySet()) {
+		for( Entry<Coord, String> e : linkIds.entrySet()) {
+			Coord coord = e.getKey();
+			String linkId = e.getValue();
 			float east = (float)coord.getX() ;
 			float north = (float)coord.getY() ;
 			float textX = (float) (((int)(east / xRaster) +1)*xRaster);
@@ -555,7 +557,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				i++;
 			}
 			xymap.put(text, Boolean.TRUE);
-			InfoTextContainer.showTextOnce(linkIds.get(coord), (float)text.getX(), (float)text.getY(), 1.f);
+			InfoTextContainer.showTextOnce(linkId, (float)text.getX(), (float)text.getY(), 1.f);
 			this.gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
 			this.gl.glLineWidth(2);
 			this.gl.glBegin(GL.GL_LINE_STRIP);

@@ -33,13 +33,13 @@ import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.gregor.MY_STATIC_STUFF;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
-
-import playground.gregor.MY_STATIC_STUFF;
 
 public class TriangularMeshSimplifier {
 
@@ -578,7 +578,7 @@ public class TriangularMeshSimplifier {
 			Set<Edge> tmp = this.triangleEdgeMapping.remove(tri);
 			for (Edge e : tmp) {
 				if (this.edgeTriangleMapping.get(e) != null) {
-					this.edgeTriangleMapping.remove(tri);
+					this.edgeTriangleMapping.remove(e);
 				}
 			}
 		}

@@ -52,8 +52,8 @@ public class ExpBetaPlanSelector implements PlanSelector {
 		Map<Plan, Double> weights = this.calcWeights(person);
 		
 		double sumWeights = 0.0;
-		for (Plan plan : weights.keySet()) {
-			sumWeights += weights.get(plan);
+		for (Double weight : weights.values()) {
+			sumWeights += weight.doubleValue();
 		}
 		
 		// choose a random number over interval [0, sumWeights[
@@ -124,8 +124,8 @@ public class ExpBetaPlanSelector implements PlanSelector {
 		double thisWeight = weights.get(plan);
 
 		double sumWeights = 0.0;
-		for (Plan plan1 : weights.keySet()) {
-			sumWeights += weights.get(plan1);
+		for (Double weight : weights.values()) {
+			sumWeights += weight.doubleValue();
 		}
 		
 		return (thisWeight / sumWeights);

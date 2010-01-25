@@ -96,7 +96,7 @@ public class CellKnowledge extends BasicNodeKnowledge {
 			else return true;
 		}
 		
-		CellData cellData = cellDataMap.get(cell.getCellId());
+		CellData cellData = cellDataMap.get(cell/*.getCellId()*/);
 	
 		// Node is on the Black or WhiteList of the Cell
 		if(cellData.getList().contains(node.getId()))

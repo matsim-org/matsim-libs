@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -157,8 +158,8 @@ public class WorldConnectLocations {
 				else { log.warn(lineCnt+": at least one of the two locations not found."); }
 				lineCnt++;
 			}
-		} catch (Exception e) {
-			throw new RuntimeException("Error while reading given nputF2LFile='"+file+"'.");
+		} catch (IOException e) {
+			throw new RuntimeException("Error while reading given nputF2LFile='"+file+"'.", e);
 		}
 		log.info("      number of facilities that are still not connected to a link = "+remainingFacilities.size());
 		log.info("    done. (connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file+")");

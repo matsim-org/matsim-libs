@@ -118,9 +118,10 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 					Object reader = readerClass.newInstance();
 					client.addAdditionalElement((OTFDataReader)reader);
 					log.info("Connected additional element writer " + element.getClass().getName() + "(" + element + ")  to " + reader.getClass().getName() + " (" + reader + ")");
-				} catch (Exception e) {
-					e.printStackTrace();
-					throw new RuntimeException();
+				} catch (InstantiationException e) {
+					throw new RuntimeException(e);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
 				}
 			}
 
