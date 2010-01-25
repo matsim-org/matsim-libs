@@ -85,9 +85,13 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	private int snapshotPeriod = 0;
+	
+	/* time since lasat snapshot */
 	private double snapshotTime = 0.0;
 
 	protected static final int INFO_PERIOD = 3600;
+
+	/* time since last "info" message */
 	private double infoTime = 0;
 
 	private final Config config;
