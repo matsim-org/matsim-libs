@@ -24,7 +24,6 @@ package org.matsim.vis.otfvis;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.ptproject.qsim.QueueSimulation;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 
@@ -44,10 +43,6 @@ public class OTFVisQueueSim extends QueueSimulation {
 
 	public void setVisualizeTeleportedAgents(boolean active) {
 		queueSimulationFeature.setVisualizeTeleportedAgents(active);
-	}
-
-	public void setConnectionManager(OTFConnectionManager connectionManager) {
-		queueSimulationFeature.setConnectionManager(connectionManager);
 	}
 
 	public OTFVisQueueSimFeature getQueueSimulationFeature() {

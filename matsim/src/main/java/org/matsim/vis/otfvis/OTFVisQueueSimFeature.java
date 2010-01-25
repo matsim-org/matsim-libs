@@ -8,9 +8,14 @@ import java.util.UUID;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
+import org.matsim.lanes.otfvis.io.OTFLaneReader;
+import org.matsim.lanes.otfvis.io.OTFLaneWriter;
+import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
 import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.ptproject.qsim.QueueSimulationFeature;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
@@ -62,6 +67,17 @@ public class OTFVisQueueSimFeature implements QueueSimulationFeature {
 				this.connectionManager.add(FacilityDrawer.DataWriter_v1_0.class, FacilityDrawer.DataReader_v1_0.class);
 				this.connectionManager.add(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
 			}
+      if (this.queueSimulation.getScenario().getConfig().scenario().isUseLanes() 
+          && (!this.queueSimulation.getScenario().getConfig().scenario().isUseSignalSystems())) {
+        // data source to writer
+        this.connectionManager.add(QueueLink.class, OTFLaneWriter.class);
+        // writer -> reader: from server to client
+        this.connectionManager.add(OTFLaneWriter.class, OTFLaneReader.class);
+        // reader to drawer (or provider to receiver)
+        this.connectionManager.add(OTFLaneReader.class, OTFLaneSignalDrawer.class);
+        // drawer -> layer
+        this.connectionManager.add(OTFLaneSignalDrawer.class, OTFLaneLayer.class);
+      }
 			OTFClientLive client = null;
 			client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
 			if (this.queueSimulation.getScenario() != null) {
