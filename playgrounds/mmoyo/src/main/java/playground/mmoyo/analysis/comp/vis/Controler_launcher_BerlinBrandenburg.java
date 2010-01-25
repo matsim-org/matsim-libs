@@ -18,6 +18,8 @@ public class Controler_launcher_BerlinBrandenburg {
 		conf = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/config/config_routedPlans_MoyoTime.xml";
 		conf = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/config/config_routedPlans_MoyoParameterized.xml";
 		
+		conf = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/config/config_merged.xml";
+		
 		TransitControler.main(new String []{conf});
 	}
 }

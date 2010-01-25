@@ -26,8 +26,8 @@ public abstract class PTValues {
 
 	public static byte routerCalculator = 1;
 	public static String scenario ; 
-	public static double distanceCoefficient =0.85;
-	public static double timeCoefficient = 0.15;
+	public static double distanceCoefficient =0.15;
+	public static double timeCoefficient = 0.85;
 	public static double transferPenalty = 60.0;
 	
 }

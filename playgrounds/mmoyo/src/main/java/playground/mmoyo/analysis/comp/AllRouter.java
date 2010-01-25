@@ -21,60 +21,22 @@ public class AllRouter {
 		-only plans inside the investigation area?
 		*/
 
-		/*
-		PTValues.scenario = "small";
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_small.xml";
-	
-		for (byte i=1; i<=3; i++){
-			PTValues.routerCalculator = i;
-			PlanRouter.main(new String[]{configFile});
-		}
+		PTValues.scenario = "BerBran_1x_subset_xy2links_nocarplans";
+		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/config_noRouted/configWithoutRouting_1x_subset_xy2links_nocarplans.xml";
 		
-		PTValues.scenario = "big";
-		configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_big.xml";
-		for (byte i=1; i<=3; i++){
-			PTValues.routerCalculator = i;
-			PlanRouter.main(new String[]{configFile});
-		}
-		*/
-		
-		/*
-		PTValues.routerCalculator = 3;
-		for (double x= 0; x<=1; x = x + 0.1 ){
-			PTValues.distanceCoefficient= x;
-			PTValues.timeCoefficient= 1-x;
-			String coef = "dist" + PTValues.distanceCoefficient + "_time" + PTValues.timeCoefficient;
-			
-			
-			String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_small.xml";
-			PTValues.scenario = coef + "small.xml"; 
-			System.out.println("Scenario:" + PTValues.scenario);
-			PlanRouter.main(new String[]{configFile});
-			
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_big.xml";
-			PTValues.scenario = coef + "big.xml";
-			System.out.println("Scenario:" + PTValues.scenario);
-			PlanRouter.main(new String[]{configFile});
-		}*/
-		
-		PTValues.scenario = "BerlinBrandenburg";
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/config.xml";
-		
+		PTValues.scenario = "BerBran_1x_subset_xy2links_ptplansonly";
+		//  configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/config_noRouted/configWithoutRouting_1x_subset_xy2links_ptplansonly.xml";
 		
 		PTValues.routerCalculator = 1;
 		PlanRouter.main(new String[]{configFile});
 		
 		PTValues.routerCalculator = 2;
 		PlanRouter.main(new String[]{configFile});
-		
+
 		PTValues.routerCalculator = 3;
-		PTValues.distanceCoefficient =0.95;
-		PTValues.timeCoefficient = 0.05;
-		PTValues.transferPenalty = 300.0;
+		PTValues.distanceCoefficient =0.15;
+		PTValues.timeCoefficient = 0.85;
+		PTValues.transferPenalty = 60.0;
 		PlanRouter.main(new String[]{configFile});
-		
-
-		
 	}
-
 }
