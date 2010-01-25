@@ -52,6 +52,7 @@ public class DgOtfStarter {
 		file = "749/it.2000/749.2000.Zurich.otfvis.mvi";
 //		file = "662/it.500/500.events.mvi";
 		file = "328/output/movie.mvi";
+//		file = "1004/output/movie.it500.mvi";
 		
 		//toll case ersa
 //		String file = "585/run585.it800.T.mvi";
@@ -98,7 +99,8 @@ public class DgOtfStarter {
 //		filename = "/home/dgrether/svnworkspace/matsim/test/input/playground/benjamin/BKickRouterTestIATBR/network.xml";
 //		filename = "/media/data/work/programming/rubyWorkspace/demandGeneration/network.xml.gz";
 		
-		
+      filename = "/home/dgrether/shared-svn/studies/countries/de/prognose_2025/demand/0.otfvis.mvi";
+
 		
 		if (filename.endsWith(".veh.gz")) {
 			tVehStarter(filename, network);

@@ -58,10 +58,9 @@ public class FourWaysVisMviTest {
     a.setTypicalDuration(8.0 * 3600.0);
     conf.charyparNagelScoring().addActivityParams(a);
     
-    
     conf.setQSimConfigGroup(new QSimConfigGroup());
     conf.getQSimConfigGroup().setSnapshotFormat("otfvis");
-    conf.getQSimConfigGroup().setSnapshotPeriod(60.0);
+    conf.getQSimConfigGroup().setSnapshotPeriod(15.0);
     conf.getQSimConfigGroup().setSnapshotStyle("queue");
     conf.getQSimConfigGroup().setStuckTime(100.0);
     
@@ -70,7 +69,7 @@ public class FourWaysVisMviTest {
     
     conf.signalSystems().setSignalSystemFile(signalFile);
     conf.signalSystems().setSignalSystemConfigFile(signalConfigFile);
-//    conf.scenario().setUseSignalSystems(true);
+    conf.scenario().setUseSignalSystems(true);
     
     conf.controler().setFirstIteration(0);
     conf.controler().setLastIteration(0);

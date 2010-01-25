@@ -60,7 +60,7 @@ public class FourWaysVis {
 		
 		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
 		scenario.getConfig().signalSystems().setSignalSystemConfigFile(signalConfigFile);
-//		scenario.getConfig().scenario().setUseSignalSystems(true);
+		scenario.getConfig().scenario().setUseSignalSystems(true);
 		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
@@ -68,7 +68,7 @@ public class FourWaysVis {
 		EventsManager events = new EventsManagerImpl();
 		
 		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
-//		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
+		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 		client.setLaneDefinitions(scenario.getLaneDefinitions());
 		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
 		client.run();

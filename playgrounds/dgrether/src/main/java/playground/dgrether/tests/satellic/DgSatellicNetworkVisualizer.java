@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DaganzoRunAll
+ * DgSatellicNetworkVisualizer
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.daganzosignal;
+package playground.dgrether.tests.satellic;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.run.OTFVis;
+
+import playground.dgrether.DgPaths;
 
 
 /**
  * @author dgrether
  *
  */
-public class DaganzoRunAll {
+public class DgSatellicNetworkVisualizer {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-		  DaganzoScenarioGenerator.isAlternativeRouteEnabled = false;
-			DaganzoScenarioGenerator scg = new DaganzoScenarioGenerator();
-			scg.createScenario();
-			new DaganzoRunner().runScenario(scg.getConfigOut());
-			Gbl.reset();
-			DaganzoScenarioGenerator.isAlternativeRouteEnabled = true;
-      scg = new DaganzoScenarioGenerator();
-      scg.createScenario();
-      new DaganzoRunner().runScenario(scg.getConfigOut());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	}
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network.xml.gz";
+    String[] a = {net};
+    OTFVis.playNetwork(a);
+    
+  }
 
 }

@@ -22,7 +22,6 @@ package playground.dgrether.daganzosignal;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -67,10 +66,9 @@ public class DaganzoRunner {
 		}
 //		String c = DgPaths.STUDIESDG + "daganzo/daganzoConfig2Agents.xml"; 
 		Controler controler = new Controler(conf);
-		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+//		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		controler.setOverwriteFiles(true);
 		Config config = controler.getConfig();
-		
 		this.addListener(controler);
 		this.addQueueSimListener(controler);
 		controler.run();
@@ -131,7 +129,7 @@ public class DaganzoRunner {
   	//write some output at shutdown
 		c.addControlerListener(new ShutdownListener() {
 			public void notifyShutdown(ShutdownEvent event) {
-				DgCountPerIterationGraph chart = new DgCountPerIterationGraph();
+				DgCountPerIterationGraph chart = new DgCountPerIterationGraph(event.getControler().getConfig().controler());
 				chart.addCountEventHandler(handler3);
 				chart.addCountEventHandler(handler4);
 				DgChartWriter.writeChart(event.getControler().getNameForOutputFilename("countPerIteration"), chart.createChart());

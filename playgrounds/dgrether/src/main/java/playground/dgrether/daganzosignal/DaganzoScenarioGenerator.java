@@ -107,13 +107,13 @@ public class DaganzoScenarioGenerator {
 
 	public String configOut, plansOut, outputDirectory;
 
-	private static final boolean isAlternativeRouteEnabled = true;
+	public static boolean isAlternativeRouteEnabled = true;
 
 	private static final boolean isUseLanes = true;
 
 	private static final boolean isUseSignalSystems = true;
 
-	private static final int iterations = 1000;
+	private static final int iterations = 500;
 	private static final int iterations2 = 0;
 
 	private static final String controllerClass = AdaptiveController.class.getCanonicalName();
@@ -264,6 +264,7 @@ public class DaganzoScenarioGenerator {
 		config.getQSimConfigGroup().setSnapshotFile("cmcf.mvi");
 		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
+//    config.getQSimConfigGroup().setSnapshotFormat(null);
 		// configure strategies for replanning
 		config.strategy().setMaxAgentPlanMemorySize(4);
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(
@@ -358,5 +359,10 @@ public class DaganzoScenarioGenerator {
 			e.printStackTrace();
 		}
 	}
+
+  
+  public String getConfigOut() {
+    return configOut;
+  }
 
 }

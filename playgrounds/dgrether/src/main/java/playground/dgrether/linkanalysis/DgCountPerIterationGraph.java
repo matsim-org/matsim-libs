@@ -29,6 +29,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 
 import playground.dgrether.analysis.charts.DgAxisBuilder;
 import playground.dgrether.analysis.charts.DgDefaultAxisBuilder;
@@ -45,9 +46,13 @@ public class DgCountPerIterationGraph {
 	
 	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 
+  private ControlerConfigGroup controllerConfig;
+
+
 	
-	public DgCountPerIterationGraph(){
+	public DgCountPerIterationGraph(ControlerConfigGroup controlerConfigGroup){
 		this.dataset = new XYSeriesCollection();
+		this.controllerConfig =  controlerConfigGroup;
 	}
 	
 	public void addCountEventHandler(TTInOutflowEventHandler h) {
@@ -62,7 +67,7 @@ public class DgCountPerIterationGraph {
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
 		ValueAxis xAxis = this.axisBuilder.createValueAxis("Iteration");
-		xAxis.setRange(0.0, 102.0);
+		xAxis.setRange(this.controllerConfig.getFirstIteration(), this.controllerConfig.getLastIteration());
 		ValueAxis yAxis = this.axisBuilder.createValueAxis("Trips");
 //		yAxis.setRange(-0.05, 0.3);
 //		xAxis.setVisible(false);

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DaganzoRunAll
+ * DgSatellicData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.daganzosignal;
+package playground.dgrether.tests.satellic;
 
-import org.matsim.core.gbl.Gbl;
+import playground.dgrether.DgPaths;
 
 
 /**
  * @author dgrether
  *
  */
-public class DaganzoRunAll {
+public interface DgSatellicData {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-		  DaganzoScenarioGenerator.isAlternativeRouteEnabled = false;
-			DaganzoScenarioGenerator scg = new DaganzoScenarioGenerator();
-			scg.createScenario();
-			new DaganzoRunner().runScenario(scg.getConfigOut());
-			Gbl.reset();
-			DaganzoScenarioGenerator.isAlternativeRouteEnabled = true;
-      scg = new DaganzoScenarioGenerator();
-      scg.createScenario();
-      new DaganzoRunner().runScenario(scg.getConfigOut());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	}
-
+  public final String BASEDIR = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/";
+  
+  public final String NETWORK = BASEDIR + "demand/network.xml.gz";
+  
+  public final String EMPTY_POPULATION = BASEDIR + "demand/plans1.xml";
+  
 }
