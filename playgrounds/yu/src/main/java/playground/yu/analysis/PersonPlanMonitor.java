@@ -90,7 +90,7 @@ public class PersonPlanMonitor {
 	public double getTotalPerformTime_h(CharyparNagelScoringConfigGroup scoring) {
 		String actType = ((Activity) this.plan.getPlanElements().get(this.idx))
 				.getType();
-		if (this.actEndTime == Double.NaN && actType.startsWith("h")) {
+		if (Double.isNaN(this.actEndTime) && actType.startsWith("h")) {
 			this.actEndTime = 24.0 * 3600.0 - 1.0;
 			this.actDur += this.calcActDuration_h(scoring
 					.getActivityParams(actType));
@@ -117,15 +117,10 @@ public class PersonPlanMonitor {
 	}
 
 	private double calcActDuration_h(ActivityParams actParams) {
-		if (actStartTime == Double.NaN
-		// || actParams.getType().startsWith("h")
-		) {
+		if (Double.isNaN(actStartTime) || actParams.getType().startsWith("h"))
 			// h or home
 			this.actStartTime = 0.0;
-			System.out.println("true???");
-		} else {
-			System.out.println("false???");
-		}
+
 		double openTime = actParams.getOpeningTime(), closeTime = actParams
 				.getClosingTime(); //
 		if (actParams.getType().startsWith("h")) {
@@ -151,15 +146,17 @@ public class PersonPlanMonitor {
 			actStart = this.actEndTime;
 			actEnd = this.actEndTime;
 		}
-		double duration = actEnd - actStart;
-
-		return typicalDuration
-				* Math.log((duration / 3600.0) / zeroUtilityDuration) / 3600.0;
+		double durAttr = typicalDuration
+				* Math
+						.log(((actEnd - actStart) / 3600.0)
+								/ zeroUtilityDuration) / 3600.0;
+		return Math.max(durAttr, 0);
 	}
 
 	public void notifyStuck() {
 		this.legDur = 24.0;
 		this.legDist = 0.0;
+		this.actDur = 0.0;
 	}
 
 }

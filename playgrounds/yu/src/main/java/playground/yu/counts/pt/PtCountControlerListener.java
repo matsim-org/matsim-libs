@@ -20,12 +20,15 @@
 
 package playground.yu.counts.pt;
 
+import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -64,12 +67,14 @@ public class PtCountControlerListener implements StartupListener,
 		Controler controler = event.getControler();
 		int iter = event.getIteration();
 		if ((iter % 10 == 0) && (iter > controler.getFirstIteration())) {
-			controler.stopwatch.beginOperation("compare with counts");
+			IterationStopWatch isw = controler.stopwatch;
+			isw.beginOperation("compare with counts");
 
+			NetworkImpl net = controler.getNetwork();
 			PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(
-					this.oa, this.boardCounts, controler.getNetwork());
+					this.oa, this.boardCounts, net);
 			PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(
-					this.oa, this.alightCounts, controler.getNetwork());
+					this.oa, this.alightCounts, net);
 
 			Double distanceFilter = new Double(this.config.findParam(
 					MODULE_NAME, "distanceFilter"));
@@ -87,15 +92,16 @@ public class PtCountControlerListener implements StartupListener,
 						distanceFilterCenterNodeId);
 			}
 
-			ccaBoard.setCountsScaleFactor(Double.parseDouble(this.config
-					.findParam(MODULE_NAME, "countsScaleFactor"))
+			double countsScaleFac = Double.parseDouble(this.config.findParam(
+					MODULE_NAME, "countsScaleFactor"));
+			ccaBoard.setCountsScaleFactor(countsScaleFac
 			// counts().getCountsScaleFactor()
 					);
-			ccaAlight.setCountsScaleFactor(Double.parseDouble(this.config
-					.findParam(MODULE_NAME, "countsScaleFactor")));
+			ccaAlight.setCountsScaleFactor(countsScaleFac);
 
 			ccaBoard.run();
 			ccaAlight.run();
+
 			// if (this.config.counts().getOutputFormat().contains("html")
 			// || this.config.counts().getOutputFormat().contains("all")) {
 			// // html and pdf output
@@ -113,13 +119,15 @@ public class PtCountControlerListener implements StartupListener,
 			// "average working day sim and count volumes"));
 			// cgw.createGraphs();
 			// }
+
 			String outputFormat = this.config.findParam(MODULE_NAME,
 					"outputformat");
 			if (outputFormat
 			// counts().getOutputFormat()
 					.contains("kml") || outputFormat.contains("all")) {
-				String filename = event.getControler().getControlerIO()
-						.getIterationFilename(iter, "countscompare.kmz");
+				ControlerIO ctlIO = controler.getControlerIO();
+				String filename = ctlIO.getIterationFilename(iter,
+						"countscompare.kmz");
 				PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(
 						ccaBoard.getComparison(), ccaAlight.getComparison(),
 						TransformationFactory.getCoordinateTransformation(
@@ -128,6 +136,10 @@ public class PtCountControlerListener implements StartupListener,
 						this.alightCounts);
 				kmlWriter.setIterationNumber(iter);
 				kmlWriter.writeFile(filename);
+				ccaBoard.write(ctlIO.getIterationFilename(iter,
+						"simCountCompareBoarding.txt"));
+				ccaAlight.write(ctlIO.getIterationFilename(iter,
+						"simCountCompareAlighting.txt"));
 			}
 			// if (this.config.counts().getOutputFormat().contains("txt")
 			// || this.config.counts().getOutputFormat().contains("all")) {
@@ -138,7 +150,7 @@ public class PtCountControlerListener implements StartupListener,
 			// cca.getComparison(), Locale.ENGLISH);
 			// ctw.writeFile(filename);
 			// }
-			controler.stopwatch.endOperation("compare with counts");
+			isw.endOperation("compare with counts");
 		}
 	}
 }

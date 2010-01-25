@@ -30,13 +30,11 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
-import org.matsim.counts.Volume;
 
 import playground.yu.analysis.pt.OccupancyAnalyzer;
+import playground.yu.utils.io.SimpleWriter;
 
 /**
  * This algorithm can be used to obtain a List of CountSimComparison objects
@@ -68,6 +66,7 @@ public abstract class PtCountsComparisonAlgorithm {
 
 	protected final static Logger log = Logger
 			.getLogger(PtCountsComparisonAlgorithm.class);
+	protected StringBuffer content = new StringBuffer();
 
 	public PtCountsComparisonAlgorithm(final OccupancyAnalyzer oa,
 			final Counts counts, final Network network) {
@@ -133,5 +132,9 @@ public abstract class PtCountsComparisonAlgorithm {
 
 	public void setCountsScaleFactor(final double countsScaleFactor) {
 		this.countsScaleFactor = countsScaleFactor;
+	}
+
+	public void write(String outputFilename) {
+		new SimpleWriter(outputFilename, content.toString());
 	}
 }
