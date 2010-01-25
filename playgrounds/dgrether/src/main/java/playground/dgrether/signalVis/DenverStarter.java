@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQSim;
 
 import playground.dgrether.DgPaths;
 
@@ -45,7 +45,7 @@ public class DenverStarter {
 		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		EventsManagerImpl e = new EventsManagerImpl();
 		
-		OTFVisQueueSim sim = new OTFVisQueueSim(sc, e);
+		OTFVisQSim sim = new OTFVisQSim(sc, e);
 		sim.run();
 		
 		

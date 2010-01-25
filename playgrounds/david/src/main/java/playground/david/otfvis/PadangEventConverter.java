@@ -26,7 +26,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
 
@@ -43,7 +43,7 @@ public class PadangEventConverter {
 		netFileName = "../../tmp/studies/padang/evacuation_net.xml";
 		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
-		QueueNetwork qnet = new QueueNetwork(net);
+		QNetwork qnet = new QNetwork(net);
 
 		String eventFile = config.getParam("events","outputFile");
 		eventFile = "../../tmp/studies/padang/0.events.txt.gz";

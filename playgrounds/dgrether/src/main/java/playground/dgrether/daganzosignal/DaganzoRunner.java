@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
@@ -76,18 +76,18 @@ public class DaganzoRunner {
 	}
 	
 	private void addQueueSimListener(final Controler controler) {
-		controler.getQueueSimulationListener().add(new SimulationInitializedListener<QueueSimulation>() {
+		controler.getQueueSimulationListener().add(new SimulationInitializedListener<QSim>() {
 			//add the adaptive controller as events listener
-			public void notifySimulationInitialized(SimulationInitializedEvent<QueueSimulation> e) {
-				QueueSimulation qs = e.getQueueSimulation();
+			public void notifySimulationInitialized(SimulationInitializedEvent<QSim> e) {
+				QSim qs = e.getQueueSimulation();
 				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				controler.getEvents().addHandler(adaptiveController);
 			}
 		});
 		//remove the adaptive controller
-		controler.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QueueSimulation>() {
-			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QueueSimulation> e) {
-				QueueSimulation qs = e.getQueueSimulation();
+		controler.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QSim>() {
+			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSim> e) {
+				QSim qs = e.getQueueSimulation();
 				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				controler.getEvents().removeHandler(adaptiveController);
 			}

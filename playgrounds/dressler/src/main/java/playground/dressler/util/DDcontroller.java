@@ -34,8 +34,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.netvis.NetVis;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -122,7 +122,7 @@ public class DDcontroller {
 			EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
 			events.addHandler(eventWriter);
 
-			QueueSimulation sim = new QueueSimulation(scenario, events);
+			QSim sim = new QSim(scenario, events);
 			sim.openNetStateWriter("./output/simout", netFilename, 10);
 			sim.run();
 
@@ -131,7 +131,7 @@ public class DDcontroller {
 		}
 
 		if (otfvis) {
-			QueueNetwork qnet = new QueueNetwork(network);
+			QNetwork qnet = new QNetwork(network);
 			
 			String eventFile = "./output/events.txt";
 			OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 60);

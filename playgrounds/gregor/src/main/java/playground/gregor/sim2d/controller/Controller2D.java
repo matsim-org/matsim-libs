@@ -18,7 +18,7 @@ import org.matsim.evacuation.otfvis.readerwriter.PolygonDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.PolygonDataWriter;
 import org.matsim.evacuation.otfvis.readerwriter.TextureDataWriter;
 import org.matsim.evacuation.otfvis.readerwriter.TextutreDataReader;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -64,7 +64,7 @@ public class Controller2D extends Controler {
 		NetworkLayer fakeNetwork = new NetworkLayer();
 		fakeNetwork.createAndAddNode(new IdImpl(0), new CoordImpl(386008.21f,5820000.04f));
 		fakeNetwork.createAndAddNode(new IdImpl(1), new CoordImpl(386241.2f,5820247.05f));
-		QueueNetwork fakeQNetwork = new QueueNetwork(fakeNetwork);
+		QNetwork fakeQNetwork = new QNetwork(fakeNetwork);
 		UUID idOne = UUID.randomUUID();
 		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), fakeQNetwork, this.population, getEvents(), false);
 		OTFBackgroundTexturesDrawer sbg = new OTFBackgroundTexturesDrawer("../../../../sim2d/sg4.png");

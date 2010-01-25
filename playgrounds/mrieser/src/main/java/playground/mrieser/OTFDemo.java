@@ -21,7 +21,7 @@
 package playground.mrieser;
 
 import org.matsim.pt.otfvis.FacilityDrawer;
-import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
@@ -92,7 +92,7 @@ public class OTFDemo {
 		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		connect.add(QLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect.add(OTFLinkAgentsHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);

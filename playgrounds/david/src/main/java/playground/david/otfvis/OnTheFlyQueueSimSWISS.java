@@ -27,7 +27,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 
 
 /**
@@ -37,7 +37,7 @@ import org.matsim.ptproject.qsim.QueueSimulation;
 public class OnTheFlyQueueSimSWISS {
 
 	public static void main(final String[] args) {
-		QueueSimulation sim;
+		QSim sim;
 		EventsManagerImpl events;
 
 		String netFileName = "../../tmp/network.xml.gz";
@@ -58,7 +58,7 @@ public class OnTheFlyQueueSimSWISS {
 		config.simulation().setSnapshotFile("output/OTFQuadfileSCHWEIZ2.mvi");
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		config.simulation().setEndTime(Time.parseTime("00:00:11"));
-		sim = new QueueSimulation(scenario, events);
+		sim = new QSim(scenario, events);
 
 		sim.run();
 

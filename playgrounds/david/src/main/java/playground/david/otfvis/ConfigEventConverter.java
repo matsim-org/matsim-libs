@@ -23,7 +23,7 @@ package playground.david.otfvis;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
 //Usage ConfigEventConverter event-file config-file mvi-file
@@ -41,7 +41,7 @@ public class ConfigEventConverter {
 		if(period == 0.0) period = 600.; // in the movie writing a period of zero does not make sense, use default value 
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		OTFEvent2MVI converter = new OTFEvent2MVI(new QueueNetwork(scenario.getNetwork()), args[0], args[2], period);
+		OTFEvent2MVI converter = new OTFEvent2MVI(new QNetwork(scenario.getNetwork()), args[0], args[2], period);
 		converter.convert();
 
 	}

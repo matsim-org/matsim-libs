@@ -41,7 +41,7 @@ import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
+import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.xml.sax.SAXException;
 
 import playground.mrieser.pt.analysis.RouteOccupancy;
@@ -91,7 +91,7 @@ public class OccupancyCounts {
 		events.addHandler(analysis2);
 
 		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
-		sim.addFeature(new OTFVisQueueSimFeature(sim));
+		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.run();
 
 		///////////show and save results/////////////////////

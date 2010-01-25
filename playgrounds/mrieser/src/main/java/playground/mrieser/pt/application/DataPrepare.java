@@ -47,7 +47,7 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQSim;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
 import org.xml.sax.SAXException;
@@ -211,7 +211,7 @@ public class DataPrepare {
 
 		log.info("start visualizer");
 		EventsManagerImpl events = new EventsManagerImpl();
-		OTFVisQueueSim client = new OTFVisQueueSim(visScenario, events);
+		OTFVisQSim client = new OTFVisQSim(visScenario, events);
 		client.run();
 	}
 

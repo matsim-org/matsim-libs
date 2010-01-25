@@ -9,7 +9,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
 import playground.yu.utils.io.SimpleReader;
@@ -91,7 +91,7 @@ public class MyOTFEvents2Mvi {
 		sr.close();
 		sw2.close();
 
-		new OTFEvent2MVI(new QueueNetwork(net), eventsOutputFilename, args[2],
+		new OTFEvent2MVI(new QNetwork(net), eventsOutputFilename, args[2],
 				Integer.parseInt(args[3])).convert();
 
 		System.out.println("done.");

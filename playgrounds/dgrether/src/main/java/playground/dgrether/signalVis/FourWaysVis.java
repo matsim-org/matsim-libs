@@ -24,7 +24,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQSim;
 
 
 public class FourWaysVis {
@@ -67,7 +67,7 @@ public class FourWaysVis {
 		
 		EventsManager events = new EventsManagerImpl();
 		
-		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
+		OTFVisQSim client = new OTFVisQSim(scenario, events);
 //		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 //		client.setLaneDefinitions(scenario.getLaneDefinitions());
 //		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());

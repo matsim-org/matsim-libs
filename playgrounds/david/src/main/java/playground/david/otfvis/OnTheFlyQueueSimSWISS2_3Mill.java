@@ -29,7 +29,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QSim;
 
 /**
  * @author DS
@@ -37,7 +37,7 @@ import org.matsim.ptproject.qsim.QueueSimulation;
 public class OnTheFlyQueueSimSWISS2_3Mill {
 
 	public static void main(String[] args) {
-		QueueSimulation sim;
+		QSim sim;
 		EventsManagerImpl events;
 
 		String netFileName = "../../tmp/studies/ivtch/network.xml";
@@ -67,7 +67,7 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 		config.simulation().setSnapshotFile("output/OTFQuadfileSCHWEIZ10p.mvi");
 		//config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		config.simulation().setEndTime(Time.parseTime("12:00:11"));
-		sim = new QueueSimulation(scenario, events);
+		sim = new QSim(scenario, events);
 
 		sim.run();
 

@@ -58,7 +58,7 @@ import org.matsim.vehicles.BasicVehicleCapacityImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.VehiclesFactory;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQSim;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
 import org.xml.sax.SAXException;
@@ -217,7 +217,7 @@ public class DataPrepare {
 
 		log.info("start visualizer");
 		EventsManagerImpl events = new EventsManagerImpl();
-		OTFVisQueueSim client = new org.matsim.vis.otfvis.OTFVisQueueSim(visScenario, events);
+		OTFVisQSim client = new org.matsim.vis.otfvis.OTFVisQSim(visScenario, events);
 		client.run();
 	}
 

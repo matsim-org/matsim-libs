@@ -14,8 +14,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -33,7 +33,7 @@ import org.matsim.world.MatsimWorldReader;
  * @author DS
  *
  */
-public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
+public class OnTheFlyQueueSimQuadLinkSpeed extends QSim{
 	private final List<SimStateWriterI> writers = new ArrayList<SimStateWriterI>();
 	private OnTheFlyServer myOTFServer = null;
 
@@ -45,7 +45,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 
 		// FOR TESTING ONLY!
 		OTFConnectionManager connect = new OTFConnectionManager();
-		connect.add(QueueLink.class, OTFLinkTravelTimesHandler.Writer.class);
+		connect.add(QLink.class, OTFLinkTravelTimesHandler.Writer.class);
 		connect.add(OTFLinkTravelTimesHandler.Writer.class, OTFLinkTravelTimesHandler.class);
 		connect.add(OTFLinkTravelTimesHandler.class, ColoredStaticNetLayer.QuadDrawerLinkSpeed.class);
 		connect.add(ColoredStaticNetLayer.QuadDrawerLinkSpeed.class, ColoredStaticNetLayer.class);

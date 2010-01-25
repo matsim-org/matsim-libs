@@ -38,7 +38,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQSim;
 
 import playground.dgrether.utils.LogOutputEventHandler;
 
@@ -60,7 +60,7 @@ public class DgLiveVisEquil {
 		events.addHandler(new LogOutputEventHandler());
 		scenario.getConfig().otfVis().setShowTeleportedAgents(true);
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
+		OTFVisQSim client = new OTFVisQSim(scenario, events);
 		client.setVisualizeTeleportedAgents(true);
 		client.run();
 	}

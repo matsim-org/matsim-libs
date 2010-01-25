@@ -43,7 +43,7 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
+import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.xml.sax.SAXException;
 
 public class PseudoNetworkDemo {
@@ -125,7 +125,7 @@ public class PseudoNetworkDemo {
 
 		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
-		sim.addFeature(new OTFVisQueueSimFeature(sim));
+		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.run();
 		writer.closeFile();
 	}

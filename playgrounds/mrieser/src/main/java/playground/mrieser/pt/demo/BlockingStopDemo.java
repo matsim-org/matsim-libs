@@ -57,7 +57,7 @@ import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.VehiclesFactory;
-import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
+import org.matsim.vis.otfvis.OTFVisQSimFeature;
 
 import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.analysis.TransitRouteAccessEgressAnalysis;
@@ -302,7 +302,7 @@ public class BlockingStopDemo {
 		events.addHandler(ttc);
 
 		this.sim = new TransitQueueSimulation(this.scenario, events);
-		sim.addFeature(new OTFVisQueueSimFeature(sim));
+		sim.addFeature(new OTFVisQSimFeature(sim));
 		this.sim.run();
 
 		System.out.println("TransitRouteAccessEgressAnalysis:");

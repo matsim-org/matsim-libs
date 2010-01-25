@@ -46,7 +46,7 @@ import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.BasicVehicleReaderV1;
-import org.matsim.vis.otfvis.OTFVisQueueSimFeature;
+import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.xml.sax.SAXException;
 
@@ -108,7 +108,7 @@ public class TransitControler extends Controler {
 	@Override
 	protected void runMobSim() {
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
-		sim.addFeature(new OTFVisQueueSimFeature(sim));
+		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.setUseUmlaeufe(true);
 		sim.run();
 	}

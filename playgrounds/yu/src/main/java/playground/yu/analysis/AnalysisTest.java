@@ -35,7 +35,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -218,7 +218,7 @@ public class AnalysisTest {
 			sr.close();
 			sw2.close();
 
-			new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
+			new OTFEvent2MVI(new QNetwork(network), eventsOutputFilename,
 					args[2] + "../" + args[args.length - 1] + "."
 							+ (scenario.equals("normal") ? "" : scenario + ".")
 							+ "vis.mvi", Integer
