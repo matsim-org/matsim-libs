@@ -59,8 +59,6 @@ public class FourWaysVisNetworkOnly {
 		lanesReader.readFile(lanesFile);
 		
 		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
-		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
-		client.setLaneDefinitions(laneDefs);
 		client.run();
 		
 		

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -51,12 +52,14 @@ public class DgLiveVisEquil {
 	
 	public DgLiveVisEquil(){
 		Scenario scenario = new ScenarioImpl();
-		scenario.getConfig().network().setInputFile("./examples/equil/network.xml");
+		scenario.getConfig().network().setInputFile("../matsim/examples/equil/network.xml");
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadNetwork();
 		createPopulation(scenario);
 		EventsManager events = new EventsManagerImpl();
 		events.addHandler(new LogOutputEventHandler());
+		scenario.getConfig().otfVis().setShowTeleportedAgents(true);
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
 		client.setVisualizeTeleportedAgents(true);
 		client.run();

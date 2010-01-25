@@ -68,9 +68,9 @@ public class FourWaysVis {
 		EventsManager events = new EventsManagerImpl();
 		
 		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
-		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
-		client.setLaneDefinitions(scenario.getLaneDefinitions());
-		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
+//		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
+//		client.setLaneDefinitions(scenario.getLaneDefinitions());
+//		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
 		client.run();
 		
 		

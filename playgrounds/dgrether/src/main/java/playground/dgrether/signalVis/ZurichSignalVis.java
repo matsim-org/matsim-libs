@@ -79,9 +79,6 @@ public class ZurichSignalVis {
 		new MatsimSignalSystemConfigurationsReader(signalConfigs).readFile(signalConfigsFile);
 		
 		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
-		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
-		client.setLaneDefinitions(laneDefs);
-		client.setSignalSystems(signalDefs, signalConfigs);
 		client.run();
 	}
 

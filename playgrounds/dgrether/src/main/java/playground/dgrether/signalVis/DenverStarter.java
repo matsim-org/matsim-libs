@@ -20,10 +20,10 @@
 package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.vis.otfvis.OTFVisQueueSim;
 
 import playground.dgrether.DgPaths;
 
@@ -45,9 +45,7 @@ public class DenverStarter {
 		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		EventsManagerImpl e = new EventsManagerImpl();
 		
-		DgOnTheFlyQueueSimQuad sim = new DgOnTheFlyQueueSimQuad(sc, e);
-		sim.setLaneDefinitions(((ScenarioImpl) sc).getLaneDefinitions());
-		sim.setSignalSystems(((ScenarioImpl) sc).getSignalSystems(), ((ScenarioImpl) sc).getSignalSystemConfigurations());
+		OTFVisQueueSim sim = new OTFVisQueueSim(sc, e);
 		sim.run();
 		
 		

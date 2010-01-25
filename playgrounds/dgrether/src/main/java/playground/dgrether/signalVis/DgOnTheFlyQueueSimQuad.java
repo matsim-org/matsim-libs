@@ -36,6 +36,6 @@ public class DgOnTheFlyQueueSimQuad extends OTFVisQueueSim {
 
 	public DgOnTheFlyQueueSimQuad(Scenario scenario, EventsManagerImpl events) {
 		super(scenario, events);
-		this.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
+//		this.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 	}
 }
