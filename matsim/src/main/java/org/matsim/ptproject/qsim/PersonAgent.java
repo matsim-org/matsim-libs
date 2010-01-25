@@ -181,6 +181,11 @@ public class PersonAgent implements DriverAgent {
 	public void teleportToLink(final Id linkId) {
 		this.currentLinkId = linkId;
 	}
+	
+	// yyyy might make sense to add this to the interface.  kai, jan'10
+	public PlanElement getCurrentPlanElement() {
+		return this.getPlanElements().get( this.currentPlanElementIndex ) ;
+	}
 
 	private void advancePlanElement(final double now) {
 		this.currentPlanElementIndex++;
