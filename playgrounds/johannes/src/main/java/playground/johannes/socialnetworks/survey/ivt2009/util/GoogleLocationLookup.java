@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.util;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -38,8 +38,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-
-import ucar.nc2.util.net.URLencode;
 
 /**
  * @author illenberger

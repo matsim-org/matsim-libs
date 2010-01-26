@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+
 
 /**
  * @author illenberger
@@ -65,9 +66,9 @@ public class Address2Coord {
 		 * add two new columns
 		 */
 		String[] header = new String[tokens.length + 2];
-		System.arraycopy(tokens, 0, header, 0, tokens.length);
-		header[tokens.length] = "long";
-		header[tokens.length + 1] = "lat";
+		System.arraycopy(tokens, 0, header, 2, tokens.length);
+		header[0] = "long";
+		header[1] = "lat";
 		/*
 		 * write header
 		 */
@@ -88,50 +89,59 @@ public class Address2Coord {
 		int lookupInterval = 100;
 		while((line = reader.readLine()) != null) {
 			Thread.currentThread().sleep(lookupInterval);
-			writer.write(line);
-			
-			tokens = line.split(TAB);
-			
-			String addressRow1 = tokens[addressIdx1];
-			String addressRow2 = tokens[addressIdx2];
-			String addressRow3 = tokens[addressIdx3];
-			
-			if(!addressRow1.equalsIgnoreCase("NA") ||
-					!addressRow2.equalsIgnoreCase("NA") ||
-					!addressRow3.equalsIgnoreCase("NA")) {
-			StringBuilder builder = new StringBuilder();
-			builder.append(addressRow1);
-			builder.append(", ");
-			builder.append(addressRow2);
-			builder.append(", ");
-			builder.append(addressRow3);
-			
-			Coord coord = lookup.locationToCoord(builder.toString());
-			if(lookup.getLastErrorCode() == 620) {
-				while(lookup.getLastErrorCode() == 620) {
-					if(lookupInterval > 5000) {
-						logger.warn("Lookup interval is 5 secs. Seems we reached the request limit!");
-						System.exit(-1);
-					}
-					logger.warn(String.format("Increasing lookup interval, now %1$s msecs.", lookupInterval));
-					lookupInterval += 100;
+
+			try {
+				tokens = line.split(TAB);
+
+				String addressRow1 = tokens[addressIdx1];
+				String addressRow2 = tokens[addressIdx2];
+				String addressRow3 = tokens[addressIdx3];
+
+				Coord coord = null;
+				if (!addressRow1.equalsIgnoreCase("NA")
+						|| !addressRow2.equalsIgnoreCase("NA")
+						|| !addressRow3.equalsIgnoreCase("NA")) {
+					StringBuilder builder = new StringBuilder();
+					builder.append(addressRow1);
+					builder.append(", ");
+					builder.append(addressRow2);
+					builder.append(", ");
+					builder.append(addressRow3);
+
 					coord = lookup.locationToCoord(builder.toString());
+					if (lookup.getLastErrorCode() == 620) {
+						while (lookup.getLastErrorCode() == 620) {
+							if (lookupInterval > 5000) {
+								logger.warn("Lookup interval is 5 secs. Seems we reached the request limit!");
+								System.exit(-1);
+							}
+							logger.warn(String.format("Increasing lookup interval, now %1$s msecs.", lookupInterval));
+							lookupInterval += 100;
+							coord = lookup.locationToCoord(builder.toString());
+						}
+					}
 				}
+				if (coord != null) {
+					writer.write(String.valueOf(coord.getX()));
+					writer.write(TAB);
+					writer.write(String.valueOf(coord.getY()));
+					writer.write(TAB);
+				} else {
+					writer.write(TAB);
+					writer.write(TAB);
+					notfound++;
+				}
+				writer.write(line);
+				writer.newLine();
+
+				counter++;
+				if (counter % 10 == 0)
+					logger.info(String.format("Processed %1$s addresses...",
+							counter));
+			} catch (Exception e) {
+				logger.warn(String.format("Error parsing line. %1$s", e
+						.getMessage()));
 			}
-			if(coord != null) {
-				writer.write(TAB);
-				writer.write(String.valueOf(coord.getX()));
-				writer.write(TAB);
-				writer.write(String.valueOf(coord.getY()));
-			} else {
-				notfound++;
-			}
-			}
-			writer.newLine();
-			
-			counter++;
-			if(counter % 10 == 0)
-				logger.info(String.format("Processed %1$s addresses...", counter));
 		}
 		writer.close();
 		logger.info(String.format("Address lookup done. Processed %1$s addresses, %2$s addresses unkown.", counter, notfound));

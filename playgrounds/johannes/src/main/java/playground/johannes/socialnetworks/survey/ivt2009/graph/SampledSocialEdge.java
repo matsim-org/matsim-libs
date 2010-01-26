@@ -43,4 +43,5 @@ public class SampledSocialEdge extends SpatialSparseEdge implements SocialEdge, 
 		return (Tuple<? extends SampledSocialVertex, ? extends SampledSocialVertex>) super.getVertices();
 	}
 
+	
 }

@@ -19,9 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.GraphFactory;
-import org.matsim.core.population.PersonImpl;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 
@@ -39,15 +38,20 @@ public class SampledSocialGraphFactory implements GraphFactory<SampledSocialGrap
 	}
 
 	public SampledSocialGraph createGraph() {
-		return new SampledSocialGraph(null);
+		throw new UnsupportedOperationException(
+				"Cannot create a graph without a coordinate reference system. User createGraph(CoordinateReferenceSystem) instead.");
+	}
+	
+	public SampledSocialGraph createGraph(CoordinateReferenceSystem crs) {
+		return new SampledSocialGraph(crs);
 	}
 
 	public SampledSocialVertex createVertex() {
 		throw new UnsupportedOperationException();
 	}
 	
-	public SampledSocialVertex createVertex(Person person, Point point) {
-		return new SampledSocialVertex(new SocialPerson((PersonImpl) person), point);
+	public SampledSocialVertex createVertex(SocialPerson person, Point point) {
+		return new SampledSocialVertex(person, point);
 	}
 
 }
