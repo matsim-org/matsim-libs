@@ -32,8 +32,8 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 	private double passengersLeavingTimeFraction = 0.0;
 	private double passengersEnteringTimeFraction = 0.0;
 
-	private final double personEntersTime = 4.0;
-	private final double personLeavesTime = 2.0;
+	private static final double personEntersTime = 4.0;
+	private static final double personLeavesTime = 2.0;
 
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PassengerAgent> leavingPassengers,

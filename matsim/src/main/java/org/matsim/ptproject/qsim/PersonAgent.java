@@ -35,6 +35,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -273,7 +274,7 @@ public class PersonAgent implements DriverAgent {
 			return this.cachedNextLinkId;
 		}
 		if (this.cacheRouteNodes == null) {
-			this.cacheRouteNodes = ((NetworkRouteWRefs) this.currentLeg.getRoute()).getNodes();
+			this.cacheRouteNodes = RouteUtils.getNodes((NetworkRouteWRefs) this.currentLeg.getRoute(), this.simulation.networkLayer);
 		}
 
 		if (this.currentNodeIndex >= this.cacheRouteNodes.size() ) {

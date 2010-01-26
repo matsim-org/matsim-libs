@@ -112,7 +112,9 @@ LegTravelTimeEstimator {
 
 		@Override
 		public boolean equals(Object obj) {
-
+			if (!(obj instanceof DynamicODMatrixEntry)) {
+				return false;
+			}
 			DynamicODMatrixEntry other = (DynamicODMatrixEntry) obj;
 
 			if (this.departureTime != other.departureTime) {
