@@ -25,11 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -49,9 +48,8 @@ public class ExternalMobsim {
 
 	private static final String CONFIG_MODULE = "simulation";
 
+	protected final Scenario scenario;
 	protected final EventsManager events;
-	protected final Population population;
-	protected final Network network;
 
 	protected String plansFileName = null;
 	protected String eventsFileName = null;
@@ -65,9 +63,8 @@ public class ExternalMobsim {
 	protected ControlerIO controlerIO;
 
 
-	public ExternalMobsim(final Population population, final Network network, final EventsManager events) {
-		this.population = population;
-		this.network = network;
+	public ExternalMobsim(final Scenario scenario, final EventsManager events) {
+		this.scenario = scenario;
 		this.events = events;
 		init();
 	}
@@ -77,7 +74,7 @@ public class ExternalMobsim {
 		this.eventsFileName = "ext_events.txt";
 		this.configFileName = "ext_config.xml";
 
-		this.executable = Gbl.getConfig().getParam(CONFIG_MODULE, "externalExe");
+		this.executable = this.scenario.getConfig().getParam(CONFIG_MODULE, "externalExe");
 	}
 
 	public void run() {
@@ -102,7 +99,7 @@ public class ExternalMobsim {
 
 	protected void writeConfig(final String iterationPlansFile, final String iterationEventsFile, final String iterationConfigFile) throws FileNotFoundException, IOException {
 		log.info("writing config for external mobsim");
-		Config simConfig = Gbl.getConfig();
+		Config simConfig = this.scenario.getConfig();
 		Config extConfig = new Config();
 		// network
 		Module module = extConfig.createModule("network");
@@ -128,11 +125,11 @@ public class ExternalMobsim {
 		log.info("writing plans for external mobsim");
 		PopulationImpl pop = new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(pop, this.network);
+		PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork());
 		PopulationWriterHandler handler = plansWriter.getHandler();
 		plansWriter.writeStartPlans(iterationPlansFile);
 		BufferedWriter writer = plansWriter.getWriter();
-		for (Person person : this.population.getPersons().values()) {
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			if (plan != null) {
 				/* we have to re-implement a custom writer here, because we only want to
@@ -177,7 +174,7 @@ public class ExternalMobsim {
 		log.info("running command: " + cmd);
 		Gbl.printMemoryUsage();
 		String logfileName = this.controlerIO.getIterationFilename(this.getIterationNumber(), "mobsim.log");
-		int timeout = Gbl.getConfig().simulation().getExternalTimeOut();
+		int timeout = this.scenario.getConfig().simulation().getExternalTimeOut();
 		int exitcode = ExeRunner.run(cmd, logfileName, timeout);
 		if (exitcode != 0) {
 			Gbl.errorMsg("There was a problem running the external mobsim. exit code: " + exitcode);

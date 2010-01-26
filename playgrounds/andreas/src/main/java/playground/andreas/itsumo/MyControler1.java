@@ -101,9 +101,9 @@ public class MyControler1 extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		ItsumoSim sim = new ItsumoSim(this.population, this.network, this.events);
+		ItsumoSim sim = new ItsumoSim(this.scenarioData, this.events);
 		sim.setControlerIO(this.getControlerIO());
-		sim.setIteration(this.getIteration());
+		sim.setIteration(this.getIterationNumber());
 		sim.run();
 	}
 
@@ -283,7 +283,7 @@ public class MyControler1 extends Controler {
 
 		log.info("  reading network xml file... ");
 		ITSUMONetworkReader reader = new ITSUMONetworkReader(network);
-		reader.read(Gbl.getConfig().getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile"));
+		reader.read(this.config.getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile"));
 //		NetworkParser network_parser = new NetworkParser(network);
 //		network_parser.parse();
 
@@ -310,10 +310,10 @@ public class MyControler1 extends Controler {
 			driversLog.renameTo(eventsFile);
 
 			Events2Snapshot events2Snapshot = new org.matsim.run.Events2Snapshot();
-			events2Snapshot.run(eventsFile, Gbl.getConfig(), this.network);
+			events2Snapshot.run(eventsFile, this.config, this.network);
 
 			// Run NetVis if possible
-			if (Gbl.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
+			if (this.config.getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
 				String[] visargs = {"./output/vis/Snapshot"};
 				NetVis.main(visargs);
 			}
@@ -347,13 +347,14 @@ public class MyControler1 extends Controler {
 
 	public static void main(final String[] args) {
 
+		Config config;
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./examples/itsumo-sesam-scenario/config.xml"});
+			config = Gbl.createConfig(new String[] {"./examples/itsumo-sesam-scenario/config.xml"});
 		} else {
-			Gbl.createConfig(args) ;
+			config = Gbl.createConfig(args) ;
 		}
 
-		final MyControler1 controler = new MyControler1(Gbl.getConfig());
+		final MyControler1 controler = new MyControler1(config);
 		controler.setOverwriteFiles(true);
 		controler.run();
 

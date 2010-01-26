@@ -42,7 +42,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 		this.eventsByPerson = new HashMap<Id, LinkedList<PersonEvent>>();
 		this.allEvents = new LinkedList<PersonEvent>();
 	}
-	
+
 	@Override
 	protected void tearDown() throws Exception {
 		this.eventsByPerson = null;
@@ -50,7 +50,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 		SimulationParameters.reset(); // SimulationParameter contains a Map containing Links which refer to the Network, give that free for GC
 		super.tearDown();
 	}
-	
+
 
 	// if populationModifier == null, then the DummyPopulationModifier is used
 	// if planFilePath == null, then the plan specified in the config file is
@@ -73,11 +73,11 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 		EventsManagerImpl events = new ParallelEventsManagerImpl(1);
 		events.addHandler(new PersonEventCollector(this.eventsByPerson, this.allEvents));
 		events.initProcessing();
-		new JDEQSimulation(scenario.getNetwork(), scenario.getPopulation(), events).run();
+		new JDEQSimulation(scenario, events).run();
 		events.finishProcessing();
 	}
-	
-	
+
+
 	protected void checkAscendingTimeStamps() {
 		// all events of one agent must have ascending time stamps
 		double lastTimeStamp;
@@ -98,10 +98,10 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 			}
 		}
 	}
-	
-	/** 
+
+	/**
 	 * Compares plan and events for each agent.
-	 * Checks the type of the event and the linkId. 
+	 * Checks the type of the event and the linkId.
 	 */
 	protected void checkEventsCorrespondToPlans(final Population population) {
 		for (LinkedList<PersonEvent> list : eventsByPerson.values()) {
@@ -186,7 +186,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 			}
 		}
 	}
-	
+
 	/**
 	 * Compare events to deq event file. The order of events must also be the
 	 * same. (this test will only succeed for simple tests with one car
@@ -195,7 +195,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	 */
 	protected void compareToDEQSimEvents(final String deqsimEventsFile) {
  		LinkedList<PersonEvent> copyEventList=new LinkedList<PersonEvent>();
- 		
+
  		// remove ActStartEvent and ActEndEvent, because this does not exist in
 		// c++ DEQSim
  		for (int i=0;i<allEvents.size();i++){
@@ -203,7 +203,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 				copyEventList.add(allEvents.get(i));
 			}
  		}
- 		
+
 		ArrayList<EventLog> deqSimLog=CppEventFileParser.parseFile(deqsimEventsFile);
 		for (int i=0;i<copyEventList.size();i++){
 			assertTrue("events not equal.", CppEventFileParser.equals(copyEventList.get(i), deqSimLog.get(i)));
@@ -216,27 +216,27 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	 * we need to compare the time each car was on the road and take its average. This figure should with in a small interval
 	 * for both simulations.
 	 * Attention: Still when vehicles are stuck, this comparison can be off by larger number, because unstucking the vehicles is
-	 * done in different ways by the two simulations 
+	 * done in different ways by the two simulations
 	 */
 	protected void compareToDEQSimTravelTimes(final String deqsimEventsFile, final double tolerancePercentValue) {
 		ArrayList<EventLog> deqSimLog = CppEventFileParser.parseFile(deqsimEventsFile);
-		
+
 		double deqSimTravelSum=EventLog.getSumTravelTime(deqSimLog);
 		double javaSimTravelSum=EventLibrary.getSumTravelTime(allEvents);
 		assertTrue ((Math.abs(deqSimTravelSum - javaSimTravelSum)/deqSimTravelSum) < tolerancePercentValue);
 	}
 
-	
+
 	private static class PersonEventCollector implements PersonEventHandler {
 
 		private final Map<Id, LinkedList<PersonEvent>> eventsByPerson;
 		private final List<PersonEvent> allEvents;
-		
+
 		/*package*/ PersonEventCollector(Map<Id, LinkedList<PersonEvent>> eventsByPerson, List<PersonEvent> allEvents) {
 			this.eventsByPerson = eventsByPerson;
 			this.allEvents = allEvents;
 		}
-		
+
 		public void handleEvent(PersonEvent event) {
 			if (!eventsByPerson.containsKey(event.getPersonId())) {
 				eventsByPerson.put(event.getPersonId(), new LinkedList<PersonEvent>());
@@ -248,7 +248,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 		public void reset(int iteration) {
 		}
 	}
-	
-	
-	
+
+
+
 }

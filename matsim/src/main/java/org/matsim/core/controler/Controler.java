@@ -802,10 +802,10 @@ public class Controler {
 			}
 
 			if ((this.config.getModule(JDEQ_SIM) != null) && (numOfThreads > 1)) {
-				PJDEQSimulation sim = new PJDEQSimulation(this.network, this.population, this.events,numOfThreads);
+				PJDEQSimulation sim = new PJDEQSimulation(this.scenarioData, this.events,numOfThreads);
 				sim.run();
 			} else if (this.config.getModule(JDEQ_SIM) != null) {
-				JDEQSimulation sim = new JDEQSimulation(this.network, this.population, this.events);
+				JDEQSimulation sim = new JDEQSimulation(this.scenarioData, this.events);
 				sim.run();
 			} else {
 			  Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
@@ -821,9 +821,9 @@ public class Controler {
 				simulation.run();
 			}
 		} else {
-			ExternalMobsim sim = new ExternalMobsim(this.population, this.network, this.events);
+			ExternalMobsim sim = new ExternalMobsim(this.scenarioData, this.events);
 			sim.setControlerIO(controlerIO);
-			sim.setIterationNumber(this.getIteration());
+			sim.setIterationNumber(this.getIterationNumber());
 			sim.run();
 		}
 	}

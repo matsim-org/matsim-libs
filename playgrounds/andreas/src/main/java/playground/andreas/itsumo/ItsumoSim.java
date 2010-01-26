@@ -26,12 +26,10 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
@@ -46,8 +44,8 @@ public class ItsumoSim extends ExternalMobsim {
 	private ControlerIO controlerio;
 	private Integer iteration;
 
-	public ItsumoSim(final Population population, final Network network, final EventsManager events) {
-		super(population, network, events);
+	public ItsumoSim(final Scenario scenario, final EventsManager events) {
+		super(scenario, events);
 		System.out.println("\n##################################################################################################\n" +
 				"#   REMINDER - Header in writeItsumoConfig has to be changed\n" +
 				"#              according to the itsumo scenario description file." +
@@ -87,7 +85,7 @@ public class ItsumoSim extends ExternalMobsim {
 
 			// aneumann
 			out.write("<config>"); out.newLine();
-			out.write(" <file>" + Gbl.getConfig().getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile") + "</file>"); out.newLine();
+			out.write(" <file>" + this.scenario.getConfig().getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile") + "</file>"); out.newLine();
 			out.write(" <steps>3600</steps>"); out.newLine();
 			out.write(" <default_deceleration>0</default_deceleration>"); out.newLine();
 			out.write(" <sensor_interval>1</sensor_interval>"); out.newLine();
@@ -98,7 +96,7 @@ public class ItsumoSim extends ExternalMobsim {
 
 			out.write(" <drivers>"); out.newLine();
 
-			for (Person person : this.population.getPersons().values()) {
+			for (Person person : this.scenario.getPopulation().getPersons().values()) {
 
 				out.write("  <driver>"); out.newLine();
 
@@ -157,13 +155,13 @@ public class ItsumoSim extends ExternalMobsim {
 
 			out.write("  <sensor>"); out.newLine();
 			out.write("   <name>total_stopped_cars_in_network</name>"); out.newLine();
-			out.write("   <file>" + this.controlerio.getIterationPath(this.iteration) + "/" + Controler.getIteration() + ".itsumo.total_stopped_cars_in_network.log</file>"); out.newLine();
+			out.write("   <file>" + this.controlerio.getIterationPath(this.iteration) + "/" + this.iteration + ".itsumo.total_stopped_cars_in_network.log</file>"); out.newLine();
 			out.write("   <state>OFF</state>"); out.newLine();
 			out.write("  </sensor>"); out.newLine();
 
 			out.write("  <sensor>"); out.newLine();
 			out.write("   <name>stopped_cars_in_lanesets</name>"); out.newLine();
-			out.write("   <file>" + this.controlerio.getIterationPath(this.iteration) + "/" + Controler.getIteration() + ".itsumo.stopped_cars_in_lanesets.log</file>"); out.newLine();
+			out.write("   <file>" + this.controlerio.getIterationPath(this.iteration) + "/" + this.iteration + ".itsumo.stopped_cars_in_lanesets.log</file>"); out.newLine();
 			out.write("   <state>OFF</state>"); out.newLine();
 			out.write("  </sensor>"); out.newLine();
 

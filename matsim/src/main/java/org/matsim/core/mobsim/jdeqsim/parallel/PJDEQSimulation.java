@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -12,7 +13,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
@@ -30,8 +30,8 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 /*
  * - both halfs of the simulation should have arround the same number of events for best performance (as expected)
  * => but this is not the case yet => need to make the algorithm better
- * 
- * 
+ *
+ *
  */
 
 /*
@@ -39,7 +39,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
  * ============
  * => -XX:+UseSpinning is useful for this application
  * => -XX:PreBlockSpin=10 has an influence on the application. A good value found for my local machine was: 10,
- *    but this might be vm/machine dependent... 
+ *    but this might be vm/machine dependent...
  */
 
 
@@ -49,25 +49,24 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
  * - parallel JDEQSim (optimal division - manual): 147.7sec / 130.5sec.
  * - JDEQSim: 181.4sec.
  * - parallel JDEQSim (without optimal devision): 153.2 sec./ 136.3 sec. (not yet optimal, as not fifty fifty devision of events).
- * - parallel JDEQSim (optimal division - manual), maxTimeDelta=600: 126.2sec / 109sec. 
+ * - parallel JDEQSim (optimal division - manual), maxTimeDelta=600: 126.2sec / 109sec.
  * - parallel JDEQSim (optimal division - manual), maxTimeDelta=100000: 121sec / 104sec.
- * 
+ *
  * (10% Zürich, on home compi)
  * - parallel JDEQSim (optimal division - manual): 19.4 sec. / 17.1 sec.
  * - JDEQSim: 25sec.
  * - parallel JDEQSim (without optimal devision): 21.9 sec. / 19.490 sec.
- * 
- * 
+ *
+ *
  * for parallel JDEQSim: (time including initialization / time just of the simulation)
- * 
+ *
  */
 public class PJDEQSimulation extends JDEQSimulation {
 
 	private int numOfThreads;
 
-	public PJDEQSimulation(Network network, Population population,
-			EventsManager events, int numOfThreads) {
-		super(network, population, events);
+	public PJDEQSimulation(Scenario scenario, EventsManager events, int numOfThreads) {
+		super(scenario, events);
 		this.numOfThreads = numOfThreads; // TODO: use this number really...
 		log = Logger.getLogger(JDEQSimulation.class);
 	}
@@ -79,19 +78,21 @@ public class PJDEQSimulation extends JDEQSimulation {
 		Timer t = new Timer();
 		t.startTimer();
 
-		
-		
+		Population population = this.scenario.getPopulation();
+		Network network = this.scenario.getNetwork();
+
+
 		PMessageQueue queue=new PMessageQueue();
-		
+
 		// set the maxTimeDelta
 		String JDEQ_SIM="JDEQSim";
 		String MAX_TIME_DELTA="maxTimeDelta";
-		String maxTimeDelta=Gbl.getConfig().findParam(JDEQ_SIM, MAX_TIME_DELTA);
-		
+		String maxTimeDelta=this.scenario.getConfig().findParam(JDEQ_SIM, MAX_TIME_DELTA);
+
 		if (maxTimeDelta!=null){
 			queue.setMaxTimeDelta(Integer.parseInt(maxTimeDelta));
 		}
-		
+
 		PScheduler scheduler = new PScheduler(queue);
 		scheduler.getQueue().idOfMainThread = Thread.currentThread().getId();
 		SimulationParameters.setAllRoads(new HashMap<Id, Road>());
@@ -99,7 +100,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 		// find out networkXMedian
 		int numberOfLinks = 0;
 		double sumXCoord = 0;
-		for (Person person : this.population.getPersons().values()) {
+		for (Person person : population.getPersons().values()) {
 			// estimate, where to cut the map
 
 			// System.out.println(((Activity)
@@ -115,15 +116,15 @@ public class PJDEQSimulation extends JDEQSimulation {
 				// sumXCoord += ((Activity) (actsLegs.get(0))).getCoord()
 				// .getX();
 				// numberOfLinks++;
-				
+
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
 					if (leg.getRoute() instanceof NetworkRouteWRefs) {
 						List<Id> linkIds = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
 						Id[] currentLinkRoute = linkIds.toArray(new Id[linkIds.size()]);
-	
+
 						for (Id linkId : currentLinkRoute) {
-							Link link = this.network.getLinks().get(linkId);
+							Link link = network.getLinks().get(linkId);
 							// because at each road there are many messages
 							// enterReq, enter, end, leave, deadlock...
 							sumXCoord += link.getCoord().getX();
@@ -131,7 +132,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 							// sumXCoord += currentLinkRoute[j].getCoord().getX();
 							// sumXCoord += currentLinkRoute[j].getCoord().getX();
 							// sumXCoord += currentLinkRoute[j].getCoord().getX();
-	
+
 							numberOfLinks++;
 						}
 					}
@@ -145,7 +146,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 		// TODO: remove this line...
 		// just for finding out how a perfect distribution would work
-		// for 10% Zh and 100%: 
+		// for 10% Zh and 100%:
 		// best performance, when for all threads the same number of messages/same number of waiting...
 		networkXMedian=683000;
 		//networkXMedian += 1500;
@@ -157,7 +158,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 		// initialize network
 		ExtendedRoad road = null;
-		for (Link link : this.network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			road = new ExtendedRoad(scheduler, link);
 
 			if (link.getCoord().getX() < networkXMedian) {
@@ -172,9 +173,9 @@ public class PJDEQSimulation extends JDEQSimulation {
 		// define border roads
 		// just one layer long
 		ExtendedRoad tempRoad = null;
-		for (Link link : this.network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			road = (ExtendedRoad) Road.getRoad(link.getId());
-			
+
 			// mark roads, which go away from border roads
 			for (Link outLink : road.getLink().getToNode().getOutLinks().values()) {
 				tempRoad = (ExtendedRoad) Road.getRoad(outLink.getId());
@@ -188,15 +189,9 @@ public class PJDEQSimulation extends JDEQSimulation {
 		}
 
 		// initialize vehicles
-		PVehicle vehicle = null;
-		// the vehicle has registered itself to the scheduler
-		for (Person person : this.population.getPersons().values()) {
-			vehicle = new PVehicle(scheduler, person);
+		for (Person person : population.getPersons().values()) {
+			new PVehicle(scheduler, person); // the vehicle registers itself to the scheduler
 		}
-
-		// just inserted to remove message in bug analysis, that vehicle
-		// variable is never read
-		vehicle.toString();
 
 		scheduler.startSimulation();
 

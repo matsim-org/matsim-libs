@@ -14,8 +14,8 @@ class DESController extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		
-		new JDEQSimulation(this.network, this.population, this.events).run();
+
+		new JDEQSimulation(this.scenarioData, this.events).run();
 	}
 
 	public static void main(final String[] args) {
@@ -24,28 +24,28 @@ class DESController extends Controler {
 		final DESController controler = new DESController(args);
 		controler.setOverwriteFiles(true);
 		EventsManager events=controler.getEvents();
-		
-		
+
+
 		ElectricCostHandler ecHandler=new ElectricCostHandler(controler,getEnergyConsumptionSamples(),events,"0");
 		events.addHandler(ecHandler);
-		
-		
+
+
 		controler.run();
 		t.endTimer();
 		t.printMeasuredTime("Time needed for MobSimController run: ");
 //		controler.events.printEventsCount();
-		
-		
+
+
 		ecHandler.printRecordedSOC();
 		//ecHandler.printEnergyConsumptionAtSelectedLink();
-		
-		
+
+
 		ecHandler.tidyup();
 	}
-	
+
 	public static EnergyConsumptionSamples getEnergyConsumptionSamples(){
 		EnergyConsumptionSamples ecs=new EnergyConsumptionSamples();
-		
+
 		// TODO: update values
 		ecs.add(new AverageSpeedEnergyConsumption(5.555555556,3.173684E+02));
 		ecs.add(new AverageSpeedEnergyConsumption(8.333333333,4.231656E+02));
@@ -61,7 +61,7 @@ class DESController extends Controler {
 		ecs.add(new AverageSpeedEnergyConsumption(36.11111111,1.825931E+03));
 		ecs.add(new AverageSpeedEnergyConsumption(38.88888889,2.418100E+03));
 		ecs.add(new AverageSpeedEnergyConsumption(41.66666667,2.905639E+03));
-		
+
 		return ecs;
 	}
 }

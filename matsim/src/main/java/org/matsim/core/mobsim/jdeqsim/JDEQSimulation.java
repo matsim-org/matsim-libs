@@ -24,13 +24,11 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.utils.misc.Time;
 
@@ -43,21 +41,19 @@ import org.matsim.core.utils.misc.Time;
 public class JDEQSimulation {
 
 	protected static Logger log = null;
-	protected Population population;
-	protected Network network;
-	
+	protected Scenario scenario;
 
-	public JDEQSimulation(final Network network, final Population population, final EventsManager events) {
+
+	public JDEQSimulation(final Scenario scenario, final EventsManager events) {
 		// constructor
-		
+
 		log = Logger.getLogger(JDEQSimulation.class);
 
-		this.population = population;
-		this.network = network;
+		this.scenario = scenario;
 
 		// reset simulation parameters
 		SimulationParameters.reset();
-		
+
 		// initialize the events handler to which the micro simulatation gives the events
 		SimulationParameters.setProcessEventThread(events);
 
@@ -72,7 +68,7 @@ public class JDEQSimulation {
 		final String GAP_TRAVEL_SPEED = "gapTravelSpeed";
 		final String END_TIME = "endTime";
 
-		Config config = Gbl.getConfig();
+		Config config = this.scenario.getConfig();
 		String squeezeTime = config.findParam(JDEQ_SIM, SQUEEZE_TIME);
 		String flowCapacityFactor = config.findParam(JDEQ_SIM, FLOW_CAPACITY_FACTOR);
 		String storageCapacityFactor = config.findParam(JDEQ_SIM, STORAGE_CAPACITY_FACTOR);
@@ -143,21 +139,14 @@ public class JDEQSimulation {
 
 		// initialize network
 		Road road = null;
-		for (Link link : this.network.getLinks().values()) {
+		for (Link link : this.scenario.getNetwork().getLinks().values()) {
 			road = new Road(scheduler, link);
 			SimulationParameters.getAllRoads().put(link.getId(), road);
 		}
 
-		// initialize vehicles
-		Vehicle vehicle = null;
-		// the vehicle has registered itself to the scheduler
-		for (Person person : this.population.getPersons().values()) {
-			vehicle = new Vehicle(scheduler, person);
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			new Vehicle(scheduler, person); // the vehicle registers itself to the scheduler
 		}
-
-		// just inserted to remove message in bug analysis, that vehicle
-		// variable is never read
-		vehicle.toString();
 
 		scheduler.startSimulation();
 
