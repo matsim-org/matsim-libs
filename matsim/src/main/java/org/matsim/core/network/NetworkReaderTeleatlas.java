@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 
  * @author balmermi
  */
-public class NetworkReaderTeleatlas implements NetworkReader {
+public class NetworkReaderTeleatlas {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

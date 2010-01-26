@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkReader;
 import org.matsim.core.network.NodeImpl;
 import org.xml.sax.SAXException;
 
@@ -22,7 +21,7 @@ import org.xml.sax.SAXException;
  * @author msieg
  *
  */
-public class CMCFNetworkWriter implements NetworkReader {
+public class CMCFNetworkWriter {
 
 	private final String netFile;
 	private final MatsimNetworkReader netReader;
