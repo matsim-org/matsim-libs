@@ -73,22 +73,15 @@ public class QLinkTest extends MatsimTestCase {
 
 	public void testAdd() {
 		Fixture f = new Fixture();
+		assertEquals(0, f.qlink1.vehOnLinkCount());
 		QueueVehicleImpl v = new QueueVehicleImpl(f.basicVehicle);
 
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
-		v.setDriver(new PersonAgent(p, null));
-		Exception e = null;
-		//as QueueLink has static access to the rest of the simulation
-		//and testing other classes is not the purpose of this test
-		//we have to do it like this
-		//can be seen as reason why static access from an object should be avoided
-		try {
-			f.qlink1.add(v);
-		}
-		catch (Exception ex) {
-			e = ex;
-		}
-		assertNotNull(e);
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		v.setDriver(new PersonAgent(p, new QSim(scenario, new EventsManagerImpl())));
+		
+		f.qlink1.add(v);
 		assertEquals(1, f.qlink1.vehOnLinkCount());
 		assertFalse(f.qlink1.hasSpace());
 		assertTrue(f.qlink1.bufferIsEmpty());
