@@ -72,6 +72,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -900,6 +901,8 @@ public class QSimTest extends TestCase {
 		Link link5 = f.network.createAndAddLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
 		Link link6 = f.network.createAndAddLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
 
+		f.network.getFactory().setRouteFactory(TransportMode.car, new LinkNetworkRouteFactory());
+
 		// create a person with a car-leg from link1 to link5, but an incomplete route
 		PersonImpl person = new PersonImpl(new IdImpl(0));
 		PlanImpl plan = person.createAndAddPlan(true);
@@ -964,14 +967,14 @@ public class QSimTest extends TestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		events.addHandler(collector);
-		
+
 		// first test without special settings
 		QSim sim = new QSim(scenario, events);
 		sim.run();
 		assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(act1.getEndTime() + leg.getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		collector.reset(0);
-		
+
 		// second test with special start/end times
 		config.getQSimConfigGroup().setStartTime(8.0*3600);
 		config.getQSimConfigGroup().setEndTime(11.0*3600);
@@ -1010,7 +1013,7 @@ public class QSimTest extends TestCase {
 	/*package*/ final static class FirstLastEventCollector implements BasicEventHandler {
 		public Event firstEvent = null;
 		public Event lastEvent = null;
-		
+
 		public void handleEvent(final Event event) {
 			if (firstEvent == null) {
 				firstEvent = event;
@@ -1094,7 +1097,7 @@ public class QSimTest extends TestCase {
 			this.link3 = this.network.createAndAddLink(new IdImpl("3"), this.node3, this.node4, 100, 100, 60000, 9);
 
 			/* build plans */
-			this.plans = (PopulationImpl) scenario.getPopulation();
+			this.plans = scenario.getPopulation();
 
 			this.nodes3 = new ArrayList<Node>();
 			this.nodes3.add(this.node3);
