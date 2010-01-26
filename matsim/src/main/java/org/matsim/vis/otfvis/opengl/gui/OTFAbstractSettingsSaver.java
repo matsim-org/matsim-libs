@@ -140,7 +140,7 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 	public OTFVisConfig openAndReadConfigFromFile(File file) {
     	ObjectInputStream inFile;
     	if(file == null) {
-    	  throw new IllegalArgumentException("Not able to read config from file: " + file.getPath());
+    	  throw new NullPointerException("Not able to read config from file.");
     	}
 		try {
 			inFile = new ObjectInputStream(new FileInputStream(file));

@@ -105,12 +105,8 @@ public class ParallelMoveNodesAndLinks {
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) 
 		{
-			MoveThread moveThread = new MoveThread(simulateAllNodes);
+			MoveThread moveThread = new MoveThread(simulateAllNodes, this.startBarrier, this.separationBarrier, this.endBarrier);
 			moveThread.setName("MoveNodesAndLinks" + i);
-			
-			moveThread.setStartBarrier(this.startBarrier);
-			moveThread.setSeparationBarrier(this.separationBarrier);
-			moveThread.setEndBarrier(this.endBarrier);
 			
 			moveThread.setExtendedQueueNodeArray(this.parallelNodesArrays[i]);
 			moveThread.handleLinks(parallelSimLinksLists.get(i));
@@ -292,31 +288,19 @@ public class ParallelMoveNodesAndLinks {
 		private boolean simulateAllNodes = false;
 		private boolean simulateAllLinks = false;
 		
-		private CyclicBarrier startBarrier;
-		private CyclicBarrier separationBarrier;
-		private CyclicBarrier endBarrier;
+		private final CyclicBarrier startBarrier;
+		private final CyclicBarrier separationBarrier;
+		private final CyclicBarrier endBarrier;
 				
 		private ExtendedQueueNode[] queueNodes;
 		private List<QLink> links = new ArrayList<QLink>();
 					
-		public MoveThread(boolean simulateAllNodes)
+		public MoveThread(boolean simulateAllNodes, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier)
 		{
 			this.simulateAllNodes = simulateAllNodes;
-		}
-
-		public void setStartBarrier(CyclicBarrier cyclicBarrier)
-		{
-			this.startBarrier = cyclicBarrier;
-		}
-		
-		public void setSeparationBarrier(CyclicBarrier cyclicBarrier)
-		{
-			this.separationBarrier = cyclicBarrier;
-		}
-		
-		public void setEndBarrier(CyclicBarrier cyclicBarrier)
-		{
-			this.endBarrier = cyclicBarrier;
+			this.startBarrier = startBarrier;
+			this.separationBarrier = separationBarrier;
+			this.endBarrier = endBarrier;
 		}
 				
 		public void setExtendedQueueNodeArray(ExtendedQueueNode[] queueNodes)

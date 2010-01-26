@@ -86,7 +86,7 @@ LegTravelTimeEstimator {
 		this.simLegInterpretation = simLegInterpretation;
 	}
 
-	private class DynamicODMatrixEntry {
+	private static class DynamicODMatrixEntry {
 
 		private final Location origin;
 		private final Location destination;

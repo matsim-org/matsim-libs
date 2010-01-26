@@ -34,7 +34,7 @@ public class AbstractMultithreadedModuleTest extends MatsimTestCase {
 		assertEquals(3, testee.getNumOfThreads());
 	}
 
-	private class DummyAbstractMultithreadedModule extends AbstractMultithreadedModule { 
+	private static class DummyAbstractMultithreadedModule extends AbstractMultithreadedModule { 
 
 		public DummyAbstractMultithreadedModule(
 				GlobalConfigGroup globalConfigGroup) {

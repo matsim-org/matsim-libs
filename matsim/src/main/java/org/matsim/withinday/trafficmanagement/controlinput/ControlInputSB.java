@@ -484,8 +484,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		for (Id id : inAndOutLinks) {
 			double extraAgents = 0.0;
 			double flow = getInOutFlow(id, route);
-			if ((this.ttFreeSpeedUpToAndIncludingLink.get(id) > ttToLink)
-					|| (this.ttFreeSpeedUpToAndIncludingLink == null)) {
+			if ((this.ttFreeSpeedUpToAndIncludingLink.get(id) > ttToLink)) {
 				extraAgents = 0.0;
 			}
 			else {

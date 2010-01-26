@@ -63,7 +63,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	private JTextField textField;
 
-	private IdResolver agentIdResolver = null;
+	private final IdResolver agentIdResolver;
 
 	private final OTFHostControlBar hostControlBar;
 	private final Map<OTFQueryRemote, OTFQueryResult> queryEntries = new HashMap<OTFQueryRemote, OTFQueryResult>();
@@ -86,9 +86,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	public OTFQueryControl(OTFHostControlBar handler, final OTFVisConfig config) {
 		this.config = config;
-		if (agentIdResolver == null) {
-			agentIdResolver = new myIdResolver();
-		}
+		this.agentIdResolver = new MyIdResolver();
 		this.hostControlBar = handler;
 		this.config.setQueryType(queries.get(0).clazz.getCanonicalName());
 	}
@@ -237,7 +235,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 		List<String> resolveId(Double origRect);
 	}
 
-	public class myIdResolver implements IdResolver {
+	public class MyIdResolver implements IdResolver {
 		public List<String> resolveId(Double origRect) {
 			QueryAgentId.Result agentIdQuery = (QueryAgentId.Result) createQuery(new QueryAgentId(origRect));
 			if ((agentIdQuery != null) && (agentIdQuery.agentIds.size() != 0)) {

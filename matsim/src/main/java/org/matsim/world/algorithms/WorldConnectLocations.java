@@ -22,6 +22,7 @@ package org.matsim.world.algorithms;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -178,8 +179,10 @@ public class WorldConnectLocations {
 			}
 			bw.close();
 			fw.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Error while writing given outputF2LFile='"+file+"'.");
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Error while writing given outputF2LFile='"+file+"'.", e);
+		} catch (IOException e) {
+			throw new RuntimeException("Error while writing given outputF2LFile='"+file+"'.", e);
 		}
 		log.info("    done. (writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file+")");
 	}

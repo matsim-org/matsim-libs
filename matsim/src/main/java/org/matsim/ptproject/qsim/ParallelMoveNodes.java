@@ -129,10 +129,8 @@ public class ParallelMoveNodes {
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) 
 		{
-			MoveNodesThread moveNodesThread = new MoveNodesThread(simulateAllNodes);
+			MoveNodesThread moveNodesThread = new MoveNodesThread(simulateAllNodes, this.startBarrier, this.endBarrier);
 			moveNodesThread.setName("MoveNodes" + i);
-			moveNodesThread.setStartBarrier(this.startBarrier);
-			moveNodesThread.setEndBarrier(this.endBarrier);
 			moveNodesThread.setExtendedQueueNodeArray(this.parallelArrays[i]);			
 			moveNodesThread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			moveNodesThreads[i] = moveNodesThread;
@@ -197,22 +195,14 @@ public class ParallelMoveNodes {
 		private boolean simulateAllNodes = false;
 		private ExtendedQueueNode[] queueNodes;
 		
-		private CyclicBarrier startBarrier;
-		private CyclicBarrier endBarrier;
+		private final CyclicBarrier startBarrier;
+		private final CyclicBarrier endBarrier;
 		
-		public MoveNodesThread(boolean simulateAllNodes)
+		public MoveNodesThread(boolean simulateAllNodes, CyclicBarrier startBarrier, CyclicBarrier endBarrier)
 		{
 			this.simulateAllNodes = simulateAllNodes;
-		}
-		
-		public void setStartBarrier(CyclicBarrier cyclicBarrier)
-		{
-			this.startBarrier = cyclicBarrier;
-		}
-		
-		public void setEndBarrier(CyclicBarrier cyclicBarrier)
-		{
-			this.endBarrier = cyclicBarrier;
+			this.startBarrier = startBarrier;
+			this.endBarrier = endBarrier;
 		}
 		
 		public void setExtendedQueueNodeArray(ExtendedQueueNode[] queueNodes)
