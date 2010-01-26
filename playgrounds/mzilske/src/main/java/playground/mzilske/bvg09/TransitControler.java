@@ -26,13 +26,18 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelCost;
@@ -41,13 +46,14 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.pt.counts.OccupancyAnalyzer;
+import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.BasicVehicleReaderV1;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
-import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.xml.sax.SAXException;
 
 import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
@@ -57,6 +63,10 @@ import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
  */
 public class TransitControler extends Controler {
 
+	private final static Logger logger = Logger.getLogger(TransitControler.class);
+	
+	private final static String COUNTS_MODULE_NAME = "ptCounts";
+	
 	private final TransitConfigGroup transitConfig;
 
 	public TransitControler(final String[] args) {
@@ -87,15 +97,10 @@ public class TransitControler extends Controler {
 		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
 		formats.add(EventsFileFormat.xml);
 		this.config.controler().setEventsFileFormats(formats);
-
 		ActivityParams params = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		params.setTypicalDuration(120.0);
 		this.config.charyparNagelScoring().addActivityParams(params);
-
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-
-		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
-		addControlerListener(cl);
 	}
 
 	@Override
@@ -103,6 +108,29 @@ public class TransitControler extends Controler {
 		StrategyManager manager = new StrategyManager();
 		TransitStrategyManagerConfigLoader.load(this, this.config, manager);
 		return manager;
+	}
+	
+	@Override
+	protected void loadControlerListeners() {
+		super.loadControlerListeners();
+		addTransitControlerListener();
+		if (config.getModule(COUNTS_MODULE_NAME) != null) {
+			addPtCountControlerListener();
+		}
+	}
+
+	private void addPtCountControlerListener() {
+		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
+		logger.info("Using counts.");
+		OccupancyAnalyzerListener oal = new OccupancyAnalyzerListener(occupancyAnalyzer);
+		addControlerListener(oal);
+		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
+		setCreateGraphs(false);
+	}
+
+	private void addTransitControlerListener() {
+		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
+		addControlerListener(cl);
 	}
 
 	@Override
@@ -160,10 +188,39 @@ public class TransitControler extends Controler {
 
 	}
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) {		
 		TransitControler tc = new TransitControler(args);
 		tc.setOverwriteFiles(true);
 		tc.run();
+	}
+
+	public static class OccupancyAnalyzerListener implements
+			BeforeMobsimListener, AfterMobsimListener {
+		
+		private OccupancyAnalyzer occupancyAnalyzer;
+		
+		public OccupancyAnalyzerListener(OccupancyAnalyzer occupancyAnalyzer) {
+			this.occupancyAnalyzer = occupancyAnalyzer;
+		}
+
+		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+			int iter = event.getIteration();
+			if (iter % 10 == 0) {
+				occupancyAnalyzer.reset(iter);
+				event.getControler().getEvents().addHandler(occupancyAnalyzer);
+			}
+		}
+
+		public void notifyAfterMobsim(AfterMobsimEvent event) {
+			int it = event.getIteration();
+			if (it % 10 == 0 && it > event.getControler().getFirstIteration()) {
+				// TODO transfer oa 2 countscompare
+				event.getControler().getEvents().removeHandler(occupancyAnalyzer);
+				occupancyAnalyzer.write(event.getControler().getControlerIO()
+						.getIterationFilename(it, "occupancyAnalysis.txt"));
+			}
+		}
+
 	}
 
 }
