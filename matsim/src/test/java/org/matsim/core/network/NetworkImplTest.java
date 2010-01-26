@@ -20,9 +20,9 @@
 
 package org.matsim.core.network;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -30,7 +30,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 /**
  * @author mrieser
  */
-public class NetworkImplTest extends TestCase {
+public class NetworkImplTest {
 
 	private static final Logger log = Logger.getLogger(NetworkImplTest.class);
 
@@ -39,6 +39,7 @@ public class NetworkImplTest extends TestCase {
 	 * an exception is thrown. No exception should be thrown when the same link is added a
 	 * second time.
 	 */
+	@Test
 	public void testAddLink_existingId() {
 		NetworkLayer network = new NetworkLayer(); // TODO should be NetworkImpl, but that doesn't work
 		Id id1 = new IdImpl(1);
@@ -58,19 +59,46 @@ public class NetworkImplTest extends TestCase {
 		LinkImpl link1b = new LinkImpl(id1, node2, node3, network, 1000, 100.0, 2000.0, 1.0);
 		LinkImpl link2 = new LinkImpl(id2, node2, node4, network, 1000, 100.0, 2000.0, 1.0);
 		network.addLink(link1);
-		assertEquals(1, network.getLinks().size());
+		Assert.assertEquals(1, network.getLinks().size());
 		try {
 			network.addLink(link1b);
-			fail("missing exception. Should not be able to add different link with existing id.");
+			Assert.fail("missing exception. Should not be able to add different link with existing id.");
 		}
-		catch (RuntimeException e) {
+		catch (IllegalArgumentException e) {
 			log.info("catched expected exception.", e);
 		}
-		assertEquals(1, network.getLinks().size());
+		Assert.assertEquals(1, network.getLinks().size());
 		network.addLink(link2);
-		assertEquals(2, network.getLinks().size());
+		Assert.assertEquals(2, network.getLinks().size());
 		network.addLink(link2); // adding the same link again should just be ignored
-		assertEquals(2, network.getLinks().size());
+		Assert.assertEquals(2, network.getLinks().size());
+	}
+	
+	@Test
+	public void testAddNode_existingId() {
+		NetworkImpl network = new NetworkImpl();
+		Id id1 = new IdImpl(1);
+		Id id2 = new IdImpl(2);
+		Id id3 = new IdImpl(3);
+		NodeImpl node1 = new NodeImpl(id1, new CoordImpl(0, 0));
+		NodeImpl node2 = new NodeImpl(id2, new CoordImpl(1000, 0));
+		NodeImpl node3 = new NodeImpl(id3, new CoordImpl(2000, 500));
+		NodeImpl node1b = new NodeImpl(id1, new CoordImpl(2000, 0));
+		network.addNode(node1);
+		network.addNode(node2);
+		Assert.assertEquals(2, network.getNodes().size());
+		try {
+			network.addNode(node1b);
+			Assert.fail("missing exception. Should not be able to add different node with existing id.");
+		}
+		catch (IllegalArgumentException e) {
+			log.info("catched expected exception.", e);
+		}
+		Assert.assertEquals(2, network.getNodes().size());
+		network.addNode(node1); // adding the same node again should just be ignored
+		Assert.assertEquals(2, network.getNodes().size());
+		network.addNode(node3);
+		Assert.assertEquals(3, network.getNodes().size());
 	}
 
 }

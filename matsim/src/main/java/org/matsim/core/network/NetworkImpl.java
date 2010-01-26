@@ -41,7 +41,6 @@ import org.matsim.world.MappedLocation;
 
 /**
  * @author nagel
- *
  */
 public class NetworkImpl implements Network {
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
@@ -92,19 +91,29 @@ public class NetworkImpl implements Network {
 				log.warn("Trying to add a link a second time to the network. link id = " + link.getId().toString());
 				return;
 			}
-			throw new RuntimeException("There exists already a link with id = " + link.getId().toString() +
+			throw new IllegalArgumentException("There exists already a link with id = " + link.getId().toString() +
 					".\nExisting link: " + testLink + "\nLink to be added: " + link +
-					"\nLink is not added to the network.");
+					".\nLink is not added to the network.");
 		}
-		Node fromNode = link.getFromNode() ;
+		Node fromNode = link.getFromNode();
 		fromNode.addOutLink(link);
-		Node toNode = link.getToNode() ;
+		Node toNode = link.getToNode();
 		toNode.addInLink(link);
 		locations.put( link.getId(), (LinkImpl) link);
 	}
 
 	public void addNode(final Node nn) {
 		Id id = nn.getId() ;
+		Node node = this.nodes.get(id);
+		if (node != null) {
+			if (node == nn) {
+				log.warn("Trying to add a node a second time to the network. node id = " + id.toString());
+				return;
+			}
+			throw new IllegalArgumentException("There exists already a node with id = " + id.toString() +
+					".\nExisting node: " + node + "\nNode to be added: " + node +
+					".\nNode is not added to the network.");
+		}
 		this.nodes.put(id, (NodeImpl) nn);
 		if (this.nodeQuadTree != null) {
 			// we changed the nodes, invalidate the quadTree
