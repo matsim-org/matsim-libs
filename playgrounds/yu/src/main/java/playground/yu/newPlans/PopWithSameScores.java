@@ -71,8 +71,8 @@ public class PopWithSameScores extends NewPopulation {
 
 	public static void main(String[] args) {
 		String netFilename = "../integration-parameterCalibration/test/network.xml", //
-		popFilename = "../integration-parameterCalibration/test/output/output_only4plans.xml.gz", //
-		newPopFilename = "../integration-parameterCalibration/test/plans1_2_100score0.xml";
+		popFilename = "../integration-parameterCalibration/test/tt_dist_perform/plans4x100.xml.gz", //
+		newPopFilename = "../integration-parameterCalibration/test/tt_dist_perform/plans4x100score0.xml.gz";
 
 		Scenario sc = new ScenarioImpl();
 

@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 
+import playground.yu.utils.DebugTools;
+
 /**
  * monitor distance and time of leg
  * 
@@ -42,6 +44,7 @@ public class PersonPlanMonitor {
 
 	private int idx;
 	private Plan plan;
+	private boolean stuck = false;
 
 	/**
 	 * 
@@ -80,14 +83,26 @@ public class PersonPlanMonitor {
 	}
 
 	public double getTotalDistances_km() {
+		if (this.stuck)
+			return 0.0;
 		return legDist;
 	}
 
 	public double getTotalTravelTimes_h() {
+		if (this.stuck)
+			return 24.0;
 		return legDur;
 	}
 
 	public double getTotalPerformTime_h(CharyparNagelScoringConfigGroup scoring) {
+		if (this.stuck)
+			return 0.0;
+		if (this.idx % 2 == 1)
+			throw new RuntimeException(PersonPlanMonitor.class.getName()
+					+ "\tline:\t" + DebugTools.getLineNumber(new Exception())
+					+ "\tthis.idx%2=1, it's impossible!!!\tfrom person\t"
+					+ this.plan.getPerson());
+
 		String actType = ((Activity) this.plan.getPlanElements().get(this.idx))
 				.getType();
 		if (Double.isNaN(this.actEndTime) && actType.startsWith("h")) {
@@ -95,8 +110,11 @@ public class PersonPlanMonitor {
 			this.actDur += this.calcActDuration_h(scoring
 					.getActivityParams(actType));
 		}
-
 		return this.actDur;
+	}
+
+	public boolean isStuck() {
+		return stuck;
 	}
 
 	/**
@@ -154,9 +172,7 @@ public class PersonPlanMonitor {
 	}
 
 	public void notifyStuck() {
-		this.legDur = 24.0;
-		this.legDist = 0.0;
-		this.actDur = 0.0;
+		this.stuck = true;
 	}
 
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PopPruner.java
+ * PopComplementer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -31,39 +31,45 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
- * deletes the spilth {@code org.matsim.api.core.v01.population.Plan}s, which is
- * more than the maxPlansPerAgent
+ * complements the {@code Population}, that each has less than maxPlansPerAgents
+ * {@code Plan}s, so that every person has maxPlansPerAgents {@code Plan}s
  * 
  * @author yu
  * 
  */
-public class PopPruner extends NewPopulation {
-	private final int maxPlansPerAgent;
-	private final WorstPlanForRemovalSelector worstPlanSelector;
+public class PopComplementer extends NewPopulation {
+	private int maxPlansPerAgent;
 
-	public PopPruner(Network net, Population population, String filename,
-			int maxPlansPerAgent) {
-		super(net, population, filename);
+	/**
+	 * @param network
+	 * @param population
+	 * @param filename
+	 */
+	public PopComplementer(Network network, Population population,
+			String filename, int maxPlansPerAgent) {
+		super(network, population, filename);
 		this.maxPlansPerAgent = maxPlansPerAgent;
-		this.worstPlanSelector = new WorstPlanForRemovalSelector();
 	}
 
 	@Override
 	public void run(Person person) {
 		int size = person.getPlans().size();
-		while (size > this.maxPlansPerAgent) {
-			person.getPlans().remove(this.worstPlanSelector.selectPlan(person));
+		while (size < this.maxPlansPerAgent) {
+			person.addPlan(new RandomPlanSelector().selectPlan(person));
 			size = person.getPlans().size();
 		}
 		this.pw.writePerson(person);
 	}
 
-	public static void main(String args[]) {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
 		String netFilename = "../integration-parameterCalibration/test/network.xml";
-		String oldPopFilename = "../integration-parameterCalibration/test/tt_dist_perform/output_plans.xml.gz";
+		String oldPopFilename = "../integration-parameterCalibration/test/tt_dist_perform/output_-4plans.xml.gz";
 		String newPopFilename = "../integration-parameterCalibration/test/tt_dist_perform/output_4plans.xml.gz";
 
 		Scenario s = new ScenarioImpl();
@@ -74,7 +80,7 @@ public class PopPruner extends NewPopulation {
 		Population pop = s.getPopulation();
 		new MatsimPopulationReader(s).readFile(oldPopFilename);
 
-		PopPruner pp = new PopPruner(net, pop, newPopFilename, 4);
+		PopComplementer pp = new PopComplementer(net, pop, newPopFilename, 4);
 		pp.run(pop);
 		pp.writeEndPlans();
 	}
