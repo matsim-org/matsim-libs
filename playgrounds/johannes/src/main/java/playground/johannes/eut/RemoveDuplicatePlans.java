@@ -19,17 +19,19 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.misc.RouteUtils;
 
 /**
  * @author illenberger
@@ -38,9 +40,15 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 public class RemoveDuplicatePlans implements BeforeMobsimListener {
 
 	private static final Logger log = Logger.getLogger(RemoveDuplicatePlans.class);
-	
+
+	private final Network network;
+
+	public RemoveDuplicatePlans(Network network) {
+		this.network = network;
+	}
+
 //	private Map<Person, Plan> selected;
-//	
+//
 //	public void notifyIterationStarts(IterationStartsEvent event) {
 //		selected = new HashMap<Person, Plan>();
 //		for(Person p : event.getControler().getPopulation()) {
@@ -65,8 +73,8 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 					}
 				}
 			}
-			
-			
+
+
 		}
 		log.warn("Removed " + counter +" plans.");
 	}
@@ -74,15 +82,15 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 	private boolean comparePlans(Plan plan1, Plan plan2) {
 		if (plan1.getPlanElements().size() > 1 && plan2.getPlanElements().size() > 1) {
 			boolean plansDiffer = false;
-			
+
 			for (int i = 1; i < plan1.getPlanElements().size(); i += 2) {
 				LegImpl leg2 = (LegImpl) plan2.getPlanElements().get(i);
 				LegImpl leg1 = (LegImpl) plan1.getPlanElements().get(i);
 				/*
 				 * Compare sequence of nodes.
 				 */
-				if (((NetworkRouteWRefs) leg2.getRoute()).getNodes().equals(
-						((NetworkRouteWRefs) leg1.getRoute()).getNodes())) {
+				if (RouteUtils.getNodes((NetworkRouteWRefs) leg2.getRoute(), this.network).equals(
+						RouteUtils.getNodes((NetworkRouteWRefs) leg1.getRoute(), this.network))) {
 					/*
 					 * Compare departure times.
 					 */
@@ -95,9 +103,9 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 					break;
 				}
 			}
-			
+
 			return !plansDiffer;
-			
+
 		} else
 			return false;
 	}

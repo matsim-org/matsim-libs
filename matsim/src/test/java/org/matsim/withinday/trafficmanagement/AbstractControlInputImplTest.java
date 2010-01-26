@@ -20,10 +20,11 @@
 
 package org.matsim.withinday.trafficmanagement;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,10 +44,26 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 		MatsimNetworkReader parser = new MatsimNetworkReader(scenario);
 		parser.readFile(getInputDirectory() + "network.xml");
 
-		NetworkRouteWRefs route1 = new NodeNetworkRouteImpl();
-		route1.setNodes(NetworkUtils.getNodes(network, "3 6 7 12"));
-		NetworkRouteWRefs route2 = new NodeNetworkRouteImpl();
-		route2.setNodes(NetworkUtils.getNodes(network, "3 8 9 12"));
+		Id agentId0 = scenario.createId("0");
+		Id agentId1 = scenario.createId("1");
+		Id agentId2 = scenario.createId("2");
+
+		Id linkId5 = scenario.createId("5");
+		Id linkId6 = scenario.createId("6");
+		Id linkId7 = scenario.createId("7");
+		Id linkId8 = scenario.createId("8");
+		Id linkId14 = scenario.createId("14");
+		Id linkId16 = scenario.createId("16");
+		Id linkId20 = scenario.createId("20");
+
+		Link link5 = network.getLinks().get(linkId5);
+		Link link7 = network.getLinks().get(linkId7);
+		Link link14 = network.getLinks().get(linkId14);
+		Link link16 = network.getLinks().get(linkId16);
+		NetworkRouteWRefs route1 = new NodeNetworkRouteImpl(link5, link14);
+		route1.setLinks(link5, NetworkUtils.getLinks(network, "6"), link14);
+		NetworkRouteWRefs route2 = new NodeNetworkRouteImpl(link7, link16);
+		route2.setLinks(link7, NetworkUtils.getLinks(network, "8"), link16);
 
 		//control input test class
 		ControlInputTestImpl ci = new ControlInputTestImpl(network);
@@ -56,64 +73,68 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		LinkEnterEventImpl enterEvent = new LinkEnterEventImpl(0.0, new IdImpl("0"), new IdImpl("5"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkEnterEventImpl(0.0, agentId0, linkId5));
+
 		assertEquals(1, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		enterEvent = new LinkEnterEventImpl(0.0, new IdImpl("1"), new IdImpl("5"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkEnterEventImpl(0.0, agentId1, linkId5));
+
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(1.0, new IdImpl("0"), new IdImpl("5"));
-		ci.handleEvent(leaveEvent);
-		enterEvent = new LinkEnterEventImpl(1.0, new IdImpl("0"), new IdImpl("6"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkLeaveEventImpl(1.0, agentId0, linkId5));
+		ci.handleEvent(new LinkEnterEventImpl(1.0, agentId0, linkId6));
+
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		enterEvent = new LinkEnterEventImpl(1.0, new IdImpl("2"), new IdImpl("7"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkEnterEventImpl(1.0, agentId2, linkId7));
+
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(1, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new LinkLeaveEventImpl(2.0, new IdImpl("2"), new IdImpl("7"));
-		ci.handleEvent(leaveEvent);
-		enterEvent = new LinkEnterEventImpl(2.0, new IdImpl("2"), new IdImpl("8"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkLeaveEventImpl(2.0, agentId2, linkId7));
+		ci.handleEvent(new LinkEnterEventImpl(2.0, agentId2, linkId8));
+
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(1, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new LinkLeaveEventImpl(3.0, new IdImpl("2"), new IdImpl("8"));
-		ci.handleEvent(leaveEvent);
-		enterEvent = new LinkEnterEventImpl(3.0, new IdImpl("2"), new IdImpl("16"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkLeaveEventImpl(3.0, agentId2, linkId8));
+		ci.handleEvent(new LinkEnterEventImpl(3.0, agentId2, linkId16));
+
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(1, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new LinkLeaveEventImpl(4.0, new IdImpl("2"), new IdImpl("16"));
-		ci.handleEvent(leaveEvent);
-		enterEvent = new LinkEnterEventImpl(4.0, new IdImpl("2"), new IdImpl("20"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkLeaveEventImpl(4.0, agentId2, linkId16));
+		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
+		ci.handleEvent(new LinkEnterEventImpl(4.0, agentId2, linkId20));
+
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new LinkLeaveEventImpl(4.0, new IdImpl("1"), new IdImpl("5"));
-		ci.handleEvent(leaveEvent);
-		enterEvent = new LinkEnterEventImpl(4.0, new IdImpl("1"), new IdImpl("6"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkLeaveEventImpl(4.0, agentId1, linkId5));
+		ci.handleEvent(new LinkEnterEventImpl(4.0, agentId1, linkId6));
+
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new LinkLeaveEventImpl(4.0, new IdImpl("1"), new IdImpl("5"));
-		ci.handleEvent(leaveEvent);
-		enterEvent = new LinkEnterEventImpl(4.0, new IdImpl("1"), new IdImpl("6"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkLeaveEventImpl(4.0, agentId1, linkId5));
+		ci.handleEvent(new LinkEnterEventImpl(4.0, agentId1, linkId6));
+
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new LinkLeaveEventImpl(4.0, new IdImpl("1"), new IdImpl("6"));
-		ci.handleEvent(leaveEvent);
-		enterEvent = new LinkEnterEventImpl(4.0, new IdImpl("1"), new IdImpl("20"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkLeaveEventImpl(4.0, agentId1, linkId6));
+		ci.handleEvent(new LinkEnterEventImpl(4.0, agentId1, linkId20));
+
 		assertEquals(1, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-    leaveEvent = new LinkLeaveEventImpl(1.0, new IdImpl("0"), new IdImpl("6"));
-		ci.handleEvent(leaveEvent);
-		enterEvent = new LinkEnterEventImpl(1.0, new IdImpl("0"), new IdImpl("20"));
-		ci.handleEvent(enterEvent);
+
+		ci.handleEvent(new LinkLeaveEventImpl(1.0, agentId0, linkId6));
+		ci.handleEvent(new LinkEnterEventImpl(1.0, agentId0, linkId20));
+
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
 	}

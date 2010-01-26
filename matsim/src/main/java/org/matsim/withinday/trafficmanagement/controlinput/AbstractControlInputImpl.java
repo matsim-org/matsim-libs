@@ -57,7 +57,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 			.getLogger(AbstractControlInputImpl.class);
 
 	protected final Network network;
-	
+
 	protected NetworkRouteWRefs mainRoute;
 
 	protected NetworkRouteWRefs alternativeRoute;
@@ -178,9 +178,11 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	public int getNumberOfVehiclesOnRoute(final NetworkRouteWRefs route) {
 		int ret = 0;
+		ret += this.numberOfAgents.get(route.getStartLinkId());
 		for (Id linkId : route.getLinkIds()) {
 			ret += this.numberOfAgents.get(linkId);
 		}
+		ret += this.numberOfAgents.get(route.getEndLinkId());
 		return ret;
 	}
 
@@ -192,6 +194,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.writer.open();
 
 		List<Id> routeLinkIds = this.getAlternativeRoute().getLinkIds();
+		routeLinkIds.add(0, this.getAlternativeRoute().getStartLinkId());
+		routeLinkIds.add(this.getAlternativeRoute().getEndLinkId());
 		this.firstLinkOnAlternativeRoute = routeLinkIds.get(0);
 		this.lastLinkOnAlternativeRoute = routeLinkIds.get(routeLinkIds.size() - 1);
 		for (Id linkId : routeLinkIds) {
@@ -207,6 +211,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 		// find the natural bottleneck on the alternative route
 		List<Id> altRouteLinkIds = this.getAlternativeRoute().getLinkIds();
+		altRouteLinkIds.add(0, this.getAlternativeRoute().getStartLinkId());
+		altRouteLinkIds.add(this.getAlternativeRoute().getEndLinkId());
 		this.altRouteNaturalBottleNeckId = altRouteLinkIds.get(0);
 		Link altRouteNaturalBottleNeck = this.network.getLinks().get(this.altRouteNaturalBottleNeckId);
 		for (int i = 1; i < altRouteLinkIds.size(); i++) {
@@ -218,6 +224,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 
 		routeLinkIds = this.getMainRoute().getLinkIds();
+		routeLinkIds.add(0, this.getMainRoute().getStartLinkId());
+		routeLinkIds.add(this.getMainRoute().getEndLinkId());
 		this.firstLinkOnMainRoute = routeLinkIds.get(0);
 		this.lastLinkOnMainRoute = routeLinkIds.get(routeLinkIds.size() - 1);
 		double tt;
@@ -234,6 +242,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 		// find the natural bottleneck on the main route
 		List<Id> mainRouteLinkIds = this.getMainRoute().getLinkIds();
+		mainRouteLinkIds.add(0, this.getMainRoute().getStartLinkId());
+		mainRouteLinkIds.add(this.getMainRoute().getEndLinkId());
 		this.mainRouteNaturalBottleNeckId = mainRouteLinkIds.get(0);
 		Link mainRouteNaturalBottleNeck = this.network.getLinks().get(this.mainRouteNaturalBottleNeckId);
 		for (int i = 1; i < mainRouteLinkIds.size(); i++) {
@@ -457,7 +467,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	}
 
 	public void reset(final int iteration) {}
-	
+
 	protected List<Id> getOutlinks(final NetworkRouteWRefs route) {
 		if (route == this.mainRoute) {
 			return this.outLinksMainRoute;

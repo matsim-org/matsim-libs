@@ -41,7 +41,7 @@ import org.matsim.withinday.trafficmanagement.TrafficManagement;
  *
  */
 public class EUTController2 extends WithindayControler {
-	
+
 	//==============================================================================
 	// private fields
 	//==============================================================================
@@ -61,15 +61,15 @@ public class EUTController2 extends WithindayControler {
 	private SummaryWriter summaryWriter;
 
 	private EUTRouterAnalyzer analyzer;
-	
+
 	private double capReduction;
-	
+
 	private List<Link> riskyLinks;
 
 	//==============================================================================
-	// 
+	//
 	//==============================================================================
-	
+
 	public EUTController2(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
@@ -113,7 +113,7 @@ public class EUTController2 extends WithindayControler {
 		for(String id : linkIds.split(" ")) {
 			Link link = getNetwork().getLinks().get(new IdImpl(id));
 			riskyLinks.add(link);
-			
+
 		}
 		/*
 		 * Count agents traversed risky links...
@@ -139,7 +139,7 @@ public class EUTController2 extends WithindayControler {
 		 * Remove all scores in the 0-th iteration.
 		 * We have to remove duplicate plans, i.e., plans with the same route and departure time!
 		 */
-		addControlerListener(new RemoveDuplicatePlans());
+		addControlerListener(new RemoveDuplicatePlans(this.network));
 		addControlerListener(new RemoveScores());
 		/*
 		 * Travel time provider for reactive travel times.
@@ -155,7 +155,7 @@ public class EUTController2 extends WithindayControler {
 		simulator.setCapReduction(capReduction);
 		for(Link link : riskyLinks)
 			simulator.addLink(link);
-		
+
 		addControlerListener(simulator);
 
 	}
@@ -169,7 +169,7 @@ public class EUTController2 extends WithindayControler {
 		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.scenarioData, this.events, this);
 		this.trafficManagement = new TrafficManagement();
 		sim.setTrafficManagement(this.trafficManagement);
-		
+
 		sim.run();
 	}
 

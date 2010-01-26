@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.utils.misc.NetworkUtils;
 
 
 /**
@@ -60,7 +59,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	@Override
 	public NetworkRouteWRefs requestRoute(final Link departureLink, final Link destinationLink, final double time) {
 		NetworkRouteWRefs subRoute;
-		NetworkRouteWRefs returnRoute = (NetworkRouteWRefs) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(TransportMode.car, departureLink, destinationLink);
+		NetworkRouteWRefs returnRoute = (NetworkRouteWRefs) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, departureLink, destinationLink);
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		Link tmpDepLink = departureLink;
 		for (RouteProvider rp : this.providers) {
@@ -70,23 +69,27 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 			subRoute = rp.requestRoute(tmpDepLink, destinationLink, time);
 			//in the first iteration of the loop we have to add all nodes
 			if (routeNodes.isEmpty()) {
+				if (subRoute.getStartLinkId() != departureLink.getId()) {
+					routeNodes.add(this.network.getLinks().get(subRoute.getStartLinkId()).getFromNode());
+				}
 				routeNodes.addAll(subRoute.getNodes());
 			}
 			//next time we don't have to add the first node
 			else {
-				routeNodes.addAll(subRoute.getNodes().subList(1, subRoute.getNodes().size()));
+				routeNodes.addAll(subRoute.getNodes());
 			}
 			returnRoute.setNodes(departureLink, routeNodes, destinationLink);
-			if (isCompleteRoute(returnRoute, destinationLink)) {
+			if (isEndCompleteRoute(returnRoute, destinationLink)) {
 				return returnRoute;
 			}
-			List<Link> returnRouteLinks = NetworkUtils.getLinks(this.network, returnRoute.getLinkIds());
-			tmpDepLink = returnRouteLinks.get(returnRouteLinks.size()-1);
+			tmpDepLink = subRoute.getEndLink();
+//			List<Link> returnRouteLinks = NetworkUtils.getLinks(this.network, returnRoute.getLinkIds());
+//			tmpDepLink = returnRouteLinks.get(returnRouteLinks.size()-1);
 		}
 		return null;
 	}
 
-	private boolean isCompleteRoute(final NetworkRouteWRefs subRoute, final Link destinationLink) {
+	private boolean isEndCompleteRoute(final NetworkRouteWRefs subRoute, final Link destinationLink) {
 		Node endNode = subRoute.getNodes().get(subRoute.getNodes().size() - 1);
 		if (endNode.getOutLinks().containsKey(destinationLink.getId())) {
 			return true;

@@ -144,7 +144,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.trafficManagement = new TrafficManagement();
 		}
 		else if (name.equalsIgnoreCase(GUIDANCEDEVICE)) {
-			this.vdsSign = new VDSSign();
+			this.vdsSign = new VDSSign(this.network);
 		}
 		else if (name.equalsIgnoreCase(MAINROUTE) || name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
 			this.currentRouteNodes = new ArrayList<Node>();
@@ -227,12 +227,50 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		String content2 = content.trim();
 		if (name.equalsIgnoreCase(MAINROUTE)) {
-			NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, null, null);
-			route.setNodes(null, this.currentRouteNodes, null);
+			Link startLink = null;
+			Node firstNode = this.currentRouteNodes.get(0);
+			Node secondNode = this.currentRouteNodes.get(1);
+			for (Link link : firstNode.getOutLinks().values()) {
+				if (link.getToNode().equals(secondNode)) {
+					startLink = link;
+				}
+			}
+			Link endLink = null;
+			Node lastNode = this.currentRouteNodes.get(this.currentRouteNodes.size() - 1);
+			Node secondLastNode = this.currentRouteNodes.get(this.currentRouteNodes.size() - 2);
+			for (Link link : lastNode.getInLinks().values()) {
+				if (link.getFromNode().equals(secondLastNode)) {
+					endLink = link;
+				}
+			}
+			this.currentRouteNodes.remove(0); // remove first
+			this.currentRouteNodes.remove(this.currentRouteNodes.size() - 1); // remove last
+
+			NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
+			route.setNodes(startLink, this.currentRouteNodes, endLink);
 			this.controlInput.setMainRoute(route);
 		} else if (name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
-			NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, null, null);
-			route.setNodes(null, this.currentRouteNodes, null);
+			Link startLink = null;
+			Node firstNode = this.currentRouteNodes.get(0);
+			Node secondNode = this.currentRouteNodes.get(1);
+			for (Link link : firstNode.getOutLinks().values()) {
+				if (link.getToNode().equals(secondNode)) {
+					startLink = link;
+				}
+			}
+			Link endLink = null;
+			Node lastNode = this.currentRouteNodes.get(this.currentRouteNodes.size() - 1);
+			Node secondLastNode = this.currentRouteNodes.get(this.currentRouteNodes.size() - 2);
+			for (Link link : lastNode.getInLinks().values()) {
+				if (link.getFromNode().equals(secondLastNode)) {
+					endLink = link;
+				}
+			}
+			this.currentRouteNodes.remove(0); // remove first
+			this.currentRouteNodes.remove(this.currentRouteNodes.size() - 1); // remove last
+
+			NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
+			route.setNodes(startLink, this.currentRouteNodes, endLink);
 			this.controlInput.setAlternativeRoute(route);
 		}
 		else if (name.equalsIgnoreCase(CONTROLINPUTCLASS)) {

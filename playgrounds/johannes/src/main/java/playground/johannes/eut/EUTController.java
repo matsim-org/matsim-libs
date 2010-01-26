@@ -77,11 +77,11 @@ public class EUTController extends WithindayControler {
 	private BenefitAnalyzer bAnalyzer;
 
 	private SummaryWriter summaryWriter;
-	
+
 	private double capReduction;
-	
+
 	private List<Link> riskyLinks;
-	
+
 
 	/**
 	 * @param args
@@ -146,7 +146,7 @@ public class EUTController extends WithindayControler {
 		this.summaryWriter = new SummaryWriter(getConfig().findParam(CONFIG_MODULE_NAME, "summaryFile"));
 		addControlerListener(this.summaryWriter);
 		super.setUp();
-		
+
 		/*
 		 * Add the ttmemory updater for day2day re-replanning.
 		 */
@@ -173,7 +173,7 @@ public class EUTController extends WithindayControler {
 		for(String id : linkIds.split(" ")) {
 			Link link = getNetwork().getLinks().get(new IdImpl(id));
 			riskyLinks.add(link);
-			
+
 		}
 		/*
 		 * Count agents traversed risky links...
@@ -198,7 +198,7 @@ public class EUTController extends WithindayControler {
 		/*
 		 *
 		 */
-		addControlerListener(new RemoveDuplicatePlans());
+		addControlerListener(new RemoveDuplicatePlans(this.network));
 		addControlerListener(new RemoveScores());
 	}
 
@@ -218,16 +218,16 @@ public class EUTController extends WithindayControler {
 		this.reactTTs = new EstimReactiveLinkTT(1, this.network); // TODO: Think about that!!!
 		this.events.addHandler(this.reactTTs);
 		this.reactTTs.reset(getIteration());
-		
+
 		RandomIncidentSimulator simulator = new RandomIncidentSimulator(network, incidentProba);
 		simulator.setCapReduction(capReduction);
 		for(Link link : riskyLinks)
 //			simulator.addLink(sim.getQueueNetworkLayer().getQueueLink(link.getId()));
 			simulator.addLink(null); //FIXME
 		simulator.notifyIterationStarts(this.getIteration());
-		
+
 		sim.run();
-		
+
 //		simulator.notifyIterationEnds(null);
 		events.removeHandler(reactTTs);
 

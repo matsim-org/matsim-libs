@@ -22,11 +22,11 @@ package org.matsim.withinday.trafficmanagement;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.gbl.MatsimRandom;
@@ -80,7 +80,10 @@ public class VDSSign {
 
 	private VDSSignOutput signOutput;
 
-	public VDSSign() {
+	private Network network = null;
+
+	public VDSSign(final Network network) {
+		this.network = network;
 	}
 
 	public void setupIteration(IterationStartsEvent event) {
@@ -287,51 +290,43 @@ public class VDSSign {
 
 	private NetworkRouteWRefs completeRoute(final NetworkRouteWRefs r) {
 		NetworkRouteWRefs ret = new NodeNetworkRouteImpl();
-		ArrayList<Node> rNodes = new ArrayList<Node>(r.getNodes());
-		if (!this.signLink.getToNode().equals(rNodes.get(0))) {
-			for (Node n : calculateInLinks(this.signLink, rNodes.get(0))) {
-				rNodes.add(0, n);
-			}
+		Link startLink = this.network.getLinks().get(r.getStartLinkId());
+		Node startNode = startLink.getFromNode();
+		ArrayList<Node> rNodes = new ArrayList<Node>();
+		rNodes.addAll(r.getNodes());
+//		if (this.signLink != startLink) {
+		if (!(this.signLink.getToNode().equals(startNode) || (this.signLink == startLink))) {
+			startLink = calculateInLink(this.signLink, startNode);
+			rNodes.add(0, startNode);
 		}
-		if (!this.directionLink.getToNode().equals(rNodes.get(rNodes.size() - 1))) {
-			rNodes.addAll(calculateOutLinks(this.directionLink, rNodes.get(rNodes
-					.size() - 1)));
+		Link endLink  = this.network.getLinks().get(r.getEndLinkId());
+		Node endNode = endLink.getToNode();
+		if (!(this.directionLink.getFromNode().equals(endNode) || (this.directionLink == endLink))) {
+			endLink = calculateOutLink(this.directionLink, endNode);
+			rNodes.add(endNode);
 		}
-		ret.setNodes(rNodes);
+		ret.setNodes(startLink, rNodes, endLink);
 		return ret;
 	}
 
-	private List<Node> calculateInLinks(final Link signLink,
-			final Node firstRouteNode) {
-		List<Node> ret = new LinkedList<Node>();
+	private Link calculateInLink(final Link signLink, final Node firstRouteNode) {
 		for (Link l : firstRouteNode.getInLinks().values()) {
 			if (l.getFromNode().equals(signLink.getToNode())) {
-				ret.add(l.getFromNode());
+				return l;
 			}
 		}
-		if (ret.size() == 0) {
-			throw new UnsupportedOperationException(
-					"Calculation of inLinks failed, please extend implementation!");
-		}
-		return ret;
+		throw new UnsupportedOperationException(
+				"Calculation of inLinks failed, please extend implementation!");
 	}
 
-	private List<Node> calculateOutLinks(final Link destLink,
-			final Node lastRouteNode) {
-		List<Node> ret = new LinkedList<Node>();
-		if (destLink.getFromNode().equals(lastRouteNode)) {
-			return ret;
-		}
+	private Link calculateOutLink(final Link destLink, final Node lastRouteNode) {
 		for (Link l : this.directionLink.getFromNode().getInLinks().values()) {
 			if (l.getFromNode().equals(lastRouteNode)) {
-				ret.add(l.getToNode());
+				return l;
 			}
 		}
-		if (ret.size() == 0) {
-			throw new UnsupportedOperationException(
-					"Calculation of OutLinks failed, please extend implementation!");
-		}
-		return ret;
+		throw new UnsupportedOperationException(
+				"Calculation of OutLinks failed, please extend implementation!");
 	}
 
 	// #############################################################################
