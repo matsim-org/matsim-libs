@@ -59,7 +59,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 		Node startNode = this.wrappedNetwork.getNodes().get(fromLinkId);	// start at the end of the "current" link
 		Node endNode = this.wrappedNetwork.getNodes().get(toLinkId); // the target is the start of the link
 
-		if (toLinkId != fromLinkId) {
+		if (!toLinkId.equals(fromLinkId)) {
 			Path path = null;
 			// do not drive/walk around, if we stay on the same link
 			path = this.getLeastCostPathCalculator().calcLeastCostPath(startNode, endNode, depTime);

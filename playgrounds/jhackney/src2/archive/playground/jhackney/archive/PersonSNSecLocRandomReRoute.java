@@ -152,7 +152,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithm{
 
 //			And replace the activity in the chain with it (only changes the facility)
 
-			if(newAct.getLinkId()!=fFromKnowledge.getLink().getId()){
+			if(!newAct.getLinkId().equals(fFromKnowledge.getLink().getId())){
 				// If the first activity was chosen, make sure the last activity is also changed
 				if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
 					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);

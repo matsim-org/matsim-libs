@@ -168,7 +168,7 @@ public class RouteSummaryTest {
 								}
 								tmpRouteLinkList.addLast(nextActLinkId);
 								routeLinkIds = tmpRouteLinkList;
-							} else if ((r.getStartLinkId() == r.getEndLinkId())
+							} else if ((r.getStartLinkId().equals(r.getEndLinkId()))
 									&& previousActLinkId.equals(nextActLinkId)) {
 								routeLinkIds.add(previousActLinkId);
 							}

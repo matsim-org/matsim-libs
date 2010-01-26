@@ -52,7 +52,7 @@ public abstract class LogitSelector {
 				
 				l.incrPaths();
 				
-				if (curr.getPrev().getId() != fromNode.getId()) {
+				if (!curr.getPrev().getId().equals(fromNode.getId())) {
 					final LogitLink p = getDCLogitLink(curr.getPrev().getPrev().getMatsimNode(),curr.getPrev().getMatsimNode());
 					l.addPred(p);
 					p.addSucc(l);
@@ -61,7 +61,7 @@ public abstract class LogitSelector {
 				}
 
 				curr = curr.getPrev();
-			} while (curr.getId() != fromNode.getId());
+			} while (!curr.getId().equals(fromNode.getId()));
 
 		}
 		

@@ -731,7 +731,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 			 * put to the end of the Link so he will immediately leave
 			 * the Link.
 			 */
-			if (route.getStartLinkId() != route.getEndLinkId())
+			if (!route.getStartLinkId().equals(route.getEndLinkId()))
 			{
 				List<Id> list = route.getLinkIds();
 				list.add(route.getEndLinkId());

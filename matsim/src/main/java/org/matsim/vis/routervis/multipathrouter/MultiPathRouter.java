@@ -527,7 +527,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		double color = 0.1;
 			for (NodeData node : toNodes) {
 				final double prob = node.getProb();
-				while (node.getId() != fromNode.getId()) {
+				while (!node.getId().equals(fromNode.getId())) {
 					for (final Link l : node.getMatsimNode().getInLinks().values()) {
 						if (l.getFromNode().getId().equals(node.getPrev().getId())) {
 							this.netStateWriter.setLinkColor(l.getId(), color);
