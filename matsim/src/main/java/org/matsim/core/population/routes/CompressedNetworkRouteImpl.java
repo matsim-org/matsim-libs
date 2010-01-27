@@ -66,6 +66,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	}
 
 	@Deprecated
+	@Override
 	public List<Link> getLinks() {
 		if (this.uncompressedLength < 0) { // it seems the route never got initialized correctly
 			return new ArrayList<Link>(0);
@@ -115,6 +116,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 		super.setStartLink(link);
 	}
 
+	@Override
 	public List<Id> getLinkIds() {
 		List<Link> links = getLinks();
 		List<Id> ids = new ArrayList<Id>(links.size());
@@ -124,49 +126,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 		return ids;
 	}
 
-	public List<Node> getNodes() {
-		if (this.uncompressedLength < 0) { // it seems the route never got initialized correctly
-			return new ArrayList<Node>(0);
-		}
-		ArrayList<Node> nodes = new ArrayList<Node>(this.uncompressedLength + 1);
-		if (this.modCount != this.routeModCountState) {
-			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
-			return nodes;
-		}
-
-		Link startLink = getStartLink();
-		Link endLink = getEndLink();
-
-		if (startLink == endLink) {
-			return nodes;
-		}
-
-		Link previousLink = startLink;
-		for (Link link : this.route) {
-			getNodesTillLink(nodes, link, previousLink);
-			previousLink = link;
-		}
-		getNodesTillLink(nodes, endLink, previousLink);
-
-		return nodes;
-	}
-
-	private void getNodesTillLink(final List<Node> nodes, final Link nextLink, final Link startLink) {
-		Link link = startLink;
-		do {
-			Node node = link.getToNode();
-			nodes.add(node);
-			for (Link outLink : node.getOutLinks().values()) {
-				if (nextLink == outLink) {
-					return;
-				}
-			}
-			// nextLink is not an outgoing link, so continue with the subsequent link
-			link = this.subsequentLinks.get(link);
-		} while (true);
-
-	}
-
+	@Override
 	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 		Link newStartLink = null;
 		Link newEndLink = null;
@@ -204,14 +164,17 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 		return subRoute;
 	}
 
+	@Override
 	public double getTravelCost() {
 		return this.travelCost;
 	}
 
+	@Override
 	public void setTravelCost(final double travelCost) {
 		this.travelCost = travelCost;
 	}
 
+	@Override
 	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
 		this.route.clear();
 		setStartLink(startLink);
@@ -234,10 +197,12 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	}
 
 	@Deprecated
+	@Override
 	public void setNodes(final List<Node> srcRoute) {
 		setNodes(null, srcRoute, null);
 	}
 
+	@Override
 	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 		this.route.clear();
 		if (startLink != null) {
@@ -316,10 +281,12 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 		return dist;
 	}
 
+	@Override
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}
 
+	@Override
 	public void setVehicleId(final Id vehicleId) {
 		this.vehicleId = vehicleId;
 	}

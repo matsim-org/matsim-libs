@@ -30,6 +30,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
@@ -107,7 +108,7 @@ public class PTActWriter {
 				System.out.println(" ");
 				System.out.println(leg.toString());
 
-				for (Node node : networkRoute.getNodes()){
+				for (Node node : RouteUtils.getNodes(networkRoute, this.logicNet)){
 					if (node != null) System.out.print(" " + node.getId() + " " );
 				}
 			}

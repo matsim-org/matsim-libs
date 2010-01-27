@@ -50,14 +50,6 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		super(startLink, endLink);
 	}
 
-	public NodeNetworkRouteImpl(final NetworkRouteWRefs route) {
-		super(route.getStartLink(), route.getEndLink());
-		super.setDistance(route.getDistance());
-		super.setTravelTime(route.getTravelTime());
-		this.route.addAll(route.getNodes());
-		this.route.trimToSize();
-	}
-
 	@Override
 	public NodeNetworkRouteImpl clone() {
 		NodeNetworkRouteImpl cloned = (NodeNetworkRouteImpl) super.clone();
@@ -66,10 +58,7 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		return cloned;
 	}
 
-	public List<Node> getNodes() {
-		return this.route;
-	}
-
+	@Override
 	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
 		this.route.clear();
 		setStartLink(startLink);
@@ -98,10 +87,12 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	}
 
 	@Deprecated
+	@Override
 	public void setNodes(final List<Node> srcRoute) {
 		setNodes(null, srcRoute, null);
 	}
 
+	@Override
 	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 		setStartLink(startLink);
 		setEndLink(endLink);
@@ -122,14 +113,17 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		return super.getDistance();
 	}
 
+	@Override
 	public final void setTravelCost(final double travelCost) {
 		this.cost = travelCost;
 	}
 
+	@Override
 	public final double getTravelCost() {
 		return this.cost;
 	}
 
+	@Override
 	public List<Id> getLinkIds() {
 		List<Id> ret = new ArrayList<Id>(Math.max(0, this.route.size() - 1));
 		for (Link l : getLinks()) {
@@ -138,6 +132,7 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		return ret;
 	}
 
+	@Override
 	public final List<Link> getLinks() {
 		// marcel, 2006-09-05: added getLinkRoute
 		/* Nodes have proved to not be the best solution to store routes.
@@ -190,6 +185,7 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	 * @return a route leading from <code>fromNode</code> to <code>toNode</code> along this route
 	 * @throws IllegalArgumentException if <code>fromNode</code> or <code>toNode</code> are not part of this route
 	 */
+	@Override
 	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 		Link fromLink = getStartLink();
 		Link toLink = getEndLink();
@@ -277,10 +273,12 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		return b.toString();
 	}
 
+	@Override
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}
 
+	@Override
 	public void setVehicleId(final Id vehicleId) {
 		this.vehicleId  = vehicleId;
 	}

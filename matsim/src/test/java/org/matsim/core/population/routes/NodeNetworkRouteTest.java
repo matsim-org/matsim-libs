@@ -22,13 +22,15 @@ package org.matsim.core.population.routes;
 
 import java.util.ArrayList;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.testcases.fakes.FakeLink;
-import org.matsim.testcases.fakes.FakeNode;
 
 /**
  * @author mrieser
@@ -40,31 +42,41 @@ public class NodeNetworkRouteTest extends AbstractNetworkRouteTest {
 		return new NodeNetworkRouteImpl(fromLink, toLink);
 	}
 
+	@Test
 	public void testClone() {
-		Id id1 = new IdImpl(1);
-		Id id2 = new IdImpl(2);
-		Id id3 = new IdImpl(3);
-		Id id4 = new IdImpl(4);
-		Id id5 = new IdImpl(5);
-		Link startLink = new FakeLink(id1);
-		Link endLink = new FakeLink(id2);
-		Node node3 = new FakeNode(id3);
-		Node node4 = new FakeNode(id4);
-		Node node5 = new FakeNode(id5);
+		Scenario scenario = new ScenarioImpl();
+		Id id1 = scenario.createId("1");
+		Id id2 = scenario.createId("2");
+		Id id3 = scenario.createId("3");
+		Id id4 = scenario.createId("4");
+		Id id5 = scenario.createId("5");
+		Network network = scenario.getNetwork();
+		Node node3 = network.getFactory().createNode(id3, scenario.createCoord(0, 0));
+		Node node4 = network.getFactory().createNode(id4, scenario.createCoord(100, 0));
+		Node node5 = network.getFactory().createNode(id5, scenario.createCoord(200, 0));
+		network.addNode(node3);
+		network.addNode(node4);
+		network.addNode(node5);
+		Link startLink = network.getFactory().createLink(id1, id3, id4);
+		Link endLink = network.getFactory().createLink(id2, id4, id5);
+		network.addLink(startLink);
+		network.addLink(endLink);
+
 		NodeNetworkRouteImpl route1 = new NodeNetworkRouteImpl(startLink, endLink);
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
 		srcRoute.add(node3);
 		srcRoute.add(node4);
 		route1.setNodes(startLink, srcRoute, endLink);
-		assertEquals(2, route1.getNodes().size());
+		Assert.assertEquals(1, route1.getLinkIds().size());
 
 		NodeNetworkRouteImpl route2 = route1.clone();
+		Assert.assertNotSame(route1, route2);
 
 		srcRoute.add(node5);
 		route1.setNodes(startLink, srcRoute, endLink);
 
-		assertEquals(3, route1.getNodes().size());
-		assertEquals(2, route2.getNodes().size());
+		Assert.assertEquals(2, route1.getLinkIds().size());
+		Assert.assertEquals(1, route2.getLinkIds().size());
 	}
 
 }

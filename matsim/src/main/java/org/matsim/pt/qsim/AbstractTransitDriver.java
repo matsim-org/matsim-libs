@@ -279,12 +279,6 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 		@Deprecated
 		@Override
-		public List<Node> getNodes() {
-			return this.delegate.getNodes();
-		}
-
-		@Deprecated
-		@Override
 		public Link getStartLink() {
 			return this.delegate.getStartLink();
 		}

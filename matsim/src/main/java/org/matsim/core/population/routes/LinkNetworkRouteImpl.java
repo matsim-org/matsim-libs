@@ -66,6 +66,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		return dist;
 	}
 
+	@Override
 	public List<Id> getLinkIds() {
 		ArrayList<Id> ids = new ArrayList<Id>(this.route.size());
 		for (Link link : this.route) {
@@ -75,24 +76,12 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		return ids;
 	}
 
+	@Override
 	public List<Link> getLinks() {
 		return Collections.unmodifiableList(this.route);
 	}
 
-	public List<Node> getNodes() {
-		ArrayList<Node> nodes = new ArrayList<Node>(this.route.size() + 1);
-		if (this.route.size() > 0) {
-			nodes.add(this.route.get(0).getFromNode());
-			for (Link link : this.route) {
-				nodes.add(link.getToNode());
-			}
-		} else if (this.getStartLink() != this.getEndLink()) {
-			nodes.add(getStartLink().getToNode());
-		}
-		nodes.trimToSize();
-		return nodes;
-	}
-
+	@Override
 	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 		Link fromLink = getStartLink();
 		Link toLink = getEndLink();
@@ -162,14 +151,17 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		return ret;
 	}
 
+	@Override
 	public double getTravelCost() {
 		return this.travelCost;
 	}
 
+	@Override
 	public void setTravelCost(final double travelCost) {
 		this.travelCost = travelCost;
 	}
 
+	@Override
 	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
 		this.route.clear();
 		setStartLink(startLink);
@@ -180,12 +172,14 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		this.route.trimToSize();
 	}
 
+	@Override
 	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 		setStartLink(startLink);
 		setEndLink(endLink);
 		setNodes(srcRoute);
 	}
 
+	@Override
 	public void setNodes(final List<Node> srcRoute) {
 		this.route.clear();
 		Node prevNode = null;
@@ -214,10 +208,12 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		return null;
 	}
 
+	@Override
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}
 
+	@Override
 	public void setVehicleId(final Id vehicleId) {
 		this.vehicleId = vehicleId;
 	}

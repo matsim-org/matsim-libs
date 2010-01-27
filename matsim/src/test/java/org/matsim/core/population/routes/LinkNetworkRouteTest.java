@@ -23,6 +23,8 @@ package org.matsim.core.population.routes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -42,20 +44,8 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 		return new LinkNetworkRouteImpl(fromLink, toLink);
 	}
 
-	public void testGetNodes_subsequentLinks_setLinks() {
-		NetworkLayer network = createTestNetwork();
-		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
-		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
-		NodeImpl node2 = network.getNodes().get(new IdImpl("2"));
-
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1, link2);
-		route.setLinks(link1, null, link2);
-		assertEquals("number of links.", 0, route.getLinkIds().size());
-		assertEquals("number of nodes.", 1, route.getNodes().size());
-		assertEquals("wrong node.", node2, route.getNodes().get(0));
-	}
-
-	public void testGetNodes_subsequentLinks_setNodes() {
+	@Test
+	public void testSetNodes_subsequentLinks() {
 		NetworkLayer network = createTestNetwork();
 		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
 		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
@@ -65,11 +55,10 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 
 		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1, link2);
 		route.setNodes(link1, nodes, link2);
-		assertEquals("number of links.", 0, route.getLinkIds().size());
-		assertEquals("number of nodes.", 1, route.getNodes().size());
-		assertEquals("wrong node.", node2, route.getNodes().get(0));
+		Assert.assertEquals("number of links.", 0, route.getLinkIds().size());
 	}
 
+	@Test
 	public void testClone() {
 		Id id1 = new IdImpl(1);
 		Id id2 = new IdImpl(2);
@@ -86,15 +75,15 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 		srcRoute.add(link3);
 		srcRoute.add(link4);
 		route1.setLinks(startLink, srcRoute, endLink);
-		assertEquals(2, route1.getLinkIds().size());
+		Assert.assertEquals(2, route1.getLinkIds().size());
 
 		LinkNetworkRouteImpl route2 = route1.clone();
 
 		srcRoute.add(link5);
 		route1.setLinks(startLink, srcRoute, endLink);
 
-		assertEquals(3, route1.getLinkIds().size());
-		assertEquals(2, route2.getLinkIds().size());
+		Assert.assertEquals(3, route1.getLinkIds().size());
+		Assert.assertEquals(2, route2.getLinkIds().size());
 	}
 
 }

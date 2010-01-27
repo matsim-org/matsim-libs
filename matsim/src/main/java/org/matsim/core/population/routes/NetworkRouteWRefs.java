@@ -39,9 +39,6 @@ public interface NetworkRouteWRefs extends RouteWRefs {
 	@Deprecated // use getStartLinkId()
 	public Link getStartLink();
 
-	@Deprecated // use getLinkIds
-	public List<Node> getNodes();
-
 	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink);
 
 	/**
