@@ -136,7 +136,9 @@ public class TransitControler extends Controler {
 	@Override
 	protected void runMobSim() {
 		TransitQSimulation sim = new TransitQSimulation(this.scenarioData, this.events);
-		sim.addFeature(new OTFVisQSimFeature(sim));
+		OTFVisQSimFeature otfVisQSimFeature = new OTFVisQSimFeature(sim);
+		otfVisQSimFeature.setVisualizeTeleportedAgents(true);
+		sim.addFeature(otfVisQSimFeature);
 		sim.setUseUmlaeufe(true);
 		sim.run();
 	}
