@@ -94,7 +94,7 @@ public class ExternalModule implements PlanStrategyModule {
 	public ExternalModule(final String exePath, final String moduleId, final ScenarioImpl scenario) {
 		this.exePath = exePath;
 		this.moduleId = moduleId + "_";
-		this.outFileRoot = Controler.getTempPath() + "/";
+		this.outFileRoot = controlerIO.getTempPath() + "/";
 		this.scenario = scenario;
 	}
 

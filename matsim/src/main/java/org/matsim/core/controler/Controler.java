@@ -403,7 +403,7 @@ public class Controler {
 			this.controlerListenerManager.fireControlerScoringEvent(iteration);
 			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
 			this.stopwatch.endOperation("iteration");
-			this.stopwatch.write(this.getNameForOutputFilename("stopwatch.txt"));
+			this.stopwatch.write(this.controlerIO.getOutputFilename("stopwatch.txt"));
 			log.info(marker + "ITERATION " + iteration + " ENDS");
 			log.info(divider);
 		}
@@ -421,21 +421,20 @@ public class Controler {
 			}
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 			// dump plans
-			new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).writeFile(this
-							.getNameForOutputFilename("output_plans.xml.gz"));
+			new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).writeFile(this.controlerIO.getOutputFilename("output_plans.xml.gz"));
 			// dump network
-			new NetworkWriter(this.network).writeFile(this.getNameForOutputFilename("output_network.xml.gz"));
+			new NetworkWriter(this.network).writeFile(this.controlerIO.getOutputFilename("output_network.xml.gz"));
 			// dump world
-			new WorldWriter(this.getWorld()).writeFile(this.getNameForOutputFilename("output_world.xml.gz"));
+			new WorldWriter(this.getWorld()).writeFile(this.controlerIO.getOutputFilename("output_world.xml.gz"));
 			// dump config
-			new ConfigWriter(this.config).writeFile(this.getNameForOutputFilename("output_config.xml.gz"));
+			new ConfigWriter(this.config).writeFile(this.controlerIO.getOutputFilename("output_config.xml.gz"));
 			// dump facilities
 			ActivityFacilities facilities = this.getFacilities();
 			if (facilities != null) {
-				new FacilitiesWriter((ActivityFacilitiesImpl) facilities).writeFile(this.getNameForOutputFilename("output_facilities.xml.gz"));
+				new FacilitiesWriter((ActivityFacilitiesImpl) facilities).writeFile(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
 			}
 			if (this.network.getFactory().isTimeVariant()) {
-				new NetworkChangeEventsWriter().write(this.getNameForOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
+				new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
 			}
 
 			if (unexpected) {
@@ -587,9 +586,9 @@ public class Controler {
 			}
 		}
 
-		File tmpDir = new File(getTempPath());
+		File tmpDir = new File(this.controlerIO.getTempPath());
 		if (!tmpDir.mkdir() && !tmpDir.exists()) {
-			throw new RuntimeException("The tmp directory " + getTempPath() + " could not be created.");
+			throw new RuntimeException("The tmp directory " + this.controlerIO.getTempPath() + " could not be created.");
 		}
 		File itersDir = new File(outputPath + "/" + DIRECTORY_ITERS);
 		if (!itersDir.mkdir() && !itersDir.exists()) {
@@ -722,7 +721,7 @@ public class Controler {
 
 		// optional: score stats
 		try {
-			this.scoreStats = new ScoreStats(this.population, this.getNameForOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
+			this.scoreStats = new ScoreStats(this.population, this.controlerIO.getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
 			this.addControlerListener(this.scoreStats);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
@@ -732,8 +731,8 @@ public class Controler {
 
 		// optional: travel distance stats
 		try {
-			this.travelDistanceStats = new TravelDistanceStats(this.population, this
-					.getNameForOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
+			this.travelDistanceStats = new TravelDistanceStats(this.population,
+					this.controlerIO.getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
 			this.addControlerListener(this.travelDistanceStats);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
@@ -1116,17 +1115,6 @@ public class Controler {
 	}
 
 	/**
-	 * Returns the path to a directory where temporary files can be stored.
-	 *
-	 * @return path to a temp-directory.
-	 * @deprecated use non static member ControlerIO to generate the desired String
-	 */
-	@Deprecated
-	public static final String getTempPath() {
-		return outputPath + "/tmp";
-	}
-
-	/**
 	 * Returns the path to the specified iteration directory. The directory path
 	 * does not include the trailing '/'.
 	 *
@@ -1155,25 +1143,6 @@ public class Controler {
 		return getIterationPath(iteration) + "/" + iteration + "." + filename;
 	}
 
-	/**
-	 * @param filename
-	 *            the basename of the file to access
-	 * @return complete path to filename prefixed with the runId in the
-	 *         controler config module (if set) to a file in the
-	 *         output-directory
-	 * @deprecated use non static member ControlerIO to generate the desired String
-	 */
-	@Deprecated
-	public final String getNameForOutputFilename(final String filename) {
-		StringBuilder s = new StringBuilder(outputPath);
-		s.append('/');
-		if (this.config.controler().getRunId() != null) {
-			s.append(this.config.controler().getRunId());
-			s.append('.');
-		}
-		s.append(filename);
-		return s.toString();
-	}
 	/**
 	 * @param filename
 	 *            the basename of the file to access

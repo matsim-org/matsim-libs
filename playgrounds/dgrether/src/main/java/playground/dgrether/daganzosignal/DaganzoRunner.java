@@ -48,11 +48,11 @@ import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
  *
  */
 public class DaganzoRunner {
-	
+
 	private static final Logger log = Logger.getLogger(DaganzoRunner.class);
-	
+
 	private TTInOutflowEventHandler handler3, handler4;
-	
+
 	public DaganzoRunner(){}
 
 	public void runScenario(final String configFile){
@@ -64,7 +64,7 @@ public class DaganzoRunner {
 		else {
 			conf = configFile;
 		}
-//		String c = DgPaths.STUDIESDG + "daganzo/daganzoConfig2Agents.xml"; 
+//		String c = DgPaths.STUDIESDG + "daganzo/daganzoConfig2Agents.xml";
 		Controler controler = new Controler(conf);
 //		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		controler.setOverwriteFiles(true);
@@ -74,7 +74,7 @@ public class DaganzoRunner {
 		controler.run();
 //		this.startVisualizer(config);
 	}
-	
+
 	private void addQueueSimListener(final Controler controler) {
 		controler.getQueueSimulationListener().add(new SimulationInitializedListener<QSim>() {
 			//add the adaptive controller as events listener
@@ -92,23 +92,23 @@ public class DaganzoRunner {
 				controler.getEvents().removeHandler(adaptiveController);
 			}
 		});
-		
-		
+
+
 	}
 
 	private void addListener(Controler c) {
 		//add some EventHandler to the EventsManager after the controler is started
 		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
 		handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
-		
+
 		c.addControlerListener(new StartupListener() {
-		  
+
 			public void notifyStartup(StartupEvent e) {
 				e.getControler().getEvents().addHandler(handler3);
 				e.getControler().getEvents().addHandler(handler4);
 			}
 		});
-		
+
 		MyStartupListener startupListener = new MyStartupListener();
 		c.addControlerListener(startupListener);
 
@@ -119,7 +119,7 @@ public class DaganzoRunner {
 				ttWriter.addTTEventHandler(handler3);
 				ttWriter.addTTEventHandler(handler4);
 				ttWriter.writeTTChart(e.getControler().getIterationPath(e.getIteration()), e.getIteration());
-				
+
 				InOutGraphWriter inoutWriter = new InOutGraphWriter();
 				inoutWriter.addInOutEventHandler(handler3);
 				inoutWriter.addInOutEventHandler(handler4);
@@ -132,30 +132,30 @@ public class DaganzoRunner {
 				DgCountPerIterationGraph chart = new DgCountPerIterationGraph(event.getControler().getConfig().controler());
 				chart.addCountEventHandler(handler3);
 				chart.addCountEventHandler(handler4);
-				DgChartWriter.writeChart(event.getControler().getNameForOutputFilename("countPerIteration"), chart.createChart());
+				DgChartWriter.writeChart(event.getControler().getControlerIO().getOutputFilename("countPerIteration"), chart.createChart());
 			}
 		});
 	}
-	
+
 	class MyStartupListener implements StartupListener {
 
     @Override
     public void notifyStartup(StartupEvent event) {
       // TODO Auto-generated method stub
-      
+
     }
-	  
+
 	}
-	
-	
+
+
 	private void startVisualizer(Config config) {
-		String[] args = {config.controler().getOutputDirectory() + 
-				"/ITERS/it." + config.controler().getLastIteration() + 
+		String[] args = {config.controler().getOutputDirectory() +
+				"/ITERS/it." + config.controler().getLastIteration() +
 				"/" + config.controler().getLastIteration() + ".otfvis.mvi"};
 		OTFVis.main(args);
 	}
-	
-	
+
+
 	/**
 	 * @param args
 	 */
