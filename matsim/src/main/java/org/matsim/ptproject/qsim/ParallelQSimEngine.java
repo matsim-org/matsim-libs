@@ -52,7 +52,7 @@ public class ParallelQSimEngine extends QSimEngine{
 	 * ParallelMoveNodes and ParallelMoveLinks could be used instead of
 	 * ParallelMoveNodesAndLinks - the do exactly the same.
 	 * 
-	 * TODO discuss which implementation should be preferred
+	 * TODO cdobler: discuss which implementation should be preferred
 	 */
 	ParallelQSimEngine(Collection<QLink> links, Collection<QNode> nodes, Random random, int numOfThreads)
 	{
@@ -74,7 +74,7 @@ public class ParallelQSimEngine extends QSimEngine{
 		 * parallel moveNodesAndLinks
 		 */
 		parallelMoveNodesAndLinks = new ParallelMoveNodesAndLinks(simulateAllNodes, simulateAllLinks);
-		parallelMoveNodesAndLinks.initNodesAndLinks(simNodesArray, allLinks, simActivateThis, numOfThreads);
+		parallelMoveNodesAndLinks.initNodesAndLinks(simNodesArray, allLinks, numOfThreads);
 	}
 
 	public ParallelQSimEngine(final QNetwork network, final Random random, int numOfThreads)
@@ -97,9 +97,12 @@ public class ParallelQSimEngine extends QSimEngine{
 	 * parallel Threads to move the Nodes.
 	 * Maybe each Thread could have its own list and the Links can be collected
 	 * from the main Thread to avoid this?
+	 * 
+	 * Should not be called anymore from the parallel Threads because we use 
+	 * them als LinkActivators.
 	 */
 	@Override
-	protected synchronized void activateLink(final QLink link)
+	public synchronized void activateLink(final QLink link)
 	{
 		super.activateLink(link);
 	}
@@ -150,7 +153,7 @@ public class ParallelQSimEngine extends QSimEngine{
 	 * We get the Number of simulated Links from the ParallelMoveLinks Module.
 	 */
 	@Override
-	protected int getNumberOfSimulatedLinks()
+	public int getNumberOfSimulatedLinks()
 	{
 		return this.parallelMoveNodesAndLinks.getNumberOfSimulatedLinks();
 //		return this.parallelMoveLinks.getNumberOfSimulatedLinks();

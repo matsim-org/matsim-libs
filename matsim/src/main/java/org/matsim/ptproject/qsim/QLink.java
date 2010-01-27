@@ -34,8 +34,8 @@ public interface QLink {
   @Deprecated
   public void finishInit();
 
-  public void setSimEngine(final QSimEngine simEngine);
-
+  public void setLinkActivator(final LinkActivator linkActivator);
+  
   public void activateLink();
 
   public Link getLink();

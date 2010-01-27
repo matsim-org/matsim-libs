@@ -28,6 +28,8 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -87,34 +89,38 @@ public class ParallelMoveNodesAndLinks {
 		}
 	}
 		
-	public void initNodesAndLinks(QNode[] simNodesArray, List<QLink> allLinks, List<QLink> simActivateThis, int numOfThreads)
+	public void initNodesAndLinks(QNode[] simNodesArray, List<QLink> allLinks, int numOfThreads)
 	{	
 		this.numOfThreads = numOfThreads;
 
 		createNodesArrays(simNodesArray);
 		createLinkLists(allLinks);
 		
-		LinkReActivator linkReActivator = new LinkReActivator(simActivateThis, parallelSimLinksLists, numOfThreads);
+		LinkReActivator linkReActivator = new LinkReActivator();
 		
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.separationBarrier = new CyclicBarrier(numOfThreads, linkReActivator);
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
 		
 		moveThreads = new MoveThread[numOfThreads];
-						
+		linkReActivator.setMoveThreads(moveThreads);
+				
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) 
 		{
-			MoveThread moveThread = new MoveThread(simulateAllNodes, this.startBarrier, this.separationBarrier, this.endBarrier);
-			moveThread.setName("MoveNodesAndLinks" + i);
+			MoveThread moveThread = new MoveThread(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, this.endBarrier);
+			moveThread.setName("ParallelMoveNodesAndLinks" + i);
 			
 			moveThread.setExtendedQueueNodeArray(this.parallelNodesArrays[i]);
-			moveThread.handleLinks(parallelSimLinksLists.get(i));
+			moveThread.addLinks(parallelSimLinksLists.get(i));
 			moveThread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			moveThreads[i] = moveThread;
 			
 			moveThread.start();
 		}
+		
+		// Assign every Link to a LinkActivator, depending on its InNode
+		assignLinkActivators();
 		
 		/*
 		 * After initialization the Threads are waiting at the
@@ -196,6 +202,29 @@ public class ParallelMoveNodesAndLinks {
 		}
 	}
 
+	/*
+	 * Within the MoveThreads Links are only activated when
+	 * a Vehicle is moved over a Node what is processed by
+	 * that Node. So we can assign each QLink to its InNode.
+	 */
+	private void assignLinkActivators()
+	{	
+		int thread = 0;
+		for (ExtendedQueueNode[] array : parallelNodesArrays)
+		{
+			for (ExtendedQueueNode node : array)
+			{
+				Node n = node.getQueueNode().getNode();
+				
+				for (Link outLink : n.getOutLinks().values())
+				{
+					QLink qLink = node.getQueueNode().queueNetwork.getQueueLink(outLink.getId());
+					qLink.setLinkActivator(this.moveThreads[thread]);
+				}
+			}
+			thread++;
+		}
+	}
 	
 	/*
 	 * We have a List for each Thread so we have to add up their size
@@ -204,11 +233,11 @@ public class ParallelMoveNodesAndLinks {
 	/*package*/ int getNumberOfSimulatedLinks()
 	{
 		int size = 0;
-		for (List<?> list : this.parallelSimLinksLists)
+		for (LinkActivator linkActivator : this.moveThreads)
 		{
-			size = size + list.size();
-		}
-		
+			size = size + linkActivator.getNumberOfSimulatedLinks();
+		}		
+
 		return size;
 	}
 	
@@ -224,28 +253,33 @@ public class ParallelMoveNodesAndLinks {
 	 */	
 	private static class LinkReActivator implements Runnable
 	{
-		private List<QLink> simActivateThis;
-		private List<List<QLink>> parallelSimLinksLists;
+		private MoveThread[] moveThreads;
 		private int numOfThreads;
 		private int distributor = 0;
 		
-		public LinkReActivator(List<QLink> simActivateThis, List<List<QLink>> parallelSimLinksLists, int numOfThreads)
+		public LinkReActivator()
 		{
-			this.simActivateThis = simActivateThis;
-			this.parallelSimLinksLists = parallelSimLinksLists;
-			this.numOfThreads = numOfThreads;
+		}
+		
+		public void setMoveThreads(MoveThread[] moveThreads)
+		{
+			this.moveThreads = moveThreads;
+			this.numOfThreads = moveThreads.length;
 		}
 		
 		public void run()
-		{
-			if (!simActivateThis.isEmpty())
+		{		
+			/*
+			 * Each Thread contains a List of Links to activate.
+			 */
+			for (MoveThread moveThread : moveThreads)
 			{
-				for(QLink link : simActivateThis)
+				for(QLink link : moveThread.getLinksToActivate())
 				{
-					parallelSimLinksLists.get(distributor % numOfThreads).add(link);
+					moveThreads[distributor % numOfThreads].addLink(link);
 					distributor++;
 				}
-				simActivateThis.clear();
+				moveThread.getLinksToActivate().clear();
 			}	
 		}
 		
@@ -282,7 +316,7 @@ public class ParallelMoveNodesAndLinks {
 	/*
 	 * The thread class that really handles the Nodes.
 	 */
-	private static class MoveThread extends Thread
+	private static class MoveThread extends Thread implements LinkActivator
 	{
 		private double time = 0.0;
 		private boolean simulateAllNodes = false;
@@ -291,26 +325,37 @@ public class ParallelMoveNodesAndLinks {
 		private final CyclicBarrier startBarrier;
 		private final CyclicBarrier separationBarrier;
 		private final CyclicBarrier endBarrier;
-				
+
 		private ExtendedQueueNode[] queueNodes;
 		private List<QLink> links = new ArrayList<QLink>();
-					
-		public MoveThread(boolean simulateAllNodes, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier)
+		
+		/** This is the collection of links that have to be activated in the current time step */
+		/*package*/ final ArrayList<QLink> linksToActivate = new ArrayList<QLink>();
+		
+		public MoveThread(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier)
 		{
 			this.simulateAllNodes = simulateAllNodes;
+			this.simulateAllLinks = simulateAllLinks;
 			this.startBarrier = startBarrier;
 			this.separationBarrier = separationBarrier;
 			this.endBarrier = endBarrier;
 		}
-				
+		
 		public void setExtendedQueueNodeArray(ExtendedQueueNode[] queueNodes)
 		{
 			this.queueNodes = queueNodes;
 		}
 		
-		public void handleLinks(List<QLink> links)
+		public void addLinks(List<QLink> links)
 		{
+//			for (QLink link : links) link.setLinkActivator(this);
 			this.links = links;
+		}
+		
+		public void addLink(QLink link)
+		{
+//			link.setLinkActivator(this);
+			this.links.add(link);
 		}
 		
 		public void setTime(final double t)
@@ -399,6 +444,26 @@ public class ParallelMoveNodesAndLinks {
 	            }
 			}
 		}	// run()
+
+		@Override
+		public void activateLink(QLink link)
+		{
+			if (!simulateAllLinks)
+			{
+				linksToActivate.add(link);
+			}
+		}
+		
+		public List<QLink> getLinksToActivate()
+		{
+			return this.linksToActivate;
+		}
+		
+		@Override
+		public int getNumberOfSimulatedLinks()
+		{
+			return this.links.size();
+		}
 		
 	}	// ReplannerThread
 	

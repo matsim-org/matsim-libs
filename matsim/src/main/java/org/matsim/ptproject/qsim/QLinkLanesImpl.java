@@ -142,7 +142,7 @@ public class QLinkLanesImpl implements QLink {
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
 	
-	private QSimEngine simEngine = null;
+	private LinkActivator linkActivator = null;
 	
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -279,14 +279,14 @@ public class QLinkLanesImpl implements QLink {
 	public void finishInit() {
 		this.active = false;
 	}
-
-	public void setSimEngine(final QSimEngine simEngine) {
-		this.simEngine = simEngine;
+	
+	public void setLinkActivator(final LinkActivator linkActivator) {
+		this.linkActivator = linkActivator;
 	}
 	
 	public void activateLink() {
 		if (!this.active) {
-			this.simEngine.activateLink(this);
+			this.linkActivator.activateLink(this);
 			this.active = true;
 		}
 	}

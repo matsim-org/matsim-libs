@@ -36,7 +36,7 @@ import java.util.Random;
  * @author dgrether
  * @author dstrippgen
  */
-public class QSimEngine {
+public class QSimEngine implements LinkActivator{
 
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
@@ -76,7 +76,7 @@ public class QSimEngine {
 		});
 		for (QLink link : this.allLinks) {
 			link.finishInit();
-			link.setSimEngine(this);
+			link.setLinkActivator(this);
 		}
 		if (simulateAllLinks) {
 			this.simLinksArray.addAll(this.allLinks);
@@ -132,7 +132,7 @@ public class QSimEngine {
 		}
 	}
 
-	protected void activateLink(final QLink link) {
+	public void activateLink(final QLink link) {
 		if (!simulateAllLinks) {
 			this.simActivateThis.add(link);
 		}
@@ -150,7 +150,7 @@ public class QSimEngine {
 	/**
 	 * @return Returns the simLinksArray.
 	 */
-	protected int getNumberOfSimulatedLinks() {
+	public int getNumberOfSimulatedLinks() {
 		return this.simLinksArray.size();
 	}
 }

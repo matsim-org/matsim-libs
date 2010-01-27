@@ -242,7 +242,7 @@ public class QLinkTest extends MatsimTestCase {
 		QNetwork queueNetwork = new QNetwork(network);
 		QSimEngine simEngine = new QSimEngine(queueNetwork, MatsimRandom.getRandom());
 		QLinkImpl qlink = (QLinkImpl) queueNetwork.getQueueLink(new IdImpl("1"));
-		qlink.setSimEngine(simEngine);
+		qlink.setLinkActivator(simEngine);
 		qlink.finishInit();
 
 		QSim qsim = new QSim(scenario, new EventsManagerImpl());
@@ -377,10 +377,10 @@ public class QLinkTest extends MatsimTestCase {
 			this.queueNetwork = new QNetwork(network);
 			QSimEngine engine = new QSimEngine(this.queueNetwork, MatsimRandom.getRandom());
 			this.qlink1 = (QLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("1"));
-			this.qlink1.setSimEngine(engine);
+			this.qlink1.setLinkActivator(engine);
 			this.qlink1.finishInit();
 			this.qlink2 = (QLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("2"));
-			this.qlink2.setSimEngine(engine);
+			this.qlink2.setLinkActivator(engine);
 			this.qlink2.finishInit();
 			
 			this.basicVehicle = new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType")));

@@ -87,8 +87,8 @@ public class QLinkImpl implements QLink {
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
-	private QSimEngine simEngine = null;
-
+	private LinkActivator linkActivator = null;
+	
 	private double length = Double.NaN;
 
 	private double freespeedTravelTime = Double.NaN;
@@ -157,14 +157,13 @@ public class QLinkImpl implements QLink {
 	public void finishInit() {
 		this.active = false;
 	}
-
-	public void setSimEngine(final QSimEngine simEngine) {
-		this.simEngine = simEngine;
+	public void setLinkActivator(final LinkActivator linkActivator) {
+		this.linkActivator = linkActivator;
 	}
-
+	
 	public void activateLink() {
 		if (!this.active) {
-			this.simEngine.activateLink(this);
+			this.linkActivator.activateLink(this);
 			this.active = true;
 		}
 	}
