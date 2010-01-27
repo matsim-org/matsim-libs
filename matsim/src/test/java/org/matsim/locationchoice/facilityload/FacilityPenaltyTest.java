@@ -3,44 +3,29 @@ package org.matsim.locationchoice.facilityload;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.matsim.core.gbl.Gbl;
-import org.matsim.locationchoice.Initializer;
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class FacilityPenaltyTest  extends MatsimTestCase {	
-	private FacilityPenalty facilitypenalty = null;
-	private Initializer initializer;
-			
-	public FacilityPenaltyTest() {
-	}
-	
-	@Override
-	protected void setUp() throws Exception {
-        super.setUp();
-        this.initializer = new Initializer();
-        this.initializer.init(this);    
-    }
-	
-	@Override
-	protected void tearDown() throws Exception {
-         super.tearDown();
-         Gbl.reset();
-    }
-	
+public class FacilityPenaltyTest {
+
+	@Test
 	public void testGetPenalty() {
-		facilitypenalty = new FacilityPenalty(0.0, 1);
-		assertEquals(facilitypenalty.getCapacityPenaltyFactor(0.0, 1.0), 0.0);
+		FacilityPenalty facilitypenalty = new FacilityPenalty(0.0, 1, new LocationChoiceConfigGroup());
+		Assert.assertEquals(facilitypenalty.getCapacityPenaltyFactor(0.0, 1.0), 0.0, MatsimTestUtils.EPSILON);
 	}
-	
-	public void testcalculateCapPenaltyFactor() throws SecurityException, NoSuchMethodException, IllegalArgumentException, 
+
+	@Test
+	public void testcalculateCapPenaltyFactor() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
 	IllegalAccessException, InvocationTargetException {
-		
-		facilitypenalty = new FacilityPenalty(0.0, 1);
-		
+
+		FacilityPenalty facilitypenalty = new FacilityPenalty(0.0, 1, new LocationChoiceConfigGroup());
+
 	    Method method = null;
-		method = this.facilitypenalty.getClass().getDeclaredMethod("calculateCapPenaltyFactor", new Class[]{int.class, int.class});
+		method = facilitypenalty.getClass().getDeclaredMethod("calculateCapPenaltyFactor", new Class[]{int.class, int.class});
 		method.setAccessible(true);
-		Double val = (Double)method.invoke(this.facilitypenalty, new Object[]{0, 1});
-		assertTrue(Math.abs(val.doubleValue()) < 0.000000001);
+		Double val = (Double)method.invoke(facilitypenalty, new Object[]{0, 1});
+		Assert.assertTrue(Math.abs(val.doubleValue()) < 0.000000001);
 	}
 }

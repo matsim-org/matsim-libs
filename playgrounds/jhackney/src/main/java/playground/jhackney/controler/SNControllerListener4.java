@@ -152,7 +152,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		this.log.info("... done");
 
 		this.log.info("  Instantiating social network EventsToScore for scoring the plans");
-		scoring = new EventsToScore(this.controler.getPopulation(),factory);
+		scoring = new EventsToScore(this.controler.getPopulation(),factory, this.controler.getConfig().charyparNagelScoring().getLearningRate());
 		this.controler.getEvents().addHandler(scoring);
 		this.log.info(" ... Instantiation of social network scoring done");
 
@@ -193,7 +193,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 //			execute nonspatial interactions (uses new social network)
 			this.log.info(" Non-Spatial interactions ...");
 			controler.stopwatch.beginOperation("infoexchange");
-			
+
 			for (int ii = 0; ii < this.infoToExchange.length; ii++) {
 				String facTypeNS = this.infoToExchange[ii];
 				if (!facTypeNS.equals("none")) {
@@ -214,7 +214,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 				this.log.info("  No introductions");
 			}
 			this.log.info("  ... introducing people done");
-			
+
 //			forget knowledge
 			this.log.info("Forgetting knowledge");
 			double multiple=Double.parseDouble(this.controler.getConfig().socnetmodule().getMemSize());
@@ -328,7 +328,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		// TODO JH 12.2008 This has to coincide with the activity types in the plan
 		// activityTypesForEncounters should be filled by entries in the config.xml, added to a list like replanning modules
 		// rndEncounterProbString should be associated with the activity types like the probabilities for replanning modules is done
-		// 
+		//
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		this.log.info(" Instantiating the Pajek writer ...");

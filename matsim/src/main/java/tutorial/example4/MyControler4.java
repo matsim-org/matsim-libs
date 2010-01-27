@@ -53,7 +53,7 @@ public class MyControler4 {
 		events.addHandler(eventWriter);
 
 		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), factory);
+		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), factory, config.charyparNagelScoring().getLearningRate());
 		events.addHandler(scoring);
 
 		QueueSimulation sim = new QueueSimulation(scenario, events);

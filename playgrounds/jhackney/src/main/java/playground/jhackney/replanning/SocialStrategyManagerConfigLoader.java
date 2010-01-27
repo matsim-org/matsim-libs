@@ -139,7 +139,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 			} else if (classname.equals("SelectExpBeta")) {
 				strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 			} else if (classname.equals("ChangeExpBeta")) {
-				strategy = new PlanStrategy(new ExpBetaPlanChanger());
+				strategy = new PlanStrategy(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
 			} else if (classname.equals("SelectRandom")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 			} else if (classname.equals("ChangeLegMode")) {

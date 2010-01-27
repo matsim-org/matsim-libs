@@ -22,7 +22,6 @@ package playground.mrieser.pt.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
@@ -51,7 +50,7 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 	 */
 	public TransitTimeAllocationMutator(Config config) {
 		super(config.global());
-		String range = Gbl.getConfig().findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
+		String range = config.findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
 		if (range == null) {
 			log.info("No mutation range defined in the config file. Using default of " + this.mutationRange + " sec.");
 		} else {

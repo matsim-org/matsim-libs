@@ -52,29 +52,30 @@ import org.matsim.locationchoice.utils.QuadTreeRing;
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
 
 public class LocationMutatorTGSimple extends LocationMutator {
-	
+
 	protected int unsuccessfullLC = 0;
-	private final DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
-	private final LeisureFacilityExtractor leisureFacilityExtractor;	
+	private final DefineFlexibleActivities defineFlexibleActivities;
+	private final LeisureFacilityExtractor leisureFacilityExtractor;
 	private final QuadTreeRing<ActivityFacilityImpl> leisureQuadtree;
-	
+
 	private final static Logger log = Logger.getLogger(LeisureFacilityExtractor.class);
-	
-	
+
+
 	public LocationMutatorTGSimple(final NetworkLayer network, Controler controler,
 			Knowledges knowledges,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
-		
+
 		super(network, controler, knowledges, quad_trees, facilities_of_type);
-		
+
 		log.info("Using modified TGMutator");
-		
-		this.leisureQuadtree = new FacilityQuadTreeBuilder().buildFacilityQuadTree("leisure", 
+
+		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
+		this.leisureQuadtree = new FacilityQuadTreeBuilder().buildFacilityQuadTree("leisure",
 				(ActivityFacilitiesImpl)controler.getFacilities());
-		leisureFacilityExtractor = new LeisureFacilityExtractor(this.leisureQuadtree);	
+		leisureFacilityExtractor = new LeisureFacilityExtractor(this.leisureQuadtree);
 	}
-	
+
 	@Override
 	public void handlePlan(final Plan plan){
 		if (!this.handleShopActs((PlanImpl)plan) && !this.handleLeisureActs((PlanImpl)plan)){
@@ -82,27 +83,27 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		}
 		super.resetRoutes(plan);
 	}
-		
+
 	private boolean handleShopActs(final PlanImpl plan) {
 		List<ActivityImpl> flexibleActivities = this.getFlexibleActivities(plan);
-		
+
 		if (flexibleActivities.size() == 0) {
 			return false;
-		}	
+		}
 		Collections.shuffle(flexibleActivities);
 		ActivityImpl actToMove = flexibleActivities.get(0);
 		List<?> actslegs = plan.getPlanElements();
 		int indexOfActToMove = actslegs.indexOf(actToMove);
-		
+
 		// starting home and ending home are never flexible
 		final Leg legPre = (Leg)actslegs.get(indexOfActToMove -1);
 		final Leg legPost = (Leg)actslegs.get(indexOfActToMove + 1);
 		final Activity actPre = (Activity)actslegs.get(indexOfActToMove - 2);
 		final Activity actPost = (Activity)actslegs.get(indexOfActToMove + 2);
-		
+
 		double travelDistancePre = 0.0;
 		double travelDistancePost = 0.0;
-		
+
 		if (legPre.getMode().compareTo(TransportMode.car) == 0) {
 			travelDistancePre = legPre.getRoute().getDistance();
 		}
@@ -116,28 +117,28 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			travelDistancePost = ((CoordImpl)actToMove.getCoord()).calcDistance(actPost.getCoord());
 		}
 		double radius =  0.5 * (travelDistancePre + travelDistancePost);
-				
+
 		if (Double.isNaN(radius)) {
 			return false;
 		}
-		
+
 		if (!this.modifyLocationShop(actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
 			return false;
 		}
 		return true;
 	}
-	
+
 	private List<ActivityImpl> getFlexibleActivities(final PlanImpl plan) {
 		List<ActivityImpl> flexibleActivities = new Vector<ActivityImpl>();
 		if (!super.locationChoiceBasedOnKnowledge) {
 			flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
 		}
 		else {
-			flexibleActivities = defineMovablePrimaryActivities(plan);			
+			flexibleActivities = defineMovablePrimaryActivities(plan);
 			List<?> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final ActivityImpl act = (ActivityImpl)actslegs.get(j);		
-				if (!this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId()) && 
+				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+				if (!this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId()) &&
 						!(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 					flexibleActivities.add(act);
 				}
@@ -145,14 +146,14 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		}
 		return flexibleActivities;
 	}
-			
-	protected boolean modifyLocationShop(ActivityImpl act, Coord startCoord, Coord endCoord, double radius) {		
+
+	protected boolean modifyLocationShop(ActivityImpl act, Coord startCoord, Coord endCoord, double radius) {
 		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
-		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;	
-		
-		ArrayList<ActivityFacility> facilitySet = 
+		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;
+
+		ArrayList<ActivityFacility> facilitySet =
 			(ArrayList<ActivityFacility>) this.quadTreesOfType.get(act.getType()).get(midPointX, midPointY, radius);
-		
+
 		ActivityFacilityImpl facility = null;
 		if (facilitySet.size() > 1) {
 			facility = (ActivityFacilityImpl)facilitySet.get(MatsimRandom.getRandom().nextInt(facilitySet.size()));
@@ -163,24 +164,24 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		act.setFacilityId(facility.getId());
    		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());
    		act.setCoord(facility.getCoord());
-   		
+
    		return true;
 	}
-	
+
 	private boolean handleLeisureActs(final PlanImpl plan) {
-		
+
 		ActivityImpl actToMove = this.getRandomLeisureActivitiy(plan);
-		
+
 		if (actToMove == null) return false;
-	
+
 		LegImpl legPre = plan.getPreviousLeg(actToMove);
-		ActivityImpl actPre = plan.getPreviousActivity(legPre);		
+		ActivityImpl actPre = plan.getPreviousActivity(legPre);
 		return this.modifyLeisureLocation(actToMove, (CoordImpl)actPre.getCoord());
 	}
-	
-	public ActivityImpl getRandomLeisureActivitiy(final Plan plan) {		
+
+	public ActivityImpl getRandomLeisureActivitiy(final Plan plan) {
 		List<ActivityImpl> flexibleActivities = new Vector<ActivityImpl>();
-		
+
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				final ActivityImpl act = (ActivityImpl) pe;
@@ -195,37 +196,37 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		}
 		else return null;
 	}
-	
+
 	private boolean modifyLeisureLocation(ActivityImpl act, CoordImpl coordActPre) {
-		
-		String type = act.getType();		
-		ActivityFacilityImpl facility = null;		
-		if (type.equals("leisure*") || type.equals("leisure")) {	// FOR DEBUIGGING // mode ride			
-			ArrayList<ActivityFacilityImpl> facilitySet = 
-				(ArrayList<ActivityFacilityImpl>)this.leisureQuadtree.get(coordActPre.getX(), coordActPre.getY(), 
-					MatsimRandom.getRandom().nextInt(5 * 1000));			
+
+		String type = act.getType();
+		ActivityFacilityImpl facility = null;
+		if (type.equals("leisure*") || type.equals("leisure")) {	// FOR DEBUIGGING // mode ride
+			ArrayList<ActivityFacilityImpl> facilitySet =
+				(ArrayList<ActivityFacilityImpl>)this.leisureQuadtree.get(coordActPre.getX(), coordActPre.getY(),
+					MatsimRandom.getRandom().nextInt(5 * 1000));
 			if (facilitySet.size() > 1) {
 				facility = facilitySet.get(MatsimRandom.getRandom().nextInt(facilitySet.size()));
 			}
 		}
 		else {
-			String[] entries = type.split("_", -1);							
+			String[] entries = type.split("_", -1);
 			int dist = Integer.parseInt(entries[1].trim());
 			facility = leisureFacilityExtractor.getFacility(coordActPre, dist);
 		}
 		if (facility != null) {
 			act.setFacilityId(facility.getId());
 	   		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());
-	   		act.setCoord(facility.getCoord());	   		
+	   		act.setCoord(facility.getCoord());
 	   		return true;
 		}
 		return false;
 	}
-				
+
 	public int getNumberOfUnsuccessfull() {
-		return this.unsuccessfullLC;		
+		return this.unsuccessfullLC;
 	}
-	
+
 	public void resetUnsuccsessfull() {
 		this.unsuccessfullLC = 0;
 	}

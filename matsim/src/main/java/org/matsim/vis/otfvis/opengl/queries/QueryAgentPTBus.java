@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueryAgentPlan.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,7 +23,6 @@ import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.media.opengl.GL;
 
@@ -37,15 +35,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
-import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
@@ -58,26 +53,24 @@ import com.sun.opengl.util.BufferUtil;
 
 /**
  * QueryAgentPTBus draws certain public transport related informations.
- * 
- * @author mrieser?
  *
  */
 public class QueryAgentPTBus extends AbstractQuery {
 
 	public class Result implements OTFQueryResult {
-		
+
 		private static final long serialVersionUID = 1L;
-		
+
 		private float[] vertex = null;
 		private transient FloatBuffer vert;
 		private boolean calcOffset = true;
-		
+
 		public void draw(OTFDrawer drawer) {
 			if(drawer instanceof OTFOGLDrawer) {
 				draw((OTFOGLDrawer)drawer);
 			}
 		}
-		
+
 		private void draw(OTFOGLDrawer drawer) {
 			if(this.vertex == null) return;
 
@@ -130,7 +123,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 		public void remove() {
 
 		}
-		
+
 		public boolean isAlive() {
 			return false;
 		}
@@ -146,13 +139,14 @@ public class QueryAgentPTBus extends AbstractQuery {
 	private Network net = null;
 
 
+	@Override
 	public void setId(String id) {
 		this.agentId = id;
 	}
 
 	private float[] buildRoute(Plan plan) {
 		List<Id> drivenLinks = new LinkedList<Id> ();
-		
+
 		List<PlanElement> actslegs = plan.getPlanElements();
 		for (PlanElement pe : actslegs) {
 			if (pe instanceof Activity) {
@@ -183,7 +177,8 @@ public class QueryAgentPTBus extends AbstractQuery {
 		}
 		return vertex;
 	}
-	
+
+	@Override
 	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.net = queueSimulation.getQueueSimulation().getNetwork().getNetworkLayer();
 		this.result = new Result();
@@ -199,7 +194,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 
 	public static void drawCircle(GL gl, float x, float y, float size) {
 		float w = 40;
-		
+
 		gl.glLineWidth(2);
 		gl.glEnable(GL.GL_LINE_SMOOTH);
 		gl.glBegin(GL.GL_LINE_STRIP);
@@ -213,6 +208,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 
 
 
+	@Override
 	public Type getType() {
 		return OTFQuery.Type.AGENT;
 	}

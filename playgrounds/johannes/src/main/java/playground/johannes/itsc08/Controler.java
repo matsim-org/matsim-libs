@@ -48,7 +48,7 @@ import playground.johannes.eut.GuidedAgentFactory;
  *
  */
 public class Controler extends WithindayControler {
-	
+
 	//==============================================================================
 	// private fields
 	//==============================================================================
@@ -64,9 +64,9 @@ public class Controler extends WithindayControler {
 	private double equipmentFraction;
 
 	//==============================================================================
-	// 
+	//
 	//==============================================================================
-	
+
 	public Controler(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
@@ -76,7 +76,7 @@ public class Controler extends WithindayControler {
 	protected void setUp() {
 		IncidentGenerator i = new IncidentGenerator(Double.parseDouble(config.getParam("eut", "capacityFactor")), config.global().getRandomSeed());
 		this.addControlerListener(i);
-		
+
 		Analyzer analyzer = new Analyzer(this, i);
 		this.addControlerListener(analyzer);
 		this.equipmentFraction = string2Double(config.getParam("eut", "alpha"));
@@ -85,7 +85,7 @@ public class Controler extends WithindayControler {
 		 * Create a new factory for our withinday agents.
 		 */
 		addControlerListener(new WithindayControlerListener());
-		
+
 		this.reactTTs = new EstimReactiveLinkTT(1, this.network);
 //		this.reactTTs = new EventBasedTTProvider(10);
 		this.events.addHandler((EventHandler) this.reactTTs);
@@ -100,14 +100,14 @@ public class Controler extends WithindayControler {
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager m = new StrategyManager();
-		m.addStrategy(new PlanStrategy(new ExpBetaPlanChanger()), 0.98);
+		m.addStrategy(new PlanStrategy(new ExpBetaPlanChanger(this.config.charyparNagelScoring().getBrainExpBeta())), 0.98);
 //		m.addStrategy(new PlanStrategy(new SelectWorstPlan()), 0.01);
 //		m.addStrategy(new PlanStrategy(new RandomPlanSelector()), 0.05);
 		m.addStrategy(new PlanStrategy(new ForceSelectPlan(new IdImpl("4"))), 0.01);
 		m.addStrategy(new PlanStrategy(new ForceSelectPlan(new IdImpl("5"))), 0.01);
 		return m;
 	}
-	
+
 	@Override
 	protected void runMobSim() {
 
@@ -117,14 +117,14 @@ public class Controler extends WithindayControler {
 		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.scenarioData, this.events, this);
 		this.trafficManagement = new TrafficManagement();
 		sim.setTrafficManagement(this.trafficManagement);
-		
+
 		sim.run();
 	}
 
 	public Set<Person> getGuidedPersons() {
 		return ((GuidedAgentFactory)factory).getGuidedPersons();
 	}
-	
+
 	private class WithindayControlerListener implements StartupListener, IterationStartsListener {
 
 		public void notifyStartup(StartupEvent event) {
@@ -143,10 +143,10 @@ public class Controler extends WithindayControler {
 		controller.setOverwriteFiles(true);
 		controller.setCreateGraphs(false);
 		controller.setWriteEventsInterval(0);
-		
-		
+
+
 		controller.run();
-		
+
 	}
 
 	private double string2Double(String str) {

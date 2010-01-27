@@ -48,23 +48,23 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 
 	private EventsToFacilityLoad eventsToFacilityLoad;
 	private TreeMap<Id, FacilityPenalty> facilityPenalties = null;
-	
+
 	//--------------------------------------------------------------------------------------------------
 
 	public FacilitiesLoadCalculator(TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		this.facilityPenalties = facilityPenalties;
 	}
-	
+
 
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
-		/* 
-		 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers 
+		/*
+		 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers
 		 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
-		 */ 
-		double scaleNumberOfPersons = Double.parseDouble(Gbl.getConfig().locationchoice().getScaleFactor());
+		 */
+		double scaleNumberOfPersons = Double.parseDouble(controler.getConfig().locationchoice().getScaleFactor());
 		this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getFacilities(), scaleNumberOfPersons,
-				this.facilityPenalties);
+				this.facilityPenalties, controler.getConfig().locationchoice());
 		event.getControler().getEvents().addHandler(this.eventsToFacilityLoad);
 	}
 
@@ -72,10 +72,10 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 		this.eventsToFacilityLoad.resetAll(event.getIteration());
 	}
 
-	public void notifyAfterMobsim(final AfterMobsimEvent event) {	
-		this.eventsToFacilityLoad.finish();		
+	public void notifyAfterMobsim(final AfterMobsimEvent event) {
+		this.eventsToFacilityLoad.finish();
 	}
-	
+
 	/*
 	 * At the end of an iteration the statistics of the facility load are printed and
 	 * the load values are set to zero afterwards.
@@ -83,33 +83,33 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
 		ActivityFacilities facilities = controler.getFacilities();
-				
+
 		if (event.getIteration() % 10 == 0) {
-			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getControler().getIteration()), event.getIteration(), 
+			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getControler().getIterationNumber()), event.getIteration(),
 					this.eventsToFacilityLoad.getFacilityPenalties());
-		}	
+		}
 	}
 
 	/*
-	 * Print daily load of every facility and aggregated hourly load 
-	 */	
-	private void printStatistics(ActivityFacilities facilities, String iterationPath, int iteration, 
+	 * Print daily load of every facility and aggregated hourly load
+	 */
+	private void printStatistics(ActivityFacilities facilities, String iterationPath, int iteration,
 			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 
 		try {
 				final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tAllVisitors\tCapacity\tsumPenaltyFactor\tis shopping facility";
-				final BufferedWriter out = 
+				final BufferedWriter out =
 					IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
-				final BufferedWriter out_summary = 
+				final BufferedWriter out_summary =
 					IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_summary.txt");
-	
+
 				out.write(header);
 				out.newLine();
-							
+
 				double loadPerHourSum[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-	
+
 				for (ActivityFacility facility : facilities.getFacilities().values()) {
-					FacilityPenalty facilityPenalty = facilityPenalties.get(facility.getId());													
+					FacilityPenalty facilityPenalty = facilityPenalties.get(facility.getId());
 					out.write(facility.getId().toString() + "\t"+
 							facility.getCoord().getX() + "\t"+
 							facility.getCoord().getY() + "\t"+
@@ -123,16 +123,16 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 					else {
 						out.write("-");
 					}
-					
+
 					out.newLine();
-					
+
 					for (int i = 0; i < 24; i++) {
 						loadPerHourSum[i] += facilityPenalty.getFacilityLoad().getLoadPerHour(i);
 					}
 				}
 				out.flush();
 				out.close();
-				
+
 				out_summary.write("Hour\tLoad");
 				out_summary.newLine();
 				for (int i = 0; i<24; i++) {
@@ -140,7 +140,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 					out_summary.newLine();
 					out_summary.flush();
 				}
-				out_summary.close();		
+				out_summary.close();
 			} catch (final IOException e) {
 				Gbl.errorMsg(e);
 			}

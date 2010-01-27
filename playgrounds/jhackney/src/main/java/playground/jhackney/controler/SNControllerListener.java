@@ -138,7 +138,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 	private Controler controler = null;
 	private Knowledges knowledges;
-	
+
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
 		this.knowledges = (controler.getScenario()).getKnowledges();
@@ -173,22 +173,22 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 //		this.controler.getEvents().addHandler(this.teo);
 		this.controler.getEvents().addHandler(this.epp);
-		
+
 		//TODO superfluous in 0th iteration and not necessary anymore except that scoring runction needs it (can null be passed?)
 		teo=new MakeTimeWindowsFromEvents(this.controler.getPopulation());
 		teo.makeTimeWindows(epp);
 		twm=teo.getTimeWindowMap();
-		
+
 		this.log.info(" ... Instantiation of events overlap tracking done");
 //		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm,controler.getFacilities());
 		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats);
-		
+
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");
 
 		this.log.info("  Instantiating social network EventsToScore for scoring the plans");
-		scoring = new EventsToScore(this.controler.getPopulation(), factory);
+		scoring = new EventsToScore(this.controler.getPopulation(), factory, this.controler.getConfig().charyparNagelScoring().getLearningRate());
 		this.controler.getEvents().addHandler(scoring);
 		this.log.info(" ... Instantiation of social network scoring done");
 
@@ -198,17 +198,17 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	public void notifyScoring(final ScoringEvent event){
 
 		this.log.info("scoring");
-		
+
 		//TODO: put in the spatial interactions here. The TimeWindowMap was updated in MobSim and is current, here.
 		// Do not call the teo.clear method. Instead, let
 		// the controler clear the teo in the notifyIterationStarts method
-		
+
 		Gbl.printMemoryUsage();
-		
+
 		//SSTEST this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
 		log.info("SSTEST Clearing and recalculating actStats "+snIter);
 		this.actStats.clear();
-		
+
 		Gbl.printMemoryUsage();
 		teo=new MakeTimeWindowsFromEvents(this.controler.getPopulation());
 		teo.makeTimeWindows(epp);
@@ -224,15 +224,15 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("finishIteration ... "+event.getIteration());
 
 		Gbl.printMemoryUsage();
-		
+
 		if( event.getIteration()%replan_interval==0){
-			
+
 			// Removing the social links here rather than before the
 			//replanning and assignment lets you use the actual encounters in a social score
 			this.log.info(" Removing social links ...");
 			this.snet.removeLinks(snIter);
 			this.log.info(" ... done");
-			
+
 			Gbl.printMemoryUsage();
 
 //			You could forget activities here, after the replanning and assignment
@@ -244,7 +244,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				this.log.info(" ... done");
 
 				Gbl.printMemoryUsage();
-				
+
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
 				aaw=new ActivityActWriter(this.controler.getFacilities());
 				aaw.openFile(SOCNET_OUT_DIR+"ActivityActMap"+snIter+".txt");
@@ -296,12 +296,12 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				this.log.info("  Agents planned social interactions, respectively their meetings based on last MobSim iteration ...");
 				this.log.info("  Agents' relationships are updated to reflect these interactions! ...");
 				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter, twm);
-				
+
 				// Agents' actual interactions
 				// TrackEventsOverlap must be passed to initialization of the interactor
 				// timeWindowMap is updated in the scoringListener after the MobSim
 				// this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
-				// 
+				//
 			} else {
 				this.log.info("     (none)");
 			}
@@ -310,7 +310,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			this.log.info(" ... Spatial interactions done\n");
 
 			Gbl.printMemoryUsage();
-			
+
 			this.log.info(" Non-Spatial interactions ...");
 			for (int ii = 0; ii < this.infoToExchange.length; ii++) {
 				String facTypeNS = this.infoToExchange[ii];
@@ -343,7 +343,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			this.log.info(" ... done");
 
 			Gbl.printMemoryUsage();
-			
+
 			snIter++;
 		}
 	}

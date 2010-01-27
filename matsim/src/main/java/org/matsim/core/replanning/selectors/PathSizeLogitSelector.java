@@ -54,7 +54,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 
 		//in PSL tau is  the equivalent to BrainExpBeta in the multinomial logit model
 		this.tau = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
-		
+
 		this.network = network;
 	}
 

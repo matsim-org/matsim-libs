@@ -2,16 +2,10 @@ package org.matsim.core.mobsim.jdeqsim.parallel;
 
 import java.util.concurrent.CyclicBarrier;
 
-import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
-
-import EDU.oswego.cs.dl.util.concurrent.BrokenBarrierException;
-
-
 
 public class PScheduler extends Scheduler {
 
-	
 	public PScheduler(PMessageQueue queue) {
 		super(queue);
 		// TODO Auto-generated constructor stub
@@ -28,7 +22,7 @@ public class PScheduler extends Scheduler {
 		} else {
 			getQueue().idOfLowerThread = messageExecutors[1].getId();
 		}
-		
+
 
 		messageExecutors[0].start();
 		messageExecutors[1].start();

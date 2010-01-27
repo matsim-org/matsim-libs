@@ -60,7 +60,7 @@ public class MyControler5 {
 		events.addHandler(eventWriter);
 
 		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), factory);
+		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), factory, config.charyparNagelScoring().getLearningRate());
 		events.addHandler(scoring);
 
 		StrategyManager strategyManager = new StrategyManager();

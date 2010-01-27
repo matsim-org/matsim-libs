@@ -39,7 +39,7 @@ public class BKickScoringIATBRTest extends MatsimTestCase {
 
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
-	
+
 	private EventsToScore planScorer;
 
 	public void testSingleIterationIncomeScoring() {
@@ -50,8 +50,8 @@ public class BKickScoringIATBRTest extends MatsimTestCase {
 		//hh loading
 		config.scenario().setUseHouseholds(true);
 		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
-		
-		
+
+
 		// controler with new scoring function
 		final BKickIncome2Controler controler = new BKickIncome2Controler(config);
 		controler.setCreateGraphs(false);
@@ -63,14 +63,14 @@ public class BKickScoringIATBRTest extends MatsimTestCase {
 //				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
 //				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
 //				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory());
+				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
 				controler.getEvents().addHandler(planScorer);
 			}
 		});
 
 		controler.run();
 		this.planScorer.finish();
-		
+
 		//this score is calculated as follows:
 		//U_total_car = 4.58*LN(120000CHF/240)   -   4.58*(((0.12/1000m)*50000m)/(120000CHF/240)))   -   (0.97/3600s)*(60min*60)   +   1.86*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +   1.86*12*LN(15/(12*EXP((-10*3600s)/(12*3600s))))
 		//            = 28.46291                 -   0.05496                                        -   0.97                      +   14.88 *LN(3.490342957)                      +   22.32  *LN(2.876218905)
@@ -78,11 +78,11 @@ public class BKickScoringIATBRTest extends MatsimTestCase {
 		//this calculation uses distance of street network * 1.5
 		//U_total_pt  = 4.58*LN(40000CHF/240)    -   4.58*(((0.28/1000m)*75000m)/(40000CHF/240)))                                  +   1.86*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +   1.86*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
 		//            = 23.43126                 -   0.57708                                                                       +   14.88 *LN(3.490342957)                      +   22.32  *LN(2.684471873)
-		//            = 
+		//            =
 		//actually it is air distance * 1.5
 		//U_total_pt  = 4.58*LN(40000CHF/240)    -   4.58*(((0.28/1000m)*48750m)/(40000CHF/240)))                                  +   1.86*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +   1.86*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
 		//            = 23.43126                 -   0.375102                                                                       +   14.88 *LN(3.490342957)                      +   22.32  *LN(2.684471873)
-		//            = 
+		//            =
 		System.out.println("Agent 001: " + this.planScorer.getAgentScore(id1));
 		System.out.println("Agent 002: " + this.planScorer.getAgentScore(id2));
 		// should be 69.618506624 using microsoft windows calculator but is in java 69.6185091561068 -> should be ok

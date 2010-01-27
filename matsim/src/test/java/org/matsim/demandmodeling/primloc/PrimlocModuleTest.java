@@ -122,7 +122,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		// ***************
 
 		System.out.println("  ** running primary location choice module (PLCM)");
-		PrimlocModule plcm = new PrimlocModule(knowledges);
+		PrimlocModule plcm = new PrimlocModule(scenario.getConfig(), knowledges);
 		plcm.externalTripDist = CumulativeDistribution.readDistributionFromFile("test/input/org/matsim/demandmodeling/primloc/sample_dist.txt");
 		plcm.setup( world, population );
 		plcm.run(population);

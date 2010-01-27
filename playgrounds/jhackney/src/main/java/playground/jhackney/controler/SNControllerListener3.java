@@ -124,7 +124,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	LinkedHashMap<String,Double> rndEncounterProbs= new LinkedHashMap<String,Double>();
 //	New variables for replanning
 	int replan_interval;
-	
+
 	private final Logger log = Logger.getLogger(SNControllerListener3.class);
 
 //	private Controler controler = null;
@@ -134,7 +134,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	public SNControllerListener3(playground.jhackney.controler.SNController3 controler){
 		this.controler=controler;
 	}
-	
+
 	public void notifyStartup(final StartupEvent event) {
 //		this.controler = event.getControler();
 		this.knowledges = (controler.getScenario()).getKnowledges();
@@ -169,7 +169,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 		this.log.info("  Instantiating social network EventsToScore for scoring the plans");
 //		scoring = new playground.jhackney.scoring.EventsToScoreAndReport(this.controler.getPopulation(), factory);
-		scoring = new EventsToScore(this.controler.getPopulation(),factory);
+		scoring = new EventsToScore(this.controler.getPopulation(),factory, this.controler.getConfig().charyparNagelScoring().getLearningRate());
 		this.controler.getEvents().addHandler(scoring);
 		this.log.info(" ... Instantiation of social network scoring done");
 
@@ -386,7 +386,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		// TODO JH 12.2008 This has to coincide with the activity types in the plan
 		// activityTypesForEncounters should be filled by entries in the config.xml, added to a list like replanning modules
 		// rndEncounterProbString should be associated with the activity types like the probabilities for replanning modules is done
-		// 
+		//
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		this.log.info(" Instantiating the Pajek writer ...");

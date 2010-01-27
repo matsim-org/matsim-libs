@@ -49,12 +49,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
-import org.matsim.vis.otfvis.interfaces.OTFQuery;
-import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
@@ -63,7 +60,7 @@ import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
  * This class is most important for the OTFVis client. It serves as the connector to the actual server.
  * Additionally it is responsible for all actions associated with the control bar on top of the OTFVis' screen.
  * Any communication with the server will run through this class.
- * 
+ *
  * @author dstrippgen
  *
  */
@@ -71,7 +68,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private static final long serialVersionUID = 1L;
 	private static Logger log = Logger.getLogger(OTFHostControlBar.class);
-	
+
 	private static final String TO_START = "to_start";
 	private static final String PAUSE = "pause";
 	private static final String PLAY = "play";
@@ -91,9 +88,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private JFormattedTextField timeField;
 	private int simTime = 0;
 	private boolean synchronizedPlay = true;
-	
+
 	private int controllerStatus = 0;
-	
+
 	private final List <OTFHostConnectionManager> hostControls = new ArrayList<OTFHostConnectionManager>();
 
 	private ImageIcon playIcon = null;
@@ -140,7 +137,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				for (OTFDrawer handler : slave.getDrawer().values()) {
 					handler.redraw();
 			}
-		}		
+		}
 	}
 
 	public void clearCaches() {
@@ -162,7 +159,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
 			add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
 		}
-		
+
 		playButton = createButton("PLAY", PLAY, "buttonPlay", "press to play simulation continuously");
 		add(playButton);
 		add(createButton(">", STEP_F, "buttonStepF", "go one timestep forward"));
@@ -307,7 +304,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
 		if (hostControl.getOTFServer().requestNewTime(newTime, prefTime)) {
 			simTime = hostControl.getOTFServer().getLocalTime();
-			
+
 			for(OTFHostConnectionManager slave : hostControls) {
 				if (!slave.equals(this.hostControl))
 					slave.getOTFServer().requestNewTime(newTime, prefTime);
@@ -350,13 +347,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private void gotoTime() {
 		boolean restart = (OTFVisController.getIteration(controllerStatus) == gotoIter) && (gotoTime < simTime);
-		
+
 		try {
 			// in case of live host, additionally request iteration
 			if(hostControl.getOTFServer().isLive()) {
 				((OTFLiveServerRemote)hostControl.getOTFServer()).requestControllerStatus(gotoIter);
 			}
-			
+
 			synchronized(hostControl.blockReading) {
 			if(restart){
 			  requestTimeStep(gotoTime, OTFServerRemote.TimePreference.RESTART);
@@ -364,7 +361,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			else if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER)) {
 				requestTimeStep(gotoTime, OTFServerRemote.TimePreference.LATER);
 			}
-			
+
 			if (progressBar != null) {
 			  progressBar.terminate = true;
 			}
@@ -491,7 +488,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 					else ((OTFLiveServerRemote)hostControl.getOTFServer()).play();
 				}
 				simTime = hostControl.getOTFServer().getLocalTime();
-				synchronizedPlay = sync; 
+				synchronizedPlay = sync;
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -527,7 +524,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 							if (!slave.equals(hostControl))
 								slave.getOTFServer().requestNewTime(simTime, OTFServerRemote.TimePreference.LATER);
 						}
-						
+
 						updateTimeLabel();
 						if (simTime != actTime) {
 							repaint();
@@ -553,7 +550,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private static class BorderlessButton extends JButton {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		public BorderlessButton() {
 			super();
 			super.setBorder(null);
@@ -567,12 +564,12 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	public void addSlave(OTFHostConnectionManager slave) {
 		this.hostControls.add(slave);
 	}
-	
+
 	/**
 	 * Method should be removed again when we once finish the refactoring
 	 */
 	public OTFHostConnectionManager getOTFHostControl(){
 		return this.hostControl;
 	}
-	
+
 }

@@ -4,21 +4,11 @@ import java.util.LinkedList;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.parallelEventsHandler.ConcurrentListSPSC;
 import org.matsim.core.mobsim.jdeqsim.DeadlockPreventionMessage;
-import org.matsim.core.mobsim.jdeqsim.EndLegMessage;
-import org.matsim.core.mobsim.jdeqsim.EndRoadMessage;
-import org.matsim.core.mobsim.jdeqsim.EnterRoadMessage;
 import org.matsim.core.mobsim.jdeqsim.EventMessage;
-import org.matsim.core.mobsim.jdeqsim.LeaveRoadMessage;
 import org.matsim.core.mobsim.jdeqsim.Message;
-import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
-import org.matsim.core.mobsim.jdeqsim.StartingLegMessage;
-import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
-import org.matsim.core.network.LinkImpl;
 
 /*
  * The locking dependencies of each type of message for ROADS (does road change):
@@ -251,8 +241,8 @@ public class MessageExecutor extends Thread {
 							m.handleMessage();
 						}
 					}
-					
-					
+
+
 				} else {
 
 					if (m.isAlive()) {
@@ -338,10 +328,10 @@ public class MessageExecutor extends Thread {
 
 			// }
 		}
-		
-		
+
+
 	}
-	
+
 	private void waitingOnMessages(){
 		// TODO: probably needed later again for satawal
 		// This is extremly important!!!!!!!!!!!! => even on local
@@ -356,14 +346,14 @@ public class MessageExecutor extends Thread {
 		// instead of just
 		// one in the queue, the advantage of this is not given
 		// anymore...
-		// 
+		//
 		// even with new form of locking, this is quite important!!!!
 		// changing the computation size has huge effect!!!
 		// TUNING NEEDED of this parameter...
-		// both too low and two high parameter cause lots of empty lists back. make it optimal, so that you have 
+		// both too low and two high parameter cause lots of empty lists back. make it optimal, so that you have
 		// a minimum of missed locks/empty lists...
 		for (int i = 0; i < 8000; i++) {
-		
+
 		}
 		// experiments on local compi of the parameter:
 		// timing of 10% zh.
@@ -373,7 +363,7 @@ public class MessageExecutor extends Thread {
 		// value: 20000, time: 16.6 sec.
 		// value: 30000, time: 17.3 sec.
 		// it is not fully correlated with the number of missed locks... (good time does not imply automatically low number of missed locks...)
-		
+
 
 		missedNumberOfLocks++;
 	}

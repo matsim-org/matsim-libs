@@ -38,7 +38,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -164,7 +163,7 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	public void prepareExternalExeConfig() {
-		String configFileName = Gbl.getConfig().strategy().getExternalExeConfigTemplate();
+		String configFileName = this.scenario.getConfig().strategy().getExternalExeConfigTemplate();
 		if (configFileName == null) {
 			this.extConfig = new Config();
 		} else {
@@ -177,7 +176,7 @@ public class ExternalModule implements PlanStrategyModule {
 		this.extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
 		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
 		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, Controler.getIterationFilename("events.txt", Controler.getIteration() - 1));
-		String networkFilename = Gbl.getConfig().findParam("network", "inputNetworkFile");
+		String networkFilename = this.scenario.getConfig().findParam("network", "inputNetworkFile");
 		this.extConfig.setParam(SCENARIO, SCENARIO_NETWORK_FILENAME, networkFilename);
 	}
 

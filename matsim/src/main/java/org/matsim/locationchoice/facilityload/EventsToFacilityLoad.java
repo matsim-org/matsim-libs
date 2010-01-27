@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.facilities.ActivityOptionImpl;
 
 /**
@@ -43,11 +44,11 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
 
 	public EventsToFacilityLoad(final ActivityFacilities facilities, double scaleNumberOfPersons,
-			TreeMap<Id, FacilityPenalty> facilityPenalties) {
+			TreeMap<Id, FacilityPenalty> facilityPenalties, LocationChoiceConfigGroup config) {
 		super();
-		
+
 		this.facilityPenalties = facilityPenalties;
-		
+
 		log.info("facilities size: " + facilities.getFacilities().values().size());
 		for (ActivityFacility f : facilities.getFacilities().values()) {
 			double capacity = Double.MAX_VALUE;
@@ -57,11 +58,11 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 				if (act.getCapacity() < capacity) {
 					capacity = act.getCapacity();
 				}
-			}			
-			this.facilityPenalties.put(f.getId(), new FacilityPenalty(capacity, scaleNumberOfPersons));
+			}
+			this.facilityPenalties.put(f.getId(), new FacilityPenalty(capacity, scaleNumberOfPersons, config));
 		}
 	}
-	
+
 	/**
 	 * Add an arrival event in "FacilityLoad" for every start of an activity
 	 * Home activities are excluded.
@@ -94,9 +95,9 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	}
 
 	public void reset(final int iteration) {
-		log.info("Not really resetting anything here."); 
+		log.info("Not really resetting anything here.");
 	}
-	
+
 	public void resetAll(final int iteration) {
 		Iterator<? extends FacilityPenalty> iter_fp = this.facilityPenalties.values().iterator();
 		while (iter_fp.hasNext()){

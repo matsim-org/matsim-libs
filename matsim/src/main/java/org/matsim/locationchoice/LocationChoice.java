@@ -29,12 +29,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorTGSimple;
@@ -46,24 +45,16 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class LocationChoice extends AbstractMultithreadedModule {
 
-	private Network network=null;
-	private Controler controler = null;
+	private final Network network;
+	private final Controler controler;
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private boolean constrained = false;
-	
+
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private Knowledges knowledges;
-	
-	
-	/**
-	 * @deprecated seems like this constructor is used nowhere
-	 */
-	public LocationChoice(Config config) {
-		super(config.global());
-	}
 
 	public LocationChoice(
 			final Network network,
@@ -72,70 +63,68 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		// TODO: why does this module need the control(l)er as argument?  Gets a bit awkward
 		// when you use it in demandmodelling where you don't really need a control(l)er.
 		// kai, jan09
-		
+
 		/*
-		 	Using the controler in the replanning module actually looks quite inconsiderately. 
-		 	But controler creates a new instance of router in every iteration! 
+		 	Using the controler in the replanning module actually looks quite inconsiderately.
+		 	But controler creates a new instance of router in every iteration!
 		 	Thus, the controler must be given to the replanning module by now (see below).
-		
-			controler.getRoutingAlgorithm(f) {		
+
+			controler.getRoutingAlgorithm(f) {
 				return new PlansCalcRoute(this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
 			}
 
-			TODO: extend handlePlan() by the argument "router". Maybe some kind of startup method is needed, which is called 
+			TODO: extend handlePlan() by the argument "router". Maybe some kind of startup method is needed, which is called
 			everytime before handlePlan is called. But that seems to
-			require extended refactorings of replanning code. 
-			
+			require extended refactorings of replanning code.
+
 			anhorni: april09
 		 */
 		this.knowledges = kn;
-		this.initLocal(network, controler);
+		this.network = network;
+		this.controler = controler;
+		initLocal();
 	}
 
 
-	private void initLocal(
-			final Network network,
-			final Controler controler) {
-						
-		if (Gbl.getConfig().locationchoice().getMode().equals("true")) {
+	private void initLocal() {
+
+		if (this.controler.getConfig().locationchoice().getMode().equals("true")) {
 			this.constrained = true;
 			log.info("Doing constrained location choice");
 		}
 		else {
 			log.info("Doing random location choice on univ. choice set");
 		}
-		this.controler = controler;
-		this.network = network;
 		((NetworkImpl) this.network).connect();
-		this.initTrees(controler.getFacilities());
+		this.initTrees(this.controler.getFacilities(), this.controler.getConfig().locationchoice());
 	}
-			
-	/*
+
+	/**
 	 * Initialize the quadtrees of all available activity types
 	 */
-	private void initTrees(ActivityFacilities facilities) {
-		DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
+	private void initTrees(ActivityFacilities facilities, LocationChoiceConfigGroup config) {
+		DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, config);
 		log.info("Doing location choice for activities: " + defineFlexibleActivities.getFlexibleTypes().toString());
-		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.network);
+		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.network, config);
 		treesBuilder.createTrees(facilities);
 		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
 	}
-		
+
 	@Override
 	public void finishReplanning() {
 		Gbl.printMemoryUsage();
-		
+
 		super.finishReplanning();
 		if (this.constrained) {
-			
+
 			int unsuccessfull = 0;
-			
+
 			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
 			while (planAlgo_it.hasNext()) {
 				PlanAlgorithm plan_algo = planAlgo_it.next();
-				
-				if (Gbl.getConfig().locationchoice().getSimpleTG().equals("true")) {				
+
+				if (this.controler.getConfig().locationchoice().getSimpleTG().equals("true")) {
 					unsuccessfull += ((LocationMutatorTGSimple)plan_algo).getNumberOfUnsuccessfull();
 					((LocationMutatorTGSimple)plan_algo).resetUnsuccsessfull();
 				}
@@ -143,8 +132,8 @@ public class LocationChoice extends AbstractMultithreadedModule {
 					unsuccessfull += ((LocationMutatorwChoiceSet)plan_algo).getNumberOfUnsuccessfull();
 					((LocationMutatorwChoiceSet)plan_algo).resetUnsuccsessfull();
 				}
-			}		
-			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);					
+			}
+			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);
 		}
 		this.planAlgoInstances.clear();
 	}
@@ -158,8 +147,8 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		}
 		else {
 			// only moving one flexible activity
-			if (Gbl.getConfig().locationchoice().getSimpleTG().equals("true")) {	
-				this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler, this.knowledges, 
+			if (this.controler.getConfig().locationchoice().getSimpleTG().equals("true")) {
+				this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler, this.knowledges,
 					this.quadTreesOfType, this.facilitiesOfType));
 			}
 			else {
@@ -167,7 +156,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,
 				this.quadTreesOfType, this.facilitiesOfType));
 			}
-		}		
+		}
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
 
@@ -183,7 +172,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	public List<PlanAlgorithm> getPlanAlgoInstances() {
 		return planAlgoInstances;
 	}
-	
+
 	// getters and setters needed exclusively for test cases
 	public boolean isConstrained() {
 		return constrained;
@@ -192,12 +181,5 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	public void setConstrained(boolean constrained) {
 		this.constrained = constrained;
 	}
-	
-	public void setNetwork(NetworkLayer network) {
-		this.network = network;
-	}
 
-	public void setControler(Controler controler) {
-		this.controler = controler;
-	}
 }

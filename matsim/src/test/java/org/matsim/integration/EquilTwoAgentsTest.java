@@ -64,7 +64,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		this.planScorer = null;
 		super.tearDown();
 	}
-	
+
 	public void testSingleIterationPlansV4() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + "config.xml");
 		String netFileName = "test/scenarios/equil/network.xml";
@@ -89,8 +89,8 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 		controler.run();
 	}
-	
-	
+
+
 	private class TestSingleIterationEventHandler implements LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
 		private final double agent1LeaveHomeTime, agent2LeaveHomeTime;

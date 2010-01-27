@@ -21,32 +21,32 @@
 package org.matsim.demandmodeling.primloc;
 
 /**
- * This Module adapts the MATSIM-independent Primary Location Choice Model (PrimlocEngine), 
+ * This Module adapts the MATSIM-independent Primary Location Choice Model (PrimlocEngine),
  * to the MATSIM Plans, Population, Persons, Layers, etc.
- * 
+ *
  * This Module modifies the Person by adding know Facilities to the Knowledge of the Person
- * 
+ *
  * It solves primary location choice with capacity constraints (limited number of facilities)
- * 
+ *
  * The method is described in : F. Marchal (2005), "A trip generation method for time-dependent
  * large-scale simulations of transport and land-use", Networks and Spatial Economics 5(2),
  * Kluwer Academic Publishers, 179-192.
  *
  * The CumulativeDistribution is in the same unit as the O-D Travel penalties
  * so if the input is travel time in minutes -> trip distribution as a function of time in minutes.
- * 
+ *
  * There are some config files and tests with some verbosity in
  * test/input/org/matsim/demandmodeling/primloc
- * 
+ *
  * you can use the module without any distribution but then you cannot
  * calibrate it automatically against anything. If you need , say a rough start, you can :
  * - use free flow travel times between O-D as a proxy for travel costs
  * - put a "mu" value of the same order of magnitude as the average travel cost
- * 
+ *
  * ... this makes sure that exp(-cost / mu) doesnt go over the edge
- * 
+ *
  * ... eventually you get a trip matrix which might make sense or not^^
- * 
+ *
  * I think (not sure), Waddell/de Palma/Picard have even generalised the problem and
  * there maybe even a python code in urbansim to do that also ...
  *
@@ -87,64 +87,64 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 	private final static String module_name = "primary location choice";
 
 	private PrimlocCore core = new PrimlocCore();  // Core of the module, independent of MATSIM plans
-	private String primaryActivityName; // activity to be considered in trips enumeration 
-	
-	// Agreggation layer 
+	private String primaryActivityName; // activity to be considered in trips enumeration
+
+	// Agreggation layer
 	private Zone[] zones;
 	private Layer zoneLayer;
 	private HashMap<Zone,Integer> zoneids = new HashMap<Zone,Integer>();
 	private HashMap<Zone, ArrayList<ActivityFacilityImpl>> primActFacilitiesPerZone =
 		new HashMap<Zone, ArrayList<ActivityFacilityImpl>>();
-	
+
 	// Class responsible for the computation of Travel_cost(Zone #i, Zone #j)
 	private PrimlocTravelCostAggregator travelCostAggregator;
-	
+
 	// Class responsible for the computation of the calibration error/fitness
 	// i.e. comparison with real external data
 	private PrimlocCalibrationError errorCalibrationClass;
-	
+
 	// Class containing the external trip distribution against
 	// which the calibration is performed
 	CumulativeDistribution externalTripDist;
-	
+
 	// Options
 	private boolean overwriteKnowledge; // toggle knowledge creation/modification
 	private boolean calibration; // toggle calibration/simple simulation
 	private boolean unspecifiedMu; // if starting mu is not specified
-	
+
 	// Utility classes
 	private final static Logger log = Logger.getLogger(PrimlocModule.class);
 	private Random random;
-	
+
 	private final Config cfg;
 
 	private Knowledges knowledges;
-	
-	public PrimlocModule (Knowledges knowledges) {
-		this.cfg = Gbl.getConfig();
+
+	public PrimlocModule (Config config, Knowledges knowledges) {
+		this.cfg = config;
 		this.knowledges = knowledges;
 	}
-	
+
 	@Override
 	public void run(Person guy){
 
-		// Modify the plans of the agents accordingly to the Primloc model 
+		// Modify the plans of the agents accordingly to the Primloc model
 		// that was run in setup()
-		// 
+		//
 		// For each agent performing the primary activity at least once:
 		// increase the knowledge of the agent by one Facility
-		
+
 		if( !agentHasPrimaryActivityInPlan( guy ) )
 			return;
-				
+
 		KnowledgeImpl knowledge = this.knowledges.getKnowledgesByPersonId().get(guy.getId());
 		ActivityFacilityImpl home = knowledge.getActivities("home").get(0).getFacility();
 		Zone homezone = (Zone) zoneLayer.getNearestLocations( home.getCoord(), null).get(0);
 		if( homezone == null )
 			log.warn("Homeless person (poor guy)" );
-		else{			
+		else{
 			int homeZoneID = zoneids.get(homezone);
-			
+
 			// Compute a random work zone using the trip matrix as a
 			// probability distribution, with home being conditional
 			double epsilon = MatsimRandom.getRandom().nextDouble();
@@ -154,7 +154,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 				cumul += (core.trips.get(homeZoneID, workZoneID))/core.P[homeZoneID];
 				workZoneID++;
 			}
-			
+
 			// Assign a link location corresponding to the workplace
 			ArrayList<ActivityFacilityImpl> workplaces = primActFacilitiesPerZone.get( zones[workZoneID] );
 			while( workplaces.size() == 0 ){
@@ -177,21 +177,21 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 	public void setup( World world, PopulationImpl population ){
 
 		random = new Random(this.cfg.global().getRandomSeed());
-		
+
 		setupParameters();
-		
+
 		setupAggregationLayer(world);
 
 		setupTravelCosts();
-			
+
 		setupNumberHomesPerZone( population );
 
 		setupNumberJobsPerZone((ActivityFacilitiesImpl) world.getLayer(ActivityFacilitiesImpl.LAYER_TYPE));
 
 		normalizeJobHomeVectors();
-		
+
 		setupCalibrationData();
-		
+
 		// Run the core location choice model
 		if( calibration )
 			core.runCalibrationProcess();
@@ -199,28 +199,28 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			core.runModel();
 
 	}
-	
+
 	public void setAggregationLayer( Layer zoneLayer ){
 		if( ! (zoneLayer instanceof ZoneLayer) )
 			Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Zone Layer") );
 		this.zoneLayer = zoneLayer;
 	}
-	
+
 	public void setTravelCost( PrimlocTravelCostAggregator travelCostAggregator ){
 		this.travelCostAggregator = travelCostAggregator;
 	}
-	
+
 	public void setExternalTripDistribution( CumulativeDistribution tripDist ){
 		externalTripDist = tripDist;
 	}
-	
+
 	private void setupParameters(){
 		// Fetch parameters from the config file
-		
-		primaryActivityName = cfg.getParam( module_name, "primary activity");		
+
+		primaryActivityName = cfg.getParam( module_name, "primary activity");
 		overwriteKnowledge = Boolean.parseBoolean( cfg.getParam(module_name, "overwrite knowledge"));
 		calibration = Boolean.parseBoolean( cfg.getParam(module_name, "calibration"));
-			
+
 		String muString = cfg.findParam(module_name, "mu");
 		unspecifiedMu = ( muString == null );
 		if( !unspecifiedMu )
@@ -231,12 +231,12 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		core.threshold3 = Double.parseDouble( cfg.getParam(module_name, "threshold3") );
 		core.maxiter = Integer.parseInt( cfg.getParam(module_name, "maxiter") );
 		core.verbose = Boolean.parseBoolean(cfg.getParam(module_name, "verbose"));
-		
+
 	}
-	
+
 	private void setupAggregationLayer(World world){
 		// Check / load the aggregation layer
-		if( zoneLayer == null ){	
+		if( zoneLayer == null ){
 			String layerName = cfg.findParam( module_name, "aggregation layer");
 			if( layerName == null )
 				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs an aggregation layer" ) );
@@ -259,41 +259,41 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			internalID++;
 		}
 	}
-	
+
 	private void setupTravelCosts(){
 		String distParam = cfg.findParam(module_name, "euclidean distance costs");
 		if( distParam != null ){
 			if( Boolean.parseBoolean( distParam ) )
 				setEuclideanDistanceImpedances();
 			else if( travelCostAggregator == null )
-				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Travel costs aggregator or euclidean distance costs enabled") );				
+				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Travel costs aggregator or euclidean distance costs enabled") );
 		}
 		else if( travelCostAggregator == null )
 				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Travel costs aggregator or euclidean distance costs enabled") );
-		
-		
+
+
 		// The following is optional but will allow to calibrate against
 		// a given trip distribution if needed
 		core.setupCostStatistics();
-		
+
 		if( unspecifiedMu ){
 			core.mu = core.avgCost;
 			if( core.verbose )
 				System.out.println("Setting mu = <cost> = "+core.avgCost);
 		}
-	
+
 	}
 
 	private void setupNumberHomesPerZone( PopulationImpl population ){
 		// Setup the number of originating trips.
-		// In this case it corresponds to the number of Persons which will 
+		// In this case it corresponds to the number of Persons which will
 		// make at least one trip with activity type = primaryActivityName
 		// We assume that agents have plans that contains at least the agenda of
 		// their activities
-		
+
 		core.P = new double[ core.numZ ];
 		// Determine how many employed persons live in each zone
-		for (Person guy : population.getPersons().values()) 
+		for (Person guy : population.getPersons().values())
 			if( agentHasPrimaryActivityInPlan( guy ) ){
 				ActivityFacilityImpl homeOfGuy = this.knowledges.getKnowledgesByPersonId().get(guy.getId()).getActivities("home").get(0).getFacility();
 				ArrayList<MappedLocation> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);
@@ -301,10 +301,10 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 				if( homezone == null )
 					log.warn("Homeless employed person (poor guy)" );
 				else
-					core.P[ zoneids.get(homezone) ]++;								
+					core.P[ zoneids.get(homezone) ]++;
 			}
 	}
-	
+
 	private boolean agentHasPrimaryActivityInPlan(Person guy) {
 		for (Plan plan : guy.getPlans()) {
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -317,7 +317,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		}
 		return false;
 	}
-	
+
 	private void setupNumberJobsPerZone(ActivityFacilitiesImpl facilities){
 		// Setup the number of available facilities at the destination of the trips
 		// In this case we take the capacities of the existing Facilities
@@ -351,9 +351,9 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 					"\t#"+primaryActivityName+": "+core.df.format(core.J[i]));
 		}
 	}
-	
-	
-	
+
+
+
 	private void setEuclideanDistanceImpedances(){
 		// Compute a simple Travel Cost matrix
 		// based on the euclidean distance between centroids
@@ -365,27 +365,27 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 
 			// The method requires cii > 0 therefore we set
 			// cii = length of the diagonal of the bounding box of Zone #i
-			
+
 			core.cij.set(i, i, (CoordUtils.calcDistance(zones[i].getMax(), zones[i].getMin()))/2 );
-			
+
 			if( core.cij.get( i, i ) == 0.0 )
 				Gbl.errorMsg( new Exception("PrimLocChoice_core requires Cii>0 for intrazonal travel costs"));
-			
+
 		}
-	}	
-	
+	}
+
 	private void setupCalibrationData(){
 		// This example simply illustrate how to calibrate against
 		// a given trip distribution
-		
+
 		if( errorCalibrationClass == null ){
 			if( externalTripDist == null )
 				return;
-			else{	
-				errorCalibrationClass = new PrimlocTripDistributionError( externalTripDist, core.cij );	
+			else{
+				errorCalibrationClass = new PrimlocTripDistributionError( externalTripDist, core.cij );
 			}
 		}
 		core.setCalibrationError( errorCalibrationClass );
 	}
-	
+
 }

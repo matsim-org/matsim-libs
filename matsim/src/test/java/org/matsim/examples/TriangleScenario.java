@@ -26,7 +26,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.matrices.Matrices;
@@ -48,6 +47,8 @@ public abstract class TriangleScenario {
 
 	private static final String studyfolder = "test/scenarios/triangle/";
 
+	private static Config config = null;
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -60,6 +61,7 @@ public abstract class TriangleScenario {
 	//////////////////////////////////////////////////////////////////////
 
 	public static final void setUpScenarioConfig(final Config config, final String outputDirectory) {
+		TriangleScenario.config = config;
 		config.config().setOutputFile(outputDirectory + "output_config.xml");
 
 		config.world().setInputFile(studyfolder + "world.xml");
@@ -85,34 +87,34 @@ public abstract class TriangleScenario {
 
 	public static final void writePlans(Population plans, Network network) {
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans, network).writeFile(Gbl.getConfig().plans().getOutputFile());
+		new PopulationWriter(plans, network).writeFile(TriangleScenario.config.plans().getOutputFile());
 		System.out.println("  done.");
 	}
 
 	public static final void writeWorld(final World world) {
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.writeFile(Gbl.getConfig().world().getOutputFile());
+		world_writer.writeFile(TriangleScenario.config.world().getOutputFile());
 		System.out.println("  done.");
 	}
 
 	public static final void writeFacilities(ActivityFacilitiesImpl facilities) {
 		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).writeFile(Gbl.getConfig().facilities().getOutputFile());
+		new FacilitiesWriter(facilities).writeFile(TriangleScenario.config.facilities().getOutputFile());
 		System.out.println("  done.");
 	}
 
 	public static final void writeMatrices(final Matrices matrices) {
 		System.out.println("  writing matrices xml file... ");
 		MatricesWriter matrices_writer = new MatricesWriter(matrices);
-		matrices_writer.writeFile(Gbl.getConfig().matrices().getOutputFile());
+		matrices_writer.writeFile(TriangleScenario.config.matrices().getOutputFile());
 		System.out.println("  done.");
 	}
 
 	public static final void writeNetwork(Network network) {
 		System.out.println("  writing network xml file... ");
 		NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.writeFile(Gbl.getConfig().network().getOutputFile());
+		network_writer.writeFile(TriangleScenario.config.network().getOutputFile());
 		System.out.println("  done.");
 	}
 

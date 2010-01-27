@@ -23,7 +23,6 @@ package org.matsim.core.replanning.selectors;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 
@@ -38,8 +37,8 @@ public class ExpBetaPlanChanger implements PlanSelector {
 	private final double beta;
 	static boolean betaFlag = true ;
 
-	public ExpBetaPlanChanger() {
-		this.beta = Gbl.getConfig().charyparNagelScoring().getBrainExpBeta();
+	public ExpBetaPlanChanger(double beta) {
+		this.beta = beta;
 	}
 
 	/**
@@ -75,7 +74,7 @@ public class ExpBetaPlanChanger implements PlanSelector {
 			 *   (1) someone would need to go through the theory to make sure that we remain within what we have said before
 			 *       (convergence to logit and proba of jump between equal options = 0.01
 			 *   (2) someone would need to test if the "traffic" results are similar
-			 */  
+			 */
 			betaFlag = false ;
 		}
 		double weight = Math.exp( 0.5 * this.beta * (otherScore - currentScore) );

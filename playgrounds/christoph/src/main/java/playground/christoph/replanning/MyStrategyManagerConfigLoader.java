@@ -36,7 +36,7 @@ import playground.christoph.replanning.modules.MyReRouteDijkstra;
 public class MyStrategyManagerConfigLoader {
 
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
-	
+
 	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
 
 		Network network = controler.getNetwork();
@@ -100,7 +100,7 @@ public class MyStrategyManagerConfigLoader {
 			} else if (classname.equals("SelectExpBeta")) {
 				strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 			} else if (classname.equals("ChangeExpBeta")) {
-				strategy = new PlanStrategy(new ExpBetaPlanChanger());
+				strategy = new PlanStrategy(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
 			} else if (classname.equals("SelectRandom")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 			} else if (classname.equals("ChangeLegMode")) {

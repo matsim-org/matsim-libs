@@ -20,7 +20,7 @@
 
 package org.matsim.locationchoice.facilityload;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 
 /*
  * TODO: (discussion)
@@ -28,9 +28,9 @@ import org.matsim.core.gbl.Gbl;
  * 		We have to define this more precise:
  * 		For work and home in the same facility we need two independent capacities
  * 		(-> could be done in Activity)
- * 		But shopping and leisure in a shopping mall with movie theaters additionally needs a 
+ * 		But shopping and leisure in a shopping mall with movie theaters additionally needs a
  * 		shared capacity (e.g. parking)
- * 
+ *
  * 		At the moment I need only shopping (and leisure) thus I only use one cap.
  * 		(The smallest of all shopping (and leisure) activities of the facility).
  *
@@ -39,47 +39,47 @@ import org.matsim.core.gbl.Gbl;
  */
 
 public class FacilityPenalty {
-	
+
 	private FacilityLoad facilityLoad;
 	private double capacity = 0.0;
 	private static int numberOfTimeBins = 4*24;
 	private double scaleNumberOfPersons = 1;
-	private double sumCapacityPenaltyFactor = 0.0;	
+	private double sumCapacityPenaltyFactor = 0.0;
 	private double restraintFcnFactor = 0.0;
 	private double restraintFcnExp = 0.0;
-	
-	FacilityPenalty(double minCapacity, double scaleNumberOfPersons) {
+
+	FacilityPenalty(double minCapacity, double scaleNumberOfPersons, LocationChoiceConfigGroup config) {
 		this.capacity = minCapacity;
 		this.facilityLoad = new FacilityLoad(FacilityPenalty.numberOfTimeBins, scaleNumberOfPersons);
-		this.scaleNumberOfPersons = scaleNumberOfPersons;		
-		this.restraintFcnFactor = Double.parseDouble(Gbl.getConfig().locationchoice().getRestraintFcnFactor());
-		this.restraintFcnExp = Double.parseDouble(Gbl.getConfig().locationchoice().getRestraintFcnExp());
+		this.scaleNumberOfPersons = scaleNumberOfPersons;
+		this.restraintFcnFactor = Double.parseDouble(config.getRestraintFcnFactor());
+		this.restraintFcnExp = Double.parseDouble(config.getRestraintFcnExp());
 		}
-		
+
 	private double calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
-		
+
 		double [] facilityload = this.facilityLoad.getLoad();
 		double capPenaltyFactor = 0.0;
-				
+
 		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
 			if (this.capacity > 0) {
 			capPenaltyFactor += restraintFcnFactor*Math.pow(
-					(double)(facilityload[i]-scaleNumberOfPersons)/(this.capacity), restraintFcnExp);
+					(facilityload[i]-scaleNumberOfPersons)/(this.capacity), restraintFcnExp);
 			}
-			
+
 			/*
 			 * facilityload[i]-scaleNumberOfPersons: being alone in a facility does not
-			 * reduce the utility. 
-			 * 
+			 * reduce the utility.
+			 *
 			 * } else: do nothing: is penalized by costs for waiting time
 			 */
 		}
 		capPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
-		capPenaltyFactor = Math.min(0.5, capPenaltyFactor);		
+		capPenaltyFactor = Math.min(0.5, capPenaltyFactor);
 		this.sumCapacityPenaltyFactor += capPenaltyFactor * this.scaleNumberOfPersons;
 		return capPenaltyFactor;
 	}
-	
+
 	public double getCapacityPenaltyFactor(double startTime, double endTime) {
 
 		if (startTime>24.0*3600.0 && endTime>24.0*3600.0) {
@@ -90,10 +90,10 @@ public class FacilityPenalty {
 		}
 
 		int startTimeBinIndex = this.facilityLoad.timeBinIndex(startTime);
-		int endTimeBinIndex = this.facilityLoad.timeBinIndex(endTime);	
+		int endTimeBinIndex = this.facilityLoad.timeBinIndex(endTime);
 		return calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
 	}
-	
+
 	public FacilityLoad getFacilityLoad() {
 		return facilityLoad;
 	}
@@ -101,7 +101,7 @@ public class FacilityPenalty {
 	public void setFacilityLoad(FacilityLoad facilityLoad) {
 		this.facilityLoad = facilityLoad;
 	}
-	
+
 	public double getCapacity() {
 		return capacity;
 	}
@@ -122,9 +122,9 @@ public class FacilityPenalty {
 	}
 
 	public void finish() {
-		this.facilityLoad.finish();	
+		this.facilityLoad.finish();
 	}
-	
+
 	public void reset() {
 		this.sumCapacityPenaltyFactor = 0.0;
 		this.facilityLoad.reset();

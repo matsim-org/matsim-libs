@@ -41,7 +41,6 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
@@ -51,7 +50,7 @@ import org.matsim.core.utils.collections.Tuple;
  * AgentStuck-Events are used if available to add a penalty to the score. The
  * final score are written to the selected plans of each person in the
  * population.
- * 
+ *
  * @author mrieser
  */
 public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
@@ -65,8 +64,14 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	private long scoreCount = 0;
 	private final double learningRate;
 
+	/**
+	 * Initializes EventsToScore with a learningRate of 1.0.
+	 *
+	 * @param population
+	 * @param factory
+	 */
 	public EventsToScore(final Population population, final ScoringFunctionFactory factory) {
-		this(population, factory, Gbl.getConfig().charyparNagelScoring().getLearningRate());
+		this(population, factory, 1.0);
 	}
 
 	public EventsToScore(final Population population, final ScoringFunctionFactory factory, final double learningRate) {
@@ -85,7 +90,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		this.agentPlanElementIndex.put(personId, Integer.valueOf(1 + index.intValue()));
 		return 1 + index.intValue();
 	}
-	
+
 	public void handleEvent(final AgentDepartureEvent event) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event.getPersonId());
 		if (data != null) {
@@ -155,7 +160,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	/**
 	 * Returns the actual average plans' score before it was assigned to the
 	 * plan and possibility mixed with old scores (learningrate).
-	 * 
+	 *
 	 * @return the average score of the plans before mixing with the old scores
 	 *         (learningrate)
 	 */
@@ -168,7 +173,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	/**
 	 * Returns the score of a single agent. This method only returns useful
 	 * values if the method {@link #finish() } was called before. description
-	 * 
+	 *
 	 * @param agentId
 	 *            The id of the agent the score is requested for.
 	 * @return The score of the specified agent.
@@ -199,13 +204,13 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		}
 		return data;
 	}
-	
+
 	/**
 	 * Returns the scoring function for the specified agent. If the agent
 	 * already has a scoring function, that one is returned. If the agent does
 	 * not yet have a scoring function, a new one is created and assigned to the
 	 * agent and returned.
-	 * 
+	 *
 	 * @param agentId
 	 *            The id of the agent the scoring function is requested for.
 	 * @return The scoring function for the specified agent.

@@ -82,7 +82,7 @@ import playground.jhackney.socialnetworks.statistics.SocialNetworkStatistics;
  *      <li>execute Replanning: Adjust plans through any combination of replanning strategies</li>
  *      <li>notifyIterationStarts: Reset events-based social network helper objects</li><br>
  *<br>
- * 
+ *
  * @author jhackney
  *
  */
@@ -136,14 +136,14 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 //		Now make new TimeWindows and update the Map of Agent<->TimeWindow (uses old plans and new events)
 		Gbl.printMemoryUsage();
 
-		controler.stopwatch.beginOperation("timewindowmap");			
+		controler.stopwatch.beginOperation("timewindowmap");
 		this.log.info(" Making time Windows and Map from Events");
 		teo.makeTimeWindows(epp);
 		twm= teo.getTimeWindowMap();
 		this.log.info(" ... done making time windows and map");
 		controler.stopwatch.endOperation("timewindowmap");
 
-//		New bracket position			
+//		New bracket position
 		if( event.getIteration()%interact_interval==0){
 //			Spatial interactions can change the social network and/or knowledge
 			controler.stopwatch.beginOperation("spatialencounters");
@@ -254,13 +254,13 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 	/**
 	 * The EventHandlers are reset in notifyIterationStarts.<p>
-	 * 
+	 *
 	 * However the results of the last MobSim, which are based on the Events,
 	 * might still be needed for social network calculations in RePlanning.<p>
-	 * 
+	 *
 	 * Clear these results here, after RePlanning, rather than in
 	 * notifyIterationStarts, in case they are needed in RePlanning.<p>
-	 * 
+	 *
 	 * See {@link org.matsim.controler.Controler#doIterations()}
 	 */
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
@@ -321,11 +321,11 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo, this.controler.getFacilities());
 		this.log.info("... done");
 
-		this.snIter = this.controler.getFirstIteration();		
+		this.snIter = this.controler.getFirstIteration();
 	}
 
 	private void setupSNScoring() {
-		// 
+		//
 		this.log.info("   Instantiating a new social network scoring factory with new Event Tracker");
 		epp=new EventsMapStartEndTimes();
 		this.controler.getEvents().addHandler(this.epp);
@@ -344,7 +344,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 		this.log.info("  Instantiating social network EventsToScore for scoring the plans");
 //		scoring = new playground.jhackney.scoring.EventsToScoreAndReport(this.controler.getPopulation(), factory);
-		scoring = new EventsToScore(this.controler.getPopulation(),factory);
+		scoring = new EventsToScore(this.controler.getPopulation(),factory, this.controler.getConfig().charyparNagelScoring().getLearningRate());
 		this.controler.getEvents().addHandler(scoring);
 		this.log.info(" ... Instantiation of social network scoring done");
 	}

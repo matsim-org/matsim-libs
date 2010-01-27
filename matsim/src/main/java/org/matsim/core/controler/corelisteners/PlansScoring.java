@@ -44,7 +44,7 @@ public class PlansScoring implements StartupListener, ScoringListener, Iteration
 
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
-		this.planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory());
+		this.planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
 		Logger.getLogger(PlansScoring.class).debug("PlanScoring loaded ScoringFunctionFactory");
 		event.getControler().getEvents().addHandler(this.planScorer);
 	}

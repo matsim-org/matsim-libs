@@ -633,7 +633,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			manager.setMaxPlansPerAgent(4);
 
 			// ChangeExpBeta
-			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanChanger());
+			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanChanger(this.config.charyparNagelScoring().getBrainExpBeta()));
 			manager.addStrategy(strategy1, 0.7);
 
 			// ChangeLegModeWithParkLocation

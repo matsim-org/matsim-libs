@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.EventsToScore;
@@ -61,12 +60,11 @@ public class SubPopScorer {
 		this.scenario.loadScenario();
 		this.linkIds = linkIds;
 		Set<Id> idSet = filterPlans(this.scenario.getScenario().getPopulation());
-		calculateScore(idSet);
+		calculateScore(idSet, this.scenario.getScenario().getConfig());
 
 	}
 
-  private void calculateScore(Set<Id> idSet) {
-  	Config config = Gbl.getConfig();
+  private void calculateScore(Set<Id> idSet, Config config) {
   	String eventsFilePath = config.events().getInputFile();
   	FilteredEventsManagerImpl events = new FilteredEventsManagerImpl();
   	MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -74,7 +72,7 @@ public class SubPopScorer {
   	PersonEventFilter filter = new PersonEventFilter(idSet);
   	events.addFilter(filter);
   	//add the handler to score
-  	EventsToScore scorer = new EventsToScore(this.scenario.getScenario().getPopulation(), new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring()));
+  	EventsToScore scorer = new EventsToScore(this.scenario.getScenario().getPopulation(), new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring()), config.charyparNagelScoring().getLearningRate());
   	events.addHandler(scorer);
 
   	reader.readFile(eventsFilePath);

@@ -40,7 +40,7 @@ public class BKickScoringTest extends MatsimTestCase {
 
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
-	
+
 	private EventsToScore planScorer;
 
 	public void testSingleIterationScoring() {
@@ -59,7 +59,7 @@ public class BKickScoringTest extends MatsimTestCase {
 //				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
 //				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
 //				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory());
+				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
 				controler.getEvents().addHandler(planScorer);
 			}
 		});
@@ -70,9 +70,9 @@ public class BKickScoringTest extends MatsimTestCase {
 		//U_total_car = 0                          -(0.2*0.12/1000m)*50000m      +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(15/(12*EXP((-10*3600s)/(12*3600s))))
 		//U_total_pt  = -(0.1/3600s)*(120min*60)   -(0.0535*0.28/1000m)*50000m   +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
 		assertEquals(50.23165311164136, this.planScorer.getAgentScore(id1), EPSILON);
-		assertEquals(48.45180305141843, this.planScorer.getAgentScore(id2), EPSILON);	
+		assertEquals(48.45180305141843, this.planScorer.getAgentScore(id2), EPSILON);
 	}
-	
+
 	public void testSingleIterationControlerScoring() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + "configControlerScoreTest.xml");
 		String netFileName = this.getClassInputDirectory() + "network.xml";
@@ -89,7 +89,7 @@ public class BKickScoringTest extends MatsimTestCase {
 //				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
 //				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
 //				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory());
+				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
 				controler.getEvents().addHandler(planScorer);
 			}
 		});
@@ -102,7 +102,7 @@ public class BKickScoringTest extends MatsimTestCase {
 		assertEquals(50.23165311164136, this.planScorer.getAgentScore(id1), EPSILON);
 		assertEquals(48.45180305141842, this.planScorer.getAgentScore(id2), EPSILON);
 	}
-	
+
 	public void testSingleIterationIncomeScoring() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + "configIncomeScoreTest.xml");
 		String netFileName = this.getClassInputDirectory() + "network.xml";
@@ -111,8 +111,8 @@ public class BKickScoringTest extends MatsimTestCase {
 		//hh loading
 		config.scenario().setUseHouseholds(true);
 		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
-		
-		
+
+
 		// controler with new scoring function
 		final BKickIncomeControler controler = new BKickIncomeControler(config);
 		controler.setCreateGraphs(false);
@@ -124,14 +124,14 @@ public class BKickScoringTest extends MatsimTestCase {
 //				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
 //				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
 //				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory());
+				planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory(), controler.getConfig().charyparNagelScoring().getLearningRate());
 				controler.getEvents().addHandler(planScorer);
 			}
 		});
 
 		controler.run();
 		this.planScorer.finish();
-		
+
 		//this score is calculated as follows:
 		//U_total_car = 0                          -(0.2*0.12/1000m)*50000m      +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(15/(12*EXP((-10*3600s)/(12*3600s))))
 		//U_total_pt  = -(0.1/3600s)*(120min*60)   -(0.0535*0.28/1000m)*50000m   +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))

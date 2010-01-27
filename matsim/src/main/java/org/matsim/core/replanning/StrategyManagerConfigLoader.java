@@ -154,7 +154,7 @@ public class StrategyManagerConfigLoader {
 		} else if (name.equals("SelectExpBeta")) {
 			strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 		} else if (name.equals("ChangeExpBeta")) {
-			strategy = new PlanStrategy(new ExpBetaPlanChanger());
+			strategy = new PlanStrategy(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
 		} else if (name.equals("SelectRandom")) {
 			strategy = new PlanStrategy(new RandomPlanSelector());
 		} else if (name.equals("ChangeLegMode")) {

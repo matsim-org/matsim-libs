@@ -20,9 +20,6 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * Tests for {@link ExpBetaPlanSelector}.
@@ -32,14 +29,8 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 public class ExpBetaPlanChangerTest extends AbstractPlanSelectorTest {
 
 	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		loadConfig(null); // required for planCalcScore.beta to be defined
-	}
-
-	@Override
 	protected PlanSelector getPlanSelector() {
-		return new ExpBetaPlanChanger();
+		return new ExpBetaPlanChanger(2.0);
 	}
 
 	// TODO write specific tests for ExpBetaPlanChanger, see ExpBetaPlanSelectorTest for examples
