@@ -38,6 +38,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSimTimer;
 
@@ -157,7 +158,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 		this.currentBottleNeckMainRouteLinkId = this.mainRouteNaturalBottleNeckId;
 		this.currentBNCapacityMainRoute = getCapacity(this.mainRouteNaturalBottleNeckId);
-		List<Node> nodesMainRoute = this.mainRoute.getNodes();
+		List<Node> nodesMainRoute = RouteUtils.getNodes(this.mainRoute, this.network);
 		for (int i = 1; i < nodesMainRoute.size() - 1; i++) {
 			Node n = nodesMainRoute.get(i);
 			for (Link inLink : n.getInLinks().values()) {
@@ -216,7 +217,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		this.currentBottleNeckAlternativeRoute = this.altRouteNaturalBottleNeckId;
 		this.currentBNCapacityAlternativeRoute = getCapacity(this.altRouteNaturalBottleNeckId);
 
-		List<Node> nodesAlternativeRoute = this.alternativeRoute.getNodes();
+		List<Node> nodesAlternativeRoute = RouteUtils.getNodes(this.alternativeRoute, this.network);
 		for (int i = 1; i < nodesAlternativeRoute.size() - 1; i++) {
 			Node n = nodesAlternativeRoute.get(i);
 			for (Link inLink : n.getInLinks().values()) {

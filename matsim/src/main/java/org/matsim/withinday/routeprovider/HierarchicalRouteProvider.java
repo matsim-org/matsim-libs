@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.misc.RouteUtils;
 
 
 /**
@@ -72,11 +73,11 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 				if (subRoute.getStartLinkId() != departureLink.getId()) {
 					routeNodes.add(this.network.getLinks().get(subRoute.getStartLinkId()).getFromNode());
 				}
-				routeNodes.addAll(subRoute.getNodes());
+				routeNodes.addAll(RouteUtils.getNodes(subRoute, this.network));
 			}
 			//next time we don't have to add the first node
 			else {
-				routeNodes.addAll(subRoute.getNodes());
+				routeNodes.addAll(RouteUtils.getNodes(subRoute, this.network));
 			}
 			returnRoute.setNodes(departureLink, routeNodes, destinationLink);
 			if (isEndCompleteRoute(returnRoute, destinationLink)) {
@@ -90,7 +91,9 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	}
 
 	private boolean isEndCompleteRoute(final NetworkRouteWRefs subRoute, final Link destinationLink) {
-		Node endNode = subRoute.getNodes().get(subRoute.getNodes().size() - 1);
+		List<Id> linkIds = subRoute.getLinkIds();
+		Link lastLink = this.network.getLinks().get(linkIds.get(linkIds.size() - 1));
+		Node endNode = lastLink.getToNode();
 		if (endNode.getOutLinks().containsKey(destinationLink.getId())) {
 			return true;
 		}

@@ -39,6 +39,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSimTimer;
 
@@ -152,7 +153,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 			}
 		}
 		this.currentBottleNeckMainRouteId = this.mainRouteNaturalBottleNeckId;
-		List<Node> nodesMainRoute = this.mainRoute.getNodes();
+		List<Node> nodesMainRoute = RouteUtils.getNodes(this.mainRoute, this.network);
 		for (int i = 0; i < nodesMainRoute.size(); i++) {
 			Node n = nodesMainRoute.get(i);
 			for (Link inLink : n.getInLinks().values()) {
@@ -211,7 +212,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		}
 		this.currentBottleNeckAlternativeRouteId = this.altRouteNaturalBottleNeckId;
 
-		List<Node> nodesAlternativeRoute = this.alternativeRoute.getNodes();
+		List<Node> nodesAlternativeRoute = RouteUtils.getNodes(this.alternativeRoute, this.network);
 		for (int i = 0; i < nodesAlternativeRoute.size(); i++) {
 			Node n = nodesAlternativeRoute.get(i);
 			for (Link inLink : n.getInLinks().values()) {
@@ -473,7 +474,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 				- getIntraFlow(bottleNeckId);
 
 		// Calculate additional agents that enter or leaves route
-		List<Node> routeList = new ArrayList<Node>(routeSegment.getNodes());
+		List<Node> routeList = RouteUtils.getNodes(routeSegment, this.network);
 		routeList.add(0, routeSegment.getStartLink().getFromNode());
 		routeList.add(routeSegment.getEndLink().getToNode());
 		List<Id> inAndOutLinks = new ArrayList<Id>();

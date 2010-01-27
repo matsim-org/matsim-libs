@@ -24,19 +24,17 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
@@ -311,10 +309,12 @@ public class VDSSignTest extends MatsimTestCase {
 			sign.calculateOutput(i);
 			NetworkRouteWRefs r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route1, sign.requestRoute());
-			//however with the setting the nodes should be the same:
-			List<Node> nodes = RouteUtils.getNodes(r, this.network);
-			for (int j = 0; j < nodes.size(); j++) {
-				assertEquals("nodes not the same!", nodes.get(j), this.route1.getNodes().get(j));
+			//however with the setting the links should be the same:
+			List<Id> linkIds = r.getLinkIds();
+			List<Id> linkIds1 = this.route1.getLinkIds();
+			assertEquals("routes have different length!", linkIds1.size(), linkIds.size());
+			for (int j = 0; j < linkIds1.size(); j++) {
+				assertEquals("different link at position " + j + ". ", linkIds1.get(j), linkIds.get(j));
 			}
 			this.incrementSystemTime();
 		}

@@ -32,6 +32,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 
@@ -293,7 +294,7 @@ public class VDSSign {
 		Link startLink = this.network.getLinks().get(r.getStartLinkId());
 		Node startNode = startLink.getFromNode();
 		ArrayList<Node> rNodes = new ArrayList<Node>();
-		rNodes.addAll(r.getNodes());
+		rNodes.addAll(RouteUtils.getNodes(r, this.network));
 //		if (this.signLink != startLink) {
 		if (!(this.signLink.getToNode().equals(startNode) || (this.signLink == startLink))) {
 			startLink = calculateInLink(this.signLink, startNode);
