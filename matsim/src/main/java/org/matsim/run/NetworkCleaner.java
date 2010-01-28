@@ -106,7 +106,7 @@ public class NetworkCleaner {
 	}
 
 	public static void main(String[] args) {
-		new NetworkCleaner().run(new String[] {"test/scenarios/berlin/network.xml", "test/scenarios/berlin/network2.xml"});
+		new NetworkCleaner().run(args);
 	}
 
 }
