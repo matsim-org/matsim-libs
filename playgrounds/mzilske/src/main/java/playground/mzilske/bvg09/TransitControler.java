@@ -68,6 +68,8 @@ public class TransitControler extends Controler {
 	private final static String COUNTS_MODULE_NAME = "ptCounts";
 	
 	private final TransitConfigGroup transitConfig;
+	
+	private boolean useOTFVis = true;
 
 	public TransitControler(final String[] args) {
 		super(args);
@@ -136,9 +138,11 @@ public class TransitControler extends Controler {
 	@Override
 	protected void runMobSim() {
 		TransitQSimulation sim = new TransitQSimulation(this.scenarioData, this.events);
-		OTFVisQSimFeature otfVisQSimFeature = new OTFVisQSimFeature(sim);
-		otfVisQSimFeature.setVisualizeTeleportedAgents(true);
-		sim.addFeature(otfVisQSimFeature);
+		if (useOTFVis) {
+			OTFVisQSimFeature otfVisQSimFeature = new OTFVisQSimFeature(sim);
+			otfVisQSimFeature.setVisualizeTeleportedAgents(true);
+			sim.addFeature(otfVisQSimFeature);
+		}
 		sim.setUseUmlaeufe(true);
 		sim.run();
 	}
@@ -225,4 +229,13 @@ public class TransitControler extends Controler {
 
 	}
 
+	boolean isUseOTFVis() {
+		return useOTFVis;
+	}
+
+	void setUseOTFVis(boolean useOTFVis) {
+		this.useOTFVis = useOTFVis;
+	}
+
+	
 }
