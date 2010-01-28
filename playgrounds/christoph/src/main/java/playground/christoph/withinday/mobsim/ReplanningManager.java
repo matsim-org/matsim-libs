@@ -24,7 +24,7 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.core.utils.misc.Time;
 
 /*
@@ -159,12 +159,12 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 	{
 		if (isActEndReplanning())
 		{
-			actEndReplanningModule.doReplanning(e.getSimulationTime() + SimulationTimer.getSimTickTime());
+			actEndReplanningModule.doReplanning(e.getSimulationTime() + QSimTimer.getSimTickTime());
 		}
 		
 		if (isLeaveLinkReplanning())
 		{
-			leaveLinkReplanningModule.doReplanning(e.getSimulationTime() + SimulationTimer.getSimTickTime());
+			leaveLinkReplanningModule.doReplanning(e.getSimulationTime() + QSimTimer.getSimTickTime());
 		}	
 	}
 }

@@ -24,19 +24,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.ptproject.qsim.DriverAgent;
 
-import playground.christoph.withinday.mobsim.ReplanningQueueSimulation;
+import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
 public class ActivityEndIdentifier extends DuringActivityIdentifier{
 
-	protected ReplanningQueueSimulation simulation;
+	protected KnowledgeWithinDayQSim simulation;
 	protected PriorityBlockingQueue<DriverAgent> queue;
 	
-	public ActivityEndIdentifier(ReplanningQueueSimulation simulation)
+	public ActivityEndIdentifier(KnowledgeWithinDayQSim simulation)
 	{
 		this.simulation = simulation;
 		this.queue = simulation.getActivityEndsList();

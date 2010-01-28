@@ -17,12 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.christoph.withinday.mobsim;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.queuesim.AgentFactory;
-import org.matsim.core.mobsim.queuesim.PersonAgent;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.ptproject.qsim.AgentFactory;
+import org.matsim.ptproject.qsim.PersonAgent;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.core.population.PersonImpl;
 
 /*
@@ -32,7 +33,7 @@ import org.matsim.core.population.PersonImpl;
  */
 public class WithinDayAgentFactory extends AgentFactory {
 
-	public WithinDayAgentFactory(final QueueSimulation simulation)
+	public WithinDayAgentFactory(final QSim simulation)
 	{
 		super(simulation);
 	}

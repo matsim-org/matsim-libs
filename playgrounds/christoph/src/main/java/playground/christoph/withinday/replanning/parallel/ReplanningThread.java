@@ -29,7 +29,7 @@ import java.util.concurrent.CyclicBarrier;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.ptproject.qsim.DriverAgent;
 
 import playground.christoph.withinday.replanning.ReplanningTask;
 import playground.christoph.withinday.replanning.WithinDayReplanner;

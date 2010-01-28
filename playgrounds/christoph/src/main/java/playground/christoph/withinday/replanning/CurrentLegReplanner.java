@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -113,7 +113,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 		int currentNodeIndex = withinDayPersonAgent.getCurrentNodeIndex();
 		NetworkRouteWRefs route = (NetworkRouteWRefs) currentLeg.getRoute();
 
-		QueueVehicle vehicle = withinDayPersonAgent.getVehicle();
+		QVehicle vehicle = withinDayPersonAgent.getVehicle();
 		
 		/* 
 		 * If the Vehicle is already on the destination Link we don't need any
@@ -184,10 +184,10 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 		route.setDistance(distance);
 		
 		// finally reset the cached next Link of the PersonAgent - it may have changed!
-		withinDayPersonAgent.ResetCachedNextLink();
+		withinDayPersonAgent.resetCachedNextLink();
 
 		// create ReplanningEvent
-		QueueSimulation.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
+		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
 		
 		return true;
 	}

@@ -23,20 +23,20 @@ package playground.christoph.withinday.replanning.identifiers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QVehicle;
 
-import playground.christoph.withinday.mobsim.ReplanningQueueSimulation;
+import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
 public class InitialIdentifierImpl extends InitialIdentifier{
 
-	protected ReplanningQueueSimulation simulation;
+	protected KnowledgeWithinDayQSim simulation;
 		
-	public InitialIdentifierImpl(ReplanningQueueSimulation simulation)
+	public InitialIdentifierImpl(KnowledgeWithinDayQSim simulation)
 	{
 		this.simulation = simulation;
 	}
@@ -45,9 +45,9 @@ public class InitialIdentifierImpl extends InitialIdentifier{
 	{
 		List<DriverAgent> agentsToReplan = new ArrayList<DriverAgent>();
 		
-		for (QueueLink queueLink : simulation.getQueueNetwork().getLinks().values())
+		for (QLink qLink : simulation.getQueueNetwork().getLinks().values())
 		{
-			for (QueueVehicle vehicle : queueLink.getAllVehicles())
+			for (QVehicle vehicle : qLink.getAllVehicles())
 			{
 				DriverAgent driverAgent = vehicle.getDriver();
 				

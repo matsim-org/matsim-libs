@@ -24,9 +24,9 @@ import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.queuesim.AbstractSimulation;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.ptproject.qsim.Simulation;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.christoph.network.MyLinkImpl;
@@ -44,7 +44,7 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 	 * created.
 	 */
 
-	private QueueNetwork queueNetwork;
+	private QNetwork qNetwork;
 
 	private static final Logger log = Logger.getLogger(LinkVehiclesCounter.class);
 
@@ -77,9 +77,9 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 	int lostVehicles;
 	int initialVehicleCount;
 
-	public void setQueueNetwork(QueueNetwork queueNetwork)
+	public void setQueueNetwork(QNetwork qNetwork)
 	{
-		this.queueNetwork = queueNetwork;
+		this.qNetwork = qNetwork;
 
 		// Doing this will create the Maps and fill them with "0" Entries.
 //		createInitialCounts();
@@ -101,12 +101,12 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 		lostVehicles = 0;
 		
 		// collect the Counts
-		for (QueueLink queueLink : queueNetwork.getLinks().values()) {
-			int vehCount = queueLink.getAllVehicles().size();
+		for (QLink qLink : qNetwork.getLinks().values()) {
+			int vehCount = qLink.getAllVehicles().size();
 
 			initialVehicleCount = initialVehicleCount + vehCount;
 
-			Id id = queueLink.getLink().getId();
+			Id id = qLink.getLink().getId();
 			parkingMap.put(id, vehCount);
 			waitingMap.put(id, 0);
 			vehQueueMap.put(id, 0);
@@ -284,9 +284,9 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 //			log.info("SIMULATION AT " + Time.writeTime(e.getSimulationTime()) + " checking parking Vehicles Counts");
 //		}
 	 
-		for (QueueLink queueLink : queueNetwork.getLinks().values()) 
+		for (QLink qLink : qNetwork.getLinks().values()) 
 		{
-			Id id = queueLink.getLink().getId();
+			Id id = qLink.getLink().getId();
 	 
 			/*
 			 * Vehicles can be moved from the Vehicle Queue to the Buffer
@@ -307,10 +307,10 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 //				vehQueueMap.put(id, myVehQueueCount - diff);
 //			}
 	 
-			if (AbstractSimulation.getLost() != lostVehicles)
+			if (Simulation.getLost() != lostVehicles)
 			{ 
 				log.error("Wrong LostCount");
-				log.error("Expected: " + AbstractSimulation.getLost() + ", Found: " + lostVehicles);
+				log.error("Expected: " + Simulation.getLost() + ", Found: " + lostVehicles);
 			} 
 //			
 //			if (queueLink.parkingCount() != parkingMap.get(id))
@@ -336,9 +336,9 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 //			}
 			
 			int allVehicles = parkingMap.get(id) + bufferMap.get(id) + vehQueueMap.get(id) + waitingMap.get(id);
-			if (queueLink.getAllVehicles().size() != allVehicles)
+			if (qLink.getAllVehicles().size() != allVehicles)
 			{
-				log.error("Wrong VehicleCount on Link " + id); log.error("Expected: " + queueLink.getAllVehicles().size() + ", Found: " + allVehicles); 
+				log.error("Wrong VehicleCount on Link " + id); log.error("Expected: " + qLink.getAllVehicles().size() + ", Found: " + allVehicles); 
 			} 	
 		}
 		
@@ -406,7 +406,7 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
             Integer vehiclesCount = entry.getValue();
          
             // Assumption...
-            MyLinkImpl link = (MyLinkImpl)((NetworkLayer) this.queueNetwork.getNetworkLayer()).getLinks().get(id);
+            MyLinkImpl link = (MyLinkImpl)((NetworkLayer) this.qNetwork.getNetworkLayer()).getLinks().get(id);
             
             link.setVehiclesCount(vehiclesCount);
         }

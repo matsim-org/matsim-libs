@@ -73,7 +73,8 @@ import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
-import playground.christoph.withinday.mobsim.ReplanningQueueSimulation;
+import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
+import playground.christoph.withinday.replanning.identifiers.LinkReplanningMap;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
@@ -100,7 +101,7 @@ import playground.christoph.withinday.replanning.parallel.ParallelDuringLegRepla
  */
 public class EventControler extends Controler {
 
-	protected ReplanningQueueSimulation sim;
+	protected KnowledgeWithinDayQSim sim;
 
 	protected ArrayList<PlanAlgorithm> replanners;
 	protected ArrayList<SelectNodes> nodeSelectors;
@@ -300,7 +301,7 @@ public class EventControler extends Controler {
 	protected void createHandlersAndListeners()
 	{
 		linkVehiclesCounter = new LinkVehiclesCounter2();
-		linkReplanningMap = new LinkReplanningMap();
+		linkReplanningMap = new LinkReplanningMap(sim);
 		lookupTableUpdater = new LookupTableUpdater();
 		replanningManager = new ReplanningManager();
 	}
@@ -308,7 +309,7 @@ public class EventControler extends Controler {
 	@Override
 	protected void runMobSim()
 	{
-		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
+		sim = new KnowledgeWithinDayQSim(this.scenarioData, this.events);
 
 		sim.useKnowledgeStorageHandler(true);
 
@@ -338,10 +339,6 @@ public class EventControler extends Controler {
 //		sim.addQueueSimulationListeners(linkVehiclesCounter);
 
 		this.events.addHandler(linkVehiclesCounter);
-
-		// fully initialize & add LinkReplanningMap
-		linkReplanningMap.setQueueNetwork(sim.getQueueNetwork());
-		this.events.addHandler(linkReplanningMap);
 
 		// set QueueNetwork in the Traveltime Calculator
 //		if (knowledgeTravelTime != null) knowledgeTravelTime.setQueueNetwork(sim.getQueueNetwork());

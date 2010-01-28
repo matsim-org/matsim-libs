@@ -26,11 +26,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;
 import playground.christoph.network.util.SubNetworkTools;
@@ -145,7 +145,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 //		}
 		
 		// create ReplanningEvent
-		QueueSimulation.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));
+		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));
 				
 		return true;
 	}

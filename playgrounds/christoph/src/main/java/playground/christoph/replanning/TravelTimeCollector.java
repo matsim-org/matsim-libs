@@ -23,6 +23,7 @@ package playground.christoph.replanning;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
@@ -64,7 +65,7 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	/*
 	 * We may have to sort / order the Trips to get deterministic results!
 	 */
-	private List<TripBin> finishedTrips;	// LinkId
+	private LinkedList<TripBin> finishedTrips;	// LinkId
 	
 	/*
 	 * For parallel Execution
@@ -87,7 +88,7 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	private void init()
 	{
 		regulatActiveTrips = new HashMap<Id, TripBin>();
-		finishedTrips = new ArrayList<TripBin>();
+		finishedTrips = new LinkedList<TripBin>();
 		
 		for (Link link : this.network.getLinks().values())
 		{
@@ -166,19 +167,14 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 
 	// Add Link TravelTimes
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e)
-	{
-		Iterator<TripBin> iter = this.finishedTrips.iterator();
-		
-		while (iter.hasNext())
-		{
-			TripBin tripBin = iter.next();
-			
+	{		
+		TripBin tripBin;
+		while ((tripBin = finishedTrips.pollFirst()) != null)
+		{	
 			double travelTime = tripBin.leaveTime - tripBin.enterTime;
 			
 			MyLinkImpl myLink = (MyLinkImpl)network.getLinks().get(tripBin.linkId);
 			myLink.addTravelTime(travelTime, e.getSimulationTime());
-			
-			iter.remove();
 		}
 	}
 	

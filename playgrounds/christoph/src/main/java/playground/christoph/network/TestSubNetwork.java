@@ -13,7 +13,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -57,7 +57,7 @@ public class TestSubNetwork {
 	private DijkstraWrapper dijkstraWrapper;
 	private KnowledgePlansCalcRoute dijkstraRouter;
 	private NetworkFactoryImpl networkFactory;
-	private QueueNetwork queueNetwork;
+	private QNetwork qNetwork;
 	
 	private final String configFileName = "mysimulations/kt-zurich/config.xml";
 	private final String dtdFileName = null;
@@ -123,9 +123,9 @@ public class TestSubNetwork {
 	
 	private void initReplanner()
 	{
-		queueNetwork = new QueueNetwork(this.scenario.getNetwork());
+		qNetwork = new QNetwork(this.scenario.getNetwork());
 		
-		travelTime = new KnowledgeTravelTimeCalculator(queueNetwork);
+		travelTime = new KnowledgeTravelTimeCalculator(qNetwork);
 		travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
 		
 		travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);

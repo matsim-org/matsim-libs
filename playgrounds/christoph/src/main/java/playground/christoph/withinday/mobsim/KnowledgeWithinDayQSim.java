@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplanningQueueSimulation.java
+ * KnowledgeWithinDayQSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,47 +20,30 @@
 
 package playground.christoph.withinday.mobsim;
 
-import java.util.concurrent.PriorityBlockingQueue;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.ptproject.qsim.DriverAgent;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 
 /*
- * This extended QueueSimulation contains some methods that
+ * This extended QSim contains some methods that
  * are needed for the WithinDay Replanning Modules.
  * 
  * Some other methods are used for the Knowledge Modules. They
  * should be separated somewhen but at the moment this seems
  * to be difficult so they remain here for now...
  */
-public class ReplanningQueueSimulation extends org.matsim.core.mobsim.queuesim.QueueSimulation{
-//public class ReplanningQueueSimulation extends org.matsim.ptproject.qsim.QueueSimulation{
+public class KnowledgeWithinDayQSim extends WithinDayQSim{
 
-	private final static Logger log = Logger.getLogger(ReplanningQueueSimulation.class);
+	private final static Logger log = Logger.getLogger(KnowledgeWithinDayQSim.class);
 	
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
 	
-	public ReplanningQueueSimulation(final Network network, final Population population, final EventsManager events)
+	public KnowledgeWithinDayQSim(final Scenario scenario, final EventsManager events)
 	{
-		super(network, population, events);
-		
-		// use WithinDayAgentFactory that creates WithinDayPersonAgents who can reset their chachedNextLink
-		super.setAgentFactory(new WithinDayAgentFactory(this));
-	}
-	
-	/*
-	 * Used by the Activity End Replanning Module.
-	 * This contains all Agents that are going to end their Activities.
-	 */
-	public PriorityBlockingQueue<DriverAgent> getActivityEndsList()
-	{
-		return super.activityEndsList;
+		super(scenario, events);
 	}
 
 	public void useKnowledgeStorageHandler(boolean value)
@@ -69,7 +52,7 @@ public class ReplanningQueueSimulation extends org.matsim.core.mobsim.queuesim.Q
 		{
 			this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(this.population);
 			this.knowledgeDBStorageHandler.start();
-			((EventsManagerImpl)getEvents()).addHandler(knowledgeDBStorageHandler);
+			getEventsManager().addHandler(knowledgeDBStorageHandler);
 			this.addQueueSimulationListeners(this.knowledgeDBStorageHandler);
 		}
 		else
@@ -77,7 +60,7 @@ public class ReplanningQueueSimulation extends org.matsim.core.mobsim.queuesim.Q
 			if (this.knowledgeDBStorageHandler != null)
 			{
 				this.knowledgeDBStorageHandler.stopHandler();
-				((EventsManagerImpl)getEvents()).removeHandler(knowledgeDBStorageHandler);
+				getEventsManager().removeHandler(knowledgeDBStorageHandler);
 			}
 		}
 	}
@@ -86,10 +69,10 @@ public class ReplanningQueueSimulation extends org.matsim.core.mobsim.queuesim.Q
 	 * for the Knowledge Modules
 	 */
 	@Override
-	protected void scheduleActivityEnd(final DriverAgent driverAgent)
+	public void scheduleActivityEnd(final DriverAgent driverAgent, int planElementIndex)
 	{	
 		if (knowledgeDBStorageHandler != null) knowledgeDBStorageHandler.scheduleActivityEnd(driverAgent);
 //		offsetActivityEndsList.add(agent);
-		super.scheduleActivityEnd(driverAgent);
+		super.scheduleActivityEnd(driverAgent, planElementIndex);
 	}
 }

@@ -24,8 +24,8 @@ import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QNetwork;
 
 import playground.christoph.network.MyLinkImpl;
 
@@ -45,7 +45,7 @@ public class LinkVehiclesCounter2 implements LinkEnterEventHandler,
 		AgentStuckEventHandler, SimulationAfterSimStepListener,
 		SimulationInitializedListener {
 
-	private QueueNetwork queueNetwork;
+	private QNetwork qNetwork;
 
 	private static final Logger log = Logger.getLogger(LinkVehiclesCounter2.class);
 	/*
@@ -63,9 +63,9 @@ public class LinkVehiclesCounter2 implements LinkEnterEventHandler,
 	 */
 	Map<Id, Integer> countChangedInTimeStepMap; // Counts from the just ended TimeStep
 	
-	public void setQueueNetwork(QueueNetwork queueNetwork)
+	public void setQueueNetwork(QNetwork qNetwork)
 	{
-		this.queueNetwork = queueNetwork;
+		this.qNetwork = qNetwork;
 	}
 
 	private synchronized void createInitialCounts() {
@@ -76,9 +76,9 @@ public class LinkVehiclesCounter2 implements LinkEnterEventHandler,
 		countChangedInTimeStepMap = new HashMap<Id, Integer>();
 
 		// collect the Counts
-		for (QueueLink queueLink : queueNetwork.getLinks().values()) 
+		for (QLink qLink : qNetwork.getLinks().values()) 
 		{
-			Id id = queueLink.getLink().getId();
+			Id id = qLink.getLink().getId();
 			
 			changedLinkSet.add(id);
 			
@@ -130,7 +130,7 @@ public class LinkVehiclesCounter2 implements LinkEnterEventHandler,
 		while(iter.hasNext())
 		{   
 			Id id = iter.next();
-            QueueLink queueLink = this.queueNetwork.getLinks().get(id);
+            QLink queueLink = this.qNetwork.getLinks().get(id);
             
     		int vehiclesCount = 0;
    			vehiclesCount = vehiclesCount + queueLink.getAllVehicles().size();

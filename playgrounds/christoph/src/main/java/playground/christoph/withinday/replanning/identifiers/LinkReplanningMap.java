@@ -1,4 +1,4 @@
-package playground.christoph.events;
+package playground.christoph.withinday.replanning.identifiers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +21,10 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -33,7 +34,7 @@ import org.matsim.core.utils.collections.Tuple;
  * 
  * The time is estimated as following:
  * When an LinkEnterEvent is thrown the Replanning Time is set to
- * the current time + the Freespeed Travel Time. This guarantees that
+ * the current time + the FreeSpeed Travel Time. This guarantees that
  * the replanning will be done while the agent is on the Link.
  * 
  * Additionally a Replanning Interval can be set. This allows an Agent
@@ -47,7 +48,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		AgentDepartureEventHandler, AgentWait2LinkEventHandler,
 		AgentStuckEventHandler {
 	
-	private QueueNetwork queueNetwork;
+	private QNetwork qNetwork;
 
 	// Repeated replanning if a person gets stuck in a Link
 	private boolean repeatedReplanning = true;
@@ -57,43 +58,34 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 
 	private Map<Id, Tuple<Id, Double>> replanningMap;	// PersonId, Tuple<LinkId, ReplanningTime>
 	
-	public LinkReplanningMap()
+	public LinkReplanningMap(QSim qSim)
 	{
+		this.qNetwork = qSim.getQueueNetwork();
+		
+		//Add LinkReplanningMap to the QueueSimulation's EventsManager
+		qSim.getEventsManager().addHandler(this);
+		
 		this.replanningMap = new HashMap<Id, Tuple<Id, Double>>();
 	}
 	
-	public void setQueueNetwork(QueueNetwork queueNetwork)
-	{
-		this.queueNetwork = queueNetwork;
-	}
-	
-	// set the earliest possible leave link time as replanning time 
+	// set the earliest possible leave link time as replanning time
 	public void handleEvent(LinkEnterEvent event)
 	{
 		double now = event.getTime();
-		QueueLink queueLink = queueNetwork.getQueueLink(event.getLinkId());
-		double departureTime = (now + ((LinkImpl)queueLink.getLink()).getFreespeedTravelTime(now));
+		QLink qLink = qNetwork.getQueueLink(event.getLinkId());
+		double departureTime = (now + ((LinkImpl)qLink.getLink()).getFreespeedTravelTime(now));
 
-		synchronized(replanningMap)
-		{
-			replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));	
-		}
+		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));	
 	}
 
 	public void handleEvent(LinkLeaveEvent event)
 	{
-		synchronized(replanningMap)
-		{
-			replanningMap.remove(event.getPersonId());
-		}
+		replanningMap.remove(event.getPersonId());
 	}
 
 	public void handleEvent(AgentArrivalEvent event)
 	{
-		synchronized(replanningMap)
-		{
-			replanningMap.remove(event.getPersonId());
-		}
+		replanningMap.remove(event.getPersonId());
 	}
 
 	// Nothing to do here...
@@ -108,18 +100,12 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	 */
 	public void handleEvent(AgentWait2LinkEvent event)
 	{		
-		synchronized(replanningMap)
-		{
-			replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), event.getTime()));
-		}
+		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), event.getTime()));
 	}
 
 	public void handleEvent(AgentStuckEvent event)
 	{
-		synchronized(replanningMap)
-		{
-			replanningMap.remove(event.getPersonId());
-		}
+		replanningMap.remove(event.getPersonId());
 	}
 	
 	public Map<Id, Tuple<Id, Double>> getLinkReplanningMap()
@@ -127,10 +113,10 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		return this.replanningMap;
 	}
 	
-	public synchronized List<QueueVehicle> getReplanningVehicles(double time)
+	public synchronized List<QVehicle> getReplanningVehicles(double time)
 	{
 		// using the ArrayList is just a Workaround...
-		ArrayList<QueueVehicle> vehiclesToReplanLeaveLink = new ArrayList<QueueVehicle>();
+		ArrayList<QVehicle> vehiclesToReplanLeaveLink = new ArrayList<QVehicle>();
 
 		Iterator<Entry<Id, Tuple<Id, Double>>> entries = replanningMap.entrySet().iterator();
 		while (entries.hasNext())
@@ -144,13 +130,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 			if (time >= replanningTime)
 			{
 				// check whether the replanning flag is set - if not, skip the person
-				QueueVehicle vehicle = this.queueNetwork.getQueueLink(linkId).getVehicle(personId);
-//				boolean replanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
-//				if(!replanning)
-//				{
-//					entries.remove();
-//					continue;
-//				}
+				QVehicle vehicle = this.qNetwork.getQueueLink(linkId).getVehicle(personId);
 				
 				// Repeated Replanning per Link possible? 
 				if (repeatedReplanning) entry.setValue(new Tuple<Id,Double>(linkId, time + this.replanningInterval));
@@ -163,7 +143,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		return vehiclesToReplanLeaveLink;
 	}
 
-	public synchronized void reset(int iteration)
+	public void reset(int iteration)
 	{
 		replanningMap = new HashMap<Id, Tuple<Id, Double>>();
 	}

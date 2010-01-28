@@ -22,7 +22,7 @@ package playground.christoph.router.costcalculators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.ptproject.qsim.QNetwork;
 
 import playground.christoph.network.MyLinkImpl;
 import playground.christoph.network.SubLink;
@@ -34,20 +34,20 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	protected double tbuffer = 35.0;		// time distance ("safety distance") between two vehicles
 	protected double vehicleLength = 7.5;	// length of a vehicle
 	protected boolean calcFreeSpeedTravelTimes = false;
-	protected QueueNetwork queueNetwork;
+	protected QNetwork qNetwork;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelTimeCalculator.class);
 	
-	public KnowledgeTravelTimeCalculator(QueueNetwork queueNetwork)
+	public KnowledgeTravelTimeCalculator(QNetwork qNetwork)
 	{
-		if (queueNetwork == null) log.warn("No QueueNetwork was commited - FreeSpeedTravelTimes will be calculated and returned!");
-		this.queueNetwork = queueNetwork;
+		if (qNetwork == null) log.warn("No QNetwork was commited - FreeSpeedTravelTimes will be calculated and returned!");
+		this.qNetwork = qNetwork;
 	}
 	
 	// return travel time without account for the actual traffic load
 	public double getLinkTravelTime(Link link, double time)
 	{
-		if(queueNetwork == null)
+		if(qNetwork == null)
 		{
 			log.warn("No QueueNetwork found - FreeSpeedTravelTime is calculated and returned!");
 			return link.getLength()/link.getFreespeed(time);
@@ -180,7 +180,7 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	@Override
 	public KnowledgeTravelTimeCalculator clone()
 	{
-		KnowledgeTravelTimeCalculator clone = new KnowledgeTravelTimeCalculator(this.queueNetwork);
+		KnowledgeTravelTimeCalculator clone = new KnowledgeTravelTimeCalculator(this.qNetwork);
 
 		clone.tbuffer = this.tbuffer;
 		clone.vehicleLength = this.vehicleLength;

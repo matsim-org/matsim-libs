@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayQueueSimulation.java
+ * WithinDayQSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,37 +23,39 @@ package playground.christoph.withinday.mobsim;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 
 /*
- * This extended QueueSimulation contains some methods that
+ * This extended QSim contains some methods that
  * are needed for the WithinDay Replanning Modules.
  * 
  * Some other methods are used for the Knowledge Modules. They
  * should be separated somewhen but at the moment this seems
  * to be difficult so they remain here for now...
  */
-public class WithinDayQueueSimulation extends QueueSimulation{
+public class WithinDayQSim extends QSim{
 
-	private final static Logger log = Logger.getLogger(WithinDayQueueSimulation.class);
+	private final static Logger log = Logger.getLogger(WithinDayQSim.class);
 	
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
-	
 
-	public WithinDayQueueSimulation(final NetworkLayer network, final PopulationImpl population, final EventsManagerImpl events)
+	public WithinDayQSim(final Scenario scenario, final EventsManager events)
 	{
-		super(network, population, events);
+		super(scenario, events);
 		
 		// use WithinDayAgentFactory that creates WithinDayPersonAgents who can reset their chachedNextLink
 		super.setAgentFactory(new WithinDayAgentFactory(this));
 	}
-			
+	
+	/*
+	 * Used by the Activity End Replanning Module.
+	 * This contains all Agents that are going to end their Activities.
+	 */
 	public PriorityBlockingQueue<DriverAgent> getActivityEndsList()
 	{
 		return super.activityEndsList;

@@ -20,14 +20,12 @@
 
 package playground.christoph.controler;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -122,7 +120,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 		
-		this.duringLegIdentifier = new LeaveLinkIdentifier(this.linkReplanningMap);
+		this.duringLegIdentifier = new LeaveLinkIdentifier(this.sim);
 		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.network);
 		this.duringLegReplanner.setReplanner(dijkstraRouter);
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);

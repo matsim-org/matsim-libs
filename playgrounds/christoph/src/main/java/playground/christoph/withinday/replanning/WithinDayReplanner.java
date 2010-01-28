@@ -28,8 +28,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.ptproject.qsim.DriverAgent;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 
@@ -84,6 +84,7 @@ public abstract class WithinDayReplanner implements Cloneable {
 		return Collections.unmodifiableList(identifiers);
 	}
 	
+	@Override
 	public abstract WithinDayReplanner clone();
 	
 	protected void cloneBasicData(WithinDayReplanner clone)

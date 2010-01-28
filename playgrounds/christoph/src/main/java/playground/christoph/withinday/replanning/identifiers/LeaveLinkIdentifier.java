@@ -23,34 +23,43 @@ package playground.christoph.withinday.replanning.identifiers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QVehicle;
 
-import playground.christoph.events.LinkReplanningMap;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 public class LeaveLinkIdentifier extends DuringLegIdentifier{
 
+	protected QSim qSim;
 	protected LinkReplanningMap linkReplanningMap;
 	
-	public LeaveLinkIdentifier(LinkReplanningMap linkReplanningMap)
+	public LeaveLinkIdentifier(QSim qSim)
 	{
+		this.qSim = qSim;
+		linkReplanningMap = new LinkReplanningMap(qSim);
+	}
+	
+	// Only for Cloning.
+	private LeaveLinkIdentifier(QSim qSim, LinkReplanningMap linkReplanningMap)
+	{
+		this.qSim = qSim;
 		this.linkReplanningMap = linkReplanningMap;
 	}
-		
+	
 	public List<DriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
 	{
-		List<QueueVehicle> vehiclesToReplanLeaveLink = linkReplanningMap.getReplanningVehicles(time);
+		List<QVehicle> vehiclesToReplanLeaveLink = linkReplanningMap.getReplanningVehicles(time);
 		List<DriverAgent> agentsToReplan = new ArrayList<DriverAgent>(); 
 
-		for (QueueVehicle queueVehicle : vehiclesToReplanLeaveLink)
+		for (QVehicle qVehicle : vehiclesToReplanLeaveLink)
 		{
-			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) queueVehicle.getDriver();
+			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) qVehicle.getDriver();
 			if (withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner))
 			{
-				agentsToReplan.add(queueVehicle.getDriver());
+				agentsToReplan.add(qVehicle.getDriver());
 			}
 		}
 		
@@ -59,7 +68,11 @@ public class LeaveLinkIdentifier extends DuringLegIdentifier{
 
 	public LeaveLinkIdentifier clone()
 	{
-		LeaveLinkIdentifier clone = new LeaveLinkIdentifier(this.linkReplanningMap);
+		/*
+		 *  We don't want to clone the linkReplanningMap. Instead we
+		 *  reuse the existing one.
+		 */
+		LeaveLinkIdentifier clone = new LeaveLinkIdentifier(this.qSim, this.linkReplanningMap);
 		
 		super.cloneBasicData(clone);
 		

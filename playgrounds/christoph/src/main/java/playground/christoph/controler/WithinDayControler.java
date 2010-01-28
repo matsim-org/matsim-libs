@@ -31,17 +31,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelTime;
 //import org.matsim.core.events.parallelEventsHandler.WithinDayParallelEventsManagerImpl;
 
-import playground.christoph.events.LinkReplanningMap;
 import playground.christoph.events.LinkVehiclesCounter2;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
@@ -58,7 +56,7 @@ import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
-import playground.christoph.withinday.mobsim.ReplanningQueueSimulation;
+import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.InitialReplanner;
@@ -89,8 +87,6 @@ import playground.christoph.withinday.replanning.parallel.ParallelDuringLegRepla
  * @author Christoph Dobler
  */
 
-//mysimulations/kt-zurich/configIterative.xml
-
 public class WithinDayControler extends Controler {
 
 	protected ArrayList<SelectNodes> nodeSelectors;
@@ -102,7 +98,7 @@ public class WithinDayControler extends Controler {
 	 */
 	protected double pInitialReplanning = 0.0;
 	protected double pActEndReplanning = 0.0;
-	protected double pLeaveLinkReplanning = 0.0;
+	protected double pLeaveLinkReplanning = 1.0;
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -122,9 +118,8 @@ public class WithinDayControler extends Controler {
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 	
 	protected LinkVehiclesCounter2 linkVehiclesCounter;
-	protected LinkReplanningMap linkReplanningMap;
 	protected ReplanningManager replanningManager;
-	protected ReplanningQueueSimulation sim;
+	protected KnowledgeWithinDayQSim sim;
 	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
 
 	private static final Logger log = Logger.getLogger(WithinDayControler.class);
@@ -203,7 +198,7 @@ public class WithinDayControler extends Controler {
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 		
-		this.duringLegIdentifier = new LeaveLinkIdentifier(this.linkReplanningMap);
+		this.duringLegIdentifier = new LeaveLinkIdentifier(this.sim);
 		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.network);
 		this.duringLegReplanner.setReplanner(dijkstraRouter);
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
@@ -229,7 +224,6 @@ public class WithinDayControler extends Controler {
 	protected void createHandlersAndListeners()
 	{
 		linkVehiclesCounter = new LinkVehiclesCounter2();
-		linkReplanningMap = new LinkReplanningMap();
 		replanningManager = new ReplanningManager();
 	}
 
@@ -238,7 +232,7 @@ public class WithinDayControler extends Controler {
 	{	
 		createHandlersAndListeners();
 		
-		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
+		sim = new KnowledgeWithinDayQSim(this.scenarioData, this.events);
 	
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
 		foqsl.addQueueSimulationInitializedListener(rfi);
@@ -256,10 +250,6 @@ public class WithinDayControler extends Controler {
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
 		
 		sim.addQueueSimulationListeners(foqsl);
-
-		// fully initialize & add LinkReplanningMap
-		linkReplanningMap.setQueueNetwork(sim.getQueueNetwork());
-		this.events.addHandler(linkReplanningMap);
 
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();
@@ -307,7 +297,7 @@ public class WithinDayControler extends Controler {
 		@Override
 		public void notifySimulationInitialized(SimulationInitializedEvent e)
 		{
-			collectAgents((QueueSimulation)e.getQueueSimulation());
+			collectAgents((QSim)e.getQueueSimulation());
 			setReplanningFlags();
 			
 		}
@@ -380,13 +370,13 @@ public class WithinDayControler extends Controler {
 			log.info(leaveLinkReplanningCounter + " persons replan their plans at each node (" + leaveLinkReplanningCounter / numPersons * 100.0 + "%)");
 		}
 		
-		protected void collectAgents(QueueSimulation sim)
+		protected void collectAgents(QSim sim)
 		{
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
 			
-			for (QueueLink queueLink : sim.getQueueNetwork().getLinks().values())
+			for (QLink queueLink : sim.getQueueNetwork().getLinks().values())
 			{
-				for (QueueVehicle queueVehicle : queueLink.getAllVehicles())
+				for (QVehicle queueVehicle : queueLink.getAllVehicles())
 				{
 					WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) queueVehicle.getDriver();
 					this.withinDayPersonAgents.put(withinDayPersonAgent.getPerson().getId(), withinDayPersonAgent);

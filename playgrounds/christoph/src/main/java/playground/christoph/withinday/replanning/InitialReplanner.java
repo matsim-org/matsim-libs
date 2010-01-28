@@ -23,7 +23,7 @@ package playground.christoph.withinday.replanning;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.ptproject.qsim.DriverAgent;
 
 import playground.christoph.router.util.KnowledgeTools;
 

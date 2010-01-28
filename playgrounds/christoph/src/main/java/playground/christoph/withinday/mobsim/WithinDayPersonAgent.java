@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.christoph.withinday.mobsim;
 
 import java.util.ArrayList;
@@ -27,12 +28,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.queuesim.PersonAgent;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.ptproject.qsim.PersonAgent;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.withinday.replanning.WithinDayReplanner;
-import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 
 public class WithinDayPersonAgent extends PersonAgent{
 
@@ -40,7 +40,7 @@ public class WithinDayPersonAgent extends PersonAgent{
 
 	private List<WithinDayReplanner> withinDayReplanner = new ArrayList<WithinDayReplanner>();
 	
-	public WithinDayPersonAgent(final PersonImpl p, final QueueSimulation simulation)
+	public WithinDayPersonAgent(final PersonImpl p, final QSim simulation)
 	{
 		super(p, simulation);
 	}
@@ -53,7 +53,7 @@ public class WithinDayPersonAgent extends PersonAgent{
 	 * because it can be called from the Replanning Module and isn't done for
 	 * every Agent even it is not necessary.
 	 */
-	public void ResetCachedNextLink()
+	public void resetCachedNextLink()
 	{
 		super.cachedNextLinkId = null;
 	}

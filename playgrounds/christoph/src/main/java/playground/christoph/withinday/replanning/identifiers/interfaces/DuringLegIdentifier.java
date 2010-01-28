@@ -20,7 +20,6 @@
 
 package playground.christoph.withinday.replanning.identifiers.interfaces;
 
-
 public abstract class DuringLegIdentifier extends AgentsToReplanIdentifier{
 
 }
