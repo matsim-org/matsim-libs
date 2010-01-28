@@ -75,9 +75,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * tries to allocate bus stop coordinates to links in MATSim "car" network
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class BusLineAllocator {
 	private class TravelCostFunctionDistance implements TravelCost {
@@ -502,7 +502,7 @@ public class BusLineAllocator {
 	}
 
 	/**
-	 * @return 
+	 * @return
 	 *         Map<TransitRouteId,List<Tuple<TransitLinkId,Tuple<fromCoord,toCoord
 	 *         >>>>
 	 */
@@ -522,15 +522,17 @@ public class BusLineAllocator {
 
 					hasStartLink = false;
 					// route. startLink
-					Link startLink = route.getStartLink();
+					Link startLink = this.multiModalNetwork.getLinks().get(route.getStartLinkId());
 					createCoordPair(startLink, ptLinkCoordPairs);
 
 					// route. links
-					for (Link link : route.getLinks())
+					for (Id linkId : route.getLinkIds()) {
+						Link link = this.multiModalNetwork.getLinks().get(linkId);
 						createCoordPair(link, ptLinkCoordPairs);
+					}
 
 					// route. endLink
-					Link endLink = route.getEndLink();
+					Link endLink = this.multiModalNetwork.getLinks().get(route.getEndLinkId());
 					createCoordPair(endLink, ptLinkCoordPairs);
 					endLinks.add(endLink);
 

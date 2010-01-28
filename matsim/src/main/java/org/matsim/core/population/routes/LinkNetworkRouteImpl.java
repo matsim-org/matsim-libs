@@ -77,6 +77,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	}
 
 	@Override
+	@Deprecated
 	public List<Link> getLinks() {
 		return Collections.unmodifiableList(this.route);
 	}

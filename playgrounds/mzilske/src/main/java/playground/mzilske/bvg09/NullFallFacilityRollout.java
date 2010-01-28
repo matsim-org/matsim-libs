@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -77,24 +78,24 @@ public class NullFallFacilityRollout {
 	private static final Logger log = Logger.getLogger(NullFallFacilityRollout.class);
 
 	private static String path = "../berlin-bvg09/pt/nullfall_M44_344_U8/";
-	
+
 	private static String InNetworkFile = path + "intermediateNetwork.xml";
 	private static String InTransitScheduleFile = path + "mergedTransitSchedule.xml";
 	private static String InVisumNetFile = "../berlin-bvg09/urdaten/nullfall2009-05-25.net";
 	private static String OutNetworkFile = path + "network.xml";
 	private static String OutTransitScheduleFile = path + "transitSchedule.xml";
 	private static String OutVehicleFile = path + "vehicles.xml";
-	
+
 	private final ScenarioImpl inScenario;
 	private final Config inConfig;
 	private final ScenarioImpl outScenario;
 	private final Config outConfig;
 	private Map<TransitStopFacility, Map<Link, TransitStopFacility>> transitStopInLinks = new HashMap<TransitStopFacility, Map<Link, TransitStopFacility>>();
 	private VisumNetwork vNetwork;
-	
+
 	private Collection<Umlauf> umlaeufe;
 
-	
+
 
 	public static void main(final String[] args) {
 		rollOutFacilitiesAndAssignVehicles();
@@ -152,7 +153,7 @@ public class NullFallFacilityRollout {
 		outLoader.loadScenario();
 		readVisumNetwork();
 	}
-	
+
 	private void readVisumNetwork()  {
 		vNetwork = new VisumNetwork();
 		log.info("reading visum network.");
@@ -196,7 +197,7 @@ public class NullFallFacilityRollout {
 			TransitLine transitLine) throws InvalidLineException {
 		for (TransitRoute transitRouteI: transitLine.getRoutes().values()) {
 			NetworkRouteWRefs linkNetworkRoute = transitRouteI.getRoute();
-			Collection<Link> links = getAllLink(linkNetworkRoute);
+			Collection<Link> links = getAllLink(linkNetworkRoute, this.inScenario.getNetwork());
 			Iterator<Link> linkIterator = links.iterator();
 			for (TransitRouteStop stop : transitRouteI.getStops()) {
 				Link link = linkIterator.next();
@@ -206,7 +207,7 @@ public class NullFallFacilityRollout {
 					log.error("Stops: ");
 					dumpStops(transitRouteI.getStops());
 					log.error("Route: ");
-					dumpRoute(linkNetworkRoute);
+					dumpRoute(linkNetworkRoute, this.inScenario.getNetwork());
 					log.error("Stop point " + stopPointNo + " doesn't appear to be in the visum network.");
 				}
 				Id stopPointNodeNo = stopPoint.nodeId;
@@ -218,7 +219,7 @@ public class NullFallFacilityRollout {
 						log.error("Stops: ");
 						dumpStops(transitRouteI.getStops());
 						log.error("Route: ");
-						dumpRoute(linkNetworkRoute);
+						dumpRoute(linkNetworkRoute, this.inScenario.getNetwork());
 						throw new InvalidLineException();
 					}
 				}
@@ -236,8 +237,8 @@ public class NullFallFacilityRollout {
 		return null;
 	}
 
-	private void dumpRoute(NetworkRouteWRefs linkNetworkRoute) {
-		Collection<Link> links = getAllLink(linkNetworkRoute);
+	private void dumpRoute(NetworkRouteWRefs linkNetworkRoute, Network network) {
+		Collection<Link> links = getAllLink(linkNetworkRoute, network);
 		for (Link link : links) {
 			log.error(link.getFromNode().getId() + " ---> " + link.getToNode().getId());
 		}
@@ -249,11 +250,13 @@ public class NullFallFacilityRollout {
 		}
 	}
 
-	private List<Link> getAllLink(NetworkRouteWRefs linkNetworkRoute) {
+	private List<Link> getAllLink(NetworkRouteWRefs linkNetworkRoute, Network network) {
 		ArrayList<Link> links = new ArrayList<Link>();
-		links.add(linkNetworkRoute.getStartLink());
-		links.addAll(linkNetworkRoute.getLinks());
-		links.add(linkNetworkRoute.getEndLink());
+		links.add(network.getLinks().get(linkNetworkRoute.getStartLinkId()));
+		for (Id linkId : linkNetworkRoute.getLinkIds()) {
+			links.add(network.getLinks().get(linkId));
+		}
+		links.add(network.getLinks().get(linkNetworkRoute.getEndLinkId()));
 		return links;
 	}
 
@@ -319,7 +322,7 @@ public class NullFallFacilityRollout {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void emptyVehicles() {
 		outScenario.getVehicles().getVehicles().clear();
 	}
@@ -328,7 +331,7 @@ public class NullFallFacilityRollout {
 		Collection<TransitLine> transitLines = outScenario.getTransitSchedule().getTransitLines().values();
 		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(outScenario.getNetwork()), transitLines);
 		umlaeufe = greedyUmlaufBuilder.build();
-		
+
 		VehiclesFactory vb = outScenario.getVehicles().getFactory();
 		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl(
 				"defaultTransitVehicleType"));
@@ -352,7 +355,7 @@ public class NullFallFacilityRollout {
 		for (Umlauf umlauf : umlaeufe) {
 			for (UmlaufStueckI umlaufstueck : umlauf.getUmlaufStuecke()) {
 				NetworkRouteWRefs route = umlaufstueck.getCarRoute();
-				for (Link link : getAllLink(route)) {
+				for (Link link : getAllLink(route, this.inScenario.getNetwork())) {
 					usedNodes.add(link.getFromNode());
 					usedNodes.add(link.getToNode());
 				}
