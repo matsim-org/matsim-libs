@@ -42,7 +42,7 @@ import playground.balmermi.teleatlas.NwElement.NwFeatureType;
  * The reader is based on
  * </p>
  * <p>
- * <strong>Tele Atlas® MultiNet® Shapefile 4.5 Format Specifications Version Final v1.0.1, June 2009</strong>
+ * <strong>Tele Atlas MultiNet Shapefile 4.5 Format Specifications Version Final v1.0.1, June 2009</strong>
  * </p>
  * <p>
  * Uses the following shape files:
@@ -159,8 +159,8 @@ public class NetworkReaderTeleatlas45v101 {
 	 * <li><code>6</code>: Pedestrian Road, Restricted Road</li>
 	 * </ul>
 	 * <p>
-	 * <b>Note:</b> the given definition is not part of the Tele Atlas®
-	 * MultiNet® Shapefile 4.5 Format Specifications. It is an interpretation
+	 * <b>Note:</b> the given definition is not part of the Tele Atlas
+	 * MultiNet Shapefile 4.5 Format Specifications. It is an interpretation
 	 * of the use of these values on the Swiss Network (Tele Atlas Abbr. <i>che</i>)
 	 * </p>
 	 */
