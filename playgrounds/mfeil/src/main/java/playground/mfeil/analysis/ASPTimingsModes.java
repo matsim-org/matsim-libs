@@ -49,7 +49,7 @@ public class ASPTimingsModes extends ASPActivityChains {
 	private final static Logger log = Logger.getLogger(ASPTimingsModes.class);
 	
 	public ASPTimingsModes(final PopulationImpl population, final Knowledges knowledges, final String outputDir) {
-		super (population, knowledges, outputDir);
+		super (population, null, knowledges, outputDir);
 	}
 	
 	@Override
@@ -117,7 +117,7 @@ public class ASPTimingsModes extends ASPActivityChains {
 			
 			
 		}
-		stream1.println((averageACLength/this.population.getPersons().size())+"\tAverage number of activities");
+		stream1.println((averageACLength/this.populationMATSim.getPersons().size())+"\tAverage number of activities");
 		stream1.println();
 		stream1.close();
 	}

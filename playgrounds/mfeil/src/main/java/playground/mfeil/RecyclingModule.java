@@ -476,11 +476,11 @@ public class RecyclingModule implements PlanStrategyModule{
 		if (this.primActsDistance.equals("yes")) {
 			softCoef.add("primActsDistance");
 		}
-		if (this.homeLocationDistance.equals("yes")) {
-			softCoef.add("homeLocationDistance");
-		}
 		if (this.municipality.equals("yes")) {
 			softCoef.add("municipality");
+		}
+		if (this.homeLocationDistance.equals("yes")) {
+			softCoef.add("homeLocationDistance");
 		}
 		if (this.age.equals("yes")) {
 			softCoef.add("age");

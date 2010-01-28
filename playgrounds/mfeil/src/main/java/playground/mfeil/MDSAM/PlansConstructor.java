@@ -1151,7 +1151,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			incomeAverage=incomeAverage/counterIncome;
 		}
-	/*	if (age.equals("yes")) {
+		/*if (age.equals("yes")) {
 			stream.print("Age_0_15\t");
 			stream.print("Age_16_30\t");
 			stream.print("Age_31_60\t");
@@ -1178,28 +1178,28 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print("CarAlways\tCarSometimes\tCarNever\t");
 			counterFirst+=3;
 		}
-		if (seasonTicket.equals("yes")) {
+	/*	if (seasonTicket.equals("yes")) {
 			stream.print("SeasonTicket\t");
 			counterFirst++;
-		}
-	/*	if (seasonTicket.equals("yes")) {
+		}*/
+		if (seasonTicket.equals("yes")) {
 			stream.print("SeasonTicket_1\t");
 			stream.print("SeasonTicket_2\t");
 			stream.print("SeasonTicket_3\t");
 			counterFirst+=3;
-		}*/
-		if (munType.equals("yes")) {
-			stream.print("MunType\t"); 
-			counterFirst++;
 		}
 	/*	if (munType.equals("yes")) {
+			stream.print("MunType\t"); 
+			counterFirst++;
+		}*/
+		if (munType.equals("yes")) {
 			stream.print("MunType_1\t"); 
 			stream.print("MunType_2\t"); 
 			stream.print("MunType_3\t"); 
 			stream.print("MunType_4\t"); 
 			stream.print("MunType_5\t"); 
 			counterFirst+=5;
-		}*/
+		}
 
 		for (int i = 0;i<this.actChains.size();i++){
 			boolean car = false;
@@ -1369,7 +1369,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterRow++;
 			}
 			if (income.equals("yes")) {
-				stream.print((aaa.getIncome().get(person.getId())/30)+"\t");
+				stream.print((aaa.getIncome().get(person.getId())/30)+"\t"); //monthly income divided by 30 days (month)
 				counterRow++;
 			}
 			if (license.equals("yes")) {
@@ -1385,7 +1385,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				else log.warn("Unidentified car availability "+car+" for person "+person.getId());
 				counterRow+=3;
 			}
-			if (seasonTicket.equals("yes")) {
+	/*		if (seasonTicket.equals("yes")) {
 				int st = aaa.getSeasonTicket().get(person.getId());		
 				int ticket = 0;
 				if (st==2 || st==3) ticket = 3;
@@ -1393,8 +1393,8 @@ public class PlansConstructor implements PlanStrategyModule{
 				else ticket = 2;
 				stream.print(ticket+"\t");
 				counterRow++;
-			}
-		/*	if (seasonTicket.equals("yes")) {
+			}*/
+			if (seasonTicket.equals("yes")) {
 				int st = aaa.getSeasonTicket().get(person.getId());		
 				int ticket = 0;
 				if (st==2 || st==3) ticket = 3;
@@ -1405,13 +1405,13 @@ public class PlansConstructor implements PlanStrategyModule{
 				else if (ticket==3) stream.print(0+"\t"+0+"\t"+1+"\t");
 				else log.warn("Unidentified seasonTicket "+st+" for person "+person.getId());
 				counterRow+=3;
-			}*/
-			if (munType.equals("yes")) {
+			}
+		/*	if (munType.equals("yes")) {
 				int mt = aaa.getMunType().get(person.getId());				
 				stream.print(mt+"\t");
 				counterRow++;
-			}
-		/*	if (munType.equals("yes")) {
+			}*/
+			if (munType.equals("yes")) {
 				int mt = aaa.getMunType().get(person.getId());				
 				if (mt==1) stream.print(1+"\t"+0+"\t"+0+"\t"+0+"\t"+0+"\t");
 				else if (mt==2) stream.print(0+"\t"+1+"\t"+0+"\t"+0+"\t"+0+"\t");
@@ -1420,7 +1420,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				else if (mt==5) stream.print(0+"\t"+0+"\t"+0+"\t"+0+"\t"+1+"\t");
 				else log.warn("Unidentified munType "+mt+" for person "+person.getId());
 				counterRow+=5;
-			}*/
+			}
 			
 			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
 			int counterFound = 0;

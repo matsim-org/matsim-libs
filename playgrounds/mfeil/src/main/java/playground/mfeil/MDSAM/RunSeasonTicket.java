@@ -49,8 +49,8 @@ public class RunSeasonTicket {
 
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/output/10_rec/output_plans.xml";
-		final String output_populationFilename = "/home/baug/mfeil/output/10_rec/output_plans_with_seasonticket.xml.gz";
+		final String populationFilename = "/home/baug/mfeil/data/Zurich10/plans.xml";
+		final String output_populationFilename = "/home/baug/mfeil/data/Zurich10/plans_with_seasonticket.xml.gz";
 
 		final String input1 = "/home/baug/mfeil/data/Zurich10/MobTSet_1.txt";
 		final String input2 = "/home/baug/mfeil/data/Zurich10/Zurich10_ids.dat";
@@ -139,12 +139,12 @@ public class RunSeasonTicket {
 				withkey++;
 				if (gen>=probabilities.get(key)[0] && gen<probabilities.get(key)[0]+probabilities.get(key)[1]){
 					if (count<10) log.info("adding ht with key");
-					person.addTravelcard("halbtax");
+					person.addTravelcard("ch-HT");
 					ht++;
 				}
 				else if (gen>=probabilities.get(key)[0]){
 					if (count<10) log.info("adding ga with key");
-					person.addTravelcard("ga");
+					person.addTravelcard("ch-GA");
 					ga++;
 				}
 				else {
@@ -156,12 +156,12 @@ public class RunSeasonTicket {
 				nokey++;
 				if (gen>=probabilities.get("total")[0] && gen<probabilities.get("total")[0]+probabilities.get("total")[1]){
 					if (count<10) log.info("adding ht without key");
-					person.addTravelcard("halbtax");
+					person.addTravelcard("ch-HT");
 					ht++;
 				}
 				else if (gen>=probabilities.get("total")[0]){
 					if (count<10) log.info("adding ga without key");
-					person.addTravelcard("ga");
+					person.addTravelcard("ch-GA");
 					ga++;
 				}
 				else {
@@ -173,7 +173,7 @@ public class RunSeasonTicket {
 		log.info("No of assignments: "+nothing+" agents without any card, "+ht+" agents with Halbtax or similar, and "+ga+" agents with GA.");
 		log.info("No of assignments with key = "+withkey+", and without key "+nokey+".");
 
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(output_populationFilename);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scenario.getKnowledges()).writeFile(output_populationFilename);
 
 		log.info("Process finished.");
 	}

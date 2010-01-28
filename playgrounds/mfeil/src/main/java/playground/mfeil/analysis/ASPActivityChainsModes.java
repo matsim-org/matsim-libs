@@ -55,7 +55,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 
 
 	public ASPActivityChainsModes(final PopulationImpl population, Knowledges knowledges, final String outputDir) {
-		super (population, knowledges, outputDir);
+		super (population, null, knowledges, outputDir);
 	}
 	
 	public ASPActivityChainsModes(final PopulationImpl population) {
@@ -64,7 +64,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 		this.outputDir = "./plans";
 	}
 	
-	@Override
+	
 	public void run(){
 		this.initAnalysis();
 		this.analyze();
@@ -75,7 +75,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 		this.activityChains = new ArrayList<List<PlanElement>>();
 		this.plans = new ArrayList<ArrayList<Plan>>();
 		ActChainEqualityCheck ac = new ActChainEqualityCheck();
-		for (Person person : this.population.getPersons().values()) {
+		for (Person person : this.populationMATSim.getPersons().values()) {
 			boolean alreadyIn = false;
 			for (int i=0;i<this.activityChains.size();i++){
 				if (ac.checkEqualActChainsModes(person.getSelectedPlan().getPlanElements(), this.activityChains.get(i))){
@@ -117,7 +117,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 			}
 			stream1.println();
 		}
-		stream1.println((averageACLength/this.population.getPersons().size())+"\tAverage number of activities");
+		stream1.println((averageACLength/this.populationMATSim.getPersons().size())+"\tAverage number of activities");
 		stream1.println();
 	}		
 	

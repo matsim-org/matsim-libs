@@ -76,12 +76,12 @@ public class JohScoringFunction implements ScoringFunction {
 	private static final Logger log = Logger.getLogger(JohScoringFunction.class);
 	
 	private static final TreeMap<String, JohActUtilityParameters> utilParams = new TreeMap<String, JohActUtilityParameters>();
-	private static double marginalUtilityOfWaiting = -4.04; //war -6
-	private static double marginalUtilityOfLateArrival = -12.12; //war -18
+	private static double marginalUtilityOfWaiting = -2.42; //war -6
+	private static double marginalUtilityOfLateArrival = -7.26; //war -18
 	private static double marginalUtilityOfEarlyDeparture = -0; // war -0
-	private static double marginalUtilityOfTraveling = -4.04; // war fuer alle -6
-	private static double marginalUtilityOfTravelingPT = -2.04; 
-	private static double marginalUtilityOfTravelingWalk = -1.17;
+	private static double marginalUtilityOfTraveling = -2.42; // war fuer alle -6
+	private static double marginalUtilityOfTravelingPT = -1.38; 
+	private static double marginalUtilityOfTravelingWalk = -1.24;
 	private static double marginalUtilityOfDistance = 0; // war 0
 	
 	//private static double repeat = 0.332;
@@ -90,14 +90,14 @@ public class JohScoringFunction implements ScoringFunction {
 	private static final double uMin_work = 0;
 	private static final double uMin_shopping = 0;
 	private static final double uMin_leisure = 0;
-	private static final double uMax_home = 2.86; //60
-	private static final double uMax_work= 1.54;  //55
-	private static final double uMax_shopping = 1.31; //12
-	private static final double uMax_leisure = 2.29;  //35
+	private static final double uMax_home = 2.75; //60
+	private static final double uMax_work= 1.36;  //55
+	private static final double uMax_shopping = 0.261; //12
+	private static final double uMax_leisure = 0.813;  //35
 	private static final double alpha_home = 8.89;//6
-	private static final double alpha_work = 4.38;//4
-	private static final double alpha_shopping = -0.84;//1
-	private static final double alpha_leisure = 0.393;//2
+	private static final double alpha_work = 4.28;//4
+	private static final double alpha_shopping = -0.525;//1
+	private static final double alpha_leisure = 0.925;//2
 	private static final double beta_home = 1.2;//1.2
 	private static final double beta_work = 1.2;
 	private static final double beta_shopping = 1.2;
@@ -108,8 +108,8 @@ public class JohScoringFunction implements ScoringFunction {
 	private static final double gamma_leisure = 1;
 	
 	private static final double uMin_education = 0;
-	private static final double uMax_education = 1.18;//40
-	private static final double alpha_education = 1.68;//3
+	private static final double uMax_education = 1.11;//40
+	private static final double alpha_education = 1.59;//3
 	private static final double beta_education = 1.2;
 	private static final double gamma_education = 1;
 	

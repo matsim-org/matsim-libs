@@ -299,10 +299,8 @@ public class AgentsAssigner implements PlanAlgorithm{
 		PlanImpl bestPlan = new org.matsim.core.population.PlanImpl (in.getPerson());
 		bestPlan.copyPlan(in);
 		List<PlanElement> al = out.getPlanElements();
-		
-		// NEW NEW NEW NEW NEW NEW NEW
+	
 		ArrayList<ActivityOptionImpl> primActs = new ArrayList<ActivityOptionImpl>(this.knowledges.getKnowledgesByPersonId().get(out.getPerson().getId()).getActivities(true));
-		
 		for (int i=2;i<bestPlan.getPlanElements().size()-2;i+=2){
 			if (!primActs.isEmpty()){
 				for (int j=0;j<primActs.size();j++){

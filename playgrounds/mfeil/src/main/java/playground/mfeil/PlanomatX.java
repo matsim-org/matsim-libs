@@ -393,8 +393,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				if (i!=tabuList.get(tabuList.size()-1).getPlanElements().size()-1) stream.print(act.getType()+"\t"+((LegImpl)(tabuList.get(tabuList.size()-1).getPlanElements()).get(i+1)).getMode()+"\t");
 				else stream.print(act.getType()+"\t");
 			}
-			stream.println(); */
-		}
+			stream.println(); 
+	*/	}
 		
 		if(al.size()>tabuList.get(tabuList.size()-1).getPlanElements().size()){ 
 			int i;

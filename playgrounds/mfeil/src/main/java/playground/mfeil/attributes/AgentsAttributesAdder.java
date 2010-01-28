@@ -522,5 +522,8 @@ public class AgentsAttributesAdder {
 	public Map<Id, Integer> getMunType (){
 		return this.munType;
 	}
+	public Map<Id, Double> getAgentsWeight (){
+		return this.agentsWeight;
+	}
 }
 
