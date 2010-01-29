@@ -116,7 +116,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		}
 		RoadPricingScheme rps = tollReader.getScheme();
 
-		Collection<Id> linkIds = (rps != null) ? rps.getLinkIds() : net
+		Collection<Id> linkIds = (rps != null) ? rps.getLinkIdSet() : net
 				.getLinks().keySet();
 		List<Map<Id, Integer>> vols = createVolumes(linkIds, va);
 		List<Map<Id, Double>> sls = SaturationLevel2QGIS
@@ -124,7 +124,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 
 		for (int i = 0; i < 24; i++) {
 			Volume2QGIS v2q = new Volume2QGIS(netFilename, ch1903);
-			v2q.setLinkIds(rps.getLinkIds());
+			v2q.setLinkIds(rps.getLinkIdSet());
 			v2q.addParameter("vol", Integer.class, vols.get(i));
 			v2q.addParameter("sl", Double.class, sls.get(i));
 			v2q

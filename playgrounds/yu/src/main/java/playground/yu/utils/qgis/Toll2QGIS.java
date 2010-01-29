@@ -50,7 +50,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 
-			for (Id linkId: toll.getLinkIds()) {
+			for (Id linkId: toll.getLinkIdSet()) {
 				Link link = network.getLinks().get(linkId);
 				// if (link != null) {
 				LinearRing lr = getLinearRing(link);

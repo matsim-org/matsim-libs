@@ -172,11 +172,11 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		}
 		RoadPricingScheme rps = tollReader.getScheme();
 
-		Collection<Id> links = (rps != null) ? rps.getLinkIds() : net
+		Collection<Id> links = (rps != null) ? rps.getLinkIdSet() : net
 				.getLinks().keySet();
 		List<Map<Id, Double>> sls = createSpeedLevels(links, clas, net);
 
-		Set<Id> linkIds = (rps != null) ? rps.getLinkIds() : net.getLinks()
+		Set<Id> linkIds = (rps != null) ? rps.getLinkIdSet() : net.getLinks()
 				.keySet();
 		for (int i = 6; i < 20; i++) {
 			SpeedLevel2QGIS sl2q = new SpeedLevel2QGIS(

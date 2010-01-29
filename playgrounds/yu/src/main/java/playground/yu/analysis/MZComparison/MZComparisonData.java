@@ -24,7 +24,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 public class MZComparisonData extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	public static boolean isInRange(Id linkId, RoadPricingScheme toll) {
-		return toll.getLinkIds().contains(linkId);
+		return toll.getLinkIdSet().contains(linkId);
 	}
 
 	private double carDist, ptDist, wlkDist,

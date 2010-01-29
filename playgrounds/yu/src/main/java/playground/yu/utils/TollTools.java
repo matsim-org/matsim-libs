@@ -19,7 +19,7 @@ public class TollTools {
 	 *         area.
 	 */
 	public static boolean isInRange(Id linkId, RoadPricingScheme toll) {
-		return toll.getLinkIds().contains(linkId);
+		return toll.getLinkIdSet().contains(linkId);
 	}
 
 }

@@ -77,7 +77,7 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 			saturationLevels.add(i, null);
 		}
 		double capPeriod = net.getCapacityPeriod() / 3600.0;
-		for (Id linkId : rps.getLinkIds()) {
+		for (Id linkId : rps.getLinkIdSet()) {
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Double> m = saturationLevels.get(i);

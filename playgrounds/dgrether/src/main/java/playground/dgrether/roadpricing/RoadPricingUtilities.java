@@ -33,7 +33,7 @@ public class RoadPricingUtilities {
 		for (PlanElement pe : plan1.getPlanElements()) {
 			if (pe instanceof Activity) {
 				Activity act = (Activity) pe;
-				if (roadPricingScheme.getLinkIds().contains(act.getLinkId())){
+				if (roadPricingScheme.getLinkIdSet().contains(act.getLinkId())){
 					return true;
 				}
 			}
