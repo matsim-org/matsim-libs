@@ -42,6 +42,8 @@ public interface PersonAgentI {
 	/* there is no corresponding setter, as the implementation should set the the corresponding time
 	 * internally, e.g. in legEnds().
 	 */
+	// yyyy getDepartureTimeFromActivity()  [[since there is also a linkDepartureTime of the 
+	// queue sim, and possibly a departure time of a leg]].  kai, jan'10
 
 	/**
 	 * Informs the agent that the currently executed activity is ended / is
