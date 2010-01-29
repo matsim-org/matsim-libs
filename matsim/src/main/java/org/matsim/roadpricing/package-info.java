@@ -77,7 +77,22 @@
  *
  * &lt;/roadpricing>
  * </pre></blockquote>
- *
+ * <h4>Distinct toll amounts for single links</h4>
+ * For both presented toll schemes, i.e. distance and cordon tolls it is possible to specify a distinct amount
+ * of toll for each link. Just include a cost section for each link in the links section of the roadpricing
+ * file. In the subsequent example for link 6 the toll specified in the general cost section of the roadpricing
+ * file is used while for link 15 those defaults are overwritten by the costs specified within the link's tag.
+ * <blockquote><pre>
+ *  &lt;links>
+ *    &lt;link id="6" />
+ *    &lt;link id="15">
+ *      &lt;cost start_time="06:00" end_time="10:00" amount="1.00" />
+ *      &lt;cost start_time="10:00" end_time="15:00" amount="0.50" />
+ *      &lt;cost start_time="15:00" end_time="19:00" amount="1.00" />
+ *    &lt;/link>
+ *  &lt;/links>
+ * </pre></blockquote>
+ * 
  * <h4>Area Toll</h4>
  * In the case of an area toll, agents have to pay a fixed amount when they drive on one of the tolled links,
  * but they have to pay the amount at most once during the simulation. The type must be set to "area" in the
@@ -116,10 +131,15 @@
  * road pricing XML file (more details and examples can be found with the description of each
  * <a href="#schemes">supported toll scheme</a>). Then add the following part to your configuration:
  * <pre>
+ * &lt;module name="scenario"&gt;
+ *   &lt;param name="useRoadpricing" value="true" /&gt;
+ * &lt;/module&gt; </pre>
+ * <pre>
  * &lt;module name="roadpricing"&gt;
  *   &lt;param name="tollLinksFile" value="path/to/your/roadpricing-file.xml" /&gt;
  * &lt;/module&gt; </pre>
- * As soon as the parameter <code>tollLinksFile</code> is set, the Controler will load the file and the required
+ * 
+ * As soon as road pricing is switched on in the scenario config module and the parameter <code>tollLinksFile</code> is set, the Controler will load the file and the required
  * classes to simulate the road pricing scenario.
  *
  * <h3><a name="no-controler">Use RoadPricing without the Controler</a></h3>

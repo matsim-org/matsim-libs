@@ -21,10 +21,12 @@
 package org.matsim.roadpricing;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
 /**
  * Writes a {@link RoadPricingScheme} to a file according to <code>roadpricing_v1.dtd</code>.
@@ -55,8 +57,19 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 
 		// links
 		this.writer.write("\t<links>\n");
-		for (Id linkId : this.scheme.getLinkIds()) {
-			this.writer.write("\t\t<link id=\"" + linkId.toString() + "\" />\n");
+		for (Id linkId : this.scheme.getLinkIds().keySet()) {
+		  List<Cost> cs = this.scheme.getLinkIds().get(linkId);
+		  this.writer.write("\t\t<link id=\"" + linkId.toString() + "\"");
+		  if (cs == null) {
+		    this.writer.write("/>\n");
+		  }
+		  else {
+		    this.writer.write(">\n");
+		    for (Cost c : cs) {
+		      this.writeCost(c);
+		    }
+		    this.writer.write("</link>");
+		  }
 		}
 		this.writer.write("\t</links>\n");
 
@@ -70,18 +83,22 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 		}
 
 		for (RoadPricingScheme.Cost cost : this.scheme.getCosts()) {
-			this.writer.write("\t<cost ");
-			if (cost.startTime != Time.UNDEFINED_TIME) {
-				this.writer.write("start_time=\"" + Time.writeTime(cost.startTime) + "\" ");
-			}
-			if (cost.endTime != Time.UNDEFINED_TIME) {
-				this.writer.write("end_time=\"" + Time.writeTime(cost.endTime) + "\" ");
-			}
-			this.writer.write("amount=\"" + cost.amount + "\" />\n");
+		  this.writeCost(cost);
 		}
 
 		// finish
 		this.writer.write("</roadpricing>");
+	}
+	
+	private void writeCost(Cost cost) throws IOException {
+    this.writer.write("\t<cost ");
+    if (cost.startTime != Time.UNDEFINED_TIME) {
+      this.writer.write("start_time=\"" + Time.writeTime(cost.startTime) + "\" ");
+    }
+    if (cost.endTime != Time.UNDEFINED_TIME) {
+      this.writer.write("end_time=\"" + Time.writeTime(cost.endTime) + "\" ");
+    }
+    this.writer.write("amount=\"" + cost.amount + "\" />\n");
 	}
 
 }

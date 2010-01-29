@@ -21,8 +21,10 @@
 package org.matsim.roadpricing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 
@@ -43,7 +45,7 @@ public class RoadPricingScheme {
 	/** The type to be used for area tolls. */
 	public static final String TOLL_TYPE_AREA = "area";
 
-	private TreeSet<Id> linkIds = null;
+	private Map<Id, List<Cost>> linkIds = null;
 
 	private String name = null;
 	private String type = null;
@@ -54,12 +56,12 @@ public class RoadPricingScheme {
 	private Cost[] costCache = null;
 
 	public RoadPricingScheme() {
-		this.linkIds = new TreeSet<Id>();
+		this.linkIds = new HashMap<Id, List<Cost>>();
 		this.costs = new ArrayList<Cost>();
 	}
 
 	public void addLink(final Id linkId) {
-		this.linkIds.add(linkId);
+		this.linkIds.put(linkId, null);
 	}
 
 	public void setName(final String name) {
@@ -93,14 +95,34 @@ public class RoadPricingScheme {
 		return cost;
 	}
 
+  public void addLinkCost(Id linkId, double startTime, double endTime,
+      double amount) {
+    Cost cost = new Cost(startTime, endTime, amount);
+    List<Cost> cs = this.linkIds.get(linkId);
+    if (cs == null) {
+      cs = new ArrayList<Cost>();
+      this.linkIds.put(linkId, cs);
+    }
+    cs.add(cost);
+  }
+	
 	public boolean removeCost(final Cost cost) {
 		return this.costs.remove(cost);
 	}
-
-	public Set<Id> getLinkIds() {
-		return this.linkIds;
+	
+	public boolean removeLinkCost(final Id linkId, final Cost cost){
+	  List<Cost> c = this.linkIds.get(linkId);
+	  return (c != null) ? c.remove(cost) : false;
 	}
 
+	public Set<Id> getLinkIdSet() {
+		return this.linkIds.keySet();
+	}
+
+	public Map<Id, List<Cost>> getLinkIds(){
+	  return this.linkIds;
+	}
+	
 	public Iterable<Cost> getCosts() {
 		return this.costs;
 	}
@@ -123,16 +145,26 @@ public class RoadPricingScheme {
 	 */
 	public Cost getLinkCost(final Id linkId, final double time) {
 		if (this.cacheIsInvalid) buildCache();
-		if (this.linkIds.contains(linkId)) {
-			for (Cost cost : this.costCache) {
-				if ((time >= cost.startTime) && (time < cost.endTime)) {
-					return cost;
-				}
-			}
-			return null;
+		if (this.linkIds.containsKey(linkId)) {
+		  List<Cost> costs = this.linkIds.get(linkId);
+		  if (costs == null) {
+	      for (Cost cost : this.costCache) {
+	        if ((time >= cost.startTime) && (time < cost.endTime)) {
+	          return cost;
+	        }
+	      }
+		  }
+		  else {
+		    for (Cost cost : costs){
+          if ((time >= cost.startTime) && (time < cost.endTime)) {
+            return cost;
+          }
+		    }
+		  }
 		}
 		return null;
 	}
+	
 
 	private void buildCache() {
 		this.costCache = new Cost[this.costs.size()];
@@ -156,5 +188,4 @@ public class RoadPricingScheme {
 			this.amount = amount;
 		}
 	}
-
 }

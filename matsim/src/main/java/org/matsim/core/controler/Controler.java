@@ -699,8 +699,8 @@ public class Controler {
 		this.addCoreControlerListener(this.plansScoring);
 
 		// load road pricing, if requested
-		if (this.config.roadpricing().getTollLinksFile() != null) {
-			this.roadPricing = new RoadPricing();
+		if (this.config.scenario().isUseRoadpricing()) {
+		  this.roadPricing = new RoadPricing();
 			this.addCoreControlerListener(this.roadPricing);
 		}
 
@@ -1022,10 +1022,10 @@ public class Controler {
 	 *         threads!
 	 */
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
-		if ((this.roadPricing != null)
-				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.roadPricing.getRoadPricingScheme().getType()))) {
+		if (this.getScenario().getConfig().scenario().isUseRoadpricing()
+				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scenarioData.getRoadPricingScheme().getType()))) {
 			return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
-					.getLeastCostPathCalculatorFactory(), this.roadPricing.getRoadPricingScheme());
+					.getLeastCostPathCalculatorFactory(), this.scenarioData.getRoadPricingScheme());
 		}
 		return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
 				.getLeastCostPathCalculatorFactory());
@@ -1103,7 +1103,6 @@ public class Controler {
 	 *         pricing is simulated.
 	 */
 	public final RoadPricing getRoadPricing() {
-		// TODO integrate roadPricing (Scheme) better in scenario
 		return this.roadPricing;
 	}
 

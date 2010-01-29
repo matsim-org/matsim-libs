@@ -26,8 +26,10 @@ import java.util.Iterator;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
@@ -51,21 +53,25 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		final String tmpFile1 = getOutputDirectory() + "roadpricing1.xml";
 		final String tmpFile2 = getOutputDirectory() + "roadpricing2.xml";
 
+		final Id id1 = new IdImpl(1);
+		final Id id2 = new IdImpl(2);
+		final Id id3 = new IdImpl(3);
+		
 		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
-
+		scenario.getConfig().scenario().setUseRoadpricing(true);
 		NetworkLayer network = Fixture.createNetwork1(scenario);
 		// first, read the scheme from file
-		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1();
+		RoadPricingScheme scheme1 = scenario.getRoadPricingScheme();
+		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(scheme1);
 		reader1.parse(origFile);
-		RoadPricingScheme scheme1 = reader1.getScheme();
 
 		// compare it with what's expected
 		assertEquals("distance-toll-1", scheme1.getName());
 		assertEquals("distance toll for org.matsim.roadpricing.Fixture.createNetwork1().", scheme1.getDescription());
-		assertEquals(3, scheme1.getLinkIds().size());
-		assertTrue(scheme1.getLinkIds().contains(new IdImpl(1)));
-		assertTrue(scheme1.getLinkIds().contains(new IdImpl(2)));
-		assertTrue(scheme1.getLinkIds().contains(new IdImpl(3)));
+		assertEquals(3, scheme1.getLinkIdSet().size());
+		assertTrue(scheme1.getLinkIdSet().contains(id1));
+		assertTrue(scheme1.getLinkIdSet().contains(id2));
+		assertTrue(scheme1.getLinkIdSet().contains(id3));
 		assertEquals(3, scheme1.getCostArray().length);
 		Iterator<RoadPricingScheme.Cost> costIter = scheme1.getCosts().iterator();
 		RoadPricingScheme.Cost cost = costIter.next();
@@ -81,6 +87,12 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		assertEquals(19*3600.0, cost.endTime, EPSILON);
 		assertEquals(0.00020, cost.amount, EPSILON);
 		assertFalse(costIter.hasNext());
+		assertTrue(scheme1.getLinkIds().containsKey(id1));
+		assertNull(scheme1.getLinkIds().get(id1));
+    assertTrue(scheme1.getLinkIds().containsKey(id2));
+    assertNull(scheme1.getLinkIds().get(id2));
+    assertTrue(scheme1.getLinkIds().containsKey(id3));
+    assertNotNull(scheme1.getLinkIds().get(id3));
 
 		// write the scheme to a file
 		RoadPricingWriterXMLv1 writer1 = new RoadPricingWriterXMLv1(scheme1);
@@ -92,10 +104,12 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		 * than the written one. Thus, read this file again and write it again and
 		 * compare them.
 		 */
-
-		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1();
+		Gbl.reset();
+		scenario = new ScenarioImpl(loadConfig(null));
+    scenario.getConfig().scenario().setUseRoadpricing(true);
+    RoadPricingScheme scheme2 = scenario.getRoadPricingScheme();
+		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(scheme2);
 		reader2.parse(tmpFile1);
-		RoadPricingScheme scheme2 = reader2.getScheme();
 
 		// write the scheme to a file
 		RoadPricingWriterXMLv1 writer2 = new RoadPricingWriterXMLv1(scheme2);

@@ -22,6 +22,7 @@ package org.matsim.roadpricing;
 
 import java.util.Stack;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
@@ -48,7 +49,19 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 
 	private RoadPricingScheme scheme = null;
 
+	private Id currentLinkId = null;
+	
+	private boolean hasLinkCosts = false;
+	/**
+	 * @deprecated use constructor RoadPricingReaderXMLv1(RoadPricingScheme)
+	 */
+	@Deprecated
 	public RoadPricingReaderXMLv1() {
+	  this.scheme = new RoadPricingScheme();
+	}
+	
+	public RoadPricingReaderXMLv1(RoadPricingScheme scheme){
+	  this.scheme = scheme;
 	}
 
 	public RoadPricingScheme getScheme() {
@@ -58,21 +71,32 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if (TAG_ROADPRICING.equals(name)) {
-			this.scheme = new RoadPricingScheme();
 			this.scheme.setName(atts.getValue(ATTR_NAME));
 			this.scheme.setType(atts.getValue(ATTR_TYPE));
 		} else if (TAG_LINK.equals(name)) {
-			this.scheme.addLink(new IdImpl(atts.getValue(ATTR_ID)));
-		} else if (TAG_COST.equals(name)) {
+		  this.currentLinkId = new IdImpl(atts.getValue(ATTR_ID));
+		} else if (TAG_COST.equals(name) && this.currentLinkId == null) {
 			this.scheme.addCost(Time.parseTime(atts.getValue(ATTR_START_TIME)),
 					Time.parseTime(atts.getValue(ATTR_END_TIME)), Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
+		} else if (TAG_COST.equals(name) && this.currentLinkId != null){
+      this.scheme.addLinkCost(this.currentLinkId, Time.parseTime(atts.getValue(ATTR_START_TIME)),
+          Time.parseTime(atts.getValue(ATTR_END_TIME)), Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
+      this.hasLinkCosts = true;
 		}
+		
 	}
 
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (TAG_DESCRIPTION.equals(name)) {
 			this.scheme.setDescription(content);
+		}
+		else if (TAG_LINK.equals(name)){
+		  if (!hasLinkCosts){
+		    this.scheme.addLink(this.currentLinkId);
+		  }
+		  this.currentLinkId = null;
+		  this.hasLinkCosts = false;
 		}
 	}
 

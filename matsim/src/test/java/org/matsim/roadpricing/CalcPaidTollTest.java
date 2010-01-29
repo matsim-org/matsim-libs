@@ -68,23 +68,23 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		compareScores(
 				referencePopulation.get(id1).getPlans().get(0).getScore().doubleValue(),
 				population.get(id1).getPlans().get(0).getScore().doubleValue(),
-				300 * 0.00020);
+				200 * 0.00020 + 100 * 0.00030);
 		compareScores(
 				referencePopulation.get(id2).getPlans().get(0).getScore().doubleValue(),
 				population.get(id2).getPlans().get(0).getScore().doubleValue(),
-				300 * 0.00010);
+				200 * 0.00010 + 100 * 0.00020);
 		compareScores(
 				referencePopulation.get(id3).getPlans().get(0).getScore().doubleValue(),
 				population.get(id3).getPlans().get(0).getScore().doubleValue(),
-				300 * 0.00020);
+				200 * 0.00020 + 100 * 0.00030);
 		compareScores(
 				referencePopulation.get(id4).getPlans().get(0).getScore().doubleValue(),
 				population.get(id4).getPlans().get(0).getScore().doubleValue(),
-				100 * 0.00020 + 200 * 0.00010);
+				100 * 0.00020 + 100 * 0.00010 + 100 * 0.00020);
 		compareScores(
 				referencePopulation.get(id5).getPlans().get(0).getScore().doubleValue(),
 				population.get(id5).getPlans().get(0).getScore().doubleValue(),
-				200 * 0.00020); // agent departs on a tolled link which must NOT be paid.
+				100 * 0.00020 + 100 * 0.00030); // agent departs on a tolled link which must NOT be paid.
 	}
 
 	public void testAreaToll() {
@@ -192,8 +192,9 @@ public class CalcPaidTollTest extends MatsimTestCase {
 	private PopulationImpl runTollSimulation(final String tollFile, final String tollType, final CharyparNagelScoringConfigGroup config) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = Fixture.createNetwork1(scenario);
-
-		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingScheme scheme = scenario.getRoadPricingScheme();
+		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
 		try {
 			reader.parse(tollFile);
 		} catch (SAXException e) {
@@ -203,7 +204,6 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		RoadPricingScheme scheme = reader.getScheme();
 		assertEquals(tollType, scheme.getType());
 
 		PopulationImpl population = Fixture.createPopulation1(scenario);

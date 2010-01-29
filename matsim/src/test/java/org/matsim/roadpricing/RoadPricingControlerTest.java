@@ -56,6 +56,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 	public void testDistanceToll() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
+		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
 		Controler controler = new TestControler(config);
 		controler.run();
@@ -69,6 +70,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 	public void testCordonToll() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
+		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "cordonToll.xml");
 		Controler controler = new TestControler(config);
 		controler.run();
@@ -82,6 +84,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 	public void testAreaToll() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
+		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "areaToll.xml");
 		Controler controler = new TestControler(config);
 		controler.run();
@@ -100,6 +103,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		// start with the default configuration, which is ok.
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
+		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "areaToll.xml");
 		try {
 			Controler controler = new TestControler(config);
@@ -160,6 +164,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 
 		// now run toll case
 		Gbl.reset();
+		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
 		config.controler().setOutputDirectory(getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);

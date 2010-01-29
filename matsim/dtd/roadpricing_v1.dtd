@@ -13,7 +13,7 @@
 
 <!ELEMENT links          (link*)>
 
-<!ELEMENT link           EMPTY>
+<!ELEMENT link           (cost*)>
 <!ATTLIST link
           id             CDATA #REQUIRED>
 

@@ -53,13 +53,13 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
 		// read the road pricing scheme from file
-		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1();
+		this.scheme = controler.getScenario().getRoadPricingScheme();
+		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
 		try {
 			rpReader.parse(controler.getConfig().roadpricing().getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		this.scheme = rpReader.getScheme();
 
 		if (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scheme.getType())) {
 			// checks that the replanning strategies don't specify a certain router, as we need a special router ourselves.
