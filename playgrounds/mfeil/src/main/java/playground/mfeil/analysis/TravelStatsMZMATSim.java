@@ -64,7 +64,7 @@ public class TravelStatsMZMATSim {
 		
 		stream.println("\taveTripDistance\t\t\t\taveTripTravelTime\t\t\t\taveAgents\t\t\t\t\t\tPopSize");
 		stream.println("\tCar\tPT\tWalk\tBike\tCar\tPT\tWalk\tBike\tplanDistance\tplanTime\tnoOfCar\tnoOfPT\tnoOfWalk\tnoOfBike");	
-	//	this.runPopulation("MZ", this.populationMZ, stream);
+		this.runPopulation("MZ", this.populationMZ, stream);
 		this.runPopulation("MATSim", this.populationMATSim, stream);
 		
 		stream.close();
@@ -148,7 +148,7 @@ public class TravelStatsMZMATSim {
 				ScenarioImpl scenarioMZ = new ScenarioImpl();
 				new MatsimNetworkReader(scenarioMZ).readFile(networkFilename);
 				new MatsimFacilitiesReader(scenarioMZ).readFile(facilitiesFilename);
-			//	new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
+				new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
 				
 				ScenarioImpl scenarioMATSim = new ScenarioImpl();
 				scenarioMATSim.setNetwork(scenarioMZ.getNetwork());

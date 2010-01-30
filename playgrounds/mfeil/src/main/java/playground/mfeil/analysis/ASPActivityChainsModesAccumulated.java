@@ -69,7 +69,7 @@ public class ASPActivityChainsModesAccumulated extends ASPActivityChainsModes{
 		this.activityChains = new ArrayList<List<PlanElement>>();
 		this.plans = new ArrayList<ArrayList<Plan>>();
 		ActChainEqualityCheck ac = new ActChainEqualityCheck();
-		for (Person person : this.populationMATSim.getPersons().values()) {
+		for (Person person : this.population.getPersons().values()) {
 			boolean alreadyIn = false;
 			for (int i=0;i<this.activityChains.size();i++){
 				if (ac.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.activityChains.get(i))){
