@@ -23,6 +23,8 @@ package playground.mfeil.MDSAM;
 
 
 import java.io.File;
+import java.util.TreeMap;
+import java.util.Map;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -75,7 +77,7 @@ import playground.mfeil.attributes.AgentsAttributesAdder;
 public class PlansConstructor implements PlanStrategyModule{
 
 	protected Controler controler;
-	protected String inputFile, outputFile, outputFileBiogeme, attributesInputFile, outputFileMod, outputFileSims;
+	protected String inputFile, outputFile, outputFileBiogeme, attributesInputFile, outputFileMod, outputFileSimsOverview, outputFileSimsDetailLog;
 	protected PopulationImpl population;
 	protected ArrayList<List<PlanElement>> actChains;
 	protected NetworkImpl network;
@@ -83,7 +85,8 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected LocationMutatorwChoiceSet locator;
 	protected MDSAM mdsam;
 	protected XY2Links linker;
-	protected List<List<Double>> sims;
+	protected Map<Id, List<Double>> sims; // indicates the similarity of a person's plans with all other plans
+	protected Map<Id, int[]> simsPosition; // indicates which activity chain alternative the plan/similarity value belongs to
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
 	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, income, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn, beta, gamma, beta_travel, munType; 
@@ -97,7 +100,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans06.dat";
 		this.attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model06.mod";
-		this.outputFileSims = "/home/baug/mfeil/data/choiceSet/it0/sims06.xls";
+		this.outputFileSimsOverview = "/home/baug/mfeil/data/choiceSet/it0/sims06.xls";
 	/*	this.inputFile = "./plans/input_plans2.xml";
 		this.outputFile = "./plans/output_plans.xml.gz";
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -134,9 +137,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.costPtGA			= 0.08;	// CHF/km
 	}
 
-	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
+	public PlansConstructor (PopulationImpl population, String simsOverviewLog, String simsDetailLog) {
 		this.population = population;
-		this.sims = sims;
+		this.outputFileSimsOverview = simsOverviewLog;
+		this.outputFileSimsDetailLog = simsDetailLog;
 		this.noOfAlternatives 	= 20;
 		this.travelCostCar		= 0.5;	// CHF/km
 		this.costPtNothing		= 0.28;	// CHF/km
@@ -741,322 +745,13 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 
-	/*
+
+
+	//****************************************************************************************
 	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
-	public void writePlansForBiogemeWithRandomSelection (String outputFile, String attributesInputFile,
-			String similarity,
-			String incomeConstant,
-			String incomeDivided,
-			String incomeDividedLN,
-			String incomeBoxCox,
-			String age,
-			String gender,
-			String employed,
-			String license,
-			String carAvail,
-			String seasonTicket,
-			String travelDistance,
-			String travelCost,
-			String travelConstant,
-			String bikeIn){
-
-		log.info("Writing plans for Biogeme...");
-
-		// Writing the variables back to head of class due to MDSAM call possibility.
-		// Like this, they are also available for modMaker class.
-		this.similarity=similarity;
-		this.incomeConstant=incomeConstant;
-		this.incomeDivided=incomeDivided;
-		this.incomeDividedLN=incomeDividedLN;
-		this.incomeBoxCox=incomeBoxCox;
-		this.age=age;
-		this.gender=gender;
-		this.employed=employed;
-		this.license=license;
-		this.carAvail=carAvail;
-		this.seasonTicket=seasonTicket;
-		this.travelDistance=travelDistance;
-		this.travelCost=travelCost;
-		this.travelConstant=travelConstant;
-		this.bikeIn=bikeIn;
-
-		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
-		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
-		int incomeAverage=0;
-		int noOfGA = 0;
-		int noOfHalbtax = 0;
-		int noOfNothing = 0;
-
-		// Run external classes if required
-		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes") || travelCost.equals("yes")){
-			aaa.run(attributesInputFile);
-		}
-		if (similarity.equals("yes")){
-			this.mdsam = new MDSAM(this.population);
-			this.sims = this.mdsam.runPopulation();
-			this.writeSims(this.outputFileSims);
-		}
-
-		PrintStream stream;
-		try {
-			stream = new PrintStream (new File(outputFile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-
-		// First row
-		int counterFirst=0;
-		stream.print("Id\tChoice\t");
-		counterFirst+=2;
-
-		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
-			stream.print("Income\t");
-			counterFirst++;
-		}
-		if (incomeBoxCox.equals("yes")) {
-			stream.print("Income_IncomeAverage\t");
-			counterFirst++;
-
-			// Calculate average income
-			int counterIncome=0;
-			for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-				PersonImpl person = iterator.next();
-				if (!aaa.getIncome().containsKey(person.getId())){
-					continue;
-				}
-				counterIncome++;
-				incomeAverage+=aaa.getIncome().get(person.getId());
-			}
-			incomeAverage=incomeAverage/counterIncome;
-		}
-		if (age.equals("yes")) {
-			stream.print("Age\t");
-			counterFirst++;
-		}
-		if (gender.equals("yes")) {
-			stream.print("Gender\t");
-			counterFirst++;
-		}
-		if (employed.equals("yes")) {
-			stream.print("Employed\t");
-			counterFirst++;
-		}
-		if (license.equals("yes")) {
-			stream.print("License\t");
-			counterFirst++;
-		}
-		if (carAvail.equals("yes")) {
-			stream.print("CarAlways\tCarSometimes\tCarNever\t");
-			counterFirst+=3;
-		}
-		if (seasonTicket.equals("yes")) {
-			stream.print("SeasonTicket\t");
-			counterFirst++;
-		}
-
-		for (int i = 0;i<this.actChains.size();i++){
-			int j=0;
-			for (j =0;j<java.lang.Math.max(this.actChains.get(i).size()-1,1);j++){
-				if (j%2==0 || (j%2==1 && !((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.bike)) || bikeIn.equals("yes")){
-					stream.print("x"+(i+1)+""+(j+1)+"\t");
-					counterFirst++;
-					if (travelCost.equals("yes") && j%2==1 && (((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.car) || ((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.pt))){
-						stream.print("x"+(i+1)+""+(j+1)+"_1\t"); // travel cost
-						counterFirst++;
-					}
-					if ((incomeBoxCox.equals("yes") || travelDistance.equals("yes")) && j%2==1){
-						stream.print("x"+(i+1)+""+(j+1)+"_2\t"); // travel distance
-						counterFirst++;
-					}
-				}
-			}
-			if (similarity.equals("yes")) {
-				stream.print("x"+(i+1)+""+(j+1)+"\t");
-				counterFirst++;
-			}
-		}
-		for (int i = 0;i<this.actChains.size();i++){
-			stream.print("av"+(i+1)+"\t");
-			counterFirst++;
-		}
-		stream.println();
-
-		// Filling plans
-		int counter=0;
-		int valid=0;
-		int invalid=0;
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
-			counter++;
-			if (counter%1000==0) {
-				log.info("Handling person "+counter);
-				Gbl.printMemoryUsage();
-			}
-
-			// Check whether all info is available for this person. Drop the person, otherwise
-			if ((incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) && !aaa.getIncome().containsKey(person.getId())){
-				log.warn("No income available for person "+person.getId()+". Dropping the person.");
-				continue;
-			}
-			if (carAvail.equals("yes") && !aaa.getCarAvail().containsKey(person.getId())){
-				log.warn("No car availability info available for person "+person.getId()+". Dropping the person.");
-				continue;
-			}
-			if (seasonTicket.equals("yes") && !aaa.getSeasonTicket().containsKey(person.getId())){
-				log.warn("No season ticket info available for person "+person.getId()+". Dropping the person.");
-				continue;
-			}
-
-			// Check whether the selected plan of the person is valid. Drop the person, otherwise
-			if (person.getSelectedPlan().getScore()!=null && person.getSelectedPlan().getScore()==-100000.0){
-				log.warn("Person's "+person.getId()+" selected plan is not valid. Dropping the person.");
-				continue;
-			}
-
-			// Calculate travelCostPt for the person
-			double travelCostPt = 0;
-			if (aaa.getSeasonTicket().get(person.getId())==11) { // No season ticket
-				travelCostPt = this.costPtNothing;
-				noOfNothing++;
-			}
-			else if (aaa.getSeasonTicket().get(person.getId())==2 || aaa.getSeasonTicket().get(person.getId())==3) { // GA
-				travelCostPt = this.costPtGA;
-				noOfGA++;
-			}
-			else { // all other cases
-				travelCostPt = this.costPtHalbtax;
-				noOfHalbtax++;
-			}
-
-			int counterRow=0;
-
-			// Person ID
-			stream.print(person.getId()+"\t");
-			counterRow++;
-
-			// Choice
-			int position = -1;
-			for (int i=0;i<this.actChains.size();i++){
-				if (acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))) {
-					position = i+1;
-					break;
-				}
-			}
-			stream.print(position+"\t");
-			counterRow++;
-
-			if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
-				stream.print((aaa.getIncome().get(person.getId())/30)+"\t");
-				counterRow++;
-			}
-			if (incomeBoxCox.equals("yes")) {
-				stream.print(((double)(aaa.getIncome().get(person.getId()))/(double)(incomeAverage))+"\t");
-				counterRow++;
-			}
-			if (age.equals("yes")) {
-				stream.print(person.getAge()+"\t");
-				counterRow++;
-			}
-			if (gender.equals("yes")) {
-				if (person.getSex().equals("f")) stream.print(0+"\t");
-				else stream.print(1+"\t");
-				counterRow++;
-			}
-			if (employed.equals("yes")) {   // No info on this available!
-				stream.print(0+"\t");
-				counterRow++;
-			}
-			if (license.equals("yes")) {
-				if (person.getLicense().equals("no")) stream.print(0+"\t");
-				else stream.print(1+"\t");
-				counterRow++;
-			}
-			if (carAvail.equals("yes")) {
-				int car = aaa.getCarAvail().get(person.getId());
-				if (car==1) stream.print(1+"\t"+0+"\t"+0+"\t");
-				else if (car==2) stream.print(0+"\t"+1+"\t"+0+"\t");
-				else if (car==3) stream.print(0+"\t"+0+"\t"+1+"\t");
-				else log.warn("Unidentified car availability "+car+" for person "+person.getId());
-				counterRow+=3;
-			}
-			if (seasonTicket.equals("yes")) {
-				stream.print(aaa.getSeasonTicket().get(person.getId())+"\t");
-				counterRow++;
-			}
-
-			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise
-			int counterFound = 0;
-			for (int i=0;i<this.actChains.size();i++){
-				boolean found = false;
-				for (int j=0;j<person.getPlans().size();j++){
-					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
-						counterRow += this.writeAccumulatedPlanIntoFile(stream, person.getPlans().get(j).getPlanElements(), this.actChains.get(i), travelCostPt);
-						found = true;
-						counterFound++;
-						break;
-					}
-				}
-				// Similarity attribute
-				// TODO hier brauchts eine neue L�sung f�r die Similarity, weil jetzt die Reihenfolge der Plans nicht mehr eindeutig ist!
-				//if (similarity.equals("yes") && found) stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
-				if (!found){
-					for (int j=0;j<Math.max(this.actChains.get(i).size()-1, 1);j++){
-						if (j%2==0 || (!((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.bike) || this.bikeIn.equals("yes"))){
-							stream.print(0+"\t");
-							counterRow++;
-							if (j%2==1 && this.travelCost.equals("yes") && (((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.car) || ((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.pt))){
-								stream.print(0+"\t");
-								counterRow++;
-							}
-							if (j%2==1 && (this.incomeBoxCox.equals("yes") || this.travelDistance.equals("yes"))){
-								stream.print(0+"\t");
-								counterRow++;
-							}
-						}
-					}
-					if (similarity.equals("yes")) {
-						stream.print(0+"\t");
-						counterRow++;
-					}
-				}
-			}
-			if (counterFound!=this.noOfAlternatives) log.warn("For person "+person+", size of choice set is not "+this.noOfAlternatives+" but only "+counterFound);
-
-			for (int i=0;i<this.actChains.size();i++){
-				boolean found = false;
-				for (int j=0;j<person.getPlans().size();j++){
-					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
-						if (person.getPlans().get(j).getScore()!=null && person.getPlans().get(j).getScore()==-100000.0) {
-							stream.print(0+"\t");
-							counterRow++;
-							invalid++;
-						}
-						else {
-							stream.print(1+"\t");
-							counterRow++;
-							valid++;
-						}
-						found = true;
-						break;
-					}
-				}
-				if (!found){
-					stream.print(0+"\t");
-					counterRow++;
-				}
-			}
-			stream.println();
-			if (counterFirst!=counterRow) log.warn("For person "+person.getId()+", the row length of "+counterRow+" does not fit the expected length of "+counterFirst+"!");
-		}
-		stream.close();
-		log.info("Number of valid plans is "+valid+"; number of invalid plans is "+invalid);
-		log.info("Number of GA = "+noOfGA+", number of Halbtax = "+noOfHalbtax+", and number of nothing = "+noOfNothing);
-		log.info("done.");
-	}*/
-
-
-	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
+	//****************************************************************************************
+	
+	
 	public void writePlansForBiogemeWithRandomSelectionAccumulated (String outputFile, String attributesInputFile,
 			String beta,
 			String gamma,
@@ -1114,9 +809,9 @@ public class PlansConstructor implements PlanStrategyModule{
 			aaa.runMZ(attributesInputFile);
 		}
 		if (similarity.equals("yes")){
-			this.mdsam = new MDSAM(this.population);
+			this.mdsam = new MDSAM(this.population, this.outputFileSimsDetailLog);
 			this.sims = this.mdsam.runPopulation();
-			this.writeSims(this.outputFileSims);
+			this.simsPosition = new TreeMap<Id, int[]>();
 		}
 
 		PrintStream stream;
@@ -1126,8 +821,13 @@ public class PlansConstructor implements PlanStrategyModule{
 			e.printStackTrace();
 			return;
 		}
-
+		
+		//**************************************************************************
 		// First row
+		//**************************************************************************
+		
+		log.info("Writing dat file...");
+		
 		int counterFirst=0;
 		stream.print("Id\tChoice\t");
 		counterFirst+=2;
@@ -1277,7 +977,12 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		stream.println();
 
+		
+		
+		//**************************************************************************
 		// Filling plans
+		//**************************************************************************
+		
 		int counter=0;
 		int valid=0;
 		int invalid=0;
@@ -1288,7 +993,10 @@ public class PlansConstructor implements PlanStrategyModule{
 				log.info("Handling person "+counter);
 				Gbl.printMemoryUsage();
 			}
-
+			
+			// Initializing similarity position array (always, even if not needed)
+			int[] personSimsPos = new int[this.noOfAlternatives];
+		
 			// Check whether all info is available for this person. Drop the person, otherwise
 			if ((incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) && !aaa.getIncome().containsKey(person.getId())){
 				log.warn("No income available for person "+person.getId()+". Dropping the person.");
@@ -1422,7 +1130,10 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterRow+=5;
 			}
 			
+			//***********************************************************************************************************
 			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
+			//***********************************************************************************************************
+			
 			int counterFound = 0;
 			for (int i=0;i<this.actChains.size();i++){
 				boolean found = false;
@@ -1431,12 +1142,15 @@ public class PlansConstructor implements PlanStrategyModule{
 						counterRow += this.writeAccumulatedPlanIntoFileAccumulated(stream, person.getPlans().get(j).getPlanElements(), this.actChains.get(i), travelCostPt);
 						found = true;
 						counterFound++;
+						// Similarity attribute
+						if (similarity.equals("yes")) {
+							stream.print(this.sims.get(person.getId()).get(j)+"\t");
+							counterRow++;
+							personSimsPos[j]=i;
+						}
 						break;
 					}
 				}
-				// Similarity attribute
-				// TODO hier brauchts eine neue L�sung f�r die Similarity, weil jetzt die Reihenfolge der Plans nicht mehr eindeutig ist!
-				//if (similarity.equals("yes") && found) stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 				if (!found){
 					boolean car = false;
 					boolean pt = false;
@@ -1512,13 +1226,13 @@ public class PlansConstructor implements PlanStrategyModule{
 						stream.print("0\t");
 						counterRow++;
 					}
-
 					if (similarity.equals("yes")) {
 						stream.print(0+"\t");
 						counterRow++;
 					}
 				}
 			}
+			if (similarity.equals("yes")) this.simsPosition.put(person.getId(), personSimsPos);
 			if (counterFound!=this.noOfAlternatives) log.warn("For person "+person+", size of choice set is not "+this.noOfAlternatives+" but only "+counterFound);
 
 			for (int i=0;i<this.actChains.size();i++){
@@ -1551,6 +1265,9 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("Number of valid plans is "+valid+"; number of invalid plans is "+invalid);
 		log.info("Number of GA = "+noOfGA+", number of Halbtax = "+noOfHalbtax+", and number of nothing = "+noOfNothing);
 		log.info("done.");
+		
+		// Write out the similarity values to a separate file for cross-check
+		if (similarity.equals("yes")) this.writeSims();
 	}
 
 
@@ -1927,35 +1644,50 @@ public class PlansConstructor implements PlanStrategyModule{
 	// Writing sim file
 	//////////////////////////////////////////////////////////////////////
 
-	public void writeSims (String outputFile){
+	public void writeSims (){
+		
 		log.info("Writing sims file...");
 
+		// Statistics
 		int [] stats = new int [50];
-
 		for (int i=0;i<stats.length;i++){
 			stats[i]=0;
 		}
 
 		PrintStream stream;
 		try {
-			stream = new PrintStream (new File(outputFile));
+			stream = new PrintStream (new File(this.outputFileSimsOverview));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
 		}
 
-		for (int i=0;i<this.sims.get(0).size();i++){
+		for (int i=0;i<this.actChains.size();i++){
 			stream.print("alt"+(i+1)+"\t");
 		}
 		stream.println();
 
-		for (int i=0;i<this.sims.size();i++){
-			for (int j=0;j<this.sims.get(i).size();j++){
-				stream.print(this.sims.get(i).get(j)+"\t");
-				stats [this.sims.get(i).get(j).intValue()]++;
+		for (Person p : this.population.getPersons().values()) {
+			if (this.simsPosition.containsKey(p.getId())){
+				stream.print(p.getId()+"\t");
+				for (int i=0;i<this.actChains.size();i++){
+					boolean found = false;
+					for (int j=0;j<this.simsPosition.get(p.getId()).length;j++){
+						if (this.simsPosition.get(p.getId())[j]==i){
+							stream.print(this.sims.get(p.getId()).get(j)+"\t");
+							found=true;
+							break;
+						}
+					}
+					if (!found)stream.print("\t");
+				}
+				stream.println();
 			}
-			stream.println();
+			else {
+				log.info("No similarity info for person "+p.getId()+"!");
+			}
 		}
+		
 		stream.println();
 
 		for (int i=0;i<stats.length;i++){

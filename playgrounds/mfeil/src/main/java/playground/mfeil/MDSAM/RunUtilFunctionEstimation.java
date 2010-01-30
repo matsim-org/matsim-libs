@@ -21,6 +21,8 @@
 package playground.mfeil.MDSAM;
 
 import java.util.List;
+import java.util.Map;
+import org.matsim.api.core.v01.Id;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -42,9 +44,11 @@ public class RunUtilFunctionEstimation {
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
-		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans0972.dat";
+		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans0969.dat";
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model0972.mod";
+		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model0969.mod";
+		final String outputFileSimsOverview = "/home/baug/mfeil/data/choiceSet/it0/simsOverview0969.xls";
+		final String outputFileSimsDetailLog = "/home/baug/mfeil/data/choiceSet/it0/simsDetails0969.xls";
 		
 /*		final String populationFilename = "./plans/output_plans.xml";
 		final String networkFilename = "./plans/network.xml";
@@ -55,15 +59,15 @@ public class RunUtilFunctionEstimation {
 		
 		String beta				= "yes";
 		String gamma			= "no";
-		String similarity 		= "no";
+		String similarity 		= "yes";
 		String incomeConstant 	= "no";
 		String incomeDivided	= "no";
 		String incomeDividedLN	= "no";
 		String incomeBoxCox		= "no";
 		String gender 			= "yes";
-		String age 				= "yes";
-		String income	 		= "yes";
-		String license 			= "yes";
+		String age 				= "no";
+		String income	 		= "no";
+		String license 			= "no";
 		String carAvail 		= "no";
 		String seasonTicket 	= "no";
 		String travelDistance	= "no"; 
@@ -78,13 +82,7 @@ public class RunUtilFunctionEstimation {
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 		
-//		MDSAM mdsam = new MDSAM(scenario.getPopulation());				
-//		List<List<Double>> sims = mdsam.runPopulation();
-//		log.info("Size of sime is "+sims.size()+" times "+sims.get(0).size());
-		
-		List<List<Double>> sims = null;
-
-		PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), sims);
+		PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), outputFileSimsOverview, outputFileSimsDetailLog);
 		pc.keepPersons();
 		//pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
 		//		similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, employed, license, carAvail, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn);

@@ -21,6 +21,9 @@
 package playground.mfeil.MDSAM;
 
 import java.io.File;
+import java.util.TreeMap;
+import java.util.Map;
+import org.matsim.api.core.v01.Id;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -45,7 +48,7 @@ import org.matsim.core.population.PopulationImpl;
 public class MDSAM {
 
 	private final PopulationImpl population;
-	private List<List<Double>> sims;
+	private Map<Id,List<Double>> sims;
 	private final double GWact, GWmode, GWlocation; 
 	private static final Logger log = Logger.getLogger(MDSAM.class);
 	private final String outputFile;
@@ -54,20 +57,19 @@ public class MDSAM {
 	private int counter;
 
 
-	public MDSAM(final PopulationImpl population) {
+	public MDSAM(final PopulationImpl population, final String mdsamOutputFile) {
 		this.population=population;
 		this.GWact = 2.0;
 		this.GWmode = 1.0;
 		this.GWlocation = 1.0;
-	//	this.outputFile = "./plans/plans_similarity.xls";	
-		this.outputFile = "/home/baug/mfeil/data/mz/simlog.xls";	
-		this.printing = false;
+		this.outputFile = mdsamOutputFile;	
+		this.printing = true;
 		this.unidimensional = 0;
 		this.multidimensional = 0;
 		this.counter = 0;
 	}
 	
-	public List<List<Double>> runPopulation () {
+	public Map<Id, List<Double>> runPopulation () {
 		long overall = System.currentTimeMillis();
 		log.info("Calculating similarity of plans of population...");
 		
@@ -76,17 +78,17 @@ public class MDSAM {
 			stream = new PrintStream (new File(outputFile));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			return new ArrayList<List<Double>>();
+			return null;
 		}	
 		
-		this.sims = new ArrayList<List<Double>>();
+		this.sims = new TreeMap<Id,List<Double>>();
 		
 		int counter=0;
 		for (Person person : this.population.getPersons().values()) {
 			counter++;
 			if (counter>20) this.printing=false;
-			
-			this.sims.add(new ArrayList<Double>()); // store overall similarities of all persons' plans
+
+			ArrayList<Double> intermediateList = new ArrayList<Double>();
 			double [][] matrix = new double [person.getPlans().size()][person.getPlans().size()]; //store a person's similarities among plans
 			
 			for (int i=0;i<person.getPlans().size();i++){
@@ -147,8 +149,10 @@ public class MDSAM {
 						sim += matrix[i][j];
 					}
 				}
-				this.sims.get(this.sims.size()-1).add(sim/person.getPlans().size());	
+				intermediateList.add(sim/person.getPlans().size());
+			//	this.sims.get(this.sims.size()-1).add(sim/person.getPlans().size());	
 			}
+			this.sims.put(person.getId(),intermediateList); // store overall similarities of all persons' plans
 		}
 		stream.close();
 		log.info("Overall runtime was "+(System.currentTimeMillis()-overall));
@@ -345,4 +349,6 @@ public class MDSAM {
 		return java.lang.Math.min(del, sub);
 	}
 }
+	
+	
 

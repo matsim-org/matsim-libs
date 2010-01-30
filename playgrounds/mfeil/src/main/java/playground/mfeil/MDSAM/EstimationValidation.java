@@ -21,6 +21,8 @@
 package playground.mfeil.MDSAM;
 
 import java.io.File;
+import java.util.Map;
+import org.matsim.api.core.v01.Id;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.List;
@@ -59,7 +61,7 @@ public class EstimationValidation {
 	public void run(String outputFile){
 		log.info("Scoring mz plans file...");
 		log.info("populationOrig: "+this.population.getPersons().size());	
-		List<List<Double>> sims = this.calculateSimilarity();
+		Map<Id,List<Double>> sims = this.calculateSimilarity();
 		
 		PrintStream stream;
 		try {
@@ -99,7 +101,8 @@ public class EstimationValidation {
 			stream.print(position+"\t");
 			
 			//Chosen utility
-			stream.print((this.scorer.getScore(person.getSelectedPlan())+sims.get(counterOut).get(position-1)*(-0.621))+"\t");
+			// TODO not valid after refactoring of sims!!!
+		//	stream.print((this.scorer.getScore(person.getSelectedPlan())+sims.get(counterOut).get(position-1)*(-0.621))+"\t");
 			
 			//MaxUtility
 			double maxScore = -100000;
@@ -108,7 +111,8 @@ public class EstimationValidation {
 			for (Plan plan : person.getPlans()) {
 				counterIn++;
 				if (plan.getScore() == null || plan.getScore()!=-100000){
-					plan.setScore(this.scorer.getScore(plan)+sims.get(counterOut).get(counterIn)*(-0.621));
+					// TODO not valid after refactoring of sims!!!
+				//	plan.setScore(this.scorer.getScore(plan)+sims.get(counterOut).get(counterIn)*(-0.621));
 					if (maxScore<plan.getScore()) maxScore = plan.getScore();
 					if (plan.getScore()>person.getSelectedPlan().getScore()) rank++;
 				}
@@ -138,8 +142,8 @@ public class EstimationValidation {
 	}
 	
 	
-	private List<List<Double>> calculateSimilarity (){
-		MDSAM mdsam = new MDSAM(this.population);
+	private Map<Id,List<Double>> calculateSimilarity (){
+		MDSAM mdsam = new MDSAM(this.population, null);
 		return mdsam.runPopulation();
 	}
 	
