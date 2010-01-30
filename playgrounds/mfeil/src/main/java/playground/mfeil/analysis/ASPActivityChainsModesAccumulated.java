@@ -54,7 +54,7 @@ public class ASPActivityChainsModesAccumulated extends ASPActivityChainsModes{
 	
 	public ASPActivityChainsModesAccumulated(final PopulationImpl population) {
 		super (population);
-		this.outputDir = "/home/baug/mfeil/data/largeSet";
+		this.outputDir = "/home/baug/mfeil/data/choiceSet/it0";
 	//	this.outputDir = "./plans";
 	}
 	

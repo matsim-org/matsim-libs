@@ -64,7 +64,7 @@ public class TravelStatsMZMATSim {
 		
 		stream.println("\taveTripDistance\t\t\t\taveTripTravelTime\t\t\t\taveAgents\t\t\t\t\t\tPopSize");
 		stream.println("\tCar\tPT\tWalk\tBike\tCar\tPT\tWalk\tBike\tplanDistance\tplanTime\tnoOfCar\tnoOfPT\tnoOfWalk\tnoOfBike");	
-		this.runPopulation("MZ", this.populationMZ, stream);
+	//	this.runPopulation("MZ", this.populationMZ, stream);
 		this.runPopulation("MATSim", this.populationMATSim, stream);
 		
 		stream.close();
@@ -94,26 +94,30 @@ public class TravelStatsMZMATSim {
 			for (int i=1;i<plan.getPlanElements().size();i+=2){
 				LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 				if (leg.getMode().equals(TransportMode.car)) {
-					aveTripDistanceCarPop1 += leg.getRoute().getDistance();
+					if (leg.getRoute()!=null) aveTripDistanceCarPop1 += leg.getRoute().getDistance();
+					else log.warn("A car leg of person "+person.getId()+" has no route!");
 					aveTripTimeCarPop1 += leg.getTravelTime();
 					counterCar++;
 				}
 				else if (leg.getMode().equals(TransportMode.pt)) {
-					aveTripDistancePTPop1 += leg.getRoute().getDistance();
+					if (leg.getRoute()!=null) aveTripDistancePTPop1 += leg.getRoute().getDistance();
+					else log.warn("A pt leg of person "+person.getId()+" has no route!");
 					aveTripTimePTPop1 += leg.getTravelTime();
 					counterPT++;
 				}
 				else if (leg.getMode().equals(TransportMode.walk)) {
-					aveTripDistanceWalkPop1 += leg.getRoute().getDistance();
+					if (leg.getRoute()!=null) aveTripDistanceWalkPop1 += leg.getRoute().getDistance();
+					else log.warn("A walk leg of person "+person.getId()+" has no route!");
 					aveTripTimeWalkPop1 += leg.getTravelTime();
 					counterWalk++;
 				}
 				else if (leg.getMode().equals(TransportMode.bike)) {
-					aveTripDistanceBikePop1 += leg.getRoute().getDistance();
+					if (leg.getRoute()!=null) aveTripDistanceBikePop1 += leg.getRoute().getDistance();
+					else log.warn("A bike leg of person "+person.getId()+" has no route!");
 					aveTripTimeBikePop1 += leg.getTravelTime();
 					counterBike++;
 				}
-				else log.warn("Undefined transport mode for person "+plan.getPerson().getId());
+				else log.warn("Undefined transport mode for person "+plan.getPerson().getId()+": "+leg.getMode());
 			}		
 		}
 		stream.print(aveTripDistanceCarPop1/counterCar+"\t");
@@ -137,14 +141,14 @@ public class TravelStatsMZMATSim {
 	public static void main(final String [] args) {
 				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-				final String populationFilenameMATSim = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz02.xml";
+				final String populationFilenameMATSim = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
 				final String populationFilenameMZ = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
-				final String outputFile = "/home/baug/mfeil/data/largeSet/it1/trip_stats0216.xls";
+				final String outputFile = "/home/baug/mfeil/data/choiceSet/trip_stats_mz05.xls";
 	
 				ScenarioImpl scenarioMZ = new ScenarioImpl();
 				new MatsimNetworkReader(scenarioMZ).readFile(networkFilename);
 				new MatsimFacilitiesReader(scenarioMZ).readFile(facilitiesFilename);
-				new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
+			//	new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
 				
 				ScenarioImpl scenarioMATSim = new ScenarioImpl();
 				scenarioMATSim.setNetwork(scenarioMZ.getNetwork());

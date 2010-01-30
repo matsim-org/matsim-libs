@@ -336,9 +336,16 @@ public class ASPActivityChains {
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilenameMATSim = "/home/baug/mfeil/data/runs/run0922_initialdemand_20/output_plans.xml";
 		final String populationFilenameMZ = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
-		final String outputDir = "/home/baug/mfeil/data/runs/run0922_initialdemand_20";		
+		final String outputDir = "/home/baug/mfeil/data/runs/run0922_initialdemand_20";	
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
+		
+/*
+		final String populationFilename = "./plans/output_plans.xml";
+		final String networkFilename = "./plans/network.xml";
+		final String facilitiesFilename = "./plans/facilities.xml";
+		final String outputDir = "./plans";
 
+*/
 
 /*		final String populationFilename = "C:/Workspace/matsim/output/Test1/output_plans.xml.gz";
 		final String networkFilename = "C:/Workspace/matsim/test/scenarios/chessboard/network.xml";
