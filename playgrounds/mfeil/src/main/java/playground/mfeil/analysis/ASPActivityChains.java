@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -239,29 +240,53 @@ public class ASPActivityChains {
 		stream1.println((averageACLength/this.population.getPersons().size())+"\tAverage number of activities");
 		stream1.println();
 		
+		double[] kpis= this.analyzeActTypes(null);
+		stream1.println(kpis[0]+"\tAverage number of same consecutive acts per plan");
+		stream1.println(kpis[1]+"\tPercentage of same consecutive acts");
+		stream1.println(kpis[2]+"\tAverage number of occurrences of same acts per plan");
+		stream1.println(kpis[3]+"\tAverage number of same acts per plan");
+		stream1.println(kpis[4]+"\tAverage maximum number of same acts per plan");
+		stream1.println(kpis[5]+"\tShare of plans in which same acts occur");
+	}
+	
+	public double[] analyzeActTypes (final Map<Id, Double> personsWeights){
+		
+		double overall = 0;
+		for (int i=0; i<this.plans.size();i++){
+			for (int j=0;j<this.plans.get(i).size();j++){
+				if (personsWeights!=null) overall += personsWeights.get(((Plan)this.plans.get(i).get(j)).getPerson().getId());
+				else overall += this.plans.get(i).size();
+			}
+		}
+		
 		int sameCon = 0;
 		int sumActs = 0;
 		int occSame = 0;
 		int occSeveral = 0;
 		double numSame = 0;
 		double maxSame = 0;
+		
 		ArrayList<String> takenActTypes = new ArrayList<String>();
+		
 		for (int i=0; i<this.activityChains.size();i++){
 			for (int j=0; j<this.plans.get(i).size();j++){
+				
+				double weight = -1;
 				Plan plan = this.plans.get(i).get(j);
+				if (personsWeights!=null) weight = personsWeights.get(plan.getPerson().getId());
+				else weight = 1;
+				if (weight<0) log.warn("An invalid weight of "+weight+" has been assigned to person "+plan.getPerson().getId());
+				
 				takenActTypes.clear();
-				//log.info("Plan of person "+plan.getPerson().getId());
-				//for (int z=0;z<plan.getPlanElements().size();z+=2){
-				//	log.info("Act "+z+" is "+((ActivityImpl)(plan.getPlanElements().get(z))).getType());
-				//}				
+						
 				boolean occ = false;
 				boolean occSev = false;
 				double numPlanSame = 0;
 				double maxPlanSame = 0;
 				for (int k=0;k<plan.getPlanElements().size()-2;k+=2){
-					sumActs++;
+					sumActs+=weight;
 					if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().equals(((ActivityImpl)(plan.getPlanElements().get(k+2))).getType())){
-						sameCon++;
+						sameCon+=weight;
 						occ = true;
 					}
 					if (!takenActTypes.contains(((ActivityImpl)(plan.getPlanElements().get(k))).getType())){
@@ -285,24 +310,31 @@ public class ASPActivityChains {
 						if (max>maxPlanSame) maxPlanSame = max;
 					}
 				}
-				if (occ) occSame++;
-				if (occSev) occSeveral++;
+				if (occ) occSame+=weight;
+				if (occSev) occSeveral+=weight;
 				if (Math.floor(plan.getPlanElements().size()/2)>0) {
-					numSame += Double.parseDouble(numPlanSame+"")/Math.floor(plan.getPlanElements().size()/2);
-					maxSame += Double.parseDouble(maxPlanSame+"")/Math.floor(plan.getPlanElements().size()/2);
-					//log.info("numSame: "+Double.parseDouble(numPlanSame+"")/Math.floor(plan.getPlanElements().size()/2));
-					//log.info("maxSame: "+Double.parseDouble(maxPlanSame+"")/Math.floor(plan.getPlanElements().size()/2));
-					//log.info("occSame: "+occSame);
-					//log.info("occSeveral "+occSeveral);
+					numSame += weight*Double.parseDouble(numPlanSame+"")/Math.floor(plan.getPlanElements().size()/2);
+					maxSame += weight*Double.parseDouble(maxPlanSame+"")/Math.floor(plan.getPlanElements().size()/2);
 				}
 			}
 		}
+		
+		double [] kpis = new double[5];
+		kpis[0] = Double.parseDouble(sameCon+"")/overall;
+		kpis[1] = Double.parseDouble(sameCon+"")/sumActs;
+		kpis[2] = Double.parseDouble(occSame+"")/overall;
+		kpis[3] = numSame/overall;
+		kpis[4] = maxSame/occSeveral;
+		kpis[5] = Double.parseDouble(occSeveral+"")/overall;
+		return kpis;
+		/*
 		stream1.println((Double.parseDouble(sameCon+"")/this.population.getPersons().size())+"\tAverage number of same consecutive acts per plan");
 		stream1.println((Double.parseDouble(sameCon+"")/Double.parseDouble(sumActs+""))+"\tPercentage of same consecutive acts");
 		stream1.println((Double.parseDouble(occSame+"")/this.population.getPersons().size())+"\tAverage number of occurrences of same acts per plan");
 		stream1.println((numSame/this.population.getPersons().size())+"\tAverage number of same acts per plan");
 		stream1.println((maxSame/occSeveral)+"\tAverage maximum number of same acts per plan");
 		stream1.println(Double.parseDouble(occSeveral+"")/this.population.getPersons().size()+"\tShare of plans in which same acts occur");
+		*/
 	}
 	
 
