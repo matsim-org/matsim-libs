@@ -21,7 +21,7 @@ package playground.kai.ptproject.qsim.interfaces;
 
 import java.util.Queue;
 
-import org.matsim.core.mobsim.jdeqsim.Vehicle;
+import org.matsim.ptproject.qsim.QVehicle;
 
 /**Essentially the "driveway".  I think this is _directly_ a priority queue.
  * If this is so, then it might just delegate the collections container (may be slow!!).
@@ -30,8 +30,7 @@ import org.matsim.core.mobsim.jdeqsim.Vehicle;
  * @author nagel
  *
  */
-@Deprecated // do not yet use
-public interface WaitQueue extends Queue<Vehicle>{
+public interface WaitQueue extends Queue<QVehicle>{
 	// The "Vehicle" import (from jdqsim) does not make sense.
 
 }

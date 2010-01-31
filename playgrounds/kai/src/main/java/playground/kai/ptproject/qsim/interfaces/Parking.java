@@ -19,8 +19,11 @@
 
 package playground.kai.ptproject.qsim.interfaces;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.jdeqsim.Vehicle;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.ptproject.qsim.QVehicle;
 
 /**<p>
  * This is there to contain "vehicles".  
@@ -39,37 +42,25 @@ import org.matsim.core.mobsim.jdeqsim.Vehicle;
  * @author nagel
  *
  */
-@Deprecated // do not yet use
-public interface Parking {
+public class Parking {
+	WaitQueue wq = null ;
+	Map<Id,QVehicle> vehicles = null ;
 	
-	/**Receives the vehicle from the traffic link.  In this situation, it contains at least a driver, and possibly passengers.
-	 * 
-	 * @param veh
-	 * @return
-	 */
-	boolean addVehicleFromTrafficLink( Vehicle veh ) ;
+	/**Receives the vehicle from the traffic link.  In this situation, it contains at least a driver, and possibly passengers. */
+	void addVehicleFromTrafficLink( QVehicle veh ) {}
 	
-	/**Receives an empty vehicle.  Normally during initialization.
-	 * 
-	 * @param veh
-	 * @return
-	 */
-	boolean addEmptyVehicle( Vehicle veh ) ;
+	/**Receives an empty vehicle.  Normally during initialization. */
+	void addEmptyVehicle( QVehicle veh ) {
+		vehicles.put( veh.getId(), veh ) ;
+	}
 	
-	/**Receives a driver, typically from an activity.
-	 * 
-	 * @param person
-	 * @return
-	 */
-	boolean addDriver( Person person ) ;
-	// Should this be a person?  Or a DriverAgent?  Or a QPerson?
-
-	
-	// If we assume that the departure sequence is:
-	// - agent enters parking facility, 
-	// - enters vehicle, and 
-	// - departs, 
-	// then a "removeVehicle" command is not needed, since this can be done inside
-	// the driver departure
+	/**Receives a driver, typically from an activity. */
+	void addDriver( DriverAgent driver ) {
+		// person.getVehicleId ;
+		Id vehId = null ; // dummy 
+		QVehicle veh = vehicles.get( vehId ) ;
+		veh.setDriver( driver ) ;
+		wq.add( veh ) ;
+	}
 	
 }

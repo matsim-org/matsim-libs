@@ -20,27 +20,23 @@
 package playground.kai.ptproject.qsim.interfaces;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.ptproject.qsim.PersonAgentI;
 
 /**
  * @author nagel
  *
  */
-@Deprecated // do not yet use
-public interface BusStop {
+public class BusStop {
 	
-	/**Adding a person that eventually wants to board a bus.
-	 * 
-	 * @param person
-	 * @return
-	 */
-	boolean addPerson( Person person ) ;
+	/**Adding a person that eventually wants to board a bus.	 */
+	void addPerson( PersonAgentI person ) {}
 	
-	/**Getting the persons for a certain pt line one by one
-	 * 
-	 * @param busLine
-	 * @return
-	 */
-	Person getNextPersonForPTLine( String busLine ) ;
+	/**Getting the persons for a certain pt line one by one	 */
+	Person getNextPersonForPTLine( String busLine ) {
+		return new PersonImpl(new IdImpl("lsdkfj")) ; // dummy
+	}
 	// get the types right!!
 
 }

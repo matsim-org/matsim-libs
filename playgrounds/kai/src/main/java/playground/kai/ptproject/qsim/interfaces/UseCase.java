@@ -19,37 +19,38 @@
 
 package playground.kai.ptproject.qsim.interfaces;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.ptproject.qsim.PersonAgent;
+import org.matsim.ptproject.qsim.PersonAgentI;
+import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.QueueVehicleImpl;
 
 /**
  * @author nagel
  *
  */
-@Deprecated // do not yet use
-public interface ActivityFacility {
-	// that name is already taken.
-	
-	/**Adding a person, normally to do an activity.
-	 * 
-	 * @param person
-	 * @return
+public class UseCase {
+
+	/**
+	 * @param args
 	 */
-	boolean addPerson( Person person ) ;
-	// Is the "person" enough, or do we need to know how far s/he is in her/his plan?
-	
-	boolean update() ;
-	// We can either say something like
-	//    Person person = actFac.peekPersons() ;
-	//    if ( nextDepartureTime( person ) <= now ) {
-	//        actFac.remove( person ) ;
-	//        parking.add( person ) ;
-	//    }
-	// _or_ something like
-	//    actFac.update()
-	// and contain the above dynamics _inside_ the container.
-	//
-	// Intuitions?
-	//
-	// The interface is more minimal in the second case.
+	public static void main(String[] args) {
+		Scenario sc = new ScenarioImpl() ;
+		Person person = sc.getPopulation().getFactory().createPerson(null) ;
+		PersonAgentI qperson = new PersonAgent( person, null ) ;
+		MobsimActivityFacility actFac = new MobsimActivityFacility() ;
+		actFac.addPerson( qperson ) ;
+		
+		QVehicle veh = new QueueVehicleImpl(null) ;
+		Parking parking = new Parking() ;
+		parking.addEmptyVehicle( veh ) ;
+		
+		actFac.selfUpdate() ;
+		
+		
+		
+	}
 
 }
