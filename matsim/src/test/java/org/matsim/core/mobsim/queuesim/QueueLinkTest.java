@@ -87,6 +87,10 @@ public class QueueLinkTest extends MatsimTestCase {
 			e = ex;
 		}
 		assertNotNull(e);
+		// According to Dominik, this exception should _not_ be null since the qlink.add(veh) needs a "getEvents()",
+		// which should be undefined in this setup.  If it is not undefined, it is a leftover from somewhere else
+		// (which explains why the test in isolation may work, but may NOT work as part of the full suite).  kai, jan'10
+		
 		assertEquals(1, f.qlink1.vehOnLinkCount());
 		assertFalse(f.qlink1.hasSpace());
 		assertTrue(f.qlink1.bufferIsEmpty());
