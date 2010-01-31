@@ -49,7 +49,7 @@ public class MDSAM {
 
 	private final PopulationImpl population;
 	private Map<Id,List<Double>> sims;
-	private final double GWact, GWmode, GWlocation; 
+	private final double GWtime, GWact, GWmode, GWlocation; 
 	private static final Logger log = Logger.getLogger(MDSAM.class);
 	private final String outputFile;
 	private boolean printing;
@@ -59,6 +59,7 @@ public class MDSAM {
 
 	public MDSAM(final PopulationImpl population, final String mdsamOutputFile) {
 		this.population=population;
+		this.GWtime = 0.5;
 		this.GWact = 2.0;
 		this.GWmode = 1.0;
 		this.GWlocation = 1.0;
@@ -91,30 +92,35 @@ public class MDSAM {
 			ArrayList<Double> intermediateList = new ArrayList<Double>();
 			double [][] matrix = new double [person.getPlans().size()][person.getPlans().size()]; //store a person's similarities among plans
 			
+			// Needed for printing
+			int longestPlan = -1;
+			for (int z=0;z<person.getPlans().size();z++){
+				if (person.getPlans().get(z).getPlanElements().size()>longestPlan) longestPlan = person.getPlans().get(z).getPlanElements().size();
+			}
+			longestPlan = longestPlan/2;
+			
 			for (int i=0;i<person.getPlans().size();i++){
-				Plan plan = person.getPlans().get(i);
-				
+				Plan plan = person.getPlans().get(i);				
 				if (this.printing){
 					stream.println("Person "+person.getId());
 					stream.println("origPlan");
 					stream.print("Acts\t");
-					for (int k=0;k<person.getSelectedPlan().getPlanElements().size();k+=2){
-						stream.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getType()+"\t");
+					for (int k=0;k<plan.getPlanElements().size();k+=2){
+						stream.print(((ActivityImpl)(plan.getPlanElements().get(k))).getType()+"\t");
 					}
-					if (person.getSelectedPlan().getPlanElements().size()<plan.getPlanElements().size()){
-						for (int z=0;z<(plan.getPlanElements().size()-person.getSelectedPlan().getPlanElements().size())/2;z++) stream.print("\t");
-					}
+					for (int z=0;z<longestPlan-plan.getPlanElements().size()/2;z++) stream.print("\t");
 					stream.print("\tModes\t");
-					for (int k=1;k<person.getSelectedPlan().getPlanElements().size();k+=2){
-						stream.print(((LegImpl)(person.getSelectedPlan().getPlanElements().get(k))).getMode()+"\t");
+					for (int k=1;k<plan.getPlanElements().size();k+=2){
+						stream.print(((LegImpl)(plan.getPlanElements().get(k))).getMode()+"\t");
 					}
-					if (person.getSelectedPlan().getPlanElements().size()<plan.getPlanElements().size()){
-						for (int z=0;z<(plan.getPlanElements().size()-person.getSelectedPlan().getPlanElements().size())/2;z++) stream.print("\t");
-					}
+					for (int z=0;z<longestPlan-plan.getPlanElements().size()/2;z++) stream.print("\t");
 					stream.print("\tLocations\t");
-					for (int k=0;k<person.getSelectedPlan().getPlanElements().size();k+=2){
-						stream.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getLinkId()+"\t");
+					for (int k=0;k<plan.getPlanElements().size();k+=2){
+						stream.print(((ActivityImpl)(plan.getPlanElements().get(k))).getLinkId()+"\t");
 					}
+					stream.print("\tTimings\t");
+					double[] timings = this.calculateTimings(plan);
+					stream.print("Home\t"+timings[0]+"Work\t"+timings[1]+"Education\t"+timings[2]+"Leisure\t"+timings[3]+"Shop\t"+timings[4]);
 					stream.println();
 				}
 				
@@ -126,23 +132,22 @@ public class MDSAM {
 						if (this.printing){
 							stream.println("comparePlan");
 							stream.print("Acts\t");
-							for (int k=0;k<plan.getPlanElements().size();k+=2){
-								stream.print(((ActivityImpl)(plan.getPlanElements().get(k))).getType()+"\t");
+							for (int k=0;k<person.getPlans().get(j).getPlanElements().size();k+=2){
+								stream.print(((ActivityImpl)(person.getPlans().get(j).getPlanElements().get(k))).getType()+"\t");
 							}
-							if (person.getSelectedPlan().getPlanElements().size()>plan.getPlanElements().size()){
-								for (int z=0;z<(person.getSelectedPlan().getPlanElements().size()-plan.getPlanElements().size())/2;z++) stream.print("\t");
-							}
+							for (int z=0;z<longestPlan-person.getPlans().get(j).getPlanElements().size()/2;z++) stream.print("\t");
 							stream.print("\tModes\t");
-							for (int k=1;k<plan.getPlanElements().size();k+=2){
-								stream.print(((LegImpl)(plan.getPlanElements().get(k))).getMode()+"\t");
+							for (int k=1;k<person.getPlans().get(j).getPlanElements().size();k+=2){
+								stream.print(((LegImpl)(person.getPlans().get(j).getPlanElements().get(k))).getMode()+"\t");
 							}
-							if (person.getSelectedPlan().getPlanElements().size()>plan.getPlanElements().size()){
-								for (int z=0;z<(person.getSelectedPlan().getPlanElements().size()-plan.getPlanElements().size())/2;z++) stream.print("\t");
-							}
+							for (int z=0;z<longestPlan-person.getPlans().get(j).getPlanElements().size()/2;z++) stream.print("\t");
 							stream.print("\tLocations\t");
-							for (int k=0;k<plan.getPlanElements().size();k+=2){
-								stream.print(((ActivityImpl)(plan.getPlanElements().get(k))).getLinkId()+"\t");
+							for (int k=0;k<person.getPlans().get(j).getPlanElements().size();k+=2){
+								stream.print(((ActivityImpl)(person.getPlans().get(j).getPlanElements().get(k))).getLinkId()+"\t");
 							}
+							stream.print("\tTimings\t");
+							double[] timings = this.calculateTimings(person.getPlans().get(j));
+							stream.print("Home\t"+timings[0]+"Work\t"+timings[1]+"Education\t"+timings[2]+"Leisure\t"+timings[3]+"Shop\t"+timings[4]);
 							stream.println();
 						}
 						matrix[i][j] = this.runPlans(person.getPlans().get(j), plan, stream);
@@ -172,7 +177,6 @@ public class MDSAM {
 		// Length is number of acts minus last home plus 0th position, or number of legs respectively
 		
 		double [][][] table = new double [3][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
-		//double [][][] table = new double [1][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
 		
 		for (int k=0;k<table.length;k++){
 			double GW = 0;
@@ -304,6 +308,23 @@ public class MDSAM {
 			}
 		}
 		
+		// Timings		
+		double[] origTimings = this.calculateTimings(origPlan);
+		double[] compareTimings = this.calculateTimings(comparePlan);
+		double diff = 0;
+		for (int z=0;z<origTimings.length;z++){
+			diff += java.lang.Math.abs(origTimings[z]-compareTimings[z]);
+			if (this.printing){
+				if (z==0)stream.println(java.lang.Math.abs(origTimings[z]-compareTimings[z])+"\thome");
+				else if (z==1)stream.println(java.lang.Math.abs(origTimings[z]-compareTimings[z])+"\twork");
+				else if (z==2)stream.println(java.lang.Math.abs(origTimings[z]-compareTimings[z])+"\teducation");
+				else if (z==3)stream.println(java.lang.Math.abs(origTimings[z]-compareTimings[z])+"\tleisure");
+				else if (z==4)stream.println(java.lang.Math.abs(origTimings[z]-compareTimings[z])+"\tshop");
+				else log.warn("Unknown act type in timings printing!");
+			}
+		}
+		if (this.printing)stream.println();
+		
 		
 		double sum=0;
 		for (int m=0;m<oset.size();m++){
@@ -313,6 +334,8 @@ public class MDSAM {
 			if (dimensions.get(m).contains(2)) GW = java.lang.Math.max(GW, this.GWlocation);
 			sum += GW;
 		}
+		sum += this.GWtime*diff;
+		
 		if (this.printing){
 			stream.println("Sum is "+sum);
 			stream.println();
@@ -347,6 +370,29 @@ public class MDSAM {
 		// return minimum of ins, del, sub
 		del = java.lang.Math.min(del, ins);		
 		return java.lang.Math.min(del, sub);
+	}
+	
+	private double[] calculateTimings(Plan plan){
+		double home = 0;
+		double work = 0;
+		double education = 0;
+		double leisure = 0;
+		double shop = 0;
+		for (int k=0;k<plan.getPlanElements().size();k+=2){
+			if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("h")) home+=((ActivityImpl)(plan.getPlanElements().get(k))).calculateDuration();
+			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("w")) work+=((ActivityImpl)(plan.getPlanElements().get(k))).calculateDuration();
+			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("e")) education+=((ActivityImpl)(plan.getPlanElements().get(k))).calculateDuration();
+			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("l")) leisure+=((ActivityImpl)(plan.getPlanElements().get(k))).calculateDuration();
+			else if (((ActivityImpl)(plan.getPlanElements().get(k))).getType().startsWith("s")) shop+=((ActivityImpl)(plan.getPlanElements().get(k))).calculateDuration();
+			else log.warn("Unknown act type for person "+plan.getPerson().getId());
+		}
+		double[] timings = new double[5];
+		timings[0]=home/3600;
+		timings[1]=work/3600;
+		timings[2]=education/3600;
+		timings[3]=leisure/3600;
+		timings[4]=shop/3600;
+		return timings;
 	}
 }
 	

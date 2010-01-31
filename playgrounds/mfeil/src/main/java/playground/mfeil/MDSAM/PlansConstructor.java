@@ -1674,7 +1674,9 @@ public class PlansConstructor implements PlanStrategyModule{
 					boolean found = false;
 					for (int j=0;j<this.simsPosition.get(p.getId()).length;j++){
 						if (this.simsPosition.get(p.getId())[j]==i){
-							stream.print(this.sims.get(p.getId()).get(j)+"\t");
+							double value = this.sims.get(p.getId()).get(j);
+							stream.print(value+"\t");
+							stats[(int)(value)]++;
 							found=true;
 							break;
 						}
