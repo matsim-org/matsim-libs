@@ -60,8 +60,9 @@ public class ASPGeneral {
 	private ASPActivityChains sp;
 	private ASPActivityChains spMZ;
 	private Map<Id, Double> personsWeights;
+	private PrintStream stream;
 	
-	private void runMATSim (final PopulationImpl population){
+	private void runMATSimActivityChains (final PopulationImpl population){
 		log.info("Analyzing MATSim population...");
 		this.sp = new ASPActivityChains(population);
 		this.sp.run();
@@ -90,7 +91,7 @@ public class ASPGeneral {
 		return pop;
 	}
 	
-	private void runMZ (final PopulationImpl population){
+	private void runMZActivityChains (final PopulationImpl population){
 		log.info("Analyzing MZ population...");
 		// Analyze the activity chains
 		this.spMZ = new ASPActivityChains(population);
@@ -100,21 +101,24 @@ public class ASPGeneral {
 		log.info("done.");
 	}
 	
-	private void compareMATSimAndMZ (final String compareOutput){
-		PrintStream stream;
+	private void initiatePrinter(final String compareOutput){
 		try {
-			stream = new PrintStream (new File(compareOutput));
+			this.stream = new PrintStream (new File(compareOutput));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
 		}
+	}
+	
+	private void compareMATSimAndMZActivityChains (){
 		
 		/* Analysis of activity chains */
 		double averageACLengthMZWeighted=0;
 		double averageACLengthMZUnweighted=0;
 		double averageACLengthMATSim=0;
-		stream.println("MZ_weighted\t\tMZ_not_weighted\t\tMATSim");
-		stream.println("Number of occurrences\tRelative\tNumber of occurrences\tRelative\tNumber of occurrences\tRelative\tActivity chain");
+		this.stream.println("Activity chains");
+		this.stream.println("MZ_weighted\t\tMZ_not_weighted\t\tMATSim");
+		this.stream.println("Number of occurrences\tRelative\tNumber of occurrences\tRelative\tNumber of occurrences\tRelative\tActivity chain");
 		
 		// Overall weighted and unweighted number of persons in MZ	
 		double overallWeight = 0;
@@ -136,58 +140,68 @@ public class ASPGeneral {
 		for (int i=0;i<this.activityChainsMZ.size();i++){
 			// MZ weighted
 			double weight = 0;
-			for (int j=0;j<this.plansMZ.size();j++){
-				weight += this.personsWeights.get(((Plan) this.plansMZ.get(j)).getPerson());
+			for (int j=0;j<this.plansMZ.get(i).size();j++){
+				weight += this.personsWeights.get(((Plan) this.plansMZ.get(i).get(j)).getPerson().getId());
 			}
-			stream.print(weight+"\t"+weight/overallWeight+"\t");
+			this.stream.print(weight+"\t"+weight/overallWeight+"\t");
 			
 			// MZ unweighted
-			stream.print(this.plansMZ.get(i).size()+"\t"+this.plansMZ.get(i).size()/overallUnweighted+"\t");
+			this.stream.print(this.plansMZ.get(i).size()+"\t"+this.plansMZ.get(i).size()/overallUnweighted+"\t");
 			
 			// MATSim
 			boolean found = false;
 			for (int k=0;k<this.activityChainsMATSim.size();k++){
 				if (check.checkEqualActChains(this.activityChainsMATSim.get(k), this.activityChainsMZ.get(i))){
-					stream.print(this.plansMATSim.get(k).size()+"\t"+this.plansMATSim.get(k).size()/overallMATSim+"\t");
+					this.stream.print(this.plansMATSim.get(k).size()+"\t"+this.plansMATSim.get(k).size()/overallMATSim+"\t");
 					found = true;
 					break;
 				}
 			}
-			if (!found) stream.print("0\t0\t");
+			if (!found) this.stream.print("0\t0\t");
 			
 			// Activity chain
 			for (int j=0; j<this.activityChainsMZ.size();j=j+2){
-				stream.print(((ActivityImpl)(this.activityChainsMZ.get(i).get(j))).getType()+"\t");
+				this.stream.print(((ActivityImpl)(this.activityChainsMZ.get(i).get(j))).getType()+"\t");
 			}
-			stream.println();
+			this.stream.println();
 		}
 		
 		// Calculate missing MATSim chains
 		for (int i=0;i<this.activityChainsMATSim.size();i++){
 			for (int k=0;k<this.activityChainsMZ.size();k++){
 				if (check.checkEqualActChains(this.activityChainsMATSim.get(i), this.activityChainsMZ.get(k))){
-					stream.print("0\t0\t0\t0\t"+this.plansMATSim.get(i).size()+"\t"+this.plansMATSim.get(i).size()/overallMATSim+"\t");
+					this.stream.print("0\t0\t0\t0\t"+this.plansMATSim.get(i).size()+"\t"+this.plansMATSim.get(i).size()/overallMATSim+"\t");
 					for (int j=0; j<this.activityChainsMATSim.size();j=j+2){
-						stream.print(((ActivityImpl)(this.activityChainsMATSim.get(i).get(j))).getType()+"\t");
+						this.stream.print(((ActivityImpl)(this.activityChainsMATSim.get(i).get(j))).getType()+"\t");
 					}
-					stream.println();
+					this.stream.println();
 					break;
 				}
 			}
 		}
 		// Average lenghts of act chains
-		stream.println((averageACLengthMZWeighted/overallWeight)+"\t\t"+(averageACLengthMZUnweighted/overallUnweighted)+"\t\t"+(averageACLengthMATSim/overallMATSim)+"\tAverage number of activities");
-		stream.println();
+		this.stream.println((averageACLengthMZWeighted/overallWeight)+"\t\t"+(averageACLengthMZUnweighted/overallUnweighted)+"\t\t"+(averageACLengthMATSim/overallMATSim)+"\tAverage number of activities");
+		this.stream.println();
 		
 		double[] kpisMZWeighted = this.spMZ.analyzeActTypes(this.personsWeights);
 		double[] kpisMZUnweighted = this.spMZ.analyzeActTypes(null);
 		double[] kpisMATSim = this.sp.analyzeActTypes(null);
-		stream.println(kpisMZWeighted[0]+"\t\t"+kpisMZUnweighted[0]+"\t\t"+kpisMATSim[0]+"\tAverage number of same consecutive acts per plan");
-		stream.println(kpisMZWeighted[1]+"\t\t"+kpisMZUnweighted[1]+"\t\t"+kpisMATSim[1]+"\tPercentage of same consecutive acts");
-		stream.println(kpisMZWeighted[2]+"\t\t"+kpisMZUnweighted[2]+"\t\t"+kpisMATSim[2]+"\tAverage number of occurrences of same acts per plan");
-		stream.println(kpisMZWeighted[3]+"\t\t"+kpisMZUnweighted[3]+"\t\t"+kpisMATSim[3]+"\tAverage number of same acts per plan");
-		stream.println(kpisMZWeighted[4]+"\t\t"+kpisMZUnweighted[4]+"\t\t"+kpisMATSim[4]+"\tAverage maximum number of same acts per plan");
-		stream.println(kpisMZWeighted[5]+"\t\t"+kpisMZUnweighted[5]+"\t\t"+kpisMATSim[5]+"\tShare of plans in which same acts occur");
+		this.stream.println(kpisMZWeighted[0]+"\t\t"+kpisMZUnweighted[0]+"\t\t"+kpisMATSim[0]+"\tAverage number of same consecutive acts per plan");
+		this.stream.println(kpisMZWeighted[1]+"\t\t"+kpisMZUnweighted[1]+"\t\t"+kpisMATSim[1]+"\tPercentage of same consecutive acts");
+		this.stream.println(kpisMZWeighted[2]+"\t\t"+kpisMZUnweighted[2]+"\t\t"+kpisMATSim[2]+"\tAverage number of occurrences of same acts per plan");
+		this.stream.println(kpisMZWeighted[3]+"\t\t"+kpisMZUnweighted[3]+"\t\t"+kpisMATSim[3]+"\tAverage number of same acts per plan");
+		this.stream.println(kpisMZWeighted[4]+"\t\t"+kpisMZUnweighted[4]+"\t\t"+kpisMATSim[4]+"\tAverage maximum number of same acts per plan");
+		this.stream.println(kpisMZWeighted[5]+"\t\t"+kpisMZUnweighted[5]+"\t\t"+kpisMATSim[5]+"\tShare of plans in which same acts occur");
+	}
+	
+	private void runMATSimTrips (PopulationImpl pop){
+		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
+		ts.printHeader(this.stream);
+		ts.runPopulation("MATSim", pop, this.stream);
+	}
+	
+	private void runMZTrips (PopulationImpl pop){
+		new TravelStatsMZMATSim().runPopulation("MZ", pop, this.stream);
 	}
 	
 	public static void main(final String [] args) {
@@ -203,7 +217,7 @@ public class ASPGeneral {
 		final String populationFilenameMZ = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
 		
 		// Output file
-		final String outputFile = "/home/baug/mfeil/data/runs/run0922_initialdemand_20";	
+		final String outputFile = "/home/baug/mfeil/data/runs/run0922_initialdemand_20/analysis.xls";	
 		
 		// Settings
 		final boolean compareWithMZ = true; 
@@ -223,15 +237,20 @@ public class ASPGeneral {
 			new MatsimFacilitiesReader(scenarioMZ).readFile(facilitiesFilename);
 			new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
 		}
-
 		
 		ASPGeneral asp = new ASPGeneral();
-		asp.runMATSim(scenarioMATSim.getPopulation());
+		asp.initiatePrinter(outputFile);
+		asp.runMATSimActivityChains(scenarioMATSim.getPopulation());
 		
 		if (compareWithMZ) {
 			PopulationImpl pop = asp.reducePopulation(scenarioMZ.getPopulation(), attributesInputFile);
-			asp.runMZ(pop);
-			asp.compareMATSimAndMZ(outputFile);
+			asp.runMZActivityChains(pop);
+			asp.compareMATSimAndMZActivityChains();
+		}
+		
+		asp.runMATSimTrips(scenarioMATSim.getPopulation());
+		if (compareWithMZ) {
+			asp.runMZTrips(scenarioMZ.getPopulation());
 		}
 
 		

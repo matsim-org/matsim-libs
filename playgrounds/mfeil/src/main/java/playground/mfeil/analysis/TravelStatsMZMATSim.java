@@ -43,34 +43,33 @@ import org.matsim.core.population.PopulationImpl;
  * @author mfeil
  */
 public class TravelStatsMZMATSim {
-
-	private final PopulationImpl populationMZ, populationMATSim;
+	
 	private static final Logger log = Logger.getLogger(TravelStatsMZMATSim.class);
 
-
-	public TravelStatsMZMATSim(final PopulationImpl populationMZ, final PopulationImpl populationMATSim) {
-		this.populationMZ = populationMZ;
-		this.populationMATSim = populationMATSim;
-	}	
-	
-	private void run(String outputFile){
+	private PrintStream initiatePrinter(String outputFile){
 		PrintStream stream;
 		try {
 			stream = new PrintStream (new File(outputFile));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			return;
+			return null;
 		}
-		
+		return stream;
+	}
+	
+	public void printHeader(PrintStream stream){
+		stream.println("Trips");
 		stream.println("\taveTripDistance\t\t\t\taveTripTravelTime\t\t\t\taveAgents\t\t\t\t\t\tPopSize");
 		stream.println("\tCar\tPT\tWalk\tBike\tCar\tPT\tWalk\tBike\tplanDistance\tplanTime\tnoOfCar\tnoOfPT\tnoOfWalk\tnoOfBike");	
-		this.runPopulation("MZ", this.populationMZ, stream);
-		this.runPopulation("MATSim", this.populationMATSim, stream);
-		
-		stream.close();
+	}
+	
+	public void run(PopulationImpl populationMZ, PopulationImpl populationMATSim, PrintStream stream){
+				
+		this.runPopulation("MZ", populationMZ, stream);
+		this.runPopulation("MATSim", populationMATSim, stream);
 	}
 		
-		private void runPopulation (String name, PopulationImpl population, PrintStream stream){
+	public void runPopulation (String name, PopulationImpl population, PrintStream stream){
 		
 		// Initiate output
 		double aveTripDistanceCarPop1 = 0;
@@ -155,8 +154,10 @@ public class TravelStatsMZMATSim {
 				new MatsimFacilitiesReader(scenarioMATSim).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioMATSim).readFile(populationFilenameMATSim);
 								
-				TravelStatsMZMATSim ts = new TravelStatsMZMATSim(scenarioMZ.getPopulation(), scenarioMATSim.getPopulation());
-				ts.run(outputFile);
+				TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
+				PrintStream stream = ts.initiatePrinter(outputFile);
+				ts.printHeader(stream);
+				ts.run(scenarioMZ.getPopulation(), scenarioMATSim.getPopulation(), stream);
 				log.info("Process finished.");
 			}
 }
