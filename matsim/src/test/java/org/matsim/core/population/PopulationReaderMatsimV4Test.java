@@ -87,6 +87,41 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		assertEquals("different endLink for third leg.", network.getLinks().get(scenario.createId("1")).getId(), route2b.getEndLinkId());
 	}
 
+	/**
+	 * Tests that reading in plans that contain route-elements, but the activities before or after do
+	 * not contain any link-information, works. This can be the case if the given routes are part of
+	 * a teleported transport mode, where links may not be required.
+	 */
+	public void testReadRouteWithoutActivityLinks() {
+		final ScenarioImpl scenario = new ScenarioImpl();
+		final PopulationImpl population = scenario.getPopulation();
+
+		PopulationReaderMatsimV4 parser = new PopulationReaderMatsimV4(scenario);
+
+		Stack<String> context = new Stack<String>(); // seems to be not used by reader
+		parser.startTag("plans", new AttributesBuilder().add("name", "").get(), context);
+		parser.startTag("person", new AttributesBuilder().add("id", "981").get(), context);
+		parser.startTag("plan", new AttributesBuilder().add("selected", "yes").get(), context);
+		parser.startTag("act", new AttributesBuilder().add("type", "h").add("x", "125").add("y", "500").add("end_time", "08:00:00").get(), context);
+		parser.endTag("act", null, context);
+		parser.startTag("leg", new AttributesBuilder().add("mode", "pt").get(), context);
+		parser.startTag("route", new AttributesBuilder().add("dist", "1980.11").get(), context);
+		parser.endTag("route", "   ", context);
+		parser.endTag("leg", null, context);
+		parser.startTag("act", new AttributesBuilder().add("type", "w").add("x", "500").add("y", "1100").add("start_time", "10:05:00").get(), context);
+		parser.endTag("act", null, context);
+		parser.endTag("plan", null, context);
+		parser.endTag("person", null, context);
+		parser.endTag("plans", null, context);
+
+		assertEquals("population size.", 1, population.getPersons().size());
+		Person person1 = population.getPersons().get(scenario.createId("981"));
+		Plan plan1 = person1.getPlans().get(0);
+		LegImpl leg1 = (LegImpl) plan1.getPlanElements().get(1);
+		RouteWRefs route1 = leg1.getRoute();
+		assertNotNull(route1);
+	}
+
 	public void testReadActivity() {
 		final ScenarioImpl scenario = new ScenarioImpl();
 		final NetworkLayer network = scenario.getNetwork();
