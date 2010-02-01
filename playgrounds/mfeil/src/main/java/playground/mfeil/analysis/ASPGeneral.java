@@ -68,7 +68,7 @@ public class ASPGeneral {
 		this.sp.run();
 		this.activityChainsMATSim = sp.getActivityChains();
 		this.plansMATSim = sp.getPlans();
-		log.info("done.");
+		log.info("done. "+this.activityChainsMATSim.size()+" act chains.");
 	}
 	
 	private PopulationImpl reducePopulation (PopulationImpl pop, final String attributesInputFile){
@@ -97,8 +97,9 @@ public class ASPGeneral {
 		this.spMZ = new ASPActivityChains(population);
 		this.spMZ.run();
 		this.activityChainsMZ = spMZ.getActivityChains();
+		this.activityChainsMZ = this.normalizeActTypes(this.activityChainsMZ);
 		this.plansMZ = spMZ.getPlans();
-		log.info("done.");
+		log.info("done. "+this.activityChainsMZ.size()+" act chains.");
 	}
 	
 	private void initiatePrinter(final String compareOutput){
@@ -125,9 +126,9 @@ public class ASPGeneral {
 		double overallUnweighted = 0;
 		double overallMATSim = 0;
 		for (int i=0; i<this.plansMZ.size();i++){
+			overallUnweighted += this.plansMZ.get(i).size();
 			for (int j=0;j<this.plansMZ.get(i).size();j++){
 				overallWeight += this.personsWeights.get(((Plan)this.plansMZ.get(i).get(j)).getPerson().getId());
-				overallUnweighted += this.plansMZ.get(i).size();
 			}
 		}
 		// Overall number of persons in MATSim
@@ -160,7 +161,7 @@ public class ASPGeneral {
 			if (!found) this.stream.print("0\t0\t");
 			
 			// Activity chain
-			for (int j=0; j<this.activityChainsMZ.size();j=j+2){
+			for (int j=0; j<this.activityChainsMZ.get(i).size();j=j+2){
 				this.stream.print(((ActivityImpl)(this.activityChainsMZ.get(i).get(j))).getType()+"\t");
 			}
 			this.stream.println();
@@ -168,17 +169,22 @@ public class ASPGeneral {
 		
 		// Calculate missing MATSim chains
 		for (int i=0;i<this.activityChainsMATSim.size();i++){
+			boolean found = false;
 			for (int k=0;k<this.activityChainsMZ.size();k++){
 				if (check.checkEqualActChains(this.activityChainsMATSim.get(i), this.activityChainsMZ.get(k))){
-					this.stream.print("0\t0\t0\t0\t"+this.plansMATSim.get(i).size()+"\t"+this.plansMATSim.get(i).size()/overallMATSim+"\t");
-					for (int j=0; j<this.activityChainsMATSim.size();j=j+2){
-						this.stream.print(((ActivityImpl)(this.activityChainsMATSim.get(i).get(j))).getType()+"\t");
-					}
-					this.stream.println();
+					found = true;
 					break;
 				}
 			}
+			if (!found){
+				this.stream.print("0\t0\t0\t0\t"+this.plansMATSim.get(i).size()+"\t"+this.plansMATSim.get(i).size()/overallMATSim+"\t");
+				for (int j=0; j<this.activityChainsMATSim.get(i).size();j=j+2){
+					this.stream.print(((ActivityImpl)(this.activityChainsMATSim.get(i).get(j))).getType()+"\t");
+				}
+				this.stream.println();
+			}
 		}
+		
 		// Average lenghts of act chains
 		this.stream.println((averageACLengthMZWeighted/overallWeight)+"\t\t"+(averageACLengthMZUnweighted/overallUnweighted)+"\t\t"+(averageACLengthMATSim/overallMATSim)+"\tAverage number of activities");
 		this.stream.println();
@@ -202,6 +208,33 @@ public class ASPGeneral {
 	
 	private void runMZTrips (PopulationImpl pop){
 		new TravelStatsMZMATSim().runPopulation("MZ", pop, this.stream);
+	}
+	
+	private void runMATSimTimings (PopulationImpl pop){
+		ActTimingsMZMATSim at = new ActTimingsMZMATSim();
+		at.printHeader(this.stream);
+		at.runPopulation("MATSim", pop, this.stream);
+	}
+	
+	private void runMZTimings (PopulationImpl pop){
+		new ActTimingsMZMATSim().runPopulation("MZ", pop, this.stream);
+	}
+	
+	private ArrayList<List<PlanElement>> normalizeActTypes (ArrayList<List<PlanElement>> actChains){
+		log.info("Normalizing act types ...");
+		for (int i=0;i<actChains.size();i++){
+			for (int j=0;j<actChains.get(i).size();j+=2){
+				ActivityImpl act = (ActivityImpl) actChains.get(i).get(j);
+				if (act.getType().startsWith("h")) act.setType("home");
+				else if (act.getType().startsWith("w")) act.setType("work");
+				else if (act.getType().startsWith("e")) act.setType("education");
+				else if (act.getType().startsWith("l")) act.setType("leisure");
+				else if (act.getType().startsWith("s")) act.setType("shop");
+				else log.warn("Unknown act type in actChain "+i+" at position "+j);
+			}
+		}
+		log.info("done.");
+		return actChains;
 	}
 	
 	public static void main(final String [] args) {
@@ -251,6 +284,11 @@ public class ASPGeneral {
 		asp.runMATSimTrips(scenarioMATSim.getPopulation());
 		if (compareWithMZ) {
 			asp.runMZTrips(scenarioMZ.getPopulation());
+		}
+		
+		asp.runMATSimTimings(scenarioMATSim.getPopulation());
+		if (compareWithMZ) {
+			asp.runMZTimings(scenarioMZ.getPopulation());
 		}
 
 		

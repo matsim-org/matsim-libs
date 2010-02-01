@@ -319,7 +319,7 @@ public class ASPActivityChains {
 			}
 		}
 		
-		double [] kpis = new double[5];
+		double [] kpis = new double[6];
 		kpis[0] = Double.parseDouble(sameCon+"")/overall;
 		kpis[1] = Double.parseDouble(sameCon+"")/sumActs;
 		kpis[2] = Double.parseDouble(occSame+"")/overall;
