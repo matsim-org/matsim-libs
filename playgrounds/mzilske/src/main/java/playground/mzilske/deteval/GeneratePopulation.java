@@ -333,7 +333,7 @@ public class GeneratePopulation {
 				if (palter.equals("997")) {
 					// Verweigert
 				} else if (palter.equals("998")) {
-					// Wei§ nicht
+					// Weiss nicht
 				} else if (palter.equals("999")) {
 					// Keine Angabe
 				} else {
