@@ -89,8 +89,6 @@ public class ActTimingsMZMATSim {
 		int counterShop = 0;
 		int size = population.getPersons().size();
 		
-		stream.print(name+"\t");
-		
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			for (int i=0;i<plan.getPlanElements().size();i+=2){
@@ -98,16 +96,15 @@ public class ActTimingsMZMATSim {
 				if (i==0) { // first home act
 					if (act.getEndTime()!=Time.UNDEFINED_TIME){
 						endHome += act.getEndTime(); 
+						counterHome++;
 					}
 					else log.warn("The end time of person's "+person.getId()+" fist home act is undefined!");
-					counterHome++;
 				}
 				else if (i==plan.getPlanElements().size()-1) { // last home act
 					if (act.getStartTime()!=Time.UNDEFINED_TIME){
 						startHome += act.getStartTime(); 
 					}
 					else log.warn("The start time of person's "+person.getId()+" last home act is undefined!");
-					counterHome++;
 				}
 				else {
 					if (act.getType().startsWith("h")) {
@@ -135,7 +132,7 @@ public class ActTimingsMZMATSim {
 			}
 		}
 		stream.print(name+"\t");
-		stream.print(Time.writeTime(startHome/counterHome)+"\t"+Time.writeTime(endHome/counterHome)+"\t");
+		stream.print(Time.writeTime(endHome/counterHome)+"\t"+Time.writeTime(startHome/counterHome)+"\t");
 		stream.print(Time.writeTime(durationInnerHome/counterInnerHome)+"\t"+Time.writeTime(durationWork/counterWork)+"\t"+Time.writeTime(durationEducation/counterEducation)+"\t"+Time.writeTime(durationLeisure/counterLeisure)+"\t"+Time.writeTime(durationShop/counterShop)+"\t");
 		stream.println(size);
 	}		

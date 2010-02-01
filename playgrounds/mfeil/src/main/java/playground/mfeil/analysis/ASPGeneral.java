@@ -32,6 +32,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -45,8 +46,11 @@ import playground.mfeil.ActChainEqualityCheck;
 
 
 /**
- * This is a class that facilitates calling various other analysis classes. 
- * It summarizes the analysis functionalities and offers simple access.
+ * This class summarizes the analysis functionalities 
+ * act chains,
+ * trips,
+ * and act timings,
+ * and offers simple access.
  *
  * @author mfeil
  */
@@ -62,8 +66,9 @@ public class ASPGeneral {
 	private Map<Id, Double> personsWeights;
 	private PrintStream stream;
 	
-	private void runMATSimActivityChains (final PopulationImpl population){
+	private void runMATSimActivityChains (PopulationImpl population){
 		log.info("Analyzing MATSim population...");
+		population = this.normalizeMATSimActTypes(population);
 		this.sp = new ASPActivityChains(population);
 		this.sp.run();
 		this.activityChainsMATSim = sp.getActivityChains();
@@ -71,6 +76,7 @@ public class ASPGeneral {
 		log.info("done. "+this.activityChainsMATSim.size()+" act chains.");
 	}
 	
+	// Drop the MZ persons for whom no weight information is available
 	private PopulationImpl reducePopulation (PopulationImpl pop, final String attributesInputFile){
 		log.info("Reading weights of persons...");
 		// Get persons' weights
@@ -97,7 +103,7 @@ public class ASPGeneral {
 		this.spMZ = new ASPActivityChains(population);
 		this.spMZ.run();
 		this.activityChainsMZ = spMZ.getActivityChains();
-		this.activityChainsMZ = this.normalizeActTypes(this.activityChainsMZ);
+		this.activityChainsMZ = this.normalizeMZActTypes(this.activityChainsMZ);
 		this.plansMZ = spMZ.getPlans();
 		log.info("done. "+this.activityChainsMZ.size()+" act chains.");
 	}
@@ -143,17 +149,20 @@ public class ASPGeneral {
 			double weight = 0;
 			for (int j=0;j<this.plansMZ.get(i).size();j++){
 				weight += this.personsWeights.get(((Plan) this.plansMZ.get(i).get(j)).getPerson().getId());
+				averageACLengthMZWeighted+=weight;
 			}
 			this.stream.print(weight+"\t"+weight/overallWeight+"\t");
 			
 			// MZ unweighted
 			this.stream.print(this.plansMZ.get(i).size()+"\t"+this.plansMZ.get(i).size()/overallUnweighted+"\t");
+			averageACLengthMZUnweighted+=this.plansMZ.get(i).size();
 			
 			// MATSim
 			boolean found = false;
 			for (int k=0;k<this.activityChainsMATSim.size();k++){
 				if (check.checkEqualActChains(this.activityChainsMATSim.get(k), this.activityChainsMZ.get(i))){
 					this.stream.print(this.plansMATSim.get(k).size()+"\t"+this.plansMATSim.get(k).size()/overallMATSim+"\t");
+					averageACLengthMATSim+=this.plansMATSim.get(k).size();
 					found = true;
 					break;
 				}
@@ -178,6 +187,7 @@ public class ASPGeneral {
 			}
 			if (!found){
 				this.stream.print("0\t0\t0\t0\t"+this.plansMATSim.get(i).size()+"\t"+this.plansMATSim.get(i).size()/overallMATSim+"\t");
+				averageACLengthMATSim+=this.plansMATSim.get(i).size();
 				for (int j=0; j<this.activityChainsMATSim.get(i).size();j=j+2){
 					this.stream.print(((ActivityImpl)(this.activityChainsMATSim.get(i).get(j))).getType()+"\t");
 				}
@@ -186,7 +196,7 @@ public class ASPGeneral {
 		}
 		
 		// Average lenghts of act chains
-		this.stream.println((averageACLengthMZWeighted/overallWeight)+"\t\t"+(averageACLengthMZUnweighted/overallUnweighted)+"\t\t"+(averageACLengthMATSim/overallMATSim)+"\tAverage number of activities");
+		this.stream.println((averageACLengthMZWeighted/overallWeight)+"\t\t"+(averageACLengthMZUnweighted/overallUnweighted)+"\t\t"+(averageACLengthMATSim/overallMATSim)+"\t\tAverage number of activities");
 		this.stream.println();
 		
 		double[] kpisMZWeighted = this.spMZ.analyzeActTypes(this.personsWeights);
@@ -198,6 +208,7 @@ public class ASPGeneral {
 		this.stream.println(kpisMZWeighted[3]+"\t\t"+kpisMZUnweighted[3]+"\t\t"+kpisMATSim[3]+"\tAverage number of same acts per plan");
 		this.stream.println(kpisMZWeighted[4]+"\t\t"+kpisMZUnweighted[4]+"\t\t"+kpisMATSim[4]+"\tAverage maximum number of same acts per plan");
 		this.stream.println(kpisMZWeighted[5]+"\t\t"+kpisMZUnweighted[5]+"\t\t"+kpisMATSim[5]+"\tShare of plans in which same acts occur");
+		this.stream.println();
 	}
 	
 	private void runMATSimTrips (PopulationImpl pop){
@@ -208,6 +219,7 @@ public class ASPGeneral {
 	
 	private void runMZTrips (PopulationImpl pop){
 		new TravelStatsMZMATSim().runPopulation("MZ", pop, this.stream);
+		this.stream.println();
 	}
 	
 	private void runMATSimTimings (PopulationImpl pop){
@@ -218,9 +230,11 @@ public class ASPGeneral {
 	
 	private void runMZTimings (PopulationImpl pop){
 		new ActTimingsMZMATSim().runPopulation("MZ", pop, this.stream);
+		this.stream.println();
 	}
 	
-	private ArrayList<List<PlanElement>> normalizeActTypes (ArrayList<List<PlanElement>> actChains){
+	// MZ act chains have only letters, MATSim chain full types. Therefore, MZ chains need to adapted.
+	private ArrayList<List<PlanElement>> normalizeMZActTypes (ArrayList<List<PlanElement>> actChains){
 		log.info("Normalizing act types ...");
 		for (int i=0;i<actChains.size();i++){
 			for (int j=0;j<actChains.get(i).size();j+=2){
@@ -230,11 +244,27 @@ public class ASPGeneral {
 				else if (act.getType().startsWith("e")) act.setType("education");
 				else if (act.getType().startsWith("l")) act.setType("leisure");
 				else if (act.getType().startsWith("s")) act.setType("shop");
-				else log.warn("Unknown act type in actChain "+i+" at position "+j);
+				else log.warn("Unknown act type in MZ actChain "+i+" at position "+j);
 			}
 		}
 		log.info("done.");
 		return actChains;
+	}
+	
+	// MATSim act chains have several work and education types, MZ not. Therefore, MATSim chains need to adapted.
+	private PopulationImpl normalizeMATSimActTypes (PopulationImpl pop){
+		log.info("Normalizing act types ...");
+		for (Person person : pop.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			for (int j=0;j<plan.getPlanElements().size();j+=2){
+				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(j);
+				if (act.getType().startsWith("w")) act.setType("work");
+				else if (act.getType().startsWith("e")) act.setType("education");
+				else if (!act.getType().startsWith("l") || !act.getType().startsWith("h") || !act.getType().startsWith("s")) log.warn("Unknown act type in MATSim actChain of person "+person+" at position "+j);
+			}
+		}
+		log.info("done.");
+		return pop;
 	}
 	
 	public static void main(final String [] args) {

@@ -253,10 +253,11 @@ public class ASPActivityChains {
 		
 		double overall = 0;
 		for (int i=0; i<this.plans.size();i++){
-			for (int j=0;j<this.plans.get(i).size();j++){
-				if (personsWeights!=null) overall += personsWeights.get(((Plan)this.plans.get(i).get(j)).getPerson().getId());
-				else overall += this.plans.get(i).size();
-			}
+			if (personsWeights!=null) 
+				for (int j=0;j<this.plans.get(i).size();j++){
+					overall += personsWeights.get(((Plan)this.plans.get(i).get(j)).getPerson().getId());
+				}
+			else overall += this.plans.get(i).size();
 		}
 		
 		int sameCon = 0;
