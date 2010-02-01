@@ -32,21 +32,21 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 
 /**
- * Ensures that each link in the network can be reached by any other link. 
+ * Ensures that each link in the network can be reached by any other link.
  * Links that cannot be reached by some other links, or links from which it
  * is not possible to reach all other links, are removed from the network.
- * Nodes with no incoming or outgoing links are removed as well from the 
+ * Nodes with no incoming or outgoing links are removed as well from the
  * network.
- * 
+ *
  * @author mrieser
  * @author balmermi
  */
 public class NetworkCleaner implements NetworkRunnable {
-	
+
 	private static final Logger log = Logger.getLogger(NetworkCleaner.class);
 
 	/**
@@ -58,7 +58,7 @@ public class NetworkCleaner implements NetworkRunnable {
 	 * @param network the network the startNode is part of
 	 * @return cluster of nodes <pre>startNode</pre> is part of
 	 */
-	private Map<Id, Node> findCluster(final Node startNode, final NetworkLayer network) {
+	private Map<Id, Node> findCluster(final Node startNode, final Network network) {
 
 		final Map<Node, DoubleFlagRole> nodeRoles = new HashMap<Node, DoubleFlagRole>(network.getNodes().size());
 
@@ -108,14 +108,14 @@ public class NetworkCleaner implements NetworkRunnable {
 	}
 
 	public void run(final Network network2) {
-		NetworkLayer network = (NetworkLayer) network2 ;
+		NetworkImpl network = (NetworkImpl) network2 ;
 		final Map<Id, Node> visitedNodes = new TreeMap<Id, Node>();
 		Map<Id, Node> biggestCluster = new TreeMap<Id, Node>();
 
 		log.info("running " + this.getClass().getName() + " algorithm...");
 
 		// search the biggest cluster of nodes in the network
-		log.info("  checking " + network.getNodes().size() + " nodes and " + 
+		log.info("  checking " + network.getNodes().size() + " nodes and " +
 				network.getLinks().size() + " links for dead-ends...");
 		boolean stillSearching = true;
 		Iterator<? extends Node> iter = network.getNodes().values().iterator();
@@ -145,7 +145,7 @@ public class NetworkCleaner implements NetworkRunnable {
 				network.removeNode(node);		// removeNode takes care of removing links too in the network
 			}
 		}
-		log.info("  resulting network contains " + network.getNodes().size() + " nodes and " + 
+		log.info("  resulting network contains " + network.getNodes().size() + " nodes and " +
 				network.getLinks().size() + " links.");
 		log.info("done.");
 	}

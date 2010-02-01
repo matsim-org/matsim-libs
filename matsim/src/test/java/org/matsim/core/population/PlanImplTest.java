@@ -217,7 +217,7 @@ public class PlanImplTest extends MatsimTestCase {
 		Node node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(2000, 0));
 		Link link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 		Link link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
-		
+
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -226,10 +226,10 @@ public class PlanImplTest extends MatsimTestCase {
 		route.setDistance(123.45);
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
-		
+
 		PlanImpl plan2 = new PlanImpl(new PersonImpl(new IdImpl(2)));
 		plan2.copyPlan(plan);
-		
+
 		assertEquals("person must not be copied.", new IdImpl(2), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		RouteWRefs route2 = ((LegImpl) plan.getPlanElements().get(1)).getRoute();
@@ -245,7 +245,7 @@ public class PlanImplTest extends MatsimTestCase {
 		Node node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(2000, 0));
 		Link link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 		Link link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
-		
+
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -254,10 +254,10 @@ public class PlanImplTest extends MatsimTestCase {
 		route.setDistance(123.45);
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
-		
+
 		PlanImpl plan2 = new PlanImpl(new PersonImpl(new IdImpl(2)));
 		plan2.copyPlan(plan);
-		
+
 		assertEquals("person must not be copied.", new IdImpl(2), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		RouteWRefs route2 = ((LegImpl) plan.getPlanElements().get(1)).getRoute();
@@ -265,7 +265,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals(123.45, route2.getDistance(), EPSILON);
 		assertEquals(98.76, route2.getTravelTime(), EPSILON);
 	}
-	
+
 	/**
 	 * @author meisterk
 	 */
@@ -273,17 +273,17 @@ public class PlanImplTest extends MatsimTestCase {
 
 		PlanImpl testee = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		testee.createAndAddActivity("h", new CoordImpl(0, 0));
-		LegImpl leg = testee.createAndAddLeg(TransportMode.car);
+		testee.createAndAddLeg(TransportMode.car);
 		testee.createAndAddActivity("w", new CoordImpl(100, 200));
-		leg = testee.createAndAddLeg(TransportMode.car);
+		testee.createAndAddLeg(TransportMode.car);
 		testee.createAndAddActivity("h", new CoordImpl(0, 0));
 
 		testee.removeActivity(3);
 		assertEquals(5, testee.getPlanElements().size());
-		
+
 		testee.removeActivity(4);
 		assertEquals(3, testee.getPlanElements().size());
-		
+
 	}
 
 	/**
@@ -293,17 +293,17 @@ public class PlanImplTest extends MatsimTestCase {
 
 		PlanImpl testee = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		testee.createAndAddActivity("h", new CoordImpl(0, 0));
-		LegImpl leg = testee.createAndAddLeg(TransportMode.car);
+		testee.createAndAddLeg(TransportMode.car);
 		testee.createAndAddActivity("w", new CoordImpl(100, 200));
-		leg = testee.createAndAddLeg(TransportMode.car);
+		testee.createAndAddLeg(TransportMode.car);
 		testee.createAndAddActivity("h", new CoordImpl(0, 0));
 
 		testee.removeLeg(4);
 		assertEquals(5, testee.getPlanElements().size());
-		
+
 		testee.removeLeg(3);
 		assertEquals(3, testee.getPlanElements().size());
 
 	}
-	
+
 }

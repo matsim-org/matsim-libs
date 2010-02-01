@@ -46,8 +46,8 @@ import org.matsim.testcases.MatsimTestCase;
 public class DemandGenerationTest extends MatsimTestCase {
 
 	private static final String populationFile = "population.xml";
-	private final double homeEndTime = 9*3600.0;
-	private final double workEndTime = 19*3600.0;
+	private static final double homeEndTime = 9*3600.0;
+	private static final double workEndTime = 19*3600.0;
 	private List<Id> ids = new ArrayList<Id>();
 	private Scenario sc = null;
 
@@ -189,9 +189,9 @@ public class DemandGenerationTest extends MatsimTestCase {
 				PlanElement element = p.getPlanElements().get(i);
 				assertNotNull(element);
 			}
-			assertEquals(this.homeEndTime, ((Activity)p.getPlanElements().get(0)).getEndTime(), EPSILON);
+			assertEquals(homeEndTime, ((Activity)p.getPlanElements().get(0)).getEndTime(), EPSILON);
 			assertEquals(ids.get(0), ((Activity)p.getPlanElements().get(0)).getLinkId());
-			assertEquals(this.workEndTime, ((Activity)p.getPlanElements().get(2)).getEndTime(), EPSILON);
+			assertEquals(workEndTime, ((Activity)p.getPlanElements().get(2)).getEndTime(), EPSILON);
 			assertEquals(ids.get(2), ((Activity)p.getPlanElements().get(2)).getLinkId());
 			assertEquals(Time.UNDEFINED_TIME, ((Activity)p.getPlanElements().get(4)).getEndTime(), EPSILON);
 			assertEquals(ids.get(0), ((Activity)p.getPlanElements().get(4)).getLinkId());
