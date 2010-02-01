@@ -89,7 +89,8 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected Map<Id, int[]> simsPosition; // indicates which activity chain alternative the plan/similarity value belongs to
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
-	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, income, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn, beta, gamma, beta_travel, munType; 
+	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, 
+	carAvail, income, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn, beta, gamma, beta_travel, munType, innerHome; 
 	protected double travelCostCar, costPtNothing, costPtHalbtax, costPtGA;
 
 
@@ -196,7 +197,9 @@ public class PlansConstructor implements PlanStrategyModule{
 		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
 		//		this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
 		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile, 
-				this.beta, this.gamma, this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.income, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.beta_travel, this.bikeIn, this.munType);	
+				this.beta, this.gamma, this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, 
+				this.incomeBoxCox, this.age, this.gender, this.income, this.license, this.carAvail, this.seasonTicket, 
+				this.travelDistance, this.travelCost, this.travelConstant, this.beta_travel, this.bikeIn, this.munType, this.innerHome);	
 		
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
@@ -771,7 +774,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			String travelConstant,
 			String beta_travel,
 			String bikeIn,
-			String munType){
+			String munType,
+			String innerHome){
 
 		log.info("Writing plans for Biogeme...");
 
@@ -796,6 +800,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.beta_travel=beta_travel;
 		this.bikeIn=bikeIn;
 		this.munType=munType;
+		this.innerHome=innerHome;
 
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
@@ -1636,7 +1641,8 @@ public class PlansConstructor implements PlanStrategyModule{
 				this.travelConstant,
 				this.beta_travel,
 				this.bikeIn,
-				this.munType);
+				this.munType,
+				this.innerHome);
 	}
 
 

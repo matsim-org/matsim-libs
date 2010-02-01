@@ -41,14 +41,16 @@ public class RunUtilFunctionEstimation {
 	public static void main(String[] args) {
 		log.info("Process started...");
 		
+		final String version = "0979_innerHome";
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
-		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans0969.dat";
+		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans"+version+".dat";
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model0969.mod";
-		final String outputFileSimsOverview = "/home/baug/mfeil/data/choiceSet/it0/simsOverview0969.xls";
-		final String outputFileSimsDetailLog = "/home/baug/mfeil/data/choiceSet/it0/simsDetails0969.xls";
+		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model"+version+".mod";
+		final String outputFileSimsOverview = "/home/baug/mfeil/data/choiceSet/it0/simsOverview"+version+".xls";
+		final String outputFileSimsDetailLog = "/home/baug/mfeil/data/choiceSet/it0/simsDetails"+version+".xls";
+	
 		
 /*		final String populationFilename = "./plans/output_plans.xml";
 		final String networkFilename = "./plans/network.xml";
@@ -57,14 +59,14 @@ public class RunUtilFunctionEstimation {
 		final String outputFile = "./plans/output_plans.dat";
 		*/
 		
-		String beta				= "yes";
+		String beta				= "no";
 		String gamma			= "no";
 		String similarity 		= "yes";
 		String incomeConstant 	= "no";
 		String incomeDivided	= "no";
 		String incomeDividedLN	= "no";
 		String incomeBoxCox		= "no";
-		String gender 			= "yes";
+		String gender 			= "no";
 		String age 				= "no";
 		String income	 		= "no";
 		String license 			= "no";
@@ -76,6 +78,7 @@ public class RunUtilFunctionEstimation {
 		String beta_travel		= "no";
 		String bikeIn			= "yes";
 		String munType			= "no";
+		String innerHome		= "yes";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
@@ -87,7 +90,9 @@ public class RunUtilFunctionEstimation {
 		//pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
 		//		similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, employed, license, carAvail, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn);
 		pc.writePlansForBiogemeWithRandomSelectionAccumulated(outputFileBiogeme, attributesInputFile, 
-				beta, gamma, similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, income, license, carAvail, seasonTicket, travelDistance, travelCost, travelConstant, beta_travel, bikeIn, munType);
+				beta, gamma, similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, 
+				age, gender, income, license, carAvail, seasonTicket, travelDistance, travelCost, travelConstant, 
+				beta_travel, bikeIn, munType, innerHome);
 		pc.writeModFileWithRandomSelection(outputFileMod);
 		log.info("Process finished.");
 	}

@@ -754,7 +754,8 @@ public class ModFileMaker {
 			String travelConstant,
 			String beta_travel,
 			String bikeIn,
-			String munType){
+			String munType,
+			String innerHome){
 		
 		log.info("Writing mod file...");
 		
@@ -783,31 +784,44 @@ public class ModFileMaker {
 		// Home
 		stream.println("HomeUmax \t4  \t0 \t100  \t0");
 		stream.println("HomeAlpha \t8  \t-5 \t20  \t0");
-		if (beta.equals("yes")) stream.println("HomeBeta \t0.36  \t0 \t5  \t1");
+		//if (beta.equals("yes")) stream.println("HomeBeta \t0.345  \t0 \t100  \t0"); // from 0981
+		if (beta.equals("yes")) stream.println("HomeBeta \t1  \t0 \t100  \t0"); 
 		if (gamma.equals("yes")) stream.println("HomeGamma \t1  \t0 \t5  \t0");
+		
+		// InnerHome
+		if (innerHome.equals("yes")){
+			stream.println("InnerHomeUmax \t4  \t0 \t100  \t0");
+			stream.println("InnerHomeAlpha \t8  \t-5 \t20  \t0");
+			if (beta.equals("yes")) stream.println("InnerHomeBeta \t1  \t0 \t100  \t0"); 
+			if (gamma.equals("yes")) stream.println("InnerHomeGamma \t1  \t0 \t5  \t0");
+		}
 		
 		// Work
 		stream.println("WorkUmax \t3  \t0 \t100  \t0");
 		stream.println("WorkAlpha \t4  \t-5 \t20  \t0");
-		if (beta.equals("yes")) stream.println("WorkBeta \t0.66  \t0 \t5  \t1");
+		//if (beta.equals("yes")) stream.println("WorkBeta \t0.654  \t0 \t100  \t1"); // from 0981
+		if (beta.equals("yes")) stream.println("WorkBeta \t1  \t0 \t100  \t0"); 
 		if (gamma.equals("yes")) stream.println("WorkGamma \t1  \t0 \t5  \t0");
 		
 		// Education
 		stream.println("EducationUmax \t3  \t0 \t100  \t0");
 		stream.println("EducationAlpha \t2  \t-5 \t20  \t0");
-		if (beta.equals("yes")) stream.println("EducationBeta \t2.6  \t0 \t5  \t1");
+		//if (beta.equals("yes")) stream.println("EducationBeta \t2.65  \t0 \t100  \t1"); // from 0913_1
+		if (beta.equals("yes")) stream.println("EducationBeta \t1  \t0 \t100  \t0"); 
 		if (gamma.equals("yes")) stream.println("EducationGamma \t1  \t0 \t5  \t0");
 		
 		// Shop
 		stream.println("ShopUmax \t1  \t0 \t100  \t0");
 		stream.println("ShopAlpha \t1  \t-5 \t20  \t0");
-		if (beta.equals("yes")) stream.println("ShopBeta \t5  \t0 \t5  \t1");
+		//if (beta.equals("yes")) stream.println("ShopBeta \t100  \t0 \t100  \t1"); // from 0981
+		if (beta.equals("yes")) stream.println("ShopBeta \t1  \t0 \t100  \t0"); 
 		if (gamma.equals("yes")) stream.println("ShopGamma \t1  \t0 \t5  \t0");
 		
 		// Leisure
 		stream.println("LeisureUmax \t2  \t0 \t100  \t0");
 		stream.println("LeisureAlpha \t1  \t-5 \t20  \t0");
-		if (beta.equals("yes")) stream.println("LeisureBeta \t100  \t0 \t100  \t1");
+		//if (beta.equals("yes")) stream.println("LeisureBeta \t39.7  \t0 \t100  \t1"); // from 0981
+		if (beta.equals("yes")) stream.println("LeisureBeta \t1  \t0 \t100  \t0"); 
 		if (gamma.equals("yes")) stream.println("LeisureGamma \t1  \t0 \t5  \t0");
 		
 		// betas and gammas
@@ -1244,7 +1258,10 @@ public class ModFileMaker {
 					else if (gender.equals("yes") && act.getType().toString().equals("leisure")) stream.print("( one + beta_female_leisure * Female ) * ");
 				*/	//if (age.equals("yes")) stream.print("( one + beta_age_0_15 * Age_0_15 + beta_age_16_30 * Age_16_30 + beta_age_31_60 * Age_31_60 + beta_age_61 * Age_61 ) * ");
 					if (beta.equals("no") && gamma.equals("no")){				
-						if (act.getType().toString().equals("h")) stream.print("HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
+						if (act.getType().toString().equals("h")) {
+							if (innerHome.equals("yes")) stream.print("InnerHomeUmax * one / ( one + exp( one_point_two * ( InnerHomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
+							else stream.print("HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
+						}
 						else if (act.getType().toString().equals("w")) stream.print("WorkUmax * one / ( one + exp( one_point_two * ( WorkAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 						else if (act.getType().toString().equals("e")) stream.print("EducationUmax * one / ( one + exp( one_point_two * ( EducationAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 						else if (act.getType().toString().equals("shop")) stream.print("ShopUmax * one / ( one + exp( one_point_two * ( ShopAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
@@ -1252,7 +1269,10 @@ public class ModFileMaker {
 						else log.warn("Act has no valid type! ActChains position: "+i);
 					}
 					else if (beta.equals("yes") && gamma.equals("no")){
-						if (act.getType().toString().equals("h")) stream.print("HomeUmax * one / ( one + exp( HomeBeta * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
+						if (act.getType().toString().equals("h")) {
+							if (innerHome.equals("yes")) stream.print("InnerHomeUmax * one / ( one + exp( InnerHomeBeta * ( InnerHomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
+							else stream.print("HomeUmax * one / ( one + exp( HomeBeta * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
+						}
 						else if (act.getType().toString().equals("w")) stream.print("WorkUmax * one / ( one + exp( WorkBeta * ( WorkAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 						else if (act.getType().toString().equals("e")) stream.print("EducationUmax * one / ( one + exp( EducationBeta * ( EducationAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 						else if (act.getType().toString().equals("shop")) stream.print("ShopUmax * one / ( one + exp( ShopBeta * ( ShopAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
@@ -1260,7 +1280,10 @@ public class ModFileMaker {
 						else log.warn("Act has no valid type! ActChains position: "+i);
 					}
 					else if (beta.equals("no") && gamma.equals("yes")){
-						if (act.getType().toString().equals("h")) stream.print("HomeUmax * one / ( ( one + HomeGamma * exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / HomeGamma * one ) )");
+						if (act.getType().toString().equals("h")) {
+							if (innerHome.equals("yes")) stream.print("InnerHomeUmax * one / ( ( one + InnerHomeGamma * exp( one_point_two * ( InnerHomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / InnerHomeGamma * one ) )");
+							else stream.print("HomeUmax * one / ( ( one + HomeGamma * exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / HomeGamma * one ) )");
+						}
 						else if (act.getType().toString().equals("w")) stream.print("WorkUmax * one / ( ( one + WorkGamma * exp( one_point_two * ( WorkAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / WorkGamma * one ) )");
 						else if (act.getType().toString().equals("e")) stream.print("EducationUmax * one / ( ( one + EducationGamma * exp( one_point_two * ( EducationAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / EducationGamma * one ) )");
 						else if (act.getType().toString().equals("shop")) stream.print("ShopUmax * one / ( ( one + ShopGamma * exp( one_point_two * ( ShopAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / ShopGamma * one ) )");
@@ -1268,7 +1291,10 @@ public class ModFileMaker {
 						else log.warn("Act has no valid type! ActChains position: "+i);
 					}
 					else {
-						if (act.getType().toString().equals("h")) stream.print("HomeUmax * one / ( ( one + HomeGamma * exp( HomeBeta * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / HomeGamma * one ) )");
+						if (act.getType().toString().equals("h")) {
+							if (innerHome.equals("yes")) stream.print("HomeUmax * one / ( ( one + HomeGamma * exp( HomeBeta * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / HomeGamma * one ) )");
+							else stream.print("HomeUmax * one / ( ( one + HomeGamma * exp( HomeBeta * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / HomeGamma * one ) )");
+						}
 						else if (act.getType().toString().equals("w")) stream.print("WorkUmax * one / ( ( one + WorkGamma * exp( WorkBeta * ( WorkAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / WorkGamma * one ) )");
 						else if (act.getType().toString().equals("e")) stream.print("EducationUmax * one / ( ( one + EducationGamma * exp( EducationBeta * ( EducationAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / EducationGamma * one ) )");
 						else if (act.getType().toString().equals("shop")) stream.print("ShopUmax * one / ( ( one + ShopGamma * exp( ShopBeta * ( ShopAlpha * one - x"+(i+1)+""+(j+1)+" ) ) ) ^ ( one / ShopGamma * one ) )");
