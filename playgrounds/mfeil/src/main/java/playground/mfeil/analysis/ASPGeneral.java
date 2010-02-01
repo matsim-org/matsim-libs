@@ -149,20 +149,20 @@ public class ASPGeneral {
 			double weight = 0;
 			for (int j=0;j<this.plansMZ.get(i).size();j++){
 				weight += this.personsWeights.get(((Plan) this.plansMZ.get(i).get(j)).getPerson().getId());
-				averageACLengthMZWeighted+=weight;
 			}
+			averageACLengthMZWeighted+=weight*(this.activityChainsMZ.get(i).size()/2+1);
 			this.stream.print(weight+"\t"+weight/overallWeight+"\t");
 			
 			// MZ unweighted
 			this.stream.print(this.plansMZ.get(i).size()+"\t"+this.plansMZ.get(i).size()/overallUnweighted+"\t");
-			averageACLengthMZUnweighted+=this.plansMZ.get(i).size();
+			averageACLengthMZUnweighted+=this.plansMZ.get(i).size()*(this.activityChainsMZ.get(i).size()/2+1);
 			
 			// MATSim
 			boolean found = false;
 			for (int k=0;k<this.activityChainsMATSim.size();k++){
 				if (check.checkEqualActChains(this.activityChainsMATSim.get(k), this.activityChainsMZ.get(i))){
 					this.stream.print(this.plansMATSim.get(k).size()+"\t"+this.plansMATSim.get(k).size()/overallMATSim+"\t");
-					averageACLengthMATSim+=this.plansMATSim.get(k).size();
+					averageACLengthMATSim+=this.plansMATSim.get(k).size()*(this.activityChainsMATSim.get(k).size()/2+1);
 					found = true;
 					break;
 				}
@@ -187,7 +187,7 @@ public class ASPGeneral {
 			}
 			if (!found){
 				this.stream.print("0\t0\t0\t0\t"+this.plansMATSim.get(i).size()+"\t"+this.plansMATSim.get(i).size()/overallMATSim+"\t");
-				averageACLengthMATSim+=this.plansMATSim.get(i).size();
+				averageACLengthMATSim+=this.plansMATSim.get(i).size()*(this.activityChainsMATSim.get(i).size()/2+1);
 				for (int j=0; j<this.activityChainsMATSim.get(i).size();j=j+2){
 					this.stream.print(((ActivityImpl)(this.activityChainsMATSim.get(i).get(j))).getType()+"\t");
 				}
@@ -260,7 +260,7 @@ public class ASPGeneral {
 				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(j);
 				if (act.getType().startsWith("w")) act.setType("work");
 				else if (act.getType().startsWith("e")) act.setType("education");
-				else if (!act.getType().startsWith("l") || !act.getType().startsWith("h") || !act.getType().startsWith("s")) log.warn("Unknown act type in MATSim actChain of person "+person+" at position "+j);
+				else if (!act.getType().startsWith("l") && !act.getType().startsWith("h") && !act.getType().startsWith("s")) log.warn("Unknown act type in MATSim actChain of person "+person.getId()+" at position "+j);
 			}
 		}
 		log.info("done.");
