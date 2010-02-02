@@ -62,6 +62,7 @@ public class AnalyzerExe {
 		ZoneLayer zones = ZoneLayerSHP.read(zonesfile);
 		
 		SpatialAnalyzerTask task = new SpatialAnalyzerTask(output, zones);
+		task.addTask(new WaveSizeTask(output));
 		
 		Map<String, Object> analyzers = new HashMap<String, Object>();
 		analyzers.put(DegreeTask.class.getCanonicalName(), new SampledDegree());

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
@@ -40,12 +41,13 @@ public class SampledSocialVertex extends SpatialSparseVertex implements SocialVe
 	
 	private SnowballAttributes attributes;
 	
-	private SampledSocialVertex recruitedBy;
+	private List<SampledSocialVertex> sources;
 	
 	protected SampledSocialVertex(SocialPerson person, Point point) {
 		super(point);
 		this.person = person;
 		attributes = new SnowballAttributes();
+		sources = new ArrayList<SampledSocialVertex>(3);
 	}
 
 	@Override
@@ -84,12 +86,12 @@ public class SampledSocialVertex extends SpatialSparseVertex implements SocialVe
 		attributes.sample(iteration);
 	}
 
-	public void setRecruitedBy(SampledSocialVertex ego) {
-		recruitedBy = ego;
+	public void addSource(SampledSocialVertex vertex) {
+		sources.add(vertex);
 	}
 	
-	public SampledSocialVertex getRecruitedBy() {
-		return recruitedBy;
+	public List<SampledSocialVertex> getSources() {
+		return sources;
 	}
 
 	@Override

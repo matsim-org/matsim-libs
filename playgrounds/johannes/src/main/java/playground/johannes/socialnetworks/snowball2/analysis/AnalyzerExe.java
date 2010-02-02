@@ -54,7 +54,7 @@ public class AnalyzerExe {
 	 */
 	public static void main(String[] args) throws IOException {
 		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/graph/graph.graphml");
+		SampledSpatialGraph graph = reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/graph/graph.ch1903.noisolates.graphml");
 
 		
 //		SpatialAnalyzerTask task = new SpatialAnalyzerTask("/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/");

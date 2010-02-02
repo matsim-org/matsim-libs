@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDistance.java
+ * VertexBetweennessColorizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial.analysis;
+package playground.johannes.socialnetworks.graph.spatial.io;
 
-import java.util.Set;
+import gnu.trove.TObjectDoubleIterator;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
+import java.awt.Color;
 
-import playground.johannes.socialnetworks.graph.spatial.Distance;
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
+
+import playground.johannes.socialnetworks.graph.GraphStatistics;
+import playground.johannes.socialnetworks.graph.GraphStatistics.GraphDistance;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
+public class VertexBetweennessColorizer implements Colorizable<Vertex> {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		/*
-		 * I think it makes no difference to directly calling super(vertices)
-		 * since each edge is only counted once. joh13/1/10
-		 */
-		return super.distribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	private Vertex vertex = null;
+	
+	public VertexBetweennessColorizer(Graph graph) {
+		GraphDistance dist = GraphStatistics.centrality(graph);
+		
+		double max = 0;
+		
+		TObjectDoubleIterator<Vertex> it = dist.getVertexBetweennees().iterator();
+		for(int i = 0; i < dist.getVertexBetweennees().size(); i++) {
+			it.advance();
+			if(it.value() > max) {
+				max = it.value();
+				vertex = it.key();
+			}
+		}
+		System.err.println("Max betweenness is " + max);
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Override
-	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	public Color getColor(Vertex object) {
+		if(object == vertex)
+			return Color.RED;
+		else
+			return Color.WHITE;
 	}
 
 }

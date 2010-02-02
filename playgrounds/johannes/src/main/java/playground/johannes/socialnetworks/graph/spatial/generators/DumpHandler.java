@@ -29,9 +29,9 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekDegreeColorizer;
@@ -41,15 +41,10 @@ import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorizer;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger
@@ -198,11 +193,11 @@ public class DumpHandler implements SampleHandler {
 			/*
 			 * KML
 			 */
-			KMLWriter kmlWriter = new KMLWriter();
-			kmlWriter.setVertexStyle(new KMLDegreeStyle(kmlWriter.getVertexIconLink()));
-			kmlWriter.setVertexDescriptor(new KMLVertexDescriptor(net));
+			SpatialGraphKMLWriter kmlWriter = new SpatialGraphKMLWriter();
+//			kmlWriter.setVertexStyle(new KMLDegreeStyle(kmlWriter.getVertexIconLink()));
+//			kmlWriter.setVertexDescriptor(new KMLVertexDescriptor(net));
 			kmlWriter.setDrawEdges(false);
-			kmlWriter.setCoordinateTransformation(new CH1903LV03toWGS84());
+//			kmlWriter.setCoordinateTransformation(new CH1903LV03toWGS84());
 			kmlWriter.write(net, String.format("%1$sgraph.k.kml", currentOutputDir));
 			/*
 			 * Pajek

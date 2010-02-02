@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphML2KML.java
+ * RemoveIsolatesTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,48 +17,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
-import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
 import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
-
-import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSampledComponents;
-import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSnowballDescriptor;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.KMLVertexId;
-
-
+import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLWriter;
 
 /**
  * @author illenberger
  *
  */
-public class GraphML2KML {
+public class RemoveIsolatesTask implements GraphTask<SparseGraph> {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+	private static final Logger logger = Logger.getLogger(RemoveIsolatesTask.class);
+	
+	@Override
+	public SparseGraph apply(SparseGraph graph) {
+		Set<SparseVertex> toRemove = new HashSet<SparseVertex>();
+		for(SparseVertex v : graph.getVertices()) {
+			if(v.getEdges().isEmpty())
+				toRemove.add(v);
+		}
+		
+		SparseGraphBuilder builder = new SparseGraphBuilder();
+		for(SparseVertex v : toRemove)
+			if(!builder.removeVertex(graph, v))
+				throw new RuntimeException("Removing vertex failed.");
+
+		logger.info(String.format("Removed %1$s isolated vertices.", toRemove.size()));
+		
+		return graph;
+	}
+	
+	public static void main(String args[]) throws IOException {
+		RemoveIsolatesTask task = new RemoveIsolatesTask();
 		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
 		SampledSpatialGraph graph = reader.readGraph(args[0]);
-
-		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
-		KMLSampledComponents components = new KMLSampledComponents();
-		writer.setKmlPartitition(components);
-		KMLIconVertexStyle vertexStyle = new KMLIconVertexStyle(graph);
-		vertexStyle.setVertexColorizer(components);
-		writer.addKMZWriterListener(vertexStyle);
-		writer.setKmlVertexStyle(vertexStyle);
-		
-		KMLObjectDetailComposite<SpatialVertex> detail = new KMLObjectDetailComposite<SpatialVertex>();
-		detail.addObjectDetail(new KMLSnowballDescriptor());
-		detail.addObjectDetail(new KMLVertexId());
-		writer.setKmlVertexDetail(detail);
-		
+		graph = (SampledSpatialGraph) task.apply((SparseGraph) graph);
+		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
 		writer.write(graph, args[1]);
 	}
 

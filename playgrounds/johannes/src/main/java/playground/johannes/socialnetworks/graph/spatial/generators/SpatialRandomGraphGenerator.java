@@ -40,27 +40,24 @@ import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekDegreeColorizer;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphAnalyzer;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorizer;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
-import playground.johannes.socialnetworks.spatial.ZoneLegacy;
-import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
+import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
+import playground.johannes.socialnetworks.spatial.ZoneLegacy;
 
 /**
  * @author illenberger
@@ -210,11 +207,12 @@ public class SpatialRandomGraphGenerator<G extends SpatialSparseGraph, V extends
 			/*
 			 * KML
 			 */
-			KMLWriter kmlWriter = new KMLWriter();
-			kmlWriter.setVertexStyle(new KMLDegreeStyle(kmlWriter.getVertexIconLink()));
-			kmlWriter.setVertexDescriptor(new KMLVertexDescriptor(graph));
+			SpatialGraphKMLWriter kmlWriter = new SpatialGraphKMLWriter();
+//			kmlWriter.setVertexStyle(new KMLDegreeStyle(kmlWriter.getVertexIconLink()));
+//			kmlWriter.setVertexDescriptor(new KMLVertexDescriptor(graph));
 			kmlWriter.setDrawEdges(false);
-			kmlWriter.setCoordinateTransformation(new CH1903LV03toWGS84());
+//			kmlWriter.setCoordinateTransformation(new CH1903LV03toWGS84());
+			
 			kmlWriter.write(graph, String.format("%1$sgraph.k.kml", currentOutputDir));
 			/*
 			 * Pajek

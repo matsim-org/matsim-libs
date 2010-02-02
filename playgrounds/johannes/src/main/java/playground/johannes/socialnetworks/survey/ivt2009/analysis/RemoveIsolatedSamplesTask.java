@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDistance.java
+ * RemoveIsolatedSamplesTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
+import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
-
-import playground.johannes.socialnetworks.graph.spatial.Distance;
 import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraphBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
+public class RemoveIsolatedSamplesTask implements GraphTask<SampledSocialGraph> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		/*
-		 * I think it makes no difference to directly calling super(vertices)
-		 * since each edge is only counted once. joh13/1/10
-		 */
-		return super.distribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	public SampledSocialGraph apply(SampledSocialGraph graph) {
+		Set<SampledSocialVertex> partition = SnowballPartitions.createSampledPartition((Set<SampledSocialVertex>)(graph.getVertices()));
+		Set<SampledSocialVertex> remove = new HashSet<SampledSocialVertex>();
+		for(SampledSocialVertex vertex : partition) {
+			if(vertex.getNeighbours().size() < 2) {
+				remove.add(vertex);
+			}
+		}
+		
+		SampledSocialGraphBuilder builder = new SampledSocialGraphBuilder();
+		for(SampledSocialVertex vertex : remove)
+			builder.removeVertex(graph, vertex);
+		
+		return graph;
 	}
 
 }

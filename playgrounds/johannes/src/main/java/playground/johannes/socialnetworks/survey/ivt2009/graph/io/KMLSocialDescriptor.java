@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDistance.java
+ * KMLSocialDescriptor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-import java.util.Set;
+import net.opengis.kml._2.PlacemarkType;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
 
-import playground.johannes.socialnetworks.graph.spatial.Distance;
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
+import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSnowballDescriptor;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
+public class KMLSocialDescriptor extends KMLSnowballDescriptor {
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		/*
-		 * I think it makes no difference to directly calling super(vertices)
-		 * since each edge is only counted once. joh13/1/10
-		 */
-		return super.distribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	public void addDetail(PlacemarkType kmlPlacemark, SpatialVertex object) {
+		super.addDetail(kmlPlacemark, object);
+		
+		StringBuilder builder = new StringBuilder(kmlPlacemark.getDescription());
+		builder.append("<br>Source: ");
+		for(SampledSocialVertex vertex : ((SampledSocialVertex)object).getSources()) {
+			builder.append(vertex.getPerson().getId().toString());
+			builder.append(" ");
+		}
+		
+		kmlPlacemark.setDescription(builder.toString());
 	}
 
 }

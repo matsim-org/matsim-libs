@@ -29,10 +29,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLWriter;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
+import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import playground.johannes.socialnetworks.survey.ivt2009.analysis.RemoveIsolatedSamplesTask;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraphBuilder;
@@ -110,6 +114,7 @@ public class GraphBuilderTXT {
 				}
 				SampledSocialEdge edge = builder.addEdge(graph, vertex, source); 
 				if(edge != null) {
+					vertex.addSource(source);
 					/*
 					 * add edge attributes
 					 */
@@ -196,14 +201,34 @@ public class GraphBuilderTXT {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		String egoTableFile = "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/egos.xy.txt";
-		String alterTableFile = "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/alteri.xy.txt";
+		String egoTableFile = "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/1-2010/egos.xy.txt";
+		String alterTableFile = "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/1-2010/alteri.xy.txt";
 		String surveyData = "";
 		
 		GraphBuilderTXT builder = new GraphBuilderTXT();
 		SampledSocialGraph graph = builder.buildGraph(egoTableFile, alterTableFile, surveyData);
 		
-		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
+		RemoveIsolatedSamplesTask task = new RemoveIsolatedSamplesTask();
+		graph = task.apply(graph);
+		
+//		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
+//		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/tmp.graphml");
+		SampledSocialGraphMLWriter writer = new SampledSocialGraphMLWriter();
 		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/tmp.graphml");
+		
+		SpatialGraphKMLWriter kmlwriter = new SpatialGraphKMLWriter();
+		KMLSeedComponents components = new KMLSeedComponents();
+		kmlwriter.setKmlPartitition(components);
+		KMLIconVertexStyle vertexStyle = new KMLIconVertexStyle(graph);
+		vertexStyle.setVertexColorizer(components);
+		kmlwriter.addKMZWriterListener(vertexStyle);
+		kmlwriter.setKmlVertexStyle(vertexStyle);
+		
+		KMLObjectDetailComposite<SpatialVertex> detail = new KMLObjectDetailComposite<SpatialVertex>();
+		detail.addObjectDetail(new KMLSocialDescriptor());
+		detail.addObjectDetail(new KMLVertexId());
+		kmlwriter.setKmlVertexDetail(detail);
+		
+		kmlwriter.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/graph/components.kmz");
 	}
 }

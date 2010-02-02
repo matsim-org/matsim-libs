@@ -34,7 +34,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.EdgeDecorator;
 import org.matsim.contrib.sna.graph.Graph;
@@ -43,13 +42,10 @@ import org.matsim.contrib.sna.graph.SparseGraphProjectionBuilder;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.io.PajekCommunityColorizer;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLCommunityStlyle;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 
 /**
@@ -152,18 +148,18 @@ public class GirvanNewmanAlgorithm {
 			}
 			
 			//************************************************
-			KMLWriter writer = new KMLWriter();
-			writer.setCoordinateTransformation(new CH1903LV03toWGS84());
+			SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
+//			writer.setCoordinateTransformation(new CH1903LV03toWGS84());
 			writer.setDrawEdges(false);
-			writer.setDrawNames(false);
-			writer.setVertexDescriptor(new KMLVertexDescriptor((SpatialSparseGraph) projection.getDelegate()));
-			writer.setVertexStyle(new KMLCommunityStlyle(writer.getVertexIconLink(), components));
-			try {
+//			writer.setDrawNames(false);
+//			writer.setVertexDescriptor(new KMLVertexDescriptor((SpatialSparseGraph) projection.getDelegate()));
+//			writer.setVertexStyle(new KMLCommunityStlyle(writer.getVertexIconLink(), components));
+//			try {
 				writer.write((SpatialSparseGraph) projection.getDelegate(), String.format("%1$s/%2$s.communityGraph.kmz", outputDir, level));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			} catch (IOException e) {
+//				 TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			//************************************************
 			try {
 				writeDendogram(dendogram, String.format("%1$s/%2$s.dendogram.txt", outputDir, level));

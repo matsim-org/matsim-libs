@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KMLPersonDescriptor.java
+ * KMLVertexId.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,42 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectDescriptor;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
+import net.opengis.kml._2.PlacemarkType;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
+
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class KMLSnowballDescriptor implements KMLObjectDescriptor<SampledSocialVertex> {
+public class KMLVertexId implements KMLObjectDetail<SpatialVertex> {
 
-	public String getDescription(SampledSocialVertex object) {
-		StringBuilder builder = new StringBuilder();
-		
-		builder.append("Name: ");
-		builder.append(object.getPerson().getId().toString());
-		builder.append("<br>");
-		builder.append("Sampled: ");
-		builder.append(String.valueOf(object.getIterationSampled()));
-		builder.append("<br>");
-		builder.append("Detected: ");
-		builder.append(String.valueOf(object.getIterationDetected()));
-		builder.append("<br>");
-		builder.append("Recruited by: ");
-		SampledSocialVertex name = object.getRecruitedBy();
-		if(name == null)
-			builder.append("seed");
-		else
-			builder.append(name.getPerson().getId().toString());
-		
-		return builder.toString();
-	}
-
-	public String getName(SampledSocialVertex object) {
-		return object.getPerson().getId().toString();
+	@Override
+	public void addDetail(PlacemarkType kmlPlacemark, SpatialVertex object) {
+		kmlPlacemark.setName(((SocialVertex) object).getPerson().getId().toString());
 	}
 
 }

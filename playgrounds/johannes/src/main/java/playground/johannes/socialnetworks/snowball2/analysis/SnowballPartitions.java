@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDistance.java
+ * SnowballPartititions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial.analysis;
+package playground.johannes.socialnetworks.snowball2.analysis;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
-
-import playground.johannes.socialnetworks.graph.spatial.Distance;
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		/*
-		 * I think it makes no difference to directly calling super(vertices)
-		 * since each edge is only counted once. joh13/1/10
-		 */
-		return super.distribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+public class SnowballPartitions {
+	
+	public static <V extends SampledVertex> Set<V> createSampledPartition(Collection<V> vertices) {
+		Set<V> partition = new HashSet<V>();
+		for(V vertex : vertices) {
+			if(vertex.isSampled())
+				partition.add(vertex);
+		}
+		return partition;
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	
+	public static <V extends SampledVertex> Set<V> createSampledPartition(Collection<V> vertices, int iteration) {
+		Set<V> partition = new HashSet<V>();
+		for(V vertex : vertices) {
+			if(vertex.getIterationSampled() == iteration)
+				vertices.add(vertex);
+		}
+		return partition;
 	}
-
+	
+	public static <V extends SampledVertex> Set<V> createDetectedPartition(Collection<V> vertices, int iteration) {
+		Set<V> partition = new HashSet<V>();
+		for(V vertex : vertices) {
+			if(vertex.getIterationDetected() == iteration)
+				vertices.add(vertex);
+		}
+		return partition;
+	}
 }

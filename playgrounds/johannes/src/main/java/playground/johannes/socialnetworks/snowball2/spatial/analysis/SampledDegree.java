@@ -29,6 +29,8 @@ import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
+import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
+
 
 /**
  * @author illenberger

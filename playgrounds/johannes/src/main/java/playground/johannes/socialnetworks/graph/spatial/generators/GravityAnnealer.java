@@ -41,7 +41,6 @@ import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTriangles;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitch;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 
 /**
  * @author illenberger
@@ -76,13 +75,8 @@ public class GravityAnnealer {
 		generator.outputDir = config.getParam(MODULE_NAME, "output");
 		generator.descretization = Double.parseDouble(config.getParam(MODULE_NAME, "descretization"));
 		
-		String gridFile = config.findParam(MODULE_NAME, "densityGrid");
-		SpatialGrid<Double> densityGrid = null;
-		if(gridFile != null)
-			densityGrid = SpatialGrid.readFromFile(gridFile);
-		
 		new File(generator.outputDir).mkdirs();
-		generator.generate(graph, densityGrid);
+		generator.generate(graph);
 	
 	}
 	
@@ -104,7 +98,7 @@ public class GravityAnnealer {
 	
 	private double descretization = 1000.0;
 	
-	public void generate(SpatialSparseGraph graph, SpatialGrid<Double> densityGrid) {
+	public void generate(SpatialSparseGraph graph) {
 		SpatialAdjacencyMatrix matrix = new SpatialAdjacencyMatrix(graph);
 		/*
 		 * Setup ergm terms.

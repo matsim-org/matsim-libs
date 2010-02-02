@@ -400,24 +400,24 @@ public class SpatialGraphStatistics {
 		return edgeLengthDegreeCorrelation(network.getVertices());
 	}
 
-	public static TDoubleDoubleHashMap densityCorrelation(
-			TObjectDoubleHashMap<? extends SpatialSparseVertex> vertexValues,
-			SpatialGrid<Double> densityGrid, double binsize) {
-		double values1[] = new double[vertexValues.size()];
-		double values2[] = new double[vertexValues.size()];
-
-		TObjectDoubleIterator<? extends SpatialSparseVertex> it = vertexValues
-				.iterator();
-		for (int i = 0; i < values1.length; i++) {
-			it.advance();
-			if (densityGrid.isInBounds(it.key().getCoordinate())) {
-				values1[i] = densityGrid.getValue(it.key().getCoordinate());
-				values2[i] = it.value();
-			}
-		}
-
-		return Correlations.correlationMean(values1, values2, binsize);
-	}
+//	public static TDoubleDoubleHashMap densityCorrelation(
+//			TObjectDoubleHashMap<? extends SpatialSparseVertex> vertexValues,
+//			SpatialGrid<Double> densityGrid, double binsize) {
+//		double values1[] = new double[vertexValues.size()];
+//		double values2[] = new double[vertexValues.size()];
+//
+//		TObjectDoubleIterator<? extends SpatialSparseVertex> it = vertexValues
+//				.iterator();
+//		for (int i = 0; i < values1.length; i++) {
+//			it.advance();
+//			if (densityGrid.isInBounds(it.key().getCoordinate())) {
+//				values1[i] = densityGrid.getValue(it.key().getCoordinate());
+//				values2[i] = it.value();
+//			}
+//		}
+//
+//		return Correlations.correlationMean(values1, values2, binsize);
+//	}
 
 	public static TDoubleDoubleHashMap densityCorrelation(TObjectDoubleHashMap<? extends SpatialSparseVertex> vertexValues, ZoneLayerDouble zones, double binsize) {
 		double values1[] = new double[vertexValues.size()];
@@ -437,17 +437,17 @@ public class SpatialGraphStatistics {
 		return Correlations.correlationMean(values1, values2, binsize);
 	}
 	
-	public static TDoubleDoubleHashMap degreeDensityCorrelation(
-			Collection<? extends SpatialSparseVertex> vertices,
-			SpatialGrid<Double> densityGrid) {
-		TObjectDoubleHashMap<SpatialSparseVertex> vertexValues = new TObjectDoubleHashMap<SpatialSparseVertex>();
-		for (SpatialSparseVertex e : vertices) {
-			vertexValues.put(e, e.getEdges().size());
-		}
-
-		return densityCorrelation(vertexValues, densityGrid, densityGrid
-				.getResolution());
-	}
+//	public static TDoubleDoubleHashMap degreeDensityCorrelation(
+//			Collection<? extends SpatialSparseVertex> vertices,
+//			SpatialGrid<Double> densityGrid) {
+//		TObjectDoubleHashMap<SpatialSparseVertex> vertexValues = new TObjectDoubleHashMap<SpatialSparseVertex>();
+//		for (SpatialSparseVertex e : vertices) {
+//			vertexValues.put(e, e.getEdges().size());
+//		}
+//
+//		return densityCorrelation(vertexValues, densityGrid, densityGrid
+//				.getResolution());
+//	}
 	
 	public static TDoubleDoubleHashMap degreeDensityCorrelation(
 			Collection<? extends SpatialSparseVertex> vertices,
@@ -460,13 +460,13 @@ public class SpatialGraphStatistics {
 		return densityCorrelation(vertexValues, zones, binsize);
 	}
 
-	public static TDoubleDoubleHashMap clusteringDensityCorrelation(
-			Collection<? extends SpatialSparseVertex> vertices,
-			SpatialGrid<Double> densityGrid) {
-		return densityCorrelation(GraphStatistics
-				.localClusteringCoefficients(vertices), densityGrid,
-				densityGrid.getResolution());
-	}
+//	public static TDoubleDoubleHashMap clusteringDensityCorrelation(
+//			Collection<? extends SpatialSparseVertex> vertices,
+//			SpatialGrid<Double> densityGrid) {
+//		return densityCorrelation(GraphStatistics
+//				.localClusteringCoefficients(vertices), densityGrid,
+//				densityGrid.getResolution());
+//	}
 	
 	public static TDoubleDoubleHashMap clusteringDensityCorrelation(
 			Collection<? extends SpatialSparseVertex> vertices,
@@ -546,17 +546,17 @@ public class SpatialGraphStatistics {
 		return centerDistanceCorrelation(GraphStatistics.localClusteringCoefficients(vertices), binsize);
 	}
 	
-	public static <V extends SpatialSparseVertex> TDoubleObjectHashMap<Set<V>> createDensityPartitions(
-			Set<V> vertices, SpatialGrid<Double> densityGrid, double binsize) {
-		TObjectDoubleHashMap<V> vertexValues = new TObjectDoubleHashMap<V>();
-		for (V v : vertices) {
-			if (densityGrid.isInBounds(v.getCoordinate())) {
-				double rho = densityGrid.getValue(v.getCoordinate());
-				vertexValues.put(v, rho);
-			}
-		}
-		return Partitions.createPartitions(vertexValues, binsize);
-	}
+//	public static <V extends SpatialSparseVertex> TDoubleObjectHashMap<Set<V>> createDensityPartitions(
+//			Set<V> vertices, SpatialGrid<Double> densityGrid, double binsize) {
+//		TObjectDoubleHashMap<V> vertexValues = new TObjectDoubleHashMap<V>();
+//		for (V v : vertices) {
+//			if (densityGrid.isInBounds(v.getCoordinate())) {
+//				double rho = densityGrid.getValue(v.getCoordinate());
+//				vertexValues.put(v, rho);
+//			}
+//		}
+//		return Partitions.createPartitions(vertexValues, binsize);
+//	}
 	
 	public static <V extends SpatialSparseVertex> TDoubleObjectHashMap<Set<V>> createDensityPartitions(
 			Set<V> vertices, ZoneLayerDouble zones, double binsize) {

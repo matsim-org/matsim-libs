@@ -127,7 +127,7 @@ public class EgoAlterTableReader {
 			/*
 			 * parse id and source
 			 */
-			if(ignore(tokens[idIdx]))
+			if(idIdx >= tokens.length || ignore(tokens[idIdx]))
 				data.id = new Integer(idPool++);
 			else
 				data.id = new Integer(tokens[idIdx]);
