@@ -72,6 +72,7 @@ public class OTFClientFile extends OTFClient {
 		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		this.connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		
 		this.connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		this.connect.add(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
 		this.connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
@@ -79,8 +80,11 @@ public class OTFClientFile extends OTFClient {
 		 * Only needed for backward compatibility, see comment above (dg, nov 09)
 		 */
 		this.connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
+
 		this.connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+		
 		this.connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+
 		this.connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		
 		/*
