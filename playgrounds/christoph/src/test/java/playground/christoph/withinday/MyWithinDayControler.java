@@ -85,17 +85,17 @@ public class MyWithinDayControler extends Controler {
 //
 
 		// use replanning during activity
-		this.duringActivityIdentifier = new Identifier(this.sim);
+		this.duringActivityIdentifier = new OldPeopleIdentifier(this.sim);
 		this.duringActivityReplanner = new ReplannerOldPeople(ReplanningIdGenerator.getNextId());
 		this.duringActivityReplanner.setReplanner(dijkstraRouter);
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 
-//		this.duringLegIdentifier = new LeaveLinkIdentifier(this.sim);
-//		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.network);
-//		this.duringLegReplanner.setReplanner(dijkstraRouter);
-//		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
-//		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
+		this.duringLegIdentifier = new YoungPeopleIdentifier(this.sim);
+		this.duringLegReplanner = new ReplannerYoungPeople(ReplanningIdGenerator.getNextId(), this.network);
+		this.duringLegReplanner.setReplanner(dijkstraRouter);
+		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
+		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
 	}
 
 	/*
@@ -152,7 +152,7 @@ public class MyWithinDayControler extends Controler {
 		//just activitate replanning during an activity
 		replanningManager.doActEndReplanning(true);
 		replanningManager.doInitialReplanning(false);
-		replanningManager.doLeaveLinkReplanning(false);
+		replanningManager.doLeaveLinkReplanning(true);
 
 		sim.run();
 	}

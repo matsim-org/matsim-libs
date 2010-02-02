@@ -12,7 +12,7 @@ import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
-public class Identifier extends DuringActivityIdentifier {
+public class OldPeopleIdentifier extends DuringActivityIdentifier {
 
 	private WithinDayQSim queueSim;
 
@@ -44,7 +44,7 @@ public class Identifier extends DuringActivityIdentifier {
 		return list;
 	}
 
-	public Identifier(WithinDayQSim queueSim) {
+	public OldPeopleIdentifier(WithinDayQSim queueSim) {
 		this.queueSim = queueSim;
 	}
 

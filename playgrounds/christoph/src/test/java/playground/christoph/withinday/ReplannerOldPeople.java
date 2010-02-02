@@ -74,7 +74,7 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 		
 		LegImpl legToNewWork=new LegImpl(TransportMode.car);
 		
-		selectedPlan.insertLegAct(selectedPlan.getPlanElements().indexOf(currentActivity)+1, legToNewWork, newWorkAct);
+		selectedPlan.insertLegAct(selectedPlan.getActLegIndex(currentActivity)+1, legToNewWork, newWorkAct);
 		
 		
 		// Create a new plan for only that part, which is changed.
