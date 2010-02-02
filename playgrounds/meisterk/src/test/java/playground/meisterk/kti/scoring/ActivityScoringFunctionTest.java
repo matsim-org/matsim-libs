@@ -93,9 +93,9 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		this.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
 		// Scenario
-		
+
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		
+
 		// generate person
 		this.population = scenario.getPopulation();
 //		Id personId = new IdImpl("123");
@@ -132,7 +132,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		RouteFactory ptRouteFactory = new KtiPtRouteFactory(null);
 		this.network.getFactory().setRouteFactory(TransportMode.pt, ptRouteFactory);
-		
+
 		// generate desires
 		Desires desires = person.createDesires("test desires");
 		desires.putActivityDuration("home", Time.parseTime("15:40:00"));
@@ -143,7 +143,8 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		// generate plan
 		plan = person.createAndAddPlan(true);
 
-		ActivityImpl act = plan.createAndAddActivity("home", facilityHome);
+		ActivityImpl act = plan.createAndAddActivity("home");
+		act.setFacilityId(facilityHome.getId());
 		Link link = this.network.getLinks().get(new IdImpl("2030"));
 		act.setLinkId(link.getId());
 		act.setCoord(link.getCoord());
@@ -151,7 +152,8 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		RouteWRefs route = network.getFactory().createRoute(TransportMode.car, this.network.getLinks().get(new IdImpl("2030")), this.network.getLinks().get(new IdImpl("3040")));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("work_sector3", facilityWork);
+		act = plan.createAndAddActivity("work_sector3");
+		act.setFacilityId(facilityWork.getId());
 		link = this.network.getLinks().get(new IdImpl("3040"));
 		act.setLinkId(link.getId());
 		act.setCoord(link.getCoord());
@@ -161,7 +163,8 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		((GenericRoute) route).setRouteDescription(this.network.getLinks().get(new IdImpl("3040")), "bla", this.network.getLinks().get(new IdImpl("4050")));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("leisure", facilityLeisure);
+		act = plan.createAndAddActivity("leisure");
+		act.setFacilityId(facilityLeisure.getId());
 		link = this.network.getLinks().get(new IdImpl("4050"));
 		act.setLinkId(link.getId());
 		act.setCoord(link.getCoord());
@@ -171,7 +174,8 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		((GenericRoute) route).setRouteDescription(this.network.getLinks().get(new IdImpl("3040")), "bla", this.network.getLinks().get(new IdImpl("4050")));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("work_sector3", facilityWork);
+		act = plan.createAndAddActivity("work_sector3");
+		act.setFacilityId(facilityWork.getId());
 		link = this.network.getLinks().get(new IdImpl("3040"));
 		act.setLinkId(link.getId());
 		act.setCoord(link.getCoord());
@@ -179,7 +183,8 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route = network.getFactory().createRoute(TransportMode.car, this.network.getLinks().get(new IdImpl("3040")), this.network.getLinks().get(new IdImpl("2030")));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("home", facilityHome);
+		act = plan.createAndAddActivity("home");
+		act.setFacilityId(facilityHome.getId());
 		link = this.network.getLinks().get(new IdImpl("2030"));
 		act.setLinkId(link.getId());
 		act.setCoord(link.getCoord());
@@ -187,7 +192,8 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLinks().get(new IdImpl("2030")), this.network.getLinks().get(new IdImpl("1020")));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("shop", facilityShop);
+		act = plan.createAndAddActivity("shop");
+		act.setFacilityId(facilityShop.getId());
 		link = this.network.getLinks().get(new IdImpl("1020"));
 		act.setLinkId(link.getId());
 		act.setCoord(link.getCoord());
@@ -195,7 +201,8 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLinks().get(new IdImpl("1020")), this.network.getLinks().get(new IdImpl("2030")));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("home", facilityHome);
+		act = plan.createAndAddActivity("home");
+		act.setFacilityId(facilityHome.getId());
 		link = this.network.getLinks().get(new IdImpl("2030"));
 		act.setLinkId(link.getId());
 		act.setCoord(link.getCoord());
@@ -324,7 +331,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(1, ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().size());
 		assertEquals(ActivityScoringFunction.class, ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().get(0).getClass());
 		ActivityScoringFunction asf = (ActivityScoringFunction) ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().get(0);
-		
+
 		testee.endActivity(Time.parseTime("08:00:00"));
 
 		assertEquals(0, asf.getAccumulatedDurations().size());

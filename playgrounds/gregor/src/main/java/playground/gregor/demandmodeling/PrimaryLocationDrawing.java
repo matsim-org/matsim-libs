@@ -170,7 +170,7 @@ public class PrimaryLocationDrawing {
 			for (int i = 0; i < li ; i++) {
 				final PersonImpl pers = new PersonImpl(new IdImpl(this.id++));
 				final PlanImpl plan = new org.matsim.core.population.PlanImpl(pers);
-				final ActivityImpl act = new org.matsim.core.population.ActivityImpl("h",link.getCoord(),link);
+				final ActivityImpl act = new org.matsim.core.population.ActivityImpl("h",link.getCoord(),link.getId());
 				act.setEndTime(6*3600);
 				plan.addActivity(act);
 				pers.addPlan(plan);
@@ -241,7 +241,7 @@ public class PrimaryLocationDrawing {
 				leg.setArrivalTime(Time.UNDEFINED_TIME);
 				leg.setDepartureTime(Time.UNDEFINED_TIME);
 				leg.setTravelTime(Time.UNDEFINED_TIME);
-				ActivityImpl act = new org.matsim.core.population.ActivityImpl("w",link.getCoord(),link);
+				ActivityImpl act = new org.matsim.core.population.ActivityImpl("w",link.getCoord(),link.getId());
 				pers.getSelectedPlan().addLeg(leg);
 				pers.getSelectedPlan().addActivity(act);
 				try {

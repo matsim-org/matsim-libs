@@ -21,41 +21,49 @@
 package org.matsim.analysis;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteWRefs;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+/**
+ * Calculates the average trip length of all routes in a plan. The trip length
+ * is the sum of the length of all links, including the route's end link, but
+ * <em>not</em> including the route's start link.
+ *
+ * @author mrieser
+ */
 public class CalcAverageTripLength extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private double sumLength = 0.0;
 	private int cntTrips = 0;
 	private final Network network;
-	
+
 	public CalcAverageTripLength(final Network network) {
 		this.network = network;
 	}
-	
+
 	@Override
 	public void run(final Person person) {
 		this.run(person.getSelectedPlan());
 	}
 
 	public void run(final Plan plan) {
-		for (int i = 2, max = plan.getPlanElements().size(); i < max; i += 2) {
-			ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i);
-			LegImpl leg = (LegImpl) plan.getPlanElements().get(i - 1);
-			RouteWRefs route = leg.getRoute();
-			if (route != null) {
-				double dist = route.getDistance();
-				if (act.getLinkId() != null) {
-					dist += this.network.getLinks().get(act.getLinkId()).getLength();
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				Route route = leg.getRoute();
+				if (route != null) {
+					double dist = route.getDistance();
+					if (route.getEndLinkId() != null && route.getStartLinkId() != route.getEndLinkId()) {
+						dist += this.network.getLinks().get(route.getEndLinkId()).getLength();
+					}
+					this.sumLength += dist;
+					this.cntTrips++;
 				}
-				this.sumLength += dist;
-				this.cntTrips++;
 			}
 		}
 	}

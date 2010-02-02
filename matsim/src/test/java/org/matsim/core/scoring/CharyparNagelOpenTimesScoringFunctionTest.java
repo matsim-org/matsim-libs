@@ -73,10 +73,10 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		this.person = new PersonImpl(new IdImpl(1));
 		this.plan = person.createAndAddPlan(true);
 
-		ActivityImpl act = plan.createAndAddActivity("no type", testFacility);
+		ActivityImpl act = plan.createAndAddActivity("no type");
+		act.setFacilityId(testFacility.getId());
 		act.setStartTime(8.0 * 3600);
 		act.setEndTime(16.0 * 3600);
-		act.setFacilityId(testFacility.getId());
 	}
 
 	@Override

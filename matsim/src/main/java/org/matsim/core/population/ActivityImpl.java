@@ -22,9 +22,7 @@ package org.matsim.core.population;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -35,18 +33,18 @@ public class ActivityImpl implements Activity {
 	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
 	@Deprecated
 	private double startTime = Time.UNDEFINED_TIME;
-	
+
 	private double dur = Time.UNDEFINED_TIME;
 
 	private String type;
 	private Coord coord = null;
 	protected Id linkId = null;
 	protected Id facilityId = null;
-	
-	private ActivityImpl(final String type) {
+
+	/*package*/ ActivityImpl(final String type) {
 		this.type = type.intern();
 	}
-	
+
 	public ActivityImpl(final String type, final Id linkId) {
 		this(type);
 		this.setLinkId(linkId);
@@ -57,13 +55,8 @@ public class ActivityImpl implements Activity {
 		this.setCoord(coord);
 	}
 
-	public ActivityImpl(final String type, final ActivityFacility fac) {
-		this(type);
-		this.setFacilityId(fac.getId());
-	}
-
-	public ActivityImpl(final String type, final Coord coord, final Link link) {
-		this(type, link.getId());
+	public ActivityImpl(final String type, final Coord coord, final Id linkId) {
+		this(type, linkId);
 		this.setCoord(coord);
 	}
 
@@ -79,34 +72,41 @@ public class ActivityImpl implements Activity {
 		this.setFacilityId(act.getFacilityId());
 	}
 
+	@Override
 	public final double getEndTime() {
 		return this.endTime;
 	}
-	
+
+	@Override
 	public final void setEndTime(final double endTime) {
 		this.endTime = endTime;
 	}
 
 	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
 	@Deprecated
+	@Override
 	public final double getStartTime() {
 		return this.startTime;
 	}
 
 	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
 	@Deprecated
+	@Override
 	public final void setStartTime(final double startTime) {
 		this.startTime = startTime;
 	}
-	
+
+	@Override
 	public final String getType() {
 		return this.type;
 	}
 
+	@Override
 	public final void setType(final String type) {
 		this.type = type.intern();
 	}
-	
+
+	@Override
 	public final Coord getCoord() {
 		return this.coord;
 	}
@@ -115,14 +115,16 @@ public class ActivityImpl implements Activity {
 		this.coord = coord;
 	}
 
-	public final Id getLinkId() { 
+	@Override
+	public final Id getLinkId() {
 		return this.linkId;
 	}
-	
+
+	@Override
 	public final Id getFacilityId() {
 		return this.facilityId;
 	}
-	
+
 	public final void setFacilityId(final Id facilityId) {
 		this.facilityId = facilityId;
 	}
@@ -130,7 +132,7 @@ public class ActivityImpl implements Activity {
 	public final void setLinkId(final Id linkId) {
 		this.linkId = linkId;
 	}
-	
+
 	@Override
 	public final String toString() {
 		return "[type=" + this.getType() + "]" +
@@ -185,5 +187,5 @@ public class ActivityImpl implements Activity {
 	public void setDuration(final double dur) {
 		this.dur = dur;
 	}
-	
+
 }

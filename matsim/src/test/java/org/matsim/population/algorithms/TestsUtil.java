@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -28,7 +27,8 @@ public class TestsUtil {
 			Location location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
 			ActivityImpl act;
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(planomatConfigGroup.getTripStructureAnalysisLayer())) {
-				act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacilityImpl) location);
+				act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
+				act.setFacilityId(location.getId());
 			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(planomatConfigGroup.getTripStructureAnalysisLayer())) {
 				act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
 			} else {
@@ -41,9 +41,9 @@ public class TestsUtil {
 		}
 		return plan;
 	}
-	
+
 	/* Warning: This is NOT claimed to be correct. (It isn't.)
-	 * 
+	 *
 	 */
 	static boolean equals(PlanElement o1, PlanElement o2) {
 		if (o1 instanceof LegImpl) {

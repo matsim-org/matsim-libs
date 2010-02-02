@@ -181,7 +181,7 @@ public class PTActWriter {
 					}
 			    	thisAct.setLinkId(logicNet.getNearestLink(thisAct.getCoord()).getId());
 
-			    	newPlan.addActivity(newPTAct(thisAct.getType(), thisAct.getCoord(), logicNet.getLinks().get(thisAct.getLinkId()), thisAct.getStartTime(), thisAct.getEndTime()));
+			    	newPlan.addActivity(newPTAct(thisAct.getType(), thisAct.getCoord(), thisAct.getLinkId(), thisAct.getStartTime(), thisAct.getEndTime()));
 					lastAct = thisAct;
 					first=false;
 				}
@@ -278,7 +278,7 @@ public class PTActWriter {
 					arrTime= depTime+ legTravelTime;
 					legDistance=legDistance + linkDistance;
 					newPlan.addLeg(newPTLeg(TransportMode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime)); //Attention: The legMode car is temporal only for visualization purposes
-					newPlan.addActivity(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, arrTime)); //describes the location
+					newPlan.addActivity(newPTAct("exit pt veh", link.getToNode().getCoord(), link.getId(), arrTime, arrTime)); //describes the location
 				}
 
 			}else if(link.getType().equals(PTValues.TRANSFER_STR) ){  //add the PTleg and a Transfer Act
@@ -288,7 +288,7 @@ public class PTActWriter {
 					newPlan.addLeg(newPTLeg(TransportMode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime)); //-->: The legMode car is temporal only for visualization purposes
 					//newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
 					double endTime = accumulatedTime + linkTravelTime;
-					newPlan.addActivity(newPTAct("transf", link.getFromNode().getCoord(), link, accumulatedTime, endTime));
+					newPlan.addActivity(newPTAct("transf", link.getFromNode().getCoord(), link.getId(), accumulatedTime, endTime));
 
 					/*
 					////////////////////////////// find roundabout connections
@@ -312,7 +312,7 @@ public class PTActWriter {
 				newPlan.addLeg(newPTLeg(TransportMode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
 
 				/**act exit ptv*/
-				newPlan.addActivity(newPTAct("transf off", link.getFromNode().getCoord(), link, arrTime, arrTime));
+				newPlan.addActivity(newPTAct("transf off", link.getFromNode().getCoord(), link.getId(), arrTime, arrTime));
 
 				/**like a Walking leg*/
 				walkTime= linkDistance * ptValues.AV_WALKING_SPEED;
@@ -324,7 +324,7 @@ public class PTActWriter {
 
 				/**wait pt*/
 				double endTime= depTime + linkTravelTime; // The ptTravelTime must be calculated like this: travelTime = walk + transferTime;
-				newPlan.addActivity(newPTAct("transf on", link.getToNode().getCoord(), link, arrTime, endTime));
+				newPlan.addActivity(newPTAct("transf on", link.getToNode().getCoord(), link.getId(), arrTime, endTime));
 
 			}else if (link.getType().equals(PTValues.EGRESS_STR)){
 				legRouteLinks.clear();
@@ -344,7 +344,7 @@ public class PTActWriter {
 
 				/**wait pt*/
 				double endTime= depTime + linkTravelTime;
-				newPlan.addActivity(newPTAct("wait pt", link.getToNode().getCoord(), link, arrTime, endTime));
+				newPlan.addActivity(newPTAct("wait pt", link.getToNode().getCoord(), link.getId(), arrTime, endTime));
 
 			}
 					/*
@@ -359,8 +359,8 @@ public class PTActWriter {
 		}//for Link
 	}//insert
 
-	private ActivityImpl newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double endTime){
-		ActivityImpl ptAct= new ActivityImpl(type, coord, link);
+	private ActivityImpl newPTAct(final String type, final Coord coord, final Id linkId, final double startTime, final double endTime){
+		ActivityImpl ptAct= new ActivityImpl(type, coord, linkId);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		return ptAct;

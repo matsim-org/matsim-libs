@@ -35,7 +35,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -50,7 +49,7 @@ import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 
 /**
  * Test class for {@link PlanAnalyzeTourModeChoiceSet}.
- * 
+ *
  * Contains illustrative examples for analysis of feasible mode chains. See documentation <a href=http://matsim.org/node/267">here</a>.
  * @author meisterk
  *
@@ -61,7 +60,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 	private static Logger log = Logger.getLogger(PlanAnalyzeTourModeChoiceSetTest.class);
 
 	private Config config;
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -310,17 +309,17 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			TransportMode[] combination = new TransportMode[testedActChainLocations.split(" ").length - 1];
 			combination[0] = combination[1] = combination[4] = combination[5] = TransportMode.car;
 			for (int jj = 0; jj < variableLegs ; jj++) {
-				combination[jj + 2] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk; 
+				combination[jj + 2] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk;
 			}
 			expectedTourModeOptions.add(combination);
-		}		
+		}
 
 		variableLegs = 4;
 		for (int ii = 0; ii < (int) Math.pow(2, variableLegs); ii++) {
 			TransportMode[] combination = new TransportMode[testedActChainLocations.split(" ").length - 1];
 			combination[0] = combination[5] = TransportMode.car;
 			for (int jj = 0; jj < variableLegs ; jj++) {
-				combination[jj + 1] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk; 
+				combination[jj + 1] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk;
 			}
 			expectedTourModeOptions.add(combination);
 		}
@@ -330,7 +329,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			TransportMode[] combination = new TransportMode[testedActChainLocations.split(" ").length - 1];
 			combination[0] = TransportMode.pt;
 			for (int jj = 0; jj < variableLegs; jj++) {
-				combination[jj + 1] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk; 
+				combination[jj + 1] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk;
 			}
 			expectedTourModeOptions.add(combination);
 		}
@@ -341,7 +340,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			combination[0] = combination[5] = TransportMode.bike;
 			combination[1] = TransportMode.pt;
 			for (int jj = 0; jj < variableLegs; jj++) {
-				combination[jj + 2] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk; 
+				combination[jj + 2] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk;
 			}
 			expectedTourModeOptions.add(combination);
 		}
@@ -358,7 +357,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			combination[0] = combination[5] = TransportMode.bike;
 			combination[1] = TransportMode.walk;
 			for (int jj = 0; jj < variableLegs; jj++) {
-				combination[jj + 2] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk; 
+				combination[jj + 2] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk;
 			}
 			expectedTourModeOptions.add(combination);
 		}
@@ -368,7 +367,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			TransportMode[] combination = new TransportMode[testedActChainLocations.split(" ").length - 1];
 			combination[0] = TransportMode.walk;
 			for (int jj = 0; jj < variableLegs; jj++) {
-				combination[jj + 1] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk; 
+				combination[jj + 1] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk;
 			}
 			expectedTourModeOptions.add(combination);
 		}
@@ -380,20 +379,20 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		testee.setModeSet(possibleModes);
 
 //		testee.setDoLogging(true);
-		
+
 		for (Entry<String, ArrayList<TransportMode[]>> entry : testCases.entrySet()) {
 
 			String facString  = entry.getKey();
 			log.info("Testing location sequence: " + facString);
 
 			PlanImpl plan = this.generateTestPlan(facString, layer);
-			
+
 			testee.run(plan);
 
 			ArrayList<TransportMode[]> actual = testee.getChoiceSet();
 			assertEquals(entry.getValue().size(), actual.size());
 			assertTrue(Arrays.deepEquals(
-					entry.getValue().toArray(new TransportMode[0][0]), 
+					entry.getValue().toArray(new TransportMode[0][0]),
 					actual.toArray(new TransportMode[0][0])));
 
 		}
@@ -401,7 +400,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 	}
 
 	public void testIsModeChainFeasible(ActivityFacilities facilities) {
-		
+
 		// load data
 		log.info("Reading network xml file...");
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -415,43 +414,43 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		String facString = "1 2 3 4 3 2 1";
 		PlanImpl testPlan = this.generateTestPlan(facString, network);
 		EnumSet<TransportMode> chainBasedModes = EnumSet.of(TransportMode.bike, TransportMode.car);
-		
+
 		HashMap<TransportMode[], Boolean> candidates = new HashMap<TransportMode[], Boolean>();
 		candidates.put(
 				new TransportMode[]{
-						TransportMode.car, 
-						TransportMode.car, 
-						TransportMode.car, 
-						TransportMode.car, 
-						TransportMode.car, 
-						TransportMode.car}, 
+						TransportMode.car,
+						TransportMode.car,
+						TransportMode.car,
+						TransportMode.car,
+						TransportMode.car,
+						TransportMode.car},
 				true);
 		candidates.put(
 				new TransportMode[]{
-						TransportMode.car, 
-						TransportMode.pt, 
-						TransportMode.car, 
-						TransportMode.car, 
-						TransportMode.pt, 
-						TransportMode.car}, 
+						TransportMode.car,
+						TransportMode.pt,
+						TransportMode.car,
+						TransportMode.car,
+						TransportMode.pt,
+						TransportMode.car},
 				false);
 		candidates.put(
 				new TransportMode[]{
-						TransportMode.car, 
-						TransportMode.pt, 
-						TransportMode.walk, 
-						TransportMode.walk, 
-						TransportMode.pt, 
-						TransportMode.car}, 
+						TransportMode.car,
+						TransportMode.pt,
+						TransportMode.walk,
+						TransportMode.walk,
+						TransportMode.pt,
+						TransportMode.car},
 				true);
 		candidates.put(
 				new TransportMode[]{
-						TransportMode.car, 
-						TransportMode.pt, 
-						TransportMode.walk, 
-						TransportMode.walk, 
-						TransportMode.pt, 
-						TransportMode.walk}, 
+						TransportMode.car,
+						TransportMode.pt,
+						TransportMode.walk,
+						TransportMode.walk,
+						TransportMode.pt,
+						TransportMode.walk},
 				false);
 
 		for (TransportMode[] candidate : candidates.keySet()) {
@@ -459,23 +458,24 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 					Boolean.valueOf(PlanAnalyzeTourModeChoiceSet.isModeChainFeasible(testPlan, candidate, chainBasedModes, this.config.planomat().getTripStructureAnalysisLayer(), facilities, network)),
 					candidates.get(candidate));
 		}
-		
+
 	}
-	
+
 	private PlanImpl generateTestPlan(String facString, Layer layer) {
 
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer = this.config.planomat().getTripStructureAnalysisLayer();
 		Location location = null;
 		ActivityImpl act = null;
-		
+
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-				act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacilityImpl) location);
+				act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
+				act.setFacilityId(location.getId());
 			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
 				act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
 			}
@@ -484,9 +484,9 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 				plan.createAndAddLeg(TransportMode.undefined);
 			}
 		}
-		
+
 		return plan;
-		
+
 	}
-	
+
 }

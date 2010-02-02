@@ -25,7 +25,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
@@ -62,7 +61,8 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	public ActivityImpl createActivityFromFacilityId(final String actType, final Id facilityId) {
-		ActivityImpl act = new ActivityImpl(actType, ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(facilityId));
+		ActivityImpl act = new ActivityImpl(actType);
+		act.setFacilityId(facilityId);
 		return act;
 	}
 

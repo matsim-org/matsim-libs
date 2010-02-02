@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.misc.Time;
 
 public class PlanImpl implements Plan {
@@ -67,9 +66,9 @@ public class PlanImpl implements Plan {
 		return a;
 	}
 
-	public final ActivityImpl createAndAddActivity(final String type, final ActivityFacility fac) {
+	public final ActivityImpl createAndAddActivity(final String type) {
 		verifyCreateAct();
-		ActivityImpl a = new ActivityImpl(type, fac);
+		ActivityImpl a = new ActivityImpl(type);
 		getPlanElements().add(a);
 		return a;
 	}
