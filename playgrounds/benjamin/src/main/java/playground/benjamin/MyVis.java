@@ -35,6 +35,7 @@ public class MyVis {
 //		String otffile = "../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
 //		String otffile = BkPaths.RUNBASE + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
 
+
 //	Für den interactiven Modus: Hier die config übergeben und in der config:
 //		1. QSim-Modul einschalten ("qsim" statt "simulation")!
 //		2. Snapshot-Period auf 0 setzen!
