@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.PersonAgentI;
 
-public class MobsimActivityFacility {
+public class MobsimActivityFacility implements Updateable {
 	final private static Logger log = Logger.getLogger( MobsimActivityFacility.class ) ; 
 	
 	private Queue<PersonAgentI> internalQueue = new PriorityQueue<PersonAgentI>(1, new DepartureTimeComparator() ) ;
@@ -40,7 +40,7 @@ public class MobsimActivityFacility {
 		internalQueue.add( person ) ;
 	}
 	
-	void selfUpdate() {
+	public void update() {
 		PersonAgentI person = internalQueue.peek();
 	    if ( person.getDepartureTime() <= now() ) {
 	        internalQueue.remove();
