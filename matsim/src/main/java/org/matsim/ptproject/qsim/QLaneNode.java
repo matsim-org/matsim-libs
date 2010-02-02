@@ -110,7 +110,7 @@ public class QLaneNode extends QNode {
       if (nextQueueLink.hasSpace()) {
         currentLane.popFirstFromBuffer();
         veh.getDriver().moveOverNode();
-        nextQueueLink.add(veh);
+        nextQueueLink.addFromIntersection(veh);
         return true;
       }
 
@@ -130,7 +130,7 @@ public class QLaneNode extends QNode {
         } else {
           currentLane.popFirstFromBuffer();
           veh.getDriver().moveOverNode();
-          nextQueueLink.add(veh);
+          nextQueueLink.addFromIntersection(veh);
           return true;
         }
       }

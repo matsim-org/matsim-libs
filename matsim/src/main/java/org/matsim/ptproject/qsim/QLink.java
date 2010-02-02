@@ -48,7 +48,7 @@ public interface QLink {
    * @param veh
    *          the vehicle
    */
-  public void add(final QVehicle veh);
+  public void addFromIntersection(final QVehicle veh);
 
   public void addParkedVehicle(QVehicle vehicle);
 

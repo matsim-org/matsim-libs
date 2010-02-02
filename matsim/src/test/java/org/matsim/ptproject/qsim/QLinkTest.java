@@ -81,7 +81,7 @@ public class QLinkTest extends MatsimTestCase {
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		v.setDriver(new PersonAgent(p, new QSim(scenario, new EventsManagerImpl())));
 		
-		f.qlink1.add(v);
+		f.qlink1.addFromIntersection(v);
 		assertEquals(1, f.qlink1.vehOnLinkCount());
 		assertFalse(f.qlink1.hasSpace());
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -110,7 +110,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(0, f.qlink1.getAllVehicles().size());
 
 		// add a vehicle, it should be now in the vehicle queue
-		f.qlink1.add(veh);
+		f.qlink1.addFromIntersection(veh);
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(1, f.qlink1.vehOnLinkCount());
 		assertEquals("vehicle not found on link.", veh, f.qlink1.getVehicle(id1));
@@ -275,7 +275,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertTrue(qlink.bufferIsEmpty());
 		assertEquals(0, qlink.vehOnLinkCount());
 		// add v1
-		qlink.add(v1);
+		qlink.addFromIntersection(v1);
 		assertEquals(1, qlink.vehOnLinkCount());
 		assertTrue(qlink.bufferIsEmpty());
 		// time step 1, v1 is moved to buffer
@@ -283,7 +283,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(0, qlink.vehOnLinkCount());
 		assertFalse(qlink.bufferIsEmpty());
 		// add v2, still time step 1
-		qlink.add(v2);
+		qlink.addFromIntersection(v2);
 		assertEquals(1, qlink.vehOnLinkCount());
 		assertFalse(qlink.bufferIsEmpty());
 		// time step 2, v1 still in buffer, v2 cannot enter buffer, so still on link
@@ -322,9 +322,9 @@ public class QLinkTest extends MatsimTestCase {
 		veh5.setDriver(new PersonAgent(p, null));
 		
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);
-		f.qlink2.add(veh5);  // used vehicle equivalents: 5
+		f.qlink2.addFromIntersection(veh5);  // used vehicle equivalents: 5
 		assertTrue(f.qlink2.hasSpace());
-		f.qlink2.add(veh5);  // used vehicle equivalents: 10
+		f.qlink2.addFromIntersection(veh5);  // used vehicle equivalents: 10
 		assertFalse(f.qlink2.hasSpace());
 		
 		assertTrue(f.qlink2.bufferIsEmpty());
@@ -334,18 +334,18 @@ public class QLinkTest extends MatsimTestCase {
 		f.qlink2.popFirstFromBuffer();  // first veh leaves buffer
 		assertTrue(f.qlink2.hasSpace());
 		
-		f.qlink2.add(veh25); // used vehicle equivalents: 7.5
-		f.qlink2.add(veh1);  // used vehicle equivalents: 8.5
-		f.qlink2.add(veh1);  // used vehicle equivalents: 9.5
+		f.qlink2.addFromIntersection(veh25); // used vehicle equivalents: 7.5
+		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 8.5
+		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 9.5
 		assertTrue(f.qlink2.hasSpace());
-		f.qlink2.add(veh1);  // used vehicle equivalents: 10.5
+		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 10.5
 		assertFalse(f.qlink2.hasSpace());
 		
 		f.qlink2.moveLink(6.0); // first veh moves to buffer, used vehicle equivalents: 5.5
 		assertTrue(f.qlink2.hasSpace());
-		f.qlink2.add(veh1);  // used vehicle equivalents: 6.5
-		f.qlink2.add(veh25); // used vehicle equivalents: 9.0
-		f.qlink2.add(veh1);  // used vehicle equivalents: 10.0
+		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 6.5
+		f.qlink2.addFromIntersection(veh25); // used vehicle equivalents: 9.0
+		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 10.0
 		assertFalse(f.qlink2.hasSpace());
 		
 	}

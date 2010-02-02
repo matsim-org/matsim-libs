@@ -175,7 +175,7 @@ public class QLinkImpl implements QLink {
 	 * @param veh
 	 *          the vehicle
 	 */
-	public void add(final QVehicle veh) {
+	public void addFromIntersection(final QVehicle veh) {
 		double now = QSimTimer.getTime();
 		activateLink();
 		this.add(veh, now);

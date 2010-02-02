@@ -220,7 +220,7 @@ public class QNode {
       if (nextQueueLink.hasSpace()) {
         (currentLane).popFirstFromBuffer();
         veh.getDriver().moveOverNode();
-        nextQueueLink.add(veh);
+        nextQueueLink.addFromIntersection(veh);
         return true;
       }
 
@@ -240,7 +240,7 @@ public class QNode {
         } else {
           currentLane.popFirstFromBuffer();
           veh.getDriver().moveOverNode();
-          nextQueueLink.add(veh);
+          nextQueueLink.addFromIntersection(veh);
           return true;
         }
       }
