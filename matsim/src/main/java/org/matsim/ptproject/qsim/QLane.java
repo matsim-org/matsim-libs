@@ -48,7 +48,6 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.pt.qsim.TransitQLaneFeature;
-import org.matsim.pt.qsim.TransitVehicle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -734,7 +733,7 @@ public class QLane {
 
 		public Collection<PositionInfo> getVehiclePositions(double time, 
 				final Collection<PositionInfo> positions) {
-			log.warn( " entering getVehiclePositions ") ;
+//			log.warn( " entering getVehiclePositions ") ;
 
 			String snapshotStyle = Gbl.getConfig().getQSimConfigGroup().getSnapshotStyle();
 			if ("queue".equals(snapshotStyle)) {

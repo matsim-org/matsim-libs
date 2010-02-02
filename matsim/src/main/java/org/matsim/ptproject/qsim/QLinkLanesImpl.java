@@ -498,7 +498,7 @@ public class QLinkLanesImpl implements QLink {
 		}
 
 		public Collection<PositionInfo> getVehiclePositions(double time, final Collection<PositionInfo> positions) {
-			log.warn( " entering getVehiclePositions ") ;
+//			log.warn( " entering getVehiclePositions ") ;
 			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 				lane.visdata.getVehiclePositions(time, positions);
 			}
