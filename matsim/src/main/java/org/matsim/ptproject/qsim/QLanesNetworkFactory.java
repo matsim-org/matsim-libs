@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.ptproject.qsim;
 
 import org.matsim.api.core.v01.network.Link;
@@ -25,12 +26,12 @@ import org.matsim.api.core.v01.network.Node;
 
 public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLink> {
 
-  private QNetworkFactory<QNode, QLink> delegate;
+//  private QNetworkFactory<QNode, QLink> delegate;
 
   public QLanesNetworkFactory(QNetworkFactory<QNode, QLink> delegate){
-    this.delegate = delegate;
+//    this.delegate = delegate;
   }
-  
+
   @Override
   public QLinkLanesImpl newQueueLink(Link link, QNetwork queueNetwork,
       QNode queueNode) {

@@ -30,22 +30,22 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
 public class ParallelMoveLinks {
-	
+
 	private final static Logger log = Logger.getLogger(ParallelMoveLinks.class);
-	
+
 	private MoveLinksThread[] moveLinksThreads;
 	private boolean simulateAllLinks = false;
 	private int numOfThreads;
 	private int distributor = 0;
-		
+
 	private CyclicBarrier startBarrier;
 	private CyclicBarrier endBarrier;
-	
-	/* 
+
+	/*
 	 * This is the collection of links that have to be moved in the simulation
 	 */
 	private List<List<QLink>> parallelSimLinksLists;
-		
+
 	public ParallelMoveLinks(boolean simulateAllLinks)
 	{
 		this.simulateAllLinks = simulateAllLinks;
@@ -54,7 +54,7 @@ public class ParallelMoveLinks {
 	/*
 	 * The Threads are waiting at the startBarrier.
 	 * We trigger them by reaching this Barrier. Now the
-	 * Threads will start moving the Links. We wait 
+	 * Threads will start moving the Links. We wait
 	 * until all of them reach the endBarrier to move
 	 * on. We should not have any Problems with Race Conditions
 	 * because even if the Threads would be faster than this
@@ -62,18 +62,18 @@ public class ParallelMoveLinks {
 	 * this Method does, it should work anyway.
 	 */
 	public void run(double time)
-	{	
+	{
 		try
 		{
 			// set current Time
 			for (MoveLinksThread moveLinksThread : moveLinksThreads)
-			{			
+			{
 				moveLinksThread.setTime(time);
 			}
-			
+
 			this.startBarrier.await();
-				
-			this.endBarrier.await();		
+
+			this.endBarrier.await();
 		}
 		catch (InterruptedException e)
 		{
@@ -84,46 +84,44 @@ public class ParallelMoveLinks {
 	      	Gbl.errorMsg(e);
 		}
 	}
-		
+
 	public void init(List<QLink> allLinks, int numOfThreads)
-	{		
+	{
 		this.numOfThreads = numOfThreads;
 
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
-		
+
 		createLinkLists(allLinks);
-		
+
 		moveLinksThreads = new MoveLinksThread[numOfThreads];
-		
+
 		// setup threads
-		for (int i = 0; i < numOfThreads; i++) 
+		for (int i = 0; i < numOfThreads; i++)
 		{
-			MoveLinksThread moveLinksThread = new MoveLinksThread(simulateAllLinks);
+			MoveLinksThread moveLinksThread = new MoveLinksThread(simulateAllLinks, this.startBarrier, this.endBarrier);
 			moveLinksThread.setName("MoveLinks" + i);
-			moveLinksThread.setStartBarrier(this.startBarrier);
-			moveLinksThread.setEndBarrier(this.endBarrier);
 			moveLinksThread.handleLinks(parallelSimLinksLists.get(i));
 			moveLinksThread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			moveLinksThreads[i] = moveLinksThread;
-			
+
 			moveLinksThread.start();
 		}
-			
+
 		/*
 		 * After initialization the Threads are waiting at the
-		 * endBarrier. We trigger this Barrier once so 
+		 * endBarrier. We trigger this Barrier once so
 		 * they wait at the startBarrier what has to be
 		 * their state if the run() method is called.
 		 */
 		try
 		{
 			this.endBarrier.await();
-		} 
-		catch (InterruptedException e) 
+		}
+		catch (InterruptedException e)
 		{
 			Gbl.errorMsg(e);
-		} 
+		}
 		catch (BrokenBarrierException e)
 		{
 			Gbl.errorMsg(e);
@@ -136,16 +134,16 @@ public class ParallelMoveLinks {
 	private void createLinkLists(List<QLink> allLinks)
 	{
 		parallelSimLinksLists = new ArrayList<List<QLink>>();
-		
+
 		for (int i = 0; i < numOfThreads; i++)
 		{
 			parallelSimLinksLists.add(new ArrayList<QLink>());
 		}
-		
+
 		/*
 		 * If we simulate all Links, we have to add them initially to the Lists.
 		 */
-		if (simulateAllLinks) 
+		if (simulateAllLinks)
 		{
 			int roundRobin = 0;
 			for(QLink link : allLinks)
@@ -155,18 +153,18 @@ public class ParallelMoveLinks {
 			}
 		}
 	}
-	
+
 	/*
 	 * We do the load balancing between the Threads using some kind
 	 * of round robin.
-	 * 
+	 *
 	 * Additionally we should check from time to time whether the load
 	 * is really still balanced. This is not guaranteed due to the fact
 	 * that some Links get deactivated while others don't. If the number
 	 * of Links is high enough statistically the difference shouldn't
 	 * be to significant.
-	 */	
-	/*package*/ void reactivateLinks(List<QLink> simActivateThis) 
+	 */
+	/*package*/ void reactivateLinks(List<QLink> simActivateThis)
 	{
 		if (!simulateAllLinks)
 		{
@@ -181,7 +179,7 @@ public class ParallelMoveLinks {
 			}
 		}
 	}
-	
+
 	/*
 	 * We have a List for each Thread so we have to add up their size
 	 * to get the Number of simulated Links.
@@ -193,10 +191,10 @@ public class ParallelMoveLinks {
 		{
 			size = size + list.size();
 		}
-		
+
 		return size;
 	}
-	
+
 	/**
 	 * The thread class that really handles the links.
 	 */
@@ -205,32 +203,24 @@ public class ParallelMoveLinks {
 		private double time = 0.0;
 		private boolean simulationRunning = true;
 		private boolean simulateAllLinks = false;
-		
+
 		private List<QLink> links = new ArrayList<QLink>();
-		
-		private CyclicBarrier startBarrier;
-		private CyclicBarrier endBarrier;
-		
-		public MoveLinksThread(boolean simulateAllLinks)
+
+		private final CyclicBarrier startBarrier;
+		private final CyclicBarrier endBarrier;
+
+		public MoveLinksThread(final boolean simulateAllLinks, final CyclicBarrier startBarrier, final CyclicBarrier endBarrier)
 		{
 			this.simulateAllLinks = simulateAllLinks;
+			this.startBarrier = startBarrier;
+			this.endBarrier = endBarrier;
 		}
-				
+
 		public void setTime(final double t)
 		{
 			time = t;
 		}
-		
-		public void setStartBarrier(CyclicBarrier cyclicBarrier)
-		{
-			this.startBarrier = cyclicBarrier;
-		}
-		
-		public void setEndBarrier(CyclicBarrier cyclicBarrier)
-		{
-			this.endBarrier = cyclicBarrier;
-		}
-		
+
 		public void handleLinks(List<QLink> links)
 		{
 			this.links = links;
@@ -244,26 +234,26 @@ public class ParallelMoveLinks {
 				try
 				{
 					/*
-					 * The End of the Moving is synchronized with 
+					 * The End of the Moving is synchronized with
 					 * the endBarrier. If all Threads reach this Barrier
 					 * the main run() Thread can go on.
-					 * 
+					 *
 					 * The Threads wait now at the startBarrier until
 					 * they are triggered again in the next TimeStep by the main run()
 					 * method.
 					 */
 					endBarrier.await();
-						
+
 					startBarrier.await();
-					
+
 					ListIterator<QLink> simLinks = this.links.listIterator();
 					QLink link;
 					boolean isActive;
 
-					while (simLinks.hasNext()) 
+					while (simLinks.hasNext())
 					{
 						link = simLinks.next();
-						
+
 						/*
 						 * Synchronize on the QueueLink is only some kind of Workaround.
 						 * It is only needed, if the QueueSimulation teleports Vehicles
@@ -274,7 +264,7 @@ public class ParallelMoveLinks {
 						synchronized(link)
 						{
 							isActive = link.moveLink(time);
-							
+
 							if (!isActive && !simulateAllLinks)
 							{
 								simLinks.remove();
@@ -291,9 +281,9 @@ public class ParallelMoveLinks {
 	            	Gbl.errorMsg(e);
 	            }
 			}	// while Simulation Running
-			
+
 		}	// run()
-		
+
 	}	// ReplannerThread
-	
+
 }

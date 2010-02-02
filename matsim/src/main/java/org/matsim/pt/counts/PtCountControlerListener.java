@@ -33,12 +33,12 @@ import org.matsim.counts.MatsimCountsReader;
 /**
  * @author yu
  */
-public class PtCountControlerListener implements StartupListener,
-		IterationEndsListener {
+public class PtCountControlerListener implements StartupListener, IterationEndsListener {
+
+	private final static String MODULE_NAME = "ptCounts";
 
 	private final Config config;
 	private final Counts boardCounts, alightCounts;
-	final String MODULE_NAME = "ptCounts";
 	private final OccupancyAnalyzer oa;
 
 	public PtCountControlerListener(final Config config, OccupancyAnalyzer oa) {
@@ -49,10 +49,8 @@ public class PtCountControlerListener implements StartupListener,
 	}
 
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-		new MatsimCountsReader(this.boardCounts).readFile(this.config
-				.findParam(MODULE_NAME, "inputBoardCountsFile"));
-		new MatsimCountsReader(this.alightCounts).readFile(this.config
-				.findParam(MODULE_NAME, "inputAlightCountsFile"));
+		new MatsimCountsReader(this.boardCounts).readFile(this.config.findParam(MODULE_NAME, "inputBoardCountsFile"));
+		new MatsimCountsReader(this.alightCounts).readFile(this.config.findParam(MODULE_NAME, "inputAlightCountsFile"));
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
@@ -61,34 +59,25 @@ public class PtCountControlerListener implements StartupListener,
 		if ((iter % 10 == 0) && (iter > controler.getFirstIteration())) {
 			controler.stopwatch.beginOperation("compare with counts");
 
-			PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(
-					this.oa, this.boardCounts, controler.getNetwork());
-			PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(
-					this.oa, this.alightCounts, controler.getNetwork());
+			PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(this.oa, this.boardCounts, controler.getNetwork());
+			PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(this.oa, this.alightCounts, controler.getNetwork());
 
-			Double distanceFilter = new Double(this.config.findParam(
-					MODULE_NAME, "distanceFilter"));
-			String distanceFilterCenterNodeId = this.config.findParam(
-					MODULE_NAME, "distanceFilterCenterNode");
+			String distanceFilter = this.config.findParam(MODULE_NAME, "distanceFilter");
+			String distanceFilterCenterNodeId = this.config.findParam(MODULE_NAME, "distanceFilterCenterNode");
 			if ((distanceFilter	!= null) && (distanceFilterCenterNodeId != null)) {
-				ccaBoard.setDistanceFilter(distanceFilter,
-						distanceFilterCenterNodeId);
-				ccaAlight.setDistanceFilter(distanceFilter,
-						distanceFilterCenterNodeId);
+				Double distance = Double.valueOf(distanceFilter);
+				ccaBoard.setDistanceFilter(distance, distanceFilterCenterNodeId);
+				ccaAlight.setDistanceFilter(distance, distanceFilterCenterNodeId);
 			}
 
-			ccaBoard.setCountsScaleFactor(Double.parseDouble(this.config
-					.findParam(MODULE_NAME, "countsScaleFactor")));
-			ccaAlight.setCountsScaleFactor(Double.parseDouble(this.config
-					.findParam(MODULE_NAME, "countsScaleFactor")));
+			ccaBoard.setCountsScaleFactor(Double.parseDouble(this.config.findParam(MODULE_NAME, "countsScaleFactor")));
+			ccaAlight.setCountsScaleFactor(Double.parseDouble(this.config.findParam(MODULE_NAME, "countsScaleFactor")));
 
 			ccaBoard.run();
 			ccaAlight.run();
-			String outputFormat = this.config.findParam(MODULE_NAME,
-					"outputformat");
+			String outputFormat = this.config.findParam(MODULE_NAME, "outputformat");
 			if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-				String filename = event.getControler().getControlerIO()
-						.getIterationFilename(iter, "countscompare.kmz");
+				String filename = event.getControler().getControlerIO().getIterationFilename(iter, "countscompare.kmz");
 				PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(
 						ccaBoard.getComparison(), ccaAlight.getComparison(),
 						TransformationFactory.getCoordinateTransformation(

@@ -62,12 +62,12 @@ public class VisumNetworkReader {
 	private final String[] ATTRIBUTE_NODE_NAME = {ATTRIBUTE_UNKNOWN, "NAME"};
 	private final String[] ATTRIBUTE_NODE_XCOORD = {ATTRIBUTE_UNKNOWN, "XKOORD"};
 	private final String[] ATTRIBUTE_NODE_YCOORD = {ATTRIBUTE_UNKNOWN, "YKOORD"};
-	
+
 	private final String[] ATTRIBUTE_EDGE_NO = {ATTRIBUTE_UNKNOWN, "NR"};
 	private final String[] ATTRIBUTE_EDGE_FROM_NODE = {ATTRIBUTE_UNKNOWN, "VONKNOTNR"};
 	private final String[] ATTRIBUTE_EDGE_TO_NODE = {ATTRIBUTE_UNKNOWN, "NACHKNOTNR"};
 	private final String[] ATTRIBUTE_EDGE_LENGTH = {ATTRIBUTE_UNKNOWN, "LAENGE"};
-	
+
 	private final String[] ATTRIBUTE_STOP_NO = {"NO", "NR"};
 	private final String[] ATTRIBUTE_STOP_NAME = {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_STOP_XCOORD = {"XCOORD", "XKOORD"};
@@ -219,6 +219,9 @@ public class VisumNetworkReader {
 		final int idxLanguage = getAttributeIndex("LANGUAGE", attributes);
 
 		String line = reader.readLine();
+		if (line == null) {
+			throw new RuntimeException("Language definition cannot be found.");
+		}
 		final String[] parts = StringUtils.explode(line, ';');
 		if (parts[idxLanguage].equals("ENG")) {
 			this.language = 0;
@@ -227,8 +230,8 @@ public class VisumNetworkReader {
 		} else {
 			throw new RuntimeException("Unknown language: " + parts[idxLanguage]);
 		}
-		// proceed to next line, should be empty
-		line = reader.readLine();
+		// proceed to next line, assumed to be empty
+		reader.readLine();
 	}
 
 	private void readNodes(final String tableAttributes, final BufferedReader reader) throws IOException {
@@ -239,7 +242,7 @@ public class VisumNetworkReader {
 		final int idxYcoord = getAttributeIndex(this.ATTRIBUTE_NODE_YCOORD[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			VisumNetwork.Node node = new VisumNetwork.Node(new IdImpl(parts[idxNo]), parts[idxName],
 					new CoordImpl(Double.parseDouble(parts[idxXcoord].replace(',', '.')), Double.parseDouble(parts[idxYcoord].replace(',', '.'))));
@@ -248,16 +251,16 @@ public class VisumNetworkReader {
 			line = reader.readLine();
 		}
 	}
-	
+
 	private void readEdges(String tableAttributes, BufferedReader reader) throws IOException {
 		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_EDGE[this.language].length()), ';');
 		final int idxNo = getAttributeIndex(this.ATTRIBUTE_EDGE_NO[this.language], attributes);
 		final int idxFromNode = getAttributeIndex(this.ATTRIBUTE_EDGE_FROM_NODE[this.language], attributes);
 		final int idxToNode = getAttributeIndex(this.ATTRIBUTE_EDGE_TO_NODE[this.language], attributes);
 		final int idxLength = getAttributeIndex(this.ATTRIBUTE_EDGE_LENGTH[this.language], attributes);
-		
+
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			IdImpl id = new IdImpl(parts[idxNo]);
 			IdImpl fromNodeId = new IdImpl(parts[idxFromNode]);
@@ -271,7 +274,7 @@ public class VisumNetworkReader {
 				}
 			}
 			double length = Double.parseDouble(parts[idxLength].replace(',', '.'));
-			VisumNetwork.Edge edge = new VisumNetwork.Edge(id, 
+			VisumNetwork.Edge edge = new VisumNetwork.Edge(id,
 					fromNodeId, toNodeId, length);
 			this.network.addEdge(edge);
 			// proceed to next line
@@ -287,7 +290,7 @@ public class VisumNetworkReader {
 		final int idxYcoord = getAttributeIndex(this.ATTRIBUTE_STOP_YCOORD[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			VisumNetwork.Stop stop = new VisumNetwork.Stop(new IdImpl(parts[idxNo]), parts[idxName],
 					new CoordImpl(Double.parseDouble(parts[idxXcoord].replace(',', '.')), Double.parseDouble(parts[idxYcoord].replace(',', '.'))));
@@ -303,7 +306,7 @@ public class VisumNetworkReader {
 		final int idxStopId = getAttributeIndex(this.ATTRIBUTE_STOPAREA_STOPNO[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			VisumNetwork.StopArea stopAr = new VisumNetwork.StopArea(new IdImpl(parts[idxNo]), new IdImpl(parts[idxStopId]));
 			this.network.addStopArea(stopAr);
@@ -319,7 +322,7 @@ public class VisumNetworkReader {
 		final int idxRLNo = getAttributeIndex(this.ATTRIBUTE_STOPPT_RLNO[this.language], attributes);
 		final int idxNode = getAttributeIndex(this.ATTRIBUTE_STOPPT_NODE[this.language], attributes);
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			VisumNetwork.StopPoint stopPt = new VisumNetwork.StopPoint(new IdImpl(parts[idxNo]), new IdImpl(parts[idxStopAreaNo]),parts[idxName], new IdImpl(parts[idxRLNo]), new IdImpl(parts[idxNode]));
 			this.network.addStopPoint(stopPt);
@@ -335,7 +338,7 @@ public class VisumNetworkReader {
 		final int idxTakt = getAttributeIndex(this.ATTRIBUTE_LR_TAKT[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			VisumNetwork.TransitLineRoute lr1 = new VisumNetwork.TransitLineRoute(new IdImpl(parts[idxName]), new IdImpl(parts[idxLineName]),new IdImpl(parts[idxDCode]));
 			if (idxTakt != -1) {
@@ -353,7 +356,7 @@ public class VisumNetworkReader {
 		final int idxVehCombNo = getAttributeIndex(this.ATTRIBUTE_L_VEHCOMBNO[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			VisumNetwork.TransitLine tLine = new VisumNetwork.TransitLine(new IdImpl(parts[idxName]),parts[idxTCode], parts[idxVehCombNo]);
 			this.network.addline(tLine);
@@ -372,7 +375,7 @@ public class VisumNetworkReader {
 
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			IdImpl nodeId = new IdImpl(parts[idxNodeId]);
 			String stopPointNoString = parts[idxStopPointNo];
@@ -397,7 +400,7 @@ public class VisumNetworkReader {
 		final int idxVehCombNo = getAttributeIndex(this.ATTRIBUTE_TP_VEHCOMBNO[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 
 			VisumNetwork.TimeProfile tp1 = new VisumNetwork.TimeProfile(new IdImpl(parts[idxLineName]),
@@ -420,7 +423,7 @@ public class VisumNetworkReader {
 		final int idxLRIIndex = getAttributeIndex(this.ATTRIBUTE_TPI_LRIINDEX[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 
 			VisumNetwork.TimeProfileItem tpi1 = new VisumNetwork.TimeProfileItem(parts[idxLineName],parts[idxLineRouteName],parts[idxTPName],parts[idxDCode],parts[idxIndex],parts[idxArr],parts[idxDep],new IdImpl(parts[idxLRIIndex]));
@@ -440,7 +443,7 @@ public class VisumNetworkReader {
 		final int idxDCode = getAttributeIndex(this.ATTRIBUTE_D_DCODE[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 
 			VisumNetwork.Departure d = new VisumNetwork.Departure(parts[idxLineName],parts[idxLineRouteName],parts[idxIndex],parts[idxTRI],parts[idxDep],new IdImpl(parts[idxDCode]));
@@ -458,7 +461,7 @@ public class VisumNetworkReader {
 		final int idxTotalCap = getAttributeIndex(this.ATTRIBUTE_VEHUNIT_TOTALCAP[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 
 			VisumNetwork.VehicleUnit vehicleUnit = new VisumNetwork.VehicleUnit(parts[idxId], parts[idxCode],
@@ -475,7 +478,7 @@ public class VisumNetworkReader {
 		final int idxName = getAttributeIndex(this.ATTRIBUTE_VEHCOMB_NAME[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 
 			VisumNetwork.VehicleCombination vehicleComb = new VisumNetwork.VehicleCombination(parts[idxId], parts[idxName]);
@@ -492,7 +495,7 @@ public class VisumNetworkReader {
 		final int idxVehicleNumber = getAttributeIndex(this.ATTRIBUTE_VEHUNITTOVEHCOMB_NUMVEHUNITS[this.language], attributes);
 
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 
 			VisumNetwork.VehicleCombination vehicleComb = this.network.vehicleCombinations.get(parts[idxVehicleComb]);
@@ -505,7 +508,7 @@ public class VisumNetworkReader {
 
 	private void readUnknownTable(final String tableAttributes, final BufferedReader reader) throws IOException {
 		String line = reader.readLine();
-		while (line.length() > 0) {
+		while (line != null && line.length() > 0) {
 
 			line = reader.readLine();
 		}
