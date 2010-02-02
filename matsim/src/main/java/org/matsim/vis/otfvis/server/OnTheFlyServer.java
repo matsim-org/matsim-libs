@@ -412,6 +412,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		};
 		
 		try {
+			// If the simulation is currently running or stepping,
+			// this call blocks until the simulation thread passes the updateStatus method,
+			// calculating the result.
 			return executorService.submit(callable).get();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
