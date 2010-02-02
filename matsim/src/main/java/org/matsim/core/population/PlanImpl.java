@@ -49,17 +49,6 @@ public class PlanImpl implements Plan {
 
 	private PlanImpl.Type type = null;
 
-	private boolean isSelected;
-
-	
-	/**
-	 * Constant describing the score of an unscored plan. <b>Do not use this constant in
-	 * comparisons</b>, but use <code>getScore() == null</code>
-	 * instead to test if a plan has an undefined score.
-	 */
-	@Deprecated
-	public static final double UNDEF_SCORE = Double.NaN;
-
 	private final static Logger log = Logger.getLogger(PlanImpl.class);
 
 	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
@@ -190,19 +179,19 @@ public class PlanImpl implements Plan {
 	public final PersonImpl getPerson() {
 		return (PersonImpl) this.person;
 	}
-	
+
 	public void setPerson(final Person person) {
 		this.person = person;
 	}
-	
+
 	public final Double getScore() {
 		return this.score;
 	}
-	
+
 	public void setScore(final Double score) {
 		this.score = score;
 	}
-	
+
 	public PlanImpl.Type getType() {
 		return this.type;
 	}
@@ -210,7 +199,7 @@ public class PlanImpl implements Plan {
 	public void setType(PlanImpl.Type type) {
 		this.type = type;
 	}
-	
+
 	public final List<PlanElement> getPlanElements() {
 		return this.actsLegs;
 	}

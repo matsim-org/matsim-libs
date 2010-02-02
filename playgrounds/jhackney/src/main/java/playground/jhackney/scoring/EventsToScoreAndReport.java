@@ -167,7 +167,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 //					// TODO Auto-generated catch block
 //					e.printStackTrace();
 //				}
-				
+
 				while(actLegIter.hasNext()){//alternates Act-Leg-Act-Leg and ends with Act
 					Object o = actLegIter.next();
 					if (o instanceof LegImpl ) {
@@ -237,7 +237,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	 * @return the average score of the plans before mixing with the old scores (learningrate)
 	 */
 	public double getAveragePlanPerformance() {
-		if (this.scoreSum == 0) return PlanImpl.UNDEF_SCORE;
+		if (this.scoreSum == 0) return Double.NaN;
 		return (this.scoreSum / this.scoreCount);
 	}
 
@@ -251,7 +251,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	 */
 	public double getAgentScore(final Id agentId) {
 		ScoringFunction sf = this.agentScorers.get(agentId.toString());
-		if (sf == null) return PlanImpl.UNDEF_SCORE;
+		if (sf == null) return Double.NaN;
 		return sf.getScore();
 	}
 

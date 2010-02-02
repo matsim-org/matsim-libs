@@ -48,8 +48,8 @@ import org.matsim.signalsystems.systems.SignalSystems;
 
 
 public class QSimSignalEngine implements SignalEngine {
-	
-	
+
+
 	private static final Logger log = Logger.getLogger(QSimSignalEngine.class);
 
 	/**
@@ -80,14 +80,14 @@ public class QSimSignalEngine implements SignalEngine {
 	public QSimSignalEngine(QSim sim) {
 		this.simulation = sim;
 		this.network = sim.getQueueNetwork();
-		this.events = QSim.getEvents();
+		this.events = sim.getEventsManager();
 	}
 
 	public void setSignalSystems(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
 		this.signalSystems = signalSystems;
 		this.signalSystemsConfig = signalSystemConfigurations;
 	}
-	
+
 	/**
 	 * Initialize the signal systems
 	 */
@@ -99,7 +99,7 @@ public class QSimSignalEngine implements SignalEngine {
 			initSignalSystemController(this.signalSystemsConfig);
 		}
 	}
-	
+
 	/**
 	 * @see org.matsim.signalsystems.mobsim.SignalEngine#getSignalSystemControlerBySystemId()
 	 */
@@ -114,7 +114,7 @@ public class QSimSignalEngine implements SignalEngine {
 	public SortedMap<Id, SignalSystemDefinition> getSignalSystemDefinitions() {
 		return this.signalSystemDefinitions;
 	}
-	
+
 
 	private void initSignalSystems(final SignalSystems signalSystems) {
 		//store the signalSystemDefinitions in a Map
@@ -191,8 +191,8 @@ public class QSimSignalEngine implements SignalEngine {
 						group.setResponsibleLSAControler(systemControler);
 					}
 				}
-				
-				
+
+
 			}
 			else {
 				log.error("Could not initialize signal system controler for signal system with id: " + config.getSignalSystemId() + " " +
@@ -257,5 +257,5 @@ public class QSimSignalEngine implements SignalEngine {
 	public EventsManager getEvents() {
 		return this.events;
 	}
-	
+
 }

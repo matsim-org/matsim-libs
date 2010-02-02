@@ -80,11 +80,11 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
  */
 public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation {
 
-	
+
 	/* time since last snapshot */
 	private double snapshotTime = 0.0;
 	private int snapshotPeriod = 0;
-	
+
 	/* time since last "info" */
 	private double infoTime = 0;
 	protected static final int INFO_PERIOD = 3600;
@@ -123,7 +123,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private QSimSnapshotWriterManager snapshotManager;
 
 	/**
-	 * Initialize the QueueSimulation 
+	 * Initialize the QueueSimulation
 	 * @param scenario
 	 * @param events
 	 */
@@ -132,7 +132,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		init(this.scenario, events);
 	}
 	/**
-	 * extended constructor method that can also be 
+	 * extended constructor method that can also be
 	 * after assignments of another constructor
 	 */
 	private void init(Scenario sc, EventsManager eventsManager){
@@ -165,8 +165,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
       }
       this.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
     }
-  
-    
+
+
     this.agentFactory = new AgentFactory(this);
     this.notTeleportedModes.add(TransportMode.car);
     this.simEngine = new QSimEngine(this.network, MatsimRandom.getRandom());
@@ -326,7 +326,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
     if (this.snapshotTime < simStartTime) {
       this.snapshotTime += this.snapshotPeriod;
     }
-		
+
 		prepareNetworkChangeEventsQueue();
 
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
@@ -471,7 +471,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.networkLayer.getLinks().get(linkId));
 		}
-		double arrivalTime = QSimTimer.getTime() + agent.getCurrentLeg().getTravelTime();
+		double arrivalTime = now + agent.getCurrentLeg().getTravelTime();
 		this.teleportationList.add(new Tuple<Double, DriverAgent>(arrivalTime, agent));
 	}
 
@@ -500,7 +500,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleAgentArrival(agent);
 		}
-		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
+		getEventsManager().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
 				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 	}
 
@@ -658,7 +658,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public void setControlerIO(ControlerIO controlerIO) {
 		this.controlerIO = controlerIO;
 	}
-	
+
 	public double getTimeOfDay() {
 		return QSimTimer.getTime() ;
 	}
