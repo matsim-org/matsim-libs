@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 import javax.swing.ProgressMonitor;
 
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.otfvis.executables.OTFVisController;
+import org.matsim.vis.otfvis.OTFVisControlerListener;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote.TimePreference;
@@ -60,7 +60,7 @@ public class OTFAbortGoto extends Thread  {
 			actTime = host.getLocalTime();
 			if(host.isLive()) {
 				actStatus = ((OTFLiveServerRemote)host).getControllerStatus();
-				actIter = OTFVisController.getIteration(actStatus);
+				actIter = OTFVisControlerListener.getIteration(actStatus);
 			}
 			
 		} catch (RemoteException e1) {
@@ -83,15 +83,15 @@ public class OTFAbortGoto extends Thread  {
 				actTime = host.getLocalTime();
 				if(((lastTime > actTime) || (actTime == -1)) && (host.isLive())){
 					actStatus = ((OTFLiveServerRemote)host).getControllerStatus();
-					actIter = OTFVisController.getIteration(actStatus);
-					actStatus = OTFVisController.getStatus(actStatus);
+					actIter = OTFVisControlerListener.getIteration(actStatus);
+					actStatus = OTFVisControlerListener.getStatus(actStatus);
 					if(actTime == -1) actTime = 0;
 				}
 				
 				String message = String.format("Completed to Time: "+ Time.writeTime(actTime));
-				if(actStatus == OTFVisController.RUNNING){
+				if(actStatus == OTFVisControlerListener.RUNNING){
 					message = String.format("Completed to Time: "+ actIter + "#" + Time.writeTime(actTime));
-				} else if( actStatus == OTFVisController.REPLANNING){
+				} else if( actStatus == OTFVisControlerListener.REPLANNING){
 					message = String.format("Completed to Iteration: "+ actIter + ": REPLANNING");
 				} else {
 					

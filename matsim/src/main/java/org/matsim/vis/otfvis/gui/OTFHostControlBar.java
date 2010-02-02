@@ -49,7 +49,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.executables.OTFVisController;
+import org.matsim.vis.otfvis.OTFVisControlerListener;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
@@ -67,6 +67,7 @@ import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
 
 	private static final long serialVersionUID = 1L;
+	
 	private static Logger log = Logger.getLogger(OTFHostControlBar.class);
 
 	private static final String TO_START = "to_start";
@@ -122,11 +123,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	public void invalidateDrawers() {
 		try {
-		for(OTFHostConnectionManager slave : hostControls) {
-			for (OTFDrawer handler : slave.getDrawer().values()) {
-				handler.invalidate(simTime);
-		}
-		}
+			for (OTFHostConnectionManager slave : hostControls) {
+				for (OTFDrawer handler : slave.getDrawer().values()) {
+					handler.invalidate(simTime);
+				}
+			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -166,7 +167,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
 		MessageFormat format = new MessageFormat("{0,number,00}:{1,number,00}:{2,number,00}");
 		if(this.hostControl.getOTFServer().isLive()) {
-			 if(controllerStatus != OTFVisController.NOCONTROL) {
+			 if(controllerStatus != OTFVisControlerListener.NOCONTROL) {
 					 format = new MessageFormat("{0,number,00}#{0,number,00}:{1,number,00}:{2,number,00}");
 			 }
 		}
@@ -207,24 +208,24 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	public void updateTimeLabel() throws RemoteException {
 		simTime = this.hostControl.getOTFServer().getLocalTime();
-		if(controllerStatus != OTFVisController.NOCONTROL){
+		if(controllerStatus != OTFVisControlerListener.NOCONTROL){
 			controllerStatus = ((OTFLiveServerRemote)this.hostControl.getOTFServer()).getControllerStatus();
 		}
 
-		switch (OTFVisController.getStatus(controllerStatus)) {
-		case OTFVisController.STARTUP:
-			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#Preparing...#");
+		switch (OTFVisControlerListener.getStatus(controllerStatus)) {
+		case OTFVisControlerListener.STARTUP:
+			timeField.setText(OTFVisControlerListener.getIteration(controllerStatus) +"#Preparing...#");
 			break;
-		case (OTFVisController.RUNNING + OTFVisController.PAUSED):
+		case (OTFVisControlerListener.RUNNING + OTFVisControlerListener.PAUSED):
 			if((movieTimer != null) && !synchronizedPlay) stopMovie();
-		case OTFVisController.RUNNING:
-			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#" +Time.writeTime(simTime));
+		case OTFVisControlerListener.RUNNING:
+			timeField.setText(OTFVisControlerListener.getIteration(controllerStatus) +"#" +Time.writeTime(simTime));
 			break;
-		case OTFVisController.REPLANNING:
-			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#Replanning...#");
+		case OTFVisControlerListener.REPLANNING:
+			timeField.setText(OTFVisControlerListener.getIteration(controllerStatus) +"#Replanning...#");
 			break;
-		case OTFVisController.CANCEL:
-			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#Cancelling...#");
+		case OTFVisControlerListener.CANCEL:
+			timeField.setText(OTFVisControlerListener.getIteration(controllerStatus) +"#Cancelling...#");
 			break;
 
 		default:
@@ -238,7 +239,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	public void stopMovie() {
 		if (movieTimer != null) {
 			movieTimer.terminate();
-			movieTimer.setActive(false);
 			movieTimer = null;
 			playButton.setIcon(playIcon);
 		}
@@ -247,7 +247,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private void pressed_TO_START() throws IOException {
 		stopMovie();
 		if(this.hostControl.getOTFServer().isLive()) {
-			((OTFLiveServerRemote)this.hostControl.getOTFServer()).requestControllerStatus(OTFVisController.CANCEL);
+			((OTFLiveServerRemote)this.hostControl.getOTFServer()).requestControllerStatus(OTFVisControlerListener.CANCEL);
 			requestTimeStep(0, OTFServerRemote.TimePreference.LATER);
 			simTime = 0;
 			updateTimeLabel();
@@ -259,21 +259,26 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void pressed_PAUSE() throws IOException {
+		log.debug("Pressed PAUSE.");
 		stopMovie();
-		if(hostControl.getOTFServer().isLive()){
-			((OTFLiveServerRemote)hostControl.getOTFServer()).pause();
+		if (hostControl.getOTFServer().isLive()) {
+			pressPauseOnServer();
 		}
 	}
 
 	private void pressed_PLAY() throws IOException {
 		if (movieTimer == null) {
- 	  	movieTimer = new MovieTimer();
- 	 	  movieTimer.start();
- 			movieTimer.setActive(true);
- 			playButton.setIcon(pauseIcon);
- 	  } else {
- 	   	pressed_PAUSE();
- 	  }
+			log.debug("Pressed PLAY, creating movie timer.");
+			movieTimer = new MovieTimer();
+			playButton.setIcon(pauseIcon);
+			movieTimer.start();
+			if (!synchronizedPlay) {
+				pressPlayOnServer();
+			}
+		} else {
+			log.debug("Pressed PLAY, but there already is a movie timer.");
+			pressed_PAUSE();
+		}
 	}
 
 	private void pressed_FULLSCREEN() {
@@ -346,7 +351,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 
 	private void gotoTime() {
-		boolean restart = (OTFVisController.getIteration(controllerStatus) == gotoIter) && (gotoTime < simTime);
+		boolean restart = (OTFVisControlerListener.getIteration(controllerStatus) == gotoIter) && (gotoTime < simTime);
 
 		try {
 			// in case of live host, additionally request iteration
@@ -385,7 +390,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		String newTime = ((JFormattedTextField) event.getSource()).getText();
 		int index = newTime.indexOf("#");
 		String tmOfDay = newTime.substring(index + 1);
-		if ((index != -1) && (controllerStatus != OTFVisController.NOCONTROL)) {
+		if ((index != -1) && (controllerStatus != OTFVisControlerListener.NOCONTROL)) {
 			gotoIter = Integer.parseInt(newTime.substring(0, index));
 		}
 		int newTime_s = (int) Time.parseTime(tmOfDay);
@@ -424,34 +429,38 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			} else if (command.equals(SET_TIME))
 				changed_SET_TIME(event);
 		} catch (IOException e) {
-			System.err.println("ControlToolbar encountered problem: " + e);
+			System.err.println("ControlToolbar encountered problem.");
+			e.printStackTrace();
 		}
 		try {
 			updateTimeLabel();
 		} catch (RemoteException e) {
+			e.printStackTrace();
 		}
 		repaint();
 	}
 
 	private void createCheckBoxes() {
 		if (hostControl.isLiveHost()) {
-			JCheckBox SynchBox = new JCheckBox(TOGGLE_SYNCH);
-			SynchBox.setMnemonic(KeyEvent.VK_V);
-			SynchBox.setSelected(synchronizedPlay);
-			SynchBox.addItemListener(this);
-			add(SynchBox);
+			JCheckBox synchBox = new JCheckBox(TOGGLE_SYNCH);
+			synchBox.setMnemonic(KeyEvent.VK_V);
+			synchBox.setSelected(synchronizedPlay);
+			synchBox.addItemListener(this);
+			add(synchBox);
 		}
 
 	}
+	
 	public void itemStateChanged(ItemEvent e) {
-		JCheckBox source = (JCheckBox)e.getItemSelectable();
+		JCheckBox source = (JCheckBox) e.getItemSelectable();
 		if (source.getText().equals(TOGGLE_SYNCH)) {
-			if (movieTimer != null) movieTimer.updateSyncPlay(e.getStateChange() != ItemEvent.DESELECTED);
+			synchronizedPlay = source.isSelected();
+			if (movieTimer != null) {
+				movieTimer.updateSyncPlay();
+			}
 		}
 		repaint();
 	}
-
-
 
 	private int loopStart = 0;
 	private int loopEnd = Integer.MAX_VALUE;
@@ -462,42 +471,36 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	 * @param max either sec for endloop or -1 for leave unchanged default = Integer.MAX_VALUE
 	 */
 	public void setLoopBounds(int min, int max) {
-		if(min != -1) loopStart = min;
-		if(max != -1) loopEnd = max;
+		if (min != -1) {
+			loopStart = min;
+		}
+		if (max != -1) {
+			loopEnd = max;
+		}
 	}
 
 	class MovieTimer extends Thread {
-		private boolean isActive = false;
 		private boolean terminate = false;
 
 		public MovieTimer() {
 			setDaemon(true);
 		}
 
-		public synchronized boolean isActive() {
-			return isActive;
-		}
-
-		private synchronized void updateSyncPlay(boolean sync) {
+		private synchronized void updateSyncPlay() {
 			try {
-				if (isActive) {
-					if(!hostControl.isLiveHost()) return;
-					// this is only calles for Live Servers!
-					// before we sent the host sleeping, we make sure, there i no pending getTimeStep waiting for results
-					if (sync)((OTFLiveServerRemote)hostControl.getOTFServer()).pause();
-					else ((OTFLiveServerRemote)hostControl.getOTFServer()).play();
+				if (!hostControl.isLiveHost()) {
+					return;
+				}
+				if (synchronizedPlay) {
+					pressPauseOnServer();
+				} else {
+					pressPlayOnServer();
 				}
 				simTime = hostControl.getOTFServer().getLocalTime();
-				synchronizedPlay = sync;
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
 
-		}
-
-		public synchronized void setActive(boolean isActive) {
-			this.isActive = isActive;
-			updateSyncPlay(synchronizedPlay);
 		}
 
 		public synchronized void terminate() {
@@ -510,30 +513,33 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			int actTime = 0;
 			while (!terminate) {
 				try {
-				  delay = OTFClientControl.getInstance().getOTFVisConfig().getDelay_ms();
+					delay = OTFClientControl.getInstance().getOTFVisConfig().getDelay_ms();
 					sleep(delay);
-					synchronized(hostControl.blockReading) {
-						if (isActive && synchronizedPlay &&
-							((simTime >= loopEnd) || !hostControl.getOTFServer().requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))) {
-							hostControl.getOTFServer().requestNewTime(loopStart, OTFServerRemote.TimePreference.LATER);
+					synchronized (hostControl.blockReading) {
+						if (synchronizedPlay
+								&& ((simTime >= loopEnd) || !hostControl
+										.getOTFServer()
+										.requestNewTime(
+												simTime + 1,
+												OTFServerRemote.TimePreference.LATER))) {
+							hostControl.getOTFServer().requestNewTime(
+									loopStart,
+									OTFServerRemote.TimePreference.LATER);
 						}
-
 						actTime = simTime;
 						simTime = hostControl.getOTFServer().getLocalTime();
-						for(OTFHostConnectionManager slave : hostControls) {
+						for (OTFHostConnectionManager slave : hostControls) {
 							if (!slave.equals(hostControl))
 								slave.getOTFServer().requestNewTime(simTime, OTFServerRemote.TimePreference.LATER);
 						}
-
 						updateTimeLabel();
 						if (simTime != actTime) {
 							repaint();
-							if (isActive)  {
-								invalidateDrawers();
-							}
+							invalidateDrawers();
 						}
 					}
 				} catch (RemoteException e) {
+					e.printStackTrace();
 					stopMovie();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -570,6 +576,14 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	 */
 	public OTFHostConnectionManager getOTFHostControl(){
 		return this.hostControl;
+	}
+
+	private void pressPlayOnServer() throws RemoteException {
+		((OTFLiveServerRemote) hostControl.getOTFServer()).play();
+	}
+
+	private void pressPauseOnServer() throws RemoteException {
+		((OTFLiveServerRemote) hostControl.getOTFServer()).pause();
 	}
 
 }
