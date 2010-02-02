@@ -30,8 +30,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 
-import playground.mrieser.visum.VisumNetwork;
-import playground.mrieser.visum.VisumNetwork.Stop;
+import playground.yalcin.visum.VisumNetwork;
+import playground.yalcin.visum.VisumNetwork.Stop;
 
 public class SegmentsTableHandler implements TabularFileHandler {
 
@@ -81,7 +81,7 @@ public class SegmentsTableHandler implements TabularFileHandler {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public void setOnlyWriteCodedTrips(final boolean onlyWriteCodedTrips) {
 		this.onlyWriteCodedTrips = onlyWriteCodedTrips;
 	}
@@ -145,7 +145,7 @@ public class SegmentsTableHandler implements TabularFileHandler {
 				// this line has no code, and we should only write lines that contain a code...
 				return;
 			}
-			
+
 			// write basic information
 			this.writer.write(TAB + this.personId + TAB + this.tripId + TAB + this.cntSegments + TAB + this.cntPuTSegments + TAB + this.cntRailSegments
 					+ TAB + this.startCoord.getX() * 1000.0 + TAB + this.startCoord.getY()*1000.0 + TAB + this.startDate+ TAB + this.startTime
@@ -170,16 +170,16 @@ public class SegmentsTableHandler implements TabularFileHandler {
 			Stop nearestStartStop = this.vNetwork.findNearestStop(this.startCoord);
 			this.writer.write(TAB);
 			this.writer.write(nearestStartStop.id.toString());
-			
+
 			//NearestStartStopDistance
 			this.writer.write(TAB);
 			this.writer.write(Double.toString(CoordUtils.calcDistance(this.startCoord, nearestStartStop.coord)));
-			
+
 			//NearestEndStop
 			Stop nearestEndStop = this.vNetwork.findNearestStop(this.endCoord);
 			this.writer.write(TAB);
 			this.writer.write(nearestEndStop.id.toString());
-			
+
 			//NearestEndStopDistance
 			this.writer.write(TAB);
 			this.writer.write(Double.toString(CoordUtils.calcDistance(this.endCoord, nearestEndStop.coord)));

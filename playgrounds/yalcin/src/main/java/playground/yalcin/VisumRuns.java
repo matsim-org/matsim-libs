@@ -29,8 +29,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
-import playground.mrieser.visum.VisumNetwork;
-import playground.mrieser.visum.VisumNetworkReader;
+import playground.yalcin.visum.VisumNetwork;
+import playground.yalcin.visum.VisumNetworkReader;
 
 public class VisumRuns {
 
@@ -65,7 +65,7 @@ public class VisumRuns {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		/* read test file with codes */
 		final TabularFileParser codesParser = new TabularFileParser();
 		final TabularFileParserConfig codesParserConfig = new TabularFileParserConfig();
@@ -96,7 +96,7 @@ public class VisumRuns {
 		SegmentsTableHandler handler = new SegmentsTableHandler(vNetwork, 0.6, codesHandler, "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/new/results1.txt"); // yalcin
 //		SegmentsTableHandler handler = new SegmentsTableHandler(vNetwork, 0.6, codesHandler, "../mystudies/yalcin/results.txt"); // marcel
 		handler.setOnlyWriteCodedTrips(true);
-		
+
 		try {
 			// this will read the file AND write out the looked up data
 			parser.parse(parserConfig, handler);
