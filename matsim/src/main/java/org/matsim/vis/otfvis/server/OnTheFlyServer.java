@@ -115,6 +115,13 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	
 	private ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<Runnable>();
 
+	/**
+	 * This ExecutorService is used for update requests from the visualizer.
+	 * A running simulation cannot be queried, because QLinks are not thread-safe.
+	 * So update requests are queued by this ExecutorService and handled by the simulation
+	 * thread, which passes by the updateStatus method of this class every time step.
+	 * If the simulations is not running, the request is handled immediately.
+	 */
 	private ExecutorService executorService = new AbstractExecutorService() {
 
 		@Override
