@@ -29,42 +29,29 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.lanes.LaneDefinitions;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.SignalGroupSettings;
 import org.matsim.signalsystems.config.SignalSystemConfiguration;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.config.SignalSystemPlan;
-import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Simple test case for the QueueSim signal system implementation.
  * One agent drives one round in the signal system default simple test
  * network.
- * 
+ *
  * @author dgrether
  */
 public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		LinkEnterEventHandler {
 
-	
 	private static final Logger log = Logger.getLogger(SignalSystemsOneAgentTest.class);
-	
+
 	private Id id1 = new IdImpl(1);
 	private Id id2 = new IdImpl(2);
-	
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-	
 	public void testTrafficLightIntersection2arms1Agent() {
 		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
 		String plansFile = this.getClassInputDirectory() + "plans1Agent.xml";
@@ -80,11 +67,8 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		conf.setQSimConfigGroup(new QSimConfigGroup());
 		ScenarioImpl scenario = new ScenarioImpl(conf);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		
+
 		loader.loadScenario();
-		
-		LaneDefinitions lanedefs = scenario.getLaneDefinitions();
-		SignalSystems signalSystems = scenario.getSignalSystems();
 
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(this);
@@ -93,21 +77,16 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		for (SignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
 			PlanBasedSignalSystemControlInfo controlInfo = (PlanBasedSignalSystemControlInfo) lssConfig
 					.getControlInfo();
-			SignalSystemPlan p = controlInfo.getPlans()
-					.get(new IdImpl("2"));
+			SignalSystemPlan p = controlInfo.getPlans().get(new IdImpl("2"));
 			p.setCycleTime(60);
-			SignalGroupSettings group = p.getGroupConfigs().get(
-					new IdImpl("100"));
+			SignalGroupSettings group = p.getGroupConfigs().get(new IdImpl("100"));
 			group.setDropping(60);
 		}
 
-		QSim sim = new QSim(scenario, events);
-		sim.run();
-		
-		sim = new QSim(scenario, events);
-		sim.run();
+		new QSim(scenario, events).run();
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		log.info("LinkEnter: " + e.getLinkId().toString() + " time: " + e.getTime());
 		if (e.getLinkId().equals(id1)){
@@ -118,6 +97,7 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		}
 	}
 
+	@Override
 	public void reset(int iteration) {
 	}
 

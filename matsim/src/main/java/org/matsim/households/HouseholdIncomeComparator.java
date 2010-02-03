@@ -19,15 +19,18 @@
  * *********************************************************************** */
 package org.matsim.households;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 
 /**
  * Simple comparator for households to compare them by income
- * @author dgrether
  *
+ * @author dgrether
  */
-public class HouseholdIncomeComparator implements Comparator<Household> {
+public class HouseholdIncomeComparator implements Comparator<Household>, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public int compare(Household o1, Household o2) {
 		if (o1.getIncome().getIncomePeriod() != o2.getIncome().getIncomePeriod()){

@@ -115,21 +115,21 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private static final String NUMBEROFEVENTSDETECTION = "numberOfEventsDetection";
 
-	private TrafficManagement trafficManagement;
+	private TrafficManagement trafficManagement = null;
 
-	private VDSSign vdsSign;
+	private VDSSign vdsSign = null;
 
-	private ArrayList<Node> currentRouteNodes;
+	private ArrayList<Node> currentRouteNodes = null;
 
-	private NetworkImpl network;
+	private final NetworkImpl network;
 
-	private ControlInput controlInput;
+	private ControlInput controlInput = null;
 
-	private EventsManager events;
+	private final EventsManager events;
 
-	private VDSSignOutput vdsSignOutput;
+	private VDSSignOutput vdsSignOutput = null;
 
-	private QSimConfigGroup simulationConfig;
+	private final QSimConfigGroup simulationConfig;
 
 
 	public TrafficManagementConfigParser(final NetworkImpl network,

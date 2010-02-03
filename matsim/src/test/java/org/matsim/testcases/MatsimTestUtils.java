@@ -30,7 +30,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.
- * 
+ *
  * @author mrieser
  */
 public class MatsimTestUtils extends TestName {
@@ -50,7 +50,7 @@ public class MatsimTestUtils extends TestName {
 	 * The input directory one level above the default input directory. If files are
 	 * used by several test methods of a testcase they have to be stored in this directory.
 	 */
-	private String classInputDirectory;
+	private String classInputDirectory = null;
 	/**
 	 * The input directory two levels above the default input directory. If files are used
 	 * by several test classes of a package they have to be stored in this directory.
@@ -134,8 +134,9 @@ public class MatsimTestUtils extends TestName {
 	 * @return path to the input directory for this test
 	 */
 	public String getPackageInputDirectory() {
+		String classDirectory = getClassInputDirectory();
 		if (this.packageInputDirectory == null) {
-			this.packageInputDirectory = this.classInputDirectory.substring(0, this.classInputDirectory.lastIndexOf("/") + 1);
+			this.packageInputDirectory = classDirectory.substring(0, classDirectory.lastIndexOf("/") + 1);
 		}
 		return this.packageInputDirectory;
 	}
@@ -148,5 +149,5 @@ public class MatsimTestUtils extends TestName {
 		}
 		return name;
 	}
-	
+
 }

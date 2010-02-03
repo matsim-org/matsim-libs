@@ -43,15 +43,15 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 public class OTFVisControlerListener implements StartupListener, ShutdownListener, BeforeMobsimListener, AfterMobsimListener{
 
 	public static final int NOCONTROL = 0x00000000;
-	
+
 	public static final int STARTUP = 0x01000000;
 	public static final int RUNNING = 0x02000000;
-	public static final int PAUSED = 0x80000000; //Flag for indicating paused mode to "other clients"	
 	public static final int REPLANNING = 0x04000000;
 	public static final int CANCEL = 0x08000000;
+	public static final int PAUSED = 0x80000000; //Flag for indicating paused mode to "other clients"
 	public static final int ALL_FLAGS = 0xff000000;
 
-	
+
 	private QNetwork queueNetwork;
 	private OnTheFlyServer otfserver;
 
@@ -77,22 +77,22 @@ public class OTFVisControlerListener implements StartupListener, ShutdownListene
 			sim.addQueueSimulationListeners(l);
 		}
 		otfserver.setSimulation(sim.getQueueSimulationFeature());
-		otfserver.setControllerStatus(RUNNING + e.getControler().getIteration());
+		otfserver.setControllerStatus(RUNNING + e.getControler().getIterationNumber().intValue());
 		sim.run();
 	}
 
 	public void notifyAfterMobsim(AfterMobsimEvent e) {
-		otfserver.setControllerStatus(REPLANNING + e.getControler().getIteration()+1);		
+		otfserver.setControllerStatus(REPLANNING + e.getControler().getIterationNumber().intValue()+1);
 	}
 
 	public void notifyShutdown(ShutdownEvent event) {
-		this.otfserver.cleanup();		
+		this.otfserver.cleanup();
 	}
 
 	public static int getStatus(int flags) {
 		return flags & ALL_FLAGS;
 	}
-	
+
 	public static int getIteration(int flags) {
 		int res = flags & 0xffffff;
 		return res;
