@@ -25,80 +25,80 @@ public class IterativeKnowledgeControler extends Controler{
 	private static final Logger log = Logger.getLogger(EventControler.class);
 
 	boolean knowledgeLoaded = false;
-	
+
 	/*
 	 * Select which size the known Areas should have in the Simulation.
 	 * The needed Parameter is the Name of the Table in the MYSQL Database.
 	 */
 	private static final String tableName = "BatchTable1_5";
-	
-	public IterativeKnowledgeControler(String[] args) 
+
+	public IterativeKnowledgeControler(String[] args)
 	{
 		super(args);
 
 		setConstructorParameters();
 	}
-	
+
 	private void setConstructorParameters()
 	{
 		// Use MyLinkImpl. They can carry some additional Information like their
 		// TravelTime or VehicleCount.
 		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
 	}
-	
+
 	private void setScoringFunction()
 	{
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 	}
-	
+
 	private void setCalculators()
 	{
 		// Use knowledge when Re-Routing
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
-		
+
 		this.setTravelCostCalculator(travelCostWrapper);
 //.		this.setTravelCostCalculator(travelCost);
 	}
-	
+
 	private void initialReplanning()
 	{
 		log.info("Do initial Replanning");
-		
+
 		// Use a Wrapper - by doing this, already available MATSim
 		// CostCalculators can be used
-		TravelTime travelTime = new FreespeedTravelTimeCost();
+		TravelTime travelTime = new FreespeedTravelTimeCost(this.config.charyparNagelScoring());
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
 
 //		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
-//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime, network);	
+//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime, network);
 //		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCostWrapper, travelTime, new DijkstraWrapperFactory());
-		
+
 //		FreespeedTravelTimeCost test = new FreespeedTravelTimeCost();
 //		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(test);
 //		travelCostWrapper.checkNodeKnowledge(false);
 //		travelCostWrapper.useLookupTable(false);
-//		
+//
 //		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, test);
 //		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, test, network);
 //		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
-		
+
 		for (Person person : this.getPopulation().getPersons().values())
 		{
 			dijkstraRouter.run(person.getSelectedPlan());
 		}
 	}
-	
-	private void setKnowledgeStorageHandler() 
+
+	private void setKnowledgeStorageHandler()
 	{
 		log.info("Loading Knowledge from Database");
-		
-		for (Person person : this.getPopulation().getPersons().values()) 
+
+		for (Person person : this.getPopulation().getPersons().values())
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
@@ -108,21 +108,21 @@ public class IterativeKnowledgeControler extends Controler{
 			mapKnowledgeDB.setPerson(person);
 			mapKnowledgeDB.setNetwork(network);
 			mapKnowledgeDB.setTableName(tableName);
-			
+
 			mapKnowledgeDB.readFromDB();
 
 			customAttributes.put("NodeKnowledge", mapKnowledgeDB);
 		}
 	}
-	
+
 	@Override
 	protected void setUp() {
 		super.setUp();
-		
+
 		setScoringFunction();
 		setCalculators();
 	}
-	
+
 	@Override
 	protected StrategyManager loadStrategyManager()
 	{
@@ -130,7 +130,7 @@ public class IterativeKnowledgeControler extends Controler{
 		MyStrategyManagerConfigLoader.load(this, this.config, manager);
 		return manager;
 	}
-	
+
 	@Override
 	protected void runMobSim()
 	{
@@ -140,19 +140,19 @@ public class IterativeKnowledgeControler extends Controler{
 //			initialReplanning();
 			knowledgeLoaded = true;
 		}
-		
+
 		super.runMobSim();
 	}
-	
-	public static void main(final String[] args) 
+
+	public static void main(final String[] args)
 	{
-		if ((args == null) || (args.length == 0)) 
+		if ((args == null) || (args.length == 0))
 		{
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
-		} 
-		else 
+		}
+		else
 		{
 			final IterativeKnowledgeControler controler = new IterativeKnowledgeControler(args);
 			controler.setOverwriteFiles(true);

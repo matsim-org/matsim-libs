@@ -84,7 +84,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
-		QueueSimulation qsim = new QueueSimulation(network, plans, events);
+		QueueSimulation qsim = new QueueSimulation(scenario, events);
 		qsim.run();
 
 		// check that we get the expected result
@@ -144,7 +144,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
-		QueueSimulation qsim = new QueueSimulation(network, plans, events);
+		QueueSimulation qsim = new QueueSimulation(scenario, events);
 		qsim.run();
 		/*
 		 * The last person of the first wave should have taken 20 s to travel

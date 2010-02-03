@@ -40,23 +40,23 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		}
 
 		private static final long serialVersionUID = 1L;
-		
+
 	}
-	
+
 	private static Logger log = Logger.getLogger(TransitQSimFeature.class);
-  
+
 	private QSim queueSimulation;
-	
+
 	private TransitSchedule schedule = null;
-	
+
 	protected final TransitStopAgentTracker agentTracker;
 
 	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
 
 	private boolean useUmlaeufe = false;
-	
+
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
-	
+
 	public TransitQSimFeature(QSim queueSimulation) {
 		this.queueSimulation = queueSimulation;
 		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
@@ -81,18 +81,18 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 	@Override
 	public void afterAfterSimStep(double time) {
-		
+
 	}
 
 	@Override
 	public void beforeCleanupSim() {
-		
+
 	}
 
 	private void createVehiclesAndDriversWithUmlaeufe(TransitSchedule thisSchedule,
 			TransitStopAgentTracker thisAgentTracker) {
 		BasicVehicles vehicles = ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles();
-		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.queueSimulation.getScenario().getNetwork(),((ScenarioImpl) this.queueSimulation.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles());
+		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.queueSimulation.getScenario().getNetwork(),((ScenarioImpl) this.queueSimulation.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles(), this.queueSimulation.getScenario().getConfig().charyparNagelScoring());
 		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
 		for (Umlauf umlauf : umlaeufe) {
 			BasicVehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
@@ -192,16 +192,16 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		}
 	}
 
-	
-	
+
+
 	@Override
 	public void afterActivityBegins(DriverAgent agent, int planElementIndex) {
-	
+
 	}
 
 	@Override
 	public void afterActivityEnds(DriverAgent agent, double time) {
-		
+
 	}
 
 	public TransitStopAgentTracker getAgentTracker() {
@@ -215,5 +215,5 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
 		this.stopHandlerFactory = stopHandlerFactory;
 	}
-	
+
 }

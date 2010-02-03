@@ -81,10 +81,10 @@ public class OTFDemo {
 //		org.matsim.run.OTFVis.main(new String[] {"test/input/playground/marcel/pt/config.xml"});
 
 //		org.matsim.run.OTFVis.main(new String[] {});
-		
+
 //		OTFDemo.ptConnect("OTFServer_Transit");
 	}
-	
+
 	public static void ptConnect(final String servername) {
 
 		OTFConnectionManager connect = new OTFConnectionManager();
@@ -103,16 +103,16 @@ public class OTFDemo {
 		connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
-		
+
 		connect.add(FacilityDrawer.DataWriter_v1_0.class, FacilityDrawer.DataReader_v1_0.class);
 		connect.add(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
-		
+
 //		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_Transit", connect).start();
 		new OTFClientLive("rmi:127.0.0.1:4019:" + servername, connect).start();
 //		new OnTheFlyClientQuad("rmi:127.0.0.1:4019", connect).start();
-		
-	
-		
+
+
+
 	}
 
 }

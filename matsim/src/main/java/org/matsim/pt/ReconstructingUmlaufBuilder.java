@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -23,21 +24,21 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 		public int compare(UmlaufStueck o1, UmlaufStueck o2) {
 			return Double.compare(o1.getDeparture().getDepartureTime(), o2.getDeparture().getDepartureTime());
 		}
-		
+
 	};
-	
+
 	private Collection<TransitLine> transitLines;
 	private BasicVehicles basicVehicles;
 	private Map<Id,Umlauf> umlaeufe = new HashMap<Id,Umlauf>();
 	private ArrayList<UmlaufStueck> umlaufStuecke;
-	
+
 	private UmlaufInterpolator umlaufInterpolator;
-	
-	
+
+
 	public ReconstructingUmlaufBuilder(Network network, Collection<TransitLine> transitLines,
-			BasicVehicles basicVehicles) {
+			BasicVehicles basicVehicles, CharyparNagelScoringConfigGroup config) {
 		super();
-		this.umlaufInterpolator = new UmlaufInterpolator(network);
+		this.umlaufInterpolator = new UmlaufInterpolator(network, config);
 		this.transitLines = transitLines;
 		this.basicVehicles = basicVehicles;
 	}

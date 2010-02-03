@@ -79,7 +79,7 @@ public class IteratePopSimTest {
 
 //		QueueLink link = (QueueLink)network.getLinks().get("15");
 //		link.setCapacity()
-		QueueSimulation sim = new QueueSimulation(network, population, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.openNetStateWriter("testWrite", netFileName, 10);
 
 		sim.run();

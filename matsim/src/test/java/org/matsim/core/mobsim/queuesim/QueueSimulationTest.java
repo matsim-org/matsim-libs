@@ -112,7 +112,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -150,7 +150,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -187,7 +187,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -230,7 +230,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -279,7 +279,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -306,7 +306,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -337,7 +337,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -395,7 +395,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -452,7 +452,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -521,7 +521,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -564,7 +564,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.setTeleportVehicles(true);
 		sim.run();
 
@@ -613,7 +613,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.setTeleportVehicles(false);
 		try {
 			sim.run();
@@ -658,7 +658,7 @@ public class QueueSimulationTest extends TestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 
 		/* prepare sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		QueueNetwork qnet = sim.getQueueNetwork();
 		QueueLink qlink2 = qnet.getQueueLink(id2);
 		QueueLink qlink3 = qnet.getQueueLink(new IdImpl(3));
@@ -718,7 +718,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -771,7 +771,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -919,7 +919,7 @@ public class QueueSimulationTest extends TestCase {
 		/* run sim with special logger */
 		LogCounter logger = new LogCounter();
 		Logger.getRootLogger().addAppender(logger);
-		new QueueSimulation(f.network, f.plans, events).run();
+		new QueueSimulation(f.scenario, events).run();
 		Logger.getRootLogger().removeAppender(logger);
 
 		return logger;
@@ -1057,6 +1057,7 @@ public class QueueSimulationTest extends TestCase {
 	 * @author mrieser
 	 */
 	private static final class Fixture {
+		final ScenarioImpl scenario;
 		final Config config;
 		final NetworkLayer network;
 		final Node node1;
@@ -1072,7 +1073,7 @@ public class QueueSimulationTest extends TestCase {
 
 		public Fixture() {
 			Gbl.reset();
-			ScenarioImpl scenario = new ScenarioImpl();
+			this.scenario = new ScenarioImpl();
 			this.config = scenario.getConfig();
 			this.config.simulation().setFlowCapFactor(1.0);
 			this.config.simulation().setStorageCapFactor(1.0);

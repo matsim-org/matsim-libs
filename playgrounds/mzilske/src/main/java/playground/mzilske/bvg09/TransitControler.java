@@ -64,11 +64,11 @@ import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
 public class TransitControler extends Controler {
 
 	private final static Logger logger = Logger.getLogger(TransitControler.class);
-	
+
 	private final static String COUNTS_MODULE_NAME = "ptCounts";
-	
+
 	private final TransitConfigGroup transitConfig;
-	
+
 	private boolean useOTFVis = true;
 
 	public TransitControler(final String[] args) {
@@ -111,7 +111,7 @@ public class TransitControler extends Controler {
 		TransitStrategyManagerConfigLoader.load(this, this.config, manager);
 		return manager;
 	}
-	
+
 	@Override
 	protected void loadControlerListeners() {
 		super.loadControlerListeners();
@@ -146,7 +146,7 @@ public class TransitControler extends Controler {
 		sim.setUseUmlaeufe(true);
 		sim.run();
 	}
-	
+
 	@Override
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
 		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
@@ -188,13 +188,14 @@ public class TransitControler extends Controler {
 					event.getControler().getScenario().getNetwork(), event
 							.getControler().getScenario()
 							.getTransitSchedule().getTransitLines().values(),
-					event.getControler().getScenario().getVehicles());
+					event.getControler().getScenario().getVehicles(),
+					event.getControler().getScenario().getConfig().charyparNagelScoring());
 			reconstructingUmlaufBuilder.build();
 		}
 
 	}
 
-	public static void main(final String[] args) {		
+	public static void main(final String[] args) {
 		TransitControler tc = new TransitControler(args);
 		tc.setOverwriteFiles(true);
 		tc.run();
@@ -202,9 +203,9 @@ public class TransitControler extends Controler {
 
 	public static class OccupancyAnalyzerListener implements
 			BeforeMobsimListener, AfterMobsimListener {
-		
+
 		private OccupancyAnalyzer occupancyAnalyzer;
-		
+
 		public OccupancyAnalyzerListener(OccupancyAnalyzer occupancyAnalyzer) {
 			this.occupancyAnalyzer = occupancyAnalyzer;
 		}
@@ -237,5 +238,5 @@ public class TransitControler extends Controler {
 		this.useOTFVis = useOTFVis;
 	}
 
-	
+
 }

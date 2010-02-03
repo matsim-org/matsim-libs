@@ -27,9 +27,7 @@ import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
@@ -46,11 +44,9 @@ public class EquilTest extends MatsimTestCase {
 		String referenceFileName = getInputDirectory() + "events.txt.gz";
 
 		ScenarioImpl scenario = new ScenarioImpl(c);
-		
-		NetworkLayer network = scenario.getNetwork();
+
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		PopulationImpl population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);
 
@@ -59,7 +55,7 @@ public class EquilTest extends MatsimTestCase {
 		events.addHandler(writer);
 
 		SimulationTimer.setTime(0);
-		QueueSimulation sim = new QueueSimulation(network, population, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.run();
 
 		writer.closeFile();

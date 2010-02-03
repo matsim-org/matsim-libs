@@ -55,7 +55,7 @@ import org.matsim.vis.routervis.multipathrouter.PSLogitRouter;
 public class RouterVis {
 
 	private static final Logger log = Logger.getLogger(RouterVis.class);
-	
+
 	private final RouterNetStateWriter writer;
 
 	private VisLeastCostPathCalculator router;
@@ -66,7 +66,7 @@ public class RouterVis {
 	 * @param network
 	 * @param costCalculator
 	 * @param timeCalculator
-	 * @param router 
+	 * @param router
 	 */
 	public RouterVis(final Network network, final TravelCost costCalculator,
 			final TravelTime timeCalculator, final Class<? extends VisLeastCostPathCalculator> router){
@@ -92,7 +92,7 @@ public class RouterVis {
 		if (ex != null) {
 			throw new RuntimeException(
 					"Cannot instantiate link from prototype, this should never happen, but never say never!",
-					ex);			
+					ex);
 		}
 	}
 
@@ -152,9 +152,9 @@ public class RouterVis {
 
 		Class<? extends VisLeastCostPathCalculator> router = VisDijkstra.class;
 		String outputDirSuffix = "/DijkstraRouter/";
-		
+
 		if (args.length == 4) {
-			
+
 			if (args[3].equals("PSLogitRouter")) {
 				router = PSLogitRouter.class;
 				outputDirSuffix = "VisDijkstra/";
@@ -167,7 +167,7 @@ public class RouterVis {
 			}
 			outputDirSuffix = "/" + args[3];
 		}
-		
+
 		Config config = null;
 		if (args.length >= 3) {
 			config = Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
@@ -181,7 +181,7 @@ public class RouterVis {
 			toNodeId = new IdImpl("7");
 		}
 		log.info(" done.");
-		
+
 		config.controler().setOutputDirectory(config.controler().getOutputDirectory() + outputDirSuffix);
 
 		log.info("  reading the network...");
@@ -192,7 +192,7 @@ public class RouterVis {
 
 		log.info("  creating output dir if needed");
 		final File outputDir = new File(config.controler().getOutputDirectory());
-		
+
 		if (!outputDir.exists()){
 			outputDir.mkdirs();
 		} else if (outputDir.list().length > 0) {
@@ -202,7 +202,7 @@ public class RouterVis {
 		log.info( "done");
 
 		log.info("  creating RouterVis object.");
-		final TravelTime costCalc = new FreespeedTravelTimeCost();
+		final TravelTime costCalc = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
 		final RouterVis vis = new RouterVis(network,(TravelCost) costCalc,costCalc,router);
 		log.info("  done.");
 

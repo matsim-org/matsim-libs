@@ -29,9 +29,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.router.Dijkstra;
@@ -48,7 +47,6 @@ import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -61,7 +59,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class NetworkLoaderImpl implements NetworkLoader {
 
 	private static final Logger log = Logger.getLogger(NetworkLoaderImpl.class);
-	
+
 	private static final double RANGE = 0.45;
 
 	private static final double OVER_LENGTH = 2.;
@@ -95,11 +93,14 @@ public class NetworkLoaderImpl implements NetworkLoader {
 
 	private FreespeedTravelTimeCost cost;
 
+	private final CharyparNagelScoringConfigGroup config;
+
 	private Dijkstra router;
 
 
-	public NetworkLoaderImpl(NetworkLayer net) {
+	public NetworkLoaderImpl(NetworkLayer net, final CharyparNagelScoringConfigGroup config) {
 		this.network = net;
+		this.config = config;
 	}
 
 	public Map<MultiPolygon,List<Link>> getFloors() {
@@ -107,7 +108,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 			loadNetwork();
 		}
 		Map<MultiPolygon,List<Link>> mps = new HashMap<MultiPolygon,List<Link>>();
-		
+
 		for (Geometry geo : this.geos) {
 			MultiPolygon mp = null;
 			if (geo instanceof MultiPolygon) {
@@ -117,7 +118,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 			} else {
 				throw new RuntimeException("Could not create Geometry of:" + geo);
 			}
-			
+
 			//TODO needs to be changed as soon as we have several floors (multi polygon)
 			log.warn("needs to be changed as soon as we have several floors (multi polygon)");
 			List<Link> links = new ArrayList<Link>(this.network.getLinks().values());
@@ -125,7 +126,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 		}
 		return mps;
 	}
-	
+
 	public Network loadNetwork() {
 
 		if (!this.initialized) {
@@ -150,7 +151,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 			//		builder.setCoordinateReferenceSystem(crs);
 			builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 			builder.setWidthCoefficient(0.5);
-			builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
+			builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 			new Links2ESRIShape(this.network,"../../../../tmp/simplifiedNetwork.shp", builder).write();
 		}
 
@@ -159,7 +160,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 
 
 	private void simplifyVisibilityGraph() {
-		this.cost = new FreespeedTravelTimeCost();
+		this.cost = new FreespeedTravelTimeCost(this.config);
 		this.router = new Dijkstra(this.network, this.cost, this.cost);
 
 		LinkComp comp = new LinkComp();
@@ -315,7 +316,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 		//			}
 		//			Polygon p = (Polygon) geo;
 		//			LineString ls = p.getExteriorRing();
-		//			
+		//
 		//		}
 
 		if (DEBUG) {
@@ -347,7 +348,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 				return -1;
 			} else if(o1.getCentroid().getCoordinate().x > o2.getCentroid().getCoordinate().x) {
 				return 1;
-			} 
+			}
 			return 0;
 		}
 
@@ -374,7 +375,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 		for (Geometry geo : this.geos) {
 			Coordinate[] coords = geo.getCoordinates();
 			for (Coordinate c : coords) {
-				List<Point> points = new ArrayList<Point>(); 
+				List<Point> points = new ArrayList<Point>();
 				double incr = 2*Math.PI/16;
 				for (double alpha = 0; alpha < 2*Math.PI; alpha += incr) {
 					double cos = Math.cos(alpha);
@@ -554,7 +555,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 	}
 
 	public static void main(String [] args) {
-		Gbl.createConfig(null);
-		new NetworkLoaderImpl(new NetworkLayer()).loadNetwork();
+		ScenarioImpl scenario = new ScenarioImpl();
+		new NetworkLoaderImpl(scenario.getNetwork(), scenario.getConfig().charyparNagelScoring()).loadNetwork();
 	}
 }

@@ -46,7 +46,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	private Map<MultiPolygon, List<Link>> mps;
 
 	private StaticForceField sff;
-	
+
 	public ScenarioLoader2DImpl(ScenarioImpl scenarioData) {
 		super(scenarioData);
 	}
@@ -56,9 +56,9 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		if (Sim2DConfig.LOAD_NETWORK_FROM_XML_FILE) {
 			super.loadNetwork();
 			loadMps();
-			
+
 		} else if (!Sim2DConfig.NETWORK_LOADERII) {
-			NetworkLoader loader = new NetworkLoaderImpl(getScenario().getNetwork());
+			NetworkLoader loader = new NetworkLoaderImpl(getScenario().getNetwork(), getScenario().getConfig().charyparNagelScoring());
 			this.mps = loader.getFloors();
 			if (this.mps.size() > 1) {
 				throw new RuntimeException("multiple floors are not supported yet");
@@ -87,7 +87,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		}
 		loadStaticForceField();
 	}
-	
+
 	private void loadMps() {
 		FeatureSource fs = null;
 		try {
@@ -95,7 +95,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		Iterator it = null;
 		try {
 			it = fs.getFeatures().iterator();
@@ -113,7 +113,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		List<Link> links = new ArrayList<Link>(super.getScenario().getNetwork().getLinks().values());
 		this.mps = new HashMap<MultiPolygon, List<Link>>();
 		this.mps.put((MultiPolygon)geo, links);
-		
+
 	}
 
 	private FeatureType initFeatureType() {
@@ -133,7 +133,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		throw new RuntimeException(ex);
 
 	}
-	
+
 	private void loadStaticForceField() {
 		if (Sim2DConfig.LOAD_STATIC_FORCE_FIELD_FROM_FILE) {
 			this.sff = new StaticForceFieldReader(Sim2DConfig.STATIC_FORCE_FIELD_FILE).getStaticForceField();

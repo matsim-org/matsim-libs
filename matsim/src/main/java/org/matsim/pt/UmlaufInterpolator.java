@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.Dijkstra;
@@ -15,11 +16,13 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 public class UmlaufInterpolator {
 
-	private Network network;
+	private final Network network;
+	private final CharyparNagelScoringConfigGroup config;
 
-	public UmlaufInterpolator(Network network) {
+	public UmlaufInterpolator(Network network, final CharyparNagelScoringConfigGroup config) {
 		super();
 		this.network = network;
+		this.config = config;
 	}
 
 	public void addUmlaufStueckToUmlauf(UmlaufStueck umlaufStueck, Umlauf umlauf) {
@@ -37,7 +40,7 @@ public class UmlaufInterpolator {
 	}
 
 	private void insertWenden(Link fromLink, Link toLink, Umlauf umlauf) {
-		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost();
+		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(this.config);
 		LeastCostPathCalculator routingAlgo = new Dijkstra(network, calculator, calculator);
 
 		Node startNode = fromLink.getToNode();

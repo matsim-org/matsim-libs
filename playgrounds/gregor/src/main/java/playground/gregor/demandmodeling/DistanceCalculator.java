@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -43,11 +44,13 @@ public class DistanceCalculator {
 	private final List<String []> entries = new ArrayList<String []>();
 	private final HashMap<String,Household> housholds = new HashMap<String,Household>();
 	private final String outfile;
+	private final CharyparNagelScoringConfigGroup config;
 
-	public DistanceCalculator(NetworkLayer network, String csvfile, String outfile) {
+	public DistanceCalculator(NetworkLayer network, String csvfile, String outfile, CharyparNagelScoringConfigGroup config) {
 		this.network = network;
 		this.csvfile = csvfile;
 		this.outfile = outfile;
+		this.config = config;
 	}
 
 
@@ -62,7 +65,8 @@ public class DistanceCalculator {
 
 	private void routeHomeToActivities() {
 		this.network.connect();
-		Dijkstra router = new Dijkstra(this.network, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());
+		FreespeedTravelTimeCost ttCostCalculator = new FreespeedTravelTimeCost(this.config);
+		Dijkstra router = new Dijkstra(this.network, ttCostCalculator, ttCostCalculator);
 		CSVFileWriter writer = new CSVFileWriter(this.outfile);
 		writer.writeLine(new String [] {"Excel_ID","ID","DISTANCE"});
 		for (String [] entry : this.entries) {
@@ -159,7 +163,7 @@ public class DistanceCalculator {
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 
-		new DistanceCalculator(network,infile,outfile).run();
+		new DistanceCalculator(network,infile,outfile, scenario.getConfig().charyparNagelScoring()).run();
 
 	}
 

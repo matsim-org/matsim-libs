@@ -223,7 +223,7 @@ public class DataPrepare {
 
 	private void buildUmlaeufe() {
 		Collection<TransitLine> transitLines = scenario.getTransitSchedule().getTransitLines().values();
-		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(scenario.getNetwork()), transitLines);
+		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(scenario.getNetwork(), scenario.getConfig().charyparNagelScoring()), transitLines);
 		Collection<Umlauf> umlaeufe = greedyUmlaufBuilder.build();
 
 		VehiclesFactory vb = this.scenario.getVehicles().getFactory();

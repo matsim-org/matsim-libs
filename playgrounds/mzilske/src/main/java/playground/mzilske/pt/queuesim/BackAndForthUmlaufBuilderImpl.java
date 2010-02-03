@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.Dijkstra;
@@ -37,13 +38,15 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 
 	};
 
-	private NetworkLayer network;
-	private Collection<TransitLine> transitLines;
+	private final NetworkLayer network;
+	private final Collection<TransitLine> transitLines;
 	private ArrayList<Umlauf> umlaeufe;
+	private final CharyparNagelScoringConfigGroup config;
 
-	public BackAndForthUmlaufBuilderImpl(NetworkLayer network, Collection<TransitLine> transitLines) {
+	public BackAndForthUmlaufBuilderImpl(NetworkLayer network, Collection<TransitLine> transitLines, CharyparNagelScoringConfigGroup config) {
 		this.network = network;
 		this.transitLines = transitLines;
+		this.config = config;
 	}
 
 	public boolean canBuild() {
@@ -112,7 +115,7 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 	}
 
 	private void insertWenden(Link fromLink, Link toLink, Umlauf umlauf) {
-		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost();
+		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(this.config);
 		LeastCostPathCalculator routingAlgo = new Dijkstra(network, calculator, calculator);
 
 		Node startNode = fromLink.getToNode();

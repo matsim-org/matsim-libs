@@ -48,14 +48,14 @@ public class WithindayAgentLogicFactory {
 	protected Network network;
 	private CharyparNagelScoringConfigGroup scoringConfig;
 	protected AStarLandmarksRouteProvider aStarRouteProvider;
-	
+
 	public WithindayAgentLogicFactory(final Network network, final CharyparNagelScoringConfigGroup scoringConfig) {
 		this.network = network;
 		this.scoringConfig = scoringConfig;
-		this.aStarRouteProvider = new AStarLandmarksRouteProvider(this.network);
+		this.aStarRouteProvider = new AStarLandmarksRouteProvider(this.network, this.scoringConfig);
 	}
-	
-	
+
+
 	public RouteProvider createRouteProvider() {
 		return new HierarchicalRouteProvider(this.aStarRouteProvider, this.network);
 	}
@@ -63,23 +63,23 @@ public class WithindayAgentLogicFactory {
 	public AgentContentment createAgentContentment(final WithindayAgent agent) {
 		return new PlanScore(agent, this.network, this.scoringConfig.getPerforming(), this.scoringConfig.getLateArrival());
 	}
-	
+
 	public ScoringFunctionFactory createScoringFunctionFactory() {
 		return new CharyparNagelScoringFunctionFactory(this.scoringConfig);
 	}
-	
-	
+
+
 	public Tuple<AgentBeliefs, List<AgentPercepts>> createAgentPerceptsBeliefs(final int sightDistance) {
 		//create the beliefs
-		AgentBeliefs beliefs = new AgentBeliefsImpl();
+		AgentBeliefs beliefs = new AgentBeliefsImpl(this.scoringConfig);
 		NextLinkTravelTimePerception nextLinkPerception = new NextLinkTravelTimePerception(sightDistance);
 		beliefs.addTravelTimePerception(nextLinkPerception);
 		//create the percepts
 		List<AgentPercepts> percepts = new LinkedList<AgentPercepts>();
 		percepts.add(nextLinkPerception);
-		
+
 		return new Tuple<AgentBeliefs, List<AgentPercepts>>(beliefs, percepts);
-		
+
 	}
-	
+
 }

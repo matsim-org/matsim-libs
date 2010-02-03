@@ -56,7 +56,6 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -85,7 +84,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	private int snapshotPeriod = 0;
-	
+
 	/* time since lasat snapshot */
 	private double snapshotTime = 0.0;
 
@@ -95,7 +94,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	private double infoTime = 0;
 
 	private final Config config;
-	protected final PopulationImpl population;
+	protected final Population population;
 	protected QueueNetwork network;
 	protected Network networkLayer;
 
@@ -141,36 +140,25 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
-	 * @param network
-	 * @param plans
+	 * @param scenario
 	 * @param events
 	 */
-	public QueueSimulation(final Network network, final Population plans, final EventsManager events) {
-		// In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
-		this.listenerManager = new SimulationListenerManager(this);
+	public QueueSimulation(final Scenario scenario, final EventsManager events) {
+		this.scenario = scenario;
+		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
 		AbstractSimulation.reset();
-		this.config = Gbl.getConfig();
+		this.config = scenario.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
 		setEvents(events);
-		this.population = (PopulationImpl) plans;
+		this.population = scenario.getPopulation();
 
-		this.networkLayer = network;
+		this.networkLayer = scenario.getNetwork();
 		this.network = new QueueNetwork(this.networkLayer);
 		this.agentFactory = new AgentFactory(this);
 
 		this.notTeleportedModes.add(TransportMode.car);
 
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
-	}
-
-	/**
-	 * Initialize the QueueSimulation without signal systems
-	 * @param scenario
-	 * @param events
-	 */
-	public QueueSimulation(final Scenario scenario, final EventsManager events) {
-		this(scenario.getNetwork(), scenario.getPopulation(), events);
-		this.scenario = scenario;
 	}
 
 	/**

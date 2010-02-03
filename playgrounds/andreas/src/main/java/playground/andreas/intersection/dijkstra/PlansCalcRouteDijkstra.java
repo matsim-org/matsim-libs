@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -27,8 +28,8 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	Network wrappedNetwork;
 	Network originalNetwork;
 
-	public PlansCalcRouteDijkstra(final Network originalNetwork, final Network wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator) {
-		this(originalNetwork, wrappedNetwork, costCalculator, timeCalculator, new FreespeedTravelTimeCost());
+	public PlansCalcRouteDijkstra(final Network originalNetwork, final Network wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator, final CharyparNagelScoringConfigGroup config) {
+		this(originalNetwork, wrappedNetwork, costCalculator, timeCalculator, new FreespeedTravelTimeCost(config));
 	}
 
 	@SuppressWarnings("deprecation")

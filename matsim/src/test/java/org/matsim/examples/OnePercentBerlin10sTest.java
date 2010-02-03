@@ -28,7 +28,6 @@ import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -53,14 +52,13 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		config.simulation().setTimeStepSize(10.0);
 		config.simulation().setFlowCapFactor(0.01);
 		config.simulation().setStorageCapFactor(0.04);
-		
+
 		config.simulation().setRemoveStuckVehicles(false);
 		config.simulation().setStuckTime(10.0);
-		
+
 		config.charyparNagelScoring().setLearningRate(1.0);
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		PopulationImpl population = scenario.getPopulation();
@@ -72,7 +70,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
 		events.addHandler(writer);
 
-		QueueSimulation sim = new QueueSimulation(network, population, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		log.info("START testOnePercent10s SIM");
 		sim.run();
 		log.info("STOP testOnePercent10s SIM");

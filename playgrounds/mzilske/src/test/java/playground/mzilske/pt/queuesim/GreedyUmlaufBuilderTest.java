@@ -27,7 +27,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 public class GreedyUmlaufBuilderTest {
 
 	ScenarioImpl scenario = new ScenarioImpl();
-	
+
 	private final Id[] ids = new Id[25];
 
 	private void createIds() {
@@ -35,7 +35,7 @@ public class GreedyUmlaufBuilderTest {
 			this.ids[i] = this.scenario.createId(Integer.toString(i));
 		}
 	}
-	
+
 	@Test
 	public void testGreedyUmlaufBuilder() {
 		createIds();
@@ -47,7 +47,7 @@ public class GreedyUmlaufBuilderTest {
 		createNetwork();
 		setupSchedule();
 		Collection<TransitLine> transitLines = scenario.getTransitSchedule().getTransitLines().values();
-		UmlaufBuilder umlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(scenario.getNetwork()), transitLines);	
+		UmlaufBuilder umlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(scenario.getNetwork(), scenario.getConfig().charyparNagelScoring()), transitLines);
 		Collection<Umlauf> umlaeufe = umlaufBuilder.build();
 	}
 
@@ -60,7 +60,7 @@ public class GreedyUmlaufBuilderTest {
 		TransitStopFacility stop4 = builder.createTransitStopFacility(this.ids[4], this.scenario.createCoord(3400, 450), false);
 		TransitStopFacility stop5 = builder.createTransitStopFacility(this.ids[5], this.scenario.createCoord(3900, 50), false);
 		TransitStopFacility stop6 = builder.createTransitStopFacility(this.ids[6], this.scenario.createCoord(3900, 850), false);
-		
+
 		TransitStopFacility stop7 = builder.createTransitStopFacility(this.ids[7], this.scenario.createCoord(2600, 550), false);
 		TransitStopFacility stop8 = builder.createTransitStopFacility(this.ids[8], this.scenario.createCoord( 600, 550), false);
 
@@ -83,7 +83,7 @@ public class GreedyUmlaufBuilderTest {
 		LinkImpl link17 = this.scenario.getNetwork().getLinks().get(this.ids[17]);
 		LinkImpl link18 = this.scenario.getNetwork().getLinks().get(this.ids[18]);
 		LinkImpl link19 = this.scenario.getNetwork().getLinks().get(this.ids[19]);
-		
+
 		stop1.setLink(link3);
 		stop2.setLink(link4);
 		stop3.setLink(link7);
@@ -140,12 +140,12 @@ public class GreedyUmlaufBuilderTest {
 		tRoute2a.addDeparture(builder.createDeparture(this.ids[1], Time.parseTime("07:18:00")));
 		tRoute2a.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:28:00")));
 		tRoute2a.addDeparture(builder.createDeparture(this.ids[3], Time.parseTime("07:38:00")));
-		
+
 		schedule.addTransitLine(tLine2);
 	}
-	
+
 	private void createNetwork() {
-		/*                   
+		/*
 		 * (2)-2 21--(4)-4 20--(6)                                               (12)---12-17--(14)
 		 *                    o  \                                               /o
 		 *                    2   \                                             /  6
@@ -203,5 +203,5 @@ public class GreedyUmlaufBuilderTest {
 		network.createAndAddLink(this.ids[20], node6, node4, 1000.0, 10.0, 3600.0, 1);
 		network.createAndAddLink(this.ids[21], node4, node2, 1000.0, 10.0, 3600.0, 1);
 	}
-	
+
 }
