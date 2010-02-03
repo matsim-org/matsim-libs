@@ -32,14 +32,12 @@ public class ErrorReader implements TabularFileHandler {
 				i++;
 			}
 			if (!equalsHeader) {
-				log.warn("#######################################################################");
 				log.warn("Unfortunately the structure does not match!");
 				log.warn("The header should be: ");
 				for (String g : HEADER) {
 					System.out.print(g + " ");
 				}
 				System.out.println();
-				log.warn("#######################################################################");
 				}
 				this.isFirstLine = false;
 			}else {

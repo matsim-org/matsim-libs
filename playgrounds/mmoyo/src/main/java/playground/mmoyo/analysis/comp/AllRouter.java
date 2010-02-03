@@ -21,22 +21,22 @@ public class AllRouter {
 		-only plans inside the investigation area?
 		*/
 
-		PTValues.scenario = "BerBran_1x_subset_xy2links_nocarplans";
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/config_noRouted/configWithoutRouting_1x_subset_xy2links_nocarplans.xml";
 		
 		PTValues.scenario = "BerBran_1x_subset_xy2links_ptplansonly";
-		//  configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/config_noRouted/configWithoutRouting_1x_subset_xy2links_ptplansonly.xml";
+		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/config_noRouted/configWithoutRouting_1x_subset_xy2links_ptplansonly.xml";
 		
 		PTValues.routerCalculator = 1;
 		PlanRouter.main(new String[]{configFile});
-		
+				
 		PTValues.routerCalculator = 2;
 		PlanRouter.main(new String[]{configFile});
+
 
 		PTValues.routerCalculator = 3;
 		PTValues.distanceCoefficient =0.15;
 		PTValues.timeCoefficient = 0.85;
 		PTValues.transferPenalty = 60.0;
 		PlanRouter.main(new String[]{configFile});
+
 	}
 }

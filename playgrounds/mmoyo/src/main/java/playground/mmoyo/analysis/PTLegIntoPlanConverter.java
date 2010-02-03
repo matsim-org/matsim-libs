@@ -14,7 +14,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.PtConstants;
 
-/**Reads a plan with pt-plans and convert each pt-connection into a plan, each new plan has a index suffix*/
+/**Plan fragmenter: reads a plan with pt-plans and convert each pt-connection into a plan, each new plan has a index suffix*/
 public class PTLegIntoPlanConverter {
 
 	public PTLegIntoPlanConverter() {
@@ -67,8 +67,8 @@ public class PTLegIntoPlanConverter {
 	}
 
 	public static void main(String[] args) {
-		//String configFile = args[0];
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/routed_configs/config_900s_small_rieser.xml";
+		String configFile = args[0];
+		//String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/routed_configs/config_900s_small_rieser.xml";
 
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl scenario = scenarioLoader.getScenario();

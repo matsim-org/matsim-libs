@@ -30,11 +30,11 @@ public class PlanRouter {
 	public PlanRouter(ScenarioImpl scenario) {
 
 		//Get rid of only car plans
-		PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.pt, false ) ;
-		plansFilter.run(scenario.getPopulation()) ;
+		//PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.pt, false ) ;
+		//plansFilter.run(scenario.getPopulation()) ;
 
 		//split pt connections into plans
-		new PTLegIntoPlanConverter().run(scenario);
+		//new PTLegIntoPlanConverter().run(scenario);
 
 		PlansCalcRoute router= null;
 		String routedPlansFile = "../playgrounds/mmoyo/output";

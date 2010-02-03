@@ -39,6 +39,7 @@ import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
@@ -54,6 +55,7 @@ public class OccupancyCounts {
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQSimulation sim = new TransitQSimulation(scenario, (EventsManagerImpl) events);
+		sim.setUseUmlaeufe(true);
 		sim.run();
 	}
 
@@ -78,6 +80,16 @@ public class OccupancyCounts {
 		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
 		new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getVehicles()).run();
 
+		for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()){
+			System.out.println("line :"  +  line.getId());
+				for (TransitRoute route: line.getRoutes().values()){
+					System.out.println("		route : "  +  route.getId());
+				}
+		}
+		
+		
+		
+		
 		//////////////////
 		
 		EventsManagerImpl events = new EventsManagerImpl();

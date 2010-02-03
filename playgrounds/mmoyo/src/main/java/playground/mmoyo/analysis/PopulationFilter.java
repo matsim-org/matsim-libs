@@ -71,7 +71,8 @@ public class PopulationFilter {
 	}
 	
 	public static void main(String[] args) {
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/NullFallAlles/configRouted.xml";
+		//String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/NullFallAlles/configRouted.xml";
+		String configFile = args[0];
 		
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl scenario = scenarioLoader.getScenario();
