@@ -70,6 +70,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	private static final Logger 			log = Logger.getLogger(PlanomatX.class);
 	private final String					finalOpt;
 	private final ActivityTypeFinder 		finder;
+	private final double					LC_minimum_time = 900;
 	
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final Knowledges knowledges;
@@ -213,14 +214,16 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			
 			/* Remove last secondary activity to make plan shorter*/
 			for (int z=plan.getPlanElements().size()-3;z>=2;z=z-2){
-				if (this.checkPrimary((ActivityImpl)plan.getPlanElements().get(z), primActs)		&&
-					!(this.checkForSamePrimary(plan, z/2))) {
-					log.warn("In continue Schleife!");
+				if ((this.checkPrimary((ActivityImpl)plan.getPlanElements().get(z), primActs)		&&
+					!(this.checkForSamePrimary(plan, z/2)))	||
+					!this.checkForHomeSequenceRemoving((PlanImpl)plan, z)) {
+					log.info("Cannot remove activity, checking next one...");
 					continue;
 				}
 				else {
+					log.info("Removed a "+((ActivityImpl)(plan.getPlanElements().get(z))).getType()+" act of the initial plan for person "+plan.getPerson().getId());
 					this.removeAct(z/2, plan);
-					log.warn("Removed an act of the initial plan for person "+plan.getPerson().getId());
+					this.router.run(plan);
 					break;
 				}
 			}
@@ -1145,9 +1148,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		ManageSubchains manager = new ManageSubchains();
 		if (second-first==1){	// one long subchain
 			/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
-			if (((LegImpl)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(1);
-			if (((LegImpl)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(first*2+1)).setTravelTime(1);
-			if (((LegImpl)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(second*2+1)).setTravelTime(1);
+			if (((LegImpl)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(this.LC_minimum_time);
+			if (((LegImpl)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(first*2+1)).setTravelTime(this.LC_minimum_time);
+			if (((LegImpl)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(second*2+1)).setTravelTime(this.LC_minimum_time);
 			manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (LegImpl)plan.getPlanElements().get((first-1)*2+1));
 			manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (LegImpl)plan.getPlanElements().get(first*2+1));
 			manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(second*2), (LegImpl)plan.getPlanElements().get(second*2+1));
@@ -1156,16 +1159,16 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		else{					// two short subchains
 			if (first!=-1){
 				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
-				if (((LegImpl)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(1);
-				if (((LegImpl)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(first*2+1)).setTravelTime(1);
+				if (((LegImpl)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(this.LC_minimum_time);
+				if (((LegImpl)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(first*2+1)).setTravelTime(this.LC_minimum_time);
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (LegImpl)plan.getPlanElements().get((first-1)*2+1));
 				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (LegImpl)plan.getPlanElements().get(first*2+1));
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first+1)*2), null);
 			}
 			if (second!=-1){
 				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
-				if (((LegImpl)plan.getPlanElements().get((second-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((second-1)*2+1)).setTravelTime(1);
-				if (((LegImpl)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(second*2+1)).setTravelTime(1);
+				if (((LegImpl)plan.getPlanElements().get((second-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((second-1)*2+1)).setTravelTime(this.LC_minimum_time);
+				if (((LegImpl)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(second*2+1)).setTravelTime(this.LC_minimum_time);
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second-1)*2), (LegImpl)plan.getPlanElements().get((second-1)*2+1));
 				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(second*2), (LegImpl)plan.getPlanElements().get(second*2+1));
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second+1)*2), null);
