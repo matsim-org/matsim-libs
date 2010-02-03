@@ -45,7 +45,7 @@ implements Comparable<Intervall>
 	private int _r;
 
 	/**
-	 *mode of oppenes with the folowing meaning:
+	 *mode of opennes with the folowing meaning:
 	 *1 closed
 	 *2 leftopen
 	 *3 rightopen

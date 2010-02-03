@@ -216,18 +216,18 @@ extends      BinTree
      */
     public BinTreeNode goToNodeAt ( int t )
     {
-	if ( isEmpty() )
-	    return null ;
-	
-	BinTreeNode parent = _findParentAt( t ) ;               // "parent" of obj
-	//TODO intervall finden
-	BinTreeNode node   = (parent==_dummy || (t- parent.obj.getLowBound()) < 0
-			       ?  parent.left  :  parent.right ) ;
-	if(node !=null && node.obj.contains(t)){
-		_curr=node;
-	}
-	return ( node != null && node.obj.contains(t)  ?  node  :  null ) ;
-		//TODO may want to throw Exception
+    	if ( isEmpty() )
+    		return null ;
+
+    	BinTreeNode parent = _findParentAt( t ) ;               // "parent" of obj
+    	//TODO intervall finden
+    	BinTreeNode node   = (parent==_dummy || (t- parent.obj.getLowBound()) < 0
+    			?  parent.left  :  parent.right ) ;
+    	if(node !=null && node.obj.contains(t)){
+    		_curr=node;
+    	}
+    	return ( node != null && node.obj.contains(t)  ?  node  :  null ) ;
+    	//TODO may want to throw Exception
     }  // contains()
 
     /**
@@ -235,15 +235,15 @@ extends      BinTree
      */
     public Intervall contains ( int t )
     {
-	if ( isEmpty() )
-	    return null ;
-	
-	BinTreeNode parent = _findParentAt( t ) ;               // "parent" of obj
-	//TODO intervall finden
-	BinTreeNode node   = (parent==_dummy || (t- parent.obj.getLowBound()) < 0
-			       ?  parent.left  :  parent.right ) ;
+    	if ( isEmpty() )
+    		return null ;
 
-	return ( node != null && node.obj.contains(t)  ?  node.obj  :  null ) ;
+    	BinTreeNode parent = _findParentAt( t ) ;               // "parent" of obj
+    	//TODO intervall finden
+    	BinTreeNode node   = (parent==_dummy || (t- parent.obj.getLowBound()) < 0
+    			?  parent.left  :  parent.right ) ;
+
+    	return ( node != null && node.obj.contains(t)  ?  node.obj  :  null ) ;
 
     }  // contains()
 

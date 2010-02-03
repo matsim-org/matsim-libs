@@ -25,9 +25,7 @@ package playground.dressler.Intervall.src.Intervalls;
 import java.util.ArrayList;
 
 //playground imports
-import playground.dressler.ea_flow.FlowEdgeTraversalCalculator;
-import playground.dressler.ea_flow.GlobalFlowCalculationSettings;
-
+import playground.dressler.ea_flow.FlowCalculationSettings;
 
 /**
  * class representing the flow of an edge in a Time Expanded Network
@@ -49,9 +47,9 @@ public class EdgeIntervalls {
 	private EdgeIntervall _last; 
 
 	/**
-	 * traveltime caclator
+	 * traveltime for easy access 
 	 */
-	public final FlowEdgeTraversalCalculator _traveltime;
+	public final int _traveltime;
 	
 	/**
 	 * debug flag
@@ -66,7 +64,7 @@ public class EdgeIntervalls {
 	 * Default Constructor Constructs an object containing only 
 	 * one EdgeIntervall [0,Integer.MAX_VALUE) with flow equal to 0
 	 */
-	public EdgeIntervalls(final FlowEdgeTraversalCalculator traveltime){
+	public EdgeIntervalls(final int traveltime){
 		EdgeIntervall intervall = new EdgeIntervall(0,Integer.MAX_VALUE);
 		_tree = new AVLTree();
 		_tree.insert(intervall);
@@ -272,203 +270,93 @@ public class EdgeIntervalls {
 		}
 		return null;
 	}
-	
-	/**
-	 * used to constrain the bounds of the intervall eIntervall, 
-	 * so that no Holdover is needed
-	 * @param eIntervall
-	 * @param latestStartTimeAtFromNode the last, time (included) 
-	 * at which flow can be send
-	 * @return	null, if holdover is needed; a new Intervall otherwise
-	 *  which forbids holdover
-	 */
-	public EdgeIntervall forbidHoldoverForwards(final EdgeIntervall eIntervall, 
-			final int latestStartTimeAtFromNode){
-		if(eIntervall == null)
-			return null;
-		if(latestStartTimeAtFromNode >= eIntervall.getLowBound())
-		{
-			int latestPossibleStart = Math.min(latestStartTimeAtFromNode +1,
-					eIntervall.getHighBound());
-			return new EdgeIntervall(eIntervall.getLowBound(), latestPossibleStart,
-					eIntervall.getFlow());
-		}
-		return null;
-	}
-	
-	/**
-	 * finds the next EdgeIntervall after time arrivalTime - maxTraveltime 
-	 * upon which f>0 
-	 * so that flow could be sent over the Residual Edge starting at time t 
-	 * and arrive 
-	 * during the returned Intervall  
-	 * @param earliestStartTimeAtFromNode time >= traveltime
-	 * @return Edge first Intervall [a,b] with f>0 a=arrivalTime-traveltime
-	 */
-	public EdgeIntervall minPossibleBackwards(final int earliestStartTimeAtFromNode){
-		//calc earliest start time at the to node 
-		int earliestStartTimeAtToNode = earliestStartTimeAtFromNode - 
-				this._traveltime.getMaximalTravelTime();
-		earliestStartTimeAtToNode = Math.max(0, earliestStartTimeAtToNode);
-		EdgeIntervall forwardIntervall = (EdgeIntervall)this.getIntervallAt(
-				earliestStartTimeAtToNode);
-		while(forwardIntervall != null)
-		{
-			int flow = this.getFlowAt(forwardIntervall.getLowBound());
-			//we need flow to reverse it!
-			if(flow > 0){
-				int traveltime = this._traveltime.getTravelTimeForFlow(flow);
-				//we have to arrive after or at the minimal time at which 
-				//we can send flow
-				if(forwardIntervall.getHighBound() + traveltime > 
-						earliestStartTimeAtFromNode){
-					int earliestStartTimeForward = Math.max(
-							earliestStartTimeAtFromNode - traveltime,
-							forwardIntervall.getLowBound());
-					//if the flow can be send before the highbound of 
-					//the forwardIntervall, we have found the first
-					//valid intervall
-					if(earliestStartTimeForward < forwardIntervall.getHighBound())
-						return new EdgeIntervall(earliestStartTimeForward, 
-								forwardIntervall.getHighBound(), 
-								forwardIntervall.getFlow());
-				}
-			}
-			if(forwardIntervall.getHighBound() == Integer.MAX_VALUE)
-				break;
-			forwardIntervall = this.getIntervallAt(forwardIntervall.getHighBound());
-		}
-		return null;
-	}
-	
-	/**
-	 * finds the next EdgeIntervall after time arrivalTime - maxTraveltime 
-	 * upon which f>0 
-	 * so that flow could be sent over the Residual Edge
-	 *  starting at time t and arrive during the returned Intervall  
-	 * @param earliestStartTimeAtFromNode time >= traveltime
-	 * @return Edge first Intervall [a,b] with f>0 a=arrivalTime-traveltime
-	 */
-	public EdgeIntervall forbidHoldoverBackward(final EdgeIntervall eIntervall,
-			final int latestStartTimeAtFromNode){
-		if(eIntervall == null){
-			return null;
-		}
-		int traveltime = _traveltime.getTravelTimeForFlow(eIntervall.getFlow());
-		//the flow has to be negated before the latest possible arrival time at 
-		//the from node
-		if(latestStartTimeAtFromNode < eIntervall.getLowBound() + traveltime){
-			return null;
-		}
-		int latestPossibleSend = Math.min(latestStartTimeAtFromNode-traveltime + 1,
-				eIntervall.getHighBound());
-		return new EdgeIntervall(eIntervall.getLowBound(), latestPossibleSend, 
-				eIntervall.getFlow());
-	}
 		
 	/**
-	 * Gves A list Of Intervallt upon which the ther node can be reached over the Link
-	 * @param arrivaleIntervall VertexIntervall where we can start
-	 * @param u capacity of the Link
+	 * Gives a list of intervals when the other end of the link can be reached.
+	 * If forward, these are incoming times + length.
+	 * Otherwise, these are incoming times - length.
+	 * @param incoming Intervall where we can start
+	 * @param capacity Capacity of the Link
 	 * @param forward indicates whether we use residual edge or not 
-	 * @return
+	 * @return plain old Intervall
 	 */
-	public ArrayList<VertexIntervall> propagate(final VertexIntervall 
-			arrivaleIntervall,final int u ,final boolean forward){
-		ArrayList<VertexIntervall> result = new ArrayList<VertexIntervall>();
-		int earliestStartPossible = arrivaleIntervall.getLowBound();
-		//-1 is important!
-		int latestStartPossible = arrivaleIntervall.getHighBound() - 1;
-		VertexIntervall foundIntervall;
-		EdgeIntervall currentIntervall = this.getIntervallAt(earliestStartPossible);
+	public ArrayList<Intervall> propagate(final Intervall incoming,
+			final int capacity ,final boolean forward){
+
+		ArrayList<Intervall> result = new ArrayList<Intervall>();
+
+		EdgeIntervall current;
+		Intervall toinsert;
+
+		int low = -1;
+		int high = -1;						
+		boolean collecting = false;
+
 		if(forward){
-			//iterate over our edge intervalls as long as the intervall
-			//	is not null
-			while(currentIntervall != null){
-				int nextHighBound = currentIntervall.getHighBound();
-				if(currentIntervall.getFlow() < u){
-					EdgeIntervall nextPossibleIntervall = new EdgeIntervall(currentIntervall);
-					nextPossibleIntervall.setFlow(currentIntervall.getFlow());
-					nextPossibleIntervall.setLowBound(Math.max(earliestStartPossible,
-							currentIntervall.getLowBound()));
-					if(!GlobalFlowCalculationSettings.useHoldover)
-						nextPossibleIntervall = this.forbidHoldoverForwards(nextPossibleIntervall,
-								latestStartPossible);
-					if(_debug>0){
-						System.out.println("kapazitaet frei");
-						System.out.println("old i: " +arrivaleIntervall);
-						System.out.println("old j: " +nextPossibleIntervall);
+			current = this.getIntervallAt(incoming.getLowBound());
+			do {				
+				if (current.getFlow() < capacity) {				
+					if (collecting) {
+						high = current.getHighBound();
+					} else {
+						collecting = true;
+						low = current.getLowBound();					  
+						high = current.getHighBound();
 					}
-					if(nextPossibleIntervall!=null){
-						int currentFlow = nextPossibleIntervall.getFlow();
-						Integer travelTime = this._traveltime.getTravelTimeForAdditionalFlow(
-								currentFlow);					
-						nextPossibleIntervall = nextPossibleIntervall.shiftPositive(travelTime);
-						if(_debug>0){
-							System.out.println("shifted by: " + travelTime+ " -> " + 
-									nextPossibleIntervall);
-							System.out.println("new i: " +arrivaleIntervall);
-							System.out.println("new j: " +nextPossibleIntervall);
-							System.out.println("tau:" +this._traveltime);
-						}
-						foundIntervall = new VertexIntervall(nextPossibleIntervall);
-						foundIntervall.setTravelTimeToPredecessor(travelTime);
-						result.add(foundIntervall);
+
+				} else {
+					if (collecting) { // finish the Interval
+						low = Math.max(low, incoming.getLowBound());					  
+						high = Math.min(high, incoming.getHighBound());
+						toinsert = new Intervall(low + this._traveltime, high + this._traveltime);					  
+						result.add(toinsert);
+						collecting = false;
 					}
 				}
-				if(GlobalFlowCalculationSettings.useHoldover){
-					//if we use holdover, we dont need to propagate any intervall
-					//after the first one found!
-					break;
-				}
-				if(nextHighBound > latestStartPossible){
-						//if the next intervall starts after our latestArrivalTime, 
-						//we are finished
-						break;
-				}
-				currentIntervall = this.getIntervallAt(nextHighBound);
+				current = this.getIntervallAt(current.getHighBound());
+
+			} while (current.getLowBound() < incoming.getHighBound());
+
+			if (collecting) { // finish the Interval
+				low = Math.max(low, incoming.getLowBound());					  
+				high = Math.min(high, incoming.getHighBound());
+				toinsert = new Intervall(low + this._traveltime, high + this._traveltime);					  
+				result.add(toinsert);
+				collecting = false;
 			}
-		}
-		if(!forward){
-			//latestStartPossible = arrivaleIntervall.getLastDepartureAtFromNode();
-			while(currentIntervall != null)
-			{	
-				int nextHigh = currentIntervall.getHighBound();
-				EdgeIntervall nextPossibleIntervall = minPossibleBackwards(
-						Math.max(earliestStartPossible, currentIntervall.getLowBound()));
-				if(nextPossibleIntervall == null)
-				{
-					//no intervall can be found after this!
-					break;
+		} else { // not forward
+			current = this.getIntervallAt(incoming.getLowBound() - this._traveltime);
+			do {				
+				if (current.getFlow() < capacity) {				
+					if (collecting) {
+						high = current.getHighBound();
+					} else {
+						collecting = true;
+						low = current.getLowBound();					  
+						high = current.getHighBound();
+					}
+
+				} else {
+					if (collecting) { // finish the Interval
+						low = Math.max(low, incoming.getLowBound() - this._traveltime);					  
+						high = Math.min(high, incoming.getHighBound() - this._traveltime);
+						toinsert = new Intervall(low, high);					  
+						result.add(toinsert);
+						collecting = false;
+					}
 				}
-				
-				if(!GlobalFlowCalculationSettings.useHoldover)
-					nextPossibleIntervall = this.forbidHoldoverBackward(nextPossibleIntervall,
-							latestStartPossible);
-				if(nextPossibleIntervall!=null){
-					nextHigh = nextPossibleIntervall.getHighBound() + 
-					this._traveltime.getTravelTimeForFlow(nextPossibleIntervall.getFlow());
-					foundIntervall = new VertexIntervall(nextPossibleIntervall);
-					int traveltime = _traveltime.getTravelTimeForFlow(
-							nextPossibleIntervall.getFlow());
-					foundIntervall.setTravelTimeToPredecessor(traveltime);
-					result.add(foundIntervall);
-				}
-				if(GlobalFlowCalculationSettings.useHoldover)
-				{
-					//if we use holdover, we dont need to propagate any intervall
-					//after the first one found!
-					break;
-				}else{
-					//we get the next edgeintervall
-					if(nextHigh > latestStartPossible)
-						//if the next intervall starts after our latestArrivalTime,
-						//we are finished
-						break;
-					earliestStartPossible = nextHigh;
-					currentIntervall = this.getIntervallAt(nextHigh);
-				}
+				current = this.getIntervallAt(current.getHighBound());
+
+			} while (current.getLowBound() < incoming.getHighBound() - this._traveltime);
+
+			if (collecting) { // finish the Interval
+				low = Math.max(low, incoming.getLowBound() - this._traveltime);					  
+				high = Math.min(high, incoming.getHighBound() - this._traveltime);
+				toinsert = new Intervall(low, high);					  
+				result.add(toinsert);
+				collecting = false;
 			}
+
 		}
 		return result;
 	}
@@ -514,7 +402,7 @@ public class EdgeIntervalls {
 				}
 		EdgeIntervall i = getIntervallAt(t);
 		if (i.getFlow()+f>u){
-			throw new IllegalArgumentException("to much flow! flow: " + i.getFlow() + " + " +
+			throw new IllegalArgumentException("too much flow! flow: " + i.getFlow() + " + " +
 					f + " > " + u);
 		}
 		if (i.getFlow()+f<0){
@@ -541,8 +429,7 @@ public class EdgeIntervalls {
 		}
 		EdgeIntervall i= getIntervallAt(t);
 		if(f<0){
-			throw new IllegalArgumentException("can not rduce flow by an negative amount " +
-					"without specified capacity");
+			throw new IllegalArgumentException("cannot reduce flow by a negative amount");
 		}
 		int oldflow= i.getFlow();
 		if(oldflow-f <0){
@@ -558,227 +445,5 @@ public class EdgeIntervalls {
 	}
 	
 
-//--------------------------------UNEUSED STUFF----------------------------------------//
-	
-	/**
-	 * This method is not supported at the moment do not use it since it is not tested
- 	 * @param arrivaleIntervall
-	 * @param u
-	 * @param forward
-	 * @return
-	 */
-	public ArrayList<VertexIntervall> propagateBowEdge(final VertexIntervall 
-			arrivaleIntervall, final int u ,final boolean forward){
-		if(true){
-			throw new RuntimeException("Method propagateBowEdge(final VertexIntervall " +
-					"arrivaleIntervall, final int u ,final boolean forward) not supported at the moment");
-		}
-		ArrayList<VertexIntervall> result = new ArrayList<VertexIntervall>();
-		int earliestStartPossible = arrivaleIntervall.getLowBound();
-		//-1 is important!
-		int latestStartPossible = arrivaleIntervall.getHighBound() - 1;
-		VertexIntervall foundIntervall;
-		EdgeIntervall currentIntervall = this.getIntervallAt(earliestStartPossible);
-		if(forward){
-			//iterate over our edge intervalls as long as the intervall
-			//	is not null
-			while(currentIntervall != null){
-				EdgeIntervall nextPossibleIntervall;
-				nextPossibleIntervall = this.minPossibleForwards(
-						Math.max(currentIntervall.getLowBound(), earliestStartPossible),u);
-				if(nextPossibleIntervall==null){
-					if(_debug>0){
-						System.out.println("no possible interval after:" + earliestStartPossible+
-								"with cap: " +u);
-					}
-					break;
-				}
-				if(!GlobalFlowCalculationSettings.useHoldover)
-					nextPossibleIntervall = this.forbidHoldoverForwards(nextPossibleIntervall,
-							latestStartPossible);
-				int nextHigh = Integer.MAX_VALUE;
-				if(nextPossibleIntervall != null)
-					nextHigh = nextPossibleIntervall.getHighBound();
-				
-				if(_debug>0){
-					System.out.println("kapazitaet frei");
-					System.out.println("old i: " +arrivaleIntervall);
-					System.out.println("old j: " +nextPossibleIntervall);
-				}
-				if(nextPossibleIntervall!=null){
-					int lastPossibleDeparture = nextPossibleIntervall.getHighBound()-1;
-					int currentFlow = nextPossibleIntervall.getFlow();
-					Integer travelTime = this._traveltime.getTravelTimeForAdditionalFlow(
-							currentFlow);					
-					nextPossibleIntervall = nextPossibleIntervall.shiftPositive(travelTime);
-					if(_debug>0)
-					{
-						System.out.println("shifted by: " + travelTime+ " -> " +  
-								nextPossibleIntervall);
-						System.out.println("new i: " +arrivaleIntervall);
-						System.out.println("new j: " +nextPossibleIntervall);
-						System.out.println("tau:" +this._traveltime);
-					}
-					foundIntervall = new VertexIntervall(nextPossibleIntervall);
-					foundIntervall.setTravelTimeToPredecessor(travelTime);
-					foundIntervall.setLastDepartureAtFromNode(lastPossibleDeparture);
-					result.add(foundIntervall);
-				}
-				if(GlobalFlowCalculationSettings.useHoldover)
-				{
-					//if we use holdover, we dont need to propagate any intervall
-					//after the first one found!
-					break;
-				}
-				else
-				{
-					int nextTimeStep = currentIntervall.getHighBound();
-					if(nextHigh < nextTimeStep)
-					{
-						nextTimeStep = nextHigh;
-						earliestStartPossible = nextHigh;
-					}
-					if(nextTimeStep > latestStartPossible)
-						//if the next intervall starts after our latestArrivalTime, 
-						//we are finished
-						break;
-					currentIntervall = this.getIntervallAt(nextTimeStep);
-				}
-			}
-			result = addHoldover(result);
-		}
-		if(!forward){
-			//latestStartPossible = arrivaleIntervall.getLastDepartureAtFromNode();
-			while(currentIntervall != null)
-			{	
-				EdgeIntervall nextPossibleIntervall = minPossibleBackwards(
-						Math.max(earliestStartPossible, currentIntervall.getLowBound()));
-				if(nextPossibleIntervall == null)
-				{
-					//no intervall can be found after this!
-					break;
-				}
-				if(!GlobalFlowCalculationSettings.useHoldover)
-					nextPossibleIntervall = this.forbidHoldoverBackward(nextPossibleIntervall, 
-							latestStartPossible);
-				int nextHigh = Integer.MAX_VALUE;
-				if(nextPossibleIntervall != null)
-					nextHigh = nextPossibleIntervall.getHighBound() + 
-					this._traveltime.getTravelTimeForFlow(nextPossibleIntervall.getFlow());
-				if(nextPossibleIntervall!=null){
-					foundIntervall = new VertexIntervall(nextPossibleIntervall);
-					int traveltime = _traveltime.getTravelTimeForFlow(
-							nextPossibleIntervall.getFlow());
-					foundIntervall.setTravelTimeToPredecessor(traveltime);
-					foundIntervall.setLastDepartureAtFromNode(
-							nextPossibleIntervall.getHighBound() - 1);
-					result.add(foundIntervall);
-				}
-				if(GlobalFlowCalculationSettings.useHoldover)
-				{
-					//if we use holdover, we dont need to propagate any intervall
-					//after the first one found!
-					break;
-				}
-				else
-				{
-					//we get the next edgeintervall
-					int nextTimeStep = currentIntervall.getHighBound();
-					if(nextHigh < nextTimeStep)
-					{
-						nextTimeStep = nextHigh;
-						earliestStartPossible = nextHigh;
-					}
-					if(nextTimeStep > latestStartPossible)
-						//if the next intervall starts after our latestArrivalTime, 
-						//we are finished
-						break;
-					currentIntervall = this.getIntervallAt(nextTimeStep);
-				}
-			}
-			
-			result = addHoldover(result);
-		}
-		return result;
-	}
-	
 
-	/**
-	 * This method is not supported at the moment do not use it since it is not tested
-	 * @param oldIntervalls
-	 * @return
-	 */
-	protected ArrayList<VertexIntervall> addHoldover(ArrayList<VertexIntervall> oldIntervalls)
-	{
-		if(true){
-			throw new RuntimeException("Method addHoldover(ArrayList<VertexIntervall> oldIntervalls) not supported at the moment");
-		}
-		//order intervalls
-		ArrayList<VertexIntervall> orderedResult = new ArrayList<VertexIntervall>(
-				oldIntervalls.size());
-		for(int i = 0; i < oldIntervalls.size(); ++i)
-		{
-			
-			VertexIntervall toAdd = oldIntervalls.get(i);
-			int insertAt = 0;
-			if(orderedResult.size() > 0)
-			{
-				//search for insert position
-				for(; insertAt < orderedResult.size(); ++insertAt)
-				{
-					if(toAdd.getLowBound() < orderedResult.get(insertAt).getLowBound())
-					{
-						break;
-					}
-				}
-			}
-			orderedResult.add(insertAt, toAdd);
-		}
-		//if space between: fill up
-		for(int i = 0; i < orderedResult.size()-1; ++i)
-		{
-			VertexIntervall current = orderedResult.get(i);
-			VertexIntervall next = orderedResult.get(i+1);
-			if(current.getHighBound() < next.getLowBound())
-			{
-				//split up intervall
-				VertexIntervall spaceIntervall = new VertexIntervall(current.getHighBound(), 
-						next.getLowBound(), current);
-				spaceIntervall.setOverridable(true);
-				orderedResult.add(i+1, spaceIntervall);
-				++i;
-			}
-		}
-		if(orderedResult.size() > 0)
-		{
-			VertexIntervall last = orderedResult.get(orderedResult.size()-1);
-			if(last.getHighBound() < Integer.MAX_VALUE)
-			{
-				//split up intervall
-				VertexIntervall spaceIntervall = new VertexIntervall(last.getHighBound(),
-						Integer.MAX_VALUE, last);
-				spaceIntervall.setOverridable(true);
-				orderedResult.add(spaceIntervall);
-			}
-		}
-		return orderedResult;
-	}
-
-	/**
-	 * This method is not supported at the moment do not use it since it is not tested
-	 * gives the previous EdgeIntervall with respect to the order contained 
-	 * @param o should be contained
-	 * @return next EdgeIntervall iff o is not first and contained
-	 */
-	public EdgeIntervall getPrevious(final EdgeIntervall o){
-		if(true){
-			throw new RuntimeException("Method addHoldover(ArrayList<VertexIntervall> oldIntervalls) not supported at the moment");
-		}
-		if(o.getLowBound() == 0){
-			return null;
-		}
-		return this.getIntervallAt(o.getLowBound()-1);
-	}
-	
-	
 }

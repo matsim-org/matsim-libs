@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.management.RuntimeErrorException;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,8 +46,11 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
-import playground.dressler.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
-import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
+import playground.dressler.Intervall.src.Intervalls.SourceIntervalls;
+import playground.dressler.ea_flow.TimeExpandedPath;
+import playground.dressler.ea_flow.PathStep;
+import playground.dressler.ea_flow.StepEdge;
+import playground.dressler.ea_flow.StepSourceFlow;
 /**
  * Class representing a dynamic flow on an network with multiple sources and a single sink 
  * @author Manuel Schneider
@@ -55,22 +60,28 @@ import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
 public class Flow {
 ////////////////////////////////////////////////////////////////////////////////////////	
 //--------------------------FIELDS----------------------------------------------------//
-////////////////////////////////////////////////////////////////////////////////////////	
+////////////////////////////////////////////////////////////////////////////////////////
 	/**
-	 * The network on which we find routes. We expect the network to change
-	 * between runs!
+	 * The global settings.
+	 */
+	private final FlowCalculationSettings _settings;
+	
+	/**
+	 * The network on which we find routes. 
+	 * We expect the network not to change between runs!
 	 */
 	private final NetworkLayer _network;
-	
-	/**
-	 * used to calculate the length of every edge in the network
-	 */
-	private final Map<Link, FlowEdgeTraversalCalculator> _lengths = new HashMap<Link, FlowEdgeTraversalCalculator>(); 
-	
+		
 	/**
 	 * Edge representation of flow on the network  
 	 */
 	private HashMap<Link, EdgeIntervalls> _flow;
+	
+	
+	/**
+	 * Source outflow, somewhat like holdover for sources  
+	 */
+	private HashMap<Node, SourceIntervalls> _sourceoutflow;
 	
 	/**
 	 * TimeExpandedTimeExpandedPath representation of flow on the network
@@ -81,31 +92,29 @@ public class Flow {
 	 * list of all sources
 	 */
 	private final LinkedList<Node> _sources;
-	
+		
 	/**
 	 * stores unsatisfied demands for each source
 	 */
 	private Map<Node,Integer> _demands;
 	
 	/**
-	 *stores for all nodes whether they are an non active source 
-	 */
-	private final HashMap<Node,Boolean> _nonactives;
-
-	/**
 	 * the sink, to which all flow is directed
 	 */
 	private final  Node _sink;
 	
 	/**
-	 * maximal time Horizon for the flow
+	 * the Time Horizon (for easy access)
 	 */
-	private final  int _timeHorizon;
+	private int _timeHorizon;
 	
+		
 	/**
 	 * total flow augmented so far
 	 */
 	private int totalflow;
+	
+	
 	
 	/**
 	 * TODO use debug mode
@@ -113,63 +122,42 @@ public class Flow {
 	 */
 	@SuppressWarnings("unused")
 	private static int _debug = 0;
-	
-	private final EdgeTypeEnum edgeType;
+		
 	
 ///////////////////////////////////////////////////////////////////////////////////	
 //-----------------------------Constructors--------------------------------------//	
 ///////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Constructor that initializes a zero flow over time on the specified network
-	 * the length of the edges will be as specified by FakeTravelTimeCost 
-	 * @param network network on which the flow will "live"
-	 * @param sources the potential sources of the flow		
-	 * @param demands the demands in the sources as nonnegative integers
-	 * @param sink the sink for all the flow
-	 * @param horizon the time horizon in which flow is allowed
+	 * Constructor that initializes a zero flow over time for the specified settings
+	 * @param settings
 	 */
-	public Flow(final NetworkLayer network, Map<Node, Integer> demands, final Node sink, final int horizon, EdgeTypeEnum edgeTypeToUse) {
-		this._network = network;
-		this._flow = new HashMap<Link,EdgeIntervalls>();
-		this.edgeType = edgeTypeToUse;
+	public Flow(FlowCalculationSettings settings) {
 		
-		// initialize distances
-		for(Link link : network.getLinks().values()){
-			
-			FlowEdgeTraversalCalculator bTT = GlobalFlowCalculationSettings.getFlowEdgeTraversalCalculator(edgeTypeToUse, link);
-			_lengths.put(link, bTT);
-			this._flow.put(link, new EdgeIntervalls(bTT));
-		}
-		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();
-		this._demands = demands;
+		this._settings = settings;
+		this._network = settings.getNetwork();
+		this._flow = new HashMap<Link,EdgeIntervalls>();
+		this._sourceoutflow = new HashMap<Node, SourceIntervalls>();
+		
+		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();		
+		this._demands = new HashMap<Node, Integer>();
 		this._sources = new LinkedList<Node>();
-		this._sources.addAll(demands.keySet());
-		this._sink = sink;
-		_timeHorizon = horizon;
-		this._nonactives = this.nonActives();
+		
+				
+		for(Node node : this._network.getNodes().values()){
+			Integer i = settings.getDemands().get(node);
+			if (i != null && i > 0) {
+				this._sources.add(node);
+				this._sourceoutflow.put(node, new SourceIntervalls());
+				this._demands.put(node, i);
+			}			
+		}			
+		
+		this._sink = settings.getSink();
+		this._timeHorizon = settings.TimeHorizon;
 		this.totalflow = 0;
 		
-	}
-	
-	/**
-	 * for all Nodes it is specified if the node is an non active source
-	 */
-	private HashMap<Node,Boolean> nonActives(){
-		HashMap<Node,Boolean> nonactives = new HashMap<Node,Boolean>();
-		for(Node node : this._network.getNodes().values()){
-			if(!this._sources.contains(node)){
-				nonactives.put(node, false);
-			}else{
-				if(this._demands.get(node)!=0){
-					nonactives.put(node, false);
-				}else{
-					nonactives.put(node, true);
-				}
-			}
-		}
-		return nonactives;
-	}
+	}	
 	
 //////////////////////////////////////////////////////////////////////////////////
 //--------------------Flow handling Methods-------------------------------------//	
@@ -184,11 +172,7 @@ public class Flow {
 		if (i== null){
 			return false;
 		}else{
-			if (i>0){
-				return true;
-			}else{
-				return false;
-			}
+			return (i > 0);			
 		}
 	}
 	
@@ -205,62 +189,142 @@ public class Flow {
 			throw new IllegalArgumentException("Startnode is no source " + TimeExpandedPath);
 		}
 		int result = this._demands.get(source);
-		if(result == 0)
-			System.out.println("OMG NO DEMANDS FOR ME :(");
-		//go through the pat edges
+		if(result == 0) {			
+			System.out.println("Weird. Source of TimeExpandedPath had no supply left.");
+			return 0;
+		}
+		//go through the path edges
 		//System.out.println("augmenting path: ");
-		for(PathEdge edge : TimeExpandedPath.getPathEdges()){
-			Link link = edge.getEdge();
-			int startTime = edge.getStartTime();
-			int arrivalTime = edge.getArrivalTime();
-			int neededTravelTime = arrivalTime-startTime;
-			//check forward capacity
-			if(edge.isForward()){
-				int flow = this._flow.get(link).getFlowAt(startTime);
-				if(_lengths.get(link).getTravelTimeForAdditionalFlow(flow) == null)
-				{
-					return 0;
-				}
-				int traveltime = _lengths.get(link).getTravelTimeForAdditionalFlow(flow);
-				if(traveltime != neededTravelTime)
-				{
-					System.out.println("path not feasible anymore");
-					return 0;
-				}
-				int cap = _lengths.get(link).getRemainingForwardCapacityWithThisTravelTime(flow);
-				if (cap<0){
-					throw new IllegalArgumentException("too much flow on " + edge);
-				}
+		
+		int cap;
+		for(PathStep step : TimeExpandedPath.getPathSteps()){			
+			
+			// FIXME really bad style ...			
+			if (step instanceof StepEdge) {
+				StepEdge se = (StepEdge) step;
+				Link edge = se.getEdge();				
+						
+				if(se.getForward()){
+					cap = this._settings.getCapacity(edge);										
+				} else {
+					cap = this._flow.get(edge).getFlowAt(se.getArrivalTime());
+				}			
 				if(cap<result ){
 					result= cap;
-				}
-			}
-			// backwards capacity
-			else{
-				if(link.getFromNode().getId().toString().equals("29218296") && startTime == 142)
-				{
-					int debug = 0;
-				}
-				int flow = this._flow.get(link).getFlowAt(startTime);
-				int traveltime = _lengths.get(link).getTravelTimeForFlow(flow);
-				if(traveltime != neededTravelTime)
-				{
-					System.out.println("path not feasible anymore");
-					return 0;
-				}
-				flow = _lengths.get(link).getRemainingBackwardCapacityWithThisTravelTime(flow);
-				if(flow<result){
-					result= flow;
-				}
-			}
-			
-			
+				}			
+			} else if (step instanceof StepSourceFlow) {
+				StepSourceFlow ssf = (StepSourceFlow) step;
+				Node node  = ssf.getStartNode();
+				
+				if (!ssf.getForward()) {
+					SourceIntervalls si = this._sourceoutflow.get(node);
+					if (si == null) {
+						System.out.println("Weird. Source of StepSourceFlow has no sourceoutflow!");
+						return 0;			    	 
+					} else {
+						cap = si.getFlowAt(ssf.getStartTime());
+						if (cap < result) {
+							result = cap;
+						}
+					}				    		  
+				} 
+				/* no else, because outflow out of a source has no cap.
+				   (the demand of the original source is accounted for,
+				   demand of sources we pass through does not matter) */    
+			} else {
+				throw new RuntimeException("Unsupported kind of PathStep!");
+			}  
+						
 		}
 		//System.out.println(""+ result);
 		return result;
 	}
 	
-	public Set<TimeExpandedPath> augmentPathWithBackwardEdges(TimeExpandedPath pathWithBackwardEdges, int flowToAugment)
+	/**
+	 * Method to add another TimeExpandedPath to the flow. The TimeExpandedPath will be added with flow equal to its bottleneck capacity
+	 * @param TimeExpandedPath the TimeExpandedPath on which the maximal possible flow is augmented
+	 * @return Amount of flow augmented 
+	 */
+	public int augment(TimeExpandedPath TEP){	  
+	  int bottleneck = bottleNeckCapacity(TEP);
+	  this.augment(TEP, bottleneck);
+	  return bottleneck;
+	}
+	
+	/**
+	 * Method to add another TimeExpandedPath to the flow with a given flow value on it 
+	 * @param TEP The TimeExpandedPath on which the maximal flow possible is augmented
+	 * @param gamma Amount of flow to augment 
+	 * @return Amount of flow that was really augmented. Should be gamma under most circumstances.
+	 */
+	public void augment(TimeExpandedPath TEP, int gamma){
+	  if (TEP.hadToFixSourceLinks()) {
+	    System.out.println("TimeExpandedPath should start with PathEdge of type SourceOutflow! Fixed.");		  
+	  }
+	  TEP.setFlow(gamma);
+	  dumbaugment(TEP, gamma); // throws exceptions if something is wrong	  
+	  this.totalflow += gamma;
+	  	  
+	  this.unfold(TEP);	  // FIXME still a stub
+	}
+	/**
+	 * Method to change just the flow values according to TimeExpandedPath and gamma 
+	 * @param TEP The TimeExpandedPath on which the flow is augmented
+	 * @param gamma Amount of flow to augment 
+	 * @return Amount of flow that was really augmented. Should be gamma under most circumstances.
+	 */
+	
+	private void dumbaugment(TimeExpandedPath TEP, int gamma) {
+	  
+		for (PathStep step : TEP.getPathSteps()) {
+
+			// FIXME really bad style ...			
+			if (step instanceof StepEdge) {
+				StepEdge se = (StepEdge) step;
+				Link edge = se.getEdge();				
+
+				if(se.getForward()){
+					this._flow.get(edge).augment(se.getStartTime(), gamma, this._settings.getCapacity(edge));
+				}	else {
+					this._flow.get(edge).augmentreverse(se.getArrivalTime(), gamma);									  
+				}			
+			} else if (step instanceof StepSourceFlow) {
+				StepSourceFlow ssf = (StepSourceFlow) step;
+				Node source = ssf.getStartNode();
+				Integer demand = this._demands.get(source);
+
+				if (demand == null) {
+					throw new IllegalArgumentException("Startnode is no source on TimeExpandedPath " + TEP);
+				}
+
+				if (ssf.getForward()) {	
+					demand -= gamma;
+					if (demand < 0) {
+						throw new IllegalArgumentException("too much flow on TimeExpandedPath " + TEP);
+					}
+					this._sourceoutflow.get(source).augment(ssf.getStartTime(), gamma, Integer.MAX_VALUE);
+					this._demands.put(source, demand);
+				} else {
+					this._sourceoutflow.get(source).augmentreverse(ssf.getArrivalTime(), gamma);
+					this._demands.put(source, demand + gamma);
+				}
+
+			} else {
+				throw new RuntimeException("Unsupported kind of PathStep!");
+			}  
+		}
+	}
+	
+	/**
+	 * Recursive method to resolve residual edges in TEP 
+	 * @param TEP A TimeExpandedPath 
+	 */
+	private void unfold(TimeExpandedPath TEP){
+		System.out.println("Cannot unfold paths yet! TEPs are not stored at all.");
+		// TODO stub
+	}
+	
+	/*public Set<TimeExpandedPath> augmentPathWithBackwardEdges(TimeExpandedPath pathWithBackwardEdges, int flowToAugment)
 	{
 		List<PathEdge> backwardEdges = new LinkedList<PathEdge>();
 		for(PathEdge pE : pathWithBackwardEdges.getPathEdges())
@@ -373,7 +437,7 @@ public class Flow {
 			LinkedList<PathEdge> list = tEPath.getPathEdges();
 			for(PathEdge pE : tEPath.getPathEdges())
 			{
-				if(pE.equals(backwardPathEdge))
+				if(backwardPathEdge.isResidualVersionOf(pE))
 				{
 					result.put(tEPath, pE);
 					neededFlow -= Math.min(tEPath.getFlow(), neededFlow);						
@@ -385,10 +449,10 @@ public class Flow {
 		}
 		return result;
 	}
-	/**
+	*//**
 	 * Method to add another TimeExpandedPath to the flow. The TimeExpandedPath will be added with flow equal to its bottleneck capacity
 	 * @param TimeExpandedPath the TimeExpandedPath on which the maximal flow possible is augmented 
-	 */
+	 *//*
 	public int augment(TimeExpandedPath timeExpandedPath){
 		boolean backward = false;
 		for(PathEdge pE : timeExpandedPath.getPathEdges())
@@ -403,7 +467,7 @@ public class Flow {
 		int gamma = bottleNeckCapacity(timeExpandedPath);
 		if(gamma == 0)
 			return 0;
-		this.totalflow += gamma;
+//		this.totalflow += gamma;
 		timeExpandedPath.setFlow(gamma);
 		// no backward links
 		if(!backward){
@@ -441,14 +505,14 @@ public class Flow {
 			reduceDemand(timeExpandedPath);
 		}
 		return gamma;
-	}
+	}*/
 	
 	/**
 	 * construct a path from a List of subpaths
 	 * @param PathList with subgraphs
 	 * @return new path
 	 */
-	public TimeExpandedPath constructPath(LinkedList<TimeExpandedPath> PathList){
+	/*public TimeExpandedPath constructPath(LinkedList<TimeExpandedPath> PathList){
 		TimeExpandedPath result = new TimeExpandedPath();
 		if(PathList.size() <= 0){
 			return null;
@@ -501,34 +565,15 @@ public class Flow {
 			return null;
 		}
 	}
-	
+	*/
 	/**
-	 * Reduces the demand of the first node in the TimeExpandedPath by the flow value of the TimeExpandedPath
-	 * @param TimeExpandedPath TimeExpandedPath used to determine flow and Source Node
-	 */
-	private void reduceDemand(final TimeExpandedPath TimeExpandedPath) {
-		Node source = TimeExpandedPath.getSource();
-		if(!this._demands.containsKey(source)){
-			throw new IllegalArgumentException("Startnode is no source" + TimeExpandedPath);
-		}
-		int flow = TimeExpandedPath.getFlow();
-		int demand = this._demands.get(source)-flow;
-		if(demand<0){
-			throw new IllegalArgumentException("too much flow on TimeExpandedPath" + TimeExpandedPath);
-		}
-		this._demands.put(source, demand);
-		if (demand==0){
-			this._nonactives.put(source, true);
-		}
-	}
-	
-	/**
-	 * decides whether a Node is an non active Source
+	 * decides whether a Node is a non-active (depleted) Source
 	 * @param node Node to check for	
-	 * @return true iff node is a Source with demand 0
+	 * @return true iff node is a Source now with demand 0
 	 */
 	public boolean isNonActiveSource(final Node node){
-		return this._nonactives.get(node);
+		Integer i = this._settings.getDemands().get(node);
+		return (i != null && i == 0);
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////////
@@ -580,7 +625,7 @@ public class Flow {
 		//StringBuilder strb1 = new StringBuilder();
 		StringBuilder strb2 = new StringBuilder("  arrivals:");
 		int[] a =this.arrivals();
-		for (int i=1; i<a.length;i++){
+		for (int i=0; i<a.length;i++){
 			String temp = String.valueOf(a[i]);
 			strb2.append(" "+i+":"+temp);
 		}
@@ -596,7 +641,7 @@ public class Flow {
 		//StringBuilder strb1 = new StringBuilder();
 		StringBuilder strb2 = new StringBuilder("arrival pattern:");
 		int[] a =this.arrivalPattern();
-		for (int i=1; i<a.length;i++){
+		for (int i=0; i<a.length;i++){
 			String temp = String.valueOf(a[i]);
 			strb2.append(" "+i+":"+temp);
 		}
@@ -613,7 +658,7 @@ public class Flow {
 	/**
 	 * 
 	 */
-	public PopulationImpl createPoulation(String oldfile){
+	public PopulationImpl createPopulation(String oldfile){
 		//check whether oldfile exists
 		//boolean org = (oldfile!=null);
 		//HashMap<Node,LinkedList<Person>> orgpersons = new  HashMap<Node,LinkedList<Person>>();
@@ -648,8 +693,10 @@ public class Flow {
 				int nofpersons = path.getFlow();
 				// list of links in order of the path
 				LinkedList<Id> ids = new LinkedList<Id>();
-				for (PathEdge edge : path.getPathEdges()){
-					ids.add(edge.getEdge().getId());
+				for (PathStep step : path.getPathSteps()){
+					if (step instanceof StepEdge) {
+					  ids.add(((StepEdge) step).getEdge().getId());
+					}
 				}
 				
 				
@@ -730,46 +777,11 @@ public class Flow {
 						id++;
 					}
 					
-				/*}  else { // LEAVE THE ROUTES EMPTY! (sadly, this needs different types ...)
-					BasicRouteImpl route;				
-					route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
-					
-					//BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.car);
-					Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
-					leg.setRoute(route);
-					//BasicActImpl home = new BasicActImpl("h");
-					ActImpl home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
-					home.setEndTime(0);
-					home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
-					home.setEndTime(path.getPathEdges().getFirst().getTime());
-					//BasicActImpl work = new BasicActImpl("w");
-					ActImpl work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
-					work.setEndTime(0);
-					work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
-					Link fromlink =path.getPathEdges().getFirst().getEdge();
-					Link tolink =path.getPathEdges().getLast().getEdge();
-					
-					home.setLink(fromlink);
-					work.setLink(tolink);
-					for (int i =1 ; i<= nofpersons;i++){
-						Id matsimid  = new IdImpl(id);
-						Person p = new PersonImpl(matsimid);
-						Plan plan = new org.matsim.population.PlanImpl(p);
-						plan.addAct(home);
-						plan.addLeg(leg);					
-						plan.addAct(work);
-						p.addPlan(plan);
-						result.addPerson(p);
-						id++;
-					}
-										
-				}*/
-				
-			
-				
-			}else{
-				// TODO this should not happen! just output an error?
-				// residual edges
+			}else{ // residual edges
+				// this should not happen!
+				System.out.println("createPopulation encountered a residual step in");
+				System.out.println(path);
+				System.out.println("This should not happen!");
 			}
 			
 			
@@ -791,6 +803,11 @@ public class Flow {
 		for (EdgeIntervalls EI : _flow.values()) {
 		  gain += EI.cleanup();	
 		}
+		for (Node node : this._settings.getDemands().keySet()) {
+			 SourceIntervalls si = this._sourceoutflow.get(node);
+			 if (si != null)
+			   gain += si.cleanup();				
+		}
 		return gain;
 	}	
 	
@@ -800,7 +817,7 @@ public class Flow {
 	
 	
 	/**
-	 * returns a String representation of a TimeExpandedPath
+	 * returns a String representation of the entire flows
 	 */
 	@Override
 	public String toString(){
@@ -838,6 +855,10 @@ public class Flow {
 	 */
 	public void setFlow(HashMap<Link, EdgeIntervalls> flow) {
 		this._flow = flow;
+	}
+		
+	public HashMap<Node, SourceIntervalls> getSourceOutflow() {
+		return this._sourceoutflow;
 	}
 
 	/**
@@ -901,13 +922,4 @@ public class Flow {
 		return this.arrivals().length-1;
 	}
 	
-	public int getMaxTravelTimeForLink(Link l)
-	{
-		return _lengths.get(l).getMaximalTravelTime();
-	}
-
-	public EdgeTypeEnum getEdgeType()
-	{
-		return this.edgeType;
-	}
 }

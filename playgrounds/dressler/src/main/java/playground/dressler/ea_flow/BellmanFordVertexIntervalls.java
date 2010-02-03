@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 package playground.dressler.ea_flow;
 
 // java imports
@@ -39,16 +39,15 @@ import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.Intervall.src.Intervalls.Intervall;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervall;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
-import playground.dressler.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
 import ucar.ma2.Section.Iterator;
 
 
-/**
+*//**
  * Implementation of the Moore-Bellman-Ford Algorithm for a static network! i =
  * 1 .. n for all e = (v,w) if l(w) > l(v) + c(e) then l(w) = l(v) + c(e), p(w) =
  * v.
  * @author Manuel Schneider
- */
+ *//*
 
 
 public class BellmanFordVertexIntervalls {
@@ -65,7 +64,7 @@ public class BellmanFordVertexIntervalls {
 				if (firstPossibleNextRelabel != secondPossibleNextRelabel) {
 				  return firstPossibleNextRelabel.compareTo(secondPossibleNextRelabel);
 				} else {
-					// Important! PriorityQueue assumes that compate = 0 implies the same object ...
+					// Important! PriorityQueue assumes that compare = 0 implies the same object ...
 					return first.getId().compareTo(second.getId());
 				}
 				
@@ -86,52 +85,52 @@ public class BellmanFordVertexIntervalls {
 	
 	
 
-	/**
+	*//**
 	 * The network on which we find routes. We expect the network not to change
 	 * between runs!
-	 */
+	 *//*
 	private final NetworkLayer network;
 
-	/**
+	*//**
 	 * data structure to to represent the flow on a network  
-	 */
+	 *//*
 	private HashMap<Link, EdgeIntervalls> _flowlabels;
 	
-	/**
+	*//**
 	 * data structure to keep distance labels on nodes during and after one Iteration of the shortest TimeExpandedPath Algorithm
-	 */
+	 *//*
 	private HashMap<Node, VertexIntervalls> _labels;
 	
-	/**
+	*//**
 	 * data structure to hold the present flow
-	 */
+	 *//*
 	private Flow _flow;
  
-	/**
+	*//**
 	 * maximal time horizon
-	 */
+	 *//*
 	private final int _timehorizon;
 	
-	/**
+	*//**
 	 * sink node to which TimeExpandedPaths are searched
-	 */
+	 *//*
 	private final Node _sink;
-	/**
+	*//**
 	 * 
-	 */
+	 *//*
 	private Collection<TimeExpandedPath> _timeexpandedpath;
-	 /**
+	 *//**
 	  * 
-	  */
+	  *//*
 	private static int _warmstart;
-	/**
+	*//**
 	 * 
-	 */
+	 *//*
 	private LinkedList<Node> _warmstartlist;
 	
-	/**
+	*//**
 	 * debug variable, the higher the value the more it tells
-	 */
+	 *//*
 	private static int _debug=0;
 
 	public int gain = 0;
@@ -154,10 +153,10 @@ public class BellmanFordVertexIntervalls {
 	
 	//--------------------CONSTRUCTORS-------------------------------------//
 	
-	/**
+	*//**
 	 * Constructor using all the data initialized in the Flow object use recommended
 	 * @param flow 
-	 */
+	 *//*
 	public BellmanFordVertexIntervalls(Flow flow) {
 		this._flow = flow;
 		this.network = flow.getNetwork();
@@ -169,15 +168,15 @@ public class BellmanFordVertexIntervalls {
 	
 	
 	
-	/**
+	*//**
 	 * Setter for debug mode the higher the value the more it tells
 	 * @param debug > 0 is debug mode is on
-	 */
+	 *//*
 	public static void debug(int debug){
 		BellmanFordVertexIntervalls._debug = debug;
 	}
 	
-	/**
+	*//**
 	 * Setter for warmstart mode 
 	 * @param warmstart > 0 is warmstart mode is on
 	public static void warmstart(int warmstart){
@@ -187,7 +186,7 @@ public class BellmanFordVertexIntervalls {
 	/**
 	 * refreshes all dist labels before one run of the algorithm
 	 * @return returns all active sources
-	 */
+	 *//*
 	private LinkedList<Node> refreshLabels(){
 		LinkedList<Node> nodes = new LinkedList<Node>();
 		for(Node node: network.getNodes().values()){
@@ -202,11 +201,11 @@ public class BellmanFordVertexIntervalls {
 		return nodes;
 	}
 	
-	/**
+	*//**
 	 * decides whether a node is an active source
 	 * @param node to be checked
 	 * @return true if there is still demand on the node
-	 */
+	 *//*
 	private boolean isActiveSource(Node node) {
 		if(_debug>3){
 			System.out.println(node.getId() + " active:" + this._flow.isActiveSource(node));
@@ -214,10 +213,10 @@ public class BellmanFordVertexIntervalls {
 		return this._flow.isActiveSource(node);
 	}
 	
-	/**
+	*//**
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
-	 */
+	 *//*
 	private Collection<TimeExpandedPath> constructRoutes()throws BFException{
 		Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
 		
@@ -307,14 +306,14 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	
-	/**
+	*//**
 	 * method for updating the labels of Node to during one iteration of the algorithm
 	 * @param from Node from which we start
 	 * @param to Node to which we want to go 
 	 * @param over Link upon which we travel
 	 * @param forward indicates, weather we use a forward or backwards edge
 	 * @return true if any label of Node to has changed
-	 */
+	 *//*
 	private boolean relabel(VertexIntervall start, Node from, Node to, Link over,boolean forward){
 		VertexIntervalls labelto = _labels.get(to);
 		EdgeIntervalls	flowover = _flowlabels.get(over);
@@ -384,10 +383,10 @@ public class BellmanFordVertexIntervalls {
 		return changed;
 	}
 	
-	/**
+	*//**
 	 * main bellman ford algorithm calculating a shortest TimeExpandedPath
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
-	 */
+	 *//*
 	public Collection<TimeExpandedPath> doCalculations() {
 		//set the startLabels and add active sources to to the queue
 		LinkedList<Node> activesources = this.refreshLabels();
@@ -397,12 +396,12 @@ public class BellmanFordVertexIntervalls {
 		
 		if(_warmstart>0 && _warmstartlist!=null){
 			queue.addAll(_warmstartlist);					
-			/* for( Node node : activesources){
+			 for( Node node : activesources){
 				if(!queue.contains(node)){
 					queue.add(node);
 				}
 				
-			}*/
+			}
 			queue.addAll(activesources);
 		}else{
 			queue.addAll(activesources);
@@ -520,9 +519,9 @@ public class BellmanFordVertexIntervalls {
 	
 	
 	
-	/**
+	*//**
 	 * creates a new warmstartlist, from the data of one run of the BF algorithm an sets _warmstartlist accordingly
-	 */
+	 *//*
 	private void createwarmstartList() {
 		// use cases of _warmstart to decide what to do
 	
@@ -531,10 +530,10 @@ public class BellmanFordVertexIntervalls {
 
 
 
-	/**
+	*//**
 	 * prints the Status on the console
 	 *
-	 */
+	 *//*
 	private void printStatus() {
 		int i = 3;
 		if(i +1 < 6)
@@ -574,3 +573,4 @@ public class BellmanFordVertexIntervalls {
 	
 
 }
+*/

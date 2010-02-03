@@ -294,34 +294,34 @@ abstract class BinTree
 
 	do                         // while ( origin != LEFT  &&  ! isAtEnd() )
 	{
-	    switch ( origin )
-	    {
-	    case LEFT:
-		 if ( _curr.right != null )
-		 {
-		     origin = ABOVE ;
-		     _curr  = _curr.right ;      // we go from above into right
-		 }
-		 else
-		     origin = RIGHT ;  // pretend we finished the right subtree
-		 break ;
+		switch ( origin )
+		{
+		case LEFT:
+			if ( _curr.right != null )
+			{
+				origin = ABOVE ;
+				_curr  = _curr.right ;      // we go from above into right
+			}
+			else
+				origin = RIGHT ;  // pretend we finished the right subtree
+			break ;
 
-	    case RIGHT:
-	         if ( _curr.isLeftChild() )
-		     origin = LEFT ;
-		 _curr = _curr.parent ;         // we go from below into parent
-		 break ;
-		    
-	    case ABOVE:
-		 if ( _curr.left != null )
-		     _curr = _curr.left ;        // we go from above into right
-		 else
-		     return ;
-		 break ;
+		case RIGHT:
+			if ( _curr.isLeftChild() )
+				origin = LEFT ;
+			_curr = _curr.parent ;         // we go from below into parent
+			break ;
 
-	    default: ;
+		case ABOVE:
+			if ( _curr.left != null )
+				_curr = _curr.left ;        // we go from above into right
+			else
+				return ;
+			break ;
 
-	    }  // switch ( origin )
+		default: ;
+
+		}  // switch ( origin )
 
 	} while ( origin != LEFT ) ;
 	Intervall newOne = this._curr.obj;

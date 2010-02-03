@@ -42,23 +42,18 @@ public class TimeExpandedPath {
 	private int _flow;
 	
 	/**
-	 * the actual path in order from the sink
+	 * the actual path in order from the source
 	 */
-	private LinkedList<PathEdge> _edges;
+	private LinkedList<PathStep> _steps;
 	
 	/**
 	 * arrivaltime of a path
 	 */
 	private int _arrival;
 	
+
 	/**
 	 * time, that the path wait in the source
-	 */
-	private int _wait;
-	
-	
-	/**
-	 * currently aequivalent to _wait, will change in future!
 	 */
 	private int startTime;
 	
@@ -72,105 +67,17 @@ public class TimeExpandedPath {
 	
 	/**
 	 * Class representing an edge in a path with flow over time on an network
-	 * @author Manuel Schneider
+	 * it can also represent sourceoutflow or holdover if edge == null
+	 * @author Manuel Schneider, Daniel Dressler
 	 *
-	 */
-	public class PathEdge {
-		
-		/**
-		 * Edge in a path
-		 */
-		private final Link edge;
-		
-		/**
-		 * time upon which the flow enters the edge
-		 */
-		private final int startTime;
-		
-		/**
-		 * time upon the flow arrivs at the toNode
-		 */
-		private final int arrivalTime;
-		
-		
-		/**
-		 * reminder if this is a forward edge or not
-		 */
-		private final boolean forward;
-		
-		/**
-		 * default Constructor setting the Arguments
-		 * @param edge Link used
-		 * @param time starting time
-		 * @param forward flag if edge is forward or backward
-		 */
-		PathEdge(Link edge, int startTime, int arrivalTime, boolean forward){
-			this.startTime = startTime;
-			this.arrivalTime = arrivalTime;
-			this.edge = edge;
-			this.forward = forward;
-		}
-		
-		/**
-		 * Method returning a String representation of the PathEdge
-		 */
-		@Override
-		public String toString(){
-			String s = this.startTime + " " + edge.getFromNode().getId().toString()+"-->" + edge.getToNode().getId().toString() + " " +this.arrivalTime;
-			if(!this.forward){
-				s += " backwards";
-			}
-			return s;
-		}
-
-		/**
-		 * Getter for the Link used
-		 * @return the edge
-		 */
-		public Link getEdge() {
-			return edge;
-		}
-
-		/**
-		 * checks weather the link is used in forward direction
-		 * @return the forward
-		 */
-		public boolean isForward() {
-			return forward;
-		}
-
-		/**
-		 * getter for the time at which an edge is entered
-		 * @return the time
-		 */
-		public int getStartTime() {
-			return startTime;
-		}
-		
-		public int getArrivalTime()
-		{
-			return arrivalTime;
-		}
-		
-		public boolean equals(PathEdge other)
-		{
-			if(this.getStartTime() == other.startTime
-					&& this.getEdge().equals(other.getEdge())
-					&& this.getArrivalTime() == other.getArrivalTime())
-			{
-				return true;
-			}
-			return false;
-			
-		}
-	}
+	 */	
 	
 	/**
 	 * Default Constructor creating a Path with flow value 0 and no edges
 	 */
 	public TimeExpandedPath(){
 		this._flow = 0;
-		this._edges = new LinkedList<PathEdge>();
+		this._steps = new LinkedList<PathStep>();
 	}
 	
 	/**
@@ -181,21 +88,21 @@ public class TimeExpandedPath {
 	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te last edge in the path
 	 */
 	public void append(Link edge, int startTime, int arrivalTime, boolean forward){
-		//adding first PathEdge
-		if(this._edges.isEmpty()){
-			PathEdge temp =new PathEdge(edge, startTime, arrivalTime, forward);
-			this._edges.addLast(temp);
+		//adding first PathStep
+		StepEdge temp = new StepEdge(edge, startTime, arrivalTime, forward);
+		if(this._steps.isEmpty()){			
+			this._steps.addLast(temp);
 		}else{
-			PathEdge old = this._edges.getLast();
-			PathEdge temp =new PathEdge(edge, startTime, arrivalTime, forward);
+			PathStep old = this._steps.getLast();			
 			if(checkPair(old,temp)){
-				this._edges.addLast(temp);
+				this._steps.addLast(temp);
 			}else{
-				throw new IllegalArgumentException("non adjacent last PathEdge: ... " + old.toString() +" "+ temp.toString() ); 
+				throw new IllegalArgumentException("non adjacent PathSteps: ... " + old.toString() +" "+ temp.toString() ); 
 			}
 		}
 	}
 	
+
 	/**
 	 * Method to push a new Edge to the beginning of the path with the specified input
 	 * @param edge Link used
@@ -204,52 +111,44 @@ public class TimeExpandedPath {
 	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te first edge in the path
 	 */
 	public void push(Link edge, int startTime, int arrivalTime, boolean forward){
-		if(this._edges.isEmpty()){
-			PathEdge temp =new PathEdge(edge, startTime, arrivalTime, forward);
-			this._edges.addFirst(temp);
+		//adding first PathStep
+		StepEdge temp = new StepEdge(edge, startTime, arrivalTime, forward);
+		if(this._steps.isEmpty()){			
+			this._steps.addLast(temp);
 		}else{
-			PathEdge old = this._edges.getFirst();
-			PathEdge temp =new PathEdge(edge, startTime, arrivalTime, forward);
-			if(checkPair(temp,old)){
-				this._edges.addFirst(temp);
+			PathStep old = this._steps.getFirst();			
+			if(checkPair(temp, old)){
+				this._steps.addLast(temp);
 			}else{
-				throw new IllegalArgumentException("non adjacent first PathEdge:" + temp.toString() + old.toString()+"..." ); 
+				throw new IllegalArgumentException("non adjacent PathSteps: ... " + temp.toString() +" "+ old.toString() ); 
 			}
-		}
+		}		
 	}
 	
 	/**
-	 * checks weather two edges are adjacent with respect to their direction used
-	 * does not account for valid times
+	 * checks whether two steps are adjacent with respect to their direction and time 
 	 * @param first first edge in order traversion of the path
 	 * @param second second edge in order traversion of the path
 	 * @return true iff a path could go over first and over second immediatly after
 	 */
-	private static boolean checkPair(PathEdge first, PathEdge second){
-		Node node;
-		if(first.forward){
-			node = first.edge.getToNode();
-		}else{
-			node = first.edge.getFromNode();
-		}
-		if(second.forward){
-			return(node==second.edge.getFromNode());
-		}else{
-			return(node==second.edge.getToNode());
-		}
-		
+	private static boolean checkPair(PathStep first, PathStep second){
+		if (first.getArrivalTime() == second.getStartTime()) {
+			return first.getArrivalNode().equals(second.getStartNode()); 
+		} else {
+			return false;
+		}				 
 	}
 	
 	/**
-	 * checks weather a path is consistent with respect to adjacency of its edges in the specified order, 
-	 * does not acount for valid times 
+	 * checks whether a path is consistent with respect to adjacency of its edges in the specified order, 
+	 * also checks arrival and departure times  
 	 * @return true iff refrenced Object describes a path
 	 */
 	public boolean check(){
-		ListIterator<PathEdge> iter = this._edges.listIterator();
-		PathEdge last = iter.next();
+		ListIterator<PathStep> iter = this._steps.listIterator();
+		PathStep last = iter.next();
 		while(iter.hasNext()){
-			PathEdge next = iter.next();
+			PathStep next = iter.next();
 			if(!checkPair(last,next)){
 				return false;
 			}
@@ -263,8 +162,8 @@ public class TimeExpandedPath {
 	 * @return true iff all edges are forward
 	 */
 	public boolean isforward() {
-		for(PathEdge edge : this._edges){
-			if (!edge.isForward()){
+		for(PathStep step: this._steps){
+			if (!step.getForward()){
 				return false;
 			}
 		}
@@ -276,14 +175,9 @@ public class TimeExpandedPath {
 	 * @return first Node 
 	 */
 	public Node getSource(){
-		PathEdge firstedge = this._edges.getFirst();
-		Node result;
-		if(firstedge.isForward()){
-			result = firstedge.getEdge().getFromNode();
-		}else{
-			result = firstedge.getEdge().getToNode();
-		}
-		return result;
+		PathStep step = this._steps.getFirst();
+
+		return step.getStartNode();
 	}
 	
 	/**
@@ -291,7 +185,7 @@ public class TimeExpandedPath {
 	 * @param fromNode from
 	 * @param toNode to
 	 * @return subpath
-	 */
+	 *//*
 	public TimeExpandedPath getSubPath(int from, int to){
 		TimeExpandedPath result = null;
 		if(from <= to){
@@ -299,22 +193,22 @@ public class TimeExpandedPath {
 				if((to < this._edges.size()) && (to >= 0)){
 					result = new TimeExpandedPath();
 					for(int i = from; i <= to; i++){
-						result.append(this._edges.get(i).edge, this._edges.get(i).startTime, this._edges.get(i).arrivalTime, this._edges.get(i).isForward());
+						result.append(this._edges.get(i));
 					}
 				}
 			}
 		}
 		if(result == null){
-			System.out.println("Indices doesn't match");
+			System.out.println("Indices don't match");
 		}
 		return result;
-	}
+	}*/
 	
 	/**
 	 * Method to indicate, if link is in a path
 	 * @param PathEdge edge
 	 * @return boolean 
-	 */
+	 *//*
 	public boolean containsForwardLink(PathEdge edge){
 		if(edge.isForward()){
 			System.out.println("Error: Try to find forward link of an forward link.");
@@ -331,13 +225,13 @@ public class TimeExpandedPath {
 			}
 		}
 		return result;
-	}
+	}*/
 	
 	/**
 	 * Method to find the forward link of an backward link in a path
 	 * @param PathEdge edge
 	 * @return PathEdge 
-	 */
+	 *//*
 	public PathEdge getForwardLink(PathEdge edge){
 		if(edge.isForward()){
 			System.out.println("Error: Try to find forward link of an forward link.");
@@ -358,13 +252,13 @@ public class TimeExpandedPath {
 			}
 		}
 		return result;
-	}
+	}*/
 	
 	/**
 	 * Method to find the index of the forward link of an backward link in a path
 	 * @param PathEdge edge
 	 * @return index of forward link 
-	 */
+	 *//*
 	public Integer getIndexOfForwardLink(PathEdge edge){
 		if(edge.isForward()){
 			System.out.println("Error: Try to find forward link of an forward link.");
@@ -389,7 +283,7 @@ public class TimeExpandedPath {
 			return null;
 		}
 		return result;
-	}
+	}*/
 	
 	/**
 	 * returns a String representation of the Path
@@ -398,8 +292,8 @@ public class TimeExpandedPath {
 	public String toString(){
 		StringBuilder strb = new StringBuilder();
 		strb.append("f: "+this._flow+" on: ");
-		for (PathEdge edge : this._edges){
-			strb.append(" |" + edge.toString() + "| ");
+		for (PathStep step : this._steps){
+			strb.append(" |" + step.toString() + "| ");
 		}	
 		strb.append("arrivaltime: " + _arrival);
 		return strb.toString();
@@ -409,8 +303,8 @@ public class TimeExpandedPath {
 	 * Getter for the List of PathEdges of which the Path consitst 
 	 * @return List of PathEdges in order of thier traversal
 	 */
-	public LinkedList<PathEdge> getPathEdges(){
-		return this._edges;
+	public LinkedList<PathStep> getPathSteps(){
+		return this._steps;
 	}
 	
 	/**
@@ -449,28 +343,13 @@ public class TimeExpandedPath {
 		return this._arrival;
 	}
 	
-	/**
-	 * setting the time the path wait in the source
-	 * @param time
-	 */
-	public void setWait(int time){
-		this._wait = time;
-	}
-	
-	/**
-	 * getter for time, the path wait in the source, if it is set
-	 * @return wait time
-	 */
-	public int getWait(){
-		return this._wait;
-	}
 	
 	/**
 	 * getter for length of the path
 	 * @return length
 	 */
 	public int length(){
-		return this._edges.size();
+		return this._steps.size();
 	}
 	
 	/**
@@ -484,7 +363,7 @@ public class TimeExpandedPath {
 
 	/**
 	 * print the path
-	 */
+	 *//*
 	public void print(){
 		Link edge;
 		System.out.println("Path waits at source " + this._wait);
@@ -498,9 +377,15 @@ public class TimeExpandedPath {
 		System.out.println("Path arrives at sink at " + this._arrival);
 		System.out.println("Path has flow " + this._flow);
 		System.out.println();
-	}
+	}*/
 	
-	public List<TimeExpandedPath> splitPathAtEdge(PathEdge pathEdgeToSplitAt, boolean testForward)
+	/**
+	 * Split a path at a given pathEdge
+	 * @param pathEdgeToSplitAt this edge will be in neither of the parts
+	 * @param testForward check the direction 
+	 * @return length
+	 */
+	public List<TimeExpandedPath> splitPathAtStep(PathStep stepToSplitAt, boolean testForward)
 	{
 		List<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
 		TimeExpandedPath head = new TimeExpandedPath();
@@ -510,34 +395,23 @@ public class TimeExpandedPath {
 		head.setFlow(this._flow);
 		tail.setFlow(this._flow);
 		boolean preSplit = true;
-		for(PathEdge pE : this._edges)
+		for(PathStep step : this._steps)
 		{
-			if(pE.equals(pathEdgeToSplitAt) && (!testForward || pE.isForward() == pathEdgeToSplitAt.forward))
+			// that testFowrard check is always redundant with PathEdge.equals !
+			//if(pE.equals(pathEdgeToSplitAt) && (!testForward || pE.isForward() == pathEdgeToSplitAt.forward))
+			// FIXME gehoert das so mit equals? oder doch forward egal?
+			if(step.equals(stepToSplitAt))
 			{
 				preSplit = false;
 				continue;
 			}
 			if(preSplit)
 			{
-				if(pE.isForward())
-				{
-					head.append(pE.edge, pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
-				}
-				else
-				{
-					head.append(pE.edge, pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
-				}
+				head.append(step);				
 			}
 			else
 			{
-				if(pE.isForward())
-				{
-					tail.append(pE.edge, pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
-				}
-				else
-				{
-					tail.append(pE.edge, pE.getStartTime() , pE.getArrivalTime(), pE.isForward());
-				}
+				tail.append(step);				
 			}
 		}
 		result.add(head);
@@ -547,27 +421,26 @@ public class TimeExpandedPath {
 	
 	public void addTailToPath(TimeExpandedPath other)
 	{
-		for(PathEdge pE : other.getPathEdges())
+		for(PathStep step : other.getPathSteps())
 		{
-			this.append(pE);
+			this.append(step);
 		}
 		this.setArrival(other.getArrival());
 	}
 	
-	public void append(PathEdge pE)
+	public void append(PathStep step)
 	{
-		this.append(pE.getEdge(), pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
+		this._steps.addLast(step);
 	}
 	
 	public static TimeExpandedPath clone(TimeExpandedPath original)
 	{
 		TimeExpandedPath copy = new TimeExpandedPath();
 		copy.setArrival(original.getArrival());
-		copy.setFlow(original.getArrival());
-		copy.setWait(original.getWait());
-		for(PathEdge pE : original.getPathEdges())
+		copy.setFlow(original.getArrival());		
+		for(PathStep step : original.getPathSteps())
 		{
-			copy.append(pE);
+			copy.append(step);
 		}
 		return copy;
 	}
@@ -589,6 +462,20 @@ public class TimeExpandedPath {
 
 	public void setStartTime(int startTime) {
 		this.startTime = startTime;
+	}
+
+	/**
+	 * Make sure that TimeExpandedPath starts with a PathStep that is a StepSourceFlow!
+	 * @return true iff something was fixed
+	 */
+	public boolean hadToFixSourceLinks() {
+		PathStep step = this._steps.getFirst();
+		if (!(step instanceof StepSourceFlow)) {		
+			StepSourceFlow newstep = new StepSourceFlow(step.getStartNode(), step.getStartTime(), true);
+			this._steps.addFirst(newstep);
+			return true;
+		}
+		return false;
 	}
 	
 }

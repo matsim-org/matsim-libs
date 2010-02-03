@@ -24,6 +24,8 @@ package playground.dressler.Intervall.src.Intervalls;
 //matsim imports
 import org.matsim.api.core.v01.network.Link;
 
+import playground.dressler.ea_flow.PathStep;
+
 
 /**
  * @author Manuel Schneider
@@ -45,21 +47,9 @@ public class VertexIntervall extends Intervall {
 
 	/**
 	 * predecessor in a shortest path
+	 * the times stored in the step are valid for the low bound!
 	 */
-	private Link _predecessor=null;
-	
-	/**
-	 * travel time to predecessor
-	 */
-	private int travelTimeToPredecessor;
-	
-	//VERY IMPORTANT DEFAULT SETTING.
-	//the variable may not be used..
-	private int lastDepartureAtFromNode = Integer.MAX_VALUE;
-	
-	//VERY IMPORTANT DEFAULT SETTING.
-	//the variable may not be used..
-	private boolean overridable = false;
+	private PathStep _predecessor=null;
 	
 
 //---------------------------METHODS----------------------------//
@@ -84,10 +74,15 @@ public class VertexIntervall extends Intervall {
 	 */
 	public VertexIntervall(final int l,final int r) {
 		super(l, r);
+		// dummy values
+		this.reachable = false;
+		this.scanned = false;
+		this._predecessor = null;
 	}
 	
 	/**
-	 * construct an VertexIntervall from l to r wit he settings of other
+	 * construct an VertexIntervall from l to r with the settings of other
+	 * the Predecessor will be shifted to the new value of l
 	 * @param l lowbound
 	 * @param r highbound
 	 * @param other Intervall to copy settings from
@@ -95,12 +90,10 @@ public class VertexIntervall extends Intervall {
 	public VertexIntervall(final int l,final int r,final VertexIntervall other)
 	{
 		super(l,r);
-		this.setLastDepartureAtFromNode(other.lastDepartureAtFromNode);
-		this.setPredecessor(other._predecessor);
-		this.setReachable(other.reachable);
-		this.setScanned(other.isScanned());
-		this.setOverridable(other.overridable);
-		this.setTravelTimeToPredecessor(other.travelTimeToPredecessor);
+		//this.lastDepartureAtFromNode = other.lastDepartureAtFromNode;		
+		this.reachable = other.reachable;
+		this.scanned = other.scanned;
+		this._predecessor = other._predecessor.copyShiftedTo(l);
 	}
 
 	/**
@@ -124,7 +117,7 @@ public class VertexIntervall extends Intervall {
 	
 	/**
 	 * Getter for the min distance to the sink at time lowbound
-	 * @return min distance to sink
+	 * @return if reachable from source
 	 */
 	public boolean getReachable(){
 		return this.reachable;
@@ -135,7 +128,7 @@ public class VertexIntervall extends Intervall {
 	 * Setter for the predecessor in a shortest path
 	 * @param pred predesessor vertex
 	 */
-	public void setPredecessor(final Link pred){
+	public void setPredecessor(final PathStep pred){
 		this._predecessor=pred;
 	}
 	
@@ -143,25 +136,10 @@ public class VertexIntervall extends Intervall {
 	 * Getter for the predecessor in a shortest path
 	 * @return predecessor vertex 
 	 */
-	public Link getPredecessor(){
+	public PathStep getPredecessor(){
 		return this._predecessor;
 	}
 	
-	/**
-	 * getter for travelTimeToPredecessor
-	 * @return travelTimeToPredecessor
-	 */
-	public int getTravelTimeToPredecessor() {
-		return travelTimeToPredecessor;
-	}
-
-	/**
-	 * setter for travelTimeToPredecessor
-	 * @param travelTimeToPredecessor
-	 */
-	public void setTravelTimeToPredecessor(final int travelTimeToPredecessor) {
-		this.travelTimeToPredecessor = travelTimeToPredecessor;
-	}
 	
 	/**
 	 * getter for scanned
@@ -178,58 +156,37 @@ public class VertexIntervall extends Intervall {
 	public void setScanned(final boolean scanned) {
 		this.scanned = scanned;
 	}
+	
 	/**
-	 * getter for lastDepartureAtFromNode
-	 * @return lastDepartureAtFromNode
+	 * Set the fields of the VertexIntervall reachable true, scanned false.
+	 * This performs no checks at all!
+	 * @param pred which is set as predecessor, always shifted to low bound!
 	 */
-	public int getLastDepartureAtFromNode() {
-		return lastDepartureAtFromNode;
-	}
-
-	/**
-	 * setter for lastDepartureAtFromNode
-	 * @param lastArrivalAtThisNode
-	 */
-	public void setLastDepartureAtFromNode(final int lastArrivalAtThisNode) {
-		this.lastDepartureAtFromNode = lastArrivalAtThisNode;
-	}
-
-	/**
-	 * getter for overridable
-	 * @return overridable
-	 */
-	public boolean isOverridable() {
-		return overridable;
-	}
-
-	/**
-	 * setter for overridable
-	 * @param overridable
-	 */
-	public void setOverridable(final boolean overridable) {
-		this.overridable = overridable;
+	public void setArrivalAttributes (final PathStep pred)
+	{
+		//we might have already scanned this intervall
+		this.scanned = false;
+		this.reachable = true;				
+		this._predecessor = pred.copyShiftedTo(this.getLowBound());
+		//ourIntervall.setLastDepartureAtFromNode(arrive.getLastDepartureAtFromNode());		
 	}
 	
 //----------------------------SPLITTING----------------------------//
 	
 	/**
 	 * splits the referenced VertexIntervall at t contained in (lowbound, higbound)
-	 * by changeing!! referenced Intervall to (lowbound,t) 
+	 * by changing!! referenced Intervall to (lowbound,t) 
 	 * and creating a new EdgeInterval (t,highbound) with same Predecesor as the referenced
-	 * Min Dist is set to dist at time  t
-	 *@param t point to split at
+	 *@param t time to split at
 	 *@return new Interval 
 	 */
-	public VertexIntervall splitAt(int t){
-		boolean newdist = this.getReachable();
-		Intervall j =super.splitAt(t);
+	public VertexIntervall splitAt(int t){		
+		Intervall j = super.splitAt(t);
 		VertexIntervall k = new VertexIntervall(j);
-		k.reachable = newdist;
-		k.scanned = this.isScanned();
-		k._predecessor= this._predecessor;
-		k.travelTimeToPredecessor = this.travelTimeToPredecessor;
-		k.lastDepartureAtFromNode = this.lastDepartureAtFromNode;
-		k.overridable = this.overridable;
+		k.reachable = this.reachable;
+		k.scanned = this.scanned;
+		k._predecessor= this._predecessor.copyShiftedTo(k.getLowBound());
+		//k.lastDepartureAtFromNode = this.lastDepartureAtFromNode;
 		return k;
 	}
 	
@@ -241,9 +198,6 @@ public class VertexIntervall extends Intervall {
 	 
 	public String toString()
 	{
-		if(this._predecessor != null)
-			return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned + "; pred: " + this._predecessor.getId().toString() + "; travelTime: " + this.travelTimeToPredecessor;
-		else
-			return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned;
+		return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned + "; pred: " + this._predecessor;
 	}
 }
