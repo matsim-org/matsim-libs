@@ -47,7 +47,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	public void testBestAlternatives() {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		NetworkLayer network = Fixture.createNetwork2(scenario);
+		Fixture.createNetwork2(scenario);
+		NetworkLayer network = scenario.getNetwork();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
@@ -60,7 +61,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		 * is: 20s * (-6 EUR / h) = 20 * (-6) / 3600 = 0.03333
 		 */
 
-		PopulationImpl population = Fixture.createPopulation2(scenario);
+		Fixture.createPopulation2(scenario);
+		PopulationImpl population = scenario.getPopulation();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
@@ -104,7 +106,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	public void testTolledActLink() {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		NetworkLayer network = Fixture.createNetwork2(scenario);
+		Fixture.createNetwork2(scenario);
+		NetworkLayer network = scenario.getNetwork();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
@@ -112,7 +115,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addLink(scenario.createId("7"));
 		toll.addCost(6*3600, 10*3600, 0.06);
 
-		PopulationImpl population = Fixture.createPopulation2(scenario);
+		Fixture.createPopulation2(scenario);
+		PopulationImpl population = scenario.getPopulation();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
@@ -133,7 +137,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	public void testAllAlternativesTolled() {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		NetworkLayer network = Fixture.createNetwork2(scenario);
+		Fixture.createNetwork2(scenario);
+		NetworkLayer network = scenario.getNetwork();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
@@ -142,11 +147,12 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addLink(scenario.createId("5"));
 		toll.addCost(6*3600, 10*3600, 0.06);
 
-		PopulationImpl population = Fixture.createPopulation2(scenario);
+		Fixture.createPopulation2(scenario);
+		PopulationImpl population = scenario.getPopulation();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
-		
+
 		Id id1 = new IdImpl("1");
 		LegImpl leg1 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
 		LegImpl leg2 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
@@ -159,7 +165,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	public void testOutsideTollTime() {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		NetworkLayer network = Fixture.createNetwork2(scenario);
+		Fixture.createNetwork2(scenario);
+		NetworkLayer network = scenario.getNetwork();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
@@ -168,7 +175,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addLink(scenario.createId("11"));
 		toll.addCost(8*3600, 10*3600, 1.0); // high costs!
 
-		PopulationImpl population = Fixture.createPopulation2(scenario);
+		Fixture.createPopulation2(scenario);
+		PopulationImpl population = scenario.getPopulation();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);

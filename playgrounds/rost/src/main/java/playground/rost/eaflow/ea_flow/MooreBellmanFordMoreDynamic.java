@@ -36,6 +36,7 @@ import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.rost.eaflow.Intervall.src.Intervalls.EdgeIntervall;
@@ -49,7 +50,7 @@ import playground.rost.eaflow.Intervall.src.Intervalls.EdgeIntervalls;
  * Implementation of the Moore-Bellman-Ford Algorithm for a static network! i =
  * 1 .. n for all e = (v,w) if l(w) > l(v) + c(e) then l(w) = l(v) + c(e), p(w) =
  * v.
- * 
+ *
  */
 public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
@@ -93,7 +94,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 	/**
 	 * Default constructor.
-	 * 
+	 *
 	 * @param network
 	 *            The network on which to route.
 	 * @param costFunction
@@ -126,7 +127,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 	/**
 	 * Default constructor.
-	 * 
+	 *
 	 * @param network
 	 *            The network on which to route.
 	 * @param costFunction
@@ -161,7 +162,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	/**
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'.
-	 * 
+	 *
 	 * @param fromNode
 	 *            The Node at which the route should start.
 	 * @param toNode
@@ -176,7 +177,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 		// run the algorithm
 		boolean found = false;
-		
+
 		// find shortest path with Moore-Bellman-Ford-Algorithm
 		found = doCalculations(fromNode, toNode, startTime, flow);
 
@@ -230,7 +231,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	/**
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'.
-	 * 
+	 *
 	 * @param fromNode
 	 *            The Node at which the route should start.
 	 * @param toNode
@@ -247,7 +248,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 		// run the algorithm
 		boolean found = false;
-		
+
 		// find shortest path with Moore-Bellman-Ford-Algorithm
 		found = doCalculations(fromNode, toNode, startTime, flow);
 
@@ -295,7 +296,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 			}
 		}
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl();
-		route.setNodes(routeNodes);
+		route.setLinks(null, RouteUtils.getLinksFromNodes(routeNodes), null);
 
 		return route;
 	}
@@ -304,7 +305,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'. This returns an array of links which is more
 	 * useful than the Route object
-	 * 
+	 *
 	 * @param fromNode
 	 *            The Node at which the route should start.
 	 * @param toNode
@@ -354,7 +355,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'. This returns an array of links which is more
 	 * useful than the Route object
-	 * 
+	 *
 	 * @param fromNode
 	 *            The Node at which the route should start.
 	 * @param toNode
@@ -401,7 +402,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'. This returns an array of links which is more
 	 * useful than the Route object
-	 * 
+	 *
 	 * @param fromNode
 	 *            The Node at which the route should start.
 	 * @param toNode
@@ -416,7 +417,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 		// run the algorithm
 		boolean found = false;
-		
+
 		// calculate path
 		found = doCalculations(fromNode, toNode, startTime, flow);
 		if (pathToRoute == null) {
@@ -425,19 +426,19 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		if (pathToRoute == null) {
 			return null;
 		}
-		
+
 		if (!found){
 			System.out.println("Warum?");
 			return null;
 		}
-		
+
 		/*System.out.println("Wait:");
 		for(Node node : network.getNodes().values()){
 			System.out.println("To reach " + node.getId() + " wait " + waited.get(node) + " TU.");
 		}*/
-		
+
 		gamma = calculateGamma(fromNode, toNode, pathToRoute);
-		
+
 		if(gamma == 0){
 			return null;
 		}
@@ -473,7 +474,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'. This returns an array of links which is more
 	 * useful than the Route object
-	 * 
+	 *
 	 * @param fromNode
 	 *            The Node at which the route should start.
 	 * @param toNode
@@ -500,34 +501,34 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		if (pathToRoute == null) {
 			return null;
 		}
-		
+
 		if (!found){
 			System.out.println("Warum?");
 			return null;
 		}
-		
+
 		/*System.out.println("Wait:");
 		for(Node node : network.getNodes().values()){
 			System.out.println("To reach " + node.getId() + " wait " + waited.get(node) + " TU.");
 		}*/
-		
-		 /*System.out.println("Preds: "); 
-		 for (Node node : network.getNodes().values()) { 
+
+		 /*System.out.println("Preds: ");
+		 for (Node node : network.getNodes().values()) {
 			 if (pred.get(node)==null) {
-				 System.out.println("node " + node.getId() + " has no pred "); 
-			 } 
+				 System.out.println("node " + node.getId() + " has no pred ");
+			 }
 			 else {
 				 if (pred.get(node).getFromNode().equals(node)) {
-					 System.out.println("node " + node.getId() + " has pred " +pred.get(node).getToNode().getId()); 
-				 } 
-				 else if (pred.get(node).getToNode().equals(node)) { 
-					 System.out.println("node " + node.getId() + " has pred " + pred.get(node).getFromNode().getId()); 
+					 System.out.println("node " + node.getId() + " has pred " +pred.get(node).getToNode().getId());
 				 }
-				 else { 
-					 System.out.println("node " + node.getId() + " has pred Error"); 
+				 else if (pred.get(node).getToNode().equals(node)) {
+					 System.out.println("node " + node.getId() + " has pred " + pred.get(node).getFromNode().getId());
+				 }
+				 else {
+					 System.out.println("node " + node.getId() + " has pred Error");
 				 }
 			 }
-		} 
+		}
 		System.out.println();
 		*/
 		gamma = calculateGamma(fromNode, toNode, pathToRoute);
@@ -536,7 +537,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		if(gamma == 0){
 			return null;
 		}
-		
+
 		// augment flow
 		Node tmpNode = fromNode;
 		Link tmpLink;
@@ -576,7 +577,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	/*
 	 * this is the Moore-Bellman-Ford Algorithm on the residual network with
 	 * flow
-	 * 
+	 *
 	 */
 	private boolean doCalculations(final Node fromNode, final Node toNode,
 			final double startTime, final HashMap<Link, EdgeIntervalls> flow) {
@@ -783,7 +784,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 	/**
 	 * Initializes the nodes of the network
-	 * 
+	 *
 	 * @param fromNode
 	 *            The starting node
 	 */
@@ -926,7 +927,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 			System.out.print("(" + tmpLink.getFromNode().getId() + ","
 					+ tmpLink.getToNode().getId() + ") ");
 			tmpNode = node;
-			
+
 		}
 		System.out.println();
 	}

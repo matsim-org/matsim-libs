@@ -42,6 +42,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.vis.netvis.NetVis;
 
@@ -128,7 +129,7 @@ public class MyControler1 extends Controler {
 				act1a.setEndTime(0*60*60.);
 				LegImpl leg = plan1.createAndAddLeg(TransportMode.car);
 				NetworkRouteWRefs route = new NodeNetworkRouteImpl(link9, link15);
-				route.setNodes(link9, NetworkUtils.getNodes(this.network, "3 4"), link15);
+				route.setLinks(link9, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "3 4")), link15);
 				leg.setRoute(route);
 				ActivityImpl act1b = plan1.createAndAddActivity("h", new CoordImpl(200., 200.));
 				act1b.setLinkId(link15.getId());
@@ -141,7 +142,7 @@ public class MyControler1 extends Controler {
 				act2a.setEndTime(0*60*60.);
 				LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
 				NetworkRouteWRefs route2 = new NodeNetworkRouteImpl(link9, link15);
-				route2.setNodes(link9, NetworkUtils.getNodes(this.network, "3 6 4"), link15);
+				route2.setLinks(link9, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "3 6 4")), link15);
 				leg2.setRoute(route2);
 				ActivityImpl act2b = plan1.createAndAddActivity("h", new CoordImpl(200., 200.));
 				act2b.setLinkId(link15.getId());

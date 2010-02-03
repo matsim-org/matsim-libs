@@ -173,7 +173,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 		nodesBuffer.addAll(RouteUtils.getNodes(newRoute, this.network));
 
 		// Update Route by replacing the Nodes.
-		route.setNodes(route.getStartLink(), nodesBuffer, route.getEndLink());
+		route.setLinks(route.getStartLink(), RouteUtils.getLinksFromNodes(nodesBuffer), route.getEndLink());
 
 		// Update Distance
 		double distance = 0.0;

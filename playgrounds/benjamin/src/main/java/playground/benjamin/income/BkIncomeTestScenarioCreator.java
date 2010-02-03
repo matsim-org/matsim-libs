@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -38,10 +37,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.utils.ListUtils;
 
 
 /**
@@ -90,16 +89,12 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act1);
 
 			Leg leg1Car = builder.createLeg(TransportMode.car);
-			NodeNetworkRouteImpl routeCar = new NodeNetworkRouteImpl(this.uselessNetwork.getLinks().get(id1), this.uselessNetwork.getLinks().get(id4));
+			LinkNetworkRouteImpl routeCar = new LinkNetworkRouteImpl(this.uselessNetwork.getLinks().get(id1), this.uselessNetwork.getLinks().get(id4));
 			//this would be so nice
 			List<Id> linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id2);
 			linkidsCar.add(id3);
-//			routeCar.setLinkIds(linkidsCar);
-			// but this is reality
-			routeCar.setNodes(ListUtils.<Node>makeList(this.uselessNetwork.getNodes().get(new IdImpl("2")),
-					this.uselessNetwork.getNodes().get(new IdImpl("3")),
-					this.uselessNetwork.getNodes().get(new IdImpl("4"))));
+			routeCar.setLinks(this.uselessNetwork.getLinks().get(id1), NetworkUtils.getLinks(this.uselessNetwork, linkidsCar), this.uselessNetwork.getLinks().get(id4));
 			leg1Car.setRoute(routeCar);
 			plan.addLeg(leg1Car);
 
@@ -110,21 +105,13 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act2);
 
 			Leg leg2Car = builder.createLeg(TransportMode.car);
-			routeCar = new NodeNetworkRouteImpl(this.uselessNetwork.getLinks().get(id4), this.uselessNetwork.getLinks().get(id1));
+			routeCar = new LinkNetworkRouteImpl(this.uselessNetwork.getLinks().get(id4), this.uselessNetwork.getLinks().get(id1));
 			//in a beautiful world we would do...
 			linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id5);
 			linkidsCar.add(id6);
 			linkidsCar.add(id7);
-//			routeCar.setLinkIds(linkidsCar);
-			//but not with mankind
-
-
-			routeCar.setNodes(ListUtils.<Node>makeList(this.uselessNetwork.getNodes().get(new IdImpl("5")),
-					this.uselessNetwork.getNodes().get(new IdImpl("6")),
-					this.uselessNetwork.getNodes().get(new IdImpl("7")),
-					this.uselessNetwork.getNodes().get(new IdImpl("8")),
-					this.uselessNetwork.getNodes().get(new IdImpl("1"))));
+			routeCar.setLinks(this.uselessNetwork.getLinks().get(id4), NetworkUtils.getLinks(this.uselessNetwork, linkidsCar), this.uselessNetwork.getLinks().get(id1));
 			leg2Car.setRoute(routeCar);
 			plan.addLeg(leg2Car);
 

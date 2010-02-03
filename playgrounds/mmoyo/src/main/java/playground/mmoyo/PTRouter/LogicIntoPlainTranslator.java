@@ -87,7 +87,7 @@ public class LogicIntoPlainTranslator {
 					LegImpl leg = (LegImpl)pe;
 					NetworkRouteWRefs logicRoute = (NetworkRouteWRefs)leg.getRoute();
 					List<Node> plainNodes = convertNodesToPlain(RouteUtils.getNodes(logicRoute, this.plainNet));
-					logicRoute.setNodes(null, plainNodes, null);
+					logicRoute.setLinks(null, RouteUtils.getLinksFromNodes(plainNodes), null);
 				}
 			}
 		}

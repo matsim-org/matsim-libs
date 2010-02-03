@@ -174,42 +174,6 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	}
 
 	@Override
-	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
-		setStartLink(startLink);
-		setEndLink(endLink);
-		setNodes(srcRoute);
-	}
-
-	@Override
-	public void setNodes(final List<Node> srcRoute) {
-		this.route.clear();
-		Node prevNode = null;
-		for (Node node : srcRoute) {
-			if (prevNode != null) {
-				findAndAddLink(prevNode, node);
-			}
-			prevNode = node;
-		}
-		this.route.trimToSize();
-	}
-
-	private void findAndAddLink(Node prevNode, Node node) {
-		Link foundLink = findLink(prevNode, node);
-		if (foundLink != null) {
-			this.route.add(foundLink);
-		}
-	}
-
-	private Link findLink(Node prevNode, Node node) {
-		for (Link link : prevNode.getOutLinks().values()) {
-			if (link.getToNode().equals(node)) {
-				return link;
-			}
-		}
-		return null;
-	}
-
-	@Override
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}

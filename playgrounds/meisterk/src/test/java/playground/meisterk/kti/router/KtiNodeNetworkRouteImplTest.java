@@ -74,7 +74,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 
 			this.config.planomat().setSimLegInterpretation(simLegInterpretation);
 			NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
-			route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
+			route.setLinks(link1, NetworkUtils.getLinks(network, "22 12 -23 3"), link4);
 
 			Assert.assertEquals(
 					"different distance calculated.",
@@ -92,7 +92,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 
 			this.config.planomat().setSimLegInterpretation(simLegInterpretation);
 			NetworkRouteWRefs route = getNetworkRouteInstance(link1, link1, network);
-			route.setNodes(link1, NetworkUtils.getNodes(network, ""), link1);
+			route.setLinks(link1, NetworkUtils.getLinks(network, ""), link1);
 
 			Assert.assertEquals(
 					"different distance calculated.",

@@ -21,7 +21,6 @@
 package playground.mrieser;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
@@ -88,6 +87,7 @@ import org.matsim.population.algorithms.PlanFilterActTypes;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.run.OTFVis;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
@@ -748,7 +748,22 @@ public class MyRuns {
 
 		Gbl.printSystemInfo();
 
-		System.out.println(new File("/Users/mrieser/Desktop/Umlautä.txt").exists());
+//		Scenario scenario = new ScenarioImpl();
+//		OsmNetworkReader osmReader = new OsmNetworkReader(scenario.getNetwork(), new WGS84toCH1903LV03());
+//		osmReader.setKeepPaths(false);
+//		try {
+//			osmReader.parse("/Users/mrieser/Downloads/switzerland.osm");
+//		} catch (SAXException e) {
+//			e.printStackTrace();
+//		} catch (ParserConfigurationException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		new NetworkWriter(scenario.getNetwork()).writeFile("/Users/mrieser/Downloads/switzerland.xml");
+		OTFVis.main(new String[]{"/Users/mrieser/Downloads/switzerland.xml"});
+
+
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();

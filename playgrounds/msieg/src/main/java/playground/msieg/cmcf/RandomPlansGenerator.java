@@ -158,7 +158,7 @@ public class RandomPlansGenerator {
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(randTime);
 			NetworkRouteWRefs route = new NodeNetworkRouteImpl(lHome, lWork);
-			route.setNodes(lHome, lPath.nodes, lWork);
+			route.setLinks(lHome, lPath.links, lWork);
 			leg.setRoute(route);
 
 			//create work act

@@ -32,6 +32,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -69,18 +70,18 @@ public class CountsCreator {
 		//the nodes of davids otf scenario
 //		r1.setRoute("9296 9298 9294 9282 9281");
 		//the new route
-		r1.setNodes(NetworkUtils.getNodes(this.network, "1341 5268 1342 1348 1349 1375 1585 1581 1583"));
+		r1.setLinks(null, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "1341 5268 1342 1348 1349 1375 1585 1581 1583")), null);
 		NetworkRouteWRefs r2 = new NodeNetworkRouteImpl();
 		//the nodes of carls master thesis alternative route
 //		r2.setRoute("9231 9234 9243 9218 9189 9210 9193 9206 9283 9295 9299 9297 9285 9288 9305");
 		//the nodes of davids otf scenario
 //		r2.setRoute("9286 1725 1727 1722 1718 9284 9281");
 		//the new routes
-		r2.setNodes(NetworkUtils.getNodes(this.network, "1583 1588 1597 1596 1591 1593 1600 2216 1603 1601 9250 9254"));
+		r2.setLinks(null, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "1583 1588 1597 1596 1591 1593 1600 2216 1603 1601 9250 9254")), null);
 		NetworkRouteWRefs r3 = new NodeNetworkRouteImpl();
-		r3.setNodes(NetworkUtils.getNodes(this.network, "1583 1587 1641 1644 1645 1648 5210 2420 9275 9272"));
+		r3.setLinks(null, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "1583 1587 1641 1644 1645 1648 5210 2420 9275 9272")), null);
 		NetworkRouteWRefs r4 = new NodeNetworkRouteImpl();
-		r4.setNodes(NetworkUtils.getNodes(this.network, "1370 9180 9183 9181 9261 9265 9269 9408 9409 9404 9400 9403 9402 9398 9394 9414 9276"));
+		r4.setLinks(null, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "1370 9180 9183 9181 9261 9265 9269 9408 9409 9404 9400 9403 9402 9398 9394 9414 9276")), null);
 
 		log.info("  creating routes done");
 		Set<NetworkRouteWRefs> routes = new HashSet<NetworkRouteWRefs>();
@@ -114,12 +115,12 @@ public class CountsCreator {
 //				c.createVolume(i, ql.getSimulatedFlowCapacity()*3600);
 //			}
 //		}
-		
+
 		log.fatal("I don't understand how this can have worked beforeso I can't fix it.  Maybe at some point in time" +
 				" QueueLink had something to do with Link but now it does not. Kai") ;
 		System.exit(-1) ;
 
-	
+
 		CountsWriter cw = new CountsWriter(counts);
 		cw.writeFile("./output/counts.xml");
 		log.info("counts written successfully to: ./output/counts.xml");

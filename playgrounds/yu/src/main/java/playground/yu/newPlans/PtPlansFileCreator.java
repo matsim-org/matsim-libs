@@ -9,6 +9,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -22,11 +23,12 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PtPlansFileCreator {
 	private int personCount = 0;
@@ -110,11 +112,11 @@ public class PtPlansFileCreator {
 		createSouthBus245Person("00:18");
 	}
 
-	public List<Node> getSrcRoute(final int[] nodes) {
+	public List<Link> getSrcRoute(final int[] nodes) {
 		List<Node> srcRoute = new ArrayList<Node>();
 		for (int i = 0; i < nodes.length; i++)
 			srcRoute.add(this.network.getNodes().get(new IdImpl(nodes[i])));
-		return srcRoute;
+		return RouteUtils.getLinksFromNodes(srcRoute);
 	}
 
 	protected void createSouthBus245Person(final String endTime) {
@@ -137,7 +139,7 @@ public class PtPlansFileCreator {
 
 	@SuppressWarnings("deprecation")
 	private void createPtPerson(final String startLinkId, final String endTime,
-			final String endLinkId, final List<Node> srcRoute) {
+			final String endLinkId, final List<Link> srcRoute) {
 
 		PersonImpl p = new PersonImpl(new IdImpl("245-" + this.personCount));
 		try {
@@ -154,7 +156,7 @@ public class PtPlansFileCreator {
 			Id endLinkID = new IdImpl(endLinkId);
 			LinkImpl endLink = this.network.getLinks().get(endLinkID);
 			pl.createAndAddActivity("w", endLinkID);
-			route.setNodes(startLink, srcRoute, endLink);
+			route.setLinks(startLink, srcRoute, endLink);
 			this.pop.addPerson(p);
 			this.personCount++;
 			System.out.println("i have " + this.pop.getPersons().size()

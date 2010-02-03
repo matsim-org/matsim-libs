@@ -191,7 +191,7 @@ public class WithindayAgent extends PersonAgent {
     newRouteConcatedList.addAll(passedNodesList);
     newRouteConcatedList.addAll(RouteUtils.getNodes(alternativeRoute, this.network));
     NetworkRouteWRefs newRoute = (NetworkRouteWRefs) ((NetworkLayer) currentLink.getLayer()).getFactory().createRoute(TransportMode.car, oldRoute.getStartLink(), oldRoute.getEndLink());
-    newRoute.setNodes(oldRoute.getStartLink(), newRouteConcatedList, oldRoute.getEndLink());
+    newRoute.setLinks(oldRoute.getStartLink(), RouteUtils.getLinksFromNodes(newRouteConcatedList), oldRoute.getEndLink());
     //put the new route in the leg and the leg in the plan
     newLeg.setRoute(newRoute);
     (newPlan.getPlanElements()).add(currentLegIndex, newLeg);

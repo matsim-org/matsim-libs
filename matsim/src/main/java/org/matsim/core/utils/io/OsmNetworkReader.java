@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
  * This works only for smaller regions.</li>
  * <li>by <a href="http://wiki.openstreetmap.org/wiki/Getting_Data" target="_blank">downloading</a> the requested
  * data from OpenStreetMap.
- * <li>by extracting the corresponding data from <a href="" target="_blank">Planet.osm</a>. Planet.osm contains
+ * <li>by extracting the corresponding data from <a href="http://planet.openstreetmap.org/" target="_blank">Planet.osm</a>. Planet.osm contains
  * the <em>complete</em> data from OpenStreetMap and is huge! Thus, you must extract a subset of data to be able
  * to process it.  For some countries, there are
  * <a href="http://wiki.openstreetmap.org/wiki/Planet.osm#Extracts" target="_blank">Extracts</a> available containing
@@ -91,8 +91,8 @@ public class OsmNetworkReader {
 	private final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
 
 
-	
-	
+
+
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
 	 *
@@ -130,7 +130,7 @@ public class OsmNetworkReader {
 			this.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
 		}
 	}
-	
+
 	/**
 	 * Parses the given osm file and creates a MATSim network from the data.
 	 *
@@ -140,11 +140,11 @@ public class OsmNetworkReader {
 	 * @throws IOException
 	 */
 	public void parse(final String osmFilename) throws SAXException, ParserConfigurationException, IOException {
-		
+
 		if(this.hierarchyLayers.isEmpty()){
 			log.warn("No hierarchy layer specified. Will convert every highway specified by setHighwayDefaults.");
 		}
-		
+
 		OsmXmlParser parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
 		parser.parse(osmFilename);
 		convert();
@@ -209,23 +209,23 @@ public class OsmNetworkReader {
 	public void setKeepPaths(final boolean keepPaths) {
 		this.keepPaths = keepPaths;
 	}
-	
+
 	/**
 	 * In case the speed limit allowed does not represent the speed a vehicle can actually realize, e.g. by constrains of
 	 * traffic lights not explicitly modeled, a kind of "average simulated speed" can be used.
 	 *
 	 * Defaults to <code>false</code>.
 	 *
-	 * @param scaleMaxSpeed <code>true</code> to scale the speed limit down by the value specified by the 
+	 * @param scaleMaxSpeed <code>true</code> to scale the speed limit down by the value specified by the
 	 * {@link #setHighwayDefaults(int, String, double, double, double, double) defaults}.
 	 */
 	public void setScaleMaxSpeed(final boolean scaleMaxSpeed) {
 		this.scaleMaxSpeed = scaleMaxSpeed;
 	}
-	
+
 	/**
-	 * Defines a new hierarchy layer by specifying a rectangle and the hierarchy level to which highways will be converted. 
-	 * 
+	 * Defines a new hierarchy layer by specifying a rectangle and the hierarchy level to which highways will be converted.
+	 *
 	 * @param coordNWLat The latitude of the north western corner of the rectangle.
 	 * @param coordNWLon The longitude of the north western corner of the rectangle.
 	 * @param coordSELat The latitude of the south eastern corner of the rectangle.
@@ -238,7 +238,7 @@ public class OsmNetworkReader {
 
 	private void convert() {
 		this.network.setCapacityPeriod(3600);
-		
+
 		// check which nodes are used
 		for (OsmWay way : this.ways.values()) {
 			String highway = way.tags.get("highway");
@@ -246,7 +246,7 @@ public class OsmNetworkReader {
 				if (this.highwayDefaults.containsKey(highway)) {
 					// check to which level a way belongs
 					way.hierarchy = this.highwayDefaults.get(highway).hierarchy;
-					
+
 					// first and last are counted twice, so they are kept in all cases
 					this.nodes.get(way.nodes.get(0)).ways++;
 					this.nodes.get(way.nodes.get(way.nodes.size()-1)).ways++;
@@ -348,7 +348,7 @@ public class OsmNetworkReader {
 										}
 									}
 								}
-								
+
 								fromNode = toNode;
 								length = 0.0;
 							}
@@ -402,7 +402,7 @@ public class OsmNetworkReader {
 				oneway = false; // may be used to overwrite defaults
 			}
 		}
-		
+
 		// In case trunks, primary and secondary roads are marked as oneway,
 		// the default number of lanes should be two instead of one.
 		if(highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary")){
@@ -410,8 +410,8 @@ public class OsmNetworkReader {
 				nofLanes = 2.0;
 			}
 		}
-		
-		if (way.tags.containsKey("maxspeed")) {        
+
+		if (way.tags.containsKey("maxspeed")) {
 			try {
 				double maxspeed = Double.parseDouble(way.tags.get("maxspeed"));
 				if (maxspeed < freespeed) {
@@ -421,7 +421,7 @@ public class OsmNetworkReader {
 				}
 			} catch (NumberFormatException e) {
 				log.warn("Could not parse freespeed tag:" + e.getMessage() + ". Ignoring it.");
-			}			
+			}
 		}
 
 		// check tag "lanes"
@@ -432,19 +432,19 @@ public class OsmNetworkReader {
 				}
 			} catch (Exception e) {
 				log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
-			}			
+			}
 		}
-		
+
 		// create the link(s)
 		double capacity = nofLanes * laneCapacity;
-		
+
 		if (this.scaleMaxSpeed) {
 			freespeed = freespeed * freespeedFactor;
 		}
 
 		// only create link, if both nodes were found, node could be null, since nodes outside a layer were dropped
 		if(network.getNodes().get(fromNode.id) != null && network.getNodes().get(toNode.id) != null){
-		
+
 			if (!onewayReverse) {
 				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed, capacity, nofLanes);
 				((LinkImpl) l).setOrigId(origId);
@@ -455,10 +455,10 @@ public class OsmNetworkReader {
 				((LinkImpl) l).setOrigId(origId);
 				this.id++;
 			}
-		
+
 		}
 	}
-	
+
 	private static class OsmFilter {
 		private final Coord coordNW;
 		private final Coord coordSE;
@@ -469,12 +469,12 @@ public class OsmNetworkReader {
 			this.coordSE = coordSE;
 			this.hierarchy = hierarchy;
 		}
-		
+
 		public boolean coordInFilter(final Coord coord, final int hierarchyLevel){
 			if(this.hierarchy < hierarchyLevel){
 				return false;
 			}
-			
+
 			if(this.coordNW.getX() < coord.getX() && coord.getX() < this.coordSE.getX()){
 				if(this.coordNW.getY() > coord.getY() && coord.getY() > this.coordSE.getY()){
 					return true;
@@ -485,7 +485,7 @@ public class OsmNetworkReader {
 	}
 
 	private static class OsmNode {
-		public final Id id;		
+		public final Id id;
 		public boolean used = false;
 		public int ways = 0;
 		public final Coord coord;
@@ -499,7 +499,7 @@ public class OsmNetworkReader {
 	private static class OsmWay {
 		public final long id;
 		public final List<String> nodes = new ArrayList<String>();
-		public final Map<String, String> tags = new HashMap<String, String>();				
+		public final Map<String, String> tags = new HashMap<String, String>();
 		public int hierarchy;
 
 		public OsmWay(final long id) {

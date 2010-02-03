@@ -25,7 +25,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 
 
 /**
@@ -40,15 +39,6 @@ public interface NetworkRouteWRefs extends RouteWRefs {
 	public Link getStartLink();
 
 	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink);
-
-	/**
-	 * @param srcRoute
-	 * @deprecated please use method {@link #setNodes(LinkImpl, List, LinkImpl)} which also specifies start and end Link
-	 */
-	@Deprecated
-	public void setNodes(final List<Node> srcRoute);
-
-	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink);
 
 	public void setTravelCost(final double travelCost);
 

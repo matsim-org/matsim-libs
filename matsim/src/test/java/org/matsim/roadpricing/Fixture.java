@@ -59,8 +59,8 @@ import org.matsim.core.utils.misc.Time;
 		// static class
 	}
 
-	/** @return a simple network consisting of 5 equal links in a row. */
-	protected static NetworkLayer createNetwork1(final ScenarioImpl scenario) {
+	/** Creates a simple network consisting of 5 equal links in a row. */
+	protected static void createNetwork1(final ScenarioImpl scenario) {
 		/* This creates the following network:
 		 *
 		 * (1)-------(2)-------(3)-------(4)-------(5)-------(6)
@@ -82,11 +82,10 @@ import org.matsim.core.utils.misc.Time;
 		network.createAndAddLink(new IdImpl(2), node3, node4, 100, 5, 100, 1);
 		network.createAndAddLink(new IdImpl(3), node4, node5, 100, 5, 100, 1);
 		network.createAndAddLink(new IdImpl(4), node5, node6, 100, 5, 100, 1);
-		return network;
 	}
 
-	/** @return a simple network with route alternatives in 2 places. */
-	protected static NetworkLayer createNetwork2(final ScenarioImpl scenario) {
+	/** Creates a simple network with route alternatives in 2 places. */
+	protected static void createNetwork2(final ScenarioImpl scenario) {
 		/* This creates the following network:
 		 *
 		 *            3 /----(3)----\ 4
@@ -134,14 +133,13 @@ import org.matsim.core.utils.misc.Time;
 		network.createAndAddLink(new IdImpl("11"),  node7,  node9, 100, 5, 100, 1);
 		network.createAndAddLink(new IdImpl("12"),  node9, node10, 100, 5, 100, 1);
 		network.createAndAddLink(new IdImpl("13"), node10, node11, 100, 5, 100, 1);
-		return network;
 	}
 
 	/**
+	 * Creates a population for network1
 	 * @param network the network returned by {@link #createNetwork1()}
-	 * @return a population for network1
 	 **/
-	protected static PopulationImpl createPopulation1(final ScenarioImpl scenario) {
+	protected static void createPopulation1(final ScenarioImpl scenario) {
 		PopulationImpl population = scenario.getPopulation();
 		NetworkLayer network = scenario.getNetwork();
 
@@ -150,45 +148,41 @@ import org.matsim.core.utils.misc.Time;
 		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
 		LinkImpl link3 = network.getLinks().get(new IdImpl(3));
 		LinkImpl link4 = network.getLinks().get(new IdImpl(4));
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 1, "07:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 1st time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 2, "11:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 2nd time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 3, "16:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 3rd time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 4, "09:59:50", link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 1st and 2nd time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 5, "08:00:00", link1, NetworkUtils.getNodes(network, "3 4 5"), link4), population); // starts on the 2nd link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 6, "09:00:00", link0, NetworkUtils.getNodes(network, "2 3 4"), link3), population); // ends not on the last link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 7, "08:30:00", link1, NetworkUtils.getNodes(network, "3 4"), link3), population); // starts and ends not on the first/last link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 8, "08:35:00", link1, NetworkUtils.getNodes(network, "3"), link2), population); // starts and ends not on the first/last link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 9, "08:40:00", link1, NetworkUtils.getNodes(network, ""), link1), population); // two acts on the same link
-		Fixture.addPersonToPopulation(Fixture.createPerson1(10, "08:45:00", link2, NetworkUtils.getNodes(network, "4"), link3), population);
-
-		return population;
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 1, "07:00"   , link0, NetworkUtils.getLinks(network, "1 2 3"), link4), population); // toll in 1st time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 2, "11:00"   , link0, NetworkUtils.getLinks(network, "1 2 3"), link4), population); // toll in 2nd time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 3, "16:00"   , link0, NetworkUtils.getLinks(network, "1 2 3"), link4), population); // toll in 3rd time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 4, "09:59:50", link0, NetworkUtils.getLinks(network, "1 2 3"), link4), population); // toll in 1st and 2nd time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 5, "08:00:00", link1, NetworkUtils.getLinks(network, "2 3"), link4), population); // starts on the 2nd link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 6, "09:00:00", link0, NetworkUtils.getLinks(network, "1 2"), link3), population); // ends not on the last link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 7, "08:30:00", link1, NetworkUtils.getLinks(network, "2"), link3), population); // starts and ends not on the first/last link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 8, "08:35:00", link1, NetworkUtils.getLinks(network, ""), link2), population); // starts and ends not on the first/last link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 9, "08:40:00", link1, NetworkUtils.getLinks(network, ""), link1), population); // two acts on the same link
+		Fixture.addPersonToPopulation(Fixture.createPerson1(10, "08:45:00", link2, NetworkUtils.getLinks(network, ""), link3), population);
 	}
-	
+
 	private static void addPersonToPopulation(final PersonImpl person, final PopulationImpl population) {
 		population.addPerson(person);
 	}
 
 	/**
+	 * Creates a population for network2
 	 * @param network the network returned by {@link #createNetwork2()}
-	 * @return a population for network2
 	 **/
-	protected static PopulationImpl createPopulation2(final ScenarioImpl scenario) {
+	protected static void createPopulation2(final ScenarioImpl scenario) {
 		PopulationImpl population = scenario.getPopulation();
 		NetworkLayer network = scenario.getNetwork();
 
 		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLinks().get(new IdImpl("1")), network.getLinks().get(new IdImpl("7")), network.getLinks().get(new IdImpl("13"))), population);
-
-		return population;
 	}
 
-	private static PersonImpl createPerson1(final int personId, final String startTime, final Link homeLink, final List<Node> routeNodes, final Link workLink) {
+	private static PersonImpl createPerson1(final int personId, final String startTime, final Link homeLink, final List<Link> routeLinks, final Link workLink) {
 		PersonImpl person = new PersonImpl(new IdImpl(personId));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAndAddActivity("h", homeLink.getId()).setEndTime(Time.parseTime(startTime));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);//"car", startTime, "00:01", null);
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(homeLink, workLink);
-		route.setNodes(homeLink, routeNodes, workLink);
+		route.setLinks(homeLink, routeLinks, workLink);
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", workLink.getId());//, null, "24:00", null, "yes");
 		return person;
@@ -215,7 +209,8 @@ import org.matsim.core.utils.misc.Time;
 		// run mobsim once without toll and get score for network1/population1
 		ScenarioImpl scenario = new ScenarioImpl();
 		Fixture.createNetwork1(scenario);
-		PopulationImpl referencePopulation = Fixture.createPopulation1(scenario);
+		Fixture.createPopulation1(scenario);
+		PopulationImpl referencePopulation = scenario.getPopulation();
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory(config));
 		events.addHandler(scoring);

@@ -21,7 +21,6 @@
 package org.matsim.core.population.routes;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -193,69 +192,6 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 		}
 		this.route.trimToSize();
 		this.uncompressedLength = srcRoute.size();
-//		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
-	}
-
-	@Deprecated
-	@Override
-	public void setNodes(final List<Node> srcRoute) {
-		setNodes(null, srcRoute, null);
-	}
-
-	@Override
-	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
-		this.route.clear();
-		if (startLink != null) {
-			setStartLink(startLink);
-		}
-		if (endLink != null) {
-			setEndLink(endLink);
-		}
-		this.routeModCountState = this.modCount;
-		Link previousLink = getStartLink();
-		Node previousNode = previousLink.getToNode();
-		Iterator<Node> iter = srcRoute.iterator();
-		if (iter.hasNext()) {
-			iter.next(); // ignore the first part, it should be the same as previousNode
-		} else {
-			// empty srcRoute, nothing else to do than a check
-			// check that this route is complete, so it will be possible to decompress it again without problems
-			if ((startLink != endLink) && (startLink.getToNode() != endLink.getFromNode())) {
-				throw new IllegalArgumentException("The last node must be the fromNode of the endLink. endLink=" + endLink.getId());
-			}
-
-			this.uncompressedLength = 0;
-			return;
-		}
-		Node node = getStartLink().getToNode();
-		while (iter.hasNext()) {
-			node = iter.next();
-			// find link from prevNode to node
-			Link link = null;
-			for (Link tmpLink : previousNode.getOutLinks().values()) {
-				if (node == tmpLink.getToNode()) {
-					link = tmpLink;
-					break;
-				}
-			}
-			if (link == null) {
-				throw new IllegalArgumentException("Could not find any link from node " + previousNode.getId() + " to " + node.getId());
-			}
-			Link subsequent = this.subsequentLinks.get(previousLink);
-			if (subsequent != link) {
-				this.route.add(link);
-			}
-			previousLink = link;
-			previousNode = link.getToNode();
-		}
-
-		// check that this route is complete, so it will be possible to uncompress it again without problems
-		if (node != getEndLink().getFromNode()) {
-			throw new IllegalArgumentException("The last node must be the fromNode of the endLink. endLink=" + endLink.getId());
-		}
-
-		this.route.trimToSize();
-		this.uncompressedLength = srcRoute.size() - 1;
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
 	}
 

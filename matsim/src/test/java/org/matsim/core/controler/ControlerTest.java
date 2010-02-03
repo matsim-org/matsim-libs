@@ -61,7 +61,7 @@ public class ControlerTest extends MatsimTestCase {
 		assertEquals(0, controler.getNetwork().getNodes().size());
 		assertEquals(0, controler.getPopulation().getPersons().size());
 	}
-	
+
 	/**
 	 * Tests that the travel times are correctly calculated during the simulation.
 	 *
@@ -83,10 +83,9 @@ public class ControlerTest extends MatsimTestCase {
 		LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
 		NetworkRouteWRefs route1 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg1.setRoute(route1);
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		nodes.add(f.node2);
-		nodes.add(f.node3);
-		route1.setNodes(f.link1, nodes, f.link3);
+		ArrayList<Link> links = new ArrayList<Link>();
+		links.add(f.link2);
+		route1.setLinks(f.link1, links, f.link3);
 		plan1.createAndAddActivity("h", f.link3.getId());
 		population.addPerson(person1);
 
@@ -97,7 +96,7 @@ public class ControlerTest extends MatsimTestCase {
 		LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
 		NetworkRouteWRefs route2 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg2.setRoute(route2);
-		route2.setNodes(f.link1, nodes, f.link3);
+		route2.setLinks(f.link1, links, f.link3);
 		plan2.createAndAddActivity("h", f.link3.getId());
 		population.addPerson(person2);
 
@@ -471,7 +470,7 @@ public class ControlerTest extends MatsimTestCase {
 		protected Fixture(final Config config) {
 			this.scenario = new ScenarioImpl(config);
 			this.network = scenario.getNetwork();
-			
+
 			/* Create a simple network with 4 nodes and 3 links:
 			 *
 			 * (1)---1---(2)-----------2-------------(3)---3---(4)

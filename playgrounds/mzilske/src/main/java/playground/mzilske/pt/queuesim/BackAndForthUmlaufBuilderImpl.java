@@ -28,15 +28,15 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 
 public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
-	
+
 	private static final Comparator<Departure> departureTimeComparator = new Comparator<Departure>() {
 
 		public int compare(Departure o1, Departure o2) {
 			return Double.compare(o1.getDepartureTime(), o2.getDepartureTime());
 		}
-		
+
 	};
-	
+
 	private NetworkLayer network;
 	private Collection<TransitLine> transitLines;
 	private ArrayList<Umlauf> umlaeufe;
@@ -45,7 +45,7 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 		this.network = network;
 		this.transitLines = transitLines;
 	}
-	
+
 	public boolean canBuild() {
 		for (TransitLine line : transitLines) {
 			if (!canBuildThisLine(line)) {
@@ -54,7 +54,7 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 		}
 		return true;
 	}
-	
+
 	public ArrayList<Umlauf> build() {
 		if (!canBuild()) {
 			throw new IllegalArgumentException();
@@ -110,13 +110,13 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 		}
 		return true;
 	}
-	
+
 	private void insertWenden(Link fromLink, Link toLink, Umlauf umlauf) {
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost();
 		LeastCostPathCalculator routingAlgo = new Dijkstra(network, calculator, calculator);
 
-		Node startNode = fromLink.getToNode();		
-		Node endNode = toLink.getFromNode(); 
+		Node startNode = fromLink.getToNode();
+		Node endNode = toLink.getFromNode();
 
 		double depTime = 0.0;
 
@@ -128,9 +128,9 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 		}
 		NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory()
 				.createRoute(TransportMode.car, fromLink, toLink);
-		route.setNodes(fromLink, wendenPath.nodes, toLink);
+		route.setLinks(fromLink, wendenPath.links, toLink);
 		umlauf.getUmlaufStuecke().add(new Wenden(route));
 	}
-	
+
 
 }

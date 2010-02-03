@@ -14,6 +14,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.PTRouter.LogicFactory;
@@ -22,19 +23,19 @@ import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.PTRouter.PTValues;
 
 /**
- * Receives two acts and returns a list of PT legs connecting their coordinates 
+ * Receives two acts and returns a list of PT legs connecting their coordinates
  */
 public class TransitRouteFinder {
 	private PTRouter ptRouter;
 	private LogicIntoPlainTranslator logicToPlainTranslator;
-	
+
 	public TransitRouteFinder(final TransitSchedule transitSchedule){
 		LogicFactory logicFactory = new LogicFactory(transitSchedule);
 		this.ptRouter = new PTRouter(logicFactory.getLogicNet());
 		this.logicToPlainTranslator = logicFactory.getLogicToPlainTranslator();
 	}
-	
-	/**returns a list of legs that represent a PT connection between two activities locations*/ 
+
+	/**returns a list of legs that represent a PT connection between two activities locations*/
 	public List<Leg> calculateRoute (final ActivityImpl fromAct, final ActivityImpl toAct, final Person person ){
 		List<Leg> legList = new ArrayList<Leg>();
 		Path path = ptRouter.findPTPath(fromAct.getCoord(), toAct.getCoord(), fromAct.getEndTime());
@@ -43,17 +44,17 @@ public class TransitRouteFinder {
 			List <Link> linkList = new ArrayList<Link>();
 			double depTime=fromAct.getEndTime();
 			double travTime= depTime;
-			
+
 			int i=1;
 			String linkType;
 			String lastLinkType= null;
 			for (Link link: path.links){
 				linkType = ((LinkImpl)link).getType();
-				
+
 				if (i>1){
 					if (!linkType.equals(lastLinkType)){
 						if (!lastLinkType.equals(PTValues.TRANSFER_STR)){    //transfers will not be described in legs
-							LegImpl newLeg = createLeg(selectMode(lastLinkType), linkList, depTime, travTime);  
+							LegImpl newLeg = createLeg(selectMode(lastLinkType), linkList, depTime, travTime);
 							legList.add(newLeg);
 						}
 						depTime=travTime;
@@ -74,33 +75,33 @@ public class TransitRouteFinder {
 		}
 		return legList;
 	}
-	
+
 	private TransportMode selectMode(final String linkType){
 		TransportMode mode = null;
-		if (linkType.equals(PTValues.STANDARD_STR)){ 
+		if (linkType.equals(PTValues.STANDARD_STR)){
 			mode=  TransportMode.pt;
 		}else{
 			mode=  TransportMode.undefined;
 		}
 		return mode;
 	}
-	
+
 	private LegImpl createLeg(TransportMode mode, final List<Link> routeLinks, final double depTime, final double arrivTime){
-		double travTime= arrivTime - depTime;  
+		double travTime= arrivTime - depTime;
 		List<Node> routeNodeList = new ArrayList<Node>();
-		
+
 		double distance=0;
 		if (routeLinks.size()>0) routeNodeList.add(routeLinks.get(0).getFromNode());
 		for(Link link : routeLinks) {
 			distance += link.getLength();
 			routeNodeList.add(link.getToNode());
-		} 
-		
+		}
+
 		NetworkRouteWRefs legRoute = new LinkNetworkRouteImpl(null, null);
 		legRoute.setDistance(distance);
 		legRoute.setLinks(null, routeLinks, null);
 		legRoute.setTravelTime(travTime);
-		legRoute.setNodes(null, routeNodeList, null);
+		legRoute.setLinks(null, RouteUtils.getLinksFromNodes(routeNodeList), null);
 
 		LegImpl leg = new LegImpl(mode);
 		leg.setRoute(legRoute);
@@ -110,5 +111,5 @@ public class TransitRouteFinder {
 
 		return leg;
 	}
-	
+
 }

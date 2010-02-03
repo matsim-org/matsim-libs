@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
@@ -34,7 +35,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
@@ -61,7 +61,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Id id3 = new IdImpl("3");
 		Id id4 = new IdImpl("4");
 		Id id5 = new IdImpl("5");
-		
+
 		Map<Id, ? extends Person> referencePopulation = Fixture.createReferencePopulation1(config.charyparNagelScoring()).getPersons();
 		Map<Id, ? extends Person> population = runTollSimulation(tollFile, "distance", config.charyparNagelScoring()).getPersons();
 
@@ -191,7 +191,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 
 	private PopulationImpl runTollSimulation(final String tollFile, final String tollType, final CharyparNagelScoringConfigGroup config) {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = Fixture.createNetwork1(scenario);
+		Fixture.createNetwork1(scenario);
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingScheme scheme = scenario.getRoadPricingScheme();
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
@@ -206,19 +206,19 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		}
 		assertEquals(tollType, scheme.getType());
 
-		PopulationImpl population = Fixture.createPopulation1(scenario);
-		runTollSimulation(network, population, scheme, config);
-		return population;
+		Fixture.createPopulation1(scenario);
+		runTollSimulation(scenario, scheme, config);
+		return scenario.getPopulation();
 	}
 
-	private void runTollSimulation(final NetworkLayer network, final PopulationImpl population, final RoadPricingScheme toll, final CharyparNagelScoringConfigGroup config) {
+	private void runTollSimulation(final Scenario scenario, final RoadPricingScheme toll, final CharyparNagelScoringConfigGroup config) {
 		EventsManagerImpl events = new EventsManagerImpl();
-		CalcPaidToll paidToll = new CalcPaidToll(network, toll);
+		CalcPaidToll paidToll = new CalcPaidToll(scenario.getNetwork(), toll);
 		events.addHandler(paidToll);
-		EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory(config));
+		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), new CharyparNagelScoringFunctionFactory(config));
 		events.addHandler(scoring);
 
-		QueueSimulation sim = new QueueSimulation(network, population, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.run();
 
 		paidToll.sendUtilityEvents(Time.MIDNIGHT, events);

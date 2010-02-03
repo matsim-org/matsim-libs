@@ -49,7 +49,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
 
 	private Network network = null;
-	
+
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
@@ -58,7 +58,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		config.charyparNagelScoring().setPathSizeLogitBeta(2.0);
 		this.network = null;
 	}
-	
+
 	@Override
 	protected void tearDown() throws Exception {
 		this.network = null;
@@ -75,13 +75,13 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		this.network = createNetwork();
 		PlanSelector selector = getPlanSelector();
 
+		Link l1 = network.getLinks().get(new IdImpl("1"));
+		Link l2 = network.getLinks().get(new IdImpl("2"));
+		Link l3 = network.getLinks().get(new IdImpl("3"));
+		Link l4 = network.getLinks().get(new IdImpl("4"));
+		Link l5 = network.getLinks().get(new IdImpl("5"));
 		Link l6 = network.getLinks().get(new IdImpl("6"));
 		Link l7 = network.getLinks().get(new IdImpl("7"));
-
-		Node n1 = network.getNodes().get(new IdImpl("1"));
-		Node n2 = network.getNodes().get(new IdImpl("2"));
-		Node n3 = network.getNodes().get(new IdImpl("3"));
-		Node n4 = network.getNodes().get(new IdImpl("4"));
 
 		// test with only one plan...
 		PersonImpl person = new PersonImpl(new IdImpl(1));
@@ -94,10 +94,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setArrivalTime(10.0);
 
 		NetworkRouteWRefs r = new NodeNetworkRouteImpl(l6, l7);
-		ArrayList<Node> srcRoute = new ArrayList<Node>();
-		srcRoute.add(n1);
-		srcRoute.add(n3);
-		r.setNodes(l6, srcRoute, l7);
+		ArrayList<Link> srcRoute = new ArrayList<Link>();
+		srcRoute.add(l1);
+		r.setLinks(l6, srcRoute, l7);
 		leg.setRoute(r);
 		p1.addActivity(a);
 		p1.addLeg(leg);
@@ -116,11 +115,10 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setArrivalTime(10.0);
 		PlanImpl p2 = new org.matsim.core.population.PlanImpl(person);
 		r = new NodeNetworkRouteImpl(l6, l7);
-		srcRoute = new ArrayList<Node>();
-		srcRoute.add(n1);
-		srcRoute.add(n2);
-		srcRoute.add(n3);
-		r.setNodes(l6, srcRoute, l7);
+		srcRoute = new ArrayList<Link>();
+		srcRoute.add(l2);
+		srcRoute.add(l3);
+		r.setLinks(l6, srcRoute, l7);
 		leg.setRoute(r);
 		p2.addActivity(a);
 		p2.addLeg(leg);
@@ -136,12 +134,11 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setArrivalTime(10.0);
 		PlanImpl p3 = new org.matsim.core.population.PlanImpl(person);
 		r = new NodeNetworkRouteImpl(l6, l7);
-		srcRoute = new ArrayList<Node>();
-		srcRoute.add(n1);
-		srcRoute.add(n2);
-		srcRoute.add(n4);
-		srcRoute.add(n3);
-		r.setNodes(l6, srcRoute, l7);
+		srcRoute = new ArrayList<Link>();
+		srcRoute.add(l2);
+		srcRoute.add(l4);
+		srcRoute.add(l5);
+		r.setLinks(l6, srcRoute, l7);
 		leg.setRoute(r);
 		p3.addActivity(a);
 		p3.addLeg(leg);
@@ -149,11 +146,11 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p3.setScore(-10.0);
 		person.addPlan(p3);
 		assertNotNull(selector.selectPlan(person));
-		
+
 		// ... and test with multiple plans where the sum of all scores stays negative
 		p3.setScore(15.0);
 		assertNotNull(selector.selectPlan(person));
-		
+
 		// test with only one plan, but with NEGATIVE_INFINITY...
 		person = new PersonImpl(new IdImpl(1));
 		p1 = new org.matsim.core.population.PlanImpl(person);
@@ -164,30 +161,27 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		r = new NodeNetworkRouteImpl(l6, l7);
-		srcRoute = new ArrayList<Node>();
-		srcRoute.add(n1);
-		srcRoute.add(n3);
-		r.setNodes(l6, srcRoute, l7);
+		srcRoute = new ArrayList<Link>();
+		srcRoute.add(l1);
+		r.setLinks(l6, srcRoute, l7);
 		leg.setRoute(r);
 		p1.addActivity(a);
 		p1.addLeg(leg);
 		p1.addActivity(b);
 		p1.setScore(Double.NEGATIVE_INFINITY);
-		person.addPlan(p1);		
+		person.addPlan(p1);
 		assertNotNull(selector.selectPlan(person));
-		
+
 	}
 
 	@Override
 	public void testZeroScore() {
 		this.network = createNetwork();
 		PlanSelector selector = getPlanSelector();
+		Link l1 = network.getLinks().get(new IdImpl("1"));
 		Link l6 = network.getLinks().get(new IdImpl("6"));
 		Link l7 = network.getLinks().get(new IdImpl("7"));
-		
-		Node n1 = network.getNodes().get(new IdImpl("1"));
-		Node n3 = network.getNodes().get(new IdImpl("3"));
-		
+
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
 		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
@@ -196,32 +190,31 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
-		
+
 		NetworkRouteWRefs r = new NodeNetworkRouteImpl(l6, l7);
-		ArrayList<Node> srcRoute = new ArrayList<Node>();
-		srcRoute.add(n1);
-		srcRoute.add(n3);
-		r.setNodes(l6, srcRoute, l7);
+		ArrayList<Link> srcRoute = new ArrayList<Link>();
+		srcRoute.add(l1);
+		r.setLinks(l6, srcRoute, l7);
 		leg.setRoute(r);
 		p1.addActivity(a);
 		p1.addLeg(leg);
 		p1.addActivity(b);
 		p1.setScore(0.0);
 		person.addPlan(p1);
-		
+
 		assertNotNull(selector.selectPlan(person));
 	}
 
 	public void testPathSizeLogitSelector() {
 		this.network = createNetwork();
 
+		Link l1 = network.getLinks().get(new IdImpl("1"));
+		Link l2 = network.getLinks().get(new IdImpl("2"));
+		Link l3 = network.getLinks().get(new IdImpl("3"));
+		Link l4 = network.getLinks().get(new IdImpl("4"));
+		Link l5 = network.getLinks().get(new IdImpl("5"));
 		Link l6 = network.getLinks().get(new IdImpl("6"));
 		Link l7 = network.getLinks().get(new IdImpl("7"));
-		
-		Node n1 = network.getNodes().get(new IdImpl("1"));
-		Node n2 = network.getNodes().get(new IdImpl("2"));
-		Node n3 = network.getNodes().get(new IdImpl("3"));
-		Node n4 = network.getNodes().get(new IdImpl("4"));
 
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
@@ -232,17 +225,16 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		NetworkRouteWRefs r = new NodeNetworkRouteImpl(l6, l7);
-		ArrayList<Node> srcRoute = new ArrayList<Node>();
-		srcRoute.add(n1);
-		srcRoute.add(n3);
-		r.setNodes(l6, srcRoute, l7);
+		ArrayList<Link> srcRoute = new ArrayList<Link>();
+		srcRoute.add(l1);
+		r.setLinks(l6, srcRoute, l7);
 		leg.setRoute(r);
 		p1.addActivity(a);
 		p1.addLeg(leg);
 		p1.addActivity(b);
 		p1.setScore(-10.0);
 		person.addPlan(p1);
-	
+
 		a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
 		b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
 		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
@@ -251,18 +243,17 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setArrivalTime(10.0);
 		PlanImpl p2 = new org.matsim.core.population.PlanImpl(person);
 		r = new NodeNetworkRouteImpl(l6, l7);
-		srcRoute = new ArrayList<Node>();
-		srcRoute.add(n1);
-		srcRoute.add(n2);
-		srcRoute.add(n3);
-		r.setNodes(l6, srcRoute, l7);
+		srcRoute = new ArrayList<Link>();
+		srcRoute.add(l2);
+		srcRoute.add(l3);
+		r.setLinks(l6, srcRoute, l7);
 		leg.setRoute(r);
 		p2.addActivity(a);
 		p2.addLeg(leg);
 		p2.addActivity(b);
 		p2.setScore(-10.0);
 		person.addPlan(p2);
-		
+
 		a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
 		b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
 		leg = new org.matsim.core.population.LegImpl(TransportMode.car);
@@ -271,12 +262,11 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setArrivalTime(10.0);
 		PlanImpl p3 = new org.matsim.core.population.PlanImpl(person);
 		r = new NodeNetworkRouteImpl(l6, l7);
-		srcRoute = new ArrayList<Node>();
-		srcRoute.add(n1);
-		srcRoute.add(n2);
-		srcRoute.add(n4);
-		srcRoute.add(n3);
-		r.setNodes(l6, srcRoute, l7);
+		srcRoute = new ArrayList<Link>();
+		srcRoute.add(l2);
+		srcRoute.add(l4);
+		srcRoute.add(l5);
+		r.setLinks(l6, srcRoute, l7);
 		leg.setRoute(r);
 		p3.addActivity(a);
 		p3.addLeg(leg);
@@ -308,28 +298,28 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	private NetworkLayer createNetwork() {
 		//we use a simple "red bus / blue bus paradox" network
 		// Sketch of the network
-		// Note: Node (4) is necessary since MATSim still operates on node based routes and without this 
+		// Note: Node (4) is necessary since MATSim still operates on node based routes and without this
 		// additional node (4) the route (1)-(2)-(3) would be ambiguous.
-		// Since activities are performed on links we need to additional links: (6)-(1) and (3)-(5). 
-		//            
+		// Since activities are performed on links we need to additional links: (6)-(1) and (3)-(5).
+		//
 		//             (6)
-		//              |
+		//              |6
 		//             (1)
 		//             / \
 		//            /   \
 		//           /     |
 		//          |      |
-		//          |      |
-		//          |      |
+		//          |      2
+		//          1      |
 		//          |      |
 		//          |    (2)
-		//           \   /\
-		//            \ /(4)
-		//             \|/
+		//           \   /\4
+		//            \ 3(4)
+		//             \|/5
 		//             (3)
-		//              |
+		//              |7
 		//             (5)
-		
+
 		NetworkLayer network = new NetworkLayer();
 		Node n1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0,10));
 		Node n2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(3,2));

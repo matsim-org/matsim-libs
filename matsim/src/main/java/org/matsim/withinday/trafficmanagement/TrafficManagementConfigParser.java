@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputMB;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputSB;
@@ -247,7 +248,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.currentRouteNodes.remove(this.currentRouteNodes.size() - 1); // remove last
 
 			NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
-			route.setNodes(startLink, this.currentRouteNodes, endLink);
+			route.setLinks(startLink, RouteUtils.getLinksFromNodes(this.currentRouteNodes), endLink);
 			this.controlInput.setMainRoute(route);
 		} else if (name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
 			Link startLink = null;
@@ -270,7 +271,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.currentRouteNodes.remove(this.currentRouteNodes.size() - 1); // remove last
 
 			NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
-			route.setNodes(startLink, this.currentRouteNodes, endLink);
+			route.setLinks(startLink, RouteUtils.getLinksFromNodes(this.currentRouteNodes), endLink);
 			this.controlInput.setAlternativeRoute(route);
 		}
 		else if (name.equalsIgnoreCase(CONTROLINPUTCLASS)) {

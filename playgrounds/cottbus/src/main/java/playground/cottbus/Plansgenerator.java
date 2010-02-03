@@ -38,6 +38,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 
 
 /**
@@ -208,7 +209,7 @@ public class Plansgenerator {
 			//leg to work
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 			NetworkRouteWRefs route = new NodeNetworkRouteImpl(start, target);
-			route.setNodes(start, NetworkUtils.getNodes(network, ROUTE), target);
+			route.setLinks(start, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, ROUTE)), target);
 			leg.setRoute(route);
 			//work
 			a = plan.createAndAddActivity("w", workCoord);

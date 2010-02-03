@@ -21,17 +21,13 @@
 package org.matsim.core.population.routes;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.testcases.fakes.FakeLink;
 
 /**
@@ -42,20 +38,6 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 	@Override
 	public NetworkRouteWRefs getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
 		return new LinkNetworkRouteImpl(fromLink, toLink);
-	}
-
-	@Test
-	public void testSetNodes_subsequentLinks() {
-		NetworkLayer network = createTestNetwork();
-		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
-		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
-		NodeImpl node2 = network.getNodes().get(new IdImpl("2"));
-		List<Node> nodes = new ArrayList<Node>();
-		nodes.add(node2);
-
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1, link2);
-		route.setNodes(link1, nodes, link2);
-		Assert.assertEquals("number of links.", 0, route.getLinkIds().size());
 	}
 
 	@Test

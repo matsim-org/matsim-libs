@@ -50,18 +50,20 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 	public void testDistanceTollRouter() {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = Fixture.createNetwork2(scenario);
+		Fixture.createNetwork2(scenario);
+		NetworkLayer network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
 		toll.setType("distance");
 		toll.addLink(scenario.createId("5"));
 		toll.addLink(scenario.createId("11"));
-		PopulationImpl population = Fixture.createPopulation2(scenario);
+		Fixture.createPopulation2(scenario);
+		PopulationImpl population = scenario.getPopulation();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
-		
+
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
 
@@ -102,13 +104,15 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 	public void testCordonTollRouter() {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = Fixture.createNetwork2(scenario);
+		Fixture.createNetwork2(scenario);
+		NetworkLayer network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
 		toll.setType("cordon");
 		toll.addLink(scenario.createId("5"));
 		toll.addLink(scenario.createId("11"));
-		PopulationImpl population = Fixture.createPopulation2(scenario);
+		Fixture.createPopulation2(scenario);
+		PopulationImpl population = scenario.getPopulation();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 

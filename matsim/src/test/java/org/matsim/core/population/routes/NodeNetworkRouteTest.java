@@ -50,33 +50,35 @@ public class NodeNetworkRouteTest extends AbstractNetworkRouteTest {
 		Id id3 = scenario.createId("3");
 		Id id4 = scenario.createId("4");
 		Id id5 = scenario.createId("5");
+		Id id6 = scenario.createId("6");
 		Network network = scenario.getNetwork();
 		Node node3 = network.getFactory().createNode(id3, scenario.createCoord(0, 0));
 		Node node4 = network.getFactory().createNode(id4, scenario.createCoord(100, 0));
 		Node node5 = network.getFactory().createNode(id5, scenario.createCoord(200, 0));
+		Node node6 = network.getFactory().createNode(id6, scenario.createCoord(200, 0));
 		network.addNode(node3);
 		network.addNode(node4);
 		network.addNode(node5);
-		Link startLink = network.getFactory().createLink(id1, id3, id4);
-		Link endLink = network.getFactory().createLink(id2, id4, id5);
-		network.addLink(startLink);
-		network.addLink(endLink);
+		network.addNode(node6);
+		Link link1 = network.getFactory().createLink(id1, id3, id4);
+		Link link2 = network.getFactory().createLink(id2, id4, id5);
+		Link link3 = network.getFactory().createLink(id3, id5, id6);
+		network.addLink(link1);
+		network.addLink(link2);
 
-		NodeNetworkRouteImpl route1 = new NodeNetworkRouteImpl(startLink, endLink);
-		ArrayList<Node> srcRoute = new ArrayList<Node>();
-		srcRoute.add(node3);
-		srcRoute.add(node4);
-		route1.setNodes(startLink, srcRoute, endLink);
-		Assert.assertEquals(1, route1.getLinkIds().size());
+		NodeNetworkRouteImpl route1 = new NodeNetworkRouteImpl(link1, link2);
+		ArrayList<Link> srcRoute = new ArrayList<Link>();
+		route1.setLinks(link1, srcRoute, link2);
+		Assert.assertEquals(0, route1.getLinkIds().size());
 
 		NodeNetworkRouteImpl route2 = route1.clone();
 		Assert.assertNotSame(route1, route2);
 
-		srcRoute.add(node5);
-		route1.setNodes(startLink, srcRoute, endLink);
+		srcRoute.add(link2);
+		route1.setLinks(link1, srcRoute, link3);
 
-		Assert.assertEquals(2, route1.getLinkIds().size());
-		Assert.assertEquals(1, route2.getLinkIds().size());
+		Assert.assertEquals(1, route1.getLinkIds().size());
+		Assert.assertEquals(0, route2.getLinkIds().size());
 	}
 
 }

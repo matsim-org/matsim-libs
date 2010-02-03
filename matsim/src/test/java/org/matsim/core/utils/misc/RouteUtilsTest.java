@@ -113,6 +113,37 @@ public class RouteUtilsTest {
 		Assert.assertEquals(f.scenario.createId("3"), nodes.get(6).getId());
 	}
 
+	@Test
+	public void testGetLinksFromNodes() {
+		Fixture f = new Fixture();
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		List<Link> links = RouteUtils.getLinksFromNodes(nodes);
+
+		Assert.assertEquals(0, links.size());
+
+		nodes.add(f.network.getNodes().get(f.scenario.createId("3")));
+		links = RouteUtils.getLinksFromNodes(nodes);
+		Assert.assertEquals(0, links.size());
+
+		nodes.add(f.network.getNodes().get(f.scenario.createId("4")));
+		links = RouteUtils.getLinksFromNodes(nodes);
+		Assert.assertEquals(1, links.size());
+		Assert.assertEquals(f.scenario.createId("3"), links.get(0).getId());
+
+		nodes.add(f.network.getNodes().get(f.scenario.createId("5")));
+		links = RouteUtils.getLinksFromNodes(nodes);
+		Assert.assertEquals(2, links.size());
+		Assert.assertEquals(f.scenario.createId("3"), links.get(0).getId());
+		Assert.assertEquals(f.scenario.createId("4"), links.get(1).getId());
+
+		nodes.add(0, f.network.getNodes().get(f.scenario.createId("2")));
+		links = RouteUtils.getLinksFromNodes(nodes);
+		Assert.assertEquals(3, links.size());
+		Assert.assertEquals(f.scenario.createId("2"), links.get(0).getId());
+		Assert.assertEquals(f.scenario.createId("3"), links.get(1).getId());
+		Assert.assertEquals(f.scenario.createId("4"), links.get(2).getId());
+	}
+
 	private static class Fixture {
 		protected final Scenario scenario;
 		protected final Network network;

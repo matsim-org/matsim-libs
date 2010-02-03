@@ -303,17 +303,6 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			throw new UnsupportedOperationException("read only route.");
 		}
 
-		@Deprecated
-		@Override
-		public void setNodes(final List<Node> srcRoute) {
-			throw new UnsupportedOperationException("read only route.");
-		}
-
-		@Override
-		public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
-			throw new UnsupportedOperationException("read only route.");
-		}
-
 		@Override
 		public void setTravelCost(final double travelCost) {
 			throw new UnsupportedOperationException("read only route.");

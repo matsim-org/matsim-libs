@@ -78,7 +78,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		leg.setRoute(route);
 
 		// prepare route
-		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 4"), link5);
+		route.setLinks(link0, NetworkUtils.getLinks(network, "1 2"), link5);
 
 		// prepare area of interest
 		HashMap<Id, Link> aoi = new HashMap<Id, Link>();

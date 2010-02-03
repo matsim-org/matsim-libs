@@ -15,6 +15,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.misc.RouteUtils;
 
 /**
  * A AbstractPersonAlgorithm that calculates and sets the routes of a person's activities using {@link Dijkstra}.
@@ -22,7 +23,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
  * @author mrieser, aneumann
  */
 public class PlansCalcRouteDijkstra extends PlansCalcRoute {
-	
+
 	Network wrappedNetwork;
 	Network originalNetwork;
 
@@ -37,14 +38,14 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 				new Dijkstra(wrappedNetwork, freespeedTimeCost, freespeedTimeCost));
 		this.originalNetwork = originalNetwork;
 		this.wrappedNetwork = wrappedNetwork;
-	}	
-	
+	}
+
 	/*
 	 * Need to override it here, to ensure correct route conversion to wrapped network and vice versa.
 	 * That's why I had to change visibility to protected.
-	 * 
+	 *
 	 * TODO [an] No other transport means are implemented, yet.
-	 * 
+	 *
 	 * (non-Javadoc)
 	 * @see org.matsim.router.PlansCalcRoute#handleCarLeg(org.matsim.population.Leg, org.matsim.population.Act, org.matsim.population.Act, double)
 	 */
@@ -64,19 +65,19 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			// do not drive/walk around, if we stay on the same link
 			path = this.getLeastCostPathCalculator().calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			
+
 			ArrayList<Node> realRouteNodeList = new ArrayList<Node>();
-			
+
 			for (Node node : path.nodes) {
 				realRouteNodeList.add(originalNetwork.getLinks().get(node.getId()).getToNode());
 			}
-			
+
 			realRouteNodeList.remove(realRouteNodeList.size() - 1);
-			
+
 			NetworkRouteWRefs wrappedRoute = new NodeNetworkRouteImpl();
-			wrappedRoute.setNodes(realRouteNodeList);
+			wrappedRoute.setLinks(null, RouteUtils.getLinksFromNodes(realRouteNodeList), null);
 			wrappedRoute.setTravelTime(path.travelTime);
-			
+
 			leg.setRoute(wrappedRoute);
 			travTime = path.travelTime;
 		} else {

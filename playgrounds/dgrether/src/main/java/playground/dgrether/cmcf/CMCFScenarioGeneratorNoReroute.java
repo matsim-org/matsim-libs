@@ -37,6 +37,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.IdFactory;
@@ -159,7 +160,7 @@ public class CMCFScenarioGeneratorNoReroute {
 			plansOut = plans1Out;
 			configOut = config1Out;
 		}
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		this.config = scenario.getConfig();
 
@@ -190,10 +191,10 @@ public class CMCFScenarioGeneratorNoReroute {
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 			NetworkRouteWRefs route = new NodeNetworkRouteImpl(l1, l6);
 			if (!isAlternativeRouteEnabled) {
-				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 5 6"), l6);
+				route.setLinks(l1, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "2 3 5 6")), l6);
 			}
 			if (isAlternativeRouteEnabled) {
-				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 4 5 6"), l6);
+				route.setLinks(l1, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "2 3 4 5 6")), l6);
 			}
 			leg.setRoute(route);
 			ActivityImpl act2 = plan.createAndAddActivity("h", l6.getCoord());

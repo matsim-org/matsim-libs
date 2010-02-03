@@ -207,7 +207,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			leg1.setDepartureTime(departureTime);
 			leg1.setTravelTime(10);
 			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, depLink, destLink);
-			route.setNodes(depLink, NetworkUtils.getNodes(network, "2 3"), destLink);
+			route.setLinks(depLink, NetworkUtils.getLinks(network, "2"), destLink);
 			leg1.setRoute(route);
 			plan1.createAndAddActivity("w", destLink.getId());
 

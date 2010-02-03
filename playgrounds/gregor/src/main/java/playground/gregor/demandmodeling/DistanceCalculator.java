@@ -27,11 +27,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -44,20 +43,20 @@ public class DistanceCalculator {
 	private final List<String []> entries = new ArrayList<String []>();
 	private final HashMap<String,Household> housholds = new HashMap<String,Household>();
 	private final String outfile;
-	
+
 	public DistanceCalculator(NetworkLayer network, String csvfile, String outfile) {
 		this.network = network;
 		this.csvfile = csvfile;
 		this.outfile = outfile;
 	}
-	
-	
+
+
 	public void run(){
 		readCSVFile();
 		localizeHousholds();
 		routeHomeToActivities();
-		
-		
+
+
 	}
 
 
@@ -72,30 +71,30 @@ public class DistanceCalculator {
 			}
 			String excId = entry[0];
 			String id = entry[1];
-						
+
 			double xcoord = Double.parseDouble(entry[7]);
 			double ycoord = Double.parseDouble(entry[8]);
 			CoordImpl actCoord = new CoordImpl(xcoord, ycoord);
-						
+
 			Household hh = this.housholds.get(id);
 			if (hh == null) {
 				writer.writeLine(new String [] {excId,id,"NO HOME LOCATION"});
 				continue;
 			}
-			
-			
-			
+
+
+
 			NodeImpl home = this.network.getNearestNode(hh.home);
 			NodeImpl act = this.network.getNearestNode(actCoord);
 			Path path = router.calcLeastCostPath(home, act, 0);
-			NetworkRouteWRefs route = new NodeNetworkRouteImpl();
-			route.setNodes(path.nodes);
-			double dist = route.getDistance();
+			double dist = 0;
+			for (Link link : path.links) {
+				dist += link.getLength();
+			}
 			writer.writeLine(new String [] {excId,id,Double.toString(dist)});
-			
-			
-		}	
-		
+
+		}
+
 		writer.finish();
 	}
 
@@ -113,17 +112,17 @@ public class DistanceCalculator {
 			if (this.housholds.get(id) != null) {
 				continue;
 			}
-						
+
 			double xcoord = Double.parseDouble(entry[7]);
 			double ycoord = Double.parseDouble(entry[8]);
-			
+
 			Household hh = new Household();
 			hh.id = id;
 			CoordImpl c = new CoordImpl(xcoord,ycoord);
 			hh.home = c;
 			this.housholds.put(id, hh);
 		}
-		
+
 	}
 
 
@@ -131,37 +130,37 @@ public class DistanceCalculator {
 		CSVFileReader reader = new CSVFileReader(this.csvfile);
 		reader.readLine(); //first line is the head - so skip it!
 		String [] line = reader.readLine();
-		
+
 		while (line != null){
 			entries.add(line);
 			line = reader.readLine();
 //			this.entries.add(line);
 		}
-		
-		
+
+
 	}
 
-	
+
 	private static class Household {
 		String id;
 		CoordImpl home;
 	}
-	
+
 
 	public static void main(String [] args) {
-		
+
 		String infile = "./padang/demand_generation/working-day_coord_1activ.csv";
 		String outfile = "./padang/demand_generation/routed.csv";
 		String netfile = "./networks/padang_net_v20080618.xml";
-		
+
 		log.info("loading network layer...");
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
-		
+
 		new DistanceCalculator(network,infile,outfile).run();
-		
+
 	}
 
 }

@@ -55,4 +55,30 @@ public class RouteUtils {
 		}
 		return nodes;
 	}
+
+	public static List<Link> getLinksFromNodes(final List<Node> nodes) {
+		ArrayList<Link> links = new ArrayList<Link>(nodes.size());
+		Node prevNode = null;
+		for (Node node : nodes) {
+			if (prevNode != null) {
+				Link foundLink = findLink(prevNode, node);
+				if (foundLink != null) {
+					links.add(foundLink);
+				}
+			}
+			prevNode = node;
+		}
+		links.trimToSize();
+		return links;
+	}
+
+	private static Link findLink(Node prevNode, Node node) {
+		for (Link link : prevNode.getOutLinks().values()) {
+			if (link.getToNode().equals(node)) {
+				return link;
+			}
+		}
+		return null;
+	}
+
 }

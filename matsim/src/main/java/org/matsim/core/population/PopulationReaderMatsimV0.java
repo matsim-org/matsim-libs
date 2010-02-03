@@ -38,6 +38,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -166,7 +167,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		if (atts.getValue("zone") != null) {
 			log.info("The attribute 'zone' of <act> will be ignored");
 		}
-		
+
 		Coord coord = null;
 		ActivityImpl act;
 		if (atts.getValue("link") != null) {
@@ -185,9 +186,9 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		act.setStartTime(Time.parseTime(atts.getValue("start_time")));
 		act.setDuration(Time.parseTime(atts.getValue("dur")));
 		act.setEndTime(Time.parseTime(atts.getValue("end_time")));
-		
+
 		if (this.routeNodes != null) {
-			this.currroute.setNodes(this.network.getLinks().get(this.prevAct.getLinkId()), NetworkUtils.getNodes(this.network, this.routeNodes), this.network.getLinks().get(act.getLinkId()));
+			this.currroute.setLinks(this.network.getLinks().get(this.prevAct.getLinkId()), RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeNodes)), this.network.getLinks().get(act.getLinkId()));
 			this.routeNodes = null;
 			this.currroute = null;
 		}

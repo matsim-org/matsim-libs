@@ -26,8 +26,8 @@ package playground.johannes.itsc08;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
@@ -71,10 +71,8 @@ public class ReactRouteGuidance implements RouteProvider {
 		}
 		Path path = this.algorithm.calcLeastCostPath(departureLink.getToNode(),
 					destinationLink.getFromNode(), time);
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl();
-		route.setStartLink(departureLink);
-		route.setEndLink(destinationLink);
-		route.setNodes(path.nodes);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(departureLink, destinationLink);
+		route.setLinks(departureLink, path.links, destinationLink);
 		return route;
 	}
 

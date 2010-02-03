@@ -65,7 +65,7 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 			final double time) {
 		Path path = this.landmarksAStar.calcLeastCostPath(departureLink.getToNode(), destinationLink.getFromNode(), time);
 		NetworkRouteWRefs route = (NetworkRouteWRefs) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(TransportMode.car, departureLink, destinationLink);
-		route.setNodes(departureLink, path.nodes, destinationLink);
+		route.setLinks(departureLink, path.links, destinationLink);
 		return route;
 	}
 

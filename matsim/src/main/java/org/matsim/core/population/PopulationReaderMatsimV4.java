@@ -46,6 +46,7 @@ import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
@@ -358,7 +359,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			if (this.currRoute instanceof GenericRoute) {
 				((GenericRoute) this.currRoute).setRouteDescription(startLink, this.routeDescription.trim(), endLink);
 			} else if (this.currRoute instanceof NetworkRouteWRefs) {
-				((NetworkRouteWRefs) this.currRoute).setNodes(startLink, NetworkUtils.getNodes(this.network, this.routeDescription), endLink);
+				((NetworkRouteWRefs) this.currRoute).setLinks(startLink, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeDescription)), endLink);
 			} else {
 				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
 			}

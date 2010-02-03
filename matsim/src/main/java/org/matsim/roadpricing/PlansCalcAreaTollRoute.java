@@ -120,9 +120,9 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 						throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 					}
 					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex]);
-					tollRoute.setNodes(fromLink, path.nodes, toLink);
+					tollRoute.setLinks(fromLink, path.links, toLink);
 					tollRoute.setTravelTime((int) path.travelTime);
-					tollRoute.setTravelCost(path.travelCost); 
+					tollRoute.setTravelCost(path.travelCost);
 				} else {
 					// do not drive/walk around, if we stay on the same link
 					tollRoute.setDistance(0.0);
@@ -141,8 +141,8 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					 * will still be a route returned.
 					 */
 					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					noTollRoute = (NetworkRouteWRefs) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
-					noTollRoute.setNodes(fromLink, path.nodes, toLink);
+					noTollRoute = (NetworkRouteWRefs) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, fromLink, toLink);
+					noTollRoute.setLinks(fromLink, path.links, toLink);
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);
 

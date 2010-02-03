@@ -79,7 +79,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 			else {
 				routeNodes.addAll(RouteUtils.getNodes(subRoute, this.network));
 			}
-			returnRoute.setNodes(departureLink, routeNodes, destinationLink);
+			returnRoute.setLinks(departureLink, RouteUtils.getLinksFromNodes(routeNodes), destinationLink);
 			if (isEndCompleteRoute(returnRoute, destinationLink)) {
 				return returnRoute;
 			}

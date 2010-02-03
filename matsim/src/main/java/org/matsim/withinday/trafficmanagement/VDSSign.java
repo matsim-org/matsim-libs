@@ -306,7 +306,7 @@ public class VDSSign {
 			endLink = calculateOutLink(this.directionLink, endNode);
 			rNodes.add(endNode);
 		}
-		ret.setNodes(startLink, rNodes, endLink);
+		ret.setLinks(startLink, RouteUtils.getLinksFromNodes(rNodes), endLink);
 		return ret;
 	}
 

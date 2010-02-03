@@ -40,8 +40,8 @@ public class UmlaufInterpolator {
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost();
 		LeastCostPathCalculator routingAlgo = new Dijkstra(network, calculator, calculator);
 
-		Node startNode = fromLink.getToNode();		
-		Node endNode = toLink.getFromNode(); 
+		Node startNode = fromLink.getToNode();
+		Node endNode = toLink.getFromNode();
 
 		double depTime = 0.0;
 
@@ -53,7 +53,7 @@ public class UmlaufInterpolator {
 		}
 		NetworkRouteWRefs route = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory())
 				.createRoute(TransportMode.car, fromLink, toLink);
-		route.setNodes(fromLink, wendenPath.nodes, toLink);
+		route.setLinks(fromLink, wendenPath.links, toLink);
 		umlauf.getUmlaufStuecke().add(new Wenden(route));
 	}
 

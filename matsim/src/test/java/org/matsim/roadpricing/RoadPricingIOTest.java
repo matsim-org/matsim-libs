@@ -56,10 +56,11 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		final Id id1 = new IdImpl(1);
 		final Id id2 = new IdImpl(2);
 		final Id id3 = new IdImpl(3);
-		
+
 		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		NetworkLayer network = Fixture.createNetwork1(scenario);
+		Fixture.createNetwork1(scenario);
+		NetworkLayer network = scenario.getNetwork();
 		// first, read the scheme from file
 		RoadPricingScheme scheme1 = scenario.getRoadPricingScheme();
 		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(scheme1);

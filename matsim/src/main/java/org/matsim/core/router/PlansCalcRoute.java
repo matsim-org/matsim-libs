@@ -48,8 +48,8 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**<p>
- * This is, I think, a configurable wrapper/adapter class that essentially uses 
- * <tt>(new DijkstraFactory()).createPathCalculator( costCalculator, timeCalculator )</tt> 
+ * This is, I think, a configurable wrapper/adapter class that essentially uses
+ * <tt>(new DijkstraFactory()).createPathCalculator( costCalculator, timeCalculator )</tt>
  * to bundle costCalculator and timeCalculator with the Dijkstra s.p. algorithm into a MATSim Person/PlanAlgo.
  * </p><p>
  * Dijkstra can be replaced by something else by using the <tt>factory</tt> parameter.
@@ -58,11 +58,11 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private static final Logger log = Logger.getLogger(PlansCalcRoute.class);
-	
+
 	private static final String NO_CONFIGGROUP_SET_WARNING = "No PlansCalcRouteConfigGroup"
 		+ " is set in PlansCalcRoute, using the default values. Make sure that those values" +
 				"fit your needs, otherwise set it expclicitly.";
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -75,12 +75,12 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * The routing algorithm to be used for finding pt routes, based on the empty network, with freeflow travel times.
 	 */
 	private final LeastCostPathCalculator routeAlgoPtFreeflow;
-	
+
 	/**
-	 * if not set via constructor use the default values 
+	 * if not set via constructor use the default values
 	 */
 	protected PlansCalcRouteConfigGroup configGroup = new PlansCalcRouteConfigGroup();
-	
+
 	private final NetworkFactoryImpl routeFactory;
 
 	protected final Network network;
@@ -88,15 +88,15 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
-	
+
 	/**Does the following (as far as I can see):<ul>
 	 * <li> sets routeAlgo to the path calculator defined by <tt>factory</tt>, using <tt>costCalculator</tt> and <tt>timeCalculator</tt> as arguments </li>
 	 * <li> sets routeAlgoPtFreeflow to "-1 utils/sec" (which is <it>enormous</it>--????) </li>
 	 * <li> sets configGroup to <tt>group</tt> but it is not clear where this will be used.
 	 * </ul>
-	 * [[old javadoc: Uses the speed factors from the config group and the rerouting of the factory]] 
+	 * [[old javadoc: Uses the speed factors from the config group and the rerouting of the factory]]
 	 */
-	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, 
+	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network,
 			final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		this.routeAlgo = factory.createPathCalculator(network, costCalculator, timeCalculator);
@@ -111,7 +111,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			log.warn(NO_CONFIGGROUP_SET_WARNING);
 		}
 	}
-	
+
 	/**
 	 * Creates a rerouting strategy module using dijkstra rerouting.  Does the following (as far as I can see):<ul>
 	 * <li> sets routeAlgo to the path calculator defined by <tt>new DijkstraFactory()</tt>, using <tt>costCalculator</tt> and <tt>timeCalculator</tt> as arguments </li>
@@ -137,11 +137,11 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		this.routeFactory = (NetworkFactoryImpl) network.getFactory();
 		log.warn(NO_CONFIGGROUP_SET_WARNING);
 	}
-	
+
 	public final LeastCostPathCalculator getLeastCostPathCalculator(){
 		return this.routeAlgo;
 	}
-	
+
 	public final LeastCostPathCalculator getPtFreeflowLeastCostPathCalculator(){
 		return this.routeAlgoPtFreeflow;
 	}
@@ -180,7 +180,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 					fromAct = (ActivityImpl) pe;
 				} else {
 					toAct = (ActivityImpl) pe;
-					
+
 					double endTime = fromAct.getEndTime();
 					double startTime = fromAct.getStartTime();
 					double dur = fromAct.getDuration();
@@ -196,9 +196,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 					} else {
 						throw new RuntimeException("activity of plan of person " + plan.getPerson().getId().toString() + " has neither end-time nor duration." + fromAct.toString());
 					}
-					
+
 					now += handleLeg(leg, fromAct, toAct, now);
-					
+
 					fromAct = toAct;
 				}
 			}
@@ -252,7 +252,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			NetworkRouteWRefs route = (NetworkRouteWRefs) this.routeFactory.createRoute(TransportMode.car, fromLink, toLink);
-			route.setNodes(fromLink, path.nodes, toLink);
+			route.setLinks(fromLink, path.links, toLink);
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
 			leg.setRoute(route);
@@ -299,7 +299,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			double travelTimeLastLink = ((LinkImpl) toLink).getFreespeedTravelTime(depTime + path.travelTime);
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.configGroup.getPtSpeedFactor());
 			RouteWRefs route = this.routeFactory.createRoute(TransportMode.pt, fromLink, toLink);
-//			route.setNodes(fromLink, path.nodes, toLink);
 			route.setTravelTime(travTime);
 			double dist = 0;
 			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
@@ -308,7 +307,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 				dist = CoordUtils.calcDistance(fromLink.getCoord(), toLink.getCoord());
 			}
 			route.setDistance(dist * 1.5);
-//			route.setTravelCost(path.travelCost); 
+//			route.setTravelCost(path.travelCost);
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink

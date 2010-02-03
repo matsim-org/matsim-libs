@@ -86,25 +86,6 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		this.route.trimToSize();
 	}
 
-	@Deprecated
-	@Override
-	public void setNodes(final List<Node> srcRoute) {
-		setNodes(null, srcRoute, null);
-	}
-
-	@Override
-	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
-		setStartLink(startLink);
-		setEndLink(endLink);
-		if (srcRoute == null) {
-			this.route.clear();
-		} else {
-			this.route.clear();
-			this.route.addAll(srcRoute);
-		}
-		this.route.trimToSize();
-	}
-
 	@Override
 	public final double getDistance() {
 		if (Double.isNaN(super.getDistance())) {
@@ -253,8 +234,9 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 				throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 			}
 		}
-		NodeNetworkRouteImpl ret = new NodeNetworkRouteImpl();
-		ret.setNodes(fromLink, this.route.subList(fromIndex, toIndex + 1), toLink);
+		NodeNetworkRouteImpl ret = new NodeNetworkRouteImpl(fromLink, toLink);
+		ret.route.addAll(this.route.subList(fromIndex, toIndex + 1));
+		ret.route.trimToSize();
 		return ret;
 	}
 

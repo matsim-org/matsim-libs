@@ -129,8 +129,8 @@ public class RouteSetGenerator {
 			Path path = this.router.calcLeastCostPath(o,d,time);
 			NetworkRouteWRefs route = null;
 			if (path != null) {
-				route = new NodeNetworkRouteImpl(path.links.get(0),path.links.get(path.links.size()-1));
-				route.setNodes(path.links.get(0),path.nodes,path.links.get(path.links.size()-1));
+				route = new NodeNetworkRouteImpl(path.links.get(0), path.links.get(path.links.size()-1));
+				route.setLinks(path.links.get(0), path.links, path.links.get(path.links.size()-1));
 			}
 
 			//first check if route is local route (i.e. contains only local road links)
@@ -212,7 +212,7 @@ public class RouteSetGenerator {
 		}
 		// add the least cost path at the beginning of the route
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(path.links.get(0),path.links.get(path.links.size()-1));
-		route.setNodes(path.links.get(0), path.nodes, path.links.get(path.links.size()-1));
+		route.setLinks(path.links.get(0), path.links, path.links.get(path.links.size()-1));
 		routes.addFirst(route);
 
 		// joining the resulting routes in one linked list which is returned by the algorithm
