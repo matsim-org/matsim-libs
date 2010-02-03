@@ -74,6 +74,30 @@ public class PersonAgent implements DriverAgent {
 	}
 
 	/**
+	 * Some data of the currently simulated Leg is cached to speed up 
+	 * the simulation. If the Leg changes (for example the Route or 
+	 * the Destination Link), those cached data has to be reseted.
+	 * 
+	 * If the Leg has not changed, calling this method has no effect
+	 * on the Results of the Simulation!
+	 */
+	public void resetCaches()
+	{
+		this.cachedNextLinkId = null;
+		this.cacheRouteNodes = null;
+		this.destinationLinkId = null;
+		
+		RouteWRefs route = currentLeg.getRoute();
+		if (route == null) {
+			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
+			Simulation.decLiving();
+			Simulation.incLost();
+			return;
+		}
+		this.destinationLinkId = route.getEndLinkId();
+	}
+	
+	/**
 	 * Convenience method delegating to person's selected plan
 	 * @return list of {@link ActivityImpl}s and {@link LegImpl}s of this agent's plan
 	 */
