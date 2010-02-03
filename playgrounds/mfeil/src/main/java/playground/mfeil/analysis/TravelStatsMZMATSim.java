@@ -23,8 +23,10 @@ package playground.mfeil.analysis;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -34,6 +36,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+
+import playground.mfeil.attributes.AgentsAttributesAdder;
 
 
 
@@ -63,13 +67,18 @@ public class TravelStatsMZMATSim {
 		stream.println("\tCar\tPT\tWalk\tBike\tCar\tPT\tWalk\tBike\tplanDistance\tplanTime\tnoOfCar\tnoOfPT\tnoOfWalk\tnoOfBike");	
 	}
 	
-	public void run(PopulationImpl populationMZ, PopulationImpl populationMATSim, PrintStream stream){
+	public void run(PopulationImpl populationMZ, PopulationImpl populationMATSim, PrintStream stream, final String attributesInputFile){
 				
-		this.runPopulation("MZ", populationMZ, stream);
-		this.runPopulation("MATSim", populationMATSim, stream);
+		AgentsAttributesAdder aaa = new AgentsAttributesAdder();
+		aaa.runMZ(attributesInputFile);
+		Map<Id, Double> personsWeights = aaa.getAgentsWeight();
+		
+		this.runPopulation("MZ_weighted", populationMZ, stream, personsWeights);
+		this.runPopulation("MZ_unweighted", populationMZ, stream, null);
+		this.runPopulation("MATSim", populationMATSim, stream, null);
 	}
 		
-	public void runPopulation (String name, PopulationImpl population, PrintStream stream){
+	public void runPopulation (String name, PopulationImpl population, PrintStream stream, final Map<Id, Double> personsWeights){
 		
 		// Initiate output
 		double aveTripDistanceCarPop1 = 0;
@@ -89,32 +98,37 @@ public class TravelStatsMZMATSim {
 		stream.print(name+"\t");
 		
 		for (Person person : population.getPersons().values()) {
+			
+			double weight = -1;
+			if (personsWeights!=null) weight = personsWeights.get(person.getId());
+			else weight = 1;
+			
 			Plan plan = person.getSelectedPlan();
 			for (int i=1;i<plan.getPlanElements().size();i+=2){
 				LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 				if (leg.getMode().equals(TransportMode.car)) {
-					if (leg.getRoute()!=null) aveTripDistanceCarPop1 += leg.getRoute().getDistance();
+					if (leg.getRoute()!=null) aveTripDistanceCarPop1 += weight*leg.getRoute().getDistance();
 					else log.warn("A car leg of person "+person.getId()+" has no route!");
-					aveTripTimeCarPop1 += leg.getTravelTime();
-					counterCar++;
+					aveTripTimeCarPop1 += weight*leg.getTravelTime();
+					counterCar+=weight;
 				}
 				else if (leg.getMode().equals(TransportMode.pt)) {
-					if (leg.getRoute()!=null) aveTripDistancePTPop1 += leg.getRoute().getDistance();
+					if (leg.getRoute()!=null) aveTripDistancePTPop1 += weight*leg.getRoute().getDistance();
 					else log.warn("A pt leg of person "+person.getId()+" has no route!");
-					aveTripTimePTPop1 += leg.getTravelTime();
-					counterPT++;
+					aveTripTimePTPop1 += weight*leg.getTravelTime();
+					counterPT+=weight;
 				}
 				else if (leg.getMode().equals(TransportMode.walk)) {
-					if (leg.getRoute()!=null) aveTripDistanceWalkPop1 += leg.getRoute().getDistance();
+					if (leg.getRoute()!=null) aveTripDistanceWalkPop1 += weight*leg.getRoute().getDistance();
 					else log.warn("A walk leg of person "+person.getId()+" has no route!");
-					aveTripTimeWalkPop1 += leg.getTravelTime();
-					counterWalk++;
+					aveTripTimeWalkPop1 += weight*leg.getTravelTime();
+					counterWalk+=weight;
 				}
 				else if (leg.getMode().equals(TransportMode.bike)) {
-					if (leg.getRoute()!=null) aveTripDistanceBikePop1 += leg.getRoute().getDistance();
+					if (leg.getRoute()!=null) aveTripDistanceBikePop1 += weight*leg.getRoute().getDistance();
 					else log.warn("A bike leg of person "+person.getId()+" has no route!");
-					aveTripTimeBikePop1 += leg.getTravelTime();
-					counterBike++;
+					aveTripTimeBikePop1 += weight*leg.getTravelTime();
+					counterBike+=weight;
 				}
 				else log.warn("Undefined transport mode for person "+plan.getPerson().getId()+": "+leg.getMode());
 			}		
@@ -143,6 +157,9 @@ public class TravelStatsMZMATSim {
 				final String populationFilenameMATSim = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
 				final String populationFilenameMZ = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
 				final String outputFile = "/home/baug/mfeil/data/choiceSet/trip_stats_mz05.xls";
+				
+				// Special MZ file so that weights of MZ persons can be read
+				final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 	
 				ScenarioImpl scenarioMZ = new ScenarioImpl();
 				new MatsimNetworkReader(scenarioMZ).readFile(networkFilename);
@@ -157,7 +174,7 @@ public class TravelStatsMZMATSim {
 				TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
 				PrintStream stream = ts.initiatePrinter(outputFile);
 				ts.printHeader(stream);
-				ts.run(scenarioMZ.getPopulation(), scenarioMATSim.getPopulation(), stream);
+				ts.run(scenarioMZ.getPopulation(), scenarioMATSim.getPopulation(), stream, attributesInputFile);
 				log.info("Process finished.");
 			}
 }

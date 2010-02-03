@@ -23,8 +23,10 @@ package playground.mfeil.analysis;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -35,6 +37,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
+
+import playground.mfeil.attributes.AgentsAttributesAdder;
 
 
 
@@ -64,13 +68,18 @@ public class ActTimingsMZMATSim {
 		stream.println("\tStart\tEnd\tDuration\tDuration\tDuration\tDuration\tDuration");	
 	}
 	
-	public void run(PopulationImpl populationMZ, PopulationImpl populationMATSim, PrintStream stream){
+	public void run(PopulationImpl populationMZ, PopulationImpl populationMATSim, PrintStream stream, final String attributesInputFile){
 				
-		this.runPopulation("MZ", populationMZ, stream);
-		this.runPopulation("MATSim", populationMATSim, stream);
+		AgentsAttributesAdder aaa = new AgentsAttributesAdder();
+		aaa.runMZ(attributesInputFile);
+		Map<Id, Double> personsWeights = aaa.getAgentsWeight();
+		
+		this.runPopulation("MZ_weighted", populationMZ, stream, personsWeights);
+		this.runPopulation("MZ_unweighted", populationMZ, stream, null);
+		this.runPopulation("MATSim", populationMATSim, stream, null);
 	}
 		
-	public void runPopulation (String name, PopulationImpl population, PrintStream stream){
+	public void runPopulation (String name, PopulationImpl population, PrintStream stream, final Map<Id, Double> personsWeights){
 		
 		// Initiate output
 		double startHome = 0;
@@ -90,42 +99,47 @@ public class ActTimingsMZMATSim {
 		int size = population.getPersons().size();
 		
 		for (Person person : population.getPersons().values()) {
+			
+			double weight = -1;
+			if (personsWeights!=null) weight = personsWeights.get(person.getId());
+			else weight = 1;
+			
 			Plan plan = person.getSelectedPlan();
 			for (int i=0;i<plan.getPlanElements().size();i+=2){
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 				if (i==0) { // first home act
 					if (act.getEndTime()!=Time.UNDEFINED_TIME){
-						endHome += act.getEndTime(); 
-						counterHome++;
+						endHome += weight*act.getEndTime(); 
+						counterHome+=weight;
 					}
 					else log.warn("The end time of person's "+person.getId()+" fist home act is undefined!");
 				}
 				else if (i==plan.getPlanElements().size()-1) { // last home act
 					if (act.getStartTime()!=Time.UNDEFINED_TIME){
-						startHome += act.getStartTime(); 
+						startHome += weight*act.getStartTime(); 
 					}
 					else log.warn("The start time of person's "+person.getId()+" last home act is undefined!");
 				}
 				else {
 					if (act.getType().startsWith("h")) {
-						durationInnerHome+=act.calculateDuration();
-						counterInnerHome++;
+						durationInnerHome+=weight*act.calculateDuration();
+						counterInnerHome+=weight;
 					}
 					else if (act.getType().startsWith("w")) {
-						durationWork+=act.calculateDuration();
-						counterWork++;
+						durationWork+=weight*act.calculateDuration();
+						counterWork+=weight;
 					}
 					else if (act.getType().startsWith("e")) {
-						durationEducation+=act.calculateDuration();
-						counterEducation++;
+						durationEducation+=weight*act.calculateDuration();
+						counterEducation+=weight;
 					}
 					else if (act.getType().startsWith("l")) {
-						durationLeisure+=act.calculateDuration();
-						counterLeisure++;
+						durationLeisure+=weight*act.calculateDuration();
+						counterLeisure+=weight;
 					}
 					else if (act.getType().startsWith("s")) {
-						durationShop+=act.calculateDuration();
-						counterShop++;
+						durationShop+=weight*act.calculateDuration();
+						counterShop+=weight;
 					}
 					else log.warn("Unknown act type in person's "+person.getId()+" plan at position "+i+"!");
 				}
@@ -144,6 +158,9 @@ public class ActTimingsMZMATSim {
 				final String populationFilenameMATSim = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
 				final String populationFilenameMZ = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
 				final String outputFile = "/home/baug/mfeil/data/choiceSet/trip_stats_mz05.xls";
+				
+				// Special MZ file so that weights of MZ persons can be read
+				final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 	
 				ScenarioImpl scenarioMZ = new ScenarioImpl();
 				new MatsimNetworkReader(scenarioMZ).readFile(networkFilename);
@@ -158,7 +175,7 @@ public class ActTimingsMZMATSim {
 				ActTimingsMZMATSim ts = new ActTimingsMZMATSim();
 				PrintStream stream = ts.initiatePrinter(outputFile);
 				ts.printHeader(stream);
-				ts.run(scenarioMZ.getPopulation(), scenarioMATSim.getPopulation(), stream);
+				ts.run(scenarioMZ.getPopulation(), scenarioMATSim.getPopulation(), stream, attributesInputFile);
 				log.info("Process finished.");
 			}
 }

@@ -214,22 +214,26 @@ public class ASPGeneral {
 	private void runMATSimTrips (PopulationImpl pop){
 		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
 		ts.printHeader(this.stream);
-		ts.runPopulation("MATSim", pop, this.stream);
+		ts.runPopulation("MATSim", pop, this.stream, null);
 	}
 	
 	private void runMZTrips (PopulationImpl pop){
-		new TravelStatsMZMATSim().runPopulation("MZ", pop, this.stream);
+		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
+		ts.runPopulation("MZ_weighted", pop, this.stream, this.personsWeights);
+		ts.runPopulation("MZ_unweighted", pop, this.stream, null);
 		this.stream.println();
 	}
 	
 	private void runMATSimTimings (PopulationImpl pop){
 		ActTimingsMZMATSim at = new ActTimingsMZMATSim();
 		at.printHeader(this.stream);
-		at.runPopulation("MATSim", pop, this.stream);
+		at.runPopulation("MATSim", pop, this.stream, null);
 	}
 	
 	private void runMZTimings (PopulationImpl pop){
-		new ActTimingsMZMATSim().runPopulation("MZ", pop, this.stream);
+		ActTimingsMZMATSim at = new ActTimingsMZMATSim();
+		at.runPopulation("MZ_weighted", pop, this.stream, this.personsWeights);
+		at.runPopulation("MZ_unweighted", pop, this.stream, null);
 		this.stream.println();
 	}
 	
