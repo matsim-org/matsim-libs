@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Plansgenerator.java
+ * Plansgenerator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -57,9 +57,9 @@ public class Plansgenerator {
 	private Population plans;
 
 	private void init() {
-		Scenario scenario = new ScenarioImpl();
-		this.network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		this.scenario = new ScenarioImpl();
+		this.network = this.scenario.getNetwork();
+		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
 	}
 
 	private void createPlans() throws Exception {

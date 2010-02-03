@@ -24,24 +24,40 @@ package playground.cottbus;
  * [based on tutorial.example7]
  */
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.vis.netvis.NetVis;
+import org.matsim.vis.otfvis.OTFVisQSim;
 
 public class CottbusController {
 	
-	public static void main (String[] args) {
+	public static void main (String[] args) {	
 		String config = "./input/denver/config.xml";
 		// configuration that describes current scenario
 		
-		Controler controler = new Controler(config);
-		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		controler.setOverwriteFiles(true);
+		//Controler controler = new Controler(config);
+		//controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		//controler.setOverwriteFiles(true);
 		// effects output-folder
-		controler.run();
+		//controler.run();
 		
 		// output via NetVis:
-		String[] visargs = {"output/denver/ITERS/it.0/Snapshot"};
-		NetVis.main(visargs);
+		//String[] visargs = {"output/denver/ITERS/it.0/Snapshot"};
+		//NetVis.main(visargs);
+		
+		//temporally changed NetVis to OTFVis
+		
+		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(config);
+		Scenario sc = scl.loadScenario();
+		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		EventsManagerImpl e = new EventsManagerImpl();
+		
+		OTFVisQSim sim = new OTFVisQSim(sc, e);
+		sim.run();
+		
+		
 	}
 }
