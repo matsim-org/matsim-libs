@@ -97,8 +97,8 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		// This would be the "correct" Type - but it is slower and is not necessary
 		//String type = this.plan.getPreviousActivity(leg).getType();
 
-		ActivityImpl newFromAct = new ActivityImpl(type, vehicle.getCurrentLink().getToNode().getCoord(), vehicle.getCurrentLink());
-
+		ActivityImpl newFromAct = new ActivityImpl(type, vehicle.getCurrentLink().getToNode().getCoord(), vehicle.getCurrentLink().getId());
+		
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
 
