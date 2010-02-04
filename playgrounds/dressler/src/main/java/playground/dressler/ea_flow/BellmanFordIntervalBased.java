@@ -102,9 +102,9 @@ public class BellmanFordIntervalBased {
 	
 	private int _roundpolls=0;
 	
-	private long _prepstart=0;
+	/*private long _prepstart=0;
 	private long _prepend=0;
-	private long _totalpreptime=0;
+	private long _totalpreptime=0;*/
 	
 	private long _calcstart=0;
 	private long _calcend=0;
@@ -209,7 +209,7 @@ public class BellmanFordIntervalBased {
 	 */
 	private Collection<TimeExpandedPath> constructRoutes() throws BFException {
 		
-		System.out.println("Constructing routes ...");
+		//System.out.println("Constructing routes ...");
 		
 		Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
 		
@@ -248,8 +248,7 @@ public class BellmanFordIntervalBased {
 		}*/		
 		
 		//start constructing the TimeExpandedPath
-		TimeExpandedPath TEP = new TimeExpandedPath();
-		TEP.setArrival(toTime);		
+		TimeExpandedPath TEP = new TimeExpandedPath();		
 		
 		PathStep pred;
 		pred = toLabel.getPredecessor();
@@ -470,27 +469,27 @@ public class BellmanFordIntervalBased {
 				}
 			}
 			
-			// TODO FIXME treat empty sources! 
+			// treat empty sources! 
 			if (this._flow.isNonActiveSource(iv._node)) {
-				System.out.println("Hit non-active source: " + iv.toString());
+				//System.out.println("Hit non-active source: " + iv.toString());
 				if (!this._sourcelabels.get(iv._node).getReachable()) {
-					System.out.println("it was not reachable yet ...");
+					//System.out.println("it was not reachable yet ...");
 					// we might have to do something ...
 					// check if we can reverse flow
 					SourceIntervalls si = this._flow.getSourceOutflow(iv._node);
-					System.out.println("its label is");
-					System.out.println(si.toString());
+					//System.out.println("its label is");
+					//System.out.println(si.toString());
 					Intervall arrive = si.canSendFlowBack(iv._ival);
 					if (arrive != null) {
-						System.out.println("we're sending flow back!");
-						System.out.println(arrive);
+						//System.out.println("we're sending flow back!");
+						//System.out.println(arrive);
 						// indeed, we need to process this source
 						this._unprocessedsources.add(iv._node);				   
 						StepSourceFlow pred = new StepSourceFlow(iv._node, arrive.getLowBound(), false);	
-						System.out.println(pred);
+						//System.out.println(pred);
 						this._sourcelabels.get(iv._node).setArrivalAttributes(pred);
-						System.out.println("New label:");
-						System.out.println(this._sourcelabels.get(iv._node));
+						//System.out.println("New label:");
+						//System.out.println(this._sourcelabels.get(iv._node));
 					}
 				}
 			}
@@ -515,12 +514,7 @@ public class BellmanFordIntervalBased {
 		}catch (BFException e){
 			System.out.println("stop reason: " + e.getMessage());
 		}
-		/*if(_warmstart>0){
-			this._prepstart= System.currentTimeMillis();
-			createwarmstartList();
-			this._prepend= System.currentTimeMillis();
-			this._totalpreptime+=(this._prepend-this._prepstart);
-		}*/
+		
 		return TEPs;
 		
 	}
@@ -624,10 +618,10 @@ public class BellmanFordIntervalBased {
 	public String measure() {
 		String result=
 		"              Polls: "+this._roundpolls+
-		"\n      Preptime (ms): "+(this._prepend-this._prepstart)+
+		//"\n      Preptime (ms): "+(this._prepend-this._prepstart)+
 		"\n      Calctime (ms): "+(this._calcend-this._calcstart)+
 		"\n         Totalpolls: "+(this._totalpolls)+
-		"\n  Totalpreptime (s): "+(this._totalpreptime/1000)+
+		//"\n  Totalpreptime (s): "+(this._totalpreptime/1000)+
 		"\n  Totalcalctime (s): "+(this._totalcalctime/1000);
 		return result;
 	}

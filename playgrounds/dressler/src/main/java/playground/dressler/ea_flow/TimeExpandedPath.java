@@ -47,12 +47,6 @@ public class TimeExpandedPath {
 	private LinkedList<PathStep> _steps;
 	
 	/**
-	 * arrivaltime of a path
-	 */
-	private int _arrival;
-	
-
-	/**
 	 * time, that the path wait in the source
 	 */
 	private int startTime;
@@ -294,8 +288,7 @@ public class TimeExpandedPath {
 		strb.append("f: "+this._flow+" on: ");
 		for (PathStep step : this._steps){
 			strb.append(" |" + step.toString() + "| ");
-		}	
-		strb.append("arrivaltime: " + _arrival);
+		}			
 		return strb.toString();
 	}
 	
@@ -326,21 +319,13 @@ public class TimeExpandedPath {
 	public int getFlow(){
 		 return this._flow;
 	 }
-	
-	/**
-	 * setting the arrival time at the final node
-	 * @param time
-	 */
-	public void setArrival(int time){
-		this._arrival = time;
-	}
-	
+		
 	/**
 	 * getter for arrival time if it is set
 	 * @return arrival time
 	 */
 	public int getArrival(){
-		return this._arrival;
+		return this._steps.getLast().getArrivalTime();
 	}
 	
 	
@@ -382,7 +367,7 @@ public class TimeExpandedPath {
 	/**
 	 * Split a path at a given pathEdge
 	 * @param pathEdgeToSplitAt this edge will be in neither of the parts
-	 * @param testForward check the direction 
+	 * @param testForward check the direction as well
 	 * @return length
 	 */
 	public List<TimeExpandedPath> splitPathAtStep(PathStep stepToSplitAt, boolean testForward)
@@ -390,28 +375,42 @@ public class TimeExpandedPath {
 		List<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
 		TimeExpandedPath head = new TimeExpandedPath();
 		TimeExpandedPath tail = new TimeExpandedPath();
-		head.setArrival(this._arrival);
-		tail.setArrival(this._arrival);
+		
 		head.setFlow(this._flow);
 		tail.setFlow(this._flow);
+		
 		boolean preSplit = true;
-		for(PathStep step : this._steps)
-		{
-			// that testFowrard check is always redundant with PathEdge.equals !
-			//if(pE.equals(pathEdgeToSplitAt) && (!testForward || pE.isForward() == pathEdgeToSplitAt.forward))
-			// FIXME gehoert das so mit equals? oder doch forward egal?
-			if(step.equals(stepToSplitAt))
-			{
-				preSplit = false;
-				continue;
+		if (testForward) {
+			for(PathStep step : this._steps)
+			{			
+				if(step.equals(stepToSplitAt)) 	{
+					preSplit = false;
+					continue;
+				}
+				if(preSplit)
+				{
+					head.append(step);				
+				}
+				else
+				{
+					tail.append(step);				
+				}
 			}
-			if(preSplit)
-			{
-				head.append(step);				
-			}
-			else
-			{
-				tail.append(step);				
+		} else {
+			for(PathStep step : this._steps)
+			{			
+				if(step.equalsNoCheckForward(stepToSplitAt)) 	{
+					preSplit = false;
+					continue;
+				}
+				if(preSplit)
+				{
+					head.append(step);				
+				}
+				else
+				{
+					tail.append(step);				
+				}
 			}
 		}
 		result.add(head);
@@ -424,8 +423,7 @@ public class TimeExpandedPath {
 		for(PathStep step : other.getPathSteps())
 		{
 			this.append(step);
-		}
-		this.setArrival(other.getArrival());
+		}		
 	}
 	
 	public void append(PathStep step)
@@ -440,9 +438,8 @@ public class TimeExpandedPath {
 	
 	public static TimeExpandedPath clone(TimeExpandedPath original)
 	{
-		TimeExpandedPath copy = new TimeExpandedPath();
-		copy.setArrival(original.getArrival());
-		copy.setFlow(original.getArrival());		
+		TimeExpandedPath copy = new TimeExpandedPath();		
+		copy.setFlow(original.getFlow());		
 		for(PathStep step : original.getPathSteps())
 		{
 			copy.append(step);

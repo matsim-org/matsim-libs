@@ -52,11 +52,16 @@ public class StepEdge implements PathStep {
 	public String toString(){
 		String s;
 
-		s = this.startTime + " " + edge.getFromNode().getId().toString()+"-->" + edge.getToNode().getId().toString() + " " +this.arrivalTime;
-		if(!this.forward){
-			s += " backwards";
+		s = this.startTime + " ";
+		
+		if(this.forward){
+			s += edge.getFromNode().getId().toString()+"-->" + edge.getToNode().getId().toString();
+		} else {
+			s += edge.getToNode().getId().toString()+"-->" + edge.getFromNode().getId().toString();
+			s += " (is residual)";
 		} 
 
+		s +=  " " +this.arrivalTime;
 		return s;
 	}
 
@@ -132,6 +137,33 @@ public class StepEdge implements PathStep {
 		}
 		return false;
 		
+	}
+	
+	/**
+	 * Checks if two PathEdges are "identical" up to direction
+	 * @param other another PathStep 
+	 * @return true iff identical up 
+	 */
+	@Override
+	public boolean equalsNoCheckForward(PathStep other) {
+		if (!(other instanceof StepSourceFlow)) return false;
+		StepEdge o = (StepEdge) other;
+
+		if (this.forward == o.forward) {
+			if (this.startTime == o.startTime && this.arrivalTime == o.arrivalTime) {
+				return (this.edge.equals(o.edge));
+			} else {
+				return false;
+			}
+			
+		} else {
+			if (this.startTime == o.arrivalTime && this.arrivalTime == o.startTime) {
+				return (this.edge.equals(o.edge));
+			} else {
+				return false;
+			}
+		}
+				
 	}
 	
 	/**

@@ -53,11 +53,6 @@ public class VertexIntervalls {
 	 */
 	@SuppressWarnings("unused")
 	private static boolean _debug = false;
-	/**
-	 * total number of removed VertexIntervall in cleanup
-	 */
-	public static int rem;
-	
 	
 	
 //-----------------------METHODS----------------------------------//

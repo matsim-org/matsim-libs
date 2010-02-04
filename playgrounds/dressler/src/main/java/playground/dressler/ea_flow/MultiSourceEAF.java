@@ -170,33 +170,41 @@ public class MultiSourceEAF {
 			for(TimeExpandedPath path : result){
 				fluss.augment(path);
 				if(_debug){
-					tempstr += path + "\n";
+					System.out.println("found path: " +  path);
 				}
 			}
 			if (_debug) {
-				System.out.println("found path: " +  tempstr);
+				System.out.println();
 			}
+			
 			timer3 = System.currentTimeMillis();
 			gain += fluss.cleanUp();
 
 			timeAugment += timer3 - timer2;
 			if (_debug) {
-				if (i % 100 == 0) {
-					System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-					//System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
-					//System.out.println("last " + tempstr);
-					System.out.println(routingAlgo.measure());
-					System.out.println("");
+				if (i % 100 == 0) {					
+					System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+					System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
+					System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
+					//System.out.println("removed on the fly:" + VertexIntervalls.rem);
+					System.out.println("last path: " + tempstr);
+					System.out.println(routingAlgo.measure());	
+					System.out.println();
 				}
 			}
-			if (_debug) {
-				long timeStop = System.currentTimeMillis();
-				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-				System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
-				System.out.println("last " + tempstr);
-			}
-			System.out.println("Removed " + routingAlgo.gain + " intervals.");
-			System.out.println("removed on the fly:" + VertexIntervalls.rem);
+
+			
+		}
+		
+		if (_debug) {
+			long timeStop = System.currentTimeMillis();
+			System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+			System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
+			System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
+			//System.out.println("removed on the fly:" + VertexIntervalls.rem);
+			System.out.println("last path: " + tempstr);
+			System.out.println(routingAlgo.measure());	
+			System.out.println();
 		}
 		
 		return fluss;
@@ -279,13 +287,11 @@ public class MultiSourceEAF {
 		}
 
 		String networkfile = null;
-		//networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_2s_cap.xml";
-		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s.xml";
+		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
 		networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
-		//networkfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_60s_EAF.xml";
-		//networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
+		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
@@ -319,6 +325,10 @@ public class MultiSourceEAF {
 
 		int uniformDemands = 5;
 
+		// Rounding is now down per timestep!
+		int timestep = 1; 
+
+		
 		String sinkid = "supersink"; //siouxfalls, problem
 		//String sinkid = "en2";  //padang, line, swissold		
 
@@ -370,7 +380,7 @@ public class MultiSourceEAF {
 			System.out.println("reading input done");
 		}
 
-		settings = new FlowCalculationSettings(network, sinkid, demands, 1);
+		settings = new FlowCalculationSettings(network, sinkid, demands, timestep);
 
 		//set parameters
 		//settings.TimeHorizon = 200000;

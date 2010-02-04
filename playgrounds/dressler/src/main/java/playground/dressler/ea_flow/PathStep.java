@@ -64,6 +64,13 @@ public interface PathStep {
 	boolean equals(PathStep other);
 	
 	/**
+	 * Checks if two PathEdges are "identical" up to direction
+	 * @param other another PathStep 
+	 * @return true iff identical up 
+	 */
+	boolean equalsNoCheckForward(PathStep other);
+	
+	/**
 	 * Checks if this is the residual of other.
 	 * In particular, this must be a residual step and other a forward step for this to return true.
 	 * @param other a forward PathEdge 

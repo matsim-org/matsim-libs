@@ -99,6 +99,24 @@ public class StepSourceFlow implements PathStep {
 	}
 	
 	/**
+	 * Checks if two PathEdges are "identical" up to direction
+	 * @param other another PathStep 
+	 * @return true iff identical up 
+	 */
+	@Override
+	public boolean equalsNoCheckForward(PathStep other) {
+		if (!(other instanceof StepSourceFlow)) return false;
+		StepSourceFlow o = (StepSourceFlow) other;
+
+		if(this.time == o.time) {
+			return (this.node.equals(o.node));
+		} else {
+			return false;
+		}
+
+	}
+	
+	/**
 	 * checks if two PathEdges are identical in all fields
 	 * @return true iff identical
 	 */
