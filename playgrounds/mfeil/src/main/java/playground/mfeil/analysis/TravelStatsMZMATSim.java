@@ -89,11 +89,11 @@ public class TravelStatsMZMATSim {
 		double aveTripTimePTPop1 = 0;
 		double aveTripTimeBikePop1 = 0;
 		double aveTripTimeWalkPop1 = 0;
-		int counterCar = 0;
-		int counterPT = 0;
-		int counterWalk = 0;
-		int counterBike = 0;
-		int size = population.getPersons().size();
+		double counterCar = 0;
+		double counterPT = 0;
+		double counterWalk = 0;
+		double counterBike = 0;
+		double size = population.getPersons().size();
 		
 		stream.print(name+"\t");
 		

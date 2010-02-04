@@ -313,16 +313,14 @@ public class ASPGeneral {
 			PopulationImpl pop = asp.reducePopulation(scenarioMZ.getPopulation(), attributesInputFile);
 			asp.runMZActivityChains(pop);
 			asp.compareMATSimAndMZActivityChains();
+			asp.runMATSimTrips(scenarioMATSim.getPopulation());
+			asp.runMZTrips(pop);
+			asp.runMATSimTimings(scenarioMATSim.getPopulation());
+			asp.runMZTimings(pop);
 		}
-		
-		asp.runMATSimTrips(scenarioMATSim.getPopulation());
-		if (compareWithMZ) {
-			asp.runMZTrips(scenarioMZ.getPopulation());
-		}
-		
-		asp.runMATSimTimings(scenarioMATSim.getPopulation());
-		if (compareWithMZ) {
-			asp.runMZTimings(scenarioMZ.getPopulation());
+		else {
+			asp.runMATSimTrips(scenarioMATSim.getPopulation());
+			asp.runMATSimTimings(scenarioMATSim.getPopulation());
 		}
 
 		
