@@ -32,8 +32,10 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 	private double passengersLeavingTimeFraction = 0.0;
 	private double passengersEnteringTimeFraction = 0.0;
 
-	private static final double personEntersTime = 4.0;
-	private static final double personLeavesTime = 2.0;
+	private static final double personEntersTime = 1.0;
+	private static final double personLeavesTime = 0.75;
+	private static final double openDoorsDuration = 2.0;
+	private static final double closeDoorsDuration = 3.0;
 
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PassengerAgent> leavingPassengers,
@@ -50,7 +52,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 				// case doors are shut, but passengers want to leave or enter
 				// the veh
 				this.doorsOpen = true;
-				stopTime = 5.0; // Time to open doors
+				stopTime = openDoorsDuration; // Time to open doors
 			} else {
 				// case nobody wants to leave or enter the veh
 				stopTime = 0.0;
@@ -75,7 +77,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 							handler.handlePassengerEntering(enteringPassengers.get(0), now);
 							enteringPassengers.remove(0);
-							this.passengersEnteringTimeFraction += this.personEntersTime;
+							this.passengersEnteringTimeFraction += personEntersTime;
 						}
 
 						this.passengersEnteringTimeFraction -= 1.0;
@@ -103,7 +105,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 							}
 							handler.handlePassengerLeaving(leavingPassengers.get(0), now);
 							leavingPassengers.remove(0);
-							this.passengersLeavingTimeFraction += this.personLeavesTime;
+							this.passengersLeavingTimeFraction += personLeavesTime;
 						}
 
 						this.passengersLeavingTimeFraction -= 1.0;
@@ -131,7 +133,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 					this.doorsOpen = false;
 					this.passengersEnteringTimeFraction = 0.0;
 					this.passengersLeavingTimeFraction = 0.0;
-					stopTime = 10.0; // Time to shut the doors
+					stopTime = closeDoorsDuration; // Time to shut the doors
 				}
 
 				// somebody is still leaving or entering the veh so wait again
