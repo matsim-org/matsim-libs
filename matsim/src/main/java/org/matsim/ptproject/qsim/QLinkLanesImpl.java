@@ -46,7 +46,7 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * @author mrieser
  *
  * A QueueLink can consist of one or more QueueLanes, which may have the following layout
- * (Dashes stand for the borders of the QueueLink, equal signs (===) depict one lane, 
+ * (Dashes stand for the borders of the QueueLink, equal signs (===) depict one lane,
  * plus signs (+) symbolize a decision point where one lane splits into several lanes) :
  * <pre>
  * ----------------
@@ -69,8 +69,8 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  *         ========
  * ----------------
  * </pre>
- * 
- * 
+ *
+ *
  * The following layouts are not allowed:
  * <pre>
  * ----------------
@@ -86,7 +86,7 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * =======
  * ----------------
  * </pre>
- * 
+ *
  *agent
  * Queue Model Link implementation with the following properties:
  * <ul>
@@ -94,9 +94,9 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  *   <li>Each QueueLink has at least one QueueLane. All QueueVehicles added to the QueueLink
  *   are placed on this always existing instance.
  *    </li>
- *   <li>All QueueLane instances which are connected to the ToQueueNode are 
+ *   <li>All QueueLane instances which are connected to the ToQueueNode are
  *   held in the attribute toNodeQueueLanes</li>
- *   <li>QueueLink is active as long as at least one 
+ *   <li>QueueLink is active as long as at least one
  * of its QueueLanes is active.</li>
  * </ul>
  */
@@ -105,7 +105,7 @@ public class QLinkLanesImpl implements QLink {
 	final private static Logger log = Logger.getLogger(QLinkLanesImpl.class);
 
 	final private static QLane.FromLinkEndComparator fromLinkEndComparator = new QLane.FromLinkEndComparator();
-	
+
 	/**
 	 * The Link instance containing the data
 	 */
@@ -131,19 +131,19 @@ public class QLinkLanesImpl implements QLink {
 	private boolean hasLanes = false;
 
 	/**
-	 * If more than one QueueLane exists this list holds all QueueLanes connected to 
+	 * If more than one QueueLane exists this list holds all QueueLanes connected to
 	 * the (To)QueueNode of the QueueLink
 	 */
 	private List<QLane> toNodeQueueLanes = null;
-	
+
 	private boolean active = false;
 
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
-	
+
 	private LinkActivator linkActivator = null;
-	
+
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param link2
@@ -169,7 +169,7 @@ public class QLinkLanesImpl implements QLink {
 	/*package*/ void createLanes(Map<Id, Lane> map) {
 		this.hasLanes = true;
 		boolean firstNodeLinkInitialized = false;
-		
+
 		for (Lane signalLane : map.values()) {
 			if (signalLane.getLength() > this.link.getLength()) {
 				throw new IllegalStateException("Link Id " + this.link.getId() + " is shorter than Lane Id " + signalLane.getId() + " on this link!");
@@ -192,7 +192,7 @@ public class QLinkLanesImpl implements QLink {
 				this.originalLane.calculateCapacities();
 				firstNodeLinkInitialized = true;
 				this.originalLane.setFireLaneEvents(true);
-			} 
+			}
 			else if (signalLane.getLength() != this.originalLane.getMeterFromLinkEnd()){
 					String message = "The lanes on link id " + this.getLink().getId() + " have "
 						+ "different length. Currently this feature is not supported. To " +
@@ -213,13 +213,13 @@ public class QLinkLanesImpl implements QLink {
 		}
 		return this.toNodeQueueLanes;
 	}
-	
+
 	protected void addSignalGroupDefinition(SignalGroupDefinition signalGroupDefinition) {
 		for (QLane lane : this.toNodeQueueLanes) {
 			lane.addSignalGroupDefinition(signalGroupDefinition);
-		}				
+		}
 	}
-	
+
 
 	/**
 	 * Helper setting the Ids of the toLinks for the QueueLane given as parameter.
@@ -238,7 +238,7 @@ public class QLinkLanesImpl implements QLink {
 			this.originalLane.addDestinationLink(link.getLink().getId());
 		}
 	}
-	
+
 	private void findLayout(){
 		SortedMap<Double, Link> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
 		for (QLane lane : this.queueLanes) {
@@ -279,11 +279,11 @@ public class QLinkLanesImpl implements QLink {
 	public void finishInit() {
 		this.active = false;
 	}
-	
+
 	public void setLinkActivator(final LinkActivator linkActivator) {
 		this.linkActivator = linkActivator;
 	}
-	
+
 	public void activateLink() {
 		if (!this.active) {
 			this.linkActivator.activateLink(this);
@@ -307,7 +307,7 @@ public class QLinkLanesImpl implements QLink {
 				new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
 						this.getLink().getId()));
 	}
-	
+
 	public void clearVehicles() {
 		this.parkedVehicles.clear();
 		for (QLane lane : this.queueLanes){
@@ -327,14 +327,14 @@ public class QLinkLanesImpl implements QLink {
 	public QVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
-	
+
 	public void addDepartingVehicle(QVehicle vehicle) {
 		this.originalLane.waitingList.add(vehicle);
 		this.activateLink();
 	}
 
 	public boolean moveLink(double now) {
-		boolean ret = false;	
+		boolean ret = false;
 		if (this.hasLanes) { // performance optimization: "if" is faster then "for(queueLanes)" with only one lane
 			for (QLane lane : this.queueLanes){
 				if (lane.moveLane(now)){
@@ -437,7 +437,7 @@ public class QLinkLanesImpl implements QLink {
 	public Link getLink() {
 		return this.link;
 	}
-	
+
 	public QNetwork getQueueNetwork() {
 		return this.queueNetwork;
 	}
@@ -457,22 +457,22 @@ public class QLinkLanesImpl implements QLink {
 	public double getSimulatedFlowCapacity() {
 		return this.originalLane.getSimulatedFlowCapacity();
 	}
-	
+
 	/**
 	 * @return the QueueLanes of this QueueLink
 	 */
 	public List<QLane> getQueueLanes(){
 		return this.queueLanes;
 	}
-	
+
 	public VisData getVisData() {
 		return this.visdata;
 	}
-	
+
 	public QLane getOriginalLane(){
 		return this.originalLane;
 	}
-	
+
   @Override
   public LinkedList<QVehicle> getVehQueue() {
     LinkedList<QVehicle> ll = this.originalLane.getVehQueue();
@@ -481,7 +481,7 @@ public class QLinkLanesImpl implements QLink {
     }
     return ll;
   }
-	
+
 	/**
 	 * Inner class to capsulate visualization methods
 	 * @author dgrether
@@ -508,8 +508,7 @@ public class QLinkLanesImpl implements QLink {
 			if (cnt > 0) {
 				String snapshotStyle = Gbl.getConfig().getQSimConfigGroup().getSnapshotStyle();
 				int nLanes = Math.round((float)Math.max(getLink().getNumberOfLanes(Time.UNDEFINED_TIME),1.0d));
-				int lane = nLanes + 4;
-	
+
 				double cellSize = 7.5;
 				double distFromFromNode = getLink().getLength();
 				if ("queue".equals(snapshotStyle)) {
@@ -521,7 +520,7 @@ public class QLinkLanesImpl implements QLink {
 				} else {
 					log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
 				}
-	
+
 				// add the parked vehicles
 				int cnt2 = 0 ;
 				for (QVehicle veh : parkedVehicles.values()) {

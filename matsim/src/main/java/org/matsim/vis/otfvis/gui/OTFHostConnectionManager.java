@@ -41,21 +41,21 @@ import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 public class OTFHostConnectionManager {
 
 	private String address;
-	
+
 	private OTFServerRemote host = null;
 	protected OTFLiveServerRemote liveHost = null;
 
 	protected Object blockReading = new Object();
 
 	protected int controllerStatus = 0;
-	
+
 	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
 	private final Map <String,OTFDrawer> drawer = new HashMap<String,OTFDrawer>();
-	
+
 	public OTFHostConnectionManager(String url) throws RemoteException, InterruptedException, NotBoundException{
 		this.openAddress(url);
 	}
-	
+
 	public OTFServerRemote getOTFServer(){
 		return this.host;
 	}
@@ -91,11 +91,11 @@ public class OTFHostConnectionManager {
 		}
 		return -1;
 	}
-	
+
 	public String getAddress() {
 		return address;
 	}
-	
+
 	public Map<String, OTFClientQuad> getQuads() {
 		return quads;
 	}
@@ -116,7 +116,7 @@ public class OTFHostConnectionManager {
 
 	protected boolean preCacheCurrentTime(int time, OTFTimeLine timeLine) throws IOException {
 		boolean result = getOTFServer().requestNewTime(time, OTFServerRemote.TimePreference.LATER);
-		
+
 		for(OTFDrawer handler : getDrawer().values()) {
 			if(handler != timeLine) {
 			  handler.getQuad().getSceneGraphNoCache(getOTFServer().getLocalTime(), null, handler);
@@ -124,8 +124,8 @@ public class OTFHostConnectionManager {
 		}
 		return result;
 	}
-	
-	
+
+
 	private class PreloadHelper extends Thread {
 
 		public void preloadCache() {
@@ -133,9 +133,10 @@ public class OTFHostConnectionManager {
 			OTFTimeLine timeLine = (OTFTimeLine)drawer.get("timeline");
 
 			try {
-				int	time = getOTFServer().getLocalTime();
+//				int	time = getOTFServer().getLocalTime();
 
 				while (hasNext && !(timeLine.isCancelCaching)) {
+					int time;
 					synchronized(blockReading) {
 						// remember time the block had before caching next step
 //						int	origtime = getOTFServer().getLocalTime();
@@ -159,5 +160,5 @@ public class OTFHostConnectionManager {
 			preloadCache();
 		}
 	}
-	
+
 }

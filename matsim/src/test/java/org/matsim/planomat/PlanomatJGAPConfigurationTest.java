@@ -44,39 +44,38 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
 	private static final Id TEST_PERSON_ID = new IdImpl("100");
 	private static final int TEST_PLAN_NR = 0;
-	
-	private Scenario scenario;
-	
+
+	private Scenario scenario = null;
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Config config = super.loadConfig(this.getClassInputDirectory() + "config.xml");
 		config.plans().setInputFile(getPackageInputDirectory() + "testPlans.xml");
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-		loader.loadScenario();
-		this.scenario = loader.getScenario();
+		this.scenario = loader.loadScenario();
 	}
 
 	public void testPlanomatJGAPConfiguration() {
 
 		this.runATest(1, 0, BestChromosomesSelector.class, 15, 2, 0.6);
-		
+
 	}
-	
+
 	public void testPlanomatJGAPConfigurationCarPt() {
-		
+
 		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
 		this.runATest(1, 0, BestChromosomesSelector.class, 17, 2, 0.6);
-		
+
 	}
 
 	public void testPlanWithoutLegs() {
-		
+
 		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 		((PlanImpl) testPlan).removeActivity(2);
 		this.runATest(1, 0, BestChromosomesSelector.class, 8, 2, 0.6);
-		
+
 	}
 
 	private void runATest(
@@ -87,7 +86,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 			int expectedNumberOfGeneticOperators,
 			double expectedCrossoverRate
 			) {
-		
+
 		// first person
 		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
@@ -97,7 +96,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		Planomat testee = new Planomat(null, null, planomatConfigGroup, null, this.scenario.getNetwork());
 
 		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
-		
+
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (possibleModes.length > 0) {
 			planAnalyzeSubtours = new PlanAnalyzeSubtours(scenario.getConfig().planomat());
@@ -107,8 +106,8 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		// run testee
 		long seed = 3812;
 		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(
-				testPlan, 
-				planAnalyzeSubtours, 
+				testPlan,
+				planAnalyzeSubtours,
 				seed,
 				128,
 				possibleModes,
@@ -142,8 +141,8 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
 		// test correct setting of random number generator
 		jgapConfig = new PlanomatJGAPConfiguration(
-				testPlan, 
-				planAnalyzeSubtours, 
+				testPlan,
+				planAnalyzeSubtours,
 				seed,
 				128,
 				possibleModes,
@@ -153,10 +152,10 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 			randomNumberSequenceB[ii] = jgapConfig.getRandomGenerator().nextDouble();
 		}
 		assertTrue(Arrays.deepEquals(randomNumberSequenceA, randomNumberSequenceB));
-		
+
 	}
-	
-	
+
+
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();

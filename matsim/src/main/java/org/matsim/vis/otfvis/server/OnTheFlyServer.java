@@ -65,7 +65,7 @@ import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 
 /**
  * OnTheFlyServer is the live server of the OTFVis.
- * it is injected into a running QueueSimulation by either overloading the 
+ * it is injected into a running QueueSimulation by either overloading the
  * simulation's afterSimStep() method or via the external trigger events.
  * The simulation should call on every tick the method updateStatus().
  * Then the server can stop the simulation run whenever wanted.
@@ -79,13 +79,13 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private static final long serialVersionUID = -4012748585344947013L;
 
 	private static final Logger log = Logger.getLogger(OnTheFlyServer.class);
-	
+
 	private enum Status {
 		UNCONNECTED, PAUSE, PLAY, STEP;
 	}
 
 	private Status status = Status.UNCONNECTED;
-	
+
 	private static Registry registry;
 
 	private final Object paused = new Object();
@@ -104,7 +104,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private EventsManager events;
 
 	private OTFQSimServerQuadBuilder quadBuilder;
-	
+
 	private Collection<AbstractQuery> activeQueries = new ArrayList<AbstractQuery>();
 
 	private final ByteBuffer buf = ByteBuffer.allocate(20000000);
@@ -112,7 +112,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private double stepToTime = 0;
 
 	private OTFVisQSimFeature otfVisQueueSimFeature;
-	
+
 	private ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<Runnable>();
 
 	/**
@@ -152,17 +152,17 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 		@Override
 		public void shutdown() {
-			
+
 		}
 
 		@Override
 		public List<Runnable> shutdownNow() {
 			return null;
 		}
-		
+
 	};
-	
-	
+
+
 	private OnTheFlyServer(RMIClientSocketFactory clientSocketFactory, RMIServerSocketFactory serverSocketFactory) throws RemoteException {
 		super(0, new SslRMIClientSocketFactory(), new SslRMIServerSocketFactory());
 		OTFDataWriter.setServer(this);
@@ -171,13 +171,13 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private OnTheFlyServer() throws RemoteException {
 		super(0);
 	}
-	
+
 	private void init(QNetwork network, Population population, EventsManager events){
 		this.quadBuilder = new OTFQSimServerQuadBuilder(network);
 		this.setEvents(events);
 	}
-	
-	
+
+
 	public static OnTheFlyServer createInstance(String readableName, QNetwork network, Population population, EventsManager events, boolean useSSL) {
 		registry = getRegistry(useSSL);
 		try {
@@ -245,7 +245,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			stepDone.notifyAll();
 		};
 	}
-	
+
 	public void cleanup() {
 		try {
 			UnicastRemoteObject.unexportObject(this, true);
@@ -263,7 +263,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			System.out.println("Blubb");
 			runnable = queue.poll();
 		}
-		
+
 		localTime = (int) time;
 		if (status == Status.STEP) {
 			// Time and Iteration reached?
@@ -285,14 +285,13 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 	}
 
-	public boolean requestNewTime(int time, final TimePreference searchDirection) throws RemoteException {
+	public boolean requestNewTime(final int time, final TimePreference searchDirection) throws RemoteException {
 		if( ((searchDirection == TimePreference.RESTART) && (time < localTime))){
 			requestStatus = OTFVisControlerListener.CANCEL;
 			doStep(time);
 			return true;
 		} else if ((stepToIteration < controllerIteration) || ((stepToIteration == controllerIteration) && (time < localTime)) ) {
 			// if requested time lies in the past, sorry we cannot do that right now
-			time = localTime;
 			stepToTime = 0;
 			// if forward search is OK, then the actual timestep is the BEST fit
 			return (searchDirection != TimePreference.EARLIER);
@@ -408,9 +407,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 				buf.get(result);
 				return result;
 			}
-			
+
 		};
-		
+
 		try {
 			// If the simulation is currently running or stepping,
 			// this call blocks until the simulation thread passes the updateStatus method,
@@ -419,7 +418,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
+
 	}
 
 	public OTFQueryRemote answerQuery(AbstractQuery query) throws RemoteException {
@@ -454,7 +453,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	public int getControllerStatus() {
-		if ((controllerStatus == OTFVisControlerListener.RUNNING) && (status == Status.PAUSE)) 
+		if ((controllerStatus == OTFVisControlerListener.RUNNING) && (status == Status.PAUSE))
 			return  OTFVisControlerListener.RUNNING + OTFVisControlerListener.PAUSED;
 		return controllerStatus;
 	}
@@ -480,7 +479,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			break;
 		}
 	}
-	
+
 	public void addAdditionalElement(OTFDataWriter<?> element) {
 		this.additionalElements.add(element);
 	}
@@ -496,5 +495,5 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public void setSimulation(OTFVisQSimFeature otfVisQueueSimFeature) {
 		this.otfVisQueueSimFeature = otfVisQueueSimFeature;
 	}
-	
+
 }

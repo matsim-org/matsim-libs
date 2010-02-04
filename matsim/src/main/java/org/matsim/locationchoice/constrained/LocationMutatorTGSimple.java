@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
@@ -106,7 +105,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	}
 
 	private List<ActivityImpl> getFlexibleActivities(final Plan plan) {
-		List<ActivityImpl> flexibleActivities = new Vector<ActivityImpl>();
+		List<ActivityImpl> flexibleActivities;
 		if (!super.locationChoiceBasedOnKnowledge) {
 			flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
 		}

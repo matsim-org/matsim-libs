@@ -425,7 +425,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 
 					if ((agentsUpToLink / currentBottleNeckCapacity) >= freeSpeedUpToLink) {
 //						guidanceObjectWillQueue = true;
-						currentBottleNeckId = linkId;
+//						currentBottleNeckId = linkId;
 						agentsToQueueAtBottleNeck = agentsUpToLink;
 						// log.debug("Distribution check: Critical link. All agents on link
 						// " + criticalCongestedLink.getId().toString() + " will NOT pass

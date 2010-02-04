@@ -42,28 +42,28 @@ import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
 public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFWriterFactory<QLinkLanesImpl>{
-	
+
 	private static final Logger log = Logger.getLogger(OTFLaneWriter.class);
-	
-  public static final boolean DRAW_LINK_TO_LINK_LINES = true;	
-	
+
+  public static final boolean DRAW_LINK_TO_LINK_LINES = true;
+
   private double linkScale = OTFDefaultLinkHandler.LINK_SCALE;
-  
+
   private double calculateLinkLength(Point2D.Double deltaLink) {
   	return Math.sqrt(Math.pow(deltaLink.x, 2) + Math.pow(deltaLink.y, 2));
   }
-  
+
 	@Override
 	public void writeConstData(ByteBuffer out) throws IOException {
 //		String id = this.src.getLink().getId().toString();
 //		ByteBufferUtils.putString(out, id);
-		Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
+		Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 				this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-		
+
 		Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 				this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 
-		
+
 		//calculate link width
 		double cellWidth = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
 		double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
@@ -76,21 +76,21 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
 		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
 		Point2D.Double scaledLinkStart = scaledLink.getFirst();
-		
-		
+
+
 		//modify x and y coordinates of quad to get a middle line
-		Point2D.Double mlinkStart = this.calculateMiddleOfLink(linkStart, normalizedOrthogonal, quadWidth);
+//		Point2D.Double mlinkStart = this.calculateMiddleOfLink(linkStart, normalizedOrthogonal, quadWidth);
 		Point2D.Double mscaledLinkStart = this.calculateMiddleOfLink(scaledLinkStart, normalizedOrthogonal, quadWidth);
 //		Point2D.Double mlinkEnd = this.calculateMiddleOfLink(linkEnd, normalizedOrthogonal, quadWidth);
-		
+
 		int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
 		out.putInt(numberOfToNodeQueueLanes);
 
 		out.putDouble(mscaledLinkStart.x);
 		out.putDouble(mscaledLinkStart.y);
-		
+
 		//number of tonodequeuelanes
-		
+
 		if (numberOfToNodeQueueLanes == 1) {
 			Double mscaledLinkEnd = this.calculateMiddleOfLink(scaledLinkEnd, normalizedOrthogonal, quadWidth);
 			//the branch point is the middle of the link end
@@ -110,18 +110,18 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 			//write position of branchPoint
 			QLane ql = this.src.getOriginalLane();
 			double meterFromLinkEnd = ql.getMeterFromLinkEnd();
-			
+
 			Point2D.Double branchPoint = new Point2D.Double(mscaledLinkStart.x + ((linkLength - meterFromLinkEnd) * linkScale * deltaLinkNorm.x),
 					mscaledLinkStart.y + ((linkLength - meterFromLinkEnd) * deltaLinkNorm.y * linkScale));
 			out.putDouble(branchPoint.x);
 			out.putDouble(branchPoint.y);
-			
+
 			//write toNodeQueueLanes end points
 			double distanceBtwLanes = quadWidth / (numberOfToNodeQueueLanes + 1);
-//			Point2D.Double linkEnd2 = new Point2D.Double(linkEnd.x + (normalizedOrthogonal.x * quadWidth), 
+//			Point2D.Double linkEnd2 = new Point2D.Double(linkEnd.x + (normalizedOrthogonal.x * quadWidth),
 //					linkEnd.y + (normalizedOrthogonal.y * quadWidth));
 //			log.debug("normOrtho x " + normalizedOrthogonalX + " y " + normalizedOrthogonalY);
-			
+
 			double laneEndPointX, laneEndPointY;
 			int laneIncrement = 1;
 			for (QLane l : this.src.getToNodeQueueLanes()){
@@ -132,7 +132,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 				laneIncrement++;
 				out.putDouble(laneEndPointX);
 				out.putDouble(laneEndPointY);
-				
+
 				if (DRAW_LINK_TO_LINK_LINES){
 					out.putInt(l.getDestinationLinkIds().size());
 					for (Id toLinkId :  l.getDestinationLinkIds()){
@@ -145,18 +145,18 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 			}
 		}
 	}
-	
+
 	private Point2D.Double calculateMiddleOfToLink(Link toLink, double cellWidth) {
 		//get coordinates
-		Point2D.Double toLinkStart = new Point2D.Double(toLink.getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
+		Point2D.Double toLinkStart = new Point2D.Double(toLink.getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 				toLink.getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-		Point2D.Double toLinkEnd = new Point2D.Double(toLink.getToNode().getCoord().getX()  - OTFServerQuad2.offsetEast, 
+		Point2D.Double toLinkEnd = new Point2D.Double(toLink.getToNode().getCoord().getX()  - OTFServerQuad2.offsetEast,
 				toLink.getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 		//scale
 		Tuple<Double, Double> scaledTuple = VectorUtils.scaleVector(toLinkStart, toLinkEnd, linkScale);
 		toLinkStart = scaledTuple.getFirst();
 		toLinkEnd = scaledTuple.getSecond();
-		
+
 		//calculate middle of toLink start
 		Point2D.Double deltaToLink = new Point2D.Double(toLinkEnd.x - toLinkStart.x, toLinkEnd.y - toLinkStart.y);
 		double toLinkLength = this.calculateLinkLength(deltaToLink);
@@ -165,10 +165,10 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 		Point2D.Double mToLinkStart = this.calculateMiddleOfLink(toLinkStart, normalizedToLinkOrthogonal, cellWidth * toLink.getNumberOfLanes(Time.UNDEFINED_TIME));
 		return mToLinkStart;
 	}
-	
-	
+
+
 	private Point2D.Double calculateMiddleOfLink(Point2D.Double linkStart, Point2D.Double normalizedOrthogonal, double quadWidth) {
-		Point2D.Double ret = new Point2D.Double(linkStart.x + (normalizedOrthogonal.x  * quadWidth/2), 
+		Point2D.Double ret = new Point2D.Double(linkStart.x + (normalizedOrthogonal.x  * quadWidth/2),
 				linkStart.y + (normalizedOrthogonal.y * quadWidth/2));
 		return ret;
 	}

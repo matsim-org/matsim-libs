@@ -49,14 +49,14 @@ import org.matsim.world.ZoneLayer;
 
 /**
  * Connects locations of neighbor layers.
- * 
+ *
  * <p>It connects different neighbor layers according to the layer connection produced by {@link World#complete()}.
  * mappings between two zones will not be touched but the mapping between zone<==>facility, zone<==>link, facility<==>link resp.
  * will be generated.</p>
- * 
+ *
  * <p><b>Note:</b> by defining a set of link types that should be excluded from the facility<==>link mapping,
  * the module is able to set the facilities to links, that actually can be accessed, and e.g. highways can be excluded.</p>
- * 
+ *
  * @author balmermi
  */
 public class WorldConnectLocations {
@@ -66,7 +66,7 @@ public class WorldConnectLocations {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(WorldConnectLocations.class);
-	
+
 	private final Set<String> excludingLinkTypes;
 
 	public final static String CONFIG_F2L = "f2l";
@@ -80,7 +80,7 @@ public class WorldConnectLocations {
 	public WorldConnectLocations() {
 		this(new HashSet<String>());
 	}
-	
+
 	public WorldConnectLocations(Set<String> excludingLinkTypes) {
 		this.excludingLinkTypes = excludingLinkTypes;
 	}
@@ -93,10 +93,10 @@ public class WorldConnectLocations {
 	 * Extracts those links and nodes from the given {@link NetworkLayer network} such
 	 * that all links with types given in {@link #excludingLinkTypes} are excluded.
 	 * It returns a newly created network. The given one will not be changed.
-	 * 
-	 * <p><b>Note:</b> The new network that will be returned is not necessarily a 
+	 *
+	 * <p><b>Note:</b> The new network that will be returned is not necessarily a
 	 * "cleaned one" (strongly connected digraph), but "empty {@link NodeImpl nodes}" are removed.</p>
-	 * 
+	 *
 	 * @param network the network that will be the base for created a sub-network
 	 * @return copy of the given network without links with type given in {@link #excludingLinkTypes}
 	 * and without empty nodes
@@ -130,17 +130,17 @@ public class WorldConnectLocations {
 		log.info("  done.");
 		return subNetwork;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private final void connect(ActivityFacilitiesImpl facilities, NetworkLayer network, World world, String file, Set<Id> remainingFacilities) {
 		log.info("    connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file);
+		BufferedReader br = null;
 		try {
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
+			br = new BufferedReader(new FileReader(file));
 			int lineCnt = 0;
-			// Skip header
-			String currLine = br.readLine(); lineCnt++;
+			String currLine;
+			br.readLine(); lineCnt++; // Skip header
 			while ((currLine = br.readLine()) != null) {
 				String[] entries = currLine.split("\t", -1);
 				// fid  lid
@@ -160,12 +160,21 @@ public class WorldConnectLocations {
 				lineCnt++;
 			}
 		} catch (IOException e) {
-			throw new RuntimeException("Error while reading given nputF2LFile='"+file+"'.", e);
+			throw new RuntimeException("Error while reading given inputF2LFile='"+file+"'.", e);
+		}
+		finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					log.warn(e);
+				}
+			}
 		}
 		log.info("      number of facilities that are still not connected to a link = "+remainingFacilities.size());
 		log.info("    done. (connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file+")");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private final void writeF2LFile(ActivityFacilitiesImpl facilities, String file) {
@@ -186,7 +195,7 @@ public class WorldConnectLocations {
 		}
 		log.info("    done. (writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file+")");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	/**
@@ -195,11 +204,11 @@ public class WorldConnectLocations {
 	 * given {@link World world}, but the {@link NetworkLayer network} does not have to be necessarily part of the
 	 * world. It could also be a sub-network of the network of the {@link World world} as created by the method {@link #extractSubNetwork(NetworkLayer)}.
 	 * In both cases the facility layer will be connected with the network in the same world.
-	 * 
+	 *
 	 * <p><b>Mapping rule:</b> each {@link ActivityFacilityImpl facility} of the {@link ActivityFacilitiesImpl facilities layer} will be
 	 * connected with <em>exactly</em> one link of the {@link NetworkLayer network layer}. the links of the network will get zero, one or many mappings to
 	 * facilities of the facilities layer. (facilities[*]-[1]links)</p>
-	 * 
+	 *
 	 * @param facilities a layer of the world
 	 * @param network either a layer of the world or a network created with {@link #extractSubNetwork(NetworkLayer)} from a network layer of the world.
 	 * @param world the world in which the facility and the network layer will be mapped
@@ -221,7 +230,7 @@ public class WorldConnectLocations {
 				connect(facilities,network,world,inputF2LFile,remainingFacilities);
 			}
 		}
-		
+
 		log.info("    connecting remaining facilities with links ("+remainingFacilities.size()+" remaining)...");
 		for (Id fid : remainingFacilities) {
 			ActivityFacilityImpl f = facilities.getFacilities().get(fid);
@@ -242,16 +251,16 @@ public class WorldConnectLocations {
 		}
 		log.info("  done. (connecting facilities with links)");
 	}
-	
+
 	/**
 	 * Sets the mapping between each {@link Zone zone} of the given {@link ZoneLayer zone layer} and
 	 * the {@link ActivityFacilityImpl facilities} of the {@link ActivityFacilitiesImpl facility layer} as part of a {@link World world}.
-	 * 
+	 *
 	 * <p><b>Mapping rule:</b> each {@link ActivityFacilityImpl facility} of the {@link ActivityFacilitiesImpl facilities layer} will be
 	 * connected with zero or one zone. A zone will only be assigned if the facility is located within the zone.
 	 * If more than one zone exists for which the facility is located in, the first one (smallest zone {@link Id id})
 	 * will be chosen. (zones[?]-[*]facilities)</p>
-	 * 
+	 *
 	 * @param zones a layer of the world
 	 * @param facilities a layer of the world
 	 * @param world the world in which the zone and the facility layer will be mapped
@@ -266,7 +275,7 @@ public class WorldConnectLocations {
 			if (nearestZones.isEmpty()) { /* facility does not belong to a zone */ }
 			else {
 				// choose the first of the list (The list is generated via a defined order of the zones,
-				// therefore the chosen zone is deterministic). 
+				// therefore the chosen zone is deterministic).
 				Zone z = (Zone)nearestZones.get(0);
 				if (!z.contains(f.getCoord())) { /* f is not located IN any of the nearest zones */ }
 				else {
@@ -280,12 +289,12 @@ public class WorldConnectLocations {
 	/**
 	 * Sets the mapping between each {@link Zone zone} of the given {@link ZoneLayer zone layer} and
 	 * the {@link LinkImpl links} of the {@link NetworkLayer network layer} as part of a {@link World world}.
-	 * 
+	 *
 	 * <p><b>Mapping rule:</b> each {@link LinkImpl link} of the {@link NetworkLayer network layer} will be
 	 * connected with zero or one zone. A zone will only be assigned if the center of the link is located within the zone.
 	 * If more than one zone exists for which the center of the link is located in, the first one (smallest zone {@link Id id})
 	 * will be chosen. (zones[?]-[*]links)</p>
-	 * 
+	 *
 	 * @param zones a layer of the world
 	 * @param network a layer of the world
 	 * @param world the world in which the zone and the network layer will be mapped
@@ -300,7 +309,7 @@ public class WorldConnectLocations {
 			if (nearestZones.isEmpty()) { /* link does not belong to a zone */ }
 			else {
 				// choose the first of the list (The list is generated via a defined order of the zone,
-				// therefore the chosen zone is deterministic). 
+				// therefore the chosen zone is deterministic).
 				Zone z = (Zone)nearestZones.get(0);
 				if (!z.contains(l.getCoord())) { /* link center is not located IN any of the nearest zones */ }
 				else {
@@ -310,7 +319,7 @@ public class WorldConnectLocations {
 		}
 		log.info("  done.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////

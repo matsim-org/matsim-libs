@@ -40,7 +40,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.QLane;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -76,17 +75,17 @@ public class QueueLink {
    * Reference to the QueueNode which is at the end of each QueueLink instance
    */
   private final QueueNode toQueueNode;
-  
+
   private boolean active = false;
 
   private final Map<Id, QueueVehicle> parkedVehicles = new LinkedHashMap<Id, QueueVehicle>(10);
 
   /*package*/ VisData visdata = this.new VisDataImpl();
-  
+
   private QueueSimEngine simEngine = null;
-  
+
   private double length = Double.NaN;
-  
+
   private double freespeedTravelTime = Double.NaN;
 
    /** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
@@ -129,7 +128,7 @@ public class QueueLink {
    * flowCapFraction.
    */
   private double buffercap_accumulate = 1.0;
-  
+
   /**
    * Initializes a QueueLink with one QueueLane.
    * @param link2
@@ -154,7 +153,7 @@ public class QueueLink {
   public void setSimEngine(final QueueSimEngine simEngine) {
     this.simEngine = simEngine;
   }
-  
+
   public void activateLink() {
     if (!this.active) {
       this.simEngine.activateLink(this);
@@ -178,7 +177,7 @@ public class QueueLink {
         new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
             this.getLink().getId()));
   }
-  
+
    /**
    * Adds a vehicle to the lane.
    *
@@ -200,7 +199,7 @@ public class QueueLink {
     veh.setLinkEnterTime(now);
     veh.setEarliestLinkExitTime(departureTime);
   }
-  
+
   public void clearVehicles() {
     this.parkedVehicles.clear();
     double now = SimulationTimer.getTime();
@@ -242,19 +241,19 @@ public class QueueLink {
   public QueueVehicle removeParkedVehicle(Id vehicleId) {
     return this.parkedVehicles.remove(vehicleId);
   }
-  
+
   public void addDepartingVehicle(QueueVehicle vehicle) {
     this.waitingList.add(vehicle);
     this.activateLink();
   }
 
   public boolean moveLink(double now) {
-    boolean ret = false;  
+    boolean ret = false;
     ret = this.moveLane(now);
     this.active = ret;
     return ret;
   }
-  
+
    /** called from framework, do everything related to link movement here
   *
   * @param now current time step
@@ -270,14 +269,14 @@ public class QueueLink {
    moveWaitToBuffer(now);
    return this.isActive();
  }
- 
+
  private void updateBufferCapacity() {
    this.bufferCap = this.simulatedFlowCapacity;
    if (this.buffercap_accumulate < 1.0) {
      this.buffercap_accumulate += this.flowCapFraction;
    }
  }
- 
+
  /**
   * Move vehicles from link to buffer, according to buffer capacity and
   * departure time of vehicle. Also removes vehicles from lane if the vehicle
@@ -304,19 +303,19 @@ public class QueueLink {
          this.usedStorageCapacity -= veh.getSizeInEquivalents();
          continue;
        }
- 
+
        /* is there still room left in the buffer, or is it overcrowded from the
         * last time steps? */
        if (!hasBufferSpace()) {
          return;
        }
- 
+
        addToBuffer(veh, now);
        this.vehQueue.poll();
        this.usedStorageCapacity -= veh.getSizeInEquivalents();
    } // end while
  }
- 
+
   /**
   * Move as many waiting cars to the link as it is possible
   *
@@ -364,7 +363,7 @@ public class QueueLink {
       calculateStorageCapacity(Time.UNDEFINED_TIME);
       this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
     }
-   
+
     private void calculateFlowCapacity(final double time) {
       this.simulatedFlowCapacity = ((LinkImpl)this.getLink()).getFlowCapacity(time);
       // we need the flow capcity per sim-tick and multiplied with flowCapFactor
@@ -404,7 +403,7 @@ public class QueueLink {
       }
     }
 
-  
+
   public QueueVehicle getVehicle(Id vehicleId) {
     QueueVehicle ret = getParkedVehicle(vehicleId);
     if (ret != null) {
@@ -426,7 +425,7 @@ public class QueueLink {
   }
 
   public Collection<QueueVehicle> getAllVehicles() {
-    
+
     Collection<QueueVehicle> vehicles = this.getAllNonParkedVehicles();
     vehicles.addAll(this.parkedVehicles.values());
 //      new ArrayList<QueueVehicle>(this.parkedVehicles.values());
@@ -444,7 +443,7 @@ public class QueueLink {
     vehicles.addAll(this.buffer);
     return vehicles;
   }
-  
+
    /**
    * @return Returns the maximum number of vehicles that can be placed on the
    *         link at a time.
@@ -452,7 +451,7 @@ public class QueueLink {
   /*package*/ double getStorageCapacity() {
     return this.storageCapacity;
   }
-  
+
   /**
    * @return the total space capacity available on that link (includes the space on lanes if available)
    */
@@ -477,7 +476,7 @@ public class QueueLink {
   public Link getLink() {
     return this.link;
   }
-  
+
   public QueueNetwork getQueueNetwork() {
     return this.queueNetwork;
   }
@@ -497,11 +496,11 @@ public class QueueLink {
   public double getSimulatedFlowCapacity() {
     return this.simulatedFlowCapacity;
   }
-  
+
   public VisData getVisData() {
     return this.visdata;
   }
-  
+
    private boolean isActive() {
       /*
        * Leave Lane active as long as there are vehicles on the link (ignore
@@ -512,11 +511,11 @@ public class QueueLink {
       boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty());
       return active;
     }
-   
+
     public LinkedList<QueueVehicle> getVehQueue() {
       return vehQueue;
     }
-    
+
     /**
      * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
      */
@@ -524,7 +523,7 @@ public class QueueLink {
       return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.bufferCap >= 1.0)
           || (this.buffercap_accumulate >= 1.0)));
     }
-  
+
     private void addToBuffer(final QueueVehicle veh, final double now) {
       if (this.bufferCap >= 1.0) {
         this.bufferCap--;
@@ -557,9 +556,9 @@ public class QueueLink {
    *
    */
   class VisDataImpl implements VisData {
-    
+
     private final double linkScale =  OTFDefaultLinkHandler.LINK_SCALE;
-    
+
     /**
      * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
      */
@@ -695,11 +694,11 @@ public class QueueLink {
       double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
       double cellSize = ((NetworkImpl)QueueLink.this.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
       double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
-      
+
       queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
       positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);
-      
-      int lane = positionVehiclesFromWaitingList(positions, link, cellSize);
+
+      positionVehiclesFromWaitingList(positions, link, cellSize);
     }
 
     private double calculateVehicleLength(Link link,
@@ -802,13 +801,8 @@ public class QueueLink {
       }
       return lane;
     }
-
-
-
   }
-  
- 
-  
+
   // //////////////////////////////////////////////////////////
   // For NetStateWriter
   // /////////////////////////////////////////////////////////
@@ -825,6 +819,6 @@ public class QueueLink {
       return 1;
     }
   }
-	
+
 }
 
