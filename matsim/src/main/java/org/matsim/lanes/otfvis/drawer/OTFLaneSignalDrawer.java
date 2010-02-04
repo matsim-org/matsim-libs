@@ -25,32 +25,24 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.apache.log4j.Logger;
 import org.matsim.lanes.otfvis.io.OTFLaneData;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
-import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 
-
-
 /**
- * @author dgrether
  *
+ * @author dgrether
  */
 public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 
-	private static final Logger log = Logger.getLogger(OTFLaneSignalDrawer.class);
-	
 	private double startX, startY;
 	private int numberOfQueueLanes;
 
-	private Point2D.Double branchPoint;
+	private Point2D.Double branchPoint = null;
 	private OTFLaneData originalLaneData = null;
 	private Map<String, OTFLaneData> laneData = new LinkedHashMap<String, OTFLaneData>();
-	
-	public OTFLaneSignalDrawer() {
-	}
-	
+
+	@Override
 	public void onDraw( GL gl) {
 		gl.glColor3d(0.0, 0.0, 1.0);
 		double zCoord = 1.0;
@@ -71,12 +63,12 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 			gl.glVertex3d(this.startX + offsetLinkStart, this.startY - offsetLinkStart, zCoord);
 		gl.glEnd();
 
-		
-		
+
+
 	//draw lines between link start point and branch point
 		gl.glBegin(GL.GL_LINES);
-			gl.glVertex3d(this.startX, this.startY , zCoord); 
-			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord); 
+			gl.glVertex3d(this.startX, this.startY , zCoord);
+			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord);
 		gl.glEnd();
 
 		//only draw lanes if there are more than one
@@ -85,16 +77,16 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 				// draw connections between branch point and lane end
 				gl.glColor3d(0.0, 0, 1.0);
 				gl.glBegin(GL.GL_LINES);
-	  			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord); 
-		  		gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
+	  			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord);
+		  		gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord);
   			gl.glEnd();
 
   			//draw link to link lines
-  			
+
   			if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES){
   				this.drawLinkToLinkLines(gl, ld, zCoord);
   			}
-  			
+
 				if (ld.isGreen()) {
 					gl.glColor3d(0.0, 1.0, 0.0);
 				}
@@ -116,28 +108,22 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 			this.drawLinkToLinkLines(gl, this.originalLaneData, zCoord);
 		}
 	}
-	
+
 
 	private void drawLinkToLinkLines(GL gl, OTFLaneData ld, double zCoord){
 		gl.glColor3d(1.0, 0.86, 0.0);
 		for (Point2D.Double point : ld.getToLinkStartPoints()){
 			gl.glBegin(GL.GL_LINES);
-			  gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
-			  gl.glVertex3d(point.x, point.y, zCoord); 
+			  gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord);
+			  gl.glVertex3d(point.x, point.y, zCoord);
 		  gl.glEnd();
 		}
-	}
-	
-	
-	@Override
-	public void invalidate(SceneGraph graph) {
-		super.invalidate(graph);
 	}
 
 	public void setNumberOfLanes(int nrQueueLanes) {
 		this.numberOfQueueLanes = nrQueueLanes;
 	}
-	
+
 	public void setMiddleOfLinkStart(double x, double y) {
 		this.startX = x;
 		this.startY = y;
@@ -147,17 +133,14 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 		this.branchPoint = new Point2D.Double(x, y);
 	}
 
-
 	public void updateGreenState(String id, boolean green) {
 		this.laneData.get(id).setGreen(green);
 	}
 
-	
 	public Map<String, OTFLaneData> getLaneData() {
 		return laneData;
 	}
 
-	
 	public void setOriginalLaneData(OTFLaneData originalLaneData) {
 		this.originalLaneData = originalLaneData;
 	}

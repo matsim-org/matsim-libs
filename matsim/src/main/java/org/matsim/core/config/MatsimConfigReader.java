@@ -28,12 +28,11 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.utils.io.MatsimXmlParser;
 
 /**
  * A reader for config-files of MATSim. This reader recognizes the format of the config-file and uses
@@ -44,7 +43,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeReader {
 
 	private final static Logger log = Logger.getLogger(MatsimConfigReader.class);
-	
+
 	private final static String CONFIG_V1 = "config_v1.dtd";
 
 	private final Config config;
@@ -69,11 +68,6 @@ public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeRea
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		this.delegate.endTag(name, content, context);
-	}
-
-	@Override
-	public void parse(final String filename) throws SAXException, ParserConfigurationException, IOException {
-		super.parse(filename);
 	}
 
 	/**

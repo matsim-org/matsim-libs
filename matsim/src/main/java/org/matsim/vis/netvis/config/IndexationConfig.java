@@ -255,7 +255,7 @@ public class IndexationConfig extends DefaultHandler {
 		String newline = "\n";
 		String quote = "\"";
 
-		StringBuffer result = new StringBuffer();
+		StringBuffer result = new StringBuffer(200);
 
 		result.append(indent + "<" + MODULE_ELEM + " " + MODULE_NAME_ATTR + "="
 				+ quote + CONFIG_NAME + quote + ">" + newline);

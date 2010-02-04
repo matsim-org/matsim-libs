@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountSimComparisonKMLWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -68,53 +67,20 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	 * constant for the name of the stops
 	 */
 	private static final String STOP = "Stop: ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String COUNTVALUE = "Count Value: ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String MATSIMVALUE = "MATSim Value: ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String RELERROR = "Relative Error: ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String IMG = "<img src=\"./";
-	/**
-	 * constant for the link description
-	 */
 	private static final String IMGEND = "\">";
-	/**
-	 * constant for the link description
-	 */
 	private static final String H24OVERVIEW = "24 h overview";
-	/**
-	 * constant for the link description
-	 */
 	private static final String DETAILSFROM = "Details from ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String OCLOCKTO = " o'clock to ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String OCLOCK = " o'clock";
-	/**
-	 * constant for the link description
-	 */
 	private static final String ZERO = "0";
-	/**
+	/*
 	 * the icons
 	 */
 	private static final String CROSSICON = "icons/plus.png";
-	/**
-	 * the icons
-	 */
 	private static final String MINUSICON = "icons/minus.png";
 	/**
 	 * the scale for the icons
@@ -170,7 +136,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 
 	/**
 	 * Sets the data to the fields of this class
-	 * 
+	 *
 	 * @param countSimCompList
 	 * @param network
 	 * @param coordTransform
@@ -263,7 +229,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 
 	/**
 	 * Writes the data to the file at the path given as String
-	 * 
+	 *
 	 * @param filename
 	 */
 	@Override
@@ -358,7 +324,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 
 	/**
 	 * Creates the string for the foldername
-	 * 
+	 *
 	 * @param timestep
 	 * @return a timestep specific standard string
 	 */
@@ -374,7 +340,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 
 	/**
 	 * Creates a legend
-	 * 
+	 *
 	 * @return a ScreenOverlay read from a file
 	 * @throws IOException
 	 */
@@ -407,7 +373,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 
 	/**
 	 * Creates a placemark
-	 * 
+	 *
 	 * @param stopid
 	 * @param csc
 	 * @param relativeError
@@ -430,7 +396,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	/**
 	 * This method writes all the data for each of the links/counts to the kml
 	 * document.
-	 * 
+	 *
 	 * @param countSimComparisonList
 	 *            provides "the data"
 	 * @param folder
@@ -510,7 +476,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	// }
 
 	/**
-	 * 
+	 *
 	 * @param stopid
 	 * @param csc
 	 * @param relativeError
@@ -589,7 +555,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	 * Creates CountsSimRealPerHourGraphs and adds them to the kmz in the given
 	 * folder. The creation of the graphs is only done if the map attribute of
 	 * this class for CountsSimRealPerHourGraphs is null.
-	 * 
+	 *
 	 * @param folder
 	 * @param timestep
 	 * @param timespan
@@ -726,7 +692,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	/**
 	 * Writes the given JFreeChart to the kmz file specified for the kmz writer
 	 * attribute of this class.
-	 * 
+	 *
 	 * @param filename
 	 *            the filename to use in the kmz
 	 * @param chart
@@ -742,7 +708,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 
 	/**
 	 * Creates the CountsErrorGraph for all the data
-	 * 
+	 *
 	 * @param kmlFilename
 	 *            the filename of the kml file
 	 * @param visible
@@ -777,16 +743,16 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 				+ new File(fileBoard).getAbsolutePath());
 		try {
 			BufferedWriter bwriter = IOUtils.getBufferedWriter(fileBoard);
-			StringBuffer buffer = new StringBuffer();
+			StringBuffer buffer = new StringBuffer(200);
 			buffer.append("hour \t mean relative error \t mean absolute bias");
 			bwriter.write(buffer.toString());
 			bwriter.newLine();
 			for (int i = 0; i < meanErrorBoard.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
-				buffer.append("\t");
+				buffer.append('\t');
 				buffer.append(meanErrorBoard[i]);
-				buffer.append("\t");
+				buffer.append('\t');
 				buffer.append(meanBiasBoard[i]);
 				bwriter.write(buffer.toString());
 				bwriter.newLine();
@@ -836,16 +802,16 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 				+ new File(fileAlight).getAbsolutePath());
 		try {
 			BufferedWriter bwriter = IOUtils.getBufferedWriter(fileAlight);
-			StringBuffer buffer = new StringBuffer();
+			StringBuffer buffer = new StringBuffer(200);
 			buffer.append("hour \t mean relative error \t mean absolute bias");
 			bwriter.write(buffer.toString());
 			bwriter.newLine();
 			for (int i = 0; i < meanErrorAlight.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
-				buffer.append("\t");
+				buffer.append('\t');
 				buffer.append(meanErrorAlight[i]);
-				buffer.append("\t");
+				buffer.append('\t');
 				buffer.append(meanBiasAlight[i]);
 				bwriter.write(buffer.toString());
 				bwriter.newLine();

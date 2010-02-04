@@ -27,21 +27,18 @@ import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
-
 /**
- * @author dgrether
  *
+ * @author dgrether
  */
 public class OTFSignalReader extends OTFLaneReader {
-  
+
   private static final Logger log = Logger.getLogger(OTFSignalReader.class);
-	/**
-	 * 
-	 */
-	public OTFSignalReader() {
+
+  public OTFSignalReader() {
 	  log.error("new SignalReader instance!!!");
 	}
-	
+
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 		int numberOfLanes = in.getInt();
@@ -56,16 +53,10 @@ public class OTFSignalReader extends OTFLaneReader {
 		}
 	}
 
-	@Override
-	public void invalidate(SceneGraph graph) {
-		super.invalidate(graph);
-		// invalidate agent receivers
-	}
-	
 //	@Override
 //	public void invalidate(SceneGraph graph) {
 ////		super.invalidate(graph);
 ////		graph.addItem(this.drawer);
 //	}
-	
+
 }

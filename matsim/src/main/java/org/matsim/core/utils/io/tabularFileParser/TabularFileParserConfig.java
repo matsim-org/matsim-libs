@@ -179,7 +179,7 @@ public class TabularFileParserConfig {
             for (int i = 0; i < alternatives.length; i++) {
                 result.append(quote(alternatives[i]));
                 if (i < alternatives.length - 1)
-                    result.append("|");
+                    result.append('|');
             }
         return result.toString();
     }

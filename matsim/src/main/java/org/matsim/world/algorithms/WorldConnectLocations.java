@@ -110,7 +110,7 @@ public class WorldConnectLocations {
 		}
 		if (remainingLinks.isEmpty()) {
 			StringBuffer str = new StringBuffer();
-			for (String s : this.excludingLinkTypes) { str.append(s); str.append(","); }
+			for (String s : this.excludingLinkTypes) { str.append(s); str.append(','); }
 			log.warn("No link will be left for the given link types ("+str+"). Therefore, connecting the facility<-->link mapping with the whole network.");
 			return network;
 		}

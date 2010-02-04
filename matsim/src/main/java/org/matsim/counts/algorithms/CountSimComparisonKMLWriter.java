@@ -74,54 +74,24 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * constant for the name of the links
 	 */
 	private static final String LINK = "Link: ";
-	/**
-	 * constant for the link description
-	 */
+
 	private static final String COUNTVALUE = "Count Value: ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String MATSIMVALUE = "MATSim Value: ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String RELERROR = "Relative Error: ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String IMG = "<img src=\"./";
-	/**
-	 * constant for the link description
-	 */
 	private static final String IMGEND = "\">";
-	/**
-	 * constant for the link description
-	 */
 	private static final String H24OVERVIEW = "24 h overview";
-	/**
-	 * constant for the link description
-	 */
 	private static final String DETAILSFROM = "Details from ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String OCLOCKTO = " o'clock to ";
-	/**
-	 * constant for the link description
-	 */
 	private static final String OCLOCK = " o'clock";
-	/**
-	 * constant for the link description
-	 */
 	private static final String ZERO = "0";
-	/**
+
+	/*
 	 * the icons
 	 */
 	private static final String CROSSICON = "icons/plus.png";
-	/**
-	 * the icons
-	 */
 	private static final String MINUSICON = "icons/minus.png";
+
 	/**
 	 * the scale for the icons
 	 */
@@ -142,7 +112,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * constant for the file name of the CountsSimRealPerHourGraphs
 	 */
 	private static final String SIMREALGRAPHNAME = "countsSimRealPerHour_";
-	
+
 	private final Network network;
 	private CoordinateTransformation coordTransform = null;
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
@@ -150,11 +120,11 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * main kml, doc and folder
 	 */
 	private KmlType mainKml = null;
-	
+
 	private DocumentType mainDoc = null;
 	private FolderType mainFolder = null;
 	private KMZWriter writer = null;
-	
+
 	private StyleType redCrossStyle;
 	private StyleType redMinusStyle;
 	private StyleType yellowCrossStyle;
@@ -223,7 +193,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		hrefs.put(this.greyMinusStyle, MINUSICON);
 
 		for (StyleType styleType : new StyleType[]{
-				this.redCrossStyle, this.redMinusStyle, this.yellowCrossStyle, this.yellowMinusStyle, 
+				this.redCrossStyle, this.redMinusStyle, this.yellowCrossStyle, this.yellowMinusStyle,
 				this.greenCrossStyle, this.greenMinusStyle, this.greyCrossStyle, this.greyMinusStyle}) {
 
 			IconStyleType icon = kmlObjectFactory.createIconStyleType();
@@ -232,7 +202,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 							colors.get(styleType)[0],
 							colors.get(styleType)[1],
 							colors.get(styleType)[2],
-							colors.get(styleType)[3]}); 
+							colors.get(styleType)[3]});
 			icon.setScale(ICONSCALE);
 
 			LinkType link = kmlObjectFactory.createLinkType();
@@ -667,16 +637,16 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		log.info("writing chart data to " + new File(file).getAbsolutePath());
 		try {
 			BufferedWriter bwriter = IOUtils.getBufferedWriter(file);
-			StringBuffer buffer = new StringBuffer();
+			StringBuffer buffer = new StringBuffer(200);
 			buffer.append("hour \t mean relative error \t mean absolute bias");
 			bwriter.write(buffer.toString());
 			bwriter.newLine();
 			for (int i = 0; i < meanError.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
-				buffer.append("\t");
+				buffer.append('\t');
 				buffer.append(meanError[i]);
-				buffer.append("\t");
+				buffer.append('\t');
 				buffer.append(meanBias[i]);
 				bwriter.write(buffer.toString());
 				bwriter.newLine();
@@ -687,8 +657,8 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
+
+
 		String filename = "errorGraphErrorBias.png";
 		try {
 			writeChartToKmz(filename, ep.getChart());
@@ -717,7 +687,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		}
 		return null;
 	}
-	
+
 	private ScreenOverlayType createOverlayBottomRight(final String fileName, final String overlayName) {
 		ScreenOverlayType overlay = kmlObjectFactory.createScreenOverlayType();
 		LinkType icon1 = kmlObjectFactory.createLinkType();
@@ -737,7 +707,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		screenXY.setXunits(UnitsEnumType.FRACTION);
 		screenXY.setYunits(UnitsEnumType.FRACTION);
 		overlay.setScreenXY(screenXY);
-		return overlay;		
+		return overlay;
 	}
 
 	/**

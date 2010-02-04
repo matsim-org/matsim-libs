@@ -27,33 +27,28 @@ import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 
-
-
 /**
- * @author dgrether
  *
+ * @author dgrether
  */
 public class OTFTeleportAgentsDrawer extends OTFGLDrawableImpl{
-	
+
 	private static final Logger log = Logger.getLogger(OTFTeleportAgentsDrawer.class);
-	
+
   private Map<String, Point2D.Double> positions = new HashMap<String, Point2D.Double>();
 
   public OTFTeleportAgentsDrawer(){
   	log.info("acitvated OTFTeleportAgentsDrawer...");
   }
-  
+
 	public void onDraw(GL gl) {
-//		log.error("starting to draw agents...");
 		float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
 		gl.glColor3d(0.0, 0.0, 1.0);
 		double zCoord = 1.0;
 		double offset = agentSize/2;
 		for (Point2D.Double p : positions.values()){
-			log.error("drawing agent at : " + p.x + " " + p.y);
 			gl.glBegin(GL.GL_QUADS);
 				gl.glVertex3d(p.x - offset, p.y - offset, zCoord);
 				gl.glVertex3d(p.x - offset, p.y + offset, zCoord);
@@ -62,16 +57,9 @@ public class OTFTeleportAgentsDrawer extends OTFGLDrawableImpl{
 			gl.glEnd();
 		}
 	}
-	
+
 	public Map<String, Point2D.Double> getPositions(){
 		return this.positions;
 	}
 
-	@Override
-	public void invalidate(SceneGraph graph) {
-		super.invalidate(graph);
-	}
-
-	
-	
 }

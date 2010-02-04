@@ -35,7 +35,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.AbstractLocation;
-import org.matsim.world.Layer;
 
 public class LinkImpl extends AbstractLocation implements Link {
 
@@ -52,9 +51,9 @@ public class LinkImpl extends AbstractLocation implements Link {
 	protected double freespeed = Double.NaN;
 	protected double capacity = Double.NaN;
 	protected double nofLanes = Double.NaN;
-	
+
 	protected EnumSet<TransportMode> allowedModes = EnumSet.of(TransportMode.car);
-	
+
 	private double flowCapacity;
 
 	protected String type = null;
@@ -71,10 +70,10 @@ public class LinkImpl extends AbstractLocation implements Link {
 	static private double plWarnCnt = 0 ;
 	static private double lengthWarnCnt = 0;
 	static private int loopWarnCnt = 0 ;
-	
+
 	public LinkImpl(final Id id, final Node from, final Node to,
 			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
-		super(network, id, 
+		super(network, id,
 				new CoordImpl(0.5*(from.getCoord().getX() + to.getCoord().getX()), 0.5*(from.getCoord().getY() + to.getCoord().getY()))
 		);
 		this.from = from;
@@ -88,7 +87,7 @@ public class LinkImpl extends AbstractLocation implements Link {
 
 		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
 
-		if (this.from.equals(this.to)) { 
+		if (this.from.equals(this.to)) {
 			if ( loopWarnCnt < 1 ) {
 				loopWarnCnt++ ;
 				log.warn("[from=to=" + this.to + " link is a loop]");
@@ -96,37 +95,37 @@ public class LinkImpl extends AbstractLocation implements Link {
 			}
 		}
 	}
-	
+
 	private void calculateFlowCapacity() {
 		this.flowCapacity = this.capacity / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
 		this.checkCapacitiySemantics();
 	}
-	
+
 	private void checkCapacitiySemantics() {
 		/*
 		 * I see no reason why a freespeed and a capacity of zero should not be
 		 * allowed! joh 9may2008
 		 */
-		if ((this.capacity <= 0.0) && (cpWarnCnt <= 0) ) { 
+		if ((this.capacity <= 0.0) && (cpWarnCnt <= 0) ) {
 			cpWarnCnt++ ;
-			log.warn("[capacity="+this.capacity+" may cause problems. Future occurences of this warning are suppressed.]"); 
+			log.warn("[capacity="+this.capacity+" may cause problems. Future occurences of this warning are suppressed.]");
 		}
 	}
-	
+
 	private void checkFreespeedSemantics() {
-		if ((this.freespeed <= 0.0) && (fsWarnCnt <= 0) ) { 
+		if ((this.freespeed <= 0.0) && (fsWarnCnt <= 0) ) {
 			fsWarnCnt++ ;
-			log.warn("[freespeed="+this.freespeed+" may cause problems. Future occurences of this warning are suppressed.]"); 
+			log.warn("[freespeed="+this.freespeed+" may cause problems. Future occurences of this warning are suppressed.]");
 		}
 	}
-	
+
 	private void checkNumberOfLanesSemantics(){
-		if ((this.nofLanes < 1) && (plWarnCnt <= 0) ) { 
+		if ((this.nofLanes < 1) && (plWarnCnt <= 0) ) {
 			plWarnCnt++ ;
-			log.warn("[permlanes="+this.nofLanes+" may cause problems. Future occurences of this warning are suppressed.]"); 
+			log.warn("[permlanes="+this.nofLanes+" may cause problems. Future occurences of this warning are suppressed.]");
 		}
 	}
-	
+
 	private void checkLengthSemantics(){
 		if ((this.getLength() <= 0.0) && (lengthWarnCnt <= 0)) {
 			lengthWarnCnt++;
@@ -175,19 +174,23 @@ public class LinkImpl extends AbstractLocation implements Link {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public Node getFromNode() {
 		return this.from;
 	}
-	
+
+	@Override
 	public final boolean setFromNode(final Node node) {
 		this.from = node;
 		return true;
 	}
 
+	@Override
 	public Node getToNode() {
 		return this.to;
 	}
 
+	@Override
 	public final boolean setToNode(final Node node) {
 		this.to = node;
 		return true;
@@ -212,7 +215,7 @@ public class LinkImpl extends AbstractLocation implements Link {
 	public final double getEuklideanDistance() {
 		return this.euklideanDist;
 	}
-	
+
 	/**
 	 * This method returns the capacity as set in the xml defining the network. Be aware
 	 * that this capacity is not normalized in time, it depends on the period set
@@ -221,57 +224,67 @@ public class LinkImpl extends AbstractLocation implements Link {
  	 * @param time - the current time
 	 * @return the capacity per network's capperiod timestep
 	 */
+	@Override
 	public double getCapacity(final double time) { // not final since needed in TimeVariantLinkImpl
 		return this.capacity;
 	}
-	
+
+	@Override
 	public final void setCapacity(double capacityPerNetworkCapcityPeriod){
 		this.capacity = capacityPerNetworkCapcityPeriod;
 		this.calculateFlowCapacity();
 	}
-	
+
 	/**
 	 * This method returns the freespeed velocity in meter per seconds.
 	 *
 	 * @param time - the current time
 	 * @return freespeed
 	 */
+	@Override
 	public double getFreespeed(final double time) { // not final since needed in TimeVariantLinkImpl
 		return this.freespeed;
 	}
-	
+
+	@Override
 	public final void setFreespeed(double freespeed) {
 		this.freespeed = freespeed;
 		this.checkFreespeedSemantics();
 	}
 
+	@Override
 	public double getLength() {
 		return this.length;
 	}
 
+	@Override
 	public final void setLength(double length) {
 		this.length = length;
 		this.checkLengthSemantics();
 	}
 
+	@Override
 	public double getNumberOfLanes(final double time) { // not final since needed in TimeVariantLinkImpl
 		return this.nofLanes;
 	}
 
+	@Override
 	public final void setNumberOfLanes(double lanes) {
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
 	}
-	
+
+	@Override
 	public final Set<TransportMode> getAllowedModes() {
 		return this.allowedModes.clone();
 	}
-	
+
+	@Override
 	public final void setAllowedModes(final Set<TransportMode> modes) {
 		this.allowedModes.clear();
 		this.allowedModes.addAll(modes);
 	}
-	
+
 	public final void setOrigId(final String id) {
 		this.origid = id;
 	}
@@ -299,9 +312,4 @@ public class LinkImpl extends AbstractLocation implements Link {
 		"[type=" + this.type + "]";
 	}
 
-	@Override
-	public Layer getLayer() {
-		return super.getLayer();
-	}
-	
 }

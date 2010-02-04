@@ -34,9 +34,6 @@ import java.io.Serializable;
  * @param <B>
  */
 public class Tuple<A extends Object, B extends Object> implements Serializable{
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -5006806073108429434L;
 	/**
 	 * First entry of the tuple
@@ -100,7 +97,7 @@ public class Tuple<A extends Object, B extends Object> implements Serializable{
 	 */
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuffer buffer = new StringBuffer(50);
 		buffer.append("[Tuple: [First: " );
 		buffer.append(this.first.toString());
 		buffer.append("], [Second: ");

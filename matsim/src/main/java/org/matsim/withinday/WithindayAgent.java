@@ -212,7 +212,7 @@ public class WithindayAgent extends PersonAgent {
 				StringBuffer buffer = new StringBuffer();
 				for (Id linkId : alternativeRoute.getLinkIds()) {
 					buffer.append(linkId.toString());
-					buffer.append(" ");
+					buffer.append(' ');
 				}
 	    	log.trace("  new route: " + newRoute + " links: " + buffer.toString());
     	}

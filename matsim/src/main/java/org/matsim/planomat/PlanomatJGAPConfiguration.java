@@ -42,14 +42,11 @@ import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 public class PlanomatJGAPConfiguration extends Configuration {
 
-	/**
-	 * default serial version ID
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public PlanomatJGAPConfiguration(
-			Plan plan, 
-			PlanAnalyzeSubtours planAnalyzeSubtours, 
+			Plan plan,
+			PlanAnalyzeSubtours planAnalyzeSubtours,
 			long seed,
 			int numTimeIntervals,
 			TransportMode[] possibleModes,
@@ -91,7 +88,7 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			// first and last activity are the same
 			// TODO what if this is not the case?
 			numActs -= 1;
-			
+
 			int numSubtours = 0;
 			if (planAnalyzeSubtours != null) {
 				numSubtours = planAnalyzeSubtours.getNumSubtours();
@@ -142,11 +139,6 @@ public class PlanomatJGAPConfiguration extends Configuration {
 		} catch (InvalidConfigurationException e) {
 			throw new RuntimeException(e.getMessage());
 		}
-	}
-
-	@Override
-	public Object clone() {
-		return super.clone();
 	}
 
 }
