@@ -100,8 +100,8 @@ extends      SearchTree
      */
     private void _rotateLeft ( BinTreeNode node )
     {
-if ( ROTATE )
-  System.out.println( "      _rotateLeft ( " + node + " )" ) ;
+    //	if ( ROTATE )
+    //		System.out.println( "      _rotateLeft ( " + node + " )" ) ;
 
 	BinTreeNode rson = node.right ;
 
@@ -127,8 +127,8 @@ if ( ROTATE )
      */
     private void _rotateRight ( BinTreeNode node )
     {
-if ( ROTATE )
-  System.out.println( "      _rotateRight( " + node + " )" ) ;
+//if ( ROTATE )
+ // System.out.println( "      _rotateRight( " + node + " )" ) ;
 
 	BinTreeNode lson = node.left ;
 
@@ -155,19 +155,19 @@ if ( ROTATE )
      */
     private boolean _rebalance ( AVLTreeNode upNode )
     {
-	if ( REBALANCE )
-	    System.out.print( "   _rebalance( up = " + upNode ) ;
+	//if ( REBALANCE )
+	//    System.out.print( "   _rebalance( up = " + upNode ) ;
 
 	if ( upNode.balance == -2 )
 	    {
 		AVLTreeNode midNode = (AVLTreeNode)( upNode.left ) ;
-		if ( REBALANCE )
-		    System.out.print( ", mid = " + midNode ) ;
+		//if ( REBALANCE )
+		//    System.out.print( ", mid = " + midNode ) ;
 
 		if ( midNode.balance <= 0 )
 		    {
-			if ( REBALANCE )
-			    System.out.println( " )" ) ;
+			//if ( REBALANCE )
+			//    System.out.println( " )" ) ;
 			_rotateRight( upNode ) ;
 			++( midNode.balance ) ;
 			upNode.balance = -midNode.balance ;
@@ -175,8 +175,8 @@ if ( ROTATE )
 		else
 		    {
 			AVLTreeNode lowNode = (AVLTreeNode)( midNode.right ) ;
-			if ( REBALANCE )
-			    System.out.println( ", low = " + lowNode + " )" ) ;
+			//if ( REBALANCE )
+			//    System.out.println( ", low = " + lowNode + " )" ) ;
 			
 			_rotateLeft ( midNode ) ;
 			_rotateRight( upNode  ) ;
@@ -192,13 +192,13 @@ if ( ROTATE )
 	if ( upNode.balance == 2 )
 	    {
 		AVLTreeNode midNode = (AVLTreeNode)( upNode.right ) ;
-		if ( REBALANCE )
-		    System.out.print( ", mid = " + midNode ) ;
+		//if ( REBALANCE )
+		//    System.out.print( ", mid = " + midNode ) ;
 		
 		if ( midNode.balance >= 0 )
 		    {
-			if ( REBALANCE )
-			    System.out.println( " )" ) ;
+			//if ( REBALANCE )
+			//    System.out.println( " )" ) ;
 			_rotateLeft( upNode ) ;
 			--( midNode.balance ) ;
 			upNode.balance = -midNode.balance ;
@@ -206,8 +206,8 @@ if ( ROTATE )
 		else
 		    {
 			AVLTreeNode lowNode = (AVLTreeNode)( midNode.left ) ;
-			if ( REBALANCE )
-			    System.out.println( ", low = " + lowNode + " )" ) ;
+			//if ( REBALANCE )
+			//    System.out.println( ", low = " + lowNode + " )" ) ;
 			
 			_rotateRight( midNode ) ;
 			_rotateLeft ( upNode  ) ;
@@ -220,8 +220,8 @@ if ( ROTATE )
 		
 	    }  // if ( upNode.balance == 2 )
 	
-	if ( REBALANCE )
-	    System.out.println( " )" ) ;
+	//if ( REBALANCE )
+	//    System.out.println( " )" ) ;
 	
 	return false ;
 	
@@ -250,13 +250,13 @@ if ( ROTATE )
 	    {
 		if ( parent.left != null )    // object with same key found in tree
 		    {                             // => nothing to do
-			if ( INSERT )
-			    System.out.println( "insert( " + obj + " ): other object found!" ) ;
+			//if ( INSERT )
+			//    System.out.println( "insert( " + obj + " ): other object found!" ) ;
 			
 			return parent.left.obj;
 		    }
-		if ( INSERT )
-		    System.out.print( "insert( " + obj + " ): before insertion: " + this ) ;
+		//if ( INSERT )
+		//    System.out.print( "insert( " + obj + " ): before insertion: " + this ) ;
 		
 		node        = new AVLTreeNode( obj ) ;
 		parent.left = node ;
@@ -265,13 +265,13 @@ if ( ROTATE )
 	    {
 		if ( parent.right != null )   // object with same key found in tree
 		    {                             // => nothing to do
-			if ( INSERT )
-			    System.out.println( "insert(): other object " + obj + " found!" ) ;
+			//if ( INSERT )
+			//    System.out.println( "insert(): other object " + obj + " found!" ) ;
 
 			return parent.right.obj;
 		    }
-		if ( INSERT )
-		    System.out.print( "insert( " + obj + " ): before insertion: " + this ) ;
+		//if ( INSERT )
+		//    System.out.print( "insert( " + obj + " ): before insertion: " + this ) ;
 		
 		node         = new AVLTreeNode( obj ) ;
 		parent.right = node ;
@@ -300,8 +300,8 @@ if ( ROTATE )
 
 	/* last things */
 	
-	if ( INSERT )
-	    System.out.println( "insert( " + obj + " ): after insertion:" + this ) ;
+	//if ( INSERT )
+	//    System.out.println( "insert( " + obj + " ): after insertion:" + this ) ;
 	
 	checkBalances() ;                 // check balance property (debugging)
 	
@@ -325,14 +325,14 @@ if ( ROTATE )
 
 	if ( node == null )            // no object with same key found in tree
 	{                              // => nothing to do
-	    if ( REMOVE )
-		System.out.println( "remove( " + obj + " ): object not found!" ) ;
+	   // if ( REMOVE )
+		//System.out.println( "remove( " + obj + " ): object not found!" ) ;
 
             return null ;
 	}
 	
-	if ( REMOVE )
-	    System.out.print( "remove( obj = " + obj + " ):  before removal: " + this ) ;
+	//if ( REMOVE )
+	//    System.out.print( "remove( obj = " + obj + " ):  before removal: " + this ) ;
 
 	/* rebalance the tree */
 
@@ -363,9 +363,9 @@ if ( ROTATE )
 
 	/* last things */
 
-	if ( REMOVE )
-	    System.out.println(   "remove(): return object " + obj
-		      + ", after removal: " + this ) ;
+	//if ( REMOVE )
+	//    System.out.println(   "remove(): return object " + obj
+	//	      + ", after removal: " + this ) ;
 
 	checkBalances() ;                 // check balance property (debugging)
 

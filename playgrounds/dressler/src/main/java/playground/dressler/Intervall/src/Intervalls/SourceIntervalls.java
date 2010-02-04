@@ -243,6 +243,7 @@ public class SourceIntervalls {
 			}
 			current = this.getIntervallAt(current.getHighBound());
 		}
+			
 
 		return null;
 	}

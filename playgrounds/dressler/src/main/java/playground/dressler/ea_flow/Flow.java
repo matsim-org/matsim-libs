@@ -145,13 +145,17 @@ public class Flow {
 		
 				
 		for(Node node : this._network.getNodes().values()){
-			Integer i = settings.getDemands().get(node);
-			if (i != null && i > 0) {
+			if (this._settings.isSource(node)) {
+				int i = this._settings.getDemand(node);
 				this._sources.add(node);
 				this._sourceoutflow.put(node, new SourceIntervalls());
 				this._demands.put(node, i);
-			}			
-		}			
+			}		
+		}
+		// initialize EdgeIntervalls
+		for (Link edge : this._network.getLinks().values()) {
+			this._flow.put(edge, new EdgeIntervalls(this._settings.getLength(edge)));
+		}
 		
 		this._sink = settings.getSink();
 		this._timeHorizon = settings.TimeHorizon;
@@ -177,8 +181,8 @@ public class Flow {
 	}
 	
 	/**
-	 * Method for finding the minimum of the demand at the start node
-	 * and the minimal capacity along the TimeExpandedPath
+	 * Method for residual bottleneck capacity of the TimeExpandedPath
+	 * (also limited by the source)
 	 * @param TimeExpandedPath
 	 * @return minimum over all unused capacities and the demand in the first node
 	 */
@@ -205,7 +209,7 @@ public class Flow {
 				Link edge = se.getEdge();				
 						
 				if(se.getForward()){
-					cap = this._settings.getCapacity(edge);										
+					cap = this._settings.getCapacity(edge) - this._flow.get(edge).getFlowAt(se.getStartTime());										
 				} else {
 					cap = this._flow.get(edge).getFlowAt(se.getArrivalTime());
 				}			
@@ -302,10 +306,10 @@ public class Flow {
 					if (demand < 0) {
 						throw new IllegalArgumentException("too much flow on TimeExpandedPath " + TEP);
 					}
-					this._sourceoutflow.get(source).augment(ssf.getStartTime(), gamma, Integer.MAX_VALUE);
+					this._sourceoutflow.get(source).augment(ssf.getArrivalTime(), gamma, Integer.MAX_VALUE);
 					this._demands.put(source, demand);
 				} else {
-					this._sourceoutflow.get(source).augmentreverse(ssf.getArrivalTime(), gamma);
+					this._sourceoutflow.get(source).augmentreverse(ssf.getStartTime(), gamma);
 					this._demands.put(source, demand + gamma);
 				}
 
@@ -572,8 +576,11 @@ public class Flow {
 	 * @return true iff node is a Source now with demand 0
 	 */
 	public boolean isNonActiveSource(final Node node){
-		Integer i = this._settings.getDemands().get(node);
-		return (i != null && i == 0);
+		if (this._settings.isSource(node)) { // superfluous ... only sources are in _demands
+		  Integer i = this._demands.get(node);
+		  return (i != null && i == 0);
+		}
+		return false;
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////////
@@ -803,7 +810,7 @@ public class Flow {
 		for (EdgeIntervalls EI : _flow.values()) {
 		  gain += EI.cleanup();	
 		}
-		for (Node node : this._settings.getDemands().keySet()) {
+		for (Node node : this._sourceoutflow.keySet()) {
 			 SourceIntervalls si = this._sourceoutflow.get(node);
 			 if (si != null)
 			   gain += si.cleanup();				
@@ -837,28 +844,14 @@ public class Flow {
 	}
 
 	/**
-	 * @param demands the _demands to set
-	 */
-	public void setDemands(HashMap<Node, Integer> demands) {
-		this._demands = demands;
-	}
-
-	/**
 	 * @return the _flow
 	 */
-	public HashMap<Link, EdgeIntervalls> getFlow() {
-		return this._flow;
+	public EdgeIntervalls getFlow(Link edge) {
+		return this._flow.get(edge);
 	}
-
-	/**
-	 * @param flow the _flow to set
-	 */
-	public void setFlow(HashMap<Link, EdgeIntervalls> flow) {
-		this._flow = flow;
-	}
-		
-	public HashMap<Node, SourceIntervalls> getSourceOutflow() {
-		return this._sourceoutflow;
+	
+	public SourceIntervalls getSourceOutflow(Node node) {
+		return this._sourceoutflow.get(node);
 	}
 
 	/**
@@ -873,13 +866,6 @@ public class Flow {
 	 */
 	public LinkedList<Node> getSources() {
 		return this._sources;
-	}
-
-	/**
-	 * @return the _timeHorizon
-	 */
-	public int getTimeHorizon() {
-		return this._timeHorizon;
 	}
 
 	/**

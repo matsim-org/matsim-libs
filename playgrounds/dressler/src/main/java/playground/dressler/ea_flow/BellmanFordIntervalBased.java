@@ -155,6 +155,11 @@ public class BellmanFordIntervalBased {
 		Boolean equals(IntervalNode node){
 			return(node._node.equals(this._node) && node._ival.equals(this._ival));
 		}
+		
+		@Override
+		public String toString(){
+			return _node.getId().toString() + " @ " + _ival.toString();
+		}
 	}
 	
 	private class IntervalNodeComparator implements Comparator<IntervalNode> {
@@ -177,11 +182,14 @@ public class BellmanFordIntervalBased {
 	 * refreshes all _labels, _sourcelabels, and _unprocessedsources before one run of the algorithm
 	 */
 	private void refreshLabels(){		
+		this._labels = new HashMap<Node, VertexIntervalls>();
+		this._sourcelabels = new HashMap<Node, VertexIntervall>();
+		this._unprocessedsources = new LinkedList<Node>();
 		for(Node node: this._network.getNodes().values()){
 			VertexIntervalls label = new VertexIntervalls();
 			_labels.put(node, label);
 			if (this._settings.isSource(node)) {
-				VertexIntervall temp = new VertexIntervall(0, this._settings.TimeHorizon + 1);
+				VertexIntervall temp = new VertexIntervall(0, this._settings.TimeHorizon);
 				if (this._flow.isActiveSource(node)){				
 					this._unprocessedsources.add(node);
 					temp.setScanned(false);
@@ -199,32 +207,36 @@ public class BellmanFordIntervalBased {
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	private Collection<TimeExpandedPath> constructRoutes()throws BFException{
-		return null;
+	private Collection<TimeExpandedPath> constructRoutes() throws BFException {
 		
-		// TODO stub
-		/*Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
+		System.out.println("Constructing routes ...");
 		
-		Node to = this._settings.getSink();
-		VertexIntervalls tolabels = this._labels.get(to);
-		if (tolabels.getFirstPossible() == null) {
+		Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
+		
+		Node toNode = this._settings.getSink();
+		//VertexIntervalls tolabels = this._labels.get(to);
+		VertexIntervall toLabel = this._labels.get(toNode).getFirstPossible();
+		if (toLabel == null) {
 			throw new BFException("Sink cannot be reached at all!");
-		}
-		int totime = tolabels.getFirstPossible().getLowBound();
-		int arrivalAtSuperSink = totime;
+		}			
+		
+		int toTime = toLabel.getLowBound();		
+		int arrivalAtSuperSink = toTime;
 		//check if TimeExpandedPath can be constructed
 		
-		if(Integer.MAX_VALUE==totime){
+		if(Integer.MAX_VALUE == toTime){
 			throw new BFException("Sink cannot be reached (totime == MAX_VALUE)!");
 		}
-		if(totime>this._settings.TimeHorizon){
-			throw new BFException("Sink cannot be reached within TimeHorizon!");
+		if(toTime >= this._settings.TimeHorizon){
+			throw new BFException("Sink cannot be reached within TimeHorizon.");
 		}
 		
+		
+		
 		// disabled (Daniel)
-		//collect all reachable sinks, that are connected by an zero transit time,
+		//collect all reachable sinks, that are connected by a zero transit time,
 		// infinite capacity arc.
-		Set<Node> realSinksToSendTo = new HashSet<Node>();
+		/*Set<Node> realSinksToSendTo = new HashSet<Node>();
 		realSinksToSendTo.add(_sink);
 		
 		for(Link link : _sink.getInLinks().values())
@@ -233,23 +245,38 @@ public class BellmanFordIntervalBased {
 			VertexIntervall realSinkIntervall = this._labels.get(realSink).getIntervallAt(totime);
 			if(realSinkIntervall.getReachable() && realSinkIntervall.getLowBound() == arrivalAtSuperSink)
 				realSinksToSendTo.add(realSink);
-		}		
+		}*/		
 		
-		for(Node realSink : realSinksToSendTo)
-		{
-			//start constructing the TimeExpandedPath
-			TimeExpandedPath timeExpandedPath = new TimeExpandedPath();
-			timeExpandedPath.setArrival(totime);
-			for(Link link : realSink.getOutLinks().values())
-			{
-				if(link.getToNode().equals(_sink))
-					timeExpandedPath.push(link, arrivalAtSuperSink, arrivalAtSuperSink, true);
+		//start constructing the TimeExpandedPath
+		TimeExpandedPath TEP = new TimeExpandedPath();
+		TEP.setArrival(toTime);		
+		
+		PathStep pred;
+		pred = toLabel.getPredecessor();
+		
+		while (pred != null) {
+			pred = pred.copyShiftedToArrival(toTime);
+						
+			TEP.prepend(pred);			
+			
+			toNode = pred.getStartNode();
+			toTime = pred.getStartTime();
+			TEP.setStartTime(toTime); // really startTime
+			
+			if (pred instanceof StepEdge) {			  		
+			  toLabel = this._labels.get(toNode).getIntervallAt(toTime);			 
+			} else if (pred instanceof StepSourceFlow) {
+			  if (pred.getForward()) {
+				  toLabel = this._sourcelabels.get(toNode);				  
+			  } else {
+				  toLabel = this._labels.get(toNode).getIntervallAt(toTime);
+			  }
+			} else {
+			  throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
 			}
-			//now we can start at each real sink
-			tolabels = _labels.get(realSink);
-			totime = arrivalAtSuperSink;
-			to = realSink;
-			VertexIntervall tolabel = tolabels.getIntervallAt(totime);
+			pred = toLabel.getPredecessor();
+			
+			/*VertexIntervall tolabel = tolabels.getIntervallAt(totime);
 			int fromtime = 0;
 			while(tolabel.getPredecessor()!=null){
 				Link edge = tolabel.getPredecessor();
@@ -286,12 +313,13 @@ public class BellmanFordIntervalBased {
 				tolabels = this._labels.get(to);
 				totime= fromtime;
 				tolabel = tolabels.getIntervallAt(totime);
-			}
-			timeExpandedPath.setArrival(arrivalAtSuperSink);
-			timeExpandedPath.setStartTime(fromtime);
-			result.add(timeExpandedPath);
+			}*/
+			
+			
 		}
-		return result;*/
+		
+		result.add(TEP);
+		return result;
 	}
 	
 	
@@ -303,40 +331,33 @@ public class BellmanFordIntervalBased {
 	 * @param forward indicates, weather we use a forward or backwards edge
 	 * @return null or the list of labels that have changed
 	 */
-	private ArrayList<VertexIntervall> relabel(IntervalNode from, Node to, Link over, boolean forward) {		
+	private ArrayList<VertexIntervall> relabel(IntervalNode from, Node to, Link over, boolean forward, int timehorizon) {		
 			VertexIntervalls labelto = _labels.get(to);
-			EdgeIntervalls flowover = this._flow.getFlow().get(over);
+			EdgeIntervalls flowover = this._flow.getFlow(over);
 			ArrayList<Intervall> arrive;
 			ArrayList<VertexIntervall> changed;
 						
 			VertexIntervall start = from._ival;
 			
-			// Create predecessor. It will be shifted correctly deeper down in the calls.
-			PathStep pred = new StepEdge(over, 0, this._settings.getLength(over), forward);
+			// Create predecessor. It will be shifted correctly deeper down in the calls.			
+			PathStep pred;
+			if (forward) {
+			  pred = new StepEdge(over, 0, this._settings.getLength(over), forward);
+			} else {
+			  pred = new StepEdge(over, this._settings.getLength(over), 0, forward);				
+			}
 			
 			if(start.getReachable() && !start.isScanned()){
-				if(_debug>0){
-					System.out.println("wir kommen los:"+ from._node.getId());
-				}	
-				arrive = flowover.propagate(start, (int)over.getCapacity(1.),forward);
+				arrive = flowover.propagate(start, this._settings.getCapacity(over),forward, timehorizon);
 					
 				if(arrive != null && !arrive.isEmpty()){
-					if(_debug>0){
-						System.out.println("wir kommen weiter: "+ to.getId());
-						for(Intervall inter: arrive){
-							System.out.println(forward);
-							System.out.println(inter);
-						}
-					}
-					
 					changed = labelto.setTrueList(arrive , pred);
 					return changed;
 				}else{					
-					if(_debug>0){
-						System.out.println("edge: " + over.getId() +" forward:"+forward+ " blocked " + flowover.toString());
-					}	
 					return null;
 				}					
+			} else {
+				System.out.println("Weird. Relabel called unreachable or unscanned interval!");
 			}
 			return null;
 					
@@ -386,9 +407,10 @@ public class BellmanFordIntervalBased {
 			this._roundpolls++;
 			this._totalpolls++;			
 			
-			w = this._unprocessedsources.poll();
+			w = this._unprocessedsources.poll();			
 			if (w != null) {
-				// FIXME send out of source
+				//System.out.println(w.getId());
+				// send out of source
 				// just set label on w and add w as IntervalNode to the regular queue
 				
 				VertexIntervall inter = this._sourcelabels.get(w);
@@ -402,7 +424,7 @@ public class BellmanFordIntervalBased {
 				
 				PathStep pred = new StepSourceFlow(w, 0, true);
 				
-				Intervall i = new Intervall(0, this._settings.TimeHorizon+1); 
+				Intervall i = new Intervall(0, this._settings.TimeHorizon); 
 				ArrayList<VertexIntervall> changed = this._labels.get(w).setTrueList(i , pred);
 				for(VertexIntervall changedintervall : changed){
 					queue.add(new IntervalNode(changedintervall, w));
@@ -413,10 +435,12 @@ public class BellmanFordIntervalBased {
 						
 			// gets the first vertex in the queue
 			iv = queue.poll();
-			
+
 			if (iv == null) {
 				break;
 			}
+			
+			//System.out.println(iv.toString());
 						
 			// Clean Up before we do anything!
 			gain += _labels.get(iv._node).cleanup();
@@ -425,41 +449,50 @@ public class BellmanFordIntervalBased {
 			// link is outgoing edge of v => forward edge
 			for (Link link : iv._node.getOutLinks().values()) {
 				w=link.getToNode();
-				ArrayList<VertexIntervall> changed = relabel(iv,w,link,true);
+				ArrayList<VertexIntervall> changed = relabel(iv,w,link,true, this._settings.TimeHorizon);
 				if (changed == null) continue;
 				if (!this._settings.isSink(w)) {
-					for(VertexIntervall changedintervall : changed){
-						queue.add(new IntervalNode(changedintervall, w));
+					for(VertexIntervall changedinterval : changed){
+						queue.add(new IntervalNode(changedinterval, w));
 					}
 				}
 			}
 			// link is incoming edge of v => backward edge
 			for (Link link : iv._node.getInLinks().values()) {
 				w=link.getFromNode();
-				ArrayList<VertexIntervall> changed = relabel(iv,w,link,false);
+				ArrayList<VertexIntervall> changed = relabel(iv,w,link,false, this._settings.TimeHorizon);
 				if (changed == null) continue;
 
 				if (!this._settings.isSink(w)) {
-					for(VertexIntervall changedintervall : changed){
-						queue.add(new IntervalNode(changedintervall, w));
+					for(VertexIntervall changedinterval : changed){
+						queue.add(new IntervalNode(changedinterval, w));
 					}
 				}
 			}
 			
 			// TODO FIXME treat empty sources! 
-			if (this._flow.isNonActiveSource(iv._node)) {			  
-			  if (!this._sourcelabels.get(iv._node).getReachable()) {
-				// we might have to do something ...
-				// check if we can reverse flow
-				SourceIntervalls si = this._flow.getSourceOutflow().get(iv._node);
-				Intervall arrive = si.canSendFlowBack(iv._ival);
-				if (arrive != null) {
-					// indeed, we need to process this source
-				   this._unprocessedsources.add(iv._node);				   
-				   StepSourceFlow pred = new StepSourceFlow(iv._node, arrive.getLowBound(), false);				   
-				   this._sourcelabels.get(iv._node).setArrivalAttributes(pred);
+			if (this._flow.isNonActiveSource(iv._node)) {
+				System.out.println("Hit non-active source: " + iv.toString());
+				if (!this._sourcelabels.get(iv._node).getReachable()) {
+					System.out.println("it was not reachable yet ...");
+					// we might have to do something ...
+					// check if we can reverse flow
+					SourceIntervalls si = this._flow.getSourceOutflow(iv._node);
+					System.out.println("its label is");
+					System.out.println(si.toString());
+					Intervall arrive = si.canSendFlowBack(iv._ival);
+					if (arrive != null) {
+						System.out.println("we're sending flow back!");
+						System.out.println(arrive);
+						// indeed, we need to process this source
+						this._unprocessedsources.add(iv._node);				   
+						StepSourceFlow pred = new StepSourceFlow(iv._node, arrive.getLowBound(), false);	
+						System.out.println(pred);
+						this._sourcelabels.get(iv._node).setArrivalAttributes(pred);
+						System.out.println("New label:");
+						System.out.println(this._sourcelabels.get(iv._node));
+					}
 				}
-			  }
 			}
 			
 			

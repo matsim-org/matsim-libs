@@ -192,7 +192,7 @@ public class EdgeIntervall extends Intervall
 		boolean ret = false;
 		ret= super.equals(other);
 		if(ret){
-			ret= (this.getFlow()==other.getFlow());
+			ret= (this._flow == other._flow);
 		}
 		return ret;
 	}

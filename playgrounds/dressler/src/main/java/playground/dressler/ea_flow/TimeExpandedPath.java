@@ -104,13 +104,13 @@ public class TimeExpandedPath {
 	
 
 	/**
-	 * Method to push a new Edge to the beginning of the path with the specified input
+	 * Method to prepend a new Edge to the beginning of the path with the specified input
 	 * @param edge Link used
 	 * @param time starting time
 	 * @param forward flag if edge is forward or backward
 	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te first edge in the path
 	 */
-	public void push(Link edge, int startTime, int arrivalTime, boolean forward){
+	public void prepend(Link edge, int startTime, int arrivalTime, boolean forward){
 		//adding first PathStep
 		StepEdge temp = new StepEdge(edge, startTime, arrivalTime, forward);
 		if(this._steps.isEmpty()){			
@@ -431,6 +431,11 @@ public class TimeExpandedPath {
 	public void append(PathStep step)
 	{
 		this._steps.addLast(step);
+	}
+	
+	public void prepend(PathStep step)
+	{
+		this._steps.addFirst(step);
 	}
 	
 	public static TimeExpandedPath clone(TimeExpandedPath original)

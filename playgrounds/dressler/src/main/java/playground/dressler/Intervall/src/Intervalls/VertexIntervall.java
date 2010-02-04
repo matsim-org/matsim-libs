@@ -47,7 +47,7 @@ public class VertexIntervall extends Intervall {
 
 	/**
 	 * predecessor in a shortest path
-	 * the times stored in the step are valid for the low bound!
+	 * the times stored in the step are valid for arrival at the low bound!
 	 */
 	private PathStep _predecessor=null;
 	
@@ -93,7 +93,7 @@ public class VertexIntervall extends Intervall {
 		//this.lastDepartureAtFromNode = other.lastDepartureAtFromNode;		
 		this.reachable = other.reachable;
 		this.scanned = other.scanned;
-		this._predecessor = other._predecessor.copyShiftedTo(l);
+		this._predecessor = other._predecessor.copyShiftedToArrival(l);
 	}
 
 	/**
@@ -167,7 +167,8 @@ public class VertexIntervall extends Intervall {
 		//we might have already scanned this intervall
 		this.scanned = false;
 		this.reachable = true;				
-		this._predecessor = pred.copyShiftedTo(this.getLowBound());
+		// FIXME this shifting here has a tendency to be confusing and to break things!
+		this._predecessor = pred.copyShiftedToArrival(this.getLowBound());
 		//ourIntervall.setLastDepartureAtFromNode(arrive.getLastDepartureAtFromNode());		
 	}
 	
@@ -185,7 +186,11 @@ public class VertexIntervall extends Intervall {
 		VertexIntervall k = new VertexIntervall(j);
 		k.reachable = this.reachable;
 		k.scanned = this.scanned;
-		k._predecessor= this._predecessor.copyShiftedTo(k.getLowBound());
+		if (this._predecessor == null) {
+			k._predecessor = null;
+		} else {
+		    k._predecessor= this._predecessor.copyShiftedToArrival(k.getLowBound());
+		}
 		//k.lastDepartureAtFromNode = this.lastDepartureAtFromNode;
 		return k;
 	}

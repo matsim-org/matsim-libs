@@ -160,9 +160,15 @@ public class StepEdge implements PathStep {
 
 	
 	@Override
-	public PathStep copyShiftedTo(int newStart) {
+	public PathStep copyShiftedToStart(int newStart) {
 	    int shift = newStart - this.startTime;
 		return new StepEdge(this.edge, newStart, this.arrivalTime + shift, this.forward); 
+	}
+	
+	@Override
+	public PathStep copyShiftedToArrival(int newArrival) {
+		int shift = newArrival - this.arrivalTime;
+		return new StepEdge(this.edge, this.startTime + shift, newArrival, this.forward);
 	}
 
 };

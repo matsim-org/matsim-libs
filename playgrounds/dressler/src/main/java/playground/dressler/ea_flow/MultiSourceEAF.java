@@ -163,7 +163,7 @@ public class MultiSourceEAF {
 			result = routingAlgo.doCalculations();
 			timer2 = System.currentTimeMillis();
 			timeMBF += timer2 - timer1;
-			if (result.isEmpty()){
+			if (result == null || result.isEmpty()){
 				break;
 			}
 			tempstr = "";
@@ -281,9 +281,9 @@ public class MultiSourceEAF {
 		String networkfile = null;
 		//networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_2s_cap.xml";
 		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s.xml";
-		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
+		networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
-		networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
+		//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
 		//networkfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_60s_EAF.xml";
 		//networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
 
@@ -304,7 +304,7 @@ public class MultiSourceEAF {
 
 		String demandsfile = null;
 		//demandsfile = "/Users/manuel/Documents/meine_EA/manu/manu2.dem";
-		//demandsfile = "/homes/combi/dressler/V/code/meine_EA/problem_demands.dem";
+		demandsfile = "/homes/combi/dressler/V/code/meine_EA/problem_demands.dem";
 
 		String outputplansfile = null;
 		//outputplansfile = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans_10p_5s.xml";
@@ -319,8 +319,8 @@ public class MultiSourceEAF {
 
 		int uniformDemands = 5;
 
-		//String sinkid = "supersink"; //siouxfalls
-		String sinkid = "en2";  //padang, line, swissold		
+		String sinkid = "supersink"; //siouxfalls, problem
+		//String sinkid = "en2";  //padang, line, swissold		
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network

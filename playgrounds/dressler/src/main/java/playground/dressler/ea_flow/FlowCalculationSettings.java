@@ -156,8 +156,10 @@ public class FlowCalculationSettings {
 		return (demand != null && demand > 0);
 	}
 	
-	public  HashMap<Node, Integer> getDemands() {
-		return this._demands;
+	public  int getDemand(Node node) {
+		Integer i = this._demands.get(node);
+		if (i != null) return i;
+		return 0;
 	}
 	
 	public int getTotalDemand() {

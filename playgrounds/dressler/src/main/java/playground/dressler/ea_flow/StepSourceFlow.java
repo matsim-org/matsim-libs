@@ -141,15 +141,26 @@ public class StepSourceFlow implements PathStep {
 
 
 	@Override
-	public PathStep copyShiftedTo(int newStart) {
-		// forward ... shift arrival time
+	public PathStep copyShiftedToStart(int newStart) {
+		// forward ... will always have starttime 0
 		if (this.forward) {
-		  return new StepSourceFlow(this.node, newStart, true);
+		  return new StepSourceFlow(this.node, this.time, true);
 		}
 		
-		// residual ... time is outgoing time, ignore newStart !
-		return new StepSourceFlow(this.node, this.time, false);
+		// residual ... when the source is entered
+		return new StepSourceFlow(this.node, newStart, false);
 	}
 
+	@Override
+	public PathStep copyShiftedToArrival(int newArrival) {
+		// forward ... shift arrival time
+		if (this.forward) {
+		  return new StepSourceFlow(this.node, newArrival, true);
+		}
+		
+		// residual ... will always have arrival 0
+		return new StepSourceFlow(this.node, this.time, false);
+	}
+	
 }
 

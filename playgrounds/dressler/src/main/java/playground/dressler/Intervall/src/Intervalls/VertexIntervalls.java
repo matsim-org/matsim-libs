@@ -115,7 +115,7 @@ public class VertexIntervalls {
 	 * @return flow at t
 	 */
 	public PathStep getPred(int t){
-		return getIntervallAt(t).getPredecessor().copyShiftedTo(t);
+		return getIntervallAt(t).getPredecessor().copyShiftedToArrival(t);
 	}
 	
 
@@ -132,7 +132,7 @@ public class VertexIntervalls {
 			throw new IllegalArgumentException("negative time: "+ t);
 		}
 		VertexIntervall i = (VertexIntervall) _tree.contains(t);
-		if(i==null)throw new IllegalArgumentException("there is no Intervall containing"+t);
+		if(i==null)throw new IllegalArgumentException("there is no Intervall containing "+t);
 		return i;
 	}
 	
@@ -271,7 +271,7 @@ public class VertexIntervalls {
 	public boolean setTrue(ArrayList<Intervall> arrive, PathStep pred) {
 		boolean changed = false;
 		boolean temp;
-		// TODO there used to be condensing here ...
+		// there used to be condensing here ...
 		// but propagate already condenses these days
 		for(int i=0; i< arrive.size(); i++){
 		  temp = setTrue(arrive.get(i), pred);
@@ -376,7 +376,7 @@ public class VertexIntervalls {
 				
 		ArrayList<VertexIntervall> changed = new ArrayList<VertexIntervall>();
 		
-		// TODO there used to be condensing here ...
+		// there used to be condensing here ...
 		// but propagate already condenses these days
 		
 		Iterator<Intervall> iterator = arrive.iterator();
@@ -459,6 +459,7 @@ public class VertexIntervalls {
 			}
 			t = current.getHighBound();
 			//pick next Intervall
+			// TODO isLast() is better! 
 			if(Integer.MAX_VALUE==t){
 				break;
 			}
@@ -478,28 +479,29 @@ public class VertexIntervalls {
 	public int cleanup() {
 		int gain = 0;
 		int timestop = getLast().getHighBound();		
+	    
+		//System.out.println("VertexIntervalls.cleanup()");
+		//System.out.println(this.toString());
+		
 		VertexIntervall i, j;
-		i = getIntervallAt(0);
-		while (i != null) {
-		  if (i.getHighBound() == timestop) break;	
+		i = getIntervallAt(0);		
+		while (i.getHighBound() < timestop) {		  
 		  j = this.getIntervallAt(i.getHighBound());
 		  if(i.getHighBound() != j.getLowBound())
 			  throw new RuntimeException("error in cleanup!");
-		  // FIXME change to new predecessors etc.
 		  if (i.getReachable() == j.getReachable() 
 				  && i.isScanned() == j.isScanned()
 				  && i.getPredecessor().equals(j.getPredecessor())) {
 			  _tree.remove(i);
 			  _tree.remove(j);
-			  VertexIntervall vI = new VertexIntervall(i.getLowBound(), j.getHighBound(), i);
-			  _tree.insert(vI);
-			  i = vI;
+			  j = new VertexIntervall(i.getLowBound(), j.getHighBound(), i);
+			  _tree.insert(j);			  
 			  gain++;
-		  } else {
-			  i = j;
-		  }		 		 
+		  } 
+		  i = j;
 		}
-		_last = (VertexIntervall) _tree._getLast().obj;
+		this._last = i;
+		
 		return gain;
 	}
 	

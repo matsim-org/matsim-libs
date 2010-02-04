@@ -11,7 +11,16 @@ public interface PathStep {
 	 * @param newStart
 	 * @return a new PathStep
 	 */
-	PathStep copyShiftedTo(int newStart);
+	PathStep copyShiftedToStart(int newStart);
+	
+	/**
+	 * Returns a shifted copy of a PathStep.
+	 * The time the flow leaves the PathStep is changed to newArrival
+	 * and the StartTime is changed accordingly. 
+	 * @param newArrival
+	 * @return a new PathStep
+	 */
+	PathStep copyShiftedToArrival(int newArrival);
 	
 	/**
 	 * Is the the forward or residual version of the step?

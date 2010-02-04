@@ -127,7 +127,7 @@ public class EdgeIntervalls {
 		}
 		EdgeIntervall i = (EdgeIntervall) _tree.contains(t);
 		if(i==null)throw new IllegalArgumentException("there is no Intervall " +
-				"containing"+t);
+				"containing "+t);
 		return i;
 	}
 
@@ -278,10 +278,11 @@ public class EdgeIntervalls {
 	 * @param incoming Intervall where we can start
 	 * @param capacity Capacity of the Link
 	 * @param forward indicates whether we use residual edge or not 
+	 * @param TimeHorizon for easy reference
 	 * @return plain old Intervall
 	 */
 	public ArrayList<Intervall> propagate(final Intervall incoming,
-			final int capacity ,final boolean forward){
+			final int capacity ,final boolean forward, int timehorizon){
 
 		ArrayList<Intervall> result = new ArrayList<Intervall>();
 
@@ -292,9 +293,9 @@ public class EdgeIntervalls {
 		int high = -1;						
 		boolean collecting = false;
 
-		if(forward){
+		if(forward) {			
 			current = this.getIntervallAt(incoming.getLowBound());
-			do {				
+			while (current.getLowBound() < incoming.getHighBound()) {				
 				if (current.getFlow() < capacity) {				
 					if (collecting) {
 						high = current.getHighBound();
@@ -306,28 +307,47 @@ public class EdgeIntervalls {
 
 				} else {
 					if (collecting) { // finish the Interval
-						low = Math.max(low, incoming.getLowBound());					  
+						low = Math.max(low, incoming.getLowBound());
+						low += this._traveltime;
 						high = Math.min(high, incoming.getHighBound());
-						toinsert = new Intervall(low + this._traveltime, high + this._traveltime);					  
-						result.add(toinsert);
+						high += this._traveltime;
+						high = Math.min(high, timehorizon);
+						if (low < high) {
+						  toinsert = new Intervall(low, high);					  
+						  result.add(toinsert);
+						}
 						collecting = false;
 					}
 				}
+				
+				if (this.isLast(current)) {
+					break;
+				} 
 				current = this.getIntervallAt(current.getHighBound());
-
-			} while (current.getLowBound() < incoming.getHighBound());
+			    				
+			}
 
 			if (collecting) { // finish the Interval
-				low = Math.max(low, incoming.getLowBound());					  
+				low = Math.max(low, incoming.getLowBound());
+				low += this._traveltime;
 				high = Math.min(high, incoming.getHighBound());
-				toinsert = new Intervall(low + this._traveltime, high + this._traveltime);					  
-				result.add(toinsert);
+				high += this._traveltime;
+				high = Math.min(high, timehorizon);
+				if (low < high) {
+					toinsert = new Intervall(low, high);					  
+					result.add(toinsert);
+				}
 				collecting = false;
 			}
 		} else { // not forward
-			current = this.getIntervallAt(incoming.getLowBound() - this._traveltime);
-			do {				
-				if (current.getFlow() < capacity) {				
+			if (incoming.getLowBound() - this._traveltime < 0) {
+				current = this.getIntervallAt(0);
+			} else {
+			  current = this.getIntervallAt(incoming.getLowBound() - this._traveltime);
+			}
+			
+			while (current.getLowBound() < incoming.getHighBound() - this._traveltime) {				
+				if (current.getFlow() > 0) {				
 					if (collecting) {
 						high = current.getHighBound();
 					} else {
@@ -338,22 +358,31 @@ public class EdgeIntervalls {
 
 				} else {
 					if (collecting) { // finish the Interval
-						low = Math.max(low, incoming.getLowBound() - this._traveltime);					  
+						low = Math.max(low, incoming.getLowBound() - this._traveltime);							
 						high = Math.min(high, incoming.getHighBound() - this._traveltime);
-						toinsert = new Intervall(low, high);					  
-						result.add(toinsert);
+						high = Math.min(high, timehorizon);
+						if (low < high) {
+						  toinsert = new Intervall(low, high);					  
+						  result.add(toinsert);
+						}
 						collecting = false;
 					}
 				}
-				current = this.getIntervallAt(current.getHighBound());
-
-			} while (current.getLowBound() < incoming.getHighBound() - this._traveltime);
+				
+				if (this.isLast(current)) {
+					break;
+				}
+				current = this.getIntervallAt(current.getHighBound());				
+			} 
 
 			if (collecting) { // finish the Interval
 				low = Math.max(low, incoming.getLowBound() - this._traveltime);					  
 				high = Math.min(high, incoming.getHighBound() - this._traveltime);
-				toinsert = new Intervall(low, high);					  
-				result.add(toinsert);
+				high = Math.min(high, timehorizon);
+				if (low < high) {
+					toinsert = new Intervall(low, high);					  
+					result.add(toinsert);
+				}
 				collecting = false;
 			}
 
@@ -368,23 +397,23 @@ public class EdgeIntervalls {
 	 */
 	public int cleanup() {
 		int gain = 0;
-		int timestop = getLast().getHighBound();
+		int timestop = this._last.getHighBound();
 		EdgeIntervall i, j;
-		i = getIntervallAt(0);
-		while (i != null) {
-		  if (i.getHighBound() == timestop) break;	
+		i = getIntervallAt(0);		
+		while (i.getHighBound() < timestop) {		  
 		  j = this.getIntervallAt(i.getHighBound());
-		  
-		  if ((i.getHighBound() == j.getLowBound()) && 
-				  (i.getFlow() == j.getFlow())) {
+		  if(i.getHighBound() != j.getLowBound())
+			  throw new RuntimeException("error in cleanup!");  
+		  if (i.getFlow() == j.getFlow()) {
 			  _tree.remove(i);
 			  _tree.remove(j);
-			  _tree.insert(new EdgeIntervall(i.getLowBound(), j.getHighBound(), i.getFlow()));
+   		      j = new EdgeIntervall(i.getLowBound(), j.getHighBound(), i.getFlow()); 			  
+			  _tree.insert(j);
 			  gain++;
-		  }else{
-			  i = j;
-		  }		 		 
-		}
+		  }
+		  i = j;		  		 		
+		}		
+		this._last = i; // we might have to update it, just do it always
 		return gain;
 	}
 	
