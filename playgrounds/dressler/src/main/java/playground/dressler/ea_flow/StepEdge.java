@@ -146,7 +146,7 @@ public class StepEdge implements PathStep {
 	 */
 	@Override
 	public boolean equalsNoCheckForward(PathStep other) {
-		if (!(other instanceof StepSourceFlow)) return false;
+		if (!(other instanceof StepEdge)) return false;
 		StepEdge o = (StepEdge) other;
 
 		if (this.forward == o.forward) {
@@ -201,6 +201,17 @@ public class StepEdge implements PathStep {
 	public PathStep copyShiftedToArrival(int newArrival) {
 		int shift = newArrival - this.arrivalTime;
 		return new StepEdge(this.edge, this.startTime + shift, newArrival, this.forward);
+	}
+	@Override
+	public boolean haveSameStart(PathStep other) {
+		if (this.startTime != other.getStartTime()) return false;
+		if (!this.getStartNode().equals(other.getStartNode())) return false;
+		
+		// they seem to leave from the same time/node-pair
+		// but other might really leave from a virtual source node
+		if (other instanceof StepSourceFlow && other.getForward()) return false;
+			
+		return true;
 	}
 
 };

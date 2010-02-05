@@ -180,5 +180,26 @@ public class StepSourceFlow implements PathStep {
 		return new StepSourceFlow(this.node, this.time, false);
 	}
 	
+	@Override
+	public boolean haveSameStart(PathStep other) {		
+		if (this.getStartTime() != other.getStartTime()) return false;
+		if (!this.node.equals(other.getStartNode())) return false;
+
+		// they seem to leave from the same time/node-pair
+		// but one might really leave from a virtual source node
+		if (this.forward) {
+			if (other instanceof StepSourceFlow && other.getForward()) {
+				return true; 
+			}
+			return false;
+		} else {
+			if (!(other instanceof StepSourceFlow && other.getForward())) {
+				return true;
+			}
+			return false;
+		}
+					
+	}
+	
 }
 

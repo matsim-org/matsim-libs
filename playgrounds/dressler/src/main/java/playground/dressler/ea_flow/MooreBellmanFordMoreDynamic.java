@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 
 package playground.dressler.ea_flow;
 
@@ -46,34 +46,34 @@ import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 // import org.matsim.utils.identifiers.IdI;
 // import org.matsim.basic.v01.Id;
 
-/**
+*//**
  * Implementation of the Moore-Bellman-Ford Algorithm for a static network! i =
  * 1 .. n for all e = (v,w) if l(w) > l(v) + c(e) then l(w) = l(v) + c(e), p(w) =
  * v.
  *
- */
+ *//*
 public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 	// private final static Logger log =
 	// Logger.getLogger(MooreBellmanFord.class);
 
-	/* avoid numerical problems when doing comparisons ... */
+	 avoid numerical problems when doing comparisons ... 
 	// private double ACCURACY = 0.001;
-	/**
+	*//**
 	 * The network on which we find routes. We expect the network to change
 	 * between runs!
-	 */
+	 *//*
 	final NetworkLayer network;
 
-	/**
+	*//**
 	 * The cost calculator. Provides the cost for each link and time step.
-	 */
+	 *//*
 	final TravelCost costFunction;
 
-	/**
+	*//**
 	 * The travel time calculator. Provides the travel time for each link and
 	 * time step. This is ignored.
-	 */
+	 *//*
 	final TravelTime timeFunction;
 
 	private HashMap<Link, EdgeIntervalls> flow;
@@ -92,7 +92,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 	private HashMap<Node, Integer> waited = new HashMap<Node, Integer>();
 
-	/**
+	*//**
 	 * Default constructor.
 	 *
 	 * @param network
@@ -103,7 +103,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            numerical problems otherwise.
 	 * @param timeFunction
 	 *            Determines the travel time on links. This is ignored!
-	 */
+	 *//*
 	public MooreBellmanFordMoreDynamic(final NetworkLayer network,
 			final TravelCost costFunction, final TravelTime timeFunction,
 			HashMap<Link, EdgeIntervalls> flow) {
@@ -125,7 +125,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		}
 	}
 
-	/**
+	*//**
 	 * Default constructor.
 	 *
 	 * @param network
@@ -136,7 +136,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            numerical problems otherwise.
 	 * @param timeFunction
 	 *            Determines the travel time on links. This is ignored!
-	 */
+	 *//*
 	public MooreBellmanFordMoreDynamic(final NetworkLayer network,
 			final TravelCost costFunction, final TravelTime timeFunction,
 			HashMap<Link, EdgeIntervalls> flow, int timeHorizon) {
@@ -159,7 +159,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 	}
 
-	/**
+	*//**
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'.
 	 *
@@ -171,7 +171,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            ignored
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
-	 */
+	 *//*
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode,
 			final double startTime) {
 
@@ -228,7 +228,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		return new Path(routeNodes, null, Time.UNDEFINED_TIME, 0);
 	}
 
-	/**
+	*//**
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'.
 	 *
@@ -240,7 +240,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            ignored
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
-	 */
+	 *//*
 	public NetworkRouteWRefs calcLeastCostPath(final Node fromNode, final Node toNode,
 			final double startTime, HashMap<Link, EdgeIntervalls> flow) {
 
@@ -301,7 +301,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		return route;
 	}
 
-	/**
+	*//**
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'. This returns an array of links which is more
 	 * useful than the Route object
@@ -314,7 +314,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            ignored
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
-	 */
+	 *//*
 	public ArrayList<Link> calcLeastCostLinkRoute(final Node fromNode,
 			final Node toNode, final double startTime) {
 
@@ -351,7 +351,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		return routeLinks;
 	}
 
-	/**
+	*//**
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'. This returns an array of links which is more
 	 * useful than the Route object
@@ -364,7 +364,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            ignored
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
-	 */
+	 *//*
 	public ArrayList<Link> calcLeastCostLinkRoute(final Node fromNode,
 			final Node toNode, final double startTime,
 			HashMap<Link, EdgeIntervalls> flow) {
@@ -398,7 +398,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		return routeLinks;
 	}
 
-	/**
+	*//**
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'. This returns an array of links which is more
 	 * useful than the Route object
@@ -411,7 +411,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            ignored
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
-	 */
+	 *//*
 	public HashMap<Link, EdgeIntervalls> calcLeastCostFlow(final Node fromNode,
 			final Node toNode, final double startTime) {
 
@@ -432,10 +432,10 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 			return null;
 		}
 
-		/*System.out.println("Wait:");
+		System.out.println("Wait:");
 		for(Node node : network.getNodes().values()){
 			System.out.println("To reach " + node.getId() + " wait " + waited.get(node) + " TU.");
-		}*/
+		}
 
 		gamma = calculateGamma(fromNode, toNode, pathToRoute);
 
@@ -470,7 +470,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		return newFlow;
 	}
 
-	/**
+	*//**
 	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
 	 * starting time 'startTime'. This returns an array of links which is more
 	 * useful than the Route object
@@ -483,7 +483,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            ignored
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
-	 */
+	 *//*
 	public HashMap<Link, EdgeIntervalls> calcLeastCostFlow(final Node fromNode,
 			final Node toNode, final double startTime,
 			HashMap<Link, EdgeIntervalls> flow) {
@@ -507,12 +507,12 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 			return null;
 		}
 
-		/*System.out.println("Wait:");
+		System.out.println("Wait:");
 		for(Node node : network.getNodes().values()){
 			System.out.println("To reach " + node.getId() + " wait " + waited.get(node) + " TU.");
-		}*/
+		}
 
-		 /*System.out.println("Preds: ");
+		 System.out.println("Preds: ");
 		 for (Node node : network.getNodes().values()) {
 			 if (pred.get(node)==null) {
 				 System.out.println("node " + node.getId() + " has no pred ");
@@ -530,7 +530,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 			 }
 		}
 		System.out.println();
-		*/
+		
 		gamma = calculateGamma(fromNode, toNode, pathToRoute);
 		System.out.println("Gamma: " + gamma);
 
@@ -574,20 +574,20 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		return newFlow;
 	}
 
-	/*
+	
 	 * this is the Moore-Bellman-Ford Algorithm on the residual network with
 	 * flow
 	 *
-	 */
+	 
 	private boolean doCalculations(final Node fromNode, final Node toNode,
 			final double startTime, final HashMap<Link, EdgeIntervalls> flow) {
 		// outprints
-		/*
+		
 		 * for (Link link : network.getLinks().values()) {
 		 * System.out.println("(" + link.getFromNode().getId() + ", " +
 		 * link.getToNode().getId() + ") hat Laenge " +
 		 * length.getLinkTravelCost(link, 0.)); }
-		 */
+		 
 
 		// set the start distances Dists of the vertices
 		init(fromNode);
@@ -782,12 +782,12 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		}
 	}
 
-	/**
+	*//**
 	 * Initializes the nodes of the network
 	 *
 	 * @param fromNode
 	 *            The starting node
-	 */
+	 *//*
 	void init(final Node fromNode) {
 		// Distances
 		Dists = new Distances(network);
@@ -974,4 +974,4 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		//System.out.println("pathToRoute empty (calculateGamma2)? " + pathToRoute.isEmpty());
 		return gamma;
 	}
-}
+}*/

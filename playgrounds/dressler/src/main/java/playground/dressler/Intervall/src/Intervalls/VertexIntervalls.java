@@ -170,6 +170,15 @@ public class VertexIntervalls {
 	
 	
 	/**
+	 * Returns the number of stored intervals
+	 * @return the number of stored intervals
+	 */
+	public int getSize() {		
+		return this._tree._size;
+	}
+	
+	
+	/**
 	 * Gives the last stored VertexIntervall
 	 * @return VertexIntervall with maximal lowbound
 	 */

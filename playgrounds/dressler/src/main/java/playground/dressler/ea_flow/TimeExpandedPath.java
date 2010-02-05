@@ -126,6 +126,7 @@ public class TimeExpandedPath {
 	 * @return true iff a path could go over first and over second immediatly after
 	 */
 	private static boolean checkPair(PathStep first, PathStep second){
+		// FIXME not 100% precise with virtual nodes!
 		if (first.getArrivalTime() == second.getStartTime()) {
 			return first.getArrivalNode().equals(second.getStartNode()); 
 		} else {
@@ -370,9 +371,9 @@ public class TimeExpandedPath {
 	 * @param testForward check the direction as well
 	 * @return length
 	 */
-	public List<TimeExpandedPath> splitPathAtStep(PathStep stepToSplitAt, boolean testForward)
+	public LinkedList<TimeExpandedPath> splitPathAtStep(PathStep stepToSplitAt, boolean testForward)
 	{
-		List<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
+		LinkedList<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
 		TimeExpandedPath head = new TimeExpandedPath();
 		TimeExpandedPath tail = new TimeExpandedPath();
 		

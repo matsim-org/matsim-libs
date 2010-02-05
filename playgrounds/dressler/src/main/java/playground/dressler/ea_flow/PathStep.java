@@ -78,5 +78,12 @@ public interface PathStep {
 	 */
 	boolean isResidualVersionOf(PathStep other);
 	
+	/**
+	 * Checks if this is the other leave the same time/node-pair in the full (virtual) time-expanded network
+	 * @param other a PathEdge 
+	 * @return true iff they really leave the same time/node
+	 */
+	boolean haveSameStart(PathStep other);
+	
 	String toString();
 }

@@ -166,6 +166,14 @@ public class SourceIntervalls {
 	
 	
 	/**
+	 * Returns the number of stored intervals
+	 * @return the number of stored intervals
+	 */
+	public int getSize() {		
+		return this._tree._size;
+	}
+	
+	/**
 	 * gives the last Stored EdgeIntervall
 	 * @return EdgeIntervall with maximal lowbound
 	 */
@@ -292,6 +300,7 @@ public class SourceIntervalls {
 			throw new IllegalArgumentException("too much flow! flow: " + i.getFlow() + " + " +
 					f + " > " + u);
 		}
+
 		if (i.getFlow()+f<0){
 			throw new IllegalArgumentException("negative flow! flow: " + i.getFlow() + " + " +
 					f + " < 0");

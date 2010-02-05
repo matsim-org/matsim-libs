@@ -144,6 +144,7 @@ public class BellmanFordIntervalBased {
 	}
 	
 	private class IntervalNode  {
+		// TODO Change to normal Intervall
 		VertexIntervall _ival;
 		Node _node;
 		
@@ -152,8 +153,8 @@ public class BellmanFordIntervalBased {
 			this._node = node; 
 			
 		}
-		Boolean equals(IntervalNode node){
-			return(node._node.equals(this._node) && node._ival.equals(this._ival));
+		Boolean equals(IntervalNode other){
+			return(other._node.equals(this._node) && other._ival.equals(this._ival));
 		}
 		
 		@Override
@@ -442,7 +443,8 @@ public class BellmanFordIntervalBased {
 			//System.out.println(iv.toString());
 						
 			// Clean Up before we do anything!
-			gain += _labels.get(iv._node).cleanup();
+			// However, clean up seems totally useless for VertexIntervalls.
+			//gain += _labels.get(iv._node).cleanup();
 			
 			// visit neighbors
 			// link is outgoing edge of v => forward edge
@@ -617,12 +619,25 @@ public class BellmanFordIntervalBased {
 
 	public String measure() {
 		String result=
-		"              Polls: "+this._roundpolls+
+		"  Polls: "+this._roundpolls+
 		//"\n      Preptime (ms): "+(this._prepend-this._prepstart)+
-		"\n      Calctime (ms): "+(this._calcend-this._calcstart)+
-		"\n         Totalpolls: "+(this._totalpolls)+
+		"\n  Calctime (ms): "+(this._calcend-this._calcstart)+
+		"\n  Totalpolls: "+(this._totalpolls)+
 		//"\n  Totalpreptime (s): "+(this._totalpreptime/1000)+
 		"\n  Totalcalctime (s): "+(this._totalcalctime/1000);
+		
+		// statistics for VertexIntervalls
+		// min, max, avg size
+		int min = Integer.MAX_VALUE;
+		int max = 0;
+		long sum = 0;
+		for (Node node : this._network.getNodes().values()) {
+			int size = this._labels.get(node).getSize(); 
+			sum += size;
+			min = Math.min(min, size);
+			max = Math.max(max, size);
+		}
+		result += "\n  Size of VertexIntervalls (min/avg/max): " + min + " / " + sum / (double) this._network.getNodes().size() + " / " + max + "\n"; 
 		return result;
 	}
 	

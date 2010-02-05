@@ -169,6 +169,14 @@ public class EdgeIntervalls {
 		return str.toString();	
 	}
 	
+	/**
+	 * Returns the number of stored intervals
+	 * @return the number of stored intervals
+	 */
+	public int getSize() {		
+		return this._tree._size;
+	}
+	
 	
 	/**
 	 * gives the last Stored EdgeIntervall
@@ -422,22 +430,24 @@ public class EdgeIntervalls {
 	/**
 	 * increeases the flow into an edge from time t to t+1 by f if capacity is obeyed
 	 * @param t raising time
-	 * @param f aumount of flow to augment
+	 * @param f aumount of flow to augment (can be negative)
 	 * @param u capcity of the edge
 	 */
 	public void augment(final int t,final int f,final int u){
 		if (t<0){
 			throw new IllegalArgumentException("negative time: "+ t);
-				}
+		}
 		EdgeIntervall i = getIntervallAt(t);
-		if (i.getFlow()+f>u){
+		if (i.getFlow() + f > u){
 			throw new IllegalArgumentException("too much flow! flow: " + i.getFlow() + " + " +
 					f + " > " + u);
 		}
-		if (i.getFlow()+f<0){
+		if (i.getFlow() + f < 0){
 			throw new IllegalArgumentException("negative flow! flow: " + i.getFlow() + " + " +
 					f + " < 0");
 		}
+		
+		// FIXME one of these cases should not happen ...
 		if(i.getLowBound() < t){
 			i= splitAt(t);
 		}
@@ -451,6 +461,7 @@ public class EdgeIntervalls {
 	 * decreases the flow into an edge from time t to t+1 by f if flow remains nonnegative
 	 * @param t raising time
 	 * @param f amount of flow to reduce
+	 * @deprecated
 	 */
 	public void augmentreverse(final int t,final int f){
 		if (t<0){
