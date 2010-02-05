@@ -73,7 +73,7 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 						y = act.getCoord().getY();
 					}
 
-					if(x == Double.NaN || y == Double.NaN){
+					if(Double.isNaN(x) || Double.isNaN(y)){
 						System.err.print("Coords are null");
 					}
 

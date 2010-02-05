@@ -42,7 +42,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 	public AbstractFeatureType createActFeature(ActivityImpl act, StyleType style) {
 
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
-		p.setName(act.getType().toString() + " act");
+		p.setName(act.getType() + " act");
 		p.setDescription(this.createActDescription(act));
 		Coord coord = this.coordTransform.transform(act.getCoord());
 		PointType point = this.kmlObjectFactory.createPointType();

@@ -20,7 +20,7 @@ public class MyKmlStyleFactory extends MatsimKmlStyleFactory{
 	
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	private DocumentType document;
-	private KMZWriter writer = null;
+//	private KMZWriter writer = null;
 	
 	
 	private StyleType myCarNetworklinkStyle;
@@ -43,9 +43,8 @@ public class MyKmlStyleFactory extends MatsimKmlStyleFactory{
 
 	public MyKmlStyleFactory(KMZWriter writer, DocumentType document) {
 		super(writer, document);
-		this.writer = writer;
+//		this.writer = writer;
 		this.document = document;
-		// TODO Auto-generated constructor stub
 	}
 	
 	public StyleType createCarNetworkLinkStyle() throws IOException {

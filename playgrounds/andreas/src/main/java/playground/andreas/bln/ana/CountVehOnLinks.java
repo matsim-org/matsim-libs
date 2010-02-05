@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -36,22 +37,17 @@ public class CountVehOnLinks implements TabularFileHandler {
 			log.info("Ignoring: " + tempBuffer);
 		} else {
 			if(row[5].equalsIgnoreCase("entered link")){
-				try {
-					if(this.linkMapWithCounts.get(row[2]) == null){
-						this.linkMapWithCounts.put(row[2], Integer.valueOf(0));
-					}						
-					
-					this.linkMapWithCounts.put(row[2], Integer.valueOf(this.linkMapWithCounts.get(row[2]).intValue() + 1));
-										
-				} catch (Exception e) {
-					// TODO: handle exception
-				}				
+
+				if(this.linkMapWithCounts.get(row[2]) == null){
+					this.linkMapWithCounts.put(row[2], Integer.valueOf(0));
+				}						
+				
+				this.linkMapWithCounts.put(row[2], Integer.valueOf(this.linkMapWithCounts.get(row[2]).intValue() + 1));
+
 			}		
-	
 		}
 		
 	}
-	
 	
 	public static HashMap<String, Integer> readFile(String filename) throws IOException {
 		
@@ -75,15 +71,16 @@ public class CountVehOnLinks implements TabularFileHandler {
 			outputEvent1 = CountVehOnLinks.readFile(filename1);
 			outputEvent2 = CountVehOnLinks.readFile(filename2);
 			
-			for (String string : outputEvent1.keySet()) {
+			for (Entry<String, Integer> entry : outputEvent1.entrySet()) {
 				
-				if(outputEvent2.containsKey(string)){
-					compareMap.put(string, Integer.valueOf((outputEvent1.get(string)).intValue() - (outputEvent2.get(string)).intValue()));					
+				if(outputEvent2.containsKey(entry.getKey())){
+					compareMap.put(entry.getKey(), Integer.valueOf(entry.getValue().intValue() - (outputEvent2.get(entry.getKey())).intValue()));					
 				} else {
-					compareMap.put(string, Integer.valueOf(outputEvent1.get(string).intValue()));
+					compareMap.put(entry.getKey(), Integer.valueOf(entry.getValue().intValue()));
 				}
 										
 			}
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -93,6 +90,10 @@ public class CountVehOnLinks implements TabularFileHandler {
 	}
 	
 	public static void main(String[] args) {
+		
+		String event1Filename = "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\1000.events.txt"; 
+		String event2Filename = "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\1000.events.txt";
+		String outFilename = "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\count.txt";
 
 		HashMap<String, Integer> outputEvent1 = null;
 		HashMap<String, Integer> outputEvent2 = null;
@@ -102,18 +103,18 @@ public class CountVehOnLinks implements TabularFileHandler {
 		BufferedWriter writer;
 		try {
 
-			outputEvent1 = CountVehOnLinks.readFile("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\1000.events.txt");
-			outputEvent2 = CountVehOnLinks.readFile("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\1000.events.txt");
+			outputEvent1 = CountVehOnLinks.readFile(event1Filename);
+			outputEvent2 = CountVehOnLinks.readFile(event2Filename);
 			
-			for (String string : outputEvent1.keySet()) {
+			for (Entry<String, Integer> entry : outputEvent1.entrySet()) {
 				
-				if(outputEvent2.containsKey(string)){
-					compareMap.put(string, Integer.valueOf((outputEvent1.get(string)).intValue() - (outputEvent2.get(string)).intValue()));					
+				if(outputEvent2.containsKey(entry.getKey())){
+					compareMap.put(entry.getKey(), Integer.valueOf(entry.getValue().intValue() - (outputEvent2.get(entry.getKey())).intValue()));					
 				}
 									
 			}			
 			
-			writer = new BufferedWriter(new FileWriter(new File("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\count.txt")));
+			writer = new BufferedWriter(new FileWriter(new File(outFilename)));
 
 			writer.write("link Id, 24hcount");
 			writer.newLine();
@@ -127,15 +128,11 @@ public class CountVehOnLinks implements TabularFileHandler {
 			writer.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		//			log.info("Finished writing trips to " + filename);
 
-
 		System.out.print("Wait");
-
-
 	}
 	
 }

@@ -35,7 +35,7 @@ public class EventReader implements TabularFileHandler {
 				try {
 					this.agentIds.add(Integer.valueOf((row[1])));
 				} catch (Exception e) {
-					// TODO: handle exception
+					e.printStackTrace();
 				}				
 			}		
 	

@@ -181,7 +181,7 @@ public class MergeCoord {
 									Integer.valueOf(person.getId().toString());
 									agentIds.add(Integer.valueOf(person.getId().toString()));
 								} catch (Exception e) {
-									// TODO: handle exception
+									e.printStackTrace();
 								}
 							}
 						}
@@ -261,7 +261,7 @@ public class MergeCoord {
 									Integer.valueOf(person.getId().toString());
 									agentIds.add(Integer.valueOf(person.getId().toString()));
 								} catch (Exception e) {
-									// TODO: handle exception
+									e.printStackTrace();
 								}
 							}
 						}

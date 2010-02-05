@@ -119,7 +119,7 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 
 		ScenarioImpl bigScenario = new ScenarioImpl();
 
-		String wholeBigNetworkFile = "D:/Berlin/BVG/berlin-bvg09/pt/baseplan_900s_bignetwork/network.multimodal.xml.gz";
+//		String wholeBigNetworkFile = "D:/Berlin/BVG/berlin-bvg09/pt/baseplan_900s_bignetwork/network.multimodal.xml.gz";
 		String unroutedWholePlansFile = "D:/Berlin/BVG/berlin-bvg09/pop/baseplan_900s.xml.gz";
 		String wholeRoutedPlansFile = "D:/Berlin/BVG/berlin-bvg09/pt/baseplan_900s_bignetwork/baseplan_900s.routedOevModell.xml.gz";
 		String outPlansFile = "./subset_pop.xml.gz";
@@ -134,9 +134,10 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 //		String outPlansFile = "./subset_pop.xml.gz";
 //		String ptLinesToKeep = "./linien_im_untersuchungsgebiet.txt";
 
-		System.out.println("Reading network " + wholeBigNetworkFile);
-		NetworkLayer wholeBigNet = bigScenario.getNetwork();
-		new MatsimNetworkReader(bigScenario).readFile(wholeBigNetworkFile);
+		// not needed
+//		System.out.println("Reading network " + wholeBigNetworkFile);
+//		NetworkLayer wholeBigNet = bigScenario.getNetwork();
+//		new MatsimNetworkReader(bigScenario).readFile(wholeBigNetworkFile);
 
 		System.out.println("Reading routed population: " + wholeRoutedPlansFile);
 		PopulationImpl wholeRoutedPop = new ScenarioImpl().getPopulation();

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -188,9 +189,9 @@ public class BlnPlansGenerator {
 		HashMap<Id,ArrayList<String[]>> filteredTripData = new HashMap<Id,ArrayList<String[]>>();
 		int numberOfPersonsWithOnlyOneTrip = 0;
 
-		for (Id personsId : unfilteredTripData.keySet()) {
-			if(unfilteredTripData.get(personsId).size() > 1){
-				filteredTripData.put(personsId, unfilteredTripData.get(personsId));
+		for (Entry<Id, ArrayList<String[]>> entry : unfilteredTripData.entrySet()) {
+			if(entry.getValue().size() > 1){
+				filteredTripData.put(entry.getKey(), entry.getValue());
 			} else {
 				numberOfPersonsWithOnlyOneTrip++;
 			}
@@ -204,10 +205,10 @@ public class BlnPlansGenerator {
 		HashMap<Id, ArrayList<String[]>> filteredTripData = new HashMap<Id, ArrayList<String[]>>();
 		int numberOfTripsWithInvalidCoord = 0;
 
-		for (Id personsId : unfilteredTripData.keySet()) {
+		for (Entry<Id, ArrayList<String[]>> entry : unfilteredTripData.entrySet()) {
 			ArrayList<String[]> filteredArrayList = new ArrayList<String[]>();
 
-			for (String[] dataString : unfilteredTripData.get(personsId)) {
+			for (String[] dataString : entry.getValue()) {
 
 				// Ignore trips with invalid coordinates
 				if (Double.parseDouble(dataString[11]) > 1.0 && Double.parseDouble(dataString[12]) > 1.0){
@@ -216,7 +217,7 @@ public class BlnPlansGenerator {
 					numberOfTripsWithInvalidCoord++;
 				}
 			}
-			filteredTripData.put(personsId, filteredArrayList);
+			filteredTripData.put(entry.getKey(), filteredArrayList);
 		}
 
 		log.info("Filtered " + numberOfTripsWithInvalidCoord + " trips, cause coords weren't specified.");
@@ -244,18 +245,18 @@ public class BlnPlansGenerator {
 			}
 		}
 
-		for (Id personsId : unfilteredTripData.keySet()) {
+		for (Entry<Id, ArrayList<String[]>> entry : unfilteredTripData.entrySet()) {
 			ArrayList<String[]> filteredArrayList = new ArrayList<String[]>();
 
-			for (String[] dataString : unfilteredTripData.get(personsId)) {
+			for (String[] dataString : entry.getValue()) {
 
 				// Ignore trips with invalid coordinates
 				if (Double.parseDouble(dataString[11]) > 1.0 && Double.parseDouble(dataString[12]) > 1.0){
 					filteredArrayList.add(dataString);
 				} else {
 
-					if (sortedCoordMapData.get(personsId) != null){
-						for (String[] coordMapEntry : sortedCoordMapData.get(personsId)) {
+					if (sortedCoordMapData.get(entry.getKey()) != null){
+						for (String[] coordMapEntry : sortedCoordMapData.get(entry.getKey())) {
 
 							// replace coord, if possible
 							if (dataString[2].equalsIgnoreCase(coordMapEntry[1])){
@@ -272,7 +273,7 @@ public class BlnPlansGenerator {
 					}
 				}
 			}
-			filteredTripData.put(personsId, filteredArrayList);
+			filteredTripData.put(entry.getKey(), filteredArrayList);
 		}
 
 		log.info("Filtered " + numberOfTripsWithInvalidCoord + " trips, cause coords weren't specified.");
@@ -284,10 +285,10 @@ public class BlnPlansGenerator {
 		double numberOfPlansFound = 0;
 
 		log.info("Adding Plans to Person, spreading time is " + BlnPlansGenerator.spreadingTime + "s");
-		for (Id personId : tripData.keySet()) {
+		for (Entry<Id, ArrayList<String[]>> entry : tripData.entrySet()) {
 
-			ArrayList<String[]> curTripList = tripData.get(personId);
-			Person curPerson = personList.get(personId);
+			ArrayList<String[]> curTripList = entry.getValue();
+			Person curPerson = personList.get(entry.getKey());
 			Plan curPlan;
 
 			if(curPerson.getSelectedPlan() == null){
