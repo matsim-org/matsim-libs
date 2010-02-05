@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.io.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -73,6 +74,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	protected final TransportMode[]			possibleModes;
 	protected List<LinkNetworkRouteImpl> 	routes;
 	private final Network network;
+	protected PrintStream 					stream;
+	boolean 								printing = false;
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -199,6 +202,29 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	
 	public void run (Plan basePlan){
 		
+		if (printing){
+			String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+basePlan.getPerson().getId()+".xls");
+			Counter.timeOptCounter++;
+			try {
+				stream = new PrintStream (new File(outputfile));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				return;
+			}
+			stream.print(basePlan.getScore()+"\t");
+			for (int z= 0;z<basePlan.getPlanElements().size();z=z+2){
+			ActivityImpl act = (ActivityImpl)basePlan.getPlanElements().get(z);
+				stream.print(act.getType()+"\t");
+			}
+			stream.println();
+			stream.print("\t");
+			for (int z= 0;z<basePlan.getPlanElements().size();z=z+2){
+				stream.print(((ActivityImpl)(basePlan.getPlanElements()).get(z)).getDuration()+"\t");
+			}
+			stream.println();
+		}
+		
+		
 		/*Do nothing if the plan has only one or two activities (=24h home)*/
 		if (basePlan.getPlanElements().size()<=3) return;
 		
@@ -262,27 +288,20 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				}
 				move = this.cleanSchedule(this.minimumTime.get(((ActivityImpl)plan.getPlanElements().get(0)).getType()), plan);
 				if (move!=0.0){
-					/*
-					// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
-					PlanomatXPlan planAux = new PlanomatXPlan(basePlan.getPerson());
-					planAux.copyPlan(basePlan);
-					double tmpScore = -100000;
-					if (this.possibleModes.length>0){						
-						tmpScore = this.chooseModeAllChains(planAux, basePlan.getPlanElements(), planAnalyzeSubtours, subtourDis);
-					}
-			
-					if (tmpScore!=-100000) {
-						log.warn("Valid initial solution found by full mode choice run.");
-						// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
-						basePlan.copyPlan(planAux);
-						break;
-					}
-					else {		*/		
-						// TODO Check whether allowed?
+					// TODO Check whether allowed?
 					basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
-						log.warn("No valid initial solution found for person "+plan.getPerson().getId()+"!");
-						return;
-			//		}
+				//	log.info("No valid initial solution found for person "+plan.getPerson().getId()+"!");
+				/*	for (int i=0;i<plan.getPlanElements().size();i++){
+						if (i%2==0){
+							ActivityImpl act = ((ActivityImpl) (plan.getPlanElements().get(i)));
+							log.info("act "+i+" = "+act.getType()+", "+act.getStartTime()+", "+act.calculateDuration()+", "+act.getEndTime());
+						}
+						else{
+							LegImpl leg = ((LegImpl) (plan.getPlanElements().get(i)));
+							log.info("leg "+i+" = "+leg.getMode()+", "+leg.getRoute().getDistance()+", "+leg.getDepartureTime()+", "+leg.getTravelTime()+", "+leg.getArrivalTime());
+						}
+					}*/
+					return;
 				}
 			}
 			loops++;
@@ -313,28 +332,6 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		int currentIteration							= 1;
 		int lastImprovement 							= 0;
 		
-		/*
-		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
-		Counter.timeOptCounter++;
-		PrintStream stream;
-		try {
-			stream = new PrintStream (new File(outputfile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		stream.print(plan.getScore()+"\t");
-		for (int z= 0;z<plan.getPlanElements().size();z=z+2){
-		Activity act = (Activity)plan.getPlanElements().get(z);
-			stream.print(act.getType()+"\t");
-		}
-		stream.println();
-		stream.print("\t");
-		for (int z= 0;z<plan.getPlanElements().size();z=z+2){
-			stream.print(((Activity)(plan.getPlanElements()).get(z)).getDuration()+"\t");
-		}
-		stream.println();
-		*/
 		
 		/* Copy the plan into all fields of the array neighbourhood */
 		for (int i = 0; i < initialNeighbourhood.length; i++){
@@ -378,7 +375,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		/* Do Tabu Search iterations */
 		for (currentIteration = 2; currentIteration<=MAX_ITERATIONS;currentIteration++){
 			
-		//	stream.println("Iteration "+currentIteration);
+			if (printing) stream.println("Iteration "+currentIteration);
 			
 			this.createNeighbourhood((PlanomatXPlan)plan, neighbourhood, score, moves, position, planAnalyzeSubtours, subtourDis);
 			pointer = this.findBestSolution (neighbourhood, score, moves, position);
@@ -418,7 +415,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		
 		
 		/* Update the plan with the final solution */ 		
-	//	stream.println("Selected solution\t"+bestScore);
+		if (printing) stream.println("Selected solution\t"+bestScore);
 		List<? extends PlanElement> al = basePlan.getPlanElements();
 		basePlan.setScore(bestScore);
 		
@@ -828,20 +825,20 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				position[0]=moves[i][0];
 				position[1]=moves[i][1];
 			}
-			/*
-			stream.print(score[i]+"\t"+((Leg)(neighbourhood[i].get(1))).getDepartureTime()+"\t");
-			stream.print(((Leg)(neighbourhood[i].get(1))).getRoute().getStartLinkId()+"\t"+((Leg)(neighbourhood[i].get(1))).getRoute().getEndLinkId()+"\t");
-			stream.print(((Leg)(neighbourhood[i].get(1))).getMode()+"\t");
-			for (int z= 2;z<neighbourhood[i].size()-1;z=z+2){
-				stream.print((((Leg)(neighbourhood[i].get(z+1))).getDepartureTime()-((Leg)(neighbourhood[i].get(z-1))).getArrivalTime())+"\t");
-				stream.print(((Leg)(neighbourhood[i].get(z+1))).getRoute().getStartLinkId()+"\t"+((Leg)(neighbourhood[i].get(z+1))).getRoute().getEndLinkId()+"\t");
-				stream.print(((Leg)(neighbourhood[i].get(z+1))).getMode()+"\t");
+			if (printing){
+				stream.print(score[i]+"\t"+((LegImpl)(neighbourhood[i].get(1))).getDepartureTime()+"\t");
+				stream.print(((LegImpl)(neighbourhood[i].get(1))).getRoute().getStartLinkId()+"\t"+((LegImpl)(neighbourhood[i].get(1))).getRoute().getEndLinkId()+"\t");
+				stream.print(((LegImpl)(neighbourhood[i].get(1))).getMode()+"\t");
+				for (int z= 2;z<neighbourhood[i].size()-1;z=z+2){
+					stream.print((((LegImpl)(neighbourhood[i].get(z+1))).getDepartureTime()-((LegImpl)(neighbourhood[i].get(z-1))).getArrivalTime())+"\t");
+					stream.print(((LegImpl)(neighbourhood[i].get(z+1))).getRoute().getStartLinkId()+"\t"+((LegImpl)(neighbourhood[i].get(z+1))).getRoute().getEndLinkId()+"\t");
+					stream.print(((LegImpl)(neighbourhood[i].get(z+1))).getMode()+"\t");
+				}
+				stream.print(86400-((LegImpl)(neighbourhood[i].get(neighbourhood[i].size()-2))).getArrivalTime()+"\t");
+				stream.println();
 			}
-			stream.print(86400-((Leg)(neighbourhood[i].get(neighbourhood[i].size()-2))).getArrivalTime()+"\t");
-			stream.println();
-			*/
 		}
-	//	stream.println("Iteration's best score\t"+firstScore);
+		if (printing) stream.println("Iteration's best score\t"+firstScore);
 		
 		/* clean-up acts of plan (=bestIterSolution) */
 		if (pointer!=-1) this.cleanActs(neighbourhood[pointer]);
