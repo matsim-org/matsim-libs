@@ -52,4 +52,12 @@ public interface BasicVehicleType {
 	public BasicVehicleCapacity getCapacity();
 	
 	public Id getId();
+	
+	public double getAccessTime();
+	
+	public void setAccessTime(double seconds);
+	
+	public double getEgressTime();
+	
+	public void setEgressTime(double seconds);
 }

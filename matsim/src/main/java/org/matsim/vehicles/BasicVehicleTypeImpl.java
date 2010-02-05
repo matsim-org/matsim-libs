@@ -32,6 +32,14 @@ public class BasicVehicleTypeImpl implements BasicVehicleType {
 	private BasicEngineInformation engineInformation;
 	private String description;
 	private BasicVehicleCapacity capacity;
+	/**
+	 * default from xml schema
+	 */
+	private double accessTime = 1.0;
+  /**
+   * default from xml schema
+   */
+	private double egressTime = 1.0;
 	
 	private Id id;
 
@@ -90,5 +98,25 @@ public class BasicVehicleTypeImpl implements BasicVehicleType {
 	public Id getId() {
 		return id;
 	}
+
+  @Override
+  public double getAccessTime() {
+    return this.accessTime;
+  }
+
+  @Override
+  public double getEgressTime() {
+    return this.egressTime;
+  }
+
+  @Override
+  public void setAccessTime(double seconds) {
+    this.accessTime = seconds;
+  }
+
+  @Override
+  public void setEgressTime(double seconds) {
+    this.egressTime = seconds;
+  }
 
 }

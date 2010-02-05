@@ -21,6 +21,8 @@
     <fuelType>diesel</fuelType>
     <gasConsumption literPerMeter="0.23"/>
   </engineInformation>
+  <accessTime secondsPerPerson="23.23" />
+  <egressTime secondsPerPerson="42.42" />
 </vehicleType>
 
 <vehicleType id="defaultValueCar">

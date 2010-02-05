@@ -27,13 +27,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.BasicEngineInformation;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicleReaderV1;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicles;
-import org.matsim.vehicles.BasicVehiclesImpl;
-import org.matsim.vehicles.VehicleWriterV1;
 
 /**
  * @author dgrether
@@ -95,6 +88,8 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertNotNull(vehType.getEngineInformation());
 		assertEquals(BasicEngineInformation.FuelType.diesel, vehType.getEngineInformation().getFuelType());
 		assertEquals(0.23, vehType.getEngineInformation().getGasConsumption(), EPSILON);
+		assertEquals(23.23, vehType.getAccessTime(), EPSILON);
+		assertEquals(42.42, vehType.getEgressTime(), EPSILON);
 		
 		vehType = vehicleTypes.get(new IdImpl("defaultValueCar"));
 		assertNotNull(vehType);

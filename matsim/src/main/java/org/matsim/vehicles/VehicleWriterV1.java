@@ -104,6 +104,13 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 			if (vt.getEngineInformation() != null) {
 				this.writeEngineInformation(vt.getEngineInformation());
 			}
+			atts.clear();
+			atts.add(this.createTuple(VehicleSchemaV1Names.SECONDSPERPERSON, vt.getAccessTime()));
+			this.writeStartTag(VehicleSchemaV1Names.ACCESSTIME, atts, true);
+			atts.clear();
+      atts.add(this.createTuple(VehicleSchemaV1Names.SECONDSPERPERSON, vt.getEgressTime()));
+      this.writeStartTag(VehicleSchemaV1Names.EGRESSTIME, atts, true);
+
 			this.writeEndTag(VehicleSchemaV1Names.VEHICLETYPE);
 		}
 	}

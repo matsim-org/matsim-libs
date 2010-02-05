@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.BasicEngineInformation.FuelType;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -147,6 +146,12 @@ public class BasicVehicleReaderV1 extends MatsimXmlParser {
 			Id id = new IdImpl(atts.getValue(VehicleSchemaV1Names.ID));
 			BasicVehicle v = this.builder.createVehicle(id, type);
 			this.vehicles.getVehicles().put(id, v);
+		}
+		else if (VehicleSchemaV1Names.ACCESSTIME.equalsIgnoreCase(name)){
+		  this.currentVehType.setAccessTime(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.SECONDSPERPERSON)));
+		}
+		else if (VehicleSchemaV1Names.EGRESSTIME.equalsIgnoreCase(name)){
+		  this.currentVehType.setEgressTime(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.SECONDSPERPERSON)));
 		}
 	}
 		
