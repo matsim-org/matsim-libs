@@ -67,6 +67,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private final String seasonTicket;
 	private final double income;
 	private final int female;
+	private final int age;
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
 	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
@@ -80,23 +81,26 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 	private static final Logger log = Logger.getLogger(JohScoringFunctionEstimation.class);
 	
-	private static final TreeMap<String, JohActUtilityParameters> utilParams = new TreeMap<String, JohActUtilityParameters>();
-	private static double marginalUtilityOfWaiting = 0; //war -6
+	private static final TreeMap<String, JohActUtilityParametersExtended> utilParams = new TreeMap<String, JohActUtilityParametersExtended>();
+	private static double marginalUtilityOfWaiting = 0; 
 	private static double factorOfLateArrival = 3; 
-	private static double marginalUtilityOfEarlyDeparture = 0; // war -0
+	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	private static double beta_time_car = -4.08; // war fuer alle -6
-	private static double beta_time_pt = 0.355; 
-	private static double beta_time_walk = -1.94;
+	// Settings of 0990
+	private static double beta_time_car = -3.02; 
+	private static double beta_time_pt = 0.397; 
+	private static double beta_time_bike = -1.96;
+	private static double beta_time_walk = -1.81;
 	
-	private static double constantPt = -0.659;
-	private static double constantWalk = 0.774;
+	private static double constantPt = -0.534;
+	private static double constantBike = 0.120;
+	private static double constantWalk = 0.802;
 	
-	private static double beta_cost_car = 0.0569;
+	private static double beta_cost_car = 0.0382;
 	private static double beta_cost_pt = -0.115;
 	
-	private static double beta_female_act = 0.169;
-	private static double beta_female_travel = 0.158;
+	private static double beta_female_act = -0.0976;
+	private static double beta_female_travel = 0.149;
 	
 	private static double travelCostCar = 0.5;	// CHF/km
 	private static double travelCostPt_None = 0.28;	// CHF/km
@@ -106,34 +110,46 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double repeat = 0;
 	
 	private static final double uMin_home = 0;
+	private static final double uMin_innerHome = 0;
 	private static final double uMin_work = 0;
 	private static final double uMin_education = 0;
 	private static final double uMin_shopping = 0;
 	private static final double uMin_leisure = 0;
 	
-	private static final double uMax_home = 4.94; //60
-	private static final double uMax_work= 2.68;  //55
-	private static final double uMax_education = 1.29;//40
-	private static final double uMax_shopping = 0.681; //12
-	private static final double uMax_leisure = 0.987;  //35
+	private static final double uMax_home = 6.39; 
+	private static final double uMax_innerHome = 1.15; 
+	private static final double uMax_work= 4.31;  
+	private static final double uMax_education = 3.97;
+	private static final double uMax_shopping = 0.553; 
+	private static final double uMax_leisure = 1.39;  
 	
-	private static final double alpha_home = 8.31;//6
-	private static final double alpha_work = 6.2;//4
-	private static final double alpha_education = 2.07;//3
-	private static final double alpha_shopping = 0.264;//1
-	private static final double alpha_leisure = 0.571;//2
+	private static final double alpha_home = 3.27;
+	private static final double alpha_innerHome = 5.29;
+	private static final double alpha_work = 5.94;
+	private static final double alpha_education = 1.54;
+	private static final double alpha_shopping = 0.0530;
+	private static final double alpha_leisure = 0.0818;
 	
-	private static final double beta_home = 0.360;//1.2
-	private static final double beta_work = 0.66;
-	private static final double beta_education = 2.60;
-	private static final double beta_shopping = 5.00;
-	private static final double beta_leisure = 100;
+	private static final double beta_home = 0.280;
+	private static final double beta_innerHome = 17.7;
+	private static final double beta_work = 0.546;
+	private static final double beta_education = 100;
+	private static final double beta_shopping = 100;
+	private static final double beta_leisure = 70.8;
 	
-	private static final double gamma_home = 1;//1
+	private static final double gamma_home = 1;
+	private static final double gamma_innerHome = 1;
 	private static final double gamma_work = 1;
 	private static final double gamma_education = 1;
 	private static final double gamma_shopping = 1;
 	private static final double gamma_leisure = 1;
+	
+	private static final double beta_age_home = 0.0105;
+	private static final double beta_age_innerHome = 0; // not significant
+	private static final double beta_age_work = -0.00811;
+	private static final double beta_age_education = -0.0188;
+	private static final double beta_age_shopping = 0.0221;
+	private static final double beta_age_leisure = -0.00344;
 	
 	
 	
@@ -176,6 +192,10 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			}
 		}
 		else this.female = 0; 
+		
+		// check age
+		this.age=person.getAge();
+		
 		
 		this.plan = plan;
 		this.person = this.plan.getPerson();
@@ -243,8 +263,16 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 	private final double calcActScore(final double arrivalTime, final double departureTime, final ActivityImpl act) {
 		
-		JohActUtilityParameters params = null;
-		params = utilParams.get(act.getType());
+		JohActUtilityParametersExtended params = null;
+		if (!act.getType().equals("home")) params = utilParams.get(act.getType());
+		else {
+			if (this.index==0 || this.index==this.lastActIndex) params = utilParams.get("home");
+			else if (this.index==2 || (this.lastActIndex>=5 && this.index==this.lastActIndex-2)) {
+				params = utilParams.get("innerHome");
+				log.warn("In person's "+this.person.getId()+" plans, an home act is at 2nd or 2nd last position. This must not happen!");
+			}
+			else params = utilParams.get("innerHome");
+		}
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
@@ -312,21 +340,21 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
-			tmpScore -= factorOfLateArrival * (1 - repeat * gamma) * (1+beta_female_act*this.female) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-((activityStart - latestStartTime)/3600))),1/params.getGamma())));
+			tmpScore -= factorOfLateArrival * (1 - repeat * gamma) * (1 + beta_female_act * this.female + params.getBetaAge() * this.age) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-((activityStart - latestStartTime)/3600))),1/params.getGamma())));
 		}
 
 		// utility of performing an action
 		if (duration>=0) {
 			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
-			double utilPerf = (1 - repeat * gamma) * (1+beta_female_act*this.female) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
+			double utilPerf = (1 - repeat * gamma) * (1 + beta_female_act * this.female + params.getBetaAge() * this.age) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
 			double utilWait = (1+beta_female_act*this.female) * marginalUtilityOfWaiting / 3600 * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
 		//	log.info("negative duration of "+duration);
 			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
-			tmpScore -= factorOfLateArrival * (1 - repeat * gamma) * (1+beta_female_act*this.female) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma())));
+			tmpScore -= factorOfLateArrival * (1 - repeat * gamma) * (1 + beta_female_act * this.female + params.getBetaAge() * this.age) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma())));
 		}
 
 		// disutility if stopping too early
@@ -345,7 +373,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 	protected double[] getOpeningInterval(final ActivityImpl act) {
 
-		JohActUtilityParameters params = utilParams.get(act.getType());
+		JohActUtilityParametersExtended params = utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
@@ -368,19 +396,24 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		
 		if (TransportMode.car.equals(leg.getMode())) {
 			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000;
-		} else if (TransportMode.pt.equals(leg.getMode())) {
+		} 
+		else if (TransportMode.pt.equals(leg.getMode())) {
 			double cost = 0;
 			if (this.seasonTicket.equals("ch-GA")) cost = travelCostPt_GA;
 			else if (this.seasonTicket.equals("ch-HT")) cost = travelCostPt_Halbtax; 
 			else cost = travelCostPt_None; 
 			tmpScore += (1+beta_female_travel*this.female) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist/1000 + constantPt;
-		} else if (TransportMode.walk.equals(leg.getMode())) {
+		} 
+		else if (TransportMode.walk.equals(leg.getMode())) {
 			tmpScore += beta_time_walk * travelTime/3600 + constantWalk;
-		} else {
+		} 
+		else if (TransportMode.bike.equals(leg.getMode())) {
+		tmpScore += beta_time_bike * travelTime/3600 + constantBike;
+		}
+		else {
 			// use the same values as for "car"
 			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000;
 		}
-	//	log.info("Score = "+tmpScore);
 		return tmpScore;
 	}
 	
@@ -392,14 +425,18 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		
 		/* TODO @MF To be replaced by config file*/
 		String type;
-		JohActUtilityParameters actParams;
+		JohActUtilityParametersExtended actParams;
 			
 		type = "home";
-		actParams = new JohActUtilityParameters("home", uMin_home, uMax_home, alpha_home, beta_home, gamma_home);
+		actParams = new JohActUtilityParametersExtended("home", uMin_home, uMax_home, alpha_home, beta_home, gamma_home, beta_age_home);
+		utilParams.put(type, actParams);
+		
+		type = "innerHome";
+		actParams = new JohActUtilityParametersExtended("innerHome", uMin_innerHome, uMax_innerHome, alpha_innerHome, beta_innerHome, gamma_innerHome, beta_age_innerHome);
 		utilParams.put(type, actParams);
 		
 		type = "work";
-		actParams = new JohActUtilityParameters("work", uMin_work, uMax_work, alpha_work, beta_work, gamma_work);
+		actParams = new JohActUtilityParametersExtended("work", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
 		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(18*3600);
 		actParams.setLatestStartTime(10*3600);
@@ -407,13 +444,13 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.put(type, actParams);
 
 		type = "shopping";
-		actParams = new JohActUtilityParameters("shopping", uMin_shopping, uMax_shopping, alpha_shopping, beta_shopping, gamma_shopping);
+		actParams = new JohActUtilityParametersExtended("shopping", uMin_shopping, uMax_shopping, alpha_shopping, beta_shopping, gamma_shopping, beta_age_shopping);
 		actParams.setOpeningTime(10*3600);
 		actParams.setClosingTime(18*3600);
 		utilParams.put(type, actParams);
 
 		type = "leisure";
-		actParams = new JohActUtilityParameters("leisure", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure);
+		actParams = new JohActUtilityParametersExtended("leisure", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure, beta_age_leisure);
 		actParams.setOpeningTime(18*3600);
 		actParams.setClosingTime(22*3600);			
 		utilParams.put(type, actParams);
@@ -421,7 +458,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		
 		//TODO @ mfeil: bad programming style, I know...
 		type = "education_higher";
-		actParams = new JohActUtilityParameters("education_higher", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams = new JohActUtilityParametersExtended("education_higher", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(7*3600);
 		actParams.setClosingTime(16*3600);
 		actParams.setLatestStartTime(9*3600);
@@ -429,7 +466,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.put(type, actParams);
 		
 		type = "education_kindergarten";
-		actParams = new JohActUtilityParameters("education_kindergarten", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams = new JohActUtilityParametersExtended("education_kindergarten", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(7*3600);
 		actParams.setClosingTime(16*3600);
 		actParams.setLatestStartTime(9*3600);
@@ -437,7 +474,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.put(type, actParams);
 		
 		type = "education_other";
-		actParams = new JohActUtilityParameters("education_other", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams = new JohActUtilityParametersExtended("education_other", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(7*3600);
 		actParams.setClosingTime(16*3600);
 		actParams.setLatestStartTime(9*3600);
@@ -445,7 +482,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.put(type, actParams);
 		
 		type = "education_primary";
-		actParams = new JohActUtilityParameters("education_primary", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams = new JohActUtilityParametersExtended("education_primary", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(7*3600);
 		actParams.setClosingTime(16*3600);
 		actParams.setLatestStartTime(9*3600);
@@ -453,7 +490,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.put(type, actParams);
 		
 		type = "education_secondary";
-		actParams = new JohActUtilityParameters("education_secondary", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams = new JohActUtilityParametersExtended("education_secondary", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(7*3600);
 		actParams.setClosingTime(16*3600);
 		actParams.setLatestStartTime(9*3600);
@@ -461,13 +498,13 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.put(type, actParams);
 		
 		type = "shop";
-		actParams = new JohActUtilityParameters("shop", uMin_shopping, uMax_shopping, alpha_shopping, beta_shopping, gamma_shopping);
+		actParams = new JohActUtilityParametersExtended("shop", uMin_shopping, uMax_shopping, alpha_shopping, beta_shopping, gamma_shopping, beta_age_shopping);
 		actParams.setOpeningTime(10*3600);
 		actParams.setClosingTime(18*3600);
 		utilParams.put(type, actParams);
 		
 		type = "work_sector2";
-		actParams = new JohActUtilityParameters("work_sector2", uMin_work, uMax_work, alpha_work, beta_work, gamma_work);
+		actParams = new JohActUtilityParametersExtended("work_sector2", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
 		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(18*3600);
 		actParams.setLatestStartTime(10*3600);
@@ -475,7 +512,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.put(type, actParams);
 		
 		type = "work_sector3";
-		actParams = new JohActUtilityParameters("work_sector3", uMin_work, uMax_work, alpha_work, beta_work, gamma_work);
+		actParams = new JohActUtilityParametersExtended("work_sector3", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
 		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(18*3600);
 		actParams.setLatestStartTime(10*3600);
@@ -483,13 +520,13 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.put(type, actParams);
 		
 		type = "tta";
-		actParams = new JohActUtilityParameters("tta", uMin_work, uMax_home, alpha_home, beta_home, gamma_home);
+		actParams = new JohActUtilityParametersExtended("tta", uMin_work, uMax_home, alpha_home, beta_home, gamma_home, beta_age_home);
 		actParams.setOpeningTime(3*3600);
 		actParams.setClosingTime(24*3600);
 		utilParams.put(type, actParams);
 		
 		type = "w";
-		actParams = new JohActUtilityParameters("w", uMin_work, uMax_work, alpha_work, beta_work, gamma_work);
+		actParams = new JohActUtilityParametersExtended("w", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
 		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(18*3600);
 		actParams.setLatestStartTime(10*3600);
@@ -497,23 +534,23 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.put(type, actParams);
 		
 		type = "h";
-		actParams = new JohActUtilityParameters("h", uMin_home, uMax_home, alpha_home, beta_home, gamma_home);
+		actParams = new JohActUtilityParametersExtended("h", uMin_home, uMax_home, alpha_home, beta_home, gamma_home, beta_age_home);
 		utilParams.put(type, actParams);
 		
 		type = "s";
-		actParams = new JohActUtilityParameters("s", uMin_shopping, uMax_shopping, alpha_shopping, beta_shopping, gamma_shopping);
+		actParams = new JohActUtilityParametersExtended("s", uMin_shopping, uMax_shopping, alpha_shopping, beta_shopping, gamma_shopping, beta_age_shopping);
 		actParams.setOpeningTime(10*3600);
 		actParams.setClosingTime(18*3600);
 		utilParams.put(type, actParams);
 
 		type = "l";
-		actParams = new JohActUtilityParameters("l", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure);
+		actParams = new JohActUtilityParametersExtended("l", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure, beta_age_leisure);
 		actParams.setOpeningTime(18*3600);
 		actParams.setClosingTime(22*3600);			
 		utilParams.put(type, actParams);
 		
 		type = "e";
-		actParams = new JohActUtilityParameters("e", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams = new JohActUtilityParametersExtended("e", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(7*3600);
 		actParams.setClosingTime(16*3600);
 		actParams.setLatestStartTime(9*3600);
