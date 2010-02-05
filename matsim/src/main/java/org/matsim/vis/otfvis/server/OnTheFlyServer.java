@@ -129,7 +129,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			if (status == Status.PLAY || status == Status.STEP) {
 				queue.add(command);
 			} else {
-				System.out.println(status);
+//				System.out.println(status);
 				command.run();
 			}
 		}
