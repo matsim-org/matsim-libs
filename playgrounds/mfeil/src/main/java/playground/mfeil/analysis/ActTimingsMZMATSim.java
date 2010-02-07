@@ -63,9 +63,9 @@ public class ActTimingsMZMATSim {
 	}
 	
 	public void printHeader(PrintStream stream){
-		stream.println("Activity timings");
-		stream.println("\tHome\t\tInnerHome\tWork\tEducations\tLeisure\tShop\tPopSize");
-		stream.println("\tStart\tEnd\tDuration\tDuration\tDuration\tDuration\tDuration");	
+		stream.println("Activity timings and frequencies");
+		stream.println("\tHome\t\t\tInnerHome\t\tWork\t\tEducations\t\tLeisure\t\tShop\t\tPopSize");
+		stream.println("\tStart\tEnd\tFrequency\tDuration\tFrequency\tDuration\tFrequency\tDuration\tFrequency\tDuration\tFrequency\tDuration\tFrequency");	
 	}
 	
 	public void run(PopulationImpl populationMZ, PopulationImpl populationMATSim, PrintStream stream, final String attributesInputFile){
@@ -148,8 +148,8 @@ public class ActTimingsMZMATSim {
 			}
 		}
 		stream.print(name+"\t");
-		stream.print(Time.writeTime(endHome/counterHome)+"\t"+Time.writeTime(startHome/counterHome)+"\t");
-		stream.print(Time.writeTime(durationInnerHome/counterInnerHome)+"\t"+Time.writeTime(durationWork/counterWork)+"\t"+Time.writeTime(durationEducation/counterEducation)+"\t"+Time.writeTime(durationLeisure/counterLeisure)+"\t"+Time.writeTime(durationShop/counterShop)+"\t");
+		stream.print(Time.writeTime(endHome/counterHome)+"\t"+Time.writeTime(startHome/counterHome)+"\t"+counterHome+"\t");
+		stream.print(Time.writeTime(durationInnerHome/counterInnerHome)+"\t"+counterInnerHome+"\t"+Time.writeTime(durationWork/counterWork)+"\t"+counterWork+"\t"+Time.writeTime(durationEducation/counterEducation)+"\t"+counterEducation+"\t"+Time.writeTime(durationLeisure/counterLeisure)+"\t"+counterLeisure+"\t"+Time.writeTime(durationShop/counterShop)+"\t"+counterShop+"\t");
 		stream.println(size);
 	}		
 		
