@@ -82,7 +82,6 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final Logger log = Logger.getLogger(JohScoringFunctionEstimation.class);
 	
 	private static final TreeMap<String, JohActUtilityParametersExtended> utilParams = new TreeMap<String, JohActUtilityParametersExtended>();
-	private static double marginalUtilityOfWaiting = 0; 
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
@@ -248,7 +247,6 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	}
 
 	public double getScore() {
-	//	if (this.score<0) log.info("score = "+this.score);
 		return this.score;
 	}
 
@@ -256,8 +254,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		if (initialized) return;
 		utilParams.clear();
 		readUtilityValues();
-		scoreActs = ((marginalUtilityOfWaiting != 0) ||
-				(factorOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
+		scoreActs = ((factorOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
 		initialized = true;
 	}
 
@@ -329,29 +326,21 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		}
 		double duration = activityEnd - activityStart;
 
-		// disutility if too early
-		if (arrivalTime < activityStart) {
-			// agent arrives to early, has to wait
-			tmpScore += marginalUtilityOfWaiting / 3600 * (activityStart - arrivalTime);
-		}
-
 		// disutility if too late: multiplicate utility of activity duration with penalty factor
 		double latestStartTime = params.getLatestStartTime();
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
-			tmpScore -= factorOfLateArrival * (1 - repeat * gamma) * (1 + beta_female_act * this.female + params.getBetaAge() * this.age) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-((activityStart - latestStartTime)/3600))),1/params.getGamma())));
+			// Maximum function since, in theory, utility may be negative and thus add positive to overall utility
+			tmpScore -= Math.max(0, factorOfLateArrival * (1 - repeat * gamma) * (1 + beta_female_act * this.female + params.getBetaAge() * this.age) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-((activityStart - latestStartTime)/3600))),1/params.getGamma()))));
 		}
 
 		// utility of performing an action
 		if (duration>=0) {
 			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
-			double utilPerf = (1 - repeat * gamma) * (1 + beta_female_act * this.female + params.getBetaAge() * this.age) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
-			double utilWait = (1+beta_female_act*this.female) * marginalUtilityOfWaiting / 3600 * duration;
-			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+			tmpScore += (1 - repeat * gamma) * (1 + beta_female_act * this.female + params.getBetaAge() * this.age) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
 		} else {
-		//	log.info("negative duration of "+duration);
 			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
 			tmpScore -= factorOfLateArrival * (1 - repeat * gamma) * (1 + beta_female_act * this.female + params.getBetaAge() * this.age) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma())));
@@ -362,12 +351,6 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
 			tmpScore += marginalUtilityOfEarlyDeparture / 3600 * (earliestEndTime - activityEnd);
 		}
-
-		// disutility if going to away to late
-		if (activityEnd < departureTime) {
-			tmpScore += marginalUtilityOfWaiting / 3600 * (departureTime - activityEnd);
-		}
-		//if (this.id.toString().equals("10")) System.out.println (tmpScore);
 		return tmpScore;
 	}
 
