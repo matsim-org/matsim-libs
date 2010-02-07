@@ -578,5 +578,22 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		this.score += lg;
 		this.index++;
 	}
+	
+	public void writeParametersToLog(){
+		log.info("Activities:");
+		log.info("Home: uMin_home = "+uMin_home+", uMax_home = "+uMax_home+", alpha_home = "+alpha_home+", beta_home = "+beta_home+", gamma_home = "+gamma_home+", beta_age_home = "+beta_age_home);
+		log.info("InnerHome: uMin_innerHome = "+uMin_innerHome+", uMax_innerHome = "+uMax_innerHome+", alpha_innerHome = "+alpha_innerHome+", beta_innerHome = "+beta_innerHome+", gamma_innerHome = "+gamma_innerHome+", beta_age_innerHome = "+beta_age_innerHome);
+		log.info("Work: uMin_work = "+uMin_work+", uMax_worke = "+uMax_work+", alpha_work = "+alpha_work+", beta_work = "+beta_work+", gamma_work = "+gamma_work+", beta_age_work = "+beta_age_work);
+		log.info("Education: uMin_education = "+uMin_education+", uMax_education = "+uMax_education+", alpha_education = "+alpha_education+", beta_education = "+beta_education+", gamma_education = "+gamma_education+", beta_age_education = "+beta_age_education);
+		log.info("Leisure: uMin_leisure = "+uMin_leisure+", uMax_leisure = "+uMax_leisure+", alpha_leisure = "+alpha_leisure+", beta_leisure = "+beta_leisure+", gamma_leisure = "+gamma_leisure+", beta_age_leisure = "+beta_age_leisure);
+		log.info("Shopping: uMin_shopping = "+uMin_shopping+", uMax_shopping = "+uMax_shopping+", alpha_shopping = "+alpha_shopping+", beta_shopping = "+beta_shopping+", gamma_shopping = "+gamma_shopping+", beta_age_shopping = "+beta_age_shopping);
+		log.info("Legs:");
+		log.info("Car: beta_time_car = "+beta_time_car+", beta_cost_car = "+beta_cost_car); 
+		log.info("PT: beta_time_pt = "+beta_time_pt+", beta_cost_pt = "+beta_cost_pt+", constantPt = "+constantPt); 
+		log.info("Bike: beta_time_bike = "+beta_time_bike+", constantBike = "+constantBike); 
+		log.info("Walk: beta_time_walk = "+beta_time_walk+", constantWalk = "+constantWalk); 
+		log.info("Gender:");
+		log.info("beta_female_act = "+beta_female_act+", beta_female_travel = "+beta_female_travel);
+	}
 
 }
