@@ -87,6 +87,16 @@ public class PersonAgent implements DriverAgent {
 		this.cacheRouteNodes = null;
 		this.destinationLinkId = null;
 		
+		/*
+		 * The Leg may have been exchanged in the Person's Plan, so
+		 * we update the Reference to the currentLeg Object.
+		 */
+		PlanElement currentPlanElement = this.getPlanElements().get(this.currentPlanElementIndex);
+		if (currentPlanElement instanceof LegImpl)
+		{
+			this.setCurrentLeg((LegImpl) currentPlanElement);			
+		}
+		
 		RouteWRefs route = currentLeg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
