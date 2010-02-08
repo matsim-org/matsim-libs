@@ -1,3 +1,4 @@
+package playground.dressler.ea_flow.alt;
 /* *********************************************************************** *
  * project: org.matsim.*
  * Distances.java
@@ -16,7 +17,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 
 package playground.dressler.ea_flow;
 
@@ -29,12 +30,12 @@ import org.matsim.core.network.NetworkLayer;
 
 public class Distances {
 
-	/**----------- Fields -------------*/
+	*//**----------- Fields -------------*//*
 	final NetworkLayer network;
 	
 	private Hashtable<Node, Integer> distLables = new Hashtable<Node, Integer>();
 	
-	/**----------- Constructor -------------*/
+	*//**----------- Constructor -------------*//*
 	
 	public Distances(final NetworkLayer network){
 		this.network = network;
@@ -55,7 +56,7 @@ public class Distances {
 		}
 	}
 	
-	/**----------- Getter and Setter -------------*/
+	*//**----------- Getter and Setter -------------*//*
 	
 	// returns false if time > currend distLabel for the node
 	public boolean setDistance(Node node, int time){
@@ -73,7 +74,7 @@ public class Distances {
 	}
 	
 	
-	/**----------- Other Methods -------------*/
+	*//**----------- Other Methods -------------*//*
 	
 	public Integer getMinTime(Node node){
 		return distLables.get(node);
@@ -87,7 +88,7 @@ public class Distances {
 	}
 	
 	
-	/**----------- Print -------------*/
+	*//**----------- Print -------------*//*
 	
 	public void printAll(){
 		for (Node n : network.getNodes().values()){
@@ -116,3 +117,4 @@ public class Distances {
 		System.out.println();
 	}
 }
+*/

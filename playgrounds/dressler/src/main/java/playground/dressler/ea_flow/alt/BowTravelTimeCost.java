@@ -1,3 +1,4 @@
+package playground.dressler.ea_flow.alt;
 /* *********************************************************************** *
  * project: org.matsim.*												   *	
  * BowTravelTimeCost.java							 					   *
@@ -16,7 +17,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 
 package playground.dressler.ea_flow;
 
@@ -39,14 +40,14 @@ public class BowTravelTimeCost implements FlowEdgeTraversalCalculator
 	
 
 	
-	/**
+	*//**
 	 * represents a single BowEdge with a capacity, a traveltime
 	 * and an intervall in which flow can be send over this edge.
 	 * The bounds of the Intervall are including!
 	 * 
 	 * @author Matthias Rost (rost@mi.fu-berlin.de)
 	 *
-	 */
+	 *//*
 	public class BowEdge
 	{
 		public int capacity;
@@ -124,12 +125,12 @@ public class BowTravelTimeCost implements FlowEdgeTraversalCalculator
 		else return currentFlow - bEdge.minFlowToUseThisEdge;
 	}
 	
-	/**
+	*//**
 	 * returns the BowEdge that is used for the amount of "flow" 
 	 * 
 	 * @param flow the flow
 	 * @return the correct BowEdge
-	 */
+	 *//*
 	protected BowEdge getBowEdge(int flow)
 	{
 		if(flow > maxCapacity || flow < 0)
@@ -160,3 +161,4 @@ public class BowTravelTimeCost implements FlowEdgeTraversalCalculator
 
 
 
+*/

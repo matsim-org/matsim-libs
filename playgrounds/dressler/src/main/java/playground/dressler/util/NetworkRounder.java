@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 
-package playground.dressler.ea_flow;
+package playground.dressler.util;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;

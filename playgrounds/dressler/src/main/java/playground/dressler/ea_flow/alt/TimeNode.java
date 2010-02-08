@@ -1,3 +1,4 @@
+package playground.dressler.ea_flow.alt;
 /* *********************************************************************** *
  * project: org.matsim.*
  * FakeTravelTimeCost.java
@@ -16,7 +17,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 
 package playground.dressler.ea_flow;
 
@@ -25,12 +26,12 @@ import org.matsim.api.core.v01.network.Node;
 
 //matsim imports
 
-/**
+*//**
  * Class representing a Node in the time-expandet network with his own successor
  *
- */
+ *//*
 public class TimeNode {
-/*
+
 	*//**
 	 * the node
 	 *//*
@@ -137,5 +138,6 @@ public class TimeNode {
 		else{
 			System.out.println("Successor-Link: (" + succ.getFromNode().getId() + "," + succ.getToNode().getId() + ")");
 		}
-	}*/
+	}
 }
+*/

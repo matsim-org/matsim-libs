@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReadNetwork.java
+ * FakeTravelTimeCost.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,48 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.dressler.util;
 
-package playground.dressler.ea_flow;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelTime;
 
-//import java.util.Map;
+/**
+ * always returns traveltime = 0 to avoid time expansion
+ * travelcost is the actual freespeed time, rounded down to integers 
+ */
+public class FakeTravelTimeCost implements TravelMinCost, TravelTime {
+		
+	public FakeTravelTimeCost() {
+				
+	}
+	
+	public double getLinkTravelCost(Link link, double time) {
+		return Math.round((link.getLength() / link.getFreespeed(0)));
+	}
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NodeImpl;
+	public double getLinkTravelTime(Link link, double time) {
+		return 0; 
+	}
 
-public class ReadNetwork {
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		 System.out.println("Ich lebe");
-			ScenarioImpl scenario = new ScenarioImpl();
-			NetworkLayer network = scenario.getNetwork();
-		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario);
-		 
-		 networkReader.readFile("./examples/equil/network.xml");
-		 		 
-		 //Map<IdI, ? extends Node> nodes = network.getNodes();
-		 //Map<IdI, ? extends Link> links = network.getLinks();
-		 
-		 //for (Node node : nodes.values()) {
-		 
-		 
-		 for (NodeImpl node : network.getNodes().values()) {
-		   System.out.println(node.toString() + "\n");
-		 }
-		 
-		 for (LinkImpl link : network.getLinks().values()) {
-		    System.out.println(link.toString() + "\n");
-  
-		 }
-		 
-		 System.out.println("... immer noch!\n");
-		 
+	public double getLinkMinimumTravelCost(Link link) {
+		return Math.round((link.getLength() / link.getFreespeed(0)));
 	}
 
 }

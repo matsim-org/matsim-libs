@@ -1,3 +1,4 @@
+package playground.dressler.ea_flow.alt;
 /* *********************************************************************** *
  * project: org.matsim.*												   *	
  * SimpleEdgeTravelTimeCost.java									   *
@@ -16,7 +17,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 
 package playground.dressler.ea_flow;
 
@@ -68,4 +69,4 @@ public class SimpleEdgeTravelTimeCost implements FlowEdgeTraversalCalculator {
 		return traveltime;
 	}
 
-}
+}*/

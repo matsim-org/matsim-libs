@@ -1,3 +1,4 @@
+package playground.dressler.ea_flow.alt;
 /* *********************************************************************** *
  * project: org.matsim.*
  * MooreBellmanFordMoreDynamic.java

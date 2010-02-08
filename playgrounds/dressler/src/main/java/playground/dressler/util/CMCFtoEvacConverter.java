@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dressler.ea_flow;
+package playground.dressler.util;
 
 import java.io.IOException;
 import java.util.LinkedList;
