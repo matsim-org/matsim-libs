@@ -35,7 +35,7 @@ public class StepEdge implements PathStep {
 	 * @param arrivalTime arrival time (usually < starttime for residual links)
 	 * @param forward flag if edge is forward or backward
 	 */
-	StepEdge(Link edge, int startTime, int arrivalTime, boolean forward){
+	public StepEdge(Link edge, int startTime, int arrivalTime, boolean forward){
 		if (edge == null) {
 			throw new IllegalArgumentException("StepEdge, Link edge may not be null");
 		}

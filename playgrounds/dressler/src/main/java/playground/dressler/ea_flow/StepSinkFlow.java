@@ -4,16 +4,16 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
 
-public class StepSourceFlow implements PathStep {	
+public class StepSinkFlow implements PathStep {	
 	
 	/**
-	 * Source node
+	 * Sink node
 	 */
 	private final Node node;
 	
 
 	/**
-	 * time when the forward flow leaves the source
+	 * time when the forward flow enters the sink
 	 */
 	private final int time;
 	
@@ -24,15 +24,15 @@ public class StepSourceFlow implements PathStep {
 	private final boolean forward;	
 	
 	/**
-	 * default Constructor setting the arguments when using a Link 
+	 * Constructor for setting the arguments when entering a sink 
 	 * @param edge Link used
 	 * @param startTime starting time
 	 * @param arrivalTime arrival time
 	 * @param forward flag if edge is forward or backward
 	 */
-	public StepSourceFlow(Node node, int leaveTime, boolean forward){
+	public StepSinkFlow(Node node, int leaveTime, boolean forward){
 		if (node == null) {
-			throw new IllegalArgumentException("StepSourceFlow, Node node may not be null");
+			throw new IllegalArgumentException("StepSinkFlow, Node node may not be null");
 		}
 		this.node = node;
 		this.time = leaveTime;		
@@ -46,7 +46,7 @@ public class StepSourceFlow implements PathStep {
 	@Override
 	public String toString(){
 		String s;
-		s = "Sourceoutflow from ";
+		s = "Sinkflow into ";
 		s += this.node.getId().toString() + " at "+ this.time;		
 		if(!this.forward){
 				s += " backwards";
@@ -70,7 +70,7 @@ public class StepSourceFlow implements PathStep {
 	@Override
 	public VirtualNode getStartNode() {
 		if (this.forward) {			
-		  return new VirtualSource(this.node);
+		  return new VirtualSink(this.node);
 		} else {
 		  return new VirtualNormalNode(this.node, this.time);	
 		}
@@ -79,9 +79,9 @@ public class StepSourceFlow implements PathStep {
 	@Override
 	public VirtualNode getArrivalNode() {
 		if (!this.forward) {			
-			return new VirtualSource(this.node);
+			return new VirtualNormalNode(this.node, this.time);
 		} else {
-			return new VirtualNormalNode(this.node, this.time);	
+			return new VirtualSink(this.node);				
 		}
 	}
 	
@@ -113,8 +113,8 @@ public class StepSourceFlow implements PathStep {
 	 */
 	@Override
 	public boolean equalsNoCheckForward(PathStep other) {
-		if (!(other instanceof StepSourceFlow)) return false;
-		StepSourceFlow o = (StepSourceFlow) other;
+		if (!(other instanceof StepSinkFlow)) return false;
+		StepSinkFlow o = (StepSinkFlow) other;
 
 		if(this.time == o.time) {
 			return (this.node.equals(o.node));
@@ -131,8 +131,8 @@ public class StepSourceFlow implements PathStep {
 	@Override
 	public boolean equals(PathStep other)
 	{
-		if (!(other instanceof StepSourceFlow)) return false;
-		StepSourceFlow o = (StepSourceFlow) other;
+		if (!(other instanceof StepSinkFlow)) return false;
+		StepSinkFlow o = (StepSinkFlow) other;
 
 		if(this.time == o.time 
 				&& this.forward == o.forward) {
@@ -157,8 +157,8 @@ public class StepSourceFlow implements PathStep {
 		if (!other.getForward())
 			return false;
 		
-		if (!(other instanceof StepSourceFlow)) return false;
-		StepSourceFlow o = (StepSourceFlow) other;
+		if (!(other instanceof StepSinkFlow)) return false;
+		StepSinkFlow o = (StepSinkFlow) other;
 
 		if (this.time != o.time) return false;
 				
@@ -168,46 +168,25 @@ public class StepSourceFlow implements PathStep {
 
 	@Override
 	public PathStep copyShiftedToStart(int newStart) {
-		// forward ... will always have starttime 0
+		// forward, adjust when sink is entered
 		if (this.forward) {
-		  return new StepSourceFlow(this.node, this.time, true);
+		  return new StepSinkFlow(this.node, newStart, true);
 		}
 		
-		// residual ... when the source is entered
-		return new StepSourceFlow(this.node, newStart, false);
+		// residual ... always starts at TimeHorizon
+		return new StepSinkFlow(this.node, this.time, false);
 	}
 
 	@Override
 	public PathStep copyShiftedToArrival(int newArrival) {
-		// forward ... shift arrival time
+		// forward ... always arrives at TimeHorizon
 		if (this.forward) {
-		  return new StepSourceFlow(this.node, newArrival, true);
+		  return new StepSinkFlow(this.node, this.time, true);
 		}
 		
-		// residual ... will always have arrival 0
-		return new StepSourceFlow(this.node, this.time, false);
+		// residual ...  update when the reverse flow exits the sink
+		return new StepSinkFlow(this.node, newArrival, false);
 	}
-	
-	/*@Override
-	public boolean haveSameStart(PathStep other) {		
-		if (this.getStartTime() != other.getStartTime()) return false;
-		if (!this.node.equals(other.getStartNode())) return false;
-
-		// they seem to leave from the same time/node-pair
-		// but one might really leave from a virtual source node
-		if (this.forward) {
-			if (other instanceof StepSourceFlow && other.getForward()) {
-				return true; 
-			}
-			return false;
-		} else {
-			if (!(other instanceof StepSourceFlow && other.getForward())) {
-				return true;
-			}
-			return false;
-		}
-					
-	}*/
-	
+		
 }
 
