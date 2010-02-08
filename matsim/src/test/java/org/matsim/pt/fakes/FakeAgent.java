@@ -59,7 +59,7 @@ public class FakeAgent implements DriverAgent, PassengerAgent {
 		this.dummyLeg = new LegImpl(TransportMode.pt);
 		if ((enterStop != null) && (exitStop != null)) {
 			GenericRoute route = new ExperimentalTransitRoute(enterStop, null, null, exitStop);
-			route.setRouteDescription(enterStop.getLink(), "PT1 " + enterStop.getId().toString() + " T1 " + exitStop.getId().toString(), exitStop.getLink());
+			route.setRouteDescription(enterStop.getLinkId(), "PT1 " + enterStop.getId().toString() + " T1 " + exitStop.getId().toString(), exitStop.getLinkId());
 			this.dummyLeg.setRoute(route);
 		}
 	}

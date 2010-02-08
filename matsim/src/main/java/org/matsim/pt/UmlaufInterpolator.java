@@ -2,8 +2,8 @@ package org.matsim.pt;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -13,6 +13,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 public class UmlaufInterpolator {
 
@@ -30,21 +31,21 @@ public class UmlaufInterpolator {
 		if (!umlaufStueckeOfThisUmlauf.isEmpty()) {
 			UmlaufStueckI previousUmlaufStueck = umlaufStueckeOfThisUmlauf.get(umlaufStueckeOfThisUmlauf.size() - 1);
 			NetworkRouteWRefs previousCarRoute = previousUmlaufStueck.getCarRoute();
-			Link fromLink = previousCarRoute.getEndLink();
-			Link toLink = umlaufStueck.getCarRoute().getStartLink();
-			if (fromLink != toLink) {
-				insertWenden(fromLink, toLink, umlauf);
+			Id fromLinkId = previousCarRoute.getEndLinkId();
+			Id toLinkId = umlaufStueck.getCarRoute().getStartLinkId();
+			if (!fromLinkId.equals(toLinkId)) {
+				insertWenden(fromLinkId, toLinkId, umlauf);
 			}
 		}
 		umlaufStueckeOfThisUmlauf.add(umlaufStueck);
 	}
 
-	private void insertWenden(Link fromLink, Link toLink, Umlauf umlauf) {
+	private void insertWenden(Id fromLinkId, Id toLinkId, Umlauf umlauf) {
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(this.config);
 		LeastCostPathCalculator routingAlgo = new Dijkstra(network, calculator, calculator);
 
-		Node startNode = fromLink.getToNode();
-		Node endNode = toLink.getFromNode();
+		Node startNode = this.network.getLinks().get(fromLinkId).getToNode();
+		Node endNode = this.network.getLinks().get(toLinkId).getFromNode();
 
 		double depTime = 0.0;
 
@@ -54,8 +55,8 @@ public class UmlaufInterpolator {
 					+ startNode.getId() + " to node " + endNode.getId() + ".");
 		}
 		NetworkRouteWRefs route = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory())
-				.createRoute(TransportMode.car, fromLink, toLink);
-		route.setLinks(fromLink, wendenPath.links, toLink);
+				.createRoute(TransportMode.car, fromLinkId, toLinkId);
+		route.setLinkIds(fromLinkId, NetworkUtils.getLinkIds(wendenPath.links), toLinkId);
 		umlauf.getUmlaufStuecke().add(new Wenden(route));
 	}
 

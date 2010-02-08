@@ -16,6 +16,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
 /**
@@ -76,7 +77,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			realRouteNodeList.remove(realRouteNodeList.size() - 1);
 
 			NetworkRouteWRefs wrappedRoute = new NodeNetworkRouteImpl();
-			wrappedRoute.setLinks(null, RouteUtils.getLinksFromNodes(realRouteNodeList), null);
+			wrappedRoute.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(realRouteNodeList)), null);
 			wrappedRoute.setTravelTime(path.travelTime);
 
 			leg.setRoute(wrappedRoute);

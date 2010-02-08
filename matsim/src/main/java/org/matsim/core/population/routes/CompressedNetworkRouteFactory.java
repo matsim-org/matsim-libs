@@ -22,13 +22,15 @@ package org.matsim.core.population.routes;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 
 public class CompressedNetworkRouteFactory implements RouteFactory {
 
-	private Map<Link, Link> subsequentLinks = null;
+	private static final long serialVersionUID = 1L;
+
+	private Map<Id, Id> subsequentLinks = null;
 	private Network network;
 	/**
 	 * Uses {@link SubsequentLinksAnalyzer} to get the map of subsequent links,
@@ -40,12 +42,12 @@ public class CompressedNetworkRouteFactory implements RouteFactory {
 		this.network = network;
 	}
 
-
-	public RouteWRefs createRoute(Link startLink, Link endLink) {
+	@Override
+	public RouteWRefs createRoute(Id startLinkId, Id endLinkId) {
 		if (this.subsequentLinks == null) {
 			this.subsequentLinks = new SubsequentLinksAnalyzer(this.network).getSubsequentLinks();
 		}
-		return new CompressedNetworkRouteImpl(startLink, endLink, this.subsequentLinks);
+		return new CompressedNetworkRouteImpl(startLinkId, endLinkId, this.network, this.subsequentLinks);
 	}
 
 }

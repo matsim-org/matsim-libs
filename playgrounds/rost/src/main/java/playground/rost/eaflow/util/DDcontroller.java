@@ -46,13 +46,13 @@ public class DDcontroller {
 	public static void main(final String[] args) {
 
     	// choose instance
-		
+
 		//final String netFilename = "./examples/equil/network.xml";
 		//final String plansFilename = "./examples/equil/plans100.xml";
 		//final String netFilename = "./examples/meine_EA/siouxfalls_network_5s_euclid.xml";
 		final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
 		//final String netFilename = "./examples/meine_EA/swissold_network_5s.xml";
-		
+
 		//final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
 		//final String plansFilename = "/homes/combi/dressler/V/Project/padang/plans/padang_plans_10p.xml.gz";
 		//final String plansFilename = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans.xml";
@@ -60,9 +60,9 @@ public class DDcontroller {
 		//final String plansFilename = "/homes/combi/dressler/V/Project/testcases/winnipeg/matsimevac/winnipeg_plans_evac.xml";
 		//final String plansFilename = "./examples/meine_EA/swissold_plans_5s_demands_100.xml";
 		final String plansFilename = "./examples/meine_EA/padang_plans_100p_flow_2s.xml";
-		
+
 		boolean testplans = false; // FIXME !
-		boolean dosim = true;		
+		boolean dosim = true;
 		boolean otfvis = true;
 		boolean netvis = false & (!otfvis);
 
@@ -98,7 +98,7 @@ public class DDcontroller {
 					continue;
 				}
 
-				Node node2 = route.getStartLink().getToNode();
+				Node node2 = network.getLinks().get(route.getStartLinkId()).getToNode();
 				Node node1 = null;
 				for (int n = 1; n < route.getLinkIds().size(); n++) {
 					node1 = network.getLinks().get(route.getLinkIds().get(n)).getFromNode();
@@ -132,7 +132,7 @@ public class DDcontroller {
 
 		if (otfvis) {
 			QNetwork qnet = new QNetwork(network);
-			
+
 			String eventFile = "./output/events.txt";
 			OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 60);
 			mviconverter.convert();

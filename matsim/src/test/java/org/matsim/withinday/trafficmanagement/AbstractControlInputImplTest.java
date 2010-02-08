@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -60,10 +60,10 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 		Link link7 = network.getLinks().get(linkId7);
 		Link link14 = network.getLinks().get(linkId14);
 		Link link16 = network.getLinks().get(linkId16);
-		NetworkRouteWRefs route1 = new NodeNetworkRouteImpl(link5, link14);
-		route1.setLinks(link5, NetworkUtils.getLinks(network, "6"), link14);
-		NetworkRouteWRefs route2 = new NodeNetworkRouteImpl(link7, link16);
-		route2.setLinks(link7, NetworkUtils.getLinks(network, "8"), link16);
+		NetworkRouteWRefs route1 = new LinkNetworkRouteImpl(link5.getId(), link14.getId(), network);
+		route1.setLinkIds(link5.getId(), NetworkUtils.getLinkIds("6"), link14.getId());
+		NetworkRouteWRefs route2 = new LinkNetworkRouteImpl(link7.getId(), link16.getId(), network);
+		route2.setLinkIds(link7.getId(), NetworkUtils.getLinkIds("8"), link16.getId());
 
 		//control input test class
 		ControlInputTestImpl ci = new ControlInputTestImpl(network);

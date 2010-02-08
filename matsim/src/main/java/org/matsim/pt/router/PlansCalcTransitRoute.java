@@ -26,8 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -140,21 +140,21 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 					if (currentTuple.getSecond() != null) {
 						// first and last leg do not have the route set, as the start or end  link is unknown.
 						Leg firstLeg = currentTuple.getSecond().get(0);
-						Link fromLink = this.network.getLinks().get(((ActivityImpl) planElements.get(i-1)).getLinkId());
-						Link toLink = null;
+						Id fromLinkId = ((ActivityImpl) planElements.get(i-1)).getLinkId();
+						Id toLinkId = null;
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							toLink = this.network.getLinks().get(((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLinkId());
+							toLinkId = ((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLinkId();
 						} else {
-							toLink = this.network.getLinks().get(((ActivityImpl) planElements.get(i+1)).getLinkId());
+							toLinkId = ((ActivityImpl) planElements.get(i+1)).getLinkId();
 						}
-						firstLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
+						firstLeg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
 
 						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
-						toLink = this.network.getLinks().get(((ActivityImpl) planElements.get(i+1)).getLinkId());
+						toLinkId = ((ActivityImpl) planElements.get(i+1)).getLinkId();
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							fromLink = this.network.getLinks().get(((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLinkId());
+							fromLinkId = ((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLinkId();
 						}
-						lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
+						lastLeg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
 
 						boolean isFirstLeg = true;
 						Coord nextCoord = null;

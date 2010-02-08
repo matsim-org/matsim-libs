@@ -466,7 +466,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		Link firstLinkInRS = this.network.getLinks().get(firstLinkIdInRS);
 		Link bottleNeck = this.network.getLinks().get(bottleNeckId);
 		if (firstLinkInRS == bottleNeck) {
-			routeSegment = new NodeNetworkRouteImpl(firstLinkInRS, bottleNeck);
+			routeSegment = new NodeNetworkRouteImpl(firstLinkIdInRS, bottleNeckId, this.network);
 		} else {
 			routeSegment = wholeRoute.getSubRoute(firstLinkInRS.getToNode(), bottleNeck.getFromNode());
 		}
@@ -475,8 +475,8 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 		// Calculate additional agents that enter or leaves route
 		List<Node> routeList = RouteUtils.getNodes(routeSegment, this.network);
-		routeList.add(0, routeSegment.getStartLink().getFromNode());
-		routeList.add(routeSegment.getEndLink().getToNode());
+		routeList.add(0, this.network.getLinks().get(routeSegment.getStartLinkId()).getFromNode());
+		routeList.add(this.network.getLinks().get(routeSegment.getEndLinkId()).getToNode());
 		List<Id> inAndOutLinks = new ArrayList<Id>();
 		inAndOutLinks.addAll(this.getOutlinks(wholeRoute));
 		inAndOutLinks.addAll(this.getInlinks(wholeRoute));

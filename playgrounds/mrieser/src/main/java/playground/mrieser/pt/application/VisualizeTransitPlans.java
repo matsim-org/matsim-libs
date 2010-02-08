@@ -48,6 +48,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreatePseudoNetwork;
@@ -136,11 +137,11 @@ public class VisualizeTransitPlans {
 						toLink = this.visScenario.getNetwork().getLinks().get(((Activity) pe).getLinkId());
 						if (route != null) {
 							if (route instanceof GenericRouteImpl) {
-								((GenericRouteImpl) route).setStartLink(fromLink);
-								((GenericRouteImpl) route).setEndLink(toLink);
+								((GenericRouteImpl) route).setStartLinkId(fromLink.getId());
+								((GenericRouteImpl) route).setEndLinkId(toLink.getId());
 							} else if (route instanceof NetworkRouteWRefs) {
-								((NetworkRouteWRefs) route).setStartLink(fromLink);
-								((NetworkRouteWRefs) route).setEndLink(toLink);
+								((NetworkRouteWRefs) route).setStartLinkId(fromLink.getId());
+								((NetworkRouteWRefs) route).setEndLinkId(toLink.getId());
 							}
 						}
 					}
@@ -186,8 +187,7 @@ public class VisualizeTransitPlans {
 		TransitStopFacility accessStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getAccessStopId());
 		TransitStopFacility egressStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getEgressStopId());
 
-		NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.realScenario.getNetwork().getLinks().get(accessStop.getLinkId()),
-				this.realScenario.getNetwork().getLinks().get(egressStop.getLinkId()));
+		NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(accessStop.getLinkId(), egressStop.getLinkId(), this.realScenario.getNetwork());
 		List<Link> links = new ArrayList<Link>();
 		boolean include = false;
 		TransitStopFacility prevStop = null;
@@ -203,8 +203,7 @@ public class VisualizeTransitPlans {
 			}
 			prevStop = stop.getStopFacility();
 		}
-		netRoute.setLinks(this.realScenario.getNetwork().getLinks().get(accessStop.getLinkId()),
-				links, this.realScenario.getNetwork().getLinks().get(egressStop.getLinkId()));
+		netRoute.setLinkIds(accessStop.getLinkId(), NetworkUtils.getLinkIds(links), egressStop.getLinkId());
 		return netRoute;
 	}
 

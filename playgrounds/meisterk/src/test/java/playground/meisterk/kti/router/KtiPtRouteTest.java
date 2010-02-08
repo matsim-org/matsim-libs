@@ -39,11 +39,11 @@ public class KtiPtRouteTest extends MatsimTestCase {
 
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
 	private KtiConfigGroup ktiConfigGroup = null;
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
 		Config config = super.loadConfig(null);
 		ktiConfigGroup = new KtiConfigGroup();
 		ktiConfigGroup.setUsePlansCalcRouteKti(true);
@@ -52,16 +52,16 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		ktiConfigGroup.setWorldInputFilename(this.getClassInputDirectory() + "world.xml");
 		ktiConfigGroup.setIntrazonalPtSpeed(10.0);
 		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
-		
+
 		NetworkLayer dummyNetwork = new NetworkLayer();
 		dummyNetwork.createAndAddNode(new IdImpl("1000"), new CoordImpl(900.0, 900.0));
 		dummyNetwork.createAndAddNode(new IdImpl("1001"), new CoordImpl(3200.0, 3200.0));
-		
+
 		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
 		this.plansCalcRouteKtiInfo.prepare(dummyNetwork);
 
 	}
-	
+
 	@Override
 	protected void tearDown() throws Exception {
 		this.plansCalcRouteKtiInfo = null;
@@ -69,10 +69,10 @@ public class KtiPtRouteTest extends MatsimTestCase {
 	}
 
 	public void testInitializationLinks() {
-		
+
 		Link link1 = new FakeLink(new IdImpl(1));
 		Link link2 = new FakeLink(new IdImpl(2));
-		KtiPtRoute testee = new KtiPtRoute(link1, link2, this.plansCalcRouteKtiInfo);
+		KtiPtRoute testee = new KtiPtRoute(link1.getId(), link2.getId(), this.plansCalcRouteKtiInfo);
 		assertEquals(link1.getId(), testee.getStartLinkId());
 		assertEquals(link2.getId(), testee.getEndLinkId());
 		assertEquals(null, testee.getFromStop());
@@ -80,25 +80,25 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertEquals(null, testee.getInVehicleTime());
 		assertEquals(null, testee.getToMunicipality());
 		assertEquals(null, testee.getToStop());
-		
+
 	}
-	
+
 	public void testFullInitialization() {
-		
+
 		Link link1 = new FakeLink(new IdImpl(1));
 		Link link2 = new FakeLink(new IdImpl(2));
 		SwissHaltestelle fromStop = new SwissHaltestelle(new IdImpl("123"), new CoordImpl(1000.0, 1000.0));
 		SwissHaltestelle toStop = new SwissHaltestelle(new IdImpl("456"), new CoordImpl(2000.0, 2000.0));
-		
+
 		World world = new World();
 		ZoneLayer municipalities = (ZoneLayer) world.createLayer(new IdImpl("municipality"), "municipalities");
-		
+
 		Coord dummyMuniCoord = new CoordImpl(3003.0, 3003.0);
 		Location fromMunicipality = new Zone(municipalities, new IdImpl("30000"), dummyMuniCoord, dummyMuniCoord, dummyMuniCoord, 0.0, "Ixwil");
 		dummyMuniCoord.setXY(4004.0, 4004.0);
 		Location toMunicipality = new Zone(municipalities, new IdImpl("30001"), dummyMuniCoord, dummyMuniCoord, dummyMuniCoord, 0.0, "Ypslikon");
-		
-		KtiPtRoute testee = new KtiPtRoute(link1, link2, this.plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
+
+		KtiPtRoute testee = new KtiPtRoute(link1.getId(), link2.getId(), this.plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
 		assertEquals(link1.getId(), testee.getStartLinkId());
 		assertEquals(link2.getId(), testee.getEndLinkId());
 		assertEquals(fromStop, testee.getFromStop());
@@ -106,13 +106,13 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertEquals(fromMunicipality, testee.getFromMunicipality());
 		assertEquals(toMunicipality, testee.getToMunicipality());
 		assertEquals(330.0, testee.getInVehicleTime().doubleValue());
-		
+
 		assertEquals("kti=123=30000=330.0=30001=456", testee.getRouteDescription());
-		
+
 	}
-	
+
 	public void testRouteDescription_KtiPtRoute() {
-		
+
 		String expectedRouteDescription = "kti=321=40000=456.78=40001=654";
 		KtiPtRoute testee = new KtiPtRoute(null, null, this.plansCalcRouteKtiInfo);
 		testee.setRouteDescription(null, expectedRouteDescription, null);
@@ -126,9 +126,9 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertNull(testee.getFromMunicipality());
 		assertNull(testee.getToMunicipality());
 		assertNull(testee.getInVehicleTime());
-		
+
 	}
-	
+
 	public void testRouteDescription_NoKtiPtRoute() {
 
 		String expectedRouteDescription = System.getProperty("line.separator") + "\t\t\t\t" + System.getProperty("line.separator");
@@ -139,27 +139,27 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertNull(testee.getFromMunicipality());
 		assertNull(testee.getToMunicipality());
 		assertNull(testee.getInVehicleTime());
-		
+
 	}
-	
+
 	public void testCalcInVehicleTimeIntrazonal() {
-		
+
 		Link link1 = new FakeLink(new IdImpl(1));
 		Link link2 = new FakeLink(new IdImpl(2));
 
 		KtiPtRoute testee = new KtiPtRoute(
-				link1, 
-				link2, 
-				this.plansCalcRouteKtiInfo, 
-				this.plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(1001)), 
-				this.plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(30000)), 
-				this.plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(30000)), 
+				link1.getId(),
+				link2.getId(),
+				this.plansCalcRouteKtiInfo,
+				this.plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(1001)),
+				this.plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(30000)),
+				this.plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(30000)),
 				this.plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(1002)));
-		
+
 		double expectedInVehicleTime = testee.calcInVehicleDistance() / ktiConfigGroup.getIntrazonalPtSpeed();
 		double actualInVehicleTime = testee.getInVehicleTime();
-		
+
 		assertEquals(expectedInVehicleTime, actualInVehicleTime);
 	}
-	
+
 }

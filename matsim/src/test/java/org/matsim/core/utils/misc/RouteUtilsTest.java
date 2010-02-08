@@ -20,6 +20,7 @@
 package org.matsim.core.utils.misc;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
@@ -41,13 +42,10 @@ public class RouteUtilsTest {
 		Fixture f = new Fixture();
 		Link startLink = f.network.getLinks().get(f.scenario.createId("0"));
 		Link endLink = f.network.getLinks().get(f.scenario.createId("5"));
-		List<Link> links = new ArrayList<Link>(4);
-		links.add(f.network.getLinks().get(f.scenario.createId("1")));
-		links.add(f.network.getLinks().get(f.scenario.createId("2")));
-		links.add(f.network.getLinks().get(f.scenario.createId("3")));
-		links.add(f.network.getLinks().get(f.scenario.createId("4")));
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink, endLink);
-		route.setLinks(startLink, links, endLink);
+		List<Id> linkIds = new ArrayList<Id>(4);
+		Collections.addAll(linkIds, f.scenario.createId("1"), f.scenario.createId("2"), f.scenario.createId("3"), f.scenario.createId("4"));
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), f.network);
+		route.setLinkIds(startLink.getId(), linkIds, endLink.getId());
 
 		List<Node> nodes = RouteUtils.getNodes(route, f.network);
 		Assert.assertEquals(5, nodes.size());
@@ -63,9 +61,9 @@ public class RouteUtilsTest {
 		Fixture f = new Fixture();
 		Link startLink = f.network.getLinks().get(f.scenario.createId("2"));
 		Link endLink = f.network.getLinks().get(f.scenario.createId("2"));
-		List<Link> links = new ArrayList<Link>(0);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink, endLink);
-		route.setLinks(startLink, links, endLink);
+		List<Id> links = new ArrayList<Id>(0);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), f.network);
+		route.setLinkIds(startLink.getId(), links, endLink.getId());
 
 		List<Node> nodes = RouteUtils.getNodes(route, f.network);
 		Assert.assertEquals(0, nodes.size());
@@ -74,11 +72,11 @@ public class RouteUtilsTest {
 	@Test
 	public void testGetNodes_NoLinksBetween() {
 		Fixture f = new Fixture();
-		Link startLink = f.network.getLinks().get(f.scenario.createId("3"));
-		Link endLink = f.network.getLinks().get(f.scenario.createId("4"));
-		List<Link> links = new ArrayList<Link>(0);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink, endLink);
-		route.setLinks(startLink, links, endLink);
+		Id startLinkId = f.scenario.createId("3");
+		Id endLinkId = f.scenario.createId("4");
+		List<Id> linkIds = new ArrayList<Id>(0);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLinkId, endLinkId, f.network);
+		route.setLinkIds(startLinkId, linkIds, endLinkId);
 
 		List<Node> nodes = RouteUtils.getNodes(route, f.network);
 		Assert.assertEquals(1, nodes.size());
@@ -91,16 +89,11 @@ public class RouteUtilsTest {
 		f.network.addLink(f.network.getFactory().createLink(f.scenario.createId("99"), f.scenario.createId("6"), f.scenario.createId("0")));
 		Link startLink = f.network.getLinks().get(f.scenario.createId("3"));
 		Link endLink = f.network.getLinks().get(f.scenario.createId("3"));
-		List<Link> links = new ArrayList<Link>(6);
-		links.add(f.network.getLinks().get(f.scenario.createId("4")));
-		links.add(f.network.getLinks().get(f.scenario.createId("5")));
-		links.add(f.network.getLinks().get(f.scenario.createId("99")));
-		links.add(f.network.getLinks().get(f.scenario.createId("0")));
-		links.add(f.network.getLinks().get(f.scenario.createId("1")));
-		links.add(f.network.getLinks().get(f.scenario.createId("2")));
+		List<Id> linkIds = new ArrayList<Id>(6);
+		Collections.addAll(linkIds, f.scenario.createId("4"), f.scenario.createId("5"), f.scenario.createId("99"), f.scenario.createId("0"), f.scenario.createId("1"), f.scenario.createId("2"));
 
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink, endLink);
-		route.setLinks(startLink, links, endLink);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), f.network);
+		route.setLinkIds(startLink.getId(), linkIds, endLink.getId());
 
 		List<Node> nodes = RouteUtils.getNodes(route, f.network);
 		Assert.assertEquals(7, nodes.size());

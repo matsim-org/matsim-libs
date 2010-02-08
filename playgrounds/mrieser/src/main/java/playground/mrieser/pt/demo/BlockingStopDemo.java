@@ -59,7 +59,6 @@ import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 
-import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.mrieser.pt.analysis.VehicleTracker;
 
@@ -134,12 +133,12 @@ public class BlockingStopDemo {
 
 		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
 		LinkImpl endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks-1]);
-		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
-		ArrayList<Link> linkList = new ArrayList<Link>(nOfLinks);
+		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		ArrayList<Id> linkIdList = new ArrayList<Id>(nOfLinks);
 		for (int i = 1; i < nOfLinks-1; i++) {
-			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
+			linkIdList.add(this.ids[i]);
 		}
-		networkRoute.setLinks(startLink, linkList, endLink);
+		networkRoute.setLinkIds(startLink.getId(), linkIdList, endLink.getId());
 		TransitRoute tRoute1 = builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
 
 		TransitLine tLine1 = builder.createTransitLine(this.ids[1]);
@@ -161,12 +160,12 @@ public class BlockingStopDemo {
 
 		startLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks]);
 		endLink = this.scenario.getNetwork().getLinks().get(this.ids[2*nOfLinks-1]);
-		networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
-		linkList = new ArrayList<Link>(nOfLinks);
+		networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		linkIdList = new ArrayList<Id>(nOfLinks);
 		for (int i = nOfLinks+1; i < (2*nOfLinks - 1); i++) {
-			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
+			linkIdList.add(this.ids[i]);
 		}
-		networkRoute.setLinks(startLink, linkList, endLink);
+		networkRoute.setLinkIds(startLink.getId(), linkIdList, endLink.getId());
 		TransitRoute tRoute2 = builder.createTransitRoute(this.ids[2], networkRoute, stopList, TransportMode.bus);
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
@@ -246,16 +245,16 @@ public class BlockingStopDemo {
 
 		// car-drivers
 		NetworkImpl network = this.scenario.getNetwork();
-		NetworkRouteWRefs carRoute1 = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, network.getLinks().get(this.ids[0]), network.getLinks().get(this.ids[nOfLinks-1]));
-		NetworkRouteWRefs carRoute2 = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, network.getLinks().get(this.ids[nOfLinks]), network.getLinks().get(this.ids[2*nOfLinks-1]));
-		List<Link> links1 = new ArrayList<Link>(nOfLinks-2);
-		List<Link> links2 = new ArrayList<Link>(nOfLinks-2);
+		NetworkRouteWRefs carRoute1 = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.ids[0], this.ids[nOfLinks-1]);
+		NetworkRouteWRefs carRoute2 = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.ids[nOfLinks], this.ids[2*nOfLinks-1]);
+		List<Id> linkIds1 = new ArrayList<Id>(nOfLinks-2);
+		List<Id> linkIds2 = new ArrayList<Id>(nOfLinks-2);
 		for (int i = 1; i<nOfLinks-1; i++) {
-			links1.add(network.getLinks().get(this.ids[i]));
-			links2.add(network.getLinks().get(this.ids[i+nOfLinks]));
+			linkIds1.add(this.ids[i]);
+			linkIds2.add(this.ids[i+nOfLinks]);
 		}
-		carRoute1.setLinks(network.getLinks().get(this.ids[0]), links1, network.getLinks().get(this.ids[nOfLinks-1]));
-		carRoute2.setLinks(network.getLinks().get(this.ids[nOfLinks]), links2, network.getLinks().get(this.ids[2*nOfLinks-1]));
+		carRoute1.setLinkIds(this.ids[0], linkIds1, this.ids[nOfLinks-1]);
+		carRoute2.setLinkIds(this.ids[nOfLinks], linkIds2, this.ids[2*nOfLinks-1]);
 		for (int i = 0; i < nOfCars; i++) {
 			PersonImpl person = (PersonImpl) pb.createPerson(this.scenario.createId(Integer.toString(i)));
 			PlanImpl plan = (PlanImpl) pb.createPlan();

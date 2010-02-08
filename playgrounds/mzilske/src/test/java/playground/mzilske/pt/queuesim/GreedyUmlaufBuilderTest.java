@@ -2,12 +2,12 @@ package playground.mzilske.pt.queuesim;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
@@ -103,15 +103,10 @@ public class GreedyUmlaufBuilderTest {
 		schedule.addStopFacility(stop8);
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
-		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2, link12);
-		ArrayList<Link> linkList = new ArrayList<Link>(6);
-		linkList.add(link4);
-		linkList.add(link6);
-		linkList.add(link7);
-		linkList.add(link8);
-		linkList.add(link9);
-		linkList.add(link10);
-		networkRoute.setLinks(link2, linkList, link12);
+		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2.getId(), link12.getId());
+		ArrayList<Id> linkIdList = new ArrayList<Id>(6);
+		Collections.addAll(linkIdList, link4.getId(), link6.getId(), link7.getId(), link8.getId(), link9.getId(), link10.getId());
+		networkRoute.setLinkIds(link2.getId(), linkIdList, link12.getId());
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(4);
 		stopList.add(builder.createTransitRouteStop(stop2, 0, 0));
 		stopList.add(builder.createTransitRouteStop(stop3, 90, 100));
@@ -123,13 +118,10 @@ public class GreedyUmlaufBuilderTest {
 		tRoute2.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:12:00")));
 		tRoute2.addDeparture(builder.createDeparture(this.ids[3], Time.parseTime("07:22:00")));
 
-		networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link17, link19);
-		linkList = new ArrayList<Link>(6);
-		linkList.add(link18);
-		linkList.add(link14);
-		linkList.add(link15);
-		linkList.add(link16);
-		networkRoute.setLinks(link17, linkList, link19);
+		networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link17.getId(), link19.getId());
+		linkIdList = new ArrayList<Id>(6);
+		Collections.addAll(linkIdList, link18.getId(), link14.getId(), link15.getId(), link16.getId());
+		networkRoute.setLinkIds(link17.getId(), linkIdList, link19.getId());
 		stopList = new ArrayList<TransitRouteStop>(4);
 		stopList.add(builder.createTransitRouteStop(stop6, 0, 0));
 		stopList.add(builder.createTransitRouteStop(stop4, 100, 110));

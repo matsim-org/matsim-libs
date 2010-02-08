@@ -21,7 +21,7 @@ import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
 
 /**
  * A special controler for the KTI-Project.
- * 
+ *
  * @author meisterk
  * @author mrieser
  * @author wrashid
@@ -34,7 +34,7 @@ public class KTIControler extends Controler {
 	protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
-	
+
 	private final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
 
@@ -43,20 +43,20 @@ public class KTIControler extends Controler {
 
 		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
-		this.getNetwork().getFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory(super.getConfig().planomat()));
+		this.getNetwork().getFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 
 	}
-	
+
 	@Override
 	protected void setUp() {
 
 		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
 			this.plansCalcRouteKtiInfo.prepare(this.getNetwork());
 		}
-		
+
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				super.config, 
+				super.config,
 				this.ktiConfigGroup,
 				this.getFacilityPenalties(),
 				this.getFacilities());
@@ -64,16 +64,16 @@ public class KTIControler extends Controler {
 
 		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
 		this.setTravelCostCalculatorFactory(costCalculatorFactory);
-		
+
 		super.setUp();
 	}
 
-	
+
 	@Override
 	protected void loadControlerListeners() {
-		
+
 		super.loadControlerListeners();
-		
+
 		// the scoring function processes facility loads
 		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
@@ -96,11 +96,11 @@ public class KTIControler extends Controler {
 		} else {
 
 			router = new PlansCalcRouteKti(
-					super.getConfig().plansCalcRoute(), 
-					super.network, 
-					travelCosts, 
-					travelTimes, 
-					super.getLeastCostPathCalculatorFactory(), 
+					super.getConfig().plansCalcRoute(),
+					super.network,
+					travelCosts,
+					travelTimes,
+					super.getLeastCostPathCalculatorFactory(),
 					this.plansCalcRouteKtiInfo);
 
 		}

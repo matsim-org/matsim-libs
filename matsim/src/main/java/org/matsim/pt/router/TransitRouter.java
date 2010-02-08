@@ -172,7 +172,7 @@ public class TransitRouter {
 							if (accessStop != null) {
 								leg = new LegImpl(TransportMode.walk);
 								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.beelineWalkSpeed;
-								Route walkRoute = new GenericRouteImpl(accessStop.getLink(), egressStop.getLink());
+								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
 								leg.setTravelTime(walkTime);
 								time += walkTime;

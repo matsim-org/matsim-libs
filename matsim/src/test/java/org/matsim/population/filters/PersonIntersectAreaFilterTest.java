@@ -74,11 +74,11 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		plan.createAndAddActivity("w", link5.getId());
 
-		NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link0, link5);
+		NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link0.getId(), link5.getId());
 		leg.setRoute(route);
 
 		// prepare route
-		route.setLinks(link0, NetworkUtils.getLinks(network, "1 2"), link5);
+		route.setLinkIds(link0.getId(), NetworkUtils.getLinkIds("1 2"), link5.getId());
 
 		// prepare area of interest
 		HashMap<Id, Link> aoi = new HashMap<Id, Link>();
@@ -112,7 +112,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		// prepare bee-line tests
 		leg.setMode(TransportMode.walk);
-		leg.setRoute(network.getFactory().createRoute(TransportMode.car, link0, link5)); // empty route // TODO should be switched to WalkRoute once that exists...
+		leg.setRoute(network.getFactory().createRoute(TransportMode.car, link0.getId(), link5.getId())); // empty route // TODO should be switched to WalkRoute once that exists...
 
 		// test bee-line without alternative aoi
 		aoi.clear();

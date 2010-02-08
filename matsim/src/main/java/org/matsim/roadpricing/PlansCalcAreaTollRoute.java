@@ -39,6 +39,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -109,7 +110,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 				Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-				NetworkRouteWRefs tollRoute = (NetworkRouteWRefs) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, fromLink, toLink);
+				NetworkRouteWRefs tollRoute = (NetworkRouteWRefs) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
 				NetworkRouteWRefs noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll
@@ -120,7 +121,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 						throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 					}
 					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex]);
-					tollRoute.setLinks(fromLink, path.links, toLink);
+					tollRoute.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 					tollRoute.setTravelTime((int) path.travelTime);
 					tollRoute.setTravelCost(path.travelCost);
 				} else {
@@ -141,8 +142,8 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					 * will still be a route returned.
 					 */
 					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					noTollRoute = (NetworkRouteWRefs) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, fromLink, toLink);
-					noTollRoute.setLinks(fromLink, path.links, toLink);
+					noTollRoute = (NetworkRouteWRefs) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+					noTollRoute.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);
 

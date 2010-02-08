@@ -20,8 +20,8 @@
 
 package org.matsim.core.network;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
@@ -35,7 +35,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class NetworkFactoryTest extends MatsimTestCase {
 
 	public void testSetRouteFactory() {
-		NetworkFactoryImpl factory = new NetworkFactoryImpl();
+		NetworkFactoryImpl factory = new NetworkFactoryImpl(null);
 
 		// test default
 		RouteWRefs carRoute = factory.createRoute(TransportMode.car, null, null);
@@ -67,8 +67,8 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 	/*package*/ static class CarRouteMock extends AbstractRoute implements Cloneable {
 		private static final long serialVersionUID = 1L;
-		CarRouteMock(final Link startLink, final Link endLink){
-			super(startLink, endLink);
+		CarRouteMock(final Id startLinkId, final Id endLinkId) {
+			super(startLinkId, endLinkId);
 		}
 		@Override
 		public CarRouteMock clone() {
@@ -78,8 +78,8 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 	/*package*/ static class PtRouteMock extends AbstractRoute implements Cloneable {
 		private static final long serialVersionUID = 1L;
-		PtRouteMock(final Link startLink, final Link endLink){
-			super(startLink, endLink);
+		PtRouteMock(final Id startLinkId, final Id endLinkId) {
+			super(startLinkId, endLinkId);
 		}
 		@Override
 		public PtRouteMock clone() {
@@ -89,16 +89,18 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 	/*package*/ static class CarRouteMockFactory implements RouteFactory {
 		private static final long serialVersionUID = 1L;
-		public RouteWRefs createRoute(final Link startLink, final Link endLink) {
-			return new CarRouteMock(startLink, endLink);
+		@Override
+		public RouteWRefs createRoute(final Id startLinkId, final Id endLinkId) {
+			return new CarRouteMock(startLinkId, endLinkId);
 		}
 
 	}
 
 	/*package*/ static class PtRouteMockFactory implements RouteFactory {
 		private static final long serialVersionUID = 1L;
-		public RouteWRefs createRoute(final Link startLink, final Link endLink) {
-			return new PtRouteMock(startLink, endLink);
+		@Override
+		public RouteWRefs createRoute(final Id startLinkId, final Id endLinkId) {
+			return new PtRouteMock(startLinkId, endLinkId);
 		}
 
 	}

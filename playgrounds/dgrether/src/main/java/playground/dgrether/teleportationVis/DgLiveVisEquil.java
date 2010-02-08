@@ -47,9 +47,9 @@ import playground.dgrether.utils.LogOutputEventHandler;
  *
  */
 public class DgLiveVisEquil {
-  
+
 	private static final Logger log = Logger.getLogger(DgLiveVisEquil.class);
-	
+
 	public DgLiveVisEquil(){
 		Scenario scenario = new ScenarioImpl();
 		scenario.getConfig().network().setInputFile("../matsim/examples/equil/network.xml");
@@ -64,8 +64,8 @@ public class DgLiveVisEquil {
 		client.setVisualizeTeleportedAgents(true);
 		client.run();
 	}
-	
-	
+
+
 	private void createPopulation(Scenario sc) {
 		Random r = new Random(234231);
 		for (int i = 0; i < 20; i ++){
@@ -85,10 +85,10 @@ public class DgLiveVisEquil {
 			Activity act2 = fac.createActivityFromCoord("h", sc.createCoord(5000, 0));
 			Link link6 = sc.getNetwork().getLinks().get(sc.createId(Integer.toString(id2)));
 			((ActivityImpl)act2).setLinkId(link6.getId());
-			Leg leg = fac.createLeg(TransportMode.walk); 
+			Leg leg = fac.createLeg(TransportMode.walk);
 			leg.setTravelTime(600.0 - id1);
-     
-			leg.setRoute(new LinkNetworkRouteImpl(link1, link6));
+
+			leg.setRoute(new LinkNetworkRouteImpl(link1.getId(), link6.getId(), sc.getNetwork()));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			plan.addActivity(act1);

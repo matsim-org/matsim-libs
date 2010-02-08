@@ -31,6 +31,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.msieg.structure.Commodity;
 
@@ -40,7 +41,7 @@ public class BestFitRouter extends CMCFRouter {
 		super(networkFile, plansFile, cmcfFile);
 	}
 
-	
+
 	@Override
 	public	void route() {
 		PopulationImpl pop = this.population;
@@ -53,8 +54,8 @@ public class BestFitRouter extends CMCFRouter {
 		int routedPersons = 0;
 		for(Person p: pop.getPersons().values()){
 			LegImpl leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(((PlanImpl) p.getSelectedPlan()).getFirstActivity());
-			Node from = leg.getRoute().getStartLink().getToNode(),
-					to = leg.getRoute().getEndLink().getFromNode();
+			Node from = network.getLinks().get(leg.getRoute().getStartLinkId()).getToNode(),
+					to = network.getLinks().get(leg.getRoute().getEndLinkId()).getFromNode();
 			// now search path for rerouting
 			List<Link> path = null;
 			Commodity<Node> com = this.pathFlow.getCommodity(from, to);
@@ -68,14 +69,14 @@ public class BestFitRouter extends CMCFRouter {
 				double flow = flowValues.get(pp);
 				if( (flow > max) && (flow > 0)){
 					path = pp;
-					max = flow; 
+					max = flow;
 				}
 			}
 			//path is found, therefore reroute:
 			assert(path != null);
 			if (path != null) {
-				NodeNetworkRouteImpl route = new NodeNetworkRouteImpl(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
-				route.setLinks(	leg.getRoute().getStartLink(), path, leg.getRoute().getEndLink());
+				NodeNetworkRouteImpl route = new NodeNetworkRouteImpl(leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), this.network);
+				route.setLinkIds(	leg.getRoute().getStartLinkId(), NetworkUtils.getLinkIds(path), leg.getRoute().getEndLinkId());
 				leg.setRoute(route);
 				flowValues.put(path, flowValues.get(path) < 1 ? 0 : flowValues.get(path)-1);
 				routedPersons++;
@@ -86,7 +87,7 @@ public class BestFitRouter extends CMCFRouter {
 		}
 		System.out.println(" Agents routed: "+routedPersons+"/"+pop.getPersons().size());
 	}
-	
+
 	/**
 	 * @param args
 	 */

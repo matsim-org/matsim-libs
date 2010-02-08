@@ -43,9 +43,10 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 
 		// create a network
-		NetworkFactoryImpl nf = new NetworkFactoryImpl();
+		final NetworkLayer network = new NetworkLayer();
+		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
-		final NetworkLayer network = new NetworkLayer(nf);
+		network.setFactory(nf);
 		network.setCapacityPeriod(3600.0);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
@@ -77,9 +78,10 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 
 		// create a network
-		NetworkFactoryImpl nf = new NetworkFactoryImpl();
+		final NetworkLayer network = new NetworkLayer();
+		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
-		final NetworkLayer network = new NetworkLayer(nf);
+		network.setFactory(nf);
 		network.setCapacityPeriod(3600.0);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0

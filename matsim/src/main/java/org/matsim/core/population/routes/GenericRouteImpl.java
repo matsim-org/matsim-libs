@@ -20,15 +20,15 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 
 
 public class GenericRouteImpl extends AbstractRoute implements GenericRoute, Cloneable {
 
 	private String routeDescription = null;
 
-	public GenericRouteImpl(final Link startLink, final Link endLink) {
-		super(startLink, endLink);
+	public GenericRouteImpl(final Id startLinkId, final Id endLinkId) {
+		super(startLinkId, endLinkId);
 	}
 
 	@Override
@@ -40,10 +40,10 @@ public class GenericRouteImpl extends AbstractRoute implements GenericRoute, Clo
 		return this.routeDescription;
 	}
 
-	public void setRouteDescription(final Link startLink, final String routeDescription, final Link endLink) {
-		setStartLink(startLink);
+	public void setRouteDescription(final Id startLinkId, final String routeDescription, final Id endLinkId) {
+		setStartLinkId(startLinkId);
 		this.routeDescription = routeDescription;
-		setEndLink(endLink);
+		setEndLinkId(endLinkId);
 	}
 
 }

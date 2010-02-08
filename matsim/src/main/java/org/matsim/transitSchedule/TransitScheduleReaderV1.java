@@ -110,18 +110,11 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		} else if (Constants.LINK.equals(name)) {
 			String linkStr = atts.getValue(Constants.REF_ID);
 			if (!linkStr.contains(" ")) {
-				Link link = this.network.getLinks().get(new IdImpl(linkStr));
-				if (link == null)
-					throw new RuntimeException("no link with id " + linkStr);
-				this.currentRouteProfile.addLink(link);
+				this.currentRouteProfile.addLink(new IdImpl(linkStr));
 			} else {
 				String[] links = linkStr.split(" ");
 				for (int i = 0; i < links.length; i++) {
-					Link link = this.network.getLinks().get(new IdImpl(links[i]));
-					if (link == null)
-						throw new RuntimeException("no link with id "
-								+ links[i]);
-					this.currentRouteProfile.addLink(link);
+					this.currentRouteProfile.addLink(new IdImpl(links[i]));
 				}
 			}
 		} else if (Constants.STOP.equals(name)) {
@@ -159,12 +152,12 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 				routeStop.setAwaitDepartureTime(tStop.awaitDeparture);
 			}
 			NetworkRouteWRefs route = null;
-			if (this.currentRouteProfile.firstLink != null) {
-				if (this.currentRouteProfile.lastLink == null) {
-					this.currentRouteProfile.lastLink = this.currentRouteProfile.firstLink;
+			if (this.currentRouteProfile.firstLinkId != null) {
+				if (this.currentRouteProfile.lastLinkId == null) {
+					this.currentRouteProfile.lastLinkId = this.currentRouteProfile.firstLinkId;
 				}
-				route = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
-				route.setLinks(this.currentRouteProfile.firstLink, this.currentRouteProfile.links, this.currentRouteProfile.lastLink);
+				route = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.currentRouteProfile.firstLinkId, this.currentRouteProfile.lastLinkId);
+				route.setLinkIds(this.currentRouteProfile.firstLinkId, this.currentRouteProfile.linkIds, this.currentRouteProfile.lastLinkId);
 			}
 			TransitRoute transitRoute = new TransitRouteImpl(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);
 			transitRoute.setDescription(this.currentTransitRoute.description);
@@ -199,22 +192,22 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	}
 
 	private static class TempRoute {
-		/*package*/ List<Link> links = new ArrayList<Link>();
-		/*package*/ Link firstLink = null;
-		/*package*/ Link lastLink = null;
+		/*package*/ List<Id> linkIds = new ArrayList<Id>();
+		/*package*/ Id firstLinkId = null;
+		/*package*/ Id lastLinkId = null;
 
 		protected TempRoute() {
 			// public constructor for private inner class
 		}
 
-		protected void addLink(final Link link) {
-			if (this.firstLink == null) {
-				this.firstLink = link;
-			} else if (this.lastLink == null) {
-				this.lastLink = link;
+		protected void addLink(final Id linkId) {
+			if (this.firstLinkId == null) {
+				this.firstLinkId = linkId;
+			} else if (this.lastLinkId == null) {
+				this.lastLinkId = linkId;
 			} else {
-				this.links.add(this.lastLink);
-				this.lastLink = link;
+				this.linkIds.add(this.lastLinkId);
+				this.lastLinkId = linkId;
 			}
 		}
 

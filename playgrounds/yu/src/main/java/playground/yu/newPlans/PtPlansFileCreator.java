@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -23,6 +22,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -146,7 +146,6 @@ public class PtPlansFileCreator {
 			PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(pl);
 			Id startLinkID = new IdImpl(startLinkId);
-			LinkImpl startLink = this.network.getLinks().get(startLinkID);
 			ActivityImpl a = pl.createAndAddActivity("h", startLinkID);
 			a.setEndTime(Time.parseTime(endTime));
 			LegImpl leg = pl.createAndAddLeg(TransportMode.car);
@@ -154,9 +153,8 @@ public class PtPlansFileCreator {
 			NetworkRouteWRefs route = new NodeNetworkRouteImpl();
 			leg.setRoute(route);
 			Id endLinkID = new IdImpl(endLinkId);
-			LinkImpl endLink = this.network.getLinks().get(endLinkID);
 			pl.createAndAddActivity("w", endLinkID);
-			route.setLinks(startLink, srcRoute, endLink);
+			route.setLinkIds(startLinkID, NetworkUtils.getLinkIds(srcRoute), endLinkID);
 			this.pop.addPerson(p);
 			this.personCount++;
 			System.out.println("i have " + this.pop.getPersons().size()

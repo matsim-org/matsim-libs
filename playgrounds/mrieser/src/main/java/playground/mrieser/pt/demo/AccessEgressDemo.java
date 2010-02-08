@@ -54,7 +54,6 @@ import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 
-import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.analysis.RouteTimeDiagram;
 import playground.mrieser.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.mrieser.pt.analysis.VehicleTracker;
@@ -121,12 +120,12 @@ public class AccessEgressDemo {
 		}
 		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
 		LinkImpl endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks - 1]);
-		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
-		ArrayList<Link> linkList = new ArrayList<Link>(nOfLinks - 2);
+		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		ArrayList<Id> linkList = new ArrayList<Id>(nOfLinks - 2);
 		for (int i = 1; i < nOfLinks -1; i++) {
-			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
+			linkList.add(this.ids[i]);
 		}
-		networkRoute.setLinks(startLink, linkList, endLink);
+		networkRoute.setLinkIds(startLink.getId(), linkList, endLink.getId());
 		TransitRoute tRoute = builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
 
 		TransitLine tLine = builder.createTransitLine(this.ids[1]);
@@ -200,7 +199,7 @@ public class AccessEgressDemo {
 		final TransitQSimulation sim = new TransitQSimulation(this.scenario, events);
 		// Transit vehicle drivers are created inside the TransitQueueSimulation, by the createAgents() method. That is, they exist
 		// as derivatives from the schedule, not as behavioral entities by themselves.  kai, oct'09
-		
+
 		sim.addFeature(new OTFVisQSimFeature(sim));
 		sim.run();
 

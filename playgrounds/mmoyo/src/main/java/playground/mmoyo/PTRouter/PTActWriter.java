@@ -30,6 +30,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
@@ -367,10 +368,10 @@ public class PTActWriter {
 	}
 
 	private LegImpl newPTLeg(final TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
-		NetworkRouteWRefs legRoute = new LinkNetworkRouteImpl(null, null);
+		NetworkRouteWRefs legRoute = new LinkNetworkRouteImpl(null, null, null);
 
 		if (mode!=TransportMode.walk){
-			legRoute.setLinks(null, routeLinks, null);
+			legRoute.setLinkIds(null, NetworkUtils.getLinkIds(routeLinks), null);
 		}else{
 			//mode= TransportMode.car;   //-> temporarly for Visualizer
 		}

@@ -27,7 +27,6 @@ import junit.framework.TestCase;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -40,8 +39,8 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -148,16 +147,16 @@ import org.matsim.core.utils.misc.Time;
 		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
 		LinkImpl link3 = network.getLinks().get(new IdImpl(3));
 		LinkImpl link4 = network.getLinks().get(new IdImpl(4));
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 1, "07:00"   , link0, NetworkUtils.getLinks(network, "1 2 3"), link4), population); // toll in 1st time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 2, "11:00"   , link0, NetworkUtils.getLinks(network, "1 2 3"), link4), population); // toll in 2nd time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 3, "16:00"   , link0, NetworkUtils.getLinks(network, "1 2 3"), link4), population); // toll in 3rd time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 4, "09:59:50", link0, NetworkUtils.getLinks(network, "1 2 3"), link4), population); // toll in 1st and 2nd time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 5, "08:00:00", link1, NetworkUtils.getLinks(network, "2 3"), link4), population); // starts on the 2nd link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 6, "09:00:00", link0, NetworkUtils.getLinks(network, "1 2"), link3), population); // ends not on the last link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 7, "08:30:00", link1, NetworkUtils.getLinks(network, "2"), link3), population); // starts and ends not on the first/last link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 8, "08:35:00", link1, NetworkUtils.getLinks(network, ""), link2), population); // starts and ends not on the first/last link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 9, "08:40:00", link1, NetworkUtils.getLinks(network, ""), link1), population); // two acts on the same link
-		Fixture.addPersonToPopulation(Fixture.createPerson1(10, "08:45:00", link2, NetworkUtils.getLinks(network, ""), link3), population);
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 1, "07:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 1st time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 2, "11:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 2nd time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 3, "16:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 3rd time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 4, "09:59:50", link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 1st and 2nd time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 5, "08:00:00", link1.getId(), NetworkUtils.getLinkIds("2 3"), link4.getId()), population); // starts on the 2nd link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 6, "09:00:00", link0.getId(), NetworkUtils.getLinkIds("1 2"), link3.getId()), population); // ends not on the last link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 7, "08:30:00", link1.getId(), NetworkUtils.getLinkIds("2"), link3.getId()), population); // starts and ends not on the first/last link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 8, "08:35:00", link1.getId(), NetworkUtils.getLinkIds(""), link2.getId()), population); // starts and ends not on the first/last link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 9, "08:40:00", link1.getId(), NetworkUtils.getLinkIds(""), link1.getId()), population); // two acts on the same link
+		Fixture.addPersonToPopulation(Fixture.createPerson1(10, "08:45:00", link2.getId(), NetworkUtils.getLinkIds(""), link3.getId()), population);
 	}
 
 	private static void addPersonToPopulation(final PersonImpl person, final PopulationImpl population) {
@@ -175,16 +174,16 @@ import org.matsim.core.utils.misc.Time;
 		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLinks().get(new IdImpl("1")), network.getLinks().get(new IdImpl("7")), network.getLinks().get(new IdImpl("13"))), population);
 	}
 
-	private static PersonImpl createPerson1(final int personId, final String startTime, final Link homeLink, final List<Link> routeLinks, final Link workLink) {
+	private static PersonImpl createPerson1(final int personId, final String startTime, final Id homeLinkId, final List<Id> routeLinkIds, final Id workLinkId) {
 		PersonImpl person = new PersonImpl(new IdImpl(personId));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
-		plan.createAndAddActivity("h", homeLink.getId()).setEndTime(Time.parseTime(startTime));
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);//"car", startTime, "00:01", null);
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(homeLink, workLink);
-		route.setLinks(homeLink, routeLinks, workLink);
+		plan.createAndAddActivity("h", homeLinkId).setEndTime(Time.parseTime(startTime));
+		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(homeLinkId, workLinkId, null);
+		route.setLinkIds(homeLinkId, routeLinkIds, workLinkId);
 		leg.setRoute(route);
-		plan.createAndAddActivity("w", workLink.getId());//, null, "24:00", null, "yes");
+		plan.createAndAddActivity("w", workLinkId);
 		return person;
 	}
 

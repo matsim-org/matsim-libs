@@ -34,7 +34,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
@@ -44,10 +44,10 @@ import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFr
 public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 
 	public static final double[] distanceClasses = new double[]{
-		0.0, 
-		100, 200, 500, 
-		1000, 2000, 5000, 
-		10000, 20000, 50000, 
+		0.0,
+		100, 200, 500,
+		1000, 2000, 5000,
+		10000, 20000, 50000,
 		100000, 200000, 500000,
 		1000000};
 
@@ -59,24 +59,24 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		Node node3 = testNetwork.createAndAddNode(new IdImpl("3"), new CoordImpl(1000.0, 1000.0));
 		Link startLink = testNetwork.createAndAddLink(new IdImpl("101"), node1, node2, 500.0, 27.7778, 2000.0, 1.0);
 		Link endLink = testNetwork.createAndAddLink(new IdImpl("102"), node2, node3, 1000.0, 27.7778, 2000.0, 1.0);
-		
+
 		PersonImpl testPerson = new PersonImpl(new IdImpl("1000"));
 		PlanImpl testPlan = testPerson.createAndAddPlan(true);
-		
+
 		ActivityImpl act = testPlan.createAndAddActivity("startActivity", startLink.getId());
-		
+
 		Leg leg = testPlan.createAndAddLeg(TransportMode.car);
-		
-		NodeNetworkRouteImpl route = new NodeNetworkRouteImpl(startLink, endLink);
+
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), scenario.getNetwork());
 		route.setDistance(1200.0);
-		
+
 		leg.setRoute(route);
-		
+
 		act = testPlan.createAndAddActivity("endActivity", endLink.getId());
-		
+
 		PopulationImpl pop = scenario.getPopulation();
 		pop.setIsStreaming(true);
-		
+
 		PrintStream out = null;
 		try {
 			out = new PrintStream(this.getOutputDirectory() + "actualOutput.txt");
@@ -86,9 +86,9 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		}
 		AbstractClassifiedFrequencyAnalysis testee = new PopulationLegDistanceDistribution(out);
 		pop.addAlgorithm(testee);
-		
+
 		pop.addPerson(testPerson);
-		
+
 		assertEquals(1, testee.getNumberOfModes());
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, distanceClasses[4], distanceClasses[5]));
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, distanceClasses[5], distanceClasses[4]));
@@ -98,16 +98,16 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		route.setDistance(13456.7);
 
 		pop.addPerson(testPerson);
-		
+
 		assertEquals(2, testee.getNumberOfModes());
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, distanceClasses[4], distanceClasses[5]));
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, distanceClasses[7], distanceClasses[8]));
-		
+
 		leg.setMode(TransportMode.car);
 		route.setDistance(0.0);
-		
+
 		pop.addPerson(testPerson);
-		
+
 		assertEquals(2, testee.getNumberOfModes());
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, -1000.0, distanceClasses[0]));
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, distanceClasses[5], distanceClasses[4]));
@@ -119,7 +119,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		assertEquals(1, testee.getNumberOfLegs(-1000.0, distanceClasses[0]));
 		assertEquals(1, testee.getNumberOfLegs(distanceClasses[5], distanceClasses[4]));
 		assertEquals(1, testee.getNumberOfLegs(distanceClasses[7], distanceClasses[8]));
-		
+
 		for (boolean isCumulative : new boolean[]{false, true}) {
 			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
 				testee.printClasses(crosstabFormat, isCumulative, distanceClasses, out);
@@ -135,7 +135,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + "expectedOutput.txt");
 		final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + "actualOutput.txt");
 		assertEquals(expectedChecksum, actualChecksum);
-		
+
 	}
-	
+
 }

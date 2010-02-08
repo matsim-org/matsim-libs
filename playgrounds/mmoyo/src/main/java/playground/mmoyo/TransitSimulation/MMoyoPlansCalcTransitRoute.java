@@ -126,7 +126,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 							toLink = this.network.getLinks().get(((Activity) planElements.get(i+1)).getLinkId());
 						}
 						Link nextPeLink = toLink;
-						firstLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
+						firstLeg.setRoute(new GenericRouteImpl(fromLink.getId(), toLink.getId()));
 
 						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
 						toLink = this.network.getLinks().get(((Activity) planElements.get(i+1)).getLinkId());
@@ -149,7 +149,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 						}*/
 						///////////////////
 
-						lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
+						lastLeg.setRoute(new GenericRouteImpl(fromLink.getId(), toLink.getId()));
 
 						boolean isFirstLeg = true;
 						Coord nextCoord = null;

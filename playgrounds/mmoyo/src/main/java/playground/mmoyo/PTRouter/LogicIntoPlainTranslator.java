@@ -3,6 +3,7 @@ package playground.mmoyo.PTRouter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -87,7 +88,7 @@ public class LogicIntoPlainTranslator {
 					LegImpl leg = (LegImpl)pe;
 					NetworkRouteWRefs logicRoute = (NetworkRouteWRefs)leg.getRoute();
 					List<Node> plainNodes = convertNodesToPlain(RouteUtils.getNodes(logicRoute, this.plainNet));
-					logicRoute.setLinks(null, RouteUtils.getLinksFromNodes(plainNodes), null);
+					logicRoute.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(plainNodes)), null);
 				}
 			}
 		}
@@ -99,8 +100,8 @@ public class LogicIntoPlainTranslator {
 			NetworkRouteWRefs logicRoute= (NetworkRouteWRefs)logicLeg.getRoute();
 			List<Link> plainLinks = convertToPlain(NetworkUtils.getLinks(this.plainNet, logicRoute.getLinkIds()));
 			//if(plainLinks.size()>0){
-				NetworkRouteWRefs plainRoute = new LinkNetworkRouteImpl(null, null);
-				plainRoute.setLinks(null, plainLinks, null);
+				NetworkRouteWRefs plainRoute = new LinkNetworkRouteImpl(null, null, null);
+				plainRoute.setLinkIds(null, NetworkUtils.getLinkIds(plainLinks), null);
 				Leg plainLeg = new LegImpl(logicLeg.getMode());
 				plainLeg = logicLeg;
 				plainLeg.setRoute(plainRoute);
@@ -117,15 +118,15 @@ public class LogicIntoPlainTranslator {
 		List<LegImpl> plainLegList = new ArrayList<LegImpl>();
 		for(LegImpl logicLeg : logicLegList){
 			NetworkRouteWRefs logicNetworkRoute= (NetworkRouteWRefs)logicLeg.getRoute();
-			List<Link> plainLinkList = new ArrayList<Link>();
+			List<Id> plainLinkList = new ArrayList<Id>();
 
 			for (Link link: NetworkUtils.getLinks(this.plainNet, logicNetworkRoute.getLinkIds())) {
 				//if (link.getType().equals(ptValues.STANDARD))
-					plainLinkList.add(link);
+					plainLinkList.add(link.getId());
 			}
 			if(plainLinkList.size()>0){
-				NetworkRouteWRefs plainRoute = new LinkNetworkRouteImpl(null, null);
-				plainRoute.setLinks(null, plainLinkList, null);
+				NetworkRouteWRefs plainRoute = new LinkNetworkRouteImpl(null, null, null);
+				plainRoute.setLinkIds(null, plainLinkList, null);
 
 				LegImpl plainLeg = new LegImpl(TransportMode.pt);
 				plainLeg = logicLeg;

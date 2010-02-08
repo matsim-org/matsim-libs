@@ -223,7 +223,7 @@ public class KroutesCalculator {
 		TransitRouteStop trStopB =transitRoute.getStop(trStopFacilityB);
 		double travelTime = trStopB.getArrivalOffset() - trStopA.getDepartureOffset();
 		NetworkRouteWRefs subRoute = transitRoute.getRoute().getSubRoute(nodeA, nodeB);
-		return new PTtrip(transitRoute, subRoute,travelTime);
+		return new PTtrip(transitRoute, subRoute,travelTime, this.plainNet);
 	}
 }
 

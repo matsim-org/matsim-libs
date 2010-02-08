@@ -43,6 +43,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -251,15 +252,15 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			// do not drive/walk around, if we stay on the same link
 			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			NetworkRouteWRefs route = (NetworkRouteWRefs) this.routeFactory.createRoute(TransportMode.car, fromLink, toLink);
-			route.setLinks(fromLink, path.links, toLink);
+			NetworkRouteWRefs route = (NetworkRouteWRefs) this.routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			NetworkRouteWRefs route = (NetworkRouteWRefs) this.routeFactory.createRoute(TransportMode.car, fromLink, toLink);
+			NetworkRouteWRefs route = (NetworkRouteWRefs) this.routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;
@@ -278,7 +279,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	}
 
 	private double handlePtLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
-		// TODO [MR] later: use special pt-router
 
 		int travTime = 0;
 		final Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
@@ -298,7 +298,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			// so let's calculate the final part.
 			double travelTimeLastLink = ((LinkImpl) toLink).getFreespeedTravelTime(depTime + path.travelTime);
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.configGroup.getPtSpeedFactor());
-			RouteWRefs route = this.routeFactory.createRoute(TransportMode.pt, fromLink, toLink);
+			RouteWRefs route = this.routeFactory.createRoute(TransportMode.pt, fromLink.getId(), toLink.getId());
 			route.setTravelTime(travTime);
 			double dist = 0;
 			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
@@ -311,7 +311,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			RouteWRefs route = this.routeFactory.createRoute(TransportMode.pt, fromLink, toLink);
+			RouteWRefs route = this.routeFactory.createRoute(TransportMode.pt, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
 			leg.setRoute(route);
@@ -327,7 +327,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		// make simple assumption about distance and walking speed
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		// create an empty route, but with realistic traveltime
-		RouteWRefs route = this.routeFactory.createRoute(TransportMode.walk, this.network.getLinks().get(fromAct.getLinkId()), this.network.getLinks().get(toAct.getLinkId()));
+		RouteWRefs route = this.routeFactory.createRoute(TransportMode.walk, fromAct.getLinkId(), toAct.getLinkId());
 		int travTime = (int)(dist / this.configGroup.getWalkSpeedFactor());
 		route.setTravelTime(travTime);
 		route.setDistance(dist * 1.5);
@@ -342,7 +342,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		// make simple assumption about distance and cycling speed
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		// create an empty route, but with realistic traveltime
-		RouteWRefs route = this.routeFactory.createRoute(TransportMode.bike, this.network.getLinks().get(fromAct.getLinkId()), this.network.getLinks().get(toAct.getLinkId()));
+		RouteWRefs route = this.routeFactory.createRoute(TransportMode.bike, fromAct.getLinkId(), toAct.getLinkId());
 		int travTime = (int)(dist / this.configGroup.getBikeSpeedFactor());
 		route.setTravelTime(travTime);
 		route.setDistance(dist * 1.5);
@@ -357,7 +357,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		// make simple assumption about distance and a dummy speed (50 km/h)
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		// create an empty route, but with realistic traveltime
-		RouteWRefs route = this.routeFactory.createRoute(TransportMode.undefined, this.network.getLinks().get(fromAct.getLinkId()), this.network.getLinks().get(toAct.getLinkId()));
+		RouteWRefs route = this.routeFactory.createRoute(TransportMode.undefined, fromAct.getLinkId(), toAct.getLinkId());
 		int travTime = (int)(dist / this.configGroup.getUndefinedModeSpeedFactor());
 		route.setTravelTime(travTime);
 		route.setDistance(dist * 1.5);

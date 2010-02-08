@@ -26,7 +26,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.GenericRouteFactory;
@@ -47,22 +46,18 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 	private NetworkLayer network;
 
 	public NetworkFactoryImpl(NetworkLayer network) {
-		this();
 		this.network = network;
-	}
-	
-	public NetworkFactoryImpl() {
 		this.linkFactory = new LinkFactoryImpl();
-		this.routeFactories.put(TransportMode.car, new NodeNetworkRouteFactory());
+		this.routeFactories.put(TransportMode.car, new NodeNetworkRouteFactory(this.network));
 		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
 	}
-	
-	public NodeImpl createNode( final Id id, final Coord coord ) {
-		NodeImpl node = new NodeImpl( id ) ;
-		node.setCoord( coord ) ;
+
+	public NodeImpl createNode(final Id id, final Coord coord) {
+		NodeImpl node = new NodeImpl(id);
+		node.setCoord(coord) ;
 		return node ;
 	}
-	
+
 	/**
 	 * TODO how to set other attributes of link consistently without invalidating time variant attributes
 	 */
@@ -84,12 +79,12 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 	 *
 	 * @see #setRouteFactory(TransportMode, RouteFactory)
 	 */
-	public RouteWRefs createRoute(final TransportMode mode, final Link startLink, final Link endLink) {
+	public RouteWRefs createRoute(final TransportMode mode, final Id startLinkId, final Id endLinkId) {
 		RouteFactory factory = this.routeFactories.get(mode);
 		if (factory == null) {
 			factory = this.defaultFactory;
 		}
-		return factory.createRoute(startLink, endLink);
+		return factory.createRoute(startLinkId, endLinkId);
 	}
 
 	/**
@@ -111,7 +106,7 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 			}
 		}
 	}
-	
+
 	public void setLinkFactory(final LinkFactory factory) {
 		this.linkFactory = factory;
 	}

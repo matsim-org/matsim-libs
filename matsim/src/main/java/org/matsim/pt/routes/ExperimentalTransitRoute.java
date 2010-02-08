@@ -21,7 +21,6 @@
 package org.matsim.pt.routes;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -42,12 +41,12 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	private Id routeId = null;
 	private String description = null;
 
-	/*package*/ ExperimentalTransitRoute(final Link startLink, final Link endLink) {
-		super(startLink, endLink);
+	/*package*/ ExperimentalTransitRoute(final Id startLinkId, final Id endLinkId) {
+		super(startLinkId, endLinkId);
 	}
 
 	public ExperimentalTransitRoute(final TransitStopFacility accessFacility, final TransitLine line, final TransitRoute route, final TransitStopFacility egressFacility) {
-		this(accessFacility.getLink(), egressFacility.getLink());
+		this(accessFacility.getLinkId(), egressFacility.getLinkId());
 		this.accessStopId = accessFacility.getId();
 		this.lineId = (line == null ? null : line.getId());
 		this.routeId = (route == null ? null : route.getId());
@@ -76,8 +75,8 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	}
 
 	@Override
-	public void setRouteDescription(final Link startLink, final String routeDescription, final Link endLink) {
-		super.setRouteDescription(startLink, routeDescription, endLink);
+	public void setRouteDescription(final Id startLinkId, final String routeDescription, final Id endLinkId) {
+		super.setRouteDescription(startLinkId, routeDescription, endLinkId);
 		if (routeDescription.startsWith(IDENTIFIER_1)) {
 			String[] parts = routeDescription.split(SEPARATOR, 6);//StringUtils.explode(routeDescription, '\t', 6);
 			this.accessStopId = new IdImpl(parts[1]);

@@ -18,7 +18,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
  * add parking to plans (leg + activities)
  */
 public class AddParkingsToPlans {
-	
+
 	/**
 	 * As input this method receives a population, without parking acts (and
 	 * related lets) and adds these.
@@ -30,11 +30,11 @@ public class AddParkingsToPlans {
 	}
 
 	/**
-	 * Returns the same population object, but added with parking act/legs. 
+	 * Returns the same population object, but added with parking act/legs.
 	 * The facility is also added to the existing acts.
 	 */
 	private static void addParkings(ScenarioImpl scenario) {
-		
+
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			List<PlanElement> planElements = person.getSelectedPlan()
 					.getPlanElements();
@@ -58,22 +58,22 @@ public class AddParkingsToPlans {
 					// add parking departure activity
 					newPlanElements.add(getParkingFacility(previousActivity,
 							"parkingDeparture"));
-					
+
 					// add the actual car leg
 					newPlanElements.add(planElements.get(i));
-					
+
 					// add parking arrival activity
 					newPlanElements.add(getParkingFacility(nextActivity,
 					"parkingArrival"));
 
 					// add leg from parking to next activity Activity to parking
 					newPlanElements.add(getParkingWalkLeg(scenario.getNetwork().getLinks().get(nextActivity.getLinkId())));
-					
-					
+
+
 					// set the facility of the activities also
 					previousActivity.setFacilityId(new IdImpl("facility_" + previousActivity.getLinkId().toString()));
 					nextActivity.setFacilityId(new IdImpl("facility_" + previousActivity.getLinkId().toString()));
-					
+
 				} else {
 					// add every thing else the new plan without change
 					newPlanElements.add(planElements.get(i));
@@ -93,11 +93,11 @@ public class AddParkingsToPlans {
 	 */
 	private static Leg getParkingWalkLeg(Link link) {
 		double walkDuration = 10; // in seconds
- 
+
 		Leg leg = new LegImpl(TransportMode.walk);
 
 		leg.setTravelTime(walkDuration);
-		leg.setRoute(new GenericRouteImpl(link, link));
+		leg.setRoute(new GenericRouteImpl(link.getId(), link.getId()));
 		leg.getRoute().setTravelTime(walkDuration);
 
 		return leg;
@@ -105,9 +105,9 @@ public class AddParkingsToPlans {
 
 	/**
 	 * Add a parking facility at the same location as the given activity.
-	 * 
+	 *
 	 * activityType should either be parkingDeparture or parkingArrival
-	 * 
+	 *
 	 * @param activity
 	 * @param activityType
 	 * @return

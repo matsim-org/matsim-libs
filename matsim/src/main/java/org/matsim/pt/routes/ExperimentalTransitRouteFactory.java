@@ -20,7 +20,7 @@
 
 package org.matsim.pt.routes;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
 
@@ -29,8 +29,9 @@ public class ExperimentalTransitRouteFactory implements RouteFactory {
 
 	private static final long serialVersionUID = 1L;
 
-	public RouteWRefs createRoute(final Link startLink, final Link endLink) {
-		return new ExperimentalTransitRoute(startLink, endLink);
+	@Override
+	public RouteWRefs createRoute(final Id startLinkId, final Id endLinkId) {
+		return new ExperimentalTransitRoute(startLinkId, endLinkId);
 	}
 
 }

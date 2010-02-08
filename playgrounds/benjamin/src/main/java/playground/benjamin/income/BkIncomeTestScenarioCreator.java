@@ -38,7 +38,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.dgrether.DgPaths;
 
@@ -59,11 +58,9 @@ public class BkIncomeTestScenarioCreator {
 	private final Id id6 = new IdImpl(6);
 	private final Id id7 = new IdImpl(7);
 
-	private final NetworkImpl uselessNetwork;
 	private final ScenarioImpl scenario;
 
 	public BkIncomeTestScenarioCreator(ScenarioImpl scenario) {
-		this.uselessNetwork = scenario.getNetwork();
 		this.scenario = scenario;
 	}
 
@@ -89,12 +86,12 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act1);
 
 			Leg leg1Car = builder.createLeg(TransportMode.car);
-			LinkNetworkRouteImpl routeCar = new LinkNetworkRouteImpl(this.uselessNetwork.getLinks().get(id1), this.uselessNetwork.getLinks().get(id4));
+			LinkNetworkRouteImpl routeCar = new LinkNetworkRouteImpl(id1, id4, this.scenario.getNetwork());
 			//this would be so nice
 			List<Id> linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id2);
 			linkidsCar.add(id3);
-			routeCar.setLinks(this.uselessNetwork.getLinks().get(id1), NetworkUtils.getLinks(this.uselessNetwork, linkidsCar), this.uselessNetwork.getLinks().get(id4));
+			routeCar.setLinkIds(id1, linkidsCar, id4);
 			leg1Car.setRoute(routeCar);
 			plan.addLeg(leg1Car);
 
@@ -105,13 +102,13 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act2);
 
 			Leg leg2Car = builder.createLeg(TransportMode.car);
-			routeCar = new LinkNetworkRouteImpl(this.uselessNetwork.getLinks().get(id4), this.uselessNetwork.getLinks().get(id1));
+			routeCar = new LinkNetworkRouteImpl(id4, id1, this.scenario.getNetwork());
 			//in a beautiful world we would do...
 			linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id5);
 			linkidsCar.add(id6);
 			linkidsCar.add(id7);
-			routeCar.setLinks(this.uselessNetwork.getLinks().get(id4), NetworkUtils.getLinks(this.uselessNetwork, linkidsCar), this.uselessNetwork.getLinks().get(id1));
+			routeCar.setLinkIds(id4, linkidsCar, id1);
 			leg2Car.setRoute(routeCar);
 			plan.addLeg(leg2Car);
 

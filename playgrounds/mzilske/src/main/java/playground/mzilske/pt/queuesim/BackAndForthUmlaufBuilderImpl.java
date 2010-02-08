@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -18,6 +19,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
 import org.matsim.pt.UmlaufImpl;
@@ -92,10 +94,10 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 		List<UmlaufStueckI> umlaufStuecke = umlauf.getUmlaufStuecke();
 		if (!umlaufStuecke.isEmpty()) {
 			UmlaufStueckI previousUmlaufStueck = umlaufStuecke.get(umlaufStuecke.size() - 1);
-			Link fromLink = previousUmlaufStueck.getCarRoute().getEndLink();
-			Link toLink = route.getRoute().getStartLink();
-			if (fromLink != toLink) {
-				insertWenden(fromLink, toLink, umlauf);
+			Id fromLinkId = previousUmlaufStueck.getCarRoute().getEndLinkId();
+			Id toLinkId = route.getRoute().getStartLinkId();
+			if (!fromLinkId.equals(toLinkId)) {
+				insertWenden(this.network.getLinks().get(fromLinkId), this.network.getLinks().get(toLinkId), umlauf);
 			}
 		}
 		umlaufStuecke.add(umlaufStueck);
@@ -130,8 +132,8 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 					+ startNode.getId() + " to node " + endNode.getId() + ".");
 		}
 		NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory()
-				.createRoute(TransportMode.car, fromLink, toLink);
-		route.setLinks(fromLink, wendenPath.links, toLink);
+				.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+		route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(wendenPath.links), toLink.getId());
 		umlauf.getUmlaufStuecke().add(new Wenden(route));
 	}
 

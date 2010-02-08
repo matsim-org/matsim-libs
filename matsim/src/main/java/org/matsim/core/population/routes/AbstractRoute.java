@@ -21,7 +21,6 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -34,9 +33,9 @@ public abstract class AbstractRoute implements RouteWRefs {
 	private double dist = Double.NaN;
 
 	private double travTime = Time.UNDEFINED_TIME;
-	
-	private Link startLink = null;
-	private Link endLink = null;
+
+	private Id startLinkId = null;
+	private Id endLinkId = null;
 
 	/**
 	 * This constructor is only needed for backwards compatibility reasons and thus is
@@ -47,9 +46,9 @@ public abstract class AbstractRoute implements RouteWRefs {
 	protected AbstractRoute(){
 	}
 
-	public AbstractRoute(final Link startLink, final Link endLink) {
-		this.startLink = startLink;
-		this.endLink = endLink;
+	public AbstractRoute(final Id startLinkId, final Id endLinkId) {
+		this.startLinkId = startLinkId;
+		this.endLinkId = endLinkId;
 	}
 
 	@Override
@@ -66,36 +65,30 @@ public abstract class AbstractRoute implements RouteWRefs {
 	public final double getTravelTime() {
 		return this.travTime;
 	}
-	
+
 	@Override
 	public final void setTravelTime(final double travTime) {
 		this.travTime = travTime;
 	}
-	
-	@Deprecated // use getEndLinkId()
-	public Link getEndLink() {
-		return this.endLink;
+
+	@Override
+	public void setEndLinkId(final Id linkId) {
+		this.endLinkId = linkId;
 	}
 
-	@Deprecated // use getStartLinkId()
-	public Link getStartLink() {
-		return this.startLink;
+	@Override
+	public void setStartLinkId(final Id linkId) {
+		this.startLinkId = linkId;
 	}
 
-	public void setEndLink(final Link link) {
-		this.endLink = link;
-	}
-
-	public void setStartLink(final Link link) {
-		this.startLink = link;
-	}
-
+	@Override
 	public Id getStartLinkId() {
-		return (this.startLink == null ? null : this.startLink.getId());
+		return this.startLinkId;
 	}
 
+	@Override
 	public Id getEndLinkId() {
-		return (this.endLink == null ? null : this.endLink.getId());
+		return this.endLinkId;
 	}
 
 	@Override

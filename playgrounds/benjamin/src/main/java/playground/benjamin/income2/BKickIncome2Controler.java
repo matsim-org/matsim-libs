@@ -39,13 +39,13 @@ public class BKickIncome2Controler extends BKickControler {
 	public BKickIncome2Controler(String arg) {
 		super(arg);
 	}
-	
+
 
 	public BKickIncome2Controler(String[] args) {
 		super(args);
 	}
 
-	
+
 	public BKickIncome2Controler(Config config) {
 		super(config);
 	}
@@ -57,16 +57,16 @@ public class BKickIncome2Controler extends BKickControler {
 	@Override
 	protected void setUp() {
 		this.hhdb = new PersonHouseholdMapping(this.getScenario().getHouseholds());
-		ScoringFunctionFactory scoringFactory = new BKickIncome2ScoringFunctionFactory(this.getScenario().getConfig().charyparNagelScoring(), hhdb);
+		ScoringFunctionFactory scoringFactory = new BKickIncome2ScoringFunctionFactory(this.getScenario().getConfig().charyparNagelScoring(), hhdb, this.getNetwork());
 		setTravelCostCalculatorFactory(new Income2TravelCostCalculatorFactory());
 		this.setScoringFunctionFactory(scoringFactory);
 		super.setUp();
 	}
 
-	
+
 	@Override
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
-		return new Income2PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, 
+		return new Income2PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 				this.getLeastCostPathCalculatorFactory(), this.hhdb);
 	}
 
@@ -84,5 +84,5 @@ public class BKickIncome2Controler extends BKickControler {
 	}
 }
 
-	
+
 }

@@ -31,6 +31,7 @@ import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 /**
  *
@@ -67,8 +68,8 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 	public NetworkRouteWRefs requestRoute(final Link departureLink, final Link destinationLink,
 			final double time) {
 		Path path = this.landmarksAStar.calcLeastCostPath(departureLink.getToNode(), destinationLink.getFromNode(), time);
-		NetworkRouteWRefs route = (NetworkRouteWRefs) ((NetworkLayer) network).getFactory().createRoute(TransportMode.car, departureLink, destinationLink);
-		route.setLinks(departureLink, path.links, destinationLink);
+		NetworkRouteWRefs route = (NetworkRouteWRefs) ((NetworkLayer) network).getFactory().createRoute(TransportMode.car, departureLink.getId(), destinationLink.getId());
+		route.setLinkIds(departureLink.getId(), NetworkUtils.getLinkIds(path.links), destinationLink.getId());
 		return route;
 	}
 

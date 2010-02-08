@@ -43,7 +43,7 @@ public class ExperimentalTransitRouteTest extends TestCase {
 	public void testInitializationLinks() {
 		Link link1 = new FakeLink(new IdImpl(1));
 		Link link2 = new FakeLink(new IdImpl(2));
-		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1, link2);
+		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1.getId(), link2.getId());
 		assertEquals(link1.getId(), route.getStartLinkId());
 		assertEquals(link2.getId(), route.getEndLinkId());
 		assertNull(route.getAccessStopId());
@@ -75,11 +75,11 @@ public class ExperimentalTransitRouteTest extends TestCase {
 		Link link2 = new FakeLink(new IdImpl(2));
 		Link link3 = new FakeLink(new IdImpl(3));
 		Link link4 = new FakeLink(new IdImpl(4));
-		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1, link2);
+		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1.getId(), link2.getId());
 		assertEquals(link1.getId(), route.getStartLinkId());
 		assertEquals(link2.getId(), route.getEndLinkId());
-		route.setStartLink(link3);
-		route.setEndLink(link4);
+		route.setStartLinkId(link3.getId());
+		route.setEndLinkId(link4.getId());
 		assertEquals(link3.getId(), route.getStartLinkId());
 		assertEquals(link4.getId(), route.getEndLinkId());
 	}

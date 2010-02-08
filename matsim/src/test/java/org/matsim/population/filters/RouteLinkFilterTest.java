@@ -74,8 +74,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		ActivityImpl a = plan.createAndAddActivity("h", link1.getId());
 		a.setEndTime(7.0 * 3600);
 		leg = plan.createAndAddLeg(TransportMode.car);
-		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
-		route.setLinks(link1, NetworkUtils.getLinks(network, "6 15"), link20);
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1.getId(), link20.getId());
+		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", link20.getId());
 		population.addPerson(person);
@@ -85,8 +85,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		ActivityImpl a2 = plan.createAndAddActivity("h", link1.getId());
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);
-		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
-		route.setLinks(link1, NetworkUtils.getLinks(network, "6 15"), link20);
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1.getId(), link20.getId());
+		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", link20.getId());
 		population.addPerson(person);
@@ -96,8 +96,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		ActivityImpl a3 = plan.createAndAddActivity("h", link1.getId());
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);
-		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
-		route.setLinks(link1, NetworkUtils.getLinks(network, "5 14"), link20);
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1.getId(), link20.getId());
+		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("5 14"), link20.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", link20.getId());
 		population.addPerson(person);

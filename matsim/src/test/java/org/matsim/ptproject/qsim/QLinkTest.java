@@ -30,7 +30,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -80,7 +79,7 @@ public class QLinkTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		v.setDriver(new PersonAgent(p, new QSim(scenario, new EventsManagerImpl())));
-		
+
 		f.qlink1.addFromIntersection(v);
 		assertEquals(1, f.qlink1.vehOnLinkCount());
 		assertFalse(f.qlink1.hasSpace());
@@ -89,9 +88,9 @@ public class QLinkTest extends MatsimTestCase {
 
 	/**
 	 * Tests that vehicles driving on a link are found with {@link QLink#getVehicle(Id)}
-	 * and {@link QLink#getAllVehicles()}. 
-	 * 
-	 * @author mrieser 
+	 * and {@link QLink#getAllVehicles()}.
+	 *
+	 * @author mrieser
 	 */
 	public void testGetVehicle_Driving() {
 		Fixture f = new Fixture();
@@ -136,8 +135,8 @@ public class QLinkTest extends MatsimTestCase {
 	/**
 	 * Tests that vehicles parked on a link are found with {@link QLink#getVehicle(Id)}
 	 * and {@link QLink#getAllVehicles()}.
-	 *  
-	 * @author mrieser 
+	 *
+	 * @author mrieser
 	 */
 	public void testGetVehicle_Parking() {
 		Fixture f = new Fixture();
@@ -171,8 +170,8 @@ public class QLinkTest extends MatsimTestCase {
 	/**
 	 * Tests that vehicles departing on a link are found with {@link QLink#getVehicle(Id)}
 	 * and {@link QLink#getAllVehicles()}.
-	 * 
-	 * @author mrieser 
+	 *
+	 * @author mrieser
 	 */
 	public void testGetVehicle_Departing() {
 		Fixture f = new Fixture();
@@ -186,7 +185,7 @@ public class QLinkTest extends MatsimTestCase {
 		pers.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
-		leg.setRoute(new LinkNetworkRouteImpl(f.link1, f.link2));
+		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId(), f.scenario.getNetwork()));
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonAgent driver = new PersonAgent(pers, qsim);
@@ -228,10 +227,10 @@ public class QLinkTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testBuffer() {
-	  Config conf = Gbl.createConfig(null);
+	  Config conf = super.loadConfig(null);
 	  ScenarioImpl scenario = new ScenarioImpl(conf);
 	  conf.setQSimConfigGroup(new QSimConfigGroup());
-	  
+
 		NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
@@ -252,9 +251,9 @@ public class QLinkTest extends MatsimTestCase {
 		try {
 			plan.createAndAddActivity("h", link1.getId());
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link2);
+			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1.getId(), link2.getId());
 			leg.setRoute(route);
-			route.setLinks(link1, null, link2);
+			route.setLinkIds(link1.getId(), null, link2.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", link2.getId());
 		} catch (Exception e) {
@@ -307,7 +306,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(0, qlink.vehOnLinkCount());
 		assertTrue(qlink.bufferIsEmpty());
 	}
-	
+
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
 		PersonImpl p = new PersonImpl(new IdImpl(5));
@@ -320,34 +319,34 @@ public class QLinkTest extends MatsimTestCase {
 		veh25.setDriver(new PersonAgent(p, null));
 		QVehicle veh5 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(3), vehType), 5);
 		veh5.setDriver(new PersonAgent(p, null));
-		
+
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);
 		f.qlink2.addFromIntersection(veh5);  // used vehicle equivalents: 5
 		assertTrue(f.qlink2.hasSpace());
 		f.qlink2.addFromIntersection(veh5);  // used vehicle equivalents: 10
 		assertFalse(f.qlink2.hasSpace());
-		
+
 		assertTrue(f.qlink2.bufferIsEmpty());
 		f.qlink2.moveLink(5.0); // first veh moves to buffer, used vehicle equivalents: 5
 		assertTrue(f.qlink2.hasSpace());
 		assertFalse(f.qlink2.bufferIsEmpty());
 		f.qlink2.popFirstFromBuffer();  // first veh leaves buffer
 		assertTrue(f.qlink2.hasSpace());
-		
+
 		f.qlink2.addFromIntersection(veh25); // used vehicle equivalents: 7.5
 		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 8.5
 		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 9.5
 		assertTrue(f.qlink2.hasSpace());
 		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 10.5
 		assertFalse(f.qlink2.hasSpace());
-		
+
 		f.qlink2.moveLink(6.0); // first veh moves to buffer, used vehicle equivalents: 5.5
 		assertTrue(f.qlink2.hasSpace());
 		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 6.5
 		f.qlink2.addFromIntersection(veh25); // used vehicle equivalents: 9.0
 		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 10.0
 		assertFalse(f.qlink2.hasSpace());
-		
+
 	}
 
 	/**
@@ -382,7 +381,7 @@ public class QLinkTest extends MatsimTestCase {
 			this.qlink2 = (QLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("2"));
 			this.qlink2.setLinkActivator(engine);
 			this.qlink2.finishInit();
-			
+
 			this.basicVehicle = new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType")));
 		}
 

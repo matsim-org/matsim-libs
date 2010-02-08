@@ -23,7 +23,6 @@ package org.matsim.core.population.routes;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
 
@@ -35,25 +34,18 @@ import org.matsim.api.core.v01.network.Node;
  */
 public interface NetworkRouteWRefs extends RouteWRefs {
 
-	@Deprecated // use getStartLinkId()
-	public Link getStartLink();
-
-	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink);
+	public void setLinkIds(final Id startLinkId, final List<Id> linkIds, final Id endLinkId);
 
 	public void setTravelCost(final double travelCost);
 
 	public double getTravelCost();
 
 	/**
-	 * Returns the list of links that build the route. The links where the route
+	 * Returns the list of link ids that build the route. The links where the route
 	 * starts and ends (the links where the activities are on) are <b>not</b>
 	 * included in the list.
-	 * @return a list containing the links the agents plans to travel along
-	 * @deprecated use getLinkIds()
+	 * @return a list containing the link ids the agents plans to travel along
 	 */
-	@Deprecated // use getLinkIds()
-	public List<Link> getLinks();
-
 	public List<Id> getLinkIds();
 
 	/**

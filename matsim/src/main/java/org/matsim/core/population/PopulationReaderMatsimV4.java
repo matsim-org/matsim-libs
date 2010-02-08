@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -348,18 +347,18 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			this.curract.setFacilityId(f.getId());
 		}
 		if (this.routeDescription != null) {
-			Link startLink = null;
+			Id startLinkId = null;
 			if (this.prevAct.getLinkId() != null) {
-				startLink = this.network.getLinks().get(this.prevAct.getLinkId());
+				startLinkId = this.prevAct.getLinkId();
 			}
-			Link endLink = null;
+			Id endLinkId = null;
 			if (this.curract.getLinkId() != null) {
-				endLink = this.network.getLinks().get(this.curract.getLinkId());
+				endLinkId = this.curract.getLinkId();
 			}
 			if (this.currRoute instanceof GenericRoute) {
-				((GenericRoute) this.currRoute).setRouteDescription(startLink, this.routeDescription.trim(), endLink);
+				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
 			} else if (this.currRoute instanceof NetworkRouteWRefs) {
-				((NetworkRouteWRefs) this.currRoute).setLinks(startLink, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeDescription)), endLink);
+				((NetworkRouteWRefs) this.currRoute).setLinkIds(startLinkId, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeDescription))), endLinkId);
 			} else {
 				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
 			}

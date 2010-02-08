@@ -33,6 +33,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.withinday.routeprovider.RouteProvider;
 
 import playground.johannes.eut.EventBasedTTProvider;
@@ -47,7 +48,10 @@ public class ReactRouteGuidance implements RouteProvider {
 
 	private RoutableLinkCost linkcost;
 
+	private final Network network;
+
 	public ReactRouteGuidance(Network network, TravelTime traveltimes) {
+		this.network = network;
 		this.linkcost = new RoutableLinkCost();
 		this.linkcost.traveltimes = traveltimes;
 		this.algorithm = new Dijkstra(network, this.linkcost, this.linkcost);
@@ -71,8 +75,8 @@ public class ReactRouteGuidance implements RouteProvider {
 		}
 		Path path = this.algorithm.calcLeastCostPath(departureLink.getToNode(),
 					destinationLink.getFromNode(), time);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(departureLink, destinationLink);
-		route.setLinks(departureLink, path.links, destinationLink);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(departureLink.getId(), destinationLink.getId(), network);
+		route.setLinkIds(departureLink.getId(), NetworkUtils.getLinkIds(path.links), destinationLink.getId());
 		return route;
 	}
 

@@ -87,7 +87,6 @@ import org.matsim.population.algorithms.PlanFilterActTypes;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
-import org.matsim.run.OTFVis;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
@@ -659,6 +658,10 @@ public class MyRuns {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
+	public static void setValue(int i) {
+		i = 5;
+	}
+
 	public static void main(final String[] args) {
 
 
@@ -761,9 +764,12 @@ public class MyRuns {
 //			e.printStackTrace();
 //		}
 //		new NetworkWriter(scenario.getNetwork()).writeFile("/Users/mrieser/Downloads/switzerland.xml");
-		OTFVis.main(new String[]{"/Users/mrieser/Downloads/switzerland.xml"});
+//		OTFVis.main(new String[]{"/Users/mrieser/Downloads/switzerland.xml"});
 
-
+		int j = 3;
+		System.out.println(j);
+		setValue(j);
+		System.out.println(j);
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();

@@ -20,11 +20,13 @@
 
 package playground.meisterk.kti.router;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
 
 public class KtiPtRouteFactory implements RouteFactory {
+
+	private static final long serialVersionUID = 1L;
 
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 
@@ -33,8 +35,9 @@ public class KtiPtRouteFactory implements RouteFactory {
 		this.plansCalcRouteKtiInfo = plansCalcRouteKtiInfo;
 	}
 
-	public RouteWRefs createRoute(Link startLink, Link endLink) {
-		return new KtiPtRoute(startLink, endLink, this.plansCalcRouteKtiInfo);
+	@Override
+	public RouteWRefs createRoute(Id startLinkId, Id endLinkId) {
+		return new KtiPtRoute(startLinkId, endLinkId, this.plansCalcRouteKtiInfo);
 	}
 
 }

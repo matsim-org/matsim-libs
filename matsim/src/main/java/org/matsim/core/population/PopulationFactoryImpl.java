@@ -19,14 +19,12 @@
 
 package org.matsim.core.population;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
@@ -46,15 +44,18 @@ public class PopulationFactoryImpl implements PopulationFactory {
 		this.scenario = scenario;
 	}
 
+	@Override
 	public PersonImpl createPerson(final Id id) {
 		PersonImpl p = new PersonImpl(id);
 		return p;
 	}
 
+	@Override
 	public Plan createPlan(){
 		return new PlanImpl();
 	}
 
+	@Override
 	public ActivityImpl createActivityFromCoord(final String actType, final Coord coord) {
 		ActivityImpl act = new ActivityImpl(actType, coord);
 		return act;
@@ -66,35 +67,20 @@ public class PopulationFactoryImpl implements PopulationFactory {
 		return act;
 	}
 
+	@Override
 	public ActivityImpl createActivityFromLinkId(final String actType, final Id linkId) {
 		ActivityImpl act = new ActivityImpl(actType, linkId);
 		return act;
 	}
 
+	@Override
 	public LegImpl createLeg(final TransportMode legMode) {
 		return new LegImpl(legMode);
 	}
 
 	public Route createRoute(final Id startLinkId, final Id endLinkId, final List<Id> currentRouteLinkIds) {
-		Link start = this.scenario.getNetwork().getLinks().get(startLinkId);
-		Link end = this.scenario.getNetwork().getLinks().get(endLinkId);
-		if (start == null) {
-			throw new IllegalStateException("Can't create Route with StartLink Id " + startLinkId + " because the Link cannot be found in the loaded Network.");
-		}
-		if (end == null) {
-			throw new IllegalStateException("Can't create Route with EndLink Id " + startLinkId + " because the Link cannot be found in the loaded Network.");
-		}
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(start, end);
-		List<Link> links = new ArrayList<Link>();
-		Link link;
-		for (Id id : currentRouteLinkIds) {
-			link = this.scenario.getNetwork().getLinks().get(id);
-			if (link == null) {
-				throw new IllegalStateException("Can't create Route over Link with Id " + id + " because the Link cannot be found in the loaded Network.");
-			}
-			links.add(this.scenario.getNetwork().getLinks().get(id));
-		}
-		route.setLinks(start, links, end);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLinkId, endLinkId, this.scenario.getNetwork());
+		route.setLinkIds(startLinkId, currentRouteLinkIds, endLinkId);
 		return route;
 	}
 

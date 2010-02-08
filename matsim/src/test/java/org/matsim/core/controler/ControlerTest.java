@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -81,11 +82,11 @@ public class ControlerTest extends MatsimTestCase {
 		Activity a1 = plan1.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route1 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
+		NetworkRouteWRefs route1 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		leg1.setRoute(route1);
-		ArrayList<Link> links = new ArrayList<Link>();
-		links.add(f.link2);
-		route1.setLinks(f.link1, links, f.link3);
+		ArrayList<Id> linkIds = new ArrayList<Id>();
+		linkIds.add(f.link2.getId());
+		route1.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
 		plan1.createAndAddActivity("h", f.link3.getId());
 		population.addPerson(person1);
 
@@ -94,9 +95,9 @@ public class ControlerTest extends MatsimTestCase {
 		Activity a2 = plan2.createAndAddActivity("h", f.link1.getId());
 		a2.setEndTime(7.0*3600);
 		LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route2 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
+		NetworkRouteWRefs route2 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		leg2.setRoute(route2);
-		route2.setLinks(f.link1, links, f.link3);
+		route2.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
 		plan2.createAndAddActivity("h", f.link3.getId());
 		population.addPerson(person2);
 

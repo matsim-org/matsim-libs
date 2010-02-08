@@ -125,7 +125,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		this.ktiConfigGroup.setUsePlansCalcRouteKti(true);
 //		this.runATest(TransportMode.pt, "unknown", "kti=8503006=26101=300.0=26102=8503015", -8.010467);
 		this.runATest(TransportMode.pt, "unknown", "kti=8503006=26101=300.0=26102=8503015", -7.5);
-	}	
+	}
 
 	public void testCalcLegScoreCar() {
 		this.runATest(TransportMode.car, null, null, -2.2);
@@ -158,16 +158,16 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		RouteFactory ptRouteFactory = new KtiPtRouteFactory(this.plansCalcRouteKtiInfo);
 		this.network.getFactory().setRouteFactory(TransportMode.pt, ptRouteFactory);
 
-		RouteWRefs route = network.getFactory().createRoute(mode, startLink, endLink);
+		RouteWRefs route = network.getFactory().createRoute(mode, startLink.getId(), endLink.getId());
 		testLeg.setRoute(route);
 		route.setDistance(10000.0);
 		if (route instanceof KtiPtRoute) {
-			((KtiPtRoute) route).setRouteDescription(startLink, routeDescription, endLink);
+			((KtiPtRoute) route).setRouteDescription(startLink.getId(), routeDescription, endLink.getId());
 		}
 
 		CharyparNagelScoringParameters charyparNagelParams = new CharyparNagelScoringParameters(config.charyparNagelScoring());
 		LegScoringFunction testee = new LegScoringFunction(
-				testPlan, 
+				testPlan,
 				charyparNagelParams,
 				config,
 				this.ktiConfigGroup);

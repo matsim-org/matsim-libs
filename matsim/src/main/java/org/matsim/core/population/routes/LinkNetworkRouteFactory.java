@@ -20,7 +20,8 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 
 
 /**
@@ -28,8 +29,16 @@ import org.matsim.api.core.v01.network.Link;
  */
 public class LinkNetworkRouteFactory implements RouteFactory {
 
-	public RouteWRefs createRoute(Link startLink, Link endLink) {
-		return new LinkNetworkRouteImpl(startLink, endLink);
+	private static final long serialVersionUID = 1L;
+	private final Network network;
+
+	public LinkNetworkRouteFactory(final Network network) {
+		this.network = network;
+	}
+
+	@Override
+	public RouteWRefs createRoute(Id startLinkId, Id endLinkId) {
+		return new LinkNetworkRouteImpl(startLinkId, endLinkId, network);
 	}
 
 }

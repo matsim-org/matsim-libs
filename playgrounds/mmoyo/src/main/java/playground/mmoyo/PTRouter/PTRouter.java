@@ -76,7 +76,7 @@ public class PTRouter{
 
 		//if the two activities are located in the same link, create an undefined transport mode leg between them
 		//System.out.println(fromAct.getType() + " " + toAct.getType() + " " + fromAct.getLinkId() + " " + toAct.getLinkId());
-		GenericRouteImpl undefinedRoute = new GenericRouteImpl(this.logicNet.getLinks().get(fromAct.getLinkId()),this.logicNet.getLinks().get(toAct.getLinkId()));
+		GenericRouteImpl undefinedRoute = new GenericRouteImpl(fromAct.getLinkId(),toAct.getLinkId());
 		undefinedRoute.setDistance(CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()));
 		LegImpl undefinedLeg = new LegImpl(TransportMode.undefined);
 		undefinedLeg.setTravelTime(undefinedRoute.getDistance() * PTValues.AV_WALKING_SPEED);
@@ -117,7 +117,7 @@ public class PTRouter{
 						legList.add(createLeg(TransportMode.undefined, linkList, depTime, time));
 					}
 				}
-				time += ptTravelTime.getLinkTravelTime(link, time);;
+				time += ptTravelTime.getLinkTravelTime(link, time);
 				linkList.add(ptLink);
 				lastLinkType = ptLink.getAliasType();
 				i++;
@@ -218,9 +218,9 @@ public class PTRouter{
 			leg.setTravelTime(firstLink.getWalkTime());
 			GenericRouteImpl undefinedRoute;
 			if (firstLink.getAliasType() ==3 || firstLink.getAliasType() ==4){  //transfers
-				undefinedRoute = new GenericRouteImpl(((Station)firstLink.getFromNode()).getTransitStopFacility().getLink(), ((Station)firstLink.getToNode()).getTransitStopFacility().getLink());
+				undefinedRoute = new GenericRouteImpl(((Station)firstLink.getFromNode()).getTransitStopFacility().getLinkId(), ((Station)firstLink.getToNode()).getTransitStopFacility().getLinkId());
 			}else{
-				undefinedRoute = new GenericRouteImpl(firstLink,firstLink);
+				undefinedRoute = new GenericRouteImpl(firstLink.getId(),firstLink.getId());
 			}
 			undefinedRoute.setDistance(firstLink.getLength());
 			leg.setRoute(undefinedRoute);
@@ -255,7 +255,7 @@ public class PTRouter{
 			leg.setTravelTime(firstLink.getWalkTime());
 
 			if (firstLink.getAliasType() ==3 || firstLink.getAliasType() ==4){  //transfers
-				leg.setRoute(new GenericRouteImpl(((Station)firstLink.getFromNode()).getTransitStopFacility().getLink(), ((Station)firstLink.getToNode()).getTransitStopFacility().getLink()));
+				leg.setRoute(new GenericRouteImpl(((Station)firstLink.getFromNode()).getTransitStopFacility().getLinkId(), ((Station)firstLink.getToNode()).getTransitStopFacility().getLinkId()));
 			}
 		}
 		//leg.setDepartureTime(depTime);??

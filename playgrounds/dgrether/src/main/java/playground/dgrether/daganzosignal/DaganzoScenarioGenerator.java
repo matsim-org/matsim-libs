@@ -219,12 +219,12 @@ public class DaganzoScenarioGenerator {
 			// leg to home
 			LegImpl leg = (LegImpl) factory.createLeg(TransportMode.car);
 			// TODO check this
-			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(l1, l7);
+			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(l1.getId(), l7.getId(), network);
 			if (isAlternativeRouteEnabled) {
-				route.setLinks(l1, NetworkUtils.getLinks(network, "2 3 5 6"), l7);
+				route.setLinkIds(l1.getId(), NetworkUtils.getLinkIds("2 3 5 6"), l7.getId());
 			}
 			else {
-				route.setLinks(l1, NetworkUtils.getLinks(network, "2 4 6"), l7);
+				route.setLinkIds(l1.getId(), NetworkUtils.getLinkIds("2 4 6"), l7.getId());
 			}
 			leg.setRoute(route);
 
@@ -362,7 +362,7 @@ public class DaganzoScenarioGenerator {
 		}
 	}
 
-  
+
   public String getConfigOut() {
     return configOut;
   }

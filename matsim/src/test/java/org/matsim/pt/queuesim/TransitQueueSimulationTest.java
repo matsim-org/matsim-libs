@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -165,9 +166,9 @@ public class TransitQueueSimulationTest {
 		stop3.setLink(link2);
 		stop4.setLink(link2);
 
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1, link2);
-		ArrayList<Link> links = new ArrayList<Link>();
-		route.setLinks(link1, links, link2);
+		NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		ArrayList<Id> links = new ArrayList<Id>(0);
+		route.setLinkIds(link1.getId(), links, link2.getId());
 
 		{ // line 1, 1 route, 2 departures
 			TransitLine line = builder.createTransitLine(scenario.createId("1"));
@@ -292,11 +293,11 @@ public class TransitQueueSimulationTest {
 		// check everything
 		assertEquals(1, simulation.getAgentTracker().getAgentsAtStop(stop1).size());
 	}
-	
+
 	/**
 	 * Tests that the simulation refuses to let an agent teleport herself by starting a transit
 	 * leg on a link where she isn't.
-	 * 
+	 *
 	 */
 	@Test(expected = TransitAgentTriesToTeleportException.class)
 	public void testAddAgentToStopWrongLink() {
@@ -304,7 +305,7 @@ public class TransitQueueSimulationTest {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		
+
 		// setup: network
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
@@ -427,10 +428,10 @@ public class TransitQueueSimulationTest {
 		stop3.setLink(link4);
 		stop4.setLink(link5); // one stop on the last link of the network route, as that one may be specially handled
 
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1, link5);
-		ArrayList<Link> links = new ArrayList<Link>();
-		Collections.addAll(links, link2, link3, link4);
-		route.setLinks(link1, links, link5);
+		NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1.getId(), link5.getId(), network);
+		ArrayList<Id> links = new ArrayList<Id>();
+		Collections.addAll(links, link2.getId(), link3.getId(), link4.getId());
+		route.setLinkIds(link1.getId(), links, link5.getId());
 
 		TransitRoute tRoute = builder.createTransitRoute(scenario.createId(">"), route, stops, TransportMode.pt);
 		Departure departure = builder.createDeparture(scenario.createId("dep1"), 6.0*3600);
@@ -636,7 +637,7 @@ public class TransitQueueSimulationTest {
 		stopFacility1.setLink(link1);
 		stopFacility2.setLink(link2);
 		TransitLine tLine = sb.createTransitLine(scenario.createId("1"));
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1, link2);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
 		TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
 		TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
@@ -727,7 +728,7 @@ public class TransitQueueSimulationTest {
 		stopFacility1.setLink(link1);
 		stopFacility2.setLink(link2);
 		TransitLine tLine = sb.createTransitLine(scenario.createId("1"));
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1, link2);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
 		TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
 		TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
@@ -748,7 +749,7 @@ public class TransitQueueSimulationTest {
 		Activity act1 = pb.createActivityFromLinkId("h", link1.getId());
 		act1.setEndTime(depTime - 60.0);
 		Leg leg1 = pb.createLeg(TransportMode.walk);
-		Route route1 = new GenericRouteImpl(link1, link1);
+		Route route1 = new GenericRouteImpl(link1.getId(), link1.getId());
 		route1.setTravelTime(10.0);
 		leg1.setRoute(route1);
 		Activity act2 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
@@ -760,7 +761,7 @@ public class TransitQueueSimulationTest {
 		Activity act3 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
 		act3.setEndTime(0.0);
 		Leg leg3 = pb.createLeg(TransportMode.walk);
-		Route route3 = new GenericRouteImpl(link2, link2);
+		Route route3 = new GenericRouteImpl(link2.getId(), link2.getId());
 		route3.setTravelTime(10.0);
 		leg3.setRoute(route3);
 		Activity act4 = pb.createActivityFromLinkId("w", link2.getId());

@@ -21,11 +21,11 @@
 package org.matsim.core.population.routes;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.LinkNetworkRoute;
 
@@ -37,19 +37,21 @@ import org.matsim.api.core.v01.population.LinkNetworkRoute;
 public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs, LinkNetworkRoute, Cloneable {
 
 	private static final long serialVersionUID = 1L;
-	private ArrayList<Link> route = new ArrayList<Link>();
+	private ArrayList<Id> route = new ArrayList<Id>();
 	private double travelCost = Double.NaN;
 	private Id vehicleId = null;
+	private final Network network;
 
-	public LinkNetworkRouteImpl(final Link startLink, final Link endLink){
-		super(startLink, endLink);
+	public LinkNetworkRouteImpl(final Id startLinkId, final Id endLinkId, final Network network) {
+		super(startLinkId, endLinkId);
+		this.network = network;
 	}
 
 	@Override
 	public LinkNetworkRouteImpl clone() {
 		LinkNetworkRouteImpl cloned = (LinkNetworkRouteImpl) super.clone();
-		ArrayList<Link> tmp = cloned.route;
-		cloned.route = new ArrayList<Link>(tmp); // deep copy of route
+		ArrayList<Id> tmp = cloned.route;
+		cloned.route = new ArrayList<Id>(tmp); // deep copy of route
 		return cloned;
 	}
 
@@ -58,8 +60,8 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		double dist = super.getDistance();
 		if (Double.isNaN(dist)) {
 			dist = 0;
-			for (Link link : this.route) {
-				dist += link.getLength();
+			for (Id linkId : this.route) {
+				dist += this.network.getLinks().get(linkId).getLength();
 			}
 			this.setDistance(dist);
 		}
@@ -69,30 +71,23 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	@Override
 	public List<Id> getLinkIds() {
 		ArrayList<Id> ids = new ArrayList<Id>(this.route.size());
-		for (Link link : this.route) {
-			ids.add(link.getId());
-		}
-		ids.trimToSize();
+		ids.addAll(this.route);
 		return ids;
 	}
 
 	@Override
-	@Deprecated
-	public List<Link> getLinks() {
-		return Collections.unmodifiableList(this.route);
-	}
-
-	@Override
 	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
-		Link fromLink = getStartLink();
-		Link toLink = getEndLink();
+		Link startLink = this.network.getLinks().get(getStartLinkId());
+		Link fromLink = startLink;
+		Link endLink = this.network.getLinks().get(getEndLinkId());
+		Link toLink = endLink;
 		int fromIndex = -1;
 		int toIndex = -1;
 		int max = this.route.size();
 		if (fromNode == toNode) {
 			boolean found = false;
 			for (int i = 0; i < max; i++) {
-				Link link = this.route.get(i);
+				Link link = this.network.getLinks().get(this.route.get(i));
 				if (found) {
 					toLink = link;
 					break;
@@ -105,11 +100,11 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 				}
 			}
 			if (fromIndex == -1) {
-				if (fromNode.equals(getStartLink().getToNode())) {
+				if (fromNode.equals(startLink.getToNode())) {
 					fromIndex = 0;
-					fromLink = getStartLink();
+					fromLink = startLink;
 					if (this.route.size() > 0) {
-						toLink = this.route.get(0);
+						toLink = this.network.getLinks().get(this.route.get(0));
 					}
 				} else {
 					throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
@@ -117,7 +112,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 			}
 		} else {
 			for (int i = 0; i < max; i++) {
-				Link link = this.route.get(i);
+				Link link = this.network.getLinks().get(this.route.get(i));
 				Node node = link.getFromNode();
 				if (node.equals(fromNode)) {
 					fromIndex = i;
@@ -129,7 +124,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 				throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
 			}
 			for (int i = fromIndex; i < max; i++) {
-				Link link = this.route.get(i);
+				Link link = this.network.getLinks().get(this.route.get(i));
 				if (toIndex >= 0) {
 					toLink = link;
 					break;
@@ -143,11 +138,11 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 				throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 			}
 		}
-		LinkNetworkRouteImpl ret = new LinkNetworkRouteImpl(fromLink, toLink);
+		LinkNetworkRouteImpl ret = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId(), this.network);
 		if (toIndex >= fromIndex) {
-			ret.setLinks(fromLink, this.route.subList(fromIndex, toIndex + 1), toLink);
+			ret.setLinkIds(fromLink.getId(), this.route.subList(fromIndex, toIndex + 1), toLink.getId());
 		} else {
-			ret.setLinks(fromLink, null, toLink);
+			ret.setLinkIds(fromLink.getId(), null, toLink.getId());
 		}
 		return ret;
 	}
@@ -163,10 +158,10 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	}
 
 	@Override
-	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
+	public void setLinkIds(final Id startLinkId, final List<Id> srcRoute, final Id endLinkId) {
 		this.route.clear();
-		setStartLink(startLink);
-		setEndLink(endLink);
+		setStartLinkId(startLinkId);
+		setEndLinkId(endLinkId);
 		if (srcRoute != null) {
 			this.route.addAll(srcRoute);
 		}

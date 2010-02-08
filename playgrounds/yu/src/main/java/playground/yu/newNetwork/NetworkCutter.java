@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newNetwork;
 
@@ -51,9 +51,9 @@ import org.matsim.core.utils.misc.ArgumentParser;
 /**
  * ensures only links in a rectangle that could be passed over by the plans can
  * be retained in the network.
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class NetworkCutter {
 	private double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE, maxX = 0,
@@ -84,7 +84,7 @@ public class NetworkCutter {
 	 * Runs the network cutting algorithms over the network and the plans read
 	 * in from <code>inputNetworkFile</code> and <code>plansFile</code>, writes
 	 * the resulting ("cleaned") network to the specified file.
-	 * 
+	 *
 	 * @param inputNetworkFile
 	 *            filename of the network to be handled
 	 * @param plansFile
@@ -147,8 +147,8 @@ public class NetworkCutter {
 		for (Id linkId : route.getLinkIds()) {
 			resetBoundary(net.getLinks().get(linkId));
 		}
-		resetBoundary(route.getStartLink());
-		resetBoundary(route.getEndLink());
+		resetBoundary(net.getLinks().get(route.getStartLinkId()));
+		resetBoundary(net.getLinks().get(route.getEndLinkId()));
 	}
 
 	private void resetBoundary(Link link) {
@@ -172,7 +172,7 @@ public class NetworkCutter {
 	/**
 	 * Runs the network cutting algorithms over the network read in from the
 	 * argument list, and writing the resulting network out to a file again
-	 * 
+	 *
 	 * @param args
 	 *            <code>args[0]</code> filename of the network to be handled,
 	 *            <code>args[1]</code> filename of the population to be

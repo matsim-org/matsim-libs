@@ -98,9 +98,9 @@ public class VDSSignTest extends MatsimTestCase {
 		Link link5 = this.network.getLinks().get(new IdImpl("5"));
 		Link link6 = this.network.getLinks().get(new IdImpl("6"));
 
-		this.route1 = new LinkNetworkRouteImpl(link3, link5);
+		this.route1 = new LinkNetworkRouteImpl(link3.getId(), link5.getId(), network);
 		this.controlInput.setMainRoute(this.route1);
-		this.route2 = new LinkNetworkRouteImpl(link4, link6);
+		this.route2 = new LinkNetworkRouteImpl(link4.getId(), link6.getId(), network);
 		this.controlInput.setAlternativeRoute(this.route2);
 		//set control input
 		sign.setControlInput(this.controlInput);

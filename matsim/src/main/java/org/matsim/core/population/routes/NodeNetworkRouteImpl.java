@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.misc.Time;
 
@@ -36,7 +37,7 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	private double cost = Double.NaN;
 
 	private Id vehicleId = null;
-
+	protected final Network network;
 
 	/**
 	 * This constructor is only needed for backwards compatibility reasons and thus is
@@ -44,10 +45,13 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	 * start and the end link of a Route correctly.
 	 */
 	@Deprecated
-	public NodeNetworkRouteImpl(){}
+	public NodeNetworkRouteImpl(){
+		this.network = null; // FIXME [MR]
+	}
 
-	public NodeNetworkRouteImpl(final Link startLink, final Link endLink) {
-		super(startLink, endLink);
+	public NodeNetworkRouteImpl(final Id startLinkId, final Id endLinkId, final Network network) {
+		super(startLinkId, endLinkId);
+		this.network = network;
 	}
 
 	@Override
@@ -59,26 +63,28 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	}
 
 	@Override
-	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
+	public void setLinkIds(final Id startLinkId, final List<Id> srcRoute, final Id endLinkId) {
 		this.route.clear();
-		setStartLink(startLink);
-		setEndLink(endLink);
+		setStartLinkId(startLinkId);
+		setEndLinkId(endLinkId);
 		if (srcRoute == null) {
-			if (startLink != endLink) {
+			if ((startLinkId != null) && (endLinkId != null) && (!startLinkId.equals(endLinkId))) {
+				Link startLink = this.network.getLinks().get(startLinkId);
 				// we do not check that start link and end link are really connected with the same node
 				this.route.add(startLink.getToNode());
 			}
 		} else {
+			Link startLink = this.network.getLinks().get(startLinkId);
 			if (srcRoute.size() == 0) {
-				if (startLink != endLink) {
+				if (!startLinkId.equals(endLinkId)) {
 					// we do not check that start link and end link are really connected with the same node
 					this.route.add(startLink.getToNode());
 				}
 			} else {
-				Link l = srcRoute.get(0);
+				Link l = this.network.getLinks().get(srcRoute.get(0));
 				this.route.add(l.getFromNode());
 				for (int i = 0; i < srcRoute.size(); i++) {
-					l = srcRoute.get(i);
+					l = this.network.getLinks().get(srcRoute.get(i));
 					this.route.add(l.getToNode());
 				}
 			}
@@ -105,27 +111,13 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	}
 
 	@Override
-	public List<Id> getLinkIds() {
-		List<Id> ret = new ArrayList<Id>(Math.max(0, this.route.size() - 1));
-		for (Link l : getLinks()) {
-			ret.add(l.getId());
-		}
-		return ret;
-	}
-
-	@Override
-	public final List<Link> getLinks() {
-		// marcel, 2006-09-05: added getLinkRoute
-		/* Nodes have proved to not be the best solution to store routes.
-		 * Thus it should be changed sooner or later to links instead of nodes
-		 * This function is a first step for this as it helps to create the
-		 * list of links the route leads through */
+	public final List<Id> getLinkIds() {
 		if (this.route.size() == 0) {
-			return new ArrayList<Link>(0);
+			return new ArrayList<Id>(0);
 		}
 
 		Node prevNode = null;
-		ArrayList<Link> links = new ArrayList<Link>(this.route.size() - 1);
+		ArrayList<Id> linkIds = new ArrayList<Id>(this.route.size() - 1);
 		for (Node node : this.route) {
 			if (prevNode != null) {
 				// search link from prevNode to node
@@ -133,7 +125,7 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 				for (Iterator<? extends Link> iter = prevNode.getOutLinks().values().iterator(); iter.hasNext() && !linkFound; ) {
 					Link link = iter.next();
 					if (link.getToNode() == node) {
-						links.add(link);
+						linkIds.add(link.getId());
 						linkFound = true;
 					}
 				}
@@ -143,7 +135,7 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 			}
 			prevNode = node;
 		}
-		return links;
+		return linkIds;
 	}
 
 	protected double calcDistance() {
@@ -152,8 +144,8 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		 * fix this somehow, but how?? MR, jan07
 		 */
 		double distance = 0;
-		for (Link link : getLinks()) {
-			distance += link.getLength();
+		for (Id linkId : getLinkIds()) {
+			distance += this.network.getLinks().get(linkId).getLength();
 		}
 		return distance;
 	}
@@ -168,16 +160,16 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	 */
 	@Override
 	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
-		Link fromLink = getStartLink();
-		Link toLink = getEndLink();
+		Link fromLink = this.network.getLinks().get(getStartLinkId());
+		Link toLink = this.network.getLinks().get(getEndLinkId());
 		int fromIndex = -1;
 		int toIndex = -1;
-		List<Link> links = getLinks();
-		int max = links.size();
+		List<Id> linkIds = getLinkIds();
+		int max = linkIds.size();
 		if (fromNode == toNode) {
 			if (this.route.size() > 1) {
 				for (int i = 0; i < max; i++) {
-					Link link = links.get(i);
+					Link link = this.network.getLinks().get(linkIds.get(i));
 					Node node = link.getFromNode();
 					if (node.equals(fromNode)) {
 						fromIndex = i;
@@ -208,7 +200,7 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 			}
 		} else { // --> fromNode != toNode
 			for (int i = 0; i < max; i++) {
-				Link link = links.get(i);
+				Link link = this.network.getLinks().get(linkIds.get(i));
 				Node node = link.getFromNode();
 				if (node.equals(fromNode)) {
 					fromIndex = i;
@@ -220,7 +212,7 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 				throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
 			}
 			for (int i = fromIndex; i < max; i++) {
-				Link link = links.get(i);
+				Link link = this.network.getLinks().get(linkIds.get(i));
 				if (toIndex >= 0) {
 					toLink = link;
 					break;
@@ -234,7 +226,7 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 				throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 			}
 		}
-		NodeNetworkRouteImpl ret = new NodeNetworkRouteImpl(fromLink, toLink);
+		NodeNetworkRouteImpl ret = new NodeNetworkRouteImpl(fromLink.getId(), toLink.getId(), this.network);
 		ret.route.addAll(this.route.subList(fromIndex, toIndex + 1));
 		ret.route.trimToSize();
 		return ret;

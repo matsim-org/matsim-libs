@@ -33,14 +33,15 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
 public class RouteSetGenerator {
@@ -129,8 +130,8 @@ public class RouteSetGenerator {
 			Path path = this.router.calcLeastCostPath(o,d,time);
 			NetworkRouteWRefs route = null;
 			if (path != null) {
-				route = new NodeNetworkRouteImpl(path.links.get(0), path.links.get(path.links.size()-1));
-				route.setLinks(path.links.get(0), path.links, path.links.get(path.links.size()-1));
+				route = new LinkNetworkRouteImpl(path.links.get(0).getId(), path.links.get(path.links.size()-1).getId(), this.network);
+				route.setLinkIds(path.links.get(0).getId(), NetworkUtils.getLinkIds(path.links), path.links.get(path.links.size()-1).getId());
 			}
 
 			//first check if route is local route (i.e. contains only local road links)
@@ -211,8 +212,8 @@ public class RouteSetGenerator {
 			nonLocalRoutes.remove(MatsimRandom.getRandom().nextInt(nonLocalRoutes.size()));
 		}
 		// add the least cost path at the beginning of the route
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(path.links.get(0),path.links.get(path.links.size()-1));
-		route.setLinks(path.links.get(0), path.links, path.links.get(path.links.size()-1));
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(path.links.get(0).getId(), path.links.get(path.links.size()-1).getId(), this.network);
+		route.setLinkIds(path.links.get(0).getId(), NetworkUtils.getLinkIds(path.links), path.links.get(path.links.size()-1).getId());
 		routes.addFirst(route);
 
 		// joining the resulting routes in one linked list which is returned by the algorithm

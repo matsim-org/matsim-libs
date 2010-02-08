@@ -120,11 +120,11 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		assertEquals(schedule1, schedule2);
 
 		// now add route info to the schedule
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(l1, l4);
-		List<Link> links = new ArrayList<Link>(2);
-		links.add(l2);
-		links.add(l3);
-		route.setLinks(l1, links, l4);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(l1.getId(), l4.getId(), network);
+		List<Id> links = new ArrayList<Id>(2);
+		links.add(l2.getId());
+		links.add(l3.getId());
+		route.setLinkIds(l1.getId(), links, l4.getId());
 		TransitRoute route2 = builder.createTransitRoute(new IdImpl(2), route, stops, TransportMode.bus);
 		line1.addRoute(route2);
 		stop1.setLink(l1);

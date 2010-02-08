@@ -54,7 +54,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 	private final PlansCalcRoute plansCalcRoute;
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 	private final Network network;
-	
+
 	protected FixedRouteLegTravelTimeEstimator(
 			Plan plan,
 			TravelTime linkTravelTimeEstimator,
@@ -70,19 +70,19 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 		this.network = network;
 
 		this.initPlanSpecificInformation();
-		
+
 	}
 
 	private HashMap<Integer, EnumMap<TransportMode, LegImpl>> fixedRoutes = new HashMap<Integer, EnumMap<TransportMode, LegImpl>>();
 
 	@Override
 	public LegImpl getNewLeg(
-			TransportMode mode, 
+			TransportMode mode,
 			ActivityImpl actOrigin,
 			ActivityImpl actDestination,
 			int legPlanElementIndex,
 			double departureTime) {
-		
+
 		EnumMap<TransportMode, LegImpl> legInformation = null;
 		if (this.fixedRoutes.containsKey(legPlanElementIndex)) {
 			legInformation = this.fixedRoutes.get(legPlanElementIndex);
@@ -90,33 +90,33 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 			legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
 			this.fixedRoutes.put(legPlanElementIndex, legInformation);
 		}
-		
+
 		LegImpl newLeg = null;
 		if (legInformation.containsKey(mode)) {
 			newLeg = legInformation.get(mode);
 		} else {
 			newLeg = new LegImpl(mode);
-			
+
 			if (mode.equals(TransportMode.car)) {
 				Link startLink = this.network.getLinks().get(actOrigin.getLinkId());
 				Link endLink = this.network.getLinks().get(actDestination.getLinkId());
-				NetworkRouteWRefs newRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink, endLink);
+				NetworkRouteWRefs newRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 
 				// calculate free speed route and cache it
 				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
-						startLink.getToNode(), 
-						endLink.getFromNode(), 
+						startLink.getToNode(),
+						endLink.getFromNode(),
 						0.0);
 
-				newRoute.setLinks(startLink, path.links, endLink);
+				newRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(path.links), endLink.getId());
 				newLeg.setRoute(newRoute);
 			} else {
 				this.plansCalcRoute.handleLeg(newLeg, actOrigin, actDestination, departureTime);
 			}
-			
+
 			legInformation.put(mode, newLeg);
 		}
-		
+
 		if (mode.equals(TransportMode.car)) {
 
 			double now = departureTime;
@@ -132,8 +132,8 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 			}
 
 			newLeg.setTravelTime(now - departureTime);
-			
-		} 
+
+		}
 
 		return newLeg;
 	}
@@ -155,15 +155,15 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 				LegImpl newLeg = new LegImpl(TransportMode.car);
 				Link startLink = this.network.getLinks().get(actOrigin.getLinkId());
 				Link endLink = this.network.getLinks().get(actDestination.getLinkId());
-				NetworkRouteWRefs newRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink, endLink);
+				NetworkRouteWRefs newRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 
 				// calculate free speed route and cache it
 				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
-						startLink.getToNode(), 
-						endLink.getFromNode(), 
+						startLink.getToNode(),
+						endLink.getFromNode(),
 						0.0);
 
-				newRoute.setLinks(startLink, path.links, endLink);
+				newRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(path.links), endLink.getId());
 				newLeg.setRoute(newRoute);
 
 				EnumMap<TransportMode, LegImpl> legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
@@ -186,10 +186,10 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 			}
 
 			NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(
-					TransportMode.car, 
-					this.network.getLinks().get(actOrigin.getLinkId()), 
-					this.network.getLinks().get(actDestination.getLinkId()));
-			networkRoute.setLinks(this.network.getLinks().get(actOrigin.getLinkId()), NetworkUtils.getLinks(this.network, route.getLinkIds()), this.network.getLinks().get(actDestination.getLinkId()));
+					TransportMode.car,
+					actOrigin.getLinkId(),
+					actDestination.getLinkId());
+			networkRoute.setLinkIds(actOrigin.getLinkId(), route.getLinkIds(), actDestination.getLinkId());
 			legIntermediate.setRoute(networkRoute);
 
 			legTravelTimeEstimation = now - departureTime;

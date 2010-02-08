@@ -64,7 +64,7 @@ public class NullFallDataPrepare {
 
 	private static String OutPath = "../berlin-bvg09/pt/nullfall_M44_344_U8/";
 	private static String InVisumNetFile = "../berlin-bvg09/urdaten/nullfall2009-05-25.net";
-	private static List<String> transitLineFilter = Arrays.asList("U-8","B-M44","B-344"); 
+	private static List<String> transitLineFilter = Arrays.asList("U-8","B-M44","B-344");
 
 	// OUTPUT FILES
 	private static String OutNetworkFile = OutPath + "intermediateNetwork.xml";
@@ -77,7 +77,7 @@ public class NullFallDataPrepare {
 
 	private final Pattern taktPattern = Pattern.compile("([0-9]*)s");
 
-	
+
 
 	public NullFallDataPrepare() {
 		this.scenario = new ScenarioImpl();
@@ -142,19 +142,19 @@ public class NullFallDataPrepare {
 		for (TransitRoute transitRouteI: transitLine.getRoutes().values()) {
 			VisumNetwork.TransitLineRoute transitLineRoute = getTransitLineRoute(transitLine, transitRouteI);
 			List<VisumNetwork.LineRouteItem> lineRouteItems = getLineRouteItems(transitLine, transitRouteI);
-			List<Link> links = new ArrayList<Link>();
+			List<Id> linkIds = new ArrayList<Id>();
 			Iterator<VisumNetwork.LineRouteItem> i = lineRouteItems.iterator();
 			VisumNetwork.LineRouteItem initialLineRouteItem = i.next();
 			Link initialLink = createOrFindInitialLink(initialLineRouteItem);
-			links.add(initialLink);
+			linkIds.add(initialLink.getId());
 			VisumNetwork.LineRouteItem previousLineRouteItem = initialLineRouteItem;
 			while (i.hasNext()) {
 				VisumNetwork.LineRouteItem nextLineRouteItem = i.next();
 				Link link = findLink(previousLineRouteItem, nextLineRouteItem);
-				links.add(link);
+				linkIds.add(link.getId());
 				previousLineRouteItem = nextLineRouteItem;
 			}
-			NetworkRouteWRefs linkNetworkRoute = NetworkUtils.createLinkNetworkRoute(links);
+			NetworkRouteWRefs linkNetworkRoute = NetworkUtils.createLinkNetworkRoute(linkIds, this.scenario.getNetwork());
 			transitRouteI.setRoute(linkNetworkRoute);
 			if (transitLineRoute.takt != null) {
 				int taktInSeconds = parseTaktToSeconds(transitLineRoute.takt);
@@ -234,7 +234,7 @@ public class NullFallDataPrepare {
 		}
 		return foundLink;
 	}
-	
+
 	private Link createOrFindInitialLink(LineRouteItem initialLineRouteItem) {
 		NetworkLayer network = scenario.getNetwork();
 		Node node = network.getNodes().get(initialLineRouteItem.nodeId);

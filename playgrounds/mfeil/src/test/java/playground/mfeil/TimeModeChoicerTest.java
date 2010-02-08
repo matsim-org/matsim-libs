@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -49,7 +49,6 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.testcases.fakes.FakeLink;
 
 import playground.mfeil.FilesForTests.Initializer;
 import playground.mfeil.FilesForTests.JohScoringTestFunctionFactory;
@@ -158,11 +157,11 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		PlanImpl newPlan = new PlanImpl (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(null, null);
-		List<Link> links1 = new ArrayList<Link>();
-		links1.add(new FakeLink(new IdImpl("1")));
-		links1.add(new FakeLink(new IdImpl("2")));
-		route.setLinks(null, links1, null);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(null, null, null);
+		List<Id> links1 = new ArrayList<Id>();
+		links1.add(new IdImpl("1"));
+		links1.add(new IdImpl("2"));
+		route.setLinkIds(null, links1, null);
 		((LegImpl)(newPlan.getPlanElements().get(1))).setRoute(route);
 
 		double planActTime = ((ActivityImpl)(newPlan.getPlanElements().get(0))).getEndTime();
@@ -173,10 +172,10 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		((ActivityImpl)(newPlanActsLegs.get(0))).setEndTime(0.0);
 
 		// but flat copy of leg routes so that change in plan does also affect newPlan
-		List<Link> links2 = new ArrayList<Link>();
-		links2.add(new FakeLink(new IdImpl("3")));
-		links2.add(new FakeLink(new IdImpl("2")));
-		route.setLinks(null, links2, null);
+		List<Id> links2 = new ArrayList<Id>();
+		links2.add(new IdImpl("3"));
+		links2.add(new IdImpl("2"));
+		route.setLinkIds(null, links2, null);
 
 		log.info("planActTime "+planActTime);
 		log.info("newPlanActsLegs.get(0))).getEndTime() "+((ActivityImpl)(newPlanActsLegs.get(0))).getEndTime());

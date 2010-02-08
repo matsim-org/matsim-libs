@@ -14,8 +14,9 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.QVehicle;
@@ -100,7 +101,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
 
-		NodeNetworkRouteImpl subRoute = new NodeNetworkRouteImpl(vehicle.getCurrentLink(), route.getEndLink());
+		LinkNetworkRouteImpl subRoute = new LinkNetworkRouteImpl(vehicle.getCurrentLink().getId(), route.getEndLinkId(), this.network);
 
 		// put the new route in a new leg
 		Leg newLeg = new LegImpl(currentLeg.getMode());
@@ -152,7 +153,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		nodesBuffer.addAll(RouteUtils.getNodes(newRoute, this.network));
 
 		// Update Route by replacing the Nodes.
-		route.setLinks(route.getStartLink(), RouteUtils.getLinksFromNodes(nodesBuffer), route.getEndLink());
+		route.setLinkIds(route.getStartLinkId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(nodesBuffer)), route.getEndLinkId());
 
 		// Update Distance
 		double distance = 0.0;

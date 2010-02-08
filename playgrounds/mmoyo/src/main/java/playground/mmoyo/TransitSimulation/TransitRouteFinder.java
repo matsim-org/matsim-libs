@@ -14,6 +14,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
@@ -97,11 +98,11 @@ public class TransitRouteFinder {
 			routeNodeList.add(link.getToNode());
 		}
 
-		NetworkRouteWRefs legRoute = new LinkNetworkRouteImpl(null, null);
+		NetworkRouteWRefs legRoute = new LinkNetworkRouteImpl(null, null, null);
 		legRoute.setDistance(distance);
-		legRoute.setLinks(null, routeLinks, null);
+		legRoute.setLinkIds(null, NetworkUtils.getLinkIds(routeLinks), null);
 		legRoute.setTravelTime(travTime);
-		legRoute.setLinks(null, RouteUtils.getLinksFromNodes(routeNodeList), null);
+		legRoute.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(routeNodeList)), null);
 
 		LegImpl leg = new LegImpl(mode);
 		leg.setRoute(legRoute);

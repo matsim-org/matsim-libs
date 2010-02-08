@@ -20,7 +20,7 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Route;
 
 /**
@@ -30,13 +30,9 @@ import org.matsim.api.core.v01.population.Route;
  */
 public interface RouteWRefs extends Route {
 
-	@Deprecated // use getStartLinkId()
-	public Link getStartLink();
-	public void setStartLink(final Link link);
+	public void setStartLinkId(final Id linkId);
 
-	@Deprecated // use getEndLinkId()
-	public Link getEndLink();
-	public void setEndLink(final Link link);
+	public void setEndLinkId(final Id linkId);
 
 	/* make the clone method public, but do NOT implement Cloneable
 	 * so that implementations can decide on their own if they support

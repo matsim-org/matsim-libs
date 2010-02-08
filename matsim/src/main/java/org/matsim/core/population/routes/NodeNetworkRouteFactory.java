@@ -20,28 +20,26 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 
 
 /**
  * Creates new instances of {@link NodeNetworkRouteImpl}.
- * 
+ *
  * @author mrieser
  */
 public class NodeNetworkRouteFactory implements RouteFactory {
 
+	private final Network network;
 
-	public RouteWRefs createRoute(Link startLink, Link endLink) {
-		return new NodeNetworkRouteImpl(startLink, endLink);
+	public NodeNetworkRouteFactory(final Network network) {
+		this.network = network;
 	}
 
-	/**
-	 * Method only available for backward compatibility. Make use
-	 * of createRoute(Link, Link) method if possible.
-	 */
-	@Deprecated
-	public RouteWRefs createRoute() {
-		return new NodeNetworkRouteImpl();
+	@Override
+	public RouteWRefs createRoute(Id startLinkId, Id endLinkId) {
+		return new NodeNetworkRouteImpl(startLinkId, endLinkId, this.network);
 	}
 
 }

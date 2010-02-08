@@ -20,13 +20,15 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.api.core.v01.network.Link;
-
+import org.matsim.api.core.v01.Id;
 
 public class GenericRouteFactory implements RouteFactory {
 
-	public RouteWRefs createRoute(final Link startLink, final Link endLink) {
-		return new GenericRouteImpl(startLink, endLink);
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public RouteWRefs createRoute(final Id startLinkId, final Id endLinkId) {
+		return new GenericRouteImpl(startLinkId, endLinkId);
 	}
 
 }

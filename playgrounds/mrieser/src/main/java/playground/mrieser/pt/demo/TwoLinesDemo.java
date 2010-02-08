@@ -21,11 +21,11 @@
 package playground.mrieser.pt.demo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
@@ -51,7 +51,6 @@ import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 
-import playground.mrieser.OTFDemo;
 import playground.mrieser.pt.analysis.RouteOccupancy;
 import playground.mrieser.pt.analysis.VehicleTracker;
 
@@ -165,15 +164,10 @@ public class TwoLinesDemo {
 		schedule.addStopFacility(stop6);
 
 		TransitLine tLine1 = builder.createTransitLine(this.ids[1]);
-		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link1, link13);
-		ArrayList<Link> linkList = new ArrayList<Link>(6);
-		linkList.add(link3);
-		linkList.add(link5);
-		linkList.add(link7);
-		linkList.add(link8);
-		linkList.add(link9);
-		linkList.add(link11);
-		networkRoute.setLinks(link1, linkList, link13);
+		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link1.getId(), link13.getId());
+		ArrayList<Id> linkIdList = new ArrayList<Id>(6);
+		Collections.addAll(linkIdList, link3.getId(), link5.getId(), link7.getId(), link8.getId(), link9.getId(), link11.getId());
+		networkRoute.setLinkIds(link1.getId(), linkIdList, link13.getId());
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(4);
 		stopList.add(builder.createTransitRouteStop(stop1, 0, 0));
 		stopList.add(builder.createTransitRouteStop(stop3, 90, 100));
@@ -192,15 +186,10 @@ public class TwoLinesDemo {
 		schedule.addTransitLine(tLine1);
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
-		networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2, link12);
-		linkList = new ArrayList<Link>(6);
-		linkList.add(link4);
-		linkList.add(link6);
-		linkList.add(link7);
-		linkList.add(link8);
-		linkList.add(link9);
-		linkList.add(link10);
-		networkRoute.setLinks(link2, linkList, link12);
+		networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2.getId(), link12.getId());
+		linkIdList = new ArrayList<Id>(6);
+		Collections.addAll(linkIdList, link4.getId(), link6.getId(), link7.getId(), link8.getId(), link9.getId(), link10.getId());
+		networkRoute.setLinkIds(link2.getId(), linkIdList, link12.getId());
 		stopList = new ArrayList<TransitRouteStop>(4);
 		stopList.add(builder.createTransitRouteStop(stop2, 0, 0));
 		stopList.add(builder.createTransitRouteStop(stop3, 90, 100));

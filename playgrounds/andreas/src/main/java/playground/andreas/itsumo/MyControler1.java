@@ -38,8 +38,8 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -111,11 +111,9 @@ public class MyControler1 extends Controler {
 	@Override
 	protected Population loadPopulation() {
 
-
 		PopulationImpl population = new ScenarioImpl().getPopulation();
 
 		log.info("  generating plans... ");
-
 
 		LinkImpl link9 = this.network.getLinks().get(new IdImpl("9"));
 		LinkImpl link15 = this.network.getLinks().get(new IdImpl("15"));
@@ -123,26 +121,26 @@ public class MyControler1 extends Controler {
 			PersonImpl p = new PersonImpl(new IdImpl(i+1));
 
 			try {
-				PlanImpl plan1 = new org.matsim.core.population.PlanImpl(p);
+				PlanImpl plan1 = new PlanImpl(p);
 				ActivityImpl act1a = plan1.createAndAddActivity("h", new CoordImpl(100., 100.));
 				act1a.setLinkId(link9.getId());
 				act1a.setEndTime(0*60*60.);
 				LegImpl leg = plan1.createAndAddLeg(TransportMode.car);
-				NetworkRouteWRefs route = new NodeNetworkRouteImpl(link9, link15);
-				route.setLinks(link9, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "3 4")), link15);
+				NetworkRouteWRefs route = new LinkNetworkRouteImpl(link9.getId(), link15.getId(), this.network);
+				route.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "3 4"))), link15.getId());
 				leg.setRoute(route);
 				ActivityImpl act1b = plan1.createAndAddActivity("h", new CoordImpl(200., 200.));
 				act1b.setLinkId(link15.getId());
 				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
-				PlanImpl plan2 = new org.matsim.core.population.PlanImpl(p);
+				PlanImpl plan2 = new PlanImpl(p);
 				ActivityImpl act2a = plan1.createAndAddActivity("h", new CoordImpl(100., 100.));
 				act2a.setLinkId(link9.getId());
 				act2a.setEndTime(0*60*60.);
 				LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
-				NetworkRouteWRefs route2 = new NodeNetworkRouteImpl(link9, link15);
-				route2.setLinks(link9, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "3 6 4")), link15);
+				NetworkRouteWRefs route2 = new LinkNetworkRouteImpl(link9.getId(), link15.getId(), this.network);
+				route2.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "3 6 4"))), link15.getId());
 				leg2.setRoute(route2);
 				ActivityImpl act2b = plan1.createAndAddActivity("h", new CoordImpl(200., 200.));
 				act2b.setLinkId(link15.getId());

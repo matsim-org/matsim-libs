@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
 /**
@@ -42,106 +43,103 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 
 	private final static Logger log = Logger.getLogger(CompressedNetworkRouteImpl.class);
 
-	private ArrayList<Link> route = new ArrayList<Link>(0);
-	private final Map<Link, Link> subsequentLinks;
+	private ArrayList<Id> route = new ArrayList<Id>(0);
+	private final Map<Id, Id> subsequentLinks;
 	private double travelCost = Double.NaN;
 	/** number of links in uncompressed route */
 	private int uncompressedLength = -1;
 	private int modCount = 0;
 	private int routeModCountState = 0;
 	private Id vehicleId = null;
+	private final Network network;
 
-	public CompressedNetworkRouteImpl(final Link startLink, final Link endLink, final Map<Link, Link> subsequentLinks) {
-		super(startLink, endLink);
+	public CompressedNetworkRouteImpl(final Id startLinkId, final Id endLinkId, Network network, final Map<Id, Id> subsequentLinks) {
+		super(startLinkId, endLinkId);
+		this.network = network;
 		this.subsequentLinks = subsequentLinks;
 	}
 
 	@Override
 	public CompressedNetworkRouteImpl clone() {
 		CompressedNetworkRouteImpl cloned = (CompressedNetworkRouteImpl) super.clone();
-		ArrayList<Link> tmpRoute = cloned.route;
-		cloned.route = new ArrayList<Link>(tmpRoute); // deep copy
+		ArrayList<Id> tmpRoute = cloned.route;
+		cloned.route = new ArrayList<Id>(tmpRoute); // deep copy
 		return cloned;
-	}
-
-	@Deprecated
-	@Override
-	public List<Link> getLinks() {
-		if (this.uncompressedLength < 0) { // it seems the route never got initialized correctly
-			return new ArrayList<Link>(0);
-		}
-		ArrayList<Link> links = new ArrayList<Link>(this.uncompressedLength);
-		if (this.modCount != this.routeModCountState) {
-			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
-			return links;
-		}
-		Link previousLink = getStartLink();
-		Link endLink = getEndLink();
-		if (previousLink == endLink) {
-			return links;
-		}
-		for (Link link : this.route) {
-			getLinksTillLink(links, link, previousLink);
-			links.add(link);
-			previousLink = link;
-		}
-		getLinksTillLink(links, endLink, previousLink);
-
-		return links;
-	}
-
-	private void getLinksTillLink(final List<Link> links, final Link nextLink, final Link startLink) {
-		Link link = startLink;
-		while (true) { // loop until we hit "return;"
-			for (Link outLink : link.getToNode().getOutLinks().values()) {
-				if (outLink == nextLink) { // TODO [MR] check for performance improvement: if link.getToNode == nextLink.getFromNode
-					return;
-				}
-			}
-			link = this.subsequentLinks.get(link);
-			links.add(link);
-		}
-	}
-
-	@Override
-	public void setEndLink(final Link link) {
-		this.modCount++;
-		super.setEndLink(link);
-	}
-
-	@Override
-	public void setStartLink(final Link link) {
-		this.modCount++;
-		super.setStartLink(link);
 	}
 
 	@Override
 	public List<Id> getLinkIds() {
-		List<Link> links = getLinks();
-		List<Id> ids = new ArrayList<Id>(links.size());
-		for (Link link : links) {
-			ids.add(link.getId());
+		if (this.uncompressedLength < 0) { // it seems the route never got initialized correctly
+			return new ArrayList<Id>(0);
 		}
-		return ids;
+		ArrayList<Id> links = new ArrayList<Id>(this.uncompressedLength);
+		if (this.modCount != this.routeModCountState) {
+			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
+			return links;
+		}
+		Id previousLinkId = getStartLinkId();
+		Id endLinkId = getEndLinkId();
+		if ((previousLinkId == null) || (endLinkId == null)) {
+			return links;
+		}
+		if (previousLinkId.equals(endLinkId)) {
+			return links;
+		}
+		for (Id linkId : this.route) {
+			getLinksTillLink(links, linkId, previousLinkId);
+			links.add(linkId);
+			previousLinkId = linkId;
+		}
+		getLinksTillLink(links, endLinkId, previousLinkId);
+
+		return links;
 	}
+
+	private void getLinksTillLink(final List<Id> links, final Id nextLinkId, final Id startLinkId) {
+		Id linkId = startLinkId;
+		Link nextLink = this.network.getLinks().get(nextLinkId);
+		while (true) { // loop until we hit "return;"
+			Link link = this.network.getLinks().get(linkId);
+			if (link.getToNode() == nextLink.getFromNode()) {
+				return;
+			}
+			linkId = this.subsequentLinks.get(linkId);
+			links.add(linkId);
+		}
+	}
+
+	@Override
+	public void setEndLinkId(final Id linkId) {
+		this.modCount++;
+		super.setEndLinkId(linkId);
+	}
+
+	@Override
+	public void setStartLinkId(final Id linkId) {
+		this.modCount++;
+		super.setStartLinkId(linkId);
+	}
+
 
 	@Override
 	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 		Link newStartLink = null;
 		Link newEndLink = null;
-		List<Link> newLinks = new ArrayList<Link>(10);
+		List<Id> newLinkIds = new ArrayList<Id>(10);
 
-		Link startLink = getStartLink();
+		Link startLink = this.network.getLinks().get(getStartLinkId());
 		if (startLink.getToNode() == fromNode) {
 			newStartLink = startLink;
 		}
-		for (Link link : getLinks()) {
+		Link endLink = this.network.getLinks().get(getEndLinkId());
+		for (Id linkId : getLinkIds()) {
+			Link link = this.network.getLinks().get(linkId);
 			if (link.getFromNode() == toNode) {
 				newEndLink = link;
 				break;
 			}
 			if (newStartLink != null) {
-				newLinks.add(link);
+				newLinkIds.add(link.getId());
 			}
 			if (link.getToNode() == fromNode) {
 				newStartLink = link;
@@ -151,15 +149,15 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 			throw new IllegalArgumentException("fromNode is not part of this route.");
 		}
 		if (newEndLink == null) {
-			if (getEndLink().getFromNode() == toNode) {
-				newEndLink = getEndLink();
+			if (endLink.getFromNode() == toNode) {
+				newEndLink = endLink;
 			} else {
 				throw new IllegalArgumentException("toNode is not part of this route.");
 			}
 		}
 
-		NetworkRouteWRefs subRoute = new CompressedNetworkRouteImpl(newStartLink, newEndLink, this.subsequentLinks);
-		subRoute.setLinks(newStartLink, newLinks, newEndLink);
+		NetworkRouteWRefs subRoute = new CompressedNetworkRouteImpl(newStartLink.getId(), newEndLink.getId(), this.network, this.subsequentLinks);
+		subRoute.setLinkIds(newStartLink.getId(), newLinkIds, newEndLink.getId());
 		return subRoute;
 	}
 
@@ -174,21 +172,21 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	}
 
 	@Override
-	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
+	public void setLinkIds(final Id startLinkId, final List<Id> srcRoute, final Id endLinkId) {
 		this.route.clear();
-		setStartLink(startLink);
-		setEndLink(endLink);
+		setStartLinkId(startLinkId);
+		setEndLinkId(endLinkId);
 		this.routeModCountState = this.modCount;
 		if ((srcRoute == null) || (srcRoute.size() == 0)) {
 			this.uncompressedLength = 0;
 			return;
 		}
-		Link previousLink = startLink;
-		for (Link link : srcRoute) {
-			if (!this.subsequentLinks.get(previousLink).equals(link)) {
-				this.route.add(link);
+		Id previousLinkId = startLinkId;
+		for (Id linkId : srcRoute) {
+			if (!this.subsequentLinks.get(previousLinkId).equals(linkId)) {
+				this.route.add(linkId);
 			}
-			previousLink = link;
+			previousLinkId = linkId;
 		}
 		this.route.trimToSize();
 		this.uncompressedLength = srcRoute.size();
@@ -210,8 +208,8 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 			return 99999.999;
 		}
 		double dist = 0;
-		for (Link link : getLinks()) {
-			dist += link.getLength();
+		for (Id linkId: getLinkIds()) {
+			dist += this.network.getLinks().get(linkId).getLength();
 		}
 		setDistance(dist);
 		return dist;

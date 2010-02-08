@@ -30,8 +30,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
@@ -290,7 +291,7 @@ public class VDSSign {
 	}
 
 	private NetworkRouteWRefs completeRoute(final NetworkRouteWRefs r) {
-		NetworkRouteWRefs ret = new NodeNetworkRouteImpl();
+		NetworkRouteWRefs ret = new LinkNetworkRouteImpl(null, null, null);
 		Link startLink = this.network.getLinks().get(r.getStartLinkId());
 		Node startNode = startLink.getFromNode();
 		ArrayList<Node> rNodes = new ArrayList<Node>();
@@ -306,7 +307,7 @@ public class VDSSign {
 			endLink = calculateOutLink(this.directionLink, endNode);
 			rNodes.add(endNode);
 		}
-		ret.setLinks(startLink, RouteUtils.getLinksFromNodes(rNodes), endLink);
+		ret.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(rNodes)), endLink.getId());
 		return ret;
 	}
 

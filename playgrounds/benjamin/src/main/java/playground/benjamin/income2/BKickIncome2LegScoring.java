@@ -21,6 +21,7 @@ package playground.benjamin.income2;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -32,7 +33,7 @@ import org.matsim.households.Income.IncomePeriod;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class BKickIncome2LegScoring extends LegScoringFunction {
 
@@ -44,13 +45,16 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 
 	private double incomePerDay;
 
-	public BKickIncome2LegScoring(final Plan plan, final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb) {
+	private final Network network;
+
+	public BKickIncome2LegScoring(final Plan plan, final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb, Network network) {
 		super(plan, params);
 		Income income = hhdb.getHousehold(plan.getPerson().getId()).getIncome();
 		this.incomePerDay = this.calculateIncomePerDay(income);
+		this.network = network;
 //		log.info("Using BKickLegScoring...");
 	}
-	
+
 	@Override
 	public void finish() {
 		this.score += (betaIncomeCar * Math.log(this.incomePerDay));
@@ -66,12 +70,12 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 		if (TransportMode.car.equals(leg.getMode())) {
 			RouteWRefs route = leg.getRoute();
 			dist = route.getDistance();
-			dist += route.getEndLink().getLength();
+			dist += this.network.getLinks().get(route.getEndLinkId()).getLength();
 			if (Double.isNaN(dist)){
 				throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
 			}
-			
-			tmpScore += (travelTime * this.params.marginalUtilityOfTraveling) 
+
+			tmpScore += (travelTime * this.params.marginalUtilityOfTraveling)
 					+ (this.params.marginalUtilityOfDistanceCar * dist * betaIncomeCar)
 					/ this.incomePerDay;
 		}
@@ -81,8 +85,8 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 					throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
 				}
 
-				tmpScore += (travelTime * this.params.marginalUtilityOfTravelingPT) 
-						+ (this.params.marginalUtilityOfDistancePt * dist * betaIncomePt) 
+				tmpScore += (travelTime * this.params.marginalUtilityOfTravelingPT)
+						+ (this.params.marginalUtilityOfDistancePt * dist * betaIncomePt)
 						/ this.incomePerDay;
 			}
 			else {

@@ -40,10 +40,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * <blockquote>
  *  <p>Charypar, D. und K. Nagel (2005) <br>
  *  Generating complete all-day activity plans with genetic algorithms,<br>
- *  Transportation, 32 (4) 369–397.</p>
+ *  Transportation, 32 (4) 369-397.</p>
  * </blockquote>
  * TODO dg march 09: when walk mode is tested add a walk mode leg and modify at least testMarginalUtilityOfDistance
- * 
+ *
  * TODO [MR] split this into multiple test classes for the specific parts, according to the newer, more modular scoring function
  * @author mrieser
  */
@@ -76,7 +76,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		params = new CharyparNagelScoringConfigGroup.ActivityParams("w");
 		params.setTypicalDuration(8*3600);
 		scoring.addActivityParams(params);
-		
+
 		this.network = new NetworkLayer();
 		Node node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
 		Node node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
@@ -95,13 +95,13 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		try {
 			this.plan.createAndAddActivity("h", link1.getId());
 			LegImpl leg = this.plan.createAndAddLeg(TransportMode.car);
-			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link3);
+			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1.getId(), link3.getId());
 			leg.setRoute(route);
 			route.setDistance(25000.0);
 			route.setTravelTime(0.5*3600);
 			this.plan.createAndAddActivity("w", link3.getId());
 			leg = this.plan.createAndAddLeg(TransportMode.pt);
-			route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link3, link5);
+			route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link3.getId(), link5.getId());
 			leg.setRoute(route);
 			route.setDistance(20000.0);
 			route.setTravelTime(0.25*3600);
@@ -121,7 +121,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	}
 
 	private double calcScore() {
-		ScoringFunction testee = getScoringFunctionInstance(this.plan); 
+		ScoringFunction testee = getScoringFunctionInstance(this.plan);
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (LegImpl) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
@@ -333,7 +333,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config.charyparNagelScoring().setLateArrival(-18.0);
 		this.config.charyparNagelScoring().setTraveling(-6.0);
 
-		ScoringFunction testee = getScoringFunctionInstance(this.plan); 
+		ScoringFunction testee = getScoringFunctionInstance(this.plan);
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (LegImpl) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
@@ -350,7 +350,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config.charyparNagelScoring().setLateArrival(-3.0);
 		this.config.charyparNagelScoring().setTraveling(-6.0);
 
-		testee = getScoringFunctionInstance(this.plan); 
+		testee = getScoringFunctionInstance(this.plan);
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (LegImpl) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);

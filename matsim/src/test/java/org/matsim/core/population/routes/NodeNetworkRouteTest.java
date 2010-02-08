@@ -38,8 +38,8 @@ import org.matsim.core.network.NetworkLayer;
 public class NodeNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRouteWRefs getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
-		return new NodeNetworkRouteImpl(fromLink, toLink);
+	public NetworkRouteWRefs getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkLayer network) {
+		return new NodeNetworkRouteImpl(fromLinkId, toLinkId, network);
 	}
 
 	@Test
@@ -66,16 +66,16 @@ public class NodeNetworkRouteTest extends AbstractNetworkRouteTest {
 		network.addLink(link1);
 		network.addLink(link2);
 
-		NodeNetworkRouteImpl route1 = new NodeNetworkRouteImpl(link1, link2);
-		ArrayList<Link> srcRoute = new ArrayList<Link>();
-		route1.setLinks(link1, srcRoute, link2);
+		NodeNetworkRouteImpl route1 = new NodeNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		ArrayList<Id> srcRoute = new ArrayList<Id>();
+		route1.setLinkIds(link1.getId(), srcRoute, link2.getId());
 		Assert.assertEquals(0, route1.getLinkIds().size());
 
 		NodeNetworkRouteImpl route2 = route1.clone();
 		Assert.assertNotSame(route1, route2);
 
-		srcRoute.add(link2);
-		route1.setLinks(link1, srcRoute, link3);
+		srcRoute.add(link2.getId());
+		route1.setLinkIds(link1.getId(), srcRoute, link3.getId());
 
 		Assert.assertEquals(1, route1.getLinkIds().size());
 		Assert.assertEquals(0, route2.getLinkIds().size());

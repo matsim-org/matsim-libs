@@ -34,8 +34,8 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -97,7 +97,7 @@ public class Plansgenerator {
 		currentId = addCommodity(
 				"604","664",HOME_END_TIME,duration,(int)(0.3*DEFAULT_CARS_PER_HOUR_PER_LANE),
 				"11 26 25 24 37 23 22 21",currentId);
-		// #5 straﬂe der jugend richtung peitz
+		// #5 strasse der jugend richtung peitz
 		currentId = addCommodity(
 				"652","622",HOME_END_TIME,duration,(int)(0.3*DEFAULT_CARS_PER_HOUR_PER_LANE),
 				"20 51 19 50 18 17 16 15",currentId);
@@ -121,7 +121,7 @@ public class Plansgenerator {
 		currentId = addCommodity(
 				"727","654",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
 				"38 14 55 54 28 29 36 53 52 33 34 35 20",currentId);
-		
+
 		// #11 post zu dissenchener
 		currentId = addCommodity(
 				"691","311",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
@@ -142,11 +142,11 @@ public class Plansgenerator {
 		currentId = addCommodity(
 				"604","644",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
 				"11 12 13 38 14 39 15 16 17 18 50 19",currentId);
-		
-		
+
+
 	}
-	
-	
+
+
 	/**
 	 * generates agents for denver (straight) scenario
 	 * @param HOME_END_TIME
@@ -267,8 +267,8 @@ public class Plansgenerator {
 			a.setEndTime(homeEndtime);
 			//leg to work
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-			NetworkRouteWRefs route = new NodeNetworkRouteImpl(start, target);
-			route.setLinks(start, RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, ROUTE)), target);
+			NetworkRouteWRefs route = new LinkNetworkRouteImpl(start.getId(), target.getId(), this.network);
+			route.setLinkIds(start.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, ROUTE))), target.getId());
 			leg.setRoute(route);
 			//work
 			a = plan.createAndAddActivity("w", workCoord);

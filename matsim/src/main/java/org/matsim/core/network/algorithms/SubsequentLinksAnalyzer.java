@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -50,10 +51,8 @@ public class SubsequentLinksAnalyzer {
 
 	private final Network network;
 
-	private final static LinkIdComparator linkComparator = new LinkIdComparator();
-
 	/** Stores the logical subsequent link (value) for a given link (key). */
-	private final TreeMap<Link, Link> subsequentLinks = new TreeMap<Link, Link>(linkComparator);
+	private final TreeMap<Id, Id> subsequentLinks = new TreeMap<Id, Id>();
 
 	public SubsequentLinksAnalyzer(final Network network) {
 		this.network = network;
@@ -63,7 +62,7 @@ public class SubsequentLinksAnalyzer {
 	/**
 	 * @return a map, giving for each link (key in map) the computed subsequent link (value in map).
 	 */
-	public Map<Link, Link> getSubsequentLinks() {
+	public Map<Id, Id> getSubsequentLinks() {
 		return this.subsequentLinks;
 	}
 
@@ -73,7 +72,7 @@ public class SubsequentLinksAnalyzer {
 	 * ssLinks.
 	 */
 	private void compute() {
-		Map<Link, Double> absDeltaThetas = new TreeMap<Link, Double>(linkComparator);
+		Map<Link, Double> absDeltaThetas = new TreeMap<Link, Double>(new LinkIdComparator());
 		for (Link l : this.network.getLinks().values()) {
 			Node from = l.getFromNode();
 			Node to = l.getToNode();
@@ -97,9 +96,9 @@ public class SubsequentLinksAnalyzer {
 					}
 					absDeltaThetas.put(out, Math.abs(deltaTheta));
 				}
-				this.subsequentLinks.put(l, computeSubsequentLink(l, absDeltaThetas));
+				this.subsequentLinks.put(l.getId(), computeSubsequentLink(l, absDeltaThetas).getId());
 			} else if (outLinks.size() == 1) {
-				this.subsequentLinks.put(l, outLinks.iterator().next());
+				this.subsequentLinks.put(l.getId(), outLinks.iterator().next().getId());
 			}
 		}
 	}
@@ -122,7 +121,7 @@ public class SubsequentLinksAnalyzer {
 		if (minThetaOutLinks.size() == 1) {
 			return minThetaOutLinks.get(0);
 		}
-	
+
 		double maxCapacity = Double.NEGATIVE_INFINITY;
 		Link maxCapLink = null;
 		for (Link link : minThetaOutLinks) {

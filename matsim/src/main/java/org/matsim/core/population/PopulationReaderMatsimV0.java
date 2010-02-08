@@ -188,7 +188,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		act.setEndTime(Time.parseTime(atts.getValue("end_time")));
 
 		if (this.routeNodes != null) {
-			this.currroute.setLinks(this.network.getLinks().get(this.prevAct.getLinkId()), RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeNodes)), this.network.getLinks().get(act.getLinkId()));
+			this.currroute.setLinkIds(this.prevAct.getLinkId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeNodes))), act.getLinkId());
 			this.routeNodes = null;
 			this.currroute = null;
 		}
@@ -203,7 +203,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute() {
-		this.currroute = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.network.getLinks().get(this.prevAct.getLinkId()), this.network.getLinks().get(this.prevAct.getLinkId()));
+		this.currroute = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.prevAct.getLinkId(), this.prevAct.getLinkId());
 		this.currleg.setRoute(this.currroute);
 	}
 

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
 
@@ -60,7 +61,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	@Override
 	public NetworkRouteWRefs requestRoute(final Link departureLink, final Link destinationLink, final double time) {
 		NetworkRouteWRefs subRoute;
-		NetworkRouteWRefs returnRoute = (NetworkRouteWRefs) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, departureLink, destinationLink);
+		NetworkRouteWRefs returnRoute = (NetworkRouteWRefs) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, departureLink.getId(), destinationLink.getId());
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		Link tmpDepLink = departureLink;
 		for (RouteProvider rp : this.providers) {
@@ -79,11 +80,11 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 			else {
 				routeNodes.addAll(RouteUtils.getNodes(subRoute, this.network));
 			}
-			returnRoute.setLinks(departureLink, RouteUtils.getLinksFromNodes(routeNodes), destinationLink);
+			returnRoute.setLinkIds(departureLink.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(routeNodes)), destinationLink.getId());
 			if (isEndCompleteRoute(returnRoute, destinationLink)) {
 				return returnRoute;
 			}
-			tmpDepLink = subRoute.getEndLink();
+			tmpDepLink = this.network.getLinks().get(subRoute.getEndLinkId());
 //			List<Link> returnRouteLinks = NetworkUtils.getLinks(this.network, returnRoute.getLinkIds());
 //			tmpDepLink = returnRouteLinks.get(returnRouteLinks.size()-1);
 		}

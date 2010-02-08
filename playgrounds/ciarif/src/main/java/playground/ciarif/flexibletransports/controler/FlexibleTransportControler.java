@@ -20,16 +20,16 @@ import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 
 public class FlexibleTransportControler extends Controler {
-	
+
 	protected static final String SVN_INFO_FILE_NAME = "svninfo.txt";
 	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
 	protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
-	
+
 	private final FtConfigGroup ftConfigGroup;
 	private KtiConfigGroup kTIConfigGroup; //TODO now is null and dosn't take any value when the FlexibleTransportControler is instantiated
-	
+
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(kTIConfigGroup);
 
 	public FlexibleTransportControler(String[] args) {
@@ -38,21 +38,21 @@ public class FlexibleTransportControler extends Controler {
 		this.ftConfigGroup = new FtConfigGroup();
 		super.config.addModule(FtConfigGroup.GROUP_NAME, this.ftConfigGroup);
 
-		this.getNetwork().getFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory(super.getConfig().planomat()));
+		this.getNetwork().getFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
-		this.getNetwork().getFactory().setRouteFactory(TransportMode.ride, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo)); 
-		//TODO modify the line here over when a specific router for ride is available, now it is not used 
+		this.getNetwork().getFactory().setRouteFactory(TransportMode.ride, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+		//TODO modify the line here over when a specific router for ride is available, now it is not used
 	}
-	
+
 	@Override
 	protected void setUp() {
 
 		if (this.ftConfigGroup.isUsePlansCalcRouteKti()) {
 			this.plansCalcRouteKtiInfo.prepare(this.getNetwork());
 		}
-		
+
 		FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
-				super.config, 
+				super.config,
 				this.ftConfigGroup,
 				this.getFacilityPenalties(),
 				this.getFacilities());
@@ -61,12 +61,12 @@ public class FlexibleTransportControler extends Controler {
 		super.setUp();
 	}
 
-	
+
 	@Override
 	protected void loadControlerListeners() {
-		
+
 		super.loadControlerListeners();
-		
+
 		// the scoring function processes facility loads
 		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
@@ -89,11 +89,11 @@ public class FlexibleTransportControler extends Controler {
 		} else {
 
 			router = new PlansCalcRouteKti(
-					super.getConfig().plansCalcRoute(), 
-					super.network, 
-					travelCosts, 
-					travelTimes, 
-					super.getLeastCostPathCalculatorFactory(), 
+					super.getConfig().plansCalcRoute(),
+					super.network,
+					travelCosts,
+					travelTimes,
+					super.getLeastCostPathCalculatorFactory(),
 					this.plansCalcRouteKtiInfo);
 
 		}

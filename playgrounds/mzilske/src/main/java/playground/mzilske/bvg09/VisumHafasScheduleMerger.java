@@ -34,9 +34,9 @@ import org.xml.sax.SAXException;
 
 
 public class VisumHafasScheduleMerger {
-	
+
 	private static Logger log = Logger.getLogger(VisumHafasScheduleMerger.class);
-	
+
 	private static String path = "../berlin-bvg09/pt/nullfall_M44_344_U8/";
 	private static String InNetworkFile = path + "intermediateNetwork.xml";
 	private static String InTransitScheduleFile = path + "intermediateTransitSchedule.xml";
@@ -44,13 +44,13 @@ public class VisumHafasScheduleMerger {
 	private static String InVisumNetFile = "../berlin-bvg09/urdaten/nullfall2009-05-25.net";
 	// private static String OutNetworkFile = path + "network.xml";
 	private static String OutTransitScheduleFile = path + "mergedTransitSchedule.xml";
-	
+
 	private Map<Id, Id> hafas2visum;
-	
+
 	private VisumNetwork vNetwork;
-	
+
 	private static Id REMOVE = new IdImpl("REMOVE");
-	
+
 	private static Map<Id, Id> getHafas2visumM44() {
 		Map<Id, Id> hafas2visum = new HashMap<Id, Id>();
 		hafas2visum.put(new IdImpl("9081202"), new IdImpl("812020"));
@@ -71,11 +71,11 @@ public class VisumHafasScheduleMerger {
 		hafas2visum.put(new IdImpl("9080104"), new IdImpl("801040"));
 		hafas2visum.put(new IdImpl("9079205"), new IdImpl("792050"));
 		hafas2visum.put(new IdImpl("9079221"), new IdImpl("792200"));
-		
+
 		hafas2visum.put(new IdImpl("9080181"), REMOVE); // Betriebshof Britz
 		return hafas2visum;
 	}
-		
+
 	private static Map<Id, Id> getHafas2visum344() {
 		Map<Id, Id> hafas2visum = new HashMap<Id, Id>();
 		hafas2visum.put(new IdImpl("9079204"), new IdImpl("792040"));
@@ -89,7 +89,7 @@ public class VisumHafasScheduleMerger {
 		hafas2visum.put(new IdImpl("9078101"), new IdImpl("781015"));
 		return hafas2visum;
 	}
-		
+
 	private static Map<Id, Id> getHafas2visumU8() {
 		Map<Id, Id> hafas2visum = new HashMap<Id, Id>();
 		hafas2visum.put(new IdImpl("9096101"), new IdImpl("964072"));
@@ -118,10 +118,10 @@ public class VisumHafasScheduleMerger {
 		hafas2visum.put(new IdImpl("9079221"), new IdImpl("792215"));
 		return hafas2visum;
 	}
-	
+
 	private TransitLine hafasLine;
 	private TransitLine visumLine;
-	
+
 	ScenarioImpl intermediateScenario;
 	Config intermediateConfig;
 	ScenarioImpl hafasScenario;
@@ -130,7 +130,7 @@ public class VisumHafasScheduleMerger {
 	Config outConfig;
 
 	private TransitSchedule outSchedule;
-	
+
 	public VisumHafasScheduleMerger() {
 		this.intermediateScenario = new ScenarioImpl();
 		this.intermediateConfig = this.intermediateScenario.getConfig();
@@ -176,7 +176,7 @@ public class VisumHafasScheduleMerger {
 		outLoader.loadScenario();
 		readVisumNetwork();
 	}
-	
+
 	private void treatRoutes(Id hafasLineId, Id visumLineId, Map<Id, Id> hafas2visum) {
 		this.hafas2visum = hafas2visum;
 		this.hafasLine = hafasScenario.getTransitSchedule().getTransitLines().get(hafasLineId);
@@ -198,7 +198,7 @@ public class VisumHafasScheduleMerger {
 		}
 		this.outSchedule = outSchedule;
 	}
-	
+
 	private TransitRoute treatRoute(TransitRoute route) {
 		List<Id> idRouteHafas = getIdRoute(route.getStops());
 		List<Id> idRouteVisum = listHafas2Visum(idRouteHafas);
@@ -247,7 +247,7 @@ public class VisumHafasScheduleMerger {
 			Id stopPointNodeNo = findNodeId(stopPointNo);
 			if (stopPointNodeNo == null) {
 				throw new RuntimeException("Stop point " + stopPointNo + " doesn't appear to be in the visum network.");
-			} 
+			}
 			while (!stopPointNodeNo.equals(link.getToNode().getId())) {
 				if (linkIterator.hasNext()) {
 					link = linkIterator.next();
@@ -262,7 +262,7 @@ public class VisumHafasScheduleMerger {
 		}
 		int lastLinkIndex = linkIterator.previousIndex();
 		List<Link> usedSegmentLinks = links.subList(firstLinkIndex, lastLinkIndex + 1);
-		NetworkRouteWRefs usedSegment = NetworkUtils.createLinkNetworkRoute(usedSegmentLinks);
+		NetworkRouteWRefs usedSegment = NetworkUtils.createLinkNetworkRoute(NetworkUtils.getLinkIds(usedSegmentLinks), this.outScenario.getNetwork());
 		return usedSegment;
 	}
 
@@ -277,12 +277,12 @@ public class VisumHafasScheduleMerger {
 
 	private List<Link> getAllLink(NetworkRouteWRefs linkNetworkRoute) {
 		ArrayList<Link> links = new ArrayList<Link>();
-		links.add(linkNetworkRoute.getStartLink());
-		links.addAll(linkNetworkRoute.getLinks());
-		links.add(linkNetworkRoute.getEndLink());
+		links.add(this.outScenario.getNetwork().getLinks().get(linkNetworkRoute.getStartLinkId()));
+		links.addAll(NetworkUtils.getLinks(this.outScenario.getNetwork(), linkNetworkRoute.getLinkIds()));
+		links.add(this.outScenario.getNetwork().getLinks().get(linkNetworkRoute.getEndLinkId()));
 		return links;
 	}
-	
+
 	private List<Id> listHafas2Visum(List<Id> idRouteHafas) {
 		List<Id> idRouteVisum = new ArrayList<Id>();
 		for (Id hafasId : idRouteHafas) {
@@ -314,7 +314,7 @@ public class VisumHafasScheduleMerger {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void main(final String[] args) {
 		VisumHafasScheduleMerger visumHafasScheduleMerger = new VisumHafasScheduleMerger();
 		visumHafasScheduleMerger.prepareConfig();
@@ -324,5 +324,5 @@ public class VisumHafasScheduleMerger {
 		visumHafasScheduleMerger.treatRoutes(new IdImpl("U8   "), new IdImpl("U-8"), getHafas2visumU8());
 		visumHafasScheduleMerger.writeNetworkAndScheduleAndVehicles();
 	}
-	
+
 }

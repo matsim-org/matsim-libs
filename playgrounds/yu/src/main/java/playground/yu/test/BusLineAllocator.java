@@ -779,21 +779,11 @@ public class BusLineAllocator {
 			/*-----with carNetwork-----*/
 			endLink = carNet.getLinks().get(routeLinks.removeLast());
 			startLink = carNet.getLinks().get(routeLinks.remove(0));
-			NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink,
-					endLink);
-			route.setLinks(startLink, ids2links(routeLinks), endLink);
+			NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), carNet);
+			route.setLinkIds(startLink.getId(), routeLinks, endLink.getId());
 			routes.put(routeId_linkPathPair.getKey()/* routeId */, route);
 		}
 		return routes;
-	}
-
-	private List<Link> ids2links(List<Id> ids) {
-		List<Link> links = new ArrayList<Link>();
-		for (Id id : ids) {
-			/*-----with carNetwork-----*/
-			links.add(carNet.getLinks().get(id));
-		}
-		return links;
 	}
 
 	private void generateNewPlans(PopulationImpl pop, String newPopFile) {

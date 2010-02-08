@@ -114,7 +114,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		p.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
-		leg.setRoute(new LinkNetworkRouteImpl(f.link1, f.link2));
+		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId(), f.scenario.getNetwork()));
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonAgent driver = new PersonAgent(p, qsim);
@@ -171,7 +171,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		p.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
-		leg.setRoute(new LinkNetworkRouteImpl(f.link1, f.link2));
+		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId(), f.scenario.getNetwork()));
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonAgent driver = new PersonAgent(p, qsim);
@@ -217,7 +217,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		p.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
-		leg.setRoute(new LinkNetworkRouteImpl(f.link1, f.link2));
+		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId(), f.scenario.getNetwork()));
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonAgent driver = new PersonAgent(p, qsim);
@@ -280,9 +280,9 @@ public class QueueLinkTest extends MatsimTestCase {
 		try {
 			plan.createAndAddActivity("h", link1.getId());
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link2);
+			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1.getId(), link2.getId());
 			leg.setRoute(route);
-			route.setLinks(link1, null, link2);
+			route.setLinkIds(link1.getId(), null, link2.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", link2.getId());
 		} catch (Exception e) {

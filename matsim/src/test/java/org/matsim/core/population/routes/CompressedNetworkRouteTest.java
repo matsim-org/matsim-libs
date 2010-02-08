@@ -21,6 +21,7 @@
 package org.matsim.core.population.routes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,7 +34,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkIdComparator;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -44,9 +44,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRouteWRefs getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
+	public NetworkRouteWRefs getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkLayer network) {
 		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
-		return new CompressedNetworkRouteImpl(fromLink, toLink, subsequent.getSubsequentLinks());
+		return new CompressedNetworkRouteImpl(fromLinkId, toLinkId, network, subsequent.getSubsequentLinks());
 	}
 
 	/**
@@ -65,18 +65,15 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		Link linkM24 = network.getLinks().get(new IdImpl("-24"));
 		Link link4 = network.getLinks().get(new IdImpl("4"));
 
-		List<Link> links = new ArrayList<Link>(5);
-		links.add(link22);
-		links.add(link12);
-		links.add(link13);
-		links.add(linkM24);
-		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
-		route.setLinks(link1, links, link4);
+		List<Id> linkIds = new ArrayList<Id>(5);
+		Collections.addAll(linkIds, link22.getId(), link12.getId(), link13.getId(), linkM24.getId());
+		NetworkRouteWRefs route = getNetworkRouteInstance(link1.getId(), link4.getId(), network);
+		route.setLinkIds(link1.getId(), linkIds, link4.getId());
 
 		List<Id> linksId2 = route.getLinkIds();
-		Assert.assertEquals("wrong number of links.", links.size(), linksId2.size());
-		for (int i = 0, n = links.size(); i < n; i++) {
-			Assert.assertEquals("different link at position " + i, links.get(i).getId(), linksId2.get(i));
+		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		for (int i = 0, n = linkIds.size(); i < n; i++) {
+			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
 		}
 	}
 
@@ -89,24 +86,22 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		Link link3 = network.getLinks().get(new IdImpl("3"));
 		Link link4 = network.getLinks().get(new IdImpl("4"));
 
-		List<Link> links = new ArrayList<Link>(4);
-		links.add(link1);
-		links.add(link2);
-		links.add(link3);
+		List<Id> linkIds = new ArrayList<Id>(4);
+		Collections.addAll(linkIds, link1.getId(), link2.getId(), link3.getId());
 
-		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
-		subsequentLinks.put(link0, link1);
-		subsequentLinks.put(link1, link2);
-		subsequentLinks.put(link2, link3);
-		subsequentLinks.put(link3, link4);
+		Map<Id, Id> subsequentLinks = new TreeMap<Id, Id>();
+		subsequentLinks.put(link0.getId(), link1.getId());
+		subsequentLinks.put(link1.getId(), link2.getId());
+		subsequentLinks.put(link2.getId(), link3.getId());
+		subsequentLinks.put(link3.getId(), link4.getId());
 
-		NetworkRouteWRefs route = new CompressedNetworkRouteImpl(link0, link4, subsequentLinks);
-		route.setLinks(link0, links, link4);
+		NetworkRouteWRefs route = new CompressedNetworkRouteImpl(link0.getId(), link4.getId(), network, subsequentLinks);
+		route.setLinkIds(link0.getId(), linkIds, link4.getId());
 
 		List<Id> linksId2 = route.getLinkIds();
-		Assert.assertEquals("wrong number of links.", links.size(), linksId2.size());
-		for (int i = 0, n = links.size(); i < n; i++) {
-			Assert.assertEquals("different link at position " + i, links.get(i).getId(), linksId2.get(i));
+		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		for (int i = 0, n = linkIds.size(); i < n; i++) {
+			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
 		}
 	}
 
@@ -123,13 +118,13 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		Link link3 = network.getLinks().get(new IdImpl("3"));
 		Link link4 = network.getLinks().get(new IdImpl("4"));
 
-		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
-		subsequentLinks.put(link0, link1);
-		subsequentLinks.put(link1, link2);
-		subsequentLinks.put(link2, link3);
-		subsequentLinks.put(link3, link4);
+		Map<Id, Id> subsequentLinks = new TreeMap<Id, Id>();
+		subsequentLinks.put(link0.getId(), link1.getId());
+		subsequentLinks.put(link1.getId(), link2.getId());
+		subsequentLinks.put(link2.getId(), link3.getId());
+		subsequentLinks.put(link3.getId(), link4.getId());
 
-		NetworkRouteWRefs route = new CompressedNetworkRouteImpl(link0, link4, subsequentLinks);
+		NetworkRouteWRefs route = new CompressedNetworkRouteImpl(link0.getId(), link4.getId(), network, subsequentLinks);
 		// NO route.setLinks() here!
 
 		Assert.assertEquals("expected 0 links.", 0, route.getLinkIds().size());
@@ -174,23 +169,22 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		network.addLink(link5);
 		network.addLink(endLink);
 
-		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
-		subsequentLinks.put(startLink, link3);
-		subsequentLinks.put(link3, link4);
-		subsequentLinks.put(link4, link5);
-		subsequentLinks.put(link5, endLink);
+		Map<Id, Id> subsequentLinks = new TreeMap<Id, Id>();
+		subsequentLinks.put(startLink.getId(), link3.getId());
+		subsequentLinks.put(link3.getId(), link4.getId());
+		subsequentLinks.put(link4.getId(), link5.getId());
+		subsequentLinks.put(link5.getId(), endLink.getId());
 
-		CompressedNetworkRouteImpl route1 = new CompressedNetworkRouteImpl(startLink, endLink, subsequentLinks);
-		ArrayList<Link> srcRoute = new ArrayList<Link>();
-		srcRoute.add(link3);
-		srcRoute.add(link4);
-		route1.setLinks(startLink, srcRoute, link5);
+		CompressedNetworkRouteImpl route1 = new CompressedNetworkRouteImpl(startLink.getId(), endLink.getId(), network, subsequentLinks);
+		ArrayList<Id> srcRoute = new ArrayList<Id>(5);
+		Collections.addAll(srcRoute, link3.getId(), link4.getId());
+		route1.setLinkIds(startLink.getId(), srcRoute, link5.getId());
 		Assert.assertEquals(2, route1.getLinkIds().size());
 
 		CompressedNetworkRouteImpl route2 = route1.clone();
 
-		srcRoute.add(link5);
-		route1.setLinks(startLink, srcRoute, endLink);
+		srcRoute.add(link5.getId());
+		route1.setLinkIds(startLink.getId(), srcRoute, endLink.getId());
 
 		Assert.assertEquals(3, route1.getLinkIds().size());
 		Assert.assertEquals(2, route2.getLinkIds().size());

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.teach.telematics.ub8;
 
@@ -62,7 +62,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.LegImpl;
@@ -95,7 +94,7 @@ public class Controller extends Controler {
 		c.setWriteEventsInterval(0);
 		c.run();
 	}
-	
+
 	@Override
 	protected void setUp() {
 		super.setUp();
@@ -105,15 +104,15 @@ public class Controller extends Controler {
 		this.addControlerListener(scorer);
 		this.addControlerListener(observer);
 		this.events.addHandler(observer);
-		
+
 		IncidentGenerator generator = new IncidentGenerator(getConfig().getParam("telematics", "incidentsFile"), getNetwork());
 		this.addControlerListener(generator);
-		
+
 		ForceRouteSwitch routeSwitch = new ForceRouteSwitch();
 		routeSwitch.proba = Double.parseDouble(getConfig().getParam("telematics", "p_forceSwitch"));
 		this.addControlerListener(routeSwitch);
 	}
-	
+
 	@Override
 	protected void loadCoreListeners() {
 
@@ -141,14 +140,14 @@ public class Controller extends Controler {
 		this.addCoreControlerListener(new PlansReplanning());
 //		this.addCoreControlerListener(new PlansDumping());
 	}
-	
+
 	public static class NonSelectedPlanScorer implements ScoringListener {
 
 		private RouteTTObserver observer;
-		
+
 		public void notifyScoring(ScoringEvent event) {
 			double alpha = Double.parseDouble(event.getControler().getConfig().getParam("planCalcScore", "learningRate"));
-			
+
 			for(Person p : event.getControler().getPopulation().getPersons().values()) {
 				for(Plan plan : p.getPlans()) {
 					double tt = 0;
@@ -156,7 +155,7 @@ public class Controller extends Controler {
 					RouteWRefs route = leg.getRoute();
 					for(Id id : ((NetworkRouteWRefs) route).getLinkIds()) {
 						if(id.toString().equals("4")) {
-							
+
 							tt = observer.avr_route1TTs;
 							break;
 						} else if(id.toString().equals("5")) {
@@ -164,35 +163,35 @@ public class Controller extends Controler {
 							break;
 						}
 					}
-					
+
 					Double oldScore = plan.getScore();
 					if(oldScore == null)
 						oldScore = 0.0;
-					
+
 					plan.setScore(alpha * -tt/3600.0 + (1-alpha)*oldScore);
 				}
-			
-				
+
+
 			}
 		}
 	}
-	
+
 	private class ForceRouteSwitch implements BeforeMobsimListener {
 
 		private double proba;
-		
+
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 //			NetworkLayer network = event.getControler().getNetwork();
 			Random random = new Random(config.global().getRandomSeed());
-			
-			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-			LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) factory.createRoute(network.getLinks().get(new IdImpl("1")), network.getLinks().get(new IdImpl("6")));
-			List<Link> links = new ArrayList<Link>();
-			links.add(network.getLinks().get(new IdImpl("1.2")));
-			links.add(network.getLinks().get(new IdImpl("3")));
-			links.add(network.getLinks().get(new IdImpl("5")));
-			route.setLinks(route.getStartLink(), links, route.getEndLink());
-			
+
+			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory(event.getControler().getNetwork());
+			LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) factory.createRoute(new IdImpl("1"), new IdImpl("6"));
+			List<Id> linkIds = new ArrayList<Id>();
+			linkIds.add(new IdImpl("1.2"));
+			linkIds.add(new IdImpl("3"));
+			linkIds.add(new IdImpl("5"));
+			route.setLinkIds(route.getStartLinkId(), linkIds, route.getEndLinkId());
+
 			for(Person p : event.getControler().getPopulation().getPersons().values()) {
 				if(random.nextDouble() <= proba) {
 					Plan plan = p.getSelectedPlan();
@@ -200,40 +199,38 @@ public class Controller extends Controler {
 				}
 			}
 		}
-		
+
 	}
-	
+
 	public static class RouteTTObserver implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
 
 		private Set<Id> route1;
-		
+
 		private Set<Id> route2;
-		
+
 		private TObjectDoubleHashMap<Id> personTTs;
-		
+
 		private TObjectDoubleHashMap<Id> departureTimes;
-		
+
 		private BufferedWriter writer;
-		
+
 		private double avr_route1TTs;
-		
+
 		private double avr_route2TTs;
-		
+
 		public RouteTTObserver(String filename) {
 			try {
 				writer = org.matsim.core.utils.io.IOUtils.getBufferedWriter(filename);
 				writer.write("it\tn_1\tn_2\ttt_1\ttt_2");
 				writer.newLine();
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			this.reset(0);
 		}
-		
+
 		public void handleEvent(AgentDepartureEvent event) {
 			departureTimes.put(event.getPersonId(), event.getTime());
 		}
@@ -249,7 +246,7 @@ public class Controller extends Controler {
 			double depTime = departureTimes.get(event.getPersonId());
 			if(depTime == 0)
 				throw new RuntimeException("Agent departure time not found!");
-			
+
 			personTTs.put(event.getPersonId(), event.getTime() - depTime);
 		}
 
@@ -262,8 +259,8 @@ public class Controller extends Controler {
 		}
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			
-			
+
+
 			try {
 				writer.write(String.valueOf(event.getIteration()));
 				writer.write("\t");
@@ -271,18 +268,18 @@ public class Controller extends Controler {
 				writer.write("\t");
 				writer.write(String.valueOf(route2.size()));
 				writer.write("\t");
-				
+
 				if(route1.isEmpty())
 					writer.write("0");
 				else
 					writer.write(String.valueOf(avr_route1TTs));
 				writer.write("\t");
-				
+
 				if(route2.isEmpty())
 					writer.write("0");
 				else
 					writer.write(String.valueOf(avr_route2TTs));
-				
+
 				writer.newLine();
 				writer.flush();
 			} catch (IOException e) {
@@ -293,17 +290,17 @@ public class Controller extends Controler {
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			TDoubleArrayList route1TTs = new TDoubleArrayList();
 			TDoubleArrayList route2TTs = new TDoubleArrayList();
-			
+
 			for(Id p : route1) {
 				route1TTs.add(personTTs.get(p));
 			}
 			for(Id p : route2) {
 				route2TTs.add(personTTs.get(p));
 			}
-			
+
 			avr_route1TTs = StatUtils.mean(route1TTs.toNativeArray());
 			avr_route2TTs = StatUtils.mean(route2TTs.toNativeArray());
-			
+
 			if(Double.isNaN(avr_route1TTs)) {
 				avr_route1TTs = getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("2")));
 				avr_route1TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("4")));
@@ -314,7 +311,7 @@ public class Controller extends Controler {
 				avr_route2TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("6")));
 			}
 		}
-		
+
 		private double getFreespeedTravelTime(final Link link) {
 			return link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 		}
@@ -326,34 +323,32 @@ public class Controller extends Controler {
 //			try {
 //				Distribution.writeHistogram(distribution.absoluteDistribution(10), event.getControler().getOutputFilename("tthist.txt"));
 //			} catch (FileNotFoundException e) {
-//				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			} catch (IOException e) {
-//				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
-//			
+//
 //		}
-		
+
 	}
-	
+
 	private class IncidentGenerator implements BeforeMobsimListener {
 
 		private TIntObjectHashMap<List<NetworkChangeEvent>> changeEvents;
-		
+
 		public IncidentGenerator(String filename, Network network) {
 			try {
 				changeEvents = new TIntObjectHashMap<List<NetworkChangeEvent>>();
-				
+
 				BufferedReader reader = IOUtils.getBufferedReader(filename);
 				String line = null;
 				while((line = reader.readLine()) != null) {
 					String[] tokens = line.split("\t");
-					
+
 					NetworkChangeEvent badEvent = new NetworkChangeEvent(0);
 					badEvent.addLink(network.getLinks().get(new IdImpl(tokens[1])));
 					badEvent.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, Double.parseDouble(tokens[2])));
-//					
+//
 					int it = Integer.parseInt(tokens[0]);
 					List<NetworkChangeEvent> events = changeEvents.get(it);
 					if(events == null) {
@@ -363,21 +358,19 @@ public class Controller extends Controler {
 					events.add(badEvent);
 				}
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
+
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			List<NetworkChangeEvent> events = changeEvents.get(event.getIteration());
 			if(events != null) {
-				((NetworkImpl) event.getControler().getNetwork()).setNetworkChangeEvents(events);
+				(event.getControler().getNetwork()).setNetworkChangeEvents(events);
 			} else
-				((NetworkImpl) event.getControler().getNetwork()).setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
+				(event.getControler().getNetwork()).setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
 		}
-		
+
 	}
 }

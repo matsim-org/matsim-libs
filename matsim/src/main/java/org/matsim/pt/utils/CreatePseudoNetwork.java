@@ -29,12 +29,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -83,16 +83,16 @@ public class CreatePseudoNetwork {
 
 		for (TransitLine tLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute tRoute : tLine.getRoutes().values()) {
-				ArrayList<Link> routeLinks = new ArrayList<Link>();
+				ArrayList<Id> routeLinks = new ArrayList<Id>();
 				TransitRouteStop prevStop = null;
 				for (TransitRouteStop stop : tRoute.getStops()) {
 					Link link = getNetworkLink(prevStop, stop);
-					routeLinks.add(link);
+					routeLinks.add(link.getId());
 					prevStop = stop;
 				}
 
 				if (routeLinks.size() > 0) {
-					NetworkRouteWRefs route = NetworkUtils.createLinkNetworkRoute(routeLinks);
+					NetworkRouteWRefs route = NetworkUtils.createLinkNetworkRoute(routeLinks, this.network);
 					tRoute.setRoute(route);
 				} else {
 					System.err.println("Line " + tLine.getId() + " route " + tRoute.getId() + " has less than two stops. Removing this route from schedule.");
@@ -123,7 +123,7 @@ public class CreatePseudoNetwork {
 		} else {
 			fromNode = this.nodes.get(fromFacility);
 		}
-		
+
 		Node toNode = this.nodes.get(toFacility);
 		if (toNode == null) {
 			toNode = this.network.getFactory().createNode(new IdImpl(this.prefix + toFacility.getId()), toFacility.getCoord());

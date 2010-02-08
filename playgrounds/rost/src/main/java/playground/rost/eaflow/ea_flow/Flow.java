@@ -47,48 +47,48 @@ import playground.rost.eaflow.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
 import playground.rost.eaflow.ea_flow.TimeExpandedPath.PathEdge;
 /**
- * Class representing a dynamic flow on an network with multiple sources and a single sink 
+ * Class representing a dynamic flow on an network with multiple sources and a single sink
  * @author Manuel Schneider
  *
  */
 
 public class Flow {
-////////////////////////////////////////////////////////////////////////////////////////	
+////////////////////////////////////////////////////////////////////////////////////////
 //--------------------------FIELDS----------------------------------------------------//
-////////////////////////////////////////////////////////////////////////////////////////	
+////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * The network on which we find routes. We expect the network to change
 	 * between runs!
 	 */
 	private final NetworkLayer _network;
-	
+
 	/**
 	 * used to calculate the length of every edge in the network
 	 */
-	private final Map<Link, FlowEdgeTraversalCalculator> _lengths = new HashMap<Link, FlowEdgeTraversalCalculator>(); 
-	
+	private final Map<Link, FlowEdgeTraversalCalculator> _lengths = new HashMap<Link, FlowEdgeTraversalCalculator>();
+
 	/**
-	 * Edge representation of flow on the network  
+	 * Edge representation of flow on the network
 	 */
 	private HashMap<Link, EdgeIntervalls> _flow;
-	
+
 	/**
 	 * TimeExpandedTimeExpandedPath representation of flow on the network
 	 */
 	private final LinkedList<TimeExpandedPath> _TimeExpandedPaths;
-	
+
 	/**
 	 * list of all sources
 	 */
 	private final LinkedList<Node> _sources;
-	
+
 	/**
 	 * stores unsatisfied demands for each source
 	 */
 	private Map<Node,Integer> _demands;
-	
+
 	/**
-	 *stores for all nodes whether they are an non active source 
+	 *stores for all nodes whether they are an non active source
 	 */
 	private final HashMap<Node,Boolean> _nonactives;
 
@@ -96,35 +96,35 @@ public class Flow {
 	 * the sink, to which all flow is directed
 	 */
 	private final  Node _sink;
-	
+
 	/**
 	 * maximal time Horizon for the flow
 	 */
 	private final  int _timeHorizon;
-	
+
 	/**
 	 * total flow augmented so far
 	 */
 	private int totalflow;
-	
+
 	/**
 	 * TODO use debug mode
 	 * flag for debug mode
 	 */
 	@SuppressWarnings("unused")
 	private static int _debug = 0;
-	
+
 	private final EdgeTypeEnum edgeType;
-	
-///////////////////////////////////////////////////////////////////////////////////	
-//-----------------------------Constructors--------------------------------------//	
+
 ///////////////////////////////////////////////////////////////////////////////////
-	
+//-----------------------------Constructors--------------------------------------//
+///////////////////////////////////////////////////////////////////////////////////
+
 	/**
 	 * Constructor that initializes a zero flow over time on the specified network
-	 * the length of the edges will be as specified by FakeTravelTimeCost 
+	 * the length of the edges will be as specified by FakeTravelTimeCost
 	 * @param network network on which the flow will "live"
-	 * @param sources the potential sources of the flow		
+	 * @param sources the potential sources of the flow
 	 * @param demands the demands in the sources as nonnegative integers
 	 * @param sink the sink for all the flow
 	 * @param horizon the time horizon in which flow is allowed
@@ -133,10 +133,10 @@ public class Flow {
 		this._network = network;
 		this._flow = new HashMap<Link,EdgeIntervalls>();
 		this.edgeType = edgeTypeToUse;
-		
+
 		// initialize distances
 		for(Link link : network.getLinks().values()){
-			
+
 			FlowEdgeTraversalCalculator bTT = GlobalFlowCalculationSettings.getFlowEdgeTraversalCalculator(edgeTypeToUse, link);
 			_lengths.put(link, bTT);
 			this._flow.put(link, new EdgeIntervalls(bTT));
@@ -149,9 +149,9 @@ public class Flow {
 		_timeHorizon = horizon;
 		this._nonactives = this.nonActives();
 		this.totalflow = 0;
-		
+
 	}
-	
+
 	/**
 	 * for all Nodes it is specified if the node is an non active source
 	 */
@@ -170,10 +170,10 @@ public class Flow {
 		}
 		return nonactives;
 	}
-	
+
 //////////////////////////////////////////////////////////////////////////////////
-//--------------------Flow handling Methods-------------------------------------//	
-//////////////////////////////////////////////////////////////////////////////////	
+//--------------------Flow handling Methods-------------------------------------//
+//////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * Method to determine whether a Node is a Source with positive demand
 	 * @param node Node that is checked
@@ -191,7 +191,7 @@ public class Flow {
 			}
 		}
 	}
-	
+
 	/**
 	 * Method for finding the minimum of the demand at the start node
 	 * and the minimal capacity along the TimeExpandedPath
@@ -253,13 +253,13 @@ public class Flow {
 					result= flow;
 				}
 			}
-			
-			
+
+
 		}
 		//System.out.println(""+ result);
 		return result;
 	}
-	
+
 	public Set<TimeExpandedPath> augmentPathWithBackwardEdges(TimeExpandedPath pathWithBackwardEdges, int flowToAugment)
 	{
 		List<PathEdge> backwardEdges = new LinkedList<PathEdge>();
@@ -288,7 +288,7 @@ public class Flow {
 		}
 		return timeExpandedPathsWithBackwardEdges;
 	}
-	
+
 	protected Set<TimeExpandedPath> augmentSingleBackwardEdge(Set<TimeExpandedPath> tEPathsWithBackwardEdges, PathEdge backwardEdgeToReplace, int flowToAugment)
 	{
 		Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
@@ -310,25 +310,25 @@ public class Flow {
 				//create new paths
 				List<TimeExpandedPath> splittedForwardPath = tEPath.splitPathAtEdge(forwardPathEdge, false);
 				List<TimeExpandedPath> splittedBackwardPath = pathWithBackwardEdges.splitPathAtEdge(backwardEdgeToReplace, true);
-				
+
 				TimeExpandedPath forwardHead = splittedForwardPath.get(0);
 //				System.out.println("forwardHead: ");
 //				forwardHead.print();
 				TimeExpandedPath forwardTail = splittedForwardPath.get(1);
 //				System.out.println("forwardTail: ");
 //				forwardTail.print();
-				
+
 				TimeExpandedPath backwardHead = splittedBackwardPath.get(0);
 //				System.out.println("backwardHead: ");
 //				backwardHead.print();
 				TimeExpandedPath backwardTail = splittedBackwardPath.get(1);
 //				System.out.println("backwardTail: ");
 //				backwardTail.print();
-				
+
 				forwardHead.addTailToPath(backwardTail);
 //				System.out.println("new backward path: ");
 //				forwardHead.print();
-				
+
 				backwardHead.addTailToPath(forwardTail);
 //				System.out.println("new forward path: ");
 //				backwardHead.print();
@@ -364,7 +364,7 @@ public class Flow {
 		}
 		return result;
 	}
-	
+
 	protected Map<TimeExpandedPath, PathEdge> getForwardPathEdges(PathEdge backwardPathEdge, int neededFlow)
 	{
 		Map<TimeExpandedPath, PathEdge> result = new HashMap<TimeExpandedPath, PathEdge>();
@@ -376,7 +376,7 @@ public class Flow {
 				if(pE.equals(backwardPathEdge))
 				{
 					result.put(tEPath, pE);
-					neededFlow -= Math.min(tEPath.getFlow(), neededFlow);						
+					neededFlow -= Math.min(tEPath.getFlow(), neededFlow);
 					break;
 				}
 			}
@@ -387,7 +387,7 @@ public class Flow {
 	}
 	/**
 	 * Method to add another TimeExpandedPath to the flow. The TimeExpandedPath will be added with flow equal to its bottleneck capacity
-	 * @param TimeExpandedPath the TimeExpandedPath on which the maximal flow possible is augmented 
+	 * @param TimeExpandedPath the TimeExpandedPath on which the maximal flow possible is augmented
 	 */
 	public int augment(TimeExpandedPath timeExpandedPath){
 		boolean backward = false;
@@ -429,20 +429,20 @@ public class Flow {
 			{
 				if(pE.isForward())
 					_flow.get(pE.getEdge()).augment(pE.getStartTime(), flow, (int)pE.getEdge().getCapacity(1.));
-				else 
+				else
 					_flow.get(pE.getEdge()).augmentreverse(pE.getStartTime(), flow);
 			}
 			for(TimeExpandedPath tEPath : newPaths)
 			{
 				this._TimeExpandedPaths.add(tEPath);
 			}
-						
+
 			// add rest of the paths and reduce demands
 			reduceDemand(timeExpandedPath);
 		}
 		return gamma;
 	}
-	
+
 	/**
 	 * construct a path from a List of subpaths
 	 * @param PathList with subgraphs
@@ -501,7 +501,7 @@ public class Flow {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Reduces the demand of the first node in the TimeExpandedPath by the flow value of the TimeExpandedPath
 	 * @param TimeExpandedPath TimeExpandedPath used to determine flow and Source Node
@@ -521,20 +521,20 @@ public class Flow {
 			this._nonactives.put(source, true);
 		}
 	}
-	
+
 	/**
 	 * decides whether a Node is an non active Source
-	 * @param node Node to check for	
+	 * @param node Node to check for
 	 * @return true iff node is a Source with demand 0
 	 */
 	public boolean isNonActiveSource(final Node node){
 		return this._nonactives.get(node);
 	}
-	
+
 ////////////////////////////////////////////////////////////////////////////////////
 //-----------evaluation methods---------------------------------------------------//
 ////////////////////////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * gives back an array containing the amount of flow into the sink for all time steps from 0 to time horizon
 	 */
@@ -545,21 +545,21 @@ public class Flow {
 			int flow = TimeExpandedPath.getFlow();
 			int time = TimeExpandedPath.getArrival();
 			if (maxtime < time){
-				maxtime = time; 
+				maxtime = time;
 			}
 			temp[time]+=flow;
 		}
-		
+
 		int[] result = new int[maxtime+1];
 		for(int i=0; i<=maxtime;i++){
 			result[i]=temp[i];
 		}
 		return result;
-		
+
 	}
-	
+
 	/**
-	 * gives back an array containing the total amount of flow into the sink by a given time 
+	 * gives back an array containing the total amount of flow into the sink by a given time
 	 * for all time steps from 0 to time horizon
 	 */
 	public int[] arrivalPattern(){
@@ -586,9 +586,9 @@ public class Flow {
 		}
 		return strb2.toString();
 	}
-	
+
 	/**
-	 * a STring specifying the total amount of flow into the sink by a given time 
+	 * a STring specifying the total amount of flow into the sink by a given time
 	 * for all time steps from 0 to time horizon
 	 * @return String representation of the arrival pattern
 	 */
@@ -604,17 +604,17 @@ public class Flow {
 	}
 
 //////////////////////////////////////////////////////////////////////////////////////
-//---------------------------Plans Converter----------------------------------------//	
+//---------------------------Plans Converter----------------------------------------//
 //////////////////////////////////////////////////////////////////////////////////////
-	
-	
+
+
 	@SuppressWarnings("unchecked")
-	
+
 	public PopulationImpl createPoulation(String oldfile){
 		//check whether oldfile exists
 		//boolean org = (oldfile!=null);
 		//HashMap<Node,LinkedList<Person>> orgpersons = new  HashMap<Node,LinkedList<Person>>();
-		
+
 		//read old network an find out the startnodes of persons if oldfile exists
 		/*if(org){
 			Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
@@ -623,7 +623,7 @@ public class Flow {
 			for(Person person : population.getPersons().values() ){
 				Link link = person.getPlans().get(0).getFirstActivity().getLink();
 				if (link == null) continue; // happens with plans that don't match the network.
-				
+
 				Node node = link.getToNode();
 				if(orgpersons.get(node)==null){
 					LinkedList<Person> list = new LinkedList<Person>();
@@ -635,7 +635,7 @@ public class Flow {
 				}
 			}
 		}*/
-		
+
 		//construct Population
 		PopulationImpl result =new ScenarioImpl().getPopulation();
 		int id =1;
@@ -648,14 +648,14 @@ public class Flow {
 				for (PathEdge edge : path.getPathEdges()){
 					ids.add(edge.getEdge().getId());
 				}
-				
-				
-				//if (!emptylegs) { 
+
+
+				//if (!emptylegs) {
 					// normal case, write the routes!
 					LinkNetworkRouteImpl route;
-					
+
 					Node firstnode  = _network.getLinks().get(ids.get(0)).getFromNode();
-					
+
 					// for each unit of flow construct a Person
 					for (int i =1 ; i<= nofpersons;i++){
 						//add the first edge if olfile exists
@@ -677,23 +677,23 @@ public class Flow {
 							stringid = "new"+String.valueOf(id);
 							id++;
 						//}
-						
+
 //						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
 						Link startLink = _network.getLinks().get(ids.get(0));
 						Link endLink = _network.getLinks().get(ids.get(ids.size()-1));
-						route = new LinkNetworkRouteImpl(startLink, endLink);
-						
-						List<Link> routeLinks = null;
+						route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), _network);
+
+						List<Id> routeLinkIds = null;
 						if (ids.size() > 1) {
-							routeLinks = new ArrayList<Link>();
+							routeLinkIds = new ArrayList<Id>();
 //							route.setLinkIds(ids.subList(1, ids.size()-1));
 							for (Id iid : ids.subList(1, ids.size()-1)){
-								routeLinks.add(_network.getLinks().get(iid));
+								routeLinkIds.add(iid);
 							}
-						} 
-						route.setLinks(startLink, routeLinks, endLink);
+						}
+						route.setLinkIds(startLink.getId(), routeLinkIds, endLink.getId());
 
-						
+
 						LegImpl leg = new LegImpl(TransportMode.car);
 						//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 						leg.setRoute(route);
@@ -703,34 +703,34 @@ public class Flow {
 						Link tolink =_network.getLinks().get(ids.getLast());
 						ActivityImpl work = new ActivityImpl("w", tolink.getId());
 //						work.setLinkId(tolink.getId());
-						
+
 
 						//Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
 						home.setEndTime(0);
-						//home.setCoord(_network.getLink(ids.getFirst()).getFromNode().getCoord());	
+						//home.setCoord(_network.getLink(ids.getFirst()).getFromNode().getCoord());
 						// no end time for now.
 						//home.setEndTime(path.getPathEdges().getFirst().getTime());
-						
+
 						//Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
 						work.setEndTime(0);
 						//work.setCoord(_network.getLink(ids.getLast()).getToNode().getCoord());
-						
-						
+
+
 						Id matsimid  = new IdImpl(stringid);
 						PersonImpl p = new PersonImpl(matsimid);
 						PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 						plan.addActivity(home);
-						plan.addLeg(leg);					
+						plan.addLeg(leg);
 						plan.addActivity(work);
 						p.addPlan(plan);
 						result.addPerson(p);
 						id++;
 					}
-					
+
 				/*}  else { // LEAVE THE ROUTES EMPTY! (sadly, this needs different types ...)
-					BasicRouteImpl route;				
+					BasicRouteImpl route;
 					route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
-					
+
 					//BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.car);
 					Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 					leg.setRoute(route);
@@ -745,7 +745,7 @@ public class Flow {
 					work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
 					Link fromlink =path.getPathEdges().getFirst().getEdge();
 					Link tolink =path.getPathEdges().getLast().getEdge();
-					
+
 					home.setLink(fromlink);
 					work.setLink(tolink);
 					for (int i =1 ; i<= nofpersons;i++){
@@ -753,49 +753,49 @@ public class Flow {
 						Person p = new PersonImpl(matsimid);
 						Plan plan = new org.matsim.population.PlanImpl(p);
 						plan.addAct(home);
-						plan.addLeg(leg);					
+						plan.addLeg(leg);
 						plan.addAct(work);
 						p.addPlan(plan);
 						result.addPerson(p);
 						id++;
 					}
-										
+
 				}*/
-				
-			
-				
+
+
+
 			}else{
 				// TODO this should not happen! just output an error?
 				// residual edges
 			}
-			
-			
+
+
 		}
-		
-		
+
+
 		return result;
 	}
 
 //////////////////////////////////////////////////////////////////////////////////////
-//------------------- Clean Up---------------------------------------//	
+//------------------- Clean Up---------------------------------------//
 //////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Call the cleanup-method for each edge 
+	 * Call the cleanup-method for each edge
 	 */
-	public int cleanUp() {		
+	public int cleanUp() {
 		int gain = 0;
 		for (EdgeIntervalls EI : _flow.values()) {
-		  gain += EI.cleanup();	
+		  gain += EI.cleanup();
 		}
 		return gain;
-	}	
-	
+	}
+
 //////////////////////////////////////////////////////////////////////////////////////
-//-------------------Getters Setters toString---------------------------------------//	
+//-------------------Getters Setters toString---------------------------------------//
 //////////////////////////////////////////////////////////////////////////////////////
-	
-	
+
+
 	/**
 	 * returns a String representation of a TimeExpandedPath
 	 */
@@ -864,22 +864,22 @@ public class Flow {
 	public NetworkLayer getNetwork() {
 		return this._network;
 	}
-	
+
 	/**
 	 * @return the total flow so far
 	 */
 	public int getTotalFlow() {
 		return this.totalflow;
 	}
-	
+
     /** @return the paths
 	*/
 	public LinkedList<TimeExpandedPath> getPaths() {
 		return this._TimeExpandedPaths;
 	}
-	
+
 	/**
-	
+
 	/**
 	 * setter for debug mode
 	 * @param debug debug mode true is on
@@ -887,17 +887,17 @@ public class Flow {
 	public static void debug(int debug){
 		Flow._debug=debug;
 	}
-	
+
 	public int getStartTime()
 	{
 		return 0;
 	}
-	
+
 	public int getEndTime()
 	{
 		return this.arrivals().length-1;
 	}
-	
+
 	public int getMaxTravelTimeForLink(Link l)
 	{
 		return _lengths.get(l).getMaximalTravelTime();

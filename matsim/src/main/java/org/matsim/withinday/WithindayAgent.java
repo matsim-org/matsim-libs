@@ -42,6 +42,7 @@ import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.PersonAgent;
 import org.matsim.ptproject.qsim.QSim;
@@ -190,8 +191,8 @@ public class WithindayAgent extends PersonAgent {
     ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(passedNodesList.size() + alternativeRoute.getLinkIds().size() + 1);
     newRouteConcatedList.addAll(passedNodesList);
     newRouteConcatedList.addAll(RouteUtils.getNodes(alternativeRoute, this.network));
-    NetworkRouteWRefs newRoute = (NetworkRouteWRefs) ((NetworkLayer) currentLink.getLayer()).getFactory().createRoute(TransportMode.car, oldRoute.getStartLink(), oldRoute.getEndLink());
-    newRoute.setLinks(oldRoute.getStartLink(), RouteUtils.getLinksFromNodes(newRouteConcatedList), oldRoute.getEndLink());
+    NetworkRouteWRefs newRoute = (NetworkRouteWRefs) ((NetworkLayer) currentLink.getLayer()).getFactory().createRoute(TransportMode.car, oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
+    newRoute.setLinkIds(oldRoute.getStartLinkId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(newRouteConcatedList)), oldRoute.getEndLinkId());
     //put the new route in the leg and the leg in the plan
     newLeg.setRoute(newRoute);
     (newPlan.getPlanElements()).add(currentLegIndex, newLeg);

@@ -115,7 +115,7 @@ public class PseudoNetworkDemo {
 		plan.addActivity(act);
 		Leg leg = population.getFactory().createLeg(TransportMode.walk);
 		leg.setTravelTime(15*3600.0);
-		leg.setRoute(network.getFactory().createRoute(TransportMode.walk, link1, link1));
+		leg.setRoute(network.getFactory().createRoute(TransportMode.walk, link1.getId(), link1.getId()));
 		plan.addLeg(leg);
 		plan.addActivity(population.getFactory().createActivityFromLinkId("home", link1.getId()));
 

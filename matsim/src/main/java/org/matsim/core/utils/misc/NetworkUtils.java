@@ -33,7 +33,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 /**
- * Contains several helper methods for working with {@link NetworkLayer networks}. 
+ * Contains several helper methods for working with {@link NetworkLayer networks}.
  *
  * @author mrieser
  */
@@ -111,7 +111,7 @@ public class NetworkUtils {
 		}
 		String[] parts = trimmed.split("[ \t\n]+");
 		final List<Link> linksList = new ArrayList<Link>(parts.length);
-		
+
 		for (String id : parts) {
 			Link link = network.getLinks().get(new IdImpl(id));
 			if (link == null) {
@@ -121,7 +121,24 @@ public class NetworkUtils {
 		}
 		return linksList;
 	}
-	
+
+	public static List<Id> getLinkIds(final String links) {
+		if (links == null) {
+			return new ArrayList<Id>(0);
+		}
+		String trimmed = links.trim();
+		if (trimmed.length() == 0) {
+			return new ArrayList<Id>(0);
+		}
+		String[] parts = trimmed.split("[ \t\n]+");
+		final List<Id> linkIdsList = new ArrayList<Id>(parts.length);
+
+		for (String id : parts) {
+			linkIdsList.add(new IdImpl(id));
+		}
+		return linkIdsList;
+	}
+
 	public static List<Link> getLinks(final Network network, final List<Id> linkIds) {
 		List<Link> links = new ArrayList<Link>();
 		for (Id linkId : linkIds) {
@@ -133,7 +150,15 @@ public class NetworkUtils {
 		}
 		return links;
 	}
-	
+
+	public static List<Id> getLinkIds(final List<Link> links) {
+		List<Id> linkIds = new ArrayList<Id>();
+		for (Link link : links) {
+			linkIds.add(link.getId());
+		}
+		return linkIds;
+	}
+
 	/**
 	 * @return the maximum of 1 and the mathematically rounded number of lanes attribute's value at time "time" of the link given as parameter
 	 */
@@ -141,13 +166,13 @@ public class NetworkUtils {
 		return Math.round((float)Math.max(link.getNumberOfLanes(time), 1.0d));
 	}
 
-	public static LinkNetworkRouteImpl createLinkNetworkRoute(List<Link> routeLinks) {
-		Link startLink = routeLinks.get(0);
-		List<Link> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 1) : new ArrayList<Link>(0);
-		Link endLink = routeLinks.get(routeLinks.size() - 1);
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLink, endLink);
-		route.setLinks(startLink, linksBetween, endLink);
+	public static LinkNetworkRouteImpl createLinkNetworkRoute(List<Id> routeLinkIds, final Network network) {
+		Id startLinkId = routeLinkIds.get(0);
+		List<Id> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<Id>(0);
+		Id endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLinkId, endLinkId, network);
+		route.setLinkIds(startLinkId, linksBetween, endLinkId);
 		return route;
 	}
-	
+
 }

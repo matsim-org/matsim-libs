@@ -25,7 +25,6 @@ import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -271,18 +270,6 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			return this.delegate.getLinkIds();
 		}
 
-		@Deprecated
-		@Override
-		public List<Link> getLinks() {
-			return this.delegate.getLinks();
-		}
-
-		@Deprecated
-		@Override
-		public Link getStartLink() {
-			return this.delegate.getStartLink();
-		}
-
 		@Override
 		public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 			return this.delegate.getSubRoute(fromNode, toNode);
@@ -299,7 +286,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 
 		@Override
-		public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
+		public void setLinkIds(final Id startLinkId, final List<Id> srcRoute, final Id endLinkId) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
@@ -313,19 +300,13 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			throw new UnsupportedOperationException("read only route.");
 		}
 
-		@Deprecated
 		@Override
-		public Link getEndLink() {
-			return this.delegate.getEndLink();
-		}
-
-		@Override
-		public void setEndLink(final Link link) {
+		public void setEndLinkId(final Id  linkId) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
 		@Override
-		public void setStartLink(final Link link) {
+		public void setStartLinkId(final Id linkId) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 

@@ -26,6 +26,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -52,9 +53,8 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 	}
 
 	@Override
-	protected NetworkRouteWRefs getNetworkRouteInstance(Link fromLink,
-			Link toLink, NetworkLayer network) {
-		return new KtiNodeNetworkRouteImpl(fromLink, toLink, this.config.planomat().getSimLegInterpretation());
+	protected NetworkRouteWRefs getNetworkRouteInstance(Id fromLinkId, Id toLinkId, NetworkLayer network) {
+		return new KtiNodeNetworkRouteImpl(fromLinkId, toLinkId, network, this.config.planomat().getSimLegInterpretation());
 	}
 
 	@Override
@@ -73,8 +73,8 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : expectedDistances.keySet()) {
 
 			this.config.planomat().setSimLegInterpretation(simLegInterpretation);
-			NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
-			route.setLinks(link1, NetworkUtils.getLinks(network, "22 12 -23 3"), link4);
+			NetworkRouteWRefs route = getNetworkRouteInstance(link1.getId(), link4.getId(), network);
+			route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("22 12 -23 3"), link4.getId());
 
 			Assert.assertEquals(
 					"different distance calculated.",
@@ -91,8 +91,8 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : expectedDistances.keySet()) {
 
 			this.config.planomat().setSimLegInterpretation(simLegInterpretation);
-			NetworkRouteWRefs route = getNetworkRouteInstance(link1, link1, network);
-			route.setLinks(link1, NetworkUtils.getLinks(network, ""), link1);
+			NetworkRouteWRefs route = getNetworkRouteInstance(link1.getId(), link1.getId(), network);
+			route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds(""), link1.getId());
 
 			Assert.assertEquals(
 					"different distance calculated.",

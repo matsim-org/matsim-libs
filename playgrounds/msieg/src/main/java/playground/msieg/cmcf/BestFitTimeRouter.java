@@ -31,74 +31,75 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.msieg.structure.Commodity;
 
 public class BestFitTimeRouter extends CMCFRouter {
 
 	protected final int timeSteps;
-	
+
 	public BestFitTimeRouter(String networkFile, String plansFile,
 			String cmcfFile) {
 		this(networkFile, plansFile, cmcfFile, 1);
 	}
-	
+
 	public BestFitTimeRouter(String networkFile, String plansFile,
 			String cmcfFile, int steps) {
 		super(networkFile, plansFile, cmcfFile);
 		this.timeSteps = steps;
 	}
 
-	
+
 	@Override
 	public void route() {
 		Set<Person> unroutedPersons = new HashSet<Person>(this.population.getPersons().values());
-		
+
 		Map<List<Link>, Double> flowValues = new HashMap<List<Link>, Double>();
 		for(Commodity<Node> c: this.pathFlow.getCommodities()){
 			for(List<Link> path: this.pathFlow.getFlowPaths(c))
 				flowValues.put(path, 0.);
 		}
-		
+
 		for(int i=0; i < this.timeSteps; i++){
 			/**
 			 * in each timestep we do the following:
-			 * 
+			 *
 			 * take the CMCF solution and add the flowValues to the flowValues mapping
-			 * 
+			 *
 			 * then route an unrouted person on a path with flowValue >= 1
 			 *  	add routed person to the corresponding set, decrease flowValue by 1
 			 */
-			
+
 			//add flow value
 			for(Commodity<Node> c: this.pathFlow.getCommodities()){
 				for(List<Link> path: this.pathFlow.getFlowPaths(c))
 					flowValues.put(path, flowValues.get(path)+this.pathFlow.getFlowValue(c, path));
 			}
-			
+
 			//look for a path with value >= 1
 			for(List<Link> path: flowValues.keySet()){
-				double flow = flowValues.get(path); 
+				double flow = flowValues.get(path);
 				while (flow > 0.99) //0.99 because of rounding errors
 				{	//look for unrouted person with the same start and target
 					Person person = null;
 					LegImpl leg = null;
 					for(Person p: unroutedPersons){
 						leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(((PlanImpl) p.getSelectedPlan()).getFirstActivity());
-						Node from = leg.getRoute().getStartLink().getToNode(),
-								to = leg.getRoute().getEndLink().getFromNode();
+						Node from = this.network.getLinks().get(leg.getRoute().getStartLinkId()).getToNode(),
+								to = this.network.getLinks().get(leg.getRoute().getEndLinkId()).getFromNode();
 						if(path.get(0).getFromNode() == from
 								&& path.get(path.size()-1).getToNode() == to){
 							person = p;
 							break;
 						}
 					}
-					
+
 					assert(person != null && leg != null);
-					
-					NodeNetworkRouteImpl route = new NodeNetworkRouteImpl(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
-					route.setLinks(	leg.getRoute().getStartLink(), path, leg.getRoute().getEndLink());
+
+					LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), this.network);
+					route.setLinkIds(	leg.getRoute().getStartLinkId(), NetworkUtils.getLinkIds(path), leg.getRoute().getEndLinkId());
 					leg.setRoute(route);
 					double depTime = ((PlanImpl) person.getSelectedPlan()).getFirstActivity().getStartTime()
 									+ i * (((PlanImpl) person.getSelectedPlan()).getFirstActivity().getEndTime()

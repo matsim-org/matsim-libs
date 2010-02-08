@@ -36,8 +36,8 @@ import org.matsim.testcases.fakes.FakeLink;
 public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRouteWRefs getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
-		return new LinkNetworkRouteImpl(fromLink, toLink);
+	public NetworkRouteWRefs getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkLayer network) {
+		return new LinkNetworkRouteImpl(fromLinkId, toLinkId, network);
 	}
 
 	@Test
@@ -52,17 +52,17 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 		Link link3 = new FakeLink(id3);
 		Link link4 = new FakeLink(id4);
 		Link link5 = new FakeLink(id5);
-		LinkNetworkRouteImpl route1 = new LinkNetworkRouteImpl(startLink, endLink);
-		ArrayList<Link> srcRoute = new ArrayList<Link>();
-		srcRoute.add(link3);
-		srcRoute.add(link4);
-		route1.setLinks(startLink, srcRoute, endLink);
+		LinkNetworkRouteImpl route1 = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), null);
+		ArrayList<Id> srcRoute = new ArrayList<Id>();
+		srcRoute.add(link3.getId());
+		srcRoute.add(link4.getId());
+		route1.setLinkIds(startLink.getId(), srcRoute, endLink.getId());
 		Assert.assertEquals(2, route1.getLinkIds().size());
 
 		LinkNetworkRouteImpl route2 = route1.clone();
 
-		srcRoute.add(link5);
-		route1.setLinks(startLink, srcRoute, endLink);
+		srcRoute.add(link5.getId());
+		route1.setLinkIds(startLink.getId(), srcRoute, endLink.getId());
 
 		Assert.assertEquals(3, route1.getLinkIds().size());
 		Assert.assertEquals(2, route2.getLinkIds().size());

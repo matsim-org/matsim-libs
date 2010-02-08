@@ -43,8 +43,8 @@ public class TransitRouteValidator {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				for (TransitRoute transitRoute2 : transitLine.getRoutes().values()){
 					if(!transitRoute.equals(transitRoute2)){
-						Node node1 = transitRoute.getRoute().getStartLink().getToNode();
-						Node node2 = transitRoute2.getRoute().getEndLink().getFromNode();
+						Node node1 = this.logicNetwork.getLinks().get(transitRoute.getRoute().getStartLinkId()).getToNode();
+						Node node2 = this.logicNetwork.getLinks().get(transitRoute2.getRoute().getEndLinkId()).getFromNode();
 						Path path = expressDijkstra.calcLeastCostPath(node1, node2, 600);
 						comparisons++;
 						if (path==null){

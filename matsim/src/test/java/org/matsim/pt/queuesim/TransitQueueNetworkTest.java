@@ -56,9 +56,9 @@ import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QLinkImpl;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSimEngine;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.ptproject.qsim.QueueVehicleImpl;
-import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -1013,10 +1013,10 @@ public class TransitQueueNetworkTest extends TestCase {
 			Activity act = pb.createActivityFromLinkId("home", id1);
 			plan.addActivity(act);
 			Leg leg = pb.createLeg(TransportMode.car);
-			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links[1], links[3]);
-			List<Link> links_2 = new ArrayList<Link>();
-			links_2.add(links[2]);
-			route.setLinks(links[1], links_2, links[3]);
+			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId(), scenario.getNetwork());
+			List<Id> linkIds_2 = new ArrayList<Id>();
+			linkIds_2.add(links[2].getId());
+			route.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
 			leg.setRoute(route);
 			plan.addLeg(leg);
 			plan.addActivity(pb.createActivityFromLinkId("work", id2));
@@ -1035,8 +1035,8 @@ public class TransitQueueNetworkTest extends TestCase {
 				stop2.setLink(links[secondStopLocation]);
 			}
 			TransitLine tLine = builder.createTransitLine(id1);
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(links[1], links[3]);
-			netRoute.setLinks(links[1], links_2, links[3]);
+			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId(), network);
+			netRoute.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
 			ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 			if (stop2 != null) {
@@ -1096,8 +1096,8 @@ public class TransitQueueNetworkTest extends TestCase {
 				act2.setEndTime(120);
 				plan2.addActivity(act2);
 				Leg leg2 = pb.createLeg(TransportMode.car);
-				LinkNetworkRouteImpl route2 = new LinkNetworkRouteImpl(links[1], links[3]);
-				route2.setLinks(links[1], links_2, links[3]);
+				LinkNetworkRouteImpl route2 = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId(), network);
+				route2.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
 				leg2.setRoute(route2);
 				plan2.addLeg(leg2);
 				plan2.addActivity(pb.createActivityFromLinkId("work", id2));

@@ -52,8 +52,6 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.mrieser.pt.controler.TransitControler;
-
 public class TransitControlerIntegrationTest extends MatsimTestCase {
 
 	public void testTransitRouteCopy() {
@@ -99,8 +97,8 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		stops.add(stop1);
 		stops.add(stop2);
 
-		NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(link1, link2);
-		netRoute.setLinks(link1, Collections.<Link>emptyList(), link2);
+		NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		netRoute.setLinkIds(link1.getId(), Collections.<Id>emptyList(), link2.getId());
 		TransitRoute tRoute1 = sBuilder.createTransitRoute(id1, netRoute, stops, TransportMode.bus);
 
 		tRoute1.addDeparture(sBuilder.createDeparture(id1, 7.0*3600));

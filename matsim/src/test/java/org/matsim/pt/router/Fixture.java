@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -43,7 +44,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 /**
  * Network:
  * <pre>
- * 
+ *
  * (n) node                              K(12)-------------(13)L
  * [s] stop facilities                   / [19]    21     [20]\
  *  l  link                             /                      \
@@ -58,18 +59,18 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
  *                                    \                        /23
  *                                     \[23]       24    [22] /
  *                                     N(16)--------------(15)M
- * 
+ *
  * </pre>
  * Coordinates: 4km between two stops along x-axis, 5km along y-axis. Thus: A is at 4000/5000,
  * C at 12000/5000, N at 16000/0, L at 24000/10000, J at 36000/5000.
- * 
+ *
  * Transit Lines:
  * <ul>
  * <li>red line: express line once an hour from C to G and back without stop</li>
  * <li>blue line: regular line every 20 minutes from A to J with stop on all facilities</li>
  * <li>green line: circular line every 10 minutes C-K-L-G-M-N-C</li>
  * </ul>
- * 
+ *
  * @author mrieser
  */
 /*package*/ class Fixture {
@@ -248,10 +249,10 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 		this.redLine = this.builder.createTransitLine(this.scenario.createId("red"));
 		this.schedule.addTransitLine(this.redLine);
 		{ // route from left to right
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[2], this.links[6]);
-			List<Link> routeLinks = new ArrayList<Link>();
-			Collections.addAll(routeLinks, this.links[3], this.links[4], this.links[5]);
-			netRoute.setLinks(this.links[2], routeLinks, this.links[6]);
+			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[2].getId(), this.links[6].getId(), this.network);
+			List<Id> routeLinks = new ArrayList<Id>();
+			Collections.addAll(routeLinks, this.links[3].getId(), this.links[4].getId(), this.links[5].getId());
+			netRoute.setLinkIds(this.links[2].getId(), routeLinks, this.links[6].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[4], Time.UNDEFINED_TIME, 0.0));
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[12], Time.UNDEFINED_TIME, 9.0*60));
@@ -264,10 +265,10 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r>04"), 9.0*3600));
 		}
 		{ // route from right to left
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[11], this.links[15]);
-			List<Link> routeLinks = new ArrayList<Link>();
-			Collections.addAll(routeLinks, this.links[12], this.links[13], this.links[14]);
-			netRoute.setLinks(this.links[11], routeLinks, this.links[15]);
+			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[11].getId(), this.links[15].getId(), this.network);
+			List<Id> routeLinks = new ArrayList<Id>();
+			Collections.addAll(routeLinks, this.links[12].getId(), this.links[13].getId(), this.links[14].getId());
+			netRoute.setLinkIds(this.links[11].getId(), routeLinks, this.links[15].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[13], Time.UNDEFINED_TIME, 0.0));
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[5], Time.UNDEFINED_TIME, 9.0*60));
@@ -285,10 +286,10 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 		this.blueLine = this.builder.createTransitLine(this.scenario.createId("blue"));
 		this.schedule.addTransitLine(this.blueLine);
 		{ // route from left to right
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[0], this.links[8]);
-			List<Link> routeLinks = new ArrayList<Link>();
-			Collections.addAll(routeLinks, this.links[1], this.links[2], this.links[3], this.links[4], this.links[5], this.links[6], this.links[7]);
-			netRoute.setLinks(this.links[0], routeLinks, this.links[8]);
+			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[0].getId(), this.links[8].getId(), this.network);
+			List<Id> routeLinks = new ArrayList<Id>();
+			Collections.addAll(routeLinks, this.links[1].getId(), this.links[2].getId(), this.links[3].getId(), this.links[4].getId(), this.links[5].getId(), this.links[6].getId(), this.links[7].getId());
+			netRoute.setLinkIds(this.links[0].getId(), routeLinks, this.links[8].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			TransitRouteStop stop;
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[ 0], Time.UNDEFINED_TIME, 0.0);
@@ -338,10 +339,10 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>15"), 9.0*3600 + 46.0*60));
 		}
 		{ // route from right to left
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[9], this.links[17]);
-			List<Link> routeLinks = new ArrayList<Link>();
-			Collections.addAll(routeLinks, this.links[10], this.links[11], this.links[12], this.links[13], this.links[14], this.links[15], this.links[16]);
-			netRoute.setLinks(this.links[9], routeLinks, this.links[17]);
+			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[9].getId(), this.links[17].getId(), this.network);
+			List<Id> routeLinks = new ArrayList<Id>();
+			Collections.addAll(routeLinks, this.links[10].getId(), this.links[11].getId(), this.links[12].getId(), this.links[13].getId(), this.links[14].getId(), this.links[15].getId(), this.links[16].getId());
+			netRoute.setLinkIds(this.links[9].getId(), routeLinks, this.links[17].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			TransitRouteStop stop;
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[17], Time.UNDEFINED_TIME, 0.0);
@@ -396,10 +397,10 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 		this.greenLine = this.builder.createTransitLine(this.scenario.createId("green"));
 		this.schedule.addTransitLine(this.greenLine);
 		{ // route in circle in clockwise
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[25], this.links[25]);
-			List<Link> routeLinks = new ArrayList<Link>();
-			Collections.addAll(routeLinks, this.links[20], this.links[21], this.links[22], this.links[23], this.links[24]);
-			netRoute.setLinks(this.links[25], routeLinks, this.links[25]);
+			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[25].getId(), this.links[25].getId(), this.network);
+			List<Id> routeLinks = new ArrayList<Id>();
+			Collections.addAll(routeLinks, this.links[20].getId(), this.links[21].getId(), this.links[22].getId(), this.links[23].getId(), this.links[24].getId());
+			netRoute.setLinkIds(this.links[25].getId(), routeLinks, this.links[25].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			TransitRouteStop stop;
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[18], Time.UNDEFINED_TIME, 0.0);

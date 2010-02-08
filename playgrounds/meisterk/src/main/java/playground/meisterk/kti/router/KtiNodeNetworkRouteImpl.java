@@ -20,16 +20,17 @@
 
 package playground.meisterk.kti.router;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 
 /**
  * Temporary solution to calculate the route distance as it is simulated in the JEDQSim.
- * 
+ *
  * TODO Generalize in MATSim that routes are handled consistently with their interpretation in the traffic simulation.
- * 
+ *
  * @author meisterk
  *
  */
@@ -37,8 +38,8 @@ public class KtiNodeNetworkRouteImpl extends NodeNetworkRouteImpl {
 
 	final private PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 
-	public KtiNodeNetworkRouteImpl(Link fromLink, Link toLink, SimLegInterpretation simLegInterpretation) {
-		super(fromLink, toLink);
+	public KtiNodeNetworkRouteImpl(Id fromLinkId, Id toLinkId, Network network, SimLegInterpretation simLegInterpretation) {
+		super(fromLinkId, toLinkId, network);
 		this.simLegInterpretation = simLegInterpretation;
 	}
 
@@ -47,14 +48,13 @@ public class KtiNodeNetworkRouteImpl extends NodeNetworkRouteImpl {
 
 		double distance = super.calcDistance();
 
-		if (!this.getStartLink().equals(this.getEndLink())) {
-			PlanomatConfigGroup.SimLegInterpretation simLegInterpretation = this.simLegInterpretation;
-			switch (simLegInterpretation) {
+		if (!this.getStartLinkId().equals(this.getEndLinkId())) {
+			switch (this.simLegInterpretation) {
 			case CetinCompatible:
-				distance += this.getEndLink().getLength();
+				distance += this.network.getLinks().get(this.getEndLinkId()).getLength();
 				break;
 			case CharyparEtAlCompatible:
-				distance += this.getStartLink().getLength();
+				distance += this.network.getLinks().get(this.getStartLinkId()).getLength();
 				break;
 			}
 		}
