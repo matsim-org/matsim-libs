@@ -24,10 +24,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
+import org.matsim.core.events.SignalGroupStateChangedEventImpl;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
+import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
@@ -50,17 +52,36 @@ public class AdaptiveController extends
 	}
 
 	public boolean givenSignalGroupIsGreen(double time, SignalGroupDefinition signalGroup) {
+	  SignalGroupState oldState = this.getSignalGroupStates().get(signalGroup);
+	  SignalGroupState newState = null;
 		if (signalGroup.getLinkRefId().equals(id5)){
 			if (vehOnLink5Lane1 > 0) {
-				return true;
+				newState = SignalGroupState.GREEN;
 			}
-			return false;
+			else {
+			  newState = SignalGroupState.RED;
+			}
 		}
-		if (signalGroup.getLinkRefId().equals(id4)){
+		else if (signalGroup.getLinkRefId().equals(id4)){
 			if (vehOnLink5Lane1 > 0){
-				return false;
+			  newState = SignalGroupState.RED;
 			}
-			return true;
+			else {
+			  newState = SignalGroupState.GREEN;
+			}
+		}
+		//save the new state
+		this.getSignalGroupStates().put(signalGroup, newState);
+		
+		//fire the event
+		if (!newState.equals(oldState)){
+      this.getSignalEngine().getEvents().processEvent(
+          new SignalGroupStateChangedEventImpl(time, signalGroup.getSignalSystemDefinitionId(), 
+              signalGroup.getId(), newState));
+		}
+		
+		if (newState.equals(SignalGroupState.RED)){
+		  return false;
 		}
 		return true;
 	}

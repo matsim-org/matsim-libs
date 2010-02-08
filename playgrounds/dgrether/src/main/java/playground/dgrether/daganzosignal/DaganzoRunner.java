@@ -41,6 +41,8 @@ import playground.dgrether.linkanalysis.DgCountPerIterationGraph;
 import playground.dgrether.linkanalysis.InOutGraphWriter;
 import playground.dgrether.linkanalysis.TTGraphWriter;
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
+import playground.dgrether.signalsystems.DgGreenSplitPerIterationGraph;
+import playground.dgrether.signalsystems.DgSignalGreenSplitHandler;
 
 
 /**
@@ -52,6 +54,9 @@ public class DaganzoRunner {
 	private static final Logger log = Logger.getLogger(DaganzoRunner.class);
 
 	private TTInOutflowEventHandler handler3, handler4;
+
+  private DgSignalGreenSplitHandler signalGreenSplitHandler;
+  private DgGreenSplitPerIterationGraph greenSplitPerIterationGraph;
 
 	public DaganzoRunner(){}
 
@@ -101,16 +106,22 @@ public class DaganzoRunner {
 		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
 		handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
 
+		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
+		signalGreenSplitHandler.addSignalSystem(new IdImpl("1"));
+		
+		greenSplitPerIterationGraph = new DgGreenSplitPerIterationGraph(c.getConfig().controler(), new IdImpl("1"));
+		
 		c.addControlerListener(new StartupListener() {
 
 			public void notifyStartup(StartupEvent e) {
 				e.getControler().getEvents().addHandler(handler3);
 				e.getControler().getEvents().addHandler(handler4);
+				e.getControler().getEvents().addHandler(signalGreenSplitHandler);
+
+				
 			}
 		});
-
-		MyStartupListener startupListener = new MyStartupListener();
-		c.addControlerListener(startupListener);
+		
 
 		//write some output after each iteration
 		c.addControlerListener(new IterationEndsListener() {
@@ -124,6 +135,8 @@ public class DaganzoRunner {
 				inoutWriter.addInOutEventHandler(handler3);
 				inoutWriter.addInOutEventHandler(handler4);
 				inoutWriter.writeInOutChart(e.getControler().getIterationPath(e.getIteration()), e.getIteration());
+			
+				greenSplitPerIterationGraph.addIterationData(signalGreenSplitHandler, e.getIteration());
 			}
 		});
   	//write some output at shutdown
@@ -133,22 +146,13 @@ public class DaganzoRunner {
 				chart.addCountEventHandler(handler3);
 				chart.addCountEventHandler(handler4);
 				DgChartWriter.writeChart(event.getControler().getControlerIO().getOutputFilename("countPerIteration"), chart.createChart());
+			
+				DgChartWriter.writeChart(event.getControler().getControlerIO().getOutputFilename("greensplit"), greenSplitPerIterationGraph.createChart());
 			}
 		});
 	}
 
-	class MyStartupListener implements StartupListener {
-
-    @Override
-    public void notifyStartup(StartupEvent event) {
-      // TODO Auto-generated method stub
-
-    }
-
-	}
-
-
-	private void startVisualizer(Config config) {
+		private void startVisualizer(Config config) {
 		String[] args = {config.controler().getOutputDirectory() +
 				"/ITERS/it." + config.controler().getLastIteration() +
 				"/" + config.controler().getLastIteration() + ".otfvis.mvi"};

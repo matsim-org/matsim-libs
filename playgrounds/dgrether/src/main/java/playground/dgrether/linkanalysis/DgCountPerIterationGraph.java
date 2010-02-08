@@ -67,7 +67,7 @@ public class DgCountPerIterationGraph {
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
 		ValueAxis xAxis = this.axisBuilder.createValueAxis("Iteration");
-		xAxis.setRange(this.controllerConfig.getFirstIteration(), this.controllerConfig.getLastIteration());
+		xAxis.setRange(this.controllerConfig.getFirstIteration(), this.controllerConfig.getLastIteration() + 2);
 		ValueAxis yAxis = this.axisBuilder.createValueAxis("Trips");
 //		yAxis.setRange(-0.05, 0.3);
 //		xAxis.setVisible(false);
@@ -95,7 +95,7 @@ public class DgCountPerIterationGraph {
 		chart.setBackgroundPaint(ChartColor.WHITE);
 		chart.getLegend().setItemFont(this.axisBuilder.getAxisFont());
 		chart.setTextAntiAlias(true);
-		chart.removeLegend();
+//		chart.removeLegend();
 		return chart;
 	}
 	

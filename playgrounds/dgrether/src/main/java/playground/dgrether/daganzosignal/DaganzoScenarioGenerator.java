@@ -102,7 +102,7 @@ public class DaganzoScenarioGenerator {
 		+ "output/normalRoute/";
 
 	private static final String OUTPUTDIRECTORYALTERNATIVEROUTE = DAGANZOBASEDIR
-		+ "output/alternativeRoute/";
+		+ "output/alternativeRoute2/";
 
 
 	public String configOut, plansOut, outputDirectory;
@@ -113,9 +113,11 @@ public class DaganzoScenarioGenerator {
 
 	private static final boolean isUseSignalSystems = true;
 
-	private static final int iterations = 500;
+	private static final int iterations = 2;
 	private static final int iterations2 = 0;
 
+	private static final int ttBinSize = 1;
+	
 	private static final String controllerClass = AdaptiveController.class.getCanonicalName();
 
 	private Id id1, id2, id4, id5, id6;
@@ -193,13 +195,13 @@ public class DaganzoScenarioGenerator {
 	private void createPlans(ScenarioImpl scenario) {
 		Network network = scenario.getNetwork();
 		PopulationImpl population = scenario.getPopulation();
-		int firstHomeEndTime =  1 * 3600;
-		int homeEndTime = firstHomeEndTime;
+		double firstHomeEndTime =  600.0;
+		double homeEndTime = firstHomeEndTime;
 		Link l1 = network.getLinks().get(scenario.createId("1"));
 		Link l7 = network.getLinks().get(scenario.createId("7"));
 		PopulationFactory factory = population.getFactory();
 
-		for (int i = 1; i <= 1000; i++) {
+		for (int i = 1; i <= 2000; i++) {
 			PersonImpl p = (PersonImpl) factory.createPerson(scenario.createId(Integer
 					.toString(i)));
 			Plan plan = factory.createPlan();
@@ -242,7 +244,7 @@ public class DaganzoScenarioGenerator {
 
 		// configure scoring for plans
 		config.charyparNagelScoring().setLateArrival(0.0);
-		config.charyparNagelScoring().setPerforming(6.0);
+		config.charyparNagelScoring().setPerforming(0.0);
 		// this is unfortunately not working at all....
 		ActivityParams homeParams = new ActivityParams("h");
 		// homeParams.setOpeningTime(0);
@@ -253,7 +255,7 @@ public class DaganzoScenarioGenerator {
 				"24:00:00");
 
 		// configure controler
-		config.travelTimeCalculator().setTraveltimeBinSize(1);
+		config.travelTimeCalculator().setTraveltimeBinSize(ttBinSize);
 		config.controler().setLastIteration(iterations + iterations2);
 		config.controler().setOutputDirectory(outputDirectory);
 
