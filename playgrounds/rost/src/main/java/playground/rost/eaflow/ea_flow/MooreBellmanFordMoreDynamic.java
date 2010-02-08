@@ -296,7 +296,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				routeNodes.add(tmpNode);
 			}
 		}
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl();
+		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null, network);
 		route.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(routeNodes)), null);
 
 		return route;

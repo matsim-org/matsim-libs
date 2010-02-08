@@ -39,16 +39,6 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	private Id vehicleId = null;
 	protected final Network network;
 
-	/**
-	 * This constructor is only needed for backwards compatibility reasons and thus is
-	 * set to deprecated. New code should make use of the constructor which sets the
-	 * start and the end link of a Route correctly.
-	 */
-	@Deprecated
-	public NodeNetworkRouteImpl(){
-		this.network = null; // FIXME [MR]
-	}
-
 	public NodeNetworkRouteImpl(final Id startLinkId, final Id endLinkId, final Network network) {
 		super(startLinkId, endLinkId);
 		this.network = network;
