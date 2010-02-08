@@ -335,13 +335,13 @@ public class MultiSourceEAF {
 		
 		// FIXME 
 		// Unfold BUG: siouxfalls demands=5000, step=50 ... ca 10 Minuten
-		// (500, 5)
-		// (100, 5) ... 10 sekunden
+		// (500, 5) ... geht jetzt.
+		// (100, 5) ... 10 sekunden. geht jetzt.
 		
-		int uniformDemands = 100;
+		int uniformDemands = 5000;
 
-		// Rounding is now down per timestep!
-		int timestep = 5; 
+		// Rounding is now done according to this timestep variable!
+		int timestep = 50; 
 
 		
 		String sinkid = "supersink"; //siouxfalls, problem

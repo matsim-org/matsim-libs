@@ -311,33 +311,25 @@ public class SourceIntervalls {
 		if(i.getHighBound() > (t+1)){
 			splitAt(t+1);
 		}
-		i.changeFlow(f, u);
+		i.augment(f, u);
 	}
 	
 	/**
-	 * decreases the flow into an edge from time t to t+1 by f if flow remains nonnegative
+	 * increeases the flow into an edge from time t to t+1 by f
+	 * no checking is done
 	 * @param t raising time
-	 * @param f amount of flow to reduce
+	 * @param gamma aumount of flow to augment (can be negative) 
 	 */
-	public void augmentreverse(final int t,final int f){
-		if (t<0){
-			throw new IllegalArgumentException("negative time : "+ t);
-		}
-		EdgeIntervall i= getIntervallAt(t);
-		if(f<0){
-			throw new IllegalArgumentException("can not rduce flow by an negative amount " +
-					"without specified capacity");
-		}
-		int oldflow= i.getFlow();
-		if(oldflow-f <0){
-			throw new IllegalArgumentException("flow would get negative");
-		}
+	public void augmentUnsafe(final int t, final int gamma){
+		EdgeIntervall i = getIntervallAt(t);
+		// FIXME one of these cases should not happen ... I think
 		if(i.getLowBound() < t){
 			i= splitAt(t);
 		}
-		if(i.getHighBound() > t+1){
+		if(i.getHighBound() > (t+1)){
 			splitAt(t+1);
 		}
-		i.setFlow(oldflow-f);
+		i.augmentUnsafe(gamma);
 	}
+
 }

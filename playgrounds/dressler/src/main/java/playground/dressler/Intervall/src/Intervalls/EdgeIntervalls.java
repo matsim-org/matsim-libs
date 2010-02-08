@@ -433,28 +433,46 @@ public class EdgeIntervalls {
 	 * @param f aumount of flow to augment (can be negative)
 	 * @param u capcity of the edge
 	 */
-	public void augment(final int t,final int f,final int u){
+	public void augment(final int t,final int gamma,final int u){
 		if (t<0){
 			throw new IllegalArgumentException("negative time: "+ t);
 		}
 		EdgeIntervall i = getIntervallAt(t);
-		if (i.getFlow() + f > u){
+		if (i.getFlow() + gamma > u){
 			throw new IllegalArgumentException("too much flow! flow: " + i.getFlow() + " + " +
-					f + " > " + u);
+					gamma + " > " + u);
 		}
-		if (i.getFlow() + f < 0){
+		if (i.getFlow() + gamma < 0){
 			throw new IllegalArgumentException("negative flow! flow: " + i.getFlow() + " + " +
-					f + " < 0");
+					gamma + " < 0");
 		}
 		
-		// FIXME one of these cases should not happen ...
+		// FIXME one of these cases should not happen ... I think
 		if(i.getLowBound() < t){
 			i= splitAt(t);
 		}
 		if(i.getHighBound() > (t+1)){
 			splitAt(t+1);
 		}
-		i.changeFlow(f, u);
+		i.augment(gamma, u);
+	}
+	
+	/**
+	 * increeases the flow into an edge from time t to t+1 by f
+	 * no checking is done
+	 * @param t raising time
+	 * @param gamma aumount of flow to augment (can be negative) 
+	 */
+	public void augmentUnsafe(final int t, final int gamma){
+		EdgeIntervall i = getIntervallAt(t);
+		// FIXME one of these cases should not happen ... I think
+		if(i.getLowBound() < t){
+			i= splitAt(t);
+		}
+		if(i.getHighBound() > (t+1)){
+			splitAt(t+1);
+		}
+		i.augmentUnsafe(gamma);
 	}
 	
 	/**

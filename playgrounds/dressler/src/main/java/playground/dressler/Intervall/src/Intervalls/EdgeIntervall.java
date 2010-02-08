@@ -136,20 +136,41 @@ public class EdgeIntervall extends Intervall
 		if(u<0){
 			throw new IllegalArgumentException("negative capacity");
 		}
-		if(f<=u){
-			this.setFlow(f);
-		}else
+		if (f < 0) {
+			throw new IllegalArgumentException("flow is negative");
+		}
+		if(f > u){
 			throw new IllegalArgumentException("capacity violated");
+		} else {
+			this._flow = f;
+		}			
 	}
 	
 	/**
-	 * changes the flow by f and throws an Exception if the new flow would succeed 
+	 * augments the flow by gamma and throws an Exception if the new flow would succeed 
 	 * u or get negative
-	 * @param f amount of flow to augment
+	 * @param gamma amount of flow to augment
 	 * @param u  nonnegative capacity
 	 */
-	public void changeFlow(final int f,final int u){
-		this.setFlow(f+this._flow, u);
+	public void augment(final int gamma,final int u){
+		this.setFlow(gamma+this._flow, u);
+	}
+	
+	/**
+	 * augments the flow by gamma, no checking is done! 
+	 * @param gamma the amount of flow to augment
+	 */
+	public void augmentUnsafe(final int gamma){
+		this._flow += gamma;		
+	}
+	
+	/**
+	 * checks the flow 
+	 * @param u the capacity
+	 * @return true iff the 0 <= flow <= u 
+	 */
+	public boolean checkFlow(final int u){
+		return (0 <= this._flow && this._flow <= u);
 	}
 	
 //-------------------------------------SPLITTING-----------------------------------//

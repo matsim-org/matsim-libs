@@ -321,6 +321,9 @@ public class Flow {
 				this._demands.put(source, demand);
 			} else {
 				demand += gamma;
+				if (demand > this._settings.getDemand(source)) {
+					throw new IllegalArgumentException("too much flow sent back into source " + step);
+				}
 				this._sourceoutflow.get(source).augment(ssf.getStartTime(), -gamma, Integer.MAX_VALUE);
 				this._demands.put(source, demand);
 			}
@@ -329,6 +332,107 @@ public class Flow {
 			throw new RuntimeException("Unsupported kind of PathStep!");
 		}  
 	
+	}
+	
+	/**
+	 * Method to change just the flow values on the step, no checking is done!
+	 * @param step The Step
+	 * @param gamma Amount of flow to augment, positive or negative! 
+	 */
+	
+	private void augmentStepUnsafe(PathStep step, int gamma) {
+		
+		// FIXME really bad style ...			
+		if (step instanceof StepEdge) {
+			StepEdge se = (StepEdge) step;
+			Link edge = se.getEdge();				
+
+			if(se.getForward()){
+				this._flow.get(edge).augmentUnsafe(se.getStartTime(), gamma);
+			}	else {
+				this._flow.get(edge).augmentUnsafe(se.getArrivalTime(), -gamma);									  
+			}			
+		} else if (step instanceof StepSourceFlow) {
+			StepSourceFlow ssf = (StepSourceFlow) step;
+			Node source;
+			
+			if (ssf.getForward()) {
+				source = ssf.getStartNode(); 
+			} else {
+				source = ssf.getArrivalNode();
+			}
+			
+			Integer demand = this._demands.get(source);
+
+			if (demand == null) {
+				throw new IllegalArgumentException("Startnode is no source four StepSourceFlow " + step);
+			}
+
+			if (ssf.getForward()) {	
+				demand -= gamma;
+				this._sourceoutflow.get(source).augmentUnsafe(ssf.getArrivalTime(), gamma);
+				this._demands.put(source, demand);
+			} else {
+				demand += gamma;
+				this._sourceoutflow.get(source).augmentUnsafe(ssf.getStartTime(), -gamma);
+				this._demands.put(source, demand);
+			}
+
+		} else {
+			throw new RuntimeException("Unsupported kind of PathStep!");
+		}  
+	
+	}
+	
+	/**
+	 * Method to check the flow on the edge associated with step
+	 * @param step The Step to check.
+	 * @return true iff 0 <= flow <= capacity at time associated with step 
+	 */
+	
+	private boolean checkStep(PathStep step) {
+		
+		// FIXME really bad style ...			
+		if (step instanceof StepEdge) {
+			StepEdge se = (StepEdge) step;
+			Link edge = se.getEdge();				
+
+			if(se.getForward()){
+				return this._flow.get(edge).getIntervallAt(se.getStartTime()).checkFlow(this._settings.getCapacity(edge));			
+
+			}	else {
+				return this._flow.get(edge).getIntervallAt(se.getArrivalTime()).checkFlow(this._settings.getCapacity(edge));													 
+			}			
+		} else if (step instanceof StepSourceFlow) {
+			StepSourceFlow ssf = (StepSourceFlow) step;
+			Node source;
+			
+			if (ssf.getForward()) {
+				source = ssf.getStartNode(); 
+			} else {
+				source = ssf.getArrivalNode();
+			}
+			
+			Integer demand = this._demands.get(source);
+
+			if (demand == null) {
+				throw new IllegalArgumentException("Startnode is no source four StepSourceFlow " + step);
+			}
+			
+			if (demand < 0 || demand > this._settings.getDemand(source)) {
+				return false;
+			    //throw new RuntimeException("Demand of source is negative or too large!");
+			}
+			
+			if (ssf.getForward()) {	
+				return this._sourceoutflow.get(source).getIntervallAt(ssf.getArrivalTime()).checkFlow(Integer.MAX_VALUE);				
+			} else {				
+				return this._sourceoutflow.get(source).getIntervallAt(ssf.getStartTime()).checkFlow(Integer.MAX_VALUE);								
+			}
+
+		} else {
+			throw new RuntimeException("Unsupported kind of PathStep!");
+		}  	    
 	}
 	
 	/**
@@ -435,6 +539,7 @@ public class Flow {
 			}
 			
 			if (endLoop != null) {
+				ArrayList<PathStep> loop = new ArrayList<PathStep>(); 
 				if (_debug > 0) {
 				  System.out.println("with loops: " + TEP);
 				}
@@ -450,23 +555,36 @@ public class Flow {
 					if (!inloop) {
 						newTEP.append(step);
 					} else {
-						// FIXME adjust flow on edges to be in sync with TEP collection!
-						// However, removing the flow forwards is bad ...
-						// it might (must?) have first increased the flow, then decreased
-						// now we first decrease (even though it might be 0), then increase
-						// hmmmmmm ....
-						augmentStep(step, -TEP.getFlow());						
+						/* FIXME adjust flow on edges to be in sync with TEP collection!
+						   However, removing the flow might temporarily exceed [0, u] boundaries
+						   if the TEP could unfold with itself */  
+						augmentStepUnsafe(step, -TEP.getFlow());
+						loop.add(step);
 					}
 				}
-				TEP = newTEP;
+								
+				// just to be sure
+				// if (_debug > 0) {
+				for (PathStep step : loop) {
+					if (!checkStep(step)) {
+						System.out.println("without loops: " + TEP);
+						System.out.println("Bad unlooped new TEP: " + newTEP);						
+						System.out.println("problem step: " + step);
+						throw new RuntimeException("Unsafe unlooping violated bounds on flow!");
+					}
+				}
+			    // }
+				
 				if (_debug > 0) {
 					System.out.println("without loops: " + TEP);
-					if (!TEP.check()) {
-						System.out.println("Bad unlooped TEP!");
-						System.out.println(TEP);
+					if (!newTEP.check()) {
+						System.out.println("Bad unlooped new TEP:");
+						System.out.println(newTEP);
 						throw new RuntimeException("Bad unlooped TEP!");
 					}
 				}
+				
+				TEP = newTEP;
 			}
 		
 			
