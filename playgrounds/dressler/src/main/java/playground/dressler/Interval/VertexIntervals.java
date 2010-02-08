@@ -74,45 +74,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	
 
 //------------------------------GETTER-----------------------//
-	
-	
-	/**
-	 * Gives a String representation of all stored VertexInterval Instances line by line
-	 * @return String representation
-	 */
-	@Override
-	public String toString(){
-		String l,r;
-		switch (Interval.getMode()){
-		case 1: 
-			l="[";
-			r="]";
-			break;
-		case 2:
-			l="(";
-			r="]";
-			break;
-		case 3:
-			l="[";
-			r=")";
-			break;
-		case 4:
-			l="(";
-			r=")";
-			break;
-		default: 
-			l="|";
-			r="|";
-			break;
-		}
-		StringBuilder str = new StringBuilder();
-		for(_tree.reset();!_tree.isAtEnd();_tree.increment()){
-			VertexInterval i= (VertexInterval) _tree._curr.obj;
-			str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" d:"+i.getReachable()+ " scanned: " + i.isScanned() + " pred:"+i.getPredecessor()+"\n");			
-		}
-		return str.toString();
-	}
-	
+
 
 	/**
 	 * setter for debug mode

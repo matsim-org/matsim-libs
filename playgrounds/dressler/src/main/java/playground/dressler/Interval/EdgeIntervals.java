@@ -81,43 +81,6 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	
 //-------------------------------------GETTER--------------------------------------//
 
-	/**
-	 * Gives a String representation of all stored EdgeIntervals
-	 * @return String representation
-	 */
-	@Override
-	public String toString(){
-		String l,r;
-		switch (Interval.getMode()){
-		case 1: 
-			l="[";
-			r="]";
-			break;
-		case 2:
-			l="(";
-			r="]";
-			break;
-		case 3:
-			l="[";
-			r=")";
-			break;
-		case 4:
-			l="(";
-			r=")";
-			break;
-		default: 
-			l="|";
-			r="|";
-			break;
-		}
-		StringBuilder str = new StringBuilder();
-		for(_tree.reset();!_tree.isAtEnd();_tree.increment()){
-			EdgeInterval i= (EdgeInterval) _tree._curr.obj;
-			str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" " +
-					"f: "+i.getFlow()+" \n");
-		}
-		return str.toString();	
-	}
 	
 
 	

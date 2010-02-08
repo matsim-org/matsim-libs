@@ -145,4 +145,20 @@ public class Intervals<T extends Interval > {
 		public static void debug(int debug){
 			Intervals._debug=debug;
 		}
+		
+
+		/**
+		 * Gives a String representation of all stored Intervals
+		 * @return String representation
+		 */
+		
+		public String toString(){
+			
+			StringBuilder str = new StringBuilder();
+			for(_tree.reset();!_tree.isAtEnd();_tree.increment()){
+				T i= (T) _tree._curr.obj;
+				str.append(i.toString()+" \n");
+			}
+			return str.toString();	
+		}
 }

@@ -256,8 +256,7 @@ public class EdgeInterval extends Interval
 	@Override
 	public String toString()
 	{
-		return "[" + this.getLowBound() + "," + 
-			this.getHighBound() + ") f: " + this.getFlow(); 
+			return super.toString()+" f: " + this.getFlow(); 
 	}
 
 }
