@@ -45,8 +45,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
-import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
-import playground.dressler.Intervall.src.Intervalls.SourceIntervalls;
+import playground.dressler.Interval.EdgeIntervals;
+import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.ea_flow.TimeExpandedPath;
 import playground.dressler.ea_flow.PathStep;
 import playground.dressler.ea_flow.StepEdge;
@@ -75,13 +75,13 @@ public class Flow {
 	/**
 	 * Edge representation of flow on the network  
 	 */
-	private HashMap<Link, EdgeIntervalls> _flow;
+	private HashMap<Link, EdgeIntervals> _flow;
 	
 	
 	/**
 	 * Source outflow, somewhat like holdover for sources  
 	 */
-	private HashMap<Node, SourceIntervalls> _sourceoutflow;
+	private HashMap<Node, SourceIntervals> _sourceoutflow;
 	
 	/**
 	 * TimeExpandedTimeExpandedPath representation of flow on the network
@@ -136,8 +136,8 @@ public class Flow {
 		
 		this._settings = settings;
 		this._network = settings.getNetwork();
-		this._flow = new HashMap<Link,EdgeIntervalls>();
-		this._sourceoutflow = new HashMap<Node, SourceIntervalls>();
+		this._flow = new HashMap<Link,EdgeIntervals>();
+		this._sourceoutflow = new HashMap<Node, SourceIntervals>();
 		
 		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();		
 		this._demands = new HashMap<Node, Integer>();
@@ -148,13 +148,13 @@ public class Flow {
 			if (this._settings.isSource(node)) {
 				int i = this._settings.getDemand(node);
 				this._sources.add(node);
-				this._sourceoutflow.put(node, new SourceIntervalls());
+				this._sourceoutflow.put(node, new SourceIntervals());
 				this._demands.put(node, i);
 			}		
 		}
 		// initialize EdgeIntervalls
 		for (Link edge : this._network.getLinks().values()) {
-			this._flow.put(edge, new EdgeIntervalls(this._settings.getLength(edge)));
+			this._flow.put(edge, new EdgeIntervals(this._settings.getLength(edge)));
 		}
 		
 		this._sink = settings.getSink();
@@ -221,7 +221,7 @@ public class Flow {
 				Node node  = ssf.getStartNode();
 				
 				if (!ssf.getForward()) {
-					SourceIntervalls si = this._sourceoutflow.get(node);
+					SourceIntervals si = this._sourceoutflow.get(node);
 					if (si == null) {
 						System.out.println("Weird. Source of StepSourceFlow has no sourceoutflow!");
 						return 0;			    	 
@@ -398,10 +398,10 @@ public class Flow {
 			Link edge = se.getEdge();				
 
 			if(se.getForward()){
-				return this._flow.get(edge).getIntervallAt(se.getStartTime()).checkFlow(this._settings.getCapacity(edge));			
+				return this._flow.get(edge).getIntervalAt(se.getStartTime()).checkFlow(this._settings.getCapacity(edge));			
 
 			}	else {
-				return this._flow.get(edge).getIntervallAt(se.getArrivalTime()).checkFlow(this._settings.getCapacity(edge));													 
+				return this._flow.get(edge).getIntervalAt(se.getArrivalTime()).checkFlow(this._settings.getCapacity(edge));													 
 			}			
 		} else if (step instanceof StepSourceFlow) {
 			StepSourceFlow ssf = (StepSourceFlow) step;
@@ -425,9 +425,9 @@ public class Flow {
 			}
 			
 			if (ssf.getForward()) {	
-				return this._sourceoutflow.get(source).getIntervallAt(ssf.getArrivalTime()).checkFlow(Integer.MAX_VALUE);				
+				return this._sourceoutflow.get(source).getIntervalAt(ssf.getArrivalTime()).checkFlow(Integer.MAX_VALUE);				
 			} else {				
-				return this._sourceoutflow.get(source).getIntervallAt(ssf.getStartTime()).checkFlow(Integer.MAX_VALUE);								
+				return this._sourceoutflow.get(source).getIntervalAt(ssf.getStartTime()).checkFlow(Integer.MAX_VALUE);								
 			}
 
 		} else {
@@ -998,11 +998,11 @@ public class Flow {
 	 */
 	public int cleanUp() {		
 		int gain = 0;
-		for (EdgeIntervalls EI : _flow.values()) {
+		for (EdgeIntervals EI : _flow.values()) {
 		  gain += EI.cleanup();	
 		}
 		for (Node node : this._sourceoutflow.keySet()) {
-			 SourceIntervalls si = this._sourceoutflow.get(node);
+			 SourceIntervals si = this._sourceoutflow.get(node);
 			 if (si != null)
 			   gain += si.cleanup();				
 		}
@@ -1021,7 +1021,7 @@ public class Flow {
 	public String toString(){
 		StringBuilder strb = new StringBuilder();
 		for(Link link : _flow.keySet()){
-			EdgeIntervalls edge =_flow.get(link);
+			EdgeIntervals edge =_flow.get(link);
 			strb.append(link.getId().toString()+ ": " + edge.toString()+ "\n");
 		}
 		return strb.toString();
@@ -1037,11 +1037,11 @@ public class Flow {
 	/**
 	 * @return the _flow
 	 */
-	public EdgeIntervalls getFlow(Link edge) {
+	public EdgeIntervals getFlow(Link edge) {
 		return this._flow.get(edge);
 	}
 	
-	public SourceIntervalls getSourceOutflow(Node node) {
+	public SourceIntervals getSourceOutflow(Node node) {
 		return this._sourceoutflow.get(node);
 	}
 
@@ -1106,7 +1106,7 @@ public class Flow {
 		int min = Integer.MAX_VALUE;
 		int max = 0;
 		long sum = 0;
-		for (EdgeIntervalls i : this._flow.values()) {
+		for (EdgeIntervals i : this._flow.values()) {
 			int size = i.getSize(); 
 			sum += size;
 			min = Math.min(min, size);
@@ -1114,7 +1114,7 @@ public class Flow {
 		}
 		result = "  Size of EdgeIntervalls (min/avg/max): " + min + " / " + sum / (double) this._network.getNodes().size() + " / " + max + "\n"; 
 		
-		for (SourceIntervalls i : this._sourceoutflow.values()) {
+		for (SourceIntervals i : this._sourceoutflow.values()) {
 			int size = i.getSize(); 
 			sum += size;
 			min = Math.min(min, size);

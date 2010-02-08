@@ -31,9 +31,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 
 //playground imports
-import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
-import playground.dressler.Intervall.src.Intervalls.SourceIntervalls;
-import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
+import playground.dressler.Interval.EdgeIntervals;
+import playground.dressler.Interval.SourceIntervals;
+import playground.dressler.Interval.VertexIntervals;
 
 public class FlowCalculationSettings {
 
@@ -171,9 +171,9 @@ public class FlowCalculationSettings {
 		MultiSourceEAF.debug(true);
 		//BellmanFordVertexIntervalls.debug(3);
 		BellmanFordIntervalBased.debug(3);
-		VertexIntervalls.debug(true);
-		EdgeIntervalls.debug(3);
-		SourceIntervalls.debug(3);
+		VertexIntervals.debug(true);
+		EdgeIntervals.debug(3);
+		SourceIntervals.debug(3);
 		Flow.debug(3);
 	}
 	
@@ -182,9 +182,9 @@ public class FlowCalculationSettings {
 		MultiSourceEAF.debug(false);
 		//BellmanFordVertexIntervalls.debug(0);
 		BellmanFordIntervalBased.debug(0);
-		VertexIntervalls.debug(false);
-		EdgeIntervalls.debug(0);
-		SourceIntervalls.debug(0);
+		VertexIntervals.debug(false);
+		EdgeIntervals.debug(0);
+		SourceIntervals.debug(0);
 		Flow.debug(0);
 	}	
 }

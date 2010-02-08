@@ -47,8 +47,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
-import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
-import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
+import playground.dressler.Interval.EdgeIntervals;
+import playground.dressler.Interval.VertexIntervals;
 
 /**
  * @author Manuel Schneider
@@ -284,9 +284,9 @@ public class MultiSourceEAF {
 		MultiSourceEAF.debug(true);
 		//BellmanFordVertexIntervalls.debug(0);
 		BellmanFordIntervalBased.debug(0);
-		VertexIntervalls.debug(false);
+		VertexIntervals.debug(false);
 		//VertexIntervall.debug(false);
-		EdgeIntervalls.debug(0);
+		EdgeIntervals.debug(0);
 		//EdgeIntervall.debug(false);
 		Flow.debug(0);
 		
