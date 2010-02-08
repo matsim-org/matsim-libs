@@ -41,6 +41,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
+import playground.dressler.Interval.EdgeInterval;
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.SourceIntervals;
 /**
@@ -146,7 +147,8 @@ public class Flow {
 		}
 		// initialize EdgeIntervalls
 		for (Link edge : this._network.getLinks().values()) {
-			this._flow.put(edge, new EdgeIntervals(this._settings.getLength(edge)));
+			EdgeInterval temp =new EdgeInterval(0,Integer.MAX_VALUE);
+			this._flow.put(edge, new EdgeIntervals(temp, this._settings.getLength(edge)));
 		}
 
 		this._sink = settings.getSink();

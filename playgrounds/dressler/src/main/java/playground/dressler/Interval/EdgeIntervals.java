@@ -1,4 +1,5 @@
 /* *********************************************************************** *
+
  * project: org.matsim.*												   *
  * EdgeIntervals.java													   *
  *                                                                         *
@@ -32,24 +33,21 @@ import playground.dressler.ea_flow.FlowCalculationSettings;
  * @author Manuel Schneider
  *
  */
-public class EdgeIntervals {
+public class EdgeIntervals extends Intervals<EdgeInterval> {
 
 //**********************************FIELDS*****************************************//
 	
 	/**
 	 * internal binary search tree holding distinkt Intervals
 	 */
-	private AVLTree _tree;
+	//private AVLTree _tree;
 	
-	/**
-	 * reference to the last Interval
-	 */
-	private EdgeInterval _last; 
 
 	/**
 	 * traveltime for easy access 
 	 */
 	public final int _traveltime;
+	
 	
 	/**
 	 * debug flag
@@ -64,44 +62,11 @@ public class EdgeIntervals {
 	 * Default Constructor Constructs an object containing only 
 	 * one EdgeInterval [0,Integer.MAX_VALUE) with flow equal to 0
 	 */
-	public EdgeIntervals(final int traveltime){
-		EdgeInterval interval = new EdgeInterval(0,Integer.MAX_VALUE);
-		_tree = new AVLTree();
-		_tree.insert(interval);
-		_last = interval;
+	public EdgeIntervals(EdgeInterval interval, final int traveltime){
+		super(interval); 
 		this._traveltime=traveltime;
 	}
 
-//-----------------------------------SPLITTING-------------------------------------//	
-	
-	/**
-	 * Finds the EgdeInterval containing t and splits this at t 
-	 * giving it the same flow as the flow as the original 
-	 * it inserts the new EdgeInterval after the original
-	 * @param t time point to split at
-	 * @return the new EdgeInterval for further modification
- 	 */
-	public EdgeInterval splitAt(final int t){
-		boolean found = false;
-		EdgeInterval j = null;
-		EdgeInterval i = getIntervalAt(t);
-		if (i != null){
-			found = true;
-			//update last
-			if(i == _last){
-				j = i.splitAt(t);
-				_last = j;
-			}else {
-				j = i.splitAt(t);
-			}
-		}	
-		if (found){
-			_tree.insert(j);
-			return j;
-		}
-		else throw new IllegalArgumentException("there is no Interval that " +
-				"can be split at "+t);
-	}
 
 //--------------------------------------FLOW---------------------------------------//	
 	
@@ -115,21 +80,6 @@ public class EdgeIntervals {
 	}
 	
 //-------------------------------------GETTER--------------------------------------//
-
-	/**
-	 * Finds the EdgeInterval containing t in the collection
-	 * @param t time
-	 * @return  EdgeInterval  containing t
-	 */
-	public EdgeInterval getIntervalAt(final int t){
-		if(t<0){
-			throw new IllegalArgumentException("negative time: "+ t);
-		}
-		EdgeInterval i = (EdgeInterval) _tree.contains(t);
-		if(i==null)throw new IllegalArgumentException("there is no Interval " +
-				"containing "+t);
-		return i;
-	}
 
 	/**
 	 * Gives a String representation of all stored EdgeIntervals
@@ -169,72 +119,7 @@ public class EdgeIntervals {
 		return str.toString();	
 	}
 	
-	/**
-	 * Returns the number of stored intervals
-	 * @return the number of stored intervals
-	 */
-	public int getSize() {		
-		return this._tree._size;
-	}
-	
-	
-	/**
-	 * gives the last Stored EdgeInterval
-	 * @return EdgeInterval with maximal lowbound
-	 */
-	public EdgeInterval getLast(){
-		return _last;
-	}
-	
-	
-	/**
-	 * checks weather last is referenced right
-	 * @return true iff everything is OK
-	 */
-	public boolean checkLast(){
-		return _last==_tree._getLast().obj;
-	}
-	
-	/**
-	 * Checks weather the given EdgeInterval is the last
-	 * @param o EgeInterval which it test for 
-	 * @return true if getLast.equals(o)
-	 */
-	public boolean isLast(final EdgeInterval o){
-		return (_last.equals(o));
-	}
-	
-	/**
-	 * setter for debug mode
-	 * @param debug debug mode true is on
-	 */
-	public static void debug(final int debug){
-		EdgeIntervals._debug=debug;
-	}
-	
-	/**
-	 * gives the next EdgeInterval with respect of the order contained 
-	 * @param o schould be contained
-	 * @return next EdgeInterval iff o is not last and contained. if o is last,
-	 *  null is returned.
-	 */
-	public EdgeInterval getNext(final EdgeInterval o){
-		_tree.goToNodeAt(o.getLowBound());
-		EdgeInterval j = (EdgeInterval) _tree._curr.obj;
-		if(j.equals(o)){
-			_tree.increment();
-			if(!_tree.isAtEnd()){
-				EdgeInterval i = (EdgeInterval) _tree._curr.obj;
-				_tree.reset();
-				return i;
-			}else{ 	
-				return null;
-			}
-		}
-		else throw new IllegalArgumentException("Interval was not contained");
-	}
 
-	
 	
 	/**
 	 * finds the next EdgeInterval that has flow less than u after time t
@@ -481,7 +366,7 @@ public class EdgeIntervals {
 	 * @param f amount of flow to reduce
 	 * @deprecated
 	 */
-	public void augmentreverse(final int t,final int f){
+	public void ugamentreverse(final int t,final int f){
 		if (t<0){
 			throw new IllegalArgumentException("negative time : "+ t);
 		}
@@ -502,6 +387,12 @@ public class EdgeIntervals {
 		i.setFlow(oldflow-f);
 	}
 	
-
+	/**
+	 * setter for debug mode
+	 * @param debug debug mode true is on
+	 */
+	public static void debug(int debug){
+		EdgeIntervals._debug=debug;
+	}
 
 }
