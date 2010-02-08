@@ -298,8 +298,8 @@ public class MultiSourceEAF {
 		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
 		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
-		//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
-		networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
+		networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
+		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
@@ -335,14 +335,14 @@ public class MultiSourceEAF {
 		
 		// ehemalige Unfold Bugs: uniformdemands = 100 oder 500, timestep =5
 		
-		int uniformDemands = 500;
+		int uniformDemands = 100;
 
 		// Rounding is now done according to this timestep variable!
 		int timestep = 5; 
 
 		
-		String sinkid = "supersink"; //siouxfalls, problem
-		//String sinkid = "en2";  //padang, line, swissold		
+		//String sinkid = "supersink"; //siouxfalls, problem
+		String sinkid = "en1";  //padang, line, swissold		
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network

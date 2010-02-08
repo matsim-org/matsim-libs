@@ -22,6 +22,7 @@
 package playground.dressler.ea_flow;
 
 //matsim imports
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.network.Link;
@@ -37,8 +38,6 @@ import playground.dressler.Interval.VertexIntervals;
 
 public class FlowCalculationSettings {
 
-	private Node _superSink;
-	
 	private HashMap<Link, Integer> _capacities;
 	private HashMap<Link, Integer> _lengths;
 	
@@ -48,35 +47,71 @@ public class FlowCalculationSettings {
 	
 	// leave these untouched!
 	private HashMap<Node, Integer> _demands;
-	private int _totaldemand;
+	private int _totaldemandsources;
+	private int _totaldemandsinks;
 	
 	public int TimeHorizon = 200000; // should be safe
 	public int MaxRounds = 100000;	// should be safe
 	
+    /* Constructor to set the parameters for the EAF calculation 
+     * @param network The MATSim network
+     * @param demands The demands. Sources are > 0, Sinks are < 0
+     * @param timeStep The granularity of the time-expanded network 
+     */
+	FlowCalculationSettings (NetworkLayer network, HashMap<Node, Integer> demands, int timeStep) {
+		this._network = network;
+		this._demands = demands;
+		this._timeStep = timeStep;		
+		
+		scaleParameters();
+		
+		setDemands();
+	}
+	
+
+    /* Constructor to set the parameters for the EAF calculation 
+     * @param network The MATSim network
+     * @param sinkId  The ID of the supersink.
+     * @param demands The demands. Should be >= 0 ! Note that the demand of supersink will be overwritten. 
+     * @param timeStep The granularity of the time-expanded network 
+     */
 	FlowCalculationSettings (NetworkLayer network, String sinkId, HashMap<Node, Integer> demands, int timeStep) {
 		this._network = network;
 		this._demands = demands;
-		this._superSink = this._network.getNodes().get(new IdImpl(sinkId));
-		
-		if (this._superSink == null) {		  
+		this._timeStep = timeStep;		
+
+		Node superSink = network.getNodes().get(new IdImpl(sinkId));  
+		if (superSink == null) {		  
 			throw new RuntimeException("Sink " + sinkId + " not found in network!");
 		}
 		
-		this._timeStep = timeStep;		
+		scaleParameters();
 		
+		int totaldemand = 0;
+		for (Node node : this._network.getNodes().values()) {
+			Integer i = this._demands.get(node);
+			if (i != null && i > 0)
+			  totaldemand += i; 
+		}
+		demands.put(superSink, -totaldemand);
+		
+		setDemands();
+	}
+	
+	
+	private void scaleParameters() {
 		this._capacities = new HashMap<Link, Integer>();
 		this._lengths = new HashMap<Link, Integer>();
 		
-		
-		double capperiod = network.getCapacityPeriod();
+        double capperiod = this._network.getCapacityPeriod();
 		
 		int roundedtozerocap = 0;
 		int roundedtozerotime = 0;
 
-		for (Link link : network.getLinks().values()){
+		for (Link link : this._network.getLinks().values()){
 			
 			// from long to int ...
-			int newTravelTime = (int) Math.round(link.getLength() / (link.getFreespeed(0.) * timeStep));
+			int newTravelTime = (int) Math.round(link.getLength() / (link.getFreespeed(0.) * this._timeStep));
 			if (newTravelTime == 0 && link.getLength() != 0d) {				
 				roundedtozerotime++; 
 			}
@@ -84,7 +119,7 @@ public class FlowCalculationSettings {
 			this._lengths.put(link, newTravelTime);
 			
 			
-			long newcapacity = Math.round(link.getCapacity(1.) * timeStep / capperiod);
+			long newcapacity = Math.round(link.getCapacity(1.) * this._timeStep / capperiod);
 			
 			// no one uses that much capacity for real ...
 			if (newcapacity > Integer.MAX_VALUE) {
@@ -98,14 +133,23 @@ public class FlowCalculationSettings {
 		}
 		System.out.println("Rounded to zero length: " + roundedtozerotime);
 		System.out.println("Rounded to zero capacity: " + roundedtozerocap);
-		
-		this._totaldemand = 0;
+	}
+	
+	private void setDemands() {
+		this._totaldemandsources = 0;
+		this._totaldemandsinks = 0;
 		for (Node node : this._network.getNodes().values()) {
 			Integer i = this._demands.get(node);
-			if (i != null)
-			  this._totaldemand += i; 
+			if (i != null) {
+				if (i > 0) {
+					this._totaldemandsources += i;
+				} else {
+					this._totaldemandsinks += -i;
+				}
+				
+			}
 		}
-		System.out.println("Total demand: " + this._totaldemand);
+		System.out.println("Total demand sources: " + this._totaldemandsources + " | sinks: " + this._totaldemandsinks);
 	}
 	
 	/**
@@ -138,32 +182,38 @@ public class FlowCalculationSettings {
 		return this._network;
 	}   
 	
-	public Node getSink() {
+	/*public Node getSink() {
 		return this._superSink;
-	}
+	}*/
 	
+	/**
+	 * decides whether a node is or was a sink
+	 * @param node to be checked
+	 * @return true if there was originally negative demand on the node
+	 */
 	public boolean isSink(Node node) {
-		return (node.getId().equals(this._superSink.getId()));
+		Integer demand = this._demands.get(node);
+		return (demand != null && demand < 0);		
 	}	 
 	
 	/**
 	 * decides whether a node is or was a source
 	 * @param node to be checked
-	 * @return true if there was originally demand on the node
+	 * @return true if there was originally positive demand on the node
 	 */
 	public boolean isSource(Node node) {
 		Integer demand = this._demands.get(node);
 		return (demand != null && demand > 0);
 	}
 	
-	public  int getDemand(Node node) {
+	public int getDemand(Node node) {
 		Integer i = this._demands.get(node);
 		if (i != null) return i;
 		return 0;
 	}
 	
 	public int getTotalDemand() {
-		return this._totaldemand;
+		return this._totaldemandsources;
 	}
 	
 	public static void enableDebuggingForAllFlowRelatedClasses()

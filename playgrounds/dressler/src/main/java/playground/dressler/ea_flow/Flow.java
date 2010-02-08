@@ -85,16 +85,16 @@ public class Flow {
 	 * list of all sources
 	 */
 	private final ArrayList<Node> _sources;
+	
+	/**
+	 * list of all sinks
+	 */
+	private final ArrayList<Node> _sinks;
 
 	/**
 	 * stores unsatisfied demands for each source
 	 */
 	private Map<Node,Integer> _demands;
-
-	/**
-	 * the sink, to which all flow is directed
-	 */
-	private final  Node _sink;
 
 	/**
 	 * the Time Horizon (for easy access)
@@ -135,6 +135,7 @@ public class Flow {
 		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();
 		this._demands = new HashMap<Node, Integer>();
 		this._sources = new ArrayList<Node>();
+		this._sinks = new ArrayList<Node>();
 
 
 		for(Node node : this._network.getNodes().values()){
@@ -143,6 +144,8 @@ public class Flow {
 				this._sources.add(node);
 				this._sourceoutflow.put(node, new SourceIntervals());
 				this._demands.put(node, i);
+			} else if (this._settings.isSink(node)) {
+				this._sinks.add(node);
 			}
 		}
 		// initialize EdgeIntervalls
@@ -150,8 +153,7 @@ public class Flow {
 			EdgeInterval temp =new EdgeInterval(0,settings.TimeHorizon);
 			this._flow.put(edge, new EdgeIntervals(temp, this._settings.getLength(edge)));
 		}
-
-		this._sink = settings.getSink();
+		
 		this._timeHorizon = settings.TimeHorizon;
 		this.totalflow = 0;
 
@@ -1042,8 +1044,8 @@ public class Flow {
 	/**
 	 * @return the _sink
 	 */
-	public Node getSink() {
-		return _sink;
+	public ArrayList<Node> getSinks() {
+		return _sinks;
 	}
 
 	/**
