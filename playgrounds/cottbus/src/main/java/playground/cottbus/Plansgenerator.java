@@ -44,13 +44,13 @@ import org.matsim.core.utils.misc.RouteUtils;
 /**
  * @author	rschneid-btu
  * [based on same file from dgrether]
- * generates an amount of agents
+ * generates an amount of agents per commodity (see addCommodity for further details)
  */
 public class Plansgenerator {
 
-	private static final String networkFilename = "./input/denver/networkDenver.xml";
+	private static final String networkFilename = "./input/cottbus/network.xml";
 
-	private static final String plansOut = "./input/denver/plans.xml";
+	private static final String plansOut = "./input/cottbus/plans.xml";
 
 	private Scenario scenario;
 	private Network network;
@@ -67,30 +67,86 @@ public class Plansgenerator {
 		this.plans = this.scenario.getPopulation();
 		final int HOME_END_TIME = 6 * 3600; // time to start
 
-		createDenverStraight(HOME_END_TIME);
+		createCottbusFirst(HOME_END_TIME);
 
 		new PopulationWriter(this.plans, this.network).writeFile(plansOut);
 	}
 
 	/**
-	 * only for testing used, only to see how it looks like
+	 * generates agents for cottbus scenario
 	 * @param HOME_END_TIME
-	 * @deprecated
 	 */
-	@Deprecated
-	private void createDenverTest(final int HOME_END_TIME) {
+	private void createCottbusFirst(final int HOME_END_TIME) {
 		int currentId = 1;
-		int duration = 1 * 3600;
+		int duration = (int)(0.5 * 3600); // seconds
+		final int DEFAULT_CARS_PER_HOUR_PER_LANE = 2000;
 
+		// #1 uni zu stadion
 		currentId = addCommodity(
-				"11","122",HOME_END_TIME,duration,2000,
-				"8 9 10 11 12 6 5 4 3 2 1",currentId);
-
+				"701","324",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"26 27 28 29 30 32",currentId);
+		// #2 stadion zu uni
 		currentId = addCommodity(
-				"133","158",HOME_END_TIME,duration,2000,
-				"19 20 21 27 28 22 16 10 11 12 6 5 4",currentId);
+				"192","703",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"32 30 29 28 27 26",currentId);
+		// #3 bahnhof zu cottbus nord
+		currentId = addCommodity(
+				"662","602",HOME_END_TIME,duration,(int)(0.3*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"21 22 23 37 24 25 26 11",currentId);
+		// #4 cottbus nord zu bahnhof
+		currentId = addCommodity(
+				"604","664",HOME_END_TIME,duration,(int)(0.3*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"11 26 25 24 37 23 22 21",currentId);
+		// #5 straﬂe der jugend richtung peitz
+		currentId = addCommodity(
+				"652","622",HOME_END_TIME,duration,(int)(0.3*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"20 51 19 50 18 17 16 15",currentId);
+		// #6 peitz zu bahnhof
+		currentId = addCommodity(
+				"624","673",HOME_END_TIME,duration,(int)(0.3*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"15 16 17 18 50 19 51 20 21",currentId);
+		// #7 karl-liebknecht zu max bahr
+		currentId = addCommodity(
+				"681","631",HOME_END_TIME,duration,(int)(0.3*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"23 35 34 33 32 31 18",currentId);
+		// #8 max bahr zu karl-liebknecht
+		currentId = addCommodity(
+				"633","683",HOME_END_TIME,duration,(int)(0.3*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"18 31 32 33 34 35 23",currentId);
+		// #9 str der jugend zu TKC
+		currentId = addCommodity(
+				"652","725",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"20 35 34 33 52 53 36 29 28 54 55 14 38",currentId);
+		// #10 TKC zu str der jugend
+		currentId = addCommodity(
+				"727","654",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"38 14 55 54 28 29 36 53 52 33 34 35 20",currentId);
+		
+		// #11 post zu dissenchener
+		currentId = addCommodity(
+				"691","311",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"24 36 29 30 31",currentId);
+		// #12 branitz zu peitz
+		currentId = addCommodity(
+				"642","622",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"19 50 18 17 16 15",currentId);
+		// #13 peitz zu branitz
+		currentId = addCommodity(
+				"624","644",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"15 16 17 18 50 19",currentId);
+		// #14 branitz zu sielow
+		currentId = addCommodity(
+				"642","602",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"19 50 18 17 16 15 39 14 38 13 12 11",currentId);
+		// #15 sielow zu branitz
+		currentId = addCommodity(
+				"604","644",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"11 12 13 38 14 39 15 16 17 18 50 19",currentId);
+		
+		
 	}
-
+	
+	
 	/**
 	 * generates agents for denver (straight) scenario
 	 * @param HOME_END_TIME
@@ -189,8 +245,11 @@ public class Plansgenerator {
 		int homeEndtime = 0;
 		final Link start = network.getLinks().get(new IdImpl(HOME_LINK));
 		final Link target = network.getLinks().get(new IdImpl(TARGET_LINK));
-		final Coord homeCoord = new CoordImpl(-25000, 0);
-		final Coord workCoord = new CoordImpl(10000, 0);
+		final int visPlaces = 3000; //better visualization of start and target
+		final Coord startCoord = start.getToNode().getCoord();
+		final Coord targetCoord = target.getFromNode().getCoord();
+		final Coord homeCoord = new CoordImpl(startCoord.getX()-visPlaces,startCoord.getY()+visPlaces);
+		final Coord workCoord = new CoordImpl(targetCoord.getX()+visPlaces,targetCoord.getY()-visPlaces);
 
 		final int AMOUNT_OF_CARS = CARS_PER_HOUR * DURATION / 3600;
 		final int MAX_ID = CURRENT_ID+1 + AMOUNT_OF_CARS;

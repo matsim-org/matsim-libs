@@ -38,18 +38,17 @@ public class CottbusController {
 		String config = "./input/denver/config.xml";
 		// configuration that describes current scenario
 		
-		//Controler controler = new Controler(config);
-		//controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		//controler.setOverwriteFiles(true);
+		Controler controler = new Controler(config);
+		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		controler.setOverwriteFiles(true);
 		// effects output-folder
-		//controler.run();
+		controler.run();
 		
-		// output via NetVis:
+		// @deprecated output via NetVis:
 		//String[] visargs = {"output/denver/ITERS/it.0/Snapshot"};
 		//NetVis.main(visargs);
 		
-		//temporally changed NetVis to OTFVis
-		
+		// changed NetVis to OTFVis
 		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(config);
 		Scenario sc = scl.loadScenario();
 		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
