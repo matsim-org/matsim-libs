@@ -1,108 +1,95 @@
 package playground.mmoyo.analysis.counts.chen;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.imageio.ImageIO;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.charts.BarChart;
-
-public class CountsComparingGraph {	
-	String [] hours = new String[24];
-	int itNum = 0;   									//iteration number where the data will be taken from
-	Map <Id, CountChart> chartsMap = new TreeMap <Id, CountChart>();
+public class CountsComparingGraph {
+	String dirPath;
+	String SEPARATOR = "/";
 	
-	public CountsComparingGraph (String directory){
-		File dir = new File(directory);    				 //System directory that contains all routing algorithms results with iterations  
-		if (!dir.exists()) {  
-			//TODO: stop here 
-		}
-		
-		for (byte h = 1 ; h<=hours.length ; h++){
-			hours[h-1] = Byte.toString(h);
-		}
-		
-		for (int i =0; i< dir.list().length ; i++ ){     //go through the 3 routing cost calculations
-				String algorithm=  dir.list()[i]; 				
+	public CountsComparingGraph(String dirPath) {
+		this.dirPath = dirPath;
+	}
 
-				//get alighting values
-				String alightCountCompFilePath = directory + "/" + algorithm + "/ITERS/it." + itNum + "/" +  itNum + ".simCountCompareAlighting.txt";
-				File alightCountCompFile = new File(alightCountCompFilePath);
-				if (alightCountCompFile.exists()){
-					System.out.println ("Counts file :" + alightCountCompFilePath + " algorithm:" + algorithm);
-					CountsReader alightCountsValues = new CountsReader (alightCountCompFilePath); 
-					for (Id alightStopId : alightCountsValues.getStopsIds()){
-						Id chartId = new IdImpl(dir.getName() + " " + alightStopId  + " " + "alighting" );
-						if (!chartsMap.containsKey(chartId)){
-							CountChart countChart = new CountChart(chartId, alightCountsValues.getRoutValues(alightStopId,false));
-							chartsMap.put(chartId, countChart);
-							System.out.println("creating chart: " + chartId );
+	private void compareGraphs() throws IOException{
+		File dir = new File(this.dirPath);    	
+		File headerFile = new File ("../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/comparingGraphs/volume_comparison/header.png");
+		
+		//assuming the iteration 0 
+		String ITERPATH = "/ITERS/it.0/graphs/stationCounts/";    //extract files from kml to  [graphs/stationCounts/]  or  [graphs/stationCounts/]  
+		
+		//get algorithms names and graphs names
+		List<String> algList = new ArrayList <String>(); 
+		List<String> graphList = new ArrayList <String>();
+		boolean isFirst = true;
+		for (int i= 0; i< dir.list().length ; i++){
+			String alg = dir.list()[i];
+			if (!(alg.equals(".svn") || alg.equals("info.txt"))){
+				algList.add(alg);
+				if (isFirst){
+					File graphDir1 = new File(this.dirPath + SEPARATOR +  alg + ITERPATH);   ///stationCounts
+					for (int ii= 0; ii< graphDir1.list().length; ii++){
+						String graphName= graphDir1.list()[ii];
+						if (!(graphName.equals(".svn") || graphName.equals("info.txt"))){
+							graphList.add(graphName);
 						}
-						chartsMap.get(chartId).seriesMap.put(algorithm, alightCountsValues.getRoutValues(alightStopId,true));
 					}
 				}
-				
-				//get boarding values       //TODO create get method
-				String boardCountCompFilePath = directory + "/" + algorithm + "/ITERS/it." + itNum + "/" +  itNum + ".simCountCompareBoarding.txt";        
-				File boardCountCompFile = new File(boardCountCompFilePath);
-				if (boardCountCompFile.exists()){
-					System.out.println ("Counts file :" + boardCountCompFilePath + " algorithm:" + algorithm);
-					CountsReader boardCountsValues = new CountsReader (boardCountCompFilePath); 
-					for (Id boardStopId : boardCountsValues.getStopsIds()){
-						Id chartId = new IdImpl(dir.getName() + " " + boardStopId  + " " + "boarding" );
-						if (!chartsMap.containsKey(chartId)){
-							CountChart countChart = new CountChart(chartId, boardCountsValues.getRoutValues(boardStopId,false));
-							chartsMap.put(chartId, countChart);
-							System.out.println("creating chart: " + chartId );
-						}
-						chartsMap.get(chartId).seriesMap.put(algorithm, boardCountsValues.getRoutValues(boardStopId,true));
-					}
-				}
-				
-		}
-
-		for ( CountChart  cChart : chartsMap.values()){
-			createGraphic (cChart);
+			}
 		}
 		
-	}
-	
-	private void createGraphic (CountChart cChart){
-		BarChart chart = new BarChart(cChart.getId().toString(), "hour", "passager counts", hours );
-		chart.addSeries("Counts", cChart.getCounts());
+		//merge graphs in one image
+		BufferedImage headImg = ImageIO.read(headerFile);
+		for (String graphName : graphList ){
+			
+			String file1Path = this.dirPath + SEPARATOR +  algList.get(0) + ITERPATH + graphName;
+			String file2Path = this.dirPath + SEPARATOR +  algList.get(1) + ITERPATH + graphName;
+			String file3Path = this.dirPath + SEPARATOR +  algList.get(2) + ITERPATH + graphName;
+			
+			System.out.println( "processing: "  + graphName + " " + algList.get(0) + " " + algList.get(1) + " " + algList.get(2));
+			
+			File graphFile1 = new File(file1Path);
+			File graphFile2 = new File(file2Path);
+			File graphFile3 = new File(file3Path);
 
-		for( Map.Entry <String,double[]> entry: cChart.seriesMap.entrySet() ){
-			chart.addSeries(entry.getKey(),  entry.getValue()); //key: serieName, value:serieValues
-		}
-		chart.addMatsimLogo();
-		chart.saveAsPng("../playgrounds/mmoyo/output/chart_" + cChart.getId() + ".png", 800, 600);	
-	}
-
-	
-	private class CountChart{
-		Id id;
-		double [] counts; 
-		Map <String, double []> seriesMap = new TreeMap <String, double []>();
+			BufferedImage img1 = null;
+			BufferedImage img2 = null;
+			BufferedImage img3 = null;
+			
+			if(graphFile1.exists()) img1 = ImageIO.read(graphFile1); else System.out.println("graph does not exist: " + file1Path);
+			if(graphFile2.exists()) img2 = ImageIO.read(graphFile2); else System.out.println("graph does not exist: " + file2Path);
+			if(graphFile3.exists()) img3 = ImageIO.read(graphFile3); else System.out.println("graph does not exist: " + file3Path); 
+			 
+			//300= height    400= width
+			BufferedImage combined = new BufferedImage(400*3, 300 + headImg.getHeight(), BufferedImage.TYPE_INT_RGB);
+			Graphics g = combined.getGraphics();
+			g.drawImage(headImg,0,0, null);
+			g.drawImage(img1, 0, headImg.getHeight(), null);
+			g.drawImage(img2, 400, headImg.getHeight(), null);
+			g.drawImage(img3, 400 + 400, headImg.getHeight(), null);
+			g.dispose();
 		
-		private CountChart (Id idChart, double[] counts ){
-			this.id = idChart;
-			this.counts = counts;
+			File outputFile = new File("../playgrounds/mmoyo/output/" + graphName);
+			ImageIO.write(combined,"png", outputFile);	
 		}
-
-		private Id getId() {
-			return id;
-		}
-		
-		private double[] getCounts() {
-			return counts;
-		}
+			
 	}
-	
 	
 	public static void main(String[] args) {
-		String path = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/KMZ_counts_scalefactor50";
-		new CountsComparingGraph (path);
+		String dir = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/KMZ_counts_scalefactor50";
+	
+		CountsComparingGraph countsComparingGraph2 = new CountsComparingGraph(dir);
+
+		try {
+			countsComparingGraph2.compareGraphs();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
