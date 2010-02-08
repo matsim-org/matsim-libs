@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PathStep.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.dressler.ea_flow;
 
 import org.matsim.api.core.v01.network.Node;
@@ -33,14 +53,14 @@ public interface PathStep {
 	 * This is adjusted according to isForward().
 	 * @return The first visited node.
 	 */
-	Node getStartNode();
+	VirtualNode getStartNode();
 	
 	/**
 	 * Returns the node that the flow uses second.
 	 * This is adjusted according to isForward().
 	 * @return The second visited node.
 	 */
-	Node getArrivalNode();
+	VirtualNode getArrivalNode();
 
 	/**
 	 * Returns the time point when the flow enters.
@@ -83,7 +103,7 @@ public interface PathStep {
 	 * @param other a PathEdge 
 	 * @return true iff they really leave the same time/node
 	 */
-	boolean haveSameStart(PathStep other);
+	//boolean haveSameStart(PathStep other);
 	
 	String toString();
 }

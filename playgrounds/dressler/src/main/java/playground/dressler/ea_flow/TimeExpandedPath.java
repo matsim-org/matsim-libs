@@ -126,12 +126,7 @@ public class TimeExpandedPath {
 	 * @return true iff a path could go over first and over second immediatly after
 	 */
 	private static boolean checkPair(PathStep first, PathStep second){
-		// FIXME not 100% precise with virtual nodes!
-		if (first.getArrivalTime() == second.getStartTime()) {
-			return first.getArrivalNode().equals(second.getStartNode()); 
-		} else {
-			return false;
-		}				 
+		return (first.getArrivalNode().equals(second.getStartNode()));
 	}
 	
 	/**
@@ -167,12 +162,13 @@ public class TimeExpandedPath {
 	
 	/**
 	 * Method to find the First node in a path
+	 * This function ignores virtual nodes! 
 	 * @return first Node 
 	 */
 	public Node getSource(){
 		PathStep step = this._steps.getFirst();
 
-		return step.getStartNode();
+		return step.getStartNode().getRealNode();
 	}
 	
 	/**
@@ -459,13 +455,14 @@ public class TimeExpandedPath {
 	}
 	
 	
-	public int getStartTime() {
+	// now handled by the step
+	/*public int getStartTime() {
 		return startTime;
 	}
 
 	public void setStartTime(int startTime) {
 		this.startTime = startTime;
-	}
+	}*/
 
 	/**
 	 * Make sure that TimeExpandedPath starts with a PathStep that is a StepSourceFlow!
@@ -474,7 +471,7 @@ public class TimeExpandedPath {
 	public boolean hadToFixSourceLinks() {
 		PathStep step = this._steps.getFirst();
 		if (!(step instanceof StepSourceFlow)) {		
-			StepSourceFlow newstep = new StepSourceFlow(step.getStartNode(), step.getStartTime(), true);
+			StepSourceFlow newstep = new StepSourceFlow(step.getStartNode().getRealNode(), step.getStartTime(), true);
 			this._steps.addFirst(newstep);
 			return true;
 		}

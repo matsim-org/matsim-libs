@@ -68,13 +68,21 @@ public class StepSourceFlow implements PathStep {
 	 * @return startNode
 	 */
 	@Override
-	public Node getStartNode() {
-		return this.node;
+	public VirtualNode getStartNode() {
+		if (this.forward) {			
+		  return new VirtualSource(this.node);
+		} else {
+		  return new VirtualNormalNode(this.node, this.time);	
+		}
 	}
 	
 	@Override
-	public Node getArrivalNode() {
-		return this.node;
+	public VirtualNode getArrivalNode() {
+		if (!this.forward) {			
+			return new VirtualSource(this.node);
+		} else {
+			return new VirtualNormalNode(this.node, this.time);	
+		}
 	}
 	
 	/**
@@ -180,7 +188,7 @@ public class StepSourceFlow implements PathStep {
 		return new StepSourceFlow(this.node, this.time, false);
 	}
 	
-	@Override
+	/*@Override
 	public boolean haveSameStart(PathStep other) {		
 		if (this.getStartTime() != other.getStartTime()) return false;
 		if (!this.node.equals(other.getStartNode())) return false;
@@ -199,7 +207,7 @@ public class StepSourceFlow implements PathStep {
 			return false;
 		}
 					
-	}
+	}*/
 	
 }
 

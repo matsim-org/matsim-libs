@@ -87,21 +87,21 @@ public class StepEdge implements PathStep {
 	 * @return startNode
 	 */
 	@Override
-	public Node getStartNode() {
+	public VirtualNode getStartNode() {
 		if (this.forward) {
-		  return this.edge.getFromNode();
+		  return new VirtualNormalNode(this.edge.getFromNode(), this.startTime);
 		} else {
-		  return this.edge.getToNode();
+		  return new VirtualNormalNode(this.edge.getToNode(), this.startTime);
 		}
 		
 	}
 	
 	@Override
-	public Node getArrivalNode() {
+	public VirtualNode getArrivalNode() {
 		if (!this.forward) {
-			return this.edge.getFromNode();
+			return new VirtualNormalNode(this.edge.getFromNode(), this.arrivalTime);
 		} else {
-			return this.edge.getToNode();
+			return new VirtualNormalNode(this.edge.getToNode(), this.arrivalTime);			
 		}
 	}
 	
@@ -202,7 +202,8 @@ public class StepEdge implements PathStep {
 		int shift = newArrival - this.arrivalTime;
 		return new StepEdge(this.edge, this.startTime + shift, newArrival, this.forward);
 	}
-	@Override
+	
+	/*@Override
 	public boolean haveSameStart(PathStep other) {
 		if (this.startTime != other.getStartTime()) return false;
 		if (!this.getStartNode().equals(other.getStartNode())) return false;
@@ -212,7 +213,7 @@ public class StepEdge implements PathStep {
 		if (other instanceof StepSourceFlow && other.getForward()) return false;
 			
 		return true;
-	}
+	}*/
 
 };
 

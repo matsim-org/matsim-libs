@@ -147,7 +147,7 @@ public class Flow {
 		}
 		// initialize EdgeIntervalls
 		for (Link edge : this._network.getLinks().values()) {
-			EdgeInterval temp =new EdgeInterval(0,Integer.MAX_VALUE);
+			EdgeInterval temp =new EdgeInterval(0,settings.TimeHorizon);
 			this._flow.put(edge, new EdgeIntervals(temp, this._settings.getLength(edge)));
 		}
 
@@ -212,7 +212,7 @@ public class Flow {
 				}
 			} else if (step instanceof StepSourceFlow) {
 				StepSourceFlow ssf = (StepSourceFlow) step;
-				Node node  = ssf.getStartNode();
+				Node node  = ssf.getStartNode().getRealNode();
 
 				if (!ssf.getForward()) {
 					SourceIntervals si = this._sourceoutflow.get(node);
@@ -295,9 +295,9 @@ public class Flow {
 			Node source;
 
 			if (ssf.getForward()) {
-				source = ssf.getStartNode();
+				source = ssf.getStartNode().getRealNode(); 
 			} else {
-				source = ssf.getArrivalNode();
+				source = ssf.getArrivalNode().getRealNode();
 			}
 
 			Integer demand = this._demands.get(source);
@@ -351,9 +351,9 @@ public class Flow {
 			Node source;
 
 			if (ssf.getForward()) {
-				source = ssf.getStartNode();
+				source = ssf.getStartNode().getRealNode(); 
 			} else {
-				source = ssf.getArrivalNode();
+				source = ssf.getArrivalNode().getRealNode();
 			}
 
 			Integer demand = this._demands.get(source);
@@ -402,9 +402,9 @@ public class Flow {
 			Node source;
 
 			if (ssf.getForward()) {
-				source = ssf.getStartNode();
+				source = ssf.getStartNode().getRealNode(); 
 			} else {
-				source = ssf.getArrivalNode();
+				source = ssf.getArrivalNode().getRealNode();
 			}
 
 			Integer demand = this._demands.get(source);
@@ -519,7 +519,7 @@ public class Flow {
 						afterwards = true;
 						continue;
 					} else if (afterwards) {
-						if (step1.haveSameStart(step2)) {
+						if (step1.getStartNode().equals(step2.getStartNode())) {
 							// loop!
 							//System.out.println("Loop! " + step1 + " and " + step2);
 							endLoop = step2;
