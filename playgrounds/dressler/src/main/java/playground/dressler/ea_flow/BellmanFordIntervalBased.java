@@ -195,19 +195,20 @@ public class BellmanFordIntervalBased {
 		this._sourcelabels = new HashMap<Node, VertexInterval>();
 		
 		for(Node node: this._network.getNodes().values()){
-			VertexIntervals label = new VertexIntervals();
+			VertexInterval temp1 = new VertexInterval(0,this._settings.TimeHorizon);
+			VertexIntervals label = new VertexIntervals(temp1);
 			_labels.put(node, label);
 			if (this._settings.isSource(node)) {
-				VertexInterval temp = new VertexInterval(0, this._settings.TimeHorizon);
+				VertexInterval temp2 = new VertexInterval(0, this._settings.TimeHorizon);
 				if (this._flow.isActiveSource(node)){				
-					queue.add(new BFTask(new VirtualSource(node), temp));
-					temp.setScanned(false);
-					temp.setReachable(true);				
+					queue.add(new BFTask(new VirtualSource(node), temp2));
+					temp2.setScanned(false);
+					temp2.setReachable(true);				
 				} else {
-					temp.setScanned(false);
-					temp.setReachable(false);
+					temp2.setScanned(false);
+					temp2.setReachable(false);
 				}
-				this._sourcelabels.put(node, temp);
+				this._sourcelabels.put(node, temp2);
 			}
 		}		
 	}		

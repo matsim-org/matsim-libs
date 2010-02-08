@@ -284,7 +284,7 @@ public class MultiSourceEAF {
 		MultiSourceEAF.debug(true);
 		//BellmanFordVertexIntervalls.debug(0);
 		BellmanFordIntervalBased.debug(0);
-		VertexIntervals.debug(false);
+		VertexIntervals.debug(0);
 		//VertexIntervall.debug(false);
 		EdgeIntervals.debug(0);
 		//EdgeIntervall.debug(false);
