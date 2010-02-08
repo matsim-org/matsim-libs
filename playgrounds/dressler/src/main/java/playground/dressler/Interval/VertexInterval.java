@@ -59,9 +59,8 @@ public class VertexInterval extends Interval {
 
 //--------------------------CONSTUCTORS-------------------------//
 	/**
-	 * Default costructor creates an (0,1) Interval 
-	 * with Integer.MAX_VALUE as initial distance to the sink
-	 * no predesessor is specified
+	 * Default costructor creates an (0,1) Interval
+	 * not reachable, not scanned, no predecessor 
 	 */
 	public VertexInterval() {
 		super();
@@ -97,8 +96,8 @@ public class VertexInterval extends Interval {
 	}
 
 	/**
-	 * creates an VertexInterval instance as a copy of an Interval
-	 * Predecessor is set to null and dist to Integer.MAX_VALUE
+	 * creates a VertexInterval instance as a copy of an Interval
+	 * not reachable, not scanned, no predecessor
 	 * @param j Interval to copy
 	 */
 	public VertexInterval(final Interval j) {

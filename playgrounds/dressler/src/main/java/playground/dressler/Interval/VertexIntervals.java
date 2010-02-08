@@ -55,7 +55,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	
 	/**
 	 * Default Constructor Constructs an object containing only 
-	 * one EdgeInterval [0,Integer.MAX_VALUE) with flow equal to 0
+	 * the given interval
 	 */
 	public VertexIntervals(VertexInterval interval){
 		super(interval);
@@ -150,74 +150,6 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		// slightly slower, but easier to manage if this just calls the new setTrueList
 		ArrayList<VertexInterval> temp = setTrueList(arrive, pred);
 		return (temp != null && !temp.isEmpty());
-		
-		/*boolean changed = false;
-		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
-		int t = current.getHighBound();
-		while(current.getLowBound() < arrive.getHighBound()){
-			//either ourInterval was never reachable before and is not scanned
-			if(!current.getReachable() && !current.isScanned())
-			{
-				//test if the intervals intersect at all (using the condition in while head above)
-				if(arrive.getLowBound() >= current.getLowBound()
-						|| arrive.getHighBound() > current.getLowBound())
-				{
-					//if arrive contains ourInterval, we relabel it completely
-					if(arrive.contains(current))
-					{
-						current.setArrivalAttributes(pred);						
-						changed = true;
-					}
-					else if(current.contains(arrive))
-					{
-						//if arrive is contained..
-						//we adapt our interval, so that our lowbound equals
-						//the low bound of the arrive interval..
-						if(current.getLowBound() < arrive.getLowBound())
-						{
-							current = this.splitAt(arrive.getLowBound());
-						}
-						//or we set our highbound to the highbound of arrival
-						if(current.getHighBound() > arrive.getHighBound())
-						{
-							this.splitAt(arrive.getHighBound());
-							current = this.getIntervalAt(arrive.getHighBound()-1);
-						}
-						//ourinterval has exactly the same bounds as arrive
-						//so relabel it completely
-						current.setArrivalAttributes(pred);						
-						changed = true;
-					}
-					else
-					{
-						//ourInterval intersects arrive, but is neither contained nor does it contain
-						//arrive. thus they overlap somewhere
-						//if the lowerBound of arrive, is greater than our lower bound
-						//we set our lower bound to the bound of arrive
-						if(arrive.getLowBound() > current.getLowBound() && arrive.getLowBound() < current.getHighBound())
-						{
-							current = this.splitAt(arrive.getLowBound());
-						}
-						//we adapt our highbound, so that they are the same
-						if(arrive.getHighBound() < current.getHighBound())
-						{
-							this.splitAt(arrive.getHighBound());
-							current = this.getIntervalAt(arrive.getHighBound()-1);
-						}
-						//we set the attributes
-						current.setArrivalAttributes(pred);
-						changed = true;
-					}
-				}
-			}
-			t = current.getHighBound();
-			//pick next Interval
-			if(Integer.MAX_VALUE==t){
-				break;
-			}
-			current= this.getIntervalAt(t);
-		}	
-		return changed;*/
 	}
 	
 	/**
@@ -314,12 +246,12 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 					}
 				}
 			}
-			t = current.getHighBound();
-			//pick next Interval
-			// TODO isLast() is better! 
-			if(Integer.MAX_VALUE==t){
+			
+			
+			if (isLast(current)) {
 				break;
 			}
+			t = current.getHighBound();
 			current= this.getIntervalAt(t);
 		}	
 		return changed;
@@ -369,13 +301,17 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	public VertexInterval getFirstUnscannedInterval()
 	{
 		int lowBound = 0;
-		while(lowBound < Integer.MAX_VALUE)
+		VertexInterval vI;
+		do
 		{
-			VertexInterval vI = this.getIntervalAt(lowBound);
+			vI = this.getIntervalAt(lowBound);
 			if(vI.getReachable() &&  !vI.isScanned())
 				return vI;
 			lowBound = vI.getHighBound();
-		}
+			if (isLast(vI)) {
+				break;
+			}
+		} while (!isLast(vI));
 		return null;
 	}
 	

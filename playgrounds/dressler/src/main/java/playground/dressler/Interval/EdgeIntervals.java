@@ -60,7 +60,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	
 	/**
 	 * Default Constructor Constructs an object containing only 
-	 * one EdgeInterval [0,Integer.MAX_VALUE) with flow equal to 0
+	 * the given interval, and stores the traveltime
 	 */
 	public EdgeIntervals(EdgeInterval interval, final int traveltime){
 		super(interval); 

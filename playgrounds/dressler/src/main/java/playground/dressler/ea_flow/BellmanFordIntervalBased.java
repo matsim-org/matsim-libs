@@ -306,7 +306,9 @@ public class BellmanFordIntervalBased {
 			ArrayList<Interval> arrive;
 			ArrayList<VertexInterval> changed;
 						
-			//Interval start = _labels.get(from).getIntervalAt(time);
+			// just to make sure that the VertexInterval is still good
+			// it might even pick up a larger interval (or smaller if something weird happened)
+			VertexInterval start = _labels.get(from).getIntervalAt(ival.getLowBound());
 			
 			// Create predecessor. It will be shifted correctly deeper down in the calls.			
 			PathStep pred;
@@ -316,8 +318,8 @@ public class BellmanFordIntervalBased {
 			  pred = new StepEdge(over, this._settings.getLength(over), 0, forward);				
 			}
 						
-			//if(start.getReachable() && !start.isScanned()){
-				arrive = flowover.propagate(ival, this._settings.getCapacity(over),forward, timehorizon);
+			if(start.getReachable() && !start.isScanned()){
+				arrive = flowover.propagate(start, this._settings.getCapacity(over),forward, timehorizon);
 					
 				if(arrive != null && !arrive.isEmpty()){
 					changed = labelto.setTrueList(arrive , pred);
@@ -325,10 +327,10 @@ public class BellmanFordIntervalBased {
 				}else{					
 					return null;
 				}					
-			/*} else {
+			} else {
 				System.out.println("Weird. Relabel called for unreachable or unscanned interval!");
 			}
-			return null;*/
+			return null;
 					
 	}
 	

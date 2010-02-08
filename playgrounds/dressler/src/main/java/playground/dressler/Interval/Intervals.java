@@ -27,7 +27,7 @@ public class Intervals<T extends Interval > {
 		
 		/**
 		 * Default Constructor Constructs an object containing only 
-		 * one EdgeInterval [0,Integer.MAX_VALUE) with flow equal to 0
+		 * the given Interval first
 		 */
 		public Intervals(T first){
 			T interval = first;
