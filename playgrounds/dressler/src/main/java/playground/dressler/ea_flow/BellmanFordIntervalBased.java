@@ -223,71 +223,107 @@ public class BellmanFordIntervalBased {
 		
 		Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
 		
-		Node toNode = this._settings.getSink();
+		Node superSink = this._settings.getSink();
 		//VertexIntervalls tolabels = this._labels.get(to);
-		VertexInterval toLabel = this._labels.get(toNode).getFirstPossible();
-		if (toLabel == null) {
+		VertexInterval superSinkLabel = this._labels.get(superSink).getFirstPossible();
+		if (superSinkLabel == null) {
 			throw new BFException("Sink cannot be reached at all!");
 		}			
 		
-		int toTime = toLabel.getLowBound();		
+		int superSinkTime = superSinkLabel.getLowBound();		
 		
 		//check if TimeExpandedPath can be constructed
 		
-		if(Integer.MAX_VALUE == toTime){
+		if(Integer.MAX_VALUE == superSinkTime){
 			throw new BFException("Sink cannot be reached (totime == MAX_VALUE)!");
 		}
-		if(toTime >= this._settings.TimeHorizon){
+		if(superSinkTime >= this._settings.TimeHorizon){
 			throw new BFException("Sink cannot be reached within TimeHorizon.");
 		}
 		
 		
 		
-		// disabled (Daniel)
-		//collect all reachable sinks, that are connected by a zero transit time,
-		// infinite capacity arc.
-		/*Set<Node> realSinksToSendTo = new HashSet<Node>();
-		realSinksToSendTo.add(_sink);
+		// collect all reachable sinks, that are connected by a zero transit time
+		LinkedList<Node> realSinksToSendTo = new LinkedList<Node>();
+		HashMap<Node, Link> edgesToSuperSink = new HashMap<Node, Link>();
 		
-		for(Link link : _sink.getInLinks().values())
-		{
+		
+		boolean notasupersink = false;
+		for(Link link : superSink.getInLinks().values()) {
 			Node realSink = link.getFromNode();
-			VertexIntervall realSinkIntervall = this._labels.get(realSink).getIntervallAt(totime);
-			if(realSinkIntervall.getReachable() && realSinkIntervall.getLowBound() == arrivalAtSuperSink)
-				realSinksToSendTo.add(realSink);
-		}*/		
-		
-		//start constructing the TimeExpandedPath
-		TimeExpandedPath TEP = new TimeExpandedPath();		
-		
-		PathStep pred;
-		pred = toLabel.getPredecessor();
-		
-		while (pred != null) {
-			pred = pred.copyShiftedToArrival(toTime);
-						
-			TEP.prepend(pred);			
-			
-			toNode = pred.getStartNode().getRealNode();
-			toTime = pred.getStartTime();
-			//TEP.setStartTime(toTime); // really startTime
-			
-			if (pred instanceof StepEdge) {			  		
-				toLabel = this._labels.get(toNode).getIntervalAt(toTime);			 
-			} else if (pred instanceof StepSourceFlow) {
-				if (pred.getForward()) {
-					toLabel = this._sourcelabels.get(toNode);				  
-				} else {
-					toLabel = this._labels.get(toNode).getIntervalAt(toTime);
-				}
+			// while not strictly necessary, we only want sinks and not just generic predecessors 
+			if (this._settings.getLength(link) == 0) {
+				VertexInterval realSinkIntervall = this._labels.get(realSink).getIntervalAt(superSinkTime);
+				// are we reachable and is there residual capacity left?
+				if(realSinkIntervall.getReachable()) {
+					if (this._flow.getFlow(link).getFlowAt(superSinkTime) < this._settings.getCapacity(link)) {
+						realSinksToSendTo.add(realSink);
+						edgesToSuperSink.put(realSink, link);
+					} else {
+						notasupersink = true;
+					}
+				} // no else, because an unreachable sink does not matter
 			} else {
-				throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
+				notasupersink = true;
 			}
-			pred = toLabel.getPredecessor();
-			
+		}
+
+		if (notasupersink) {
+  		  // put the supersink in there, because it really has interesting edges coming in
+		  // that is, edges that have non-zero length or finite capacity 
+		  realSinksToSendTo.add(superSink);
 		}
 		
-		result.add(TEP);
+		for (Node toNode : realSinksToSendTo) {
+			VertexInterval toLabel = this._labels.get(toNode).getFirstPossible();
+			
+			int toTime = toLabel.getLowBound();		
+			
+			if (toLabel == null) {
+				throw new BFException("Sink cannot be reached at all!");
+			}	
+
+			//start constructing the TimeExpandedPath
+			TimeExpandedPath TEP = new TimeExpandedPath();		
+
+			PathStep pred;
+			
+			// include the superSink, whenever we start one step too early
+			if (!toNode.equals(superSink)) {				
+			   pred = new StepEdge(edgesToSuperSink.get(toNode), toTime, toTime, true);
+			   TEP.append(pred);
+			}
+			
+			
+			pred = toLabel.getPredecessor();
+
+			while (pred != null) {
+				pred = pred.copyShiftedToArrival(toTime);
+
+				TEP.prepend(pred);			
+
+				toNode = pred.getStartNode().getRealNode();
+				toTime = pred.getStartTime();
+				//TEP.setStartTime(toTime); // really startTime
+
+				if (pred instanceof StepEdge) {			  		
+					toLabel = this._labels.get(toNode).getIntervalAt(toTime);			 
+				} else if (pred instanceof StepSourceFlow) {
+					if (pred.getForward()) {
+						toLabel = this._sourcelabels.get(toNode);				  
+					} else {
+						toLabel = this._labels.get(toNode).getIntervalAt(toTime);
+					}
+				} else {
+					throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
+				}
+				pred = toLabel.getPredecessor();
+
+			}
+
+			
+			result.add(TEP);
+		}
 		return result;
 	}
 	
