@@ -129,12 +129,12 @@ public class DaganzoRunner {
 				TTGraphWriter ttWriter = new TTGraphWriter();
 				ttWriter.addTTEventHandler(handler3);
 				ttWriter.addTTEventHandler(handler4);
-				ttWriter.writeTTChart(e.getControler().getIterationPath(e.getIteration()), e.getIteration());
+				ttWriter.writeTTChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
 
 				InOutGraphWriter inoutWriter = new InOutGraphWriter();
 				inoutWriter.addInOutEventHandler(handler3);
 				inoutWriter.addInOutEventHandler(handler4);
-				inoutWriter.writeInOutChart(e.getControler().getIterationPath(e.getIteration()), e.getIteration());
+				inoutWriter.writeInOutChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
 			
 				greenSplitPerIterationGraph.addIterationData(signalGreenSplitHandler, e.getIteration());
 			}

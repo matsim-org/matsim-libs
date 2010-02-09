@@ -61,7 +61,7 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 			
 			PrintStream out = null;
 			try {
-				out = new PrintStream(org.matsim.core.controler.Controler.getIterationFilename(filename, event.getIteration()));
+				out = new PrintStream(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), filename));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}

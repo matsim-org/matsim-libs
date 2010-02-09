@@ -113,7 +113,7 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 
 			PrintStream out = null;
 			try {
-				out = new PrintStream(org.matsim.core.controler.Controler.getIterationFilename(travelTimeDistributionFilename, event.getIteration()));
+				out = new PrintStream(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), travelTimeDistributionFilename));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}

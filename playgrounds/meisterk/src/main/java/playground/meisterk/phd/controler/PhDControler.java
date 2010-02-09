@@ -103,7 +103,7 @@ public class PhDControler extends Controler {
 			log.info("Writing results file...");
 			PrintStream out = null;
 			try {
-				out = new PrintStream(org.matsim.core.controler.Controler.getIterationFilename(FILENAME, event.getIteration()));
+				out = new PrintStream(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FILENAME));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}

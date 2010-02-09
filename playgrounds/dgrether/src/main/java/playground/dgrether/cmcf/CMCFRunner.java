@@ -90,11 +90,11 @@ public class CMCFRunner {
 					TTGraphWriter ttWriter = new TTGraphWriter();
 					ttWriter.addTTEventHandler(handler3);
 					ttWriter.addTTEventHandler(handler4);
-					ttWriter.writeTTChart(event.getControler().getIterationPath(event.getIteration()), event.getIteration());
+					ttWriter.writeTTChart(event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration());
 					InOutGraphWriter inoutWriter = new InOutGraphWriter();
 					inoutWriter.addInOutEventHandler(handler3);
 					inoutWriter.addInOutEventHandler(handler4);
-					inoutWriter.writeInOutChart(event.getControler().getIterationPath(event.getIteration()), event.getIteration());
+					inoutWriter.writeInOutChart(event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration());
 				}
 				
 			});
