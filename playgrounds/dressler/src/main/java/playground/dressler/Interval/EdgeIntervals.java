@@ -278,6 +278,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	 * @param o EgeInterval which it test for 
 	 * @return true if getLast.equals(o)
 	 */
+	@Override
 	public boolean isLast(EdgeInterval o){
 		return super.isLast(o)&& o.getFlow()==this.getLast().getFlow();
 	}

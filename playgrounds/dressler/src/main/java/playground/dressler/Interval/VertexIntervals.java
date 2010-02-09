@@ -327,4 +327,16 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		else
 			return vInterval.getLowBound();
 	}
+	
+	/**
+	 * Checks whether the given VertexInterval is the last
+	 * @param o EgeInterval which it test for 
+	 * @return true if getLast.equals(o)
+	 */
+	@Override
+	public boolean isLast(VertexInterval o){
+		return super.isLast(o);
+		
+		//TODO check if other fields are equal 
+	}
 }
