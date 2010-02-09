@@ -81,52 +81,6 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	
 //-------------------------------------GETTER--------------------------------------//
 
-	
-
-	
-	/**
-	 * finds the next EdgeInterval that has flow less than u after time t
-	 * so that additional flow could be sent during the Interval
-	 * @param earliestStartTimeAtFromNode time >=0 !!!
-	 * @param capacity capacity
-	 * @return EdgeInterval[a,b] with f<u  and a>=t
-	 */
-	public EdgeInterval minPossibleForwards(final int earliestStartTimeAtFromNode,
-			final int capacity){
-		if (earliestStartTimeAtFromNode<0){
-			throw new IllegalArgumentException("time shold not be negative");
-		}
-		if (capacity<=0){
-			throw new IllegalArgumentException("capacity shold be positive");
-		}
-		boolean wasAtEnd = false;
-		//search for the next interval, at which flow can be send!
-		for(_tree.goToNodeAt(earliestStartTimeAtFromNode); !wasAtEnd; _tree.increment()){
-			if(_debug>0){
-				System.out.println("f: " +
-						((EdgeInterval)_tree._curr.obj).getFlow()+" on: "+
-						((EdgeInterval)_tree._curr.obj));
-			}
-			EdgeInterval currentInterval = (EdgeInterval)_tree._curr.obj;
-			if(currentInterval.getFlow()<capacity){
-				if(_debug>0){
-					System.out.println("capacity left: " +
-							(capacity-currentInterval.getFlow()));
-				}
-				int earliestPossibleStart = Math.max(earliestStartTimeAtFromNode,
-						currentInterval.getLowBound());
-				return new EdgeInterval(earliestPossibleStart, 
-						currentInterval.getHighBound(), currentInterval.getFlow());
-			}
-			//to iterate over the intervals
-			if(_tree.isAtEnd())
-			{
-				wasAtEnd = true;
-			}
-		}
-		return null;
-	}
-		
 	/**
 	 * Gives a list of intervals when the other end of the link can be reached.
 	 * If forward, these are incoming times + length.
@@ -333,12 +287,21 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 		i.augmentUnsafe(gamma);
 	}
 	
+	
+	/**
+	 * setter for debug mode
+	 * @param debug debug mode true is on
+	 */
+	public static void debug(int debug){
+		EdgeIntervals._debug=debug;
+	}
+	
 	/**
 	 * decreases the flow into an edge from time t to t+1 by f if flow remains nonnegative
 	 * @param t raising time
 	 * @param f amount of flow to reduce
 	 * @deprecated
-	 */
+	 *//*
 	public void ugamentreverse(final int t,final int f){
 		if (t<0){
 			throw new IllegalArgumentException("negative time : "+ t);
@@ -358,14 +321,55 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 			splitAt(t+1);
 		}
 		i.setFlow(oldflow-f);
-	}
+	}*/
+	
+
+	
+
 	
 	/**
-	 * setter for debug mode
-	 * @param debug debug mode true is on
+	 * finds the next EdgeInterval that has flow less than u after time t
+	 * so that additional flow could be sent during the Interval
+	 * @param earliestStartTimeAtFromNode time >=0 !!!
+	 * @param capacity capacity
+	 * @return EdgeInterval[a,b] with f<u  and a>=t
 	 */
-	public static void debug(int debug){
-		EdgeIntervals._debug=debug;
-	}
+	/*public EdgeInterval minPossibleForwards(final int earliestStartTimeAtFromNode,
+			final int capacity){
+		if (earliestStartTimeAtFromNode<0){
+			throw new IllegalArgumentException("time shold not be negative");
+		}
+		if (capacity<=0){
+			throw new IllegalArgumentException("capacity shold be positive");
+		}
+		boolean wasAtEnd = false;
+		//search for the next interval, at which flow can be send!
+		for(_tree.goToNodeAt(earliestStartTimeAtFromNode); !wasAtEnd; _tree.increment()){
+			if(_debug>0){
+				System.out.println("f: " +
+						((EdgeInterval)_tree._curr.obj).getFlow()+" on: "+
+						((EdgeInterval)_tree._curr.obj));
+			}
+			EdgeInterval currentInterval = (EdgeInterval)_tree._curr.obj;
+			if(currentInterval.getFlow()<capacity){
+				if(_debug>0){
+					System.out.println("capacity left: " +
+							(capacity-currentInterval.getFlow()));
+				}
+				int earliestPossibleStart = Math.max(earliestStartTimeAtFromNode,
+						currentInterval.getLowBound());
+				return new EdgeInterval(earliestPossibleStart, 
+						currentInterval.getHighBound(), currentInterval.getFlow());
+			}
+			//to iterate over the intervals
+			if(_tree.isAtEnd())
+			{
+				wasAtEnd = true;
+			}
+		}
+		return null;
+	}*/
+		
+
 
 }
