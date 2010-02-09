@@ -149,12 +149,12 @@ public class TwoLinesDemo {
 		LinkImpl link12 = this.scenario.getNetwork().getLinks().get(this.ids[12]);
 		LinkImpl link13 = this.scenario.getNetwork().getLinks().get(this.ids[13]);
 
-		stop1.setLink(link3);
-		stop2.setLink(link4);
-		stop3.setLink(link7);
-		stop4.setLink(link9);
-		stop5.setLink(link11);
-		stop6.setLink(link10);
+		stop1.setLinkId(link3.getId());
+		stop2.setLinkId(link4.getId());
+		stop3.setLinkId(link7.getId());
+		stop4.setLinkId(link9.getId());
+		stop5.setLinkId(link11.getId());
+		stop6.setLinkId(link10.getId());
 
 		schedule.addStopFacility(stop1);
 		schedule.addStopFacility(stop2);

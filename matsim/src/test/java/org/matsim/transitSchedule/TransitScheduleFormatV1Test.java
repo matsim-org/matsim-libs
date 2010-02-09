@@ -127,7 +127,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		route.setLinkIds(l1.getId(), links, l4.getId());
 		TransitRoute route2 = builder.createTransitRoute(new IdImpl(2), route, stops, TransportMode.bus);
 		line1.addRoute(route2);
-		stop1.setLink(l1);
+		stop1.setLinkId(l1.getId());
 
 		// write and read version with network-route
 		filename = getOutputDirectory() + "scheduleWithRoute.xml";

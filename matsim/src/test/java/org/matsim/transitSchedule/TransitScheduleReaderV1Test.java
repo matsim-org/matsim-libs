@@ -20,11 +20,15 @@
 
 package org.matsim.transitSchedule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Stack;
 
-import junit.framework.TestCase;
-
-import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -50,11 +54,11 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public class TransitScheduleReaderV1Test extends TestCase {
+public class TransitScheduleReaderV1Test {
 
-	private static final Logger log = Logger.getLogger(TransitScheduleReaderV1Test.class);
 	private static final String EMPTY_STRING = "";
 
+	@Test
 	public void testStopFacility_Minimalistic() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -81,6 +85,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertFalse(stop.getIsBlockingLane());
 	}
 
+	@Test
 	public void testStopFacility_withLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		NetworkLayer network = new NetworkLayer();
@@ -110,6 +115,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(link3.getId(), stop.getLinkId());
 	}
 
+	@Test
 	public void testStopFacility_withBadLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		NetworkLayer network = new NetworkLayer();
@@ -126,15 +132,19 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		context.push(Constants.TRANSIT_STOPS);
 		Attributes atts = new AttributesBuilder().add(Constants.ID, "stop1").
 				add(Constants.X, "79").add(Constants.Y, "80").add(Constants.LINK_REF_ID, "4").get();
-		try {
-			reader.startTag(Constants.STOP_FACILITY, atts, context);
-			fail("missing exception.");
-		}
-		catch (RuntimeException e) {
-			log.info("catched expected exception: ", e);
-		}
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, "", context);
+		context.pop();
+		reader.endTag(Constants.TRANSIT_STOPS, "", context);
+		context.pop();
+		reader.endTag(Constants.TRANSIT_SCHEDULE, "", context);
+
+		TransitStopFacility stop = schedule.getFacilities().get(new IdImpl("stop1"));
+		assertEquals(new IdImpl("4"), stop.getLinkId());
+		assertNull(network.getLinks().get(stop.getLinkId()));
 	}
 
+	@Test
 	public void testStopFacility_withName() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -159,6 +169,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals("some stop name", stop.getName());
 	}
 
+	@Test
 	public void testStopFacility_isBlocking() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
@@ -184,6 +195,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertTrue(stop.getIsBlockingLane());
 	}
 
+	@Test
 	public void testStopFacility_Multiple() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -218,6 +230,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(42.0, stop2.getCoord().getY(), MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testTransitLine_Single() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -235,6 +248,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(lineId, line.getId());
 	}
 
+	@Test
 	public void testTransitLine_Multiple() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -258,6 +272,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(lineId2, line2.getId());
 	}
 
+	@Test
 	public void testTransitRoute_Single() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -296,6 +311,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(0, route1.getDepartures().size());
 	}
 
+	@Test
 	public void testTransitRoute_Multiple() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -350,6 +366,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 
 	}
 
+	@Test
 	public void testTransitRoute_Description() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -387,6 +404,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(description, route1.getDescription());
 	}
 
+	@Test
 	public void testRouteProfile_SingleStop() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -440,6 +458,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(false, stop1.isAwaitDepartureTime());
 	}
 
+	@Test
 	public void testRouteProfile_MultipleStop() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -510,6 +529,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(schedule.getFacilities().get(stopId1), stop3.getStopFacility());
 	}
 
+	@Test
 	public void testRouteProfileStop_Offsets() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -605,6 +625,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(Time.UNDEFINED_TIME, stop4.getDepartureOffset(), MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testRouteProfileStop_AwaitDeparture() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -674,6 +695,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(false, stop3.isAwaitDepartureTime());
 	}
 
+	@Test
 	public void testRouteProfileRoute_NoLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -711,6 +733,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertNull(route.getRoute());
 	}
 
+	@Test
 	public void testRouteProfileRoute_OneLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
@@ -769,6 +792,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(0, netRoute.getLinkIds().size());
 	}
 
+	@Test
 	public void testRouteProfileRoute_TwoLinks() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
@@ -829,6 +853,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(0, netRoute.getLinkIds().size());
 	}
 
+	@Test
 	public void testRouteProfileRoute_MoreLinks() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
@@ -895,6 +920,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(link3.getId(), netRoute.getLinkIds().get(1));
 	}
 
+	@Test
 	public void testDepartures_Single() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -936,6 +962,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(Time.parseTime(depTime1), dep1.getDepartureTime(), MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testDepartures_Multiple() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
@@ -987,6 +1014,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(Time.parseTime(depTime2), dep2.getDepartureTime(), MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testDepartures_withVehicleRef() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);

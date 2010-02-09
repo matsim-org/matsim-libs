@@ -126,7 +126,7 @@ public class BlockingStopDemo {
 		// line 1
 		for (int i = 0; i < nOfStops; i++) {
 			stops[i] = builder.createTransitStopFacility(this.ids[i], this.scenario.createCoord(1000 + i*500, 0), false);
-			stops[i].setLink(this.scenario.getNetwork().getLinks().get(this.ids[i+1]));
+			stops[i].setLinkId(this.ids[i+1]);
 			schedule.addStopFacility(stops[i]);
 			stopList.add(builder.createTransitRouteStop(stops[i], 100 + i*70, 120 + i*70));
 		}
@@ -153,7 +153,7 @@ public class BlockingStopDemo {
 		stopList = new ArrayList<TransitRouteStop>(nOfStops);
 		for (int i = 0; i < nOfStops; i++) {
 			stops[i+nOfStops] = builder.createTransitStopFacility(this.ids[i+nOfStops], this.scenario.createCoord(1000 + i*500, 500), true);
-			stops[i+nOfStops].setLink(this.scenario.getNetwork().getLinks().get(this.ids[i+1+nOfLinks]));
+			stops[i+nOfStops].setLinkId(this.ids[i+1+nOfLinks]);
 			schedule.addStopFacility(stops[i+nOfStops]);
 			stopList.add(builder.createTransitRouteStop(stops[i+nOfStops], 100 + i*70, 120 + i*70));
 		}

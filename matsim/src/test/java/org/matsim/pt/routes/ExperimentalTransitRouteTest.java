@@ -57,8 +57,8 @@ public class ExperimentalTransitRouteTest extends TestCase {
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(18, 7), false);
 		Link link1 = new FakeLink(new IdImpl(3));
 		Link link2 = new FakeLink(new IdImpl(4));
-		stop1.setLink(link1);
-		stop2.setLink(link2);
+		stop1.setLinkId(link1.getId());
+		stop2.setLinkId(link2.getId());
 		TransitLine line = builder.createTransitLine(new IdImpl(5));
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl(6), null, Collections.<TransitRouteStop>emptyList(), TransportMode.bus);
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(stop1, line, tRoute, stop2);

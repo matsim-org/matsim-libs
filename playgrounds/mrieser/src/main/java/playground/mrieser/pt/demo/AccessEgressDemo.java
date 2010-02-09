@@ -113,7 +113,7 @@ public class AccessEgressDemo {
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(nOfLinks);
 		for (int i = 0; i < nOfLinks; i++) {
 			stops[i] = builder.createTransitStopFacility(this.ids[i], this.scenario.createCoord((i+1)*500, 0), stopsBlockLane);
-			stops[i].setLink(this.scenario.getNetwork().getLinks().get(this.ids[i]));
+			stops[i].setLinkId(this.ids[i]);
 			schedule.addStopFacility(stops[i]);
 			TransitRouteStop stop = builder.createTransitRouteStop(stops[i], i * 50, i * 50 + 10);
 			stopList.add(stop);

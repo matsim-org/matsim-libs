@@ -161,10 +161,10 @@ public class TransitQueueSimulationTest {
 		schedule.addStopFacility(stop2);
 		schedule.addStopFacility(stop3);
 		schedule.addStopFacility(stop4);
-		stop1.setLink(link1);
-		stop2.setLink(link1);
-		stop3.setLink(link2);
-		stop4.setLink(link2);
+		stop1.setLinkId(link1.getId());
+		stop2.setLinkId(link1.getId());
+		stop3.setLinkId(link2.getId());
+		stop4.setLinkId(link2.getId());
 
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1.getId(), link2.getId(), network);
 		ArrayList<Id> links = new ArrayList<Id>(0);
@@ -260,7 +260,7 @@ public class TransitQueueSimulationTest {
 		TransitLine line = builder.createTransitLine(scenario.createId("1"));
 
 		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
-		stop1.setLink(link);
+		stop1.setLinkId(link.getId());
 		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0), false);
 		schedule.addStopFacility(stop1);
 		schedule.addStopFacility(stop2);
@@ -327,9 +327,9 @@ public class TransitQueueSimulationTest {
 		TransitLine line = builder.createTransitLine(scenario.createId("1"));
 
 		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
-		stop1.setLink(link1);
+		stop1.setLinkId(link1.getId());
 		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0), false);
-		stop2.setLink(link2);
+		stop2.setLinkId(link2.getId());
 		schedule.addStopFacility(stop1);
 		schedule.addStopFacility(stop2);
 
@@ -423,10 +423,10 @@ public class TransitQueueSimulationTest {
 		schedule.addStopFacility(stop3);
 		schedule.addStopFacility(stop4);
 
-		stop1.setLink(link1); // one stop on the first link of network route, as that one may be specially handled
-		stop2.setLink(link3); // some stop in the middle of the network route
-		stop3.setLink(link4);
-		stop4.setLink(link5); // one stop on the last link of the network route, as that one may be specially handled
+		stop1.setLinkId(link1.getId()); // one stop on the first link of network route, as that one may be specially handled
+		stop2.setLinkId(link3.getId()); // some stop in the middle of the network route
+		stop3.setLinkId(link4.getId());
+		stop4.setLinkId(link5.getId()); // one stop on the last link of the network route, as that one may be specially handled
 
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1.getId(), link5.getId(), network);
 		ArrayList<Id> links = new ArrayList<Id>();
@@ -634,8 +634,8 @@ public class TransitQueueSimulationTest {
 		TransitStopFacility stopFacility2 = sb.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(2000, 0), false);
 		schedule.addStopFacility(stopFacility1);
 		schedule.addStopFacility(stopFacility2);
-		stopFacility1.setLink(link1);
-		stopFacility2.setLink(link2);
+		stopFacility1.setLinkId(link1.getId());
+		stopFacility2.setLinkId(link2.getId());
 		TransitLine tLine = sb.createTransitLine(scenario.createId("1"));
 		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
 		TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
@@ -725,8 +725,8 @@ public class TransitQueueSimulationTest {
 		TransitStopFacility stopFacility2 = sb.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(2000, 0), false);
 		schedule.addStopFacility(stopFacility1);
 		schedule.addStopFacility(stopFacility2);
-		stopFacility1.setLink(link1);
-		stopFacility2.setLink(link2);
+		stopFacility1.setLinkId(link1.getId());
+		stopFacility2.setLinkId(link2.getId());
 		TransitLine tLine = sb.createTransitLine(scenario.createId("1"));
 		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
 		TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);

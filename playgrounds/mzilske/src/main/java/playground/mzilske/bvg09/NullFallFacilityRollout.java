@@ -289,7 +289,7 @@ public class NullFallFacilityRollout {
 					.createTransitStopFacility(newId, toFacility.getCoord(),
 							toFacility.getIsBlockingLane());
 			newFacility.setStopPostAreaId(toFacility.getId());
-			newFacility.setLink(link);
+			newFacility.setLinkId(link.getId());
 			outSchedule.addStopFacility(newFacility);
 			inLinks.put(link, newFacility);
 			return newFacility;

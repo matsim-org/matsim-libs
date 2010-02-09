@@ -1027,12 +1027,12 @@ public class TransitQueueNetworkTest extends TestCase {
 			TransitScheduleFactory builder = schedule.getFactory();
 			TransitStopFacility stop1 = builder.createTransitStopFacility(id1, scenario.createCoord(0, 0), firstStopisBlocking);
 			schedule.addStopFacility(stop1);
-			stop1.setLink(links[firstStopLocation]);
+			stop1.setLinkId(links[firstStopLocation].getId());
 			TransitStopFacility stop2 = null;
 			if (secondStopLocation > 0) {
 				stop2 = builder.createTransitStopFacility(id2, scenario.createCoord(100, 0), secondStopIsBlocking);
 				schedule.addStopFacility(stop2);
-				stop2.setLink(links[secondStopLocation]);
+				stop2.setLinkId(links[secondStopLocation].getId());
 			}
 			TransitLine tLine = builder.createTransitLine(id1);
 			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId(), network);

@@ -22,7 +22,6 @@ package org.matsim.transitSchedule;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -37,7 +36,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	private final Id id;
 	private Id stopPostAreaId;
 	private final Coord coord;
-	private Link link = null;
+	private Id linkId = null;
 	private final boolean isBlockingLane;
 	private String name = null;
 
@@ -48,37 +47,37 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 		this.stopPostAreaId = id;
 	}
 
-	public Link getLink() {
-		return this.link;
+	@Override
+	public void setLinkId(final Id linkId) {
+		this.linkId = linkId;
 	}
 
-	public void setLink(final Link link) {
-		this.link = link;
-	}
-
+	@Override
 	public Id getLinkId() {
-		if (this.link == null) {
-			return null;
-		}
-		return this.link.getId();
+		return this.linkId;
 	}
 
+	@Override
 	public Coord getCoord() {
 		return this.coord;
 	}
 
+	@Override
 	public Id getId() {
 		return this.id;
 	}
 
+	@Override
 	public boolean getIsBlockingLane() {
 		return this.isBlockingLane;
 	}
-	
+
+	@Override
 	public void setName(final String name) {
 		this.name = name;
 	}
-	
+
+	@Override
 	public String getName() {
 		return this.name;
 	}
@@ -87,13 +86,15 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	public String toString() {
 		return "TransitStopFacilityImpl_" + this.id;
 	}
-	
+
+	@Override
 	public Id getStopPostAreaId() {
 		return stopPostAreaId;
 	}
-	
+
+	@Override
 	public void setStopPostAreaId(Id stopPostAreaId) {
 		this.stopPostAreaId = stopPostAreaId;
 	}
-	
+
 }

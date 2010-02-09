@@ -704,12 +704,11 @@ public class BusLineAllocator {
 			if (path != null) {
 				if (path.size() > 0)
 					/*------with carNet-----*/
-					stop.setLink(carNet.getLinks().get(
-							path.get(path.size() - 1)));
+					stop.setLinkId(path.get(path.size() - 1));
 				else
-					stop.setLink(null);
+					stop.setLinkId(null);
 			} else {
-				stop.setLink(null);
+				stop.setLinkId(null);
 			}
 		}
 		/*---------------------TRANSITROUTES--------------------------*/

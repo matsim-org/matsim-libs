@@ -31,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -80,11 +79,8 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			TransitStopFacility stop = new TransitStopFacilityImpl(
 					new IdImpl(atts.getValue(Constants.ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")), isBlocking);
 			if (atts.getValue(Constants.LINK_REF_ID) != null) {
-				Link link = this.network.getLinks().get(new IdImpl(atts.getValue(Constants.LINK_REF_ID)));
-				if (link == null) {
-					throw new RuntimeException("no link with id " + atts.getValue(Constants.LINK_REF_ID));
-				}
-				stop.setLink(link);
+				Id linkId = new IdImpl(atts.getValue(Constants.LINK_REF_ID));
+				stop.setLinkId(linkId);
 			}
 			if (atts.getValue(Constants.NAME) != null) {
 				stop.setName(atts.getValue(Constants.NAME));

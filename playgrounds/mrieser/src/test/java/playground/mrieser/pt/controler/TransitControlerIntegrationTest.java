@@ -84,8 +84,8 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 
 		TransitStopFacility stopF1 = sBuilder.createTransitStopFacility(id1, scenario.createCoord(1000.0, 0), false);
 		TransitStopFacility stopF2 = sBuilder.createTransitStopFacility(id2, scenario.createCoord(2000.0, 0), false);
-		stopF1.setLink(link1);
-		stopF2.setLink(link2);
+		stopF1.setLinkId(link1.getId());
+		stopF2.setLinkId(link2.getId());
 		schedule.addStopFacility(stopF1);
 		schedule.addStopFacility(stopF2);
 

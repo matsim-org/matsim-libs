@@ -429,13 +429,13 @@ public class TransitRouterTest extends TestCase {
 			this.stop5 = sb.createTransitStopFacility(this.scenario.createId("5"), this.coord5, false);
 			this.stop6 = sb.createTransitStopFacility(this.scenario.createId("6"), this.coord6, false);
 			this.stop7 = sb.createTransitStopFacility(this.scenario.createId("7"), this.coord7, false);
-			this.stop1.setLink(link1);
-			this.stop2.setLink(link1);
-			this.stop3.setLink(link2);
-			this.stop4.setLink(link2);
-			this.stop5.setLink(link3);
-			this.stop6.setLink(link4);
-			this.stop7.setLink(link4);
+			this.stop1.setLinkId(link1.getId());
+			this.stop2.setLinkId(link1.getId());
+			this.stop3.setLinkId(link2.getId());
+			this.stop4.setLinkId(link2.getId());
+			this.stop5.setLinkId(link3.getId());
+			this.stop6.setLinkId(link4.getId());
+			this.stop7.setLinkId(link4.getId());
 
 			{ // line 1
 				TransitLine tLine = sb.createTransitLine(this.scenario.createId("1"));

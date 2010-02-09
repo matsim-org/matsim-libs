@@ -140,8 +140,8 @@ public class CreatePseudoNetwork {
 				createAndAddLink(toNode, fromNode, new Tuple<Node, Node>(toNode, fromNode));
 			}
 
-			if (toFacility.getLink() == null) {
-				toFacility.setLink(link);
+			if (toFacility.getLinkId() == null) {
+				toFacility.setLinkId(link.getId());
 				this.stopFacilities.put(connection, toFacility);
 			} else {
 				List<TransitStopFacility> copies = this.facilityCopies.get(toFacility);
@@ -152,7 +152,7 @@ public class CreatePseudoNetwork {
 				IdImpl newId = new IdImpl(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1));
 				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
 				newFacility.setStopPostAreaId(toFacility.getId());
-				newFacility.setLink(link);
+				newFacility.setLinkId(link.getId());
 				copies.add(newFacility);
 				this.nodes.put(newFacility, toNode);
 				this.schedule.addStopFacility(newFacility);

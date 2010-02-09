@@ -84,14 +84,14 @@ public class GreedyUmlaufBuilderTest {
 		LinkImpl link18 = this.scenario.getNetwork().getLinks().get(this.ids[18]);
 		LinkImpl link19 = this.scenario.getNetwork().getLinks().get(this.ids[19]);
 
-		stop1.setLink(link3);
-		stop2.setLink(link4);
-		stop3.setLink(link7);
-		stop4.setLink(link9);
-		stop5.setLink(link11);
-		stop6.setLink(link10);
-		stop7.setLink(link14);
-		stop8.setLink(link16);
+		stop1.setLinkId(link3.getId());
+		stop2.setLinkId(link4.getId());
+		stop3.setLinkId(link7.getId());
+		stop4.setLinkId(link9.getId());
+		stop5.setLinkId(link11.getId());
+		stop6.setLinkId(link10.getId());
+		stop7.setLinkId(link14.getId());
+		stop8.setLinkId(link16.getId());
 
 		schedule.addStopFacility(stop1);
 		schedule.addStopFacility(stop2);

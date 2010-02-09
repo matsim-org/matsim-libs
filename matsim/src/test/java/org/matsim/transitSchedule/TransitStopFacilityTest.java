@@ -72,12 +72,12 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertNull(stop.getLinkId());
 		Link link = new FakeLink(new IdImpl(99), null, null);
-		stop.setLink(link);
+		stop.setLinkId(link.getId());
 		assertEquals(link.getId(), stop.getLinkId());
-		stop.setLink(null);
+		stop.setLinkId(null);
 		assertNull(stop.getLinkId());
 	}
-	
+
 	public void testName() {
 		Id id = new IdImpl(9791);
 		Coord coord = new CoordImpl(10, 5);
@@ -90,6 +90,6 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		stop.setName(name);
 		assertEquals(name, stop.getName());
 		stop.setName(null);
-		assertNull(stop.getName());		
+		assertNull(stop.getName());
 	}
 }
