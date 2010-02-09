@@ -58,10 +58,12 @@ public class StepEdge implements PathStep {
 			s += edge.getFromNode().getId().toString()+"-->" + edge.getToNode().getId().toString();
 		} else {
 			s += edge.getToNode().getId().toString()+"-->" + edge.getFromNode().getId().toString();
-			s += " (is residual)";
 		} 
 
 		s +=  " " +this.arrivalTime;
+		if (!this.forward) {
+			s += " backwards";
+		}
 		return s;
 	}
 

@@ -21,6 +21,7 @@
 package playground.dressler.ea_flow;
 
 //java imports
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -50,6 +51,12 @@ public class TimeExpandedPath {
 	 * time, that the path wait in the source
 	 */
 	private int startTime;
+	
+	/*
+	 * which real nodes are part of this path?
+	 * only build when needed  
+	 */
+	private HashSet<Node> nodesTouched = null;
 	
 
 	/**
@@ -454,15 +461,6 @@ public class TimeExpandedPath {
 		this._flow -= flow;
 	}
 	
-	
-	// now handled by the step
-	/*public int getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(int startTime) {
-		this.startTime = startTime;
-	}*/
 
 	/**
 	 * Make sure that TimeExpandedPath starts with a PathStep that is a StepSourceFlow!
@@ -476,6 +474,54 @@ public class TimeExpandedPath {
 			return true;
 		}
 		return false;
+	}
+	
+	
+	/*
+	 *  method to rebuild the set of touched nodes
+	 */
+	public void rebuildTouchedNodes() {
+	  this.nodesTouched = new HashSet<Node>();
+	  for (PathStep step : this._steps) {
+		  this.nodesTouched.add(step.getStartNode().getRealNode());
+		  this.nodesTouched.add(step.getArrivalNode().getRealNode());
+	  }
+	  //System.out.println("Rebuilding ...");
+	}
+	
+	/*
+	 * method to check whether a (real) node is used at all in the path
+	 * this only works reliable if touchednodes is updated after any change
+	 * which is not done automatically!
+	 */	
+	public boolean doesTouch(Node node) {
+		// careful ... this might not be up to date if the TEP was changed!
+		
+		// DEBUG for speed test 
+		//return true;
+		
+		if (this.nodesTouched == null) {
+			rebuildTouchedNodes();
+		}
+		return (this.nodesTouched.contains(node)); 
+	}
+	
+	
+	/*
+	 * method to check whether the real associated with the virtual node is used at all in the path
+	 * this only works reliable if touchednodes is updated after any change
+	 * which is not done automatically!
+	 */	
+	public boolean doesTouch(VirtualNode node) {
+		// careful ... this might not be up to date if the TEP was changed!
+		
+		// DEBUG for speed test 
+		//return true;
+		
+		if (this.nodesTouched == null) {
+			rebuildTouchedNodes();
+		}
+		return (this.nodesTouched.contains(node.getRealNode()));
 	}
 	
 }

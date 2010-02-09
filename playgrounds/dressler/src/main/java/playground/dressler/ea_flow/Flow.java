@@ -613,6 +613,15 @@ public class Flow {
 
   				   // search for an appropriate TEP to unfold with
 				   for (TimeExpandedPath otherTEP : this._TimeExpandedPaths) {
+					   
+					   // FIXME this seems to slow down rather than speed up the augmenting!
+					   // That is somewhat surprising, though. Needs more testing.
+					   if (!otherTEP.doesTouch(step.getStartNode()) || !otherTEP.doesTouch(step.getArrivalNode())) {
+						   // this path cannot contain the reverse of step
+						   //System.out.println("Skipped checking a path!");
+						   continue;
+					   }
+					   
  					   // DEBUG
 					   if (otherTEP.getFlow() == 0) {
 						   throw new RuntimeException("OtherTEP.getFlow() == 0 even earlier");

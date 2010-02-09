@@ -105,6 +105,8 @@ public class MultiSourceEAF {
 	private static HashMap<Node,Integer> readPopulation(final Scenario scenario, final String filename){
 		new MatsimPopulationReader(scenario).readFile(filename);
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
+		
+		int missing = 0;
 
 		for(Person person : scenario.getPopulation().getPersons().values() ){
 
@@ -112,14 +114,23 @@ public class MultiSourceEAF {
 			if(((PlanImpl) plan).getFirstActivity().getLinkId()==null){
 				continue;
 			}
-
-			Node node = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId()).getToNode();
+			
+			Link link = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
+			if (link == null) {
+				missing += 1;				
+				continue;				
+			}
+			Node node = link.getToNode();
 			if(allnodes.containsKey(node)){
 				int temp = allnodes.get(node);
 				allnodes.put(node, temp + 1);
 			}else{
 				allnodes.put(node, 1);
 			}
+		}
+		
+		if (missing > 0) {
+			System.out.println("Missed some start link! Ignored " + missing + " people.");
 		}
 
 		return allnodes;
@@ -298,8 +309,8 @@ public class MultiSourceEAF {
 		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
 		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
-		networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
-		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
+		//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
+		networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
@@ -308,7 +319,7 @@ public class MultiSourceEAF {
 		//networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
 
 		String plansfile = null;
-		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
+		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
 		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
@@ -335,14 +346,15 @@ public class MultiSourceEAF {
 		
 		// ehemalige Unfold Bugs: uniformdemands = 100 oder 500, timestep =5
 		
-		int uniformDemands = 100;
+		int uniformDemands = 5000;
 
-		// Rounding is now done according to this timestep variable!
-		int timestep = 5; 
+		// Rounding is now done according to timestep and flowFactor!
+		int timestep = 100; 
+		double flowFactor = 1.0;
 
 		
-		//String sinkid = "supersink"; //siouxfalls, problem
-		String sinkid = "en1";  //padang, line, swissold		
+		String sinkid = "supersink"; //siouxfalls, problem
+		//String sinkid = "en1";  //padang, line, swissold
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
@@ -392,11 +404,11 @@ public class MultiSourceEAF {
 			System.out.println("reading input done");
 		}
 
-		settings = new FlowCalculationSettings(network, sinkid, demands, timestep);
+		settings = new FlowCalculationSettings(network, sinkid, demands, timestep, flowFactor);
 
 		//set parameters
 		//settings.TimeHorizon = 200000;
-		//settings.MaxRounds = 100000;
+		//settings.MaxRounds = 101;
 		
 
 		Flow fluss = calcEAFlow(settings);
@@ -412,6 +424,8 @@ public class MultiSourceEAF {
 				}
 			}
 		}
+		
+		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
 
 		if(outputplansfile!=null){
 			PopulationImpl output = fluss.createPopulation(plansfile);				
