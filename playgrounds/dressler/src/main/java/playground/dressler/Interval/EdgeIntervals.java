@@ -25,6 +25,8 @@ package playground.dressler.Interval;
 //java imports
 import java.util.ArrayList;
 
+import javax.management.RuntimeErrorException;
+
 //playground imports
 import playground.dressler.ea_flow.FlowCalculationSettings;
 
@@ -81,18 +83,36 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	
 //-------------------------------------GETTER--------------------------------------//
 
+	
 	/**
 	 * Gives a list of intervals when the other end of the link can be reached.
-	 * If forward, these are incoming times + length.
+	 * If primal, these are incoming times + length.
 	 * Otherwise, these are incoming times - length.
+	 * This is for the default "forward" search.
 	 * @param incoming Interval where we can start
 	 * @param capacity Capacity of the Link
-	 * @param forward indicates whether we use residual edge or not 
+	 * @param primal indicates whether we use an original or residual edge 
 	 * @param TimeHorizon for easy reference
 	 * @return plain old Interval
 	 */
 	public ArrayList<Interval> propagate(final Interval incoming,
-			final int capacity ,final boolean forward, int timehorizon){
+			final int capacity, final boolean primal, int timehorizon) {
+		
+		return this.propagate(incoming, capacity, primal, false, timehorizon);
+	}
+	
+	/**
+	 * Gives a list of intervals when the other end of the link can be reached.
+	 * This is supposed to work for forward or reverse search.
+	 * @param incoming Interval where we can start
+	 * @param capacity Capacity of the Link
+	 * @param primal indicates whether we use an original or residual edge
+	 * @param reverse indicates whether we want to search forward or backward 
+	 * @param TimeHorizon for easy reference
+	 * @return plain old Interval
+	 */
+	public ArrayList<Interval> propagate(final Interval incoming,
+			final int capacity, final boolean primal, final boolean reverse, int timehorizon){
 
 		ArrayList<Interval> result = new ArrayList<Interval>();
 
@@ -102,101 +122,87 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 		int low = -1;
 		int high = -1;						
 		boolean collecting = false;
+		
+		// Handle all cases of primal and reverse in one unified matter.
+		// One always just runs through the list of intervals anyway
+		// One has to shift input and output appropriately, and
+		// for primal check flow < capacity, for !primal check flow > 0.
 
-		if(forward) {			
-			current = this.getIntervalAt(incoming.getLowBound());
-			while (current.getLowBound() < incoming.getHighBound()) {				
-				if (current.getFlow() < capacity) {				
-					if (collecting) {
-						high = current.getHighBound();
-					} else {
-						collecting = true;
-						low = current.getLowBound();					  
-						high = current.getHighBound();
-					}
+		int inputoffset, outputoffset;
+		if (!reverse) {
+		  if (primal) {
+			  inputoffset = 0;
+			  outputoffset = this._traveltime;
+		  } else {
+			  inputoffset = -this._traveltime;
+			  outputoffset = 0;
+		  }
+		} else { // reverse search
+		  if (primal) {
+			  inputoffset = -this._traveltime;
+			  outputoffset = 0;
+		  } else {
+			  inputoffset =  0;
+			  outputoffset = this._traveltime;
+		  }		  
+		}
 
+		if (incoming.getLowBound() + inputoffset < 0) {
+		  current = this.getIntervalAt(0);
+		} else {
+		  current = this.getIntervalAt(incoming.getLowBound() + inputoffset);
+		}
+		
+		while (current.getLowBound() < incoming.getHighBound() + inputoffset) {
+			int flow = current.getFlow();
+			if ((primal && flow < capacity) || (!primal && flow > 0)) {				
+				if (collecting) {
+					high = current.getHighBound();
 				} else {
-					if (collecting) { // finish the Interval
-						low = Math.max(low, incoming.getLowBound());
-						low += this._traveltime;
-						high = Math.min(high, incoming.getHighBound());
-						high += this._traveltime;
-						high = Math.min(high, timehorizon);
-						if (low < high) {
-						  toinsert = new Interval(low, high);					  
-						  result.add(toinsert);
-						}
-						collecting = false;
-					}
+					collecting = true;
+					low = current.getLowBound();					  
+					high = current.getHighBound();
 				}
-				
-				if (this.isLast(current)) {
-					break;
-				} 
-				current = this.getIntervalAt(current.getHighBound());
-			    				
-			}
 
-			if (collecting) { // finish the Interval
-				low = Math.max(low, incoming.getLowBound());
-				low += this._traveltime;
-				high = Math.min(high, incoming.getHighBound());
-				high += this._traveltime;
-				high = Math.min(high, timehorizon);
-				if (low < high) {
-					toinsert = new Interval(low, high);					  
-					result.add(toinsert);
-				}
-				collecting = false;
-			}
-		} else { // not forward
-			if (incoming.getLowBound() - this._traveltime < 0) {
-				current = this.getIntervalAt(0);
 			} else {
-			  current = this.getIntervalAt(incoming.getLowBound() - this._traveltime);
-			}
-			
-			while (current.getLowBound() < incoming.getHighBound() - this._traveltime) {				
-				if (current.getFlow() > 0) {				
-					if (collecting) {
-						high = current.getHighBound();
-					} else {
-						collecting = true;
-						low = current.getLowBound();					  
-						high = current.getHighBound();
-					}
+				if (collecting) { // finish the Interval
+					low = Math.max(low, incoming.getLowBound() + inputoffset);
+					low += outputoffset;
+					low = Math.max(low, 0);
+					high = Math.min(high, incoming.getHighBound() + inputoffset);
+					high += outputoffset;
+					high = Math.min(high, timehorizon);
 
-				} else {
-					if (collecting) { // finish the Interval
-						low = Math.max(low, incoming.getLowBound() - this._traveltime);							
-						high = Math.min(high, incoming.getHighBound() - this._traveltime);
-						high = Math.min(high, timehorizon);
-						if (low < high) {
-						  toinsert = new Interval(low, high);					  
-						  result.add(toinsert);
-						}
-						collecting = false;
+					if (low < high) {
+						toinsert = new Interval(low, high);					  
+						result.add(toinsert);
 					}
+					collecting = false;
 				}
-				
-				if (this.isLast(current)) {
-					break;
-				}
-				current = this.getIntervalAt(current.getHighBound());				
+			}
+
+			if (this.isLast(current)) {
+				break;
 			} 
-
-			if (collecting) { // finish the Interval
-				low = Math.max(low, incoming.getLowBound() - this._traveltime);					  
-				high = Math.min(high, incoming.getHighBound() - this._traveltime);
-				high = Math.min(high, timehorizon);
-				if (low < high) {
-					toinsert = new Interval(low, high);					  
-					result.add(toinsert);
-				}
-				collecting = false;
-			}
+			current = this.getIntervalAt(current.getHighBound());
 
 		}
+
+		if (collecting) { // finish the Interval
+			low = Math.max(low, incoming.getLowBound() + inputoffset);
+			low += outputoffset;
+			low = Math.max(low, 0);
+			high = Math.min(high, incoming.getHighBound() + inputoffset);
+			high += outputoffset;
+			high = Math.min(high, timehorizon);
+
+			if (low < high) {
+				toinsert = new Interval(low, high);					  
+				result.add(toinsert);
+			}
+			collecting = false;
+		}
+	
 		return result;
 	}
 	
