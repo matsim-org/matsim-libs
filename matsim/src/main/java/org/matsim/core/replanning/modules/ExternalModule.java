@@ -175,7 +175,7 @@ public class ExternalModule implements PlanStrategyModule {
 		// Change scenario config according to given output- and input-filenames: events, plans, network
 		this.extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
 		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
-		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, Controler.getIterationFilename("events.txt", Controler.getIteration() - 1));
+		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controlerIO.getIterationFilename(Controler.getIteration() - 1, "events.txt"));
 		String networkFilename = this.scenario.getConfig().findParam("network", "inputNetworkFile");
 		this.extConfig.setParam(SCENARIO, SCENARIO_NETWORK_FILENAME, networkFilename);
 	}

@@ -73,7 +73,7 @@ public class CountControlerListener implements StartupListener,
 				// html and pdf output
 				boolean htmlset = true;
 				boolean pdfset = true;
-				CountsGraphWriter cgw = new CountsGraphWriter(Controler.getIterationPath(event.getIteration()), cca.getComparison(), event.getIteration(), htmlset, pdfset);
+				CountsGraphWriter cgw = new CountsGraphWriter(event.getControler().getControlerIO().getIterationPath(event.getIteration()), cca.getComparison(), event.getIteration(), htmlset, pdfset);
 				cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
 				cgw.setGraphsCreator(new CountsErrorGraphCreator("errors"));
 				cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));

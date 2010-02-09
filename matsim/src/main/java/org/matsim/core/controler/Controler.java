@@ -754,12 +754,12 @@ public class Controler {
 	 * @param iteration
 	 */
 	private void makeIterationPath(final int iteration) {
-		File dir = new File(getIterationPath(iteration));
+		File dir = new File(this.controlerIO.getIterationPath(iteration));
 		if (!dir.mkdir()) {
 			if (this.overwriteFiles && dir.exists()) {
-				log.info("Iteration directory " + getIterationPath(iteration) + " exists already.");
+				log.info("Iteration directory " + this.controlerIO.getIterationPath(iteration) + " exists already.");
 			} else {
-				log.warn("Could not create iteration directory " + getIterationPath(iteration) + ".");
+				log.warn("Could not create iteration directory " + this.controlerIO.getIterationPath(iteration) + ".");
 			}
 		}
 	}
@@ -1114,57 +1114,6 @@ public class Controler {
 	}
 
 	/**
-	 * Returns the path to the specified iteration directory. The directory path
-	 * does not include the trailing '/'.
-	 *
-	 * @param iter
-	 *            the iteration the path to should be returned
-	 * @return path to the specified iteration directory
-	 * @deprecated use non static member ControlerIO to generate the desired String
-	 */
-	@Deprecated
-	public static final String getIterationPath(final int iter) {
-		return outputPath + "/" + Controler.DIRECTORY_ITERS + "/it." + iter;
-	}
-	/**
-	 * Returns the complete filename to access an iteration-file with the given
-	 * basename.
-	 *
-	 * @param filename
-	 *            the basename of the file to access
-	 * @param iteration
-	 *            the iteration to which the path of the file should point
-	 * @return complete path and filename to a file in a iteration directory
-	 * @deprecated use non static member ControlerIO to generate the desired String
-	 */
-	@Deprecated
-	public static final String getIterationFilename(final String filename, final int iteration) {
-		return getIterationPath(iteration) + "/" + iteration + "." + filename;
-	}
-
-	/**
-	 * @param filename
-	 *            the basename of the file to access
-	 * @return complete path to filename prefixed with the runId in the
-	 *         controler config module (if set) to a file in the
-	 *         output-directory  of the current iteration
-	 *  @deprecated use non static member ControlerIO to generate the desired String
-	 */
-	@Deprecated
-	public final String getNameForIterationFilename(final String filename){
-		StringBuilder s = new StringBuilder(getIterationPath(iteration));
-		s.append('/');
-		if (this.config.controler().getRunId() != null) {
-			s.append(this.config.controler().getRunId());
-			s.append('.');
-		}
-		s.append(iteration);
-		s.append(".");
-		s.append(filename);
-		return s.toString();
-	}
-
-	/**
 	 * Returns the complete filename to access a file in the output-directory.
 	 *
 	 * @param filename
@@ -1228,10 +1177,10 @@ public class Controler {
 				for (EventsFileFormat format : controler.config.controler().getEventsFileFormats()) {
 					switch (format) {
 					case txt:
-						this.eventWriters.add(new EventWriterTXT(event.getControler().getNameForIterationFilename(FILENAME_EVENTS_TXT)));
+						this.eventWriters.add(new EventWriterTXT(event.getControler().getControlerIO().getIterationFilename(event.getIteration(),FILENAME_EVENTS_TXT)));
 						break;
 					case xml:
-						this.eventWriters.add(new EventWriterXML(event.getControler().getNameForIterationFilename(FILENAME_EVENTS_XML)));
+						this.eventWriters.add(new EventWriterXML(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FILENAME_EVENTS_XML)));
 						break;
 					default:
 						log.warn("Unknown events file format specified: " + format.toString() + ".");
@@ -1270,11 +1219,11 @@ public class Controler {
 
 			if ((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) {
 				controler.events.removeHandler(controler.volumes);
-				controler.linkStats.writeFile(event.getControler().getNameForIterationFilename(FILENAME_LINKSTATS));
+				controler.linkStats.writeFile(event.getControler().getControlerIO().getIterationFilename(iteration, FILENAME_LINKSTATS));
 			}
 
 			if (controler.legTimes != null) {
-				controler.legTimes.writeStats(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "tripdurations.txt"));
+				controler.legTimes.writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "tripdurations.txt"));
 				// - print averages in log
 				log.info("[" + iteration + "] average trip duration is: " + (int) controler.legTimes.getAverageTripDuration()
 						+ " seconds = " + Time.writeTime(controler.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
