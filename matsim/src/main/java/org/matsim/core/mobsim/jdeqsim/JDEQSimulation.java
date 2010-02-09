@@ -40,14 +40,12 @@ import org.matsim.core.utils.misc.Time;
  */
 public class JDEQSimulation {
 
-	protected static Logger log = null;
+	private final static Logger log = Logger.getLogger(JDEQSimulation.class);
 	protected Scenario scenario;
 
 
 	public JDEQSimulation(final Scenario scenario, final EventsManager events) {
 		// constructor
-
-		log = Logger.getLogger(JDEQSimulation.class);
 
 		this.scenario = scenario;
 

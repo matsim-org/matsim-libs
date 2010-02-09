@@ -27,28 +27,28 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
 
 
 /**
- * OTFGLDrawableImpl is a basic implementation of the OTFOGLDrawable interface with an 
+ * OTFGLDrawableImpl is a basic implementation of the OTFOGLDrawable interface with an
  * additional simple invalidation mechanism.
- * 
+ *
  * @author dstrippgen
- * 
- * <p> 
+ *
+ * <p>
  * isValid is set to true or false, but I can't figure out where this is ever used.
  * kai, jan'10
  * </p>
  *
  */
 public abstract class OTFGLDrawableImpl implements OTFGLDrawable, OTFDataReceiver {
-	private boolean isValid = true; // setting this from "default" to "private" curiously does not seem to make a difference.  kai, jan'10
+//	private boolean isValid = true; // setting this from "default" to "private" curiously does not seem to make a difference.  kai, jan'10
 	private static GL gl; // setting this from "public" to "protected" seems to work.  kai, jan'10
 
 	public final void draw() {
 		// Make sure onDraw is called only once per object
 		onDraw(getGl());
-		isValid = true;
+//		isValid = true;
 	}
 	public void invalidate(SceneGraph graph) {
-		isValid = false;
+//		isValid = false;
 		graph.addItem(this);
 	}
 	/**<p>
@@ -56,7 +56,7 @@ public abstract class OTFGLDrawableImpl implements OTFGLDrawable, OTFDataReceive
 	 * OTFOGLDrawer has its own (private, non-static) gl variable.  In that call, the content of that non-static
 	 * variable is pushed to the static variable here. --???  kai, jan'10
 	 * </p>
-	 * 
+	 *
 	 * @param gl
 	 */
 	protected static void setGl(GL gl) {

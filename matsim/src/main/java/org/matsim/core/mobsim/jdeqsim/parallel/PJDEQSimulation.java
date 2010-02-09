@@ -63,17 +63,16 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
  */
 public class PJDEQSimulation extends JDEQSimulation {
 
+	private final static Logger log = Logger.getLogger(PJDEQSimulation.class);
 	private int numOfThreads;
 
 	public PJDEQSimulation(Scenario scenario, EventsManager events, int numOfThreads) {
 		super(scenario, events);
 		this.numOfThreads = numOfThreads; // TODO: use this number really...
-		log = Logger.getLogger(JDEQSimulation.class);
 	}
 
 	@Override
 	public void run() {
-		log = Logger.getLogger(PJDEQSimulation.class);
 
 		Timer t = new Timer();
 		t.startTimer();

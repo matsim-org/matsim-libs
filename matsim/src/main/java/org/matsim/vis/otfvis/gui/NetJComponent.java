@@ -48,8 +48,8 @@ import javax.swing.event.MouseInputAdapter;
 import org.matsim.vis.netvis.renderers.ValueColorizer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -66,7 +66,7 @@ abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
 	public final void draw() {
 		onDraw(g2d);
 	}
-	
+
 	abstract public void onDraw(Graphics2D g2d);
 
 	public void invalidate(SceneGraph graph) {
@@ -77,7 +77,7 @@ abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
 /**
  * The class implementaing the Component for SWING based drawing of the OTFVis.
  * This version of the OTFVis does not support all possible features implemented in the OpenGL-based version.
- * 
+ *
  * @author dstrippgen
  *
  */
@@ -103,7 +103,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			System.out.println("Scalee " + this.scale);
 			super.scaleNetwork(scale);
 		}
-		
+
 		public float getScale() {
 			return scale;
 		}
@@ -120,7 +120,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	private static final long serialVersionUID = 1L;
 
 	private static final double BORDER_FACTOR = 0.0;
-	public static float linkWidth = 100;
+	private static final float linkWidth = 100;
 
     private final int frameDefaultWidth;
 
@@ -183,7 +183,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
     public NetJComponent(JFrame frame, OTFClientQuad quad) {
         this.quad = quad;
- 
+
         // calculate size of frame
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -196,7 +196,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
         scale(1);
         setViewClipCoords(0,0,1,1);
-        
+
         networkScrollPane = new MyNetVisScrollPane(this);
 		VizGuiHandler handi = new VizGuiHandler();
 		networkScrollPane.addMouseMotionListener(handi);
@@ -308,7 +308,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
         Graphics2D g2 = (Graphics2D) g;
 
         boolean useAntiAliasing = true;
-        
+
 		if (useAntiAliasing ) {
         	g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
         } else {
@@ -321,7 +321,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		OTFSwingDrawable.g2d = g2;
 
 		g2.setStroke(new BasicStroke(Math.round(0.05 * linkWidth)));
-	
+
 		AffineTransform linkTransform = new AffineTransform(originalTransform);
 		linkTransform.concatenate(getBoxTransform());
 		g2.setTransform(linkTransform);
@@ -349,15 +349,15 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		networkScrollPane.invalidate();
 		networkScrollPane.repaint();
 	}
-	
-	
+
+
 	/***
 	 * Drawer class for drawing simple quads
 	 */
 	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuadReceiver{
 		protected final Point2D.Float[] quad = new Point2D.Float[4];
 //		protected float coloridx = 0;
-		
+
 
 		Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end, int nrLanes){
 			double dx = end.y - start.y;
@@ -403,22 +403,22 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 		public void setId(char[] idBuffer) {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
-	
-	
+
+
 	/***
-	 * Drawer class for drawing agents 
+	 * Drawer class for drawing agents
 	 */
-	
+
 	public static class AgentDrawer extends OTFSwingDrawable implements OTFDataSimpleAgentReceiver{
 		//Anything above 50km/h should be yellow!
 		private final static ValueColorizer colorizer = new ValueColorizer(
 				new double[] { 0.0, 30., 50.}, new Color[] {
 						Color.RED, Color.YELLOW, Color.GREEN});
 
-		protected char[] id; 
+		protected char[] id;
 		protected float startX, startY, color;
 		protected int state;
 
@@ -445,7 +445,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 //			display.setColor(color);
 //
 //		}
-//		
+//
 
 		@Override
 		public void onDraw(Graphics2D display) {
@@ -474,7 +474,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 	}
 
-	
+
 	/***
 	 * VizGuiHandler handles mouse input etc
 	 */
@@ -491,10 +491,10 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 				g2.drawRect(currentRect.x,
 						currentRect.y, currentRect.width, currentRect.height);
 				}
-				
-			
+
+
 		}
-		
+
 		@Override
 		public void mousePressed(MouseEvent e) {
 			int x = e.getX();
@@ -568,7 +568,8 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			float scale = networkScrollPane.getScale() * 1.42f;
 			if ( scale < 100) networkScrollPane.scaleNetwork(scale);
 		}
-		
+
+		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
 			int i = e.getWheelRotation();
 			if(i>0)pressed_ZOOM_OUT();
@@ -585,19 +586,19 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 //	public void removeQueries() {
 //		// TODO Auto-generated method stub
 //	}
-	
+
 	public void clearCache() {
 		if(quad != null) quad.clearCache();
 	}
 
 	public void handleClick(Double point, int mouseButton, MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void handleClick(Rectangle currentRect, int button) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
