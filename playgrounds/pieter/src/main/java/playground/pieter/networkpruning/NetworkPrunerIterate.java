@@ -1,22 +1,20 @@
 package playground.pieter.networkpruning;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
-import org.matsim.core.network.algorithms.NetworkSummary;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkWriter;
+import org.matsim.network.algorithms.NetworkCalcTopoType;
+import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
+import org.matsim.network.algorithms.NetworkSummary;
 
 public class NetworkPrunerIterate {
 	private NetworkLayer network;
@@ -31,11 +29,10 @@ public class NetworkPrunerIterate {
 	private double shortLeafLength = 1000;
 
 	public NetworkPrunerIterate(String inFile, String outFile) {
-		ScenarioImpl scenario = new ScenarioImpl();
-		this.network = scenario.getNetwork();
+		this.network = new NetworkLayer();
 		this.inFile = inFile;
 		this.outFile = outFile;
-		new MatsimNetworkReader(scenario).readFile(this.inFile);
+		new MatsimNetworkReader(network).readFile(this.inFile);
 		new NetworkSummary().run(network);
 	}
 
@@ -60,16 +57,16 @@ public class NetworkPrunerIterate {
 		System.out.println("One way links removed: " + this.oneWayLinkJointCount);
 		System.out.println("Two way links removed: " + this.twoWayLinkJointCount);
 		System.out.println("Leaves shorter than " + this.shortLeafLength + " removed: " + this.shortLeafRemovedCount);
-		new NetworkWriter(this.network).writeFile(this.outFile);
+		new NetworkWriter(this.network,this.outFile).write();
 		System.out.println("File written to "+ this.outFile);
 	}
 
 	private void removeShortLeaves(double length) {
-		Map<Id,? extends LinkImpl> netLinks = network.getLinks();
-		Iterator<? extends LinkImpl> linkIterator = netLinks.values().iterator();
+		Map<Id,? extends Link> netLinks = network.getLinks();
+		Iterator<? extends Link> linkIterator = netLinks.values().iterator();
 		int shortLeafRemovalCount = 0;
 		while(linkIterator.hasNext()){
-			LinkImpl currentLink = linkIterator.next();
+			Link currentLink = linkIterator.next();
 			if(currentLink.getLength() < length){
 				Node fromNode = currentLink.getFromNode();
 				Node toNode = currentLink.getToNode();
@@ -102,8 +99,9 @@ public class NetworkPrunerIterate {
 
 
 	private void joinOneWayLinks() {
-		Map<Id,NodeImpl> nodeMap =  network.getNodes();
-		Iterator<NodeImpl> nodeIterator = nodeMap.values().iterator();
+		// TODO Auto-generated method stub
+		Map<Id,Node> nodeMap =  network.getNodes();
+		Iterator<Node> nodeIterator = nodeMap.values().iterator();
 		int linkJoinCount = 0;
 		while(nodeIterator.hasNext()){
 			 Node currentNode =nodeIterator.next();
@@ -111,17 +109,17 @@ public class NetworkPrunerIterate {
 			 Map<Id,? extends Link> outLinks = currentNode.getOutLinks();
 			 if(inLinks.size()==1 && outLinks.size()==1){
 				 //check that it's not a dead-end, and has same parameters
-				 double time = Time.UNDEFINED_TIME;
+				 double period = 1;
 				 Link inLink = inLinks.values().iterator().next();
 				 Link outLink = outLinks.values().iterator().next();
 				 Node fromNode = inLink.getFromNode();
 				 Node toNode = outLink.getToNode();
-				 double inFlow = inLink.getCapacity(time);
-				 double outFlow = outLink.getCapacity(time);
-				 double inSpeed = inLink.getFreespeed(time);
-				 double outSpeed = outLink.getFreespeed(time);
-				 double inLanes = inLink.getNumberOfLanes(time);
-				 double outLanes = outLink.getNumberOfLanes(time);
+				 double inFlow = inLink.getFlowCapacity(period);
+				 double outFlow = outLink.getFlowCapacity(period);
+				 double inSpeed = inLink.getFreespeed(period);
+				 double outSpeed = outLink.getFreespeed(period);
+				 int inLanes = inLink.getLanesAsInt(period);
+				 int outLanes = outLink.getLanesAsInt(period);
 				 double inLength = inLink.getLength();
 				 double outLength = outLink.getLength();
 				 if((!fromNode.equals(toNode)) &&
@@ -133,7 +131,7 @@ public class NetworkPrunerIterate {
 
 					 inLink.setToNode(toNode);
 					 toNode.addInLink(inLink);
-					 ((NodeImpl) currentNode).removeInLink(inLink);
+					 currentNode.removeInLink(inLink);
 					 inLink.setLength(inLink.getLength() + outLink.getLength());
 					 linkJoinCount++;
 					 this.oneWayLinkJointCount++;
@@ -144,8 +142,9 @@ public class NetworkPrunerIterate {
 		System.out.println("number of oneway links joined: "+ linkJoinCount);
 	}
 	private void joinTwoWayLinks() {
-		Map<Id,NodeImpl> nodeMap =  network.getNodes();
-		Iterator<NodeImpl> nodeIterator = nodeMap.values().iterator();
+		// TODO Auto-generated method stub
+		Map<Id,Node> nodeMap =  network.getNodes();
+		Iterator<Node> nodeIterator = nodeMap.values().iterator();
 		int linkJoinCount = 0;
 //		ArrayList<Node> removeList = new ArrayList<Node>();
 		while(nodeIterator.hasNext()){
@@ -215,14 +214,14 @@ public class NetworkPrunerIterate {
 				 }
 
 
-				 double inFlow = inLink1.getCapacity(period);
-				 double outFlow = outLink1.getCapacity(period);
+				 double inFlow = inLink1.getFlowCapacity(period);
+				 double outFlow = outLink1.getFlowCapacity(period);
 
 				 double inSpeed = inLink1.getFreespeed(period);
 				 double outSpeed = outLink1.getFreespeed(period);
 
-				 double inLanes = inLink1.getNumberOfLanes(period);
-				 double outLanes = outLink1.getNumberOfLanes(period);
+				 int inLanes = inLink1.getLanesAsInt(period);
+				 int outLanes = outLink1.getLanesAsInt(period);
 
 				 double inLength1 = inLink1.getLength();
 				 double inLength2 = inLink2.getLength();
@@ -243,8 +242,8 @@ public class NetworkPrunerIterate {
 					 inLink2.setToNode(fromNode);
 					 inLink2.setLength(inLength2 + outLength2);
 					 fromNode.addInLink(inLink2);
-					 ((NodeImpl) currentNode).removeInLink(inLink1);
-					 ((NodeImpl) currentNode).removeInLink(inLink2);
+					 currentNode.removeInLink(inLink1);
+					 currentNode.removeInLink(inLink2);
 //					 removeList.add(currentNode);
 					 linkJoinCount++;
 					 this.twoWayLinkJointCount++;
@@ -262,7 +261,7 @@ public class NetworkPrunerIterate {
 	}
 
 	private void findShortestLink(){
-		Iterator<? extends LinkImpl> linkIterator = this.network.getLinks().values().iterator();
+		Iterator<? extends Link> linkIterator = this.network.getLinks().values().iterator();
 		while (linkIterator.hasNext()){
 			double length = linkIterator.next().getLength();
 			if (length<this.shortestLink){

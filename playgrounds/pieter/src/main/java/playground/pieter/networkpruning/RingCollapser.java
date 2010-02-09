@@ -4,18 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.network.algorithms.NetworkSummary;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.basic.v01.Id;
+import org.matsim.interfaces.core.v01.Link;
+import org.matsim.interfaces.core.v01.Node;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkWriter;
+import org.matsim.network.algorithms.NetworkSummary;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class RingCollapser {
 	private NetworkLayer network;
@@ -29,19 +27,18 @@ public class RingCollapser {
 	private int maxNodeId;
 
 	public RingCollapser(String inFile, String outFile) {
-		ScenarioImpl scenario = new ScenarioImpl();
-		this.network = scenario.getNetwork();
+		this.network = new NetworkLayer();
 		this.inFile = inFile;
 		this.outFile = outFile;
-		new MatsimNetworkReader(scenario).readFile(this.inFile);
+		new MatsimNetworkReader(network).readFile(this.inFile);
 		new NetworkSummary().run(network);
-		this.capPeriod = network.getCapacityPeriod();
+		this.capPeriod = (double)network.getCapacityPeriod();
 	}
 	
 	//constructor when class gets called to go to work on existing networklayer
 	public RingCollapser(NetworkLayer network){
 		this.network = network;
-		this.capPeriod = network.getCapacityPeriod();
+		this.capPeriod = (double)network.getCapacityPeriod();
 	}
 
 	public void run(){
@@ -56,7 +53,7 @@ public class RingCollapser {
 		System.out.println("Number of rings collapsed: " + this.ringCollapseCount);
 		
 		if(!this.outFile.equals(null)){
-			new NetworkWriter(this.network).writeFile(this.outFile);			
+			new NetworkWriter(this.network,this.outFile).write();			
 		}
 		System.out.println("File written to "+ this.outFile);
 	}
@@ -64,11 +61,11 @@ public class RingCollapser {
 	private void removeRings() {
 		findMaxNodeId();
 //		Map<Id, Node> nodeMap = this.network.getNodes();
-		ArrayList<NodeImpl> originalNodes = new ArrayList<NodeImpl>();
+		ArrayList<Node> originalNodes = new ArrayList<Node>();
 		originalNodes.addAll(this.network.getNodes().values());
-		Iterator<NodeImpl> nodeIterator = originalNodes.iterator();
+		Iterator<Node> nodeIterator = originalNodes.iterator();
 		while(nodeIterator.hasNext()){
-			NodeImpl currentNode = nodeIterator.next();
+			Node currentNode = nodeIterator.next();
 			if(!checkIfNodeQualifies(currentNode))
 				continue;
 			LoopSeekerRoot rootNode = new LoopSeekerRoot(currentNode, this.maxLength, this.streetCap, this.capPeriod);
@@ -85,7 +82,7 @@ public class RingCollapser {
 
 	private void findMaxNodeId() {
 		int max_node_id = Integer.MIN_VALUE;
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			int node_getID = Integer.parseInt(node.getId().toString());
 			if (max_node_id < node_getID) { max_node_id = node_getID; }
 		}
@@ -93,7 +90,8 @@ public class RingCollapser {
 		
 	}
 
-	private boolean checkIfNodeQualifies(NodeImpl currentNode) {
+	private boolean checkIfNodeQualifies(Node currentNode) {
+		// TODO Auto-generated method stub
 		boolean isStreetNode = false;
 		boolean isThruNode = false;
 //		first check that it has at least two inLinks and 2 outLinks, and that they are of street capacity
@@ -111,6 +109,7 @@ public class RingCollapser {
 
 
 	private boolean checkIfStreetNode(Map<Id, ? extends Link> linkMap) {
+		// TODO Auto-generated method stub
 		Iterator<? extends Link> linkIterator = linkMap.values().iterator();
 		while(linkIterator.hasNext()){
 			Link currentLink = linkIterator.next();
@@ -122,6 +121,7 @@ public class RingCollapser {
 
 
 	private Node createCentroidNode(ArrayList<Node> ringNodePath) {
+			// TODO Auto-generated method stub
 			double averageX = 0;
 			double averageY = 0;
 			int nodeCount = 0;
@@ -135,7 +135,7 @@ public class RingCollapser {
 			averageX /= nodeCount;
 			averageY /= nodeCount;
 	//		create centroidNode;
-			Node centroidNode = this.network.createAndAddNode(new IdImpl(++this.maxNodeId), new CoordImpl(averageX, averageY));
+			Node centroidNode = this.network.createNode(new IdImpl(++this.maxNodeId), new CoordImpl(averageX, averageY));
 			return centroidNode;
 		}
 
