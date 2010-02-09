@@ -59,7 +59,7 @@ public class VertexInterval extends Interval {
 
 //--------------------------CONSTUCTORS-------------------------//
 	/**
-	 * Default costructor creates an (0,1) Interval
+	 * Default costructor creates an [0,1) VertexInterval
 	 * not reachable, not scanned, no predecessor 
 	 */
 	public VertexInterval() {
@@ -67,7 +67,8 @@ public class VertexInterval extends Interval {
 	}
 
 	/**
-	 * Creates in VertexInterval from l to r
+	 * Creates in VertexInterval [l,r)
+	 * not reachable, not scanned, no predecessor 
 	 * @param l lowbound
 	 * @param r highbound
 	 */
@@ -88,8 +89,7 @@ public class VertexInterval extends Interval {
 	 */
 	public VertexInterval(final int l,final int r,final VertexInterval other)
 	{
-		super(l,r);
-		//this.lastDepartureAtFromNode = other.lastDepartureAtFromNode;		
+		super(l,r);	
 		this.reachable = other.reachable;
 		this.scanned = other.scanned;
 		this._predecessor = other._predecessor.copyShiftedToArrival(l);
@@ -190,7 +190,6 @@ public class VertexInterval extends Interval {
 		} else {
 		    k._predecessor= this._predecessor.copyShiftedToArrival(k.getLowBound());
 		}
-		//k.lastDepartureAtFromNode = this.lastDepartureAtFromNode;
 		return k;
 	}
 	

@@ -272,6 +272,15 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 		this._last = i; // we might have to update it, just do it always
 		return gain;
 	}
+
+	/**
+	 * Checks whether the given VertexInterval is the last
+	 * @param o EgeInterval which it test for 
+	 * @return true if getLast.equals(o)
+	 */
+	public boolean isLast(EdgeInterval o){
+		return super.isLast(o)&& o.getFlow()==this.getLast().getFlow();
+	}
 	
 //------------------------Augmentation--------------------------------//
 	
