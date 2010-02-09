@@ -109,6 +109,65 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 		return null;
 	}
 	
+	/**
+	 * Gives a list of intervals when flow into the source can be undone
+	 * this is for the reverse seach.
+	 * @param timeHorizon for easy reference
+	 * @return plain old ArrayList of Interval
+	 */
+	public ArrayList<Interval> canSendFlowBackAll(int timeHorizon){
+
+		ArrayList<Interval> result = new ArrayList<Interval>();
+
+		EdgeInterval current;
+		Interval toinsert;
+
+		int low = -1;
+		int high = -1;						
+		boolean collecting = false;
+
+		
+		current = this.getIntervalAt(0);
+			
+		while (current.getLowBound() < timeHorizon) {				
+			if (current.getFlow() > 0) {				
+				if (collecting) {
+					high = current.getHighBound();
+				} else {
+					collecting = true;
+					low = current.getLowBound();					  
+					high = current.getHighBound();
+				}
+			} else {
+				if (collecting) { // finish the Interval
+					high = Math.min(high, timeHorizon);
+					if (low < high) {
+						toinsert = new Interval(low, high);					  
+						result.add(toinsert);
+					}
+					collecting = false;
+				}
+			}
+				
+			if (this.isLast(current)) {
+				break;
+			}
+			current = this.getIntervalAt(current.getHighBound());				
+		} 
+
+		if (collecting) { // finish the Interval
+			high = Math.min(high, timeHorizon);
+			if (low < high) {
+				toinsert = new Interval(low, high);					  
+				result.add(toinsert);
+			}
+			collecting = false;
+		}
+
+
+		return result;
+	}
+	
 	
 //------------------------Clean Up--------------------------------//
 	/**
