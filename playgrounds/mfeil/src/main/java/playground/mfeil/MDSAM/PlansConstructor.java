@@ -837,7 +837,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.print("Id\tChoice\t");
 		counterFirst+=2;
 
-		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
+		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || income.equals("yes")) {
 			stream.print("Income\t");
 			counterFirst++;
 		}
@@ -869,10 +869,6 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		if (gender.equals("yes")) {
 			stream.print("Female\t");
-			counterFirst++;
-		}
-		if (income.equals("yes")) {
-			stream.print("Income\t");
 			counterFirst++;
 		}
 		if (license.equals("yes")) {
@@ -926,7 +922,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			if (car) {
 				stream.print("x"+(i+1)+"_car_time\t");
 				counterFirst++;
-				if (travelCost.equals("yes")) {
+				if (travelCost.equals("yes")|| incomeDivided.equals("yes") || incomeDividedLN.equals("yes")) {
 					stream.print("x"+(i+1)+"_car_cost\t");
 					counterFirst++;
 				}
@@ -940,7 +936,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			if (pt) {
 				stream.print("x"+(i+1)+"_pt_time\t");
 				counterFirst++;
-				if (travelCost.equals("yes")) {
+				if (travelCost.equals("yes")|| incomeDivided.equals("yes") || incomeDividedLN.equals("yes")) {
 					stream.print("x"+(i+1)+"_pt_cost\t");
 					counterFirst++;
 				}
@@ -1024,7 +1020,7 @@ public class PlansConstructor implements PlanStrategyModule{
 
 			// Calculate travelCostPt for the person
 			double travelCostPt = 0;
-			if (travelCost.equals("yes")){
+			if (this.travelCost.equals("yes") || this.incomeDivided.equals("yes") || this.incomeDividedLN.equals("yes")){
 				if (aaa.getSeasonTicket().get(person.getId())==11) { // No season ticket
 					travelCostPt = this.costPtNothing;
 					noOfNothing++;
@@ -1056,7 +1052,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print(position+"\t");
 			counterRow++;
 
-			if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
+			if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || income.equals("yes")) {
 				stream.print((aaa.getIncome().get(person.getId())/30)+"\t");
 				counterRow++;
 			}
@@ -1079,10 +1075,6 @@ public class PlansConstructor implements PlanStrategyModule{
 				if (person.getSex().equals("f")) stream.print(1+"\t");
 				else if (person.getSex().equals("m")) stream.print(0+"\t");
 				else log.warn("Person "+person.getId()+" has no valid gender.");
-				counterRow++;
-			}
-			if (income.equals("yes")) {
-				stream.print((aaa.getIncome().get(person.getId())/30)+"\t"); //monthly income divided by 30 days (month)
 				counterRow++;
 			}
 			if (license.equals("yes")) {
@@ -1186,7 +1178,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					if (car) {
 						stream.print("0\t");
 						counterRow++;
-						if (travelCost.equals("yes")){
+						if (this.travelCost.equals("yes") || this.incomeDivided.equals("yes") || this.incomeDividedLN.equals("yes")){
 							stream.print("0\t");
 							counterRow++;
 						}
@@ -1200,7 +1192,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					if (pt) {
 						stream.print("0\t");
 						counterRow++;
-						if (travelCost.equals("yes")){
+						if (this.travelCost.equals("yes") || this.incomeDivided.equals("yes") || this.incomeDividedLN.equals("yes")){
 							stream.print("0\t");
 							counterRow++;
 						}
@@ -1557,7 +1549,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			if (car>0){
 				stream.print(car_time+"\t");
 				counter++;
-				if (this.travelCost.equals("yes")){
+				if (this.travelCost.equals("yes") || this.incomeDivided.equals("yes") || this.incomeDividedLN.equals("yes")){
 					stream.print(car_cost+"\t");
 					counter++;
 				}
@@ -1571,7 +1563,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			if (pt>0){
 				stream.print(pt_time+"\t");
 				counter++;
-				if (this.travelCost.equals("yes")){
+				if (this.travelCost.equals("yes") || this.incomeDivided.equals("yes") || this.incomeDividedLN.equals("yes")){
 					stream.print(pt_cost+"\t");
 					counter++;
 				}

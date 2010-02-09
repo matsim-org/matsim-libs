@@ -41,7 +41,7 @@ public class RunUtilFunctionEstimation {
 	public static void main(String[] args) {
 		log.info("Process started...");
 		
-		final String version = "0979_innerHome";
+		final String version = "0993";
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
@@ -59,26 +59,29 @@ public class RunUtilFunctionEstimation {
 		final String outputFile = "./plans/output_plans.dat";
 		*/
 		
-		String beta				= "no";
+		String beta				= "yes";
 		String gamma			= "no";
 		String similarity 		= "yes";
 		String incomeConstant 	= "no";
 		String incomeDivided	= "no";
 		String incomeDividedLN	= "no";
-		String incomeBoxCox		= "no";
-		String gender 			= "no";
+		String incomeBoxCox		= "yes";
+		String gender 			= "yes";
 		String age 				= "no";
 		String income	 		= "no";
 		String license 			= "no";
 		String carAvail 		= "no";
 		String seasonTicket 	= "no";
 		String travelDistance	= "no"; 
-		String travelCost		= "yes"; 
+		String travelCost		= "no"; 
 		String travelConstant 	= "yes";
 		String beta_travel		= "no";
 		String bikeIn			= "yes";
 		String munType			= "no";
 		String innerHome		= "yes";
+		
+		// if incomeBoxCox is set to yes, travelCost must be yes, too.
+		if (incomeBoxCox.equals("yes")) travelCost = "yes";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);

@@ -784,44 +784,39 @@ public class ModFileMaker {
 		// Home
 		stream.println("HomeUmax \t4  \t0 \t100  \t0");
 		stream.println("HomeAlpha \t8  \t-5 \t20  \t0");
-		//if (beta.equals("yes")) stream.println("HomeBeta \t0.345  \t0 \t100  \t0"); // from 0981
-		if (beta.equals("yes")) stream.println("HomeBeta \t1  \t0 \t100  \t0"); 
+		if (beta.equals("yes")) stream.println("HomeBeta \t0.281  \t0 \t100  \t1"); // from 0983_ohne_timings
 		if (gamma.equals("yes")) stream.println("HomeGamma \t1  \t0 \t5  \t0");
 		
 		// InnerHome
 		if (innerHome.equals("yes")){
 			stream.println("InnerHomeUmax \t4  \t0 \t100  \t0");
 			stream.println("InnerHomeAlpha \t8  \t-5 \t20  \t0");
-			if (beta.equals("yes")) stream.println("InnerHomeBeta \t1  \t0 \t100  \t0"); 
+			if (beta.equals("yes")) stream.println("InnerHomeBeta \t17.8  \t0 \t100  \t1"); // from 0983_ohne_timings
 			if (gamma.equals("yes")) stream.println("InnerHomeGamma \t1  \t0 \t5  \t0");
 		}
 		
 		// Work
 		stream.println("WorkUmax \t3  \t0 \t100  \t0");
 		stream.println("WorkAlpha \t4  \t-5 \t20  \t0");
-		//if (beta.equals("yes")) stream.println("WorkBeta \t0.654  \t0 \t100  \t1"); // from 0981
-		if (beta.equals("yes")) stream.println("WorkBeta \t1  \t0 \t100  \t0"); 
+		if (beta.equals("yes")) stream.println("WorkBeta \t0.481  \t0 \t100  \t1"); // from 0983_ohne_timings
 		if (gamma.equals("yes")) stream.println("WorkGamma \t1  \t0 \t5  \t0");
 		
 		// Education
 		stream.println("EducationUmax \t3  \t0 \t100  \t0");
 		stream.println("EducationAlpha \t2  \t-5 \t20  \t0");
-		//if (beta.equals("yes")) stream.println("EducationBeta \t2.65  \t0 \t100  \t1"); // from 0913_1
-		if (beta.equals("yes")) stream.println("EducationBeta \t1  \t0 \t100  \t0"); 
+		if (beta.equals("yes")) stream.println("EducationBeta \t100  \t0 \t100  \t1"); // from 0983_ohne_timings
 		if (gamma.equals("yes")) stream.println("EducationGamma \t1  \t0 \t5  \t0");
 		
 		// Shop
 		stream.println("ShopUmax \t1  \t0 \t100  \t0");
 		stream.println("ShopAlpha \t1  \t-5 \t20  \t0");
-		//if (beta.equals("yes")) stream.println("ShopBeta \t100  \t0 \t100  \t1"); // from 0981
-		if (beta.equals("yes")) stream.println("ShopBeta \t1  \t0 \t100  \t0"); 
+		if (beta.equals("yes")) stream.println("ShopBeta \t100  \t0 \t100  \t1"); // from 0983_ohne_timings
 		if (gamma.equals("yes")) stream.println("ShopGamma \t1  \t0 \t5  \t0");
 		
 		// Leisure
 		stream.println("LeisureUmax \t2  \t0 \t100  \t0");
 		stream.println("LeisureAlpha \t1  \t-5 \t20  \t0");
-		//if (beta.equals("yes")) stream.println("LeisureBeta \t39.7  \t0 \t100  \t1"); // from 0981
-		if (beta.equals("yes")) stream.println("LeisureBeta \t1  \t0 \t100  \t0"); 
+		if (beta.equals("yes")) stream.println("LeisureBeta \t83.8  \t0 \t100  \t1"); // from 0983_ohne_timings
 		if (gamma.equals("yes")) stream.println("LeisureGamma \t1  \t0 \t5  \t0");
 		
 		// betas and gammas
@@ -844,7 +839,6 @@ public class ModFileMaker {
 		if (incomeDivided.equals("yes")) stream.println("beta_cost_car_div_income \t0  \t-50 \t50  \t0");
 		if (incomeDividedLN.equals("yes")) stream.println("beta_cost_car_div_LNincome \t0  \t-50 \t50  \t0");
 		if (incomeBoxCox.equals("yes")) {
-			//stream.println("lambda_time_car_income \t0  \t-50 \t50  \t0");
 			if (travelCost.equals("yes")) stream.println("lambda_cost_car_income \t0  \t-50 \t50  \t0");
 			if (travelDistance.equals("yes")) stream.println("lambda_distance_car_income \t0  \t-50 \t50  \t0");
 		}
@@ -857,7 +851,6 @@ public class ModFileMaker {
 		if (incomeDivided.equals("yes")) stream.println("beta_cost_pt_div_income \t0  \t-50 \t50  \t0");
 		if (incomeDividedLN.equals("yes")) stream.println("beta_cost_pt_div_LNincome \t0  \t-50 \t50  \t0");
 		if (incomeBoxCox.equals("yes")) {
-			//stream.println("lambda_time_pt_income \t0  \t-50 \t50  \t0");
 			if (travelCost.equals("yes")) stream.println("lambda_cost_pt_income \t0  \t-50 \t50  \t0");
 			if (travelDistance.equals("yes")) stream.println("lambda_distance_pt_income \t0  \t-50 \t50  \t0");
 		}
@@ -867,7 +860,6 @@ public class ModFileMaker {
 		if (travelDistance.equals("yes")) stream.println("beta_distance_walk \t0  \t-50 \t30  \t0");
 		if (travelConstant.equals("yes")) stream.println("constant_walk \t0  \t-50 \t50  \t0");
 		if (incomeBoxCox.equals("yes")) {
-			//stream.println("lambda_time_walk_income \t0  \t-50 \t50  \t0");
 			if (travelDistance.equals("yes")) stream.println("lambda_distance_walk_income \t0  \t-50 \t50  \t0");
 		}
 		
@@ -877,7 +869,6 @@ public class ModFileMaker {
 			if (travelDistance.equals("yes")) stream.println("beta_distance_bike \t0  \t-50 \t30  \t0");
 			if (travelConstant.equals("yes")) stream.println("constant_bike \t0  \t-50 \t50  \t0");
 			if (incomeBoxCox.equals("yes")) {
-				//stream.println("lambda_time_bike_income \t0  \t-50 \t50  \t0");
 				if (travelDistance.equals("yes")) stream.println("lambda_distance_bike_income \t0  \t-50 \t50  \t0");
 			}
 		}
@@ -887,28 +878,29 @@ public class ModFileMaker {
 		
 		// Gender, age, carAvail, income, license, munType, seasonTicket
 		if (gender.equals("yes")) {
-		/*	stream.println("beta_female_travel_car \t0  \t-50 \t50  \t0");
-			stream.println("beta_female_travel_pt \t0  \t-50 \t50  \t0");
-			stream.println("beta_female_travel_bike \t0  \t-50 \t50  \t0");
-			stream.println("beta_female_travel_walk \t0  \t-50 \t50  \t0");
-			stream.println("beta_female_home \t0  \t-50 \t50  \t0");
-			stream.println("beta_female_work \t0  \t-50 \t50  \t0");
-			stream.println("beta_female_education \t0  \t-50 \t50  \t0");
-			stream.println("beta_female_shop \t0  \t-50 \t50  \t0");
-			stream.println("beta_female_leisure \t0  \t-50 \t50  \t0");*/
+	/*	//	stream.println("beta_female_travel_car \t0.283  \t-50 \t50  \t1");
+			stream.println("beta_female_travel_pt \t-0.240  \t-50 \t50  \t1");
+			stream.println("beta_female_travel_bike \t0.688  \t-50 \t50  \t1");
+		//	stream.println("beta_female_travel_walk \t0  \t-50 \t50  \t0");
+			stream.println("beta_female_home \t0.259  \t-50 \t50  \t1");
+		//	stream.println("beta_female_innerHome \t0  \t-50 \t50  \t0");
+			stream.println("beta_female_work \t-0.134  \t-50 \t50  \t1");
+		//	stream.println("beta_female_education \t0  \t-50 \t50  \t0");
+			stream.println("beta_female_shop \t0.698  \t-50 \t50  \t1");
+		//	stream.println("beta_female_leisure \t0  \t-50 \t50  \t0");*/
 			stream.println("beta_female_travel \t0.12  \t-50 \t50  \t0");
 			stream.println("beta_female_act \t0.12  \t-50 \t50  \t0");
-		//	stream.println("beta_female_shop \t0  \t-50 \t50  \t0");
 		}
 		if (age.equals("yes")) {
 		/*	stream.println("beta_age_0_15_travel \t0  \t-50 \t50  \t0");
 			stream.println("beta_age_16_30_travel \t0  \t-50 \t50  \t0");
 			stream.println("beta_age_31_60_travel \t0  \t-50 \t50  \t0");
 			stream.println("beta_age_61_travel \t0  \t-50 \t50  \t0");*/
-		//	stream.println("beta_age_home \t0  \t-50 \t50  \t0");
+			stream.println("beta_age_home \t0  \t-50 \t50  \t0");
+			stream.println("beta_age_innerHome \t0  \t-50 \t50  \t0");
 			stream.println("beta_age_work \t0  \t-50 \t50  \t0");
 			stream.println("beta_age_education \t0  \t-50 \t50  \t0");
-		//	stream.println("beta_age_shop \t0  \t-50 \t50  \t0");
+			stream.println("beta_age_shop \t0  \t-50 \t50  \t0");
 			stream.println("beta_age_leisure \t0  \t-50 \t50  \t0");
 		//	stream.println("beta_age_act \t0  \t-50 \t50  \t0");
 		}
@@ -927,23 +919,24 @@ public class ModFileMaker {
 			stream.println("beta_carNever_walk \t0  \t-50 \t50  \t0");
 		}
 		if (income.equals("yes")) {
-		//	stream.println("beta_income_home \t0  \t-50 \t50  \t0");
+			stream.println("beta_income_home \t0  \t-50 \t50  \t0");
+			stream.println("beta_income_innerHome \t0  \t-50 \t50  \t0");
 			stream.println("beta_income_work \t0  \t-50 \t50  \t0");
 			stream.println("beta_income_education \t0  \t-50 \t50  \t0");
 			stream.println("beta_income_leisure \t0  \t-50 \t50  \t0");
-		//	stream.println("beta_income_shop \t0  \t-50 \t50  \t0");
+			stream.println("beta_income_shop \t0  \t-50 \t50  \t0");
 		/*	stream.println("beta_income_car \t0  \t-50 \t50  \t0");
 			stream.println("beta_income_pt \t0  \t-50 \t50  \t0");
 			stream.println("beta_income_bike \t0  \t-50 \t50  \t0");
 			stream.println("beta_income_act \t0  \t-50 \t50  \t0");*/
 		}
 		if (license.equals("yes")) {
-		/*	stream.println("beta_license_car \t0  \t-50 \t50  \t0");
+			stream.println("beta_license_car \t0  \t-50 \t50  \t0");
 			stream.println("beta_license_pt \t0  \t-50 \t50  \t0");
 			stream.println("beta_license_bike \t0  \t-50 \t50  \t0");
-			stream.println("beta_license_walk \t0  \t-50 \t50  \t0");*/
-			stream.println("beta_license_car \t0  \t-50 \t50  \t0");
-			stream.println("beta_license_noncar \t0  \t-50 \t50  \t0");
+			stream.println("beta_license_walk \t0  \t-50 \t50  \t0");
+		//	stream.println("beta_license_car \t0  \t-50 \t50  \t0");
+		//	stream.println("beta_license_noncar \t0  \t-50 \t50  \t0");
 		//	stream.println("beta_license_travel \t0  \t-50 \t50  \t0");
 		}
 		if (munType.equals("yes")) {
@@ -1005,7 +998,7 @@ public class ModFileMaker {
 						}
 						else stream.print(" + beta_time_car * x"+(i+1)+"_car_time");
 					}
-					if (travelCost.equals("yes")) {
+					if (travelCost.equals("yes") && incomeBoxCox.equals("no")) {
 						if (!started){
 							stream.print("beta_cost_car * x"+(i+1)+"_car_cost");
 							started = true;
@@ -1032,7 +1025,7 @@ public class ModFileMaker {
 						}
 						else stream.print(" + beta_time_pt * x"+(i+1)+"_pt_time");
 					}
-					if (travelCost.equals("yes")) {
+					if (travelCost.equals("yes") && incomeBoxCox.equals("no")) {
 						if (!started){
 							stream.print("beta_cost_pt * x"+(i+1)+"_pt_cost");
 							started = true;
@@ -1168,15 +1161,15 @@ public class ModFileMaker {
 						}	
 					}
 				}
-				if (similarity.equals("yes")){
-					stream.print(" + beta_sim * x"+(i+1)+"_sim");
+			}
+			if (similarity.equals("yes")){
+				if (started) stream.print(" + beta_sim * x"+(i+1)+"_sim");
+				else {
+					stream.print("beta_sim * x"+(i+1)+"_sim");
 					started = true;
 				}
-				if (!started) stream.print("$NONE");
 			}
-			else if (incomeConstant.equals("no")){
-				stream.print("$NONE");
-			}
+			if (!started) stream.print("$NONE");
 			stream.println();
 		}		
 		stream.println();
@@ -1195,16 +1188,14 @@ public class ModFileMaker {
 			stream.print((i+1)+"\t");
 			
 			// Activities
-		//	if (gender.equals("yes") && income.equals("no")) stream.print("( one + beta_female_act * Female ) * ");
-		//	else if (gender.equals("no") && income.equals("yes")) stream.print("( one + beta_income_home * Income ) * ");
-		//	else if (gender.equals("yes") && income.equals("yes")) stream.print("( one + beta_female_act * Female + beta_income_home * Income ) * ");
 			if (gender.equals("yes")) stream.print("( one + beta_female_act * Female ");
+		//	if (gender.equals("yes")) stream.print("( one + beta_female_home * Female ");
 		//	if (age.equals("yes")) stream.print("+ beta_age_0_15_act * Age_0_15 + beta_age_16_30_act * Age_16_30 + beta_age_31_60_act * Age_31_60 + beta_age_61_act * Age_61 ");
-		//	if (age.equals("yes")) stream.print("+ beta_age_home * Age ");
+			if (age.equals("yes")) stream.print("+ beta_age_home * Age ");
 		//	if (age.equals("yes")) stream.print("+ beta_age_act * Age ");
 		//	if (munType.equals("yes") && gender.equals("yes")) stream.print("+ beta_munType_act_1 * MunType_1 + beta_munType_act_2 * MunType_2 + beta_munType_act_3 * MunType_3 + beta_munType_act_4 * MunType_4 + beta_munType_act_5 * MunType_5 ");
 		//	if (munType.equals("yes") && gender.equals("no")) stream.print("( one + beta_munType_act * MunType ");
-		//	if (income.equals("yes")) stream.print("+ beta_income_act * Income ");
+			if (income.equals("yes")) stream.print("+ beta_income_home * Income ");
 			if (gender.equals("yes")) stream.print(") * ");
 			if (beta.equals("no") && gamma.equals("no")) stream.print("HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+1+" ) ) )");			
 			else if (beta.equals("yes") && gamma.equals("no")) stream.print("HomeUmax * one / ( one + exp( HomeBeta * ( HomeAlpha * one - x"+(i+1)+""+1+" ) ) )");			
@@ -1215,12 +1206,19 @@ public class ModFileMaker {
 				if (j%2==0){
 					ActivityImpl act = (ActivityImpl)actslegs.get(j);
 					stream.print(" + ");
-					if (gender.equals("yes") /*&& income.equals("no")*/) stream.print("( one + beta_female_act * Female ");
+					if (gender.equals("yes")) stream.print("( one + beta_female_act * Female ");
+				/*	if (gender.equals("yes")) {
+						if (act.getType().toString().equals("h")) stream.print("( one ");
+						if (act.getType().toString().equals("w")) stream.print("( one + beta_female_work * Female ");
+						else if (act.getType().toString().equals("e")) stream.print("( one ");
+						else if (act.getType().toString().equals("shop")) stream.print("( one + beta_female_shop * Female ");
+						else if (act.getType().toString().equals("leisure")) stream.print("( one ");
+					}*/
 					if (income.equals("yes")) {
-					//	if (act.getType().toString().equals("h")) stream.print("+ beta_income_act * Income ");
-						if (act.getType().toString().equals("w")) stream.print("+ beta_income_work * Income ");
+						if (act.getType().toString().equals("h")) stream.print("+ beta_income_innerHome * Income ");
+						else if (act.getType().toString().equals("w")) stream.print("+ beta_income_work * Income ");
 						else if (act.getType().toString().equals("e")) stream.print("+ beta_income_education * Income ");
-					//	else if (act.getType().toString().equals("shop")) stream.print("+ beta_income_shop * Income ");
+						else if (act.getType().toString().equals("shop")) stream.print("+ beta_income_shop * Income ");
 						else if (act.getType().toString().equals("leisure")) stream.print("+ beta_income_leisure * Income ");
 					}
 					if (munType.equals("yes")) {
@@ -1235,10 +1233,10 @@ public class ModFileMaker {
 			//		if (age.equals("yes")) stream.print("+ beta_age_0_15_act * Age_0_15 + beta_age_16_30_act * Age_16_30 + beta_age_31_60_act * Age_31_60 + beta_age_61_act * Age_61 ");
 			//		if (age.equals("yes")) stream.print("+ beta_age_act * Age ");
 					if (age.equals("yes")) {
-			//			if (act.getType().toString().equals("h")) stream.print("+ beta_age_home * Age ");
+						if (act.getType().toString().equals("h")) stream.print("+ beta_age_innerHome * Age ");
 						if (act.getType().toString().equals("w")) stream.print("+ beta_age_work * Age ");
 						else if (act.getType().toString().equals("e")) stream.print(" + beta_age_education * Age ");
-			//			else if (act.getType().toString().equals("shop")) stream.print("+ beta_age_shop * Age ");
+						else if (act.getType().toString().equals("shop")) stream.print("+ beta_age_shop * Age ");
 						else if (act.getType().toString().equals("leisure")) stream.print("+ beta_age_leisure * Age ");
 					}
 			/*		else if (gender.equals("yes") && income.equals("yes")) {
@@ -1315,12 +1313,12 @@ public class ModFileMaker {
 			// Legs
 			
 			// beta_cost_<mode>_div_income
-			if (incomeDivided.equals("yes") && travelCost.equals("yes")) {
+			if (incomeDivided.equals("yes")) {
 				if (car==1) stream.print(" + beta_cost_car_div_income * x"+(i+1)+"_car_cost / ( Income * one + one )");
 				if (pt==1) stream.print(" + beta_cost_pt_div_income * x"+(i+1)+"_pt_cost / ( Income * one + one )");
 			}
 			// beta_cost_<mode>_div_LNincome
-			if (incomeDividedLN.equals("yes") && travelCost.equals("yes")) {
+			if (incomeDividedLN.equals("yes")) {
 				if (car==1) stream.print(" + beta_cost_car_div_LNincome * x"+(i+1)+"_car_cost / LN( Income * one + one_point_two )");
 				if (pt==1) stream.print(" + beta_cost_pt_div_LNincome * x"+(i+1)+"_pt_cost / LN( Income * one + one_point_two )");
 			}
@@ -1328,21 +1326,17 @@ public class ModFileMaker {
 			if (incomeBoxCox.equals("yes")) {
 				// lamda_<cost/distance>_<mode>
 				if (car==1) {
-					//stream.print(" + beta_time_car * x"+(i+1)+"_car_time * ( Income_IncomeAverage * one ) ^ lambda_time_car_income");
 					if (travelCost.equals("yes")) stream.print(" + beta_cost_car * x"+(i+1)+"_car_cost * ( Income_IncomeAverage * one ) ^ lambda_cost_car_income");
 					if (travelDistance.equals("yes")) stream.print(" + beta_distance_car * x"+(i+1)+"_car_distance * ( Income_IncomeAverage * one ) ^ lambda_distance_car_income");
 				}
 				if (pt==1) {
-					//stream.print(" + beta_time_pt * x"+(i+1)+"_pt_time * ( Income_IncomeAverage * one ) ^ lambda_time_pt_income");
 					if (travelCost.equals("yes")) stream.print(" + beta_cost_pt * x"+(i+1)+"_pt_cost * ( Income_IncomeAverage * one ) ^ lambda_cost_pt_income");
 					if (travelDistance.equals("yes")) stream.print(" + beta_distance_pt * x"+(i+1)+"_pt_distance * ( Income_IncomeAverage * one ) ^ lambda_distance_pt_income");
 				}
 				if (bike==1){
-					//stream.print(" + beta_time_bike * x"+(i+1)+"_bike_time * ( Income_IncomeAverage * one ) ^ lambda_time_bike_income");
 					if (travelDistance.equals("yes")) stream.print(" + beta_distance_bike * x"+(i+1)+"_bike_distance * ( Income_IncomeAverage * one ) ^ lambda_distance_bike_income");
 				}
 				if (walk==1) {
-					//stream.print(" + beta_time_walk * x"+(i+1)+"_walk_time * ( Income_IncomeAverage * one ) ^ lambda_time_walk_income");
 					if (travelDistance.equals("yes")) stream.print(" + beta_distance_walk * x"+(i+1)+"_walk_distance * ( Income_IncomeAverage * one ) ^ lambda_distance_walk_income");
 				}
 				
@@ -1406,6 +1400,7 @@ public class ModFileMaker {
 					stream.print(" + beta_time_car * x"+(i+1)+"_car_time");
 					if (gender.equals("yes")) {
 						stream.print(" * ( one + beta_female_travel * Female ");
+				//		stream.print(" * ( one + beta_female_travel_car * Female ");
 				//		if (age.equals("yes")) stream.print("+ beta_age_travel * Age ");
 				//		if (age.equals("yes")) stream.print("+ beta_age_0_15_travel * Age_0_15 + beta_age_16_30_travel * Age_16_30 + beta_age_31_60_travel * Age_31_60 + beta_age_61_travel * Age_61 ");
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_car * CarAlways + beta_carSometimes_car * CarSometimes + beta_carNever_car * CarNever ");
@@ -1464,12 +1459,13 @@ public class ModFileMaker {
 					stream.print(" + beta_time_pt * x"+(i+1)+"_pt_time");
 					if (gender.equals("yes")) {
 						stream.print(" * ( one + beta_female_travel * Female ");
+				//		stream.print(" * ( one + beta_female_travel_pt * Female ");
 				//		if (age.equals("yes")) stream.print("+ beta_age_travel * Age ");
 				//		if (age.equals("yes")) stream.print("+ beta_age_0_15_travel * Age_0_15 + beta_age_16_30_travel * Age_16_30 + beta_age_31_60_travel * Age_31_60 + beta_age_61_travel * Age_61 ");
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_pt * CarAlways + beta_carSometimes_pt * CarSometimes + beta_carNever_pt * CarNever ");
 				//		if (income.equals("yes")) stream.print("+ beta_income_travel * Income ");
-				//		if (license.equals("yes")) stream.print("+ beta_license_pt * License ");
-						if (license.equals("yes")) stream.print("+ beta_license_noncar * License ");
+						if (license.equals("yes")) stream.print("+ beta_license_pt * License ");
+				//		if (license.equals("yes")) stream.print("+ beta_license_noncar * License ");
 				//		if (license.equals("yes")) stream.print("+ beta_license_travel * License ");
 				//		if (munType.equals("yes")) stream.print("+ beta_munType_travel_1 * MunType_1 + beta_munType_travel_2 * MunType_2 + beta_munType_travel_3 * MunType_3 + beta_munType_travel_4 * MunType_4 + beta_munType_travel_5 * MunType_5 ");
 						if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_pt_1 * SeasonTicket_1 + beta_seasonTicket_pt_2 * SeasonTicket_2 + beta_seasonTicket_pt_3 * SeasonTicket_3 ");
@@ -1523,12 +1519,13 @@ public class ModFileMaker {
 					stream.print(" + beta_time_bike * x"+(i+1)+"_bike_time");
 					if (gender.equals("yes")) {
 						stream.print(" * ( one + beta_female_travel * Female ");
+				//		stream.print(" * ( one + beta_female_travel_bike * Female ");
 				//		if (age.equals("yes")) stream.print("+ beta_age_travel * Age ");
 				//		if (age.equals("yes")) stream.print("+ beta_age_0_15_travel * Age_0_15 + beta_age_16_30_travel * Age_16_30 + beta_age_31_60_travel * Age_31_60 + beta_age_61_travel * Age_61 ");
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_bike * CarAlways + beta_carSometimes_bike * CarSometimes + beta_carNever_bike * CarNever ");
 				//		if (income.equals("yes")) stream.print("+ beta_income_travel * Income ");
-				//		if (license.equals("yes")) stream.print("+ beta_license_bike * License ");
-						if (license.equals("yes")) stream.print("+ beta_license_noncar * License ");
+						if (license.equals("yes")) stream.print("+ beta_license_bike * License ");
+				//		if (license.equals("yes")) stream.print("+ beta_license_noncar * License ");
 				//		if (license.equals("yes")) stream.print("+ beta_license_travel * License ");
 				//		if (munType.equals("yes")) stream.print("+ beta_munType_travel_1 * MunType_1 + beta_munType_travel_2 * MunType_2 + beta_munType_travel_3 * MunType_3 + beta_munType_travel_4 * MunType_4 + beta_munType_travel_5 * MunType_5 ");
 				//		if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_bike_1 * SeasonTicket_1 + beta_seasonTicket_bike_2 * SeasonTicket_2 + beta_seasonTicket_bike_3 * SeasonTicket_3 ");
@@ -1582,12 +1579,14 @@ public class ModFileMaker {
 					stream.print(" + beta_time_walk * x"+(i+1)+"_walk_time");
 					if (gender.equals("yes")) {
 						stream.print(" * ( one + beta_female_travel * Female ");
+				//		stream.print(" * ( one + beta_female_travel_walk * Female ");
+				//		stream.print(" * ( one ");
 				//		if (age.equals("yes")) stream.print("+ beta_age_travel * Age ");
 				//		if (age.equals("yes")) stream.print("+ beta_age_0_15_travel * Age_0_15 + beta_age_16_30_travel * Age_16_30 + beta_age_31_60_travel * Age_31_60 + beta_age_61_travel * Age_61 ");
 						if (carAvail.equals("yes")) stream.print("+ beta_carAlways_walk * CarAlways + beta_carSometimes_walk * CarSometimes + beta_carNever_walk * CarNever ");
 				//		if (income.equals("yes")) stream.print("+ beta_income_travel * Income ");
-				//		if (license.equals("yes")) stream.print("+ beta_license_walk * License ");
-						if (license.equals("yes")) stream.print("+ beta_license_noncar * License ");
+						if (license.equals("yes")) stream.print("+ beta_license_walk * License ");
+				//		if (license.equals("yes")) stream.print("+ beta_license_noncar * License ");
 				//		if (license.equals("yes")) stream.print("+ beta_license_travel * License ");
 				//		if (munType.equals("yes")) stream.print("+ beta_munType_travel_1 * MunType_1 + beta_munType_travel_2 * MunType_2 + beta_munType_travel_3 * MunType_3 + beta_munType_travel_4 * MunType_4 + beta_munType_travel_5 * MunType_5 ");
 			//			if (seasonTicket.equals("yes")) stream.print("+ beta_seasonTicket_walk_1 * SeasonTicket_1 + beta_seasonTicket_walk_2 * SeasonTicket_2 + beta_seasonTicket_walk_3 * SeasonTicket_3 ");
