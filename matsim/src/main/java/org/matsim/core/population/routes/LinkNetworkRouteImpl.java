@@ -40,7 +40,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	private ArrayList<Id> route = new ArrayList<Id>();
 	private double travelCost = Double.NaN;
 	private Id vehicleId = null;
-	private final Network network;
+	protected final Network network;
 
 	public LinkNetworkRouteImpl(final Id startLinkId, final Id endLinkId, final Network network) {
 		super(startLinkId, endLinkId);
@@ -57,13 +57,16 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 
 	@Override
 	public double getDistance() {
-		double dist = super.getDistance();
-		if (Double.isNaN(dist)) {
-			dist = 0;
-			for (Id linkId : this.route) {
-				dist += this.network.getLinks().get(linkId).getLength();
-			}
-			this.setDistance(dist);
+		if (Double.isNaN(super.getDistance())) {
+			super.setDistance(this.calcDistance());
+		}
+		return super.getDistance();
+	}
+
+	protected double calcDistance() {
+		double dist = 0;
+		for (Id linkId : this.route) {
+			dist += this.network.getLinks().get(linkId).getLength();
 		}
 		return dist;
 	}

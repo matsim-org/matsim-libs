@@ -28,8 +28,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -222,7 +222,7 @@ public class PlanImplTest extends MatsimTestCase {
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new CoordImpl(100, 200));
-		RouteWRefs route = new NodeNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		RouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
 		route.setDistance(123.45);
 		route.setTravelTime(98.76);
 		leg.setRoute(route);

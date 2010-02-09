@@ -47,7 +47,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
@@ -141,7 +141,7 @@ public class KMLPersonPlanWriter {
 					mainFolder.getAbstractFeatureGroup().add(LocalkmlObjectFactory.createFolder(activityFolder));
 				}
 			}
-			
+
 			// write the person's full plan
 			if(this.writeFullPlan){
 				FolderType activityFolder = getFullPlan();
@@ -192,7 +192,7 @@ public class KMLPersonPlanWriter {
 
 					FolderType routeLinksFolder = this.kmlObjectFactory.createFolderType();
 					routeLinksFolder.setName(leg.getMode().toString() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + leg.getRoute().getDistance());
-					
+
 					if(tempLinkList.size() != 0){
 						routeLinksFolder.setDescription("see attached route");
 						for (Id linkId : tempLinkList) {
@@ -203,7 +203,7 @@ public class KMLPersonPlanWriter {
 					} else {
 						routeLinksFolder.setDescription("sorry no route found");
 					}
-					
+
 					linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(routeLinksFolder));
 
 				} else if (leg.getMode() == TransportMode.pt) {
@@ -219,9 +219,9 @@ public class KMLPersonPlanWriter {
 							}
 
 						}
-						
+
 						AbstractFeatureType abstractFeature;
-						
+
 						if(((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("===R")){
 							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createDBNetworkLinkStyle());
 						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("===S")){
@@ -238,11 +238,11 @@ public class KMLPersonPlanWriter {
 							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createDefaultNetworkLinkStyle());
 						}
 
-						
+
 						abstractFeature.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
 						linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 					}
-				
+
 					} else if (leg.getMode() == TransportMode.walk || leg.getMode() == TransportMode.bike || leg.getMode() == TransportMode.undefined) {
 
 						if (iterator.hasNext()) {
@@ -308,7 +308,7 @@ public class KMLPersonPlanWriter {
 			if (leg.getMode() == TransportMode.car) {
 
 				if (leg.getRoute() != null) {
-					NodeNetworkRouteImpl tempRoute = (NodeNetworkRouteImpl) leg.getRoute();
+					LinkNetworkRouteImpl tempRoute = (LinkNetworkRouteImpl) leg.getRoute();
 					for (Id linkId : tempRoute.getLinkIds()) {
 						linkIds.add(linkId);
 					}

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.GenericRouteFactory;
-import org.matsim.core.population.routes.NodeNetworkRouteFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
 
@@ -48,7 +48,7 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 	public NetworkFactoryImpl(NetworkLayer network) {
 		this.network = network;
 		this.linkFactory = new LinkFactoryImpl();
-		this.routeFactories.put(TransportMode.car, new NodeNetworkRouteFactory(this.network));
+		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory(this.network));
 		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
 	}
 

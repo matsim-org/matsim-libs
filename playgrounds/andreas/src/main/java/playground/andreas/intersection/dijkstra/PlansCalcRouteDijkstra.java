@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -76,7 +76,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 
 			realRouteNodeList.remove(realRouteNodeList.size() - 1);
 
-			NetworkRouteWRefs wrappedRoute = new NodeNetworkRouteImpl(null, null, wrappedNetwork);
+			NetworkRouteWRefs wrappedRoute = new LinkNetworkRouteImpl(null, null, wrappedNetwork);
 			wrappedRoute.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(realRouteNodeList)), null);
 			wrappedRoute.setTravelTime(path.travelTime);
 
@@ -84,7 +84,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			travTime = path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null, wrappedNetwork);
+			NetworkRouteWRefs route = new LinkNetworkRouteImpl(null, null, wrappedNetwork);
 			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;

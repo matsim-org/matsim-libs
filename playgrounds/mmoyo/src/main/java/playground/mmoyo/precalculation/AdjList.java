@@ -8,8 +8,8 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -51,7 +51,7 @@ public class AdjList {
 				}
 
 		 		/**sets also route as nodes.*/
-				NetworkRouteWRefs nodeRoute = new NodeNetworkRouteImpl(null, null, null);
+				NetworkRouteWRefs nodeRoute = new LinkNetworkRouteImpl(null, null, null);
 				nodeRoute.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(nodeList)), null);
 				transitRoute.setRoute(nodeRoute);
 			}

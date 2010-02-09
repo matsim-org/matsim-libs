@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.msieg.structure.Commodity;
@@ -75,7 +75,7 @@ public class BestFitRouter extends CMCFRouter {
 			//path is found, therefore reroute:
 			assert(path != null);
 			if (path != null) {
-				NodeNetworkRouteImpl route = new NodeNetworkRouteImpl(leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), this.network);
+				LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), this.network);
 				route.setLinkIds(	leg.getRoute().getStartLinkId(), NetworkUtils.getLinkIds(path), leg.getRoute().getEndLinkId());
 				leg.setRoute(route);
 				flowValues.put(path, flowValues.get(path) < 1 ? 0 : flowValues.get(path)-1);

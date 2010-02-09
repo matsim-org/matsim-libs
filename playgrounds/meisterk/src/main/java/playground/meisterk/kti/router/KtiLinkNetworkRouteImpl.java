@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KtiNodeNetworkRouteFactory.java
+ * KtiLinkNetworkRouteImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,23 +23,43 @@ package playground.meisterk.kti.router;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.population.routes.RouteWRefs;
+import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
-public class KtiNodeNetworkRouteFactory implements RouteFactory {
+/**
+ * Temporary solution to calculate the route distance as it is simulated in the JEDQSim.
+ *
+ * TODO Generalize in MATSim that routes are handled consistently with their interpretation in the traffic simulation.
+ *
+ * @author meisterk
+ *
+ */
+public class KtiLinkNetworkRouteImpl extends LinkNetworkRouteImpl {
 
-	private final Network network;
-	private final PlanomatConfigGroup planomatConfigGroup;
+	final private PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 
-	public KtiNodeNetworkRouteFactory(final Network network, final PlanomatConfigGroup simLegInterpretation) {
-		super();
-		this.network = network;
-		this.planomatConfigGroup = simLegInterpretation;
+	public KtiLinkNetworkRouteImpl(Id fromLinkId, Id toLinkId, Network network, SimLegInterpretation simLegInterpretation) {
+		super(fromLinkId, toLinkId, network);
+		this.simLegInterpretation = simLegInterpretation;
 	}
 
 	@Override
-	public RouteWRefs createRoute(Id startLinkId, Id endLinkId) {
-		return new KtiNodeNetworkRouteImpl(startLinkId, endLinkId, this.network, this.planomatConfigGroup.getSimLegInterpretation());
+	public double calcDistance() {
+
+		double distance = super.calcDistance();
+
+		if (!this.getStartLinkId().equals(this.getEndLinkId())) {
+			switch (this.simLegInterpretation) {
+			case CetinCompatible:
+				distance += this.network.getLinks().get(this.getEndLinkId()).getLength();
+				break;
+			case CharyparEtAlCompatible:
+				distance += this.network.getLinks().get(this.getStartLinkId()).getLength();
+				break;
+			}
+		}
+		return distance;
+
 	}
 
 }

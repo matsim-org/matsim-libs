@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -296,7 +296,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				routeNodes.add(tmpNode);
 			}
 		}
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null, network);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(null, null, network);
 		route.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(routeNodes)), null);
 
 		return route;

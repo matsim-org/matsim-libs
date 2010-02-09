@@ -36,7 +36,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -75,7 +75,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 					if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
 						Route route = leg.getRoute();
-						assertTrue(route instanceof NodeNetworkRouteImpl); // that must be different from the class used below
+						assertTrue(route instanceof LinkNetworkRouteImpl); // that must be different from the class used below
 					}
 				}
 			}
@@ -88,7 +88,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		scenario.getNetwork().getFactory().setRouteFactory(TransportMode.car, new CompressedNetworkRouteFactory(scenario.getNetwork()));
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
-		
+
 		Controler controler2 = new Controler(scenario);
 		controler2.setCreateGraphs(false);
 		controler2.setWriteEventsInterval(0);
@@ -109,6 +109,6 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 			}
 		}
 
-	}	
+	}
 
 }

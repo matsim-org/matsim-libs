@@ -36,8 +36,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.fakes.FakeAgent;
@@ -97,7 +97,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Link link5 = network.createAndAddLink(new IdImpl("5"), node5, node6, 1000.0, 10.0, 3600.0, 1);
 
 		Collections.addAll(linkIds, link2.getId(), link3.getId(), link4.getId());
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1.getId(), link5.getId(), network);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link5.getId(), network);
 		route.setLinkIds(link1.getId(), linkIds, link5.getId());
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), TransportMode.bus);
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
@@ -129,7 +129,7 @@ public class TransitDriverTest extends MatsimTestCase {
 	public void testInitializationDeparture() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null, null);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(null, null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), TransportMode.bus);
 		double depTime = 9876.5;
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), depTime);
@@ -142,7 +142,7 @@ public class TransitDriverTest extends MatsimTestCase {
 	public void testInitializationStops() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null, null);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(null, null, null);
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
@@ -193,7 +193,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null, null);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(null, null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
@@ -261,7 +261,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		stop2.setLinkId(new IdImpl("dummy"));
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null, null);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(null, null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
@@ -317,7 +317,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(1000, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 100, 110));
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null, null);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(null, null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
@@ -361,7 +361,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitRouteStop routeStop3 = builder.createTransitRouteStop(stop3, Time.UNDEFINED_TIME, departureOffset3);
 		routeStop3.setAwaitDepartureTime(true);
 		stops.add(routeStop3);
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null, null);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(null, null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
 		double departureTime = 9876.0;
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), departureTime);
@@ -406,7 +406,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null, null);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(null, null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();

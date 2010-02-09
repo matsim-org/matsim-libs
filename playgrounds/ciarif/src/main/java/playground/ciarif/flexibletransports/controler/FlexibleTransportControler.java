@@ -14,7 +14,7 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
 import playground.meisterk.kti.controler.listeners.ScoreElements;
-import playground.meisterk.kti.router.KtiNodeNetworkRouteFactory;
+import playground.meisterk.kti.router.KtiLinkNetworkRouteFactory;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
@@ -38,7 +38,7 @@ public class FlexibleTransportControler extends Controler {
 		this.ftConfigGroup = new FtConfigGroup();
 		super.config.addModule(FtConfigGroup.GROUP_NAME, this.ftConfigGroup);
 
-		this.getNetwork().getFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
+		this.getNetwork().getFactory().setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.ride, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 		//TODO modify the line here over when a specific router for ride is available, now it is not used

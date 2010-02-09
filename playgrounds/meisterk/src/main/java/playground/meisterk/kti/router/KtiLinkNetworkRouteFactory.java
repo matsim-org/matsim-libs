@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KtiNodeNetworkRouteImpl.java
+ * KtiNodeNetworkRouteFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,43 +23,23 @@ package playground.meisterk.kti.router;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.population.routes.RouteFactory;
+import org.matsim.core.population.routes.RouteWRefs;
 
-/**
- * Temporary solution to calculate the route distance as it is simulated in the JEDQSim.
- *
- * TODO Generalize in MATSim that routes are handled consistently with their interpretation in the traffic simulation.
- *
- * @author meisterk
- *
- */
-public class KtiNodeNetworkRouteImpl extends NodeNetworkRouteImpl {
+public class KtiLinkNetworkRouteFactory implements RouteFactory {
 
-	final private PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
+	private final Network network;
+	private final PlanomatConfigGroup planomatConfigGroup;
 
-	public KtiNodeNetworkRouteImpl(Id fromLinkId, Id toLinkId, Network network, SimLegInterpretation simLegInterpretation) {
-		super(fromLinkId, toLinkId, network);
-		this.simLegInterpretation = simLegInterpretation;
+	public KtiLinkNetworkRouteFactory(final Network network, final PlanomatConfigGroup simLegInterpretation) {
+		super();
+		this.network = network;
+		this.planomatConfigGroup = simLegInterpretation;
 	}
 
 	@Override
-	public double calcDistance() {
-
-		double distance = super.calcDistance();
-
-		if (!this.getStartLinkId().equals(this.getEndLinkId())) {
-			switch (this.simLegInterpretation) {
-			case CetinCompatible:
-				distance += this.network.getLinks().get(this.getEndLinkId()).getLength();
-				break;
-			case CharyparEtAlCompatible:
-				distance += this.network.getLinks().get(this.getStartLinkId()).getLength();
-				break;
-			}
-		}
-		return distance;
-
+	public RouteWRefs createRoute(Id startLinkId, Id endLinkId) {
+		return new KtiLinkNetworkRouteImpl(startLinkId, endLinkId, this.network, this.planomatConfigGroup.getSimLegInterpretation());
 	}
 
 }

@@ -65,7 +65,6 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.qsim.SimpleTransitStopHandler;
@@ -166,7 +165,7 @@ public class TransitQueueSimulationTest {
 		stop3.setLinkId(link2.getId());
 		stop4.setLinkId(link2.getId());
 
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
 		ArrayList<Id> links = new ArrayList<Id>(0);
 		route.setLinkIds(link1.getId(), links, link2.getId());
 
@@ -428,7 +427,7 @@ public class TransitQueueSimulationTest {
 		stop3.setLinkId(link4.getId());
 		stop4.setLinkId(link5.getId()); // one stop on the last link of the network route, as that one may be specially handled
 
-		NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1.getId(), link5.getId(), network);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link5.getId(), network);
 		ArrayList<Id> links = new ArrayList<Id>();
 		Collections.addAll(links, link2.getId(), link3.getId(), link4.getId());
 		route.setLinkIds(link1.getId(), links, link5.getId());

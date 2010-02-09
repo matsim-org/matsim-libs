@@ -54,7 +54,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 
 	@Override
 	protected NetworkRouteWRefs getNetworkRouteInstance(Id fromLinkId, Id toLinkId, NetworkLayer network) {
-		return new KtiNodeNetworkRouteImpl(fromLinkId, toLinkId, network, this.config.planomat().getSimLegInterpretation());
+		return new KtiLinkNetworkRouteImpl(fromLinkId, toLinkId, network, this.config.planomat().getSimLegInterpretation());
 	}
 
 	@Override

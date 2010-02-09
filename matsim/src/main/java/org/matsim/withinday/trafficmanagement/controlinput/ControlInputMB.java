@@ -37,8 +37,8 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSimTimer;
@@ -466,7 +466,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		Link firstLinkInRS = this.network.getLinks().get(firstLinkIdInRS);
 		Link bottleNeck = this.network.getLinks().get(bottleNeckId);
 		if (firstLinkInRS == bottleNeck) {
-			routeSegment = new NodeNetworkRouteImpl(firstLinkIdInRS, bottleNeckId, this.network);
+			routeSegment = new LinkNetworkRouteImpl(firstLinkIdInRS, bottleNeckId, this.network);
 		} else {
 			routeSegment = wholeRoute.getSubRoute(firstLinkInRS.getToNode(), bottleNeck.getFromNode());
 		}
