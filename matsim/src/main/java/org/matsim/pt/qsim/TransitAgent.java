@@ -49,7 +49,7 @@ public class TransitAgent extends PersonAgent implements PassengerAgent {
 
 	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
-		if (line.getId().equals(route.getLineId()) && transitRoute.getId().equals(route.getRouteId())) {
+		if (line.getId().equals(route.getLineId())) {
 			return containsId(stopsToCome, route.getEgressStopId());
 		} else {
 			return false;
