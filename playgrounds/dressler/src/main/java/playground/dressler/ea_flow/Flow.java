@@ -142,7 +142,8 @@ public class Flow {
 			if (this._settings.isSource(node)) {
 				int i = this._settings.getDemand(node);
 				this._sources.add(node);
-				this._sourceoutflow.put(node, new SourceIntervals());
+				EdgeInterval temp = new EdgeInterval(0,this._settings.TimeHorizon);
+				this._sourceoutflow.put(node, new SourceIntervals(temp));
 				this._demands.put(node, i);
 			} else if (this._settings.isSink(node)) {
 				this._sinks.add(node);
