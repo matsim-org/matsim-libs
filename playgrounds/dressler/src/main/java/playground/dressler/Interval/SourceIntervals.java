@@ -102,6 +102,10 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 			if (current.getHighBound() >= incoming.getHighBound()) {
 				break;
 			}
+			
+			if (this.isLast(current)) {
+				break;
+			}
 			current = this.getIntervalAt(current.getHighBound());
 		}
 			
@@ -148,7 +152,11 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 					collecting = false;
 				}
 			}
-				
+			
+			if (!checkLast()) {
+				System.out.println("Checklast failed!");
+				System.out.println(this);
+			}
 			if (this.isLast(current)) {
 				break;
 			}
@@ -184,6 +192,7 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 		  
 		  if ((i.getHighBound() == j.getLowBound()) && 
 				  (i.getFlow() == j.getFlow())) {
+			  // FIXME use a safer method for removing things!
 			  _tree.remove(i);
 			  _tree.remove(j);
 			  _tree.insert(new EdgeInterval(i.getLowBound(), j.getHighBound(), i.getFlow()));
@@ -192,6 +201,7 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 			  i = j;
 		  }		 		 
 		}
+		this._last = i; // we might have to update it, just do it always
 		return gain;
 	}
 	

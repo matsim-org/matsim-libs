@@ -32,7 +32,7 @@ import playground.dressler.ea_flow.FlowCalculationSettings;
 
 /**
  * class representing the flow of an edge in a Time Expanded Network
- * @author Manuel Schneider
+ * @author Manuel Schneider, Daniel Dressler
  *
  */
 public class EdgeIntervals extends Intervals<EdgeInterval> {
@@ -40,7 +40,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 //**********************************FIELDS*****************************************//
 	
 	/**
-	 * internal binary search tree holding distinkt Intervals
+	 * internal binary search tree holding distinct Intervals
 	 */
 	//private AVLTree _tree;
 	
@@ -221,6 +221,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 		  if(i.getHighBound() != j.getLowBound())
 			  throw new RuntimeException("error in cleanup!");  
 		  if (i.getFlow() == j.getFlow()) {
+			  // FIXME use a safer method for removing things!
 			  _tree.remove(i);
 			  _tree.remove(j);
    		      j = new EdgeInterval(i.getLowBound(), j.getHighBound(), i.getFlow()); 			  
@@ -308,7 +309,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	 * @param f amount of flow to reduce
 	 * @deprecated
 	 *//*
-	public void ugamentreverse(final int t,final int f){
+	public void augmentreverse(final int t,final int f){
 		if (t<0){
 			throw new IllegalArgumentException("negative time : "+ t);
 		}
@@ -375,7 +376,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 		}
 		return null;
 	}*/
-		
+	
 
 
 }

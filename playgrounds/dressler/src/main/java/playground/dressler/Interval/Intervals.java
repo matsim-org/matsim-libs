@@ -4,12 +4,12 @@ public class Intervals<T extends Interval > {
 //------------------------FIELDS----------------------------------//
 
 	/**
-	 * internal binary search tree holding distinct VertexInterval instances
+	 * internal binary search tree holding distinct Interval instances
 	 */
 	AVLTree _tree;
 	
 	/**
-	 * reference to the last VertexInterval
+	 * reference to the last Interval
 	 */
 	 T _last; 
 	
@@ -41,7 +41,7 @@ public class Intervals<T extends Interval > {
 		/**
 		 * Finds the VertexInterval containing t in the collection
 		 * @param t time
-		 * @return  VertexInterval  containing t
+		 * @return Interval  containing t
 		 */
 		public T getIntervalAt(int t){
 			if(t<0){
@@ -60,8 +60,8 @@ public class Intervals<T extends Interval > {
 			return this._tree._size;
 		}
 		/**
-		 * Gives the last stored VertexInterval
-		 * @return VertexInterval with maximal lowbound
+		 * Gives the last stored Interval
+		 * @return Interval with maximal lowbound
 		 */
 		public T getLast(){
 			return _last;
@@ -77,20 +77,20 @@ public class Intervals<T extends Interval > {
 		}
 		
 		/**
-		 * Checks whether the given VertexInterval is the last
+		 * Checks whether the given Interval is the last
 		 * @param o EgeInterval which it test for 
 		 * @return true if getLast.equals(o)
 		 */
-		public boolean isLast(T o){
+		public boolean isLast(T o){			
 			return (_last.equals(o));
 		}
 		
 		
 		
 		/**
-		 * gives the next VertexInterval with respect to the order contained 
+		 * gives the next Interval with respect to the order contained 
 		 * @param o should be contained
-		 * @return next VertexInterval iff o is not last and contained
+		 * @return next Interval iff o is not last and contained
 		 */
 		public T getNext(T o){
 			_tree.goToNodeAt(o.getLowBound());
@@ -110,26 +110,26 @@ public class Intervals<T extends Interval > {
 	//------------------------SPLITTING--------------------------------//	
 		
 		/**
-		 * Finds the VertexInterval containing t and splits this at t 
+		 * Finds the Interval containing t and splits this at t 
 		 * giving it the same flow as the flow as the original 
-		 * it inserts the new VertexInterval after the original
+		 * it inserts the new Interval after the original
 		 * @param t time point to split at
-		 * @return the new VertexInterval for further modification
+		 * @return the new Interval for further modification
 	 	 */
 		public T splitAt(int t){
 			boolean found = false;
 			T j = null;
 			T i = this.getIntervalAt(t);
-				if (i != null){
-					found = true;
-					//update last
-					if(i == _last){
-						j =(T) i.splitAt(t);
-						_last = j;
-					}else {
-						j =(T) i.splitAt(t);
-					}
+			if (i != null){
+				found = true;
+				//update last
+				if(i == _last){
+					j = (T) i.splitAt(t);
+					_last = j;
+				}else {
+					j = (T) i.splitAt(t);
 				}
+			}
 			if (found){
 				_tree.insert(j);
 				return j;

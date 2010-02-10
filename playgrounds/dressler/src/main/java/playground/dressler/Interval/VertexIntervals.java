@@ -122,13 +122,13 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 * where it was null beforehand
 	 * @param arrive Intervals at which node is reachable
 	 * @param pred Predecessor PathStep. It will always be shifted to the beginning of the interval
-	 * @return null or list of changed intervals iff anything was changed
+	 * @return (possibly empty) list of changed intervals
 	 */
     public ArrayList<VertexInterval> setTrueList(ArrayList<Interval> arrive, PathStep pred) {
 		
-		if (arrive == null || arrive.isEmpty()) { return null; }
-				
-		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();
+    	ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();
+    	
+		if (arrive == null || arrive.isEmpty()) { return changed; }
 		
 		// there used to be condensing here ...
 		// but propagate already condenses these days
@@ -166,7 +166,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 					//if arrive contains current, we relabel it completely
 					if(arrive.contains(current))
 					{
-						current.setArrivalAttributes(pred);						
+						current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));						
 						changed.add(current);
 					}
 					else if(current.contains(arrive))
@@ -186,7 +186,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 						}
 						//current has exactly the same bounds as arrive
 						//so relabel it completely
-						current.setArrivalAttributes(pred);						
+						current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));						
 						changed.add(current);
 					}
 					else
@@ -206,7 +206,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 							current = this.getIntervalAt(arrive.getHighBound()-1);
 						}
 						//we set the attributes
-						current.setArrivalAttributes(pred);
+						current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
 						changed.add(current);
 					}
 				}
@@ -246,6 +246,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		  if (i.getReachable() == j.getReachable() 
 				  && i.isScanned() == j.isScanned()
 				  && i.getPredecessor().equals(j.getPredecessor())) {
+			  // FIXME use a safer method for removing things!
 			  _tree.remove(i);
 			  _tree.remove(j);
 			  j = new VertexInterval(i.getLowBound(), j.getHighBound(), i);
@@ -254,7 +255,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		  } 
 		  i = j;
 		}
-		this._last = i;
+		this._last = i; // we might have to update it, just do it always
 		
 		return gain;
 	}

@@ -165,10 +165,11 @@ public class VertexInterval extends Interval {
 	{
 		//we might have already scanned this interval
 		this.scanned = false;
-		this.reachable = true;				
-		// FIXME this shifting here has a tendency to be confusing and to break things!
-		this._predecessor = pred.copyShiftedToArrival(this.getLowBound());
-		//ourInterval.setLastDepartureAtFromNode(arrive.getLastDepartureAtFromNode());		
+		this.reachable = true;
+		this._predecessor = pred;
+		
+		// this shifting here had a tendency to be confusing and to break things!		
+		// this._predecessor = pred.copyShiftedToArrival(this.getLowBound());	
 	}
 	
 //----------------------------SPLITTING----------------------------//
