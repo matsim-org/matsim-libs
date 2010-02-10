@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.ptproject.qsim.QNetwork;
@@ -63,9 +62,8 @@ import com.sun.opengl.util.BufferUtil;
 /**
  * For a given agentID this QueryAgentPlan draws a visual representation of the
  * agent's day.
- * 
+ *
  * @author dstrippgen
- * 
  */
 public class QueryAgentPlan extends AbstractQuery {
 
@@ -74,12 +72,12 @@ public class QueryAgentPlan extends AbstractQuery {
 	private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
 
 	private Id agentId;
-	
+
 	private transient Result result;
 	private transient Map<Id, TeleportationVisData> visTeleportationData;
 	private transient QNetwork net;
 	private transient OTFVisQSimFeature queueSimulation;
-	
+
 
 	@Override
 	public OTFQueryResult query() {
@@ -95,7 +93,7 @@ public class QueryAgentPlan extends AbstractQuery {
 		queryActivityStatus();
 		return result;
 	}
-	
+
 	private void queryActivityStatus() {
 		Integer currentActivityNumber = queueSimulation.getCurrentActivityNumbers().get(this.agentId);
 		if (currentActivityNumber != null) {
@@ -107,14 +105,17 @@ public class QueryAgentPlan extends AbstractQuery {
 		}
 	}
 
+	@Override
 	public Type getType() {
 		return OTFQuery.Type.AGENT;
 	}
 
+	@Override
 	public void setId(String id) {
 		this.agentId = new IdImpl(id);
 	}
 
+	@Override
 	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.queueSimulation = queueSimulation;
 		this.net = queueSimulation.getQueueSimulation().getNetwork();
@@ -146,18 +147,17 @@ public class QueryAgentPlan extends AbstractQuery {
 
 	public static class Result implements OTFQueryResult {
 
-		private static final Logger log = Logger
-				.getLogger(QueryAgentPlan.class);
+		private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
 
 		private static final long serialVersionUID = -8415337571576184768L;
-		
-		private String agentId;
-		private boolean hasPlan = false;
-		private Point2D.Double teleportingAgentPosition = null;
+
+		/*package*/ String agentId;
+		/*package*/ boolean hasPlan = false;
+		/*package*/ Point2D.Double teleportingAgentPosition = null;
 		protected float[] vertex = null;
 		protected byte[] colors = null;
 		private transient FloatBuffer vert;
-		private List<MyInfoText> acts = new ArrayList<MyInfoText>();
+		/*package*/ List<MyInfoText> acts = new ArrayList<MyInfoText>();
 		private transient List<InfoText> activityTexts;
 		protected transient InfoText agentText = null;
 		private ByteBuffer cols;
@@ -182,8 +182,7 @@ public class QueryAgentPlan extends AbstractQuery {
 				prepare(gl);
 				createActivityTextsIfNecessary(drawer);
 			}
-			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer
-			.getActGraph().getLayer(AgentPointDrawer.class);
+			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
 			Point2D.Double pos = tryToFindAgentPosition(layer);
 			if (pos == null) {
 				pos = teleportingAgentPosition;
@@ -195,7 +194,7 @@ public class QueryAgentPlan extends AbstractQuery {
 				createLabelTextIfNecessary(pos);
 				updateAgentTextPosition(pos);
 			} else {
-				fillActivityLabel(drawer);
+				fillActivityLabel();
 			}
 			unPrepare(gl);
 		}
@@ -262,7 +261,7 @@ public class QueryAgentPlan extends AbstractQuery {
 			return layer.getAgentCoords(agentIdString.toCharArray());
 		}
 
-		private void fillActivityLabel(OTFOGLDrawer drawer) {
+		private void fillActivityLabel() {
 			if ((activityNr != -1) && (activityNr < this.acts.size())) {
 				InfoText posT = this.activityTexts.get(activityNr);
 				posT.setColor(new Color(255, 50, 50, 180));
@@ -286,7 +285,7 @@ public class QueryAgentPlan extends AbstractQuery {
 
 		private void createActivityTextsIfNecessary(OTFOGLDrawer drawer) {
 			if (activityTexts == null)  {
-				activityTexts = new ArrayList<InfoText>(); 
+				activityTexts = new ArrayList<InfoText>();
 				for (MyInfoText activityEntry : this.acts ) {
 					InfoText activityText = InfoTextContainer.showTextPermanent(
 							activityEntry.name, activityEntry.east - (float) drawer.getQuad().offsetEast, activityEntry.north - (float) drawer.getQuad().offsetNorth,
@@ -306,6 +305,7 @@ public class QueryAgentPlan extends AbstractQuery {
 			}
 		}
 
+		@Override
 		public void remove() {
 			if (this.activityTexts != null) {
 				for (InfoText inf : this.activityTexts) {
@@ -317,12 +317,13 @@ public class QueryAgentPlan extends AbstractQuery {
 			}
 		}
 
+		@Override
 		public boolean isAlive() {
 			return true;
 		}
 
 	}
-	
+
 	public static class MyInfoText implements Serializable {
 
 		private static final long serialVersionUID = 1L;

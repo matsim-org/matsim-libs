@@ -61,7 +61,7 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 	
 	public PositionInfo(final Id agentId, final LinkImpl link, final double distanceOnLink, final int lane, final double speed,
 			final AgentState vehicleState, final String visualizerData) {
-		super(agentId, 0, 0, 0, 0, 0, PositionInfo.AgentState.PERSON_DRIVING_CAR,	null);
+		super(agentId, 0, 0, 0, 0, 0, PositionInfo.AgentState.PERSON_DRIVING_CAR);
 		this.agentId = agentId;
 		this.link = link;
 		final TreeMap<Double,LineSegment> lsMap = lsTree.getTreeMap(link.getId().toString());

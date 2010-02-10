@@ -66,7 +66,7 @@ public class Controller2D extends Controler {
 		fakeNetwork.createAndAddNode(new IdImpl(1), new CoordImpl(386241.2f,5820247.05f));
 		QNetwork fakeQNetwork = new QNetwork(fakeNetwork);
 		UUID idOne = UUID.randomUUID();
-		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), fakeQNetwork, this.population, getEvents(), false);
+		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), fakeQNetwork, getEvents(), false);
 		OTFBackgroundTexturesDrawer sbg = new OTFBackgroundTexturesDrawer("../../../../sim2d/sg4.png");
 //		sbg.addLocation(new CoordImpl(386124.75,5820130.6), 0, 33.33);
 		sbg.addLocation(386108.0859f,5820114.04f,386141.2f,5820147.092897f);

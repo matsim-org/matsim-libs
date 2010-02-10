@@ -40,7 +40,6 @@ import java.awt.geom.Point2D.Double;
 import java.rmi.RemoteException;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -181,35 +180,35 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
     // --------------- CONSTRUCTION ---------------
 
-    public NetJComponent(JFrame frame, OTFClientQuad quad) {
-        this.quad = quad;
+    public NetJComponent(OTFClientQuad quad) {
+    	this.quad = quad;
 
-        // calculate size of frame
+    	// calculate size of frame
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        double factor = screenSize.getWidth() / networkClippingWidth();
-        factor = Math.min(factor, screenSize.getHeight() / networkClippingHeight());
-        factor *= 0.8f;
+    	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    	double factor = screenSize.getWidth() / networkClippingWidth();
+    	factor = Math.min(factor, screenSize.getHeight() / networkClippingHeight());
+    	factor *= 0.8f;
 
-        frameDefaultWidth = (int) Math.floor(networkClippingWidth() * factor);
-        frameDefaultHeight = (int) Math.floor(networkClippingHeight() * factor);
+    	frameDefaultWidth = (int) Math.floor(networkClippingWidth() * factor);
+    	frameDefaultHeight = (int) Math.floor(networkClippingHeight() * factor);
 
-        scale(1);
-        setViewClipCoords(0,0,1,1);
+    	scale(1);
+    	setViewClipCoords(0,0,1,1);
 
-        networkScrollPane = new MyNetVisScrollPane(this);
-		VizGuiHandler handi = new VizGuiHandler();
-		networkScrollPane.addMouseMotionListener(handi);
-		networkScrollPane.addMouseListener(handi);
-		networkScrollPane.getViewport().addChangeListener(handi);
-		mouseMan = handi;
-		networkScrollPane.addMouseWheelListener(mouseMan);
+    	networkScrollPane = new MyNetVisScrollPane(this);
+    	VizGuiHandler handi = new VizGuiHandler();
+    	networkScrollPane.addMouseMotionListener(handi);
+    	networkScrollPane.addMouseListener(handi);
+    	networkScrollPane.getViewport().addChangeListener(handi);
+    	mouseMan = handi;
+    	networkScrollPane.addMouseWheelListener(mouseMan);
 
-        // linkWidth = 5;
-        // nodeRadius = 5;
-        //
-        // networkRenderer.setNodeRadius(nodeRadius);
-        // networkRenderer.setLinkWidth(linkWidth);
+    	// linkWidth = 5;
+    	// nodeRadius = 5;
+    	//
+    	// networkRenderer.setNodeRadius(nodeRadius);
+    	// networkRenderer.setLinkWidth(linkWidth);
     }
 
     public void scale(double factor) {

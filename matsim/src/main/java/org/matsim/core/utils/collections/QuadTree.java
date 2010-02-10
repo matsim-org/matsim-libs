@@ -685,10 +685,8 @@ public class QuadTree<T> implements Serializable {
 				return values;
 			}
 			// no more childs, so we must contain the closest object
-			if (this.leaf != null && this.leaf.values.size() > 0) {
-				if (bounds.contains(this.leaf.x, this.leaf.y)) {
-					values.addAll(this.leaf.values);
-				}
+			if (this.leaf != null && this.leaf.values.size() > 0 && bounds.contains(this.leaf.x, this.leaf.y)) {
+				values.addAll(this.leaf.values);
 			}
 			return values;
 		}
@@ -711,11 +709,9 @@ public class QuadTree<T> implements Serializable {
 				return count;
 			}
 			// no more childs, so we must contain the closest object
-			if (this.leaf != null && this.leaf.values.size() > 0) {
-				if (globalBounds.contains(this.leaf.x, this.leaf.y)) {
-					count += this.leaf.values.size();
-					for (T object : this.leaf.values) executor.execute(this.leaf.x, this.leaf.y, object);
-				}
+			if (this.leaf != null && this.leaf.values.size() > 0 && globalBounds.contains(this.leaf.x, this.leaf.y)) {
+				count += this.leaf.values.size();
+				for (T object : this.leaf.values) executor.execute(this.leaf.x, this.leaf.y, object);
 			}
 			return count;
 		}

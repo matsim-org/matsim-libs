@@ -43,8 +43,8 @@ public class LayerImpl implements Serializable, Layer {
 	private final Id type;
 	private String name;
 
-	MappingRule upRule = null; // to aggregate
-	MappingRule downRule = null; // to disaggregate
+	transient MappingRule upRule = null; // to aggregate
+	transient MappingRule downRule = null; // to disaggregate
 
 	final TreeMap<Id, MappedLocation> locations = new TreeMap<Id,MappedLocation>();
 
@@ -106,9 +106,9 @@ public class LayerImpl implements Serializable, Layer {
 
 		this.upRule = null;
 		return true;
-		
+
 	}
-	
+
 	@Deprecated // do not use; this is here only for re-factoring purposes.  kai, jul09
 	public void forceDownRuleToNull() {
 		this.downRule = null ;
@@ -170,7 +170,7 @@ public class LayerImpl implements Serializable, Layer {
 	}
 
 	/**
-	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in 
+	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in
 	 * most cases.
      *
 	 * @param coord A coordinate to which the nearest location should be returned.
@@ -183,16 +183,16 @@ public class LayerImpl implements Serializable, Layer {
 	}
 
 	/**
-	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in 
+	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in
 	 * most cases.
-	 * 
+	 *
 	 * @param coord A coordinate to which the nearest location should be returned.
 	 * @param excludeLocation A location that should be ignored when finding the nearest location. Useful to
 	 * find the nearest neighbor of the excluded location.
 	 *
 	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
 	 * the same minimal distance, all of them are returned.
-	 * 
+	 *
 	 */
 	public final ArrayList<MappedLocation> getNearestLocations(final Coord coord, final Location excludeLocation) {
 		ArrayList<MappedLocation> locs = new ArrayList<MappedLocation>();

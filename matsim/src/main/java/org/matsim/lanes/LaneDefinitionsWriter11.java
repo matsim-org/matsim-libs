@@ -45,7 +45,7 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
 
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsWriter11.class);
-	
+
 	private LaneDefinitions laneDefinitions;
 
 	private XMLLaneDefinitions xmlLaneDefinitions;
@@ -53,8 +53,8 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
 	/**
 	 * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd
 	 * file format.
-	 * @param lanedefs 
-	 * 
+	 * @param lanedefs
+	 *
 	 */
 	public LaneDefinitionsWriter11(LaneDefinitions lanedefs) {
 		log.info("Using LaneDefinitionWriter11...");
@@ -73,7 +73,7 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
 			jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions11.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
 			super.setMarshallerProperties(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11, m);
-			m.marshal(this.xmlLaneDefinitions, IOUtils.getBufferedWriter(filename)); 
+			m.marshal(this.xmlLaneDefinitions, IOUtils.getBufferedWriter(filename));
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
@@ -82,19 +82,19 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private XMLLaneDefinitions convertBasicToXml() {
 		ObjectFactory fac = new ObjectFactory();
 		XMLLaneDefinitions xmllaneDefs = fac.createXMLLaneDefinitions();
-		
-		for (LanesToLinkAssignment ltla : this.laneDefinitions.getLanesToLinkAssignmentsList()) {
+
+		for (LanesToLinkAssignment ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
 			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
 			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
-			
-			for (Lane bl : ltla.getLanesList()) {
+
+			for (Lane bl : ltla.getLanes().values()) {
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
-				
+
 				for (Id id : bl.getToLinkIds()) {
 					XMLIdRefType xmlToLink = fac.createXMLIdRefType();
 					xmlToLink.setRefId(id.toString());
@@ -104,16 +104,16 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
 				XMLLaneType.XMLRepresentedLanes lanes = new XMLLaneType.XMLRepresentedLanes();
 				lanes.setNumber(Integer.valueOf(bl.getNumberOfRepresentedLanes()));
 				xmllane.setRepresentedLanes(lanes);
-				
+
 				XMLLaneType.XMLLength length = new XMLLaneType.XMLLength();
 				length.setMeter(Double.valueOf(bl.getLength()));
 				xmllane.setLength(length);
-				
+
 				xmlltla.getLane().add(xmllane);
 			}
 			xmllaneDefs.getLanesToLinkAssignment().add(xmlltla);
 		} //end writing lanesToLinkAssignments
-				
+
 		return xmllaneDefs;
 	}
 

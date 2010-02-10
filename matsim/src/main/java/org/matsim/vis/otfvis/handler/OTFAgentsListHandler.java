@@ -61,7 +61,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	public static class ExtendedPositionInfo extends PositionInfo {
 
 		private ExtendedPositionInfo(Id driverId, double easting, double northing, double elevation, double azimuth, double speed, AgentState vehicleState, int type, int userdata) {
-			super(driverId, easting, northing, elevation, azimuth, speed, vehicleState, "");
+			super(driverId, easting, northing, elevation, azimuth, speed, vehicleState);
 			this.setType(type);
 			this.setUserDefined(userdata);
 		}

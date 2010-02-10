@@ -47,7 +47,6 @@ import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.ptproject.qsim.QNetwork;
@@ -164,21 +163,22 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 
 	private OnTheFlyServer(RMIClientSocketFactory clientSocketFactory, RMIServerSocketFactory serverSocketFactory) throws RemoteException {
-		super(0, new SslRMIClientSocketFactory(), new SslRMIServerSocketFactory());
+		super(0, clientSocketFactory, serverSocketFactory);
 		OTFDataWriter.setServer(this);
 	}
 
 	private OnTheFlyServer() throws RemoteException {
 		super(0);
+		OTFDataWriter.setServer(this);
 	}
 
-	private void init(QNetwork network, Population population, EventsManager events){
+	private void init(QNetwork network, EventsManager events){
 		this.quadBuilder = new OTFQSimServerQuadBuilder(network);
 		this.setEvents(events);
 	}
 
 
-	public static OnTheFlyServer createInstance(String readableName, QNetwork network, Population population, EventsManager events, boolean useSSL) {
+	public static OnTheFlyServer createInstance(String readableName, QNetwork network, EventsManager events, boolean useSSL) {
 		registry = getRegistry(useSSL);
 		try {
 			// Register with RMI to be seen from client
@@ -188,7 +188,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			} else {
 				instance = new OnTheFlyServer();
 			}
-			instance.init(network, population, events);
+			instance.init(network, events);
 			registry.bind(readableName, instance);
 			log.info("OTFServer bound in RMI registry");
 			return instance;

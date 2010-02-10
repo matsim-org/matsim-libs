@@ -37,7 +37,7 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 /**
  * OTFDoubleMVI displays two movies in different areas of a split screen application.
- * 
+ *
  * @author dstrippgen
  *
  */
@@ -64,9 +64,9 @@ public class OTFDoubleMVI extends OTFClientFile {
 		OTFDrawer superDrawer = super.createDrawer();
 		OTFDrawer drawer;
 		try {
-			drawer = new OTFOGLDrawer(frame, this.getLeftDrawerComponent());
+			drawer = new OTFOGLDrawer(this.getLeftDrawerComponent());
 			this.leftComp = drawer;
-			
+
 			drawer.invalidate((int)hostControlBar.getOTFHostControl().getTime());
 			this.hostControlBar.addDrawer("test", drawer);
 			pane.setLeftComponent(drawer.getComponent());
@@ -83,7 +83,7 @@ public class OTFDoubleMVI extends OTFClientFile {
 			connectR.add(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 
 			OTFClientQuad clientQ2 = createNewView(null, connectR, hostControl2);
-			OTFOGLDrawer drawer2 = new OTFOGLDrawer(this.frame, clientQ2);
+			OTFOGLDrawer drawer2 = new OTFOGLDrawer(clientQ2);
 			drawer2.invalidate((int)hostControlBar.getOTFHostControl().getTime());
 			drawer2.replaceMouseHandler(((OTFOGLDrawer) this.mainDrawer).getMouseHandler());
 			hostControlBar.addDrawer("test", drawer2);
@@ -106,8 +106,8 @@ public class OTFDoubleMVI extends OTFClientFile {
 		if (args.length == 2) {
 			filename = args[0];
 			filename2 = args[1];
-		} 
-		
+		}
+
 		OTFDoubleMVI client = new OTFDoubleMVI(filename, filename2);
 		client.start();
 	}

@@ -107,14 +107,14 @@ import com.sun.opengl.util.texture.TextureIO;
 /**
  * Call TextRenderHack to fix the TextRender problem on the Mac This class should only be used until
  * Apple puts out their fix.
- * 
+ *
  * @author Jeff Addison - Southgate Software Ltd. www.southgatesoftware.com
  */
 class TextRenderHack
 {
 	/**
 	 * Call this function in your drawing code to fix the TextRender rendering problem on the Mac
-	 * 
+	 *
 	 * @param tr Text Renderer to fix
 	 */
 	public static void fixIt(TextRenderer tr)
@@ -139,7 +139,7 @@ class TextRenderHack
 
 	/**
 	 * Invokes a private method on and Object.
-	 * 
+	 *
 	 * @param o Object to call private method on
 	 * @param methodName Name of the method to call
 	 * @param params Array of parameters to be passed to the function
@@ -200,8 +200,8 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		float height = this.size*this.t.getHeight()/viewport[3];
 		float length = this.size*this.t.getWidth()/viewport[2];
 		int z = 0;
-		float startX = this.relX >= 0 ? -1.f + this.relX : 1.f -length +this.relX; 
-		float startY = this.relY >= 0 ? -1.f + this.relY : 1.f -height +this.relY; 
+		float startX = this.relX >= 0 ? -1.f + this.relX : 1.f -length +this.relX;
+		float startY = this.relY >= 0 ? -1.f + this.relY : 1.f -height +this.relY;
 
 		gl.glColor4d(1,1,1,1);
 
@@ -244,16 +244,16 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 }
 /**
  * OTFOGLDrawer is responsible for everything that goes on inside the OpenGL context.
- * The main functions are invalidate() and redraw(). The latter will simply redraw a given 
+ * The main functions are invalidate() and redraw(). The latter will simply redraw a given
  * SceneGraph, whilst invalidate() will update the content.
- * 
+ *
  * @author dstrippgen
  *
  */
 public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
-	
+
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
-	
+
 	private static int linkTexWidth = 0;
 	private static float agentSize = 10.f;
 	private int netDisplList = 0;
@@ -302,7 +302,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			initTextRenderer();
 			this.drawable = drawable;
 		}
-		
+
 		private void initTextRenderer() {
 			// Create the text renderer
 			Font font = new Font("SansSerif", Font.PLAIN, 32);
@@ -369,7 +369,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			return this.fastValues[(int)(value*this.grain)] ;
 		}
 	}
-	
+
 	public static class RandomColorizer {
 		Color [] fastValues;
 		private static final Random rand = new Random();
@@ -384,13 +384,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 	}
 
-	/**I think that this class is used nowhere except that some static fields are used from somewhere else.  
+	/**I think that this class is used nowhere except that some static fields are used from somewhere else.
 	 * (But, as usual, it might be needed in some old mvi files.)  Kai, jan'10
-	 * 
+	 *
 	 */
-	public static class AgentDrawer 
-//	extends OTFGLDrawableImpl 
-//	implements OTFDataSimpleAgentReceiver 
+	public static class AgentDrawer
+//	extends OTFGLDrawableImpl
+//	implements OTFDataSimpleAgentReceiver
 	{
 //		//Anything above 50km/h should be yellow!
 //		private final static FastColorizer colorizer = new FastColorizer(
@@ -402,12 +402,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 //		protected int state;
 
 		public static  Texture  carjpg = null;
-		
-		//for backward compatibility only 
-		@Deprecated 
+
+		//for backward compatibility only
+		@Deprecated
 		public static  Texture  wavejpg = null;
 		//for backward compatibility only
-		@Deprecated 
+		@Deprecated
 		public static  Texture  pedpng = null;
 
 //		private static int cnt = 0 ;
@@ -466,7 +466,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				super.paint(arg0);
 			}
 		}
-		
+
 	}
 
 	private Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps, final GLContext motherContext) {
@@ -479,8 +479,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		canvas.addGLEventListener(drawer);
 		return canvas;
 	}
-	
-	public OTFOGLDrawer(JFrame frame, OTFClientQuad clientQ) {
+
+	public OTFOGLDrawer(OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
 		GLCapabilities caps = new GLCapabilities();
 		this.canvas = createGLCanvas(this, caps, motherContext);
@@ -519,7 +519,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.canvas.addMouseMotionListener(this.mouseMan);
 		this.canvas.addMouseWheelListener(this.mouseMan);
 	}
-	
+
 	public VisGUIMouseHandler getMouseHandler() {
 		return this.mouseMan;
 	}
@@ -613,10 +613,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		// Mac OS X impl of TextRenderer is broken as of 2008/10/24
 		// remove this if there is --ever-- a fix
 		TextRenderHack.fixIt( this.statusDrawer.textRenderer );
-		
+
 		Collection<String> visibleLinkIds = coordStringPairs.values();
 		InfoTextContainer.drawInfoTexts(drawable, visibleLinkIds);
-		
+
 		if (OTFClientControl.getInstance().getOTFVisConfig().drawTime()) {
 			this.statusDrawer.displayStatusText(this.lastTime);
 		}
@@ -628,11 +628,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				item.draw();
 			}
 		}
-		
+
 		if (OTFClientControl.getInstance().getOTFVisConfig().drawScaleBar()) {
 			this.scaleBar.draw();
 		}
-		
+
 		if (OTFClientControl.getInstance().getOTFVisConfig().renderImages() && (this.lastShot < this.now)){
 			this.lastShot = this.now;
 			String nr = String.format("%07d", this.now);
@@ -656,7 +656,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	public void init(GLAutoDrawable drawable) {
 		if(motherContext == null) motherContext = drawable.getContext();
-		
+
 		this.gl = drawable.getGL();
 		this.gl.setSwapInterval(0);
 		float[] components = OTFClientControl.getInstance().getOTFVisConfig().getBackgroundColor().getColorComponents(new float[4]);
@@ -664,8 +664,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this.mouseMan.init(this.gl);
 
-		AgentDrawer.carjpg = createTexture(MatsimResource.getAsInputStream("car.png"));	
-		AgentDrawer.wavejpg = createTexture(MatsimResource.getAsInputStream("square.png"));		
+		AgentDrawer.carjpg = createTexture(MatsimResource.getAsInputStream("car.png"));
+		AgentDrawer.wavejpg = createTexture(MatsimResource.getAsInputStream("square.png"));
 		AgentDrawer.pedpng = createTexture(MatsimResource.getAsInputStream("ped.png"));
 
 		this.netDisplList = this.gl.glGenLists(1);
@@ -690,8 +690,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.canvas.getParent();
 		this.zoomD.setLocation(pD);
 		this.zoomD.setPreferredSize(this.canvas.getSize());
-		GridLayout gbl = new GridLayout(3,3); 
-		this.zoomD.getContentPane().setLayout( gbl ); 
+		GridLayout gbl = new GridLayout(3,3);
+		this.zoomD.getContentPane().setLayout( gbl );
 		ArrayList<JButton> buttons = new ArrayList<JButton>();
 		final List<ZoomEntry> zooms = OTFClientControl.getInstance().getOTFVisConfig().getZooms();
 		log.debug("Number of zooms: " + OTFClientControl.getInstance().getOTFVisConfig().getZooms().size());
@@ -702,24 +702,24 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			b.setPreferredSize(new Dimension(220, 100));
 			buttons.add(i, b);
 			b.setActionCommand(Integer.toString(i));
-			b.addActionListener( new ActionListener() { 
+			b.addActionListener( new ActionListener() {
 				public void actionPerformed( ActionEvent e ) {
 					int num = Integer.parseInt(e.getActionCommand());
 					OTFOGLDrawer.this.lastZoom = zooms.get(num);
 					OTFOGLDrawer.this.mouseMan.setToNewPos(OTFOGLDrawer.this.lastZoom.getZoomstart());
-					OTFOGLDrawer.this.zoomD.setVisible(false); 
-				} 
-			} ); 			
+					OTFOGLDrawer.this.zoomD.setVisible(false);
+				}
+			} );
 			this.zoomD.getContentPane().add(b);
 		}
 		JPanel pane = new JPanel();
 		JButton bb = new JButton("Cancel");
-		bb.addActionListener( new ActionListener() { 
+		bb.addActionListener( new ActionListener() {
 			public void actionPerformed( ActionEvent e ) {
 				OTFOGLDrawer.this.lastZoom = null;
-				OTFOGLDrawer.this.zoomD.setVisible(false); 
-			} 
-		} ); 	
+				OTFOGLDrawer.this.zoomD.setVisible(false);
+			}
+		} );
 		bb.setPreferredSize(new Dimension(120, 40));
 		pane.add(bb);
 		this.zoomD.getContentPane().add(pane);
@@ -739,10 +739,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		if(withName) {
 			final JDialog d = new JDialog((JFrame)null,"Name for this zoom", true);
 			JTextField field = new JTextField(20);
-			ActionListener al =  new ActionListener() { 
+			ActionListener al =  new ActionListener() {
 				public void actionPerformed( ActionEvent e ) {
 					d.setVisible(false);
-				} }; 
+				} };
 				field.addActionListener(al);
 				d.getContentPane().add(field);
 				d.pack();
@@ -750,7 +750,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				name = field.getText();
 		}
 		this.canvas.repaint();
-		
+
 		BufferedImage image = ImageUtil.createThumbnail(this.current, 300);
 		OTFClientControl.getInstance().getOTFVisConfig().addZoom(new ZoomEntry(image,zoomstore, name));
 
@@ -760,46 +760,46 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		if(mouseButton == 4 ){
 			this.current = null;
 
-			JPopupMenu popmen = new JPopupMenu(); 
-			JMenuItem menu1 = new JMenuItem( "Zoom"); 
+			JPopupMenu popmen = new JPopupMenu();
+			JMenuItem menu1 = new JMenuItem( "Zoom");
 			menu1.setBackground(Color.lightGray);
 			popmen.add( menu1 );
 			popmen.addSeparator();
-			popmen.add( new AbstractAction("Store Zoom") { 
+			popmen.add( new AbstractAction("Store Zoom") {
 				private static final long serialVersionUID = 1L;
 				public void actionPerformed( ActionEvent e ) {
 					storeZoom(false, "");
-				} 
-			} ); 
-			popmen.add( new AbstractAction("Store inital Zoom") { 
+				}
+			} );
+			popmen.add( new AbstractAction("Store inital Zoom") {
 				private static final long serialVersionUID = 1L;
 				public void actionPerformed( ActionEvent e ) {
 					storeZoom(false, "*Initial*");
-				} 
-			} ); 
-			popmen.add( new AbstractAction("Store named Zoom...") { 
+				}
+			} );
+			popmen.add( new AbstractAction("Store named Zoom...") {
 				private static final long serialVersionUID = 1L;
 				public void actionPerformed( ActionEvent e ) {
 					storeZoom(true, "");
-				} 
+				}
 			} );
 			popmen.addSeparator();
-			popmen.add( new AbstractAction("Load Zoom...") { 
+			popmen.add( new AbstractAction("Load Zoom...") {
 				private static final long serialVersionUID = 1L;
-				public void actionPerformed( ActionEvent e ) { 
+				public void actionPerformed( ActionEvent e ) {
 					showZoomDialog();
-					if(OTFOGLDrawer.this.lastZoom != null) OTFOGLDrawer.this.mouseMan.setToNewPos(OTFOGLDrawer.this.lastZoom.getZoomstart()); 
-				} 
-			} ); 
-			popmen.add( new AbstractAction("Delete last Zoom") { 
+					if(OTFOGLDrawer.this.lastZoom != null) OTFOGLDrawer.this.mouseMan.setToNewPos(OTFOGLDrawer.this.lastZoom.getZoomstart());
+				}
+			} );
+			popmen.add( new AbstractAction("Delete last Zoom") {
 				private static final long serialVersionUID = 1L;
-				public void actionPerformed( ActionEvent e ) { 
+				public void actionPerformed( ActionEvent e ) {
 					if(OTFOGLDrawer.this.lastZoom != null) {
 						OTFClientControl.getInstance().getOTFVisConfig().deleteZoom(OTFOGLDrawer.this.lastZoom);
 						OTFOGLDrawer.this.lastZoom = null;
 					}
-				} 
-			} );  
+				}
+			} );
 			popmen.show(this.getComponent(),e.getX(), e.getY());
 			return;
 		}
@@ -927,7 +927,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		if(queryHandler != null) this.queryHandler = queryHandler;
 	}
-	
+
 
 	public OTFQueryHandler getQueryHandler() {
 		return queryHandler;

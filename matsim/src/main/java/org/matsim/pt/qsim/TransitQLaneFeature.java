@@ -125,7 +125,7 @@ public class TransitQLaneFeature {
 			double vehPosition = queueLane.getLink().getLength();
 			for (QVehicle veh : this.transitVehicleStopQueue) {
 				PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, veh.getDriver().getPerson().getId(), queueLane.getLink(),
-						vehPosition, lane, 0.0, 	AgentSnapshotInfo.AgentState.TRANSIT_DRIVER, null);
+						vehPosition, lane, 0.0, 	AgentSnapshotInfo.AgentState.TRANSIT_DRIVER);
 				positions.add(position);
 				vehPosition -= veh.getSizeInEquivalents() * cellSize;
 			}

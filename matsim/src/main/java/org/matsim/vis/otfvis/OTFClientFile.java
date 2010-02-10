@@ -49,14 +49,14 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
  *
  * This class is still a bit dirty as it is using tons of code to stay compatible
  * to older versions of OTFVis. dg dez 09
- * 
+ *
  * @author dstrippgen
  * @author dgrether
  */
 public class OTFClientFile extends OTFClient {
-	
+
 	private static final Logger log = Logger.getLogger(OTFClientFile.class);
-	
+
 	protected OTFConnectionManager connect = new OTFConnectionManager();
 
   private OTFFileSettingsSaver fileSettingsSaver;
@@ -64,7 +64,7 @@ public class OTFClientFile extends OTFClient {
 	public OTFClientFile( String filename) {
 		super("file:" + filename);
 		/*
-		 * If I got it right: The following entries to the connection manager are really needed to 
+		 * If I got it right: The following entries to the connection manager are really needed to
 		 * get otfvis running with the current matsim version. The other entries added
 		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
 		 */
@@ -72,7 +72,7 @@ public class OTFClientFile extends OTFClient {
 		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		this.connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
-		
+
 		this.connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		this.connect.add(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
 		this.connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
@@ -82,16 +82,16 @@ public class OTFClientFile extends OTFClient {
 		this.connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 
 		this.connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		
+
 		this.connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 
 		this.connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		
+
 		/*
 		 * This entry is needed to couple the org.matsim.core.queuesim to the visualizer
 		 */
 		this.connect.add(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		
+
 	}
 
 	protected OTFClientQuad getRightDrawerComponent() throws RemoteException {
@@ -113,7 +113,7 @@ public class OTFClientFile extends OTFClient {
 	protected OTFDrawer createDrawer(){
 		try {
 			frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
-			mainDrawer = 	new OTFOGLDrawer(frame, this.getRightDrawerComponent());
+			mainDrawer = 	new OTFOGLDrawer(this.getRightDrawerComponent());
 
 		}catch (RemoteException e) {
 			e.printStackTrace();
@@ -122,11 +122,11 @@ public class OTFClientFile extends OTFClient {
 		hostControlBar.finishedInitialisition();
 		return mainDrawer;
 	}
-	
+
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
 		OTFVisConfig visconf = new OTFVisConfig();
-		fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);	
+		fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);
 		visconf = fileSettingsSaver.openAndReadConfig();
 		saver = new OTFLiveSettingsSaver(visconf, this.url);
 		return visconf;

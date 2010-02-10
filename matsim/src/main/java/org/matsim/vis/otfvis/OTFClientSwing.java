@@ -41,7 +41,7 @@ import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
  * This Client is capable of running on SWING only computers. It does not need OpenGL acceleration.
  * But it does not feature the whole set of operations possible with the OpenGL client.
  * It is also very slow, but for small networks it should work.
- * 
+ *
  * @author dstrippgen
  * @author dgrether
  *
@@ -49,7 +49,7 @@ import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 public class OTFClientSwing extends OTFClient {
 
 	private static final Logger log = Logger.getLogger(OTFClientSwing.class);
-	
+
 	private OTFConnectionManager connect2 = new OTFConnectionManager();
 
   private OTFFileSettingsSaver fileSettingsSaver;
@@ -63,9 +63,9 @@ public class OTFClientSwing extends OTFClient {
 		 * This entry is needed to couple the org.matsim.core.queuesim to the visualizer
 		 */
 		this.connect2.add(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		
+
 	}
-		
+
 
 	@Override
 	protected OTFDrawer createDrawer(){
@@ -75,7 +75,7 @@ public class OTFClientSwing extends OTFClient {
 			} else  {
 				throw new IllegalStateException("Server in live mode!");
 			}
-			mainDrawer = new NetJComponent(frame, createNewView("swing", connect2, hostControlBar.getOTFHostControl()));
+			mainDrawer = new NetJComponent(createNewView("swing", connect2, hostControlBar.getOTFHostControl()));
 
 		}catch (RemoteException e) {
 			e.printStackTrace();
@@ -84,11 +84,11 @@ public class OTFClientSwing extends OTFClient {
 		hostControlBar.finishedInitialisition();
 		return mainDrawer;
 	}
-	
+
 	@Override
   protected OTFVisConfig createOTFVisConfig() {
     OTFVisConfig visconf = new OTFVisConfig();
-    fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);  
+    fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);
     visconf = fileSettingsSaver.openAndReadConfig();
     saver = new OTFLiveSettingsSaver(visconf, this.url);
     return visconf;
@@ -103,8 +103,8 @@ public class OTFClientSwing extends OTFClient {
 		else arg0 = args[0];
 
 		new OTFClientSwing("file:" + arg0).run();
-		
-	}		
+
+	}
 
 
 

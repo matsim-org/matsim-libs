@@ -511,20 +511,18 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 			QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
 				// try to fix it somehow
-				if (this.teleportVehicles) {
-					if (agent instanceof PersonAgent) {
-						vehicle = ((PersonAgent) agent).getVehicle();
-						if (vehicle.getCurrentLink() != null) {
-							if (this.cntTeleportVehicle < 9) {
-								this.cntTeleportVehicle++;
-								log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
-								if (this.cntTeleportVehicle == 9) {
-									log.info("No more occurrences of teleported vehicles will be reported.");
-								}
+				if (this.teleportVehicles && (agent instanceof PersonAgent)) {
+					vehicle = ((PersonAgent) agent).getVehicle();
+					if (vehicle.getCurrentLink() != null) {
+						if (this.cntTeleportVehicle < 9) {
+							this.cntTeleportVehicle++;
+							log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
+							if (this.cntTeleportVehicle == 9) {
+								log.info("No more occurrences of teleported vehicles will be reported.");
 							}
-							QueueLink qlinkOld = this.network.getQueueLink(vehicle.getCurrentLink().getId());
-							qlinkOld.removeParkedVehicle(vehicle.getId());
 						}
+						QueueLink qlinkOld = this.network.getQueueLink(vehicle.getCurrentLink().getId());
+						qlinkOld.removeParkedVehicle(vehicle.getId());
 					}
 				}
 			}

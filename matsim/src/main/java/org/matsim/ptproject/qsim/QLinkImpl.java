@@ -706,7 +706,7 @@ public class QLinkImpl implements QLink {
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLinkImpl.this.getLink(),
-								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
+								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 						positions.add(position);
 					}
 					distFromFromNode -= cellSize;
@@ -720,7 +720,7 @@ public class QLinkImpl implements QLink {
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLinkImpl.this.getLink(),
-								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
+								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 						positions.add(position);
 					}
 					distFromFromNode -= cellSize;
@@ -739,7 +739,7 @@ public class QLinkImpl implements QLink {
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLinkImpl.this.getLink(),
-								distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY, null);
+								distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 						positions.add(position);
 					}
 					distFromFromNode -= cellSize;
@@ -799,7 +799,7 @@ public class QLinkImpl implements QLink {
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI person : peopleInVehicle) {
 					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), link, queueEnd,
-							lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
+							lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					if ( person.getPerson().getId().toString().startsWith("pt") ) { 
 						position.setAgentState( AgentState.TRANSIT_DRIVER ) ;
 					} else {
@@ -906,7 +906,7 @@ public class QLinkImpl implements QLink {
 			Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 			for (PersonAgentI person : peopleInVehicle) {
 				PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLinkImpl.this.getLink(),
-						/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
+						/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 				if ( person.getPerson().getId().toString().startsWith("pt") ) { 
 					position.setAgentState( AgentState.TRANSIT_DRIVER ) ;
 				} else {

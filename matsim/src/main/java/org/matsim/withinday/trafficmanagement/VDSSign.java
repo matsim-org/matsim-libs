@@ -168,12 +168,11 @@ public class VDSSign {
 			if (log.isTraceEnabled()) {
 				log.trace("Output: " + finalOutput);
 			}
-			this.calculateInput(finalOutput, time);
+			this.calculateInput(finalOutput);
 		}
 	}
 
-
-	private void calculateInput(final double finalOutput, final double time) {
+	private void calculateInput(final double finalOutput) {
 		double rawInput, input;
 		rawInput = this.controler.control(finalOutput);
 		if (log.isTraceEnabled()) {
@@ -304,7 +303,7 @@ public class VDSSign {
 		Link endLink  = this.network.getLinks().get(r.getEndLinkId());
 		Node endNode = endLink.getToNode();
 		if (!(this.directionLink.getFromNode().equals(endNode) || (this.directionLink == endLink))) {
-			endLink = calculateOutLink(this.directionLink, endNode);
+			endLink = calculateOutLink(endNode);
 			rNodes.add(endNode);
 		}
 		ret.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(rNodes)), endLink.getId());
@@ -321,7 +320,7 @@ public class VDSSign {
 				"Calculation of inLinks failed, please extend implementation!");
 	}
 
-	private Link calculateOutLink(final Link destLink, final Node lastRouteNode) {
+	private Link calculateOutLink(final Node lastRouteNode) {
 		for (Link l : this.directionLink.getFromNode().getInLinks().values()) {
 			if (l.getFromNode().equals(lastRouteNode)) {
 				return l;

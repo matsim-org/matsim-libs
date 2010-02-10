@@ -47,10 +47,10 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(ActivityFacilityImpl.class);
-	
+
 	private final TreeMap<String, ActivityOptionImpl> activities = new TreeMap<String, ActivityOptionImpl>();
 	private String desc = null;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
@@ -90,17 +90,17 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 	 * Moves a facility to a new {@link Coord coordinate}. It also takes care that
 	 * the up- and down-mapping to the neighbor layers (up-layer: {@link ZoneLayer}
 	 * and down-layer: {@link NetworkLayer}) will be updated, too (if the neighbors exist).
-	 * 
+	 *
 	 * <p><b>Note:</b> Other data structures than the {@link World} and the {@link NetworkLayer} of MATSim
 	 * will not be updated (i.e. the references to links and facilities in a {@link PlanImpl}
 	 * of an agent of the {@link PopulationImpl}).</p>
-	 * 
-	 * <p><b>Mapping rule (zone-facility):</b> The facility gets one zones assigned, in which 
+	 *
+	 * <p><b>Mapping rule (zone-facility):</b> The facility gets one zones assigned, in which
 	 * the facility is located in, or---if no such zone exists---the facility does not get a zone assigned.</p>
-	 * 
+	 *
 	 * <p><b>Mapping rule (facility-link):</b> The facility gets the nearest right entry link assigned
 	 * (see also {@link NetworkLayer#getNearestRightEntryLink(Coord)}).</p>
-	 * 
+	 *
 	 * @param newCoord the now coordinate of the facility
 	 */
 	public final void moveTo(Coord newCoord) {
@@ -111,13 +111,11 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 			removeAllUpMappings();
 			ZoneLayer zones = (ZoneLayer)layer.getUpRule().getUpLayer();
 			ArrayList<MappedLocation> nearestZones = zones.getNearestLocations(center);
-			if (nearestZones.isEmpty()) { /* facility does not belong to a zone */ }
-			else {
+			if (!nearestZones.isEmpty()) { // facility does belong to a zone
 				// choose the first of the list (The list is generated via a defined order of the zones,
-				// therefore the chosen zone is deterministic). 
+				// therefore the chosen zone is deterministic).
 				Zone z = (Zone)nearestZones.get(0);
-				if (!z.contains(center)) { /* f is not located IN any of the nearest zones */ }
-				else {
+				if (z.contains(center)) { /* f is located in one of the nearest zones */
 					addUpMapping(z);
 					z.addDownMapping(this);
 					log.info("  added "+up_mapping.size()+" new up-mappings (zone):");
@@ -137,7 +135,7 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 		}
 		log.info("done.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
@@ -146,7 +144,7 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 		if (desc == null) { this.desc = null; }
 		else { this.desc = desc.intern(); }
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
@@ -154,7 +152,7 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 	public final String getDesc() {
 		return this.desc;
 	}
-	
+
 	public final TreeMap<String,ActivityOptionImpl> getActivityOptions() {
 		return this.activities;
 	}

@@ -35,7 +35,7 @@ import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
 
 public class OTFClientLive extends OTFClient {
 
-  
+
 	private static final Logger log = Logger.getLogger(OTFClientLive.class);
 
 	private OTFConnectionManager connect = new OTFConnectionManager();
@@ -59,13 +59,13 @@ public class OTFClientLive extends OTFClient {
 		visconf.setCachingAllowed(false); // no use to cache in live mode
 		return visconf;
 	}
-	
+
 	@Override
 	protected OTFDrawer createDrawer(){
-		try {		
+		try {
 			OTFClientQuad clientQ = createNewView(this.url, connect, this.hostControlBar.getOTFHostControl());
-			mainDrawer = new OTFOGLDrawer(this.frame, clientQ);
-			
+			mainDrawer = new OTFOGLDrawer(clientQ);
+
 			if (hostControlBar.getOTFHostControl().isLiveHost()) {
 				OTFQueryControl queryControl = new OTFQueryControl(hostControlBar, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
@@ -76,7 +76,7 @@ public class OTFClientLive extends OTFClient {
 			else {
 				throw new IllegalStateException("Server not in live mode!");
 			}
-			
+
 
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -88,5 +88,5 @@ public class OTFClientLive extends OTFClient {
 			this.visconf = otfVisConfig;
 	}
 
-	
+
 }

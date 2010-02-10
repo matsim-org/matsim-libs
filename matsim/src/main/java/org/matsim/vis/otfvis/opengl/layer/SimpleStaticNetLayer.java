@@ -47,15 +47,15 @@ import com.sun.opengl.util.texture.TextureCoords;
 
 
 /**
- * SimpleStaticNetLayer is the default network drawing layer. 
+ * SimpleStaticNetLayer is the default network drawing layer.
  * It represents the network as uni-colored quads.
  * It is not dynamically changeable.
- * 
+ *
  * @author dstrippgen
  *
  */
 public class SimpleStaticNetLayer  extends SimpleSceneLayer{
-  
+
 	protected OGLProvider myDrawer;
 	private static final Map<OGLProvider, Integer> netDisplListMap = new HashMap<OGLProvider, Integer>(); // not yet defined
 	private static final Map<OGLProvider, List<OTFDrawable>> itemsListMap = new HashMap<OGLProvider, List<OTFDrawable>>(); // not yet defined
@@ -65,7 +65,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 
 	public static Texture marktex = null;
 
-	
+
 	@Override
 	public void addItem(OTFDataReceiver item) {
 		// only add items in initial run
@@ -106,9 +106,10 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	}
 
 
-	private void checkTexture(GL gl) {
-		if(marktex == null)marktex = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("mark.png"));
-
+	private void checkTexture() {
+		if (marktex == null) {
+			marktex = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("mark.png"));
+		}
 	}
 
 	@Override
@@ -117,7 +118,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 
 		checkNetList(gl);
 
-		checkTexture(gl);
+		checkTexture();
 		if (marktex != null) {
 			marktex.enable();
 			gl.glEnable(GL.GL_TEXTURE_2D);
@@ -153,12 +154,12 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	public int getDrawOrder() {
 		return 1;
 	}
-	
+
 	 public static class SimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQuadReceiver{
 
     private static final Logger log = Logger
         .getLogger(SimpleStaticNetLayer.SimpleQuadDrawer.class);
-	   
+
 	    protected final Point2D.Float[] quad = new Point2D.Float[4];
 	    protected float coloridx = 0;
 	    protected char[] id;
@@ -176,7 +177,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	      gl.glVertex3f(quad[2].x, quad[2].y, 0);
 	      gl.glEnd();
 	    }
-	    
+
 	    public void onDraw( GL gl) {
 	      final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes*SimpleStaticNetLayer.cellWidth_m);
 	      this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);

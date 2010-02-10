@@ -35,33 +35,15 @@ public class LanesToLinkAssignmentImpl implements LanesToLinkAssignment {
 	private final Id linkId;
 
 	private final SortedMap<Id, Lane> lanes = new TreeMap<Id, Lane>();
-	
-	/**
-	 * @param linkId
-	 */
+
 	public LanesToLinkAssignmentImpl(Id linkId) {
 		this.linkId = linkId;
 	}
 
-	/**
-	 * @see org.matsim.lanes.LanesToLinkAssignment#getLanesList()
-	 */
-	public List<Lane> getLanesList() {
-		List<Lane> r = new ArrayList<Lane>();
-		r.addAll(this.lanes.values());
-		return Collections.unmodifiableList(r);
-	}
-	
-	/**
-	 * @see org.matsim.lanes.LanesToLinkAssignment#addLane(org.matsim.lanes.Lane)
-	 */
 	public void addLane(Lane lane) {
-		this.lanes.put(lane.getId(), lane); 
+		this.lanes.put(lane.getId(), lane);
 	}
-	
-	/**
-	 * @see org.matsim.lanes.LanesToLinkAssignment#getLinkId()
-	 */
+
 	public Id getLinkId() {
 		return linkId;
 	}

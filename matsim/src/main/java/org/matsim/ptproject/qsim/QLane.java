@@ -773,7 +773,7 @@ public class QLane {
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLane.this.queueLink.getLink(),
-								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
+								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 						positions.add(position);
 					}
 					distFromFromNode -= cellSize;
@@ -787,7 +787,7 @@ public class QLane {
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLane.this.queueLink.getLink(),
-								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
+								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 						positions.add(position);
 					}
 					distFromFromNode -= cellSize;
@@ -806,7 +806,7 @@ public class QLane {
 					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 					for (PersonAgentI person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLane.this.queueLink.getLink(),
-								distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY, null);
+								distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 						positions.add(position);
 					}
 					distFromFromNode -= cellSize;
@@ -869,7 +869,7 @@ public class QLane {
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI person : peopleInVehicle) {
 					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), link, queueEnd,
-							lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
+							lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					positions.add(position);
 				}
 				queueEnd -= vehLen;
@@ -924,7 +924,7 @@ public class QLane {
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI passenger : peopleInVehicle) {
 					PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
-							lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, null);
+							lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					positions.add(passengerPosition);
 				}
 				
@@ -957,7 +957,7 @@ public class QLane {
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI person : peopleInVehicle) {
 					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLane.this.queueLink.getLink(),
-							/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY, null);
+							/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 					positions.add(position);
 				}
 			}

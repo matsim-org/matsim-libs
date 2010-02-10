@@ -242,27 +242,25 @@ public class OsmNetworkReader {
 		// check which nodes are used
 		for (OsmWay way : this.ways.values()) {
 			String highway = way.tags.get("highway");
-			if (highway != null) {
-				if (this.highwayDefaults.containsKey(highway)) {
-					// check to which level a way belongs
-					way.hierarchy = this.highwayDefaults.get(highway).hierarchy;
+			if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
+				// check to which level a way belongs
+				way.hierarchy = this.highwayDefaults.get(highway).hierarchy;
 
-					// first and last are counted twice, so they are kept in all cases
-					this.nodes.get(way.nodes.get(0)).ways++;
-					this.nodes.get(way.nodes.get(way.nodes.size()-1)).ways++;
+				// first and last are counted twice, so they are kept in all cases
+				this.nodes.get(way.nodes.get(0)).ways++;
+				this.nodes.get(way.nodes.get(way.nodes.size()-1)).ways++;
 
-					for (String nodeId : way.nodes) {
-						OsmNode node = this.nodes.get(nodeId);
-						if(this.hierarchyLayers.isEmpty()){
-							node.used = true;
-							node.ways++;
-						} else {
-							for (OsmFilter osmFilter : this.hierarchyLayers) {
-								if(osmFilter.coordInFilter(node.coord, way.hierarchy)){
-									node.used = true;
-									node.ways++;
-									break;
-								}
+				for (String nodeId : way.nodes) {
+					OsmNode node = this.nodes.get(nodeId);
+					if(this.hierarchyLayers.isEmpty()){
+						node.used = true;
+						node.ways++;
+					} else {
+						for (OsmFilter osmFilter : this.hierarchyLayers) {
+							if(osmFilter.coordInFilter(node.coord, way.hierarchy)){
+								node.used = true;
+								node.ways++;
+								break;
 							}
 						}
 					}
@@ -280,31 +278,29 @@ public class OsmNetworkReader {
 			// verify we did not mark nodes as unused that build a loop
 			for (OsmWay way : this.ways.values()) {
 				String highway = way.tags.get("highway");
-				if (highway != null) {
-					if (this.highwayDefaults.containsKey(highway)) {
-						int prevRealNodeIndex = 0;
-						OsmNode prevRealNode = this.nodes.get(way.nodes.get(prevRealNodeIndex));
+				if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
+					int prevRealNodeIndex = 0;
+					OsmNode prevRealNode = this.nodes.get(way.nodes.get(prevRealNodeIndex));
 
-						for (int i = 1; i < way.nodes.size(); i++) {
-							OsmNode node = this.nodes.get(way.nodes.get(i));
-							if (node.used) {
-								if (prevRealNode == node) {
-									/* We detected a loop between to "real" nodes.
-									 * Set some nodes between the start/end-loop-node to "used" again.
-									 * But don't set all of them to "used", as we still want to do some network-thinning.
-									 * I decided to use sqrt(.)-many nodes in between...
-									 */
-									double increment = Math.sqrt(i - prevRealNodeIndex);
-									double nextNodeToKeep = prevRealNodeIndex + increment;
-									for (double j = nextNodeToKeep; j < i; j += increment) {
-										int index = (int) Math.floor(j);
-										OsmNode intermediaryNode = this.nodes.get(way.nodes.get(index));
-										intermediaryNode.used = true;
-									}
+					for (int i = 1; i < way.nodes.size(); i++) {
+						OsmNode node = this.nodes.get(way.nodes.get(i));
+						if (node.used) {
+							if (prevRealNode == node) {
+								/* We detected a loop between to "real" nodes.
+								 * Set some nodes between the start/end-loop-node to "used" again.
+								 * But don't set all of them to "used", as we still want to do some network-thinning.
+								 * I decided to use sqrt(.)-many nodes in between...
+								 */
+								double increment = Math.sqrt(i - prevRealNodeIndex);
+								double nextNodeToKeep = prevRealNodeIndex + increment;
+								for (double j = nextNodeToKeep; j < i; j += increment) {
+									int index = (int) Math.floor(j);
+									OsmNode intermediaryNode = this.nodes.get(way.nodes.get(index));
+									intermediaryNode.used = true;
 								}
-								prevRealNodeIndex = i;
-								prevRealNode = node;
 							}
+							prevRealNodeIndex = i;
+							prevRealNode = node;
 						}
 					}
 				}
@@ -380,10 +376,9 @@ public class OsmNetworkReader {
 
 		// check if there are tags that overwrite defaults
 		// - check tag "junction"
-		if (way.tags.containsKey("junction")) {
-			if ("roundabout".equals(way.tags.get("junction"))) {
-				oneway = true;
-			}
+		if ("roundabout".equals(way.tags.get("junction"))) {
+			// if "junction" is not set in tags, get() returns null and equals() evaluates to false
+			oneway = true;
 		}
 
 		// check tag "oneway"
@@ -475,12 +470,8 @@ public class OsmNetworkReader {
 				return false;
 			}
 
-			if(this.coordNW.getX() < coord.getX() && coord.getX() < this.coordSE.getX()){
-				if(this.coordNW.getY() > coord.getY() && coord.getY() > this.coordSE.getY()){
-					return true;
-				}
-			}
-			return false;
+			return ((this.coordNW.getX() < coord.getX() && coord.getX() < this.coordSE.getX()) &&
+				(this.coordNW.getY() > coord.getY() && coord.getY() > this.coordSE.getY()));
 		}
 	}
 
