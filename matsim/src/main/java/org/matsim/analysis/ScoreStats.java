@@ -211,7 +211,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 				System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
 				chart.addSeries("avg. executed score", iterations, values);
 				chart.addMatsimLogo();
-				chart.saveAsPng(Controler.getOutputFilename("scorestats.png"), 800, 600);
+				chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename("scorestats.png"), 800, 600);
 			}
 			if (index == this.history[0].length) {
 				// we cannot store more information, so disable the graph feature.

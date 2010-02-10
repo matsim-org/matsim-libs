@@ -204,7 +204,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 				System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
 				chart.addSeries("executed plan", iterations, values);
 				chart.addMatsimLogo();
-				chart.saveAsPng(Controler.getOutputFilename("traveldistancestats.png"), 800, 600);
+				chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename("traveldistancestats.png"), 800, 600);
 			}
 			if (index == this.history[0].length) {
 				// we cannot store more information, so disable the graph feature.
