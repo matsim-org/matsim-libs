@@ -31,8 +31,6 @@ public class QSimConfigGroup extends Module {
 
 	private static final long serialVersionUID = 1L;
 
-	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
-	
 	public static final String GROUP_NAME = "qsim";
 
 	private static final String START_TIME = "startTime";
@@ -146,7 +144,7 @@ public class QSimConfigGroup extends Module {
 		map.put(NUMBER_OF_THREADS, getValue(NUMBER_OF_THREADS));
 		return map;
 	}
-	
+
 	@Override
 	protected final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -174,17 +172,17 @@ public class QSimConfigGroup extends Module {
 
 	/**
 	 * Sets the number of seconds the simulation should advance from one simulated time step to the next.
-	 * 
+	 *
 	 * @param seconds
 	 */
 	public void setTimeStepSize(final double seconds) {
 		this.timeStepSize = seconds;
 	}
-	
+
 	public double getTimeStepSize() {
 		return this.timeStepSize;
 	}
-	
+
 	public void setSnapshotPeriod(final double snapshotPeriod) {
 		this.snapshotPeriod = snapshotPeriod;
 	}
@@ -270,7 +268,7 @@ public class QSimConfigGroup extends Module {
     return this.numberOfThreads ;
   }
 
-  
+
   public void setNumberOfThreads(int numberOfThreads) {
     this.numberOfThreads = numberOfThreads;
   }

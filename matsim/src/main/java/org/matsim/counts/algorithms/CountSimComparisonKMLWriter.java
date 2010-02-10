@@ -624,7 +624,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		double[] meanBias = ep.getMeanAbsBias();
 		int index = kmlFilename.lastIndexOf(System.getProperty("file.separator"));
 		if (index == -1){
-			index = kmlFilename.lastIndexOf("/");
+			index = kmlFilename.lastIndexOf('/');
 		}
 		String outdir;
 		if (index == -1) {

@@ -98,7 +98,7 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 
 		System.out.println("  running plans algorithms... ");
-		new PlansCreateFromNetwork(network,ns_algo, 0).run(plans);
+		new PlansCreateFromNetwork(ns_algo,0).run(plans);
 		System.out.println("  done.");
 
 		System.out.println();

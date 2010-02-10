@@ -116,20 +116,30 @@ public class OutputDelegate {
 			}//catch
 		}//if
 	}
-	
+
 	private void copyResourceToFile(final String resourceFilename, final String destinationFilename) throws IOException {
-		final InputStream inStream = MatsimResource.getAsInputStream(resourceFilename);
-		final OutputStream outStream = new FileOutputStream(destinationFilename);
-		IOUtils.copyStream(inStream, outStream);
+		InputStream inStream = null;
+		OutputStream outStream = null;
 		try {
-			inStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+			inStream = MatsimResource.getAsInputStream(resourceFilename);
+			outStream = new FileOutputStream(destinationFilename);
+			IOUtils.copyStream(inStream, outStream);
 		}
-		try {
-			outStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		finally {
+			if (inStream != null) {
+				try {
+					inStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (outStream != null) {
+				try {
+					outStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

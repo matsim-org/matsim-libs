@@ -719,7 +719,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 		int index = kmlFilename.lastIndexOf(System
 				.getProperty("file.separator"));
 		if (index == -1) {
-			index = kmlFilename.lastIndexOf("/");
+			index = kmlFilename.lastIndexOf('/');
 		}
 		String outdir;
 		if (index == -1) {
@@ -776,10 +776,9 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	}
 
 	private ScreenOverlayType createBiasErrorGraphAlight(String kmlFilename) {
-		int index = kmlFilename.lastIndexOf(System
-				.getProperty("file.separator"));
+		int index = kmlFilename.lastIndexOf(System.getProperty("file.separator"));
 		if (index == -1) {
-			index = kmlFilename.lastIndexOf("/");
+			index = kmlFilename.lastIndexOf('/');
 		}
 		String outdir;
 		if (index == -1) {

@@ -67,7 +67,7 @@ import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private static Logger log = Logger.getLogger(OTFHostControlBar.class);
 
 	private static final String TO_START = "to_start";
@@ -388,7 +388,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private void changed_SET_TIME(ActionEvent event) {
 		String newTime = ((JFormattedTextField) event.getSource()).getText();
-		int index = newTime.indexOf("#");
+		int index = newTime.indexOf('#');
 		String tmOfDay = newTime.substring(index + 1);
 		if ((index != -1) && (controllerStatus != OTFVisControlerListener.NOCONTROL)) {
 			gotoIter = Integer.parseInt(newTime.substring(0, index));
@@ -450,7 +450,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 
 	}
-	
+
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox) e.getItemSelectable();
 		if (source.getText().equals(TOGGLE_SYNCH)) {

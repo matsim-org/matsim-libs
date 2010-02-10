@@ -214,13 +214,19 @@ public class TabularFileParserConfig {
 
     @Override
 		public String toString() {
-        StringBuffer result = new StringBuffer("TabularFileParserConfig:\n");
+        StringBuffer result = new StringBuffer(100);
 
-        result.append("\tfile=" + file + "\n");
-        result.append("\tstartRegex=" + startRegex + "\n");
-        result.append("\tendRegex=" + endRegex + "\n");
-        result.append("\tcommentRegex=" + commentRegex + "\n");
-        result.append("\tdelimiterRegex=" + delimiterRegex);
+        result.append("TabularFileParserConfig:\n");
+        result.append("\tfile=");
+        result.append(file);
+        result.append("\n\tstartRegex=");
+        result.append(startRegex);
+        result.append("\n\tendRegex=");
+        result.append(endRegex);
+        result.append("\n\tcommentRegex=");
+        result.append(commentRegex);
+        result.append("\n\tdelimiterRegex=");
+        result.append(delimiterRegex);
 
         return result.toString();
     }

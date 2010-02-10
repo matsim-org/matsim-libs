@@ -61,7 +61,7 @@ public class KMZWriter {
 	private final Map<String, String> nonKmlFiles = new HashMap<String, String>();
 
 	private final static Marshaller marshaller;
-	
+
 	private final static ObjectFactory kmlObjectFactory = new ObjectFactory();
 
 	static {
@@ -73,7 +73,7 @@ public class KMZWriter {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
 	 * Creates a new kmz-file and a writer for it and opens the file for writing.
 	 *
@@ -92,7 +92,7 @@ public class KMZWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		// generate the first KML entry in the zip file that links to the (later
 		// added) main-KML.
 		// this is required as GoogleEarth will only display the first-added KML in
@@ -156,13 +156,12 @@ public class KMZWriter {
 
 	/**
 	 * Adds a file to the kmz which is not a kml file.
-	 * 
+	 *
 	 * @param filename the path to the file, relative or absolute
 	 * @param inZipFilename the filename used for the file in the kmz file
 	 * @throws IOException
 	 */
-	public void addNonKMLFile(final String filename, final String inZipFilename)
-			throws IOException {
+	public void addNonKMLFile(final String filename, final String inZipFilename) throws IOException {
 		if (this.nonKmlFiles.containsKey(filename) && (inZipFilename.compareTo(this.nonKmlFiles.get(filename)) == 0)) {
 			log.warn("File: " + filename + " is already included in the kmz as " + inZipFilename);
 			return;
@@ -173,7 +172,7 @@ public class KMZWriter {
 
 	/**
 	 * Adds some data as a file to the kmz.
-	 * 
+	 *
 	 * @param data the data to add to the kmz
 	 * @param inZipFilename the filename used for the file in the kmz file
 	 * @throws IOException
@@ -196,7 +195,7 @@ public class KMZWriter {
 			data.close();
 		}
 	}
-	
+
 	/**
 	 * Adds a file (in form of a byte array) to a kml file.
 	 * @param data
@@ -228,7 +227,7 @@ public class KMZWriter {
 			} catch (JAXBException e) {
 				e.printStackTrace();
 			}
-			
+
 			this.out.flush();
 
 		} catch (IOException e) {

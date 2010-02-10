@@ -119,8 +119,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				externalCounter++;
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = settings.getExePath();
-				ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controler.getScenario());
-				em.setControlerIO(controler.getControlerIO());
+				ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controler.getControlerIO(), controler.getScenario());
 				em.setIterationNumber(controler.getIterationNumber());
 				strategy.addStrategyModule(em);
 			} else if (classname.equals("Planomat")) {

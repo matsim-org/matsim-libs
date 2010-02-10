@@ -96,7 +96,7 @@ public class SubsequentLinksAnalyzer {
 					}
 					absDeltaThetas.put(out, Math.abs(deltaTheta));
 				}
-				this.subsequentLinks.put(l.getId(), computeSubsequentLink(l, absDeltaThetas).getId());
+				this.subsequentLinks.put(l.getId(), computeSubsequentLink(absDeltaThetas).getId());
 			} else if (outLinks.size() == 1) {
 				this.subsequentLinks.put(l.getId(), outLinks.iterator().next().getId());
 			}
@@ -104,11 +104,10 @@ public class SubsequentLinksAnalyzer {
 	}
 
 	/**
-	 * @param l
 	 * @param thetas map of outgoing-link and theta of that link. must include at least one entry, otherwise it won't work!
 	 * @return the link with the smallest theta, if multiple links have the same smallest theta, the one with the biggest capacity is returned.
 	 */
-	private Link computeSubsequentLink(final Link l, final Map<Link, Double> thetas) {
+	private Link computeSubsequentLink(final Map<Link, Double> thetas) {
 		List<Link> minThetaOutLinks = new ArrayList<Link>();
 
 		minThetaOutLinks.clear();

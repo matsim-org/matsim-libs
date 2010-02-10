@@ -155,7 +155,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  running plans modules... ");
-		new PlansCreateFromNetwork(network,ns_algo,2.0).run(plans);
+		new PlansCreateFromNetwork(ns_algo,2.0).run(plans);
 		log.info("  done.");
 
 		log.info("\n");

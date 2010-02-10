@@ -23,7 +23,6 @@ package org.matsim.core.network;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,8 +36,7 @@ import org.matsim.world.MappingRule;
 public class NetworkLayer extends NetworkImpl implements Layer {
 	// yyyy I would say that this should be moved to org.matsim.world.  Right now, however, it needs to be used quite a lot
 	// and so I leave it here for the time being.  kai, jul09
-	private final static Logger log = Logger.getLogger(NetworkLayer.class);
-	
+
 	// ////////////////////////////////////////////////////////////////////
 	// creational methods
 	// ////////////////////////////////////////////////////////////////////
@@ -88,14 +86,14 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		LinkImpl link = this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
 		link.setType(type);
 		link.setOrigId(origId);
-		
+
 		this.addLink( link ) ;
 
 		return link;
 	}
-	
+
 	// things below here are originally automatically generated.  kai, jul09
-	
+
 	@Deprecated
 	public MappingRule getDownRule() {
 		return layerDelegate.getDownRule();

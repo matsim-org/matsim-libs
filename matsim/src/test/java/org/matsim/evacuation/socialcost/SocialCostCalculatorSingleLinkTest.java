@@ -21,54 +21,14 @@ import org.matsim.core.network.NetworkLayer;
 
 public class SocialCostCalculatorSingleLinkTest extends TestCase {
 
-	private ArrayList<Vehicle> agents;
-	private ScenarioImpl sc;
-	private NetworkLayer network;
-	private Id l0;
-	private LinkImpl link0;
-
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-
-		this.sc = new ScenarioImpl();
-		this.network = this.sc.getNetwork();
-
-		this.agents = new ArrayList<Vehicle>();
-		for (int i = 0; i < 100; i++) {
-			Vehicle v = new Vehicle();
-			v.id = this.sc.createId(Integer.toString(i));
-			this.agents.add(v);
-		}
-
-		this.l0 = this.sc.createId("0");
-		Id n0 = this.sc.createId("0");
-		Id n1 = this.sc.createId("1");
-
-		Node node0 = (this.network).createAndAddNode(n0, this.sc.createCoord(0,0));
-		Node node1 = (this.network).createAndAddNode(n1, this.sc.createCoord(10,0));
-
-		this.link0 = (LinkImpl) (this.network).createAndAddLink(this.l0,node0,node1,100,10,1,1);
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		this.sc = null;
-		this.agents = null;
-		this.network = null;
-		this.l0 = null;
-		this.link0 = null;
-		super.tearDown();
-	}
-
 	public void testSocialCostCalculatorSingleLinkZeroCost() {
-
-		Controler c = new Controler(this.sc);
+		Fixture f = new Fixture();
+		Controler c = new Controler(f.sc);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 
 
-		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(this.network,60, events);
+		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(f.network,60, events);
 		scalc.notifyIterationStarts(new IterationStartsEvent(c,1));
 
 		events.addHandler(scalc);
@@ -76,15 +36,15 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 
 		double time = 0;
 		Queue<Vehicle> vehQueue = new ConcurrentLinkedQueue<Vehicle>();
-		for (Vehicle v : this.agents) {
+		for (Vehicle v : f.agents) {
 			v.enterTime = time;
 			vehQueue.add(v);
-			LinkEnterEventImpl lee = new LinkEnterEventImpl(time,v.id,this.l0);
+			LinkEnterEventImpl lee = new LinkEnterEventImpl(time, v.id, f.l0);
 			events.processEvent(lee);
 
-			while (vehQueue.size() > 0 && (time-vehQueue.peek().enterTime) >= this.link0.getFreespeedTravelTime(time) ) {
+			while (vehQueue.size() > 0 && (time-vehQueue.peek().enterTime) >= f.link0.getFreespeedTravelTime(time) ) {
 				Vehicle tmp = vehQueue.poll();
-				LinkLeaveEventImpl lle = new LinkLeaveEventImpl(time,tmp.id,this.l0);
+				LinkLeaveEventImpl lle = new LinkLeaveEventImpl(time,tmp.id, f.l0);
 				events.processEvent(lle);
 
 			}
@@ -96,7 +56,7 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 
 		double costs = 0.;
 		for (; time >= 0; time--) {
-			costs += scalc.getLinkTravelCost(this.link0, time);
+			costs += scalc.getLinkTravelCost(f.link0, time);
 		}
 
 		assertEquals(0., costs);
@@ -105,13 +65,13 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 	}
 
 	public void testSocialCostCalculatorSingleLinkCost() {
-
-		Controler c = new Controler(this.sc);
+		Fixture f = new Fixture();
+		Controler c = new Controler(f.sc);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 
 
-		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(this.network,60, events);
+		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(f.network, 60, events);
 		scalc.notifyIterationStarts(new IterationStartsEvent(c,1));
 
 		AgentPenaltyCalculator apc = new AgentPenaltyCalculator();
@@ -122,18 +82,18 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 
 		double time = 0;
 		Queue<Vehicle> vehQueue = new ConcurrentLinkedQueue<Vehicle>();
-		for (Vehicle v : this.agents) {
+		for (Vehicle v : f.agents) {
 			v.enterTime = time;
 			vehQueue.add(v);
-			LinkEnterEventImpl lee = new LinkEnterEventImpl(time,v.id,this.l0);
+			LinkEnterEventImpl lee = new LinkEnterEventImpl(time,v.id,f.l0);
 			events.processEvent(lee);
 
 
 			//first 9 vehicle travel with fs tt
 			if (time <= 90 || time > 630) {
-				while (vehQueue.size() > 0 && (time-vehQueue.peek().enterTime) >= this.link0.getFreespeedTravelTime(time) ) {
+				while (vehQueue.size() > 0 && (time-vehQueue.peek().enterTime) >= f.link0.getFreespeedTravelTime(time) ) {
 					Vehicle tmp = vehQueue.poll();
-					LinkLeaveEventImpl lle = new LinkLeaveEventImpl(time,tmp.id,this.l0);
+					LinkLeaveEventImpl lle = new LinkLeaveEventImpl(time,tmp.id,f.l0);
 					events.processEvent(lle);
 
 				}
@@ -141,9 +101,9 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 			//55 vehicles congested
 			// 8 tt bin congestion 48 vehicles // 6 per time bin
 			} else if (time <= 630) {
-				while (vehQueue.size() > 0 && (time-vehQueue.peek().enterTime) >= (20+this.link0.getFreespeedTravelTime(time)) ) {
+				while (vehQueue.size() > 0 && (time-vehQueue.peek().enterTime) >= (20+f.link0.getFreespeedTravelTime(time)) ) {
 					Vehicle tmp = vehQueue.poll();
-					LinkLeaveEventImpl lle = new LinkLeaveEventImpl(time,tmp.id,this.l0);
+					LinkLeaveEventImpl lle = new LinkLeaveEventImpl(time,tmp.id,f.l0);
 					events.processEvent(lle);
 
 				}
@@ -158,7 +118,7 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 		// 6*(60-10) + 6*(120-10) +  ... + 6*(480-10) = 12480
 		double costs = 0.;
 		for (; time >= 0; time -= 10) {
-			costs += scalc.getLinkTravelCost(this.link0, time);
+			costs += scalc.getLinkTravelCost(f.link0, time);
 		}
 		assertEquals(12480., costs);
 
@@ -167,7 +127,7 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 	}
 
 
-	private static class AgentPenaltyCalculator implements AgentMoneyEventHandler {
+	/*package*/ static class AgentPenaltyCalculator implements AgentMoneyEventHandler {
 		double penalty = 0.;
 
 		@Override
@@ -181,8 +141,37 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 
 	}
 
-	private static class Vehicle {
+	/*package*/ static class Vehicle {
 		Id id;
 		double enterTime;
+	}
+
+	private static class Fixture {
+		/*package*/ ArrayList<Vehicle> agents;
+		/*package*/ ScenarioImpl sc;
+		/*package*/ NetworkLayer network;
+		/*package*/ Id l0;
+		/*package*/ LinkImpl link0;
+
+		public Fixture() {
+			this.sc = new ScenarioImpl();
+			this.network = this.sc.getNetwork();
+
+			this.agents = new ArrayList<Vehicle>();
+			for (int i = 0; i < 100; i++) {
+				Vehicle v = new Vehicle();
+				v.id = this.sc.createId(Integer.toString(i));
+				this.agents.add(v);
+			}
+
+			this.l0 = this.sc.createId("0");
+			Id n0 = this.sc.createId("0");
+			Id n1 = this.sc.createId("1");
+
+			Node node0 = (this.network).createAndAddNode(n0, this.sc.createCoord(0,0));
+			Node node1 = (this.network).createAndAddNode(n1, this.sc.createCoord(10,0));
+
+			this.link0 = (LinkImpl) (this.network).createAndAddLink(this.l0,node0,node1,100,10,1,1);
+		}
 	}
 }

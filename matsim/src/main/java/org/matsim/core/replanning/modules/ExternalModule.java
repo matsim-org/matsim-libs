@@ -87,12 +87,13 @@ public class ExternalModule implements PlanStrategyModule {
 	protected String outFileRoot = "";
 
 	private Integer iterationNumber = null;
-	private ControlerIO controlerIO;
+	private final ControlerIO controlerIO;
 
 
-	public ExternalModule(final String exePath, final String moduleId, final ScenarioImpl scenario) {
+	public ExternalModule(final String exePath, final String moduleId, final ControlerIO controlerIO, final ScenarioImpl scenario) {
 		this.exePath = exePath;
 		this.moduleId = moduleId + "_";
+		this.controlerIO = controlerIO;
 		this.outFileRoot = controlerIO.getTempPath() + "/";
 		this.scenario = scenario;
 	}
@@ -233,10 +234,6 @@ public class ExternalModule implements PlanStrategyModule {
 
 	public void setIterationNumber(Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
-	}
-
-	public void setControlerIO(ControlerIO controlerIO) {
-		this.controlerIO = controlerIO;
 	}
 
 	/**

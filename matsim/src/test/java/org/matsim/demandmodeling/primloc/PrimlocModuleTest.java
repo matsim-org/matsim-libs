@@ -43,7 +43,6 @@ import org.matsim.world.WorldWriter;
  * Note that it uses a "zone" layer, which is defined in "world.xml".
  *
  * @author fabrice and wisinee
- *
  */
 public class PrimlocModuleTest extends MatsimTestCase{
 
@@ -53,44 +52,33 @@ public class PrimlocModuleTest extends MatsimTestCase{
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	Config config;
-
 	private static final String inputfolder = "test/scenarios/triangle/" ;
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.config = super.loadConfig( "test/input/org/matsim/demandmodeling/primloc/config_primloc_triangle.xml");
-		String outputDirectory = super.getOutputDirectory();
-
-		this.config.config().setOutputFile(outputDirectory + "output_config.xml");
-
-		this.config.world().setInputFile(inputfolder + "world.xml");
-		this.config.world().setOutputFile(outputDirectory + "output_world.xml");
-
-		this.config.network().setInputFile(inputfolder + "network.xml");
-		this.config.network().setOutputFile(outputDirectory + "output_network.xml");
-
-		this.config.facilities().setInputFile(inputfolder + "facilities.xml");
-		this.config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
-
-		this.config.plans().setInputFile(inputfolder + "init_plans.xml.gz" );
-		this.config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
-		this.config.plans().setOutputVersion("v4");
-		this.config.plans().setOutputSample(1.0);
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		this.config = null;
-		super.tearDown();
-	}
 
 	public void testModule() {
 
 		System.out.println("TEST MODULE PRIMLOC:");
 
-		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		Config config = super.loadConfig( "test/input/org/matsim/demandmodeling/primloc/config_primloc_triangle.xml");
+		String outputDirectory = super.getOutputDirectory();
+
+		config.config().setOutputFile(outputDirectory + "output_config.xml");
+
+		config.world().setInputFile(inputfolder + "world.xml");
+		config.world().setOutputFile(outputDirectory + "output_world.xml");
+
+		config.network().setInputFile(inputfolder + "network.xml");
+		config.network().setOutputFile(outputDirectory + "output_network.xml");
+
+		config.facilities().setInputFile(inputfolder + "facilities.xml");
+		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
+
+		config.plans().setInputFile(inputfolder + "init_plans.xml.gz" );
+		config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
+		config.plans().setOutputVersion("v4");
+		config.plans().setOutputSample(1.0);
+
+
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		// reading all available input
 

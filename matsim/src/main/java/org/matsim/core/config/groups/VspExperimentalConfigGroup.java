@@ -21,7 +21,6 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 /**
@@ -37,8 +36,6 @@ public class VspExperimentalConfigGroup extends Module {
 	private static final String USE_ACTIVITY_DURATIONS = "useActivityDurations";
 
 	private boolean useActivityDurations = true;
-
-	private static final Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);
 
 	public VspExperimentalConfigGroup() {
 		super(GROUP_NAME);
@@ -63,7 +60,7 @@ public class VspExperimentalConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)){
 			this.setUseActivityDurations(Boolean.parseBoolean(value));
-		} 
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -83,5 +80,5 @@ public class VspExperimentalConfigGroup extends Module {
 	public void setUseActivityDurations(boolean useActivityDurations) {
 		this.useActivityDurations = useActivityDurations;
 	}
-	
+
 }

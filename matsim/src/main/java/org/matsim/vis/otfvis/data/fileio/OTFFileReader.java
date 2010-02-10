@@ -48,13 +48,13 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
  * The OTF has a file Reader and a file Writer part.
  * The Reader is the the mvi playing OTFServer.
 
- * @author dstrippgen 
+ * @author dstrippgen
  * @author dgrether
  */
 public class OTFFileReader implements OTFServerRemote {
-	
+
 	private static final Logger log = Logger.getLogger(OTFFileReader.class);
-	
+
 	private final String fileName;
 
 	public OTFFileReader(final String fname) {
@@ -74,7 +74,7 @@ public class OTFFileReader implements OTFServerRemote {
 
 	TreeMap<Double, Long> timesteps = new TreeMap<Double, Long>();
 
-	// TODO [DS] This is not safe when opening more than one file concurrently 
+	// TODO [DS] This is not safe when opening more than one file concurrently
 	public static int version = 0;
 	public static int minorversion = 0;
 
@@ -218,7 +218,7 @@ public class OTFFileReader implements OTFServerRemote {
 				name = name.replaceFirst("org.matsim.evacuation.otfvis.readerwriter.InundationData",
 				"org.matsim.evacuation.otfvis.legacy.readerwriter.InundationData");
 				return Class.forName(name);
-			} 			
+			}
 			return super.resolveClass(desc);
 		}
 	}
@@ -259,7 +259,7 @@ public class OTFFileReader implements OTFServerRemote {
 				try {
 					OTFConnectionManager connect2 = (OTFConnectionManager) new OTFObjectInputStream(
 							is).readObject();
-					
+
 //					log.error("");
 //					log.error("connection manager from file...");
 //					log.error("");
@@ -412,5 +412,5 @@ public class OTFFileReader implements OTFServerRemote {
 	public void toggleShowParking() throws RemoteException {
 		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
 	}
-	
+
 }

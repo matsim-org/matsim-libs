@@ -130,7 +130,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 	public static class InitialNode {
 		public final double initialCost;
 		public final double initialTime;
-		public InitialNode(final Node node, final double initialCost, final double initialTime) {
+		public InitialNode(final double initialCost, final double initialTime) {
 			this.initialCost = initialCost;
 			this.initialTime = initialTime;
 		}

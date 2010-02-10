@@ -43,17 +43,6 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimFileWriter {
 	//////////////////////////////////////////////////////////////////////
 
 	public ConfigWriter(final Config config) {
-		this(config, config.config().getOutputFile());
-	}
-
-	public ConfigWriter(final Config config, final java.io.Writer writer) {
-		super();
-		this.config = config;
-		this.writer = new BufferedWriter(writer);
-		this.handler = new ConfigWriterHandlerImplV1();
-	}
-
-	public ConfigWriter(final Config config, final String filename) {
 		this.config = config;
 		// always write the latest version, currently v1
 		this.dtd = "http://www.matsim.org/files/dtd/config_v1.dtd";
@@ -74,7 +63,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimFileWriter {
 			Gbl.errorMsg(e);
 		}
 	}
-	
+
 	public final void writeFile(final String filename) {
 		try {
 			openFile(filename);
@@ -85,7 +74,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimFileWriter {
 			Gbl.errorMsg(e);
 		}
 	}
-	
+
 	private final void write() {
 		try {
 			writeXmlHead();

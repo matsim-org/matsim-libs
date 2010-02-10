@@ -52,9 +52,9 @@ import de.schlichtherle.io.ArchiveDetector;
 import de.schlichtherle.io.DefaultArchiveDetector;
 
 /**
- * OTFFileSettingsSaver is responsible for saving and 
+ * OTFFileSettingsSaver is responsible for saving and
  * retrieving the OTFVisConfig settings in either binary or XML format.
- * 
+ *
  * @author dstrippgen
  *
  */
@@ -62,14 +62,14 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 	String fileName;
 
 	private OTFVisConfig visConfig;
-	
+
 	private static final Logger log = Logger.getLogger(OTFAbstractSettingsSaver.class);
-	
+
 	private interface Writer {
 		void writeObject(Object o) throws IOException;
 		void close()throws IOException;
 	}
-	
+
 	private static class BinWriter extends ObjectOutputStream implements Writer{
 
 		public BinWriter(OutputStream out) throws IOException {
@@ -83,7 +83,7 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 			super(out);
 		}
 	}
-		
+
 	public OTFAbstractSettingsSaver(OTFVisConfig visconf, String filename) {
 		this.fileName = filename;
 		this.visConfig = visconf;
@@ -95,45 +95,45 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 		JFileChooser fc;
 
 		String path = selFile.getParent();
-		
+
 		fc = new JFileChooser(path);
 		fc.setSelectedFile( selFile );
 		if(saveIt)fc.setDialogType(JFileChooser.SAVE_DIALOG);
-		
-	    fc.setFileFilter( new FileFilter() 
-	    { 
-	      @Override public boolean accept( File f ) 
-	      { 
-	        return f.isDirectory() || 
-	          f.getName().toLowerCase().endsWith( ".vcfg" ); 
-	      } 
-	      @Override public String getDescription() 
-	      { 
-	        return "OTFVis Config File (*.vcfg)"; 
-	      } 
-	    } ); 
-	    fc.setFileFilter( new FileFilter() 
-	    { 
-	      @Override public boolean accept( File f ) 
-	      { 
-	        return f.isDirectory() || 
-	          f.getName().toLowerCase().endsWith( ".vxmlcfg" ); 
-	      } 
-	      @Override public String getDescription() 
-	      { 
-	        return "OTFVis XML Config File (*.vxmlcfg)"; 
-	      } 
-	    } ); 
-	 
-	    int state = saveIt ? fc.showSaveDialog( null ) : fc.showOpenDialog( null ); 
-	 
-	    if ( state == JFileChooser.APPROVE_OPTION ) 
-	    { 
-	    	erg = fc.getSelectedFile(); 
-	    }  else {  
+
+	    fc.setFileFilter( new FileFilter()
+	    {
+	      @Override public boolean accept( File f )
+	      {
+	        return f.isDirectory() ||
+	          f.getName().toLowerCase().endsWith( ".vcfg" );
+	      }
+	      @Override public String getDescription()
+	      {
+	        return "OTFVis Config File (*.vcfg)";
+	      }
+	    } );
+	    fc.setFileFilter( new FileFilter()
+	    {
+	      @Override public boolean accept( File f )
+	      {
+	        return f.isDirectory() ||
+	          f.getName().toLowerCase().endsWith( ".vxmlcfg" );
+	      }
+	      @Override public String getDescription()
+	      {
+	        return "OTFVis XML Config File (*.vxmlcfg)";
+	      }
+	    } );
+
+	    int state = saveIt ? fc.showSaveDialog( null ) : fc.showOpenDialog( null );
+
+	    if ( state == JFileChooser.APPROVE_OPTION )
+	    {
+	    	erg = fc.getSelectedFile();
+	    }  else {
 	      log.info( "Auswahl abgebrochen" );
 	    }
-	    
+
 	    return erg;
 	}
 
@@ -159,7 +159,7 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
     throw new IllegalArgumentException("Not able to read config from file: " + file.getPath());
 	 }
 
-	
+
 
 	private void openAndSaveConfig() {
 	  log.debug("trying to save config to : " + this.fileName);
@@ -176,11 +176,11 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 	    		final JDialog d = new JDialog((JFrame)null,"MVI File is read-only", true);
 	    		JLabel field = new JLabel("Can not access .MVI!\n Maybe it is in use by pre-caching.\n Please try again when loading is finished.");
 	    		JButton ok = new JButton("Ok");
-	    	    ActionListener al =  new ActionListener() { 
+	    	    ActionListener al =  new ActionListener() {
 	    	        public void actionPerformed( ActionEvent e ) {
 	    	        	d.setVisible(false);
-	    	        	
-	    	      } }; 
+
+	    	      } };
 	    	      ok.addActionListener(al);
 	    	      d.getContentPane().setLayout( new FlowLayout() );
 		    		d.getContentPane().add(field);
@@ -191,7 +191,7 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 	    		de.schlichtherle.io.File.umount(true);
 	    		return;
 			}
-			
+
 			OutputStream out = new de.schlichtherle.io.FileOutputStream(fileName + "/config.bin");
 			try {
 				ObjectOutputStream outFile = new ObjectOutputStream(out);
@@ -216,13 +216,15 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
+	@Override
 	public void saveSettings() {
 		openAndSaveConfig();
 	}
-	
+
+	@Override
 	public void saveSettingsAs() {
 		File file = chooseFile(true);
 		if(file != null){
@@ -232,7 +234,7 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 				out = new FileOutputStream(file);
 				Writer outFile = null;
 				if (asXML) {
-				  outFile = new XMLWriter(out); 
+				  outFile = new XMLWriter(out);
 				}
 				else {
 				  outFile = new BinWriter(out);
@@ -251,23 +253,23 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 			}
 		}
 	}
+
+	@Override
 	public OTFVisConfig readSettings() {
     	File file = chooseFile(false);
 		return openAndReadConfigFromFile(file);
 	}
-	
+
 	private void dumpConfig(){
     log.info("OTFVis config dump:");
     StringWriter writer = new StringWriter();
     Config tmpConfig = new Config();
     tmpConfig.addModule(OTFVisConfig.GROUP_NAME, this.visConfig);
     PrintWriter pw = new PrintWriter(writer);
-    new ConfigWriter(tmpConfig, pw).writeStream(pw);
+    new ConfigWriter(tmpConfig).writeStream(pw);
     log.info("\n\n" + writer.getBuffer().toString());
     log.info("Complete config dump done.");
 	}
 
-
 }
-
 

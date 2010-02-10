@@ -20,14 +20,12 @@
 
 package org.matsim.population.algorithms;
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 public class PlansCreateFromNetwork {
 
@@ -35,7 +33,6 @@ public class PlansCreateFromNetwork {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final NetworkLayer network;
 	private final NetworkSummary network_summary;
 	private final double p2c_prop;
 
@@ -43,10 +40,9 @@ public class PlansCreateFromNetwork {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansCreateFromNetwork(final NetworkLayer network, final NetworkSummary network_summary,final double p2c_prop) {
+	public PlansCreateFromNetwork(final NetworkSummary network_summary, final double p2c_prop) {
 		super();
 		this.network_summary = network_summary;
-		this.network = network;
 		this.p2c_prop = p2c_prop;
 	}
 
@@ -54,11 +50,11 @@ public class PlansCreateFromNetwork {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final PopulationImpl plans) {
+	public void run(final Population plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		if (plans.getName() == null) {
-			plans.setName("created by '" + this.getClass().getName() + "' with network '" + this.network.getName() + "'");
+			plans.setName("created by '" + this.getClass().getName());
 		}
 		if (!plans.getPersons().isEmpty()) {
 			Gbl.errorMsg("[plans=" + plans + " is not empty]");
@@ -71,7 +67,7 @@ public class PlansCreateFromNetwork {
 		System.out.println("      creating " + nof_persons + " persons");
 		for (int i=1; i<=nof_persons; i++) {
 			String sex = "m";
-			if (MatsimRandom.getRandom().nextDouble() < 0.5) { 
+			if (MatsimRandom.getRandom().nextDouble() < 0.5) {
 				sex = "f";
 			}
 			double rd = MatsimRandom.getRandom().nextDouble();
@@ -85,7 +81,7 @@ public class PlansCreateFromNetwork {
 				age = 7 + MatsimRandom.getRandom().nextInt(11);
 			} else if (rd < 0.4) {
 				age = 18 + MatsimRandom.getRandom().nextInt(10);
-				if (MatsimRandom.getRandom().nextDouble() < 0.7) { 
+				if (MatsimRandom.getRandom().nextDouble() < 0.7) {
 					employed = "yes";
 				}
 				if (MatsimRandom.getRandom().nextDouble() < 0.5) {
@@ -96,7 +92,7 @@ public class PlansCreateFromNetwork {
 				}
 			} else if (rd < 0.9) {
 				age = 28 + MatsimRandom.getRandom().nextInt(37);
-				if (MatsimRandom.getRandom().nextDouble() < 0.6) { 
+				if (MatsimRandom.getRandom().nextDouble() < 0.6) {
 					employed = "yes";
 				}
 				if (MatsimRandom.getRandom().nextDouble() < 0.7) {

@@ -22,7 +22,6 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 /**
@@ -40,8 +39,6 @@ public class HouseholdsConfigGroup extends Module {
 
 	private String inputFile = null;
 
-	private static final Logger log = Logger.getLogger(HouseholdsConfigGroup.class);
-
 	public HouseholdsConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -50,7 +47,7 @@ public class HouseholdsConfigGroup extends Module {
 	public String getValue(final String key) {
 		if (INPUT_FILE.equals(key)) {
 			return getInputFile();
-		} 
+		}
 		throw new IllegalArgumentException(key);
 	}
 

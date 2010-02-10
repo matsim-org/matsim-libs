@@ -90,7 +90,7 @@ public class TransitRouter {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.beelineWalkSpeed;
 			double initialCost = - (initialTime * this.config.marginalUtilityOfTravelTimeWalk);
-			wrappedFromNodes.put(node, new InitialNode(node, initialCost, initialTime + departureTime));
+			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
 		// find possible end stops
@@ -106,7 +106,7 @@ public class TransitRouter {
 			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.beelineWalkSpeed;
 			double initialCost = - (initialTime * this.config.marginalUtilityOfTravelTimeWalk);
-			wrappedToNodes.put(node, new InitialNode(node, initialCost, initialTime + departureTime));
+			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
 		// find routes between start and end stops
