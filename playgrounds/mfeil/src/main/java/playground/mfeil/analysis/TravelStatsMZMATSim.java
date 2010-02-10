@@ -93,7 +93,6 @@ public class TravelStatsMZMATSim {
 		double counterPT = 0;
 		double counterWalk = 0;
 		double counterBike = 0;
-		double size = population.getPersons().size();
 		
 		stream.print(name+"\t");
 		
@@ -133,6 +132,7 @@ public class TravelStatsMZMATSim {
 				else log.warn("Undefined transport mode for person "+plan.getPerson().getId()+": "+leg.getMode());
 			}		
 		}
+		double counterAll = counterCar+counterPT+counterWalk+counterBike;
 		stream.print(aveTripDistanceCarPop1/counterCar+"\t");
 		stream.print(aveTripDistancePTPop1/counterPT+"\t");
 		stream.print(aveTripDistanceWalkPop1/counterWalk+"\t");
@@ -141,13 +141,13 @@ public class TravelStatsMZMATSim {
 		stream.print(aveTripTimePTPop1/counterPT+"\t");
 		stream.print(aveTripTimeWalkPop1/counterWalk+"\t");
 		stream.print(aveTripTimeBikePop1/counterBike+"\t");
-		stream.print((aveTripDistanceCarPop1+aveTripDistancePTPop1+aveTripDistanceWalkPop1+aveTripDistanceBikePop1)/size+"\t");
-		stream.print((aveTripTimeCarPop1+aveTripTimePTPop1+aveTripTimeWalkPop1+aveTripTimeBikePop1)/size+"\t");
-		stream.print(Double.parseDouble(counterCar+"")/Double.parseDouble(size+"")+"\t");
-		stream.print(Double.parseDouble(counterPT+"")/Double.parseDouble(size+"")+"\t");
-		stream.print(Double.parseDouble(counterWalk+"")/Double.parseDouble(size+"")+"\t");
-		stream.print(Double.parseDouble(counterBike+"")/Double.parseDouble(size+"")+"\t");
-		stream.println(size);
+		stream.print((aveTripDistanceCarPop1+aveTripDistancePTPop1+aveTripDistanceWalkPop1+aveTripDistanceBikePop1)/counterAll+"\t");
+		stream.print((aveTripTimeCarPop1+aveTripTimePTPop1+aveTripTimeWalkPop1+aveTripTimeBikePop1)/counterAll+"\t");
+		stream.print(Double.parseDouble(counterCar+"")/counterAll+"\t");
+		stream.print(Double.parseDouble(counterPT+"")/counterAll+"\t");
+		stream.print(Double.parseDouble(counterWalk+"")/counterAll+"\t");
+		stream.print(Double.parseDouble(counterBike+"")/counterAll+"\t");
+		stream.println(counterAll);
 	}		
 		
 	
