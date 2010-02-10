@@ -29,4 +29,6 @@ abstract class VirtualNode {
    public abstract Node getRealNode();
   
    public abstract boolean equals(VirtualNode other);
+   
+   public abstract String toString();
 }

@@ -53,6 +53,11 @@ public class VirtualSink extends VirtualNode {
 	   }
 	   return false;
    }
+   
+   @Override
+   public String toString() {
+     return "Virtual Sink " + node.getId().toString();	   
+   }
 }
 
 

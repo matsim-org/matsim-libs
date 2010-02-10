@@ -232,6 +232,12 @@ public class Flow {
 				/* no else, because outflow out of a source has no cap.
 				   (the demand of the original source is accounted for,
 				   demand of sources we pass through does not matter) */
+			} else if (step instanceof StepSinkFlow) {
+				// FIXME cannot handle residual stepsinkflow yet!
+				if (!step.getForward()) {
+					throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
+				}
+				// else no cap, because inflow into sink is uncapped
 			} else {
 				throw new RuntimeException("Unsupported kind of PathStep!");
 			}
@@ -325,6 +331,13 @@ public class Flow {
 				this._demands.put(source, demand);
 			}
 
+		} else if (step instanceof StepSinkFlow) {
+			// FIXME cannot handle residual stepsinkflow yet!
+			if (!step.getForward()) {
+				throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
+			} else {
+				// FIXME, adjust demand of sink
+			}			
 		} else {
 			throw new RuntimeException("Unsupported kind of PathStep!");
 		}

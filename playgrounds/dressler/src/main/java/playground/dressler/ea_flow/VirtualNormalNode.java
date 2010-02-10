@@ -54,4 +54,9 @@ public class VirtualNormalNode extends VirtualNode {
 	   }
 	   return false;
    }
+   
+   @Override
+   public String toString() {
+     return "Normal node " + node.getId().toString();	   
+   }
 }

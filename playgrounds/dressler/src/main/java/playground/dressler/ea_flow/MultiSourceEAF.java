@@ -168,19 +168,26 @@ public class MultiSourceEAF {
 			
 		int i;
 		long gain = 0;
+		int lasttime = 0;
 		for (i=1; i<=settings.MaxRounds; i++){
 			timer1 = System.currentTimeMillis();
 			//System.out.println("blub");
-			result = routingAlgo.doCalculations();
+			
+			//result = routingAlgo.doCalculations();
+			result = routingAlgo.doCalculationsReverse(lasttime); 
 			timer2 = System.currentTimeMillis();
 			timeMBF += timer2 - timer1;
 			if (result == null || result.isEmpty()){
 				break;
 			}
 			tempstr = "";
-			for(TimeExpandedPath path : result){				
+			
+			for(TimeExpandedPath path : result){
+				if (path.getArrival() > lasttime) {
+					lasttime = path.getArrival();
+				}
 				if(_debug){
-					tempstr += path.toString();
+					tempstr += path.toString() + "\n";
 					System.out.println("found path: " +  path);
 				}
 				int augment = fluss.augment(path);
@@ -346,10 +353,10 @@ public class MultiSourceEAF {
 		
 		// ehemalige Unfold Bugs: uniformdemands = 100 oder 500, timestep =5
 		
-		int uniformDemands = 5000;
+		int uniformDemands = 500;
 
 		// Rounding is now done according to timestep and flowFactor!
-		int timestep = 100; 
+		int timestep = 10; 
 		double flowFactor = 1.0;
 
 		
