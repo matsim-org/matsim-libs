@@ -3,8 +3,6 @@
  */
 package playground.johannes.eut;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +44,7 @@ public class KSPPenalty {
 
 //	private static boolean logging = true;
 //
-	private static PrintWriter logWriter;
+//	private static PrintWriter logWriter;
 
 	// ===========================================================================
     // constants
@@ -67,13 +65,13 @@ public class KSPPenalty {
 		this.penaltyLinkcost = new PenaltyLinkcost();
 		this.algorithm = newAlgorithm(network, this.penaltyLinkcost);
 
-		try {
-			if(logWriter == null)
-				logWriter = new PrintWriter(EUTController.getOutputFilename("ksp.log"));
-		} catch (IOException e) {
+//		try {
+//			if(logWriter == null)
+//				logWriter = new PrintWriter(EUTController.getOutputFilename("ksp.log"));
+//		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//			e.printStackTrace();
+//		}
 
 	}
 
@@ -189,8 +187,8 @@ public class KSPPenalty {
 		 */
 //		synchronized (this) {
 //			if (logging)
-				logWriter.println(runcount + "\t" + paths.size());
-				logWriter.flush();
+//				logWriter.println(runcount + "\t" + paths.size());
+//				logWriter.flush();
 //		}
 		/*
 		 * (4) The paths we identified contain decorated nodes. So "undecorate"

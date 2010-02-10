@@ -31,17 +31,20 @@ import java.util.List;
 
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author illenberger
  *
  */
-public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener, IterationStartsListener {
+public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener, IterationStartsListener, StartupListener{
 
 	private int count;
 	
@@ -54,20 +57,10 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 	private int firstEvent = 0;
 	
 	private int lastEvent = 0;
+
 	
 	public LinkCounter() {
-		try {
-			writer = IOUtils.getBufferedWriter(EUTController.getOutputFilename("1100.linkcounts.txt"));
-			writer.write("iteration\tcounts");
-			writer.newLine();
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 	}
 	public void handleEvent(LinkEnterEvent event) {
 		if(firstEvent == 0)
@@ -130,5 +123,21 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 		}
 	
 	}
+  @Override
+  public void notifyStartup(StartupEvent event) {
+    ControlerIO controlerIO = event.getControler().getControlerIO();
+    try {
+      writer = IOUtils.getBufferedWriter(controlerIO.getOutputFilename("1100.linkcounts.txt"));
+      writer.write("iteration\tcounts");
+      writer.newLine();
+      
+    } catch (FileNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }    
+  }
 
 }
