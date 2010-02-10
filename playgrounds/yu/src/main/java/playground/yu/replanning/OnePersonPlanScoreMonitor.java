@@ -27,7 +27,6 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ControlerEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -96,7 +95,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 
 	public void notifyStartup(StartupEvent event) {
 		event.getControler();
-		writer = new SimpleWriter(Controler
+		writer = new SimpleWriter(event.getControler().getControlerIO()
 				.getOutputFilename("onePlanScores_ceb6_rop.txt"));
 	}
 

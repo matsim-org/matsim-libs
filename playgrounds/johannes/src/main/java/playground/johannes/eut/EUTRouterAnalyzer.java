@@ -33,7 +33,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -174,7 +173,7 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 	}
 	
 	public void notifyStartup(StartupEvent event) {
-		String filename = Controler.getOutputFilename("replanAnalysis.txt");
+		String filename = event.getControler().getControlerIO().getOutputFilename("replanAnalysis.txt");
 		try {
 			runWriter = IOUtils.getBufferedWriter(filename);
 			runWriter.write("Iteration\trouteDiffers\tn_guided\treplannedTwice\triskyAndGuided");

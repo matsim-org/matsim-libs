@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -115,7 +114,7 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 		double varianceAvr = varianceSum / linkSamples.size();
 		
 		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(Controler.getOutputFilename("linkvariances.txt"));
+			BufferedWriter writer = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("linkvariances.txt"));
 			writer.write("link\tvariance\tmin\tmax");
 			writer.newLine();
 			

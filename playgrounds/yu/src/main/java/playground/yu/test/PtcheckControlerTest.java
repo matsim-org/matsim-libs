@@ -81,12 +81,12 @@ public class PtcheckControlerTest extends Controler {
 			Config cf = ctl.getConfig();
 			try {
 				ctl.addControlerListener(new PtRate(ctl.getPopulation(),
-						getOutputFilename("PtRate.txt"),
+				    event.getControler().getControlerIO().getOutputFilename("PtRate.txt"),
 						ctl.getLastIteration(), cf.getParam("planCalcScore",
 								"traveling"), cf.getParam("planCalcScore",
 								"travelingPt")));
 				this.ptRateWriter = IOUtils
-						.getBufferedWriter(getOutputFilename("tollPaid.txt"));
+						.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("tollPaid.txt"));
 				this.ptRateWriter
 						.write("Iter\tBetaTraveling\tBetaTravelingPt\tavg. executed score\tavg. triplength\ttraffic persformance\tavg. travel speed\ttoll_amount[�/m]\ttoll_paid[�]\tNumber of Drawees\tavg. tolled triplength\n");
 				this.ptRateWriter.flush();
@@ -146,21 +146,21 @@ public class PtcheckControlerTest extends Controler {
 			}
 			if (it == ctl.getLastIteration()) {
 				if (this.orms != null) {
-					this.orms.write(getOutputFilename("onRoute.txt.gz"));
-					this.orms.writeCharts(getOutputFilename("onRoute.png"));
+					this.orms.write(event.getControler().getControlerIO().getOutputFilename("onRoute.txt.gz"));
+					this.orms.writeCharts(event.getControler().getControlerIO().getOutputFilename("onRoute.png"));
 				}
 				if (this.ttms != null) {
-					this.ttms.write(getOutputFilename("traveltimes.txt.gz"));
-					this.ttms.writeCharts(getOutputFilename("traveltimes.png"));
+					this.ttms.write(event.getControler().getControlerIO().getOutputFilename("traveltimes.txt.gz"));
+					this.ttms.writeCharts(event.getControler().getControlerIO().getOutputFilename("traveltimes.png"));
 				}
 				if (this.ld != null) {
-					this.ld.write(getOutputFilename("legDistances.txt.gz"));
-					this.ld.writeCharts(getOutputFilename("legDistances.png"));
+					this.ld.write(event.getControler().getControlerIO().getOutputFilename("legDistances.txt.gz"));
+					this.ld.writeCharts(event.getControler().getControlerIO().getOutputFilename("legDistances.png"));
 				}
 				if (this.clas != null) {
-					this.clas.write(getOutputFilename("avgSpeed.txt.gz"));
+					this.clas.write(event.getControler().getControlerIO().getOutputFilename("avgSpeed.txt.gz"));
 					this.clas
-							.writeChart(getOutputFilename("avgSpeedCityArea.png"));
+							.writeChart(event.getControler().getControlerIO().getOutputFilename("avgSpeedCityArea.png"));
 				}
 			}
 		}

@@ -38,7 +38,6 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -167,7 +166,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 			}
 		}
 		
-		return sum/(double)persons.size();
+		return sum/persons.size();
 	}
 	
 	private double avrSelectedScore(Collection<Person> persons) {
@@ -179,7 +178,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 			sum += p.getSelectedPlan().getScore().doubleValue();
 		}
 		
-		return sum/(double)persons.size();
+		return sum/persons.size();
 	}
 	
 	public void handleEvent(AgentWait2LinkEvent event) {
@@ -203,7 +202,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 
 	public void notifyStartup(StartupEvent event) {
 		try {
-			writer = IOUtils.getBufferedWriter(Controler.getOutputFilename("tripAndScoreStats.txt"));
+			writer = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("tripAndScoreStats.txt"));
 			writer.write("Iteration");
 			writer.write("\tavr_trip\tavr_score");
 			writer.write("\tguided_trip\tguided_score");
@@ -270,7 +269,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		for(Double d : samples)
 			sum += d;
 		
-		return sum/(double)samples.size();
+		return sum/samples.size();
 	}
 
 	public Map<Id, Double> getTripDurations() {

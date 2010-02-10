@@ -151,7 +151,7 @@ public class EUTController2 extends WithindayControler {
 		/*
 		 * Create a new incident simulator...
 		 */
-		RandomIncidentSimulator simulator = new RandomIncidentSimulator(network, incidentProba);
+		RandomIncidentSimulator simulator = new RandomIncidentSimulator(network, incidentProba, this.getControlerIO());
 		simulator.setCapReduction(capReduction);
 		for(Link link : riskyLinks)
 			simulator.addLink(link);

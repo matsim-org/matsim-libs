@@ -115,7 +115,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		
 		
 		new Statistics();		
-		String outputfileOverview = Controler.getOutputFilename("assignment_log.xls");
+		String outputfileOverview = controler.getControlerIO().getOutputFilename("assignment_log.xls");
 		FileOutputStream fileOverview;
 		try {
 			fileOverview = new FileOutputStream(new File(outputfileOverview), true);

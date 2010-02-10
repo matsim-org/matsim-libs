@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -529,24 +528,6 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		return total_spatial_fraction;
 	}
 
-	/**
-	 * returns the path to the specified social network iteration directory. The directory path does not include the trailing '/'
-	 * @param snIter the iteration the path to should be returned
-	 * @return path to the specified iteration directory
-	 */
-	public final static String getSNIterationPath(final int snIter) {
-		return Controler.getOutputFilename("ITERS/" + snIter);
-	}
 
-	/**
-	 * returns the path to the specified iteration directory,
-	 * including social network iteration. The directory path does not include the trailing '/'
-	 * @param iteration the iteration the path to should be returned
-	 * @param snIter
-	 * @return path to the specified iteration directory
-	 */
-	public final static String getSNIterationPath(final int iteration, final int snIter) {
-		return Controler.getOutputFilename("ITERS/" + snIter + "/it." + iteration);
-	}
 }
 

@@ -333,10 +333,10 @@ public class ParametersPSF {
 
 		// add output path prefix to filename
 		mainHubPriceGraphFileName = "hubPrices.png";
-		mainHubPriceGraphFileName = controler.getOutputFilename(mainHubPriceGraphFileName);
+		mainHubPriceGraphFileName = controler.getControlerIO().getOutputFilename(mainHubPriceGraphFileName);
 
 		mainBaseLoadOutputGraphFileName = "baseLoad.png";
-		mainBaseLoadOutputGraphFileName = controler.getOutputFilename(mainBaseLoadOutputGraphFileName);
+		mainBaseLoadOutputGraphFileName = controler.getControlerIO().getOutputFilename(mainBaseLoadOutputGraphFileName);
 
 		// TODO: adapt this later, when we have better models (e.g. consider car
 		// type also)

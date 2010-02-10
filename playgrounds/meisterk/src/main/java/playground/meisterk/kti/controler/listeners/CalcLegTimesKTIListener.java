@@ -73,7 +73,7 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 	public void notifyStartup(StartupEvent event) {
 
 		try {
-			this.iterationSummaryOut = new PrintStream(org.matsim.core.controler.Controler.getOutputFilename(this.averagesSummaryFilename));
+			this.iterationSummaryOut = new PrintStream(event.getControler().getControlerIO().getOutputFilename(this.averagesSummaryFilename));
 			this.iterationSummaryOut.print("#iteration\tall");
 			for (TransportMode mode : TransportMode.values()) {
 				this.iterationSummaryOut.print("\t" + mode.toString());

@@ -73,7 +73,7 @@ public class JamTest extends Controler {
 			c.getEvents().addHandler(va);
 			try {
 				out = IOUtils
-						.getBufferedWriter(getOutputFilename("travol.txt.gz"));
+						.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("travol.txt.gz"));
 				out.write("LinkId\tCapacity/100[Fz/h]\tVolume[Fz/h]\n");
 				out.flush();
 			} catch (FileNotFoundException e) {

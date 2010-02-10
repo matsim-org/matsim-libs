@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -78,6 +79,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	private final Network network;
 	protected PrintStream 					stream;
 	boolean 								printing = false;
+  private ControlerIO controlerIO;
 
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -113,6 +115,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
 		this.routes					= null;
 		this.network        = controler.getNetwork();
+		this.controlerIO = controler.getControlerIO();
 
 		// meisterk
 		this.legTravelTimeEstimatorFactory = estimatorFactory;
@@ -205,7 +208,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	public void run (Plan basePlan){
 
 		if (printing){
-			String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+basePlan.getPerson().getId()+".xls");
+			String outputfile = this.controlerIO.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+basePlan.getPerson().getId()+".xls");
 			Counter.timeOptCounter++;
 			try {
 				stream = new PrintStream (new File(outputfile));

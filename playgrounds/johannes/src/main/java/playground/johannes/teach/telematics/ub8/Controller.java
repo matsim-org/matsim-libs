@@ -98,7 +98,7 @@ public class Controller extends Controler {
 	@Override
 	protected void setUp() {
 		super.setUp();
-		RouteTTObserver observer = new RouteTTObserver(Controler.getOutputFilename("routeTravelTimes.txt"));
+		RouteTTObserver observer = new RouteTTObserver(this.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
 		NonSelectedPlanScorer scorer = new NonSelectedPlanScorer();
 		scorer.observer = observer;
 		this.addControlerListener(scorer);

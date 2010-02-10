@@ -51,7 +51,6 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -129,7 +128,7 @@ public class Controller extends WithindayControler {
 		((EventHandler) this.reactTTs).reset(getIteration());
 		
 		factory2 = new GuidedAgentFactory(network, config.charyparNagelScoring(), reactTTs, equipmentFraction, config.global().getRandomSeed());
-		RouteTTObserver observer = new RouteTTObserver(Controler.getOutputFilename("routeTravelTimes.txt"));
+		RouteTTObserver observer = new RouteTTObserver(this.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
 		observer.factory = factory2;
 		NonSelectedPlanScorer scorer = new NonSelectedPlanScorer();
 		scorer.observer = observer;

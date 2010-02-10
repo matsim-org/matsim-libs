@@ -54,7 +54,7 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 
 		try {
 			
-			this.out = IOUtils.getBufferedWriter(org.matsim.core.controler.Controler.getOutputFilename(this.filename));
+			this.out = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename(this.filename));
 			this.out.write("#iteration");
 			for (String str : ScoreElements.SCORE_ELEMENT_NAMES) {
 				this.out.write("\t" + str);

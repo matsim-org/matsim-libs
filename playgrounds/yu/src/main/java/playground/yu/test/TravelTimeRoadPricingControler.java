@@ -33,8 +33,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 
-import playground.yu.analysis.PtCheck;
 import playground.yu.analysis.LegTravelTimeModalSplit;
+import playground.yu.analysis.PtCheck;
 
 /**
  * @author yu
@@ -65,7 +65,7 @@ public class TravelTimeRoadPricingControler extends Controler {
 			}
 			if (idx == ctl.getLastIteration()) {
 				if (ttms != null) {
-					ttms.write(getOutputFilename("traveltimes.txt"));
+					ttms.write(event.getControler().getControlerIO().getOutputFilename("traveltimes.txt"));
 					// ttms.writeCharts(getOutputFilename("traveltimes.png"));
 				}
 			}

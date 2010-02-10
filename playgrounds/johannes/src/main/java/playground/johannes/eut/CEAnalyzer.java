@@ -34,7 +34,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -108,7 +107,7 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 	
 	public void notifyShutdown(ShutdownEvent event) {
 		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(Controler
+			BufferedWriter writer = IOUtils.getBufferedWriter(event.getControler().getControlerIO()
 					.getOutputFilename("ceValues.txt"));
 
 			for (Person p : persons) {
@@ -118,7 +117,7 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 					utilsum += utilFunc.evaluate(d);
 				writer.write(p.getId().toString());
 				writer.write("\t");
-				double exp_util = utilsum / (double) personSamples.size();
+				double exp_util = utilsum / personSamples.size();
 				writer.write(String.valueOf(utilFunc.getTravelTime(exp_util)));
 				writer.newLine();
 			}

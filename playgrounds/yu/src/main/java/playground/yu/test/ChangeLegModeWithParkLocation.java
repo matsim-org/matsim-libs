@@ -663,7 +663,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		private Set<String> patterns;
 
 		public void notifyStartup(final StartupEvent event) {
-			this.writer = new SimpleWriter(Controler
+			this.writer = new SimpleWriter(event.getControler().getControlerIO()
 					.getOutputFilename("legModesPattern.txt"));
 			this.writer.writeln("iteration\tlegModesPatterns");
 			this.patterns = new HashSet<String>();

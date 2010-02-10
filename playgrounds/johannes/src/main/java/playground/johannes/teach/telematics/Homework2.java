@@ -64,7 +64,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.LegImpl;
@@ -107,7 +106,7 @@ public class Homework2 extends Controler {
 	@Override
 	protected void setUp() {
 		super.setUp();
-		RouteTTObserver observer = new RouteTTObserver(Controler.getOutputFilename("routeTravelTimes.txt"));
+		RouteTTObserver observer = new RouteTTObserver(this.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
 		scorer = new NonSelectedPlanScorer();
 		loadTTPredictions(getConfig().getParam("telematics", "predictionFile"));
 		scorer.route1Prediction = this.route1Prediction;
@@ -375,9 +374,9 @@ public class Homework2 extends Controler {
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			List<NetworkChangeEvent> events = changeEvents.get(event.getIteration());
 			if(events != null) {
-				((NetworkImpl) event.getControler().getNetwork()).setNetworkChangeEvents(events);
+				(event.getControler().getNetwork()).setNetworkChangeEvents(events);
 			} else
-				((NetworkImpl) event.getControler().getNetwork()).setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
+				(event.getControler().getNetwork()).setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
 		}
 		
 	}

@@ -28,7 +28,6 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -122,7 +121,7 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 						"Iterations", "Pt-Rate");
 				ptRateChart.addSeries("PtRate", x, yPtRate);
 				ptRateChart.saveAsPng(
-						Controler.getOutputFilename("PtRate.png"), 800, 600);
+				    event.getControler().getControlerIO().getOutputFilename("PtRate.png"), 800, 600);
 				XYLineChart personsChart = new XYLineChart(
 						"Schweiz: PtUser/Persons, "
 								+ maxIters
@@ -140,7 +139,7 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 						"PtUser/Persons");
 				personsChart.addSeries("PtUser", x, yPtUser);
 				personsChart.addSeries("Persons", x, yPersons);
-				personsChart.saveAsPng(Controler
+				personsChart.saveAsPng(event.getControler().getControlerIO()
 						.getOutputFilename("Persons.png"), 800, 600);
 
 			}

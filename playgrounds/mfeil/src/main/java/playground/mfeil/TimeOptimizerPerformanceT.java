@@ -7,6 +7,7 @@ import java.io.PrintStream;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -24,6 +25,7 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 	private final PlanAlgorithm 	timeOptAlgorithm;
 	private final PlanScorer		scorer;
 	private final PlansCalcRoute router;
+  private ControlerIO controlerIO;
 	
 	public TimeOptimizerPerformanceT (Controler controler, LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer, ScoringFunctionFactory scoringFunctionFactory){
 
@@ -32,14 +34,14 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 		FreespeedTravelTimeCost ttCost = new FreespeedTravelTimeCost(controler.getConfig().charyparNagelScoring());
 		this.router 				= new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), new AStarLandmarksFactory(controler.getNetwork(), ttCost));
 		this.timeOptAlgorithm 	= new Planomat (estimatorFactory, scoringFunctionFactory, controler.getConfig().planomat(), this.router, controler.getNetwork());
-		
+		this.controlerIO = controler.getControlerIO();
 	}
 	
 	public void run (Plan plan){
 		
 		if (plan.getPerson().getId().toString().equals("2")){
 		
-			String outputfile = Controler.getOutputFilename("TimeOptimizerTest.xls");
+			String outputfile = this.controlerIO.getOutputFilename("TimeOptimizerTest.xls");
 			PrintStream stream;
 			try {
 				stream = new PrintStream (new File(outputfile));

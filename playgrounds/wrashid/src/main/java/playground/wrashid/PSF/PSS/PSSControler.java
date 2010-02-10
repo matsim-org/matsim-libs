@@ -6,9 +6,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.HashMap;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
@@ -19,8 +17,6 @@ import playground.wrashid.PSF.ParametersPSFMutator;
 import playground.wrashid.PSF.energy.AddEnergyScoreListener;
 import playground.wrashid.PSF.energy.AfterSimulationListener;
 import playground.wrashid.PSF.energy.SimulationStartupListener;
-import playground.wrashid.PSF.energy.charging.ChargingTimes;
-import playground.wrashid.PSF.energy.charging.optimizedCharging.OptimizedCharger;
 import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
 import playground.wrashid.PSF.parking.LogParkingTimes;
 import playground.wrashid.lib.GeneralLib;
@@ -170,7 +166,7 @@ public class PSSControler {
 	private void saveMATSimResults() {
 		// copy all data from the matsim output directory to the results
 		// directory
-		String matsimOutputFolderName = controler.getOutputFilename("");
+		String matsimOutputFolderName = controler.getControlerIO().getOutputFilename("");
 
 		GeneralLib.copyDirectory(matsimOutputFolderName, getIterationResultDirectory());
 

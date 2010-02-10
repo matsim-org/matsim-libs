@@ -78,12 +78,12 @@ public class PtcheckControler2 extends Controler {
 			Config cf = ctl.getConfig();
 			try {
 				ctl.addControlerListener(new PtRate2(ctl.getPopulation(),
-						getOutputFilename("PtRate.txt"),
+				    event.getControler().getControlerIO().getOutputFilename("PtRate.txt"),
 						ctl.getLastIteration(), cf.getParam(PLANCALCSCORE,
 								"traveling"), cf.getParam(PLANCALCSCORE,
 								"travelingPt")));
 				ptRateWriter = IOUtils
-						.getBufferedWriter(getOutputFilename("tollPaid.txt"));
+						.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("tollPaid.txt"));
 				ptRateWriter
 						.write("Iter\tBetaTraveling\tBetaTravelingPt\tavg. executed score\tavg. triplength\ttraffic persformance\tavg. travel speed\ttoll_amount[�/m]\ttoll_paid[�]\tNumber of Drawees\tavg. tolled triplength\n");
 				ptRateWriter.flush();
@@ -142,20 +142,20 @@ public class PtcheckControler2 extends Controler {
 			}
 			if (it == ctl.getLastIteration()) {
 				if (orms != null) {
-					orms.write(getOutputFilename("onRoute.txt.gz"));
-					orms.writeCharts(getOutputFilename("onRoute.png"));
+					orms.write(event.getControler().getControlerIO().getOutputFilename("onRoute.txt.gz"));
+					orms.writeCharts(event.getControler().getControlerIO().getOutputFilename("onRoute.png"));
 				}
 				if (ttms != null) {
-					ttms.write(getOutputFilename("traveltimes.txt.gz"));
-					ttms.writeCharts(getOutputFilename("traveltimes"));
+					ttms.write(event.getControler().getControlerIO().getOutputFilename("traveltimes.txt.gz"));
+					ttms.writeCharts(event.getControler().getControlerIO().getOutputFilename("traveltimes"));
 				}
 				if (ld != null) {
-					ld.write(getOutputFilename("legDistances.txt.gz"));
-					ld.writeCharts(getOutputFilename("legDistances"));
+					ld.write(event.getControler().getControlerIO().getOutputFilename("legDistances.txt.gz"));
+					ld.writeCharts(event.getControler().getControlerIO().getOutputFilename("legDistances"));
 				}
 				if (clas != null) {
-					clas.write(getOutputFilename("avgSpeed.txt.gz"));
-					clas.writeChart(getOutputFilename("avgSpeedCityArea.png"));
+					clas.write(event.getControler().getControlerIO().getOutputFilename("avgSpeed.txt.gz"));
+					clas.writeChart(event.getControler().getControlerIO().getOutputFilename("avgSpeedCityArea.png"));
 				}
 			}
 		}

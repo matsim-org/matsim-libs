@@ -212,12 +212,12 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 				System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
 				chart.addSeries("executed plan", iterations, values);
 				chart.addMatsimLogo();
-				chart.saveAsPng(Controler.getOutputFilename("travelstats_" + this.measure + "_" + calculator.getMode() + "_" +
+				chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename("travelstats_" + this.measure + "_" + calculator.getMode() + "_" +
 						calculator.getActType() + "_" + "crowfly=" + calculator.isCrowFly() + "_way there =" + this.wayThere + ".png"), 800, 600);
 				
 				try {	
 					BufferedWriter out = IOUtils.getBufferedWriter(
-							Controler.getOutputFilename(
+					    event.getControler().getControlerIO().getOutputFilename(
 									"travelstats_" + this.measure + "_" + calculator.getMode() + "_" +
 									calculator.getActType() + "_crowfly=" + calculator.isCrowFly() + "_way there =" + this.wayThere +".txt"));
 					out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\tmedian EXECUTED\n");

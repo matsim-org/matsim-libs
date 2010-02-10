@@ -122,7 +122,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 
 		event.getControler().getEvents().addHandler(this);
 		try {
-			writer = IOUtils.getBufferedWriter(event.getControler().getOutputFilename("analysis.txt"));
+			writer = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("analysis.txt"));
 			writer.write("it\tsafe\trisky\ttt_safe\ttt_risky\ttt_return\ttt_avr\tscore_safe\tscore_risky\tscore_plan_safe\tscore_plan_risky\tscore_guided\tscore_unguided\ttt_guided\ttt_unguided");
 			writer.write("\tn_guidedSafe\ttt_guidedSafe\tn_guidedRisky\ttt_guidedRisky\tn_unguidedSafe\ttt_unguidedSafe\tn_unguidedRisky\ttt_unguidedRisky");
 			writer.newLine();
@@ -460,7 +460,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		}
 
 		try {
-			BufferedWriter w = IOUtils.getBufferedWriter(controler.getOutputFilename("ce_analysis.txt"));
+			BufferedWriter w = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("ce_analysis.txt"));
 			w.write("tt_risky_good\ttt_risky_bad\ttt_guided\tpi_avr\tpi_guided\tn_pi_avr\tn_pi_guided\tpi_avr2\tpi_guided2\tt_ce\tpi_safe_plus\tn_pi_safe_plus\tpi_safe_minus\tn_pi_safe_minus\tpi_safe_avr\twillingness");
 			w.newLine();
 			w.write(String.valueOf(StatUtils.mean(avrRiskyGoodTriptimes.getValues())));
@@ -496,11 +496,11 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			w.write(Double.toString(StatUtils.mean(willingness.toNativeArray())));
 			w.close();
 
-			Distribution.writeHistogram(avrRiskyGoodTriptimes, controler.getOutputFilename("riskyGood.txt"));
-			Distribution.writeHistogram(avrRiskyBadTriptimes, controler.getOutputFilename("riskyBad.txt"));
-			Distribution.writeHistogram(avrGuidedTriptimes, controler.getOutputFilename("guided.txt"));
-			dumpMap(calcAvrTriptimes(pi_guided_map), controler.getOutputFilename("pi_guided.txt"));
-			dumpMap(calcAvrTriptimes(pi_avr_map), controler.getOutputFilename("pi_avr.txt"));
+			Distribution.writeHistogram(avrRiskyGoodTriptimes, event.getControler().getControlerIO().getOutputFilename("riskyGood.txt"));
+			Distribution.writeHistogram(avrRiskyBadTriptimes, event.getControler().getControlerIO().getOutputFilename("riskyBad.txt"));
+			Distribution.writeHistogram(avrGuidedTriptimes, event.getControler().getControlerIO().getOutputFilename("guided.txt"));
+			dumpMap(calcAvrTriptimes(pi_guided_map), event.getControler().getControlerIO().getOutputFilename("pi_guided.txt"));
+			dumpMap(calcAvrTriptimes(pi_avr_map), event.getControler().getControlerIO().getOutputFilename("pi_avr.txt"));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

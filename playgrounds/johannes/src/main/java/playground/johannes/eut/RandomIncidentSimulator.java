@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
@@ -59,12 +59,12 @@ public class RandomIncidentSimulator implements IterationStartsListener {
 
 	private BufferedWriter writer;
 
-	public RandomIncidentSimulator(NetworkImpl network, double proba) {
+	public RandomIncidentSimulator(NetworkImpl network, double proba, ControlerIO cio) {
 		this.network = network;
 		this.incidentProba = proba;
 
 		try {
-			this.writer = new BufferedWriter(new FileWriter(Controler.getOutputFilename("incidents.txt")));
+			this.writer = new BufferedWriter(new FileWriter(cio.getOutputFilename("incidents.txt")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

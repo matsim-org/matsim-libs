@@ -52,7 +52,7 @@ public class CalcLegTimesListenerDetailed implements StartupListener, AfterMobsi
 	public void notifyStartup(StartupEvent event) {
 
 		try {
-			this.out = IOUtils.getBufferedWriter(org.matsim.core.controler.Controler.getOutputFilename(this.filename));
+			this.out = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename(this.filename));
 			this.out.write("#iteration");
 			
 			for (int i = 0; i < actTypes.length; i++) {
