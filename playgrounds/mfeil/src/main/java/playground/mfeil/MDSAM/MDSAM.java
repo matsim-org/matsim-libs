@@ -59,7 +59,7 @@ public class MDSAM {
 
 	public MDSAM(final PopulationImpl population, final String mdsamOutputFile) {
 		this.population=population;
-		this.GWtime = 0.0;
+		this.GWtime = 0.5;
 		this.GWact = 2.0;
 		this.GWmode = 1.0;
 		this.GWlocation = 1.0;
