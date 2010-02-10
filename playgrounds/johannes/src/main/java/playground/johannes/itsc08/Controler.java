@@ -89,7 +89,7 @@ public class Controler extends WithindayControler {
 		this.reactTTs = new EstimReactiveLinkTT(1, this.network);
 //		this.reactTTs = new EventBasedTTProvider(10);
 		this.events.addHandler((EventHandler) this.reactTTs);
-		((EventHandler) this.reactTTs).reset(getIteration());
+		((EventHandler) this.reactTTs).reset(this.getIterationNumber());
 
 //		LinkTTObserver obs = new LinkTTObserver(network, (EstimReactiveLinkTT) reactTTs);
 //		this.events.addHandler(obs);

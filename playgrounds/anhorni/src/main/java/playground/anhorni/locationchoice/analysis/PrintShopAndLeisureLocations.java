@@ -60,8 +60,8 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 		if (event.getIteration() % 10 != 0) return;
 		
 		this.initGeometries();
-		String shopFile = event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "shopLocations.shp");
-		String leisureFile = event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "leisureLocations.shp");
+		String shopFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "shopLocations.shp");
+		String leisureFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "leisureLocations.shp");
 		
 		ArrayList<Feature> featuresShop = new ArrayList<Feature>();
 		ArrayList<Feature> featuresLeisure = new ArrayList<Feature>();

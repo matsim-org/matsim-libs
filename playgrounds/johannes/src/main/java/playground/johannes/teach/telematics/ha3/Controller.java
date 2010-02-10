@@ -125,7 +125,7 @@ public class Controller extends WithindayControler {
 			throw new IllegalArgumentException("Travel time information type \"" + type + "\" is unknown!");
 		
 		this.events.addHandler((EventHandler) this.reactTTs);
-		((EventHandler) this.reactTTs).reset(getIteration());
+		((EventHandler) this.reactTTs).reset(getIterationNumber());
 		
 		factory2 = new GuidedAgentFactory(network, config.charyparNagelScoring(), reactTTs, equipmentFraction, config.global().getRandomSeed());
 		RouteTTObserver observer = new RouteTTObserver(this.getControlerIO().getOutputFilename("routeTravelTimes.txt"));

@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -33,7 +32,7 @@ public class CarPoolingListener implements IterationEndsListener {
 		this.tripsAnalysisIter = Integer.parseInt(controler.getConfig().findParam(CONFIG_GROUP,CONFIG_ANALYSIS_ITER));
 		if (this.tripsAnalysisIter.equals(null)) {throw new RuntimeException("In config file, param = "+CONFIG_ANALYSIS_ITER+" in module = "+CONFIG_GROUP+" not defined!");}
 		
-		if (controler.getIteration()== this.tripsAnalysisIter) {
+		if (event.getIteration() == this.tripsAnalysisIter) {
 			this.plansAnalyzer();
 		}
 		
@@ -57,7 +56,7 @@ public class CarPoolingListener implements IterationEndsListener {
 						ActivityImpl workAct = ((PlanImpl) plan).getNextActivity(homeWorkLeg);
 						if (homeWorkLeg.getMode().toString().equals("car") && workAct.getType().contains("work")) {
 							tripNumber = tripNumber+1;
-							WorkTrip wt = new WorkTrip (tripNumber,(IdImpl)p.getId(), act.getCoord(),workAct.getCoord(),homeWorkLeg, true);
+							WorkTrip wt = new WorkTrip (tripNumber,p.getId(), act.getCoord(),workAct.getCoord(),homeWorkLeg, true);
 							this.workTrips.addTrip(wt);
 						}
 					}
@@ -67,7 +66,7 @@ public class CarPoolingListener implements IterationEndsListener {
 						ActivityImpl homeAct = ((PlanImpl) plan).getNextActivity(workHomeLeg);
 						if (workHomeLeg.getMode().toString().equals("car") && homeAct.getType().equals("home")) {
 							tripNumber = tripNumber+1;
-							WorkTrip wt = new WorkTrip (tripNumber, (IdImpl)p.getId(), act.getCoord(),homeAct.getCoord(),workHomeLeg, false);
+							WorkTrip wt = new WorkTrip (tripNumber, p.getId(), act.getCoord(),homeAct.getCoord(),workHomeLeg, false);
 							this.workTrips.addTrip(wt);
 						}	
 					}

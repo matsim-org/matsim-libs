@@ -168,7 +168,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		
 		/* Detect optimal coefficients metric */
 		Statistics.prt=false;
-		if ((Controler.getIteration()==1)	&&	(this.noOfSoftCoefficients>1)) this.detectCoefficients();
+		if ((this.controler.getIterationNumber() ==1)	&&	(this.noOfSoftCoefficients>1)) this.detectCoefficients();
 		else {
 			this.calculate();
 			this.rescheduleNonassigedAgents();
@@ -176,7 +176,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		Statistics.prt=true;
 		
 		/* Print statistics of individual optimization */
-		assignment.println("Iteration "+Controler.getIteration());
+		assignment.println("Iteration "+this.controler.getIterationNumber());
 		assignment.println("Individual optimization");
 		for (int i=0;i<list[0].size();i++){
 			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScore()+"\t");

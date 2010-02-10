@@ -217,14 +217,14 @@ public class EUTController extends WithindayControler {
 //		this.reactTTs = new EstimReactiveLinkTT(sim.getQueueNetworkLayer());
 		this.reactTTs = new EstimReactiveLinkTT(1, this.network); // TODO: Think about that!!!
 		this.events.addHandler(this.reactTTs);
-		this.reactTTs.reset(getIteration());
+		this.reactTTs.reset(getIterationNumber());
 
 		RandomIncidentSimulator simulator = new RandomIncidentSimulator(network, incidentProba, this.getControlerIO());
 		simulator.setCapReduction(capReduction);
 		for(Link link : riskyLinks)
 //			simulator.addLink(sim.getQueueNetworkLayer().getQueueLink(link.getId()));
 			simulator.addLink(null); //FIXME
-		simulator.notifyIterationStarts(this.getIteration());
+		simulator.notifyIterationStarts(this.getIterationNumber());
 
 		sim.run();
 

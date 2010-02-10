@@ -44,7 +44,7 @@ public class MyCommercialActivityDensityListener implements IterationStartsListe
 	public void notifyIterationStarts(IterationStartsEvent event) {
 
 		event.getControler();
-		String outputCommercialActivityDensityFilename = event.getControler().getControlerIO().getIterationPath(event.getControler().getIteration()) + "/" + event.getControler().getIteration() + ".eventsTruckMinor.txt";
+		String outputCommercialActivityDensityFilename = event.getControler().getControlerIO().getIterationPath(event.getIteration()) + "/" + event.getIteration() + ".eventsTruckMinor.txt";
 		try {
 			this.outputCommercialActivityDensity = new BufferedWriter(new FileWriter(new File( outputCommercialActivityDensityFilename )));
 			this.outputCommercialActivityDensity.write("Long");

@@ -82,8 +82,8 @@ public class TravelDistanceDistribution implements StartupListener, IterationEnd
 				}	
 			}				
 		}
-		this.shopDistanceBins.plotDistribution(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "shopDistanceDistributions"), "");
-		this.leisureDistanceBins.plotDistribution(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "leisureDistanceDistributions"), "");
+		this.shopDistanceBins.plotDistribution(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "shopDistanceDistributions"), "");
+		this.leisureDistanceBins.plotDistribution(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "leisureDistanceDistributions"), "");
 	}
 
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {

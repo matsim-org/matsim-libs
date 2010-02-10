@@ -99,11 +99,11 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		try {
-			realTTWriter = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "realTTs.txt"));
+			realTTWriter = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "realTTs.txt"));
 			realTTWriter.write("time\ttraveltime");
 			realTTWriter.newLine();
 			
-			estimTTWriter = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "estimTTs.txt"));
+			estimTTWriter = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "estimTTs.txt"));
 			estimTTWriter.write("time\ttraveltime");
 			estimTTWriter.newLine();
 		} catch (FileNotFoundException e) {

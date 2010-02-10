@@ -81,23 +81,23 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 		}
 		// The model is run only every "n" iterations
 		//if (controler.getIteration()%gravityModelIter ==0 && controler.getIteration()>0){
-		if (controler.getIteration()==gravityModelIter){
+		if (event.getIteration() ==gravityModelIter){
 			// TODO maybe need to add if sequential statement
 			this.rsw = new RetailersSummaryWriter("../matsim/output/RetailersSummary"); 
 			this.cfc = new CountFacilityCustomers(controler.getPopulation().getPersons());
 			
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				
-				rsw.write(r, controler.getIteration(), cfc);
+				rsw.write(r, event.getIteration(), cfc);
 				r.runStrategy(lrr.getFreeLinks());
 				lrr.updateFreeLinks();
 				new ReRoutePersons().run(r.getMovedFacilities(), controler.getNetwork(), controler.getPopulation().getPersons(), pcrl, controler.getFacilities());  
 			}
 		}
 		
-		if (controler.getIteration()== controler.getLastIteration()) {
+		if (controler.getIterationNumber()== controler.getLastIteration()) {
 			for (Retailer r : this.retailers.getRetailers().values()) {
-				rsw.write(r, controler.getIteration(),cfc);
+				rsw.write(r, controler.getIterationNumber(),cfc);
 				  
 			}
 		}

@@ -364,7 +364,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 	}
 
 	private void addTravelTime(TIntObjectHashMap<TDoubleArrayList> map, int time, double traveltime) {
-		if(controler.getIteration() >= 200) {
+		if(controler.getIterationNumber() >= 200) {
 			TDoubleArrayList list = map.get(time);
 			if(list == null) {
 				list = new TDoubleArrayList();
