@@ -114,7 +114,7 @@ public class MyRuns {
 		final double[] VARY_BETA = new double[]{0.1, 1.0, 2.0, 4.0, 10.0, Double.MAX_VALUE};
 		final double[] VARY_LEARNING_RATE = new double[]{0.1, 1.0};
 		final String[] VARY_TIME_MODULE = new String[]{"Planomat", "TimeAllocationMutator"};
-		final String OUTPUT_PARENT_DIRECTORY_NAME = "brownbag250110";
+		final String OUTPUT_PARENT_DIRECTORY_NAME = "sueStudy";
 		
 		for (double beta : VARY_BETA) {
 			for (double learningRate : VARY_LEARNING_RATE) {
@@ -154,8 +154,8 @@ public class MyRuns {
 	String getBrownbag250110RunDescriptor(final String timingModule, final double beta, final double learningRate) {
 		
 		return 
-		"timingModule_" + timingModule + "-" + 
-		"beta_" + Double.toString(beta) + "-" + 
+		"timingModule_" + timingModule + "/" + 
+		"beta_" + Double.toString(beta) + "/" + 
 		"learningRate_" + Double.toString(learningRate);
 		
 	}
