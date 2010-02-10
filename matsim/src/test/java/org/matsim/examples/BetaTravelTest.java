@@ -330,7 +330,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 
 			if (iteration % 50 == 0) {
-				this.ttAnalyzer.plot(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "bottleneck_times.png"));
+				this.ttAnalyzer.plot(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "bottleneck_times.png"));
 				event.getControler().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {

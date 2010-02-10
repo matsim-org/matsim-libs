@@ -82,7 +82,7 @@ public class CountControlerListener implements StartupListener,
 			}
 			if (this.config.counts().getOutputFormat().contains("kml")||
 					this.config.counts().getOutputFormat().contains("all")) {
-				String filename = event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "countscompare.kmz");
+				String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "countscompare.kmz");
 				CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
 						cca.getComparison(), controler.getNetwork(), TransformationFactory.getCoordinateTransformation(this.config.global().getCoordinateSystem(), TransformationFactory.WGS84 ));
 				kmlWriter.setIterationNumber(event.getIteration());
@@ -90,7 +90,7 @@ public class CountControlerListener implements StartupListener,
 			}
 			if (this.config.counts().getOutputFormat().contains("txt")||
 					this.config.counts().getOutputFormat().contains("all")) {
-				String filename = event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "countscompare.txt");
+				String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "countscompare.txt");
 				CountSimComparisonTableWriter ctw=new CountSimComparisonTableWriter(cca.getComparison(),Locale.ENGLISH);
 				ctw.writeFile(filename);
 			}

@@ -69,7 +69,7 @@ public class ReRoutingTest extends MatsimTestCase {
 
 		@Override
 		protected void runMobSim() {
-			if (getIteration() == 0) {
+			if (getIterationNumber() == 0) {
 				/* only run mobsim in iteration 0, afterwards we're no longer interested
 				 * in it as we have our plans-file to compare against to check the
 				 * replanning.
