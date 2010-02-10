@@ -52,6 +52,7 @@ public class AgentsAttributesAdder {
 	private Map<Id, Integer> seasonTicket;	
 	private Map<Id, Double> agentsWeight;
 	private Map<Id, Integer> munType;
+	public static double AVERAGE_INCOME;
 	
 
 
@@ -446,11 +447,19 @@ public class AgentsAttributesAdder {
 		log.info("   adding agents income data...");
 		
 		this.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income_MZoverall_weighted.txt");
-		if (this.income.isEmpty()) return; // No income loaded
+		if (this.income.isEmpty()) {
+			log.warn("No income loaded!");
+			return; // No income loaded
+		}
+		double averageIncome = 0;
+		int personCounter = 0;
 		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
 			try{
-				person.getCustomAttributes().put("income", this.getIncome().get(person.getId()));
+				double income = this.getIncome().get(person.getId());
+				averageIncome+=income;
+				personCounter++;
+				person.getCustomAttributes().put("income", income);
 			} catch (Exception e) {
 				log.warn("No income information found for agent "+person.getId());
 			}
@@ -460,7 +469,11 @@ public class AgentsAttributesAdder {
 				log.warn("No munType information found for agent "+person.getId());
 			}
 		}	
-		log.info("   ... done.");
+		if (personCounter!=0) {
+			AgentsAttributesAdder.AVERAGE_INCOME = averageIncome/personCounter;
+			log.info("   ... done. Average income is "+AgentsAttributesAdder.AVERAGE_INCOME+".");
+		}
+		else log.warn("... done, but could not calculate average income!");
 	}
 	
 	
