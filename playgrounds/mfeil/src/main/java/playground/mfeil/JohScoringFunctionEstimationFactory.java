@@ -30,11 +30,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  * @author mfeil
  */
 public class JohScoringFunctionEstimationFactory implements ScoringFunctionFactory {
-	
-	public JohScoringFunctionEstimationFactory(){
-		new JohScoringFunctionEstimation(null).writeParametersToLog();
-	}
-	
+		
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
 		return new JohScoringFunctionEstimation(plan);
 	}

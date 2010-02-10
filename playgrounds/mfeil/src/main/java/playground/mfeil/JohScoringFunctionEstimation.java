@@ -35,6 +35,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.core.population.PersonImpl;
 
+import playground.mfeil.attributes.AgentsAttributesAdder;
+
 /**
  * New scoring function following Joh's dissertation:
  * <blockquote>
@@ -65,7 +67,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double INITIAL_SCORE = 0.0;
 	
 	private final String seasonTicket;
-	private final double income;
+	private final double income_averageIncome_ratio;
 	private final int female;
 	private final int age;
 
@@ -80,26 +82,30 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static boolean scoreActs = true;
 
 	private static final Logger log = Logger.getLogger(JohScoringFunctionEstimation.class);
+	private static boolean parametersLogged = false;
 	
 	private static final TreeMap<String, JohActUtilityParametersExtended> utilParams = new TreeMap<String, JohActUtilityParametersExtended>();
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 0990
-	private static double beta_time_car = -3.02; 
-	private static double beta_time_pt = 0.397; 
-	private static double beta_time_bike = -1.96;
-	private static double beta_time_walk = -1.81;
+	// Settings of 0993_ohne_timings
+	private static double beta_time_car = -3.42; 
+	private static double beta_time_pt = 0.479; 
+	private static double beta_time_bike = -1.98;
+	private static double beta_time_walk = -1.71;
 	
-	private static double constantPt = -0.534;
-	private static double constantBike = 0.120;
-	private static double constantWalk = 0.802;
+	private static double constantPt = -0.580;
+	private static double constantBike = 0.201;
+	private static double constantWalk = 0.849;
 	
-	private static double beta_cost_car = 0.0382;
-	private static double beta_cost_pt = -0.115;
+	private static double beta_cost_car = 0.0465;
+	private static double beta_cost_pt = -0.114;
 	
-	private static double beta_female_act = -0.0976;
-	private static double beta_female_travel = 0.149;
+	private static double lambda_cost_income_car = 0.186;
+	private static double lambda_cost_income_pt = -0.329;
+	
+	private static double beta_female_act = 0.0330;
+	private static double beta_female_travel = 0.189;
 	
 	private static double travelCostCar = 0.5;	// CHF/km
 	private static double travelCostPt_None = 0.28;	// CHF/km
@@ -115,26 +121,26 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double uMin_shopping = 0;
 	private static final double uMin_leisure = 0;
 	
-	private static final double uMax_home = 6.39; 
-	private static final double uMax_innerHome = 1.15; 
-	private static final double uMax_work= 4.31;  
-	private static final double uMax_education = 3.97;
-	private static final double uMax_shopping = 0.553; 
-	private static final double uMax_leisure = 1.39;  
+	private static final double uMax_home = 7.86; 
+	private static final double uMax_innerHome = 1.78; 
+	private static final double uMax_work= 3.23;  
+	private static final double uMax_education = 2.17;
+	private static final double uMax_shopping = 1.64; 
+	private static final double uMax_leisure = 1.67;  
 	
-	private static final double alpha_home = 3.27;
-	private static final double alpha_innerHome = 5.29;
-	private static final double alpha_work = 5.94;
-	private static final double alpha_education = 1.54;
-	private static final double alpha_shopping = 0.0530;
-	private static final double alpha_leisure = 0.0818;
+	private static final double alpha_home = 6.68;
+	private static final double alpha_innerHome = 0.239;
+	private static final double alpha_work = 4.33;
+	private static final double alpha_education = 1.72;
+	private static final double alpha_shopping = 0.0467;
+	private static final double alpha_leisure = 0.0559;
 	
-	private static final double beta_home = 0.280;
-	private static final double beta_innerHome = 17.7;
-	private static final double beta_work = 0.546;
+	private static final double beta_home = 0.281;
+	private static final double beta_innerHome = 17.8;
+	private static final double beta_work = 0.481;
 	private static final double beta_education = 100;
 	private static final double beta_shopping = 100;
-	private static final double beta_leisure = 70.8;
+	private static final double beta_leisure = 83.8;
 	
 	private static final double gamma_home = 1;
 	private static final double gamma_innerHome = 1;
@@ -143,16 +149,15 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double gamma_shopping = 1;
 	private static final double gamma_leisure = 1;
 	
-	private static final double beta_age_home = 0.0105;
-	private static final double beta_age_innerHome = 0; // not significant
-	private static final double beta_age_work = -0.00811;
-	private static final double beta_age_education = -0.0188;
-	private static final double beta_age_shopping = 0.0221;
-	private static final double beta_age_leisure = -0.00344;
+	private static final double beta_age_home = 0;
+	private static final double beta_age_innerHome = 0; 
+	private static final double beta_age_work = 0;
+	private static final double beta_age_education = 0;
+	private static final double beta_age_shopping = 0;
+	private static final double beta_age_leisure = 0;
 	
 	
-	
-	
+		
 	public JohScoringFunctionEstimation(final Plan plan) {
 		init();
 		this.reset();
@@ -170,11 +175,12 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		}
 		else this.seasonTicket = "none";
 		
-		// check income
+		// check income and divide by average income
 		if (person.getCustomAttributes()!=null && person.getCustomAttributes().containsKey("income")) {
-			this.income=Double.parseDouble(person.getCustomAttributes().get("income").toString());
+			double income =Double.parseDouble(person.getCustomAttributes().get("income").toString());
+			this.income_averageIncome_ratio = income / AgentsAttributesAdder.AVERAGE_INCOME;
 		}
-		else this.income = -1;
+		else this.income_averageIncome_ratio = 1; // assign average income otherwise
 		
 		// check gender
 		if (person.getSex()!=null){
@@ -200,6 +206,11 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		this.person = this.plan.getPerson();
 		this.lastActIndex = this.plan.getPlanElements().size() - 1;
 		this.id = plan.getPerson().getId();
+		
+		if (!parametersLogged) {
+			this.writeParametersToLog();
+			parametersLogged = true;
+		}
 	}
 
 	public void reset() {
@@ -378,14 +389,14 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		double dist = leg.getRoute().getDistance()/1000; // distance in kilometers
 		
 		if (TransportMode.car.equals(leg.getMode())) {
-			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000;
+			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000 * Math.pow(this.income_averageIncome_ratio, lambda_cost_income_car);
 		} 
 		else if (TransportMode.pt.equals(leg.getMode())) {
 			double cost = 0;
 			if (this.seasonTicket.equals("ch-GA")) cost = travelCostPt_GA;
 			else if (this.seasonTicket.equals("ch-HT")) cost = travelCostPt_Halbtax; 
 			else cost = travelCostPt_None; 
-			tmpScore += (1+beta_female_travel*this.female) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist/1000 + constantPt;
+			tmpScore += (1+beta_female_travel*this.female) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist/1000 * Math.pow(this.income_averageIncome_ratio, lambda_cost_income_pt) + constantPt;
 		} 
 		else if (TransportMode.walk.equals(leg.getMode())) {
 			tmpScore += beta_time_walk * travelTime/3600 + constantWalk;
@@ -580,20 +591,63 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	}
 	
 	public void writeParametersToLog(){
+		log.info("");
+		log.info("Scoring function parameter settings:");
+		log.info("");
 		log.info("Activities:");
-		log.info("Home: uMin_home = "+uMin_home+", uMax_home = "+uMax_home+", alpha_home = "+alpha_home+", beta_home = "+beta_home+", gamma_home = "+gamma_home+", beta_age_home = "+beta_age_home);
-		log.info("InnerHome: uMin_innerHome = "+uMin_innerHome+", uMax_innerHome = "+uMax_innerHome+", alpha_innerHome = "+alpha_innerHome+", beta_innerHome = "+beta_innerHome+", gamma_innerHome = "+gamma_innerHome+", beta_age_innerHome = "+beta_age_innerHome);
-		log.info("Work: uMin_work = "+uMin_work+", uMax_worke = "+uMax_work+", alpha_work = "+alpha_work+", beta_work = "+beta_work+", gamma_work = "+gamma_work+", beta_age_work = "+beta_age_work);
-		log.info("Education: uMin_education = "+uMin_education+", uMax_education = "+uMax_education+", alpha_education = "+alpha_education+", beta_education = "+beta_education+", gamma_education = "+gamma_education+", beta_age_education = "+beta_age_education);
-		log.info("Leisure: uMin_leisure = "+uMin_leisure+", uMax_leisure = "+uMax_leisure+", alpha_leisure = "+alpha_leisure+", beta_leisure = "+beta_leisure+", gamma_leisure = "+gamma_leisure+", beta_age_leisure = "+beta_age_leisure);
-		log.info("Shopping: uMin_shopping = "+uMin_shopping+", uMax_shopping = "+uMax_shopping+", alpha_shopping = "+alpha_shopping+", beta_shopping = "+beta_shopping+", gamma_shopping = "+gamma_shopping+", beta_age_shopping = "+beta_age_shopping);
+		log.info("uMin_home = "+uMin_home);
+		log.info("uMax_home = "+uMax_home);
+		log.info("alpha_home = "+alpha_home);
+		log.info("beta_home = "+beta_home);
+		log.info("gamma_home = "+gamma_home);
+		log.info("beta_age_home = "+beta_age_home);
+		log.info("uMin_innerHome = "+uMin_innerHome);
+		log.info("uMax_innerHome = "+uMax_innerHome);
+		log.info("alpha_innerHome = "+alpha_innerHome);
+		log.info("beta_innerHome = "+beta_innerHome);
+		log.info("gamma_innerHome = "+gamma_innerHome);
+		log.info("beta_age_innerHome = "+beta_age_innerHome);
+		log.info("uMin_work = "+uMin_work);
+		log.info("uMax_work = "+uMax_work);
+		log.info("alpha_work = "+alpha_work);
+		log.info("beta_work = "+beta_work);
+		log.info("gamma_work = "+gamma_work);
+		log.info("beta_age_work = "+beta_age_work);
+		log.info("uMin_education = "+uMin_education);
+		log.info("uMax_education = "+uMax_education);
+		log.info("alpha_education = "+alpha_education);
+		log.info("beta_education = "+beta_education);
+		log.info("gamma_education = "+gamma_education);
+		log.info("beta_age_education = "+beta_age_education);
+		log.info("uMin_leisure = "+uMin_leisure);
+		log.info("uMax_leisure = "+uMax_leisure);
+		log.info("alpha_leisure = "+alpha_leisure);
+		log.info("beta_leisure = "+beta_leisure);
+		log.info("gamma_leisure = "+gamma_leisure);
+		log.info("beta_age_leisure = "+beta_age_leisure);
+		log.info("uMin_shopping = "+uMin_shopping);
+		log.info("uMax_shopping = "+uMax_shopping);
+		log.info("alpha_shopping = "+alpha_shopping);
+		log.info("beta_shopping = "+beta_shopping);
+		log.info("gamma_shopping = "+gamma_shopping);
+		log.info("beta_age_shopping = "+beta_age_shopping);
+		log.info("");
 		log.info("Legs:");
-		log.info("Car: beta_time_car = "+beta_time_car+", beta_cost_car = "+beta_cost_car); 
-		log.info("PT: beta_time_pt = "+beta_time_pt+", beta_cost_pt = "+beta_cost_pt+", constantPt = "+constantPt); 
-		log.info("Bike: beta_time_bike = "+beta_time_bike+", constantBike = "+constantBike); 
-		log.info("Walk: beta_time_walk = "+beta_time_walk+", constantWalk = "+constantWalk); 
+		log.info("beta_time_car = "+beta_time_car);
+		log.info("beta_cost_car = "+beta_cost_car); 
+		log.info("lambda_cost_income_car = "+lambda_cost_income_car); 
+		log.info("beta_time_pt = "+beta_time_pt);
+		log.info("beta_cost_pt = "+beta_cost_pt);
+		log.info("lambda_cost_income_pt = "+lambda_cost_income_pt); 
+		log.info("constantPt = "+constantPt); 
+		log.info("beta_time_bike = "+beta_time_bike);
+		log.info("constantBike = "+constantBike); 
+		log.info("beta_time_walk = "+beta_time_walk);
+		log.info("constantWalk = "+constantWalk); 
+		log.info("");
 		log.info("Gender:");
-		log.info("beta_female_act = "+beta_female_act+", beta_female_travel = "+beta_female_travel);
+		log.info("beta_female_act = "+beta_female_act);
+		log.info("beta_female_travel = "+beta_female_travel);
 	}
 
 }
