@@ -102,14 +102,14 @@ public class MyRuns {
 //		Config config = Gbl.createConfig(args);
 
 		MyRuns myRuns = new MyRuns();
-		myRuns.doBrownbag250110(args);
+		myRuns.doSUEStudySensitivityAnalysis(args);
 		
 	}
 
 	/**
-	 * Generates the results presented at the Brownbag on January 25th, 2010.
+	 * Generates the results of the sensitivity analysis of the SUE study.
 	 */
-	void doBrownbag250110(final String[] args) {
+	void doSUEStudySensitivityAnalysis(final String[] args) {
 		
 		final double[] VARY_BETA = new double[]{0.1, 1.0, 2.0, 4.0, 10.0, Double.MAX_VALUE};
 		final double[] VARY_LEARNING_RATE = new double[]{0.1, 1.0};
@@ -137,7 +137,7 @@ public class MyRuns {
 							"output/"
 									+ OUTPUT_PARENT_DIRECTORY_NAME
 									+ "/"
-									+ this.getBrownbag250110RunDescriptor(timingModule, beta, learningRate));
+									+ this.getRunOutputDirectoryName(timingModule, beta, learningRate));
 					testee.getConfig().charyparNagelScoring().setBrainExpBeta(beta);
 					testee.getConfig().charyparNagelScoring().setLearningRate(learningRate);
 					
@@ -151,11 +151,11 @@ public class MyRuns {
 		
 	}
 	
-	String getBrownbag250110RunDescriptor(final String timingModule, final double beta, final double learningRate) {
+	String getRunOutputDirectoryName(final String timingModule, final double beta, final double learningRate) {
 		
 		return 
 		"timingModule_" + timingModule + "/" + 
-		"beta_" + Double.toString(beta) + "/" + 
+		"brainExpBeta_" + Double.toString(beta) + "/" + 
 		"learningRate_" + Double.toString(learningRate);
 		
 	}
