@@ -148,9 +148,14 @@ public class ActTimingsMZMATSim {
 			}
 		}
 		stream.print(name+"\t");
-		stream.print(Time.writeTime(endHome/counterHome)+"\t"+Time.writeTime(startHome/counterHome)+"\t"+counterHome+"\t");
-		stream.print(Time.writeTime(durationInnerHome/counterInnerHome)+"\t"+counterInnerHome+"\t"+Time.writeTime(durationWork/counterWork)+"\t"+counterWork+"\t"+Time.writeTime(durationEducation/counterEducation)+"\t"+counterEducation+"\t"+Time.writeTime(durationLeisure/counterLeisure)+"\t"+counterLeisure+"\t"+Time.writeTime(durationShop/counterShop)+"\t"+counterShop+"\t");
-		stream.println(size);
+		stream.print(Time.writeTime(endHome/counterHome)+"\t"+Time.writeTime(startHome/counterHome)+"\t"+1+"\t");
+		stream.print(Time.writeTime(durationInnerHome/counterInnerHome)+"\t"+counterInnerHome/counterHome+"\t"+Time.writeTime(durationWork/counterWork)+"\t"+counterWork/counterHome+"\t"+Time.writeTime(durationEducation/counterEducation)+"\t"+counterEducation/counterHome+"\t"+Time.writeTime(durationLeisure/counterLeisure)+"\t"+counterLeisure/counterHome+"\t"+Time.writeTime(durationShop/counterShop)+"\t"+counterShop/counterHome+"\t");
+		stream.println(counterHome);
+		// write again in seconds
+		stream.print(name+"_seconds\t");
+		stream.print((endHome/counterHome)+"\t"+(startHome/counterHome)+"\t"+1+"\t");
+		stream.print((durationInnerHome/counterInnerHome)+"\t"+counterInnerHome/counterHome+"\t"+(durationWork/counterWork)+"\t"+counterWork/counterHome+"\t"+(durationEducation/counterEducation)+"\t"+counterEducation/counterHome+"\t"+(durationLeisure/counterLeisure)+"\t"+counterLeisure/counterHome+"\t"+(durationShop/counterShop)+"\t"+counterShop/counterHome+"\t");
+		stream.println(counterHome);
 	}		
 		
 	
