@@ -37,7 +37,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -87,14 +86,14 @@ public class ExternalModule implements PlanStrategyModule {
 	protected String outFileRoot = "";
 
 	private Integer iterationNumber = null;
-	private final ControlerIO controlerIO;
+	private final Controler controler;
 
 
-	public ExternalModule(final String exePath, final String moduleId, final ControlerIO controlerIO, final ScenarioImpl scenario) {
+	public ExternalModule(final String exePath, final String moduleId, final Controler controler, final ScenarioImpl scenario) {
 		this.exePath = exePath;
 		this.moduleId = moduleId + "_";
-		this.controlerIO = controlerIO;
-		this.outFileRoot = controlerIO.getTempPath() + "/";
+		this.controler = controler;
+		this.outFileRoot = controler.getControlerIO().getTempPath() + "/";
 		this.scenario = scenario;
 	}
 
@@ -176,7 +175,7 @@ public class ExternalModule implements PlanStrategyModule {
 		// Change scenario config according to given output- and input-filenames: events, plans, network
 		this.extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
 		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
-		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controlerIO.getIterationFilename(Controler.getIteration() - 1, "events.txt"));
+		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber() - 1, "events.txt"));
 		String networkFilename = this.scenario.getConfig().findParam("network", "inputNetworkFile");
 		this.extConfig.setParam(SCENARIO, SCENARIO_NETWORK_FILENAME, networkFilename);
 	}
@@ -190,7 +189,7 @@ public class ExternalModule implements PlanStrategyModule {
 		writeExternalExeConfig();
 
 		String cmd = this.exePath + " " + this.outFileRoot + this.moduleId + ExternalConfigFileName;
-		String logfilename = this.controlerIO.getIterationFilename(this.iterationNumber, this.moduleId + "stdout.log");
+		String logfilename = this.controler.getControlerIO().getIterationFilename(this.iterationNumber, this.moduleId + "stdout.log");
 
 		return (ExeRunner.run(cmd, logfilename, 3600) == 0);
 	}

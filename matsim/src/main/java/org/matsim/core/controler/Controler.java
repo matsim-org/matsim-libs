@@ -156,7 +156,7 @@ public class Controler {
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout("%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	private boolean overwriteFiles = false;
-	private static int iteration = -1;
+	private Integer iteration = null;
 
 	/** The Config instance the Controler uses. */
 	protected final Config config;
@@ -383,7 +383,7 @@ public class Controler {
 		for (iteration = firstIteration; (iteration <= lastIteration) && (this.state == ControlerState.Running); iteration++) {
 			log.info(divider);
 			log.info(marker + "ITERATION " + iteration + " BEGINS");
-			this.stopwatch.setCurrentIteration(Controler.iteration);
+			this.stopwatch.setCurrentIteration(iteration);
 			this.stopwatch.beginOperation("iteration");
 			makeIterationPath(iteration);
 			resetRandomNumbers();
@@ -407,7 +407,7 @@ public class Controler {
 			log.info(marker + "ITERATION " + iteration + " ENDS");
 			log.info(divider);
 		}
-
+		iteration = null;
 	}
 
 	protected void shutdown(final boolean unexpected) {
@@ -1036,14 +1036,6 @@ public class Controler {
 	 * Informational methods
 	 * ===================================================================
 	 */
-	/**
-	 * @deprecated use non static method getIterationNumber
-	 */
-	@Deprecated
-	public static final int getIteration() {
-		// I don't really like this to be static..., marcel, 17jan2008
-		return iteration;
-	}
 
 	public final int getFirstIteration() {
 		return this.config.controler().getFirstIteration();
@@ -1111,19 +1103,6 @@ public class Controler {
 	 */
 	public ScoreStats getScoreStats() {
 		return this.scoreStats;
-	}
-
-	/**
-	 * Returns the complete filename to access a file in the output-directory.
-	 *
-	 * @param filename
-	 *            the basename of the file to access
-	 * @return complete path and filename to a file in the output-directory
-	 * @deprecated use non static member ControlerIO to generate the desired String
-	 */
-	@Deprecated
-	public static final String getOutputFilename(final String filename) {
-		return outputPath + "/" + filename;
 	}
 
 	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
@@ -1288,8 +1267,12 @@ public class Controler {
 		return controlerIO;
 	}
 
+	/**
+	 * @return the iteration number of the current iteration when the Controler is iterating, 
+	 * null if the Controler is in the startup/shutdown process
+	 */
 	public Integer getIterationNumber() {
-		return this.getIteration();
+		return iteration;
 	}
 
   public MobsimFactory getMobsimFactory() {
