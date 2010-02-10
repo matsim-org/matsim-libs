@@ -191,7 +191,8 @@ public class Flow {
 		}
 		int result = this._demands.get(source);
 		if(result == 0) {
-			System.out.println("Weird. Source of TimeExpandedPath had no supply left.");
+			// this may actually happen now that many paths are constructed that orginate
+			// in the same source (for the forward search).
 			return 0;
 		}
 		//go through the path edges

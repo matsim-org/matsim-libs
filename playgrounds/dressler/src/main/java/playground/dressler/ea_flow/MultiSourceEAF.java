@@ -163,7 +163,6 @@ public class MultiSourceEAF {
 		long timer1, timer2, timer3;
 		long timeStart = System.currentTimeMillis();
 
-		//BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
 		BellmanFordIntervalBased routingAlgo = new BellmanFordIntervalBased(settings, fluss);
 			
 		int i;
@@ -175,30 +174,39 @@ public class MultiSourceEAF {
 			
 			//result = routingAlgo.doCalculations();
 			result = routingAlgo.doCalculationsReverse(lasttime); 
+			
 			timer2 = System.currentTimeMillis();
 			timeMBF += timer2 - timer1;
 			if (result == null || result.isEmpty()){
 				break;
 			}
 			tempstr = "";
+			int zeroaugment = 0;
 			
 			for(TimeExpandedPath path : result){
 				if (path.getArrival() > lasttime) {
 					lasttime = path.getArrival();
 				}
+				String tempstr2 = "";
 				if(_debug){
-					tempstr += path.toString() + "\n";
-					System.out.println("found path: " +  path);
+					tempstr2 = path.toString() + "\n";
+					//System.out.println("found path: " +  path);
 				}
 				int augment = fluss.augment(path);
 				if (_debug) {
-					System.out.println("augmented " + augment);
-					tempstr += "augmented " + augment + "\n";
+					if (augment > 0) {
+						tempstr += tempstr2;
+						tempstr += "augmented " + augment + "\n";
+					} else {
+						zeroaugment += 1;
+					}
+					//System.out.println("augmented " + augment);
+					
 				}
-			
 			}
 			if (_debug) {
-				System.out.println();
+				tempstr += "Zero augment on " + zeroaugment + " paths.\n";
+				System.out.println(tempstr);				
 			}
 			
 			timer3 = System.currentTimeMillis();
@@ -223,6 +231,8 @@ public class MultiSourceEAF {
 		
 		if (_debug) {
 			long timeStop = System.currentTimeMillis();
+			System.out.println("");
+			System.out.println("");
 			System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 			System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
 			//System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
@@ -313,11 +323,11 @@ public class MultiSourceEAF {
 		}
 
 		String networkfile = null;
-		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
+		networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
 		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
-		networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
+		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
@@ -351,17 +361,15 @@ public class MultiSourceEAF {
 
 
 		
-		// ehemalige Unfold Bugs: uniformdemands = 100 oder 500, timestep =5
-		
-		int uniformDemands = 500;
+		int uniformDemands = 10;
 
 		// Rounding is now done according to timestep and flowFactor!
-		int timestep = 10; 
+		int timestep = 2; 
 		double flowFactor = 1.0;
 
 		
-		String sinkid = "supersink"; //siouxfalls, problem
-		//String sinkid = "en1";  //padang, line, swissold
+		//String sinkid = "supersink"; //siouxfalls, problem
+		String sinkid = "en1";  //padang, line, swissold
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network

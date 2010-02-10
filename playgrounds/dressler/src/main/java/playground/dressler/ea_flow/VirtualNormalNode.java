@@ -59,4 +59,9 @@ public class VirtualNormalNode extends VirtualNode {
    public String toString() {
      return "Normal node " + node.getId().toString();	   
    }
+   
+   @Override
+   public int priority() {
+	   return 1;
+   }
 }

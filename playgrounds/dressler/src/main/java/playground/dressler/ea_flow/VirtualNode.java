@@ -31,4 +31,10 @@ abstract class VirtualNode {
    public abstract boolean equals(VirtualNode other);
    
    public abstract String toString();
+   
+   // to help with the total order for the BFTask-Comparator ...
+   // source = 0
+   // normalnode = 1
+   // sink = 2
+   public abstract int priority();
 }

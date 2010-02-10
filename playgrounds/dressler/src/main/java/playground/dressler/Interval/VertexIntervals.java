@@ -121,10 +121,12 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 * Sets arrival true for all intervals in arrive and sets predecessor to link for each time t
 	 * where it was null beforehand
 	 * @param arrive Intervals at which node is reachable
-	 * @param pred Predecessor PathStep. It will always be shifted to the beginning of the interval
+	 * @param pred PathStep to set as breadcrumb (predecessor or successor)
+	 *         It will always be shifted to the beginning of the interval, according to reverse
+	 * @param reverse Is this for the reverse search?
 	 * @return (possibly empty) list of changed intervals
 	 */
-    public ArrayList<VertexInterval> setTrueList(ArrayList<Interval> arrive, PathStep pred) {
+    public ArrayList<VertexInterval> setTrueList(ArrayList<Interval> arrive, PathStep pred, final boolean reverse) {
 		
     	ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();
     	
@@ -138,7 +140,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 								
 		while(iterator.hasNext()) {
 			i = iterator.next();	        
-		    changed.addAll(setTrueList(i, pred));
+		    changed.addAll(setTrueList(i, pred, reverse));
 		}
 				
 		return changed;
@@ -148,9 +150,12 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 * Sets arrival true for all time steps in arrive and sets predecessor to link for each time t
 	 * where it was null beforehand
 	 * @param arrive Interval at which node is reachable
+	 * @param pred PathStep to set as breadcrumb (predecessor or successor)
+	 *         It will always be shifted to the beginning of the interval, according to reverse
+	 * @param reverse Is this for the reverse search?  
 	 * @return null or list of changed intervals iff anything was changed
 	 */
-	public ArrayList<VertexInterval> setTrueList(Interval arrive, PathStep pred){
+	public ArrayList<VertexInterval> setTrueList(Interval arrive, PathStep pred, final boolean reverse){
 		// TODO Test !
 		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();		
 		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
@@ -166,7 +171,11 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 					//if arrive contains current, we relabel it completely
 					if(arrive.contains(current))
 					{
-						current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));						
+						if (!reverse) {
+						  current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
+						} else {
+							current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
+						}
 						changed.add(current);
 					}
 					else if(current.contains(arrive))
@@ -186,7 +195,12 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 						}
 						//current has exactly the same bounds as arrive
 						//so relabel it completely
-						current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));						
+
+						if (!reverse) {
+							current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
+						} else {
+							current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
+						}						
 						changed.add(current);
 					}
 					else
@@ -206,7 +220,11 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 							current = this.getIntervalAt(arrive.getHighBound()-1);
 						}
 						//we set the attributes
-						current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
+						if (!reverse) {
+							current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
+						} else {
+							current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
+						}
 						changed.add(current);
 					}
 				}

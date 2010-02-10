@@ -58,6 +58,12 @@ public class VirtualSink extends VirtualNode {
    public String toString() {
      return "Virtual Sink " + node.getId().toString();	   
    }
+   
+   @Override
+   public int priority() {
+	   return 2;
+   }
+   
 }
 
 

@@ -132,7 +132,7 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 
 		
 		current = this.getIntervalAt(0);
-			
+		
 		while (current.getLowBound() < timeHorizon) {				
 			if (current.getFlow() > 0) {				
 				if (collecting) {
@@ -152,11 +152,7 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 					collecting = false;
 				}
 			}
-			
-			if (!checkLast()) {
-				System.out.println("Checklast failed!");
-				System.out.println(this);
-			}
+						
 			if (this.isLast(current)) {
 				break;
 			}

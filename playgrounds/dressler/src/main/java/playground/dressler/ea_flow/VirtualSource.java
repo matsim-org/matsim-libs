@@ -58,5 +58,10 @@ public class VirtualSource extends VirtualNode {
    public String toString() {
      return "Virtual Source " + node.getId().toString();	   
    }
+   
+   @Override
+   public int priority() {
+	   return 0;
+   }
 }
 
