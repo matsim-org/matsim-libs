@@ -1,4 +1,4 @@
-package tutorial.example7ControlerListener;
+package tutorial.programming.example7ControlerListener;
 
 import java.io.*;
 import java.util.*;
@@ -8,7 +8,7 @@ import org.matsim.core.controler.listener.*;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import tutorial.example6EventsHandling.MyEventHandler2;
+import tutorial.programming.example6EventsHandling.MyEventHandler2;
 
 
 /**

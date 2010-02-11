@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyControler1.java
+ * MyControler2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,55 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.example1;
+package tutorial.old.example2;
 
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.vis.netvis.NetVis;
 
-/**
- * This is an attempt to move this tutorial to the API.  We are not there yet, however.
- * 
- * @author nagel
- *
- */
-public class MyControler1Api {
+public class MyControler2 {
 
 	public static void main(final String[] args) {
 		final String netFilename = "./examples/equil/network.xml";
 		final String plansFilename = "./examples/equil/plans100.xml";
 
-//		ScenarioImpl scenario = new ScenarioImpl();
-//		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
-//
-//		new MatsimPopulationReader(scenario).readFile(plansFilename);
-//
-//		EventsImpl events = new EventsImpl();
-//
-//		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
-//		events.addHandler(eventWriter);
-//
-//		QueueSimulation sim = new QueueSimulation(scenario, events);
-//		sim.run();
-//
-//		eventWriter.closeFile();
+		ScenarioImpl scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-//		Scenario sc = (new ScenarioFactory()).createScenario() ;
-//
-//		Config config = sc.getConfig() ;
-//		config.network().setInputFile(netFilename) ;
-//		config.plans().setInputFile(plansFilename) ;
-//		
-//		ScenarioLoaderI scl = (new ScenarioLoaderFactory()).createScenarioLoader( sc ) ;
-//		scl.loadScenario();
-//		
-//		EventsImpl events = new EventsImpl();
-//
-//		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
-//		events.addHandler(eventWriter);
-//
-//		QueueSimulation sim = new QueueSimulation( (ScenarioImpl) sc, events);
-//		sim.run();
-//
-//		eventWriter.closeFile();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
+		EventsManagerImpl events = new EventsManagerImpl();
+
+		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
+		events.addHandler(eventWriter);
+
+		QueueSimulation sim = new QueueSimulation(scenario, events);
+		sim.openNetStateWriter("./output/simout", netFilename, 10);
+		sim.run();
+
+		eventWriter.closeFile();
+
+		String[] visargs = {"./output/simout"};
+		NetVis.main(visargs);
 	}
 
 }

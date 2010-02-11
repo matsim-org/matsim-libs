@@ -1,4 +1,4 @@
-package tutorial.example6EventsHandling;
+package tutorial.programming.example6EventsHandling;
 
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;

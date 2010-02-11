@@ -1,4 +1,4 @@
-package tutorial.example6EventsHandling;
+package tutorial.programming.example6EventsHandling;
 
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;

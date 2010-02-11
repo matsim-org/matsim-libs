@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.example3;
+package tutorial.old.example3;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventsReader
+ * GeneratedDemandRunner
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,46 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.example6EventsHandling;
+package tutorial.demandgeneration.example8DemandGeneration;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.MatsimEventsReader;
-
-
+import org.matsim.run.Controler;
+import org.matsim.run.OTFVis;
 
 
 /**
- * This class contains a main method to call the 
- * example event handlers MyEventHandler1-3.
- * 
+ * Runs the generated demand and displays the 0th iteration in OTFVis
  * @author dgrether
+ *
  */
-public class MyEventsHandling {
+public class GeneratedDemandRunner {
 
-	
-	
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		System.err.println("Although this example structurally comes before example7, as of now (may09) you need to run example7 first "
-				+ "so that you have the needed files in ./output." ) ;
+		Controler controler = new Controler("../matsimExamples/tutorial/example8DemandGeneration/config.xml");
+		controler.setOverwriteFiles(true) ;
+		controler.run();
+
+		String[] outputMvi = {"../matsimExamples/tutorial/example8DemandGeneration/output/ITERS/it.0/0.otfvis.mvi"};
+		OTFVis.main(outputMvi);
 		
-		//path to events file
-		String inputFile = "output/ITERS/it.10/10.events.txt.gz";
-		//create an event object
-		EventsManager events = new EventsManagerImpl();
-		//create the handler and add it
-		MyEventHandler1 handler = new MyEventHandler1();
-//		MyEventHandler2 handler = new MyEventHandler2(500);
-//		MyEventHandler3 handler = new MyEventHandler3();
-		events.addHandler(handler);
-		//create the reader and read the file
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(inputFile);
-		
-//		System.out.println("average travel time: " + handler.getAverageTravelTime());
-//		handler.writeChart("output/departuresPerHour.png");
-		
-		System.out.println("Events file read!");
 	}
 
 }

@@ -1,4 +1,4 @@
-package tutorial.example7ControlerListener;
+package tutorial.programming.example7ControlerListener;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.netvis.NetVis;

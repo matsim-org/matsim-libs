@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyControler3.java
+ * MyControler1.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,41 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.example3;
+package tutorial.old.example1;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.netvis.NetVis;
 
-public class MyControler3 {
+public class MyControler1 {
 
 	public static void main(final String[] args) {
 		final String netFilename = "./examples/equil/network.xml";
 		final String plansFilename = "./examples/equil/plans100.xml";
 
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl("./examples/tutorial/myConfig.xml");
-		ScenarioImpl scenario = loader.getScenario();
-
+		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
+
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = new EventsManagerImpl();
 
-//		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
-//		events.addHandler(eventWriter);
+		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
+		events.addHandler(eventWriter);
 
 		QueueSimulation sim = new QueueSimulation(scenario, events);
-		sim.openNetStateWriter("./output/simout", netFilename, 10);
 		sim.run();
 
-//		eventWriter.closeFile();
-
-		String[] visargs = {"./output/simout"};
-		NetVis.main(visargs);
+		eventWriter.closeFile();
 	}
 
 }
