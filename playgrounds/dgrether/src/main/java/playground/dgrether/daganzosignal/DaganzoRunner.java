@@ -19,7 +19,11 @@
  * *********************************************************************** */
 package playground.dgrether.daganzosignal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -33,9 +37,11 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 
+import playground.dgrether.analysis.charts.DgTravelTimeCalculatorChart;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
 import playground.dgrether.linkanalysis.DgCountPerIterationGraph;
 import playground.dgrether.linkanalysis.InOutGraphWriter;
@@ -136,6 +142,19 @@ public class DaganzoRunner {
 				inoutWriter.addInOutEventHandler(handler4);
 				inoutWriter.writeInOutChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
 			
+				DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getTravelTimeCalculator());
+				ttcalcChart.setStartTime(900.0);
+				ttcalcChart.setEndTime(3600.0 * 2.5);
+				List<Id> list = new ArrayList<Id>();
+				list.add(new IdImpl("4"));
+				ttcalcChart.addLinkId(list);
+				list = new ArrayList<Id>();
+				list.add(new IdImpl("3"));
+				list.add(new IdImpl("5"));
+				ttcalcChart.addLinkId(list);
+				DgChartWriter.writeChart(e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "ttcalculator"), 
+				    ttcalcChart.createChart());
+				
 				greenSplitPerIterationGraph.addIterationData(signalGreenSplitHandler, e.getIteration());
 			}
 		});

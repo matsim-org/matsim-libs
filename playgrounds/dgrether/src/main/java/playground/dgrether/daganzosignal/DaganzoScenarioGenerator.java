@@ -113,7 +113,7 @@ public class DaganzoScenarioGenerator {
 
 	private static final boolean isUseSignalSystems = true;
 
-	private static final int iterations = 2;
+	private static final int iterations = 0;
 	private static final int iterations2 = 0;
 
 	private static final int ttBinSize = 1;
