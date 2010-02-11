@@ -1,28 +1,20 @@
 package playground.christoph.withinday;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.DriverAgent;
-import org.matsim.ptproject.qsim.QVehicle;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
+import playground.christoph.withinday.utils.EditRoutes;
+import playground.christoph.withinday.utils.ReplacePlanElements;
 
 public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 
@@ -41,6 +33,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 
 	@Override
 	public boolean doReplanning(DriverAgent driverAgent) {
+		
 		// If we don't have a valid Replanner.
 		if (this.planAlgorithm == null) return false;
 
@@ -63,115 +56,28 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		Leg currentLeg = driverAgent.getCurrentLeg();
 		Activity nextActivity = selectedPlan.getNextActivity(currentLeg);
 
-
-		ActivityImpl newWorkAct=new ActivityImpl("w",new IdImpl("22"));
-		newWorkAct.setDuration(3600);
-
-
-
-
-
 		// If it is not a car Leg we don't replan it.
 		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
+		
+		ActivityImpl newWorkAct = new ActivityImpl("w", new ScenarioImpl().createId("22"));
+		newWorkAct.setDuration(3600);
 
+		// Replace Activity
+		new ReplacePlanElements().replaceActivity(selectedPlan, nextActivity, newWorkAct);
+		
 		/*
-		 * Get the index and the currently next Node on the route.
-		 * Entries with a lower index have already been visited!
+		 *  Replan Routes
 		 */
-		Leg currentLegClone = new LegImpl((LegImpl)currentLeg);
-		int currentNodeIndex = withinDayPersonAgent.getCurrentNodeIndex();
-		NetworkRouteWRefs route = (NetworkRouteWRefs) currentLegClone.getRoute();
-
-		QVehicle vehicle = withinDayPersonAgent.getVehicle();
-
-		/*
-		 * If the Vehicle is already on the destination Link we don't need any
-		 * further Replanning.
-		 */
-		if (vehicle.getCurrentLink().getId().equals(route.getEndLinkId())) return true;
-
-
-		// create dummy data for the "new" activities
-		String type = "w";
-		// This would be the "correct" Type - but it is slower and is not necessary
-		//String type = this.plan.getPreviousActivity(leg).getType();
-
-		ActivityImpl newFromAct = new ActivityImpl(type, vehicle.getCurrentLink().getToNode().getCoord(), vehicle.getCurrentLink().getId());
-
-		newFromAct.setStartTime(time);
-		newFromAct.setEndTime(time);
-
-		LinkNetworkRouteImpl subRoute = new LinkNetworkRouteImpl(vehicle.getCurrentLink().getId(), route.getEndLinkId(), this.network);
-
-		// put the new route in a new leg
-		Leg newLeg = new LegImpl(currentLeg.getMode());
-		newLeg.setDepartureTime(time);
-//		newLeg.setTravelTime(currentLeg.getTravelTime());
-//		newLeg.setRoute(subRoute);
-
-		Activity nextAct=selectedPlan.getNextActivity(currentLeg);
-
-		Leg homeLeg=selectedPlan.getNextLeg(nextAct);
-		Activity homeAct=selectedPlan.getNextActivity(homeLeg);
-
-
-
-
-		// create new plan and select it
-		PlanImpl newPlan = new PlanImpl(person);
-		newPlan.addActivity(newFromAct);
-		newPlan.addLeg(newLeg);
-		newPlan.addActivity(newWorkAct);
-		newPlan.addLeg(homeLeg);
-		newPlan.addActivity(homeAct);
-
-		this.planAlgorithm.run(newPlan);
-
-		int legPos=selectedPlan.getActLegIndex(currentLeg);
-
-		// backup homeleg Route
-		Route backupRoute = homeLeg.getRoute();
-
-		selectedPlan.removeLeg(legPos);
-
-		// restore Route
-		homeLeg.setRoute(backupRoute);
-
-			// get new calculated Route
-		NetworkRouteWRefs newRoute = (NetworkRouteWRefs) newLeg.getRoute();
-
-		// use VehicleId from existing Route
-		newRoute.setVehicleId(vehicle.getId());
-
-		// get Nodes from the current Route
-		List<Node> nodesBuffer = RouteUtils.getNodes(route, this.network);
-
-		// remove Nodes after the current Position in the Route
-		nodesBuffer.subList(currentNodeIndex - 1, nodesBuffer.size()).clear();
-
-		// Merge already driven parts of the Route with the new routed parts.
-		nodesBuffer.addAll(RouteUtils.getNodes(newRoute, this.network));
-
-		// Update Route by replacing the Nodes.
-		route.setLinkIds(route.getStartLinkId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(nodesBuffer)), route.getEndLinkId());
-
-		// Update Distance
-		double distance = 0.0;
-		for (Id id : route.getLinkIds())
-		{
-			distance = distance + this.network.getLinks().get(id).getLength();
-		}
-		distance = distance + this.network.getLinks().get(route.getEndLinkId()).getLength();
-		route.setDistance(distance);
-
-		// con't
-		selectedPlan.insertLegAct(legPos, (LegImpl) currentLegClone, newWorkAct);
-
-
-
-		// finally reset the cached next Link of the PersonAgent - it may have changed!
-		withinDayPersonAgent.resetCachedNextLink();
-
+		// new Route for current Leg
+		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((WithinDayPersonAgent)driverAgent).getCurrentNodeIndex(), planAlgorithm, network, time);
+		
+		// new Route for next Leg
+		Leg homeLeg = selectedPlan.getNextLeg(newWorkAct);
+		new EditRoutes().replanFutureLegRoute(selectedPlan, homeLeg, planAlgorithm);
+		
+		// finally reset the cached Values of the PersonAgent - they may have changed!
+		withinDayPersonAgent.resetCaches();
+		
 		return true;
 	}
 
