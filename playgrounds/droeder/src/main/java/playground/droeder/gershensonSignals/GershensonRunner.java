@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
 
 
@@ -88,6 +89,8 @@ public class GershensonRunner {
 				Map<Id, SignalGroupDefinition> groups = controler.getScenario().getSignalSystems().getSignalGroupDefinitions();
 				corrGroups = csg.calculateCorrespondingGroups(groups, controler.getNetwork());
 				compGroups = csg.calculateCompetingGroups(corrGroups, groups, controler.getNetwork());
+				//enable visualization
+				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 			}
 			
 		}
