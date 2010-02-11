@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.gershensonSignals;
+package java.playground.droeder;
 
 import static org.junit.Assert.assertNotNull;
 

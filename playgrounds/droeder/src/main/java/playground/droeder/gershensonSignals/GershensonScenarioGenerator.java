@@ -338,6 +338,9 @@ public class GershensonScenarioGenerator {
 		Link l12 = network.getLinks().get(scenario.createId("12"));
 		Link l13 = network.getLinks().get(scenario.createId("13"));		
 		Link l14 = network.getLinks().get(scenario.createId("14"));
+		Link l19 = network.getLinks().get(scenario.createId("19"));
+		Link l20 = network.getLinks().get(scenario.createId("20"));
+		
 		PopulationFactory factory = population.getFactory();
 
 		for (int i = 1; i <= 500; i++) {
@@ -347,12 +350,12 @@ public class GershensonScenarioGenerator {
 			homeEndTime+= 1;
 
 			LinkNetworkRouteImpl route1 = null;
-			ActivityImpl act11 = (ActivityImpl) factory.createActivityFromLinkId("h", l11.getId());
+			ActivityImpl act11 = (ActivityImpl) factory.createActivityFromLinkId("h", l19.getId());
 			act11.setEndTime(homeEndTime);
 			plan1.addActivity(act11);
 			// leg to home
 			LegImpl leg1 = (LegImpl) factory.createLeg(TransportMode.car);
-			route1 = new LinkNetworkRouteImpl(l11.getId(), l12.getId(), network);
+			route1 = new LinkNetworkRouteImpl(l19.getId(), l12.getId(), network);
 			
 			leg1.setRoute(route1);
 			plan1.addLeg(leg1);
@@ -369,12 +372,12 @@ public class GershensonScenarioGenerator {
 			homeEndTime+= 1;
 
 			LinkNetworkRouteImpl route = null;
-			ActivityImpl act21 = (ActivityImpl) factory.createActivityFromLinkId("h", l13.getId());
+			ActivityImpl act21 = (ActivityImpl) factory.createActivityFromLinkId("h", l20.getId());
 			act21.setEndTime(homeEndTime);
 			plan.addActivity(act21);
 			// leg to home
 			LegImpl leg2 = (LegImpl) factory.createLeg(TransportMode.car);
-			route = new LinkNetworkRouteImpl(l13.getId(), l14.getId(), network);
+			route = new LinkNetworkRouteImpl(l20.getId(), l14.getId(), network);
 			
 			leg2.setRoute(route);
 			plan.addLeg(leg2);
