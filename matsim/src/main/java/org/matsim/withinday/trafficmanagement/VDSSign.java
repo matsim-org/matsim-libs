@@ -147,7 +147,7 @@ public class VDSSign {
 		if (this.signOutput != null) {
 			this.signOutput.addMeasurement(time, this.controlInput.getMeasuredRouteTravelTime(this.controlInput.getMainRoute()), this.controlInput.getMeasuredRouteTravelTime(this.controlInput.getAlternativeRoute()), nashTime);
 		}
-		if (time == this.nextUpdate) {
+		if (time >= this.nextUpdate) {
 			// Choosing the output for the controler, y(t) or d(t),
 			double finalOutput;
 

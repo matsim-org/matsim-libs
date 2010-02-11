@@ -111,9 +111,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	public OTFHostControlBar(String address, JFrame frame) throws RemoteException, InterruptedException, NotBoundException {
 		this.hostControl = new OTFHostConnectionManager(address);
 		this.hostControls.add(this.hostControl);
-		if(true){
-		  addButtons();
-		}
+	  addButtons();
 		this.frame = frame;
 	}
 

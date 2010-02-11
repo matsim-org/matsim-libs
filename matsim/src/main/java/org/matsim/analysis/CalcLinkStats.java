@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,18 +43,20 @@ import org.matsim.core.utils.misc.Time;
  */
 public class CalcLinkStats {
 
+	private final static Logger log = Logger.getLogger(CalcLinkStats.class);
+
 	private static class LinkData {
 		public final int[][] volumes;
 		public final double[][] ttimes;
 
 		public LinkData(final int[][] linksVolumes, final double[][] linksTTimes) {
-			this.volumes = linksVolumes;
-			this.ttimes = linksTTimes;
+			this.volumes = linksVolumes.clone();
+			this.ttimes = linksTTimes.clone();
 		}
 	}
 
 	private double volScaleFactor = 1.0;
-	
+
 	private int count = 0;
 	private final Map<Id, LinkData> linkData;
 	private final int nofHours;
@@ -228,7 +231,9 @@ public class CalcLinkStats {
 			if (out != null) {
 				try {
 					out.close();
-				} catch (IOException ignored) {}
+				} catch (IOException e) {
+					log.warn("Could not close output-stream.", e);
+				}
 			}
 		}
 	}
@@ -327,7 +332,10 @@ public class CalcLinkStats {
 			e.printStackTrace();
 		} finally {
 			if (reader != null) {
-				try { reader.close(); } catch (IOException ignored) {}
+				try { reader.close(); }
+				catch (IOException e) {
+					log.warn("Could not close input-stream.", e);
+				}
 			}
 		}
 	}

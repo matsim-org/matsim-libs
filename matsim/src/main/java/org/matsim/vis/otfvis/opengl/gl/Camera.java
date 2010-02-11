@@ -29,22 +29,22 @@ import javax.media.opengl.glu.GLU;
  * specific target.
  *
  * @author Chris Campbell
- * 
+ *
  * in the context of the OTFVis the camera is fixed to looking straight downwards onto the network's layer.
- * 
+ *
  */
 public class Camera {
-    
+
     private Point3f location;
     private Point3f target;
     private final Point3f targetOffset;
- 
+
     public Camera() {
         location = new Point3f();
         target = new Point3f();
-        targetOffset = new Point3f(000,000,0);
+        targetOffset = new Point3f(0.0f, 0.0f, 0.0f);
     }
-    
+
     public Point3f getTargetOffset() {
 		return targetOffset;
 	}
@@ -54,19 +54,19 @@ public class Camera {
                       target.getX() + targetOffset.getX(), target.getY() + targetOffset.getY(), target.getZ() + targetOffset.getZ(),
                       0.0f, 1.0f, 0.0f);
     }
-    
+
     public Point3f getLocation() {
         return location;
     }
-    
+
     public void setLocation(Point3f location) {
         this.location = location;
     }
-    
+
     public Point3f getTarget() {
         return target;
     }
-    
+
     public void setTarget(Point3f target) {
         this.target = target;
     }

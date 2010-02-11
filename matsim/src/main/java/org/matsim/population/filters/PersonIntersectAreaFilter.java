@@ -97,17 +97,19 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 					}
 					else {
 						for (Id link : linkIds) {
-							if (this.areaOfInterest.containsKey(link)) return true;
+							if (this.areaOfInterest.containsKey(link)) {
+								return true;
+							}
 						}
 						// test departure link
 						Id linkId = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLinkId();
-						if (linkId != null) {
-							if (this.areaOfInterest.containsKey(linkId)) return true;
+						if ((linkId != null) && (this.areaOfInterest.containsKey(linkId))) {
+							return true;
 						}
 						// test arrival link
 						linkId = ((ActivityImpl) plan.getPlanElements().get(i+1)).getLinkId();
-						if (linkId != null) {
-							if (this.areaOfInterest.containsKey(linkId)) return true;
+						if ((linkId != null) && (this.areaOfInterest.containsKey(linkId))) {
+							return true;
 						}
 					}
 				}

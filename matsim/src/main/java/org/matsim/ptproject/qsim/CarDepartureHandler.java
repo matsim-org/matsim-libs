@@ -7,15 +7,15 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 public class CarDepartureHandler implements DepartureHandler {
-	
+
 	private static Logger log = Logger.getLogger(CarDepartureHandler.class);
-	
+
 	private final QSim queueSimulation;
-	
+
 	private boolean teleportVehicles = true;
-	
+
 	private int cntTeleportVehicle = 0;
-	
+
 	public CarDepartureHandler(QSim queueSimulation) {
 		this.queueSimulation = queueSimulation;
 	}
@@ -37,23 +37,19 @@ public class CarDepartureHandler implements DepartureHandler {
 		}
 		QLink qlink = queueSimulation.network.getQueueLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
-		if (vehicle == null) {
+		if ((vehicle == null) && (teleportVehicles) && (agent instanceof PersonAgent)) {
 			// try to fix it somehow
-			if (teleportVehicles) {
-				if (agent instanceof PersonAgent) {
-					vehicle = ((PersonAgent) agent).getVehicle();
-					if (vehicle.getCurrentLink() != null) {
-						if (cntTeleportVehicle < 9) {
-							cntTeleportVehicle++;
-							log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
-							if (cntTeleportVehicle == 9) {
-								log.info("No more occurrences of teleported vehicles will be reported.");
-							}
-						}
-						QLink qlinkOld = queueSimulation.network.getQueueLink(vehicle.getCurrentLink().getId());
-						qlinkOld.removeParkedVehicle(vehicle.getId());
+			vehicle = ((PersonAgent) agent).getVehicle();
+			if (vehicle.getCurrentLink() != null) {
+				if (cntTeleportVehicle < 9) {
+					cntTeleportVehicle++;
+					log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
+					if (cntTeleportVehicle == 9) {
+						log.info("No more occurrences of teleported vehicles will be reported.");
 					}
 				}
+				QLink qlinkOld = queueSimulation.network.getQueueLink(vehicle.getCurrentLink().getId());
+				qlinkOld.removeParkedVehicle(vehicle.getId());
 			}
 		}
 		if (vehicle == null) {
@@ -68,7 +64,7 @@ public class CarDepartureHandler implements DepartureHandler {
 			qlink.addDepartingVehicle(vehicle);
 		}
 	}
-	
+
 	/** Specifies whether the simulation should track vehicle usage and throw an Exception
 	 * if an agent tries to use a car on a link where the car is not available, or not.
 	 * Set <code>teleportVehicles</code> to <code>true</code> if agents always have a
@@ -82,5 +78,5 @@ public class CarDepartureHandler implements DepartureHandler {
 	public void setTeleportVehicles(final boolean teleportVehicles) {
 		this.teleportVehicles = teleportVehicles;
 	}
-	
+
 }

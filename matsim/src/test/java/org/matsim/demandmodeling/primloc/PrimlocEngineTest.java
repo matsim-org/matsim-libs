@@ -15,7 +15,7 @@ import Jama.Matrix;
 
 // FIXME this test-case has no Assert-statement, so it will always succeed!
 
-public class PrimlocEngineTest  extends MatsimTestCase {
+public class PrimlocEngineTest extends MatsimTestCase {
 
 private final static String testPropertyFile = "test/input/org/matsim/demandmodeling/primloc/PrimaryLocationChoice.xml";
 
@@ -58,7 +58,14 @@ private final static String testPropertyFile = "test/input/org/matsim/demandmode
 
 		Properties props = new Properties();
 
-		props.loadFromXML( new FileInputStream(propertyFile) );
+		FileInputStream stream = new FileInputStream(propertyFile);
+		props.loadFromXML(stream);
+		try {
+			stream.close();
+		} catch (IOException e) {
+			System.err.println("could not close stream.");
+			e.printStackTrace();
+		}
 		zoneFileName = props.getProperty("zoneFileName");
 		costFileName = props.getProperty("costFileName");
 		homesFileName = props.getProperty("homesFileName");
@@ -135,8 +142,7 @@ private final static String testPropertyFile = "test/input/org/matsim/demandmode
 		}
 
 		if( Math.abs(sp-sj) > 1.0 ){
-			System.err.println("PLCM: Error: #jobs("+sj+")!= #homes("+sp+")");
-			System.exit(-1);
+			throw new RuntimeException("PLCM: Error: #jobs("+sj+")!= #homes("+sp+")");
 		}
 		this.core.N=sp;
 

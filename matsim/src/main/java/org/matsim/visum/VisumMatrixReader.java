@@ -32,14 +32,13 @@ import org.matsim.matrices.Matrix;
 import org.matsim.world.Location;
 
 /**
- * @author marcel
- *
+ * @author mrieser
  */
 public class VisumMatrixReader {
 
 	private Matrix matrix = null;
 
-	/*default*/ static final Logger log = Logger.getLogger(VisumMatrixReader.class);
+	/*package*/ static final Logger log = Logger.getLogger(VisumMatrixReader.class);
 
 	public VisumMatrixReader(final Matrix matrix) {
 		this.matrix = matrix;
@@ -62,10 +61,10 @@ public class VisumMatrixReader {
 				} else if (header.startsWith("$O")) {
 					new SparseMatrixReader(this.matrix).read(infile);
 				} else {
-					Gbl.errorMsg("Visum file format '" + header +"' is not supported.");
+					throw new RuntimeException("Visum file format '" + header +"' is not supported.");
 				}
 			} else {
-				Gbl.errorMsg("header is missing");
+				throw new RuntimeException("header is missing");
 			}
 
 		} catch (IOException e) {
@@ -73,7 +72,8 @@ public class VisumMatrixReader {
 			return null;
 		} finally {
 			if (infile != null) {
-				try { infile.close(); } catch (IOException ignored) {}
+				try { infile.close(); }
+				catch (IOException e) { log.warn("Could not close input-stream.", e); }
 			}
 		}
 
@@ -176,7 +176,7 @@ public class VisumMatrixReader {
 		public SparseMatrixReader(final Matrix matrix) {
 			this.matrix = matrix;
 		}
-		
+
 		public void read(final BufferedReader in) throws IOException {
 			String line = null;
 			while ( (line = in.readLine()) != null) {
@@ -193,8 +193,7 @@ public class VisumMatrixReader {
 
 				String[] data = line.trim().split("\\s+");
 				if (data.length != 3) {
-					Gbl.errorMsg("Expected 3 tokens, but found " + data.length +
-					" in line " + this.lineCounter + "."
+					Gbl.errorMsg("Expected 3 tokens, but found " + data.length + " in line " + this.lineCounter + "."
 					);
 				}
 
@@ -209,7 +208,7 @@ public class VisumMatrixReader {
 					warnMissingLocation(data[1]);
 					return;
 				}
-				
+
 				/*
 				 * There is no intrazonal traffic in VISUM.
 				 * However, when there comes a matrix entry from VISUM 
@@ -246,7 +245,7 @@ public class VisumMatrixReader {
 				Gbl.errorMsg("unknown internal state: " + this.state);
 			}
 		}
-		
+
 		private void warnMissingLocation(final String locName) {
 			if (!this.knownMissingLocations.contains(locName)) {
 				this.knownMissingLocations.add(locName);

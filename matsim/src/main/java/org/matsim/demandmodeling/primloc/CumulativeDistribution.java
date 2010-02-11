@@ -29,7 +29,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
- * 
+ *
  * @author fabrice and jjoubert
  *
  */
@@ -38,7 +38,7 @@ public class CumulativeDistribution {
 	double[] xs;
 	double[] ys;
 	int numObservations;
-	
+
 	public CumulativeDistribution( double lowerBound, double upperBound, int numBins ){
 		xs = new double[ numBins+1 ];
 		ys = new double[ numBins+1 ];
@@ -46,30 +46,30 @@ public class CumulativeDistribution {
 			xs[i]=lowerBound+((upperBound-lowerBound)*i)/numBins;
 		ys[numBins]=1.0;
 	}
-	
+
 	public CumulativeDistribution( double[] xs, double ys[] ){
 		assert( xs.length == ys.length );
-		this.xs = xs;
-		this.ys = ys;
+		this.xs = xs.clone();
+		this.ys = ys.clone();
 		numObservations = 1;
 	}
-	
+
 	public void addObservation( double x ){
 		addObservations( x, 1.0 );
 	}
-	
+
 	public double getLowerBound(){
 		return xs[0];
 	}
-	
+
 	public double getUpperBound(){
 		return xs[xs.length-1];
 	}
-	
+
 	public int getNumBins(){
 		return xs.length-1;
 	}
-	
+
 	public double error( CumulativeDistribution dist2 ){
 		// return the difference between two distributions with the same support
 		double error = 0.0;
@@ -77,7 +77,7 @@ public class CumulativeDistribution {
 			error += ( ys[i] - dist2.ys[i] )*( ys[i] - dist2.ys[i] );
 		return Math.sqrt( error );
 	}
-	
+
 	public void addObservations( double x, double y ){
 		int idx=0;
 		while( x>=xs[idx] && idx<xs.length-1)
@@ -89,18 +89,20 @@ public class CumulativeDistribution {
 				ys[i]=(ys[i]*numObservations+y)/(numObservations+y);
 		}
 		idx = 0;
-		while( ys[idx++]<1.0 );
+		while( ys[idx++]<1.0 ) {
+			// idx is already increased
+		}
 		while( idx < ys.length )
 			ys[idx++] = 1.0;
 
 		numObservations += y;
 	}
-	
+
 	public void print(){
 		for( int i=0; i<xs.length;i++)
 			System.out.println( xs[i]+"\t"+ys[i]);
 	}
-	
+
 	public static CumulativeDistribution readDistributionFromFile( String filename ){
 		// Read a cumulative distribution in the following format
 		// x[i] \t y[i]
@@ -112,7 +114,7 @@ public class CumulativeDistribution {
 		//
 		Vector<Double> x = new Vector<Double>();
 		Vector<Double> y = new Vector<Double>();
-		
+
 		LineNumberReader lnr;
 		try {
 			lnr = new LineNumberReader( IOUtils.getBufferedReader(filename) );
@@ -123,7 +125,7 @@ public class CumulativeDistribution {
 				y.add( Double.valueOf(st.nextToken()));
 			}
 			lnr.close();
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -137,16 +139,16 @@ public class CumulativeDistribution {
 		}
 		return new CumulativeDistribution( xs, ys );
 	}
-	
+
 	/**
 	 * Draws a single sample from the cumulative distribution function.
-	 * 
+	 *
 	 * @return the mid-value of the bin from which the sampled value originates.
 	 */
 	public double sampleFromCDF(){
 		Double d = null;
 		double rnd = MatsimRandom.getRandom().nextDouble();
-		
+
 		int index = 1;
 		while(d == null && index <= this.getNumBins() ){
 			if( this.ys[index] > rnd){
@@ -158,5 +160,5 @@ public class CumulativeDistribution {
 		assert(d != null) : "Could not draw from the cumulative distribution function";
 		return d;
 	}
-	
+
 }

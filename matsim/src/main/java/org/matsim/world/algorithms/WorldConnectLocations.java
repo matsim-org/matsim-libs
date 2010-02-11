@@ -272,14 +272,13 @@ public class WorldConnectLocations {
 			if (!f.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->facility mappings"); }
 			// add the zone mapping to facility f
 			ArrayList<MappedLocation> nearestZones = zones.getNearestLocations(f.getCoord());
-			if (nearestZones.isEmpty()) { /* facility does not belong to a zone */ }
-			else {
+			if (!nearestZones.isEmpty()) { // facility does not belong to a zone
 				// choose the first of the list (The list is generated via a defined order of the zones,
 				// therefore the chosen zone is deterministic).
 				Zone z = (Zone)nearestZones.get(0);
-				if (!z.contains(f.getCoord())) { /* f is not located IN any of the nearest zones */ }
-				else {
-					if (!world.addMapping(z,f)) { throw new RuntimeException("could not add zone<-->facility mapping"); }
+				if (z.contains(f.getCoord())  // f is located IN one of the nearest zones
+						&& !world.addMapping(z,f)) {
+					throw new RuntimeException("could not add zone<-->facility mapping");
 				}
 			}
 		}
@@ -306,14 +305,13 @@ public class WorldConnectLocations {
 			if (!l.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->link mappings");  }
 			// add the zone mapping to link l
 			ArrayList<MappedLocation> nearestZones = zones.getNearestLocations(l.getCoord());
-			if (nearestZones.isEmpty()) { /* link does not belong to a zone */ }
-			else {
+			if (!nearestZones.isEmpty()) { // link does belong to a zone
 				// choose the first of the list (The list is generated via a defined order of the zone,
 				// therefore the chosen zone is deterministic).
 				Zone z = (Zone)nearestZones.get(0);
-				if (!z.contains(l.getCoord())) { /* link center is not located IN any of the nearest zones */ }
-				else {
-					if (!world.addMapping(z,l)) { throw new RuntimeException("could not add zone<-->link mapping"); }
+				if (z.contains(l.getCoord()) // link center is located IN one of the nearest zones
+						&& (!world.addMapping(z,l))) {
+					throw new RuntimeException("could not add zone<-->link mapping");
 				}
 			}
 		}
@@ -351,7 +349,7 @@ public class WorldConnectLocations {
 					else if ((downLayer instanceof ActivityFacilitiesImpl) && (upLayer instanceof ZoneLayer)) {
 						connect((ZoneLayer)upLayer,(ActivityFacilitiesImpl)downLayer,world);
 					}
-					else { /* zone<-->zone: nothing to do (keep it as it is) */ }
+//					else { /* zone<-->zone: nothing to do (keep it as it is) */ }
 				}
 				downLayer = upLayer;
 			}

@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.world.MappedLocation;
@@ -33,7 +34,7 @@ import org.matsim.world.ZoneLayer;
 /**
  * @author mrieser
  *
- * creates an "Anbindungstabelle" for use with VISUM.<br/>
+ * Creates an "Anbindungstabelle" for use with VISUM.<br/>
  * The Anbindungstabelle contains information about which node is connected
  * to which zone (tvz, taz) for mapping the zone-based demand to the network
  * in VISUM.<br/>
@@ -42,9 +43,7 @@ import org.matsim.world.ZoneLayer;
  */
 public class VisumAnbindungstabelleWriter {
 
-	public VisumAnbindungstabelleWriter() {
-
-	}
+	private final static Logger log = Logger.getLogger(VisumAnbindungstabelleWriter.class);
 
 	public void write(String filename, NetworkLayer network, ZoneLayer zones) {
 		BufferedWriter out = null;
@@ -86,7 +85,8 @@ public class VisumAnbindungstabelleWriter {
 		}
 		finally {
 			if (out != null) {
-				try { out.close(); } catch (IOException ignored) {}
+				try { out.close(); }
+				catch (IOException e) { log.warn("Could not close output-stream.", e); }
 			}
 		}
 	}

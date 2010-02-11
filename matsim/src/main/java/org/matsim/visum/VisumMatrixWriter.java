@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -37,6 +38,8 @@ import org.matsim.matrices.Matrix;
  * Can be used e.g. for OD-matrices.
  */
 public class VisumMatrixWriter {
+
+	/*package*/ final static Logger log = Logger.getLogger(VisumMatrixWriter.class);
 
 	Matrix matrix;
 	Set<Id> ids;
@@ -108,7 +111,8 @@ public class VisumMatrixWriter {
 			e.printStackTrace();
 		} finally {
 			if (out != null) {
-				try { out.close(); } catch (IOException ignored) {}
+				try { out.close(); }
+				catch (IOException e) { log.warn("Could not close output-stream.", e); }
 			}
 		}
 	}

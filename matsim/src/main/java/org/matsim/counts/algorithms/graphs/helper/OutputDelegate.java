@@ -29,12 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -55,14 +56,16 @@ import com.lowagie.text.pdf.PdfWriter;
 
 public class OutputDelegate {
 
+	private final static Logger log = Logger.getLogger(OutputDelegate.class);
+
 	private final List<Section> sections_;
 	private final List<CountsGraph> cg_list_;
 	private final String iterPath_;
 
 	public OutputDelegate(final String iterPath) {
 		this.iterPath_ = iterPath;
-		this.sections_ = new Vector<Section>();
-		this.cg_list_ = new Vector<CountsGraph>();
+		this.sections_ = new ArrayList<Section>();
+		this.cg_list_ = new ArrayList<CountsGraph>();
 	}
 
 	public void addSection(final Section section) {
@@ -279,7 +282,7 @@ public class OutputDelegate {
 			if (out != null) {
 				try {
 					out.close();
-				} catch (IOException ignored) {}
+				} catch (IOException e) { log.warn("Could not close output-stream.", e); }
 			}
 		}
 	}//saveChartAsPDF

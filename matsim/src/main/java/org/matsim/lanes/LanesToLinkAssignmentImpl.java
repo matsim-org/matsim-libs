@@ -19,9 +19,6 @@
 
 package org.matsim.lanes;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
