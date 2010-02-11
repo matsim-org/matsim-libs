@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package java.playground.droeder;
+package playground.droeder.gershensonSignals;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -26,8 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-
-import playground.droeder.gershensonSignals.GershensonAdaptiveTrafficLightController;
 
 public class GershensonControllerTest {
   
