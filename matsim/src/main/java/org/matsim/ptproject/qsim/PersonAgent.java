@@ -203,7 +203,7 @@ public class PersonAgent implements DriverAgent {
 
 	public void legEnds(final double now) {
 		this.simulation.handleAgentArrival(now, this);
-		if (this.currentLinkId != this.destinationLinkId) {
+		if(!this.currentLinkId.equals(this.destinationLinkId)) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.destinationLinkId
 					+ ", but arrived on link " + this.currentLinkId + ". Removing the agent from the simulation.");
 			Simulation.decLiving();
