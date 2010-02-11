@@ -62,15 +62,19 @@ public class LinkImpl extends AbstractLocation implements Link {
 
 	protected double euklideanDist;
 
-	//////////////////////////////////////////////////////////////////////
-	// constructor
-	//////////////////////////////////////////////////////////////////////
-	static private double fsWarnCnt = 0 ;
-	static private double cpWarnCnt = 0 ;
-	static private double plWarnCnt = 0 ;
-	static private double lengthWarnCnt = 0;
-	static private int loopWarnCnt = 0 ;
+	private static int fsWarnCnt = 0 ;
+	private static int cpWarnCnt = 0 ;
+	private static int plWarnCnt = 0 ;
+	private static int lengthWarnCnt = 0;
+	private static int loopWarnCnt = 0 ;
+	private static int maxFsWarnCnt = 1;
+  private static int maxCpWarnCnt = 1;
+  private static int maxPlWarnCnt = 1;
+  private static int maxLengthWarnCnt = 1;
+  private static int maxLoopWarnCnt = 1;
 
+	
+	
 	public LinkImpl(final Id id, final Node from, final Node to,
 			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(network, id,
@@ -88,7 +92,7 @@ public class LinkImpl extends AbstractLocation implements Link {
 		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
 
 		if (this.from.equals(this.to)) {
-			if ( loopWarnCnt < 1 ) {
+			if ( loopWarnCnt < maxLoopWarnCnt ) {
 				loopWarnCnt++ ;
 				log.warn("[from=to=" + this.to + " link is a loop]");
 				log.warn(Gbl.ONLYONCE) ;
@@ -106,28 +110,28 @@ public class LinkImpl extends AbstractLocation implements Link {
 		 * I see no reason why a freespeed and a capacity of zero should not be
 		 * allowed! joh 9may2008
 		 */
-		if ((this.capacity <= 0.0) && (cpWarnCnt <= 0) ) {
+		if ((this.capacity <= 0.0) && (cpWarnCnt < maxCpWarnCnt) ) {
 			cpWarnCnt++ ;
-			log.warn("[capacity="+this.capacity+" may cause problems. Future occurences of this warning are suppressed.]");
+			log.warn("[capacity=" + this.capacity + " of link id " + this.getId() + " may cause problems. Future occurences of this warning are suppressed.]");
 		}
 	}
 
 	private void checkFreespeedSemantics() {
-		if ((this.freespeed <= 0.0) && (fsWarnCnt <= 0) ) {
+		if ((this.freespeed <= 0.0) && (fsWarnCnt < maxFsWarnCnt) ) {
 			fsWarnCnt++ ;
-			log.warn("[freespeed="+this.freespeed+" may cause problems. Future occurences of this warning are suppressed.]");
+			log.warn("[freespeed=" + this.freespeed + " of link id " + this.getId() + " may cause problems. Future occurences of this warning are suppressed.]");
 		}
 	}
 
 	private void checkNumberOfLanesSemantics(){
-		if ((this.nofLanes < 1) && (plWarnCnt <= 0) ) {
+		if ((this.nofLanes < 1) && (plWarnCnt < maxPlWarnCnt) ) {
 			plWarnCnt++ ;
-			log.warn("[permlanes="+this.nofLanes+" may cause problems. Future occurences of this warning are suppressed.]");
+			log.warn("[permlanes=" + this.nofLanes + " of link id " + this.getId() +" may cause problems. Future occurences of this warning are suppressed.]");
 		}
 	}
 
 	private void checkLengthSemantics(){
-		if ((this.getLength() <= 0.0) && (lengthWarnCnt <= 0)) {
+		if ((this.getLength() <= 0.0) && (lengthWarnCnt < maxLengthWarnCnt)) {
 			lengthWarnCnt++;
 			log.warn("[length=" + this.length + " of link id " + this.getId() + " may cause problems. Future occurences of this warning are suprressed.]");
 		}
