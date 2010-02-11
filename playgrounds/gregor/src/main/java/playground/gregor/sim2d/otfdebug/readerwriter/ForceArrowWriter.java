@@ -8,7 +8,7 @@ import java.util.List;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 
-public class ForceArrowWriter  extends OTFDataWriter {
+public class ForceArrowWriter extends OTFDataWriter<List> {
 
 	/**
 	 * 

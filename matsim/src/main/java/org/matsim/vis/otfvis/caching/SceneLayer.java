@@ -30,11 +30,17 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
  *
  */
 public interface SceneLayer {
+	
 	public void init(SceneGraph graph, boolean initConstData);
+	
 	public void finish();
+	
 	public void addItem(OTFDataReceiver item);
+	
 	public void draw();
+	
 	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) throws InstantiationException, IllegalAccessException;
+	
 	public int getDrawOrder();
 	
 }

@@ -23,7 +23,6 @@ import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 
@@ -43,15 +42,10 @@ public class OTFLanesConnectionManagerFactory implements OTFConnectionManagerFac
   @Override
   public OTFConnectionManager createConnectionManager() {
     OTFConnectionManager connect = this.delegate.createConnectionManager();
-    // data source to writer
-    connect.add(QLink.class, OTFLaneWriter.class);
-    // writer -> reader: from server to client
-    connect
-    .add(OTFLaneWriter.class, OTFLaneReader.class);
-    // reader to drawer (or provider to receiver)
-    connect.add(OTFLaneReader.class, OTFLaneSignalDrawer.class);
-    // drawer -> layer
-    connect.add(OTFLaneSignalDrawer.class, OTFLaneLayer.class);
+    connect.connectQLinkToWriter(OTFLaneWriter.class);
+    connect.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
+    connect.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
+    connect.connectReceiverToLayer(OTFLaneSignalDrawer.class, OTFLaneLayer.class);
     return connect;
   }
 

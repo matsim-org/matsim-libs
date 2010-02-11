@@ -85,7 +85,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 
 		public void execute(final double x, final double y, final OTFDataReader reader) {
-			Collection<OTFDataReceiver> drawers = this.connect.getReceivers(reader.getClass(), this.graph);
+			Collection<OTFDataReceiver> drawers = this.connect.getReceiversForReader(reader.getClass(), this.graph);
 			for (OTFDataReceiver drawer : drawers) {
 				reader.connect(drawer);
 			}
@@ -170,7 +170,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		
 		log.info("Connecting additional elements...");
 		for(OTFDataReader element : this.additionalElements) {
-			Collection<OTFDataReceiver> drawers = connect.getReceivers(element.getClass(), graph);
+			Collection<OTFDataReceiver> drawers = connect.getReceiversForReader(element.getClass(), graph);
 			for (OTFDataReceiver drawer : drawers) {
 				element.connect(drawer);
 				log.info("  Connected " + element.getClass().getName() + " to " + drawer.getClass().getName());

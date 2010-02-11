@@ -139,6 +139,8 @@ public class QLinkLanesImpl implements QLink {
 
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
+	private final Map<Id, PersonAgentI> agentsInActivities = new LinkedHashMap<Id, PersonAgentI>();
+
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
 	private LinkActivator linkActivator = null;
@@ -534,6 +536,16 @@ public class QLinkLanesImpl implements QLink {
 			return positions;
 		}
 
+	}
+	
+	@Override
+	public void addAgentInActivity(PersonAgentI agent) {
+		agentsInActivities.put(agent.getPerson().getId(), agent);
+	}
+
+	@Override
+	public void removeAgentInActivity(PersonAgentI agent) {
+		agentsInActivities.remove(agent.getPerson().getId());
 	}
 
 }

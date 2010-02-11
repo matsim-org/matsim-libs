@@ -34,7 +34,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -59,7 +58,6 @@ public class OTFTVehServer implements OTFServerRemote {
 	private static final int BUFFERSIZE = 100000000;
 	private BufferedReader reader = null;
 	private double nextTime = -1;
-//	private List<Double> times = null;
 	private final TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
@@ -80,17 +78,13 @@ public class OTFTVehServer implements OTFServerRemote {
 		QNetwork qnet = new QNetwork(net);
 
 		OTFConnectionManager connect = new OTFConnectionManager();
-		connect.add(QLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-//		connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
-
-		 OTFQSimServerQuadBuilder quadBuilder = new OTFQSimServerQuadBuilder(qnet);
+		connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		
+		OTFQSimServerQuadBuilder quadBuilder = new OTFQSimServerQuadBuilder(qnet);
 
 		this.quad =  quadBuilder.createAndInitOTFServerQuad(connect);
 		this.quad.initQuadTree(connect);
 		this.quad.addAdditionalElement(this.writer);
-
-//		this.times = buildTimesList(); // Does not work very smoothly, therefore we leave it out until there is demand for this
-//		this.times =null;
 
 		open();
 		readOneStep();
@@ -120,8 +114,6 @@ public class OTFTVehServer implements OTFServerRemote {
 
 					lineFound = true;
 					this.time = Double.parseDouble(time);
-//					this.readVehicle = new OTFAgentsListHandler.ExtendedPositionInfo(new IdImpl(agent), easting, northing,
-//							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 					this.readVehicle = new PositionInfo(new IdImpl(agent), easting, northing,
 							Double.parseDouble(elevation), Double.parseDouble(azimuth) ) ;
 					this.readVehicle.setColorValueBetweenZeroAndOne( Double.parseDouble(speed) ) ;
@@ -177,14 +169,9 @@ public class OTFTVehServer implements OTFServerRemote {
 			System.arraycopy(this.buf.array(), 0, buffer, 0, buffer.length);
 			this.nextTime = actTime;
 			this.timesteps.put((int)this.nextTime, buffer);
-			//System.out.println("Read timestep: " + actTime);
 		}
 
 	}
-
-//	private void step() throws RemoteException {
-//		requestNewTime((int)(this.nextTime+1), TimePreference.LATER);
-//	}
 
 	private void open() {
 		Gbl.startMeasurement();
@@ -234,27 +221,6 @@ public class OTFTVehServer implements OTFServerRemote {
 		return false;
 	}
 
-//	public static void main(String[] args) {
-//
-//		String netFileName = "../studies/schweiz/2network/ch.xml";
-//		String vehFileName = "../runs/run168/run168.it210.T.veh";
-////		String netFileName = "../../tmp/studies/ivtch/network.xml";
-////		String vehFileName = "../../tmp/studies/ivtch/T.veh";
-//
-//		OTFTVehServer test  = new OTFTVehServer(netFileName, vehFileName);
-//		try {
-//			double time = test.getLocalTime();
-//			test.step();
-//			while (time != test.getLocalTime()) {
-//				time = test.getLocalTime();
-//				test.step();
-//			}
-//			test.finish();
-//		} catch (RemoteException e) {
-//			e.printStackTrace();
-//		}
-//	}
-
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
 		int lastTime = -1;
 		int foundTime = -1;
@@ -290,7 +256,6 @@ public class OTFTVehServer implements OTFServerRemote {
 	}
 
 	public Collection<Double> getTimeSteps() throws RemoteException {
-//		return times;
 		return null;
 	}
 

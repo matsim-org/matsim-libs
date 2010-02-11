@@ -72,13 +72,13 @@ public class Controller2D extends Controler {
 		sbg.addLocation(386108.0859f,5820114.04f,386141.2f,5820147.092897f);
 
 		this.myOTFServer.addAdditionalElement(new TextureDataWriter(sbg));
-		this.connectionManager.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
-		this.connectionManager.add(TextureDataWriter.class,TextutreDataReader.class);
+		this.connectionManager.connectReceiverToLayer(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
+		this.connectionManager.connectWriterToReader(TextureDataWriter.class,TextutreDataReader.class);
 
 		float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
 		try {
 			this.myOTFServer.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile("../../../../sim2d/sg4graph.shp"),linksColor));
-			this.connectionManager.add(PolygonDataWriter.class,PolygonDataReader.class);
+			this.connectionManager.connectWriterToReader(PolygonDataWriter.class, PolygonDataReader.class);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -86,15 +86,15 @@ public class Controller2D extends Controler {
 
 		this.agentWriter = new Agent2DWriter();
 		this.myOTFServer.addAdditionalElement(this.agentWriter);
-		this.connectionManager.add(Agent2DWriter.class,  Agent2DReader.class);
-		this.connectionManager.add(Agent2DReader.class,  Agent2DDrawer.class);
-		this.connectionManager.add( Agent2DDrawer.class, Agent2DLayer.class);
+		this.connectionManager.connectWriterToReader(Agent2DWriter.class,  Agent2DReader.class);
+		this.connectionManager.connectReaderToReceiver(Agent2DReader.class,  Agent2DDrawer.class);
+		this.connectionManager.connectReceiverToLayer( Agent2DDrawer.class, Agent2DLayer.class);
 
 		this.forceArrowWriter = new ForceArrowWriter();
 		this.myOTFServer.addAdditionalElement(this.forceArrowWriter);
-		this.connectionManager.add(ForceArrowWriter.class,ForceArrowReader.class);
-		this.connectionManager.add(ForceArrowReader.class,ForceArrowDrawer.class);
-		this.connectionManager.add(ForceArrowDrawer.class,ForceArrowLayer.class);
+		this.connectionManager.connectWriterToReader(ForceArrowWriter.class,ForceArrowReader.class);
+		this.connectionManager.connectReaderToReceiver(ForceArrowReader.class,ForceArrowDrawer.class);
+		this.connectionManager.connectReceiverToLayer(ForceArrowDrawer.class,ForceArrowLayer.class);
 
 		OTFClientLive client = null;
 		client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);

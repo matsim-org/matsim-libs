@@ -132,23 +132,23 @@ public class MVISnapshotWriter extends OTFFileWriter{
 		
 		if (this.label != null) {
 			this.quad.addAdditionalElement(new LabelWriter(this.label));
-			connect.add(LabelWriter.class,LabelReader.class);
-			connect.add(LabelReader.class,OTFLabelDrawer.class);
-			connect.add(OTFLabelDrawer.class,LabelLayer.class);
+			connect.connectWriterToReader(LabelWriter.class,LabelReader.class);
+			connect.connectReaderToReceiver(LabelReader.class,OTFLabelDrawer.class);
+			connect.connectReceiverToLayer(OTFLabelDrawer.class,LabelLayer.class);
 		}
 		
-		connect.add(PolygonDataWriter.class,PolygonDataReader.class);
+		connect.connectWriterToReader(PolygonDataWriter.class,PolygonDataReader.class);
 		
 		
 //		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		connect.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
+		connect.connectReceiverToLayer(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
 		
 
 		
 		
-		connect.add(AgentWriter.class,  AgentReader.class);
-		connect.add(AgentReader.class,AgentDrawer.class);
-		connect.add(AgentDrawer.class,AgentLayer.class);
+		connect.connectWriterToReader(AgentWriter.class,  AgentReader.class);
+		connect.connectReaderToReceiver(AgentReader.class,AgentDrawer.class);
+		connect.connectReceiverToLayer(AgentDrawer.class,AgentLayer.class);
 	
 		
 		
@@ -160,26 +160,26 @@ public class MVISnapshotWriter extends OTFFileWriter{
 		
 		
 		
-		connect.add(TileDrawerDataWriter.class,TileDrawerDataReader.class);
+		connect.connectWriterToReader(TileDrawerDataWriter.class,TileDrawerDataReader.class);
 		//		connect.add(InundationDataWriter.class,InundationDataReader.class);
 		//		connect.add(InundationDataReader.class,Dummy.class);
-		connect.add(PolygonDataWriter.class,PolygonDataReader.class);
-		connect.add(TextureDataWriter.class,TextutreDataReader.class);
+		connect.connectWriterToReader(PolygonDataWriter.class,PolygonDataReader.class);
+		connect.connectWriterToReader(TextureDataWriter.class,TextutreDataReader.class);
 		if (this.occMap != null) {
 			try {
 				FeatureSource fs = ShapeFileReader.readDataFile(this.BUILDINGS_FILE);
 				OTFSheltersDrawer sd = new OTFSheltersDrawer(fs,this.occMap,OTFServerQuad2.offsetNorth,OTFServerQuad2.offsetEast);
 				this.quad.addAdditionalElement(new SheltersWriter(sd));
-				connect.add(SheltersWriter.class,SheltersReader.class);
-				connect.add(SheltersReader.class,TimeDependentTrigger.class);
+				connect.connectWriterToReader(SheltersWriter.class,SheltersReader.class);
+				connect.connectReaderToReceiver(SheltersReader.class,TimeDependentTrigger.class);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		
 		if (this.insertWave) {
-			connect.add(InundationDataWriter.class,InundationDataReader.class);
-			connect.add(InundationDataReader.class,TimeDependentTrigger.class);
+			connect.connectWriterToReader(InundationDataWriter.class,InundationDataReader.class);
+			connect.connectReaderToReceiver(InundationDataReader.class,TimeDependentTrigger.class);
 		}
 	}
 

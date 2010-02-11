@@ -39,8 +39,10 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -366,7 +368,9 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			if (agent.getCurrentLeg() != null) {
 				currentLegMode = agent.getCurrentLeg().getMode();
 			}
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), currentLegMode));
+			if (agent.getDestinationLinkId() != null) {
+				events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), currentLegMode));
+			}
 		}
 		this.activityEndsList.clear();
 
@@ -519,16 +523,48 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 */
 	public void scheduleActivityEnd(final DriverAgent agent, int planElementIndex) {
 		this.activityEndsList.add(agent);
+		addToAgentsInActivities(agent);
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
 			queueSimulationFeature.afterActivityBegins(agent, planElementIndex);
 		}
 	}
+	
+	private void addToAgentsInActivities(final DriverAgent agent) {
+		if (agent instanceof PersonAgent) {
+			PersonAgent pa = (PersonAgent) agent;
+			PlanElement pe = pa.getCurrentPlanElement();
+			if (pe instanceof Leg) {
+				throw new RuntimeException();
+			} else {
+				Activity act = (Activity) pe;
+				Id linkId = act.getLinkId();
+				QLink qLink = network.getQueueLink(linkId);
+				qLink.addAgentInActivity(agent);
+			}
+		}
+	}
 
+	private void removeFromAgentsInActivities(DriverAgent agent) {
+		if (agent instanceof PersonAgent) {
+			PersonAgent pa = (PersonAgent) agent;
+			PlanElement pe = pa.getCurrentPlanElement();
+			if (pe instanceof Leg) {
+				throw new RuntimeException();
+			} else {
+				Activity act = (Activity) pe;
+				Id linkId = act.getLinkId();
+				QLink qLink = network.getQueueLink(linkId);
+				qLink.removeAgentInActivity(agent);
+			}
+		}
+	}
+	
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
 			DriverAgent agent = this.activityEndsList.peek();
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
+				removeFromAgentsInActivities(agent);
 				agent.activityEnds(time);
 				for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
 					queueSimulationFeature.afterActivityEnds(agent, time);
@@ -658,5 +694,5 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public double getTimeOfDay() {
 		return QSimTimer.getTime() ;
 	}
-
+	
 }

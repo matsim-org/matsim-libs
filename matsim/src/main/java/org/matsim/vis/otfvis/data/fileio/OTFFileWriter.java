@@ -34,7 +34,6 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFServerQuadBuilder;
-import org.matsim.vis.otfvis.data.OTFConnectionManager.Entry;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 /**
@@ -111,9 +110,7 @@ public class OTFFileWriter implements SnapshotWriter {
 		// this is new, write connect into the mvi as well
 		this.zos.putNextEntry(new ZipEntry("connect.bin"));
 		log.info("writing ConnectionManager to file...");
-		for (Entry e : this.connect.getEntries()){
-			log.info("writing entry: " + e.getFrom().getCanonicalName() + " to " + e.getTo().getName());
-		}
+		connect.logEntries();
 		new ObjectOutputStream(this.zos).writeObject(this.connect);
 		this.zos.closeEntry();
 	}

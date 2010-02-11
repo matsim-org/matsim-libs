@@ -36,6 +36,7 @@ public class VisumNetwork {
 
 	public final Map<Id, Node> nodes = new HashMap<Id, Node>();
 	public final Map<Id, Edge> edges = new HashMap<Id, Edge>();
+	public final Map<Id, EdgeType> edgeTypes = new HashMap<Id, EdgeType>();
 	public final Map<Id, Stop> stops = new TreeMap<Id, Stop>();
 	public final Map<Id, StopArea> stopAreas = new TreeMap<Id, StopArea>();
 	public final Map<String, StopPoint> stopPoints = new TreeMap<String, StopPoint>();
@@ -59,6 +60,13 @@ public class VisumNetwork {
 		Edge oldEdge = edges.put(edge.id, edge);
 		if (oldEdge != null) {
 			throw new IllegalArgumentException("Duplicate edge.");
+		}
+	}
+	
+	public void addEdgeType(final EdgeType edgeType) {
+		EdgeType oldEdgeType = edgeTypes.put(edgeType.id, edgeType);
+		if (oldEdgeType != null) {
+			throw new IllegalArgumentException("Duplicate edge type.");
 		}
 	}
 	
@@ -190,15 +198,30 @@ public class VisumNetwork {
 		public final Id fromNode;
 		public final Id toNode;
 		public final double length;
-		public Edge(Id id, Id fromEdge, Id toEdge, double length) {
+		public Id edgeTypeId;
+		public Edge(Id id, Id fromNode, Id toNode, double length) {
 			super();
 			this.id = id;
-			this.fromNode = fromEdge;
-			this.toNode = toEdge;
+			this.fromNode = fromNode;
+			this.toNode = toNode;
 			this.length = length;
 		}
 	}
 
+	public static class EdgeType {
+		public final Id id;
+		public final String kapIV;
+		public final String v0IV;
+
+		public EdgeType(Id id, String kapIV, String v0IV) {
+			super();
+			this.id = id;
+			this.kapIV = kapIV;
+			this.v0IV = v0IV;
+		}
+		
+	}
+	
 	public static class Stop {
 		public final Id id;
 		public final String name;

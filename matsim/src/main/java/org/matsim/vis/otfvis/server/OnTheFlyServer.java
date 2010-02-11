@@ -128,7 +128,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			if (status == Status.PLAY || status == Status.STEP) {
 				queue.add(command);
 			} else {
-//				System.out.println(status);
 				command.run();
 			}
 		}
@@ -260,7 +259,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		Runnable runnable = queue.poll();
 		while (runnable != null) {
 			runnable.run();
-			System.out.println("Blubb");
 			runnable = queue.poll();
 		}
 

@@ -33,13 +33,11 @@ import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
-import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
 
@@ -92,35 +90,22 @@ public abstract class OTFClient extends Thread {
 	}
 
 	private void addDrawerToSplitPane(String url2) {
-	  pane.setRightComponent(this.createDrawerPanel(url2, mainDrawer));
+		pane.setRightComponent(this.createDrawerPanel(url2, mainDrawer));
 		pane.validate();
 	}
 	
 	protected JPanel createDrawerPanel(String url, OTFDrawer drawer){
-    JPanel panel = new JPanel(new BorderLayout());
-    JLabel label = new JLabel();
-    label.setText(url);
-    panel.add(drawer.getComponent(), BorderLayout.CENTER);
-    panel.add(label, BorderLayout.NORTH);
-    return panel;
+	    JPanel panel = new JPanel(new BorderLayout());
+	    JLabel label = new JLabel();
+	    label.setText(url);
+	    panel.add(drawer.getComponent(), BorderLayout.CENTER);
+	    panel.add(label, BorderLayout.NORTH);
+	    return panel;
 	}
 
 	public OTFClientQuad createNewView(String id, OTFConnectionManager connect, OTFHostConnectionManager hostControl) throws RemoteException {
-		OTFVisConfig config = OTFClientControl.getInstance().getOTFVisConfig();
-
-		if((config.getFileVersion() < OTFFileWriter.VERSION) || (config.getFileMinorVersion() < OTFFileWriter.MINORVERSION)) {
-			// go through every reader class and look for the appropriate Reader Version for this fileformat
-			connect.adoptFileFormat(OTFDataReader.getVersionString(config.getFileVersion(), config.getFileMinorVersion()));
-		}
-
 		log.info("Getting Quad id " + id);
 		OTFServerQuadI servQ = hostControl.getOTFServer().getQuad(id, connect);
-//    log.error("");
-//    log.error("connection manager used...");
-//    log.error("");
-//    for (Entry e : connect.getEntries()){
-//      log.error("entry from: " + e.getFrom() + " to " + e.getTo());
-//    }
 		log.info("Converting Quad");
 		OTFClientQuad clientQ = servQ.convertToClient(id, hostControl.getOTFServer(), connect);
 		log.info("Creating receivers...");

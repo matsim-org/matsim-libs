@@ -70,10 +70,8 @@ class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializabl
  */
 public class SceneGraph {
 	
-	private static final Logger log = Logger.getLogger(SceneGraph.class);
-	
 	private Rect rect;
-	private final Map<Class, SceneLayer> layers = new LinkedHashMap<Class, SceneLayer>();
+	private final Map<Class<?>, SceneLayer> layers = new LinkedHashMap<Class<?>, SceneLayer>();
 	private final List<SceneLayer> drawingLayers = new LinkedList<SceneLayer>();
 
 	private final OTFDrawer drawer;
@@ -95,7 +93,7 @@ public class SceneGraph {
 		layers.put(Object.class, new SimpleSceneLayer());
 		
 		connect.fillLayerMap(layers);
-//		log.debug("adding " + layers.size() + " layers to SceneGraph");
+		
 		// do initialising action if necessary
 		for (SceneLayer layer : layers.values()) {
 			layer.init(this, time == -1 ? true : false);
@@ -116,9 +114,9 @@ public class SceneGraph {
 		return drawer;
 	}
 	
-	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException {
+	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) throws InstantiationException, IllegalAccessException {
 		SceneLayer layer = layers.get(clazz);
-		if (layer == null){
+		if (layer == null) {
 		  layer = layers.get(Object.class); //DS must exist: default handling
 		}
 		return layer.newInstance(clazz);
@@ -147,5 +145,6 @@ public class SceneGraph {
 		// do initialising action if necessary
 		for (SceneLayer layer : drawingLayers) layer.draw();
 	}
+	
 }
 

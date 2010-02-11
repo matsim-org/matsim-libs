@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.data.fileio.queuesim;
 
-import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 
@@ -32,10 +31,7 @@ public class OTFFileWriterQueueSimConnectionManagerFactory implements OTFConnect
 
 	public OTFConnectionManager createConnectionManager() {
 		OTFConnectionManager c = new OTFConnectionManager();
-		c.add(QueueLink.class,
-				OTFQueueSimLinkAgentsWriter.class);
-		//not needed yet for current QueueSim functionality thus disabled, reimplement when needed dg dez 09
-		//		c.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
+		c.connectQueueLinkToWriter(OTFQueueSimLinkAgentsWriter.class);
 		return c;
 	}
 

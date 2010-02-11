@@ -21,19 +21,21 @@
 package org.matsim.vis.otfvis.data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QNode;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SceneLayer;
+import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-
-
 
 /**
  * The OTFConnectionManager is the most important class when building an OTFVis instance.
@@ -54,22 +56,17 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
  */
 public class OTFConnectionManager implements Cloneable, Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6481835753628883014L;
 	
-	/* transient */ private static final Logger log = Logger.getLogger(OTFConnectionManager.class);
-	private boolean isValidated = false;
+	private static final Logger log = Logger.getLogger(OTFConnectionManager.class);
 
-	public static class Entry implements Serializable{
-		/**
-		 * 
-		 */
+	private static class Entry implements Serializable {
+
 		private static final long serialVersionUID = -2260651735789627280L;
-		Class from, to;
+		
+		Class<?> from, to;
 
-		public Entry(Class from, Class to) {
+		public Entry(Class<?> from, Class<?> to) {
 			this.from = from;
 			this.to = to;
 		}
@@ -79,14 +76,24 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 			return "(" + from.toString() + "," + to.toString() + ") ";
 		}
 
-		public Class getTo(){
+		public Class<?> getTo(){
 			return this.to;
 		}
 		
-		public Class getFrom(){
+		public Class<?> getFrom(){
 			return this.from;
 		}
-		
+
+		@Override
+		public boolean equals(Object obj) {
+			Entry other = (Entry) obj;
+			return from.equals(other.from) && to.equals(other.to);
+		}
+
+		@Override
+		public int hashCode() {
+			return from.hashCode() * to.hashCode();
+		}
 		
 	}
 	
@@ -98,51 +105,56 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		Iterator<Entry> iter = connections.iterator();
 		while(iter.hasNext()) {
 			Entry entry = iter.next();
-			clone.add(entry.from, entry.to);
+			Entry entry1 = new Entry(entry.from, entry.to);
+			clone.connections.add(entry1);
 		}
 		return clone;
 	}
 	
-	public void validate() {
-		isValidated = true;
-		
-		for (Entry entry  : connections) {
-			if(OTFDataWriter.class.isAssignableFrom(entry.from)){
-				Collection<Class> readerClasses = this.getToEntries(entry.from);
-				int count = readerClasses.size();
-				if (count != 1) {
-					// there must be exactly ONE Reader class corresponding to every Writer class
-					if (count > 1) {
-						log.fatal("For Writer class" + entry.from.getCanonicalName() + " there is more than ONE reader class defined.  The readers are:\n"
-								+ readerClasses );
-						
-					}
-					else log.fatal("For Writer class" + entry.from.getCanonicalName() + " there is NO reader class defined");
-					throw new RuntimeException(); //System.exit(1);
-				}
-			}
-		}
-
-	}
-
-	public void add(Entry entry) {
-		remove(entry.from,entry.to);
+	public void connectQNodeToWriter(Class<? extends OTFDataWriter<? extends QNode>> writer) {
+		Entry entry = new Entry(QNode.class, writer);
 		connections.add(entry);
 	}
 	
-	public void add (Class from, Class to) {
-		add(new Entry(from,to));
+	public void connectQLinkToWriter(Class<? extends OTFDataWriter<? extends QLink>> writer) {
+		Entry entry = new Entry(QLink.class, writer);
+		connections.add(entry);
+	}
+	
+	public void connectQueueLinkToWriter(Class<OTFQueueSimLinkAgentsWriter> writer) {
+		Entry entry = new Entry(QueueLink.class, writer);
+		connections.add(entry);
 	}
 
-	public void remove(Class from, Class to) {
-		Iterator<Entry> iter = connections.iterator();
-		while(iter.hasNext()) {
-			Entry entry = iter.next();
-			if ((entry.from == from) && (entry.to == to)) iter.remove();
+	@SuppressWarnings("unchecked")
+	public Collection<Class<OTFWriterFactory<QueueLink>>> getQueueLinkEntries() {
+		Collection<Class<OTFWriterFactory<QueueLink>>> result = new ArrayList<Class<OTFWriterFactory<QueueLink>>>();
+		for (Class<?> clazz : getToEntries(QueueLink.class)) {
+			result.add((Class<OTFWriterFactory<QueueLink>>) clazz);
 		}
+		return result;
 	}
 
-	public void remove (Class from) {
+	public void connectWriterToReader(Class<? extends OTFDataWriter> writer, Class<? extends OTFDataReader> reader) {
+		Collection<Class<?>> readerClasses = this.getToEntries(writer);
+		if (!readerClasses.isEmpty()) {
+			throw new RuntimeException("We already have a reader for this writer.");
+		}
+		Entry entry = new Entry(writer, reader);
+		connections.add(entry);
+	}
+	
+	public void connectReaderToReceiver(Class<? extends OTFDataReader> reader, Class<? extends OTFDataReceiver> receiver) {
+		Entry entry = new Entry(reader, receiver);
+		connections.add(entry);
+	}
+	
+	public void connectReceiverToLayer(Class<? extends OTFDataReceiver> receiver, Class<? extends SceneLayer> layer) {
+		Entry entry = new Entry(receiver, layer);
+		connections.add(entry);
+	}
+
+	public void remove(Class<?> from) {
 		Iterator<Entry> iter = connections.iterator();
 		while(iter.hasNext()) {
 			Entry entry = iter.next();
@@ -150,16 +162,8 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		}
 	}
 
-	public List<Entry> getEntries(){
-		return this.connections;
-	}
-	
-	public Collection<Class> getToEntries(Class srcClass) {
-		if (!isValidated) {
-		  validate();
-		}
-		
-		List<Class> classList = new LinkedList<Class>();
+	public Collection<Class<?>> getToEntries(Class<?> srcClass) {
+		List<Class<?>> classList = new LinkedList<Class<?>>();
 		for(Entry entry : connections) {
 			if (entry.from.equals(srcClass)) {
 			  classList.add(entry.to);
@@ -168,26 +172,13 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		return classList;
 	}
 
-	public Class getFirstToEntry(Class srcClass) {
-		if (!isValidated) validate();
-		
-		for(Entry entry : connections) {
-			if (entry.from.equals(srcClass)) return entry.to;
-		}
-		return Object.class;
-	}
-
-	public Collection<OTFDataReceiver> getReceivers(Class srcClass, SceneGraph graph) {
-		Collection<Class> classList = getToEntries(srcClass);
-//		log.error("getting receivers for class " + srcClass.getName());
-//		for (Class c : classList){
-//			log.error("found to entry " + c.getName());
-//		}
+	@SuppressWarnings("unchecked")
+	public Collection<OTFDataReceiver> getReceiversForReader(Class<? extends OTFDataReader> reader, SceneGraph graph) {
+		Collection<Class<?>> classList = getToEntries(reader);
 		List<OTFDataReceiver> receiverList = new LinkedList<OTFDataReceiver>();
-		
-		for(Class entry : classList) {
+		for(Class<?> entry : classList) {
 			try {
-				receiverList.add((OTFDataReceiver)(graph.newInstance(entry)));
+				receiverList.add(graph.newInstance((Class<? extends OTFDataReceiver>) entry));
 			} catch (InstantiationException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
@@ -196,65 +187,24 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		}
 		return receiverList;
 	}
-	private Class handleClassAdoption(Class entryClass, String fileFormat) {
-		Class newReader = null;
-		
-		if (OTFDataReader.class.isAssignableFrom(entryClass)) {
-			// entry.to is a OTFDataReader class, check for special version for this fileversion
-			String ident = entryClass.getCanonicalName() + fileFormat;
-			if (OTFDataReader.previousVersions.containsKey(ident)) {
-				// there is a special version, replace the entry to with it!
-				newReader = OTFDataReader.previousVersions.get(ident);
-			}
+
+	@SuppressWarnings("unchecked")
+	public Collection<Class<OTFDataReader>> getReadersForWriter(Class<? extends OTFDataWriter> writer) {
+		Collection<Class<?>> classList = getToEntries(writer);
+		List<Class<OTFDataReader>> readerList = new LinkedList<Class<OTFDataReader>>();
+		for(Class<?> entry : classList) {
+			readerList.add((Class<OTFDataReader>) entry);
 		}
-		return newReader;
-	}
-	
-	public void adoptFileFormat(String fileFormat) {
-		// go through every reader class and look for the appropriate Reader Version for this fileformat
-		
-		ListIterator<Entry> iter = connections.listIterator();
-		while(iter.hasNext()) {
-			Entry entry = iter.next();
-			// make sure, that the static members have been initialized
-			try {
-				entry.from.newInstance();
-			} catch (InstantiationException e) {
-				log.warn("FROM For Entry " + entry.from.getCanonicalName()+ " " + entry.to.getCanonicalName() + " the from  instance could not be generated!");
-			} catch (IllegalAccessException e) {
-				log.warn("FROM For Entry " + entry.from.getCanonicalName()+ " " + entry.to.getCanonicalName() + " the from instance could not be generated!");
-			}
-			
-			try {
-				entry.to.newInstance();
-			} catch (InstantiationException e) {
-				log.warn("TO For Entry " + entry.from.getCanonicalName()+ " " + entry.to.getCanonicalName() + " the to instance could not be generated");
-			} catch (IllegalAccessException e) {
-				log.warn("TO For Entry " + entry.from.getCanonicalName()+ " " + entry.to.getCanonicalName() + " the to instance could not be generated");
-			}
-
-			
-			// check for both classes, if they need to be replaced
-			Class newReader = handleClassAdoption(entry.to, fileFormat);
-			if (newReader != null) iter.set(new Entry(entry.from, newReader));
-
-			newReader = handleClassAdoption(entry.from, fileFormat);
-			if (newReader != null) iter.set(new Entry(newReader, entry.to));
-		}
-		log.info(OTFDataReader.previousVersions);
-		log.info(connections);
-
+		return readerList;
 	}
 
-	public void fillLayerMap(Map<Class, SceneLayer> layers) {
+	public void fillLayerMap(Map<Class<?>, SceneLayer> layers) {
 		Iterator<Entry> iter = connections.iterator();
 		while(iter.hasNext()) {
 			Entry entry = iter.next();
 			if (SceneLayer.class.isAssignableFrom(entry.to))
 				try {
 					layers.put(entry.from, (SceneLayer)(entry.to.newInstance()));
-//					log.info("created layer " + entry.to.getName());
-//					log.info("drawer for layer is " + entry.from);
 				} catch (InstantiationException e) {
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
@@ -263,12 +213,37 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		}
 	}
 
-	public void updateEntries(OTFConnectionManager connect2) {
+	public void addEntriesFrom(OTFConnectionManager connect2) {
 		Iterator<Entry> iter = connect2.connections.iterator();
 		while(iter.hasNext()) {
 			Entry entry = iter.next();
 			log.info("updating entry: " + entry.from.getCanonicalName() + " to " + entry.to.getName());
-			this.add(entry);
+			this.connections.add(entry);
 		}
 	}
+	
+	public void logEntries() {
+		for (Entry e : this.connections){
+			log.info("writing entry: " + e.getFrom().getCanonicalName() + " to " + e.getTo().getName());
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public Collection<Class<OTFWriterFactory<QNode>>> getQNodeEntries() {
+		Collection<Class<OTFWriterFactory<QNode>>> result = new ArrayList<Class<OTFWriterFactory<QNode>>>();
+		for (Class<?> clazz : getToEntries(QNode.class)) {
+			result.add((Class<OTFWriterFactory<QNode>>) clazz);
+		}
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Collection<Class<OTFWriterFactory<QLink>>> getQLinkEntries() {
+		Collection<Class<OTFWriterFactory<QLink>>> result = new ArrayList<Class<OTFWriterFactory<QLink>>>();
+		for (Class<?> clazz : getToEntries(QLink.class)) {
+			result.add((Class<OTFWriterFactory<QLink>>) clazz);
+		}
+		return result;
+	}
+	
 }

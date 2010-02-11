@@ -14,7 +14,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -45,14 +44,14 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QSim{
 
 		// FOR TESTING ONLY!
 		OTFConnectionManager connect = new OTFConnectionManager();
-		connect.add(QLink.class, OTFLinkTravelTimesHandler.Writer.class);
-		connect.add(OTFLinkTravelTimesHandler.Writer.class, OTFLinkTravelTimesHandler.class);
-		connect.add(OTFLinkTravelTimesHandler.class, ColoredStaticNetLayer.QuadDrawerLinkSpeed.class);
-		connect.add(ColoredStaticNetLayer.QuadDrawerLinkSpeed.class, ColoredStaticNetLayer.class);
-		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
+		connect.connectQLinkToWriter(OTFLinkTravelTimesHandler.Writer.class);
+		connect.connectWriterToReader(OTFLinkTravelTimesHandler.Writer.class, OTFLinkTravelTimesHandler.class);
+		connect.connectReaderToReceiver(OTFLinkTravelTimesHandler.class, ColoredStaticNetLayer.QuadDrawerLinkSpeed.class);
+		connect.connectReceiverToLayer(ColoredStaticNetLayer.QuadDrawerLinkSpeed.class, ColoredStaticNetLayer.class);
+		connect.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
+		connect.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+		connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		connect.connectReaderToReceiver(OTFAgentsListHandler.class,  AgentPointDrawer.class);
 
 		OTFClientLive client = new OTFClientLive("rmi:127.0.0.1:4019:AName1", connect);
 		client.start();

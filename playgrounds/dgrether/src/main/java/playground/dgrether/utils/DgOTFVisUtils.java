@@ -21,7 +21,6 @@ package playground.dgrether.utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFConnectionManager.Entry;
 
 
 /**
@@ -33,9 +32,7 @@ public class DgOTFVisUtils {
 	private static final Logger log = Logger.getLogger(DgOTFVisUtils.class);
 	
 	public static void printConnectionManager(OTFConnectionManager c) {
-		for (Entry e : c.getEntries()){
-			log.error("enty from: " + e.getFrom() + " to " + e.getTo());
-		}
+		c.logEntries();
 	}
 
 }

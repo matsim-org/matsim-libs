@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.data;
 
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
@@ -39,18 +38,13 @@ public class DefaultConnectionManagerFactory implements OTFConnectionManagerFact
 	 */
 	public OTFConnectionManager createConnectionManager(){
 		OTFConnectionManager connect = new OTFConnectionManager();
-	// data source to writer
-		connect.add(QLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		//writer -> reader
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		//reader -> drawer
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		//drawer -> layer
-		connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
-		//reader -> drawer
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
-		//drawer -> layer
-		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		connect.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connect.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
+		connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		return connect;
 	}
+	
 }

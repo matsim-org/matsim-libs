@@ -10,14 +10,6 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 
-//import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
-//import org.matsim.run.OTFVis;
-//import playground.mrieser.OTFDemo;
-//import playground.mrieser.pt.config.TransitConfigGroup;
-//import playground.mrieser.pt.controler.TransitControler;
-
-
-import playground.mzilske.bvg09.OTFDemo;
 import playground.mzilske.bvg09.TransitControler;
 
 public class MMoyoTransitControler extends TransitControler {

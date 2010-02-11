@@ -21,7 +21,6 @@
 package playground.mrieser;
 
 import org.matsim.pt.otfvis.FacilityDrawer;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
@@ -88,24 +87,24 @@ public class OTFDemo {
 	public static void ptConnect(final String servername) {
 
 		OTFConnectionManager connect = new OTFConnectionManager();
-		connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
-		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect.add(QLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		connect.add(OTFLinkAgentsHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
-		connect.add(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
-		connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
+		connect.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
+		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+		connect.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		connect.connectWriterToReader(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+		connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+		connect.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
+		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connect.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
+		connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
+		connect.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+		connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		connect.connectReaderToReceiver(OTFAgentsListHandler.class,  AgentPointDrawer.class);
 
-		connect.add(FacilityDrawer.DataWriter_v1_0.class, FacilityDrawer.DataReader_v1_0.class);
-		connect.add(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
+		connect.connectWriterToReader(FacilityDrawer.DataWriter_v1_0.class, FacilityDrawer.DataReader_v1_0.class);
+		connect.connectReaderToReceiver(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
 
 //		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_Transit", connect).start();
 		new OTFClientLive("rmi:127.0.0.1:4019:" + servername, connect).start();

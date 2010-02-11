@@ -24,7 +24,6 @@ package org.matsim.vis.otfvis;
 import java.awt.BorderLayout;
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.gui.NetJComponent;
@@ -48,24 +47,21 @@ import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
  */
 public class OTFClientSwing extends OTFClient {
 
-	private static final Logger log = Logger.getLogger(OTFClientSwing.class);
-
 	private OTFConnectionManager connect2 = new OTFConnectionManager();
 
-  private OTFFileSettingsSaver fileSettingsSaver;
+	private OTFFileSettingsSaver fileSettingsSaver;
 
 	public OTFClientSwing(String url) {
 		super("file:" + url);
-		connect2.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		connect2.add(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
-		connect2.add(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
+		connect2.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		connect2.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
+		connect2.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
 		/*
 		 * This entry is needed to couple the org.matsim.core.queuesim to the visualizer
 		 */
-		this.connect2.add(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connect2.connectWriterToReader(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
 
 	}
-
 
 	@Override
 	protected OTFDrawer createDrawer(){
@@ -86,27 +82,23 @@ public class OTFClientSwing extends OTFClient {
 	}
 
 	@Override
-  protected OTFVisConfig createOTFVisConfig() {
-    OTFVisConfig visconf = new OTFVisConfig();
-    fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);
-    visconf = fileSettingsSaver.openAndReadConfig();
-    saver = new OTFLiveSettingsSaver(visconf, this.url);
-    return visconf;
-  }
-
-
+	protected OTFVisConfig createOTFVisConfig() {
+	    OTFVisConfig visconf = new OTFVisConfig();
+	    fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);  
+	    visconf = fileSettingsSaver.openAndReadConfig();
+	    saver = new OTFLiveSettingsSaver(visconf, this.url);
+	    return visconf;
+	}
 
 	public static void main(String[] args) {
 		// FIXME hard-coded filenames
 		String arg0;
-		if(args.length == 0)arg0 = "file:./otfvis.mvi";
-		else arg0 = args[0];
-
+		if (args.length == 0) {
+			arg0 = "file:./otfvis.mvi";
+		} else {
+			arg0 = args[0];
+		}
 		new OTFClientSwing("file:" + arg0).run();
 
-	}
-
-
-
-
+	}		
 }

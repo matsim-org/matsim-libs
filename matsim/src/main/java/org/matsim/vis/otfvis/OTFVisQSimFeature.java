@@ -15,7 +15,6 @@ import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.ptproject.qsim.DriverAgent;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFeature;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
@@ -51,53 +50,73 @@ public class OTFVisQSimFeature implements QSimFeature {
 	}
 
 	public void afterPrepareSim() {
-		if(ownServer) {
+		if (ownServer) {
 			UUID idOne = UUID.randomUUID();
 			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getNetwork(), queueSimulation.getEvents(), false);
 			this.otfServer.setSimulation(this);
-			if (this.doVisualizeTeleportedAgents){
+			if (this.doVisualizeTeleportedAgents) {
 				this.teleportationWriter = new OTFTeleportAgentsDataWriter();
 				this.otfServer.addAdditionalElement(this.teleportationWriter);
-				this.connectionManager.add(OTFTeleportAgentsDataWriter.class, OTFTeleportAgentsDataReader.class);
-				this.connectionManager.add(OTFTeleportAgentsDataReader.class, OTFTeleportAgentsDrawer.class);
-				this.connectionManager.add(OTFTeleportAgentsDrawer.class, OTFTeleportAgentsLayer.class);
-				
+				this.connectionManager.connectWriterToReader(
+						OTFTeleportAgentsDataWriter.class,
+						OTFTeleportAgentsDataReader.class);
+				this.connectionManager.connectReaderToReceiver(
+						OTFTeleportAgentsDataReader.class,
+						OTFTeleportAgentsDrawer.class);
+				this.connectionManager.connectReceiverToLayer(
+						OTFTeleportAgentsDrawer.class,
+						OTFTeleportAgentsLayer.class);
+
 			}
 			if (queueSimulation instanceof TransitQSimulation) {
-				this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
-						queueSimulation.getNetwork().getNetworkLayer(), ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule(),
-						((TransitQSimulation) queueSimulation).getAgentTracker()));
-				this.connectionManager.add(FacilityDrawer.DataWriter_v1_0.class, FacilityDrawer.DataReader_v1_0.class);
-				this.connectionManager.add(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
+				this.otfServer
+						.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
+								queueSimulation.getNetwork().getNetworkLayer(),
+								((ScenarioImpl) queueSimulation.getScenario())
+										.getTransitSchedule(),
+								((TransitQSimulation) queueSimulation)
+										.getAgentTracker()));
+				this.connectionManager.connectWriterToReader(
+						FacilityDrawer.DataWriter_v1_0.class,
+						FacilityDrawer.DataReader_v1_0.class);
+				this.connectionManager.connectReaderToReceiver(
+						FacilityDrawer.DataReader_v1_0.class,
+						FacilityDrawer.DataDrawer.class);
 			}
-      if (this.queueSimulation.getScenario().getConfig().scenario().isUseLanes() 
-          && (!this.queueSimulation.getScenario().getConfig().scenario().isUseSignalSystems())) {
-        // data source to writer
-        this.connectionManager.add(QLink.class, OTFLaneWriter.class);
-        // writer -> reader: from server to client
-        this.connectionManager.add(OTFLaneWriter.class, OTFLaneReader.class);
-        // reader to drawer (or provider to receiver)
-        this.connectionManager.add(OTFLaneReader.class, OTFLaneSignalDrawer.class);
-        // drawer -> layer
-        this.connectionManager.add(OTFLaneSignalDrawer.class, OTFLaneLayer.class);
-      }
-      else if (this.queueSimulation.getScenario().getConfig().scenario().isUseLanes() 
-          && (this.queueSimulation.getScenario().getConfig().scenario().isUseSignalSystems())) {
-        // data source to writer
-        this.connectionManager.add(QLink.class, OTFSignalWriter.class);
-        // writer -> reader: from server to client
-        this.connectionManager.add(OTFSignalWriter.class, OTFSignalReader.class);
-        // reader to drawer (or provider to receiver)
-        this.connectionManager.add(OTFSignalReader.class, OTFLaneSignalDrawer.class);
-        // drawer -> layer
-        this.connectionManager.add(OTFLaneSignalDrawer.class, OTFSignalLayer.class);
-      }
+			if (this.queueSimulation.getScenario().getConfig().scenario()
+					.isUseLanes()
+					&& (!this.queueSimulation.getScenario().getConfig()
+							.scenario().isUseSignalSystems())) {
+				this.connectionManager.connectQLinkToWriter(OTFLaneWriter.class);
+				this.connectionManager.connectWriterToReader(OTFLaneWriter.class,
+						OTFLaneReader.class);
+				this.connectionManager.connectReaderToReceiver(OTFLaneReader.class,
+						OTFLaneSignalDrawer.class);
+				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
+						OTFLaneLayer.class);
+			} else if (this.queueSimulation.getScenario().getConfig()
+					.scenario().isUseLanes()
+					&& (this.queueSimulation.getScenario().getConfig()
+							.scenario().isUseSignalSystems())) {
+				// data source to writer
+				this.connectionManager.connectQLinkToWriter(OTFSignalWriter.class);
+				// writer -> reader: from server to client
+				this.connectionManager.connectWriterToReader(OTFSignalWriter.class,
+						OTFSignalReader.class);
+				// reader to drawer (or provider to receiver)
+				this.connectionManager.connectReaderToReceiver(OTFSignalReader.class,
+						OTFLaneSignalDrawer.class);
+				// drawer -> layer
+				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
+						OTFSignalLayer.class);
+			}
 
-      
 			OTFClientLive client = null;
-			client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
+			client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_"
+					+ idOne.toString(), this.connectionManager);
 			if (this.queueSimulation.getScenario() != null) {
-				client.setConfig(this.queueSimulation.getScenario().getConfig().otfVis());
+				client.setConfig(this.queueSimulation.getScenario().getConfig()
+						.otfVis());
 			}
 			client.start();
 

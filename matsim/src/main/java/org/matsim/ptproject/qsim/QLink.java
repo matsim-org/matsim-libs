@@ -96,6 +96,11 @@ public interface QLink {
   public boolean moveLink(double now);
   
   public QVehicle removeParkedVehicle(Id vehicleId);
+
+  public void addAgentInActivity(PersonAgentI agent);
+
+  public void removeAgentInActivity(PersonAgentI agent);
+
   
   /**
    * @deprecated can be removed see implementation
@@ -106,4 +111,5 @@ public interface QLink {
   public void processVehicleArrival(final double now, final QVehicle veh);
   
   public void addDepartingVehicle(QVehicle vehicle);
+
 }

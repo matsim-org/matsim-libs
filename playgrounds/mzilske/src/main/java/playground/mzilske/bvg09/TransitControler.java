@@ -140,7 +140,7 @@ public class TransitControler extends Controler {
 		TransitQSimulation sim = new TransitQSimulation(this.scenarioData, this.events);
 		if (useOTFVis) {
 			OTFVisQSimFeature otfVisQSimFeature = new OTFVisQSimFeature(sim);
-			otfVisQSimFeature.setVisualizeTeleportedAgents(true);
+			otfVisQSimFeature.setVisualizeTeleportedAgents(false);
 			sim.addFeature(otfVisQSimFeature);
 		}
 		sim.setUseUmlaeufe(true);

@@ -52,9 +52,8 @@ public class OTFDoubleMVI extends OTFClientFile {
 	protected OTFClientQuad getLeftDrawerComponent() throws RemoteException {
 		OTFConnectionManager connectL = this.connect.clone();
 		connectL.remove(OTFLinkAgentsHandler.class);
-
-		connectL.add(OTFLinkAgentsHandler.class, ColoredStaticNetLayer.QuadDrawer.class);
-		connectL.add(ColoredStaticNetLayer.QuadDrawer.class, ColoredStaticNetLayer.class);
+		connectL.connectReaderToReceiver(OTFLinkAgentsHandler.class, ColoredStaticNetLayer.QuadDrawer.class);
+		connectL.connectReceiverToLayer(ColoredStaticNetLayer.QuadDrawer.class, ColoredStaticNetLayer.class);
 		OTFClientQuad clientQ = createNewView(null, connectL, this.hostControlBar.getOTFHostControl());
 		return clientQ;
 	}
@@ -76,11 +75,11 @@ public class OTFDoubleMVI extends OTFClientFile {
 
 			OTFConnectionManager connectR = this.connect.clone();
 			connectR.remove(OTFLinkAgentsHandler.class);
-			connectR.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
-			connectR.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
-			connectR.add(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
-			connectR.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
-			connectR.add(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
+			connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
+			connectR.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+			connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
+			connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
+			connectR.connectReceiverToLayer(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 
 			OTFClientQuad clientQ2 = createNewView(null, connectR, hostControl2);
 			OTFOGLDrawer drawer2 = new OTFOGLDrawer(clientQ2);

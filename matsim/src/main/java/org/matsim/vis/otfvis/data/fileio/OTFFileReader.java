@@ -48,13 +48,13 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
  * The OTF has a file Reader and a file Writer part.
  * The Reader is the the mvi playing OTFServer.
 
- * @author dstrippgen
+ * @author dstrippgen 
  * @author dgrether
  */
 public class OTFFileReader implements OTFServerRemote {
-
+	
 	private static final Logger log = Logger.getLogger(OTFFileReader.class);
-
+	
 	private final String fileName;
 
 	public OTFFileReader(final String fname) {
@@ -74,7 +74,7 @@ public class OTFFileReader implements OTFServerRemote {
 
 	TreeMap<Double, Long> timesteps = new TreeMap<Double, Long>();
 
-	// TODO [DS] This is not safe when opening more than one file concurrently
+	// TODO [DS] This is not safe when opening more than one file concurrently 
 	public static int version = 0;
 	public static int minorversion = 0;
 
@@ -218,7 +218,7 @@ public class OTFFileReader implements OTFServerRemote {
 				name = name.replaceFirst("org.matsim.evacuation.otfvis.readerwriter.InundationData",
 				"org.matsim.evacuation.otfvis.legacy.readerwriter.InundationData");
 				return Class.forName(name);
-			}
+			} 			
 			return super.resolveClass(desc);
 		}
 	}
@@ -257,16 +257,8 @@ public class OTFFileReader implements OTFServerRemote {
 				BufferedInputStream is = new BufferedInputStream(zipFile
 						.getInputStream(connectEntry));
 				try {
-					OTFConnectionManager connect2 = (OTFConnectionManager) new OTFObjectInputStream(
-							is).readObject();
-
-//					log.error("");
-//					log.error("connection manager from file...");
-//					log.error("");
-//					for (Entry e : connect2.getEntries()){
-//			      log.error("entry from: " + e.getFrom() + " to " + e.getTo());
-//			    }
-					connect.updateEntries(connect2);
+					OTFConnectionManager connect2 = (OTFConnectionManager) new OTFObjectInputStream(is).readObject();
+					connect.addEntriesFrom(connect2);
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
@@ -314,14 +306,10 @@ public class OTFFileReader implements OTFServerRemote {
 		return false;
 	}
 
-	public OTFServerQuadI getQuad(final String id,
-			final OTFConnectionManager connect) throws RemoteException {
+	public OTFServerQuadI getQuad(final String id, final OTFConnectionManager connect) throws RemoteException {
 		OTFServerQuadI quad = null;
-		// if (connect != null) throw new
-		// RemoteException("writers need to be NULL, when reading from file"
-		// );
 		log.info("reading quad from file...");
-		quad  = readQuad();
+		quad = readQuad();
 		readConnect(connect);
 		return quad;
 	}
@@ -363,13 +351,6 @@ public class OTFFileReader implements OTFServerRemote {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		// double time = 0;
-		// Iterator<Double> it = this.timesteps.keySet().iterator();
-		// while(it.hasNext() && (time <= this.nextTime)) time = it.next();
-		// if (time == this.nextTime) {
-		// time = this.timesteps.firstKey();
-		// }
-		// this.nextTime = time;
 		return buffer;
 	}
 
@@ -412,5 +393,5 @@ public class OTFFileReader implements OTFServerRemote {
 	public void toggleShowParking() throws RemoteException {
 		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
 	}
-
+	
 }

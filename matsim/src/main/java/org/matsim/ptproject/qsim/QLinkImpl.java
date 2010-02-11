@@ -32,9 +32,6 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
@@ -84,6 +81,8 @@ public class QLinkImpl implements QLink {
 	private boolean active = false;
 
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
+	
+	private final Map<Id, PersonAgentI> agentsInActivities = new LinkedHashMap<Id, PersonAgentI>();
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
@@ -650,29 +649,13 @@ public class QLinkImpl implements QLink {
 //					cnt2++ ;
 //				}
 				
-				// add the persons at activities:
-				QSim qs = queueNetwork.getQSim() ;
-				if ( qs==null && qSimAccessCnt < 1 ) {
-					qSimAccessCnt++ ;
-					log.warn( "QueueNetwork.getQSim() returns null; agents at activities will not be visualized." ) ;
-					log.warn( Gbl.ONLYONCE ) ;
-				}
-				for ( DriverAgent da : queueNetwork.getQSim().activityEndsList ) {
-					if ( da instanceof PersonAgent ) {
-						PersonAgent pa = (PersonAgent) da ;
-						PlanElement pe = pa.getCurrentPlanElement() ;
-						if ( pe instanceof Leg ) {
-							log.warn("I don't understand") ;
-						} else {
-							Activity act = (Activity) pe ;
-							if( act.getLinkId().equals( getLink().getId() )) {
-								PositionInfo agInfo = new PositionInfo( da.getPerson().getId(), getLink(), cnt2 ) ;
-								agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
-								positions.add(agInfo) ;
-								cnt2++ ;
-							}
-						}
-					}
+				
+				Collection<PersonAgentI> agentsInActivities = QLinkImpl.this.agentsInActivities.values();
+				for (PersonAgentI pa : agentsInActivities) {
+					PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), getLink(), cnt2 ) ;
+					agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
+					positions.add(agInfo) ;
+					cnt2++ ;
 				}
 			
 //			}
@@ -918,4 +901,14 @@ public class QLinkImpl implements QLink {
 		return lane;
 	}
 
+	@Override
+	public void addAgentInActivity(PersonAgentI agent) {
+		agentsInActivities.put(agent.getPerson().getId(), agent);
+	}
+
+	@Override
+	public void removeAgentInActivity(PersonAgentI agent) {
+		agentsInActivities.remove(agent.getPerson().getId());
+	}
+	
 }

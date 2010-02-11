@@ -20,7 +20,6 @@
 package org.matsim.signalsystems.otfvis;
 
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.layer.OTFSignalLayer;
@@ -43,15 +42,10 @@ public class OTFSignalsConnectionManagerFactory implements OTFConnectionManagerF
   @Override
   public OTFConnectionManager createConnectionManager() {
     OTFConnectionManager connect = this.delegate.createConnectionManager();
-    // data source to writer
-    connect.add(QLink.class, OTFSignalWriter.class);
-    // writer -> reader: from server to client
-    connect
-    .add(OTFSignalWriter.class, OTFSignalReader.class);
-    // reader to drawer (or provider to receiver)
-    connect.add(OTFSignalReader.class, OTFLaneSignalDrawer.class);
-    // drawer -> layer
-    connect.add(OTFLaneSignalDrawer.class, OTFSignalLayer.class);
+    connect.connectQLinkToWriter(OTFSignalWriter.class);
+    connect.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
+    connect.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
+    connect.connectReceiverToLayer(OTFLaneSignalDrawer.class, OTFSignalLayer.class);
     return connect;
   }
 

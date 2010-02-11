@@ -21,11 +21,9 @@
 package org.matsim.vis.otfvis.handler;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -35,7 +33,6 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.vecmathutils.VectorUtils;
 
 /**
  * OTFDefaultLinkHandler handles the basic IO of a link.
@@ -46,12 +43,8 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  *
  */
 public class OTFDefaultLinkHandler extends OTFDataReader {
-  
-	static {
-		OTFDataReader.setPreviousVersion(OTFDefaultLinkHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
-	}
 
-	public static final double LINK_SCALE  = 1.0; //0.65;
+	public static final double LINK_SCALE  = 1.0; 
 	
 	protected OTFDataQuadReceiver quadReceiver = null;
 
@@ -70,12 +63,6 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 					this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 					this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-			
-			if (LINK_SCALE != 1.0) {
-				Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, LINK_SCALE);
-				linkEnd = scaledLink.getSecond();
-				linkStart = scaledLink.getFirst();
-			}
 			
 			out.putFloat((float) linkStart.x); 
 			out.putFloat((float) linkStart.y);
@@ -117,11 +104,14 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 
 
 	// Previous version of the reader
-
 	public static final class ReaderV1_1 extends OTFDefaultLinkHandler {
+		
 		@Override
 		public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+			
 		}
+		
 	}
+	
 }
 

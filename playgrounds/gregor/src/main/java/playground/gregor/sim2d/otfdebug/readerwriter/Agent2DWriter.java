@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
-public class Agent2DWriter extends OTFDataWriter{
+public class Agent2DWriter extends OTFDataWriter<List> {
 
 	/**
 	 * 

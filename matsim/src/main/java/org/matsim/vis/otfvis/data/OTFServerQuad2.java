@@ -101,6 +101,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 		this.additionalElements.add(element);
 	}
 
+	@SuppressWarnings("unchecked")
 	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect) {
 		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0., this.easting, this.northing);
 		client.offsetEast = this.minEasting;
@@ -109,11 +110,10 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 		//int colls = 
 		this.execute(0.,0.,this.easting, this.northing,
 				new ConvertToClientExecutor(connect,client));
-//		System.out.print("server executor count: " +colls );
 
-		for(OTFDataWriter element : this.additionalElements) {
-			Collection<Class> readerClasses = connect.getToEntries(element.getClass());
-			for (Class readerClass : readerClasses) {
+		for(OTFDataWriter<?> element : this.additionalElements) {
+			Collection<Class<OTFDataReader>> readerClasses = connect.getReadersForWriter(element.getClass());
+			for (Class<? extends OTFDataReader> readerClass : readerClasses) {
 				try {
 					Object reader = readerClass.newInstance();
 					client.addAdditionalElement((OTFDataReader)reader);
@@ -177,27 +177,6 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	public double getMinNorthing() {
 		return this.minNorthing;
 	}
-	
-//	public void replace(double x, double y, int index, Class clazz) {
-//		List<OTFDataWriter> writer = getLeafValues(x,y);
-//		OTFDataWriter w = writer.get(index);
-//		OTFDataWriter wnew;
-//		try {
-//			wnew = (OTFDataWriter) clazz.newInstance();
-//			wnew.setSrc(w.getSrc());
-//			writer.remove(index);
-//			writer.add(index, wnew);
-//		} catch (InstantiationException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IllegalAccessException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//	}
-
-
 
 	private static class ConvertToClientExecutor implements Executor<OTFDataWriter> {
 		final OTFConnectionManager connect;
@@ -209,7 +188,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 		}
 		@SuppressWarnings("unchecked")
 		public void execute(double x, double y, OTFDataWriter writer)  {
-			Collection<Class> readerClasses = this.connect.getToEntries(writer.getClass());
+			Collection<Class<?>> readerClasses = this.connect.getToEntries(writer.getClass());
 			for (Class readerClass : readerClasses) {
 				try {
 					OTFDataReader reader = (OTFDataReader)readerClass.newInstance();

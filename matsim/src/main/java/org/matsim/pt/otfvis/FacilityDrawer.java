@@ -52,7 +52,7 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
 public class FacilityDrawer {
 	private static final Logger log = Logger.getLogger(FacilityDrawer.class);
 	
-	public static class DataWriter_v1_0 extends OTFDataWriter {
+	public static class DataWriter_v1_0 extends OTFDataWriter<Void> {
 
 		private static final long serialVersionUID = 1L;
 		private final transient TransitSchedule schedule;

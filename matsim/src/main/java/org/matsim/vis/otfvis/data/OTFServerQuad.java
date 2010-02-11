@@ -63,7 +63,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		}
 		@SuppressWarnings("unchecked")
 		public void execute(double x, double y, OTFDataWriter writer)  {
-			Collection<Class> readerClasses = this.connect.getToEntries(writer.getClass());
+			Collection<Class<OTFDataReader>> readerClasses = this.connect.getReadersForWriter(writer.getClass());
 			for (Class readerClass : readerClasses) {
 				try {
 					OTFDataReader reader = (OTFDataReader)readerClass.newInstance();
@@ -177,10 +177,8 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		// set top node
 		setTopNode(0, 0, easting, northing);
 		// Get the writer Factories from connect
-		Collection<Class> nodeFactories = connect.getToEntries(QueueNode.class);
-		Collection<Class> linkFactories =  connect.getToEntries(QueueLink.class);
+		Collection<Class<OTFWriterFactory<QueueLink>>> linkFactories =  connect.getQueueLinkEntries();
 		List<OTFWriterFactory<QueueLink>> linkWriterFactoriyObjects = new ArrayList<OTFWriterFactory<QueueLink>>(linkFactories.size());
-		List<OTFWriterFactory<QueueNode>> nodeWriterFractoryObjects = new ArrayList<OTFWriterFactory<QueueNode>>(nodeFactories.size());
 		try {
 			OTFWriterFactory<QueueLink> linkWriterFac = null;			
 			for (Class linkFactory : linkFactories ) {
@@ -189,38 +187,11 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 					linkWriterFactoriyObjects.add(linkWriterFac);
 				}
 			}
-			OTFWriterFactory<QueueNode> nodeWriterFac = null;
-			for (Class nodeFactory : nodeFactories) {
-				if(nodeFactory != Object.class) {
-					nodeWriterFac = (OTFWriterFactory<QueueNode>)nodeFactory.newInstance();
-					nodeWriterFractoryObjects.add(nodeWriterFac);
-				}
-			}
-			
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
-//		System.out.println("server bounds: " +  " coords 0,0-" + easting + "," + northing );
-
-    	if(!nodeWriterFractoryObjects.isEmpty()) {
-    		boolean first = true;
-    		for (QueueNode node : this.net.getNodes().values()) {
-    			for (OTFWriterFactory<QueueNode> fac : nodeWriterFractoryObjects) {
-    				OTFDataWriter<QueueNode> writer = fac.getWriter();
-    				if (writer != null) {
-    					writer.setSrc(node);
-    					if (first){
-    						log.info("Connecting Source QueueNode with " + writer.getClass().getName());
-    						first = false;
-    					}
-    				}
-    				put(node.getNode().getCoord().getX() - this.minEasting, node.getNode().getCoord().getY() - this.minNorthing, writer);
-    			}
-    		}
-    	}
-//		System.out.print("server links/nodes count: " + (net.getLinks().values().size()+net.getNodes().values().size()) );
 
     	if(!linkWriterFactoriyObjects.isEmpty()) {
     		boolean first = true;
@@ -267,7 +238,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 //		System.out.print("server executor count: " +colls );
 
 		for(OTFDataWriter element : this.additionalElements) {
-			Collection<Class> readerClasses = connect.getToEntries(element.getClass());
+			Collection<Class<OTFDataReader>> readerClasses = connect.getReadersForWriter(element.getClass());
 			for (Class readerClass : readerClasses) {
 				try {
 					Object reader = readerClass.newInstance();

@@ -40,15 +40,7 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
  *
  */
 public abstract class  OTFDataReader {
-	public final static Map<String, Class> previousVersions = new HashMap<String, Class>();
-	
-	public static Class getPreviousVersion(String identifier) {
-		return previousVersions.get(identifier);
-	}
-	
-	public static void setPreviousVersion(String identifier, Class clazz) {
-		previousVersions.put(identifier, clazz);
-	}
+
 	public static String getVersionString(int major, int minor) {
 		return "V" + major + "." + minor;
 	}

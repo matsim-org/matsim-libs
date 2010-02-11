@@ -50,11 +50,6 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  */
 public class OTFAgentsListHandler extends OTFDataReader {
 
-	static {
-		OTFDataReader.setPreviousVersion(OTFAgentsListHandler.class.getCanonicalName() + "V1.1", ReaderV1_2.class);
-		OTFDataReader.setPreviousVersion(OTFAgentsListHandler.class.getCanonicalName() + "V1.2", ReaderV1_2.class);
-	}
-
 	protected Class agentReceiverClass = null;
 
 	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
@@ -65,16 +60,10 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			this.setType(type);
 			this.setUserDefined(userdata);
 		}
-//		private ExtendedPositionInfo(AgentSnapshotInfo i, int type, int userdata) {
-//			super(i.getId(), i.getEasting(), i.getNorthing(), i.getElevation(), i.getAzimuth(), i.getColorValueBetweenZeroAndOne(), i.getAgentState(), "");
-//			this.setType(type);
-//			this.setUserDefined(userdata);
-//		}
 
 	}
 
-	@SuppressWarnings("unchecked")
-	static public class Writer extends OTFDataWriter {
+	static public class Writer extends OTFDataWriter<Void> {
 
 		private static final long serialVersionUID = -6368752578878835954L;
 
@@ -215,9 +204,8 @@ public class OTFAgentsListHandler extends OTFDataReader {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
-			} //factoryAgent.getOne();
-			// at this version, only userdata was defined... aka state
-
+			}
+			
 	 	}
 	}
 

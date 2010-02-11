@@ -24,10 +24,8 @@ import java.awt.BorderLayout;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -59,7 +57,7 @@ public class OTFClientFile extends OTFClient {
 
 	protected OTFConnectionManager connect = new OTFConnectionManager();
 
-  private OTFFileSettingsSaver fileSettingsSaver;
+	private OTFFileSettingsSaver fileSettingsSaver;
 
 	public OTFClientFile( String filename) {
 		super("file:" + filename);
@@ -68,29 +66,22 @@ public class OTFClientFile extends OTFClient {
 		 * get otfvis running with the current matsim version. The other entries added
 		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
 		 */
-		this.connect.add(QLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		this.connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		this.connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		this.connect.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connect.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		this.connect.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);		
+		
+		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+		this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
+		this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 
-		this.connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		this.connect.add(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
-		this.connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		/*
 		 * Only needed for backward compatibility, see comment above (dg, nov 09)
 		 */
-		this.connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
-
-		this.connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-
-		this.connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-
-		this.connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-
-		/*
-		 * This entry is needed to couple the org.matsim.core.queuesim to the visualizer
-		 */
-		this.connect.add(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connect.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
+		this.connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+		this.connect.connectWriterToReader(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+		this.connect.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 
 	}
 
@@ -98,12 +89,12 @@ public class OTFClientFile extends OTFClient {
 		OTFConnectionManager connectR = this.connect.clone();
 		//those lines are from my point of view not really needed dg dez 09
 		connectR.remove(OTFLinkAgentsHandler.class);
-		connectR.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connectR.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connectR.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
-		connectR.add(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
-		connectR.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
-		connectR.add(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
+		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connectR.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
+		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
+		connectR.connectReceiverToLayer(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 		//end dg dez 09
 		OTFClientQuad clientQ2 = createNewView(null, connectR, this.hostControlBar.getOTFHostControl());
 		return clientQ2;

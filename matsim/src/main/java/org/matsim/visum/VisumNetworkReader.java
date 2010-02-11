@@ -45,6 +45,7 @@ public class VisumNetworkReader {
 	/* collection of localized strings: [0] english, [1] german */
 	private final String[] TABLE_NODE = {ATTRIBUTE_UNKNOWN, "$KNOTEN:"};
 	private final String[] TABLE_EDGE = {ATTRIBUTE_UNKNOWN, "$STRECKE:"};
+	private final String[] TABLE_EDGETYPE = {ATTRIBUTE_UNKNOWN, "$STRECKENTYP:"};
 	private final String[] TABLE_STOP = {"$STOP:", "$HALTESTELLE:"};
 	private final String[] TABLE_STOPAREA = {"$STOPAREA:", "$HALTESTELLENBEREICH:"};
 	private final String[] TABLE_STOPPOINT = {"$STOPPOINT:", "$HALTEPUNKT:"};
@@ -67,7 +68,12 @@ public class VisumNetworkReader {
 	private final String[] ATTRIBUTE_EDGE_FROM_NODE = {ATTRIBUTE_UNKNOWN, "VONKNOTNR"};
 	private final String[] ATTRIBUTE_EDGE_TO_NODE = {ATTRIBUTE_UNKNOWN, "NACHKNOTNR"};
 	private final String[] ATTRIBUTE_EDGE_LENGTH = {ATTRIBUTE_UNKNOWN, "LAENGE"};
-
+	private final String[] ATTRIBUTE_EDGE_EDGETYPEID = {ATTRIBUTE_UNKNOWN, "TYPNR"};
+	
+	private final String[] ATTRIBUTE_EDGETYPE_NO = {ATTRIBUTE_UNKNOWN, "NR"};
+	private final String[] ATTRIBUTE_EDGETYPE_KAPIV = {ATTRIBUTE_UNKNOWN, "KAPIV"};
+	private final String[] ATTRIBUTE_EDGETYPE_V0IV = {ATTRIBUTE_UNKNOWN, "V0IV"};
+	
 	private final String[] ATTRIBUTE_STOP_NO = {"NO", "NR"};
 	private final String[] ATTRIBUTE_STOP_NAME = {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_STOP_XCOORD = {"XCOORD", "XKOORD"};
@@ -164,6 +170,8 @@ public class VisumNetworkReader {
 					readNodes(line, reader);
 				} else if (line.startsWith(this.TABLE_EDGE[this.language])) {
 					readEdges(line, reader);
+				} else if (line.startsWith(this.TABLE_EDGETYPE[this.language])) {
+					readEdgeTypes(line, reader);
 				} else if (line.startsWith(this.TABLE_STOPAREA[this.language])) {
 					readStopAreas(line, reader);
 				} else if (line.startsWith(this.TABLE_STOPPOINT[this.language])) {
@@ -258,7 +266,8 @@ public class VisumNetworkReader {
 		final int idxFromNode = getAttributeIndex(this.ATTRIBUTE_EDGE_FROM_NODE[this.language], attributes);
 		final int idxToNode = getAttributeIndex(this.ATTRIBUTE_EDGE_TO_NODE[this.language], attributes);
 		final int idxLength = getAttributeIndex(this.ATTRIBUTE_EDGE_LENGTH[this.language], attributes);
-
+		final int idxEdgeTypeId = getAttributeIndex(this.ATTRIBUTE_EDGE_EDGETYPEID[this.language], attributes);
+		
 		String line = reader.readLine();
 		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
@@ -276,7 +285,28 @@ public class VisumNetworkReader {
 			double length = Double.parseDouble(parts[idxLength].replace(',', '.'));
 			VisumNetwork.Edge edge = new VisumNetwork.Edge(id,
 					fromNodeId, toNodeId, length);
+			String edgeTypeIdString = parts[idxEdgeTypeId];
+			if (!edgeTypeIdString.isEmpty()) {
+				IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
+				edge.edgeTypeId = edgeTypeId;
+			}
 			this.network.addEdge(edge);
+			// proceed to next line
+			line = reader.readLine();
+		}
+	}
+
+	private void readEdgeTypes(String tableAttributes, BufferedReader reader) throws IOException {
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_EDGETYPE[this.language].length()), ';');
+		final int idxNo = getAttributeIndex(this.ATTRIBUTE_EDGETYPE_NO[this.language], attributes);
+		final int idxKapIV = getAttributeIndex(this.ATTRIBUTE_EDGETYPE_KAPIV[this.language], attributes);
+		final int idxV0IV = getAttributeIndex(this.ATTRIBUTE_EDGETYPE_V0IV[this.language], attributes);
+		
+		String line = reader.readLine();
+		while (line != null && line.length() > 0) {
+			final String[] parts = StringUtils.explode(line, ';');
+			VisumNetwork.EdgeType edgeType = new VisumNetwork.EdgeType(new IdImpl(parts[idxNo]), parts[idxKapIV], parts[idxV0IV]);
+			this.network.addEdgeType(edgeType);
 			// proceed to next line
 			line = reader.readLine();
 		}
