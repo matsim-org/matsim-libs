@@ -42,7 +42,7 @@ import playground.gregor.sim2d.simulation.StaticForceField;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class Controller2D extends Controler {
-	
+
 	private Map<MultiPolygon,List<Link>> mps;
 
 	protected OnTheFlyServer myOTFServer = null;
@@ -54,13 +54,13 @@ public class Controller2D extends Controler {
 
 	private StaticForceField sff;
 
-	
+
 
 	public Controller2D(String[] args) {
 		super(args);
 		this.setOverwriteFiles(true);
-		
-		
+
+
 		NetworkLayer fakeNetwork = new NetworkLayer();
 		fakeNetwork.createAndAddNode(new IdImpl(0), new CoordImpl(386008.21f,5820000.04f));
 		fakeNetwork.createAndAddNode(new IdImpl(1), new CoordImpl(386241.2f,5820247.05f));
@@ -70,11 +70,11 @@ public class Controller2D extends Controler {
 		OTFBackgroundTexturesDrawer sbg = new OTFBackgroundTexturesDrawer("../../../../sim2d/sg4.png");
 //		sbg.addLocation(new CoordImpl(386124.75,5820130.6), 0, 33.33);
 		sbg.addLocation(386108.0859f,5820114.04f,386141.2f,5820147.092897f);
-		
+
 		this.myOTFServer.addAdditionalElement(new TextureDataWriter(sbg));
 		this.connectionManager.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
 		this.connectionManager.add(TextureDataWriter.class,TextutreDataReader.class);
-		
+
 		float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
 		try {
 			this.myOTFServer.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile("../../../../sim2d/sg4graph.shp"),linksColor));
@@ -82,14 +82,14 @@ public class Controller2D extends Controler {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		
+
+
 		this.agentWriter = new Agent2DWriter();
 		this.myOTFServer.addAdditionalElement(this.agentWriter);
 		this.connectionManager.add(Agent2DWriter.class,  Agent2DReader.class);
 		this.connectionManager.add(Agent2DReader.class,  Agent2DDrawer.class);
 		this.connectionManager.add( Agent2DDrawer.class, Agent2DLayer.class);
-		
+
 		this.forceArrowWriter = new ForceArrowWriter();
 		this.myOTFServer.addAdditionalElement(this.forceArrowWriter);
 		this.connectionManager.add(ForceArrowWriter.class,ForceArrowReader.class);
@@ -106,10 +106,10 @@ public class Controller2D extends Controler {
 			e.printStackTrace();
 		}
 	}
-	
 
-	
-	
+
+
+
 	@Override
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
@@ -117,12 +117,12 @@ public class Controller2D extends Controler {
 			this.loader.loadScenario();
 			this.mps = ((ScenarioLoader2DImpl)this.loader).getFloorLinkMapping();
 			this.sff = ((ScenarioLoader2DImpl)this.loader).getStaticForceField();
-			this.network = loadNetwork();
-			this.population = loadPopulation();
+			this.network = this.loader.getScenario().getNetwork();
+			this.population = this.loader.getScenario().getPopulation();
 			this.scenarioLoaded = true;
 
-			if (this.getWorld() != null) {
-				new WorldCheck().run(this.getWorld());
+			if (this.getScenario().getWorld() != null) {
+				new WorldCheck().run(this.getScenario().getWorld());
 			}
 		}
 	}
@@ -133,11 +133,11 @@ public class Controller2D extends Controler {
 		sim.setOTFStuff(this.myOTFServer,this.agentWriter,this.forceArrowWriter);
 		sim.run();
 	}
-	
+
 	public static void main(String [] args){
 		Controler controller = new Controller2D(args);
 		controller.run();
-		
+
 	}
 
 }

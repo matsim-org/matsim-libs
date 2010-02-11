@@ -62,7 +62,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			log.warn("Person " + person.getId() + " has no plans!");
 			return;
 		}
-		
+
 		// make sure all the plans have valid act-locations and valid routes
 		for (Plan plan : person.getPlans()) {
 			boolean needsXY2Links = false;

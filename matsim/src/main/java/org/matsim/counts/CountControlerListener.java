@@ -61,7 +61,7 @@ public class CountControlerListener implements StartupListener,
 		Controler controler = event.getControler();
 		if ((event.getIteration() % 10 == 0) && (event.getIteration() > controler.getFirstIteration())) {
 			controler.stopwatch.beginOperation("compare with counts");
-			CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(controler.getLinkStats(), this.counts, controler.getNetwork());
+			CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(controler.getLinkStats(), this.counts, controler.getNetwork(), controler.getConfig().counts().getCountsScaleFactor());
 			if ((this.config.counts().getDistanceFilter() != null) && (this.config.counts().getDistanceFilterCenterNode() != null)) {
 				cca.setDistanceFilter(this.config.counts().getDistanceFilter(), this.config.counts().getDistanceFilterCenterNode());
 			}
@@ -97,7 +97,7 @@ public class CountControlerListener implements StartupListener,
 			controler.stopwatch.endOperation("compare with counts");
 		}
 	}
-	
+
 	public Counts getCounts() {
 		return this.counts;
 	}

@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.benjamin;
 
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -36,7 +35,7 @@ public class BKickControler extends Controler {
 		super(configFileName);
 		this.config.setQSimConfigGroup(new QSimConfigGroup());
 	}
-	
+
 	public BKickControler(Config conf){
 		super(conf);
 		this.config.setQSimConfigGroup(new QSimConfigGroup());
@@ -48,9 +47,8 @@ public class BKickControler extends Controler {
 	}
 
 	@Override
-	protected Population loadPopulation() {
-		Population pop = super.loadPopulation();
-		new PlanCalcType().run(pop);
-		return pop;
+	protected void loadData() {
+		super.loadData();
+		new PlanCalcType().run(this.population);
 	}
 }

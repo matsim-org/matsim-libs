@@ -26,7 +26,7 @@ public class SocialCostTest extends Controler {
 		super(args);
 		this.setOverwriteFiles(true);
 	}
-	
+
 	@Override
 	protected void setUp() {
 		super.setUp();
@@ -38,26 +38,28 @@ public class SocialCostTest extends Controler {
 //		this.scenarioData.getConfig().evacuation().setSampleSize("1.");
 //		this.scenarioData.getConfig().simulation().setSnapshotFormat("otfvis");
 //		this.scenarioData.getConfig().simulation().setSnapshotPeriod(1);
-//		
+//
 //		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 //		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 //		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
-		
+
 		this.events.addHandler(sc);
 		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);
 		this.strategyManager = loadStrategyManager();
 		this.addControlerListener(sc);
 	}
-	
+
 	@Override
-	protected NetworkLayer loadNetwork() {
-		
+	protected void loadData() {
+		super.loadData();
+
+		// generate Network
 		NetworkLayer net = this.scenarioData.getNetwork();
 		net.setCapacityPeriod(1);
 		net.setEffectiveCellSize(0.26);
 		net.setEffectiveLaneWidth(0.71);
-		
+
 		Node ns0 = net.createAndAddNode(new IdImpl(0),new CoordImpl(-1,0));
 		Node ns1 = net.createAndAddNode(new IdImpl("s"),new CoordImpl(0,0));
 		Node n0 = net.createAndAddNode(new IdImpl(1),new CoordImpl(4,0));
@@ -68,34 +70,22 @@ public class SocialCostTest extends Controler {
 
 		this.l0 = net.createAndAddLink(new IdImpl(0), ns0, ns1, 1, 1, 100, 1);
 		net.createAndAddLink(new IdImpl(0+100000), ns1, ns0, 1, 1, 100, 1);
-		Link l1 = net.createAndAddLink(new IdImpl(1), ns1, n0, 4, 1, 1, 1);
+		net.createAndAddLink(new IdImpl(1), ns1, n0, 4, 1, 1, 1);
 		net.createAndAddLink(new IdImpl(1+100000), n0, ns1, 4, 1, 1, 1);
-		Link l2 = net.createAndAddLink(new IdImpl(2), n0, n1, 10, 1, 1./3., 1);
+		net.createAndAddLink(new IdImpl(2), n0, n1, 10, 1, 1./3., 1);
 		net.createAndAddLink(new IdImpl(2+100000), n1, n0, 10, 1./3., 1, 1);
-		Link l3 = net.createAndAddLink(new IdImpl(3), n0, n2, 8, 1, 1, 1);
+		net.createAndAddLink(new IdImpl(3), n0, n2, 8, 1, 1, 1);
 		net.createAndAddLink(new IdImpl(3+100000), n2, n0, 8, 1, 1, 1);
-		Link l4 = net.createAndAddLink(new IdImpl(4), n2, n1, 4, 1, 1, 1);
+		net.createAndAddLink(new IdImpl(4), n2, n1, 4, 1, 1, 1);
 		net.createAndAddLink(new IdImpl(4+100000), n1, n2, 4, 1, 1, 1);
-		Link l5 = net.createAndAddLink(new IdImpl(5), n1, nt0, 4, 1, 4, 1);
+		net.createAndAddLink(new IdImpl(5), n1, nt0, 4, 1, 4, 1);
 		net.createAndAddLink(new IdImpl(5+100000), nt0, n1, 4, 1, 4, 1);
 		this.l5 = net.createAndAddLink(new IdImpl(6), nt0, nt1, 1, 1, 4, 1);
 		net.createAndAddLink(new IdImpl(6+100000), nt1, nt0, 1 , 1, 4, 1);
-		
-		
-//		this.scenarioData.setNetwork(net);
-//		this.getWorld().setNetworkLayer(net);
-//		this.getWorld().complete();
-//		this.shelterLinks = this.esnl.getShelterLinks();
 
-		
-		return net;
-	}
-	
-	@Override
-	protected Population loadPopulation() {
-
+		// generate Population
 		Population pop = this.scenarioData.getPopulation();
-		
+
 		PopulationFactory pb = new PopulationFactoryImpl(this.scenarioData);
 		int id = 0;
 		for (int i = 0; i < 3; i++) {
@@ -113,9 +103,9 @@ public class SocialCostTest extends Controler {
 				pop.addPerson(p);
 			}
 		}
-		return pop;
+
 	}
-	
+
 	public static void main(final String[] args) {
 		final Controler controler = new SocialCostTest(args);
 		controler.run();

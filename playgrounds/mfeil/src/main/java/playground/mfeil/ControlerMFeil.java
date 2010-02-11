@@ -21,7 +21,6 @@ package playground.mfeil;
 
 
 
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -35,12 +34,13 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.locationchoice.LocationChoice;
-import org.matsim.world.algorithms.WorldCheck;
 
-import playground.mfeil.MDSAM.*;
+import playground.mfeil.MDSAM.ActivityTypeFinder;
+import playground.mfeil.MDSAM.PlansConstructor;
+import playground.mfeil.MDSAM.PlansEvaluator;
+import playground.mfeil.MDSAM.PlansVariatorInitializer;
 import playground.mfeil.attributes.AgentsAttributesAdder;
 
 
@@ -49,57 +49,53 @@ import playground.mfeil.attributes.AgentsAttributesAdder;
  * Adjusting the Controler in order to call the PlanomatX. Replaces also the StrategyManagerConfigLoader.
  */
 public class ControlerMFeil extends Controler {
-	
+
 	public ControlerMFeil (String [] args){
 		super(args);
 	}
-	
+
 	public ControlerMFeil (final Config config) {
 		super(config);
 	}
-	
-	/**
-	 * Load all the required data. Currently, this only calls
-	 * {@link #loadNetwork()} and {@link #loadPopulation()}, if this data was
-	 * not given in the Constructor.
-	 */
+
 	@Override
 	protected void loadData() {
-		if (!this.scenarioLoaded) {
-			this.loader = new ScenarioLoaderImpl(this.scenarioData);
-			this.loader.loadScenario();
-			this.network = loadNetwork();
-			this.population = loadPopulation();
-			this.scenarioLoaded = true;
-			
+		super.loadData();
+//		if (!this.scenarioLoaded) {
+//			this.loader = new ScenarioLoaderImpl(this.scenarioData);
+//			this.loader.loadScenario();
+//			this.network = loadNetwork();
+//			this.population = loadPopulation();
+//			this.scenarioLoaded = true;
+
 			// loading income data!
 			new AgentsAttributesAdder().loadIncomeData(this.scenarioData);
-			
-			if (this.getWorld() != null) {
-				new WorldCheck().run(this.getWorld());
-			}
-		}
+
+//			if (this.getScenario().getWorld() != null) {
+//				new WorldCheck().run(this.getScenario().getWorld());
+//			}
+//		}
 	}
-		
-	
+
+
 		/*
 		 * @return A fully initialized StrategyManager for the plans replanning.
-		 */	
-	
+		 */
+
 	@Override
 	protected StrategyManager loadStrategyManager() {
-		
-		final StrategyManager manager = new StrategyManager();	
+
+		final StrategyManager manager = new StrategyManager();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
-			
+
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 			double rate = settings.getProbability();
 			if (rate == 0.0) {
 				continue;
 			}
-			String classname = settings.getModuleName();	
+			String classname = settings.getModuleName();
 			PlanStrategy strategy = null;
-			
+
 			if (classname.equals("PlanomatX")) {
 				ActivityTypeFinder finder = new ActivityTypeFinder (this);
 				//finder.run(this.getFacilities());
@@ -131,7 +127,7 @@ public class ControlerMFeil extends Controler {
 				PlanStrategyModule module = new RecyclingModule(this, finder);
 				strategy.addStrategyModule(module);
 			}
-			
+
 			else if (classname.equals("TimeModeChoicer")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PlanStrategyModule module = new TmcInitialiser(this);
@@ -139,38 +135,38 @@ public class ControlerMFeil extends Controler {
 			}
 			else if (classname.equals("LocationChoice")) {
 	    	strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
-	    	strategy.addStrategyModule(new LocationChoice(this.getNetwork(), this, ((ScenarioImpl)this.getScenario()).getKnowledges()));
+	    	strategy.addStrategyModule(new LocationChoice(this.getNetwork(), this, (this.getScenario()).getKnowledges()));
 	    	strategy.addStrategyModule(new ReRoute(this));
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
 			}
-			
+
 			else if (classname.equals("PlansVariator")) {
 		    	strategy = new PlanStrategy(new KeepSelected());
 				strategy.addStrategyModule(new PlansVariatorInitializer(this));
 			}
-			
+
 			else if (classname.equals("PlansConstructor")) {
 		    	strategy = new PlanStrategy(new KeepSelected());
 				strategy.addStrategyModule(new PlansConstructor(this));
 			}
-			
+
 			else if (classname.equals("PlansEvaluator")) {
 		    	strategy = new PlanStrategy(new KeepSelected());
 				strategy.addStrategyModule(new PlansEvaluator(this));
 			}
-		
+
 			manager.addStrategy(strategy, rate);
 		}
 
 		return manager;
 
 	}
-	
+
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
 		//return new PlanomatXScoringFunctionFactory(this.getConfig().charyparNagelScoring());
 		//return new JohScoringFunctionFactory();
 		return new JohScoringFunctionEstimationFactory();
 	}
-	
+
 }

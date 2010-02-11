@@ -117,8 +117,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	protected Map<Id, Double> extraFlowsAlternativeRoute = new HashMap<Id, Double>();
 
 
-
-	public AbstractControlInputImpl(final Network network) {
+	public AbstractControlInputImpl(final Network network, final String outputDirectory) {
 		this.network = network;
 		this.numberOfAgents = new HashMap<Id, Integer>();
 		this.enterEvents1 = new HashMap<Id, Double>();
@@ -131,8 +130,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.ttFreeSpeedAltRoute = 0.0;
 		this.ttFreeSpeedMainRoute = 0.0;
 
-		this.writer = new ControlInputWriter();
-
+		this.writer = new ControlInputWriter(outputDirectory);
 	}
 
 	public abstract double getPredictedNashTime(NetworkRouteWRefs route);

@@ -132,12 +132,14 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private final QSimConfigGroup simulationConfig;
 
+	private final String outputDirectory;
 
 	public TrafficManagementConfigParser(final NetworkImpl network,
-			final EventsManager events, QSimConfigGroup qSimConfigGroup) {
+			final EventsManager events, QSimConfigGroup qSimConfigGroup, final String outputDirectory) {
 		this.network = network;
 		this.events = events;
 		this.simulationConfig = qSimConfigGroup;
+		this.outputDirectory = outputDirectory;
 	}
 
 	@Override
@@ -348,18 +350,18 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private ControlInput createControlInput(final String content) {
 		if (content.trim().compareTo(CONTROLINPUT1) == 0) {
-			ControlInputImpl1 cI = new ControlInputImpl1(this.network);
+			ControlInputImpl1 cI = new ControlInputImpl1(this.network, this.outputDirectory);
 			this.events.addHandler(cI);
 			return cI;
 		}
 		else if (content.trim().compareTo(CONTROLINPUTSB) == 0) {
-			ControlInputSB cI = new ControlInputSB(this.simulationConfig, this.network);
+			ControlInputSB cI = new ControlInputSB(this.simulationConfig, this.network, this.outputDirectory);
 			cI.setNetworkChangeEvents(this.network.getNetworkChangeEvents());
 			this.events.addHandler(cI);
 			return cI;
 		}
 		else if (content.trim().compareTo(CONTROLINPUTMB) == 0) {
-			ControlInputMB cI = new ControlInputMB(this.simulationConfig, this.network);
+			ControlInputMB cI = new ControlInputMB(this.simulationConfig, this.network, this.outputDirectory);
 			cI.setNetworkChangeEvents(this.network.getNetworkChangeEvents());
 			this.events.addHandler(cI);
 			return cI;

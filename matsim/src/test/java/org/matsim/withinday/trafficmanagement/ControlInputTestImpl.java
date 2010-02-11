@@ -29,10 +29,10 @@ import org.matsim.withinday.trafficmanagement.controlinput.AbstractControlInputI
  */
 public class ControlInputTestImpl extends AbstractControlInputImpl {
 
-	public ControlInputTestImpl(final Network network) {
-		super(network);
+	public ControlInputTestImpl(final Network network, final String outputDirectory) {
+		super(network, outputDirectory);
 	}
-	
+
 	@Override
 	public double getNashTime() {
 		return 0;

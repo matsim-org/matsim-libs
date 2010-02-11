@@ -112,8 +112,8 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 	private final QSimConfigGroup simulationConfig;
 
-	public ControlInputMB(final QSimConfigGroup simulationConfig2, final Network network) {
-		super(network);
+	public ControlInputMB(final QSimConfigGroup simulationConfig2, final Network network, final String outputDirectory) {
+		super(network, outputDirectory);
 		this.simulationConfig = simulationConfig2;
 	}
 

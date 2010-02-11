@@ -22,26 +22,26 @@ package playground.duncan.archive;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.netvis.NetVis;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 
 public class MyControler1 {
 
 	public static void main(final String[] args) {
 
+		String configFile;
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./src/playground/duncan/myconfig1.xml"});
+			configFile = "./src/playground/duncan/myconfig1.xml";
 		} else {
-			Gbl.createConfig(args) ;
+			configFile = args[0];
 		}
+		ScenarioImpl scenario = (ScenarioImpl) new ScenarioLoaderImpl(configFile).loadScenario();
 
-		final Controler controler = new Controler(Gbl.getConfig());
+		final Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
 		controler.run();
-
-
 	}
 
 }

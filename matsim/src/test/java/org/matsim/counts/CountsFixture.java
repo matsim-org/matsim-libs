@@ -44,10 +44,10 @@ public class CountsFixture {
 
 	public void setUp() {
 		String configFile = "test/input/org/matsim/counts/config.xml";
-		
+
 		this.scenario = new ScenarioLoaderImpl(configFile).getScenario();
 		Config config = scenario.getConfig();
-		
+
 		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
 		counts_parser.readFile(config.counts().getCountsFileName());
 
@@ -57,7 +57,7 @@ public class CountsFixture {
 
 	public CountsComparisonAlgorithm getCCA() {
 		CalcLinkStats linkStats = new AttributeFactory().createLinkStats(this.network);
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(linkStats, this.counts, this.network);
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(linkStats, this.counts, this.network, 1.0);
 		cca.setDistanceFilter(100.0, "0");
 		return cca;
 	}

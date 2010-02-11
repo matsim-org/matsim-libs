@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
@@ -95,75 +94,85 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 	// things below here are originally automatically generated.  kai, jul09
 
 	@Deprecated
+	@Override
 	public MappingRule getDownRule() {
 		return layerDelegate.getDownRule();
 	}
 
+	@Override
 	public MappedLocation getLocation(Id location_id) {
 		return layerDelegate.getLocation(location_id);
 	}
 
-	@Deprecated
-	public Location getLocation(String location_id) {
-		return layerDelegate.getLocation(new IdImpl(location_id));
-	}
-
+	@Override
 	public TreeMap<Id, ? extends MappedLocation> getLocations() {
 		return layerDelegate.getLocations();
 	}
 
+	@Override
 	public String getName() {
 		return layerDelegate.getName();
 	}
 
+	@Override
 	public ArrayList<MappedLocation> getNearestLocations(Coord coord, Location excludeLocation) {
 		return layerDelegate.getNearestLocations(coord, excludeLocation);
 	}
 
+	@Override
 	public ArrayList<MappedLocation> getNearestLocations(Coord coord) {
 		return layerDelegate.getNearestLocations(coord);
 	}
 
 	@Deprecated
+	@Override
 	public Id getType() {
 		return layerDelegate.getType();
 	}
 
 	@Deprecated
+	@Override
 	public MappingRule getUpRule() {
 		return layerDelegate.getUpRule();
 	}
 
+	@Override
 	public void setName(String name) {
 		layerDelegate.setName(name);
 	}
 
 	@Deprecated
+	@Override
 	public final boolean removeUpRule() {
 		return layerDelegate.removeUpRule();
 	}
 
 	@Deprecated
+	@Override
 	public final boolean removeDownRule() {
 		return layerDelegate.removeDownRule();
 	}
 
 	@Deprecated
+	@Override
 	public final void setUpRule(final MappingRule up_rule) {
 		layerDelegate.setUpRule( up_rule ) ;
 	}
 
 	@Deprecated
+	@Override
 	public final void setDownRule(final MappingRule down_rule) {
 		layerDelegate.setDownRule( down_rule ) ;
 	}
 
 	@Deprecated
+	@Override
 	public void forceDownRuleToNull() {
 		layerDelegate.forceDownRuleToNull();
 	}
 
 	@Deprecated
+	@Override
 	public void forceUpRuleToNull() {
 		layerDelegate.forceUpRuleToNull() ;
 	}

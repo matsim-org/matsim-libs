@@ -189,7 +189,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		int count=0;
 		for (ActivityFacilityImpl af:this.retailerFacilities.values()) {
 			if (first.get(solution.get(count)) != (af.getLinkId().toString())) {
-				Utils.moveFacility(af,controler.getNetwork().getLinks().get(new IdImpl(first.get(solution.get(count)))),this.controler.getWorld());
+				Utils.moveFacility(af,controler.getNetwork().getLinks().get(new IdImpl(first.get(solution.get(count)))),this.controler.getScenario().getWorld());
 				log.info("The facility " + af.getId() + " has been moved");
 				this.movedFacilities.put(af.getId(), af);
 				log.info("Link Id after = "+ af.getLinkId());

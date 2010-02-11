@@ -257,9 +257,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		}
 	}
 
-
 	/**
-	 *
 	 * @deprecated Netvis is no longer supported by this QueueSimulation
 	 */
 	@Deprecated
@@ -273,8 +271,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.scenario.getConfig().simulation().setSnapshotPeriod(snapshotPeriod);
 		this.scenario.getConfig().simulation().setSnapshotFile(snapshotFilename);
 	}
-
-
 
 	private void prepareNetworkChangeEventsQueue() {
 		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)(this.networkLayer)).getNetworkChangeEvents();

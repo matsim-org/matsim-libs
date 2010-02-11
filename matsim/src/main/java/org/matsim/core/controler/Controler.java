@@ -87,7 +87,6 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.parallel.PJDEQSimulation;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
@@ -125,7 +124,6 @@ import org.matsim.ptproject.qsim.ParallelQSimFactory;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldCheck;
 
@@ -425,7 +423,7 @@ public class Controler {
 			// dump network
 			new NetworkWriter(this.network).writeFile(this.controlerIO.getOutputFilename("output_network.xml.gz"));
 			// dump world
-			new WorldWriter(this.getWorld()).writeFile(this.controlerIO.getOutputFilename("output_world.xml.gz"));
+			new WorldWriter(this.getScenario().getWorld()).writeFile(this.controlerIO.getOutputFilename("output_world.xml.gz"));
 			// dump config
 			new ConfigWriter(this.config).writeFile(this.controlerIO.getOutputFilename("output_config.xml.gz"));
 			// dump facilities
@@ -598,59 +596,21 @@ public class Controler {
 	}
 
 	/**
-	 * Load all the required data. Currently, this only calls
-	 * {@link #loadNetwork()} and {@link #loadPopulation()}, if this data was
+	 * Load all the required data. Currently, this only loads the Scenario if it was
 	 * not given in the Constructor.
 	 */
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
 			this.loader = new ScenarioLoaderImpl(this.scenarioData);
 			this.loader.loadScenario();
-			this.network = loadNetwork();
-			this.population = loadPopulation();
+			this.network = this.scenarioData.getNetwork();
+			this.population = this.scenarioData.getPopulation();
 			this.scenarioLoaded = true;
 
-			if (this.getWorld() != null) {
-				new WorldCheck().run(this.getWorld());
+			if (this.getScenario().getWorld() != null) {
+				new WorldCheck().run(this.getScenario().getWorld());
 			}
 		}
-	}
-
-	/**
-	 * Loads the network for the simulation. In most cases, this should be an
-	 * instance of {@link QueueNetwork} for the standard QueueSimulation. <br>
-	 * <strong>It is highly recommended NOT to overwrite this method!</strong>
-	 * This method should be private, but is only protected at the moment
-	 * because of backward-compatibility with the old Controler class. In
-	 * general, it is recommended to pass a custom network and population using
-	 * the special {@link #Controler(ScenarioImpl) Constructor}.
-	 *
-	 * @deprecated Use the constructor
-	 *             {@link #Controler(ScenarioImpl)}
-	 *             instead.
-	 * @return The network to be used for the simulation.
-	 */
-	@Deprecated
-	protected NetworkImpl loadNetwork() {
-		return this.scenarioData.getNetwork();
-	}
-
-	/**
-	 * Loads the population for the simulation. <br>
-	 * <strong>It is highly recommended NOT to overwrite this method!</strong>
-	 * This method should be private, but is only protected at the moment
-	 * because of backward-compatibility with the old Controler class. In
-	 * general, it is recommended to pass a custom network and population using
-	 * the special {@link #Controler(ScenarioImpl) Constructor}.
-	 *
-	 * @deprecated Use the constructor
-	 *             {@link #Controler(ScenarioImpl)}
-	 *             instead.
-	 * @return The population to be used for the simulation.
-	 */
-	@Deprecated
-	protected Population loadPopulation() {
-		return this.scenarioData.getPopulation();
 	}
 
 	/**
@@ -1049,11 +1009,6 @@ public class Controler {
 		return this.config;
 	}
 
-	@Deprecated
-	public final World getWorld() {
-		return this.scenarioData.getWorld();
-	}
-
 	public final ActivityFacilities getFacilities() {
 		return this.scenarioData.getActivityFacilities();
 	}
@@ -1268,7 +1223,7 @@ public class Controler {
 	}
 
 	/**
-	 * @return the iteration number of the current iteration when the Controler is iterating, 
+	 * @return the iteration number of the current iteration when the Controler is iterating,
 	 * null if the Controler is in the startup/shutdown process
 	 */
 	public Integer getIterationNumber() {

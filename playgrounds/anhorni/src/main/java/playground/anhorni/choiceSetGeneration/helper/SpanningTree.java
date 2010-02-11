@@ -49,14 +49,14 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(SpanningTree.class);
-	
+
 	private Node origin = null;
 	private double dTime = Time.UNDEFINED_TIME;
-	
+
 	private final TravelTime ttFunction;
 	private final TravelCost tcFunction;
 	private HashMap<Id,NodeData> nodeData;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ public class SpanningTree {
 		this.tcFunction = tc;
 		log.info("done.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// inner classes
 	//////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final void setOrigin(Node origin) {
 		this.origin = origin;
 	}
@@ -115,23 +115,23 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final HashMap<Id,NodeData> getTree() {
 		return this.nodeData;
 	}
-	
-	public final void getNodesByTravelTimeBudget(double travelTimeBudget, List<Node>  nodesList, List<Double> travelTimesList) {		
+
+	public final void getNodesByTravelTimeBudget(double travelTimeBudget, List<Node>  nodesList, List<Double> travelTimesList) {
 		HashMap<Id,NodeData> tree = this.nodeData;
 		for (Id id : tree.keySet()) {
 			NodeData d = tree.get(id);
 			if ((d.getPrevNode() != null) && (d.getCost() <= travelTimeBudget)) {
 					// TODO: Check if this is ok 'prev'!
 					nodesList.add(d.getPrevNode());
-					travelTimesList.add(d.getCost());		
+					travelTimesList.add(d.getCost());
 			}
-		}	
+		}
 	}
-		
+
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
@@ -165,7 +165,7 @@ public class SpanningTree {
 		d.time = dTime;
 		d.cost = 0;
 		nodeData.put(origin.getId(),d);
-		
+
 		ComparatorCost comparator = new ComparatorCost(nodeData);
 		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500,comparator);
 		relaxNode(this.origin,pendingNodes);
@@ -174,7 +174,7 @@ public class SpanningTree {
 			relaxNode(n,pendingNodes);
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main method
 	//////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ public class SpanningTree {
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 		Config conf = scenario.getConfig();
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, conf.travelTimeCalculator());
-		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc));
+		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, conf.charyparNagelScoring()));
 		Node origin = network.getNodes().get(new IdImpl(1));
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);

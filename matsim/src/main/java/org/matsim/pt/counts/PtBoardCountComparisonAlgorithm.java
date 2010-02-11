@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.pt.counts;
 
@@ -31,7 +31,7 @@ import org.matsim.counts.Volume;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PtBoardCountComparisonAlgorithm extends
 		PtCountsComparisonAlgorithm {
@@ -42,10 +42,11 @@ public class PtBoardCountComparisonAlgorithm extends
 	 * @param network
 	 */
 	public PtBoardCountComparisonAlgorithm(OccupancyAnalyzer oa, Counts counts,
-			Network network) {
-		super(oa, counts, network);
+			Network network, final double countsScaleFactor) {
+		super(oa, counts, network, countsScaleFactor);
 	}
 
+	@Override
 	protected void compare() {
 		double countValue;
 		for (Count count : this.counts.getCounts().values()) {

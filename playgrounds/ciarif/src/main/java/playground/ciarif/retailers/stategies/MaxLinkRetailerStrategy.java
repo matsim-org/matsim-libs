@@ -100,7 +100,7 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 				}
 			}	
 			if (move_facilities == true) {
-				Utils.moveFacility((ActivityFacilityImpl) f,link, controler.getWorld());
+				Utils.moveFacility((ActivityFacilityImpl) f,link, controler.getScenario().getWorld());
 				this.movedFacilities.put(f.getId(),f);
 			}
 			else {

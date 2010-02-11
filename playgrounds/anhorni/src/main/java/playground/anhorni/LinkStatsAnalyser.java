@@ -176,7 +176,7 @@ public class LinkStatsAnalyser {
 
 		// processing counts
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats1,
-				counts, this.network);
+				counts, this.network, this.scaleFactor);
 
 		cca.setCountsScaleFactor(this.scaleFactor);
 		cca.run();

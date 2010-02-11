@@ -79,7 +79,7 @@ public class ExternalModule implements PlanStrategyModule {
 	protected PopulationWriter plansWriter = null;
 	private PopulationWriterHandler handler = null;
 	private BufferedWriter writer = null;
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 	protected Config extConfig;
 	protected String exePath = "";
 	protected String moduleId = "";
@@ -89,7 +89,7 @@ public class ExternalModule implements PlanStrategyModule {
 	private final Controler controler;
 
 
-	public ExternalModule(final String exePath, final String moduleId, final Controler controler, final ScenarioImpl scenario) {
+	public ExternalModule(final String exePath, final String moduleId, final Controler controler, final Scenario scenario) {
 		this.exePath = exePath;
 		this.moduleId = moduleId + "_";
 		this.controler = controler;
@@ -243,10 +243,10 @@ public class ExternalModule implements PlanStrategyModule {
 	 */
 	private static class PseudoScenario implements Scenario {
 
-		private final ScenarioImpl scenario;
+		private final Scenario scenario;
 		private Population myPopulation;
 
-		public PseudoScenario(final ScenarioImpl scenario, final PopulationImpl population) {
+		public PseudoScenario(final Scenario scenario, final PopulationImpl population) {
 			this.scenario = scenario;
 			this.myPopulation = population;
 		}

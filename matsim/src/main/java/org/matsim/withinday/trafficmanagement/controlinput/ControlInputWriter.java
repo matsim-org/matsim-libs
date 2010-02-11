@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 
 /**
  * @author dgrether
@@ -80,8 +79,8 @@ public class ControlInputWriter {
 
 	private boolean writeAgentsOnLinksFirstRun = true;
 
-	public ControlInputWriter() {
-		this.outputDirectory = Gbl.getConfig().controler().getOutputDirectory();
+	public ControlInputWriter(final String outputDirectory) {
+		this.outputDirectory = outputDirectory;
 		if (!this.outputDirectory.endsWith("/"))
 			this.outputDirectory += "/";
 

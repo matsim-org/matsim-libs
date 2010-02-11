@@ -85,7 +85,7 @@ public class CountsAnalyser {
 	 * name of the distancefilterCenterNode parameter in config
 	 */
 	public static final String DISTANCEFITLERCENTERNODE = "distanceFilterCenterNode";
-	
+
 	private Scenario scenario;
 	/**
 	 * the network
@@ -119,15 +119,15 @@ public class CountsAnalyser {
 	private String coordSystem;
 
 	final private Counts counts =  new Counts();
-	
+
 	/**
 	 *
 	 * @param config
 	 */
 	public CountsAnalyser(final String linkstatsfile) {
-		
+
 		this.linkstatsfile = linkstatsfile;
-		
+
 		try {
 			this.readConfig("input/config.xml");
 			this.writeCountsComparisonList(this.outputFile, this.outputFormat);
@@ -185,7 +185,7 @@ public class CountsAnalyser {
 			final CalcLinkStats calcLinkStats) {
 		// processing counts
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats,
-				counts, this.network);
+				counts, this.network, this.scenario.getConfig().counts().getCountsScaleFactor());
 		if ((this.distanceFilter != null) && (this.distanceFilterCenterNode != null))
 			cca.setDistanceFilter(this.distanceFilter, this.distanceFilterCenterNode);
 		cca.setCountsScaleFactor(this.scenario.getConfig().counts().getCountsScaleFactor());
@@ -223,7 +223,7 @@ public class CountsAnalyser {
 		}
 
 		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(countsComparisonList);
-		
+
 		double[] hours = new double[24];
 		for (int i = 1; i < 25; i++) {
 			hours[i-1] = i;
@@ -298,7 +298,7 @@ public class CountsAnalyser {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-				
+
 		CountsAnalyser ca = null;
 		if (args.length == 0) {
 			printHelp();

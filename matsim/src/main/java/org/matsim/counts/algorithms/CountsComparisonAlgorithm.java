@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
@@ -69,17 +68,12 @@ public class CountsComparisonAlgorithm {
 
 	private final static Logger log = Logger.getLogger(CountsComparisonAlgorithm.class);
 
-	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final Network network) {
+	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final Network network, final double countsScaleFactor) {
 		this.linkStats = linkStats;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();
 		this.network = network;
-		if (Gbl.getConfig()!=null) {
-			this.countsScaleFactor = Gbl.getConfig().counts().getCountsScaleFactor();
-		}
-		else {
-			this.countsScaleFactor=1.0;
-		}
+		this.countsScaleFactor = countsScaleFactor;
 	}
 
 	/**

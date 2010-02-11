@@ -90,7 +90,7 @@ public class VDSSignTest extends MatsimTestCase {
 		sign.setControler(new BangBangControler());
 		sign.setCompliance(1.0);
 		//create control input
-		this.controlInput = new EmptyControlInputImpl(this.network);
+		this.controlInput = new EmptyControlInputImpl(this.network, getOutputDirectory());
 		this.controlInput.setNashTime(0);
 
 		Link link3 = this.network.getLinks().get(new IdImpl("3"));

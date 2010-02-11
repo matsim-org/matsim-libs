@@ -60,17 +60,9 @@ public class RouterVis {
 
 	private VisLeastCostPathCalculator router;
 
-	/**
-	 * Constructor
-	 *
-	 * @param network
-	 * @param costCalculator
-	 * @param timeCalculator
-	 * @param router
-	 */
 	public RouterVis(final Network network, final TravelCost costCalculator,
-			final TravelTime timeCalculator, final Class<? extends VisLeastCostPathCalculator> router){
-		this.writer = getNetStateWriter(network);
+			final TravelTime timeCalculator, final Class<? extends VisLeastCostPathCalculator> router, Config config){
+		this.writer = getNetStateWriter(network, config);
 		final Class[] prototypeConstructor = { NetworkLayer.class,
 				TravelCost.class, TravelTime.class, RouterNetStateWriter.class};
 		Exception ex = null;
@@ -122,10 +114,9 @@ public class RouterVis {
 		return path;
 	}
 
-	private RouterNetStateWriter getNetStateWriter(final Network network) {
-		final String snapshotFile = Gbl.getConfig().controler().getOutputDirectory() + "/Snapshot";
+	private RouterNetStateWriter getNetStateWriter(final Network network, Config config) {
+		final String snapshotFile = config.controler().getOutputDirectory() + "/Snapshot";
 
-		final Config config = Gbl.getConfig();
 		int buffers = network.getLinks().size();
 		final String buffString = config.findParam("vis", "buffersize");
 		if (buffString == null) {
@@ -203,7 +194,7 @@ public class RouterVis {
 
 		log.info("  creating RouterVis object.");
 		final TravelTime costCalc = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
-		final RouterVis vis = new RouterVis(network,(TravelCost) costCalc,costCalc,router);
+		final RouterVis vis = new RouterVis(network, (TravelCost) costCalc, costCalc, router, config);
 		log.info("  done.");
 
 		log.info("  running RouterVis.");

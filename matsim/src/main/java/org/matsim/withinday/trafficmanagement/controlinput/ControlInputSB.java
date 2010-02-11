@@ -117,8 +117,8 @@ public class ControlInputSB extends AbstractControlInputImpl {
 
 	private final QSimConfigGroup simulationConfig;
 
-	public ControlInputSB(final QSimConfigGroup simulationConfig2, final Network network) {
-		super(network);
+	public ControlInputSB(final QSimConfigGroup simulationConfig2, final Network network, final String outputDirectory) {
+		super(network, outputDirectory);
 		this.simulationConfig = simulationConfig2;
 	}
 

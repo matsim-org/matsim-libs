@@ -66,7 +66,7 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 		route2.setLinkIds(link7.getId(), NetworkUtils.getLinkIds("8"), link16.getId());
 
 		//control input test class
-		ControlInputTestImpl ci = new ControlInputTestImpl(network);
+		ControlInputTestImpl ci = new ControlInputTestImpl(network, getOutputDirectory());
 		ci.setMainRoute(route1);
 		ci.setAlternativeRoute(route2);
 		ci.init();

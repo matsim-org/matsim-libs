@@ -31,10 +31,10 @@ public class EmptyControlInputImpl extends AbstractControlInputImpl {
 
 	private double nashTime;
 
-	public EmptyControlInputImpl(final Network network) {
-		super(network);
+	public EmptyControlInputImpl(final Network network, final String outputDirectory) {
+		super(network, outputDirectory);
 	}
-	
+
 	@Override
 	public double getNashTime() {
 		return this.nashTime;

@@ -26,15 +26,15 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 /**
  * Measures the travel time difference between route 1 and 2 and returns that as
  * the control signal. ("Reactive control")
- * 
+ *
  * @author a.bergsten, d.zetterberg
  */
 public class ControlInputImpl1 extends AbstractControlInputImpl {
 
-	public ControlInputImpl1(final Network network) {
-		super(network);
+	public ControlInputImpl1(final Network network, final String outputDirectory) {
+		super(network, outputDirectory);
 	}
-	
+
 	@Override
 	public double getPredictedNashTime(NetworkRouteWRefs route) {
 		if (route.equals(this.mainRoute)) {

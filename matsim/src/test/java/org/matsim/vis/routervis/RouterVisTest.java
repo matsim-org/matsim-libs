@@ -40,9 +40,9 @@ import org.matsim.vis.routervis.multipathrouter.PSLogitRouter;
  * @author glaemmel
  */
 public class RouterVisTest extends MatsimTestCase {
-	
+
 	private static final Logger log = Logger.getLogger(RouterVisTest.class);
-	
+
 	public void testVisDijkstra(){
 		final Config config = loadConfig(getClassInputDirectory() + "config.xml");
 		// read network
@@ -64,7 +64,7 @@ public class RouterVisTest extends MatsimTestCase {
 		final Node toNode = network.getNodes().get(new IdImpl("7"));
 
 		final TravelTime costCalc = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
-		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, VisDijkstra.class);
+		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, VisDijkstra.class, config);
 
 		routerVis.runRouter(fromNode, toNode, 0.0);
 
@@ -79,7 +79,7 @@ public class RouterVisTest extends MatsimTestCase {
 		assertEquals("different config files", referenceChecksumConfig, checksumConfig);
 		assertEquals("different snapshot files", referenceChecksumSnapshot, checksumSnapshot);
 	}
-	
+
 	public void testVisCLogit(){
 		final Config config = loadConfig(getInputDirectory() + "../config.xml");
 		// read network
@@ -101,7 +101,7 @@ public class RouterVisTest extends MatsimTestCase {
 		final Node toNode = network.getNodes().get(new IdImpl("7"));
 		//run the test without any opportunity costs to produce same results as the version checked in initially
 		final TravelTime costCalc = new FreespeedTravelTimeCost(-6.0/3600, 0.0, 0.0);
-		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, CLogitRouter.class);
+		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, CLogitRouter.class, config);
 
 		routerVis.runRouter(fromNode, toNode, 0.0);
 
@@ -116,7 +116,7 @@ public class RouterVisTest extends MatsimTestCase {
 		assertEquals("different config files", referenceChecksumConfig, checksumConfig);
 		assertEquals("different snapshot files", referenceChecksumSnapshot, checksumSnapshot);
 	}
-	
+
 	public void testVisPSLogit(){
 		final Config config = loadConfig(getInputDirectory() + "../config.xml");
 		// read network
@@ -138,7 +138,7 @@ public class RouterVisTest extends MatsimTestCase {
 		final Node toNode = network.getNodes().get(new IdImpl("7"));
 		//run the test without any opportunity costs to produce same results as the version checked in initially
 		final TravelTime costCalc = new FreespeedTravelTimeCost(-6.0/3600, 0.0, 0.0);
-		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, PSLogitRouter.class);
+		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, PSLogitRouter.class, config);
 
 		routerVis.runRouter(fromNode, toNode, 0.0);
 

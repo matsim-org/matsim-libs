@@ -23,13 +23,14 @@ package playground.andreas.itsumo;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -40,6 +41,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -51,8 +53,8 @@ public class MyControler1 extends Controler {
 
 	private static final Logger log = Logger.getLogger(MyControler1.class);
 
-	public MyControler1(final Config config) {
-		super(config);
+	public MyControler1(final ScenarioImpl scenario) {
+		super(scenario);
 	}
 
 	protected int[] generateDistribution(final LinkImpl[] netLinks, final int popSize, final LinkImpl[] givenLinks, final double[] probs) {
@@ -108,15 +110,15 @@ public class MyControler1 extends Controler {
 		sim.run();
 	}
 
-	@Override
-	protected Population loadPopulation() {
+	/*package*/ static void loadPopulation(final Scenario scenario) {
 
-		PopulationImpl population = new ScenarioImpl().getPopulation();
+		Population population = scenario.getPopulation();
+		Network network = scenario.getNetwork();
 
 		log.info("  generating plans... ");
 
-		LinkImpl link9 = this.network.getLinks().get(new IdImpl("9"));
-		LinkImpl link15 = this.network.getLinks().get(new IdImpl("15"));
+		Link link9 = network.getLinks().get(new IdImpl("9"));
+		Link link15 = network.getLinks().get(new IdImpl("15"));
 		for (int i=0; i<100; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i+1));
 
@@ -126,8 +128,8 @@ public class MyControler1 extends Controler {
 				act1a.setLinkId(link9.getId());
 				act1a.setEndTime(0*60*60.);
 				LegImpl leg = plan1.createAndAddLeg(TransportMode.car);
-				NetworkRouteWRefs route = new LinkNetworkRouteImpl(link9.getId(), link15.getId(), this.network);
-				route.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "3 4"))), link15.getId());
+				NetworkRouteWRefs route = new LinkNetworkRouteImpl(link9.getId(), link15.getId(), network);
+				route.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, "3 4"))), link15.getId());
 				leg.setRoute(route);
 				ActivityImpl act1b = plan1.createAndAddActivity("h", new CoordImpl(200., 200.));
 				act1b.setLinkId(link15.getId());
@@ -139,8 +141,8 @@ public class MyControler1 extends Controler {
 				act2a.setLinkId(link9.getId());
 				act2a.setEndTime(0*60*60.);
 				LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
-				NetworkRouteWRefs route2 = new LinkNetworkRouteImpl(link9.getId(), link15.getId(), this.network);
-				route2.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "3 6 4"))), link15.getId());
+				NetworkRouteWRefs route2 = new LinkNetworkRouteImpl(link9.getId(), link15.getId(), network);
+				route2.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, "3 6 4"))), link15.getId());
 				leg2.setRoute(route2);
 				ActivityImpl act2b = plan1.createAndAddActivity("h", new CoordImpl(200., 200.));
 				act2b.setLinkId(link15.getId());
@@ -268,31 +270,23 @@ public class MyControler1 extends Controler {
 		ANDREAS CODE */
 
 		log.info("  done");
-
-		return population;
 	}
 
-	//	/*	Comment it, if you want to read a native MATSim network
-	@Override
-	protected NetworkLayer loadNetwork() {
+	/*package*/ static void loadNetwork(final Scenario scenario) {
 
 		log.info("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer) super.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		Network network = scenario.getNetwork();
 		log.info("  done");
 
 		log.info("  reading network xml file... ");
-		ITSUMONetworkReader reader = new ITSUMONetworkReader(network);
-		reader.read(this.config.getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile"));
-//		NetworkParser network_parser = new NetworkParser(network);
-//		network_parser.parse();
+		ITSUMONetworkReader reader = new ITSUMONetworkReader((NetworkLayer) network);
+		reader.read(scenario.getConfig().getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile"));
 
 		NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.writeFile(config.network().getOutputFile());
+		network_writer.writeFile(scenario.getConfig().network().getOutputFile());
 		log.info("  done");
 
-		return network;
 	}
-	//	*/
 
 	/**
 	 * Conversion of events -> snapshots
@@ -346,14 +340,18 @@ public class MyControler1 extends Controler {
 
 	public static void main(final String[] args) {
 
-		Config config;
+		ScenarioLoaderImpl sl;
 		if ( args.length==0 ) {
-			config = Gbl.createConfig(new String[] {"./examples/itsumo-sesam-scenario/config.xml"});
+			sl = new ScenarioLoaderImpl("./examples/itsumo-sesam-scenario/config.xml");
 		} else {
-			config = Gbl.createConfig(args) ;
+			sl = new ScenarioLoaderImpl(args[0]);
 		}
+		ScenarioImpl scenario = sl.getScenario();
 
-		final MyControler1 controler = new MyControler1(config);
+		loadNetwork(scenario);
+		loadPopulation(scenario);
+
+		final MyControler1 controler = new MyControler1(scenario);
 		controler.setOverwriteFiles(true);
 		controler.run();
 

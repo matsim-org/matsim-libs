@@ -22,16 +22,17 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
-public class EvacuationConfigGroup  extends Module{
+public class EvacuationConfigGroup extends Module {
 
-	
-	
+	private final static Logger log = Logger.getLogger(EvacuationConfigGroup.class);
+
 	private static final long serialVersionUID = 1L;
 
 	public enum EvacuationScenario {day,night}
-	
+
 	public static final String GROUP_NAME = "evacuation";
 
 	/**
@@ -59,47 +60,42 @@ public class EvacuationConfigGroup  extends Module{
 	 * name of the shoreline shape file in config
 	 */
 	private static final String SHORELINE_FILE = "shorelineFile";
-	
+
 	/**
-	 * type of the scenario 
+	 * type of the scenario
 	 */
 	private static final String SCENARIO = "scenario";
-	
+
 	/**
 	 * size of the scenario
 	 */
 	private static final String SAMPLE_SIZE = "sampleSize";
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final String BUFFER_SIZE = "bufferSize";
-	
-	
+
+
 	private static final String SWW_ROOT = "swwRoot";
-	
+
 	private static final String SWW_FILE_PREFIX = "swwFilePrefix";
-	
+
 	private static final String SWW_FILE_SUFFIX = "swwFileSuffix";
-	
+
 	private static final String SWW_FILE_COUNT = "swwFileCount";
-	
+
 	private static final String SWW_OFFSET_EAST = "swwOffsetEast";
-	
+
 	private static final String SWW_OFFSET_NORTH = "swwOffsetNorth";
-	
+
 	private static final String LOAD_SHELTERS = "loadShelters";
-	
+
 	private static final String RISK_MINIMIZATION = "riskMinimization";
-	
+
 	private static final String SOCIAL_COST_OPTIMIZATION = "socialCostOptimization";
-	
+
 	private static final String GENERATE_EVAC_NET_FROM_SWW_FILE = "generateEvacNetFromSWWFile";
-	
-	/**
-	 * file name of the flooding data file
-	 */
-	private String floodingDataFile;
 
 	/**
 	 * file name of the buildings shape file
@@ -110,17 +106,14 @@ public class EvacuationConfigGroup  extends Module{
 	 * file name of the shoreline shape file
 	 */
 	private String shorelineFile;
-	
+
 	/**
 	 * the scenario type
 	 */
 	private EvacuationScenario scenario = EvacuationScenario.night;
-	
-	/**
-	 * 
-	 */
+
 	private double sampleSize = 0.;
-	
+
 	/**
 	 * the size of the spatial buffer
 	 */
@@ -133,19 +126,19 @@ public class EvacuationConfigGroup  extends Module{
 	private String sWWFileSuffix;
 
 	private int sWWFileCount;
-	
+
 	private double sWWOffsetEast = 0.;
-	
+
 	private double sWWOffsetNorth = 0.;
-	
+
 	private boolean loadShelters = false;
 
 	private boolean riskMinimization = false;
-	
+
 	private boolean socialCostOptimization = false;
 
 	private boolean generateEvacNetFromSWWFile = false;
-	
+
 
 
 	public EvacuationConfigGroup(){
@@ -156,8 +149,6 @@ public class EvacuationConfigGroup  extends Module{
 	public String getValue(final String key) {
 		if (EVACUATION_AREA_FILE.equals(key)) {
 			return getEvacuationAreaFile();
-		}else if (FLOODING_DATA_FILE.equals(key)) {
-			return getFloodingDataFile();
 		}else if (BUILDINGS_FILE.equals(key)) {
 			return getBuildingsFile();
 		}else if (SHORELINE_FILE.equals(key)) {
@@ -197,7 +188,7 @@ public class EvacuationConfigGroup  extends Module{
 		if (EVACUATION_AREA_FILE.equals(key)) {
 			setEvacuationAreaFile(value.replace('\\', '/'));
 		}else if(FLOODING_DATA_FILE.equals(key)){
-			setFloodingDataFile(value.replace('\\', '/'));
+			log.warn("The parameter " + FLOODING_DATA_FILE + " in the group " + GROUP_NAME + " is no longer supported and should be removed from the config file.");
 		}else if(BUILDINGS_FILE.equals(key)){
 			setBuildingsFile(value.replace('\\', '/'));
 		}else if(SHORELINE_FILE.equals(key)){
@@ -237,7 +228,6 @@ public class EvacuationConfigGroup  extends Module{
 	@Override
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(FLOODING_DATA_FILE, getValue(FLOODING_DATA_FILE));
 		map.put(EVACUATION_AREA_FILE, getValue(EVACUATION_AREA_FILE));
 		map.put(BUILDINGS_FILE, getValue(BUILDINGS_FILE));
 		map.put(SWW_ROOT, getValue(SWW_ROOT));
@@ -255,8 +245,8 @@ public class EvacuationConfigGroup  extends Module{
 		map.put(GENERATE_EVAC_NET_FROM_SWW_FILE, getValue(GENERATE_EVAC_NET_FROM_SWW_FILE));
 		return map;
 	}
-	
-	
+
+
 	/**
 	 *
 	 * @return the file name of the evacuation area file
@@ -274,25 +264,6 @@ public class EvacuationConfigGroup  extends Module{
 
 	}
 
-	/**
-	 * 
-	 * @return the file name of the flooding data file
-	 */
-	@Deprecated
-	public String getFloodingDataFile() {
-		return this.floodingDataFile;
-	}
-
-	/**
-	 * 
-	 * @param floodingDataFile
-	 * the flooding data filename to set
-	 */
-	@Deprecated
-	public void setFloodingDataFile(String floodingDataFile) {
-		this.floodingDataFile = floodingDataFile;
-	}
-	
 	public void setSWWRoot(String sWWRoot) {
 		this.sWWRoot = sWWRoot;
 	}
@@ -313,7 +284,7 @@ public class EvacuationConfigGroup  extends Module{
 	public void setSWWOffsetNorth(String sWWOffsetNorth) {
 		this.sWWOffsetNorth = Double.parseDouble(sWWOffsetNorth);
 	}
-	
+
 	public String getSWWRoot() {
 		return this.sWWRoot;
 	}
@@ -331,21 +302,21 @@ public class EvacuationConfigGroup  extends Module{
 	}
 	public double getSWWOffsetNorth() {
 		return this.sWWOffsetNorth;
-	}	
+	}
 
 
 	public void setLoadShelters(String loadShelters) {
 		this.loadShelters = Boolean.parseBoolean(loadShelters);
 	}
-	
+
 	public void setRiskMinimization(String riskMinimization) {
 		this.riskMinimization = Boolean.parseBoolean(riskMinimization);
 	}
-	
+
 	public void setSocialCostOptimization(String socialCostOptimization) {
 		this.socialCostOptimization = Boolean.parseBoolean(socialCostOptimization);
 	}
-	
+
 	public boolean isLoadShelters() {
 		return this.loadShelters;
 	}
@@ -365,9 +336,9 @@ public class EvacuationConfigGroup  extends Module{
 	public void setGenerateEvacNetFromSWWFile(String generateEvacNetFromSWWFile) {
 		this.generateEvacNetFromSWWFile = Boolean.parseBoolean(generateEvacNetFromSWWFile);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return the shapes of the buildings
 	 */
 	public String getBuildingsFile() {
@@ -375,7 +346,7 @@ public class EvacuationConfigGroup  extends Module{
 	}
 
 	/**
-	 * 
+	 *
 	 * @param buildingsFile
 	 * the shapes of the buildings
 	 */
@@ -383,34 +354,34 @@ public class EvacuationConfigGroup  extends Module{
 		this.buildingsFile = buildingsFile;
 	}
 
-	
+
 	/**
-	 * 
+	 *
 	 * @return the shapes of the shoreline
 	 */
 	public String getShorelineFile() {
 		return this.shorelineFile;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param shorelineFile
 	 * the shapes of the shoreline
 	 */
 	public void setShorelineFile(String shorelineFile) {
 		this.shorelineFile = shorelineFile;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return the scenario type (i.e. day or night)
 	 */
 	public EvacuationScenario getEvacuationScanrio() {
 		return this.scenario;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param scenario
 	 * the type of the scenario (i.e. day or night)
 	 */
@@ -425,31 +396,31 @@ public class EvacuationConfigGroup  extends Module{
 	}
 
 	/**
-	 * 
+	 *
 	 * @return the size of the scenario
 	 */
 	public double getSampleSize() {
 		return this.sampleSize;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param sampleSize
 	 */
 	public void setSampleSize(String sampleSize) {
 		this.sampleSize = Double.parseDouble(sampleSize);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return the size of the spatial buffer
 	 */
 	public double getBufferSize() {
 		return this.bufferSize;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param buffer size
 	 */
 	public void setBufferSize(String bufferSize) {

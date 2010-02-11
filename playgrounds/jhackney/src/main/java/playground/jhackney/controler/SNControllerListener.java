@@ -159,7 +159,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //		new WorldCreateRasterLayer2(gridSpacing).run(Gbl.getWorld());
 
 		// Complete the world to make sure that the layers all have relevant mapping rules
-		new WorldConnectLocations().run(event.getControler().getWorld());
+		new WorldConnectLocations().run(event.getControler().getScenario().getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 

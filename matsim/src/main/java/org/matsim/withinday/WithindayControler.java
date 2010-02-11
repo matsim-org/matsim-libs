@@ -71,14 +71,14 @@ public class WithindayControler extends Controler {
 
 	public WithindayControler(Config config) {
 		super(config);
-		this.addCoreControlerListener(new WithindayControlerListener());		
+		this.addCoreControlerListener(new WithindayControlerListener());
 	}
 
 	private void loadTrafficManagement() {
 	//initialize the traffic management
 		String trafficManagementConfig = this.config.withinday().getTrafficManagementConfiguration();
 		if (trafficManagementConfig != null) {
-			this.trafficManagementConfigurator = new TrafficManagementConfigParser(this.network, this.events, this.config.getQSimConfigGroup());
+			this.trafficManagementConfigurator = new TrafficManagementConfigParser(this.network, this.events, this.config.getQSimConfigGroup(), this.config.controler().getOutputDirectory());
 			try {
 				this.trafficManagementConfigurator.parse(trafficManagementConfig);
 			} catch (SAXException e) {
@@ -134,7 +134,7 @@ public class WithindayControler extends Controler {
 			super.runMobSim();
 		}
 	}
-	
+
 	public WithindayAgentLogicFactory getAgentLogicFactory() {
 		return this.factory;
 	}

@@ -50,13 +50,13 @@ public class PlansGeneratorControler extends Controler {
 
 	}
 
-	/** Should be overwritten in case of artificial population */
-	@Override
-	protected Population loadPopulation() {
-
-//		return generate4wPersons();
-		return generateSimplePlans();
-	}
+//	/** Should be overwritten in case of artificial population */
+//	@Override
+//	protected Population loadPopulation() {
+//
+////		return generate4wPersons();
+//		return generateSimplePlans();
+//	}
 
 	private Population generate4wPersons(){
 

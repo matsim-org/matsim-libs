@@ -129,7 +129,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 	public void notifyStartup(final StartupEvent event) {
 		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
-		new WorldConnectLocations().run(controler.getWorld());
+		new WorldConnectLocations().run(controler.getScenario().getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 		initializeKnowledge();

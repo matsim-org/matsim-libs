@@ -29,7 +29,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -49,7 +48,7 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
  * OTFTVehServer is a Server that reads from the T.veh file format.
- * 
+ *
  * @author dstrippgen
  *
  * @deprecated this currently does not work; may be fixed if needed.  kai, jan'10
@@ -69,17 +68,12 @@ public class OTFTVehServer implements OTFServerRemote {
 	private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
 	private AgentSnapshotInfo readVehicle = null;
 	private double time;
-	
+
 	public OTFTVehServer(String netFileName, String vehFileName) {
 		this.vehFileName = vehFileName;
 
-		Config config = Gbl.getConfig();
-		if (config == null) {
-			config = Gbl.createConfig(null);
-		}
-
 		Gbl.startMeasurement();
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = new ScenarioImpl();
 
 		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
@@ -90,7 +84,7 @@ public class OTFTVehServer implements OTFServerRemote {
 //		connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
 
 		 OTFQSimServerQuadBuilder quadBuilder = new OTFQSimServerQuadBuilder(qnet);
-		
+
 		this.quad =  quadBuilder.createAndInitOTFServerQuad(connect);
 		this.quad.initQuadTree(connect);
 		this.quad.addAdditionalElement(this.writer);

@@ -59,8 +59,9 @@ public class PtCountControlerListener implements StartupListener, IterationEndsL
 		if ((iter % 10 == 0) && (iter > controler.getFirstIteration())) {
 			controler.stopwatch.beginOperation("compare with counts");
 
-			PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(this.oa, this.boardCounts, controler.getNetwork());
-			PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(this.oa, this.alightCounts, controler.getNetwork());
+			double countsScaleFactor = Double.parseDouble(controler.getConfig().getParam("ptCounts", "countsScaleFactor"));
+			PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(this.oa, this.boardCounts, controler.getNetwork(), countsScaleFactor);
+			PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(this.oa, this.alightCounts, controler.getNetwork(), countsScaleFactor);
 
 			String distanceFilter = this.config.findParam(MODULE_NAME, "distanceFilter");
 			String distanceFilterCenterNodeId = this.config.findParam(MODULE_NAME, "distanceFilterCenterNode");

@@ -27,7 +27,6 @@ import java.util.Locale;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -116,8 +115,10 @@ public class CountsAnalyser {
 
 	private String coordSystem;
 
+	private double countsScaleFactor;
+
 	final private Counts counts =  new Counts();
-	
+
 	/**
 	 *
 	 * @param config
@@ -167,6 +168,7 @@ public class CountsAnalyser {
 		System.out.println("  reading LinkAttributes from: " + linksAttributeFilename);
 		this.linkStats = new CalcLinkStats(this.network);
 		this.linkStats.readFile(linksAttributeFilename);
+		this.countsScaleFactor = config.counts().getCountsScaleFactor();
 
 		System.out.println("  done.");
 	}
@@ -181,10 +183,10 @@ public class CountsAnalyser {
 			final CalcLinkStats calcLinkStats) {
 		// processing counts
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats,
-				counts, this.network);
+				counts, this.network, this.countsScaleFactor);
 		if ((this.distanceFilter != null) && (this.distanceFilterCenterNode != null))
 			cca.setDistanceFilter(this.distanceFilter, this.distanceFilterCenterNode);
-		cca.setCountsScaleFactor(Gbl.getConfig().counts().getCountsScaleFactor());
+		cca.setCountsScaleFactor(this.countsScaleFactor);
 		cca.run();
 		return cca.getComparison();
 	}
@@ -212,7 +214,7 @@ public class CountsAnalyser {
 			throw new IllegalArgumentException("Output format must be txt or kml");
 		}
 		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(countsComparisonList);
-		
+
 		double[] hours = new double[24];
 		for (int i = 1; i < 25; i++) {
 			hours[i-1] = i;
@@ -278,7 +280,7 @@ public class CountsAnalyser {
 //		String [] args2 = {"/Volumes/data/work/svnWorkspace/testData/schweiz-ivtch/ivtch-config620linkstats.xml"};
 		String [] args2 = {"/Volumes/data/work/svnWorkspace/testData/schweiz-ivtch/ivtch-config621linkstats.xml"};
 		args = args2;
-		
+
 		CountsAnalyser ca = null;
 		if (args.length != 1) {
 			printHelp();
