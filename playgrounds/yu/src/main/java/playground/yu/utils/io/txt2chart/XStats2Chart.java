@@ -39,10 +39,12 @@ public class XStats2Chart {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String fileBase = "../runs-svn/run766/";
+		String fileBase = "../runs/run623/it0-it500.";
 		// String fileBase = "../matsimTests/breakdown/output/";
-		 String inputFile = fileBase + "traveldistancestats.txt";
-//		String inputFile = fileBase + "scorestats.txt";
+
+		// String inputFile = fileBase + "traveldistancestats.txt";
+		String inputFile = fileBase + "scorestats.txt";
+
 		String chartFile = inputFile.replace("txt", "png");
 		// /////////////////////////////////////////////
 		int maxIter = 1001;
@@ -97,6 +99,6 @@ public class XStats2Chart {
 		chart.addSeries(avgAvg + serie, xs, avg);
 		chart.addSeries(avgExec, xs, exec);
 		chart.addMatsimLogo();
-		chart.saveAsPng(chartFile, 800, 600);
+		chart.saveAsPng(chartFile, 1024, 768);
 	}
 }

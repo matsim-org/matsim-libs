@@ -35,7 +35,7 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 /**
  * deletes the spilth {@code org.matsim.api.core.v01.population.Plan}s, which is
- * more than the maxPlansPerAgent
+ * more than the maxPlansPerAgent (default 4)
  * 
  * @author yu
  * 
@@ -51,6 +51,10 @@ public class PopPruner extends NewPopulation {
 		this.worstPlanSelector = new WorstPlanForRemovalSelector();
 	}
 
+	public PopPruner(Network net, Population population, String filename) {
+		this(net, population, filename, 4/* default maxPlansPerAgent */);
+	}
+
 	@Override
 	public void run(Person person) {
 		int size = person.getPlans().size();
@@ -62,9 +66,9 @@ public class PopPruner extends NewPopulation {
 	}
 
 	public static void main(String args[]) {
-		String netFilename = "../integration-parameterCalibration/test/network.xml";
-		String oldPopFilename = "../integration-parameterCalibration/test/tt_dist_perform/output_plans.xml.gz";
-		String newPopFilename = "../integration-parameterCalibration/test/tt_dist_perform/output_4plans.xml.gz";
+		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		String oldPopFilename = "../runs/run623/it.500/500.plans.xml.gz";
+		String newPopFilename = "../runs/run623/it.500/500.plans4plans.xml.gz";
 
 		Scenario s = new ScenarioImpl();
 
@@ -74,7 +78,7 @@ public class PopPruner extends NewPopulation {
 		Population pop = s.getPopulation();
 		new MatsimPopulationReader(s).readFile(oldPopFilename);
 
-		PopPruner pp = new PopPruner(net, pop, newPopFilename, 4);
+		PopPruner pp = new PopPruner(net, pop, newPopFilename);
 		pp.run(pop);
 		pp.writeEndPlans();
 	}

@@ -35,14 +35,14 @@ import org.matsim.core.population.MatsimPopulationReader;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewSmallPlan extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
-	 *
+	 * 
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
@@ -60,8 +60,8 @@ public class NewSmallPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String inputPopFilename = "../runs-svn/run669/it.500/500.plans.xml.gz";
-		final String outputPopFilename = "../matsimTests/Calibration/miniZurich/miniRun669it.500Plans.xml.gz";
+		final String inputPopFilename = "../integration-parameterCalibration/test/watch/zrh/500.plansMivZrh30km4plansScore0unselected.xml.gz";
+		final String outputPopFilename = "../integration-parameterCalibration/test/watch/zrh/MivZrh30km4plansScore0unselected0.01Mini.xml.gz";
 		// new ScenarioLoader(
 		// // "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
 		// // "../data/ivtch/make10pctPlans.xml"
@@ -76,7 +76,7 @@ public class NewSmallPlan extends NewPopulation {
 		Config c = s.getConfig();
 		PlansConfigGroup pcg = c.plans();
 		pcg.setOutputFile(outputPopFilename);
-		pcg.setOutputSample(0.0001);
+		pcg.setOutputSample(0.01);
 
 		new MatsimPopulationReader(s).readFile(inputPopFilename);
 

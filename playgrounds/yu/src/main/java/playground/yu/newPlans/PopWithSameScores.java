@@ -70,9 +70,9 @@ public class PopWithSameScores extends NewPopulation {
 	}
 
 	public static void main(String[] args) {
-		String netFilename = "../integration-parameterCalibration/test/network.xml", //
-		popFilename = "../integration-parameterCalibration/test/tt_dist_perform/plans4x100.xml.gz", //
-		newPopFilename = "../integration-parameterCalibration/test/tt_dist_perform/plans4x100score0.xml.gz";
+		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch.xml", //
+		popFilename = "../runs-svn/run663/it.500/500.plans4plans.xml.gz", //
+		newPopFilename = "../runs-svn/run663/it.500/500.plans4plansScore0.xml.gz";
 
 		Scenario sc = new ScenarioImpl();
 

@@ -97,8 +97,8 @@ public class DoublePop extends NewPopulation {
 		Gbl.startMeasurement();
 
 		String networkFilename = "../integration-parameterCalibration/test/network.xml";
-		String plansFilename = "../integration-parameterCalibration/test/plans1.xml";
-		String outputPlansFilename = "../integration-parameterCalibration/test/plans1_2_100.xml";
+		String plansFilename = "../integration-parameterCalibration/test/matsim/plans1.xml";
+		String outputPlansFilename = "../integration-parameterCalibration/test/matsim/pop100.xml";
 
 		ScenarioImpl s = new ScenarioImpl();
 

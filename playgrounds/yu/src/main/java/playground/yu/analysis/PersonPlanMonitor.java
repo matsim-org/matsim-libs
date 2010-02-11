@@ -84,7 +84,7 @@ public class PersonPlanMonitor {
 
 	public double getTotalDistances_km() {
 		if (this.stuck)
-			return 0.0;
+			return 10000.0;
 		return legDist;
 	}
 
@@ -146,10 +146,9 @@ public class PersonPlanMonitor {
 			closeTime = 24.0 * 3600.0 - 1.0;
 		}
 
-		double typicalDuration = actParams.getTypicalDuration(), zeroUtilityDuration// [h]
-		= (typicalDuration / 3600.0)
-				* Math.exp(-10.0 / (typicalDuration / 3600.0)
-						/ actParams.getPriority()), //
+		double typicalDuration_h = actParams.getTypicalDuration() / 3600.0, zeroUtilityDuration_h// [h]
+		= typicalDuration_h
+				* Math.exp(-10.0 / typicalDuration_h / actParams.getPriority()), //
 
 		actStart = this.actStartTime, actEnd = this.actEndTime;
 
@@ -164,10 +163,9 @@ public class PersonPlanMonitor {
 			actStart = this.actEndTime;
 			actEnd = this.actEndTime;
 		}
-		double durAttr = typicalDuration
-				* Math
-						.log(((actEnd - actStart) / 3600.0)
-								/ zeroUtilityDuration) / 3600.0;
+		double performingTime_h = (actEnd - actStart) / 3600.0;
+		double durAttr = typicalDuration_h
+				* Math.log(performingTime_h / zeroUtilityDuration_h);
 		return Math.max(durAttr, 0);
 	}
 
