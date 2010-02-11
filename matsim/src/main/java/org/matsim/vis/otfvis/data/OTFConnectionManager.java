@@ -23,6 +23,7 @@ package org.matsim.vis.otfvis.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -145,13 +146,23 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 	}
 	
 	public void connectReaderToReceiver(Class<? extends OTFDataReader> reader, Class<? extends OTFDataReceiver> receiver) {
-		Entry entry = new Entry(reader, receiver);
-		connections.add(entry);
+		Collection<Class<?>> receiverClasses = this.getToEntries(reader);
+		if (receiverClasses.contains(receiver)) {
+			log.warn("Trying to connect the same receiver twice. Ignoring: "+receiver);
+		} else {
+			Entry entry = new Entry(reader, receiver);
+			connections.add(entry);
+		}
 	}
 	
 	public void connectReceiverToLayer(Class<? extends OTFDataReceiver> receiver, Class<? extends SceneLayer> layer) {
-		Entry entry = new Entry(receiver, layer);
-		connections.add(entry);
+		Collection<Class<?>> layerClasses = this.getToEntries(receiver);
+		if (layerClasses.contains(layer)) {
+			log.warn("Trying to connect the same layer twice. Ignoring: "+receiver);
+		} else {
+			Entry entry = new Entry(receiver, layer);
+			connections.add(entry);
+		}
 	}
 
 	public void remove(Class<?> from) {
@@ -175,27 +186,27 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 	@SuppressWarnings("unchecked")
 	public Collection<OTFDataReceiver> getReceiversForReader(Class<? extends OTFDataReader> reader, SceneGraph graph) {
 		Collection<Class<?>> classList = getToEntries(reader);
-		List<OTFDataReceiver> receiverList = new LinkedList<OTFDataReceiver>();
+		Collection<OTFDataReceiver> receivers = new HashSet<OTFDataReceiver>();
 		for(Class<?> entry : classList) {
 			try {
-				receiverList.add(graph.newInstance((Class<? extends OTFDataReceiver>) entry));
+				receivers.add(graph.newInstance((Class<? extends OTFDataReceiver>) entry));
 			} catch (InstantiationException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			}
 		}
-		return receiverList;
+		return receivers;
 	}
 
 	@SuppressWarnings("unchecked")
 	public Collection<Class<OTFDataReader>> getReadersForWriter(Class<? extends OTFDataWriter> writer) {
 		Collection<Class<?>> classList = getToEntries(writer);
-		List<Class<OTFDataReader>> readerList = new LinkedList<Class<OTFDataReader>>();
+		Collection<Class<OTFDataReader>> readers = new HashSet<Class<OTFDataReader>>();
 		for(Class<?> entry : classList) {
-			readerList.add((Class<OTFDataReader>) entry);
+			readers.add((Class<OTFDataReader>) entry);
 		}
-		return readerList;
+		return readers;
 	}
 
 	public void fillLayerMap(Map<Class<?>, SceneLayer> layers) {

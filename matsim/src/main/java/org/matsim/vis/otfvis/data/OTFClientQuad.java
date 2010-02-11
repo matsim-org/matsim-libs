@@ -159,7 +159,12 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	}
 
 	public void addAdditionalElement(final OTFDataReader element) {
-		this.additionalElements.add(element);
+		if (additionalElements.contains(element)) {
+			// Some movies do this.
+			log.warn("Trying to add a reader twice. Ignoring: " + element);
+		} else {
+			this.additionalElements.add(element);
+		}
 	}
 
 	public synchronized void createReceiver(final OTFConnectionManager c) {

@@ -252,7 +252,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			repaint();
 		} else {
 			requestTimeStep(loopStart, OTFServerRemote.TimePreference.LATER);
-			System.out.println("To start...");
+			log.debug("To start...");
 		}
 	}
 
@@ -285,13 +285,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 		GraphicsDevice gd = this.frame.getGraphicsConfiguration().getDevice();
 		if (gd.getFullScreenWindow() == null) {
-			System.out.println("enter fullscreen");
+			log.debug("enter fullscreen");
 			this.windowBounds = frame.getBounds();
 	  	frame.dispose();
 	  	frame.setUndecorated(true);
 	  	gd.setFullScreenWindow(frame);
 		} else {
-			System.out.println("exit fullscreen");
+			log.debug("exit fullscreen");
 			gd.setFullScreenWindow(null);
 			frame.dispose();
 			frame.setUndecorated(false);
@@ -427,7 +427,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			} else if (command.equals(SET_TIME))
 				changed_SET_TIME(event);
 		} catch (IOException e) {
-			System.err.println("ControlToolbar encountered problem.");
+			log.error("ControlToolbar encountered problem.");
 			e.printStackTrace();
 		}
 		try {
