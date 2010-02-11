@@ -164,28 +164,36 @@ public class TravelTimeCalculator
 		return data;
 	}
 
+	public double getLinkTravelTime(final Id linkId, final double time) {
+    if (this.calculateLinkTravelTimes) {
+      DataContainer data = getTravelTimeData(linkId, true);
+      if (data.needsConsolidation) {
+        consolidateData(data);
+      }
+      return this.aggregator.getTravelTime(data.ttData, time); 
+    }
+    throw new IllegalStateException("No link travel time is available " +
+        "if calculation is switched off by config option!");
+	}
+	
 	public double getLinkTravelTime(final Link link, final double time) {
-		if (this.calculateLinkTravelTimes) {
-			DataContainer data = getTravelTimeData(link.getId(), true);
-			if (data.needsConsolidation) {
-				consolidateData(data);
-			}
-			return this.aggregator.getTravelTime(data.ttData, time); 
-		}
-		throw new IllegalStateException("No link travel time is available " +
-				"if calculation is switched off by config option!");
+	  return this.getLinkTravelTime(link.getId(), time);
+	}
+	
+	public double getLinkToLinkTravelTime(final Id fromLinkId, final Id toLinkId, double time){
+    if (!this.calculateLinkToLinkTravelTimes) {
+      throw new IllegalStateException("No link to link travel time is available " +
+      "if calculation is switched off by config option!");      
+    }
+    DataContainer data = this.getLinkToLinkTravelTimeData(new Tuple<Id, Id>(fromLinkId, toLinkId), true);
+    if (data.needsConsolidation) {
+      consolidateData(data);
+    }
+    return this.aggregator.getTravelTime(data.ttData, time);
 	}
 	
 	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
-		if (!this.calculateLinkToLinkTravelTimes) {
-			throw new IllegalStateException("No link to link travel time is available " +
-			"if calculation is switched off by config option!");			
-		}
-		DataContainer data = this.getLinkToLinkTravelTimeData(new Tuple<Id, Id>(fromLink.getId(), toLink.getId()), true);
-		if (data.needsConsolidation) {
-			consolidateData(data);
-		}
-		return this.aggregator.getTravelTime(data.ttData, time);
+	  return this.getLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
 	}
 
 	public void reset(int iteration) {
