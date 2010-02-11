@@ -50,29 +50,29 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  */
 public class GershensonAdaptiveTrafficLightController extends
 			AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, LaneLeaveEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
-	
+
 	private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
-	
+
 	private final double vMin = 8; // minimum Speed in km/h
 	private final double tMin = 15; // time in seconds
 	private final double minVehicles = 10; //
-	
+
 	private Map<Id, Double> vehOnLink = new TreeMap<Id, Double>();
 	private Map<Id, Double> vehOnLanes = new TreeMap<Id, Double>();
 	private Map<Id, Double> agentLinkEnterTime = new TreeMap<Id, Double>();
 	private Map<Id, Double> averageLinkTravelTime = new TreeMap<Id, Double>();
 	private Map<Id, Double> switchedToGreen = new TreeMap<Id, Double>();
-	
+
 	private SortedMap<Id, Id> corrGroups;
 	private SortedMap<Id, List<Id>> compGroups;
 	private SortedMap<Id, SignalGroupState> oldState;
-	
+
 	/**
 	 * dg hack this field should disappear in the near future
 	 */
 	private Tuple<SignalGroupDefinition, Double> lastCallOfIsGreen;
-	
-	
+
+
 	public GershensonAdaptiveTrafficLightController(AdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);
 	}
@@ -89,16 +89,16 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 		initLinkEnterTime(pop);
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
 		iteration = 0;
 		vehOnLanes.clear();
-		vehOnLink.clear();	
+		vehOnLink.clear();
 		agentLinkEnterTime.clear();
 		averageLinkTravelTime.clear();
 	}
-	
+
 	@Override
 	public void handleEvent(LaneEnterEvent e) {
 			vehOnLanes.put(e.getLinkId(), vehOnLanes.get(e.getLinkId())+1);
@@ -108,18 +108,18 @@ public class GershensonAdaptiveTrafficLightController extends
 	public void handleEvent(LaneLeaveEvent e) {
 			vehOnLanes.put(e.getLinkId(), vehOnLanes.get(e.getLinkId())-1);
 	}
-	
+
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		vehOnLink.put(e.getLinkId(), vehOnLink.get(e.getLinkId())+1);
-		agentLinkEnterTime.put(e.getPersonId(),e.getTime());		
+		agentLinkEnterTime.put(e.getPersonId(),e.getTime());
 	}
 
 	public void handleEvent(LinkLeaveEvent e) {
 		vehOnLink.put(e.getLinkId(), vehOnLink.get(e.getLinkId())-1);
-		averageLinkTravelTime.put(e.getLinkId(), (averageLinkTravelTime.get(e.getLinkId()) + 
+		averageLinkTravelTime.put(e.getLinkId(), (averageLinkTravelTime.get(e.getLinkId()) +
 				e.getTime()- agentLinkEnterTime.get(e.getPersonId())) / 2);
-		// Problem, Zeit wird erst gemessen, wenn Agent Link verlässt. Stau existiert dann uU schon?!
+		// Problem, Zeit wird erst gemessen, wenn Agent Link verlaesst. Stau existiert dann uU schon?!
 	}
 
 	@Override
@@ -137,15 +137,15 @@ public class GershensonAdaptiveTrafficLightController extends
 			this.lastCallOfIsGreen = new Tuple<SignalGroupDefinition, Double>(signalGroup, time);
 		}
 		//end dg hack
-		
-		
+
+
 		double avSpeedOut = 10;
 		boolean compGroupsGreen = false;
 		double compGreenTime = 0;
 		double approachingRed = 0; // product of time and approaching cars
 		double approachingGreenLink = 0;
 		double approachingGreenLane = 0;
-		
+
 		Map<Id, SignalGroupDefinition> groups = this.getSignalGroups();
 		SignalGroupState oldState = this.getSignalGroupStates().get(signalGroup);
 
@@ -174,17 +174,17 @@ public class GershensonAdaptiveTrafficLightController extends
 		}else{
 			approachingRed = 0;
 		}
-		
+
 		//------- end of initializing
-		
-		//check if corresponding group is switched to green in this timestep. if so and no 
-		//compGroup shows green, switch to green		
-		if (!(switchedToGreen.get(corrGroups.get(signalGroup.getId())).equals(null)) && 
+
+		//check if corresponding group is switched to green in this timestep. if so and no
+		//compGroup shows green, switch to green
+		if (!(switchedToGreen.get(corrGroups.get(signalGroup.getId())).equals(null)) &&
 				switchedToGreen.get(corrGroups.get(signalGroup.getId())).equals(time) &&
 				compGroupsGreen == false && oldState.equals(SignalGroupState.RED)){
 			return switchLight(signalGroup, oldState, time);
 		}
-		
+
 		// start algorithm
 		if (avSpeedOut < vMin && oldState.equals(SignalGroupState.GREEN)){ //4
 			return switchLight(signalGroup, oldState, time);
@@ -200,17 +200,17 @@ public class GershensonAdaptiveTrafficLightController extends
 						return switchLight(signalGroup, oldState, time);
 //				}
 			}
-			
+
 		}
 		log.error("This should never happen! Mistake in adaptiveTrafficLightAlgorithm, no condition fits!");
 		System.exit(0);
 		return false; // if no case of the algorithm fits, switch to false
 	}
-	
+
 	public void setCorrGroups(Map<Id,Id> corrGroups){
 		this.corrGroups = (SortedMap<Id, Id>) corrGroups;
 	}
-	
+
 	public void setCompGroups(Map<Id, List<Id>> compGroups){
 		this.compGroups = (SortedMap<Id, List<Id>>) compGroups;
 	}
@@ -230,7 +230,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			switchedToGreen.put(group.getId(), time);
 			return true;
 		}
-		
+
 		return false;
 	}
 }
