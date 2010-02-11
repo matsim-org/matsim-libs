@@ -24,16 +24,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.utils.misc.RouteUtils;
 
+/**
+ * Calculates the sum of the distance of all routes in a plan,
+ * including the start link, but excluding the target link.
+ * The algorithm does not care about the leg-mode!
+ */
 public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
@@ -79,49 +83,32 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// helper methods
-	//////////////////////////////////////////////////////////////////////
-
 	public void handlePlan(final Plan plan) throws Exception {
-		List<?> actslegs = plan.getPlanElements();
-		ActivityImpl fromAct = (ActivityImpl)actslegs.get(0);
+		List<? extends PlanElement> actslegs = plan.getPlanElements();
 
-		// loop over all <act>s
-		for (int j = 2; j < actslegs.size(); j=j+2) {
-			ActivityImpl toAct = (ActivityImpl)actslegs.get(j);
-			LegImpl leg = (LegImpl)actslegs.get(j-1);
+		for (PlanElement pe : actslegs) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 
-			Link startlink = this.network.getLinks().get(fromAct.getLinkId());
-			Node startnode = startlink.getFromNode();
+				ArrayList<Id> linkIds = new ArrayList<Id>();
 
-			ArrayList<Node> nodes = new ArrayList<Node>();
-			nodes.add(startnode);
+				NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
+				if (route == null) throw new Exception("route missing");
 
-			NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
-			if (route == null) throw new Exception("route missing");
-			nodes.addAll(RouteUtils.getNodes(route, network));
+				linkIds.add(route.getStartLinkId());
+				linkIds.addAll(route.getLinkIds());
+				double dist = calcDistance(linkIds);
 
-			double dist = calcDistance(nodes);
-
-			route.setDistance(dist);
-
-			fromAct = toAct;
+				route.setDistance(dist);
+			}
 		}
 	}
 
-	private double calcDistance(final ArrayList<Node> nodes) {
+	private double calcDistance(final List<Id> linkIds) {
 		double dist = 0.0;
-		for (int i=0; i<nodes.size()-1; i++) {
-			Node from = nodes.get(i);
-			Node to = nodes.get(i+1);
-
-			for (Link currlink : from.getOutLinks().values()) {
-				if (currlink.getToNode().equals(to)) {
-					dist += currlink.getLength();
-					break;
-				}
-			}
+		for (Id linkId : linkIds) {
+			Link link = this.network.getLinks().get(linkId);
+			dist += link.getLength();
 		}
 		return dist;
 	}

@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -35,11 +34,11 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
-import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
  * @author dgrether
+ * @author mrieser
  */
 public class PersonAgent implements DriverAgent {
 
@@ -60,9 +59,9 @@ public class PersonAgent implements DriverAgent {
 	private transient Id destinationLinkId;
 
 	private LegImpl currentLeg;
-	private List<Node> cacheRouteNodes = null;
+	private List<Id> cachedRouteLinkIds = null;
 
-	private int currentNodeIndex;
+	private int currentLinkIdIndex;
 
 	public PersonAgent(final Person p, final QueueSimulation simulation) {
 		this.person = p;
@@ -107,10 +106,6 @@ public class PersonAgent implements DriverAgent {
 		return this.currentLeg;
 	}
 
-	public int getCurrentNodeIndex() {
-		return this.currentNodeIndex;
-	}
-
 	@Override
 	public Id getDestinationLinkId() {
 		return this.destinationLinkId;
@@ -125,7 +120,6 @@ public class PersonAgent implements DriverAgent {
 		this.currentLinkId = firstAct.getLinkId();
 		if ((departureTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
 			setDepartureTime(departureTime);
-//			SimulationTimer.updateSimStartTime(departureTime);
 			this.simulation.scheduleActivityEnd(this);
 			AbstractSimulation.incLiving();
 			return true;
@@ -145,8 +139,8 @@ public class PersonAgent implements DriverAgent {
 
 		// set the route according to the next leg
 		this.currentLeg = leg;
-		this.cacheRouteNodes = null;
-		this.currentNodeIndex = 1;
+		this.cachedRouteLinkIds = null;
+		this.currentLinkIdIndex = 0;
 		this.cachedNextLinkId = null;
 
 		this.simulation.agentDeparts(now, this, this.currentLinkId);
@@ -253,7 +247,7 @@ public class PersonAgent implements DriverAgent {
 
 	public void moveOverNode() {
 		this.currentLinkId = this.cachedNextLinkId;
-		this.currentNodeIndex++;
+		this.currentLinkIdIndex++;
 		this.cachedNextLinkId = null; //reset cached nextLink
 	}
 
@@ -267,11 +261,11 @@ public class PersonAgent implements DriverAgent {
 		if (this.cachedNextLinkId != null) {
 			return this.cachedNextLinkId;
 		}
-		if (this.cacheRouteNodes == null) {
-			this.cacheRouteNodes = RouteUtils.getNodes((NetworkRouteWRefs) this.currentLeg.getRoute(), this.simulation.networkLayer); // TODO [MR] change to links
+		if (this.cachedRouteLinkIds == null) {
+			this.cachedRouteLinkIds = ((NetworkRouteWRefs) this.currentLeg.getRoute()).getLinkIds();
 		}
 
-		if (this.currentNodeIndex >= this.cacheRouteNodes.size() ) {
+		if (this.currentLinkIdIndex >= this.cachedRouteLinkIds.size()) {
 			// we have no more information for the route, so we should have arrived at the destination link
 			Link currentLink = this.simulation.networkLayer.getLinks().get(this.currentLinkId);
 			Link destinationLink = this.simulation.networkLayer.getLinks().get(this.destinationLinkId);
@@ -284,19 +278,16 @@ public class PersonAgent implements DriverAgent {
 				log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.currentLinkId.toString()
 						+ ", is at the end of its route, but has not yet reached its destination link " + this.destinationLinkId.toString());
 			}
-			return null;
+			return null; // the vehicle is at the end of its route
 		}
 
-		Node destNode = this.cacheRouteNodes.get(this.currentNodeIndex);
-
+		this.cachedNextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex);  //save time in later calls, if link is congested
 		Link currentLink = this.simulation.networkLayer.getLinks().get(this.currentLinkId);
-		for (Link link :  currentLink.getToNode().getOutLinks().values()) {
-			if (link.getToNode() == destNode) {
-				this.cachedNextLinkId = link.getId(); //save time in later calls, if link is congested
-				return this.cachedNextLinkId;
-			}
+		Link nextLink = this.simulation.networkLayer.getLinks().get(this.cachedNextLinkId);
+		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
+			return this.cachedNextLinkId;
 		}
-		log.warn(this + " [no link to next routenode found: routeindex= " + this.currentNodeIndex + " ]");
+		log.warn(this + " [no link to next routenode found: routeindex= " + this.currentLinkIdIndex + " ]");
 		return null;
 	}
 
