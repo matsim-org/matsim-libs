@@ -114,7 +114,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		vehOnLink.put(e.getLinkId(), vehOnLink.get(e.getLinkId())+1);
 		agentLinkEnterTime.put(e.getPersonId(),e.getTime());
 	}
-
+	@Override
 	public void handleEvent(LinkLeaveEvent e) {
 		vehOnLink.put(e.getLinkId(), vehOnLink.get(e.getLinkId())-1);
 		averageLinkTravelTime.put(e.getLinkId(), (averageLinkTravelTime.get(e.getLinkId()) +
@@ -196,15 +196,19 @@ public class GershensonAdaptiveTrafficLightController extends
 			if (approachingRed > 0 && approachingGreenLink == 0){ //16
 				return switchLight(signalGroup, oldState, time);
 			}else if(approachingGreenLane == 0){
-//				if ((time - compGreenTime) > tMin && vehOnLink.get(signalGroup.getLinkRefId()) > minVehicles){
+				if ((time - compGreenTime) > tMin && vehOnLink.get(signalGroup.getLinkRefId()) > minVehicles){
 						return switchLight(signalGroup, oldState, time);
-//				}
+				}
 			}
 
 		}
-		log.error("This should never happen! Mistake in adaptiveTrafficLightAlgorithm, no condition fits!");
-		System.exit(0);
-		return false; // if no case of the algorithm fits, switch to false
+		if(this.getSignalGroupStates().get(signalGroup).equals(SignalGroupState.GREEN)){
+				return true;
+			}
+		return false;
+//		log.error("This should never happen! Mistake in adaptiveTrafficLightAlgorithm, no condition fits!");
+//		System.exit(0);
+//		return true; // if no case of the algorithm fits, switch to false
 	}
 
 	public void setCorrGroups(Map<Id,Id> corrGroups){
