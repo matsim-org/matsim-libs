@@ -285,7 +285,7 @@ public class GeneratePopulation {
 			// Mitfahrer
 			return TransportMode.miv;
 		} else if (hauptverkehrsmittel.equals("8")) {
-			// …V
+			// PT
 			// return TransportMode.pt;
 			return TransportMode.car;
 		} else if (hauptverkehrsmittel.equals("6")) {
