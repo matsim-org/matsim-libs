@@ -26,6 +26,7 @@ package playground.droeder;
 public interface DaPaths {
 	
 	final String DATA = "D:\\Dokumente\\Uni\\Bachelorarbeit\\Eclipse\\";
+	final String DENVER = "D:\\Eclipse Workspace\\MATSim2\\Denver\\";
 	
 	final String INPUT = DATA + "input\\";
 	final String OUTPUT = DATA + "output\\";
