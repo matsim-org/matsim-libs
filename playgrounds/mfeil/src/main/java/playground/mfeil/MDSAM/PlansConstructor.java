@@ -97,41 +97,41 @@ public class PlansConstructor implements PlanStrategyModule{
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
-		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz06.xml.gz";
-		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans06.dat";
+		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz0993a.xml.gz";
+		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans0993a.dat";
 		this.attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model06.mod";
-		this.outputFileSimsOverview = "/home/baug/mfeil/data/choiceSet/it0/sims06.xls";
-	/*	this.inputFile = "./plans/input_plans2.xml";
-		this.outputFile = "./plans/output_plans.xml.gz";
-		this.outputFileBiogeme = "./plans/output_plans.dat";
-		this.outputFileMod = "./plans/model.mod";
-	*/	this.population = (PopulationImpl) controler.getPopulation(); // new PopulationImpl();
+		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model0993a.mod";
+		this.outputFileSimsOverview = "/home/baug/mfeil/data/choiceSet/it0/simsOverview0993a.xls";
+		this.population = new PopulationImpl(this.controler.getScenario());
 		this.sims = null;
 		this.network = controler.getNetwork();
 		this.init(network);
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, controler.getScenario().getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
-		this.beta				= "no";
+		this.beta				= "yes";
 		this.gamma				= "no";
-		this.similarity 		= "no";
-		this.incomeConstant 	= "yes";
+		this.similarity 		= "yes";
+		this.incomeConstant 	= "no";
 		this.incomeDivided 		= "no";
 		this.incomeDividedLN	= "no";
-		this.incomeBoxCox 		= "no";
+		this.incomeBoxCox 		= "yes";
 		this.age 				= "no";
-		this.gender 			= "no";
+		this.gender 			= "yes";
 		this.income 			= "no";
 		this.license 			= "no";
 		this.carAvail 			= "no";
 		this.seasonTicket 		= "no";
 		this.travelDistance		= "no";
 		this.travelCost			= "no";
-		this.travelConstant 	= "no";
+		this.travelConstant 	= "yes";
 		this.beta_travel		= "no";
-		this.bikeIn				= "no";
+		this.bikeIn				= "yes";
+		this.munType			= "no";
+		this.innerHome			= "yes";
+		
 		this.noOfAlternatives 	= 20;
+		
 		this.travelCostCar		= 0.5;	// CHF/km
 		this.costPtNothing		= 0.28;	// CHF/km
 		this.costPtHalbtax		= 0.15;	// CHF/km
@@ -155,6 +155,7 @@ public class PlansConstructor implements PlanStrategyModule{
 
 	public void prepareReplanning() {
 		// Read the external plans file.
+		this.controler.getScenario().setPopulation(this.population);
 		new MatsimPopulationReader(this.controler.getScenario()).readFile(this.inputFile);
 		log.info("Reading population done.");
 	}
