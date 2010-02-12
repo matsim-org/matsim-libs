@@ -30,8 +30,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.LaneEnterEvent;
@@ -49,7 +51,8 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  *
  */
 public class GershensonAdaptiveTrafficLightController extends
-			AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, LaneLeaveEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
+			AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, LaneLeaveEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
+			AgentDepartureEventHandler{
 
 	private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
 
@@ -121,6 +124,12 @@ public class GershensonAdaptiveTrafficLightController extends
 				e.getTime()- agentLinkEnterTime.get(e.getPersonId())) / 2);
 		// Problem, Zeit wird erst gemessen, wenn Agent Link verlaesst. Stau existiert dann uU schon?!
 	}
+	@Override
+	public void handleEvent(AgentDepartureEvent e) {
+		vehOnLink.put(e.getLinkId(), vehOnLink.get(e.getLinkId())+1);
+		agentLinkEnterTime.put(e.getPersonId(),e.getTime());
+	}
+	
 
 	@Override
 	public boolean givenSignalGroupIsGreen(double time, SignalGroupDefinition signalGroup) {
@@ -195,7 +204,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			}
 			if (approachingRed > 0 && approachingGreenLink == 0){ //16
 				return switchLight(signalGroup, oldState, time);
-			}else if(approachingGreenLane == 0){
+			}else {
 				if ((time - compGreenTime) > tMin && vehOnLink.get(signalGroup.getLinkRefId()) > minVehicles){
 						return switchLight(signalGroup, oldState, time);
 				}
@@ -205,10 +214,10 @@ public class GershensonAdaptiveTrafficLightController extends
 		if(this.getSignalGroupStates().get(signalGroup).equals(SignalGroupState.GREEN)){
 				return true;
 			}
+		else{
+		log.error("This should never happen! Mistake in adaptiveTrafficLightAlgorithm, no condition fits!");
 		return false;
-//		log.error("This should never happen! Mistake in adaptiveTrafficLightAlgorithm, no condition fits!");
-//		System.exit(0);
-//		return true; // if no case of the algorithm fits, switch to false
+		}
 	}
 
 	public void setCorrGroups(Map<Id,Id> corrGroups){
@@ -237,4 +246,5 @@ public class GershensonAdaptiveTrafficLightController extends
 
 		return false;
 	}
+
 }

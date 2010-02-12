@@ -51,19 +51,25 @@ public class GershensonRunner {
 	private Map<Id, Id> corrGroups;
 	private Map<Id, List<Id>> compGroups;
 	
+	// "D" run denver -- "G" run gershensonTestNetwork
+	private static final String config = "D";
+	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 
 	
 	public void runScenario (final String configFile){
 		String conf = null;
 		
-		if (configFile == null){
+		if (configFile == "G"){
 			log.info("no configfile given");
-			GershensonScenarioGenerator sg = new GershensonScenarioGenerator();
-			sg.createScenario();
-			conf = sg.CONFIGOUTPUTFILE;		
-		}
-		else{
+			GershensonScenarioGenerator gsg = new GershensonScenarioGenerator();
+			gsg.createScenario();
+			conf = gsg.CONFIGOUTPUTFILE;		
+		}else if (configFile == "D"){
+			log.info("start Denver");
+			DenverScenarioGenerator dsg = new DenverScenarioGenerator();
+			conf = dsg.CONFIGOUTPUTFILE;
+		}else {
 			conf = configFile;
 		}
 		
@@ -132,7 +138,7 @@ public class GershensonRunner {
 	
 	public static void main(String[] args) {
 		
-		new GershensonRunner().runScenario(null);
+		new GershensonRunner().runScenario(config);
 		
 	}
 	
