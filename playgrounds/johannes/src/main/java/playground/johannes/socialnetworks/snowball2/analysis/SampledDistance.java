@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * SampledDistance.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
+
+import playground.johannes.socialnetworks.graph.spatial.Distance;
+import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public class SampledDistance extends Distance {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
-	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
-	}
-	
 	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
+	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
+		return super.distribution(extractDelegates(vertices));
 	}
 
+	@Override
+	public Distribution vertexAccumulatedDistribution(
+			Set<? extends SpatialVertex> vertices) {
+		return super.vertexAccumulatedDistribution(extractDelegates(vertices));
+	}
+
+	private Set<SpatialVertex> extractDelegates(Set<? extends SpatialVertex> vertices) {
+		Set<SampledVertexDecorator<? extends SpatialVertex>> partition =
+			SnowballPartitions.<SampledVertexDecorator<? extends SpatialVertex>>
+			createSampledPartition((Set<SampledVertexDecorator<? extends SpatialVertex>>)vertices);
+		
+		Set<SpatialVertex> delegates = new HashSet<SpatialVertex>();
+		for(SampledVertexDecorator<? extends SpatialVertex> v : partition)
+			delegates.add(v.getDelegate());
+		
+		return delegates;
+	}
 }

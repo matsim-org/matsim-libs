@@ -22,26 +22,34 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraphProjectionBuilder;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
+import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraphFactory;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
-
 
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class SampledSpatialGraphProjectionBuilder <G extends SampledSpatialGraph, V extends SampledSpatialVertex, E extends SampledSpatialEdge> extends
-												SpatialGraphProjectionBuilder<G, V, E> {
+public class SampledSpatialGraphProjectionBuilder<G extends SampledSpatialGraph, V extends SampledSpatialVertex, E extends SampledSpatialEdge>
+		extends SpatialGraphProjectionBuilder<G, V, E> {
 
+	/**
+	 * Creates a new sampled spatial graph projection builder with a
+	 * {@link SampledSpatialGraphFactory}.
+	 */
 	public SampledSpatialGraphProjectionBuilder() {
 		super(new SampledSpatialGraphProjectionFactory<G, V, E>());
 	}
-	
+
+	/**
+	 * @see {@link SpatialGraphProjectionBuilder#decorate(org.matsim.contrib.sna.graph.spatial.SpatialGraph, Geometry)}
+	 */
 	@Override
 	public SampledSpatialGraphProjection<G, V, E> decorate(G delegate,
 			Geometry geometry) {
-		return (SampledSpatialGraphProjection<G, V, E>) super.decorate(delegate, geometry);
+		return (SampledSpatialGraphProjection<G, V, E>) super.decorate(
+				delegate, geometry);
 	}
 
 }

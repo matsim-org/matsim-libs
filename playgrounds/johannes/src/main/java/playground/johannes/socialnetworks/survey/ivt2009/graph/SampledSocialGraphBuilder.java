@@ -33,18 +33,12 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SampledSocialGraphBuilder extends AbstractSparseGraphBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> {
 
-	
-	public SampledSocialGraphBuilder() {
-		super(new SampledSocialGraphFactory());
+	public SampledSocialGraphBuilder(CoordinateReferenceSystem crs) {
+		super(new SampledSocialGraphFactory(crs));
 	}
 	
 	public SampledSocialGraph createGraph() {
-		throw new UnsupportedOperationException(
-		"Cannot create a graph without a coordinate reference system. User createGraph(CoordinateReferenceSystem) instead.");
-	}
-	
-	public SampledSocialGraph createGraph(CoordinateReferenceSystem crs) {
-		return ((SampledSocialGraphFactory)getFactory()).createGraph(crs);
+		return ((SampledSocialGraphFactory)getFactory()).createGraph();
 	}
 
 	@Override

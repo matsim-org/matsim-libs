@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
+import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.GraphFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -33,24 +35,37 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SampledSocialGraphFactory implements GraphFactory<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> {
 
+	private static final Logger logger = Logger.getLogger(SampledSocialGraphFactory.class);
+	
+	private final CoordinateReferenceSystem crs;
+	
+	private final int SRID;
+	
+	public SampledSocialGraphFactory(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+		SRID = CRSUtils.getSRID(crs);
+		if(SRID == 0)
+			logger.warn("Coordinate reference system has no SRID. Setting SRID to 0.");
+	}
+	
 	public SampledSocialEdge createEdge() {
 		return new SampledSocialEdge();
 	}
 
 	public SampledSocialGraph createGraph() {
-		throw new UnsupportedOperationException(
-				"Cannot create a graph without a coordinate reference system. User createGraph(CoordinateReferenceSystem) instead.");
-	}
-	
-	public SampledSocialGraph createGraph(CoordinateReferenceSystem crs) {
 		return new SampledSocialGraph(crs);
 	}
+	
+//	public SampledSocialGraph createGraph(CoordinateReferenceSystem crs) {
+//		return new SampledSocialGraph(crs);
+//	}
 
 	public SampledSocialVertex createVertex() {
 		throw new UnsupportedOperationException();
 	}
 	
 	public SampledSocialVertex createVertex(SocialPerson person, Point point) {
+		point.setSRID(SRID);
 		return new SampledSocialVertex(person, point);
 	}
 

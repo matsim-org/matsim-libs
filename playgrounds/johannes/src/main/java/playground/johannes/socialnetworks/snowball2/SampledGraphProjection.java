@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * SampledGraphProjection.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphProjection;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.snowball.SampledGraph;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public class SampledGraphProjection<G extends Graph, V extends Vertex, E extends Edge> extends GraphProjection<G, V, E> implements SampledGraph {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
-	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
+	public SampledGraphProjection(G delegate) {
+		super(delegate);
 	}
-	
-	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
-	}
-
 }

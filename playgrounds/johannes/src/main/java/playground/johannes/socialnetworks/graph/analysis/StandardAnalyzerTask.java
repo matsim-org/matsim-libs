@@ -26,11 +26,10 @@ package playground.johannes.socialnetworks.graph.analysis;
  */
 public class StandardAnalyzerTask extends GraphAnalyzerTaskComposite {
 
-	public StandardAnalyzerTask(String output) {
-		super(output);
+	public StandardAnalyzerTask() {
 		addTask(new GraphSizeTask());
-		addTask(new DegreeTask(getOutputDirectory()));
-		addTask(new TransitivityTask(getOutputDirectory()));
+		addTask(new DegreeTask());
+		addTask(new TransitivityTask());
 	}
 
 }

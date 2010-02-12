@@ -31,7 +31,7 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVert
  * @author illenberger
  *
  */
-public class RemoveIsolatedSamplesTask implements GraphTask<SampledSocialGraph> {
+public class RemoveIsolatedSamplesTask implements GraphFilter<SampledSocialGraph> {
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -44,7 +44,7 @@ public class RemoveIsolatedSamplesTask implements GraphTask<SampledSocialGraph> 
 			}
 		}
 		
-		SampledSocialGraphBuilder builder = new SampledSocialGraphBuilder();
+		SampledSocialGraphBuilder builder = new SampledSocialGraphBuilder(null);
 		for(SampledSocialVertex vertex : remove)
 			builder.removeVertex(graph, vertex);
 		

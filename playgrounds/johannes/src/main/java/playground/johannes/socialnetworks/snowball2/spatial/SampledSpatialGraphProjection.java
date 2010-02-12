@@ -22,48 +22,65 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialEdgeDecorator;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraphProjection;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertexDecorator;
+import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
 import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
 
-
 /**
+ * Extension of {@link SpatialGraphProjection} that implements
+ * {@link SampledGraph}.
+ * 
+ * @see {@link SpatialGraphProjection}
+ * @see {@link SampledGraph}
  * @author illenberger
- *
+ * 
  */
 public class SampledSpatialGraphProjection <G extends SampledSpatialGraph, V extends SampledSpatialVertex, E extends SampledSpatialEdge> extends
 		SpatialGraphProjection<G, V, E> implements SampledSpatialGraph {
 
 	/**
-	 * @param delegate
+	 * Creates an empty spatial sampled graph projection.
+	 * 
+	 * @param delegate the original graph.
 	 */
 	public SampledSpatialGraphProjection(G delegate) {
 		super(delegate);
 	}
 	
+	/**
+	 * @see {@link SpatialGraphProjection#getEdges()}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Set<? extends SampledSpatialEdgeDecorator<E>> getEdges() {
 		return (Set<? extends SampledSpatialEdgeDecorator<E>>) super.getEdges();
 	}
 
+	/**
+	 * @see {@link SpatialGraphProjection#getVertices()}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Set<? extends SampledSpatialVertexDecorator<V>> getVertices() {
 		return (Set<? extends SampledSpatialVertexDecorator<V>>) super.getVertices();
 	}
 
+	/**
+	 * @see {@link SpatialGraphProjection#getEdge(SparseVertex, SparseVertex)}
+	 */
 	@Override
-	public SpatialEdgeDecorator<E> getEdge(SparseVertex v_i, SparseVertex v_j) {
-		return (SpatialEdgeDecorator<E>) super.getEdge(v_i, v_j);
+	public SampledSpatialEdgeDecorator<E> getEdge(SparseVertex v_i, SparseVertex v_j) {
+		return (SampledSpatialEdgeDecorator<E>) super.getEdge(v_i, v_j);
 	}
 
+	/**
+	 * @see {@link SpatialGraphProjection#getVertex(org.matsim.contrib.sna.graph.spatial.SpatialVertex)}
+	 */
 	@Override
-	public SpatialVertexDecorator<V> getVertex(V v) {
-		return (SpatialVertexDecorator<V>) super.getVertex(v);
+	public SampledSpatialVertexDecorator<V> getVertex(V v) {
+		return (SampledSpatialVertexDecorator<V>) super.getVertex(v);
 	}
 
 }

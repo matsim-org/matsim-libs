@@ -35,7 +35,7 @@ import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLWriter;
  * @author illenberger
  *
  */
-public class RemoveIsolatesTask implements GraphTask<SparseGraph> {
+public class RemoveIsolatesTask implements GraphFilter<SparseGraph> {
 
 	private static final Logger logger = Logger.getLogger(RemoveIsolatesTask.class);
 	

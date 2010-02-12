@@ -26,21 +26,34 @@ import org.matsim.core.utils.collections.Tuple;
 
 
 /**
+ * A decorator for sampled spatial edges.
+ * 
  * @author illenberger
  *
  */
 public class SampledSpatialEdgeDecorator<E extends SampledSpatialEdge> extends SpatialEdgeDecorator<E>
 		implements SampledSpatialEdge {
 
+	/**
+	 * Creates an orphaned edge decorator which decorates <tt>delegate</tt>.
+	 * 
+	 * @param delegate
+	 */
 	protected SampledSpatialEdgeDecorator(E delegate) {
 		super(delegate);
 	}
 
+	/**
+	 * @see {@link SpatialEdgeDecorator#getOpposite(Vertex)}
+	 */
 	@Override
 	public SampledSpatialVertexDecorator<?> getOpposite(Vertex v) {
 		return (SampledSpatialVertexDecorator<?>) super.getOpposite(v);
 	}
 
+	/**
+	 * @see {@link SpatialEdgeDecorator#getVertices()}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Tuple<? extends SampledSpatialVertexDecorator<?>, ? extends SampledSpatialVertexDecorator<?>> getVertices() {

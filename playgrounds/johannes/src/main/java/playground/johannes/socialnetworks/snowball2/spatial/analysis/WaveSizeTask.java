@@ -31,20 +31,20 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
-import playground.johannes.socialnetworks.graph.analysis.AbstractGraphAnalyzerTask;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 
 /**
  * @author illenberger
  *
  */
-public class WaveSizeTask extends AbstractGraphAnalyzerTask {
+public class WaveSizeTask extends AnalyzerTask {
 
-	public WaveSizeTask(String output) {
-		super(output);
-	}
+//	public WaveSizeTask(String output) {
+//		super(output);
+//	}
 
 	@Override
-	public void analyze(Graph graph, Map<String, Object> analyzers, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, Double> stats) {
 		if(getOutputDirectory() != null) {
 			TIntIntHashMap detected = new TIntIntHashMap();
 			TIntIntHashMap sampled = new TIntIntHashMap();

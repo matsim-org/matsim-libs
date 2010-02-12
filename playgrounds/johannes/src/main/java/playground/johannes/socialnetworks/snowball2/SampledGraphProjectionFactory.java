@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * SampledGraphProjectionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphProjectionFactory;
+import org.matsim.contrib.sna.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public class SampledGraphProjectionFactory<G extends Graph, V extends Vertex, E extends Edge> implements
+		GraphProjectionFactory<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
-	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
-	}
-	
 	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
+	public SampledEdgeDecorator<E> createEdge(E delegate) {
+		return new SampledEdgeDecorator<E>(delegate);
+	}
+
+	@Override
+	public SampledGraphProjection<G, V, E> createGraph(G delegate) {
+		return new SampledGraphProjection<G, V, E>(delegate);
+	}
+
+	@Override
+	public SampledVertexDecorator<V> createVertex(V delegate) {
+		return new SampledVertexDecorator<V>(delegate);
 	}
 
 }

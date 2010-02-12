@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * SampledGraphProjML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.contrib.sna.graph.Graph;
+package playground.johannes.socialnetworks.snowball2.io;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public interface SampledGraphProjML {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+	public static final String DELEGATE_IDX_ATTR = "delegate";
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
-	}
+	public static final String DELEGATE_FILE = "delegateFile";
 	
-	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
-	}
-
 }

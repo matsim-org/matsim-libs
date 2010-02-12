@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * ModuleAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.contrib.sna.graph.Graph;
+package playground.johannes.socialnetworks.graph.analysis;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public abstract class ModuleAnalyzerTask<T> extends AnalyzerTask {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+	protected T module;
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
+	public void setModule(T module) {
+		this.module = module;
 	}
-	
-	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
-	}
-
 }

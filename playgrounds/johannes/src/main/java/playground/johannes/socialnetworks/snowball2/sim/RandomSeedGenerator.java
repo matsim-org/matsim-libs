@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * RandomSeedGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2.sim;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public class RandomSeedGenerator implements VertexPartition {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+	private Random random;
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
+	private int numSeeds;
+	
+	public RandomSeedGenerator(int numSeeds, long randomSeed) {
+		random = new Random(randomSeed);
+		this.numSeeds = numSeeds;
 	}
 	
 	@Override
-	public G apply(G graph) {
+	public <V extends Vertex> Set<V> getPartition(Set<V> vertices) {
+		List<V> list = new ArrayList<V>(vertices);
+		Collections.shuffle(list, random);
+		Set<V> seeds = new HashSet<V>();
+		for(int i = 0; i < numSeeds; i++)
+			seeds.add(list.get(i));
 		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
+		return seeds;
 	}
 
 }

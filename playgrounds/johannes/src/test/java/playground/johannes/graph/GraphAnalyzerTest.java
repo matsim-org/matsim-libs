@@ -43,7 +43,7 @@ public class GraphAnalyzerTest extends TestCase {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(INPUT_FILE);
 		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, null, new StandardAnalyzerTask(null));
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, new StandardAnalyzerTask());
 		
 		assertEquals(7.1462, stats.get(DegreeTask.MEAN_DEGREE), 0.0001);
 		assertEquals(19.0, stats.get(DegreeTask.MAX_DEGREE));

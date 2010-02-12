@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * TerminationCondition.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2.sim;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.contrib.sna.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public interface SamplerListener {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+	public boolean beforeSampling(Sampler<?, ?, ?> sampler);
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
-	}
+	public boolean afterSampling(Sampler<?, ?, ?> sampler);
 	
-	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
-	}
-
 }

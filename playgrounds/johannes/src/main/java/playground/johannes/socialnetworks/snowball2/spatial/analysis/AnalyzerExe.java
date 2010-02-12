@@ -61,14 +61,15 @@ public class AnalyzerExe {
 		
 		ZoneLayer zones = ZoneLayerSHP.read(zonesfile);
 		
-		SpatialAnalyzerTask task = new SpatialAnalyzerTask(output, zones);
-		task.addTask(new WaveSizeTask(output));
+		SpatialAnalyzerTask task = new SpatialAnalyzerTask(zones);
+		task.setOutputDirectoy(output);
+//		task.addTask(new WaveSizeTask(output));
 		
 		Map<String, Object> analyzers = new HashMap<String, Object>();
 		analyzers.put(DegreeTask.class.getCanonicalName(), new SampledDegree());
 		analyzers.put(DistanceTask.class.getCanonicalName(), new SampledDistance());
 		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, analyzers, task);
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
 		playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer.writeStats(stats, output + "/stats.txt");
 		
 		Geometry boundary = FeatureSHP.readFeatures(boundaryfile).iterator().next().getDefaultGeometry();
@@ -76,9 +77,10 @@ public class AnalyzerExe {
 		
 		output = output + "/clip/";
 		new File(output).mkdirs();
-		task = new SpatialAnalyzerTask(output, zones);
-		task.addTask(new WaveSizeTask(output));
-		stats = GraphAnalyzer.analyze(proj, analyzers, task);
+		task = new SpatialAnalyzerTask(zones);
+//		task.addTask(new WaveSizeTask(output));
+		task.setOutputDirectoy(output);
+//		stats = GraphAnalyzer.analyze(proj, analyzers, task);
 		playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer.writeStats(stats, output + "/stats.txt");
 	}
 

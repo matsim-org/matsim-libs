@@ -31,7 +31,7 @@ import org.matsim.contrib.sna.math.Distribution;
  * @author illenberger
  *
  */
-public class TransitivityTask extends AbstractGraphAnalyzerTask {
+public class TransitivityTask extends ModuleAnalyzerTask<Transitivity> {
 	
 	public static final Logger logger = Logger.getLogger(TransitivityTask.class);
 
@@ -43,22 +43,13 @@ public class TransitivityTask extends AbstractGraphAnalyzerTask {
 	
 	public static final String GLOBAL_CLUSTERING_COEFFICIENT = "c_global";
 	
-	public TransitivityTask(String output) {
-		super(output);
+	public TransitivityTask() {
+		setModule(new Transitivity());
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Object> analyzers, Map<String, Double> stats) {
-		Transitivity transitivity;
-		Object obj = analyzers.get(this.getClass().getCanonicalName());
-		if(obj == null)
-			transitivity = new Transitivity();
-		else {
-			transitivity = (Transitivity) obj;
-			logger.info("Using analyzer class " + transitivity.getClass().getCanonicalName());
-		}
-		
-		Distribution distr = transitivity.localClusteringDistribution(graph.getVertices());
+	public void analyze(Graph graph, Map<String, Double> stats) {
+		Distribution distr = module.localClusteringDistribution(graph.getVertices());
 		double c_mean = distr.mean();
 		double c_max = distr.max();
 		double c_min = distr.min();
@@ -66,7 +57,7 @@ public class TransitivityTask extends AbstractGraphAnalyzerTask {
 		stats.put(MAX_LOCAL_CLUSTERING, c_max);
 		stats.put(MIN_LOCAL_CLUSTERING, c_min);
 		
-		double c_global = transitivity.globalClusteringCoefficient(graph);
+		double c_global = module.globalClusteringCoefficient(graph);
 		stats.put(GLOBAL_CLUSTERING_COEFFICIENT, c_global);
 		
 		logger.info(String.format("c_local_mean = %1$.4f, c_local_max = %2$.4f, c_local_min = %3$.4f, c_global = %4$.4f.", c_mean, c_max, c_min, c_global));

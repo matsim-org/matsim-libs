@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * SeedGBe.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2.sim;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
-
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+public interface SeedGenerator {
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
-	}
-	
-	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
-	}
+	public Set<? extends Vertex> generate(Graph graph);
 
 }

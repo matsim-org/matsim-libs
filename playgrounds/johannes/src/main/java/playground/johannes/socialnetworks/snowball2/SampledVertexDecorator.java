@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * SampledVertexDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,68 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.SnowballAttributes;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public class SampledVertexDecorator<V extends Vertex> extends VertexDecorator<V> implements
+		SampledVertex {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+	private SnowballAttributes attributes = new SnowballAttributes();
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
+	protected SampledVertexDecorator(V delegate) {
+		super(delegate);
 	}
-	
+
 	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
+	public void detect(int iteration) {
+		attributes.detect(iteration);
+	}
+
+	@Override
+	public int getIterationDetected() {
+		return attributes.getIterationDeteted();
+	}
+
+	@Override
+	public int getIterationSampled() {
+		return attributes.getIterationSampled();
+	}
+
+	@Override
+	public boolean isDetected() {
+		return attributes.isDetected();
+	}
+
+	@Override
+	public boolean isSampled() {
+		return attributes.isSampled();
+	}
+
+	@Override
+	public void sample(int iteration) {
+		attributes.sample(iteration);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<? extends SampledEdgeDecorator<?>> getEdges() {
+		return (List<? extends SampledEdgeDecorator<?>>) super.getEdges();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<? extends SampledVertexDecorator<V>> getNeighbours() {
+		return (List<? extends SampledVertexDecorator<V>>) super.getNeighbours();
 	}
 
 }

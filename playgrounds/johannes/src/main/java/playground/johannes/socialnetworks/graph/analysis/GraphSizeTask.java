@@ -28,7 +28,7 @@ import org.matsim.contrib.sna.graph.Graph;
  * @author illenberger
  *
  */
-public class GraphSizeTask implements GraphAnalyzerTask {
+public class GraphSizeTask extends AnalyzerTask {
 
 	private static final Logger logger = Logger.getLogger(GraphSizeTask.class);
 	
@@ -37,7 +37,7 @@ public class GraphSizeTask implements GraphAnalyzerTask {
 	public static final String NUM_EDGES = "n_edge";
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Object> analyzers, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, Double> stats) {
 		int n_vertex = graph.getVertices().size();
 		int n_edge = graph.getEdges().size();
 		stats.put(NUM_VERTICES, new Double(n_vertex));

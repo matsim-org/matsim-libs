@@ -22,7 +22,6 @@ package playground.johannes.socialnetworks.graph.analysis;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,14 +37,9 @@ public class GraphAnalyzer {
 	
 	public static final Logger logger = Logger.getLogger(GraphAnalyzer.class);
 
-	public static Map<String, Double> analyze(Graph graph, Map<String, Object> analyzers, GraphAnalyzerTask task) {
-		if(analyzers == null)
-			analyzers = new HashMap<String, Object>();
-		
+	public static Map<String, Double> analyze(Graph graph, AnalyzerTask task) {
 		Map<String, Double> stats = new LinkedHashMap<String, Double>();
-		
-		task.analyze(graph, analyzers, stats);
-		
+		task.analyze(graph, stats);
 		return stats;
 	}
 	

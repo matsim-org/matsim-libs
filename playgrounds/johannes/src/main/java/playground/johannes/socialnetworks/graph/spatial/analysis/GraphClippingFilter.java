@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransformCRSTask.java
+ * GraphClippingFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,65 +17,95 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.geotools.referencing.CRS;
 import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
-import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
-import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
+import playground.johannes.socialnetworks.survey.ivt2009.analysis.GraphFilter;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+
 /**
  * @author illenberger
- *
+ * 
  */
-public class TransformCRSTask implements GraphFilter<SpatialGraph> {
+public class GraphClippingFilter implements GraphFilter<SpatialGraph> {
 
-	private CoordinateReferenceSystem targetCRS;
-	
-	public TransformCRSTask(CoordinateReferenceSystem targetCRS) {
-		this.targetCRS = targetCRS;
+	private GraphBuilder<SpatialGraph, SpatialVertex, SpatialEdge> builder;
+
+	private Geometry geometry;
+
+	@SuppressWarnings("unchecked")
+	public GraphClippingFilter(
+			GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge> builder,
+			Geometry geometry) {
+		this.builder = (GraphBuilder<SpatialGraph, SpatialVertex, SpatialEdge>) builder;
+		this.geometry = geometry;
 	}
-	
+
 	@Override
 	public SpatialGraph apply(SpatialGraph graph) {
-		CoordinateReferenceSystem sourceCRS = graph.getCoordinateReferenceSysten();
+		Set<SpatialEdge> edges = new HashSet<SpatialEdge>();
+		Set<SpatialVertex> vertices = new HashSet<SpatialVertex>();
+		findElements(graph, vertices, edges);
+		for (SpatialEdge edge : edges)
+			builder.removeEdge(graph, edge);
+
+		for (SpatialVertex vertex : vertices)
+			builder.removeVertex(graph, vertex);
+
+		return graph;
+
+	}
+
+	protected void findElements(SpatialGraph graph, Set<SpatialVertex> vertices,
+			Set<SpatialEdge> edges) {
 		try {
-			MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS);
-			
-			for(SpatialVertex vertex : graph.getVertices()) {
+			GeometryFactory geoFactory = new GeometryFactory();
+			CoordinateReferenceSystem sourceCRS = graph
+					.getCoordinateReferenceSysten();
+			CoordinateReferenceSystem targetCRS = CRSUtils.getCRS(geometry
+					.getSRID());
+
+			MathTransform transform = CRS.findMathTransform(sourceCRS,
+					targetCRS);
+
+			//			
+			for (SpatialVertex vertex : graph.getVertices()) {
 				double[] points = new double[] {
 						vertex.getPoint().getCoordinate().x,
 						vertex.getPoint().getCoordinate().y };
 				transform.transform(points, 0, points, 0, 1);
-				vertex.getPoint().getCoordinate().x = points[0];
-				vertex.getPoint().getCoordinate().y = points[1];
+				Point p = geoFactory.createPoint(new Coordinate(points[0],
+						points[1]));
+				if (!geometry.contains(p)) {
+					vertices.add(vertex);
+					edges.addAll(vertex.getEdges());
+				}
+
 			}
 		} catch (FactoryException e) {
 			e.printStackTrace();
-			return null;
+			// return null;
 		} catch (TransformException e) {
 			e.printStackTrace();
-			return null;
+			// return null;
 		}
-		
-		return graph;
-	}
 
-	public static void main(String[] args) throws IOException {
-		TransformCRSTask task = new TransformCRSTask(CRSUtils.getCRS(Integer.parseInt(args[2])));
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph(args[0]);
-		graph = (SampledSpatialGraph) task.apply(graph);
-		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
-		writer.write(graph, args[1]);
 	}
 }

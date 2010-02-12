@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * SampledGraphProjectionBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
+import org.matsim.contrib.sna.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
-
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+public class SampledGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends
+		GraphProjectionBuilder<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> {
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
+	public SampledGraphProjectionBuilder() {
+		super(new SampledGraphProjectionFactory<G, V, E>());
 	}
-	
-	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
-	}
-
 }

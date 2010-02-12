@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractGraphAnalyzerTast.java
+ * SampleAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.socialnetworks.snowball2.sim;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
-import org.matsim.contrib.sna.math.Distribution;
-
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
+import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
+import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 
 /**
  * @author illenberger
  *
  */
-public abstract class AbstractGraphAnalyzerTask implements GraphAnalyzerTask {
+public abstract class SampleAnalyzer implements SamplerListener {
 
-	private String output;
+	private AnalyzerTask observed;
 	
-	public AbstractGraphAnalyzerTask(String output) {
-		this.output = output;
+	private AnalyzerTask estimated;
+	
+	public SampleAnalyzer(AnalyzerTask observed, AnalyzerTask estimated) {
+		this.observed = observed;
+		this.estimated = estimated;
 	}
-	
-	protected String getOutputDirectory() {
-		return output;
-	}
-	
-	protected void writeHistograms(Distribution distr, double binsize, boolean log, String name) throws FileNotFoundException, IOException {
-		Distribution.writeHistogram(distr.absoluteDistribution(binsize), String.format("%1$s/%2$s.txt", output, name));
-		Distribution.writeHistogram(distr.normalizedDistribution(binsize), String.format("%1$s/%2$s.share.txt", output, name));
+
+	protected void analyse(SampledGraphProjection<?, ?, ?> graph, String output) {
+		try {
+			String obsOutput = String.format("%1$s/obs/", output);
+			File file = new File(obsOutput);
+			file.mkdirs();
+			observed.setOutputDirectoy(file.getAbsolutePath());
+			Map<String, Double> stats = GraphAnalyzer.analyze(graph, observed);
+			GraphAnalyzer.writeStats(stats, file.getAbsolutePath() + "/stats.txt");
+			
+			String estimOutput = String.format("%1$s/estim/", output);
+			file = new File(estimOutput);
+			file.mkdirs();
+			estimated.setOutputDirectoy(file.getAbsolutePath());
+			stats = GraphAnalyzer.analyze(graph, estimated);
+			GraphAnalyzer.writeStats(stats, file.getAbsolutePath() + "/stats.txt");
 		
-		if(log) {
-			Distribution.writeHistogram(distr.absoluteDistributionLog10(binsize), String.format("%1$s/%2$s.log10.txt", output, name));
-			Distribution.writeHistogram(distr.absoluteDistributionLog2(binsize), String.format("%1$s/%2$s.log2.txt", output, name));
-		
-			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog10(binsize)), String.format("%1$s/%2$s.share.log10.txt", output, name));
-			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog2(binsize)), String.format("%1$s/%2$s.share.log2.txt", output, name));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }

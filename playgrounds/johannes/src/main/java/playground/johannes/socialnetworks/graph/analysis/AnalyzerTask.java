@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DegreeTask.java
+ * AbstractGraphAnalyzerTast.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,55 +23,38 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.math.Distribution;
+
 
 /**
  * @author illenberger
  *
  */
-public class DegreeTask extends ModuleAnalyzerTask<Degree> {
-	
-	private static final Logger logger = Logger.getLogger(DegreeTask.class);
+public abstract class AnalyzerTask {
 
-	public static final String MEAN_DEGREE = "k_mean";
+	private String output;
 	
-	public static final String MIN_DEGREE = "k_min";
-	
-	public static final String MAX_DEGREE = "k_max";
-	
-	public static final String DEGREE_CORRELATION = "r_k";
-	
-	public DegreeTask() {
-		setModule(new Degree());
+	public void setOutputDirectoy(String output) {
+		this.output = output;
 	}
 	
-	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-		Distribution distr = module.distribution(graph.getVertices()); 
-		double k_mean = distr.mean();
-		double k_min = distr.min();
-		double k_max = distr.max();
-		stats.put(MEAN_DEGREE, k_mean);
-		stats.put(MAX_DEGREE, k_max);
-		stats.put(MIN_DEGREE, k_min);
-		logger.info(String.format("k_mean = %1$.4f, k_max = %2$s, k_min = %3$s.", k_mean, k_max, k_min));
+	protected String getOutputDirectory() {
+		return output;
+	}
+	
+	abstract public void analyze(Graph graph, Map<String, Double> stats);
+	
+	protected void writeHistograms(Distribution distr, double binsize, boolean log, String name) throws FileNotFoundException, IOException {
+		Distribution.writeHistogram(distr.absoluteDistribution(binsize), String.format("%1$s/%2$s.txt", output, name));
+		Distribution.writeHistogram(distr.normalizedDistribution(binsize), String.format("%1$s/%2$s.share.txt", output, name));
 		
-		double r_k = module.assortativity(graph);
-		stats.put(DEGREE_CORRELATION, r_k);
-		logger.info(String.format("r_k = %1$.4f", r_k));
+		if(log) {
+			Distribution.writeHistogram(distr.absoluteDistributionLog10(binsize), String.format("%1$s/%2$s.log10.txt", output, name));
+			Distribution.writeHistogram(distr.absoluteDistributionLog2(binsize), String.format("%1$s/%2$s.log2.txt", output, name));
 		
-		if(getOutputDirectory() != null) {
-			try {
-				writeHistograms(distr, 1.0, false, "k");
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog10(binsize)), String.format("%1$s/%2$s.share.log10.txt", output, name));
+			Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog2(binsize)), String.format("%1$s/%2$s.share.log2.txt", output, name));
 		}
 	}
-
 }

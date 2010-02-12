@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Graph;
 
@@ -29,24 +29,29 @@ import org.matsim.contrib.sna.graph.Graph;
  * @author illenberger
  *
  */
-public class GraphAnalyzerTaskComposite extends AbstractGraphAnalyzerTask {
+public class GraphAnalyzerTaskComposite extends AnalyzerTask {
 
-	private Set<GraphAnalyzerTask> tasks;
+	private List<AnalyzerTask> tasks;
 	
-	public GraphAnalyzerTaskComposite(String output) {
-		super(output);
-		tasks = new LinkedHashSet<GraphAnalyzerTask>();
+	public GraphAnalyzerTaskComposite() {
+		tasks = new ArrayList<AnalyzerTask>();
 	}
 	
-	public void addTask(GraphAnalyzerTask task) {
+	public void addTask(AnalyzerTask task) {
 		tasks.add(task);
 	}
 	
+	@Override
+	public void setOutputDirectoy(String output) {
+		for(AnalyzerTask task : tasks) {
+			task.setOutputDirectoy(output);
+		}
+	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Object> analyzers, Map<String, Double> stats) {
-		for(GraphAnalyzerTask task : tasks)
-			task.analyze(graph, analyzers, stats);
+	public void analyze(Graph graph, Map<String, Double> stats) {
+		for(AnalyzerTask task : tasks)
+			task.analyze(graph, stats);
 	}
 
 }

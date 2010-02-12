@@ -37,15 +37,14 @@ import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
-import playground.johannes.socialnetworks.graph.analysis.AbstractGraphAnalyzerTask;
-import playground.johannes.socialnetworks.graph.analysis.DegreeTask;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author illenberger
  *
  */
-public class PopDensityTask extends AbstractGraphAnalyzerTask {
+public class PopDensityTask extends AnalyzerTask {
 
 	private static final Logger logger = Logger.getLogger(PopDensityTask.class);
 	
@@ -53,13 +52,12 @@ public class PopDensityTask extends AbstractGraphAnalyzerTask {
 	
 	private ZoneLayer zones;
 	
-	public PopDensityTask(String output, ZoneLayer zones) {
-		super(output);
+	public PopDensityTask(ZoneLayer zones) {
 		this.zones = zones;
 	}
 
 	@Override
-	public void analyze(Graph graph, Map<String, Object> analyzers,	Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, Double> stats) {
 		if(getOutputDirectory() != null) {
 			try {
 			Set<? extends SpatialVertex> vertices = (Set<? extends SpatialVertex>) graph.getVertices();
@@ -73,24 +71,24 @@ public class PopDensityTask extends AbstractGraphAnalyzerTask {
 				}
 			}
 		
-			Object obj;
+//			Object obj;
 			
 			Degree degree;
-			obj = analyzers.get(DegreeTask.class.getCanonicalName());
-			if(obj == null)
+//			obj = analyzers.get(DegreeTask.class.getCanonicalName());
+//			if(obj == null)
 				degree = new Degree();
-			else {
-				degree = (Degree)obj;
-			}
+//			else {
+//				degree = (Degree)obj;
+//			}
 			Correlations.writeToFile(getCorrelation(degree.values(vertices), densityValues), String.format("%1$s/k_rho.txt", getOutputDirectory()), "rho", "k_mean");
 			
 			DensityCorrelation rhoCorrelation;
-			obj = analyzers.get(DensityCorrelation.class.getCanonicalName());
-			if(obj == null)
+//			obj = analyzers.get(DensityCorrelation.class.getCanonicalName());
+//			if(obj == null)
 				rhoCorrelation = new DensityCorrelation();
-			else {
-				rhoCorrelation = (DensityCorrelation)obj;
-			}
+//			else {
+//				rhoCorrelation = (DensityCorrelation)obj;
+//			}
 			Correlations.writeToFile(rhoCorrelation.densityCorrelation((SpatialGraph) graph, zones, 2000.0), String.format("%1$s/rho_rho.txt", getOutputDirectory()), "rho", "rho");
 			
 			double pearson = rhoCorrelation.pearsonCorrelation((SpatialGraph) graph, zones);

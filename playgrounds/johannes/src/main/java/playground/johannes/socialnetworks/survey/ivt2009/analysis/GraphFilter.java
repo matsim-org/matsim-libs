@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * GraphTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,31 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.contrib.sna.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public interface GraphFilter<G extends Graph> {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+	public G apply(G graph);
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
-	}
-	
-	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
-	}
-
 }

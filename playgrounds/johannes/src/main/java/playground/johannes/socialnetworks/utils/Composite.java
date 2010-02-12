@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTask.java
+ * Composite.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,16 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.utils;
 
-import org.matsim.contrib.sna.graph.Graph;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author illenberger
  *
  */
-public interface GraphTask <G extends Graph> {
+public abstract class Composite<T> {
 
-	public G apply(G graph);
+	protected List<T> components = new ArrayList<T>();
 	
+	public void addComponent(T component) {
+		components.add(component);
+	}
+	
+	public void removeComponent(T component) {
+		components.remove(component);
+	}
 }

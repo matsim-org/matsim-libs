@@ -104,9 +104,9 @@ public class SampledSocialGraphMLReader
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
 		reader.readFile(baseDir + "/" + popFile);
 
-		builder = new SampledSocialGraphBuilder();
+		builder = new SampledSocialGraphBuilder(SpatialGraphML.newCRS(attrs));
 
-		return builder.createGraph(SpatialGraphML.newCRS(attrs));
+		return builder.createGraph();
 	}
 
 	public static void main(String args[]) {

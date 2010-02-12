@@ -30,11 +30,10 @@ import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
  */
 public class SpatialAnalyzerTask extends GraphAnalyzerTaskComposite {
 
-	public SpatialAnalyzerTask(String output, ZoneLayer zones) {
-		super(output);
-		addTask(new StandardAnalyzerTask(getOutputDirectory()));
-		addTask(new DistanceTask(getOutputDirectory()));
-		addTask(new PopDensityTask(getOutputDirectory(), zones));
+	public SpatialAnalyzerTask(ZoneLayer zones) {
+		addTask(new StandardAnalyzerTask());
+		addTask(new DistanceTask());
+		addTask(new PopDensityTask(zones));
 	}
 
 }

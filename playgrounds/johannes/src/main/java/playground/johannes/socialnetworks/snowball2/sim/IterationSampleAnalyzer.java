@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * IterationSampleAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2.sim;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 
-import org.matsim.contrib.sna.graph.Graph;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public class IterationSampleAnalyzer extends SampleAnalyzer {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+	private int lastIteration;
+
+	private String output;
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
+	public IterationSampleAnalyzer(String output, AnalyzerTask observed, AnalyzerTask estimated) {
+		super(observed, estimated);
+		this.output = output;
+		lastIteration = 0;
 	}
 	
 	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
+	public boolean afterSampling(Sampler<?, ?, ?> sampler) {
+		return true;
+	}
+
+	@Override
+	public boolean beforeSampling(Sampler<?, ?, ?> sampler) {
+		if(sampler.getIteration() > lastIteration) {
+			File file = new File(String.format("%1$s/it.%2$s", output, lastIteration));
+			file.mkdirs();
+			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
+			lastIteration = sampler.getIteration();
 		}
 		
-		return graph;
+		return true;
 	}
+	
 
 }

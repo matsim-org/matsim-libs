@@ -29,14 +29,14 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.analysis.AbstractGraphAnalyzerTask;
+import playground.johannes.socialnetworks.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.Distance;
 
 /**
  * @author illenberger
  *
  */
-public class DistanceTask extends AbstractGraphAnalyzerTask {
+public class DistanceTask extends ModuleAnalyzerTask<Distance> {
 
 	private static final Logger logger = Logger.getLogger(DistanceTask.class);
 	
@@ -52,23 +52,14 @@ public class DistanceTask extends AbstractGraphAnalyzerTask {
 	
 	public static final String MAX_EDGE_LENGTH_I = "d_i_max";
 	
-	public DistanceTask(String output) {
-		super(output);
+	public DistanceTask() {
+		setModule(new Distance());
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void analyze(Graph graph, Map<String, Object> analyzers, Map<String, Double> stats) {
-			Distance distance;
-			Object obj = analyzers.get(this.getClass().getCanonicalName());
-			if(obj == null)
-				distance = new Distance();
-			else {
-				distance = (Distance) obj;
-				logger.info("Using analyzer class " + distance.getClass().getCanonicalName());
-			}
-			
-			Distribution distr = distance.distribution((Set<? extends SpatialVertex>) graph.getVertices());
+	public void analyze(Graph graph, Map<String, Double> stats) {
+			Distribution distr = module.distribution((Set<? extends SpatialVertex>) graph.getVertices());
 			double d_mean = distr.mean();
 			double d_max = distr.max();
 			double d_min = distr.min();
@@ -88,7 +79,7 @@ public class DistanceTask extends AbstractGraphAnalyzerTask {
 				}
 			}
 			
-			distr = distance.vertexAccumulatedDistribution((Set<? extends SpatialVertex>) graph.getVertices());
+			distr = module.vertexAccumulatedDistribution((Set<? extends SpatialVertex>) graph.getVertices());
 			double d_i_mean = distr.mean();
 			double d_i_max = distr.max();
 			double d_i_min = distr.min();

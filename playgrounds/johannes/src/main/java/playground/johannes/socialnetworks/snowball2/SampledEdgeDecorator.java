@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * SampledEdgeDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.EdgeDecorator;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.snowball.SampledEdge;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public class SampledEdgeDecorator<E extends Edge> extends EdgeDecorator<E> implements
+		SampledEdge {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
-	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
+	protected SampledEdgeDecorator(E delegate) {
+		super(delegate);
 	}
-	
+
 	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
+	public SampledVertexDecorator<?> getOpposite(Vertex v) {
+		return (SampledVertexDecorator<?>) super.getOpposite(v);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Tuple<? extends SampledVertexDecorator<?>, ? extends SampledVertexDecorator<?>> getVertices() {
+		return (Tuple<? extends SampledVertexDecorator<?>, ? extends SampledVertexDecorator<?>>) super.getVertices();
 	}
 
 }

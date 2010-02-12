@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * SnowballEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2.sim;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public class SnowballEstimator {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+	private double share;
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
-	}
-	
-	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
+	public void update(SampledGraph graph, int iteration) {
+		int count = 0;
+		for(Vertex vertex : graph.getVertices()) {
+			if(((SampledVertex) vertex).isSampled() && ((SampledVertex) vertex).getIterationSampled() < iteration)
+				count++;
 		}
-		
-		return graph;
 	}
-
+	
+	public double getProbability(SampledVertex vertex) {
+		return 1 - Math.pow(1 - share, vertex.getNeighbours().size());
+	}
 }
