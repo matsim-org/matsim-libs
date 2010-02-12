@@ -113,7 +113,11 @@ public class DelayEval {
 			if(this.termList.contains(event.getFacilityId())){
 			
 				DelayCountBox delBox = this.delayMapTerm.get(Integer.valueOf((int) event.getTime()/3600));
-				delBox.addEntry(event.getDelay());
+				if(event.getDelay() > 2*60){
+					delBox.addEntry(event.getDelay());
+				} else {
+					delBox.addEntry(0.0);
+				}
 			
 				this.delayMapTerm.put(Integer.valueOf((int) event.getTime()/3600), delBox); 
 				this.termCounter++;
@@ -128,10 +132,17 @@ public class DelayEval {
 		@Override
 		public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 //			dhLog.info("Found event with " + event.getDelay() + "s delay.");
-			DelayCountBox delBox = this.delayMap.get(Integer.valueOf((int) event.getTime()/3600));
-			delBox.addEntry(event.getDelay());
 			
-			this.delayMap.put(Integer.valueOf((int) event.getTime()/3600), delBox); 
+			
+			DelayCountBox delBox = this.delayMap.get(Integer.valueOf((int) event.getTime()/3600));
+			if(event.getDelay() > 2*60){
+				delBox.addEntry(event.getDelay());
+			} else {
+				delBox.addEntry(0.0);
+			}
+			
+			this.delayMap.put(Integer.valueOf((int) event.getTime()/3600), delBox);
+			
 			this.stopCounter++;
 			
 //			dhLog.info("Found event with " + event.getDelay() + "s delay.");
@@ -164,30 +175,4 @@ public class DelayEval {
 	}
 
 
-}
-
-class DelayCountBox{
-	
-	private int numberOfEntries = 0;
-	private double accumulatedDelay = 0.0;
-	
-	public void addEntry(double delay){
-		this.numberOfEntries++;
-		this.accumulatedDelay += delay;
-	}
-	
-	public int getNumberOfEntries(){
-		return this.numberOfEntries;
-	}
-	
-	public double getAccumulatedDelay(){
-		return this.accumulatedDelay;
-	}
-	
-	public double getAverageDelay(){
-		return this.accumulatedDelay / this.numberOfEntries;
-	}
-	
-	
-	
 }
