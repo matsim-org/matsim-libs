@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KMLPartition.java
+ * SparseGraphUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.graph.spatial.io;
-
-import java.util.List;
-import java.util.Set;
-
-import net.opengis.kml._2.FolderType;
-
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+package org.matsim.contrib.sna.graph;
 
 /**
- * A KMLPartition implementation allows to organize partitions of vertices into
- * separate folders.
+ * Utility class for SpraseGraphs.
  * 
  * @author jillenberger
  * 
  */
-public interface KMLPartitions {
+public class GraphUtils {
 
 	/**
-	 * Returns a list of vertex partitions that will be organized into separate
-	 * folders.
+	 * Returns the edge connecting <tt>v1</tt> and <tt>v2</tt>. If <tt>v1</tt>
+	 * and <tt>v2</tt> are connected by multiple edges the first edge that is
+	 * found will be returned.
 	 * 
-	 * @param graph
-	 *            a graph
-	 * @return a list of vertex partitions that will be organized into separate
-	 *         folders.
+	 * @param v1
+	 *            a vertex.
+	 * @param v2
+	 *            a vertex.
+	 * @return the edge connecting <tt>v1</tt> and <tt>v2</tt>, or <tt>null</tt>
+	 *         if <tt>v1</tt> and <tt>v2</tt> are not connected.
 	 */
-	public List<Set<? extends SpatialVertex>> getPartitions(SpatialGraph graph);
+	public static Edge findEdge(Vertex v1, Vertex v2) {
+		Edge e = null;
+		int cnt = v1.getEdges().size();
+		for (int i = 0; i < cnt; i++) {
+			e = v1.getEdges().get(i);
+			if (e.getOpposite(v1) == v2) {
+				return e;
+			}
+		}
 
-	/**
-	 * Adds details to the folder (such as name or description) of a partition.
-	 * 
-	 * @param kmlFolder
-	 *            the folder of <tt>partition</tt>.
-	 * @param partition
-	 *            a partition of vertices.
-	 */
-	public void addDetail(FolderType kmlFolder,
-			Set<? extends SpatialVertex> partition);
-
+		return null;
+	}
 }

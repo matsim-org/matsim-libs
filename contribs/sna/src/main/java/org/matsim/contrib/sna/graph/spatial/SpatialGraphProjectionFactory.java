@@ -22,7 +22,7 @@ package org.matsim.contrib.sna.graph.spatial;
 import org.matsim.contrib.sna.graph.GraphProjectionFactory;
 
 /**
- * Implementation of SpatialGraphProjectionFactory to create instances of SpatialGraphProjection,
+ * Implementation of GraphProjectionFactory to create instances of SpatialGraphProjection,
  * SpatialVertexDecorator and SpatialEdgeDecorator.
  * 
  * @author illenberger
@@ -32,7 +32,7 @@ public class SpatialGraphProjectionFactory<G extends SpatialGraph, V extends Spa
 		GraphProjectionFactory<G, V, E, SpatialGraphProjection<G, V, E>, SpatialVertexDecorator<V>, SpatialEdgeDecorator<E>> {
 
 	/**
-	 * Creates and returns an spatial edge decorator that decorates <tt>delegate</tt>.
+	 * Creates and returns a spatial edge decorator that decorates <tt>delegate</tt>.
 	 * 
 	 * @param delegate the original edge.
 	 * 

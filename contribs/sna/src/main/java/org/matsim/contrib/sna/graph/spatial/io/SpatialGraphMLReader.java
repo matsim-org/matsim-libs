@@ -73,7 +73,7 @@ public class SpatialGraphMLReader
 	 */
 	@Override
 	protected SpatialSparseVertex addVertex(Attributes attrs) {
-		return builder.addVertex((SpatialSparseGraph) getGraph(),
+		return builder.addVertex(getGraph(),
 				SpatialGraphML.newPoint(attrs));
 	}
 

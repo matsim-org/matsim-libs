@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * This class allows to extract subgraphs from existing graphs by projecting
  * specific vertices and edges onto a new graph. A GraphProjection works similar
@@ -37,44 +36,102 @@ import java.util.Set;
  * @author illenberger
  * 
  */
-public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> extends SparseGraph {
+public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge>
+		extends SparseGraph {
 
 	private G delegate;
-	
+
 	private Map<V, VertexDecorator<V>> vMapping = new HashMap<V, VertexDecorator<V>>();
-	
+
+	private Map<E, EdgeDecorator<E>> eMapping = new HashMap<E, EdgeDecorator<E>>();
+
 	/**
 	 * Creates a new empty projection from graph <tt>delegate</tt>.
-	 * @param delegate the original graph.
+	 * 
+	 * @param delegate
+	 *            the original graph.
 	 */
 	public GraphProjection(G delegate) {
 		this.delegate = delegate;
 	}
-	
+
 	/**
 	 * Returns the original graph.
+	 * 
 	 * @return the original graph.
 	 */
 	public G getDelegate() {
 		return delegate;
 	}
-	
+
 	/**
 	 * Returns the decorator representing the projection of vertex <tt>v</tt>.
-	 * @param v the original vertex.
-	 * @return the decorater of vertex <tt>v</tt>, or <tt>null</tt> if there is no projection fot <tt>v</tt>.
+	 * 
+	 * @param v
+	 *            the original vertex.
+	 * @return the decorater of vertex <tt>v</tt>, or <tt>null</tt> if there is
+	 *         no projection for <tt>v</tt>.
 	 */
 	public VertexDecorator<V> getVertex(V v) {
 		return vMapping.get(v);
 	}
 
+
 	/**
-	 * Associates vertex <tt>delegate</tt> with its decorator <tt>decorator</tt>.
-	 * @param delegate the original vertex.
-	 * @param decorator the decorator of the original vertex.
+	 * Returns the decorator representing the projection of edge <tt>e</tt>.
+	 * 
+	 * @param v
+	 *            the original edge.
+	 * @return the decorater of edge <tt>e</tt>, or <tt>null</tt> if there is
+	 *         no projection for <tt>e</tt>.
+	 */
+	public EdgeDecorator<E> getEdge(E e) {
+		return eMapping.get(e);
+	}
+
+	/**
+	 * Associates vertex <tt>delegate</tt> with its decorator <tt>decorator</tt>
+	 * .
+	 * 
+	 * @param delegate
+	 *            the original vertex.
+	 * @param decorator
+	 *            the decorator of the original vertex.
 	 */
 	void setMapping(V delegate, VertexDecorator<V> decorator) {
 		vMapping.put(delegate, decorator);
+	}
+
+	/**
+	 * Removes the mapping for <tt>delegate</tt>.
+	 * 
+	 * @param delegate
+	 *            the original vertex.
+	 */
+	void removeMapping(V delegate) {
+		vMapping.remove(delegate);
+	}
+
+	/**
+	 * Associates edge <tt>delegate</tt> with its decorator <tt>decorator</tt>.
+	 * 
+	 * @param delegate
+	 *            the original edge.
+	 * @param decorator
+	 *            the decorator of the original edge.
+	 */
+	void setMapping(E delegate, EdgeDecorator<E> decorator) {
+		eMapping.put(delegate, decorator);
+	}
+
+	/**
+	 * Removes the mapping for <tt>delegate</tt>.
+	 * 
+	 * @param delegate
+	 *            the original edge.
+	 */
+	void removeMapping(E delegate) {
+		eMapping.remove(delegate);
 	}
 
 	/**
@@ -95,8 +152,9 @@ public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> 
 		return (Set<? extends VertexDecorator<V>>) super.getVertices();
 	}
 
-	/** 
-	 * @see org.matsim.contrib.sna.graph.SparseGraph#getEdge(org.matsim.contrib.sna.graph.SparseVertex, org.matsim.contrib.sna.graph.SparseVertex)
+	/**
+	 * @see org.matsim.contrib.sna.graph.SparseGraph#getEdge(org.matsim.contrib.sna.graph.SparseVertex,
+	 *      org.matsim.contrib.sna.graph.SparseVertex)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override

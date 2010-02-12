@@ -58,19 +58,20 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  */
 public abstract class AbstractGraphMLReader<G extends Graph, V extends Vertex, E extends Edge> {
-	
-	private static final Logger logger = Logger.getLogger(AbstractGraphMLReader.class);
-	
+
+	private static final Logger logger = Logger
+			.getLogger(AbstractGraphMLReader.class);
+
 	private TIntObjectHashMap<V> vertexMappings;
-	
+
 	private G graph;
-	
+
 	private int numVertex;
-	
+
 	private int numEdge;
-	
+
 	private boolean parseEdges;
-	
+
 	/**
 	 * Creates a new graph out of the graph data stored in <tt>file</tt>.
 	 * 
@@ -103,7 +104,7 @@ public abstract class AbstractGraphMLReader<G extends Graph, V extends Vertex, E
 			reader.parse(new InputSource(createBufferedReader(file)));
 			parseEdges = true;
 			reader.parse(new InputSource(createBufferedReader(file)));
-			
+
 			printProgress();
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -116,14 +117,16 @@ public abstract class AbstractGraphMLReader<G extends Graph, V extends Vertex, E
 		return getGraph();
 	}
 
-	private BufferedReader createBufferedReader(String filename) throws FileNotFoundException, IOException {
+	private BufferedReader createBufferedReader(String filename)
+			throws FileNotFoundException, IOException {
 		if (filename.endsWith(".gz")) {
-			return new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename))));
+			return new BufferedReader(new InputStreamReader(
+					new GZIPInputStream(new FileInputStream(filename))));
 		} else {
 			return new BufferedReader(new FileReader(filename));
 		}
 	}
-	
+
 	/**
 	 * Returns the currently parsed graph.
 	 * 
@@ -165,44 +168,55 @@ public abstract class AbstractGraphMLReader<G extends Graph, V extends Vertex, E
 	 *            the edge's attributes.
 	 * @return a new edge.
 	 */
-	protected abstract E addEdge(V v1, V v2,
-			Attributes attrs);
-	
-	
+	protected abstract E addEdge(V v1, V v2, Attributes attrs);
+
 	private V newNode(Attributes attrs) {
 		V v = addVertex(attrs);
-		if(v == null)
+		if (v == null)
 			throw new IllegalArgumentException("A vertex must not be null!");
-		
+
 		numVertex++;
 		int id = Integer.parseInt(attrs.getValue(GraphML.ID_ATTR));
 		vertexMappings.put(id, v);
-		
-		if(numVertex % 100000 == 0)
+
+		if (numVertex % 100000 == 0)
 			printProgress();
-		
+
 		return v;
 	}
-	
+
 	private Edge newEdge(Attributes attrs) {
 		int id1 = Integer.parseInt(attrs.getValue(GraphML.SOURCE_ATTR));
 		int id2 = Integer.parseInt(attrs.getValue(GraphML.TARGET_ATTR));
 		V v1 = vertexMappings.get(id1);
 		V v2 = vertexMappings.get(id2);
-		if(v1 != null && v2 != null) {
+		if (v1 != null && v2 != null) {
 			numEdge++;
-			if(numEdge % 100000 == 0)
+			if (numEdge % 100000 == 0)
 				printProgress();
 			return addEdge(v1, v2, attrs);
 		} else {
 			throw new IllegalArgumentException("A vertex must not be null!");
 		}
 	}
-	
-	private void printProgress() {
-		logger.info(String.format("Loading graph... %1$s vertices, %2$s edges.", numVertex, numEdge));
+
+	/**
+	 * Returns the mapping of indices to vertices used to identify vertices in
+	 * the GraphML file.
+	 * 
+	 * @return the mapping of indices to vertices used to identify vertices in
+	 *         the GraphML file.
+	 */
+	public TIntObjectHashMap<V> getVertexIndices() {
+		return vertexMappings;
 	}
-	
+
+	private void printProgress() {
+		logger.info(String.format(
+				"Loading graph... %1$s vertices, %2$s edges.", numVertex,
+				numEdge));
+	}
+
 	private class XMLHandler extends DefaultHandler {
 
 		@Override

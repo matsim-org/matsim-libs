@@ -35,8 +35,6 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-
-
 /**
  * Basic class for writing graph objects into GraphML files
  * (http://graphml.graphdrawing.org/). This class treats graphs as undirected
@@ -48,9 +46,9 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 public class GraphMLWriter extends MatsimXmlWriter {
 
 	private Graph graph;
-	
+
 	private TObjectIntHashMap<Vertex> vertexTmpIds;
-	
+
 	private int vertexIdx;
 
 	/**
@@ -66,33 +64,33 @@ public class GraphMLWriter extends MatsimXmlWriter {
 		this.graph = graph;
 		openFile(filename);
 		setPrettyPrint(true);
-		
+
 		vertexTmpIds = new TObjectIntHashMap<Vertex>();
-		
+
 		writeXmlHead();
-		
+
 		int indent = 0;
 		setIndentationLevel(indent++);
-		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String,String>>();
+		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String, String>>();
 		attrs.add(createTuple(GraphML.XMLNS_TAG, GraphML.XMLNS_URL));
 		writeStartTag(GraphML.GRAPHML_TAG, attrs);
-		
+
 		setIndentationLevel(indent++);
 		writeStartTag(GraphML.GRAPH_TAG, getGraphAttributes());
-		
+
 		setIndentationLevel(indent);
 		writeVertices();
 		writeEdges();
-		
+
 		setIndentationLevel(--indent);
 		writeEndTag(GraphML.GRAPH_TAG);
-		
+
 		setIndentationLevel(--indent);
 		writeEndTag(GraphML.GRAPHML_TAG);
-		
+
 		close();
 	}
-	
+
 	/**
 	 * Returns the currently written graph.
 	 * 
@@ -101,7 +99,7 @@ public class GraphMLWriter extends MatsimXmlWriter {
 	protected Graph getGraph() {
 		return graph;
 	}
-	
+
 	/**
 	 * Returns a list of graph attributes stored in String-String-tuples. The
 	 * returned list has one entry:
@@ -112,23 +110,23 @@ public class GraphMLWriter extends MatsimXmlWriter {
 	 * @return a list of graph attributes stored in String-String-tuples.
 	 */
 	protected List<Tuple<String, String>> getGraphAttributes() {
-		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String,String>>();
+		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String, String>>();
 		attrs.add(createTuple(GraphML.EDGEDEFAULT_ATTR, GraphML.UNDIRECTED));
 		return attrs;
 	}
-	
+
 	private void writeVertices() throws IOException {
 		/*
 		 * Start indexing with 1 since 0 is returned if no mapping is found.
 		 */
 		vertexIdx = 1;
-		for(Vertex v : graph.getVertices()) {
+		for (Vertex v : graph.getVertices()) {
 			vertexTmpIds.put(v, vertexIdx);
 			writeStartTag(GraphML.NODE_TAG, getVertexAttributes(v), true);
 			vertexIdx++;
 		}
 	}
-	
+
 	/**
 	 * Returns a list of vertex attributes stored in String-String-tuples. The
 	 * returned list contains one entry:
@@ -141,17 +139,17 @@ public class GraphMLWriter extends MatsimXmlWriter {
 	 * @return a list of vertex attributes.
 	 */
 	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
-		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String,String>>();
+		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String, String>>();
 		attrs.add(createTuple(GraphML.ID_ATTR, vertexIdx));
 		return attrs;
 	}
-	
+
 	private void writeEdges() throws IOException {
-		for(Edge e : graph.getEdges()) {
+		for (Edge e : graph.getEdges()) {
 			writeStartTag(GraphML.EDGE_TAG, getEdgeAttributes(e), true);
 		}
 	}
-	
+
 	/**
 	 * Returns a list of edge attributes stored in String-String-tuples. The
 	 * returned list contains two entries:
@@ -165,17 +163,27 @@ public class GraphMLWriter extends MatsimXmlWriter {
 	 * @return a list of edge attributes.
 	 */
 	protected List<Tuple<String, String>> getEdgeAttributes(Edge e) {
-		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String,String>>();
+		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String, String>>();
 		Vertex v1 = e.getVertices().getFirst();
 		Vertex v2 = e.getVertices().getSecond();
 		int idx1 = vertexTmpIds.get(v1);
 		int idx2 = vertexTmpIds.get(v2);
-		if(idx1 > 0 && idx2 > 0) {
+		if (idx1 > 0 && idx2 > 0) {
 			attrs.add(createTuple(GraphML.SOURCE_ATTR, idx1));
 			attrs.add(createTuple(GraphML.TARGET_ATTR, idx2));
 		} else {
-			throw new IllegalArgumentException("Orphaned edges are not allowed!");
+			throw new IllegalArgumentException(
+					"Orphaned edges are not allowed!");
 		}
 		return attrs;
+	}
+
+	/**
+	 * Returns the indices associated to vertices during serialization.
+	 * 
+	 * @return the indices associated to vertices during serialization.
+	 */
+	public TObjectIntHashMap<Vertex> getVertexIndices() {
+		return vertexTmpIds;
 	}
 }

@@ -71,6 +71,11 @@ public class SpatialGraphProjectionBuilder<G extends SpatialGraph, V extends Spa
 		SpatialGraphProjection<G, V, E> projection = createGraph(delegate);
 
 		for (SpatialVertex v : delegate.getVertices()) {
+			if(v.getPoint().getSRID() != geometry.getSRID())
+				throw new RuntimeException(String.format(
+						"Graph and geometry do not have the same coordinate reference system. (%1$s, %2$s)",
+						v.getPoint().getSRID(), geometry.getSRID()));
+			
 			if (geometry.contains(v.getPoint())) {
 				addVertex(projection, (V) v);
 			}
