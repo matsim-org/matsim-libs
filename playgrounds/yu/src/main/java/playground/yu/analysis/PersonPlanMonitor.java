@@ -23,9 +23,12 @@
  */
 package playground.yu.analysis;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 
@@ -40,7 +43,7 @@ import playground.yu.utils.DebugTools;
 public class PersonPlanMonitor {
 	private double legDepTime, legArrTime = Double.NaN, legDist = 0.0/* [km] */,
 			legDur = 0.0/* [h] */, actStartTime = Double.NaN,
-			actEndTime = Double.NaN, actDur = 0.0/* [h] */;
+			actEndTime = Double.NaN, actDur = 0.0/* [h] */, firstActEndTime;
 
 	private int idx;
 	private Plan plan;
@@ -75,7 +78,7 @@ public class PersonPlanMonitor {
 	}
 
 	public void setActEndTime(double endTime, ActivityParams actParams) {
-		if (this.idx == -1)
+		if (this.idx == -1)// if first act without startTime
 			this.idx += 1;
 		this.actEndTime = endTime;
 		this.actDur += this.calcActDuration_h(actParams);
@@ -90,7 +93,7 @@ public class PersonPlanMonitor {
 
 	public double getTotalTravelTimes_h() {
 		if (this.stuck)
-			return 24.0;
+			return 24.0 * 2;
 		return legDur;
 	}
 
@@ -103,10 +106,13 @@ public class PersonPlanMonitor {
 					+ "\tthis.idx%2=1, it's impossible!!!\tfrom person\t"
 					+ this.plan.getPerson());
 
-		String actType = ((Activity) this.plan.getPlanElements().get(this.idx))
-				.getType();
-		if (Double.isNaN(this.actEndTime) && actType.startsWith("h")) {
-			this.actEndTime = 24.0 * 3600.0 - 1.0;
+		List<PlanElement> pes = this.plan.getPlanElements();
+
+		String actType = ((Activity) pes.get(this.idx)).getType();
+		if (Double.isNaN(this.actEndTime) && actType.startsWith("h")
+				&& this.idx == pes.size() - 1) {
+			// last act (home)
+			// this.actEndTime = 24.0 * 3600.0 - 1.0;
 			this.actDur += this.calcActDuration_h(scoring
 					.getActivityParams(actType));
 		}
@@ -135,34 +141,37 @@ public class PersonPlanMonitor {
 	}
 
 	private double calcActDuration_h(ActivityParams actParams) {
-		if (Double.isNaN(actStartTime) || actParams.getType().startsWith("h"))
-			// h or home
-			this.actStartTime = 0.0;
-
-		double openTime = actParams.getOpeningTime(), closeTime = actParams
-				.getClosingTime(); //
-		if (actParams.getType().startsWith("h")) {
-			openTime = 0.0;
-			closeTime = 24.0 * 3600.0 - 1.0;
+		String actType = actParams.getType();
+		if (this.idx == 0/* fist act */&& actType.startsWith("h")) {
+			this.firstActEndTime = this.actEndTime + 3600.0 * 24.0;
+			return 0.0;
 		}
 
-		double typicalDuration_h = actParams.getTypicalDuration() / 3600.0, zeroUtilityDuration_h// [h]
-		= typicalDuration_h
-				* Math.exp(-10.0 / typicalDuration_h / actParams.getPriority()), //
+		double typicalDuration_h = actParams.getTypicalDuration() / 3600.0, //
+		zeroUtilityDuration_h = typicalDuration_h
+				* Math.exp(-10.0 / typicalDuration_h / actParams.getPriority());
 
-		actStart = this.actStartTime, actEnd = this.actEndTime;
+		double actStart = this.actStartTime, actEnd;
 
-		if (openTime >= 0 && this.actStartTime < openTime)
-			actStart = openTime;
-		if (closeTime >= 0 && closeTime < this.actEndTime)
-			actEnd = closeTime;
-		if (openTime >= 0
-				&& closeTime >= 0
-				&& (openTime > this.actEndTime || closeTime < this.actStartTime)) {
-			// agent could not perform action
-			actStart = this.actEndTime;
+		if (!actType.startsWith("h")) {
+			double openTime = actParams.getOpeningTime(), closeTime = actParams
+					.getClosingTime();
 			actEnd = this.actEndTime;
+			if (openTime >= 0 && this.actStartTime < openTime)
+				actStart = openTime;
+			if (closeTime >= 0 && closeTime < this.actEndTime)
+				actEnd = closeTime;
+			if (openTime >= 0
+					&& closeTime >= 0
+					&& (openTime > this.actEndTime || closeTime < this.actStartTime)) {
+				// agent could not perform action
+				actStart = this.actEndTime;
+				actEnd = this.actEndTime;
+			}
+		} else/* act==home */{
+			actEnd = this.firstActEndTime;
 		}
+
 		double performingTime_h = (actEnd - actStart) / 3600.0;
 		double durAttr = typicalDuration_h
 				* Math.log(performingTime_h / zeroUtilityDuration_h);
