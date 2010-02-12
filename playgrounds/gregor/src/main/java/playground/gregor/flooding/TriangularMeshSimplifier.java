@@ -46,7 +46,7 @@ public class TriangularMeshSimplifier {
 
 	private static final Logger log = Logger.getLogger(TriangularMeshSimplifier.class);
 
-	private static final double MAX_LENGTH = 500;
+	private static final double MAX_LENGTH = 10;
 
 	private static final double TWO_PI = 2 * Math.PI;
 	private static final double PI_HALF =  Math.PI / 2;
@@ -169,7 +169,8 @@ public class TriangularMeshSimplifier {
 			}
 			
 			int depth = calcDepth(e);
-			double maxLength = MIN_LENGTH * Math.pow(2, depth);
+			double maxLength = Math.min(MAX_LENGTH, MIN_LENGTH * Math.pow(2, depth));
+			
 
 			
 			

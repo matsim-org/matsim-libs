@@ -54,7 +54,7 @@ public class OTFSnapshotGenerator {
 		
 		this.scenario.getConfig().evacuation().setBuildingsFile("../../../../inputs/networks/evac_zone_buildings_v20090728.shp");
 //		this.scenario.getConfig().evacuation().setSampleSize("0.1");
-//		this.scenario.getConfig().controler().setLastIteration(100);
+//		this.scenario.getConfig().controler().setLastIteration(0);
 		int it = this.scenario.getConfig().controler().getLastIteration();
 		sl.loadNetwork();
 		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + it + "/" + it + ".events.txt.gz";

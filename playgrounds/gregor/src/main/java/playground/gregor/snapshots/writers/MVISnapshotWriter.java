@@ -33,15 +33,15 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.evacuation.otfvis.drawer.AgentDrawer;
+import org.matsim.evacuation.otfvis.drawer.AgentDrawerXYAzimuth;
 import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
 import org.matsim.evacuation.otfvis.drawer.OTFLabelDrawer;
 import org.matsim.evacuation.otfvis.drawer.OTFSheltersDrawer;
 import org.matsim.evacuation.otfvis.drawer.TimeDependentTrigger;
 import org.matsim.evacuation.otfvis.layer.AgentLayer;
 import org.matsim.evacuation.otfvis.layer.LabelLayer;
-import org.matsim.evacuation.otfvis.readerwriter.AgentReader;
-import org.matsim.evacuation.otfvis.readerwriter.AgentWriter;
+import org.matsim.evacuation.otfvis.readerwriter.AgentReaderXYAzimuth;
+import org.matsim.evacuation.otfvis.readerwriter.AgentWriterXYAzimuth;
 import org.matsim.evacuation.otfvis.readerwriter.InundationDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.InundationDataWriter;
 import org.matsim.evacuation.otfvis.readerwriter.LabelReader;
@@ -86,7 +86,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 	final private static float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
 	final private static float [] nodesColor = new float [] {.4f,.4f,.4f,.7f};
 
-	private final AgentWriter writer = new AgentWriter();
+	private final AgentWriterXYAzimuth writer = new AgentWriterXYAzimuth();
 	private final boolean insertWave = true;
 	
 	private final String label = "run1006: Nash approach";
@@ -146,9 +146,9 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 		
 		
-		connect.connectWriterToReader(AgentWriter.class,  AgentReader.class);
-		connect.connectReaderToReceiver(AgentReader.class,AgentDrawer.class);
-		connect.connectReceiverToLayer(AgentDrawer.class,AgentLayer.class);
+		connect.connectWriterToReader(AgentWriterXYAzimuth.class,  AgentReaderXYAzimuth.class);
+		connect.connectReaderToReceiver(AgentReaderXYAzimuth.class,AgentDrawerXYAzimuth.class);
+		connect.connectReceiverToLayer(AgentDrawerXYAzimuth.class,AgentLayer.class);
 	
 		
 		
@@ -163,7 +163,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 		connect.connectWriterToReader(TileDrawerDataWriter.class,TileDrawerDataReader.class);
 		//		connect.add(InundationDataWriter.class,InundationDataReader.class);
 		//		connect.add(InundationDataReader.class,Dummy.class);
-		connect.connectWriterToReader(PolygonDataWriter.class,PolygonDataReader.class);
+//		connect.connectWriterToReader(PolygonDataWriter.class,PolygonDataReader.class);
 		connect.connectWriterToReader(TextureDataWriter.class,TextutreDataReader.class);
 		if (this.occMap != null) {
 			try {

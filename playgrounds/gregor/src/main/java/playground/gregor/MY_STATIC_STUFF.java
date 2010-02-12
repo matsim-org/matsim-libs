@@ -12,9 +12,11 @@ public class MY_STATIC_STUFF {
 	public final static String PADANG_SVN = SVN_ROOT + "/" + SHARED_SVN + "/studies/countries/id/padang";
 	public static final String PADANG_SVN_INUNDATION = PADANG_SVN + "/inundation";	
 	
-	public static final String SWW_ROOT = PADANG_SVN_INUNDATION + "/20090924_081241_run_final_0.8_SZ_hilman_2b_high_tide_subsidence_goseberg";
+//	public static final String SWW_ROOT = PADANG_SVN_INUNDATION + "/20090924_081241_run_final_0.8_SZ_hilman_2b_high_tide_subsidence_goseberg";
+	public static final String SWW_ROOT = PADANG_SVN_INUNDATION + "/20100201_sz_pc_2b_tide_subsidence";
 	public static final int SWW_COUNT = 8; 
-	public  static final String SWW_PREFIX = "SZ_hilman_2b_high_tide_subsidence_P";
+//	public  static final String SWW_PREFIX = "SZ_hilman_2b_high_tide_subsidence_P";
+	public  static final String SWW_PREFIX = "SZ_hilman_2b_subsidence_more_points_P";
 	public  static final String SWW_SUFFIX = "_8.sww";
 	
 	public static final String PADANG_ADDITIONAL_GIS = PADANG_SVN + "/data/GIS";
