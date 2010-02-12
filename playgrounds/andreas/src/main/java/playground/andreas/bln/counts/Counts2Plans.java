@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -17,6 +18,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
@@ -65,12 +67,34 @@ public class Counts2Plans {
 		counts2plans.add344_R();
 		
 		counts2plans.createPlans();
-		counts2plans.createPopulation("E:/_out/plans.xml.gz");
-		
 		counts2plans.printLog();
+		counts2plans.addTouristGroup(100, Time.parseTime("08:30:00"), new IdImpl("812030.1"), new IdImpl("806520.1"));
+		counts2plans.createPopulation("E:/_out/plans.xml.gz");
 		
 		Counts2Plans.log.info("Finished");
 
+	}
+
+	private void addTouristGroup(int number, double time, Id from, Id to) {
+		
+		for (int i = 1; i <= number; i++) {
+			
+			PersonImpl person = createPerson();
+			((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.transitSchedule.getFacilities().get(from).getLinkId());
+			((PlanImpl) person.getSelectedPlan()).getFirstActivity().setCoord(this.transitSchedule.getFacilities().get(from).getCoord());
+
+			((PlanImpl) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);
+			((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime(time);
+						
+			((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.transitSchedule.getFacilities().get(to).getLinkId());
+			((PlanImpl) person.getSelectedPlan()).getLastActivity().setCoord(this.transitSchedule.getFacilities().get(to).getCoord());
+
+			this.completedAgents.add(person);
+			this.numberOfPersonsWithValidPlan++;
+		}
+		
+		log.info(this.numberOfPersonsWithValidPlan + " persons after creating additional 'tourists'");
+		
 	}
 
 	private void printLog() {
@@ -86,9 +110,9 @@ public class Counts2Plans {
 			log.info("Hour: " + hour);				
 			LinkedList<PersonImpl> passengersInVehicle = new LinkedList<PersonImpl>();
 
-			for (LinkedList<Id> line : this.lines.values()) {
+			for (Entry<String, LinkedList<Id>> entry : this.lines.entrySet()) {
 
-				for (Id stopID : line) {
+				for (Id stopID : entry.getValue()) {
 
 					if (this.egress.getCount(stopID) != null) {
 						if (this.egress.getCount(stopID).getVolume(hour) != null) {
@@ -120,7 +144,13 @@ public class Counts2Plans {
 								((PlanImpl) person.getSelectedPlan()).getFirstActivity().setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
 								//								((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.access.getCount(stopID).getCoord());
 								((PlanImpl) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);
-								((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime((hour - 1 + rnd.nextDouble()) * 3600);
+								
+								// Verlegen der Nachfrage auf die Zeit des OEV-Angebots. Dieses geht von 3:30 bis 27:30 Uhr.
+								if(hour < 4){
+									((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime((hour + 24 - 1 + rnd.nextDouble()) * 3600);
+								} else {
+									((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime((hour - 1 + rnd.nextDouble()) * 3600);
+								}
 								passengersInVehicle.add(person);
 							}
 						}
@@ -129,7 +159,7 @@ public class Counts2Plans {
 				}
 
 				if(passengersInVehicle.size() != 0){
-					log.warn(hour + " hour, " + passengersInVehicle.size() + " passengers still in vehicle after last stop");
+					log.warn(hour + " hour, " + entry.getKey() + " line, " + passengersInVehicle.size() + " passengers still in vehicle after last stop");
 					this.numberOfPersonsLeftInBusAtEndOfLine += passengersInVehicle.size();
 				}
 
