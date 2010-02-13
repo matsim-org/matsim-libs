@@ -389,20 +389,29 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		double dist = leg.getRoute().getDistance()/1000; // distance in kilometers
 		
 		if (TransportMode.car.equals(leg.getMode())) {
-			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000 * Math.pow(this.income_averageIncome_ratio, lambda_cost_income_car);
+			// income_averageIncome_ratio needs to be non-zero if lambda_cost_income_car is negative, potential division by 0 otherwise
+			double incomeRatio;
+			if (this.income_averageIncome_ratio==0.0 && lambda_cost_income_car<0) incomeRatio = 0.001;
+			else incomeRatio = this.income_averageIncome_ratio;
+			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000 * Math.pow(incomeRatio, lambda_cost_income_car);
 		} 
 		else if (TransportMode.pt.equals(leg.getMode())) {
+			// income_averageIncome_ratio needs to be non-zero if lambda_cost_income_car is negative, potential division by 0 otherwise
+			double incomeRatio;
+			if (this.income_averageIncome_ratio==0.0 && lambda_cost_income_pt<0) incomeRatio = 0.001;
+			else incomeRatio = this.income_averageIncome_ratio;
+			// cost dependent from season ticket ownership
 			double cost = 0;
 			if (this.seasonTicket.equals("ch-GA")) cost = travelCostPt_GA;
 			else if (this.seasonTicket.equals("ch-HT")) cost = travelCostPt_Halbtax; 
 			else cost = travelCostPt_None; 
-			tmpScore += (1+beta_female_travel*this.female) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist/1000 * Math.pow(this.income_averageIncome_ratio, lambda_cost_income_pt) + constantPt;
+			tmpScore += (1+beta_female_travel*this.female) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist/1000 * Math.pow(incomeRatio, lambda_cost_income_pt) + constantPt;
 		} 
 		else if (TransportMode.walk.equals(leg.getMode())) {
 			tmpScore += beta_time_walk * travelTime/3600 + constantWalk;
 		} 
 		else if (TransportMode.bike.equals(leg.getMode())) {
-		tmpScore += beta_time_bike * travelTime/3600 + constantBike;
+			tmpScore += beta_time_bike * travelTime/3600 + constantBike;
 		}
 		else {
 			// use the same values as for "car"
