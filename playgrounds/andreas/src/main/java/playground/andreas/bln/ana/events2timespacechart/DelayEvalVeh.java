@@ -1,11 +1,13 @@
 package playground.andreas.bln.ana.events2timespacechart;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -24,12 +26,23 @@ public class DelayEvalVeh {
 	
 	private NetworkLayer network;
 	private TransitSchedule transitSchedule;
+	HashMap<Id, String> stopIDNameMap;
 	
 	private LinkedList<DelayHandler> handler = new LinkedList<DelayHandler>();
 	
 	public DelayEvalVeh(String outputDir) {
 		this.outputDir = outputDir;
-	}
+		this.stopIDNameMap = null;		
+	}	
+	
+	public DelayEvalVeh(String outputDir, String stopIdNamesMapFile) {
+		this.outputDir = outputDir;
+		try {
+			this.stopIDNameMap = ReadStopIDNamesMap.readFile(stopIdNamesMapFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}	
 
 	private void addTransitLine(String line) {
 		DelayHandler delayHandler = new DelayHandler(this.outputDir, line);
@@ -56,7 +69,7 @@ public class DelayEvalVeh {
 		}
 		
 		for (DelayHandler delayHandler : this.handler) {
-			delayHandler.writeGnuPlot();
+			delayHandler.writeGnuPlot(this.stopIDNameMap);
 		}
 	}
 	
@@ -82,7 +95,7 @@ public class DelayEvalVeh {
 	}
 
 	public static void main(String[] args) {
-		DelayEvalVeh delayEval = new DelayEvalVeh("E:/_out/veh/");
+		DelayEvalVeh delayEval = new DelayEvalVeh("E:/_out/veh/", "d:/Berlin/BVG/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/stopareamap.txt");
 		delayEval.readNetwork("d:/Berlin/BVG/berlin-bvg09/pt/m4_demand/network_kl.xml");
 		delayEval.readTransitSchedule("d:/Berlin/BVG/berlin-bvg09/pt/m4_demand/transitSchedule_kl.xml");
 		

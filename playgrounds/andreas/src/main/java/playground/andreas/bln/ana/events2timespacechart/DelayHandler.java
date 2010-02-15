@@ -219,9 +219,9 @@ class DelayHandler implements VehicleDepartsAtFacilityEventHandler, VehicleArriv
 		return newList;
 	}
 	
-	protected void writeGnuPlot() {
-		GnuFileWriter gnuFileWriter = new GnuFileWriter(this.outputDir);
-		gnuFileWriter.write(this.stopIdDistanceMap, this.line.toString());		
+	protected void writeGnuPlot(HashMap<Id, String> stopIdNameMap) {
+		GnuFileWriter gnuFileWriter = new GnuFileWriter(this.outputDir);		
+		gnuFileWriter.write(this.stopIdDistanceMap, this.line.toString(), stopIdNameMap);		
 	}
 			
 }
