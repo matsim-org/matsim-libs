@@ -79,6 +79,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	}
 
 	@Override
+	@Deprecated // use getSubRoute(Id, Id)
 	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 		Link startLink = this.network.getLinks().get(getStartLinkId());
 		Link fromLink = startLink;
@@ -146,6 +147,57 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 			ret.setLinkIds(fromLink.getId(), this.route.subList(fromIndex, toIndex + 1), toLink.getId());
 		} else {
 			ret.setLinkIds(fromLink.getId(), null, toLink.getId());
+		}
+		return ret;
+	}
+
+	@Override
+	public NetworkRouteWRefs getSubRoute(Id fromLinkId, Id toLinkId) {
+		/**
+		 * the index where the link after fromLinkId can be found in the route:
+		 * fromIndex==0 --> fromLinkId == startLinkId,
+		 * fromIndex==1 --> fromLinkId == first link in the route, etc.
+		 */
+		int fromIndex = -1;
+		/**
+		 * the index where toLinkId can be found in the route
+		 */
+		int toIndex = -1;
+
+		if (fromLinkId.equals(this.getStartLinkId())) {
+			fromIndex = 0;
+		} else if (fromLinkId.equals(this.getEndLinkId())) {
+			fromIndex = this.route.size();
+		} else {
+			for (int i = 0, n = this.route.size(); (i < n) && (fromIndex < 0); i++) {
+				if (fromLinkId.equals(this.route.get(i))) {
+					fromIndex = i+1;
+				}
+			}
+			if (fromIndex < 0) {
+				throw new IllegalArgumentException("Cannot create subroute because fromLinkId is not part of the route.");
+			}
+		}
+
+		if (fromLinkId.equals(toLinkId)) {
+			toIndex = fromIndex - 1;
+		} else if (toLinkId.equals(this.getEndLinkId())) {
+			toIndex = this.route.size();
+		} else {
+			for (int i = fromIndex, n = this.route.size(); (i < n) && (toIndex < 0); i++) {
+				if (toLinkId.equals(this.route.get(i))) {
+					toIndex = i;
+				}
+			}
+			if (toIndex < 0) {
+				throw new IllegalArgumentException("Cannot create subroute because toLinkId is not part of the route.");
+			}
+		}
+		LinkNetworkRouteImpl ret = new LinkNetworkRouteImpl(fromLinkId, toLinkId, this.network);
+		if (toIndex > fromIndex) {
+			ret.setLinkIds(fromLinkId, this.route.subList(fromIndex, toIndex), toLinkId);
+		} else {
+			ret.setLinkIds(fromLinkId, null, toLinkId);
 		}
 		return ret;
 	}

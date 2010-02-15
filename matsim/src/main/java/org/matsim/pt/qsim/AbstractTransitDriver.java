@@ -271,8 +271,14 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 
 		@Override
+		@Deprecated
 		public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 			return this.delegate.getSubRoute(fromNode, toNode);
+		}
+
+		@Override
+		public NetworkRouteWRefs getSubRoute(final Id fromLinkId, final Id toLinkId) {
+			return this.delegate.getSubRoute(fromLinkId, toLinkId);
 		}
 
 		@Override

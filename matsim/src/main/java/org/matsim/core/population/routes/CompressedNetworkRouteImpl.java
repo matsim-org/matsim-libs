@@ -37,6 +37,17 @@ import org.matsim.api.core.v01.network.Node;
  * networks, but is likely a bit slower due to the more complex access of the
  * route information internally.
  *
+ * <p>Description of the compression algorithm:<br />
+ * Given a map containing for each link a defined successor (subsequentLinks-map), this implementation
+ * does not store the links in its route-information that are the same as the successor defined in the
+ * subsequentLinks-map.<br />
+ * Given a startLinkId, endLinkId and a list of linkIds to be stored, this implementation stores
+ * first the startLinkId. Next, if the successor of the startLinkId is different from the first linkId
+ * in the list, this linkId is stored, otherwise not. Then the successor of that linkId is compared to
+ * the next linkId in the list. If the successor is different, the linkId is stored, otherwise not.
+ * This procedure is repeated until the complete list of linkIds is processed.
+ * </p>
+ *
  * @author mrieser
  */
 public class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs, Cloneable {
@@ -122,6 +133,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 
 
 	@Override
+	@Deprecated // use getSubRoute(Id, Id)
 	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 		Link newStartLink = null;
 		Link newEndLink = null;
@@ -158,6 +170,50 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 
 		NetworkRouteWRefs subRoute = new CompressedNetworkRouteImpl(newStartLink.getId(), newEndLink.getId(), this.network, this.subsequentLinks);
 		subRoute.setLinkIds(newStartLink.getId(), newLinkIds, newEndLink.getId());
+		return subRoute;
+	}
+
+	@Override
+	public NetworkRouteWRefs getSubRoute(Id fromLinkId, Id toLinkId) {
+		List<Id> newLinkIds = new ArrayList<Id>(10);
+		boolean foundFromLink = fromLinkId.equals(this.getStartLinkId());
+		boolean collectLinks = foundFromLink;
+		boolean equalFromTo = fromLinkId.equals(toLinkId);
+
+		if (!foundFromLink || !equalFromTo) {
+			for (Id linkId : getLinkIds()) {
+				System.out.println("try link id " + linkId);
+				if (linkId.equals(toLinkId)) {
+					collectLinks = false;
+					if (equalFromTo) {
+						foundFromLink = true;
+					}
+					break; // we found the end, stop looping
+				}
+				if (collectLinks) {
+					newLinkIds.add(linkId);
+				}
+				if (linkId.equals(fromLinkId)) {
+					foundFromLink = true;
+					collectLinks = true; // we found the start, start collecting
+				}
+			}
+			if (!foundFromLink) {
+				foundFromLink = fromLinkId.equals(this.getEndLinkId());
+				collectLinks = foundFromLink;
+			}
+			if (!foundFromLink) {
+				throw new IllegalArgumentException("fromLinkId is not part of this route.");
+			}
+			if ((collectLinks) && (toLinkId.equals(this.getEndLinkId()))) {
+				collectLinks = false;
+			}
+			if (collectLinks) {
+				throw new IllegalArgumentException("toLinkId is not part of this route.");
+			}
+		}
+		NetworkRouteWRefs subRoute = new CompressedNetworkRouteImpl(fromLinkId, toLinkId, this.network, this.subsequentLinks);
+		subRoute.setLinkIds(fromLinkId, newLinkIds, toLinkId);
 		return subRoute;
 	}
 

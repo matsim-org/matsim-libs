@@ -54,8 +54,20 @@ public interface NetworkRouteWRefs extends RouteWRefs {
 	 * @param fromNode
 	 * @param toNode
 	 * @return A flat copy of the original Route
+	 * @deprecated use getSubRoute(Id, Id)
 	 */
+	@Deprecated
 	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode);
+
+	/**
+	 * This method returns a new Route object with the subroute of this, using fromLinkId as the
+	 * subroute's startLink, toLinkId as the subroute's endLink, and the links in between fromLinkId
+	 * and toLinkIds set as the route's link
+	 * @param fromLinkId
+	 * @param toLinkId
+	 * @return subroute of this route starting at fromLinkId and ending at toLinkId
+	 */
+	public NetworkRouteWRefs getSubRoute(final Id fromLinkId, final Id toLinkId);
 
 	/**
 	 * Sets the id of the vehicle that should be used to drive along this route.
