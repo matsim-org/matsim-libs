@@ -35,9 +35,7 @@ import org.matsim.population.Desires;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 /**
- * Default implementation of {@link PersonImpl} interface.
- * 
- * @see org.matsim.core.population.PersonImpl
+ * Default implementation of {@link Person} interface.
  */
 public class PersonImpl implements Person {
 
@@ -53,9 +51,9 @@ public class PersonImpl implements Person {
 
 	private TreeSet<String> travelcards = null;
 	private Desires desires = null;
-	
+
 	private Plan selectedPlan = null;
-	
+
 	private Customizable customizableDelegate;
 
 	public PersonImpl(final Id id) {
@@ -72,7 +70,7 @@ public class PersonImpl implements Person {
 		if (this.selectedPlan == null) this.selectedPlan = plan;
 		return this.plans.add(plan);
 	}
-	
+
 	public PlanImpl createAndAddPlan(final boolean selected) {
 		PlanImpl p = new PlanImpl(this);
 		this.addPlan(p);
@@ -106,7 +104,7 @@ public class PersonImpl implements Person {
 		int index = (int)(MatsimRandom.getRandom().nextDouble()*this.getPlans().size());
 		return this.getPlans().get(index);
 	}
-	
+
 	/** @deprecated this function is not tested.  kai, oct'09 */
 	@Deprecated
 	public Plan getBestPlan() {
@@ -266,9 +264,9 @@ public class PersonImpl implements Person {
 		return this.desires;
 	}
 
-	
-	
-	
+
+
+
 	@Override
 	public final String toString() {
 		StringBuilder b = new StringBuilder();
