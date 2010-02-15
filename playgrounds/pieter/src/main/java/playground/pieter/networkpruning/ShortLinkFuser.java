@@ -1,20 +1,22 @@
 package playground.pieter.networkpruning;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
-import org.matsim.network.algorithms.NetworkCalcTopoType;
-import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
-import org.matsim.network.algorithms.NetworkSummary;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.algorithms.NetworkCalcTopoType;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
+import org.matsim.core.network.algorithms.NetworkSummary;
+import org.matsim.core.utils.misc.Time;
 
 public class ShortLinkFuser {
 	private NetworkLayer network;
@@ -27,19 +29,21 @@ public class ShortLinkFuser {
 	private int twoWayLinkJointCount;
 
 	public ShortLinkFuser(String inFile, String outFile) {
-		this.network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.network = scenario.getNetwork();
 		this.inFile = inFile;
 		this.outFile = outFile;
-		new MatsimNetworkReader(network).readFile(this.inFile);
+		new MatsimNetworkReader(scenario).readFile(this.inFile);
 		new NetworkSummary().run(network);
 		this.minLength = 1000;
 	}
 
 	public ShortLinkFuser(String inFile, String outFile, double minLength) {
-		this.network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.network = scenario.getNetwork();
 		this.inFile = inFile;
 		this.outFile = outFile;
-		new MatsimNetworkReader(network).readFile(this.inFile);
+		new MatsimNetworkReader(scenario).readFile(this.inFile);
 		new NetworkSummary().run(network);
 		this.minLength = minLength;
 	}
@@ -60,34 +64,33 @@ public class ShortLinkFuser {
 		System.out.println("Pruning  done. Shortest link is " + this.shortestLink);
 		System.out.println("One way links removed: " + this.oneWayLinkJointCount);
 		System.out.println("Two way links removed: " + this.twoWayLinkJointCount);
-		new NetworkWriter(this.network,this.outFile).write();
+		new NetworkWriter(this.network).writeFile(this.outFile);
 		System.out.println("File written to "+ this.outFile);
 	}
 
 	
 
 	private void joinOneWayLinks() {
-		// TODO Auto-generated method stub
-		Map<Id,Node> nodeMap =  network.getNodes();
-		Iterator<Node> nodeIterator = nodeMap.values().iterator();
+		Map<Id,NodeImpl> nodeMap =  network.getNodes();
+		Iterator<NodeImpl> nodeIterator = nodeMap.values().iterator();
 		int linkJoinCount = 0;
 		while(nodeIterator.hasNext()){
-			 Node currentNode =nodeIterator.next();
+			 NodeImpl currentNode =nodeIterator.next();
 			 Map<Id,? extends Link> inLinks = currentNode.getInLinks();
 			 Map<Id,? extends Link> outLinks = currentNode.getOutLinks();
 			 if(inLinks.size()==1 && outLinks.size()==1){
 				 //check that it's not a dead-end, and has same parameters
-				 double period = 1;
+				 double time = Time.UNDEFINED_TIME;
 				 Link inLink = inLinks.values().iterator().next();
 				 Link outLink = outLinks.values().iterator().next();
 				 Node fromNode = inLink.getFromNode();
 				 Node toNode = outLink.getToNode();
-				 double inFlow = inLink.getFlowCapacity(period);
-				 double outFlow = outLink.getFlowCapacity(period);
-				 double inSpeed = inLink.getFreespeed(period);
-				 double outSpeed = outLink.getFreespeed(period);
-				 int inLanes = inLink.getLanesAsInt(period);
-				 int outLanes = outLink.getLanesAsInt(period);
+				 double inFlow = inLink.getCapacity(time);
+				 double outFlow = outLink.getCapacity(time);
+				 double inSpeed = inLink.getFreespeed(time);
+				 double outSpeed = outLink.getFreespeed(time);
+				 double inLanes = inLink.getNumberOfLanes(time);
+				 double outLanes = outLink.getNumberOfLanes(time);
 				 double inLength = inLink.getLength();
 				 double outLength = outLink.getLength();
 				 if((!fromNode.equals(toNode)) &&
@@ -109,11 +112,11 @@ public class ShortLinkFuser {
 		System.out.println("number of oneway links joined: "+ linkJoinCount);
 	}
 	private void joinTwoWayLinks() {
-		Map<Id,Node> nodeMap =  network.getNodes();
-		Iterator<Node> nodeIterator = nodeMap.values().iterator();
+		Map<Id,NodeImpl> nodeMap =  network.getNodes();
+		Iterator<NodeImpl> nodeIterator = nodeMap.values().iterator();
 		int linkJoinCount = 0;
 		while(nodeIterator.hasNext()){
-			 Node currentNode =nodeIterator.next();
+			 NodeImpl currentNode =nodeIterator.next();
 			 Map<Id,? extends Link> inLinks = currentNode.getInLinks();
 			 Map<Id,? extends Link> outLinks = currentNode.getOutLinks();
 			 if(inLinks.size()==2 && outLinks.size()==2){
@@ -170,14 +173,14 @@ public class ShortLinkFuser {
 				 }
 
 
-				 double inFlow = inLink1.getFlowCapacity(period);
-				 double outFlow = outLink1.getFlowCapacity(period);
+				 double inFlow = inLink1.getCapacity(period);
+				 double outFlow = outLink1.getCapacity(period);
 
 				 double inSpeed = inLink1.getFreespeed(period);
 				 double outSpeed = outLink1.getFreespeed(period);
 
-				 int inLanes = inLink1.getLanesAsInt(period);
-				 int outLanes = outLink1.getLanesAsInt(period);
+				 double inLanes = inLink1.getNumberOfLanes(period);
+				 double outLanes = outLink1.getNumberOfLanes(period);
 
 				 double inLength1 = inLink1.getLength();
 				 double inLength2 = inLink2.getLength();
@@ -213,7 +216,7 @@ public class ShortLinkFuser {
 
 
 	private void findShortestLink(){
-		Iterator<? extends Link> linkIterator = this.network.getLinks().values().iterator();
+		Iterator<? extends LinkImpl> linkIterator = this.network.getLinks().values().iterator();
 		while (linkIterator.hasNext()){
 			double length = linkIterator.next().getLength();
 			if (length<this.shortestLink){

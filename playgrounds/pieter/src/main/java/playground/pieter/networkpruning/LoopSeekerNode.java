@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.interfaces.core.v01.Link;
-import org.matsim.interfaces.core.v01.Node;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 public class LoopSeekerNode {
 	protected Node pointsToNode;
@@ -58,7 +58,6 @@ public class LoopSeekerNode {
 	}
 
 	private void checkForRing() {
-		// TODO Auto-generated method stub
 		Iterator<LoopSeekerNode> nodeIt = this.childNodes.iterator();
 		while(nodeIt.hasNext()){
 			LoopSeekerNode currentNode = nodeIt.next();
@@ -69,7 +68,6 @@ public class LoopSeekerNode {
 		}
 	}
 	private void traceBackToRoot(LoopSeekerNode currentNode) {
-		// TODO Auto-generated method stub
 		while(!currentNode.isRoot){
 			rootNode.ringNodes.add(currentNode.pointsToNode);
 			rootNode.inWelds.addAll(currentNode.inLinks);
@@ -123,9 +121,7 @@ public class LoopSeekerNode {
 			Iterator<? extends Link> linkIterator = inMap.values().iterator();
 			while (linkIterator.hasNext()){
 				Link currentLink = linkIterator.next();
-
 					this.inLinks.add(currentLink);
-
 			}
 		}
 	}
@@ -137,7 +133,6 @@ public class LoopSeekerNode {
 	}
 
 	protected void makeOffspring() {
-		// TODO Auto-generated method stub
 		Iterator<Node> nodeIt = this.possibleOffSpring.iterator();
 		while (nodeIt.hasNext()){
 			Node currentNode = nodeIt.next();
@@ -161,7 +156,6 @@ public class LoopSeekerNode {
 	}
 
 	private boolean nodeQualifies(Node currentNode) {
-		// TODO Auto-generated method stub
 		boolean isStreetNode = false;
 		boolean isThruNode = false;
 //		first check that it has at least two inLinks and 2 outLinks, and that they are of street capacity
@@ -177,10 +171,7 @@ public class LoopSeekerNode {
 		
 	}
 
-
-
 	private boolean checkIfStreetNode(Map<Id, ? extends Link> linkMap) {
-		// TODO Auto-generated method stub
 		Iterator<? extends Link> linkIterator = linkMap.values().iterator();
 		while(linkIterator.hasNext()){
 			if(linkIterator.next().getCapacity(this.rootNode.capPeriod) != this.rootNode.streetCap)
