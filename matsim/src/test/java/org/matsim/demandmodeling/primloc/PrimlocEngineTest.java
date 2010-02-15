@@ -9,6 +9,7 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.testcases.MatsimTestCase;
 
 import Jama.Matrix;
@@ -17,7 +18,9 @@ import Jama.Matrix;
 
 public class PrimlocEngineTest extends MatsimTestCase {
 
-private final static String testPropertyFile = "test/input/org/matsim/demandmodeling/primloc/PrimaryLocationChoice.xml";
+	private final static String testPropertyFile = "test/input/org/matsim/demandmodeling/primloc/PrimaryLocationChoice.xml";
+
+	private final static Logger log = Logger.getLogger(PrimlocEngineTest.class);
 
 	PrimlocCore core = new PrimlocCore();
 
@@ -58,13 +61,15 @@ private final static String testPropertyFile = "test/input/org/matsim/demandmode
 
 		Properties props = new Properties();
 
-		FileInputStream stream = new FileInputStream(propertyFile);
-		props.loadFromXML(stream);
+		FileInputStream stream = null;
 		try {
-			stream.close();
-		} catch (IOException e) {
-			System.err.println("could not close stream.");
-			e.printStackTrace();
+			stream = new FileInputStream(propertyFile);
+			props.loadFromXML(stream);
+		}
+		finally {
+			try {
+				if (stream != null) { stream.close(); }
+			} catch (IOException e) { log.warn("Could not close stream.", e); }
 		}
 		zoneFileName = props.getProperty("zoneFileName");
 		costFileName = props.getProperty("costFileName");

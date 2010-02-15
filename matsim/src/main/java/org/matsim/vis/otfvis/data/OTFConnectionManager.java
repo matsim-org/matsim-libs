@@ -41,37 +41,36 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 /**
  * The OTFConnectionManager is the most important class when building an OTFVis instance.
  * It holds pairs of classes. Each of this class-pairs yields as a "From" -> "To" connection between classes.
- * The whole from-to conncetions established in a OTFConnectionManager describe the route all data has to 
+ * The whole from-to connections established in a OTFConnectionManager describe the route all data has to
  * take from the source (normally a QueueLink/Node, etc.) to the actual display on screen.
  * It is the programmer's responsibility to define a complete chain of responsible objects for all data sent.
- * 
- *  A chain of responsibility normally consists of 
- *  a DataSource (e.g. QueueLink), 
+ *
+ *  A chain of responsibility normally consists of
+ *  a DataSource (e.g. QueueLink),
  *  a DataWriter (e.g. OTFDefaultLinkHandler.Writer)
  *  a DataReader (e.g. OTFDefaultLinkHandler)
  *  a Visualizer class (e.g. SimpleStaticNetLayer.QuadDrawer)
  *  and possibly a layer this Drawer belongs to (e.g. SimpleStaticNetLayer)
- *  
- * @author dstrippgen
  *
+ * @author dstrippgen
  */
 public class OTFConnectionManager implements Cloneable, Serializable {
 
 	private static final long serialVersionUID = 6481835753628883014L;
-	
+
 	private static final Logger log = Logger.getLogger(OTFConnectionManager.class);
 
 	private static class Entry implements Serializable {
 
 		private static final long serialVersionUID = -2260651735789627280L;
-		
+
 		Class<?> from, to;
 
 		public Entry(Class<?> from, Class<?> to) {
 			this.from = from;
 			this.to = to;
 		}
-		
+
 		@Override
 		public String toString() {
 			return "(" + from.toString() + "," + to.toString() + ") ";
@@ -80,13 +79,16 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		public Class<?> getTo(){
 			return this.to;
 		}
-		
+
 		public Class<?> getFrom(){
 			return this.from;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
+			if (!(obj instanceof Entry)) {
+				return false;
+			}
 			Entry other = (Entry) obj;
 			return from.equals(other.from) && to.equals(other.to);
 		}
@@ -95,11 +97,11 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		public int hashCode() {
 			return from.hashCode() * to.hashCode();
 		}
-		
+
 	}
-	
+
 	private final List<Entry> connections = new LinkedList<Entry>();
-	
+
 	@Override
 	public OTFConnectionManager clone() {
 		OTFConnectionManager clone = new OTFConnectionManager();
@@ -111,17 +113,17 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		}
 		return clone;
 	}
-	
+
 	public void connectQNodeToWriter(Class<? extends OTFDataWriter<? extends QNode>> writer) {
 		Entry entry = new Entry(QNode.class, writer);
 		connections.add(entry);
 	}
-	
+
 	public void connectQLinkToWriter(Class<? extends OTFDataWriter<? extends QLink>> writer) {
 		Entry entry = new Entry(QLink.class, writer);
 		connections.add(entry);
 	}
-	
+
 	public void connectQueueLinkToWriter(Class<OTFQueueSimLinkAgentsWriter> writer) {
 		Entry entry = new Entry(QueueLink.class, writer);
 		connections.add(entry);
@@ -144,7 +146,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		Entry entry = new Entry(writer, reader);
 		connections.add(entry);
 	}
-	
+
 	public void connectReaderToReceiver(Class<? extends OTFDataReader> reader, Class<? extends OTFDataReceiver> receiver) {
 		Collection<Class<?>> receiverClasses = this.getToEntries(reader);
 		if (receiverClasses.contains(receiver)) {
@@ -154,7 +156,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 			connections.add(entry);
 		}
 	}
-	
+
 	public void connectReceiverToLayer(Class<? extends OTFDataReceiver> receiver, Class<? extends SceneLayer> layer) {
 		Collection<Class<?>> layerClasses = this.getToEntries(receiver);
 		if (layerClasses.contains(layer)) {
@@ -232,7 +234,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 			this.connections.add(entry);
 		}
 	}
-	
+
 	public void logEntries() {
 		for (Entry e : this.connections){
 			log.info("writing entry: " + e.getFrom().getCanonicalName() + " to " + e.getTo().getName());
@@ -247,7 +249,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		}
 		return result;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Collection<Class<OTFWriterFactory<QLink>>> getQLinkEntries() {
 		Collection<Class<OTFWriterFactory<QLink>>> result = new ArrayList<Class<OTFWriterFactory<QLink>>>();
@@ -256,5 +258,5 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		}
 		return result;
 	}
-	
+
 }
