@@ -64,7 +64,7 @@ import com.sun.opengl.util.texture.TextureCoords;
  * VisGUIMouseHandler handles any user input.
  * It is the most important class apart from OTFOGLDrawer and OTFHostControlBar.
  * It is responsible for moving and zooming the screen rectangle and for handling the user clicks.
- * 
+ *
  * @author dstrippgen
  *
  */
@@ -110,7 +110,6 @@ implements MouseWheelListener{
 		try {
 			clickHandler.invalidate(-1);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

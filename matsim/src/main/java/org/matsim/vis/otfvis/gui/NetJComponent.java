@@ -382,6 +382,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			this.quad[3] = new Point2D.Float(endX + ortho.x, endY + ortho.y);
 		}
 
+		@Override
 		public void setColor(float coloridx) {
 //			this.coloridx = coloridx;
 		}
@@ -400,9 +401,8 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			//display.draw(poly);
 		}
 
+		@Override
 		public void setId(char[] idBuffer) {
-			// TODO Auto-generated method stub
-
 		}
 	}
 
@@ -554,6 +554,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			networkScrollPane.repaint();
 		}
 
+		@Override
 		public void stateChanged(ChangeEvent e) {
 			networkScrollPane.updateViewClipRect();
 		}
@@ -577,26 +578,17 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 	}
 
-//
-//	public void addQuery(OTFQuery query) {
-//		// TODO Auto-generated method stub
-//	}
-//
-//	public void removeQueries() {
-//		// TODO Auto-generated method stub
-//	}
-
+	@Override
 	public void clearCache() {
 		if(quad != null) quad.clearCache();
 	}
 
+	@Override
 	public void handleClick(Double point, int mouseButton, MouseEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	public void handleClick(Rectangle currentRect, int button) {
-		// TODO Auto-generated method stub
 
 	}
 

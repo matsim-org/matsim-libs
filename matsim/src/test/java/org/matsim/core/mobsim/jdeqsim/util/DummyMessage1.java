@@ -5,11 +5,6 @@ import org.matsim.core.mobsim.jdeqsim.Message;
 public class DummyMessage1 extends Message {
 
 	public Message messageToUnschedule=null;
-	
-	public DummyMessage1(){
-		super();
-	}
-	
 
 	@Override
 	public void handleMessage() {
@@ -18,8 +13,6 @@ public class DummyMessage1 extends Message {
 
 	@Override
 	public void processEvent() {
-		// TODO Auto-generated method stub
-		
 	}
-	
+
 }

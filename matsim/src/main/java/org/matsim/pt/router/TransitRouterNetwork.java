@@ -64,7 +64,7 @@ import org.matsim.world.Layer;
 	/*package*/ static class TransitRouterNetworkNode implements Node {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		final TransitRouteStop stop;
 		final TransitRoute route;
 		final TransitLine line;
@@ -107,7 +107,7 @@ import org.matsim.world.Layer;
 	/*package*/ static class TransitRouterNetworkLink implements Link {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		final TransitRouterNetworkNode fromNode;
 		final TransitRouterNetworkNode toNode;
 		final TransitRoute route;
@@ -264,14 +264,10 @@ import org.matsim.world.Layer;
 	}
 
 	public void addNode(Node nn) {
-		// TODO Auto-generated method stub
-		//
 		throw new UnsupportedOperationException() ;
 	}
 
 	public void addLink(Link ll) {
-		// TODO Auto-generated method stub
-		//
 		throw new UnsupportedOperationException() ;
 	}
 

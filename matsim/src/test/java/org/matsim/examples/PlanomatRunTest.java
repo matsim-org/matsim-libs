@@ -29,7 +29,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class PlanomatRunTest extends MatsimTestCase {
 
 	private Config config;
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -47,17 +47,17 @@ public class PlanomatRunTest extends MatsimTestCase {
 	}
 
 	/**
-	 * TODO this test always files for an unknown reason. 
-	 * checksums of actual test results are not stable even in repeated runs of this test on one machine 
+	 * TODO this test always fails for an unknown reason.
+	 * checksums of actual test results are not stable even in repeated runs of this test on one machine
 	 */
 	public void testMainCarPt() {
 //		this.runControlerTest(this.config); // commented this out because I don't really like non-deterministic tests. kai, aug09
 	}
 
 	private void runControlerTest(final Config config) {
-		
+
 		final Logger logger = Logger.getLogger(PlanomatRunTest.class);
-		
+
 		config.controler().setOutputDirectory(this.getOutputDirectory());
 		Controler testee = new Controler(config);
 		testee.setCreateGraphs(false);
@@ -70,5 +70,5 @@ public class PlanomatRunTest extends MatsimTestCase {
 		logger.info("Actual checksum: " + Long.toString(actualChecksum));
 		assertEquals("different plans files.", expectedChecksum, actualChecksum);
 	}
-	
+
 }

@@ -6,8 +6,6 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -31,11 +29,11 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 /**
  * OTFTimeLine is the time line toolbar.
  * It is only used in case of playing a mvi file.
- * 
+ *
  * @author dstrippgen
  *
  */
-public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, ItemListener, ChangeListener {
+public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, ChangeListener {
 
 	private static final long serialVersionUID = 1L;
 	private final OTFHostControlBar hostControl;
@@ -105,6 +103,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		times.repaint();
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		// remove old label
 		// get actual time
@@ -121,11 +120,8 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		// insert new label
 	}
 
-	public void itemStateChanged(ItemEvent e) {
-		// TODO Auto-generated method stub
-	}
-
 	/** Listen to the slider. */
+	@Override
 	public void stateChanged(ChangeEvent e) {
 		JSlider source = (JSlider)e.getSource();
 		if (!source.getValueIsAdjusting()) {
@@ -170,28 +166,29 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		add(times);
 	}
 
+	@Override
 	public void clearCache() {
-		// TODO Auto-generated method stub
 	}
 
+	@Override
 	public Component getComponent() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OTFClientQuad getQuad() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public void handleClick(java.awt.geom.Point2D.Double point, int mouseButton, MouseEvent e) {
-		// TODO Auto-generated method stub
 	}
 
+	@Override
 	public void handleClick(Rectangle currentRect, int button) {
-		// TODO Auto-generated method stub
 	}
 
+	@Override
 	public void invalidate(int time) throws RemoteException {
 		if(time >= 0) times.setValue(time);
 		else {
@@ -234,8 +231,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		}
 	}
 
+	@Override
 	public void redraw() {
-		// TODO Auto-generated method stub
-
 	}
 }
