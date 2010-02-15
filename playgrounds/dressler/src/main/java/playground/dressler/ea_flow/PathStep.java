@@ -43,6 +43,14 @@ public interface PathStep {
 	PathStep copyShiftedToArrival(int newArrival);
 	
 	/**
+	 * Returns a shifted copy of a PathStep.
+	 * All times (where applicable) are shifted by shift 
+	 * @param shift
+	 * @return a new PathStep
+	 */
+	PathStep copyShifted(int shift);
+	
+	/**
 	 * Is the the forward or residual version of the step?
 	 * @return true iff forward
 	 */
@@ -106,4 +114,11 @@ public interface PathStep {
 	//boolean haveSameStart(PathStep other);
 	
 	String toString();
+
+	/**
+	 * Checks if this and other could be combined into one step, assuming the times match!
+	 * @param other a PathEdge 
+	 * @return true iff they describe the same pathstep. Times are not checked.
+	 */
+	boolean continuedBy(PathStep other);
 }

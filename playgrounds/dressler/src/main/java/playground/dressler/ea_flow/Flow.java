@@ -1134,6 +1134,9 @@ public class Flow {
 		}
 		result = "  Size of EdgeIntervalls (min/avg/max): " + min + " / " + sum / (double) this._network.getNodes().size() + " / " + max + "\n";
 
+		sum = 0;
+		max = 0;
+		min = Integer.MAX_VALUE;
 		for (SourceIntervals i : this._sourceoutflow.values()) {
 			int size = i.getSize();
 			sum += size;

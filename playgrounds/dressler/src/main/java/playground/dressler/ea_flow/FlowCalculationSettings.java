@@ -22,6 +22,8 @@
 package playground.dressler.ea_flow;
 
 //matsim imports
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,7 +31,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 //playground imports
 import playground.dressler.Interval.EdgeIntervals;
@@ -258,4 +262,215 @@ public class FlowCalculationSettings {
 		SourceIntervals.debug(0);
 		Flow.debug(0);
 	}	
+	
+	public void writeSimpleLPData() {
+		// write simple data format to sysout
+		System.out.println("% generated from matsim data");            
+        System.out.println("N " + this._network.getNodes().size());
+        System.out.println("TIME " + this.TimeHorizon);
+        HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
+        int max = 0;
+        for (NodeImpl node : this._network.getNodes().values()) {
+        	try {
+        		int i = Integer.parseInt(node.getId().toString());
+        		if (i > 0) 	newNodeNames.put(node,i);
+        		if (i > max) max = i;
+        	} catch (Exception except) {
+
+        	}            	
+        }
+            
+        for (NodeImpl node : this._network.getNodes().values()) {            	
+        	try {
+        		int i = Integer.parseInt(node.getId().toString());
+        		if (i <= 0) {
+        		  max += 1;
+            	  newNodeNames.put(node, max);
+            	  System.out.println("% node " + max + " was '" + node.getId()+ "'");
+        		}
+        	} catch (Exception except) {
+        		max += 1;
+        		newNodeNames.put(node, max);
+        		System.out.println("% node " + max + " was '" + node.getId()+ "'");
+
+        	}            	
+        }
+            
+        for (NodeImpl node : this._network.getNodes().values()) {
+        	if (this._demands.containsKey(node)) {
+        		int d = this._demands.get(node);
+        		if (d > 0) {
+        			System.out.println("S " + newNodeNames.get(node) + " " + d);            			
+        		}
+        		if (d < 0) {
+        			System.out.println("T " + newNodeNames.get(node) + " " + (-d));            			
+        		}
+        	}
+        }
+
+        System.out.println("% E from to capacity length");
+        for (LinkImpl link : this._network.getLinks().values()) {                
+        	System.out.println("E " + (newNodeNames.get(link.getFromNode())) + " " + (newNodeNames.get(link.getToNode())) + " " + (int) getCapacity(link) + " " + getLength(link));
+
+        }            
+	}
+	
+	private String edgeToVariable(Link link, int t, HashMap<Node,Integer> nodeNames) {
+		if (t < 0) return null;
+		if (t + getLength(link) >= this.TimeHorizon) return null;
+		return "flow#" + nodeNames.get(link.getFromNode()) + "#" +nodeNames.get(link.getToNode()) + "#t" + t; 
+	}
+	
+	/**
+	 * Writes the EAT problem as .lp file for CPLEX etc to standard out
+	 * This might be a big file and it includes some useless comments at the top ...
+	 */
+	public void writeLP() {
+		System.out.println("\\ generated from matsim data");            
+        System.out.println("\\ N " + this._network.getNodes().size());
+        System.out.println("\\ TIME " + this.TimeHorizon);
+        HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
+        int max = 0;
+        for (NodeImpl node : this._network.getNodes().values()) {
+        	try {
+        		int i = Integer.parseInt(node.getId().toString());
+        		if (i > 0) 	newNodeNames.put(node,i);
+        		if (i > max) max = i;
+        	} catch (Exception except) {
+
+        	}            	
+        }
+            
+        for (NodeImpl node : this._network.getNodes().values()) {            	
+        	try {
+        		int i = Integer.parseInt(node.getId().toString());
+        		if (i <= 0) {
+        		  max += 1;
+            	  newNodeNames.put(node, max);
+            	  System.out.println("\\ node " + max + " was '" + node.getId()+ "'");
+        		}
+        	} catch (Exception except) {
+        		max += 1;
+        		newNodeNames.put(node, max);
+        		System.out.println("\\ node " + max + " was '" + node.getId()+ "'");
+
+        	}            	
+        }
+
+        System.out.println("Minimize");
+        System.out.println("totaltraveltime: ");
+
+        String Sobj = " ";        	
+        for (NodeImpl node : this._network.getNodes().values()) {
+        	int d = 0;
+        	if (this._demands.containsKey(node)) {
+        		d = this._demands.get(node);
+        	} 
+
+        	if (d < 0) {
+        		for (Link link : node.getOutLinks().values()) {
+        			for (int t = 0; t < this.TimeHorizon - this.getLength(link); t++) {
+        				String tmp = edgeToVariable(link, t, newNodeNames);
+        				if (tmp != null) 
+        					Sobj += " -" + t + " " + tmp;
+        			}
+        		}
+
+        		for (Link link : node.getInLinks().values()) {
+        			for (int t = 0; t < this.TimeHorizon - this.getLength(link); t++) {
+        				String tmp = edgeToVariable(link, t, newNodeNames);
+        				if (tmp != null) 
+        					Sobj += " +" + (t + this.getLength(link)) + " " + tmp;
+        			}
+        		}
+
+
+        	}
+        }
+        System.out.println(Sobj);
+
+        
+        
+        System.out.println("Subject to");
+        
+        
+        for (NodeImpl node : this._network.getNodes().values()) {
+        	int d = 0;
+        	if (this._demands.containsKey(node)) {
+        		d = this._demands.get(node);
+        	} 
+        	// write flow conservation for each time step        	
+        	for (int t = 0; t < this.TimeHorizon; t++) {        		
+        		System.out.println("flow_conservation#" + newNodeNames.get(node) + "@t" + t + ":");
+        		String S = " ";
+        		for (Link link : node.getOutLinks().values()) {
+        			String tmp = edgeToVariable(link, t, newNodeNames);
+        			if (tmp != null) 
+        				S += " + " + tmp; 
+        		}
+        		for (Link link : node.getInLinks().values()) {
+        			String tmp = edgeToVariable(link, t - this.getLength(link), newNodeNames);
+        			if (tmp != null) 
+        				S += " - " + tmp;
+        		}
+
+
+        		if (d > 0) {
+        			S += " >= 0";
+        		} else if (d < 0) {
+        			S += " <= 0";
+        		} else {
+        			S += " = 0";
+        		}
+        		System.out.println(S);
+        	}
+        	
+        	
+        	// TODO this could be weaved into the step above ... for a little speedup (<= factor 2)
+        	if (d != 0) {
+        		if (d > 0) {
+        		  System.out.println("supply@" + newNodeNames.get(node) + ":");
+        		}  else {
+        		  System.out.println("demand@" + newNodeNames.get(node) + ":");
+        		}
+        		String S = " ";        	
+        		// write supply / demand constraint    
+        		
+        		for (Link link : node.getOutLinks().values()) {
+        			for (int t = 0; t < this.TimeHorizon - this.getLength(link); t++) {
+        				String tmp = edgeToVariable(link, t, newNodeNames);
+        				if (tmp != null) 
+        					S += " + " + tmp;
+        			}
+        		}
+
+        		for (Link link : node.getInLinks().values()) {
+        			for (int t = 0; t < this.TimeHorizon - this.getLength(link); t++) {
+        				String tmp = edgeToVariable(link, t, newNodeNames);
+        				if (tmp != null) 
+        					S += " - " + tmp;
+        			}
+        		}
+
+
+        		if (d > 0) {
+        			S += " = " + d;;
+        		} else  { // note: d < 0
+        			S += " >= " + d;
+        		}			
+        		System.out.println(S);
+        	}
+        }
+
+        //System.out.println("% E from to capacity length");
+        System.out.println("Bounds");
+        for (LinkImpl link : this._network.getLinks().values()) {
+        	for (int t = 0; t < this.TimeHorizon; t++) {
+        		String tmp = edgeToVariable(link, t, newNodeNames);
+        		if (tmp != null)
+        		  System.out.println(" 0 <= " + tmp + " <= " + this.getCapacity(link));
+        	}        	
+        }            
+        System.out.println("End");
+	}
 }

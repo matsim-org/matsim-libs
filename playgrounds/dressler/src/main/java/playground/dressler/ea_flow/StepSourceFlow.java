@@ -188,6 +188,11 @@ public class StepSourceFlow implements PathStep {
 		return new StepSourceFlow(this.node, this.time, false);
 	}
 	
+	@Override
+	public PathStep copyShifted(int shift) {
+		return new StepSourceFlow(this.node, this.time + shift, this.forward);
+	}
+	
 	/*@Override
 	public boolean haveSameStart(PathStep other) {		
 		if (this.getStartTime() != other.getStartTime()) return false;
@@ -208,6 +213,15 @@ public class StepSourceFlow implements PathStep {
 		}
 					
 	}*/
+	
+	@Override
+	public boolean continuedBy(PathStep other) {
+		if (!(other instanceof StepSourceFlow)) return false;
+		
+		StepSourceFlow o = (StepSourceFlow) other;
+		
+		return (this.forward == o.forward);			
+	}
 	
 }
 

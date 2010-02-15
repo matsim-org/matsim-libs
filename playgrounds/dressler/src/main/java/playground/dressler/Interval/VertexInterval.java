@@ -49,7 +49,7 @@ public class VertexInterval extends Interval {
 	 * predecessor in a shortest path
 	 * the times stored in the step are valid for arrival at the low bound!
 	 */
-	private PathStep _predecessor=null;
+	private PathStep _breadcrumb=null;
 	
 
 //---------------------------METHODS----------------------------//
@@ -77,7 +77,7 @@ public class VertexInterval extends Interval {
 		// dummy values
 		this.reachable = false;
 		this.scanned = false;
-		this._predecessor = null;
+		this._breadcrumb = null;
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class VertexInterval extends Interval {
 		super(l,r);	
 		this.reachable = other.reachable;
 		this.scanned = other.scanned;
-		this._predecessor = other._predecessor.copyShiftedToArrival(l);
+		this._breadcrumb = other._breadcrumb.copyShiftedToArrival(l);
 	}
 
 	/**
@@ -128,7 +128,7 @@ public class VertexInterval extends Interval {
 	 * @param pred predesessor vertex
 	 */
 	public void setPredecessor(final PathStep pred){
-		this._predecessor=pred;
+		this._breadcrumb=pred;
 	}
 	
 	/**
@@ -136,7 +136,7 @@ public class VertexInterval extends Interval {
 	 * @return predecessor vertex 
 	 */
 	public PathStep getPredecessor(){
-		return this._predecessor;
+		return this._breadcrumb;
 	}
 	
 	
@@ -166,7 +166,7 @@ public class VertexInterval extends Interval {
 		//we might have already scanned this interval
 		this.scanned = false;
 		this.reachable = true;
-		this._predecessor = pred;
+		this._breadcrumb = pred;
 		
 		// this shifting here had a tendency to be confusing and to break things!		
 		// this._predecessor = pred.copyShiftedToArrival(this.getLowBound());	
@@ -186,11 +186,17 @@ public class VertexInterval extends Interval {
 		VertexInterval k = new VertexInterval(j);
 		k.reachable = this.reachable;
 		k.scanned = this.scanned;
-		if (this._predecessor == null) {
-			k._predecessor = null;
+		if (this._breadcrumb == null) {
+			k._breadcrumb = null;
 		} else {
-		    k._predecessor= this._predecessor.copyShiftedToArrival(k.getLowBound());
+		    k._breadcrumb= this._breadcrumb.copyShifted(k.getLowBound() - t);
 		}
+		
+		if (k._breadcrumb != null && k.getPredecessor().getStartTime() < k.getLowBound()) {
+			System.out.println("Too early start time! Argh");							
+			throw new RuntimeException("Bad pred");
+		}
+		
 		return k;
 	}
 	
@@ -202,6 +208,6 @@ public class VertexInterval extends Interval {
 	 
 	public String toString()
 	{
-		return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned + "; pred: " + this._predecessor;
+		return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned + "; breadcrumb: " + this._breadcrumb;
 	}
 }

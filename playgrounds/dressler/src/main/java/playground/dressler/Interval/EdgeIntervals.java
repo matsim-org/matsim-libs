@@ -119,9 +119,6 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 		EdgeInterval current;
 		Interval toinsert;
 
-		int low = -1;
-		int high = -1;						
-		boolean collecting = false;
 		
 		// Handle all cases of primal and reverse in one unified matter.
 		// One always just runs through the list of intervals anyway
@@ -135,18 +132,23 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 			  outputoffset = this._traveltime;
 		  } else {
 			  inputoffset = -this._traveltime;
-			  outputoffset = 0;
+			  outputoffset = 0; // relative to "current", not to incoming
 		  }
 		} else { // reverse search
 		  if (primal) {
 			  inputoffset = -this._traveltime;
-			  outputoffset = 0;
+			  outputoffset = 0; // relative to "current", not to incoming
 		  } else {
 			  inputoffset =  0;
 			  outputoffset = this._traveltime;
 		  }		  
 		}
 
+		int low = -1;
+		int high = -1;						
+		boolean collecting = false;
+		
+		
 		if (incoming.getLowBound() + inputoffset < 0) {
 		  current = this.getIntervalAt(0);
 		} else {

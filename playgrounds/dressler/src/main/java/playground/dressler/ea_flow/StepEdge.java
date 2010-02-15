@@ -57,7 +57,7 @@ public class StepEdge implements PathStep {
 		if(this.forward){
 			s += edge.getFromNode().getId().toString()+"-->" + edge.getToNode().getId().toString();
 		} else {
-			s += edge.getToNode().getId().toString()+"-->" + edge.getFromNode().getId().toString();
+			s += edge.getToNode().getId().toString()+"<--" + edge.getFromNode().getId().toString();
 		} 
 
 		s +=  " " +this.arrivalTime;
@@ -205,6 +205,11 @@ public class StepEdge implements PathStep {
 		return new StepEdge(this.edge, this.startTime + shift, newArrival, this.forward);
 	}
 	
+	@Override
+	public PathStep copyShifted(int shift) {
+		return new StepEdge(this.edge, this.startTime + shift, this.arrivalTime + shift, this.forward);
+	}
+	
 	/*@Override
 	public boolean haveSameStart(PathStep other) {
 		if (this.startTime != other.getStartTime()) return false;
@@ -217,5 +222,13 @@ public class StepEdge implements PathStep {
 		return true;
 	}*/
 
+	@Override
+	public boolean continuedBy(PathStep other) {
+		if (!(other instanceof StepEdge)) return false;
+		
+		StepEdge o = (StepEdge) other;
+		if (this.forward != o.forward) return false;
+		return (this.edge.equals(o.edge));			
+	}
 };
 

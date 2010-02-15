@@ -159,6 +159,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		// TODO Test !
 		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();		
 		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
+		
 		int t = current.getHighBound();
 		while(current.getLowBound() < arrive.getHighBound()){
 			//current was never reachable before and is not scanned
@@ -226,7 +227,17 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 							current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
 						}
 						changed.add(current);
+						
+						
+						
 					}
+					
+					// DEBUG
+					/*if (reverse && current.getPredecessor().getStartTime() < current.getLowBound()) {
+						System.out.println("Too early start time! Argh");							
+						System.out.println("arrive " + arrive + " pred " + pred + " reverse " + reverse);
+						throw new RuntimeException("Bad pred");
+					}*/
 				}
 			}
 			
@@ -263,7 +274,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 			  throw new RuntimeException("error in cleanup!");
 		  if (i.getReachable() == j.getReachable() 
 				  && i.isScanned() == j.isScanned()
-				  && i.getPredecessor().equals(j.getPredecessor())) {
+				  && i.getPredecessor().continuedBy(j.getPredecessor())) {
 			  // FIXME use a safer method for removing things!
 			  _tree.remove(i);
 			  _tree.remove(j);

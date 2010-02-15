@@ -168,17 +168,34 @@ public class MultiSourceEAF {
 		int i;
 		long gain = 0;
 		int lasttime = 0;
+		
+		// additional settings ..
+		boolean useReverse = true;
+		boolean tryReverse = useReverse;
+		
 		for (i=1; i<=settings.MaxRounds; i++){
 			timer1 = System.currentTimeMillis();
 			//System.out.println("blub");
 			
-			//result = routingAlgo.doCalculations();
-			result = routingAlgo.doCalculationsReverse(lasttime); 
+			// THE IMPORTANT FUNCTION CALL HAPPENS HERE //
+			if (tryReverse) {
+				result = routingAlgo.doCalculationsReverse(lasttime);
+			} else {
+			  result = routingAlgo.doCalculations();
+			}
 			
 			timer2 = System.currentTimeMillis();
 			timeMBF += timer2 - timer1;
 			if (result == null || result.isEmpty()){
-				break;
+				if (tryReverse) { 
+					// backward search didn't find anything.
+					// try forward next time to determine new arrvivaltime
+					tryReverse = false;
+				} else { 
+				  // forward search didn't find anything
+				  // that's it, we are done.
+				  break;
+				}
 			}
 			tempstr = "";
 			int zeroaugment = 0;
@@ -186,6 +203,10 @@ public class MultiSourceEAF {
 			for(TimeExpandedPath path : result){
 				if (path.getArrival() > lasttime) {
 					lasttime = path.getArrival();
+					
+					// time has increased, might be worth trying the reverse search again
+					// if it is enabled at all
+					tryReverse = useReverse;
 				}
 				String tempstr2 = "";
 				if(_debug){
@@ -217,7 +238,7 @@ public class MultiSourceEAF {
 				if (i % 100 == 0) {					
 					System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 					System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
-					//System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
+					System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
 					//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 					System.out.println("last path: " + tempstr);
 					System.out.println(routingAlgo.measure());	
@@ -235,7 +256,7 @@ public class MultiSourceEAF {
 			System.out.println("");
 			System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 			System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
-			//System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
+			System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
 			//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 			System.out.println("last path: " + tempstr);
 			System.out.println(routingAlgo.measure());	
@@ -323,11 +344,11 @@ public class MultiSourceEAF {
 		}
 
 		String networkfile = null;
-		networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
+		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
 		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
-		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
+		networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
@@ -361,15 +382,15 @@ public class MultiSourceEAF {
 
 
 		
-		int uniformDemands = 10;
+		int uniformDemands = 5;
 
 		// Rounding is now done according to timestep and flowFactor!
-		int timestep = 2; 
+		int timestep = 10; 
 		double flowFactor = 1.0;
 
 		
-		//String sinkid = "supersink"; //siouxfalls, problem
-		String sinkid = "en1";  //padang, line, swissold
+		String sinkid = "supersink"; //siouxfalls, problem
+		//String sinkid = "en2";  //padang, line, swissold
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
@@ -421,25 +442,33 @@ public class MultiSourceEAF {
 
 		settings = new FlowCalculationSettings(network, sinkid, demands, timestep, flowFactor);
 
-		//set parameters
-		//settings.TimeHorizon = 200000;
+		// set additional parameters, mostly for the LP
+		//settings.TimeHorizon = 70;
 		//settings.MaxRounds = 101;
 		
 
-		Flow fluss = calcEAFlow(settings);
+		//settings.writeLP();
 		
-		if(_debug){
-			System.out.println(fluss.arrivalsToString());
-			System.out.println(fluss.arrivalPatternToString());
-			System.out.println("unsatisfied demands:");
-			for (Node node : fluss.getDemands().keySet()){
-				int demand = fluss.getDemands().get(node);					
-				if (demand > 0) {
-					System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
-				}
-			}
+		Flow fluss;
+		fluss = calcEAFlow(settings);
+		
+		int[] arrivals = fluss.arrivals();
+		long totalcost = 0;
+		for (int i = 0; i < arrivals.length; i++) {			
+			totalcost += i*arrivals[i];
 		}
 		
+		System.out.println("Total cost: " + totalcost);		
+		System.out.println(fluss.arrivalsToString());
+		System.out.println(fluss.arrivalPatternToString());
+		System.out.println("unsatisfied demands:");
+		for (Node node : fluss.getDemands().keySet()){
+			int demand = fluss.getDemands().get(node);					
+			if (demand > 0) {
+				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
+			}
+		}
+
 		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
 
 		if(outputplansfile!=null){

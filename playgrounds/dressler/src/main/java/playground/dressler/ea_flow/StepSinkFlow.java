@@ -187,6 +187,20 @@ public class StepSinkFlow implements PathStep {
 		// residual ...  update when the reverse flow exits the sink
 		return new StepSinkFlow(this.node, newArrival, false);
 	}
+	
+	@Override
+	public PathStep copyShifted(int shift) {
+		return new StepSinkFlow(this.node, this.time + shift, this.forward);
+	}
+	
+	@Override
+	public boolean continuedBy(PathStep other) {
+		if (!(other instanceof StepSinkFlow)) return false;
+		
+		StepSinkFlow o = (StepSinkFlow) other;
+		
+		return (this.forward == o.forward);			
+	}
 		
 }
 
