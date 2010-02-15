@@ -1,4 +1,4 @@
-package playground.andreas.bln.ana.Events2TimeSpaceDia;
+package playground.andreas.bln.ana.events2timespacechart;
 
 import java.io.IOException;
 import java.util.LinkedList;
