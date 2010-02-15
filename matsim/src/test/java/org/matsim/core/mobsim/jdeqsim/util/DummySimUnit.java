@@ -9,10 +9,8 @@ public class DummySimUnit extends SimUnit{
 	public DummySimUnit(Scheduler scheduler) {
 		super(scheduler);
 	}
-	
+
 	public void handleMessage(Message m) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

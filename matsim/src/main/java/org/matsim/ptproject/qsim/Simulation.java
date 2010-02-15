@@ -28,14 +28,17 @@ public abstract class Simulation {
 	 * @cdobler
 	 * Use AtomicIntegers as counting variables. Doing this avoids
 	 * problems with race conditions in the ParallelQueueSimulation.
-	 * 
+	 *
 	 * TODO
-	 * We should discuss if there is a possibility to assign a 
+	 * We should discuss if there is a possibility to assign a
 	 * Simulation Objects to each thread. Using the AtomicIntegers
 	 * solves the problems with the race conditions but it is still
 	 * a bottleneck...
+	 *
+	 * --
+	 * My plan once was to have one SimEngine for each thread, instead of one Simulation per thread. marcel/15feb2010
 	 */
-	
+
 	/**
 	 * Number of agents that have not yet reached their final activity location
 	 */
@@ -45,7 +48,7 @@ public abstract class Simulation {
 	 * Number of agents that got stuck in a traffic jam and where removed from the simulation to solve a possible deadlock
 	 */
 	private static AtomicInteger lost = new AtomicInteger(0);
-	
+
 	private static double stuckTime = Double.MAX_VALUE;
 
 	public static void reset(double stucktime) {
@@ -69,5 +72,5 @@ public abstract class Simulation {
 	public static final void incLiving(final int count) {living.addAndGet(count);}
 	public static final void decLiving() {living.decrementAndGet();}
 	public static final void decLiving(final int count) {living.decrementAndGet();}
-	
+
 }

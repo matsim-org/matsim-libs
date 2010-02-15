@@ -148,8 +148,8 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNode(final Attributes atts) {
-		//TODO dg refactor network to support factory and remove cast
-		Node node = ((NetworkLayer)this.network).createAndAddNode(this.scenario.createId(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+		Node node = this.network.getFactory().createNode(this.scenario.createId(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+		this.network.addNode(node);
 		((NodeImpl) node).setType(atts.getValue("type"));
 		if (atts.getValue("origid") != null) {
 			((NodeImpl) node).setOrigId(atts.getValue("origid"));
@@ -157,8 +157,6 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startLink(final Attributes atts) {
-		//TODO dg refactor network to support factory/builder and remove cast
-		
 		Link l = this.network.getFactory().createLink(this.scenario.createId(atts.getValue("id")), this.scenario.createId(atts.getValue("from")), this.scenario.createId(atts.getValue("to")));
 		l.setLength(Double.parseDouble(atts.getValue("length")));
 		l.setFreespeed(Double.parseDouble(atts.getValue("freespeed")));

@@ -8,7 +8,6 @@ public class PScheduler extends Scheduler {
 
 	public PScheduler(PMessageQueue queue) {
 		super(queue);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -33,10 +32,8 @@ public class PScheduler extends Scheduler {
 		try {
 			cb.await();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (java.util.concurrent.BrokenBarrierException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
