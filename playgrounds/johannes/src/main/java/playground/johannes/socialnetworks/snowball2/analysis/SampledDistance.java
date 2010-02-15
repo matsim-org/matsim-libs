@@ -46,14 +46,15 @@ public class SampledDistance extends Distance {
 	}
 
 	private Set<SpatialVertex> extractDelegates(Set<? extends SpatialVertex> vertices) {
-		Set<SampledVertexDecorator<? extends SpatialVertex>> partition =
-			SnowballPartitions.<SampledVertexDecorator<? extends SpatialVertex>>
-			createSampledPartition((Set<SampledVertexDecorator<? extends SpatialVertex>>)vertices);
-		
-		Set<SpatialVertex> delegates = new HashSet<SpatialVertex>();
-		for(SampledVertexDecorator<? extends SpatialVertex> v : partition)
-			delegates.add(v.getDelegate());
-		
-		return delegates;
+//		Set<SampledVertexDecorator<? extends SpatialVertex>> partition =
+//			SnowballPartitions.<SampledVertexDecorator<? extends SpatialVertex>>
+//			createSampledPartition((Set<SampledVertexDecorator<? extends SpatialVertex>>)vertices);
+//		
+//		Set<SpatialVertex> delegates = new HashSet<SpatialVertex>();
+//		for(SampledVertexDecorator<? extends SpatialVertex> v : partition)
+//			delegates.add(v.getDelegate());
+//		
+//		return delegates;
+		return null;
 	}
 }

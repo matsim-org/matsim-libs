@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.SparseGraphBuilder;
@@ -58,6 +59,12 @@ public class ProposalSim {
 	
 	private static String output;
 
+	private static int[] connectionAvr = new int[10];
+	
+	private static boolean[] connectionFound = new boolean[10];
+	
+	
+	
 	public static void main(String[] args) {
 		output = args[0];
 		int N = Integer.parseInt(args[1]);
@@ -65,7 +72,8 @@ public class ProposalSim {
 		
 		builder = new SparseGraphBuilder();
 		
-		for(int seeds = 10; seeds < 101; seeds+=10) {
+		for(int k = 0; k < 50; k++) {
+		for(int seeds = 60; seeds < 61; seeds+=10) {
 			logger.info(String.format("Running sim for %1$s seeds...", seeds));
 			logger.info("Creating graph...");
 			
@@ -76,9 +84,17 @@ public class ProposalSim {
 				population.add(builder.addVertex(graph));
 			}
 			logger.info("Expanding...");
+			for(int i = 0; i < connectionFound.length; i++)
+				connectionFound[i] = false;
+			
 			run(seeds);
 		}
+		}
 		logger.info("Done.");
+		
+		for(int i = 0; i < connectionFound.length; i++) {
+			logger.info(String.format("Average respondents required for %1$s connections: %2$s.", i+1, connectionAvr[i]/50.0));
+		}
 	}
 
 	private static void run(int n_seeds) {
@@ -92,12 +108,22 @@ public class ProposalSim {
 		Collection<SparseVertex> settled = new HashSet<SparseVertex>();
 		int[][] connectionMatrix = new int[n_seeds][n_seeds];
 		/*
+		 * set non-responding
+		 */
+//		Collection<SparseVertex> responding = new HashSet<SparseVertex>();
+//		for(SparseVertex vertex : population) {
+//			if(random.nextDouble() <= 0.2)
+//				responding.add(vertex);
+//		}
+		/*
 		 * draw seeds
 		 */
 		Collection<SparseVertex> pending = new LinkedList<SparseVertex>();
 		TObjectIntHashMap<SparseVertex> seedMapping = new TObjectIntHashMap<SparseVertex>();
 		for (int i = 0; i < n_seeds; i++) {
-			SparseVertex vertex = population.get(random.nextInt(population.size())); 
+			SparseVertex vertex = population.get(random.nextInt(population.size()));
+//			while(!responding.contains(vertex))
+//				vertex = population.get(random.nextInt(population.size()));
 			pending.add(vertex);
 			seedMapping.put(vertex, i);
 		}
@@ -108,6 +134,7 @@ public class ProposalSim {
 		while (!pending.isEmpty()) {
 			Collection<SparseVertex> newPending = new LinkedList<SparseVertex>();
 			for (SparseVertex vertex : pending) {
+//				if(responding.contains(vertex)) {
 				int idx1 = seedMapping.get(vertex);
 				/*
 				 * connect to k_mean randomly selected nodes - double edges and
@@ -128,6 +155,7 @@ public class ProposalSim {
 						seedMapping.put(neighbor, idx1);
 					}
 				}
+//				}
 				settled.add(vertex);
 
 				if(settled.size() % 10 == 0) {
@@ -183,6 +211,15 @@ public class ProposalSim {
 //			matrixWriter.newLine();
 		}
 //		matrixWriter.close();
+		for(int i = 0; i< connectionFound.length; i++) {
+			if((connections/2)==(i+1)) {
+				if(connectionFound[i]==false)
+					connectionAvr[i] += n_settled;
+				
+				connectionFound[i]=true;
+				
+			}
+		}
 		/*
 		 * dump
 		 */
