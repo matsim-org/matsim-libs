@@ -16,20 +16,14 @@ import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.gis.ShapeFileWriter;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import playground.pieter.demandgeneration.matrix.HashMatrix;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -41,15 +35,15 @@ import com.vividsolutions.jts.geom.Polygon;
 public class DemandFromSQL {
 	/**
 	 * Class to generate person home locations from EA shape file with TAZ and SP defined for each poly
-	 * Reads in 
+	 * Reads in
 	 * 1) a shapefile of EAs, with attributes FID EA_CODE SP_CODE TAZ
 	 * 2) a text file containing the number of priv veh drivers residing in each SP
 	 * 3) a SQL table of htaz, wtaz and number of trips between each combo
-	 * 
+	 *
 	 * Writes out
 	 * 1) shapefiles of home and work locations
 	 * 2) plans.xml file with home departure time ranging between 05h00 and 07h00, work duration 9hrs
-	 * 
+	 *
 	 * Home and work locations are assigned equiprobably to the EAs that compose a TAZ(w) or SP(h)
 	 * */
 
@@ -63,7 +57,7 @@ public class DemandFromSQL {
 	private final HashMap<Integer,Feature> EAHashMap;
 	private final HashMap<Integer, ArrayList<Feature>> TAZ_EA_hashMap; //used to map work locations to EA
 	private GeometryFactory geofac; //to create person feature maps
-	private FeatureType ftPerson; 
+	private FeatureType ftPerson;
 	private Random random;
 	private Collection<Feature> homeLocationCollection, workLocationCollection;
 	private final int PERSON_SCALER = 1; //this will create 1/PERSON_SCALER # of persons
@@ -131,7 +125,7 @@ public class DemandFromSQL {
 //			long eacode = ((Long)ft.getAttribute(EA_CODE_ATTNUM));
 			int eacode = ((Integer)ft.getAttribute(EA_CODE_ATTNUM));
 			ft.setDefaultGeometry(multiPoly);
-			this.EAHashMap.put((int)eacode, ft);
+			this.EAHashMap.put(eacode, ft);
 		}
 	}
 

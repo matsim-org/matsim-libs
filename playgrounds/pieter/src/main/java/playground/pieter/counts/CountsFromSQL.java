@@ -9,14 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.matsim.utils.io.IOUtils;
-
-import corejava.Format;
+import org.matsim.core.utils.io.IOUtils;
 
 public class CountsFromSQL {
-	/**
-	 * @param args
-	 */
 	private Connection sqlConn;
 	private String xmlString;
 

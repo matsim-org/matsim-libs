@@ -1,18 +1,17 @@
 package playground.pieter.demandgeneration;
 /**code by Gregor Laemmel, Pieter Fourie.
  * Class to generate person home locations from EA shape file with TAZ and SP defined for each poly
- * Reads in 
+ * Reads in
  * 1) a shapefile of EAs, with attributes FID EA_CODE SP_CODE TAZ
  * 2) a text file contaiing the number of priv veh drivers residding in each SP
- * 3) a text file containing an nxn normalised demand matrix of work trips 
- * 
+ * 3) a text file containing an nxn normalised demand matrix of work trips
+ *
  * Writes out
  * 1) shapefiles of home and work locations
  * 2) plans.xml file with home departure time ranging between 05h00 and 07h00, work duration 9hrs
- * 
+ *
  * Home and work locations are assigned equiprobably to the EAs that compose a TAZ(w) or SP(h)
  * */
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,18 +30,15 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-
-import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.gis.ShapeFileWriter;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -60,7 +56,7 @@ public class NHTSDemandHWH {
 	private String subPlaceTableFile; // SP | number of persons in SP
 	private final HashMap<Integer,Feature> EAHashMap;
 	private GeometryFactory geofac; //to create person feature maps
-	private FeatureType ftPerson; 
+	private FeatureType ftPerson;
 	private CoordinateReferenceSystem coordRefSystem;
 	private Random random;
 	private Collection<Feature> homeLocationCollection, workLocationCollection;
@@ -101,7 +97,7 @@ public class NHTSDemandHWH {
 			//reads SP_CODE as string, same as hashmap keys
 			int SP_CODE = inputReader.nextInt();
 			int numberOfPeopleInSP = inputReader.nextInt()/this.PERSON_SCALER;
-			ArrayList<Feature> homeEAs = findHomeEAs((long)SP_CODE);
+			ArrayList<Feature> homeEAs = findHomeEAs(SP_CODE);
 			if (homeEAs.size()==0) {
 				//in case the text file references a SP we dont have in  shapefile
 				continue;
@@ -128,7 +124,7 @@ public class NHTSDemandHWH {
 		}
 
 	}
-	
+
 	private void createPlansXML() throws FileNotFoundException, IOException {
 		BufferedWriter output = IOUtils.getBufferedWriter((this.outputPath+"plans.xml.gz"));
 		output.write("<?xml version=\"1.0\" ?>\n");
@@ -196,7 +192,7 @@ public class NHTSDemandHWH {
 	//			System.out.print( ((Integer(person.getAttribute(1)%100 == 0)?((person.getAttribute(1)%2900 == 0)?(person.getAttribute(1) + "\n"):(person.getAttribute(1) + " ")):"") );
 				Feature personFeature = this.ftPerson.create(workFeature);
 				this.workLocationCollection.add(personFeature);
-	
+
 			}
 		}
 
@@ -221,7 +217,7 @@ public class NHTSDemandHWH {
 		int minute = random.nextInt(60);
 		return String.format("%02d:%02d:00",hour,minute);
 	}
-	
+
 	public static Collection<Feature> getFeatures(final FeatureSource n) {
 
 		final Collection<Feature> featColl = new ArrayList<Feature>();
@@ -238,7 +234,7 @@ public class NHTSDemandHWH {
 		}
 		return featColl;
 	}
-	
+
 	private Point getRandomizedCoord(MultiPolygon mp) {
 		Polygon bounds = (Polygon)mp.getEnvelope();
 		//get the opposing corner coords from the bounding box
@@ -248,13 +244,13 @@ public class NHTSDemandHWH {
 		double dMaxY = max.y - min.y;
 		Point p = null;
 		do {
-	
+
 			double offsetX = this.random.nextDouble() * dMaxX;
 			double offsetY = this.random.nextDouble() * dMaxY;
 			p = this.geofac.createPoint(new Coordinate(min.x+offsetX,min.y+offsetY));
-	
+
 		} while (!mp.contains(p)); //keep doing this until the point falls inside the multipoly
-	
+
 		return p;
 	}
 
@@ -339,7 +335,7 @@ public class NHTSDemandHWH {
 			double rowTotal = 0;
 			//create cumulative discrete distribution
 			for(int col = 0; col < matrixDimensions; col++){
-				rowTotal += (Double)listIterator.next();
+				rowTotal += listIterator.next();
 				this.cumulODMatrix[row][col] = rowTotal;
 			}
 		}

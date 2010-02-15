@@ -1,7 +1,6 @@
 package playground.pieter.utils.gis;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,17 +9,18 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.matsim.utils.gis.ShapeFileReader;
-
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.network.LinkImpl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NodeImpl;
-import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.IOUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -32,19 +32,20 @@ public class FindDistanceToNearestLinkWithCap {
 	private Collection<Feature> points;
 	private HashMap<Double, CoordImpl> coordMap;
 	private HashMap<Double, Double> distanceMap;
-	
+
 	public FindDistanceToNearestLinkWithCap(String netFile, String outFile, String pointsFile, int idAttributeNo) {
-		this.network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.network = scenario.getNetwork();
 		this.netFile = netFile;
 		this.outFile = outFile;
 		this.pointsFile =pointsFile;
 		this.points = null;
 		this.coordMap = new HashMap<Double, CoordImpl>();
 		this.distanceMap = new HashMap<Double, Double>();
-		new MatsimNetworkReader(network).readFile(this.netFile);
+		new MatsimNetworkReader(scenario).readFile(this.netFile);
 		readPoints(idAttributeNo);
 	}
-	
+
 	public void removeLinksWithCap(double cap, boolean invert){
 		Map<Id, LinkImpl> linkMap =  network.getLinks();
 		Iterator<LinkImpl> linkIterator = linkMap.values().iterator();
@@ -60,12 +61,12 @@ public class FindDistanceToNearestLinkWithCap {
 				if(currLink.getCapacity(3600) == cap){
 					removeList.add(currLink.getId().toString());
 				}
-			}		
+			}
 		}
 //		Now remove all the marked links
 		Iterator<String> listIterator = removeList.iterator();
 		while(listIterator.hasNext()){
-			LinkImpl link = this.network.getLink(listIterator.next());
+			LinkImpl link = this.network.getLinks().get(new IdImpl(listIterator.next()));
 			this.network.removeLink(link);
 		}
 		removeList.clear();
@@ -78,15 +79,15 @@ public class FindDistanceToNearestLinkWithCap {
 		}
 		listIterator = removeList.iterator();
 		while(listIterator.hasNext()){
-			NodeImpl node = this.network.getNode(listIterator.next());
+			NodeImpl node = this.network.getNodes().get(new IdImpl(listIterator.next()));
 			this.network.removeNode(node);
 		}
 	}
-	
+
 	public void readPoints(int idAttributeNo) {
 		FeatureSource n;
 		try {
-			n = ShapeFileReader.readDataFile(this.pointsFile); //loads the shapefile into featuresource 
+			n = ShapeFileReader.readDataFile(this.pointsFile); //loads the shapefile into featuresource
 			org.geotools.feature.FeatureIterator ftIterator = n.getFeatures().features();
 			while (ftIterator.hasNext()) {
 				Feature feature = ftIterator.next();
@@ -99,7 +100,7 @@ public class FindDistanceToNearestLinkWithCap {
 			e1.printStackTrace();
 		}
 	}
-	
+
 	public void mapDistances(){
 		Iterator<Entry<Double,CoordImpl>> coordIterator = this.coordMap.entrySet().iterator();
 		while(coordIterator.hasNext()){
@@ -108,7 +109,7 @@ public class FindDistanceToNearestLinkWithCap {
 			this.distanceMap.put(currEntry.getKey(), nearestLinkDistance);
 		}
 	}
-	
+
 	public void writeDistances() throws Exception{
 			BufferedWriter output = IOUtils.getBufferedWriter(this.outFile);
 			Iterator<Entry<Double,Double>> entryIterator = this.distanceMap.entrySet().iterator();
@@ -119,8 +120,8 @@ public class FindDistanceToNearestLinkWithCap {
 			output.close();
 			System.out.println("DONE!!!");
 	}
-	
-	
+
+
 	public static void main(String[] args) throws Exception{
 		String netFile = "southafrica/IPDM_ETH_EmmeMOD/fullnetworkCLEAN_nozones.xml";
 		String shapeFile = "southafrica/IPDM_ETH_Emme/EthDOT/GISOUT/NHTSEAcentroids.shp";
