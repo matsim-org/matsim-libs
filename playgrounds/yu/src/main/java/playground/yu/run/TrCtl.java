@@ -62,13 +62,18 @@ public class TrCtl extends TransitControler {
 	}
 
 	// ---------------------------------------------------------------------
-	OccupancyAnalyzer oa = null;
+	private OccupancyAnalyzer oa = null;
 
 	public TrCtl(String[] args) {
 		super(args);
 		this.oa = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
 	}
 
+	public OccupancyAnalyzer getOa() {
+		return oa;
+	}
+
+	// -------------------------------------------------------------------
 	/**
 	 * @param args
 	 */

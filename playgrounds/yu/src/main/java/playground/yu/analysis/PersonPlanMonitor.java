@@ -116,6 +116,10 @@ public class PersonPlanMonitor {
 			this.actDur += this.calcActDuration_h(scoring
 					.getActivityParams(actType));
 		}
+		if (Double.isNaN(actDur))
+			throw new RuntimeException(PersonPlanMonitor.class.getName() + "\t"
+					+ DebugTools.getLineNumber(new Exception())
+					+ "\tactDur isNaN");
 		return this.actDur;
 	}
 
@@ -173,8 +177,13 @@ public class PersonPlanMonitor {
 		}
 
 		double performingTime_h = (actEnd - actStart) / 3600.0;
+		performingTime_h = Math.max(performingTime_h, 0.0);
 		double durAttr = typicalDuration_h
 				* Math.log(performingTime_h / zeroUtilityDuration_h);
+		if (Double.isNaN(durAttr))
+			throw new RuntimeException(PersonPlanMonitor.class.getName() + "\t"
+					+ DebugTools.getLineNumber(new Exception())
+					+ "\tdurAttr isNaN");
 		return Math.max(durAttr, 0);
 	}
 

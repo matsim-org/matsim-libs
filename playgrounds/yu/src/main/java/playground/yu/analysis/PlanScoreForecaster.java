@@ -212,6 +212,7 @@ public class PlanScoreForecaster {
 		}
 
 		double performingTime_h = (actEnd - actStart) / 3600.0;
+		performingTime_h = Math.max(performingTime_h, 0.0);
 		double durAttr = typicalDuration_h
 				* Math.log(performingTime_h / zeroUtilityDuration_h);
 
