@@ -70,6 +70,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private final double income_averageIncome_ratio;
 	private final int female;
 	private final int age;
+	private final int license;
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
 	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
@@ -88,29 +89,34 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 0993_ohne_timings
-	private static double beta_time_car = -3.42; 
-	private static double beta_time_pt = 0.479; 
-	private static double beta_time_bike = -1.98;
-	private static double beta_time_walk = -1.71;
+	// Settings of 0995
+	private static double beta_time_car = -5.54; 
+	private static double beta_time_pt = 0.557; 
+	private static double beta_time_bike = -1.81;
+	private static double beta_time_walk = -1.77;
 	
-	private static double constantPt = -0.580;
-	private static double constantBike = 0.201;
-	private static double constantWalk = 0.849;
+	private static double constantPt = -0.520;
+	private static double constantBike = 0.207;
+	private static double constantWalk = 0.899;
 	
-	private static double beta_cost_car = 0.0465;
+	private static double beta_cost_car = 0.0283;
 	private static double beta_cost_pt = -0.114;
 	
-	private static double lambda_cost_income_car = 0.186;
-	private static double lambda_cost_income_pt = -0.329;
+	private static double lambda_cost_income_car = 0.261;
+	private static double lambda_cost_income_pt = -0.277;
 	
-	private static double beta_female_act = 0.0330;
-	private static double beta_female_travel = 0.189;
+	private static double beta_female_act = -0.0582;
+	private static double beta_female_travel = 0.0855;
 	
 	private static double travelCostCar = 0.5;	// CHF/km
 	private static double travelCostPt_None = 0.28;	// CHF/km
 	private static double travelCostPt_Halbtax = 0.15;	// CHF/km
 	private static double travelCostPt_GA = 0.08;	// CHF/km;
+	
+	private static double licenseCar = -0.577;	// CHF/km
+	private static double licensePt = 0.0;	// CHF/km
+	private static double licenseBike = 0.0;	// CHF/km
+	private static double licenseWalk = 0.0;	// CHF/km;
 	
 	private static double repeat = 0;
 	
@@ -121,19 +127,19 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double uMin_shopping = 0;
 	private static final double uMin_leisure = 0;
 	
-	private static final double uMax_home = 7.86; 
-	private static final double uMax_innerHome = 1.78; 
-	private static final double uMax_work= 3.23;  
-	private static final double uMax_education = 2.17;
-	private static final double uMax_shopping = 1.64; 
-	private static final double uMax_leisure = 1.67;  
+	private static final double uMax_home = 8.46; 
+	private static final double uMax_innerHome = 1.86; 
+	private static final double uMax_work= 4.74;  
+	private static final double uMax_education = 4.72;
+	private static final double uMax_shopping = 1.82; 
+	private static final double uMax_leisure = 1.78;  
 	
-	private static final double alpha_home = 6.68;
-	private static final double alpha_innerHome = 0.239;
-	private static final double alpha_work = 4.33;
-	private static final double alpha_education = 1.72;
-	private static final double alpha_shopping = 0.0467;
-	private static final double alpha_leisure = 0.0559;
+	private static final double alpha_home = 5.98;
+	private static final double alpha_innerHome = 0.269;
+	private static final double alpha_work = 3.86;
+	private static final double alpha_education = 1.45;
+	private static final double alpha_shopping = 0.0462;
+	private static final double alpha_leisure = 0.0583;
 	
 	private static final double beta_home = 0.281;
 	private static final double beta_innerHome = 17.8;
@@ -151,8 +157,8 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	
 	private static final double beta_age_home = 0;
 	private static final double beta_age_innerHome = 0; 
-	private static final double beta_age_work = 0;
-	private static final double beta_age_education = 0;
+	private static final double beta_age_work = -0.00689;
+	private static final double beta_age_education = -0.0150;
 	private static final double beta_age_shopping = 0;
 	private static final double beta_age_leisure = 0;
 	
@@ -200,6 +206,15 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		
 		// check age
 		this.age=person.getAge();
+		
+		// check license
+		if (person.getLicense().equals("yes")) this.license=1;
+		else if (person.getLicense().equals("no")) this.license=0;
+		else {
+			log.warn("Unknown license "+person.getLicense()+" for person "+person.getId()+". " +
+				"Setting license to default \"no\".");
+			this.license=0;
+		}
 		
 		
 		this.plan = plan;
@@ -393,7 +408,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			double incomeRatio;
 			if (this.income_averageIncome_ratio==0.0 && lambda_cost_income_car<0) incomeRatio = 0.001;
 			else incomeRatio = this.income_averageIncome_ratio;
-			tmpScore += (1+beta_female_travel*this.female) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000 * Math.pow(incomeRatio, lambda_cost_income_car);
+			tmpScore += (1 + beta_female_travel*this.female + licenseCar*this.license) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000 * Math.pow(incomeRatio, lambda_cost_income_car);
 		} 
 		else if (TransportMode.pt.equals(leg.getMode())) {
 			// income_averageIncome_ratio needs to be non-zero if lambda_cost_income_car is negative, potential division by 0 otherwise
@@ -405,13 +420,13 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			if (this.seasonTicket.equals("ch-GA")) cost = travelCostPt_GA;
 			else if (this.seasonTicket.equals("ch-HT")) cost = travelCostPt_Halbtax; 
 			else cost = travelCostPt_None; 
-			tmpScore += (1+beta_female_travel*this.female) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist/1000 * Math.pow(incomeRatio, lambda_cost_income_pt) + constantPt;
+			tmpScore += (1+beta_female_travel*this.female + licensePt*this.license) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist/1000 * Math.pow(incomeRatio, lambda_cost_income_pt) + constantPt;
 		} 
 		else if (TransportMode.walk.equals(leg.getMode())) {
-			tmpScore += beta_time_walk * travelTime/3600 + constantWalk;
+			tmpScore += (1+licenseBike*this.license) * beta_time_walk * travelTime/3600 + constantWalk;
 		} 
 		else if (TransportMode.bike.equals(leg.getMode())) {
-			tmpScore += beta_time_bike * travelTime/3600 + constantBike;
+			tmpScore += (1+licenseWalk*this.license) * beta_time_bike * travelTime/3600 + constantBike;
 		}
 		else {
 			// use the same values as for "car"
