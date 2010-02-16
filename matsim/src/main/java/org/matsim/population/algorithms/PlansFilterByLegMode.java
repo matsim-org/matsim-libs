@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -36,8 +35,8 @@ import org.matsim.core.population.PersonImpl;
 
 /**
  * This algorithm filters out all persons having plans with legs with a certain leg mode.
- * There is (since Jan'10) an enum FilterType which is (hopefully) self-explanatory.  
- * 
+ * There is (since Jan'10) an enum FilterType which is (hopefully) self-explanatory.
+ *
 * Plans which do not fulfill the filter criteria are removed from a person, Persons with
  * no plans are removed from the population.
  */
@@ -59,18 +58,18 @@ public class PlansFilterByLegMode {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * There are two modes how this constructor works: 
-	 * 
+	 * There are two modes how this constructor works:
+	 *
 	 * <li> If <em>exclusive filtering</em> is used,
 	 * only plans are kept where persons travel exclusively with the specified leg mode. </li>
-	 * 
+	 *
 	 * <li> If
 	 * the <em>non-exclusive filtering</em> is used, all plans with at least one leg of the
 	 * specified leg mode are kept. </li>
-	 * 
+	 *
 	 * @param legMode
 	 * @param exclusiveFilter
-	 * 
+	 *
 	 * @deprecated use other constructor instead (in my view).  kai, jan'10
 	 */
 	@Deprecated // use other constructor instead (in my view).  kai, jan'10
@@ -84,9 +83,9 @@ public class PlansFilterByLegMode {
 		}
 		this.legModeIsCar = legMode.equals(TransportMode.car);
 	}
-	
+
 	public FilterType filterType ;
-	public enum FilterType { keepAllPlansWithMode, removeAllPlansWithMode, keepPlansWithOnlyThisMode } ;
+	public enum FilterType { keepAllPlansWithMode, removeAllPlansWithMode, keepPlansWithOnlyThisMode }
 	public PlansFilterByLegMode( final TransportMode legMode, final FilterType filterType ) {
 		super() ;
 		this.legMode = legMode ;
@@ -139,7 +138,7 @@ public class PlansFilterByLegMode {
 						person.getPlans().remove(i);
 						i--;	//otherwise, we would skip one plan
 						planCount++;
-					} 
+					}
 				} else if ( filterType==FilterType.removeAllPlansWithMode ) {
 					if ( hasSearchedLegMode ) {
 						person.getPlans().remove(i);

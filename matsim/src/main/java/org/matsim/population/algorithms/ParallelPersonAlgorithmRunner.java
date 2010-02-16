@@ -43,8 +43,8 @@ public abstract class ParallelPersonAlgorithmRunner {
 	/**
 	 * Handles each person of the given <code>population</code> with the specified <code>algorithm</code>,
 	 * using up to <code>numberOfThreads</code> threads to speed things up. Use this method only if the given
-	 * algorithm is thread-safe! Otherwise, use {@link #run(PopulationImpl, int, PersonAlgorithmProvider)}.
-	 * 
+	 * algorithm is thread-safe! Otherwise, use {@link #run(Population, int, PersonAlgorithmProvider)}.
+	 *
 	 * @param population
 	 * @param numberOfThreads
 	 * @param algorithm
@@ -56,13 +56,13 @@ public abstract class ParallelPersonAlgorithmRunner {
 			}
 		});
 	}
-	
+
 	/**
 	 * Handles each person of the given <code>population</code> with a AbstractPersonAlgorithm provided by <code>algoProvider</code>,
 	 * using up to <code>numberOfThreads</code> threads to speed things up. This method will request a new instance of the
 	 * AbstractPersonAlgorithm for each thread it allocates, thus enabling the parallel use of non-thread-safe algorithms.
 	 * For thread-safe algorithms, {@link #run(PopulationImpl, int, AbstractPersonAlgorithm)} may be an easier method to use.
-	 * 
+	 *
 	 * @param population
 	 * @param numberOfThreads
 	 * @param algoProvider
@@ -73,7 +73,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 		Thread[] threads = new Thread[numOfThreads];
 		String name = null;
 		Counter counter = null;
-		
+
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) {
 			AbstractPersonAlgorithm algo = algoProvider.getPersonAlgorithm();
@@ -86,19 +86,19 @@ public abstract class ParallelPersonAlgorithmRunner {
 			threads[i] = thread;
 			algoThreads[i] = algothread;
 		}
-		
+
 		// distribute workload between threads, as long as threads are not yet started, so we don't need synchronized data structures
 		int i = 0;
 		for (Person person : population.getPersons().values()) {
 			algoThreads[i % numOfThreads].handlePerson(person);
 			i++;
 		}
-		
+
 		// start the threads
 		for (Thread thread : threads) {
 			thread.start();
 		}
-		
+
 		// wait for the threads to finish
 		try {
 			for (Thread thread : threads) {
@@ -109,7 +109,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 			Gbl.errorMsg(e);
 		}
 	}
-	
+
 	/**
 	 * The thread class that really handles the persons.
 	 */

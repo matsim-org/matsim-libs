@@ -37,15 +37,13 @@ import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
  * This is a standalone executable to convert T.veh.gz files to .mvi files.
- * 
- * @author dstrippgen
  *
+ * @author dstrippgen
  */
 public class OTFTVeh2MVI extends OTFFileWriter {
 	private  String vehFileName = "";

@@ -1,6 +1,5 @@
 package org.matsim.vis.otfvis.opengl.queries;
 
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -26,7 +25,7 @@ public abstract class AbstractQuery implements OTFQuery, OTFQueryRemote {
 
 	@Override
 	public void uninstall() {
-		// Default implementation which doesn't do anything.
+		// Default implementation doesn't do anything.
 	}
 
 }

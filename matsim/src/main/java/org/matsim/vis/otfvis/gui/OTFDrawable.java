@@ -20,15 +20,14 @@
 
 package org.matsim.vis.otfvis.gui;
 
-import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 
 /**
  * Any object that can be drawn on screen will have to implement this interface.
  * Normally these classes will additionally implement OTFData.Recevier.
- * 
+ *
  * @author dstrippgen
- * 
+ *
  * <p>
  * Maybe it was not MEANT that way, but the existing OTFDrawable had an invalidate method
  * and thus ALWAYS de-facto extended (duplicated) OTFDataReceiver.  I thus extended it

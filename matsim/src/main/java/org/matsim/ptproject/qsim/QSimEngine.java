@@ -30,7 +30,7 @@ import java.util.Random;
 
 
 /**
- * Coordinates the movement of vehicles on the links and the nodes. 
+ * Coordinates the movement of vehicles on the links and the nodes.
  *
  * @author mrieser
  * @author dgrether
@@ -55,17 +55,17 @@ public class QSimEngine implements LinkActivator{
 	/*package*/ final QNode[] simNodesArray;
 	/** This is the collection of links that have to be activated in the current time step */
 	/*package*/ final ArrayList<QLink> simActivateThis = new ArrayList<QLink>();
-	
+
 	private final Random random;
-	
+
 	public QSimEngine(final QNetwork network, final Random random) {
 		this(network.getLinks().values(), network.getNodes().values(), random);
 	}
-	
+
 	/*package*/ QSimEngine(final Collection<QLink> links, final Collection<QNode> nodes, final Random random) {
 		this.random = random;
 		this.allLinks = new ArrayList<QLink>(links);
-		
+
 		this.simNodesArray = nodes.toArray(new QNode[nodes.size()]);
 		//dg[april08] as the order of nodes has an influence on the simulation
 		//results they are sorted to avoid indeterministic simulations
@@ -93,7 +93,7 @@ public class QSimEngine implements LinkActivator{
 			link.clearVehicles();
 		}
 	}
-	
+
 	/**
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
@@ -139,11 +139,9 @@ public class QSimEngine implements LinkActivator{
 	}
 
 	private void reactivateLinks() {
-		if (!simulateAllLinks) {
-			if (!this.simActivateThis.isEmpty()) {
-				this.simLinksArray.addAll(this.simActivateThis);
-				this.simActivateThis.clear();
-			}
+		if ((!simulateAllLinks) && (!this.simActivateThis.isEmpty())) {
+			this.simLinksArray.addAll(this.simActivateThis);
+			this.simActivateThis.clear();
 		}
 	}
 

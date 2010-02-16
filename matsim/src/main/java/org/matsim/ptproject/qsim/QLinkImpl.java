@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -51,7 +50,6 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  * @author dstrippgen
  * @author dgrether
  * @author mrieser
- *
  */
 public class QLinkImpl implements QLink {
 
@@ -141,7 +139,6 @@ public class QLinkImpl implements QLink {
 	 * @param link2
 	 * @param queueNetwork
 	 * @param toNode
-	 * @see QLink#createLanes(List)
 	 */
 	public QLinkImpl(final Link link2, final QNetwork queueNetwork, final QNode toNode) {
 		this.link = link2;

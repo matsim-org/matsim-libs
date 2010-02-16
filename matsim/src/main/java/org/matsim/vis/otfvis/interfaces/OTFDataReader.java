@@ -22,8 +22,6 @@ package org.matsim.vis.otfvis.interfaces;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
@@ -31,20 +29,19 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 
 
 /**
- * OTFDataReader is the base class for all Reader classes. 
+ * OTFDataReader is the base class for all Reader classes.
  * The Reader classes retrieve the information from the ByteStream and
  * directly transfer the information onto the receiver classes. The Reader classes have therefore
  * to extract the exact number of bytes from the stream that the Writer class has written.
- *   
- * @author dstrippgen
  *
+ * @author dstrippgen
  */
 public abstract class  OTFDataReader {
 
 	public static String getVersionString(int major, int minor) {
 		return "V" + major + "." + minor;
 	}
-	
+
 	private OTFDataWriter src;
 	public void setSrc(OTFDataWriter src) {
 		this.src = src;

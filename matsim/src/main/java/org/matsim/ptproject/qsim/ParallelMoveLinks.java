@@ -26,12 +26,9 @@ import java.util.ListIterator;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
 public class ParallelMoveLinks {
-
-	private final static Logger log = Logger.getLogger(ParallelMoveLinks.class);
 
 	private MoveLinksThread[] moveLinksThreads;
 	private boolean simulateAllLinks = false;
@@ -166,17 +163,14 @@ public class ParallelMoveLinks {
 	 */
 	/*package*/ void reactivateLinks(List<QLink> simActivateThis)
 	{
-		if (!simulateAllLinks)
+		if ((!simulateAllLinks) && (!simActivateThis.isEmpty()))
 		{
-			if (!simActivateThis.isEmpty())
+			for(QLink link : simActivateThis)
 			{
-				for(QLink link : simActivateThis)
-				{
-					parallelSimLinksLists.get(distributor % numOfThreads).add(link);
-					distributor++;
-				}
-				simActivateThis.clear();
+				parallelSimLinksLists.get(distributor % numOfThreads).add(link);
+				distributor++;
 			}
+			simActivateThis.clear();
 		}
 	}
 
