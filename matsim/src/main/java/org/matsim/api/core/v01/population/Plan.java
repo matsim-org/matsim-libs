@@ -24,8 +24,9 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.matsim.core.api.internal.MatsimPopulationObject;
+import org.matsim.utils.customize.Customizable;
 
-public interface Plan extends Serializable, MatsimPopulationObject {
+public interface Plan extends Serializable, MatsimPopulationObject, Customizable {
 
 	public List<PlanElement> getPlanElements();
 
@@ -34,11 +35,11 @@ public interface Plan extends Serializable, MatsimPopulationObject {
 	public void addActivity(final Activity act);
 
 	public boolean isSelected();
-	
+
 	public void setSelected(boolean selected);
 
 	public void setScore(Double score);
-	
+
 	public Double getScore();
 
 	public Person getPerson();
@@ -49,5 +50,5 @@ public interface Plan extends Serializable, MatsimPopulationObject {
 	 * you are using this method!.
 	 */
 	public void setPerson(Person person);
-	
+
 }

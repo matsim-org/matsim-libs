@@ -22,6 +22,7 @@ package org.matsim.core.population;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -33,6 +34,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.customize.Customizable;
+import org.matsim.utils.customize.CustomizableImpl;
 
 public class PlanImpl implements Plan {
 	/**
@@ -51,6 +54,8 @@ public class PlanImpl implements Plan {
 	private final static Logger log = Logger.getLogger(PlanImpl.class);
 
 	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
+
+	private Customizable customizableDelegate;
 
 	public PlanImpl(final Person person) {
 		this.person = person;
@@ -175,18 +180,22 @@ public class PlanImpl implements Plan {
 		}
 	}
 
+	@Override
 	public final PersonImpl getPerson() {
 		return (PersonImpl) this.person;
 	}
 
+	@Override
 	public void setPerson(final Person person) {
 		this.person = person;
 	}
 
+	@Override
 	public final Double getScore() {
 		return this.score;
 	}
 
+	@Override
 	public void setScore(final Double score) {
 		this.score = score;
 	}
@@ -199,24 +208,29 @@ public class PlanImpl implements Plan {
 		this.type = type;
 	}
 
+	@Override
 	public final List<PlanElement> getPlanElements() {
 		return this.actsLegs;
 	}
 
+	@Override
 	public final void addLeg(final Leg leg) {
 		if (this.actsLegs.size() %2 == 0 ) throw (new IllegalStateException("Error: Tried to insert leg at non-leg position"));
 		this.actsLegs.add(leg);
 	}
 
+	@Override
 	public final void addActivity(final Activity act) {
 		if (this.actsLegs.size() %2 != 0 ) throw (new IllegalStateException("Error: Tried to insert act at non-act position"));
 		this.actsLegs.add(act);
 	}
 
+	@Override
 	public final boolean isSelected() {
 		return this.getPerson().getSelectedPlan() == this;
 	}
 
+	@Override
 	public void setSelected(final boolean selected) {
 		this.getPerson().setSelectedPlan(this);
 	}
@@ -333,6 +347,14 @@ public class PlanImpl implements Plan {
 
 	public ActivityImpl getLastActivity() {
 		return (ActivityImpl) getPlanElements().get(getPlanElements().size() - 1);
+	}
+
+	@Override
+	public Map<String, Object> getCustomAttributes() {
+		if (this.customizableDelegate == null) {
+			this.customizableDelegate = new CustomizableImpl();
+		}
+		return this.customizableDelegate.getCustomAttributes();
 	}
 
 }
