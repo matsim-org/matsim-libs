@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.Time;
 
@@ -33,7 +32,7 @@ public class SimulationConfigGroup extends Module {
 	private static final long serialVersionUID = 1L;
 
 	private final static Logger log = Logger.getLogger(SimulationConfigGroup.class);
-	
+
 	public static final String GROUP_NAME = "simulation";
 
 	private static final String START_TIME = "startTime";
@@ -47,18 +46,20 @@ public class SimulationConfigGroup extends Module {
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 	private static final String STUCK_TIME = "stuckTime";
 	private static final String REMOVE_STUCK_VEHICLES = "removeStuckVehicles";
-	private static final String EVACUATION_TIME = "evacuationTime";
 	private static final String EXTERNAL_EXE = "externalExe";
 	private static final String TIMEOUT = "timeout";
 	private static final String MOVE_WAIT_FIRST = "moveWaitFirst";
 
-	private static final String SHELLTYPE = "shellType"; // TODO [MR,DS] should be moved to its own config group
-	private static final String JAVACLASSPATH = "classPath"; // _TODO dito...
+	// deprecated options
+	private static final String SHELLTYPE = "shellType";
+	private static final String JAVACLASSPATH = "classPath";
 	private static final String JVMOPTIONS = "JVMOptions";
 	private static final String CLIENTLIST = "clientList";
 	private static final String LOCALCONFIG = "localConfig";
 	private static final String LOCALCONFIGDTD = "localConfigDTD";
 	private static final String EXE_PATH = "exePath";
+	private static final String EVACUATION_TIME = "evacuationTime";
+	// end of deprecated options
 
 	private double startTime = Time.UNDEFINED_TIME;
 	private double endTime = Time.UNDEFINED_TIME;
@@ -70,7 +71,6 @@ public class SimulationConfigGroup extends Module {
 	private double flowCapFactor = 1.0;
 	private double stroageCapFactor = 1.0;
 	private double stuckTime = 100;
-	private double evacuationTime = 8*3600; // TODO [MR,GL] should be moved to its own config group
 	private boolean removeStuckVehicles = true;
 	private String externalExe = null;
 	private int timeOut = 3600;
@@ -103,13 +103,11 @@ public class SimulationConfigGroup extends Module {
 			setStuckTime(Double.parseDouble(value));
 		} else if (REMOVE_STUCK_VEHICLES.equals(key)) {
 			setRemoveStuckVehicles("true".equals(value) || "yes".equals(value));
-		} else if (EVACUATION_TIME.equals(key)) {
-			setEvacuationTime(Time.parseTime(value));
 		} else if (EXTERNAL_EXE.equals(key)) {
 			setExternalExe(value);
 		} else if (TIMEOUT.equals(key)) {
 			setExternalTimeOut(Integer.parseInt(value));
-		} else if (MOVE_WAIT_FIRST.equals(key)) {
+		} else if (MOVE_WAIT_FIRST.equals(key) || EVACUATION_TIME.equals(key)) {
 			log.warn("The config option " + key + " is no longer supported and should be removed from the configuration file.");
 		} else if (SHELLTYPE.equals(key) || JAVACLASSPATH.equals(key) || JVMOPTIONS.equals(key)
 				|| CLIENTLIST.equals(key) || LOCALCONFIG.equals(key) || LOCALCONFIGDTD.equals(key) || EXE_PATH.equals(key)) {
@@ -144,8 +142,6 @@ public class SimulationConfigGroup extends Module {
 			return Double.toString(getStuckTime());
 		} else if (REMOVE_STUCK_VEHICLES.equals(key)) {
 			return (isRemoveStuckVehicles() ? "true" : "false");
-		} else if (EVACUATION_TIME.equals(key)) {
-			return Double.toString(getEvacuationTime());
 		} else if (EXTERNAL_EXE.equals(key)) {
 			return getExternalExe();
 		} else if (TIMEOUT.equals(key)) {
@@ -169,14 +165,13 @@ public class SimulationConfigGroup extends Module {
 		map.put(STORAGE_CAPACITY_FACTOR, getValue(STORAGE_CAPACITY_FACTOR));
 		map.put(STUCK_TIME, getValue(STUCK_TIME));
 		map.put(REMOVE_STUCK_VEHICLES, getValue(REMOVE_STUCK_VEHICLES));
-		map.put(EVACUATION_TIME, getValue(EVACUATION_TIME));
 		if (this.externalExe != null) {
 			map.put(EXTERNAL_EXE, getValue(EXTERNAL_EXE));
 		}
 		map.put(TIMEOUT, getValue(TIMEOUT));
 		return map;
 	}
-	
+
 	@Override
 	protected final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -205,17 +200,17 @@ public class SimulationConfigGroup extends Module {
 
 	/**
 	 * Sets the number of seconds the simulation should advance from one simulated time step to the next.
-	 * 
+	 *
 	 * @param seconds
 	 */
 	public void setTimeStepSize(final double seconds) {
 		this.timeStepSize = seconds;
 	}
-	
+
 	public double getTimeStepSize() {
 		return this.timeStepSize;
 	}
-	
+
 	public void setSnapshotPeriod(final double snapshotPeriod) {
 		this.snapshotPeriod = snapshotPeriod;
 	}
@@ -275,14 +270,6 @@ public class SimulationConfigGroup extends Module {
 
 	public boolean isRemoveStuckVehicles() {
 		return this.removeStuckVehicles;
-	}
-
-	public void setEvacuationTime(final double evactionTime) {
-		this.evacuationTime = evactionTime;
-	}
-
-	public double getEvacuationTime() {
-		return this.evacuationTime;
 	}
 
 	public void setExternalExe(final String externalExe) {
