@@ -92,7 +92,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 		initLinkEnterTime(pop);
 	}
-
+	
 	@Override
 	public void reset(int iteration) {
 		iteration = 0;
@@ -101,7 +101,8 @@ public class GershensonAdaptiveTrafficLightController extends
 		agentLinkEnterTime.clear();
 		averageLinkTravelTime.clear();
 	}
-
+	
+	// eventhandler should be updated, because parking vehicles should not counted
 	@Override
 	public void handleEvent(LaneEnterEvent e) {
 			vehOnLanes.put(e.getLinkId(), vehOnLanes.get(e.getLinkId())+1);
@@ -122,7 +123,6 @@ public class GershensonAdaptiveTrafficLightController extends
 		vehOnLink.put(e.getLinkId(), vehOnLink.get(e.getLinkId())-1);
 		averageLinkTravelTime.put(e.getLinkId(), (averageLinkTravelTime.get(e.getLinkId()) +
 				e.getTime()- agentLinkEnterTime.get(e.getPersonId())) / 2);
-		// Problem, Zeit wird erst gemessen, wenn Agent Link verlaesst. Stau existiert dann uU schon?!
 	}
 	@Override
 	public void handleEvent(AgentDepartureEvent e) {
@@ -183,16 +183,18 @@ public class GershensonAdaptiveTrafficLightController extends
 		}else{
 			approachingRed = 0;
 		}
+		
+		// calculate outLinkSpeed still missing
 
 		//------- end of initializing
 
 		//check if corresponding group is switched to green in this timestep. if so and no
-		//compGroup shows green, switch to green
-		if (!(switchedToGreen.get(corrGroups.get(signalGroup.getId())).equals(null)) &&
-				switchedToGreen.get(corrGroups.get(signalGroup.getId())).equals(time) &&
-				compGroupsGreen == false && oldState.equals(SignalGroupState.RED)){
-			return switchLight(signalGroup, oldState, time);
-		}
+		//compGroup shows green, switch to green --- doesn't work
+//		if (!(switchedToGreen.get(corrGroups.get(signalGroup.getId())).equals(null)) &&
+//				switchedToGreen.get(corrGroups.get(signalGroup.getId())).equals(time) &&
+//				compGroupsGreen == false && oldState.equals(SignalGroupState.RED)){
+//			return switchLight(signalGroup, oldState, time);
+//		}
 
 		// start algorithm
 		if (avSpeedOut < vMin && oldState.equals(SignalGroupState.GREEN)){ //4
@@ -211,11 +213,11 @@ public class GershensonAdaptiveTrafficLightController extends
 			}
 
 		}
-		if(this.getSignalGroupStates().get(signalGroup).equals(SignalGroupState.GREEN)){
+		// if no condition fits for switching lights, return oldstate
+		if(oldState.equals(SignalGroupState.GREEN)){
 				return true;
 			}
 		else{
-		log.error("This should never happen! Mistake in adaptiveTrafficLightAlgorithm, no condition fits!");
 		return false;
 		}
 	}

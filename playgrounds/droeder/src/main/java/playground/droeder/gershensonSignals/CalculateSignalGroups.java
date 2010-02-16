@@ -56,6 +56,8 @@ public class CalculateSignalGroups{
 				for(SignalGroupDefinition sd2 : groups.values()){
 					if(sd2.getLinkRefId().equals(l.getId())){
 						corrGroups.put(sd.getId(), sd2.getId());
+					}else {
+						corrGroups.put(sd.getId(), null);
 					}
 				}
 			}

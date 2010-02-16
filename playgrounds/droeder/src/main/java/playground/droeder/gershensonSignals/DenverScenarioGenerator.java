@@ -46,10 +46,10 @@ public class DenverScenarioGenerator {
 	private static final Logger log = Logger.getLogger(DenverScenarioGenerator.class);
 
 	private static final String INPUT = DaPaths.DENVER;
-	private static final String OUTPUT =DaPaths.OUTPUT + "Denver//";
+	private static final String OUTPUT =DaPaths.OUTPUT + "Denver\\";
 	//INPUT
 	private static final String NETWORKFILE = INPUT + "networkDenver.xml";
-	private static final String LANESINPUTFILE = INPUT + "laneDefintions.xml";
+	private static final String LANESINPUTFILE = INPUT + "laneDefinitions.xml";
 	private static final String SIGNALSYSTEMINPUTFILE = INPUT + "signalSystems.xml";
 	private static final String PLANSINPUTFILE = INPUT + "plans.xml"; 
 	
@@ -82,10 +82,12 @@ public class DenverScenarioGenerator {
 		//set Signalsystems
 		conf.scenario().setUseSignalSystems(true);
 		conf.signalSystems().setSignalSystemFile(SIGNALSYSTEMINPUTFILE);
-		conf.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIG);
 		
 		//create and write SignalSystemConfig
-		createignalSystemsConfig(sc);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
+		loader.loadScenario();
+		createSignalSystemsConfig(sc);
+		conf.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIG);
 		
 		
 		//create and write config
@@ -94,19 +96,21 @@ public class DenverScenarioGenerator {
 		
 	}
 	
-	public void createignalSystemsConfig (ScenarioImpl sc){
+	public void createSignalSystemsConfig (ScenarioImpl sc){
 		SignalSystemConfigurations configs = sc.getSignalSystemConfigurations();
 		SignalSystemConfigurationsFactory factory = configs.getFactory();
 		
 		SignalSystemConfiguration systemConfig = factory.createSignalSystemConfiguration(id1);
 		AdaptiveSignalSystemControlInfo controlInfo = factory.createAdaptiveSignalSystemControlInfo();
 		
-		controlInfo.setAdaptiveControlerClass(controllerClass);
-		systemConfig.setSignalSystemControlInfo(controlInfo);
 		
 		for (SignalGroupDefinition sd: sc.getSignalSystems().getSignalGroupDefinitions().values()){
 			controlInfo.addSignalGroupId(sd.getId());
 		}
+		
+		controlInfo.setAdaptiveControlerClass(controllerClass);
+		systemConfig.setSignalSystemControlInfo(controlInfo);
+		configs.getSignalSystemConfigurations().put(systemConfig.getSignalSystemId(), systemConfig);
 		
 		SignalSystemConfigurations ssConfigs = configs;
 		MatsimSignalSystemConfigurationsWriter ssConfigsWriter = new MatsimSignalSystemConfigurationsWriter(ssConfigs);	
