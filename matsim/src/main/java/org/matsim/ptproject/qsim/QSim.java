@@ -264,14 +264,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 */
 	@Deprecated
   public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
-		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
-		 * In my eyes, the configuration should usually be a read-only object in general, but
-		 * that's hard to be implemented...
-		 */
-		this.scenario.getConfig().network().setInputFile(networkFilename);
-		this.scenario.getConfig().simulation().setSnapshotFormat("netvis");
-		this.scenario.getConfig().simulation().setSnapshotPeriod(snapshotPeriod);
-		this.scenario.getConfig().simulation().setSnapshotFile(snapshotFilename);
+		log.warn("NetVis is no longer supported by this simulation.");
 	}
 
 	private void prepareNetworkChangeEventsQueue() {
@@ -528,7 +521,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			queueSimulationFeature.afterActivityBegins(agent, planElementIndex);
 		}
 	}
-	
+
 	private void addToAgentsInActivities(final DriverAgent agent) {
 		if (agent instanceof PersonAgent) {
 			PersonAgent pa = (PersonAgent) agent;
@@ -558,7 +551,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			}
 		}
 	}
-	
+
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
 			DriverAgent agent = this.activityEndsList.peek();
@@ -694,5 +687,5 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public double getTimeOfDay() {
 		return QSimTimer.getTime() ;
 	}
-	
+
 }
