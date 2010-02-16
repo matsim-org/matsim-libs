@@ -24,9 +24,9 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		String config = getInputDirectory() + "config.xml";
 		ScenarioImpl sc = new ScenarioImpl();
 		new ConfigReaderMatsimV1(sc.getConfig()).readFile(config);
-		
+
 		new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
-			
+
 		double offsetEast = sc.getConfig().evacuation().getSWWOffsetEast();
 		double offsetNorth = sc.getConfig().evacuation().getSWWOffsetNorth();
 		List<FloodingReader> frs = new ArrayList<FloodingReader>();
@@ -40,25 +40,25 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		}
 
 
-		
-		
-		
-		
+
+
+
+
 		EventsManagerImpl events = new EventsManagerImpl();
 		RiskCostFromFloodingData rcf = new RiskCostFromFloodingData(sc.getNetwork(),frs,events,sc.getConfig().evacuation().getBufferSize());
-		
-		double delta = Math.pow(10, -6);
-		
-		//// travel costs
-	
-		
-		//baseCost = 3 *3600
-		
 
-		
+		double delta = Math.pow(10, -6);
+
+		//// travel costs
+
+
+		//baseCost = 3 *3600
+
+
+
 		//test 2 links within flooding area
-		// nodeCost = baseCost-nodeFloodTime 
-		
+		// nodeCost = baseCost-nodeFloodTime
+
 		//Link 11288 cost = 28044.9329790229
 		// fromNodeTime = 35.54864794603423333333
 		// fromNodeCost = baseCost - 60 * fromNodeTime = 8667.081123237946
@@ -69,7 +69,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		LinkImpl l0 = sc.getNetwork().getLinks().get(new IdImpl("11288"));
 		double l0Cost = rcf.getLinkTravelCost(l0,Time.UNDEFINED_TIME);
 		assertEquals(28044.9329790229,l0Cost,delta);
-		
+
 		//Link 111288 cost = 0. (opposite direction)
 		// fromNodeTime = 33.04903456966766666666
 		// toNodeTime = 35.54864794603423333333
@@ -77,13 +77,13 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		LinkImpl l0Inverse = sc.getNetwork().getLinks().get(new IdImpl("111288"));
 		double l0InverseCost = rcf.getLinkTravelCost(l0Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l0InverseCost,delta);
-		
-		
+
+
 		//bufferSize = 250
-		
+
 		//test 2 links within buffer
 		// nodeCost = baseCost/2 * (1 - (nodeFloodDist/bufferSize))
-		
+
 		//Link 9204 cost = 124.44247096468449
 		// fromNodeDist = 223.12500852607877
 		// fromNodeCost =  3 * 3600 / 2 * (1 -(223.12500852607877/250)) = 580.4998158366984
@@ -95,7 +95,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		LinkImpl l1 = sc.getNetwork().getLinks().get(new IdImpl("9204"));
 		double l1Cost = rcf.getLinkTravelCost(l1,Time.UNDEFINED_TIME);
 		assertEquals(124.44247096468449,l1Cost,delta);
-		
+
 		//Link 109204 cost = 0. (opposite direction)
 		// toNodeDist = 223.125
 		// toNodeCost =  3 * 3600 / 2 * (1 -(223.125 /250)) --> 580.4998158366984
@@ -105,7 +105,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		LinkImpl l1Inverse = sc.getNetwork().getLinks().get(new IdImpl("109204"));
 		double l1InverseCost = rcf.getLinkTravelCost(l1Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l1InverseCost,delta);
-		
+
 		//test 2 links at the edge of the buffer
 		//Link 6798 cost = 497.60526643476226
 		// toNodeDist = 223.125
@@ -116,19 +116,19 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		LinkImpl l2 = sc.getNetwork().getLinks().get(new IdImpl("6798"));
 		double l2Cost = rcf.getLinkTravelCost(l2,Time.UNDEFINED_TIME);
 		assertEquals(497.60526643476226,l2Cost,delta);
-		
+
 		//Link 106798 cost = 0. (opposite direction)
 		LinkImpl l2Inverse = sc.getNetwork().getLinks().get(new IdImpl("106798"));
 		double l2InverseCost = rcf.getLinkTravelCost(l2Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l2InverseCost,delta);
-		
+
 		//// agent penalties
 		Id id = sc.createId("agent");
 		AgentPenaltyCalculator apc = new AgentPenaltyCalculator();
 		events.addHandler(apc);
 		events.addHandler(rcf);
 		double refCost = 0.;
-		
+
 		events.processEvent(new LinkEnterEventImpl(0.,id,l0.getId()));
 		refCost += 28044.9329790229 / -600.;
 		events.processEvent(new LinkEnterEventImpl(0.,id,l0Inverse.getId()));
@@ -141,22 +141,20 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		refCost += 497.60526643476226 / -600.;
 		events.processEvent(new LinkEnterEventImpl(0.,id,l2Inverse.getId()));
 		refCost += 0.;
-		
-		
+
+
 		assertEquals(refCost, apc.penalty,delta);
 	}
-	
+
 	private static class AgentPenaltyCalculator implements AgentMoneyEventHandler {
 		double penalty = 0.;
-		
+
 		public void handleEvent(AgentMoneyEvent event) {
 			this.penalty += event.getAmount();
 		}
 
 		public void reset(int iteration) {
-			// TODO Auto-generated method stub
-			
 		}
-		
+
 	}
 }

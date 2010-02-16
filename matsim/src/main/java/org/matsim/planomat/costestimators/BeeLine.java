@@ -24,57 +24,49 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * Example implementation of a leg travel time estimation (the estimation of
  * a travel time between two activities at a given departure time).
- * 
+ *
  * It computes the travel time for the bee line distance between the from nodes
  * of the origin and destination links, at a speed of 20 km/h.
- * 
+ *
  * @author meisterk
- * 
+ *
  * @deprecated This estimator is marked as deprecated because there are better estimators, and it is referenced nowhere.
  */
 @Deprecated
 public class BeeLine implements LegTravelTimeEstimator {
-	
-	public void resetPlanSpecificInformation() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	final static double SPEED = 20.0 / 3.6; // 20km/h --> m/s
-	
+
 	@Override
 	public String toString() {
 		return "BeeLine implementation of LegTravelTimeEstimator";
 	}
 
+	@Override
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			ActivityImpl actOrigin, ActivityImpl actDestination,
 			LegImpl legIntermediate, boolean doModifyLeg) {
 
 		double distance = CoordUtils.calcDistance(actOrigin.getCoord(), actDestination.getCoord());
-		
+
 		return distance / SPEED;
 
 	}
 
-	public void initPlanSpecificInformation(PlanImpl plan) {
-		// not implemented here
-	}
-
+	@Override
 	public LegImpl getNewLeg(
-			TransportMode mode, 
+			TransportMode mode,
 			ActivityImpl actOrigin,
-			ActivityImpl actDestination, 
+			ActivityImpl actDestination,
 			int legPlanElementIndex,
 			double departureTime) {
 		// not implemented here
 		return null;
 	}
-	
+
 }
