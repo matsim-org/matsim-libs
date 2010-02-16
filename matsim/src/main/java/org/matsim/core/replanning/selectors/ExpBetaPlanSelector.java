@@ -50,12 +50,12 @@ public class ExpBetaPlanSelector implements PlanSelector {
 
 		// get the weights of all plans
 		Map<Plan, Double> weights = this.calcWeights(person);
-		
+
 		double sumWeights = 0.0;
 		for (Double weight : weights.values()) {
 			sumWeights += weight.doubleValue();
 		}
-		
+
 		// choose a random number over interval [0, sumWeights[
 		double selnum = sumWeights * MatsimRandom.getRandom().nextDouble();
 		for (Plan plan : person.getPlans()) {
@@ -82,7 +82,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	 * @return the weight of the plan
 	 */
 	protected double calcPlanWeight(final Plan plan, final double maxScore) {
-		
+
 		if (plan.getScore() == null) {
 			return Double.NaN;
 		}
@@ -93,7 +93,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 
 	/**
 	 * Builds the weights of all plans.
-	 * 
+	 *
 	 * @param person
 	 * @return a map containing the weights of all plans
 	 */
@@ -109,15 +109,13 @@ public class ExpBetaPlanSelector implements PlanSelector {
 
 		Map<Plan, Double> weights = new LinkedHashMap<Plan, Double>(person.getPlans().size());
 
-		int idx = 0;
 		for (Plan plan : person.getPlans()) {
 			weights.put(plan, this.calcPlanWeight(plan, maxScore));
-			idx++;
 		}
 
 		return weights;
 	}
-	
+
 	public double getSelectionProbability(final Plan plan) {
 
 		Map<Plan, Double> weights = this.calcWeights(plan.getPerson());
@@ -127,7 +125,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 		for (Double weight : weights.values()) {
 			sumWeights += weight.doubleValue();
 		}
-		
+
 		return (thisWeight / sumWeights);
 	}
 }
