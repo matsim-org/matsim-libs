@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
  */
 public abstract class Gbl {
 	public final static String ONLYONCE=" This message given only once.";
-	
+
 	/**
 	 * @deprecated The Controler should hold the config instance without any
 	 * static reference to the object.
@@ -60,7 +60,7 @@ public abstract class Gbl {
 	/**
 	 * @param args
 	 * @return
-	 * @deprecated use "ScenarioLoader(filename).loadScenario() to read 
+	 * @deprecated use "ScenarioLoader(filename).loadScenario() to read
 	 * a complete Scenario from file. If a Config instance with already created core modules
 	 * is needed use BasicScenario sc = new BasicScenarioImpl(); sc.getConfig();"
 	 */
@@ -99,7 +99,7 @@ public abstract class Gbl {
 
 	/**
 	 * Having config as a static member makes a lot of features of OO programming
-	 * quite useless. Thus this method will be removed in the future. If the 
+	 * quite useless. Thus this method will be removed in the future. If the
 	 * config is used somewhere in the code, the config (or the needed
 	 * parameters) need to be passed explicitly.
 	 */
@@ -110,7 +110,7 @@ public abstract class Gbl {
 
 	@Deprecated
 	public static final void setConfig(final Config config) {
-		Gbl.config = config; 
+		Gbl.config = config;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -154,34 +154,36 @@ public abstract class Gbl {
 		String date = null;
 		URL url = Gbl.class.getResource("/revision.txt");
 		if (url != null) {
+			BufferedReader reader = null;
 			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+				reader = new BufferedReader(new InputStreamReader(url.openStream()));
 				revision = reader.readLine();
 				date = reader.readLine();
-				reader.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				if (revision == null) {
-					log.info("MATSim-Build: unknown");
-				} else {
-					log.info("MATSim-Build: " + revision + " (" + date + ")");
+				if (reader != null) {
+					try { reader.close(); }
+					catch (IOException e) { log.warn("Could not close stream.", e); }
 				}
 			}
+			if (revision == null) {
+				log.info("MATSim-Build: unknown");
+			} else {
+				log.info("MATSim-Build: " + revision + " (" + date + ")");
+			}
+
 		} else {
 			log.info("MATSim-Build: unknown");
 		}
 	}
 
 	public static final void errorMsg(final Exception e) {
-		e.printStackTrace();
-		System.exit(-1);
+		throw new RuntimeException(e);
 	}
 
 	public static final void errorMsg(final String msg) {
-		// the following is only so we get a useful stacktrace and know where the error happened.
-		new Exception(msg).printStackTrace();
-		System.exit(-1);
+		throw new RuntimeException(msg);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -224,13 +226,13 @@ public abstract class Gbl {
 		log.info("### round time: " + Gbl.printTime());
 		Gbl.startMeasurement();
 	}
-	
+
 	/* Thread performance measurement */
 	private final static ThreadMXBean tbe  =  ManagementFactory.getThreadMXBean();
 
 	/**
 	 * Tries to enable CPU time measurement for threads. Not all JVMs support this feature.
-	 * 
+	 *
 	 * @return <code>true</code> if the JVM supports time measurement for threads and the feature
 	 * could be enabled, <code>false</code> otherwise.
 	 */
@@ -241,7 +243,7 @@ public abstract class Gbl {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @param thread
 	 * @return cpu time for the given thread in seconds, <code>-1</code> if cpu time is not measured.
@@ -252,10 +254,10 @@ public abstract class Gbl {
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Prints the cpu time for the given time, i.e. the time the thread was effectively active on the CPU.
-	 * 
+	 *
 	 * @param thread
 	 */
 	public static final void printThreadCpuTime(final Thread thread) {

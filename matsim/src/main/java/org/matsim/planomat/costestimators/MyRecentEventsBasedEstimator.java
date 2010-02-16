@@ -35,7 +35,7 @@ import org.matsim.core.population.PlanImpl;
 /**
  * @author meisterk
  *
- * @deprecated This estimator is deprecated because it leads to wrong results, and it is referenced nowhere. 
+ * @deprecated This estimator is deprecated because it leads to wrong results, and it is referenced nowhere.
  * It's (possibly wrong) results were reported in STRC and IATBR papers of 2006.
  */
 @Deprecated
@@ -82,11 +82,6 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 		@Override
 		public int hashCode() {
-
-			// TODO [KM] I'm sure the computation of this is very expensive (string concatenation), and should be replaced.
-
-			// Well, as all the members are final, why not calculate the hashCode once and cache it? -marcel/26feb08
-
 			return (this.agentId.toString() + this.originLocationId.toString() + this.destinationLocationId + this.mode).hashCode();
 		}
 
@@ -135,7 +130,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 	}
 
 	public LegImpl getNewLeg(
-			TransportMode mode, 
+			TransportMode mode,
 			ActivityImpl actOrigin,
 			ActivityImpl actDestination,
 			int legPlanElementIndex,

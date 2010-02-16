@@ -25,19 +25,21 @@ import java.io.LineNumberReader;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
- *
- * @author fabrice and jjoubert
- *
+ * @author fabrice
+ * @author jjoubert
  */
 public class CumulativeDistribution {
 
 	double[] xs;
 	double[] ys;
 	int numObservations;
+
+	private final static Logger log = Logger.getLogger(CumulativeDistribution.class);
 
 	public CumulativeDistribution( double lowerBound, double upperBound, int numBins ){
 		xs = new double[ numBins+1 ];
@@ -115,7 +117,7 @@ public class CumulativeDistribution {
 		Vector<Double> x = new Vector<Double>();
 		Vector<Double> y = new Vector<Double>();
 
-		LineNumberReader lnr;
+		LineNumberReader lnr = null;
 		try {
 			lnr = new LineNumberReader( IOUtils.getBufferedReader(filename) );
 			String line=null;
@@ -124,12 +126,16 @@ public class CumulativeDistribution {
 				x.add( Double.valueOf(st.nextToken()));
 				y.add( Double.valueOf(st.nextToken()));
 			}
-			lnr.close();
-
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		finally {
+			if (lnr != null) {
+				try { lnr.close(); }
+				catch (IOException e) { log.warn("Could not close stream.", e); }
+			}
 		}
 		double[] xs = new double[ x.size()];
 		double[] ys = new double[ x.size()];
