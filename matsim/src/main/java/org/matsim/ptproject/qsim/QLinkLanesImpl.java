@@ -175,6 +175,10 @@ public class QLinkLanesImpl implements QLink {
 			if (signalLane.getLength() > this.link.getLength()) {
 				throw new IllegalStateException("Link Id " + this.link.getId() + " is shorter than Lane Id " + signalLane.getId() + " on this link!");
 			}
+			if (this.originalLane.getLaneId().equals(signalLane.getId())){
+			  throw new IllegalStateException("Lane definition has same id as auto generated original lane on link " + this.link.getId());
+			}
+			
 			QLane lane = null;
 			lane = new QLane(this, signalLane);
 			lane.setMetersFromLinkEnd(0.0);
