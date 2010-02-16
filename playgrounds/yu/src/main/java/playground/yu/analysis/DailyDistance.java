@@ -34,9 +34,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * compute modal split of through distance
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyDistance extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -515,9 +515,6 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		sw.close();
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
@@ -530,7 +527,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -544,7 +542,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyDistance dd = new DailyDistance(tollReader.getScheme(), network);
+		DailyDistance dd = new DailyDistance(scenario.getRoadPricingScheme(), network);
 		dd.run(population);
 		dd.write(outputFilename);
 

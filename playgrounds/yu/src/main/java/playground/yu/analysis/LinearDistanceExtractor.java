@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -32,7 +31,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -88,9 +87,6 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 		sw.close();
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../runs-svn/run684/it.1000/1000.plans.xml.gz";
@@ -100,14 +96,14 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 		Gbl.startMeasurement();
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -118,8 +114,7 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 			e.printStackTrace();
 		}
 
-		LinearDistanceExtractor lde = new LinearDistanceExtractor(tollReader
-				.getScheme(), outputFilename);
+		LinearDistanceExtractor lde = new LinearDistanceExtractor(scenario.getRoadPricingScheme(), outputFilename);
 		lde.run(population);
 		lde.write();
 

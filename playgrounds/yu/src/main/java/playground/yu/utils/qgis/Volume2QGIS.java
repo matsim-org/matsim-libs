@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Volume2QGIS extends MATSimNet2QGIS {
 
@@ -74,9 +74,6 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		setN2g(new Volume2PolygonGraph(getNetwork(), crs, linkIds));
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 
 		// String netFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
@@ -104,7 +101,8 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 		mn2q.readEvents("../runs-svn/run669/it.1000/1000.events.txt.gz",
 				new EventHandler[] { va });
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		RoadPricingScheme rps = new RoadPricingScheme();
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(rps);
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -114,10 +112,8 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		RoadPricingScheme rps = tollReader.getScheme();
 
-		Collection<Id> linkIds = (rps != null) ? rps.getLinkIdSet() : net
-				.getLinks().keySet();
+		Collection<Id> linkIds = rps.getLinkIdSet();
 		List<Map<Id, Integer>> vols = createVolumes(linkIds, va);
 		List<Map<Id, Double>> sls = SaturationLevel2QGIS
 				.createSaturationLevels(net, rps, va);

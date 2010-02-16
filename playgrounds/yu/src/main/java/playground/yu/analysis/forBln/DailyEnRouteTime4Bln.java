@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis.forBln;
 
@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -32,9 +31,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * daily en route time analysis only for Berlin or for Berlin & Brandenburg
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		Analysis4Bln {
@@ -586,9 +585,6 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		sw.close();
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
@@ -598,10 +594,10 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		String tollFilename = "../berlin data/Hundekopf/osm/tollBerlinHundekopf.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -616,7 +612,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyEnRouteTime4Bln ert = new DailyEnRouteTime4Bln(tollReader.getScheme());
+		DailyEnRouteTime4Bln ert = new DailyEnRouteTime4Bln(scenario.getRoadPricingScheme());
 		ert.run(population);
 		ert.write(outputFilename);
 

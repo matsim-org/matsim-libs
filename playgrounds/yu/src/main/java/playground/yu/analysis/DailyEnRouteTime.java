@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -36,9 +35,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * compute modal split of en route time
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -501,9 +500,6 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		sw.close();
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
@@ -513,12 +509,12 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -529,7 +525,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 			e.printStackTrace();
 		}
 
-		DailyEnRouteTime ert = new DailyEnRouteTime(tollReader.getScheme());
+		DailyEnRouteTime ert = new DailyEnRouteTime(scenario.getRoadPricingScheme());
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);

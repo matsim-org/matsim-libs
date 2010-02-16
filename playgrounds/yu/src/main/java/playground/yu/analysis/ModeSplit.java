@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -30,7 +30,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	private int carLegs = 0, ptLegs = 0, wlkLegs = 0, bikeLegs = 0,
@@ -158,7 +158,8 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {

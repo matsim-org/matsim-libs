@@ -50,22 +50,11 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 	private RoadPricingScheme scheme = null;
 
 	private Id currentLinkId = null;
-	
+
 	private boolean hasLinkCosts = false;
-	/**
-	 * @deprecated use constructor RoadPricingReaderXMLv1(RoadPricingScheme)
-	 */
-	@Deprecated
-	public RoadPricingReaderXMLv1() {
-	  this.scheme = new RoadPricingScheme();
-	}
-	
+
 	public RoadPricingReaderXMLv1(RoadPricingScheme scheme){
 	  this.scheme = scheme;
-	}
-
-	public RoadPricingScheme getScheme() {
-		return this.scheme;
 	}
 
 	@Override
@@ -83,7 +72,7 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
           Time.parseTime(atts.getValue(ATTR_END_TIME)), Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
       this.hasLinkCosts = true;
 		}
-		
+
 	}
 
 	@Override

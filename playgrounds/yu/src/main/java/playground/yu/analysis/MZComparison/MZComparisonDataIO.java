@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis.MZComparison;
 
@@ -19,7 +19,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -33,7 +32,7 @@ import playground.yu.utils.charts.StackedBarChart;
 
 /**
  * @author yu
- * 
+ *
  */
 public class MZComparisonDataIO implements TabularFileHandler {
 	private int lineCount = 0;
@@ -167,10 +166,10 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		mzcdi.readMZData(inputFilename);
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -184,7 +183,7 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		MZComparisonData mzcd = new MZComparisonData(tollReader.getScheme());
+		MZComparisonData mzcd = new MZComparisonData(scenario.getRoadPricingScheme());
 		mzcd.run(population);
 
 		mzcdi.setData2Compare(mzcd);

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis.forZrh;
 
@@ -54,9 +54,9 @@ import playground.yu.utils.io.SimpleWriter;
 /**
  * compute daily distance of Zurich and Kanton Zurich respectively with through
  * traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 	private static final String CAR = "car", OTHERS = "others",
@@ -467,7 +467,8 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -481,7 +482,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyDistance4Zrh dd = new DailyDistance4Zrh(tollReader.getScheme(), network);
+		DailyDistance4Zrh dd = new DailyDistance4Zrh(scenario.getRoadPricingScheme(), network);
 		dd.run(population);
 		dd.write(outputFilename);
 

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Toll2QGIS extends MATSimNet2QGIS {
 	public Toll2QGIS(String netFilename, String coordRefSys) {
@@ -83,9 +83,6 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		// String netFilename = "../matsimTests/scoringTest/network.xml";
@@ -93,7 +90,8 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 
 		Toll2QGIS t2q = new Toll2QGIS(netFilename, ch1903);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		RoadPricingScheme scheme = new RoadPricingScheme();
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scheme);
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -104,8 +102,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 			e.printStackTrace();
 		}
 
-		t2q.setN2g(new Toll2PolygonGraph(t2q.getNetwork(), t2q.crs, tollReader
-				.getScheme()));
+		t2q.setN2g(new Toll2PolygonGraph(t2q.getNetwork(), t2q.crs, scheme));
 		t2q.writeShapeFile("../matsimTests/toll/ivtch-osm_toll.shp");
 	}
 }

@@ -51,7 +51,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class AnalysisTest4Zrh implements Analysis4Zrh {
 
@@ -121,9 +121,10 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			new MatsimFacilitiesReader(s).readFile(facilitiesFilename);
 		}
 		// toll
-		RoadPricingScheme toll = null;
+		s.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingScheme toll = s.getRoadPricingScheme();
 		if (scenario.equals(KANTON_ZURICH)) {
-			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(toll);
 			try {
 				tollReader.parse(tollFilename);
 			} catch (SAXException e) {
@@ -133,7 +134,6 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			toll = tollReader.getScheme();
 		}
 
 		// EventsHandlers with parameter of "Population":

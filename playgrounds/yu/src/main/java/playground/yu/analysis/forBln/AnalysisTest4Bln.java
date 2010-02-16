@@ -53,7 +53,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class AnalysisTest4Bln {
 	private static boolean withToll = false;
@@ -104,7 +104,8 @@ public class AnalysisTest4Bln {
 		// toll
 		RoadPricingScheme toll = null;
 		if (withToll) {
-			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+			sc.getConfig().scenario().setUseRoadpricing(true);
+			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(sc.getRoadPricingScheme());
 			try {
 				tollReader.parse(tollFilename);
 			} catch (SAXException e) {
@@ -114,7 +115,7 @@ public class AnalysisTest4Bln {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			toll = tollReader.getScheme();
+			toll = sc.getRoadPricingScheme();
 		}
 
 		// EventsHandlers with parameter of "Population":

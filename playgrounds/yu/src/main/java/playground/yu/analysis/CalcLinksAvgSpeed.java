@@ -54,7 +54,7 @@ import org.xml.sax.SAXException;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	/**
@@ -96,7 +96,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 	/**
 	 * support the speed calculation only for the links in a circle area
-	 * 
+	 *
 	 * @param network
 	 * @param x
 	 *            -abscissa of the center of the circle area
@@ -369,16 +369,16 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		final String roadPricingFilename = args[2];
 		final String outputPath = args[3];
 
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
 		tollReader.parse(roadPricingFilename);
-		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, tollReader
-				.getScheme());
+		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, scenario.getRoadPricingScheme());
 		events.addHandler(clas);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -61,7 +61,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- * 
+ *
  */
 public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	public SpeedLevel2QGIS(String netFilename, String coordRefSys) {
@@ -139,9 +139,6 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		setN2g(new SpeedLevel2PolygonGraph(getNetwork(), crs, linkIds));
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(
 				"../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml", ch1903);
@@ -159,7 +156,8 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		mn2q.readEvents("../matsimTests/Calibration/e5_700/700.events.txt.gz",
 				new EventHandler[] { clas, va });
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		RoadPricingScheme rps = new RoadPricingScheme();
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(rps);
 		try {
 			tollReader
 					.parse("../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml");
@@ -170,14 +168,11 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		RoadPricingScheme rps = tollReader.getScheme();
 
-		Collection<Id> links = (rps != null) ? rps.getLinkIdSet() : net
-				.getLinks().keySet();
+		Collection<Id> links = rps.getLinkIdSet();
 		List<Map<Id, Double>> sls = createSpeedLevels(links, clas, net);
 
-		Set<Id> linkIds = (rps != null) ? rps.getLinkIdSet() : net.getLinks()
-				.keySet();
+		Set<Id> linkIds = rps.getLinkIdSet();
 		for (int i = 6; i < 20; i++) {
 			SpeedLevel2QGIS sl2q = new SpeedLevel2QGIS(
 					"../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml",

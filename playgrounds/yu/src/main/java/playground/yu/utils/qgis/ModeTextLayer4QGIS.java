@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -25,7 +24,7 @@ import playground.yu.analysis.PlanModeJudger;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 	/**
@@ -61,9 +60,6 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 		writer.writeln(homeLoc.getX() + "\t" + homeLoc.getY() + "\t" + mode);
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 
@@ -78,13 +74,13 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 		// "../matsimTests/scoringTest/output/ITERS/it.100/mode.txt";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -96,7 +92,7 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 		}
 
 		ModeTextLayer4QGIS mtl = new ModeTextLayer4QGIS(textFilename,
-				tollReader.getScheme());
+				scenario.getRoadPricingScheme());
 		mtl.run(population);
 		mtl.close();
 
