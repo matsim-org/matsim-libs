@@ -89,31 +89,31 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 0995
-	private static double beta_time_car = -5.54; 
-	private static double beta_time_pt = 0.557; 
-	private static double beta_time_bike = -1.81;
-	private static double beta_time_walk = -1.77;
+	// Settings of 0995a
+	private static double beta_time_car = -3.93; 
+	private static double beta_time_pt = 0.148; 
+	private static double beta_time_bike = -1.19;
+	private static double beta_time_walk = -1.19;
 	
-	private static double constantPt = -0.520;
-	private static double constantBike = 0.207;
-	private static double constantWalk = 0.899;
+	private static double constantPt = -0.557;
+	private static double constantBike = 0.0314;
+	private static double constantWalk = 0.863;
 	
-	private static double beta_cost_car = 0.0283;
-	private static double beta_cost_pt = -0.114;
+	private static double beta_cost_car = 0.102;
+	private static double beta_cost_pt = -0.105;
 	
-	private static double lambda_cost_income_car = 0.261;
-	private static double lambda_cost_income_pt = -0.277;
+	private static double lambda_cost_income_car = 0.0677;
+	private static double lambda_cost_income_pt = -0.300;
 	
-	private static double beta_female_act = -0.0582;
-	private static double beta_female_travel = 0.0855;
+	private static double beta_female_act = 0.0471;
+	private static double beta_female_travel = 0.0994;
 	
 	private static double travelCostCar = 0.5;	// CHF/km
 	private static double travelCostPt_None = 0.28;	// CHF/km
 	private static double travelCostPt_Halbtax = 0.15;	// CHF/km
 	private static double travelCostPt_GA = 0.08;	// CHF/km;
 	
-	private static double licenseCar = -0.577;	// CHF/km
+	private static double licenseCar = -0.234;	// CHF/km
 	private static double licensePt = 0.0;	// CHF/km
 	private static double licenseBike = 0.0;	// CHF/km
 	private static double licenseWalk = 0.0;	// CHF/km;
@@ -127,26 +127,26 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double uMin_shopping = 0;
 	private static final double uMin_leisure = 0;
 	
-	private static final double uMax_home = 8.46; 
-	private static final double uMax_innerHome = 1.86; 
-	private static final double uMax_work= 4.74;  
-	private static final double uMax_education = 4.72;
-	private static final double uMax_shopping = 1.82; 
-	private static final double uMax_leisure = 1.78;  
+	private static final double uMax_home = 5.86; 
+	private static final double uMax_innerHome = 1.58; 
+	private static final double uMax_work= 4.11;  
+	private static final double uMax_education = 3.99;
+	private static final double uMax_shopping = 2.08; 
+	private static final double uMax_leisure = 2.26;  
 	
-	private static final double alpha_home = 5.98;
-	private static final double alpha_innerHome = 0.269;
-	private static final double alpha_work = 3.86;
-	private static final double alpha_education = 1.45;
-	private static final double alpha_shopping = 0.0462;
-	private static final double alpha_leisure = 0.0583;
+	private static final double alpha_home = 6.95;
+	private static final double alpha_innerHome = 0.191;
+	private static final double alpha_work = 4.14;
+	private static final double alpha_education = 1.86;
+	private static final double alpha_shopping = 0.0231;
+	private static final double alpha_leisure = 0.0222;
 	
-	private static final double beta_home = 0.281;
-	private static final double beta_innerHome = 17.8;
-	private static final double beta_work = 0.481;
-	private static final double beta_education = 100;
+	private static final double beta_home = 0.380;
+	private static final double beta_innerHome = 23.9;
+	private static final double beta_work = 0.564;
+	private static final double beta_education = 2.98;
 	private static final double beta_shopping = 100;
-	private static final double beta_leisure = 83.8;
+	private static final double beta_leisure = 100;
 	
 	private static final double gamma_home = 1;
 	private static final double gamma_innerHome = 1;
@@ -157,7 +157,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	
 	private static final double beta_age_home = 0;
 	private static final double beta_age_innerHome = 0; 
-	private static final double beta_age_work = -0.00689;
+	private static final double beta_age_work = -0.00737;
 	private static final double beta_age_education = -0.0150;
 	private static final double beta_age_shopping = 0;
 	private static final double beta_age_leisure = 0;
