@@ -40,17 +40,21 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
-
 /**
  * @author	rschneid-btu
  * [based on same file from dgrether]
  * generates an amount of agents per commodity (see addCommodity for further details)
  */
 public class Plansgenerator {
+	// =====================================================
+	private static final String chosenScenario = "portland";
+	// =====================================================
+	// ======== choose: denver / portland / cottbus ========
+	// =====================================================
 
-	private static final String networkFilename = "./input/cottbus/network.xml";
+	private static final String networkFilename = "./input/"+chosenScenario+"/network.xml";
 
-	private static final String plansOut = "./input/cottbus/plans.xml";
+	private static final String plansOut = "./input/"+chosenScenario+"/plans.xml";
 
 	private Scenario scenario;
 	private Network network;
@@ -67,11 +71,83 @@ public class Plansgenerator {
 		this.plans = this.scenario.getPopulation();
 		final int HOME_END_TIME = 6 * 3600; // time to start
 
-		createCottbusFirst(HOME_END_TIME);
+		if(chosenScenario.equals("cottbus")) {
+			createCottbusFirst(HOME_END_TIME);
+		} else
+		if(chosenScenario.equals("denver")) {
+			createDenverStraight(HOME_END_TIME);
+		} else
+		if(chosenScenario.equals("portland")) {
+			createPortland(HOME_END_TIME);
+		}
 
 		new PopulationWriter(this.plans, this.network).writeFile(plansOut);
 	}
 
+	/**
+	 * generates agents for portland/oregon scenario
+	 * @param HOME_END_TIME
+	 */
+	private void createPortland(final int HOME_END_TIME) {
+		int currentId = 1;
+		int duration = (int)(0.5 * 3600); // seconds
+		final int DEFAULT_CARS_PER_HOUR_PER_LANE = 1000;
+
+		// #1 green220
+		currentId = addCommodity(
+				"8","2",HOME_END_TIME,duration,(int)(0.22*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"4 3 2",currentId);
+		// #2 green700
+		currentId = addCommodity(
+				"145","67",HOME_END_TIME,duration,(int)(0.7*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"1 7 13 19",currentId);
+		// #3 green100
+		currentId = addCommodity(
+				"8","2",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"4 3 2",currentId);
+		// #4 purple190
+		currentId = addCommodity(
+				"2","13",HOME_END_TIME,duration,(int)(0.19*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"1 7 8",currentId);
+		// #5 rosa250
+		currentId = addCommodity(
+				"13","158",HOME_END_TIME,duration,(int)(0.25*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"9 10 4",currentId);
+		// #6 pink100
+		currentId = addCommodity(
+				"78","130",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"20 14 13",currentId);
+		// #7 lightblue180
+		currentId = addCommodity(
+				"92","122",HOME_END_TIME,duration,(int)(0.18*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"4 3 2 1",currentId);
+		// #8 blue150
+		currentId = addCommodity(
+				"133","24",HOME_END_TIME,duration,(int)(0.15*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"19 20 21 22 16 15",currentId);
+		// #9 darkblue250
+		currentId = addCommodity(
+				"33","37",HOME_END_TIME,duration,(int)(0.25*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"21 22",currentId);
+		// #10 lightbrown700
+		currentId = addCommodity(
+				"125","17",HOME_END_TIME,duration,(int)(0.7*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"7 8 9 10",currentId);
+		// #11 brown340
+		currentId = addCommodity(
+				"78","122",HOME_END_TIME,duration,(int)(0.34*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"20 14 8 2 1",currentId);
+		// #12 red700
+		currentId = addCommodity(
+				"98","158",HOME_END_TIME,duration,(int)(0.7*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"22 16 10 4",currentId);
+		// #13 yellow240
+		currentId = addCommodity(
+				"28","130",HOME_END_TIME,duration,(int)(0.24*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"16 15 14 13",currentId);
+		
+	}
+	
 	/**
 	 * generates agents for cottbus scenario
 	 * @param HOME_END_TIME
@@ -79,7 +155,7 @@ public class Plansgenerator {
 	private void createCottbusFirst(final int HOME_END_TIME) {
 		int currentId = 1;
 		int duration = (int)(0.5 * 3600); // seconds
-		final int DEFAULT_CARS_PER_HOUR_PER_LANE = 2000;
+		final int DEFAULT_CARS_PER_HOUR_PER_LANE = 4*2000;
 
 		// #1 uni zu stadion
 		currentId = addCommodity(
@@ -217,6 +293,7 @@ public class Plansgenerator {
 	 * @param HOME_END_TIME
 	 * @deprecated
 	 */
+	@SuppressWarnings("unused")
 	@Deprecated
 	private void createDenverIndividual(final int HOME_END_TIME) {
 		int currentId = 1;
@@ -230,7 +307,7 @@ public class Plansgenerator {
 	}
 
 	/**
-	 * customized algorithm: automatically fills routes with agents, main parts by dgrether
+	 * customized algorithm: automatically fills routes with agents, main parts of adding agents by dgrether
 	 * start time of each agent is randomized, but between start_time and (start_time + duration)
 	 * @param HOME_LINK
 	 * @param TARGET_LINK
@@ -245,13 +322,14 @@ public class Plansgenerator {
 		int homeEndtime = 0;
 		final Link start = network.getLinks().get(new IdImpl(HOME_LINK));
 		final Link target = network.getLinks().get(new IdImpl(TARGET_LINK));
-		final int visPlaces = 3000; //better visualization of start and target
+		final int visPlaces = 2000; //better visualization of start and target
 		final Coord startCoord = start.getToNode().getCoord();
 		final Coord targetCoord = target.getFromNode().getCoord();
 		final Coord homeCoord = new CoordImpl(startCoord.getX()-visPlaces,startCoord.getY()+visPlaces);
 		final Coord workCoord = new CoordImpl(targetCoord.getX()+visPlaces,targetCoord.getY()-visPlaces);
 
-		final int AMOUNT_OF_CARS = CARS_PER_HOUR * DURATION / 3600;
+		final int AMOUNT_OF_CARS = (int)((CARS_PER_HOUR * DURATION * 1.0) / 3600);
+//		System.out.println("start: "+start.getId()+" zielLink: "+target.getId()+" cars: "+AMOUNT_OF_CARS+ "c/h: "+CARS_PER_HOUR+" dur: "+((DURATION*1.0)/3600));
 		final int MAX_ID = CURRENT_ID+1 + AMOUNT_OF_CARS;
 
 		for (int i = CURRENT_ID+1; i <= MAX_ID; i++) {

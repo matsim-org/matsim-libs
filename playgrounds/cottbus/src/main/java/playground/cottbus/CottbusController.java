@@ -21,7 +21,7 @@ package playground.cottbus;
 
 /**
  * @author 	rschneid-btu
- * [based on tutorial.example7]
+ * start-up for our scenarios
  */
 
 import org.matsim.api.core.v01.Scenario;
@@ -29,13 +29,17 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.netvis.NetVis;
+//import org.matsim.vis.netvis.NetVis;
 import org.matsim.vis.otfvis.OTFVisQSim;
 
 public class CottbusController {
 	
-	public static void main (String[] args) {	
-		String config = "./input/denver/config.xml";
+	public static void main (String[] args) {
+//		String scenario = "cottbus";
+		String scenario = "denver";
+//		String scenario = "portland";
+						
+		String config = "./input/"+scenario+"/config.xml";
 		// configuration that describes current scenario
 		
 		Controler controler = new Controler(config);
@@ -48,7 +52,7 @@ public class CottbusController {
 		//String[] visargs = {"output/denver/ITERS/it.0/Snapshot"};
 		//NetVis.main(visargs);
 		
-		// changed NetVis to OTFVis
+		// visualization via OTFVis
 		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(config);
 		Scenario sc = scl.loadScenario();
 		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
