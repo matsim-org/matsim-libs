@@ -111,9 +111,9 @@ public class MyRuns {
 	 */
 	void doSUEStudySensitivityAnalysis(final String[] args) {
 		
-		final double[] VARY_BETA = new double[]{0.1, 1.0, 2.0, 4.0, 10.0, Double.MAX_VALUE};
-		final double[] VARY_LEARNING_RATE = new double[]{0.1, 1.0};
-		final String[] VARY_TIME_MODULE = new String[]{"Planomat", "TimeAllocationMutator"};
+		final double[] VARY_BETA = new double[]{2.0, 0.1, 1.0, 4.0, 10.0, Double.MAX_VALUE};
+		final double[] VARY_LEARNING_RATE = new double[]{1.0, 0.1};
+		final String[] VARY_TIME_MODULE = new String[]{"TimeAllocationMutator", "Planomat"};
 		final String OUTPUT_PARENT_DIRECTORY_NAME = "sueStudy";
 		
 		for (double beta : VARY_BETA) {
