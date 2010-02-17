@@ -131,7 +131,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double uMax_innerHome = 1.63; 
 	private static final double uMax_work= 3.67;  
 	private static final double uMax_education = 3.60;
-	private static final double uMax_shopping = 2.09; 
+	private static final double uMax_shopping = 0.7; 
 	private static final double uMax_leisure = 2.34;  
 	
 	private static final double alpha_home = 12;
