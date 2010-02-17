@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.lanes.Lane;
 import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
@@ -512,7 +511,7 @@ public class QLinkLanesImpl implements QLink {
 
 			int cnt = parkedVehicles.size();
 			if (cnt > 0) {
-				String snapshotStyle = Gbl.getConfig().getQSimConfigGroup().getSnapshotStyle();
+				String snapshotStyle = queueNetwork.getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
 //				int nLanes = Math.round((float)Math.max(getLink().getNumberOfLanes(Time.UNDEFINED_TIME),1.0d));
 
 				double cellSize = 7.5;
