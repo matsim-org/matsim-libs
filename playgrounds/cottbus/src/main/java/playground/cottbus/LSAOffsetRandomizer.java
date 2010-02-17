@@ -3,7 +3,7 @@ package playground.cottbus;
 /**
  * @author 	rschneid-btu
  * generates some Signal System Configs for a given Config with randomized Offsets for each Crossing
- * IMPORTANT: given Config has to be in a certain way (exactly 2 Comments surround one crossing!)
+ * IMPORTANT: given Config has to be in a certain way (exactly 2 Comments surrounding one crossing!)
  * 			  (this issue could be fixed in the future, maybe with cross-referring to the other config files...)
  */
 
@@ -23,7 +23,7 @@ import org.xml.sax.SAXNotSupportedException;
 public class LSAOffsetRandomizer {
 	
 	final static String OUTPUT_PATH = "./input/denver/random/"; // output path
-	final static String signalSystemConfig = "./input/denver/signalSystemsConfigT60.xml"; // input
+	final static String SIGNAL_SYSTEMS_CONFIG = "./input/denver/signalSystemsConfigT60.xml"; // input
 	final static short amountOfRandomizedSignalPlans = 20; // how many plans to generate? (with enumerated output)
 
 	/**
@@ -42,60 +42,68 @@ public class LSAOffsetRandomizer {
 		}
 
 		try {
-		    parser.parse(signalSystemConfig);
+		    parser.parse(SIGNAL_SYSTEMS_CONFIG);
 		    Document document = parser.getDocument();
 		    
-		    traverse (document);
+		    buildRandomizedSignalSystemConfigs (document);
 		} catch (SAXException e) {
 		    System.err.println (e);
 		} catch (IOException e) {
 		    System.err.println (e);
 		}
 
-		
     }
 
-	private static void traverse (Document doc) {
-		// parameter
-		NodeList cycleTimeNode = doc.getElementsByTagName("cycleTime");
-		int cycleTime = Integer.valueOf(cycleTimeNode.item(0).getAttributes().item(0).getNodeValue()).intValue();
-//		System.out.println(cycleTime);
-		NodeList children = doc.getElementsByTagName("signalSystemPlan").item(0).getChildNodes();
+	/**
+	 * @param doc	the DOM of the signalSystemConfig
+	 */
+	private static void buildRandomizedSignalSystemConfigs (Document doc) {
+		int cycleTime = 0;
+		try {
+			NodeList cycleTimeNode = doc.getElementsByTagName("cycleTime");
+			cycleTime = Integer.valueOf(cycleTimeNode.item(0).getAttributes().item(0).getNodeValue()).intValue();
+		} catch(Exception e) {
+			System.err.println("ERR LSAOffsetRandomizer: CycleTime not found in "+SIGNAL_SYSTEMS_CONFIG+".\n"+e);
+		}
+		NodeList signalSystemPlanChildren = doc.getElementsByTagName("signalSystemPlan").item(0).getChildNodes();
 		
 		for(int j=1; j<=amountOfRandomizedSignalPlans; j++) {
 			try {
-				int offsetDiff = (int)Math.floor(Math.random()*cycleTime);;
+				int offsetDiff = (int)Math.floor(Math.random()*cycleTime); // difference to old offset
 				short countComment = 0;
-				for (int i=0; i< children.getLength(); i++) {
-					Node child = children.item(i);
-					// Annahme: aufeinander folgende SignalGroups gehören zu einer Kreuzung!
-					// Trennung: 2 hintereinander folgende Kommentare 
+				for (int i=0; i< signalSystemPlanChildren.getLength(); i++) {
+					Node child = signalSystemPlanChildren.item(i);
+					// assuming: consecutive SignalGroups belong to one crossing!
+					// how to isolate crossings: 2 comments with no signalGroup in between
 					if (child.getNodeType() == Node.COMMENT_NODE) {
 						countComment++;
 						if (countComment == 2) {
-							// zwei Comments => neue Kreuzung => neuer random Offset
+							// two comments = new crossing => new random offset
 							offsetDiff = (int)Math.floor(Math.random()*cycleTime);
 							countComment = 0;
 						}
 					}
 					if (child.getNodeName().equals("signalGroupSettings")) {
-						countComment = 0;
+						countComment = 0; // reset
 						randomizeSignalGroup(child,offsetDiff,cycleTime);
 					}
-					
-				}
+				} //for
 				System.out.println("INFO Randomizing #"+j+" succesful.");
 			} catch(Exception e) {
-				System.err.println("ERR LSAOffsetRandomizer: randomizing failed.\n"+e);
-				//System.exit(0);
+				System.err.println("ERR Randomizing signalSystemsConfig failed.\n"+e);
 			}
-			
 			printToFile(doc,OUTPUT_PATH+"signalsystemsconfigT"+cycleTime+"random"+j+".xml");	
-			
-		}
-		
+		} //for
 	}
 	
+	
+	/**
+	 * randomizes one Signal Group with specified offset
+	 * 
+	 * @param signalGroup	the signalGroup to be randomized
+	 * @param offset		difference to old offset
+	 * @param cycleTime		cycleTime (needed if overflow)
+	 */
 	private static void randomizeSignalGroup(Node signalGroup,int offset,int cycleTime) {
 		NodeList children = signalGroup.getChildNodes();
 		
@@ -110,11 +118,16 @@ public class LSAOffsetRandomizer {
 				}
 				sec.setNodeValue(Integer.toString(newTime));
 			}
-		}
-		
+		} //for
 	}
 
 	
+	/**
+	 * generates the XML-file or shows the XML on the console
+	 * 
+	 * @param doc			contains the DOM tree of signalSystemsConfig
+	 * @param OUTPUT_PATH	specifies the output path of XML-file
+	 */
 	private static void printToFile(Document doc,final String OUTPUT_PATH) {
 		try {
 			//print
