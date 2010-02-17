@@ -35,7 +35,6 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
@@ -71,12 +70,13 @@ public class QueryAgentId extends AbstractQuery {
 	}
 
 
-	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	@Override
+  public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.result = new Result();
 		double minDist = Double.POSITIVE_INFINITY;
 		double dist = 0;
 		for(QLink qlink : queueSimulation.getQueueSimulation().getNetwork().getLinks().values()) {
-			List<PositionInfo> positions = new LinkedList<PositionInfo>();
+			List<AgentSnapshotInfo> positions = new LinkedList<AgentSnapshotInfo>();
 			qlink.getVisData().getVehiclePositions(QSimTimer.getTime(), positions);
 			for(AgentSnapshotInfo info : positions) {
 				if ((info.getAgentState()== AgentState.PERSON_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
@@ -102,11 +102,13 @@ public class QueryAgentId extends AbstractQuery {
 
 
 
-	public Type getType() {
+	@Override
+  public Type getType() {
 		return OTFQuery.Type.OTHER;
 	}
 
-	public void setId(String id) {
+	@Override
+  public void setId(String id) {
 	}
 
 	@Override

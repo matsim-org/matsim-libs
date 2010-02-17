@@ -69,7 +69,7 @@ import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 
 /**
@@ -426,10 +426,10 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	private void doSnapshot(final double time) {
 		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
-			Collection<PositionInfo> positions = this.network.getVehiclePositions(time);
+			Collection<AgentSnapshotInfo> positions = this.network.getVehiclePositions(time);
 			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
 				writer.beginSnapshot(time);
-				for (PositionInfo position : positions) {
+				for (AgentSnapshotInfo position : positions) {
 					writer.addAgent(position);
 				}
 				writer.endSnapshot();
@@ -521,7 +521,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			queueSimulationFeature.afterActivityBegins(agent, planElementIndex);
 		}
 	}
-
+	
 	private void addToAgentsInActivities(final DriverAgent agent) {
 		if (agent instanceof PersonAgent) {
 			PersonAgent pa = (PersonAgent) agent;
@@ -551,7 +551,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			}
 		}
 	}
-
+	
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
 			DriverAgent agent = this.activityEndsList.peek();
@@ -687,5 +687,5 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public double getTimeOfDay() {
 		return QSimTimer.getTime() ;
 	}
-
+	
 }

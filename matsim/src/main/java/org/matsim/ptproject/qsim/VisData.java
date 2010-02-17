@@ -21,7 +21,7 @@ package org.matsim.ptproject.qsim;
 
 import java.util.Collection;
 
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 /**
  * Interface for methods to provide a visualizer with data.
  * @author dgrether
@@ -43,8 +43,8 @@ public interface VisData {
 	 */
 	public double getDisplayableTimeCapValue(double time);
 
-	public Collection<PositionInfo> getVehiclePositions(double time, 
-			final Collection<PositionInfo> positions);
+	public Collection<AgentSnapshotInfo> getVehiclePositions(double time, 
+			final Collection<AgentSnapshotInfo> positions);
 
 /* I don't think these two methods should be part of the interface!
  * Only getVehiclePositions() should be in the interface, how the

@@ -37,6 +37,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.lanes.Lane;
 import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -502,7 +503,7 @@ public class QLinkLanesImpl implements QLink {
 			return originalLane.visdata.getDisplayableTimeCapValue(time);
 		}
 
-		public Collection<PositionInfo> getVehiclePositions(double time, final Collection<PositionInfo> positions) {
+		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
 //			log.warn( " entering getVehiclePositions ") ;
 			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 				lane.visdata.getVehiclePositions(time, positions);

@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 /**
  * QueueNetwork is responsible for creating the QueueLinks and QueueNodes.
@@ -88,8 +88,8 @@ public class QNetwork {
 	 * Called whenever this object should dump a snapshot
 	 * @return A collection with the current positions of all vehicles.
 	 */
-	public Collection<PositionInfo> getVehiclePositions(double time) {
-		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
+	public Collection<AgentSnapshotInfo> getVehiclePositions(double time) {
+		Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 		for (QLink link : this.links.values()) {
 			link.getVisData().getVehiclePositions(time, positions);
 		}

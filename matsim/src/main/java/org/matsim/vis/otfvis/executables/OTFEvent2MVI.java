@@ -32,7 +32,6 @@ import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManager
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
  * This is a standalone executable class for converting a event-file to a .mvi file.
@@ -75,7 +74,7 @@ public class OTFEvent2MVI extends OTFFileWriter {
 	}
 
 	@Override
-	public void addAgent(PositionInfo position) {
+	public void addAgent(AgentSnapshotInfo position) {
 		//drop all parking vehicles
 		if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) return;
 

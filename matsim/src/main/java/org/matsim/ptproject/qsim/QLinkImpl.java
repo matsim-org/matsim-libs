@@ -602,7 +602,7 @@ public class QLinkImpl implements QLink {
 			return count * 2.0 / QLinkImpl.this.storageCapacity;
 		}
 
-		public Collection<PositionInfo> getVehiclePositions(double time, final Collection<PositionInfo> positions) {
+		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
 			if ( getVehPosCnt < 1 ) {
 				getVehPosCnt++ ;
 			}
@@ -668,7 +668,7 @@ public class QLinkImpl implements QLink {
 		 * @param positions
 		 *          A collection where the calculated positions can be stored.
 		 */
-		private void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
+		private void getVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions) {
 			double time = QSimTimer.getTime();
 			int cnt = QLinkImpl.this.buffer.size() + QLinkImpl.this.vehQueue.size();
 			int nLanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QLinkImpl.this.getLink());
@@ -737,7 +737,7 @@ public class QLinkImpl implements QLink {
 		 * @param positions
 		 *          A collection where the calculated positions can be stored.
 		 */
-		private void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
+		private void getVehiclePositionsQueue(final Collection<AgentSnapshotInfo> positions) {
 			double now = QSimTimer.getTime();
 			Link link = QLinkImpl.this.getLink();
 			double queueEnd = getInitialQueueEnd();
@@ -767,7 +767,7 @@ public class QLinkImpl implements QLink {
 		 *  put all cars in the buffer one after the other
 		 */
 		private double positionVehiclesFromBuffer(
-				final Collection<PositionInfo> positions, double now,
+				final Collection<AgentSnapshotInfo> positions, double now,
 				double queueEnd, Link link, double vehLen) {
 			for (QVehicle veh : QLinkImpl.this.buffer) {
 
@@ -802,7 +802,7 @@ public class QLinkImpl implements QLink {
 	 * - if the position is not within the queue, just place the car  with free speed at that place
 	 */
 	private void positionOtherDrivingVehicles(
-			final Collection<PositionInfo> positions, double now,
+			final Collection<AgentSnapshotInfo> positions, double now,
 			double queueEnd, Link link, double vehLen) {
 		double lastDistance = Integer.MAX_VALUE;
 		double ttfs = link.getLength() / link.getFreespeed(now);
@@ -878,7 +878,7 @@ public class QLinkImpl implements QLink {
 	 * the from node
 	 */
 	private int positionVehiclesFromWaitingList(
-			final Collection<PositionInfo> positions, Link link,
+			final Collection<AgentSnapshotInfo> positions, Link link,
 			double cellSize) {
 		int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
 		for (QVehicle veh : QLinkImpl.this.waitingList) {

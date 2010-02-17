@@ -60,7 +60,7 @@ public class TransimsSnapshotWriter implements SnapshotWriter {
 		}
 	}
 	
-	public void addAgent(PositionInfo position) {
+	public void addAgent(AgentSnapshotInfo position) {
 		
 		//drop all parking vehicles 
 		if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) return;

@@ -714,25 +714,8 @@ public class QLane {
 		}
 
 
-
-		public Collection<AgentOnLink> getDrawableCollection(double time) {
-			Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
-			getVehiclePositions(time, positions);
-
-			List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
-			for (PositionInfo pos : positions) {
-				if (pos.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR) {
-					AgentOnLink veh = new AgentOnLink();
-					veh.posInLink_m = pos.getDistanceOnLink();
-					vehs.add(veh);
-				}
-			}
-
-			return vehs;
-		}
-
-		public Collection<PositionInfo> getVehiclePositions(double time, 
-				final Collection<PositionInfo> positions) {
+		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, 
+				final Collection<AgentSnapshotInfo> positions) {
 //			log.warn( " entering getVehiclePositions ") ;
 
 			String snapshotStyle = Gbl.getConfig().getQSimConfigGroup().getSnapshotStyle();
@@ -756,7 +739,7 @@ public class QLane {
 		 * @param positions
 		 *          A collection where the calculated positions can be stored.
 		 */
-		private void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
+		private void getVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions) {
 			double time = QSimTimer.getTime();
 			int cnt = QLane.this.buffer.size() + QLane.this.vehQueue.size();
 			int nLanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QLane.this.queueLink.getLink());
@@ -825,7 +808,7 @@ public class QLane {
 		 * @param positions
 		 *          A collection where the calculated positions can be stored.
 		 */
-		private void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
+		private void getVehiclePositionsQueue(final Collection<AgentSnapshotInfo> positions) {
 			double now = QSimTimer.getTime();
 			Link link = QLane.this.queueLink.getLink();
 			double queueEnd = getInitialQueueEnd();
@@ -849,7 +832,7 @@ public class QLane {
 		private double getInitialQueueEnd() {
 			double queueEnd = QLane.this.queueLink.getLink().getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
 			if ((QLane.this.signalGroups != null) ){ 
-				queueEnd -= 35.0;
+				queueEnd -= 20.0;
 			}
 			return queueEnd;
 		}
@@ -858,7 +841,7 @@ public class QLane {
 		 *  put all cars in the buffer one after the other
 		 */
 		private double positionVehiclesFromBuffer(
-				final Collection<PositionInfo> positions, double now,
+				final Collection<AgentSnapshotInfo> positions, double now,
 				double queueEnd, Link link, double vehLen) {
 			for (QVehicle veh : QLane.this.buffer) {
 				
@@ -885,7 +868,7 @@ public class QLane {
 		 * - if the position is not within the queue, just place the car 	with free speed at that place
 		 */
 		private void positionOtherDrivingVehicles(
-				final Collection<PositionInfo> positions, double now,
+				final Collection<AgentSnapshotInfo> positions, double now,
 				double queueEnd, Link link, double vehLen) {
 			double lastDistance = Integer.MAX_VALUE;
 			double ttfs = link.getLength() / link.getFreespeed(now);
@@ -950,7 +933,7 @@ public class QLane {
 		 * the from node
 		 */
 		private int positionVehiclesFromWaitingList(
-				final Collection<PositionInfo> positions, Link link,
+				final Collection<AgentSnapshotInfo> positions, Link link,
 				double cellSize) {
 			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
 			for (QVehicle veh : QLane.this.waitingList) {

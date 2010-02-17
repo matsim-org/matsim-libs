@@ -118,7 +118,7 @@ public class TransitQLaneFeature {
 	 * Put the transit vehicles from the transit stop list in positions.
 	 */
 	public void positionVehiclesFromTransitStop(
-			final Collection<PositionInfo> positions, double cellSize,
+			final Collection<AgentSnapshotInfo> positions, double cellSize,
 			int lane) {
 		if (this.transitVehicleStopQueue.size() > 0) {
 			lane++; // place them one lane further away

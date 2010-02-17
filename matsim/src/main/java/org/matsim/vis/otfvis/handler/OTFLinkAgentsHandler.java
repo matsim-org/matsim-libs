@@ -65,7 +65,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 		private static final long serialVersionUID = -7916541567386865404L;
 
-		protected static final transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
+		protected static final transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 
 		protected void writeAllAgents(ByteBuffer out) {
 			// Write additional agent data

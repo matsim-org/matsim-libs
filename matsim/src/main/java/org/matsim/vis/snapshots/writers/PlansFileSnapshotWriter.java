@@ -74,12 +74,12 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 		new PopulationWriter(this.plans, this.network).writeFile(this.filename);
 	}
 
-	public void addAgent(final PositionInfo position) {
+	public void addAgent(final AgentSnapshotInfo position) {
 		PersonImpl pers = new PersonImpl(position.getId());
 
 		PlanImpl plan = new PlanImpl(pers);
 		ActivityImpl actA = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(position.getEasting(), position.getNorthing()),
-				position.getLink().getId());
+				((PositionInfo)position).getLink().getId());
 		actA.setEndTime(this.currenttime);
 		plan.addActivity(actA);
 		pers.addPlan(plan);

@@ -34,7 +34,7 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFServerQuadBuilder;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 /**
  * The OTF has a file Reader and a file Writer part.
@@ -171,7 +171,7 @@ public class OTFFileWriter implements SnapshotWriter {
 		}
 	}
 
-	public void addAgent(final PositionInfo position) {
+	public void addAgent(final AgentSnapshotInfo position) {
 		// Do nothing
 	}
 

@@ -50,7 +50,7 @@ public interface SnapshotWriter {
 		 *
 		 * @param position The position, id, and speed of the agent.
 		 */
-		public void addAgent(PositionInfo position);
+		public void addAgent(AgentSnapshotInfo position);
 
 		/**
 		 * Tells the snapshot writer that no more snapshots will be added ("destructor").

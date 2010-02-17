@@ -480,7 +480,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		}
 
 		/* implementation of SnapshotWriter */
-		public void addAgent(final PositionInfo position) {
+		public void addAgent(final AgentSnapshotInfo position) {
 		}
 
 		public void beginSnapshot(final double time) {
