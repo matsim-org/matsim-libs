@@ -212,7 +212,7 @@ public class TransitControler extends Controler {
 
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			int iter = event.getIteration();
-			if (iter % 10 == 0) {
+			if (iter % 10 == 0&& iter > event.getControler().getFirstIteration()) {
 				occupancyAnalyzer.reset(iter);
 				event.getControler().getEvents().addHandler(occupancyAnalyzer);
 			}
@@ -221,7 +221,6 @@ public class TransitControler extends Controler {
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			int it = event.getIteration();
 			if (it % 10 == 0 && it > event.getControler().getFirstIteration()) {
-				// TODO transfer oa 2 countscompare
 				event.getControler().getEvents().removeHandler(occupancyAnalyzer);
 				occupancyAnalyzer.write(event.getControler().getControlerIO()
 						.getIterationFilename(it, "occupancyAnalysis.txt"));
