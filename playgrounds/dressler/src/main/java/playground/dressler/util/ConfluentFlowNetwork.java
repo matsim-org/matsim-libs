@@ -27,6 +27,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
@@ -235,6 +236,22 @@ public class ConfluentFlowNetwork {
 		}
 		
 		demands.put(sink, -1);
+		
+		// TODO HACK, REMOVE ME
+		/*int verticestokeep = 300;
+		int count = 0;
+		LinkedList<Node> todelete = new LinkedList<Node>();
+		for (Node node : network.getNodes().values()) {
+			count += 1;
+			if (count > verticestokeep) {
+				if (node != sink)
+				  todelete.add(node); 
+			}
+		}
+		
+		for (Node node : todelete) {
+			network.removeNode(node);
+		}*/
 		
 		writeCFdata (outputfile_forCF, network, demands);
 		
