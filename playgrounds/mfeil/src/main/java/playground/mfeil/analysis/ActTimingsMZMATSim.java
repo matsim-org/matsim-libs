@@ -104,48 +104,65 @@ public class ActTimingsMZMATSim {
 			if (personsWeights!=null) weight = personsWeights.get(person.getId());
 			else weight = 1;
 			
+			double duration = 0;
+			
 			Plan plan = person.getSelectedPlan();
 			for (int i=0;i<plan.getPlanElements().size();i+=2){
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
-				if (i==0) { // first home act
-					if (act.getEndTime()!=Time.UNDEFINED_TIME){
-						endHome += weight*act.getEndTime(); 
-						counterHome+=weight;
-					//	if (name.equals("MZ_weighted")) stream.println(weight+"\t"+act.getEndTime());
-					}
-					else log.warn("The end time of person's "+person.getId()+" fist home act is undefined!");
-				}
-				else if (i==plan.getPlanElements().size()-1) { // last home act
-					if (act.getStartTime()!=Time.UNDEFINED_TIME){
-						startHome += weight*act.getStartTime(); 
-					//	if (name.equals("MZ_weighted")) stream.println(weight+"\t"+act.getStartTime());
-					}
-					else log.warn("The start time of person's "+person.getId()+" last home act is undefined!");
+				if (plan.getPlanElements().size()==1){
+				//	log.info("Person "+person.getId()+" has only one home act.");
+					endHome += weight*86400.0/2.0; // assume one home activity, starting and ending at noon
+					startHome += weight*86400.0/2.0;
+					duration += 86400;
+					counterHome+=weight;
 				}
 				else {
-					if (act.getType().startsWith("h")) {
-						durationInnerHome+=weight*act.calculateDuration();
-						counterInnerHome+=weight;
+					if (i==0) { // first home act
+						if (act.getEndTime()!=Time.UNDEFINED_TIME){
+							endHome += weight*act.getEndTime(); 
+							duration += act.getEndTime();
+							counterHome+=weight;
+						}
+						else log.warn("The end time of person's "+person.getId()+" fist home act is undefined!");
 					}
-					else if (act.getType().startsWith("w")) {
-						durationWork+=weight*act.calculateDuration();
-						counterWork+=weight;
+					else if (i==plan.getPlanElements().size()-1) { // last home act
+						if (act.getStartTime()!=Time.UNDEFINED_TIME){
+							startHome += weight*act.getStartTime(); 
+							duration += (86400-act.getStartTime());
+						}
+						else log.warn("The start time of person's "+person.getId()+" last home act is undefined!");
 					}
-					else if (act.getType().startsWith("e")) {
-						durationEducation+=weight*act.calculateDuration();
-						counterEducation+=weight;
+					else {
+						if (act.getType().startsWith("h")) {
+							durationInnerHome+=weight*act.calculateDuration();
+							duration += act.calculateDuration();
+							counterInnerHome+=weight;
+						}
+						else if (act.getType().startsWith("w")) {
+							durationWork+=weight*act.calculateDuration();
+							duration += act.calculateDuration();
+							counterWork+=weight;
+						}
+						else if (act.getType().startsWith("e")) {
+							durationEducation+=weight*act.calculateDuration();
+							duration += act.calculateDuration();
+							counterEducation+=weight;
+						}
+						else if (act.getType().startsWith("l")) {
+							durationLeisure+=weight*act.calculateDuration();
+							duration += act.calculateDuration();
+							counterLeisure+=weight;
+						}
+						else if (act.getType().startsWith("s")) {
+							durationShop+=weight*act.calculateDuration();
+							duration += act.calculateDuration();
+							counterShop+=weight;
+						}
+						else log.warn("Unknown act type in person's "+person.getId()+" plan at position "+i+"!");
 					}
-					else if (act.getType().startsWith("l")) {
-						durationLeisure+=weight*act.calculateDuration();
-						counterLeisure+=weight;
-					}
-					else if (act.getType().startsWith("s")) {
-						durationShop+=weight*act.calculateDuration();
-						counterShop+=weight;
-					}
-					else log.warn("Unknown act type in person's "+person.getId()+" plan at position "+i+"!");
 				}
 			}
+		//	if (name.equals("MZ_weighted")) stream.println(person.getId()+"\t"+duration);
 		}
 		stream.print(name+"\t");
 		stream.print(Time.writeTime(endHome/counterHome)+"\t"+Time.writeTime(startHome/counterHome)+"\t"+1+"\t");

@@ -56,7 +56,7 @@ import playground.mfeil.ActChainEqualityCheck;
  */
 public class ASPGeneral {
 	
-	private static final Logger log = Logger.getLogger(ASPActivityChains.class);
+	private static final Logger log = Logger.getLogger(ASPGeneral.class);
 	private ArrayList<List<PlanElement>> activityChainsMATSim;
 	private ArrayList<ArrayList<Plan>> plansMATSim;
 	private ArrayList<List<PlanElement>> activityChainsMZ;
@@ -281,7 +281,7 @@ public class ASPGeneral {
 		
 		// Population files
 		final String populationFilenameMATSim = "/home/baug/mfeil/data/runs/run0922_initialdemand_20/output_plans.xml";
-		final String populationFilenameMZ = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
+		final String populationFilenameMZ = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
 		
 		// Output file
 		final String outputFile = "/home/baug/mfeil/data/runs/run0922_initialdemand_20/analysis.xls";	

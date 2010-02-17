@@ -36,6 +36,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.misc.Time;
 
 import playground.mfeil.attributes.AgentsAttributesAdder;
 
@@ -93,6 +94,7 @@ public class TravelStatsMZMATSim {
 		double counterPT = 0;
 		double counterWalk = 0;
 		double counterBike = 0;
+		double counterAll = 0;
 		
 		stream.print(name+"\t");
 		
@@ -101,6 +103,9 @@ public class TravelStatsMZMATSim {
 			double weight = -1;
 			if (personsWeights!=null) weight = personsWeights.get(person.getId());
 			else weight = 1;
+			counterAll += weight;
+			
+			double duration = 0;
 			
 			Plan plan = person.getSelectedPlan();
 			for (int i=1;i<plan.getPlanElements().size();i+=2){
@@ -109,30 +114,38 @@ public class TravelStatsMZMATSim {
 					if (leg.getRoute()!=null) aveTripDistanceCarPop1 += weight*leg.getRoute().getDistance();
 					else log.warn("A car leg of person "+person.getId()+" has no route!");
 					aveTripTimeCarPop1 += weight*leg.getTravelTime();
+					duration += leg.getTravelTime();
+					if (person.getId().toString().equals("114951")) log.info("car leg mit weight "+weight+" und tt "+Time.writeTime(leg.getTravelTime()));
 					counterCar+=weight;
 				}
 				else if (leg.getMode().equals(TransportMode.pt)) {
 					if (leg.getRoute()!=null) aveTripDistancePTPop1 += weight*leg.getRoute().getDistance();
 					else log.warn("A pt leg of person "+person.getId()+" has no route!");
 					aveTripTimePTPop1 += weight*leg.getTravelTime();
+					duration += leg.getTravelTime();
+					if (person.getId().toString().equals("114951")) log.info("pt leg mit weight "+weight+" und tt "+Time.writeTime(leg.getTravelTime()));
 					counterPT+=weight;
 				}
 				else if (leg.getMode().equals(TransportMode.walk)) {
 					if (leg.getRoute()!=null) aveTripDistanceWalkPop1 += weight*leg.getRoute().getDistance();
 					else log.warn("A walk leg of person "+person.getId()+" has no route!");
 					aveTripTimeWalkPop1 += weight*leg.getTravelTime();
+					duration += leg.getTravelTime();
+					if (person.getId().toString().equals("114951")) log.info("bike leg mit weight "+weight+" und tt "+Time.writeTime(leg.getTravelTime()));
 					counterWalk+=weight;
 				}
 				else if (leg.getMode().equals(TransportMode.bike)) {
 					if (leg.getRoute()!=null) aveTripDistanceBikePop1 += weight*leg.getRoute().getDistance();
 					else log.warn("A bike leg of person "+person.getId()+" has no route!");
 					aveTripTimeBikePop1 += weight*leg.getTravelTime();
+					duration += leg.getTravelTime();
+					if (person.getId().toString().equals("114951")) log.info("walk leg mit weight "+weight+" und tt "+Time.writeTime(leg.getTravelTime()));
 					counterBike+=weight;
 				}
 				else log.warn("Undefined transport mode for person "+plan.getPerson().getId()+": "+leg.getMode());
-			}		
+			}
+		//	if (name.equals("MZ_weighted")) stream.println(person.getId()+"\t"+duration);
 		}
-		double counterAll = counterCar+counterPT+counterWalk+counterBike;
 		stream.print(aveTripDistanceCarPop1/counterCar+"\t");
 		stream.print(aveTripDistancePTPop1/counterPT+"\t");
 		stream.print(aveTripDistanceWalkPop1/counterWalk+"\t");
