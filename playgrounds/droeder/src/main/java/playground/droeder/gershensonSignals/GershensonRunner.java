@@ -52,7 +52,7 @@ public class GershensonRunner {
 	private Map<Id, List<Id>> compGroups;
 	
 	// "D" run denver -- "G" run gershensonTestNetwork
-	private static final String config = "G";
+	private static final String config = "D";
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 
@@ -96,7 +96,7 @@ public class GershensonRunner {
 				corrGroups = csg.calculateCorrespondingGroups(groups, controler.getNetwork());
 				compGroups = csg.calculateCompetingGroups(corrGroups, groups, controler.getNetwork());
 				//enable visualization
-				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 			}
 			
 		}
@@ -113,7 +113,7 @@ public class GershensonRunner {
 					(GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				adaptiveController.setCorrGroups(corrGroups);
 				adaptiveController.setCompGroups(compGroups);
-				adaptiveController.init(controler.getNetwork(), controler.getPopulation());
+				adaptiveController.init(controler.getScenario().getSignalSystems().getSignalGroupDefinitions(), controler.getNetwork());
 				
 				controler.getEvents().addHandler(adaptiveController);
 			}

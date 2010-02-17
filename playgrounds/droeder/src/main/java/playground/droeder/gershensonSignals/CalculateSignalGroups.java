@@ -52,13 +52,15 @@ public class CalculateSignalGroups{
 				corrGroups.put(sd.getId(), null);
 			}else{
 				l = calculateLink(l);
-				//compare which Signalgroup fits to the calculated Link
-				for(SignalGroupDefinition sd2 : groups.values()){
-					if(sd2.getLinkRefId().equals(l.getId())){
-						corrGroups.put(sd.getId(), sd2.getId());
-					}else {
-						corrGroups.put(sd.getId(), null);
+				if (!(l == null)){
+					//compare which Signalgroup fits to the calculated Link
+					for(SignalGroupDefinition sd2 : groups.values()){
+						if(sd2.getLinkRefId().equals(l.getId())){
+							corrGroups.put(sd.getId(), sd2.getId());
+						}
 					}
+				}else{
+					corrGroups.put(sd.getId(), null);
 				}
 			}
 		}		
