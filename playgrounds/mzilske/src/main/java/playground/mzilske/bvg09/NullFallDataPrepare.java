@@ -96,8 +96,16 @@ public class NullFallDataPrepare {
 		for (VisumNetwork.Node visumNode : vNetwork.nodes.values()) {
 			network.createAndAddNode(visumNode.id, visumNode.coord);
 		}
+	
 		for (VisumNetwork.Edge visumEdge : vNetwork.edges.values()) {
-			network.createAndAddLink(visumEdge.id, network.getNodes().get(visumEdge.fromNode), network.getNodes().get(visumEdge.toNode), visumEdge.length * 1000, 14, 2000, 1);
+			float freespeed;
+			if (visumEdge.tValues.size() == 1) {
+				freespeed = visumEdge.tValues.get(0);
+			} else {
+				// Mehr als einer dieser Werte gesetzt.
+				throw new RuntimeException(visumEdge.tValues.toString());
+			}
+			network.createAndAddLink(visumEdge.id, network.getNodes().get(visumEdge.fromNode), network.getNodes().get(visumEdge.toNode), visumEdge.length * 1000, freespeed, 2000, 1);
 		}
 	}
 

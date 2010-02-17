@@ -277,17 +277,17 @@ public class GeneratePopulation {
 			return TransportMode.bike;
 		} else if (hauptverkehrsmittel.equals("3")) {
 			// Mofa, Moped
-			return TransportMode.motorbike;
+			return TransportMode.car;
 		} else if (hauptverkehrsmittel.equals("4")) {
 			// Motorrad
-			return TransportMode.motorbike;
+			return TransportMode.car;
 		} else if (hauptverkehrsmittel.equals("5")) {
 			// Mitfahrer
-			return TransportMode.miv;
+			return TransportMode.ride;
 		} else if (hauptverkehrsmittel.equals("8")) {
 			// PT
 			// return TransportMode.pt;
-			return TransportMode.car;
+			return TransportMode.pt;
 		} else if (hauptverkehrsmittel.equals("6")) {
 			return TransportMode.car;
 		} else if (hauptverkehrsmittel.equals("7")) {
@@ -295,7 +295,7 @@ public class GeneratePopulation {
 			return TransportMode.car;
 		} else if (hauptverkehrsmittel.equals("9")) {
 			// Taxi
-			return TransportMode.miv;
+			return TransportMode.ride;
 		} else if (hauptverkehrsmittel.equals("10")) {
 			// Schiff, Bahn, Bus, Flugzeug
 			// return TransportMode.pt;
