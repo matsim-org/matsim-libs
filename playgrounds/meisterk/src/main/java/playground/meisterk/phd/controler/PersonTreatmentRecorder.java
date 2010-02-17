@@ -23,6 +23,9 @@ package playground.meisterk.phd.controler;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -88,19 +91,26 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		int memorySize = c.getConfig().strategy().getMaxAgentPlanMemorySize();
 
 		out.print("#iter");
+		
+		List<String> strategyNames = new ArrayList<String>();
 		for (PlanStrategy strategy : c.getStrategyManager().getStrategies()) {
+			strategyNames.add(strategy.toString());
+		}
+		Collections.sort(strategyNames);
+		
+		for (String strategyName : strategyNames) {
 			for (int rank=0; rank <= memorySize; rank++) {
 				out.print("\t");
-				out.print(strategy.toString() + Integer.toString(rank));
+				out.print(strategyName + Integer.toString(rank));
 			}
 		}
-		for (PlanStrategy strategy : c.getStrategyManager().getStrategies()) {
+		for (String strategyName : strategyNames) {
 			out.print("\t");
-			out.print(strategy.toString() + "_diff");
+			out.print(strategyName + "_diff");
 		}
-		for (PlanStrategy strategy : c.getStrategyManager().getStrategies()) {
+		for (String strategyName : strategyNames) {
 			out.print("\t");
-			out.print(strategy.toString() + "_satisfied");
+			out.print(strategyName + "_satisfied");
 		}
 		out.print("\t");
 		out.print("all_satisfied");
