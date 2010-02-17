@@ -43,9 +43,14 @@ public class NetworkCapacityReducer {
 		this.network = network;
 	}
 	
-	private void run (double factor, String output){
+	private void run (double factor, double absoluteDelta, String output){
 		for (LinkImpl link : this.network.getLinks().values()) {
-			link.setFreespeed(link.getFreespeed(0)*factor);
+	//		link.setFreespeed(link.getFreespeed(0)*factor);
+			if (link.getFreespeed(0)+absoluteDelta>0) link.setFreespeed(link.getFreespeed(0)+absoluteDelta);
+			else {
+				log.warn("Cannot reduce speed of link "+link.getId()+" ("+link.getFreespeed(0)+") by delta of "+absoluteDelta+". Reducing speed by 10% instead.");
+				link.setFreespeed(link.getFreespeed(0)*0.9);
+			}
 		}
 		new NetworkWriter(this.network).writeFile(output);
 	}
@@ -56,10 +61,11 @@ public class NetworkCapacityReducer {
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		
 		// Output file
-		final String outputFile = "/home/baug/mfeil/data/Zurich10/network_0.33.xml";	
+		final String outputFile = "/home/baug/mfeil/data/Zurich10/network_-10.xml";	
 		
 		// Settings
-		final double factor = 0.5;
+		final double factor = 0.7;
+		final double absoluteDelta = -2.7778; // in m/s := -10km/h
 		
 	
 		
@@ -68,7 +74,7 @@ public class NetworkCapacityReducer {
 		new MatsimNetworkReader(scenarioMATSim).readFile(networkFilename);		
 		
 		NetworkCapacityReducer ncr = new NetworkCapacityReducer(scenarioMATSim.getNetwork());
-		ncr.run(factor, outputFile);
+		ncr.run(factor, absoluteDelta, outputFile);
 		
 		log.info("Reduction of network capacity finished.");
 	}
