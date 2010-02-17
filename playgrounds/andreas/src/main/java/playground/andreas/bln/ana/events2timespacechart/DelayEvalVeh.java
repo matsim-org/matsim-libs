@@ -95,6 +95,7 @@ public class DelayEvalVeh {
 	}
 
 	public static void main(String[] args) {
+//		DelayEvalVeh delayEval = new DelayEvalVeh("E:/_out/veh/");
 		DelayEvalVeh delayEval = new DelayEvalVeh("E:/_out/veh/", "d:/Berlin/BVG/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/stopareamap.txt");
 		delayEval.readNetwork("d:/Berlin/BVG/berlin-bvg09/pt/m4_demand/network_kl.xml");
 		delayEval.readTransitSchedule("d:/Berlin/BVG/berlin-bvg09/pt/m4_demand/transitSchedule_kl.xml");
