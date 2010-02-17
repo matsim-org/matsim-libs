@@ -54,4 +54,8 @@ public interface DgPaths {
   final String EXAMPLEBASE = STUDIESDG + "examples/";
   
   final String OUTDIR = WORKBASE + "matsimOutput/";
+
+  final String GERSHENSONINPUT = STUDIESDG + "gershenson/input/";
+
+  final String GERSHENSONOUTPUT = STUDIESDG + "gershenson/output/";
 }

@@ -80,8 +80,6 @@ public class DgOtfStarter {
 		
 		String filename = base + file;
 		
-		//really old otf shit
-//		filename = DgPaths.VSPCVSBASE + "runs/run493/99.T.mvi";
 		
 		//unit test for coopers withinday:
 //		String filename = "/Volumes/data/work/svnWorkspace/matsim/test/output/org/matsim/integration/withinday/CoopersBerlinIntegrationTest/testBerlinReducedSB/ITERS/it.0/0.otfvis.mvi";
@@ -104,6 +102,8 @@ public class DgOtfStarter {
 		
 //      filename = "/home/dgrether/shared-svn/studies/countries/de/prognose_2025/demand/0.otfvis.mvi";
 
+      //really old otf shit
+//    filename = DgPaths.VSPCVSBASE + "runs/run493/99.T.mvi";
 		
 		if (filename.endsWith(".veh.gz")) {
 			tVehStarter(filename, network);

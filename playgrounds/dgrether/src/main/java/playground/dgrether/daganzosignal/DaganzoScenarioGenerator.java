@@ -78,16 +78,16 @@ public class DaganzoScenarioGenerator {
 	public static final String NETWORKFILE =  DAGANZONETWORKFILE;
 
 	private static final String PLANS1OUT = DAGANZOBASEDIR
-			+ "daganzoPlansNormalRoute.xml";
+			+ "daganzo2PlansNormalRoute.xml";
 
 	private static final String PLANS2OUT = DAGANZOBASEDIR
-			+ "daganzoPlansAlternativeRoute.xml";
+			+ "daganzo2PlansAlternativeRoute.xml";
 
 	private static final String CONFIG1OUT = DAGANZOBASEDIR
-			+ "daganzoConfigNormalRoute.xml";
+			+ "daganzoConfigNormalRoutePlansOnly.xml";
 
 	private static final String CONFIG2OUT = DAGANZOBASEDIR
-			+ "daganzoConfigAlternativeRoute.xml";
+			+ "daganzoConfigAlternativeRoutePlansOnly.xml";
 
 	public static final String LANESOUTPUTFILE = DAGANZOBASEDIR
 		+ "daganzoLaneDefinitions.xml";
@@ -99,28 +99,30 @@ public class DaganzoScenarioGenerator {
 		+ "daganzoSignalSystemsConfigs.xml";
 
 	private static final String OUTPUTDIRECTORYNORMALROUTE = DAGANZOBASEDIR
-		+ "output/normalRoute/";
+		+ "output/normalRoutePlansOnlyScore/";
 
 	private static final String OUTPUTDIRECTORYALTERNATIVEROUTE = DAGANZOBASEDIR
-		+ "output/alternativeRoute2/";
+		+ "output/alternativeRoutePlansOnlyScore/";
 
 
 	public String configOut, plansOut, outputDirectory;
 
-	public static boolean isAlternativeRouteEnabled = true;
+	public static boolean isAlternativeRouteEnabled = false;
 
+	private static final boolean isUsePlansOnly = true;
+	
 	private static final boolean isUseLanes = true;
 
 	private static final boolean isUseSignalSystems = true;
 
-	private static final int iterations = 0;
+	private static final int iterations = 500;
 	private static final int iterations2 = 0;
 
 	private static final int ttBinSize = 1;
 	
 	private static final String controllerClass = AdaptiveController.class.getCanonicalName();
 
-	private Id id1, id2, id4, id5, id6;
+	private Id id1, id2, id4, id5, id6, id7;
 
 	public DaganzoScenarioGenerator() {
 		init();
@@ -145,6 +147,7 @@ public class DaganzoScenarioGenerator {
 		id4 = sc.createId("4");
 		id5 = sc.createId("5");
 		id6 = sc.createId("6");
+		id7 = sc.createId("7");
 	}
 
 	public void createScenario() {
@@ -204,37 +207,72 @@ public class DaganzoScenarioGenerator {
 		for (int i = 1; i <= 2000; i++) {
 			PersonImpl p = (PersonImpl) factory.createPerson(scenario.createId(Integer
 					.toString(i)));
-			Plan plan = factory.createPlan();
-			p.addPlan(plan);
 			// home
 			// homeEndTime = homeEndTime + ((i - 1) % 3);
 			homeEndTime+= 1;
 //			if ((i - 1) % 3 == 0) {
 //				homeEndTime++;
 //			}
-
-			ActivityImpl act1 = (ActivityImpl) factory.createActivityFromLinkId("h", l1.getId());
-			act1.setEndTime(homeEndTime);
-			plan.addActivity(act1);
-			// leg to home
-			LegImpl leg = (LegImpl) factory.createLeg(TransportMode.car);
-			// TODO check this
-			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(l1.getId(), l7.getId(), network);
-			if (isAlternativeRouteEnabled) {
-				route.setLinkIds(l1.getId(), NetworkUtils.getLinkIds("2 3 5 6"), l7.getId());
+			Plan plan = null;
+			Plan plan2 = null;
+			if (isUsePlansOnly){
+			  plan = this.createPlan(false, factory, homeEndTime, network);
+			  p.addPlan(plan);
+        plan2 = this.createPlan(true, factory, homeEndTime, network);
+        p.addPlan(plan2);
+        plan.setScore(-0.2733333333333334);
+        plan2.setScore(-0.2733333333333334);
+        if (isAlternativeRouteEnabled){
+          plan.setSelected(false);
+          plan2.setSelected(true);
+          p.setSelectedPlan(plan2);
+        }
+        else {
+          plan.setSelected(true);
+          p.setSelectedPlan(plan);
+          plan2.setSelected(false);
+        }
+        
 			}
 			else {
-				route.setLinkIds(l1.getId(), NetworkUtils.getLinkIds("2 4 6"), l7.getId());
+			  plan = this.createPlan(isAlternativeRouteEnabled, factory, homeEndTime, network);
+			  p.addPlan(plan);
 			}
-			leg.setRoute(route);
 
-			plan.addLeg(leg);
-
-			ActivityImpl act2 = (ActivityImpl) factory.createActivityFromLinkId("h", l7.getId());
-			act2.setLinkId(l7.getId());
-			plan.addActivity(act2);
 			population.addPerson(p);
 		}
+	}
+	
+	private Plan createPlan(boolean useAlternativeRoute, PopulationFactory factory, 
+	    double homeEndTime, Network network){
+    Plan plan = factory.createPlan();
+    // home
+    // homeEndTime = homeEndTime + ((i - 1) % 3);
+    homeEndTime+= 1;
+//    if ((i - 1) % 3 == 0) {
+//      homeEndTime++;
+//    }
+    ActivityImpl act1 = (ActivityImpl) factory.createActivityFromLinkId("h", id1);
+    act1.setEndTime(homeEndTime);
+    plan.addActivity(act1);
+    // leg to home
+    LegImpl leg = (LegImpl) factory.createLeg(TransportMode.car);
+    // TODO check this
+    LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(id1, id7, network);
+    if (useAlternativeRoute) {
+      route.setLinkIds(id1, NetworkUtils.getLinkIds("2 3 5 6"), id7);
+    }
+    else {
+      route.setLinkIds(id1, NetworkUtils.getLinkIds("2 4 6"), id7);
+    }
+    leg.setRoute(route);
+
+    plan.addLeg(leg);
+
+    ActivityImpl act2 = (ActivityImpl) factory.createActivityFromLinkId("h", id7);
+    act2.setLinkId(id7);
+    plan.addActivity(act2);
+    return plan;
 	}
 
 	private void createConfig(Config config) {
@@ -269,18 +307,23 @@ public class DaganzoScenarioGenerator {
 //    config.getQSimConfigGroup().setSnapshotFormat(null);
 		// configure strategies for replanning
 		config.strategy().setMaxAgentPlanMemorySize(4);
+		
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(
 				IdFactory.get(1));
-		selectExp.setProbability(0.9);
 		selectExp.setModuleName("ChangeExpBeta");
 		config.strategy().addStrategySettings(selectExp);
-
-		StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings(
-				IdFactory.get(2));
-		reRoute.setProbability(0.1);
-		reRoute.setModuleName("ReRoute");
-		reRoute.setDisableAfter(iterations);
-		config.strategy().addStrategySettings(reRoute);
+		if (isUsePlansOnly) {
+		  selectExp.setProbability(1.0);
+		}
+		else {
+		  selectExp.setProbability(0.9);
+		  StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings(
+		      IdFactory.get(2));
+		  reRoute.setProbability(0.1);
+		  reRoute.setModuleName("ReRoute");
+		  reRoute.setDisableAfter(iterations);
+		  config.strategy().addStrategySettings(reRoute);
+		}
 	}
 
 

@@ -43,6 +43,10 @@ public class DgEquilController {
 		
 		Controler controler = new Controler(config);
 		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		controler.getConfig().getQSimConfigGroup().setSnapshotFormat("otfvis");
+    controler.getConfig().getQSimConfigGroup().setSnapshotPeriod(60.0);
+    controler.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+		
 		controler.setOverwriteFiles(true);
 		
 		controler.addControlerListener(new StartupListener(){

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DenverStarter
+ * DgSatellicNetworkPostProcessing
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,12 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalVis;
+package playground.dgrether.tests.satellic;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.OTFVisQSim;
 
 import playground.dgrether.DgPaths;
 
@@ -31,22 +33,28 @@ import playground.dgrether.DgPaths;
  * @author dgrether
  *
  */
-public class DenverStarter {
+public class DgSatellicNetworkPostProcessing {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String configFile = DgPaths.STUDIESDG + "denver/dgConfig.xml";
-		
-		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(configFile);
-		Scenario sc = scl.loadScenario();
-		EventsManagerImpl e = new EventsManagerImpl();
-		
-		OTFVisQSim sim = new OTFVisQSim(sc, e);
-		sim.run();
-		
-		
-	}
-
+  
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    String netbase = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network";
+    String net = netbase + ".xml";
+    String netout = netbase + "_cleaned.xml.gz";
+    
+    Scenario sc = new ScenarioImpl();
+    sc.getConfig().network().setInputFile(net);
+    ScenarioLoader loader = new ScenarioLoaderImpl(sc);
+    loader.loadScenario();
+    
+    NetworkCleaner cleaner = new NetworkCleaner();
+    cleaner.run(sc.getNetwork());
+    
+    NetworkWriter writer = new NetworkWriter(sc.getNetwork());
+    writer.write(netout);
+    
+  }
+  
 }
