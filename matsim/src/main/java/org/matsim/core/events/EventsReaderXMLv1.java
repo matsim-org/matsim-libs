@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 public class EventsReaderXMLv1 extends MatsimXmlParser {
 
@@ -47,6 +48,16 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		if (EVENT.equals(name)) {
 			startEvent(atts);
 		}
+	}
+
+	@Override
+	public void characters(char[] ch, int start, int length) throws SAXException {
+		// ignore characters to prevent OutOfMemoryExceptions
+		/* the events-file only contains empty tags with attributes,
+		 * but without the dtd or schema, all whitespace between tags is handled
+		 * by characters and added up by super.characters, consuming huge
+		 * amount of memory when large events-files are read in.
+		 */
 	}
 
 	@Override
@@ -117,12 +128,12 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 				this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
 						new IdImpl(personString),
 						new IdImpl(vehicleString),
-						new IdImpl(transitRouteString)));			
+						new IdImpl(transitRouteString)));
 			}
 			else {
 				this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
 						new IdImpl(personString),
-						new IdImpl(vehicleString), null));			
+						new IdImpl(vehicleString), null));
 			}
 		} else if (PersonLeavesVehicleEventImpl.EVENT_TYPE.equals(eventType)) {
 			IdImpl pId = new IdImpl(atts.getValue(PersonLeavesVehicleEventImpl.ATTRIBUTE_PERSON));
@@ -130,23 +141,25 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			String transitRouteString = atts.getValue(PersonEntersVehicleEventImpl.TRANSIT_ROUTE_ID);
 			if (transitRouteString != null) {
 				this.events.processEvent(this.builder.createPersonLeavesVehicleEvent(time, pId, vId,
-						new IdImpl(transitRouteString)));			
+						new IdImpl(transitRouteString)));
 			}
 			else {
 				this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
-						pId, vId, null));			
+						pId, vId, null));
 			}
 		}
 		else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
+			String delay = atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_DELAY);
 			this.events.processEvent(this.builder.createVehicleArrivesAtFacilityEvent(time,
 					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
 					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY)),
-					Double.parseDouble(atts.getValue(VehicleDepartsAtFacilityEvent.ATTRIBUTE_DELAY))));			
+					delay == null ? 0.0 : Double.parseDouble(delay)));
 		} else if (VehicleDepartsAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
+			String delay = atts.getValue(VehicleDepartsAtFacilityEvent.ATTRIBUTE_DELAY);
 			this.events.processEvent(this.builder.createVehicleDepartsAtFacilityEvent(time,
 					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
 					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY)),
-					Double.parseDouble(atts.getValue(VehicleDepartsAtFacilityEvent.ATTRIBUTE_DELAY))));			
+					delay == null ? 0.0 : Double.parseDouble(delay)));
 		}
 	}
 

@@ -84,6 +84,11 @@ public class MatsimEventsReader implements MatsimSomeReader {
 		}
 
 		@Override
+		public void characters(char[] ch, int start, int length) throws SAXException {
+			this.delegate.characters(ch, start, length);
+		}
+
+		@Override
 		public void endTag(final String name, final String content, final Stack<String> context) {
 			this.delegate.endTag(name, content, context);
 		}
