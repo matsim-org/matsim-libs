@@ -23,7 +23,6 @@ package org.matsim.core.population.routes;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Node;
 
 
 /**
@@ -47,17 +46,6 @@ public interface NetworkRouteWRefs extends RouteWRefs {
 	 * @return a list containing the link ids the agents plans to travel along
 	 */
 	public List<Id> getLinkIds();
-
-	/**
-	 * This method returns a new Route object with the subroute of this beginning at fromNode
-	 * till toNode. If from or twoNode are not found in this, an IllegalArgumentException is thrown.
-	 * @param fromNode
-	 * @param toNode
-	 * @return A flat copy of the original Route
-	 * @deprecated use getSubRoute(Id, Id)
-	 */
-	@Deprecated
-	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode);
 
 	/**
 	 * This method returns a new Route object with the subroute of this, using fromLinkId as the

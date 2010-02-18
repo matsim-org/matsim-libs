@@ -26,7 +26,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.LinkNetworkRoute;
 
 /**
@@ -76,79 +75,6 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		ArrayList<Id> ids = new ArrayList<Id>(this.route.size());
 		ids.addAll(this.route);
 		return ids;
-	}
-
-	@Override
-	@Deprecated // use getSubRoute(Id, Id)
-	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
-		Link startLink = this.network.getLinks().get(getStartLinkId());
-		Link fromLink = startLink;
-		Link endLink = this.network.getLinks().get(getEndLinkId());
-		Link toLink = endLink;
-		int fromIndex = -1;
-		int toIndex = -1;
-		int max = this.route.size();
-		if (fromNode == toNode) {
-			boolean found = false;
-			for (int i = 0; i < max; i++) {
-				Link link = this.network.getLinks().get(this.route.get(i));
-				if (found) {
-					toLink = link;
-					break;
-				}
-				Node node = link.getToNode();
-				if (node.equals(fromNode)) {
-					found = true;
-					fromIndex = 0; // value doesn't really matter, just >= 0
-					fromLink = link;
-				}
-			}
-			if (fromIndex == -1) {
-				if (fromNode.equals(startLink.getToNode())) {
-					fromIndex = 0;
-					fromLink = startLink;
-					if (this.route.size() > 0) {
-						toLink = this.network.getLinks().get(this.route.get(0));
-					}
-				} else {
-					throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
-				}
-			}
-		} else {
-			for (int i = 0; i < max; i++) {
-				Link link = this.network.getLinks().get(this.route.get(i));
-				Node node = link.getFromNode();
-				if (node.equals(fromNode)) {
-					fromIndex = i;
-					break;
-				}
-				fromLink = link;
-			}
-			if (fromIndex == -1) {
-				throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
-			}
-			for (int i = fromIndex; i < max; i++) {
-				Link link = this.network.getLinks().get(this.route.get(i));
-				if (toIndex >= 0) {
-					toLink = link;
-					break;
-				}
-				Node node = link.getToNode();
-				if (node.equals(toNode)) {
-					toIndex = i;
-				}
-			}
-			if (toIndex == -1) {
-				throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
-			}
-		}
-		LinkNetworkRouteImpl ret = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId(), this.network);
-		if (toIndex >= fromIndex) {
-			ret.setLinkIds(fromLink.getId(), this.route.subList(fromIndex, toIndex + 1), toLink.getId());
-		} else {
-			ret.setLinkIds(fromLink.getId(), null, toLink.getId());
-		}
-		return ret;
 	}
 
 	@Override

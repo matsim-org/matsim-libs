@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 
 /**
  * Implementation of {@link NetworkRouteWRefs} that tries to minimize the amount of
@@ -129,48 +128,6 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	public void setStartLinkId(final Id linkId) {
 		this.modCount++;
 		super.setStartLinkId(linkId);
-	}
-
-
-	@Override
-	@Deprecated // use getSubRoute(Id, Id)
-	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
-		Link newStartLink = null;
-		Link newEndLink = null;
-		List<Id> newLinkIds = new ArrayList<Id>(10);
-
-		Link startLink = this.network.getLinks().get(getStartLinkId());
-		if (startLink.getToNode() == fromNode) {
-			newStartLink = startLink;
-		}
-		Link endLink = this.network.getLinks().get(getEndLinkId());
-		for (Id linkId : getLinkIds()) {
-			Link link = this.network.getLinks().get(linkId);
-			if (link.getFromNode() == toNode) {
-				newEndLink = link;
-				break;
-			}
-			if (newStartLink != null) {
-				newLinkIds.add(link.getId());
-			}
-			if (link.getToNode() == fromNode) {
-				newStartLink = link;
-			}
-		}
-		if (newStartLink == null) {
-			throw new IllegalArgumentException("fromNode is not part of this route.");
-		}
-		if (newEndLink == null) {
-			if (endLink.getFromNode() == toNode) {
-				newEndLink = endLink;
-			} else {
-				throw new IllegalArgumentException("toNode is not part of this route.");
-			}
-		}
-
-		NetworkRouteWRefs subRoute = new CompressedNetworkRouteImpl(newStartLink.getId(), newEndLink.getId(), this.network, this.subsequentLinks);
-		subRoute.setLinkIds(newStartLink.getId(), newLinkIds, newEndLink.getId());
-		return subRoute;
 	}
 
 	@Override
