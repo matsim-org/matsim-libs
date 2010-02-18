@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.queuesim;
+package org.matsim.pt.qsim;
 
 import java.util.ArrayList;
 import java.util.Collections;

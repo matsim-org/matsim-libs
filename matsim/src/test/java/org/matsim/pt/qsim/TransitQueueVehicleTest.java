@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.queuesim;
+package org.matsim.pt.qsim;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.qsim.TransitQVehicle;

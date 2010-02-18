@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.queuesim;
+package org.matsim.pt.qsim;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
