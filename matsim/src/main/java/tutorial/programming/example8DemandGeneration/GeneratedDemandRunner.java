@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.demandgeneration.example8DemandGeneration;
+package tutorial.programming.example8DemandGeneration;
 
 import org.matsim.run.Controler;
 import org.matsim.run.OTFVis;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.demandgeneration.example8DemandGeneration;
+package tutorial.programming.example8DemandGeneration;
 
 import java.io.IOException;
 import java.util.Iterator;
