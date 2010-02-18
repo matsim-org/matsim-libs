@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
@@ -101,6 +102,15 @@ public class RouteUtils {
 		}
 
 		return route.getSubRoute(fromLinkId, toLinkId);
+	}
+
+	public static NetworkRouteWRefs createNetworkRoute(List<Id> routeLinkIds, final Network network) {
+		Id startLinkId = routeLinkIds.get(0);
+		List<Id> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<Id>(0);
+		Id endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLinkId, endLinkId, network);
+		route.setLinkIds(startLinkId, linksBetween, endLinkId);
+		return route;
 	}
 
 }

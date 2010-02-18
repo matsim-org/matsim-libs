@@ -19,6 +19,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.Departure;
@@ -262,7 +263,7 @@ public class VisumHafasScheduleMerger {
 		}
 		int lastLinkIndex = linkIterator.previousIndex();
 		List<Link> usedSegmentLinks = links.subList(firstLinkIndex, lastLinkIndex + 1);
-		NetworkRouteWRefs usedSegment = NetworkUtils.createLinkNetworkRoute(NetworkUtils.getLinkIds(usedSegmentLinks), this.outScenario.getNetwork());
+		NetworkRouteWRefs usedSegment = RouteUtils.createNetworkRoute(NetworkUtils.getLinkIds(usedSegmentLinks), this.outScenario.getNetwork());
 		return usedSegment;
 	}
 

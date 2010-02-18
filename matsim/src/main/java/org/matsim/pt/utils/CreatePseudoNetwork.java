@@ -39,7 +39,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -92,7 +92,7 @@ public class CreatePseudoNetwork {
 				}
 
 				if (routeLinks.size() > 0) {
-					NetworkRouteWRefs route = NetworkUtils.createLinkNetworkRoute(routeLinks, this.network);
+					NetworkRouteWRefs route = RouteUtils.createNetworkRoute(routeLinks, this.network);
 					tRoute.setRoute(route);
 				} else {
 					System.err.println("Line " + tLine.getId() + " route " + tRoute.getId() + " has less than two stops. Removing this route from schedule.");
