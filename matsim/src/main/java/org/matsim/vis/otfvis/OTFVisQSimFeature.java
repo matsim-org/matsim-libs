@@ -30,7 +30,7 @@ import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 public class OTFVisQSimFeature implements QSimFeature {
-	
+
 	protected OnTheFlyServer otfServer = null;
 	private boolean ownServer = true;
 	private boolean doVisualizeTeleportedAgents = false;
@@ -39,11 +39,11 @@ public class OTFVisQSimFeature implements QSimFeature {
 	private QSim queueSimulation;
 	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 	private final LinkedHashMap<Id, Integer> currentActivityNumbers = new LinkedHashMap<Id, Integer>();
-	
+
 	public OTFVisQSimFeature(QSim queueSimulation) {
 		this.queueSimulation = queueSimulation;
 	}
-	
+
 	public void setServer(OnTheFlyServer server) {
 		this.otfServer = server;
 		ownServer = false;
@@ -52,7 +52,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 	public void afterPrepareSim() {
 		if (ownServer) {
 			UUID idOne = UUID.randomUUID();
-			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getNetwork(), queueSimulation.getEvents(), false);
+			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getNetwork(), queueSimulation.getEventsManager(), false);
 			this.otfServer.setSimulation(this);
 			if (this.doVisualizeTeleportedAgents) {
 				this.teleportationWriter = new OTFTeleportAgentsDataWriter();
@@ -143,7 +143,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 		this.visualizeTeleportedAgents(time);
 		this.otfServer.updateStatus(time);
 	}
-	
+
 	public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
 		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId())));
 	}
@@ -156,17 +156,17 @@ public class OTFVisQSimFeature implements QSimFeature {
 			teleportationVisData.calculatePosition(time);
 		}
 	}
-	
+
 	public void setConnectionManager(OTFConnectionManager connectionManager) {
 		this.connectionManager = connectionManager;
 	}
-	
+
 	public void setVisualizeTeleportedAgents(boolean active) {
 		this.doVisualizeTeleportedAgents = active;
 	}
 
 	public void afterCreateAgents() {
-		
+
 	}
 
 	@Override
@@ -190,5 +190,5 @@ public class OTFVisQSimFeature implements QSimFeature {
 	public Map<Id, TeleportationVisData> getVisTeleportationData() {
 		return visTeleportationData;
 	}
-	
+
 }
