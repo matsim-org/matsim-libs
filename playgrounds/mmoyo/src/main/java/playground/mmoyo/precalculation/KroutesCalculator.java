@@ -214,7 +214,7 @@ public class KroutesCalculator {
 
 	/**creates a PTtrip object*/
 	private PTtrip createTrip(final TransitRoute transitRoute, final Node nodeA, final Node nodeB){
-		/**calculates travelTime */
+		/* calculates travelTime */
 		Id idA= nodeA.getId();
 		Id idB= nodeB.getId();
 		TransitStopFacility trStopFacilityA = transitSchedule.getFacilities().get(idA);
@@ -222,8 +222,8 @@ public class KroutesCalculator {
 		TransitRouteStop trStopA =transitRoute.getStop(trStopFacilityA);
 		TransitRouteStop trStopB =transitRoute.getStop(trStopFacilityB);
 		double travelTime = trStopB.getArrivalOffset() - trStopA.getDepartureOffset();
-		NetworkRouteWRefs subRoute = transitRoute.getRoute().getSubRoute(nodeA, nodeB);
-		return new PTtrip(transitRoute, subRoute,travelTime, this.plainNet);
+		NetworkRouteWRefs subRoute = RouteUtils.getSubRoute(transitRoute.getRoute(), nodeA, nodeB, this.plainNet);
+		return new PTtrip(transitRoute, subRoute, travelTime, this.plainNet);
 	}
 }
 

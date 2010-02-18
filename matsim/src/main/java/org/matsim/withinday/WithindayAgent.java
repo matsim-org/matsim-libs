@@ -123,12 +123,13 @@ public class WithindayAgent extends PersonAgent {
 			double replanningNeed = this.getReplanningNeed();
 			if (replanningNeed >= this.replanningThreshold) {
 				Id currentLinkId = this.getCurrentLinkId();
-				Node currentToNode = this.network.getLinks().get(currentLinkId).getToNode();
-				Node currentDestinationNode = this.network.getLinks().get(this.getDestinationLinkId()).getFromNode();
+//				Node currentToNode = this.network.getLinks().get(currentLinkId).getToNode();
+//				Node currentDestinationNode = this.network.getLinks().get(this.getDestinationLinkId()).getFromNode();
 				//as replanning is rerouting agents will only replan if they are on the road and not on the link of the next activity
 				if (isEnRoute()) {
 					//only reroute if the RouteProvider provides a route
-					NetworkRouteWRefs subRoute = ((NetworkRouteWRefs) this.getCurrentLeg().getRoute()).getSubRoute(currentToNode, currentDestinationNode);
+//					NetworkRouteWRefs subRoute = ((NetworkRouteWRefs) this.getCurrentLeg().getRoute()).getSubRoute(currentToNode, currentDestinationNode);
+					NetworkRouteWRefs subRoute = ((NetworkRouteWRefs) this.getCurrentLeg().getRoute()).getSubRoute(currentLinkId, this.getDestinationLinkId());
 					if (this.desireGenerationFunction.providesRoute(currentLinkId, subRoute)) {
 						this.reroute();
 					}

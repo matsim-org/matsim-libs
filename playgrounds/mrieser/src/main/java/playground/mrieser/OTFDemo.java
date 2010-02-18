@@ -79,7 +79,7 @@ public class OTFDemo {
 //		org.matsim.run.OTFVis.main(new String[] {"test/scenarios/berlin/config.xml"});
 //		org.matsim.run.OTFVis.main(new String[] {"test/input/playground/marcel/pt/config.xml"});
 
-//		org.matsim.run.OTFVis.main(new String[] {});
+		org.matsim.run.OTFVis.main(new String[] {});
 
 //		OTFDemo.ptConnect("OTFServer_Transit");
 	}

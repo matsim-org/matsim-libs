@@ -400,15 +400,15 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		// Sum up free speed after the last queue (last route segment)
 		double ttAfterLastQueue;
 		Link endLinkLastRS = this.network.getLinks().get(bottleNeckList.getLast());
-		Node rsFromNode = endLinkLastRS.getToNode(); // the last queue ends at this
-																									// node
+//		Node rsFromNode = endLinkLastRS.getToNode(); // the last queue ends at this node
 		Link endLink = this.network.getLinks().get(route.getEndLinkId());
 		if (endLinkLastRS == endLink) { // if the last queue is on the last link
 			ttAfterLastQueue = 0.0;
 		}
 		else {
-			Node rsToNode = endLink.getFromNode();
-			NetworkRouteWRefs lastRouteSegment = route.getSubRoute(rsFromNode, rsToNode);
+//			Node rsToNode = endLink.getFromNode();
+//			NetworkRouteWRefs lastRouteSegment = route.getSubRoute(rsFromNode, rsToNode);
+			NetworkRouteWRefs lastRouteSegment = route.getSubRoute(endLinkLastRS.getId(), route.getEndLinkId());
 			ttAfterLastQueue = getFreeSpeed(lastRouteSegment);
 		}
 		Id lastBottleNeckFound = bottleNeckList.getLast();
@@ -468,7 +468,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		if (firstLinkInRS == bottleNeck) {
 			routeSegment = new LinkNetworkRouteImpl(firstLinkIdInRS, bottleNeckId, this.network);
 		} else {
-			routeSegment = wholeRoute.getSubRoute(firstLinkInRS.getToNode(), bottleNeck.getFromNode());
+			routeSegment = wholeRoute.getSubRoute(firstLinkInRS.getId(), bottleNeck.getId());
 		}
 		double netFlowOnRoute = getIntraFlow(firstLinkInRS.getId())
 				- getIntraFlow(bottleNeckId);
