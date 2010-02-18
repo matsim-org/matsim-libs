@@ -52,16 +52,16 @@ import com.sun.opengl.util.texture.Texture;
  * OGLAgentPointLayer is responsible for drawing the agents/vehicles as point sprites.
  * It is a very fast way to draw massive (100ks) of agents in realtime.
  * It does not run too well on ATI cards, though.
- * 
+ *
  * @author dstrippgen
  *
  */
 public class OGLAgentPointLayer extends DefaultSceneLayer {
-	
+
 	private final static Logger log = Logger.getLogger(OGLAgentPointLayer.class);
-	
+
 	private final static int BUFFERSIZE = 10000;
-	
+
 	private static int agentPointDrawerSetAgentCnt = 0 ;
 
 	private static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
@@ -72,26 +72,22 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 		private int count = 0;
 		private static int alpha =200;
-		
+
 		private ByteBuffer colorsIN = null;
 		private FloatBuffer vertexIN = null;
-		
+
 		private final  List<FloatBuffer> posBuffers= new LinkedList<FloatBuffer>();
 		private final  List<ByteBuffer> colBuffers= new LinkedList<ByteBuffer>();
-				
+
 		public static void setAlpha(int alp) { alpha = alp;}
-		
+
 		private final Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
 		protected Texture texture;
-		
+
 		protected void setTexture() {
 			this.texture = AgentDrawer.carjpg;
 		}
-		
-		public static void setColorizer(OTFOGLDrawer.FastColorizer newcolors) {
-			colorizer = newcolors;
-		}
-		
+
 		protected void setAgentSize() {
 			float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
 			if (getGl().isFunctionAvailable("glPointParameterf")) {
@@ -109,7 +105,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 				getGl().glPointSize(agentSize/10);
 			}
 		}
-		
+
 		protected void drawArray(GL gl) {
 			ByteBuffer colors =  null;
 			FloatBuffer vertex =  null;
@@ -121,7 +117,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 				colors.position(0);
 				vertex.position(0);
 				gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
-				gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);      
+				gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);
 				gl.glDrawArrays (GL.GL_POINTS, 0, remain);
 			}
 
@@ -129,11 +125,12 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			vertex.position((this.count % BUFFERSIZE) * 2);
 			colors.position((this.count % BUFFERSIZE) * 4);
 		}
-		
+
 		protected boolean isEmpty() {
 			return this.posBuffers.size() == 0;
 		}
-		
+
+		@Override
 		public void onDraw(GL gl) {
 			if (isEmpty()) {
 				return;
@@ -143,7 +140,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			setAgentSize();
 
 			gl.glEnableClientState (GL.GL_COLOR_ARRAY);
-			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);   
+			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
 
 			setTexture();
 			//texture = null;
@@ -151,29 +148,29 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 				this.texture.enable();
 				gl.glEnable(GL.GL_TEXTURE_2D);
 				gl.glTexEnvf(GL.GL_POINT_SPRITE, GL.GL_COORD_REPLACE, GL.GL_TRUE);
-				this.texture.bind();	        	
+				this.texture.bind();
 			}
 			gl.glDepthMask(false);
 
 			drawArray(gl);
-			
+
 			gl.glDisableClientState (GL.GL_COLOR_ARRAY);
-			gl.glDisableClientState (GL.GL_VERTEX_ARRAY); 
+			gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
 			if (this.texture != null ) {
-				this.texture.disable();	
+				this.texture.disable();
 			}
 
 			gl.glDisable(GL.GL_POINT_SPRITE);
 		}
-		
+
 		public int getNearestAgent(Point2D.Double point) {
 			FloatBuffer vertex =  null;
-			
+
 			int idx = 0;
 			int result = -1;
 			double mindist = Double.MAX_VALUE;
 			double dist = 0;
-			
+
 			for(int i = 0; i < this.posBuffers.size(); i++) {
 				vertex = this.posBuffers.get(i);
 				vertex.position(0);
@@ -182,7 +179,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 					float y = vertex.get();
 					// DS We do not need z value here but need to fetch it from buffer!
 					/*float z = */vertex.get();
-					
+
 					// Manhattan dist reicht uns hier
 					dist = Math.abs(x-point.x) + Math.abs(y-point.y);
 					if ( dist < mindist) {
@@ -205,18 +202,18 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			this.vertexIN.put(startX);
 			this.vertexIN.put(startY);
 			if (saveId) this.id2coord.put(Arrays.hashCode(id),this.count);
-			
+
 			this.colorsIN.put( (byte)mycolor.getRed());
 			this.colorsIN.put( (byte)mycolor.getGreen());
 			this.colorsIN.put((byte)mycolor.getBlue());
 			this.colorsIN.put( (byte)alpha);
-			
+
 			this.count++;
-			
+
 		}
 
 	}
-	
+
 	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver {
 		@Deprecated
 		public void setAgent(char[] id, float startX, float startY, int state, int userdefined, float color) {
@@ -232,7 +229,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 		public void setAgent( AgentSnapshotInfo agInfo ) {
 			char[] id = agInfo.getId().toString().toCharArray();
-			if ( id[0]=='p' && id[1]=='t' ) { 
+			if ( id[0]=='p' && id[1]=='t' ) {
 				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
 			} else if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
 				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), colorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne()), true);
@@ -246,14 +243,15 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
 			}
 		}
-	
+
 		@Override
 		public void invalidate(SceneGraph graph) {
 		}
-	
+
+		@Override
 		public void onDraw(GL gl) {
 		}
-		
+
 	}
 
 	public class AgentPointDrawerByID extends AgentPointDrawer {
@@ -264,22 +262,25 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			int idB = (idint % (1 << 8));
 			return new Color(idR, idG,idB,250);
 		}
-		
+
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, getColorFromID(id), true);
 		}
 	}
 
-	public /*static*/ class NoAgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver  {
-		
+	public static class NoAgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver  {
+
+		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color){
 		}
+
+		@Override
 		public void setAgent( AgentSnapshotInfo agInfo ) {
 		}
 
+		@Override
 		public void onDraw(GL gl) {
-
 		}
 	}
 
@@ -295,7 +296,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 		this.regiondrawer.drawAll();
 		this.timedrawer.drawAll();
-		
+
 	}
 
 	@Override
@@ -314,12 +315,9 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		else return this.pointdrawer;
 	}
 
+	@Override
 	public int getDrawOrder() {
 		return 100;
-	}
-
-	public int getAgentIndex(Point2D.Double point) {
-		return this.drawer.getNearestAgent(point);
 	}
 
 	public Point2D.Double getAgentCoords(char [] id) {
@@ -333,30 +331,30 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			return new Point2D.Double(x,y);
 		}
 		return null;
-		
+
 	}
-	
+
 	// #################################################################
 	// #################################################################
 	// below here is for backwards compatibility only
-	
+
 	//for backward compatibility only
-	@Deprecated 
+	@Deprecated
 	// for Padang time-based agents
 	/*package*/ final static RandomColorizer colorizer2 = new RandomColorizer(257);
-	
+
 	//for backward compatibility only
-	@Deprecated 
+	@Deprecated
 	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 120., 255. ,256.}, new Color[] {	Color.GREEN, Color.YELLOW, Color.RED, Color.RED, Color.BLUE});
-	
+
 	//for backward compatibility only
-	@Deprecated 
+	@Deprecated
 	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer4 = new OTFOGLDrawer.FastColorizer(
 			 new double[] { 0.0, 20.,255.}, new Color[] {	new Color(0,255,128,0), Color.CYAN, Color.BLUE});
-	
+
 	//for backward compatibility only
-	@Deprecated 
+	@Deprecated
 	public class AgentPadangDrawer  extends AgentPointDrawer {
 
 		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
@@ -365,11 +363,11 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			@Override
 			protected void setTexture(){this.texture = null;}
 		};
-		
+
 		public final AgentArrayDrawer drawerEvacuees = new AgentArrayDrawer(){
 			@Override
 			protected void setTexture(){this.texture = AgentDrawer.pedpng;}
-		};		
+		};
 
 		public void drawAll() {
 			this.drawerWave.draw();
@@ -378,20 +376,20 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	}
 
 	//for backward compatibility only
-	@Deprecated 
+	@Deprecated
 	public class AgentPadangRegionDrawer extends AgentPadangDrawer {
-		
+
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			if (user !=-1) this.drawerEvacuees.addAgent(id, startX, startY, colorizer2.getColor(user), false);
 			else this.drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
 		}
 	}
-	
+
 	//for backward compatibility only
-	@Deprecated 
+	@Deprecated
 	public class AgentPadangTimeDrawer extends AgentPadangDrawer {
-		
+
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			if (user != -1) this.drawerEvacuees.addAgent(id, startX, startY, colorizer3.getColor(state),false);
@@ -399,5 +397,5 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 	}
 
-	
+
 }

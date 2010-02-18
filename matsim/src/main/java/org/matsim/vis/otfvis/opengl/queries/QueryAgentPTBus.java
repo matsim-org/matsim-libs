@@ -57,13 +57,18 @@ import com.sun.opengl.util.BufferUtil;
  */
 public class QueryAgentPTBus extends AbstractQuery {
 
-	public class Result implements OTFQueryResult {
+	public static class Result implements OTFQueryResult {
 
 		private static final long serialVersionUID = 1L;
 
+		private final List<String> allIds;
 		private float[] vertex = null;
 		private transient FloatBuffer vert;
 		private boolean calcOffset = true;
+
+		public Result(final List<String> allIds) {
+			this.allIds = allIds;
+		}
 
 		public void draw(OTFDrawer drawer) {
 			if(drawer instanceof OTFOGLDrawer) {
@@ -120,10 +125,12 @@ public class QueryAgentPTBus extends AbstractQuery {
 
 		}
 
+		@Override
 		public void remove() {
 
 		}
 
+		@Override
 		public boolean isAlive() {
 			return false;
 		}
@@ -181,7 +188,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 	@Override
 	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.net = queueSimulation.getQueueSimulation().getNetwork().getNetworkLayer();
-		this.result = new Result();
+		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";
 		for(Person person : queueSimulation.getQueueSimulation().getPopulation().getPersons().values()) {
 			if(person.getId().toString().startsWith(prefix, 0)) allIds.add(person.getId().toString());

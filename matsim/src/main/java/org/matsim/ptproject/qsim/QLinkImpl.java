@@ -567,8 +567,8 @@ public class QLinkImpl implements QLink {
 		return this.buffer.peek();
 	}
 
-	private static int getVehPosCnt = 0 ;
-	private static int qSimAccessCnt = 0 ;
+//	private static int getVehPosCnt = 0 ;
+//	private static int qSimAccessCnt = 0 ;
 	/**
 	 * Inner class to capsulate visualization methods
 	 *
@@ -603,9 +603,9 @@ public class QLinkImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-			if ( getVehPosCnt < 1 ) {
-				getVehPosCnt++ ;
-			}
+//			if ( getVehPosCnt < 1 ) {
+//				getVehPosCnt++ ;
+//			}
 			String snapshotStyle = Gbl.getConfig().getQSimConfigGroup().getSnapshotStyle();
 			if ("queue".equals(snapshotStyle)) {
 				getVehiclePositionsQueue(positions);

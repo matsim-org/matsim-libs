@@ -30,14 +30,10 @@ import org.jgap.RandomGenerator;
 
 public class PlanomatJGAPChromosome extends Chromosome {
 
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	private boolean isHashValueComputed = false;
-	private int hashValue;
+//	private boolean isHashValueComputed = false;
+//	private int hashValue;
 
 	public PlanomatJGAPChromosome(Configuration a_configuration, Gene[] genes) throws InvalidConfigurationException {
 		super(a_configuration, genes);
@@ -65,7 +61,7 @@ public class PlanomatJGAPChromosome extends Chromosome {
 //		if (!this.isHashValueComputed) {
 //			this.hashValue = super.hashCode();
 //			this.isHashValueComputed = true;
-//		} 
+//		}
 //		return this.hashValue;
 //	}
 //
@@ -143,16 +139,9 @@ public class PlanomatJGAPChromosome extends Chromosome {
 	}
 
 
-
-
 	@Override
 	public boolean isHandlerFor(Object a_obj, Class a_class) {
-		if (a_class == PlanomatJGAPChromosome.class) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return (a_class == PlanomatJGAPChromosome.class);
 	}
 
 	@Override
@@ -163,7 +152,7 @@ public class PlanomatJGAPChromosome extends Chromosome {
 
 	/**
 	 * Copied from Chromosome.randomInitialChromosome, but just returning a PlanomatJGAPChromosome instance rather than a org.jgap.Chromosome instance
-	 * 
+	 *
 	 * @param a_configuration
 	 * @return
 	 * @throws InvalidConfigurationException
@@ -230,19 +219,16 @@ public class PlanomatJGAPChromosome extends Chromosome {
 		if ((PlanomatFitnessFunctionWrapper.NO_FITNESS_VALUE != super.m_fitnessValue)) {
 			return super.m_fitnessValue;
 		}
-		else {
-			return super.calcFitnessValue();
-		}
+		return super.calcFitnessValue();
 	}
 
 	@Override
 	public void setFitnessValue(double a_newFitnessValue) {
 		if (
-				(PlanomatFitnessFunctionWrapper.NO_FITNESS_VALUE != a_newFitnessValue) && 
+				(PlanomatFitnessFunctionWrapper.NO_FITNESS_VALUE != a_newFitnessValue) &&
 				(Math.abs(m_fitnessValue - a_newFitnessValue) > 0.0000001)) {
 
 			m_fitnessValue = a_newFitnessValue;
-
 		}
 	}
 

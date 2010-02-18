@@ -47,6 +47,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -72,18 +73,18 @@ import com.sun.opengl.util.BufferUtil;
 
 /**
  * QuerySpinne shows a relationship network for a given link based on several options.
- * The network shown is that of the routes that that agents take over the course of 
+ * The network shown is that of the routes that that agents take over the course of
  * their day/trip.
- * 
+ *
  * @author dstrippgen
  *
  */
 public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemListener {
 
-	public class Result implements OTFQueryResult {
+	public static class Result implements OTFQueryResult {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		private transient FloatBuffer vert;
 		private transient ByteBuffer colors =  null;
 		private transient InfoText agentText = null;
@@ -91,14 +92,15 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		private boolean calcOffset = true;
 		private float[] vertex = null;
 		private String linkIdString;
-		
+		private transient OTFOGLDrawer.FastColorizer colorizer3;
+
 		@Override
 		public void draw(OTFDrawer drawer) {
 			if(drawer instanceof OTFOGLDrawer) {
 				draw((OTFOGLDrawer)drawer);
 			}
 		}
-		
+
 		public void draw(OTFOGLDrawer drawer) {
 			if(this.vertex == null) return;
 
@@ -156,7 +158,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 			gl.glDisable(GL.GL_LINE_SMOOTH);
 			gl.glDisable(GL.GL_BLEND);
-			
+
 			drawCaption(drawer);
 		}
 
@@ -169,11 +171,11 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			gl.glVertex3d(xe, ye, z);
 			gl.glVertex3d(xs, ye, z);
 			gl.glEnd();
-			
+
 		}
 		private void drawCaption(OTFOGLDrawer drawer) {
 			QuadTree.Rect bounds = drawer.getViewBounds();
-			
+
 			double maxX = bounds.minX + (bounds.maxX -bounds.minX)*0.22;
 			double minX = bounds.minX + (bounds.maxX -bounds.minX)*0.01;
 			double maxY = bounds.minY + (bounds.maxY -bounds.minY)*0.15;
@@ -202,17 +204,17 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
 			InfoTextContainer.showTextOnce ("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
 		}
-		
+
 		@Override
 		public void remove() {
 			if (this.agentText != null) InfoTextContainer.removeTextPermanent(this.agentText);
 		}
-		
+
 		@Override
 		public boolean isAlive() {
 			return false;
 		}
-		
+
 
 	}
 
@@ -223,18 +225,16 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	private static boolean tripOnly = false;
 	private static boolean nowOnly = false;
 
-	private transient OTFOGLDrawer.FastColorizer colorizer3;
-
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals("leg only")) {
 			tripOnly = !tripOnly;
 		} else if (source.getText().equals("only vehicles on the link now")) {
 			nowOnly = ! nowOnly;
-		}	
-		
+		}
+
 	}
-	
+
 	public JComponent getOptionsGUI(JComponent mother) {
 		JPanel com = new JPanel();
 		com.setSize(500, 60);
@@ -251,7 +251,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 		return com;
 	}
-	
+
 	private void addLink(Id linkId) {
 		Integer count = this.drivenLinks.get(linkId);
 		if (count == null) this.drivenLinks.put(linkId, 1);
@@ -263,7 +263,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		QLink link = net.getLinks().get(this.queryLinkId);
 		Collection<QVehicle> vehs = link.getAllVehicles();
 		for( QVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
-		
+
 		return actPersons;
 	}
 
@@ -298,15 +298,14 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		}
 		return actPersons;
 	}
-	
-	protected void collectLinksFromTrip(List<Plan> actPersons) {
-		// TODO kai Despite the name, this collects links from the "leg", not from the trip.  kai, jun09
+
+	private void collectLinksFromLeg(List<Plan> actPersons) {
 		boolean addthis = false;
 		for (Plan plan : actPersons) {
-			for (PlanElement pe : plan.getPlanElements()) {				
-				if ( pe instanceof LegImpl ) {
-					LegImpl leg = (LegImpl) pe ;
-					RouteWRefs route = leg.getRoute();
+			for (PlanElement pe : plan.getPlanElements()) {
+				if ( pe instanceof Leg ) {
+					Leg leg = (Leg) pe ;
+					Route route = leg.getRoute();
 					if ( route instanceof NetworkRouteWRefs ) { // added in jun09, see below in "collectLinks". kai, jun09
 						List<Id> linkIds = new ArrayList<Id>();
 						for (Id linkId : ((NetworkRouteWRefs) route).getLinkIds() ) {
@@ -332,16 +331,6 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 					addLink(act.getLinkId());
 				} else if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
-
-//					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
-					/* I regularly got an exception with the above line:
-					 * Exception in thread "AWT-EventQueue-0" java.lang.ClassCastException: org.matsim.core.population.routes.GenericRouteImpl
-					 *	at org.matsim.vis.otfvis.opengl.queries.QuerySpinne.collectLinksFromTrip(QuerySpinne.java:XXX)
-					 *  ...
-					 * I assume that it comes from the fact that some routes are not network routes (but, say, pt routes).
-					 * So I included the instanceof check (see below).  Should be done in ALL the queries.  kai, jun09
-					 */
-
 					RouteWRefs route = leg.getRoute() ;
 					if ( route instanceof NetworkRouteWRefs ) {
 						NetworkRouteWRefs nr = (NetworkRouteWRefs) route ;
@@ -353,7 +342,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			}
 		}
 	}
-	
+
 	@Override
 	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		QNetwork net = queueSimulation.getQueueSimulation().getNetwork();
@@ -361,12 +350,12 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		this.result = new Result();
 		result.linkIdString = this.queryLinkId.toString();
 		this.drivenLinks = new HashMap<Id, Integer>();
-		
+
 		List<Plan> actPersons = nowOnly ? getPersonsNOW(plans, net) : getPersons(plans, net);
 
-		if(tripOnly) collectLinksFromTrip(actPersons);
+		if(tripOnly) collectLinksFromLeg(actPersons);
 		else collectLinks(actPersons);
-		
+
 		if(this.drivenLinks.size() == 0) return;
 
 		// convert this to drawable info
@@ -401,5 +390,5 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	public OTFQueryResult query() {
 		return result;
 	}
-	
+
 }

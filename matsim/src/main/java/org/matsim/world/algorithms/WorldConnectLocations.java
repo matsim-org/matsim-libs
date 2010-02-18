@@ -179,19 +179,22 @@ public class WorldConnectLocations {
 
 	private final void writeF2LFile(ActivityFacilitiesImpl facilities, String file) {
 		log.info("    writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file);
+		BufferedWriter bw = null;
 		try {
-			FileWriter fw = new FileWriter(file);
-			BufferedWriter bw = new BufferedWriter(fw);
+			bw = new BufferedWriter(new FileWriter(file));
 			bw.write("fid\tlid\n");
 			for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 				bw.write(f.getId().toString()+"\t"+f.getLinkId().toString()+"\n");
 			}
-			bw.close();
-			fw.close();
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Error while writing given outputF2LFile='"+file+"'.", e);
 		} catch (IOException e) {
 			throw new RuntimeException("Error while writing given outputF2LFile='"+file+"'.", e);
+		} finally {
+			if (bw != null) {
+				try { bw.close(); }
+				catch (IOException e) { log.warn("Could not close stream.", e); }
+			}
 		}
 		log.info("    done. (writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file+")");
 	}
