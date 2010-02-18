@@ -57,13 +57,13 @@ import playground.dressler.Interval.VertexIntervals;
 public class MultiSourceEAF {
 
 	/**
-	 * debug flag and EdgeTypes
+	 * debug flag and the algorithm to use
 	 */
-	private static boolean _debug = true;
-	private static boolean vertexAlgo = true;
-	//private static boolean IntervalBased = true;	
+	private static boolean _debug = false;
+	static boolean useReverse = false;
+	
 
-
+	
 	public static void debug(final boolean debug){
 		_debug=debug;
 	}
@@ -156,7 +156,7 @@ public class MultiSourceEAF {
 		  System.out.println("starting calculations");
 		}
 		
-		int lastArrival = 0;
+		//int lastArrival = 0;
 
 		long timeMBF = 0;
 		long timeAugment = 0;
@@ -169,13 +169,12 @@ public class MultiSourceEAF {
 		long gain = 0;
 		int lasttime = 0;
 		
-		// additional settings ..
-		boolean useReverse = true;
 		boolean tryReverse = useReverse;
 		
 		for (i=1; i<=settings.MaxRounds; i++){
 			timer1 = System.currentTimeMillis();
-			//System.out.println("blub");
+			
+			System.out.println("Iteration " + i);
 			
 			// THE IMPORTANT FUNCTION CALL HAPPENS HERE //
 			if (tryReverse) {
@@ -209,60 +208,96 @@ public class MultiSourceEAF {
 					tryReverse = useReverse;
 				}
 				String tempstr2 = "";
-				if(_debug){
-					tempstr2 = path.toString() + "\n";
-					//System.out.println("found path: " +  path);
-				}
-				int augment = fluss.augment(path);
-				if (_debug) {
-					if (augment > 0) {
-						tempstr += tempstr2;
-						tempstr += "augmented " + augment + "\n";
-					} else {
-						zeroaugment += 1;
+				
+				tempstr2 = path.toString() + "\n";					
+
+				// BIG DEBUG
+								
+				if (lasttime == 244) {
+					Flow.debug(1);
+				
+					System.out.println("Checking consistency before augmenting a single path:");
+					System.out.println("path " + path);
+					if (!fluss.checkTEPsAgainstFlow()) {
+						System.out.println("All paths so far:");
+						for (TimeExpandedPath tempTEP : fluss.getPaths()) {
+							System.out.println(tempTEP);
+						}
+
+						throw new RuntimeException("Flow and stored TEPs disagree!"); 
 					}
-					//System.out.println("augmented " + augment);
-					
+				}
+
+				
+				int augment = fluss.augment(path);
+				
+				// BIG DEBUG
+				if (lasttime == 244) {
+					System.out.println("Checking consistency after augmenting a single path:");
+					System.out.println("path " + path);
+					if (!fluss.checkTEPsAgainstFlow()) {
+						System.out.println("All paths so far:");
+						for (TimeExpandedPath tempTEP : fluss.getPaths()) {
+							System.out.println(tempTEP);
+						}
+
+						throw new RuntimeException("Flow and stored TEPs disagree!"); 
+					}
+					Flow.debug(0);
+				}
+
+				
+				if (augment > 0) {
+					tempstr += tempstr2;
+					tempstr += "augmented " + augment + "\n";
+				} else {
+					zeroaugment += 1;
 				}
 			}
-			if (_debug) {
-				tempstr += "Zero augment on " + zeroaugment + " paths.\n";
+			tempstr += "Zero augment on " + zeroaugment + " paths.\n";
+			if (_debug) {				
 				System.out.println(tempstr);				
 			}
 			
 			timer3 = System.currentTimeMillis();
 			gain += fluss.cleanUp();
-
+			
 			timeAugment += timer3 - timer2;
-			if (_debug) {
-				if (i % 100 == 0) {					
-					System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-					System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
-					System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
-					//System.out.println("removed on the fly:" + VertexIntervalls.rem);
-					System.out.println("last path: " + tempstr);
-					System.out.println(routingAlgo.measure());	
-					System.out.println(fluss.measure());
-					System.out.println();
+			
+			
+			if (i % 100 == 0) {					
+				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+				System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
+				System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
+				//System.out.println("removed on the fly:" + VertexIntervalls.rem);
+				System.out.println("last path: " + tempstr);
+				System.out.println(routingAlgo.measure());	
+				System.out.println(fluss.measure());
+				System.out.println();
+				
+				// DEBUG
+				System.out.println("Checking consistency once in a while ...");
+				if (!fluss.checkTEPsAgainstFlow()) {
+					throw new RuntimeException("Flow and stored TEPs disagree!"); 
 				}
+				System.out.println("Everything seems to be okay.");
 			}
 
-			
 		}
 		
-		if (_debug) {
-			long timeStop = System.currentTimeMillis();
-			System.out.println("");
-			System.out.println("");
-			System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-			System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
-			System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
-			//System.out.println("removed on the fly:" + VertexIntervalls.rem);
-			System.out.println("last path: " + tempstr);
-			System.out.println(routingAlgo.measure());	
-			System.out.println(fluss.measure());
-			System.out.println();
-		}
+		
+		long timeStop = System.currentTimeMillis();
+		System.out.println("");
+		System.out.println("");
+		System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+		System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
+		System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
+		//System.out.println("removed on the fly:" + VertexIntervalls.rem);
+		System.out.println("last path: " + tempstr);
+		System.out.println(routingAlgo.measure());	
+		System.out.println(fluss.measure());
+		System.out.println();
+		
 		
 		return fluss;
 	}
@@ -329,9 +364,9 @@ public class MultiSourceEAF {
 	public static void main(final String[] args) {
 
 		FlowCalculationSettings settings;
+		
 		//set debuging modes
-		MultiSourceEAF.debug(true);
-		//BellmanFordVertexIntervalls.debug(0);
+		MultiSourceEAF.debug(false);
 		BellmanFordIntervalBased.debug(0);
 		VertexIntervals.debug(0);
 		//VertexIntervall.debug(false);
@@ -344,11 +379,11 @@ public class MultiSourceEAF {
 		}
 
 		String networkfile = null;
-		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
+		networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
 		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
-		networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
+		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
@@ -357,7 +392,7 @@ public class MultiSourceEAF {
 		//networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
 
 		String plansfile = null;
-		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
+		plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
 		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
@@ -382,15 +417,15 @@ public class MultiSourceEAF {
 
 
 		
-		int uniformDemands = 5;
+		int uniformDemands = 500;
 
 		// Rounding is now done according to timestep and flowFactor!
 		int timestep = 10; 
-		double flowFactor = 1.0;
+		double flowFactor = 0.1;
 
 		
-		String sinkid = "supersink"; //siouxfalls, problem
-		//String sinkid = "en2";  //padang, line, swissold
+		//String sinkid = "supersink"; //siouxfalls, problem
+		String sinkid = "en1";  //padang, line, swissold
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
@@ -443,7 +478,7 @@ public class MultiSourceEAF {
 		settings = new FlowCalculationSettings(network, sinkid, demands, timestep, flowFactor);
 
 		// set additional parameters, mostly for the LP
-		//settings.TimeHorizon = 70;
+		settings.TimeHorizon = 400;
 		//settings.MaxRounds = 101;
 		
 

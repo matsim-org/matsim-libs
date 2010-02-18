@@ -387,7 +387,9 @@ public class TimeExpandedPath {
 		if (testForward) {
 			for(PathStep step : this._steps)
 			{			
-				if(step.equals(stepToSplitAt)) 	{
+				// should there be a second copy of stepToSplitAt in TEP,
+				// it will be output ... otherwise it would have been dropped silently.
+				if(preSplit && step.equals(stepToSplitAt)) 	{
 					preSplit = false;
 					continue;
 				}
@@ -402,8 +404,10 @@ public class TimeExpandedPath {
 			}
 		} else {
 			for(PathStep step : this._steps)
-			{			
-				if(step.equalsNoCheckForward(stepToSplitAt)) 	{
+			{
+				// should there be a second copy of stepToSplitAt in TEP,
+				// it will be output ... otherwise it would have been dropped silently.				
+				if(preSplit && step.equalsNoCheckForward(stepToSplitAt)) 	{
 					preSplit = false;
 					continue;
 				}

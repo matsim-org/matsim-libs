@@ -159,94 +159,95 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		// TODO Test !
 		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();		
 		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
-		
-		int t = current.getHighBound();
+				
 		while(current.getLowBound() < arrive.getHighBound()){
-			//current was never reachable before and is not scanned
-			if(!current.getReachable() && !current.isScanned())
-			{
-				//test if the intervals intersect at all (using the condition in while head above)
-				if(arrive.getLowBound() >= current.getLowBound()
-						|| arrive.getHighBound() > current.getLowBound())
+
+			// only do something if current was not reachable yet
+			if(!current.getReachable()) {
+				
+				// let's modify the interval to look jus right
+				if(current.getLowBound() < arrive.getLowBound()) {
+					current = this.splitAt(arrive.getLowBound());
+				}
+				
+				if(current.getHighBound() > arrive.getHighBound())
+				{
+					this.splitAt(arrive.getHighBound());
+					// pick the interval again to be on the safe side
+					current = this.getIntervalAt(arrive.getHighBound()-1);
+				}
+				
+				
+				/*if(arrive.contains(current))
 				{
 					//if arrive contains current, we relabel it completely
-					if(arrive.contains(current))
-					{
-						if (!reverse) {
-						  current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
-						} else {
-							current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
-						}
-						changed.add(current);
-					}
-					else if(current.contains(arrive))
-					{
-						//if arrive is contained..
-						//we adapt current, so that our lowbound equals
-						//the low bound of the arrive interval..
-						if(current.getLowBound() < arrive.getLowBound())
-						{
-							current = this.splitAt(arrive.getLowBound());
-						}
-						//or we set our highbound to the highbound of arrival
-						if(current.getHighBound() > arrive.getHighBound())
-						{
-							this.splitAt(arrive.getHighBound());
-							current = this.getIntervalAt(arrive.getHighBound()-1);
-						}
-						//current has exactly the same bounds as arrive
-						//so relabel it completely
-
-						if (!reverse) {
-							current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
-						} else {
-							current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
-						}						
-						changed.add(current);
-					}
-					else
-					{
-						//ourInterval intersects arrive, but is neither contained nor does it contain
-						//arrive. thus they overlap somewhere
-						//if the lowerBound of arrive, is greater than our lower bound
-						//we set our lower bound to the bound of arrive
-						if(arrive.getLowBound() > current.getLowBound() && arrive.getLowBound() < current.getHighBound())
-						{
-							current = this.splitAt(arrive.getLowBound());
-						}
-						//we adapt our highbound, so that they are the same
-						if(arrive.getHighBound() < current.getHighBound())
-						{
-							this.splitAt(arrive.getHighBound());
-							current = this.getIntervalAt(arrive.getHighBound()-1);
-						}
-						//we set the attributes
-						if (!reverse) {
-							current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
-						} else {
-							current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
-						}
-						changed.add(current);
-						
-						
-						
-					}
+					// nothing has to be done about it.
 					
-					// DEBUG
-					/*if (reverse && current.getPredecessor().getStartTime() < current.getLowBound()) {
-						System.out.println("Too early start time! Argh");							
-						System.out.println("arrive " + arrive + " pred " + pred + " reverse " + reverse);
-						throw new RuntimeException("Bad pred");
-					}*/
+					if (!reverse) {
+						current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
+					} else {
+						current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
+					}
+					changed.add(current);
 				}
+				else if(current.contains(arrive))
+				{
+					//if arrive is contained..
+					//we adapt current, so that our lowbound equals
+					//the low bound of the arrive interval..
+					if(current.getLowBound() < arrive.getLowBound())
+					{
+						current = this.splitAt(arrive.getLowBound());
+					}
+					//or we set our highbound to the highbound of arrival
+					if(current.getHighBound() > arrive.getHighBound())
+					{
+						this.splitAt(arrive.getHighBound());
+						current = this.getIntervalAt(arrive.getHighBound()-1);
+					}
+					// current now has exactly the same bounds as arrive
+					// so relabel it completely
+
+					if (!reverse) {
+						current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
+					} else {
+						current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
+					}						
+					changed.add(current);
+					
+				}
+				else
+				{
+					//ourInterval intersects arrive, but is neither contained nor does it contain
+					//arrive. thus they overlap somewhere
+					//if the lowerBound of arrive, is greater than our lower bound
+					//we set our lower bound to the bound of arrive
+					if(arrive.getLowBound() > current.getLowBound() && arrive.getLowBound() < current.getHighBound())
+					{
+						current = this.splitAt(arrive.getLowBound());
+					}
+					//we adapt our highbound, so that they are the same
+					if(arrive.getHighBound() < current.getHighBound())
+					{
+						this.splitAt(arrive.getHighBound());
+						current = this.getIntervalAt(arrive.getHighBound()-1);
+					}
+				}*/
+				
+				// and set the attributes
+				if (!reverse) {
+					current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
+				} else {
+					current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
+				}
+				changed.add(current);
 			}
-			
-			
+
+
 			if (isLast(current)) {
 				break;
-			}
-			t = current.getHighBound();
-			current= this.getIntervalAt(t);
+			}			
+			current = this.getIntervalAt(current.getHighBound());
 		}	
 		return changed;
 	}

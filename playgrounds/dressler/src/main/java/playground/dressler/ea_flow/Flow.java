@@ -255,8 +255,7 @@ public class Flow {
 	 */
 	public int augment(TimeExpandedPath TEP){
 	  int bottleneck = bottleNeckCapacity(TEP);
-	  this.augment(TEP, bottleneck);
-	  return bottleneck;
+	  return this.augment(TEP, bottleneck);	  
 	}
 
 	/**
@@ -265,7 +264,7 @@ public class Flow {
 	 * @param gamma Amount of flow to augment
 	 * @return Amount of flow that was really augmented. Should be gamma under most circumstances.
 	 */
-	public void augment(TimeExpandedPath TEP, int gamma){
+	public int augment(TimeExpandedPath TEP, int gamma){
 	  if (TEP.hadToFixSourceLinks()) {
 	    System.out.println("TimeExpandedPath should start with PathEdge of type SourceOutflow! Fixed.");
 	  }
@@ -274,12 +273,18 @@ public class Flow {
 		  if (_debug > 0) {
 			  System.out.println("I refuse to augment with 0 flow.");
 		  }
-		  return;
+		  return 0;
 	  }
-	  dumbaugment(TEP, gamma); // throws exceptions if something is wrong
+	  
+	  unfoldandaugment(TEP);
+	  
+	  // old way to do it ... bad
+	  //dumbaugment(TEP, gamma); // throws exceptions if something is wrong
+	  //this.unfold(TEP);
+	  
 	  this.totalflow += gamma;
-
-	  this.unfold(TEP);
+	  
+	  return gamma; // should be correct.
 	}
 
 	/**
@@ -447,10 +452,68 @@ public class Flow {
 	}
 
 	/**
+	 * Debug Method to compare the stored collection of TEPs against the stored flow values.
+	 * Probably quite badly implemented. 
+	 */
+	public boolean checkTEPsAgainstFlow() {
+		boolean everythingOkay = true;
+		Flow tempflow = new Flow(this._settings);
+		
+		for (TimeExpandedPath TEP : this._TimeExpandedPaths) {
+			tempflow.dumbaugment(TEP, TEP.getFlow());
+		}
+		
+		tempflow.cleanUp();
+		
+		for (Node source : this._sources) {
+			boolean thisisbad = false;
+			for (int t = 0; t < this._timeHorizon; t++) {
+				if (tempflow._sourceoutflow.get(source).getFlowAt(t) != this._sourceoutflow.get(source).getFlowAt(t)) {
+					thisisbad = true;
+					break;
+				}
+			}
+			if (thisisbad) {
+				System.out.println("Flows differ on source: " + source.getId());
+				System.out.println("Original flow believes: ");
+				System.out.println(this._sourceoutflow.get(source));
+				System.out.println("Reconstructed flow believes: ");
+				System.out.println(tempflow._sourceoutflow.get(source));
+				everythingOkay = false;
+			}
+		}
+		
+		for (Link edge : this._network.getLinks().values()) {
+			//System.out.println("Checking edge " + edge.getId() + " ...");
+			boolean thisisbad = false;
+			for (int t = 0; t < this._timeHorizon; t++) {
+				if (tempflow._flow.get(edge).getFlowAt(t) != this._flow.get(edge).getFlowAt(t)) {
+					thisisbad = true;
+					break;
+				}
+			}
+			if (thisisbad) {
+				System.out.println("Flows differ on edge: " + edge.getId() + " " + edge.getFromNode().getId() + "-->" + edge.getToNode().getId());
+				System.out.println("Original flow believes: ");
+				System.out.println(this._flow.get(edge));
+				System.out.println("Reconstructed flow believes: ");
+				System.out.println(tempflow._flow.get(edge));
+				everythingOkay = false;
+			}
+		}
+		
+		/*if (!everythingOkay) {
+			throw new RuntimeException("Flows and stored TEPs disagree!");
+		}*/
+		
+		return everythingOkay;
+	}
+	
+	
+	/**
 	 * Method to change just the flow values according to TimeExpandedPath and gamma
 	 * @param TEP The TimeExpandedPath on which the flow is augmented
-	 * @param gamma Amount of flow to augment
-	 * @return Amount of flow that was really augmented. Should be gamma under most circumstances.
+	 * @param gamma Amount of flow to augment	
 	 */
 
 	private void dumbaugment(TimeExpandedPath TEP, int gamma) {
@@ -460,72 +523,25 @@ public class Flow {
 		}
 
 	}
-
-
+	
 	/**
-	 * method to resolve residual edges in TEP
-	 * @param TEP A TimeExpandedPath
+	 * Method to remove loops in a TEP
+	 * This does not adjust the flow!
+	 * @param TEP The TimeExpandedPath on which loops should be removed. It is no longer to be used afterwards!
+	 * @return a TimeExpandedPath without loops, but it might be new or the original TEP 
 	 */
-	private void unfold(TimeExpandedPath TEPtoAdd){
-		// this function could be quite slow ...
-		/*
-		 * Paths in flow._timeexpandedpaths are always good, i.e. use just forward steps.
-		 * The current path may contain loops! (Not from the BellmanFord,
-		 *   but from unfolding with other paths.) These must be removed first.
-		 * Other unprocessed paths can also contain loops.
-		 * Unprocessed paths cannot contain forward steps for residual steps from the
-		 * current path (or any other unprocessed path), because that would imply a loop
-		 * in some path that caused these unprocessed paths. (use induction)
-		 *
-		 * FIXME removing loops can change the flow on the edges!
-		 * make sure that this function always keeps the flow and the TEP collection in sync!
+	
+	public TimeExpandedPath unloop(TimeExpandedPath TEP) {
+		/* check for loops in the path!
+		 * these can be pairwise opposing residual edges
+		 * or visiting the same time-expanded node twice
+		 * be careful with sourceoutflow-nodes ...
 		 */
-
-		// TEPs that need processing
-		LinkedList<TimeExpandedPath> unfinishedTEPs = new LinkedList<TimeExpandedPath>();
-		unfinishedTEPs.add(TEPtoAdd);
-
-		// processed TEPs that we want to add later on
-		LinkedList<TimeExpandedPath> goodTEPs = new LinkedList<TimeExpandedPath>();
-
-		// processed TEPs that now have 0 flow and we want to remove them later
-		LinkedList<TimeExpandedPath> zeroTEPs = new LinkedList<TimeExpandedPath>();
-
-		while (!unfinishedTEPs.isEmpty()) {
-			TimeExpandedPath TEP = unfinishedTEPs.poll();
-			if (_debug > 0) {
-			  System.out.println("Unfolding: " + TEP);
-			}
-
-		/*	// DEBUG
-			for (TimeExpandedPath tempTEP : this._TimeExpandedPaths) {
-				if (tempTEP.getFlow() == 0) {
-					 System.out.println("Bad allPath.getFlow() == 0... " + tempTEP);
-					 throw new RuntimeException("Bad allPath.getFlow() == 0");
-				  }
-			}*/
-
-
-			boolean onlyForward = true;
-
-			/* check for loops in the path!
-			 * these can be pairwise opposing residual edges
-			 * or visiting the same time-expanded node twice
-			 * be careful with sourceoutflow-nodes ...
-			 */
-
-/*			// DEBUG
-			if (!TEP.check()) {
-				System.out.println("Bad unprocessed TEP!");
-				System.out.println(TEP);
-				throw new RuntimeException("Bad unprocessed TEP!");
-			}
-			if (TEP.getFlow() == 0) {
-				System.out.println("TEP.getFlow() == 0");
-				throw new RuntimeException("TEP.getFlow() == 0");
-			}*/
-
+		
+		boolean hadtofixloop;
+		do {
 			PathStep startLoop = null, endLoop = null;
+			hadtofixloop = false;
 
 			for (PathStep step1 : TEP.getPathSteps()) {
 				startLoop = step1;
@@ -544,15 +560,18 @@ public class Flow {
 					}
 				}
 				if (endLoop != null) {
-					// this is the loop starting the earliest and ending the latest!
+					// This is the loop starting the earliest.
+					// Among those, it is the longest.
+					// But further loops could happen afterwards. 
 					break;
 				}
 			}
 
 			if (endLoop != null) {
-				ArrayList<PathStep> loop = new ArrayList<PathStep>();
+				hadtofixloop = true;
+				
 				if (_debug > 0) {
-				  System.out.println("with loops: " + TEP);
+					System.out.println("with loops: " + TEP);
 				}
 				TimeExpandedPath newTEP = new TimeExpandedPath();
 				newTEP.setFlow(TEP.getFlow());
@@ -565,40 +584,447 @@ public class Flow {
 					}
 					if (!inloop) {
 						newTEP.append(step);
-					} else {
-						/* FIXME adjust flow on edges to be in sync with TEP collection!
-						   However, removing the flow might temporarily exceed [0, u] boundaries
-						   if the TEP could unfold with itself */
-						augmentStepUnsafe(step, -TEP.getFlow());
-						loop.add(step);
-					}
+					} 
 				}
-
-				// just to be sure
-				// if (_debug > 0) {
-				for (PathStep step : loop) {
-					if (!checkStep(step)) {
-						System.out.println("without loops: " + TEP);
-						System.out.println("Bad unlooped new TEP: " + newTEP);
-						System.out.println("problem step: " + step);
-						throw new RuntimeException("Unsafe unlooping violated bounds on flow!");
-					}
-				}
-			    // }
 
 				if (_debug > 0) {
-					System.out.println("without loops: " + TEP);
+					System.out.println("checking path with less loops: " + newTEP);
 					if (!newTEP.check()) {
-						System.out.println("Bad unlooped new TEP:");
-						System.out.println(newTEP);
-						throw new RuntimeException("Bad unlooped TEP!");
+						System.out.println("Bad unlooped new TEP!");
+						throw new RuntimeException("Bad unlooped new TEP!");
 					}
 				}
 
 				TEP = newTEP;
 			}
+		} while (hadtofixloop); // maybe we have to fix multiple loops, so try again.
+		
+		return TEP;
+	}
 
+	
+	/**
+	 * Method to add a TEP to the stored TEP collection and adjust the flow according to TEP
+	 * All TEPs will be unlooped and unfolded, and the flow is augmented accordingly to TEP.getFlow()  
+	 * @param TEPtoAdd The TimeExpandedPath to add.
+	 */
+	private void unfoldandaugment(TimeExpandedPath TEPtoAdd){
+		// this function could be quite slow ...
+		/*
+		 * This is built on the following assumptions:
+		 * Paths in flow._timeexpandedpaths are always good, i.e. use just forward steps.
+		 * Paths in flow._timeexpandedpaths have no loops.
+		 * The flow on the edges is always equal to the sum of flow._timeexpandedpath.
+		 * However, TEPtoAdd and all other unprocessed paths are not counted,
+		 * neither are any goodpaths not yet added to flow._timeexpandedpath.  
+		 * 
+		 * I.e., this function always keeps the flow and the TEP collection in sync!
+		 */
+		
+		// TEPs that need processing
+		LinkedList<TimeExpandedPath> unfinishedTEPs = new LinkedList<TimeExpandedPath>();
+		unfinishedTEPs.add(TEPtoAdd);
+		
+		if (_debug > 0) {
+			System.out.println("Starting unfoldandaugment() ...");
+		}
 
+		// processed TEPs that we want to add later on
+		LinkedList<TimeExpandedPath> goodTEPs = new LinkedList<TimeExpandedPath>();
+
+		// processed TEPs that now have 0 flow and we want to remove them later
+		LinkedList<TimeExpandedPath> zeroTEPs = new LinkedList<TimeExpandedPath>();
+		
+		while (!unfinishedTEPs.isEmpty()) {
+			TimeExpandedPath TEP = unfinishedTEPs.poll();
+						
+			if (_debug > 0) {
+			  System.out.println("Unfolding: " + TEP);
+			}
+
+			if (_debug > 0) {
+               System.out.println("Edges etc along the path: ");
+               for (PathStep step : TEP.getPathSteps()) {
+            	   if (step instanceof StepEdge) {
+ 					  System.out.println("Flow on edge for: " + step);
+ 					  System.out.println(this._flow.get(((StepEdge) step).getEdge()));
+ 					} else if (step instanceof StepSourceFlow) {
+ 						System.out.println("Flow for source: " + step);
+   					    System.out.println(this._sourceoutflow.get(((StepSourceFlow) step).getStartNode().getRealNode()));
+ 					} else if (step instanceof StepSinkFlow) {
+ 						System.out.println("Step sink flow " + step + " ...");
+ 					} else {
+ 						System.out.println("Unknown kind of PathStep! " + step);
+ 					}
+               }
+			}
+			
+			
+		    //if (_debug > 0) {
+				if (!TEP.check()) {
+					System.out.println("Bad unprocessed TEP!");
+					System.out.println(TEP);
+					throw new RuntimeException("Bad unprocessed TEP!");
+				}
+			//}
+			
+			/* remove loops
+			 */
+			
+			TEP = unloop(TEP);
+			
+			boolean onlyForward = true;
+
+			// traverse in order
+			// be careful not to rearrange it and expect things to continue
+			for (PathStep step : TEP.getPathSteps()) {
+			   if (!step.getForward()) {
+				   onlyForward = false;
+				   if (_debug > 0) {
+				     System.out.println("Found backwards step: " + step);
+				   }
+
+				   int flowToUndo = TEP.getFlow();
+
+				   if (flowToUndo == 0) {
+					   System.out.println("flowToUndo == 0");
+					   System.out.println("processing path: " + TEP);
+					   System.out.println("good paths:");
+					   for (TimeExpandedPath tempTEP : goodTEPs) {
+							System.out.println(tempTEP);
+						}
+					   System.out.println("unfinished paths:");
+					   for (TimeExpandedPath tempTEP : unfinishedTEPs) {
+							System.out.println(tempTEP);
+						}
+					   throw new RuntimeException("flowToUndo == 0");
+				   }
+
+  				   // search for an appropriate TEP to unfold with
+				   for (TimeExpandedPath otherTEP : this._TimeExpandedPaths) {
+					   
+					   // FIXME this seems to slow down rather than speed up the augmenting!
+					   // That is somewhat surprising, though. Needs more testing.
+					  /* if (!otherTEP.doesTouch(step.getStartNode()) || !otherTEP.doesTouch(step.getArrivalNode())) {
+						   // this path cannot contain the reverse of step
+						   //System.out.println("Skipped checking a path!");
+						   continue;
+					   }*/
+					   
+ 					   // DEBUG
+					   if (otherTEP.getFlow() == 0) {
+						   throw new RuntimeException("OtherTEP.getFlow() == 0 even earlier");
+					   }
+
+					   
+					   for (PathStep otherStep : otherTEP.getPathSteps()) {
+						   if (step.isResidualVersionOf(otherStep)) {
+
+							   if (_debug > 0) {
+							     System.out.println("Found step to unfold with: " + otherStep);
+							     System.out.println("It's in otherTEP: " + otherTEP);
+							   }
+
+ 							   // must do this everytime so we get true fresh copies of myHead and myTail!
+							   // note that splitPathAtStep splits at the first possible point.
+							   LinkedList<TimeExpandedPath> myParts = TEP.splitPathAtStep(step, true);
+							   TimeExpandedPath myHead = myParts.getFirst();
+							   TimeExpandedPath myTail = myParts.getLast();
+
+							   // split the found path
+							   // since otherTEP is a good path, it only has forward edges
+							   // we make a safe check anyway
+							   LinkedList<TimeExpandedPath> otherParts = otherTEP.splitPathAtStep(otherStep, true);
+							   TimeExpandedPath otherHead = otherParts.getFirst();
+							   TimeExpandedPath otherTail = otherParts.getLast();
+
+							   int augment = Math.min(flowToUndo, otherTEP.getFlow());
+
+							   if (_debug > 0) {
+							     System.out.println("myHead " + myHead);
+							     System.out.println("myTail " + myTail);
+							     System.out.println("otherHead " + otherHead);
+							     System.out.println("otherTail " + otherTail);
+							   }
+
+							   if (otherTEP.getFlow() == 0) {
+								   System.out.println("OtherTEP.getFlow() == 0");
+								   System.out.println("processing path: " + TEP);
+								   System.out.println("other path: " + otherTEP);
+								   System.out.println("good paths:");
+								   for (TimeExpandedPath tempTEP : goodTEPs) {
+										System.out.println(tempTEP);
+									}
+								   System.out.println("unfinished paths:");
+								   for (TimeExpandedPath tempTEP : unfinishedTEPs) {
+										System.out.println(tempTEP);
+									}
+								   throw new RuntimeException("OtherTEP.getFlow() == 0");
+							   }
+							   
+							   
+
+							   myHead.addTailToPath(otherTail);
+							   myHead.setFlow(augment);
+							   goodTEPs.add(myHead);
+
+							   otherHead.addTailToPath(myTail);
+							   otherHead.setFlow(augment);
+							   unfinishedTEPs.add(otherHead);
+
+							   // adjust the flow on the edges and the flow on the (still) stored TEP
+							   dumbaugment(otherTEP, -augment);
+							   otherTEP.setFlow(otherTEP.getFlow() - augment);
+
+							   flowToUndo -= augment;
+
+							   if (_debug > 0) {
+							     System.out.println("What's left of otherTEP: ");
+							     System.out.println(otherTEP);
+							   }
+
+							   // flow might be zero, should be deleted!
+							   if (otherTEP.getFlow() == 0) {
+							     zeroTEPs.add(otherTEP);
+							   }
+
+							   // We found the forward step we were looking for.
+							   // Now look for another TEP to unfold with.
+							   break;
+						   }
+					   }
+					   
+					   if (flowToUndo == 0) break;
+				   }
+
+				   if (flowToUndo > 0) {
+					   System.out.println("problem path: " + TEP);
+					   System.out.println("good paths:");
+					   for (TimeExpandedPath tempTEP : goodTEPs) {
+							System.out.println(tempTEP);
+						}
+					   System.out.println("unfinished paths:");
+					   for (TimeExpandedPath tempTEP : unfinishedTEPs) {
+							System.out.println(tempTEP);
+					   }
+					   System.out.println("zero paths:");
+					   for (TimeExpandedPath tempTEP : zeroTEPs) {
+							System.out.println(tempTEP);
+					   }
+					   /*System.out.println("All paths so far:");
+						for (TimeExpandedPath tempTEP : this._TimeExpandedPaths) {
+							System.out.println(tempTEP);
+						}*/
+
+					   throw new RuntimeException("Could not undo all flow on backwards step!");
+				   }
+
+				   // this TEP is broken up ... don't bother with it anymore
+				   break;
+			   }
+			}
+			
+			// was everything alright?
+			if (onlyForward) {
+				goodTEPs.add(TEP);
+			}
+
+			// deleting paths with 0 flow does not change the flow
+			this._TimeExpandedPaths.removeAll(zeroTEPs);
+			zeroTEPs.clear();
+
+			/*// DEBUG
+			for (TimeExpandedPath tempTEP : goodTEPs) {
+			  if (tempTEP.getFlow() == 0) {
+				 System.out.println("Bad goodPath.getFlow() == 0... " + tempTEP);
+				 throw new RuntimeException("Bad goodPath.getFlow() == 0");
+			  }
+			}*/
+
+			// add the good flows:
+			// check for loops and adjust the flow
+			for (TimeExpandedPath good : goodTEPs) {
+			  good = unloop(good);
+			  this._TimeExpandedPaths.add(good);
+			  dumbaugment(good, good.getFlow());
+			}
+			goodTEPs.clear();
+
+			/*if (_debug > 0) {
+				System.out.println("All paths so far:");
+				for (TimeExpandedPath tempTEP : this._TimeExpandedPaths) {
+					System.out.println(tempTEP);
+				}
+			}*/
+			
+			// BIG DEBUG
+			if (_debug > 0) {
+				System.out.println("Checking consistency at end of UnfoldAndAugment");
+				if (!this.checkTEPsAgainstFlow()) {
+					System.out.println("calling path: " + TEPtoAdd);
+					System.out.println("last processed path: " + TEP);
+
+					/*System.out.println("All paths so far:");
+				for (TimeExpandedPath tempTEP : this._TimeExpandedPaths) {
+					System.out.println(tempTEP);
+				}*/
+
+					throw new RuntimeException("Flow and stored TEPs disagree!"); 
+				}
+			}
+		}
+		
+		
+		
+	}
+	
+
+	/**
+	 * method to resolve residual edges in TEP
+	 * @param TEP A TimeExpandedPath
+	 */
+	@Deprecated
+	private void unfold(TimeExpandedPath TEPtoAdd){
+		// FIXME this is broken! Do not use!
+		System.out.println("flow.unfold() is broken. Do not use it!");
+		
+		// this function could be quite slow ...
+		/*
+		 * Paths in flow._timeexpandedpaths are always good, i.e. use just forward steps.
+		 * The current path may contain loops! (Not from the BellmanFord,
+		 *   but from unfolding with other paths.) These must be removed first.
+		 * Other unprocessed paths can also contain loops.
+		 * Unprocessed paths cannot contain forward steps for residual steps from the
+		 * current path (or any other unprocessed path), because that would imply a loop
+		 * in some path that caused these unprocessed paths. (use induction)
+		 *
+		 * FIXME removing loops changes the flow on the edges!
+		 * make sure that this function always keeps the flow and the TEP collection in sync!
+		 */
+
+		// TEPs that need processing
+		LinkedList<TimeExpandedPath> unfinishedTEPs = new LinkedList<TimeExpandedPath>();
+		unfinishedTEPs.add(TEPtoAdd);
+
+		// processed TEPs that we want to add later on
+		LinkedList<TimeExpandedPath> goodTEPs = new LinkedList<TimeExpandedPath>();
+
+		// processed TEPs that now have 0 flow and we want to remove them later
+		LinkedList<TimeExpandedPath> zeroTEPs = new LinkedList<TimeExpandedPath>();
+
+		ArrayList<PathStep> wasinvolvedinloop = new ArrayList<PathStep>();
+		
+		while (!unfinishedTEPs.isEmpty()) {
+			TimeExpandedPath TEP = unfinishedTEPs.poll();
+			TimeExpandedPath TEPtoProcess = TEP; // DEBUG
+			
+			if (_debug > 0) {
+			  System.out.println("Unfolding: " + TEP);
+			}
+
+			if (_debug > 0) {
+               System.out.println("Edges etc along the path: ");
+               for (PathStep step : TEP.getPathSteps()) {
+            	   if (step instanceof StepEdge) {
+ 					  System.out.println("Flow on edge for: " + step);
+ 					  System.out.println(this._flow.get(((StepEdge) step).getEdge()));
+ 					} else if (step instanceof StepSourceFlow) {
+ 						System.out.println("Flow for source: " + step);
+   					    System.out.println(this._sourceoutflow.get(((StepSourceFlow) step).getStartNode().getRealNode()));
+ 					} else if (step instanceof StepSinkFlow) {
+ 						System.out.println("Step sink flow " + step + " ...");
+ 					} else {
+ 						System.out.println("Unknown kind of PathStep! " + step);
+ 					}
+               }
+			}
+			
+			// DEBUG
+			//if (_debug > 0) {
+				if (!TEP.check()) {
+					System.out.println("Bad unprocessed TEP!");
+					System.out.println(TEP);
+					throw new RuntimeException("Bad unprocessed TEP!");
+				}
+			//}
+			
+			/* check for loops in the path!
+			 * these can be pairwise opposing residual edges
+			 * or visiting the same time-expanded node twice
+			 * be careful with sourceoutflow-nodes ...
+			 */
+			
+			boolean hadtofixloop;
+			do {
+				PathStep startLoop = null, endLoop = null;
+				hadtofixloop = false;
+
+				for (PathStep step1 : TEP.getPathSteps()) {
+					startLoop = step1;
+					boolean afterwards = false;
+					// TODO just start searching at step1 ... would be much nicer
+					for (PathStep step2 : TEP.getPathSteps()) {
+						if (step1 == step2) { // not step.equals(step2), that would be counterproductive
+							afterwards = true;
+							continue;
+						} else if (afterwards) {
+							if (step1.getStartNode().equals(step2.getStartNode())) {
+								// loop!
+								//System.out.println("Loop! " + step1 + " and " + step2);
+								endLoop = step2;
+							}
+						}
+					}
+					if (endLoop != null) {
+						// this is the loop starting the earliest and ending the latest!
+						// but further loops could happen afterwards or 
+						break;
+					}
+				}
+
+				if (endLoop != null) {
+					hadtofixloop = true;
+					
+					if (_debug > 0) {
+						System.out.println("with loops: " + TEP);
+					}
+					TimeExpandedPath newTEP = new TimeExpandedPath();
+					newTEP.setFlow(TEP.getFlow());
+					boolean inloop = false;
+					for (PathStep step : TEP.getPathSteps()) {
+						if (step == startLoop) {
+							inloop = true;
+						} else if (step == endLoop) {
+							inloop = false;
+						}
+						if (!inloop) {
+							newTEP.append(step);
+						} else {
+							/* FIXME adjust flow on edges to be in sync with TEP collection!
+						   However, removing the flow might temporarily exceed [0, u] boundaries
+						   if the TEP could unfold with itself */
+							augmentStepUnsafe(step, -TEP.getFlow());
+							wasinvolvedinloop.add(step);
+						}
+					}
+
+					
+
+					if (_debug > 0) {
+						System.out.println("checking path with loops: " + TEP);
+						if (!newTEP.check()) {
+							System.out.println("Bad unlooped new TEP:");
+							System.out.println(newTEP);
+							throw new RuntimeException("Bad unlooped TEP!");
+						}
+					}
+
+					TEP = newTEP;
+				}
+			} while (hadtofixloop); // maybe we have to fix multiple loops, so try again. 
+
+			
+			boolean onlyForward = true;
 
 			// traverse in order
 			// be careful not to rearrange it and expect things to continue
@@ -656,12 +1082,24 @@ public class Flow {
 							   }
 
  							   // must do this everytime so we get true fresh copies of myHead and myTail!
-							   LinkedList<TimeExpandedPath> myParts = TEP.splitPathAtStep(step, false);
+							   // note that splitPathAtStep splits at the first possible point.
+							   // since TEP should not unfold with itself (after the unlooping)
+							   // this should find the right step ... 
+							   // FIXME ... but i have doubts ...
+							   // could just use splitPathAtStep(step, true)
+							   //LinkedList<TimeExpandedPath> myParts = TEP.splitPathAtStep(step, false);
+							   LinkedList<TimeExpandedPath> myParts = TEP.splitPathAtStep(step, true);
 							   TimeExpandedPath myHead = myParts.getFirst();
 							   TimeExpandedPath myTail = myParts.getLast();
 
 							   // split the found path
-							   LinkedList<TimeExpandedPath> otherParts = otherTEP.splitPathAtStep(step, false);
+							   // since otherTEP is a good path, it only has forward edges ...
+							   // but maybe, just maybe, it might contain loops because those are not removed
+							   // before adding good paths
+							   // that could have caused splitPathAtStep to fail.
+ 							   // could just use splitPathAtStep(otherstep, true)
+							   //LinkedList<TimeExpandedPath> otherParts = otherTEP.splitPathAtStep(step, false);
+							   LinkedList<TimeExpandedPath> otherParts = otherTEP.splitPathAtStep(otherStep, true);
 							   TimeExpandedPath otherHead = otherParts.getFirst();
 							   TimeExpandedPath otherTail = otherParts.getLast();
 
@@ -772,13 +1210,67 @@ public class Flow {
 			this._TimeExpandedPaths.addAll(goodTEPs);
 			goodTEPs.clear();
 
-			if (_debug > 0) {
+			/*if (_debug > 0) {
 				System.out.println("All paths so far:");
 				for (TimeExpandedPath tempTEP : this._TimeExpandedPaths) {
 					System.out.println(tempTEP);
 				}
+			}*/
+		}
+		
+		// just to be sure
+		// if (_debug > 0) {
+		boolean somethingwrong = false;
+		for (PathStep step : wasinvolvedinloop) {
+			if (!checkStep(step)) {
+				somethingwrong = true;
+				System.out.println("Path to add: " + TEPtoAdd);
+				System.out.println("good paths:");
+				for (TimeExpandedPath tempTEP : goodTEPs) {
+					System.out.println(tempTEP);
+				}
+				System.out.println("unfinished paths:");
+				for (TimeExpandedPath tempTEP : unfinishedTEPs) {
+					System.out.println(tempTEP);
+				}
+				
+				/*System.out.println("All paths so far:");
+				for (TimeExpandedPath tempTEP : this._TimeExpandedPaths) {
+					System.out.println(tempTEP);
+				}*/
+
+				/*System.out.println("with all loops: " + TEPtoProcess);
+				//System.out.println("before removing the last loop: " + TEP);
+				//System.out.println("Bad unlooped new TEP: " + newTEP);
+				System.out.println("Bad unlooped new TEP: " + TEP);
+				System.out.println("problem step: " + step);*/
+				
+				if (step instanceof StepEdge) {
+				  System.out.println("Flow on edge of the problem step: ");
+				  System.out.println(this._flow.get(((StepEdge) step).getEdge()));
+				}
+				
+				
 			}
 		}
+		if (somethingwrong) {
+			throw new RuntimeException("Unsafe unlooping violated bounds on flow!");
+		}
+		
+		// }
+		
+		// BIG DEBUG
+		/*System.out.println("Checking consistency at end of Unfold");
+		if (!this.checkTEPsAgainstFlow()) {
+			System.out.println("problem path: " + TEPtoAdd);
+
+			System.out.println("All paths so far:");
+			for (TimeExpandedPath tempTEP : this._TimeExpandedPaths) {
+				System.out.println(tempTEP);
+			}
+			
+			throw new RuntimeException("Flow and stored TEPs disagree!"); 
+		}*/
 	}
 
 	/**
@@ -1017,6 +1509,7 @@ public class Flow {
 	 * Call the cleanup-method for each edge
 	 */
 	public int cleanUp() {
+		
 		int gain = 0;
 		for (EdgeIntervals EI : _flow.values()) {
 		  gain += EI.cleanup();

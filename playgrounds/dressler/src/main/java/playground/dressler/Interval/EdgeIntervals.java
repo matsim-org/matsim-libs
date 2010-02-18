@@ -268,12 +268,12 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 					gamma + " < 0");
 		}
 		
-		// FIXME one of these cases should not happen ... I think
 		if(i.getLowBound() < t){
 			i= splitAt(t);
 		}
 		if(i.getHighBound() > (t+1)){
 			splitAt(t+1);
+			i = getIntervalAt(t); // just to be safe
 		}
 		i.augment(gamma, u);
 	}
@@ -286,12 +286,13 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	 */
 	public void augmentUnsafe(final int t, final int gamma){
 		EdgeInterval i = getIntervalAt(t);
-		// FIXME one of these cases should not happen ... I think
+
 		if(i.getLowBound() < t){
 			i= splitAt(t);
 		}
 		if(i.getHighBound() > (t+1)){
 			splitAt(t+1);
+			i = getIntervalAt(t); // just to be safe
 		}
 		i.augmentUnsafe(gamma);
 	}

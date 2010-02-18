@@ -157,19 +157,17 @@ public class VertexInterval extends Interval {
 	}
 	
 	/**
-	 * Set the fields of the VertexInterval reachable true, scanned false.
+	 * Set the fields of the VertexInterval reachable true, scanned false, and the _breadrumb to breadcrumb
 	 * This performs no checks at all!
-	 * @param pred which is set as predecessor, always shifted to low bound!
+	 * @param bread which is set as breadcrumb. It is never shifted anymore.
 	 */
-	public void setArrivalAttributes (final PathStep pred)
+	public void setArrivalAttributes (final PathStep bread)
 	{
-		//we might have already scanned this interval
+		// we might have already scanned this interval
+		// but someone insists on relabelling it.
 		this.scanned = false;
 		this.reachable = true;
-		this._breadcrumb = pred;
-		
-		// this shifting here had a tendency to be confusing and to break things!		
-		// this._predecessor = pred.copyShiftedToArrival(this.getLowBound());	
+		this._breadcrumb = bread;
 	}
 	
 //----------------------------SPLITTING----------------------------//
@@ -189,20 +187,16 @@ public class VertexInterval extends Interval {
 		if (this._breadcrumb == null) {
 			k._breadcrumb = null;
 		} else {
-		    k._breadcrumb= this._breadcrumb.copyShifted(k.getLowBound() - t);
-		}
-		
-		if (k._breadcrumb != null && k.getPredecessor().getStartTime() < k.getLowBound()) {
-			System.out.println("Too early start time! Argh");							
-			throw new RuntimeException("Bad pred");
+			// should hardly ever occur, if at all.
+		    k._breadcrumb = this._breadcrumb.copyShifted(k.getLowBound() - this.getLowBound());
 		}
 		
 		return k;
 	}
 	
 	/**
-	 * gives a string representation of tje VertexInterval of the form with optional predecessor
-	 * [x,y): reachable: true scanned: false pred: 
+	 * gives a string representation of the VertexInterval of the form 
+	 * [x,y): reachable: true scanned: false  breadcrumb: ...  
 	 * @return string representation 
 	 */
 	 

@@ -258,8 +258,10 @@ public class BellmanFordIntervalBased {
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
 	private Collection<TimeExpandedPath> constructRoutes() throws BFException {
-
-		System.out.println("Constructing routes ...");
+		
+		if (_debug > 0) {
+		  System.out.println("Constructing routes ...");
+		}
 
 		// HashSet does not seem to be deterministic! Don't use it. 
 		//Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
@@ -405,7 +407,10 @@ public class BellmanFordIntervalBased {
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
 	private Collection<TimeExpandedPath> constructRoutesReverse() throws BFException {
-		System.out.println("Constructing routes ...");
+		
+		if (_debug > 0) {
+			System.out.println("Constructing routes ...");
+		}
 		
 		// DEBUG
 		/*System.out.println("Normal labels:");
@@ -506,17 +511,19 @@ public class BellmanFordIntervalBased {
 			// it might even pick up a larger interval (or smaller if something weird happened)
 			VertexInterval start = _labels.get(from).getIntervalAt(ival.getLowBound());
 			
-			// Create predecessor. It will be shifted correctly deeper down in the calls.			
-			PathStep pred;
-			if (original) {
-			  pred = new StepEdge(over, 0, this._settings.getLength(over), original);
-			} else {
-			  pred = new StepEdge(over, this._settings.getLength(over), 0, original);				
-			}
-						
-			if(start.getReachable() && !start.isScanned()){
+			// we don't check if this is scanned because scanned gets set before relabel is called!
+			if(start.getReachable()){
+				// Create predecessor. It will be shifted correctly deeper down in the calls.			
+				PathStep pred;
+				if (original) {
+					pred = new StepEdge(over, 0, this._settings.getLength(over), original);
+				} else {
+					pred = new StepEdge(over, this._settings.getLength(over), 0, original);				
+				}
+
+
 				arrive = flowover.propagate(start, this._settings.getCapacity(over),original, timehorizon);
-					
+
 				if(arrive != null && !arrive.isEmpty()){
 					changed = labelto.setTrueList(arrive , pred, false);
 					return changed;
@@ -524,10 +531,11 @@ public class BellmanFordIntervalBased {
 					return null;
 				}					
 			} else {
-				System.out.println("Weird. Relabel called for unreachable or unscanned interval!");
+				//System.out.println("Weird. Relabel called for unreachable or already scanned interval!");
+				return null;
 			}
-			return null;
-					
+			
+
 	}
 	
 	/**
@@ -550,20 +558,22 @@ public class BellmanFordIntervalBased {
 			// it might even pick up a larger interval (or smaller if something weird happened)
 			VertexInterval start = _labels.get(from).getIntervalAt(ival.getLowBound());
 			
-			// Create successor. It will be shifted correctly deeper down in the calls.			
-			PathStep succ;
-			if (original) {
-			  succ = new StepEdge(over, 0, this._settings.getLength(over), original);
-			} else {
-			  succ = new StepEdge(over, this._settings.getLength(over), 0, original);				
-			}
-						
-			if(start.getReachable() && !start.isScanned()){
+			// we don't check if this is scanned because scanned gets set before relabel is called!
+			if(start.getReachable()){
+				// Create successor. It will be shifted correctly deeper down in the calls.			
+				PathStep succ;
+				if (original) {
+					succ = new StepEdge(over, 0, this._settings.getLength(over), original);
+				} else {
+					succ = new StepEdge(over, this._settings.getLength(over), 0, original);				
+				}
+
+
 				// "true" = run the reverse propagate
 				arrive = flowover.propagate(start, this._settings.getCapacity(over), original, true, timehorizon);
 				//System.out.println("arrive: ");
 				//System.out.println(arrive);
-									
+
 				if(arrive != null && !arrive.isEmpty()){
 					changed = labelto.setTrueList(arrive , succ, true);
 					return changed;
@@ -571,9 +581,10 @@ public class BellmanFordIntervalBased {
 					return null;
 				}					
 			} else {
-				System.out.println("Weird. Relabel called for unreachable or unscanned interval!");
+				//System.out.println("Weird. Relabel reverse called for unreachable or already scanned interval!");
+				return null;
 			}
-			return null;
+			
 					
 	}
 	
@@ -672,13 +683,21 @@ public class BellmanFordIntervalBased {
 			} else if (task.node instanceof VirtualNormalNode) {
 				// Clean Up before we do anything!
 				// TODO Effectiveness?
-				gain += _labels.get(v).cleanup();
+				// DISABLED FOR TESTING
+				//gain += _labels.get(v).cleanup();
 
+				VertexInterval inter = this._labels.get(v).getIntervalAt(task.ival.getLowBound());
+				if (inter.isScanned() || !inter.getReachable()) {
+					System.out.println("Node " + v.getId() + " was already scanned or not reachable ...");
+					continue;
+				}
+				inter.setScanned(true);
+				
 				// visit neighbors
 				// link is outgoing edge of v => forward edge
 				for (Link link : v.getOutLinks().values()) {				
 					Node w = link.getToNode();
-					ArrayList<VertexInterval> changed = relabel(v, task.ival, w, link, true, this._settings.TimeHorizon);
+					ArrayList<VertexInterval> changed = relabel(v, inter, w, link, true, this._settings.TimeHorizon);
 					if (changed == null) continue;
 					//if (!this._settings.isSink(w)) {
 						for(VertexInterval changedinterval : changed){
@@ -689,7 +708,7 @@ public class BellmanFordIntervalBased {
 				// link is incoming edge of v => backward edge
 				for (Link link : v.getInLinks().values()) {
 					Node w = link.getFromNode();
-					ArrayList<VertexInterval> changed = relabel(v, task.ival, w, link, false, this._settings.TimeHorizon);
+					ArrayList<VertexInterval> changed = relabel(v, inter, w, link, false, this._settings.TimeHorizon);
 					if (changed == null) continue;
 
 					//if (!this._settings.isSink(w)) {
@@ -705,7 +724,7 @@ public class BellmanFordIntervalBased {
 						// we might have to do something ...
 						// check if we can reverse flow
 						SourceIntervals si = this._flow.getSourceOutflow(v);
-						Interval arrive = si.canSendFlowBack(task.ival);
+						Interval arrive = si.canSendFlowBack(inter);
 						if (arrive != null) {
 							
 							// indeed, we need to process this source
@@ -810,7 +829,8 @@ public class BellmanFordIntervalBased {
 			Node v = task.node.getRealNode();
 			
 			// TODO does this help? 
-			gain += _labels.get(v).cleanup();
+			// DISABLED FOR TESTING
+			//gain += _labels.get(v).cleanup();
 			
 			if (task.node instanceof VirtualSink) {
 				// we want to arrive at lastArrival
@@ -860,16 +880,23 @@ public class BellmanFordIntervalBased {
 				
 				continue; // no need to scan another interval
 			} else if (task.node instanceof VirtualNormalNode) {
-				// Clean Up before we do anything!
-				// However, clean up seems totally useless for VertexIntervalls.
-				//gain += _labels.get(iv._node).cleanup();
-
+				
+				// set scanned
+				// As long as no cleanup happens in between, this should be safe.
+				
+				VertexInterval inter = this._labels.get(v).getIntervalAt(task.ival.getLowBound());
+				if (inter.isScanned() || !inter.getReachable()) {
+					System.out.println("Node " + v.getId() + " was already scanned or not reachable ...");
+					continue;
+				}				
+				inter.setScanned(true);
+				
 				// visit neighbors
 				// link is outgoing edge of v => backward edges have v as successor
 				for (Link link : v.getOutLinks().values()) {					
 					Node w = link.getToNode();
 					
-					ArrayList<VertexInterval> changed = relabelReverse(v, task.ival, w, link, false, this._settings.TimeHorizon);
+					ArrayList<VertexInterval> changed = relabelReverse(v, inter, w, link, false, this._settings.TimeHorizon);
 					
 					if (changed == null) continue;
 					
@@ -882,7 +909,7 @@ public class BellmanFordIntervalBased {
 				for (Link link : v.getInLinks().values()) {
 					Node w = link.getFromNode();
 
-					ArrayList<VertexInterval> changed = relabelReverse(v, task.ival, w, link, true, this._settings.TimeHorizon);
+					ArrayList<VertexInterval> changed = relabelReverse(v, inter, w, link, true, this._settings.TimeHorizon);
 					
 					if (changed == null) continue;
 
@@ -899,13 +926,16 @@ public class BellmanFordIntervalBased {
 					// we've found a source, mark it
 					VertexInterval vi = this._sourcelabels.get(v);
 					if (!vi.getReachable()) {
-						PathStep succ = new StepSourceFlow(v, task.time, true);
+						PathStep succ = new StepSourceFlow(v, inter.getLowBound(), true);
 						vi.setArrivalAttributes(succ);
 						// well, if it's an active source, this will not do anything
 						// we do it anyway, it doesn't really hurt.
 						queue.add(new BFTask(new VirtualSource(v), 0));
 					}
-				}				
+				}			
+				
+			
+				
 			} else {
 				throw new RuntimeException("Unsupported instance of VirtualNode in BellmanFordIntervalBased");
 			}

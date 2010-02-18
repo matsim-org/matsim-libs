@@ -69,19 +69,19 @@ public class StepSinkFlow implements PathStep {
 	 */
 	@Override
 	public VirtualNode getStartNode() {
-		if (this.forward) {			
-		  return new VirtualSink(this.node);
+		if (this.forward) {
+			return new VirtualNormalNode(this.node, this.time);			
 		} else {
-		  return new VirtualNormalNode(this.node, this.time);	
+			return new VirtualSink(this.node);					  
 		}
 	}
 	
 	@Override
 	public VirtualNode getArrivalNode() {
-		if (!this.forward) {			
-			return new VirtualNormalNode(this.node, this.time);
-		} else {
+		if (this.forward) {			
 			return new VirtualSink(this.node);				
+		} else {
+			return new VirtualNormalNode(this.node, this.time);			
 		}
 	}
 	
