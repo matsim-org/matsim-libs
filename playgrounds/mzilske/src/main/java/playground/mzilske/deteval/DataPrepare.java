@@ -4,16 +4,24 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
 import org.matsim.visum.VisumNetwork.EdgeType;
+
+import playground.mzilske.bvg09.StreamingVisumNetworkReader;
+import playground.mzilske.bvg09.VisumNetworkRowHandler;
 
 public class DataPrepare {
 	
@@ -41,18 +49,50 @@ public class DataPrepare {
 	}
 
 	private void convertNetwork() {
-		NetworkLayer network = scenario.getNetwork();
-		for (VisumNetwork.Node visumNode : visumNetwork.nodes.values()) {
-			network.createAndAddNode(visumNode.id, visumNode.coord);
-		}
-		for (VisumNetwork.Edge visumEdge : visumNetwork.edges.values()) {
-			double length = visumEdge.length * 1000;
-			double freespeed = getFreespeedTravelTime(visumEdge.edgeTypeId);
-			double capacity = getCapacity(visumEdge.edgeTypeId);
-			if (isEdgeTypeRelevant(visumEdge.edgeTypeId)) {
-				network.createAndAddLink(visumEdge.id, network.getNodes().get(visumEdge.fromNode), network.getNodes().get(visumEdge.toNode), length, freespeed, capacity, 1);
+		final NetworkLayer network = scenario.getNetwork();
+		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
+		
+		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {
+			
+			@Override
+			public void handleRow(Map<String, String> row) {
+				Id id = new IdImpl(row.get("NR"));
+				Coord coord = new CoordImpl(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
+				network.createAndAddNode(id, coord);
 			}
-		}
+			
+		};
+		streamingVisumNetworkReader.addRowHandler("KNOTEN", nodeRowHandler);
+		
+		VisumNetworkRowHandler edgeRowHandler = new VisumNetworkRowHandler() {
+		
+			@Override
+			public void handleRow(Map<String, String> row) {	
+				String nr = row.get("NR");
+				IdImpl id = new IdImpl(nr);
+				IdImpl fromNodeId = new IdImpl(row.get("VONKNOTNR"));
+				IdImpl toNodeId = new IdImpl(row.get("NACHKNOTNR"));
+				Link lastEdge = network.getLinks().get(id);
+				if (lastEdge != null) {
+					if (lastEdge.getFromNode().getId().equals(toNodeId) && lastEdge.getToNode().getId().equals(fromNodeId)) {
+						id = new IdImpl(nr + 'R');
+					} else {
+						throw new RuntimeException("Duplicate edge.");
+					}
+				}
+				double length = Double.parseDouble(row.get("LAENGE").replace(',', '.'));
+				String edgeTypeIdString = row.get("TYPNR");
+				IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
+				double freespeed = getFreespeedTravelTime(edgeTypeId);
+				double capacity = getCapacity(edgeTypeId);
+				if (isEdgeTypeRelevant(edgeTypeId)) {
+					network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length, freespeed, capacity, 1);
+				}
+			}
+			
+		};
+		streamingVisumNetworkReader.addRowHandler("STRECKE", edgeRowHandler);
+		streamingVisumNetworkReader.read(InVisumNetFile);
 		network.setCapacityPeriod(24*3600);
 	}
 

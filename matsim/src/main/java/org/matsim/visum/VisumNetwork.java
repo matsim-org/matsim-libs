@@ -20,7 +20,6 @@
 
 package org.matsim.visum;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,8 +34,6 @@ import org.matsim.api.core.v01.Id;
  */
 public class VisumNetwork {
 
-	public final Map<Id, Node> nodes = new HashMap<Id, Node>();
-	public final Map<Id, Edge> edges = new HashMap<Id, Edge>();
 	public final Map<Id, EdgeType> edgeTypes = new HashMap<Id, EdgeType>();
 	public final Map<Id, Stop> stops = new TreeMap<Id, Stop>();
 	public final Map<Id, StopArea> stopAreas = new TreeMap<Id, StopArea>();
@@ -49,20 +46,6 @@ public class VisumNetwork {
 	public final Map<String, Departure> departures = new TreeMap<String, Departure>();
 	public final Map<String, VehicleUnit> vehicleUnits = new HashMap<String, VehicleUnit>();
 	public final Map<String, VehicleCombination> vehicleCombinations = new HashMap<String, VehicleCombination>();
-	
-	public void addNode(final Node node) {
-		Node oldNode = nodes.put(node.id, node);
-		if (oldNode != null) {
-			throw new IllegalArgumentException("Duplicate node.");
-		}
-	}
-	
-	public void addEdge(final Edge edge) {
-		Edge oldEdge = edges.put(edge.id, edge);
-		if (oldEdge != null) {
-			throw new IllegalArgumentException("Duplicate edge.");
-		}
-	}
 	
 	public void addEdgeType(final EdgeType edgeType) {
 		EdgeType oldEdgeType = edgeTypes.put(edgeType.id, edgeType);
@@ -180,33 +163,6 @@ public class VisumNetwork {
 			// re-do the insertion
 			this.vehicleCombinations.put(oldVC.id, oldVC);
 			throw new IllegalArgumentException("There is already a vehicle combination with the same id.");
-		}
-	}
-
-	public static class Node {
-		public final Id id;
-		public final String name;
-		public final Coord coord;
-		public Node(Id id, String name, Coord coord) {
-			this.id = id;
-			this.name = name;
-			this.coord = coord;
-		}		
-	}
-	
-	public static class Edge {
-		public final Id id;
-		public final Id fromNode;
-		public final Id toNode;
-		public final double length;
-		public Id edgeTypeId;
-		public ArrayList<Float> tValues;
-		public Edge(Id id, Id fromNode, Id toNode, double length) {
-			super();
-			this.id = id;
-			this.fromNode = fromNode;
-			this.toNode = toNode;
-			this.length = length;
 		}
 	}
 

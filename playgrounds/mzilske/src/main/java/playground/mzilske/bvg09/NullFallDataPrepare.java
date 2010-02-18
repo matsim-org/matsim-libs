@@ -19,6 +19,7 @@
 
 package playground.mzilske.bvg09;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,7 +46,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.RouteUtils;
+import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.transitSchedule.TransitRouteImpl;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.Departure;
@@ -92,21 +96,66 @@ public class NullFallDataPrepare {
 	}
 
 	private void convertNetwork() {
-		NetworkLayer network = scenario.getNetwork();
-		for (VisumNetwork.Node visumNode : vNetwork.nodes.values()) {
-			network.createAndAddNode(visumNode.id, visumNode.coord);
-		}
-	
-		for (VisumNetwork.Edge visumEdge : vNetwork.edges.values()) {
-			float freespeed;
-			if (visumEdge.tValues.size() == 1) {
-				freespeed = visumEdge.tValues.get(0);
-			} else {
-				// Mehr als einer dieser Werte gesetzt.
-				throw new RuntimeException(visumEdge.tValues.toString());
+		final NetworkLayer network = scenario.getNetwork();
+		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
+		
+		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {
+			
+			@Override
+			public void handleRow(Map<String, String> row) {
+				Id id = new IdImpl(row.get("NR"));
+				Coord coord = new CoordImpl(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
+				network.createAndAddNode(id, coord);
 			}
-			network.createAndAddLink(visumEdge.id, network.getNodes().get(visumEdge.fromNode), network.getNodes().get(visumEdge.toNode), visumEdge.length * 1000, freespeed, 2000, 1);
-		}
+			
+		};
+		streamingVisumNetworkReader.addRowHandler("KNOTEN", nodeRowHandler);
+		
+		VisumNetworkRowHandler edgeRowHandler = new VisumNetworkRowHandler() {
+		
+			@Override
+			public void handleRow(Map<String, String> row) {	
+				String nr = row.get("NR");
+				IdImpl id = new IdImpl(nr);
+				IdImpl fromNodeId = new IdImpl(row.get("VONKNOTNR"));
+				IdImpl toNodeId = new IdImpl(row.get("NACHKNOTNR"));
+				Link lastEdge = network.getLinks().get(id);
+				if (lastEdge != null) {
+					if (lastEdge.getFromNode().getId().equals(toNodeId) && lastEdge.getToNode().getId().equals(fromNodeId)) {
+						id = new IdImpl(nr + 'R');
+					} else {
+						throw new RuntimeException("Duplicate edge.");
+					}
+				}
+				double length = Double.parseDouble(row.get("LAENGE").replace(',', '.'));
+				String edgeTypeIdString = row.get("TYPNR");
+				if (!edgeTypeIdString.isEmpty()) {
+					IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
+				}
+				ArrayList<Float> tValues = new ArrayList<Float>();
+				for (String letter : Arrays.asList("B", "F", "P", "R", "S", "T", "U", "V")) {
+					String key = "T-OEVSYS(" + letter + ")";
+					String value = row.get(key);
+					if (value != null) {
+						float t = Float.parseFloat(value.substring(0, value.length() - 1));
+						if (t != 0.0) {
+							tValues.add(t);
+						}
+					}
+				}
+				float freespeed;
+				if (tValues.size() == 1) {
+					freespeed = tValues.get(0);
+				} else {
+					// Mehr als einer dieser Werte gesetzt.
+					throw new RuntimeException(tValues.toString());
+				}
+				network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length * 1000, freespeed, 2000, 1);			
+			}
+			
+		};
+		streamingVisumNetworkReader.addRowHandler("STRECKE", edgeRowHandler);
+		streamingVisumNetworkReader.read(InVisumNetFile);
 	}
 
 	private void convertSchedule() {

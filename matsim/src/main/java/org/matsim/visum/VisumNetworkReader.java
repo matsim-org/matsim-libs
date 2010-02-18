@@ -23,7 +23,6 @@ package org.matsim.visum;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
@@ -44,8 +43,6 @@ public class VisumNetworkReader {
 	private int language = 0;
 
 	/* collection of localized strings: [0] english, [1] german */
-	private final String[] TABLE_NODE = {ATTRIBUTE_UNKNOWN, "$KNOTEN:"};
-	private final String[] TABLE_EDGE = {ATTRIBUTE_UNKNOWN, "$STRECKE:"};
 	private final String[] TABLE_EDGETYPE = {ATTRIBUTE_UNKNOWN, "$STRECKENTYP:"};
 	private final String[] TABLE_STOP = {"$STOP:", "$HALTESTELLE:"};
 	private final String[] TABLE_STOPAREA = {"$STOPAREA:", "$HALTESTELLENBEREICH:"};
@@ -59,26 +56,6 @@ public class VisumNetworkReader {
 	private final String[] TABLE_VEHUNIT = {"$VEHUNIT:", "$FZGEINHEIT:"};
 	private final String[] TABLE_VEHCOMB = {"$VEHCOMB:", "$FZGKOMB:"};
 	private final String[] TABLE_VEHUNITTOVEHCOMB = {"$VEHUNITTOVEHCOMB:", "$FZGEINHEITZUFZGKOMB:"};
-
-	private final String[] ATTRIBUTE_NODE_NO = {ATTRIBUTE_UNKNOWN, "NR"};
-	private final String[] ATTRIBUTE_NODE_NAME = {ATTRIBUTE_UNKNOWN, "NAME"};
-	private final String[] ATTRIBUTE_NODE_XCOORD = {ATTRIBUTE_UNKNOWN, "XKOORD"};
-	private final String[] ATTRIBUTE_NODE_YCOORD = {ATTRIBUTE_UNKNOWN, "YKOORD"};
-
-	private final String[] ATTRIBUTE_EDGE_NO = {ATTRIBUTE_UNKNOWN, "NR"};
-	private final String[] ATTRIBUTE_EDGE_FROM_NODE = {ATTRIBUTE_UNKNOWN, "VONKNOTNR"};
-	private final String[] ATTRIBUTE_EDGE_TO_NODE = {ATTRIBUTE_UNKNOWN, "NACHKNOTNR"};
-	private final String[] ATTRIBUTE_EDGE_LENGTH = {ATTRIBUTE_UNKNOWN, "LAENGE"};
-	private final String[] ATTRIBUTE_EDGE_EDGETYPEID = {ATTRIBUTE_UNKNOWN, "TYPNR"};
-	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_B = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(B)"};
-	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_F = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(F)"};
-	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_P = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(P)"};
-	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_R = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(R)"};
-	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_S = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(S)"};
-	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_T = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(T)"};
-	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_U = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(U)"};
-	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_V = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(V)"};
-	
 	
 	private final String[] ATTRIBUTE_EDGETYPE_NO = {ATTRIBUTE_UNKNOWN, "NR"};
 	private final String[] ATTRIBUTE_EDGETYPE_KAPIV = {ATTRIBUTE_UNKNOWN, "KAPIV"};
@@ -176,10 +153,6 @@ public class VisumNetworkReader {
 					readVersion(line, reader);
 				} else if (line.startsWith(this.TABLE_STOP[this.language])) {
 					readStops(line, reader);
-				} else if (line.startsWith(this.TABLE_NODE[this.language])) {
-					readNodes(line, reader);
-				} else if (line.startsWith(this.TABLE_EDGE[this.language])) {
-					readEdges(line, reader);
 				} else if (line.startsWith(this.TABLE_EDGETYPE[this.language])) {
 					readEdgeTypes(line, reader);
 				} else if (line.startsWith(this.TABLE_STOPAREA[this.language])) {
@@ -250,118 +223,6 @@ public class VisumNetworkReader {
 		}
 		// proceed to next line, assumed to be empty
 		reader.readLine();
-	}
-
-	private void readNodes(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_NODE[this.language].length()), ';');
-		final int idxNo = getAttributeIndex(this.ATTRIBUTE_NODE_NO[this.language], attributes);
-		final int idxName = getAttributeIndex(this.ATTRIBUTE_NODE_NAME[this.language], attributes);
-		final int idxXcoord = getAttributeIndex(this.ATTRIBUTE_NODE_XCOORD[this.language], attributes);
-		final int idxYcoord = getAttributeIndex(this.ATTRIBUTE_NODE_YCOORD[this.language], attributes);
-
-		String line = reader.readLine();
-		while (line != null && line.length() > 0) {
-			final String[] parts = StringUtils.explode(line, ';');
-			VisumNetwork.Node node = new VisumNetwork.Node(new IdImpl(parts[idxNo]), parts[idxName],
-					new CoordImpl(Double.parseDouble(parts[idxXcoord].replace(',', '.')), Double.parseDouble(parts[idxYcoord].replace(',', '.'))));
-			this.network.addNode(node);
-			// proceed to next line
-			line = reader.readLine();
-		}
-	}
-
-	private void readEdges(String tableAttributes, BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_EDGE[this.language].length()), ';');
-		final int idxNo = getAttributeIndex(this.ATTRIBUTE_EDGE_NO[this.language], attributes);
-		final int idxFromNode = getAttributeIndex(this.ATTRIBUTE_EDGE_FROM_NODE[this.language], attributes);
-		final int idxToNode = getAttributeIndex(this.ATTRIBUTE_EDGE_TO_NODE[this.language], attributes);
-		final int idxLength = getAttributeIndex(this.ATTRIBUTE_EDGE_LENGTH[this.language], attributes);
-		final int idxEdgeTypeId = getAttributeIndex(this.ATTRIBUTE_EDGE_EDGETYPEID[this.language], attributes);
-		final int idxT_OEVSYS_B = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_B[this.language], attributes);
-		final int idxT_OEVSYS_F = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_F[this.language], attributes);
-		final int idxT_OEVSYS_P = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_P[this.language], attributes);
-		final int idxT_OEVSYS_R = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_R[this.language], attributes);
-		final int idxT_OEVSYS_S = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_S[this.language], attributes);
-		final int idxT_OEVSYS_T = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_T[this.language], attributes);
-		final int idxT_OEVSYS_U = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_U[this.language], attributes);
-		final int idxT_OEVSYS_V = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_V[this.language], attributes);
-		
-		
-		String line = reader.readLine();
-		while (line != null && line.length() > 0) {
-			final String[] parts = StringUtils.explode(line, ';');
-			IdImpl id = new IdImpl(parts[idxNo]);
-			IdImpl fromNodeId = new IdImpl(parts[idxFromNode]);
-			IdImpl toNodeId = new IdImpl(parts[idxToNode]);
-			VisumNetwork.Edge lastEdge = this.network.edges.get(id);
-			if (lastEdge != null) {
-				if (lastEdge.fromNode.equals(toNodeId) && lastEdge.toNode.equals(fromNodeId)) {
-					id = new IdImpl(parts[idxNo] + 'R');
-				} else {
-					throw new RuntimeException("Duplicate edge.");
-				}
-			}
-			double length = Double.parseDouble(parts[idxLength].replace(',', '.'));
-			VisumNetwork.Edge edge = new VisumNetwork.Edge(id,
-					fromNodeId, toNodeId, length);
-			String edgeTypeIdString = parts[idxEdgeTypeId];
-			if (!edgeTypeIdString.isEmpty()) {
-				IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
-				edge.edgeTypeId = edgeTypeId;
-			}
-			edge.tValues = new ArrayList<Float>();
-			if (idxT_OEVSYS_B != -1) {
-				float t = Float.parseFloat(parts[idxT_OEVSYS_B].substring(0, parts[idxT_OEVSYS_B].length() - 1));
-				if (t != 0.0) {
-					edge.tValues.add(t);
-				}
-			}
-			if (idxT_OEVSYS_F != -1) {
-				float t = Float.parseFloat(parts[idxT_OEVSYS_F].substring(0, parts[idxT_OEVSYS_F].length() - 1));
-				if (t != 0.0) {
-					edge.tValues.add(t);
-				}
-			}
-			if (idxT_OEVSYS_P != -1) {
-				float t = Float.parseFloat(parts[idxT_OEVSYS_P].substring(0, parts[idxT_OEVSYS_P].length() - 1));
-				if (t != 0.0) {
-					edge.tValues.add(t);
-				}
-			}
-			if (idxT_OEVSYS_R != -1) {
-				float t = Float.parseFloat(parts[idxT_OEVSYS_R].substring(0, parts[idxT_OEVSYS_R].length() - 1));
-				if (t != 0.0) {
-					edge.tValues.add(t);
-				}
-			}
-			if (idxT_OEVSYS_S != -1) {
-				float t = Float.parseFloat(parts[idxT_OEVSYS_S].substring(0, parts[idxT_OEVSYS_S].length() - 1));
-				if (t != 0.0) {
-					edge.tValues.add(t);
-				}
-			}
-			if (idxT_OEVSYS_T != -1) {
-				float t = Float.parseFloat(parts[idxT_OEVSYS_T].substring(0, parts[idxT_OEVSYS_T].length() - 1));
-				if (t != 0.0) {
-					edge.tValues.add(t);
-				}
-			}
-			if (idxT_OEVSYS_U != -1) {
-				float t = Float.parseFloat(parts[idxT_OEVSYS_U].substring(0, parts[idxT_OEVSYS_U].length() - 1));
-				if (t != 0.0) {
-					edge.tValues.add(t);
-				}
-			}
-			if (idxT_OEVSYS_V != -1) {
-				float t = Float.parseFloat(parts[idxT_OEVSYS_V].substring(0, parts[idxT_OEVSYS_V].length() - 1));
-				if (t != 0.0) {
-					edge.tValues.add(t);
-				}
-			}
-			this.network.addEdge(edge);
-			// proceed to next line
-			line = reader.readLine();
-		}
 	}
 
 	private void readEdgeTypes(String tableAttributes, BufferedReader reader) throws IOException {
