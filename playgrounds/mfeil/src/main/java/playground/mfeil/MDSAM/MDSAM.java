@@ -59,7 +59,7 @@ public class MDSAM {
 
 	public MDSAM(final PopulationImpl population, final String mdsamOutputFile) {
 		this.population=population;
-		this.GWtime = 0.5;
+		this.GWtime = 0.0;
 		this.GWact = 2.0;
 		this.GWmode = 1.0;
 		this.GWlocation = 1.0;
@@ -243,23 +243,39 @@ public class MDSAM {
 			int j=table[k][0].length-1;
 			boolean goLeft = true;
 			while (i!=0 || j!=0){
-				if (i>0 && j>0 && table[k][i-1][j-1]>=table[k][i][j]-GW){
+				String orig = "";
+				String compare = "";
+				if (i>0 && j>0){
+					if (k==0) {
+						orig = ((ActivityImpl)(origPlan.getPlanElements().get((i-1)*2))).getType().toString();
+						compare = ((ActivityImpl)(comparePlan.getPlanElements().get((j-1)*2))).getType().toString();
+					}
+					else if (k==1) {
+						orig = ((LegImpl)(origPlan.getPlanElements().get(i*2-1))).getMode().toString();
+						compare = ((LegImpl)(comparePlan.getPlanElements().get(j*2-1))).getMode().toString();
+					}
+					else {
+						orig = ((ActivityImpl)(origPlan.getPlanElements().get((i-1)*2))).getLinkId().toString();
+						compare = ((ActivityImpl)(comparePlan.getPlanElements().get((j-1)*2))).getLinkId().toString();
+					}	
+				}
+				if (i>0 && j>0 && table[k][i-1][j-1]>=table[k][i][j]-GW && orig.equals(compare)){
 					//System.out.println("Identity.");
 					i--;
 					j--;
 				}
-				// check insertion {1,x}
-				else if (j>0 &&	table[k][i][j-1]==table[k][i][j]-GW && osetContains(oset,dimensions,k,1,j)){
+				// check insertion {1,x}, rounding due to java inexactness
+				else if (j>0 &&	Math.abs(table[k][i][j-1]-(table[k][i][j]-GW))<0.001 && osetContains(oset,dimensions,k,1,j)){
 					//System.out.println("Insertion.");
 					j--;
 				}
 				// check deletion {2,x}
-				else if (i>0 &&	table[k][i-1][j]==table[k][i][j]-GW && osetContains(oset,dimensions,k,2,i)){
+				else if (i>0 &&	Math.abs(table[k][i-1][j]-(table[k][i][j]-GW))<0.001 && osetContains(oset,dimensions,k,2,i)){
 					//System.out.println("Deletion.");
 					i--;
 				}
 				// go new path (insertion) in zick zack
-				else if (goLeft && j>0) {
+				else if (goLeft && j>0 && Math.abs(table[k][i][j-1]-(table[k][i][j]-GW))<0.001) {
 					oset.add(new int[]{1,j});
 					ArrayList<Integer> l = new ArrayList<Integer>();
 					l.add(k);
@@ -269,7 +285,7 @@ public class MDSAM {
 					//System.out.println("New insertion.");
 				}
 				// go new path (deletion) in zick zack
-				else if (!goLeft && i>0){
+				else if (!goLeft && i>0 && Math.abs(table[k][i-1][j]-(table[k][i][j]-GW))<0.001){
 					oset.add(new int[]{2,i});
 					ArrayList<Integer> l = new ArrayList<Integer>();
 					l.add(k);
@@ -279,7 +295,7 @@ public class MDSAM {
 					//System.out.println("New deletion.");
 				}
 				// go new path (insertion) 
-				else if (j>0) {
+				else if (j>0 && Math.abs(table[k][i][j-1]-(table[k][i][j]-GW))<0.001) {
 					oset.add(new int[]{1,j});
 					ArrayList<Integer> l = new ArrayList<Integer>();
 					l.add(k);
@@ -288,7 +304,7 @@ public class MDSAM {
 					//System.out.println("New insertion.");
 				}
 				// go new path (deletion)
-				else {
+				else if (Math.abs(table[k][i-1][j]-(table[k][i][j]-GW))<0.001){
 					oset.add(new int[]{2,i});
 					ArrayList<Integer> l = new ArrayList<Integer>();
 					l.add(k);
@@ -296,6 +312,7 @@ public class MDSAM {
 					i--;
 					//System.out.println("New deletion.");
 				}
+				else log.warn("Cannot find my way at i = "+i+" and j = "+j+" for person "+origPlan.getPerson().getId());					
 			}
 		}
 		
