@@ -64,6 +64,7 @@ import com.sun.opengl.util.BufferUtil;
  * agent's day.
  *
  * @author dstrippgen
+ * @author michaz
  */
 public class QueryAgentPlan extends AbstractQuery {
 

@@ -20,6 +20,7 @@
 
 package org.matsim.visum;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -199,6 +200,7 @@ public class VisumNetwork {
 		public final Id toNode;
 		public final double length;
 		public Id edgeTypeId;
+		public ArrayList<Float> tValues;
 		public Edge(Id id, Id fromNode, Id toNode, double length) {
 			super();
 			this.id = id;

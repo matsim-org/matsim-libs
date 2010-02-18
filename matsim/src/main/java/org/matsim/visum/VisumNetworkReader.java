@@ -23,6 +23,7 @@ package org.matsim.visum;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
@@ -69,6 +70,15 @@ public class VisumNetworkReader {
 	private final String[] ATTRIBUTE_EDGE_TO_NODE = {ATTRIBUTE_UNKNOWN, "NACHKNOTNR"};
 	private final String[] ATTRIBUTE_EDGE_LENGTH = {ATTRIBUTE_UNKNOWN, "LAENGE"};
 	private final String[] ATTRIBUTE_EDGE_EDGETYPEID = {ATTRIBUTE_UNKNOWN, "TYPNR"};
+	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_B = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(B)"};
+	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_F = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(F)"};
+	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_P = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(P)"};
+	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_R = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(R)"};
+	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_S = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(S)"};
+	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_T = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(T)"};
+	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_U = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(U)"};
+	private final String[] ATTRIBTUE_EDGE_T_OEVSYS_V = {ATTRIBUTE_UNKNOWN, "T-OEVSYS(V)"};
+	
 	
 	private final String[] ATTRIBUTE_EDGETYPE_NO = {ATTRIBUTE_UNKNOWN, "NR"};
 	private final String[] ATTRIBUTE_EDGETYPE_KAPIV = {ATTRIBUTE_UNKNOWN, "KAPIV"};
@@ -267,6 +277,15 @@ public class VisumNetworkReader {
 		final int idxToNode = getAttributeIndex(this.ATTRIBUTE_EDGE_TO_NODE[this.language], attributes);
 		final int idxLength = getAttributeIndex(this.ATTRIBUTE_EDGE_LENGTH[this.language], attributes);
 		final int idxEdgeTypeId = getAttributeIndex(this.ATTRIBUTE_EDGE_EDGETYPEID[this.language], attributes);
+		final int idxT_OEVSYS_B = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_B[this.language], attributes);
+		final int idxT_OEVSYS_F = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_F[this.language], attributes);
+		final int idxT_OEVSYS_P = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_P[this.language], attributes);
+		final int idxT_OEVSYS_R = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_R[this.language], attributes);
+		final int idxT_OEVSYS_S = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_S[this.language], attributes);
+		final int idxT_OEVSYS_T = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_T[this.language], attributes);
+		final int idxT_OEVSYS_U = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_U[this.language], attributes);
+		final int idxT_OEVSYS_V = getAttributeIndex(this.ATTRIBTUE_EDGE_T_OEVSYS_V[this.language], attributes);
+		
 		
 		String line = reader.readLine();
 		while (line != null && line.length() > 0) {
@@ -289,6 +308,55 @@ public class VisumNetworkReader {
 			if (!edgeTypeIdString.isEmpty()) {
 				IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
 				edge.edgeTypeId = edgeTypeId;
+			}
+			edge.tValues = new ArrayList<Float>();
+			if (idxT_OEVSYS_B != -1) {
+				float t = Float.parseFloat(parts[idxT_OEVSYS_B].substring(0, parts[idxT_OEVSYS_B].length() - 1));
+				if (t != 0.0) {
+					edge.tValues.add(t);
+				}
+			}
+			if (idxT_OEVSYS_F != -1) {
+				float t = Float.parseFloat(parts[idxT_OEVSYS_F].substring(0, parts[idxT_OEVSYS_F].length() - 1));
+				if (t != 0.0) {
+					edge.tValues.add(t);
+				}
+			}
+			if (idxT_OEVSYS_P != -1) {
+				float t = Float.parseFloat(parts[idxT_OEVSYS_P].substring(0, parts[idxT_OEVSYS_P].length() - 1));
+				if (t != 0.0) {
+					edge.tValues.add(t);
+				}
+			}
+			if (idxT_OEVSYS_R != -1) {
+				float t = Float.parseFloat(parts[idxT_OEVSYS_R].substring(0, parts[idxT_OEVSYS_R].length() - 1));
+				if (t != 0.0) {
+					edge.tValues.add(t);
+				}
+			}
+			if (idxT_OEVSYS_S != -1) {
+				float t = Float.parseFloat(parts[idxT_OEVSYS_S].substring(0, parts[idxT_OEVSYS_S].length() - 1));
+				if (t != 0.0) {
+					edge.tValues.add(t);
+				}
+			}
+			if (idxT_OEVSYS_T != -1) {
+				float t = Float.parseFloat(parts[idxT_OEVSYS_T].substring(0, parts[idxT_OEVSYS_T].length() - 1));
+				if (t != 0.0) {
+					edge.tValues.add(t);
+				}
+			}
+			if (idxT_OEVSYS_U != -1) {
+				float t = Float.parseFloat(parts[idxT_OEVSYS_U].substring(0, parts[idxT_OEVSYS_U].length() - 1));
+				if (t != 0.0) {
+					edge.tValues.add(t);
+				}
+			}
+			if (idxT_OEVSYS_V != -1) {
+				float t = Float.parseFloat(parts[idxT_OEVSYS_V].substring(0, parts[idxT_OEVSYS_V].length() - 1));
+				if (t != 0.0) {
+					edge.tValues.add(t);
+				}
 			}
 			this.network.addEdge(edge);
 			// proceed to next line

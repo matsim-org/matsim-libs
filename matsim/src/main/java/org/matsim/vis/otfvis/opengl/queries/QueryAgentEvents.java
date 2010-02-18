@@ -38,10 +38,10 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 
 /**
- * QueryAgentEvents shows a visual representation of the agents route along with the events happening
- * to the agent. The events will only show from the time the has first been selected. No past events will be shown.
+ * 
+ * Dumps all events occuring to an agent to the log.
  *  
- * @author dstrippgen
+ * @author michaz
  *
  */
 public class QueryAgentEvents extends AbstractQuery implements PersonEventHandler {
@@ -88,7 +88,6 @@ public class QueryAgentEvents extends AbstractQuery implements PersonEventHandle
 	public void handleEvent(PersonEvent event) {
 		if(event.getPersonId().equals(this.agentId)){
 			queue.add(event);
-			logger.debug("Got an event for my person. I am: " + this);
 		}
 	}
 	
