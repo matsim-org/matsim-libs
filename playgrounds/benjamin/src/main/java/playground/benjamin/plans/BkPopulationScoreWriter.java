@@ -25,8 +25,8 @@ public class BkPopulationScoreWriter {
 		double[] utilities = new double[idsScoresMap.size()];
 		
 		//functions that convert the Ids and the Scores from the map to 2 double arrays
-		convertPersonIdsToDouble(personIds);
-		convertScoresToDouble(utilities);
+		convertPersonIdsToDoubleArray(personIds);
+		convertScoresToDoubleArray(utilities);
 		
 		XYScatterChart chart = new XYScatterChart("utility per person", "personId", "utility from selected plan");
 		chart.addSeries("utility per person", personIds, utilities);	
@@ -54,18 +54,18 @@ public class BkPopulationScoreWriter {
 		}
 	}
 	
-	private void convertScoresToDouble(double[] utilities) {
-		int i = 0;
-		for (Double score : idsScoresMap.values()){
-			utilities[i] = score;
-			i++;
-		}
-	}
-
-	private void convertPersonIdsToDouble(double[] personIds) {
+	private void convertPersonIdsToDoubleArray(double[] personIds) {
 		int i = 0;
 		for (Id id : idsScoresMap.keySet()){
 			personIds[i] = Double.parseDouble(id.toString());
+			i++;
+		}
+	}
+	
+	private void convertScoresToDoubleArray(double[] utilities) {
+		int i = 0;
+		for (Double score : idsScoresMap.values()){
+			utilities[i] = score;
 			i++;
 		}
 	}
