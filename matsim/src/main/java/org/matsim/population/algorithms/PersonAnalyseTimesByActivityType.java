@@ -89,7 +89,7 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 	}
 
 	public int[][] getNumDeps() {
-		return this.numDeps;
+		return this.numDeps.clone();
 	}
 
 	private void analyseDepartures(final Person person) {
@@ -105,33 +105,33 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 					int actIndex = Activities.valueOf(actType).getPosition();
 					int timeIndex = ((int) depTime) / this.timeBinSize;
 					int oldLength = this.numDeps[actIndex].length;
-	
+
 					if (timeIndex >= oldLength) {
 						this.numDeps[actIndex] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numDeps[actIndex], timeIndex + 1);
-	
+
 						// init new fields with 0
 						for (int ii=oldLength; ii < this.numDeps[actIndex].length; ii++) {
 							this.numDeps[actIndex][ii] = 0;
 						}
-	
+
 						System.out.println("new length of " + actType + ": " + this.numDeps[actIndex].length);
 					}
-	
+
 					this.numDeps[actIndex][timeIndex]++;
-	
+
 					// resize summary array too
 					if (this.numDeps[actIndex].length > this.numDeps[ALL_POS].length) {
 						oldLength = this.numDeps[ALL_POS].length;
 						this.numDeps[ALL_POS] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numDeps[ALL_POS], timeIndex + 1);
-	
+
 						// init new fields with 0
 						for (int ii=oldLength; ii < this.numDeps[ALL_POS].length; ii++) {
 							this.numDeps[ALL_POS][ii] = 0;
 						}
-	
+
 						System.out.println("new length of " + actType + ": " + this.numDeps[actIndex].length);
 					}
-	
+
 					this.numDeps[ALL_POS][timeIndex]++;
 				}
 			}
@@ -148,40 +148,40 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 				String actType = act.getType().substring(0, 1);
 				double arrTime = act.getStartTime();
 				if (arrTime != 0.0) {
-	
+
 					int actIndex = Activities.valueOf(actType).getPosition();
-	
+
 					int timeIndex = ((int) arrTime) / this.timeBinSize;
 					int oldLength = this.numArrs[actIndex].length;
-	
+
 					if (timeIndex >= oldLength) {
-	
+
 						this.numArrs[actIndex] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numArrs[actIndex], timeIndex + 1);
-	
+
 						// init new fields with 0
 						for (int ii=oldLength; ii < this.numArrs[actIndex].length; ii++) {
 							this.numArrs[actIndex][ii] = 0;
 						}
-	
+
 						System.out.println("new length of " + actType + ": " + this.numArrs[actIndex].length);
 					}
-	
+
 					this.numArrs[actIndex][timeIndex]++;
-	
+
 					// resize summary array too
 					if (this.numArrs[actIndex].length > this.numArrs[ALL_POS].length) {
-	
+
 						oldLength = this.numArrs[ALL_POS].length;
 						this.numArrs[ALL_POS] = (int[]) PersonAnalyseTimesByActivityType.resizeArray(this.numArrs[ALL_POS], timeIndex + 1);
-	
+
 						// init new fields with 0
 						for (int ii=oldLength; ii < this.numArrs[ALL_POS].length; ii++) {
 							this.numArrs[ALL_POS][ii] = 0;
 						}
-	
+
 						System.out.println("new length of " + actType + ": " + this.numArrs[actIndex].length);
 					}
-	
+
 					this.numArrs[ALL_POS][timeIndex]++;
 				}
 			}
@@ -271,11 +271,11 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 	}
 
 	public int[][] getNumArrs() {
-		return this.numArrs;
+		return this.numArrs.clone();
 	}
 
 	public int[][] getNumTraveling() {
-		return this.numTraveling;
+		return this.numTraveling.clone();
 	}
 
 }
