@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtCountSimComparisonWriter.java
+ * PtOccupancyCountComparisonAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,48 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.yu.counts.pt;
 
-import java.util.List;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.counts.Counts;
 
-import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.algorithms.CountSimComparisonTimeFilter;
+import playground.yu.analysis.pt.OccupancyAnalyzer;
 
-/**
- * @author yu
- * 
- */
-public abstract class PtCountSimComparisonWriter {
-	public enum PtCountsType {
-		Boarding, Alighting, Occupancy
-	};
+public class PtOccupancyCountComparisonAlgorithm extends
+		PtCountsComparisonAlgorithm {
 
-	protected int iter;
-
-	protected CountSimComparisonTimeFilter boardCountComparisonFilter,
-			alightCountComparisonFilter, occupancyCountComparisonFilter;
-
-	/**
-	 * 
-	 */
-	public PtCountSimComparisonWriter(
-			final List<CountSimComparison> boardCountSimCompList,
-			final List<CountSimComparison> alightCountSimCompList,
-			final List<CountSimComparison> occupancyCountSimCompList) {
-		this.boardCountComparisonFilter = new CountSimComparisonTimeFilter(
-				boardCountSimCompList);
-		this.alightCountComparisonFilter = new CountSimComparisonTimeFilter(
-				alightCountSimCompList);
-		this.occupancyCountComparisonFilter = new CountSimComparisonTimeFilter(
-				occupancyCountSimCompList);
+	public PtOccupancyCountComparisonAlgorithm(OccupancyAnalyzer oa,
+			Counts counts, Network net) {
+		super(oa, counts, net);
 	}
 
-	public abstract void writeFile(final String filename);
-
-	public void setIterationNumber(int iter) {
-		this.iter = iter;
+	@Override
+	protected int[] getVolumesForStop(Id stopId) {
+		return this.oa.getOccupancyVolumesForStop(stopId);
 	}
+
 }

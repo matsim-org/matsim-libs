@@ -47,6 +47,8 @@ import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.helper.Comp;
 import org.matsim.counts.algorithms.graphs.helper.MyComparator;
 
+import playground.yu.counts.pt.PtCountSimComparisonWriter.PtCountsType;
+
 public class PtCountsSimRealPerHourGraph extends CountsGraph {
 	/**
 	 * The time at which the data was measured. A value in 1..24, 1 for 0 a.m.
@@ -56,10 +58,10 @@ public class PtCountsSimRealPerHourGraph extends CountsGraph {
 	/**
 	 * the String type of Counts, e.g. "board" or "alight"
 	 */
-	private String countsType;
+	private PtCountsType countsType;
 
 	public PtCountsSimRealPerHourGraph(final List<CountSimComparison> ccl,
-			final int iteration, final String filename, String countsType) {
+			final int iteration, final String filename, PtCountsType countsType) {
 		super(ccl, iteration, filename, filename);
 		this.countsType = countsType;
 	}
@@ -136,7 +138,7 @@ public class PtCountsSimRealPerHourGraph extends CountsGraph {
 		url_gen.addURLSeries(urls);
 		tt_gen.addToolTipSeries(tooltips);
 
-		String title = "[" + this.countsType + "ing]\tVolumes " + (hour - 1)
+		String title = "[" + this.countsType + "]\tVolumes " + (hour - 1)
 				+ ":00 - " + (hour) + ":00, Iteration: " + this.iteration_;
 		this.setChartTitle(title);
 		this.chart_ = ChartFactory.createXYLineChart(title,
