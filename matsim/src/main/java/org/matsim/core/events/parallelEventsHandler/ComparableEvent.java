@@ -10,7 +10,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
  * Probably this class will be needed, when event handling will be adapted for parallel JDEQSim
  */
 public class ComparableEvent implements Comparable<ComparableEvent> {
-	private EventImpl event;
+	private final EventImpl event;
 
 	public ComparableEvent(EventImpl be){
 		this.event = be;
@@ -65,5 +65,9 @@ public class ComparableEvent implements Comparable<ComparableEvent> {
 		return this.event.equals(((ComparableEvent) obj).getEvent());
 	}
 
+	@Override
+	public int hashCode() {
+		return this.event.hashCode();
+	}
 
 }
