@@ -53,7 +53,7 @@ public abstract class ChartUtil {
 		this.yAxisLabel = yAxisLabel;
 	}
 
-	protected abstract JFreeChart getChart();
+	public abstract JFreeChart getChart();
 
 	/**
 	 * Stores the chart as PNG image file.

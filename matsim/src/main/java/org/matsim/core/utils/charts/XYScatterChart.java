@@ -43,7 +43,7 @@ public class XYScatterChart extends ChartUtil {
 	}
 
 	@Override
-	protected JFreeChart getChart() {
+	public JFreeChart getChart() {
 		return this.chart;
 	}
 
