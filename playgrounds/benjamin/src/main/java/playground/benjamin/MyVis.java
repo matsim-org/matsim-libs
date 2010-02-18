@@ -33,7 +33,7 @@ public class MyVis {
 
 //		String otffile = "../matsim/test/input/playground/benjamin/BKickRouterTestIATBR/network.xml";
 //		String otffile = "../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
-		String otffile = BkPaths.RUNBASE + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
+//		String otffile = BkPaths.RUNBASE + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
 
 
 //	Für den interactiven Modus: Hier die config übergeben und in der config:
@@ -47,6 +47,7 @@ public class MyVis {
 		
 //		String otffile = "../matsim/examples/tutorial/singleIteration.xml";
 //		String otffile = BkPaths.RUNBASE + "run749/TestOTFVis_interactive/749.output_config.xml";
+		String otffile = "../detailedEval/140k-synthetische-personen/config-for-visualisation.xml";
 		
 		OTFVis.main(new String[] {otffile});
 	}
