@@ -81,4 +81,26 @@ public class RouteUtils {
 		return null;
 	}
 
+	public static NetworkRouteWRefs getSubRoute(final NetworkRouteWRefs route, final Node fromNode, final Node toNode, final Network network) {
+		Id fromLinkId = null;
+		Id toLinkId = null;
+
+		List<Id> linkIds = new ArrayList<Id>(route.getLinkIds().size() + 2);
+		linkIds.add(route.getStartLinkId());
+		linkIds.addAll(route.getLinkIds());
+		linkIds.add(route.getEndLinkId());
+		for (Id linkId : linkIds) {
+			Link link = network.getLinks().get(linkId);
+			if (link.getToNode() == fromNode) {
+				fromLinkId = link.getId();
+			}
+			if (link.getFromNode() == toNode) {
+				toLinkId = link.getId();
+				break; // we found the toLinkId, so we can stop searching, fromLinkId should be before after all
+			}
+		}
+
+		return route.getSubRoute(fromLinkId, toLinkId);
+	}
+
 }
