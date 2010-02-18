@@ -56,16 +56,15 @@ public class GershensonAdaptiveTrafficLightController extends
 
 	private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
 
-	private final double vMin = 8; // minimum Speed in km/h
-	private final double tMin = 30; // time in seconds
-	private final double minVehicles = 10; //
+	private final double tMin = 20; // time in seconds
+	private final double minCarTime = 30; //
 
 	private Map<Id, Integer> vehOnLink = new HashMap<Id, Integer>();
 	private Map<Id, Map<Id, Integer>> vehOnLinkLanes = new HashMap<Id, Map<Id, Integer>>();
 	private Map<Id, Double> switchedToGreen = new HashMap<Id, Double>();
 
-	private SortedMap<Id, Id> corrGroups;
 	private SortedMap<Id, List<Id>> compGroups;
+	private SortedMap<Id, Id> corrGroups;
 	private SortedMap<Id, SignalGroupState> oldState;
 	
 	private Network net;
@@ -183,7 +182,6 @@ public class GershensonAdaptiveTrafficLightController extends
 
 		boolean compGroupsGreen = false;
 		boolean outLinkJam = false;
-		double avSpeedOut = 10;
 		double compGreenTime = 0;
 		double approachingRed = 0; // product of time and approaching cars
 		int approachingGreenLink = 0;
@@ -255,7 +253,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			if (approachingRed > 0 && approachingGreenLink == 0){ //16
 				return switchLight(signalGroup, oldState, time);
 			}else {
-				if ((time - compGreenTime) > tMin && vehOnLink.get(signalGroup.getLinkRefId()) > minVehicles){
+				if ((time - compGreenTime) > tMin && vehOnLink.get(signalGroup.getLinkRefId()) > minCarTime){
 						return switchLight(signalGroup, oldState, time);
 				}
 			}
@@ -270,12 +268,13 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 	}
 
-	public void setCorrGroups(Map<Id,Id> corrGroups){
-		this.corrGroups = (SortedMap<Id, Id>) corrGroups;
-	}
 
 	public void setCompGroups(Map<Id, List<Id>> compGroups){
 		this.compGroups = (SortedMap<Id, List<Id>>) compGroups;
+	}
+	
+	public void setCorrGroups(Map<Id, Id> corrGroups){
+		this.corrGroups = (SortedMap<Id, Id>) corrGroups;
 	}
 	
 	public void setNetwork (Network net){

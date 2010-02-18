@@ -96,7 +96,7 @@ public class DenverScenarioGenerator {
 		
 	}
 	
-	public void createSignalSystemsConfig (ScenarioImpl sc){
+	private void createSignalSystemsConfig (ScenarioImpl sc){
 		SignalSystemConfigurations configs = sc.getSignalSystemConfigurations();
 		SignalSystemConfigurationsFactory factory = configs.getFactory();
 		

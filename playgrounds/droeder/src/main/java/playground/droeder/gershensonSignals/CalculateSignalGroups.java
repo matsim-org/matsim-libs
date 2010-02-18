@@ -42,6 +42,8 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
 public class CalculateSignalGroups{
 	private static final Logger log = Logger.getLogger(CalculateSignalGroups.class);
 	
+	private final static double corrAngle = (3/8* Math.PI);
+	
 	public Map<Id, Id> calculateCorrespondingGroups(Map<Id, SignalGroupDefinition> groups, Network net){
 		SortedMap<Id, Id> corrGroups = new TreeMap<Id, Id>();
 		Link l;
@@ -105,9 +107,10 @@ public class CalculateSignalGroups{
 		}
 		
 		for (Entry<Link, Double> e :  linkAngle.entrySet()) {
-			if (((Math.PI / 2)  - e.getValue()) < temp ){
-				temp = (Math.PI / 2) - e.getValue();
-				if (inLink.getToNode().getInLinks().size() > 3){
+			if ((corrAngle - e.getValue()) < temp ){
+				temp = (corrAngle / 2) - e.getValue();
+				
+				if (inLink.getToNode().getInLinks().size() > 1){
 					l = e.getKey();
 				}else{
 					l = null;
