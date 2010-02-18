@@ -36,7 +36,7 @@ public class PieChart extends ChartUtil {
 	}
 
 	@Override
-	protected JFreeChart getChart() {
+	public JFreeChart getChart() {
 		return chart;
 	}
 
@@ -49,7 +49,7 @@ public class PieChart extends ChartUtil {
 			sum += data[i];
 		for (int i = 0; i < data.length; i++)
 			dataset.setValue(titles[i] + "\n" + data[i] + "\n"
-					+ (double) ((int) (data[i] / sum * 10000.0)) / 100.0 + "%",
+					+ ((int) (data[i] / sum * 10000.0)) / 100.0 + "%",
 					data[i]);
 	}
 

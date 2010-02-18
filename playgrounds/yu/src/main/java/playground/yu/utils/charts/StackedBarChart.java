@@ -26,7 +26,7 @@ public class StackedBarChart extends ChartUtil {
 	}
 
 	@Override
-	protected JFreeChart getChart() {
+	public JFreeChart getChart() {
 		return chart;
 	}
 

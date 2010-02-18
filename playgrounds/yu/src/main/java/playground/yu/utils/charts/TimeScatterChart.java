@@ -97,7 +97,7 @@ public class TimeScatterChart extends ChartUtil {
 	}
 
 	@Override
-	protected JFreeChart getChart() {
+	public JFreeChart getChart() {
 		return this.chart;
 	}
 
