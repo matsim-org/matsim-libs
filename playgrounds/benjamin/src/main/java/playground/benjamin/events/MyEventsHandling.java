@@ -23,32 +23,34 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 
+
+
+
 /**
  * This class contains a main method to call the 
  * example event handlers MyEventHandler1-3.
  * 
  * @author dgrether
  */
-public class BkEventsHandling {
+public class MyEventsHandling {
 
 	
 	
 	public static void main(String[] args) {
 		
 		//path to events file
-		String inputFile = "../matsim/output/multipleIterations/ITERS/it.10/10.events.xml.gz";
+		String inputFile = "output/multipleIterations/ITERS/it.10/10.events.xml.gz";
 		//create an event object
 		EventsManager events = new EventsManagerImpl();
 		
 		
-		//create the handler
+		//create the handler and add it
 //		MyEventHandler1 handler = new MyEventHandler1();
 		
 //		MyEventHandler2 handler = new MyEventHandler2(500);
 		
 		MyEventHandler3 handler = new MyEventHandler3();
 		
-		//add the handler
 		events.addHandler(handler);
 		
 		
@@ -56,16 +58,15 @@ public class BkEventsHandling {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(inputFile);
 		
-			System.out.println("Events file read!");
-		
 		//MyEventHandler2 has method getAverageTravelTime
 //		System.out.println("average travel time: " + handler.getAverageTravelTime());
 		
-		//MyEventHandler2 has method writeChart
-		handler.writeChart("../matsim/output/multipleIterations/departuresPerHour.png");
-		handler.writeTxt("../matsim/output/multipleIterations/departuresPerHour.txt");
+//		MyEventHandler2 has method writeChart
+		handler.writeChart("output/multipleIterations/departuresPerHour.png");
+		handler.writeTxt("output/multipleIterations/departuresPerHour.txt");
 		
-			System.out.println("Graph and table plotted!");
+		
+		System.out.println("Events file read!");
 	}
 
 }
