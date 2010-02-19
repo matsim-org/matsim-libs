@@ -53,32 +53,30 @@ import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
-
 /**
  * @author david
- *
  */
 abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
 	static Graphics2D g2d = null;
-	//static AffineTransform boxTransform = null;
 
+	@Override
 	public final void draw() {
 		onDraw(g2d);
 	}
 
 	abstract public void onDraw(Graphics2D g2d);
 
+	@Override
 	public void invalidate(SceneGraph graph) {
 		graph.addItem(this);
 	}
 }
 
 /**
- * The class implementaing the Component for SWING based drawing of the OTFVis.
+ * The class implements the Component for SWING based drawing of the OTFVis.
  * This version of the OTFVis does not support all possible features implemented in the OpenGL-based version.
  *
  * @author dstrippgen
- *
  */
 public class NetJComponent extends JComponent  implements OTFDrawer {
 
@@ -99,10 +97,11 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		@Override
 		public void scaleNetwork(float scale){
 			this.scale = scale;
-			System.out.println("Scalee " + this.scale);
+			System.out.println("Scale " + this.scale);
 			super.scaleNetwork(scale);
 		}
 
+		@Override
 		public float getScale() {
 			return scale;
 		}
@@ -110,7 +109,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		@Override
 		public float scaleNetwork(Rectangle destrect, float factor) {
 			this.scale = super.scaleNetwork(destrect, factor);
-			System.out.println("Scalee " + this.scale);
+			System.out.println("Scale " + this.scale);
 			return this.scale;
 		}
 
@@ -121,12 +120,11 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	private static final double BORDER_FACTOR = 0.0;
 	private static final float linkWidth = 100;
 
-    private final int frameDefaultWidth;
+	private final int frameDefaultWidth;
 
-    private final int frameDefaultHeight;
+	private final int frameDefaultHeight;
 
-
-    private double viewMinX, viewMinY, viewMaxX, viewMaxY;
+	private double viewMinX, viewMinY, viewMaxX, viewMaxY;
 
 	private final OTFClientQuad quad;
 
@@ -135,188 +133,146 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 	private transient final VizGuiHandler mouseMan;
 
-    public void setViewClipCoords( double minX, double minY, double maxX, double maxY) {
-    	viewMinX  = networkClippingMinEasting() +  minX * networkClippingWidth();
-    	viewMaxX  = networkClippingMinEasting() +  maxX * networkClippingWidth();
+	public void setViewClipCoords( double minX, double minY, double maxX, double maxY) {
+		viewMinX  = networkClippingMinEasting() +  minX * networkClippingWidth();
+		viewMaxX  = networkClippingMinEasting() +  maxX * networkClippingWidth();
 
-    	viewMinY  = networkClippingMinNorthing() + (1.-maxY) * networkClippingHeight();
-    	viewMaxY  = networkClippingMinNorthing() + (1.-minY) * networkClippingHeight();
-    }
+		viewMinY  = networkClippingMinNorthing() + (1.-maxY) * networkClippingHeight();
+		viewMaxY  = networkClippingMinNorthing() + (1.-minY) * networkClippingHeight();
+	}
 
-//    public void moveViewClipCoords( double deltaX, double deltaY) {
-//    	viewMinX  += deltaX * networkClippingWidth();
-//    	viewMaxX  += deltaX * networkClippingWidth();
-//
-//    	viewMinY  -= deltaY * networkClippingHeight();
-//    	viewMaxY  -= deltaY * networkClippingHeight();
-//    }
+	// returns something like this
+	// 0  1  2
+	// 4  5  6
+	// 8  9 10
+	//
+	// so 5 means the cord is IN the clipping region
+	public int checkViewClip(double x, double y) {
+		// check for quadrant
+		int xquart = x < viewMinX ? 0 : x > viewMaxX ? 2 : 1;
+		int yquart = y < viewMinY ? 0 : y > viewMaxY ? 2 : 1;
+		return xquart + 4* yquart;
+	}
 
-    // returns something like this
-    // 0  1  2
-    // 4  5  6
-    // 8  9 10
-    //
-    // so 5 means the cord is IN the clipping region
-    public int checkViewClip(double x, double y) {
-    	// check for quadrant
-    	int xquart = x < viewMinX ? 0 : x > viewMaxX ? 2 : 1;
-    	int yquart = y < viewMinY ? 0 : y > viewMaxY ? 2 : 1;
-    	return xquart + 4* yquart;
-    }
+	// --------------- CONSTRUCTION ---------------
 
-//    public boolean checkLineInClip(double sx, double sy, double ex, double ey) {
-//    	int qstart = checkViewClip(sx,sy);
-//    	int qend = checkViewClip(ex,ey);
-//
-//    	// both in same sector, that is not middle sector
-//    	if ( (qstart == qend) && qstart != 5) return false;
-//    	// both are either left or right and not in the middle
-//    	if( (qstart % 4) == ( qend % 4) && (qstart % 4) != 1 ) return false;
-//    	// both are either top or bottom but not in the middle
-//    	if( (qstart / 4) == ( qend / 4) && (qstart / 4) != 1 ) return false;
-//
-//    	return true; // all other cases are possibly visible
-//    }
+	public NetJComponent(OTFClientQuad quad) {
+		this.quad = quad;
 
-    // --------------- CONSTRUCTION ---------------
+		// calculate size of frame
 
-    public NetJComponent(OTFClientQuad quad) {
-    	this.quad = quad;
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		double factor = screenSize.getWidth() / networkClippingWidth();
+		factor = Math.min(factor, screenSize.getHeight() / networkClippingHeight());
+		factor *= 0.8f;
 
-    	// calculate size of frame
+		frameDefaultWidth = (int) Math.floor(networkClippingWidth() * factor);
+		frameDefaultHeight = (int) Math.floor(networkClippingHeight() * factor);
 
-    	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    	double factor = screenSize.getWidth() / networkClippingWidth();
-    	factor = Math.min(factor, screenSize.getHeight() / networkClippingHeight());
-    	factor *= 0.8f;
+		scale(1);
+		setViewClipCoords(0,0,1,1);
 
-    	frameDefaultWidth = (int) Math.floor(networkClippingWidth() * factor);
-    	frameDefaultHeight = (int) Math.floor(networkClippingHeight() * factor);
+		networkScrollPane = new MyNetVisScrollPane(this);
+		VizGuiHandler handi = new VizGuiHandler();
+		networkScrollPane.addMouseMotionListener(handi);
+		networkScrollPane.addMouseListener(handi);
+		networkScrollPane.getViewport().addChangeListener(handi);
+		mouseMan = handi;
+		networkScrollPane.addMouseWheelListener(mouseMan);
+	}
 
-    	scale(1);
-    	setViewClipCoords(0,0,1,1);
+	public void scale(double factor) {
+		if (factor > 0) {
+			int scaledWidth = (int) Math.round(factor * frameDefaultWidth);
+			int scaledHeight = (int) Math.round(factor * frameDefaultHeight);
 
-    	networkScrollPane = new MyNetVisScrollPane(this);
-    	VizGuiHandler handi = new VizGuiHandler();
-    	networkScrollPane.addMouseMotionListener(handi);
-    	networkScrollPane.addMouseListener(handi);
-    	networkScrollPane.getViewport().addChangeListener(handi);
-    	mouseMan = handi;
-    	networkScrollPane.addMouseWheelListener(mouseMan);
+			this.setPreferredSize(new Dimension(scaledWidth, scaledHeight));
+		}
+	}
 
-    	// linkWidth = 5;
-    	// nodeRadius = 5;
-    	//
-    	// networkRenderer.setNodeRadius(nodeRadius);
-    	// networkRenderer.setLinkWidth(linkWidth);
-    }
+	// -------------------- COORDINATE TRANSFORMATION --------------------
 
-    public void scale(double factor) {
-        if (factor > 0) {
-            int scaledWidth = (int) Math.round(factor * frameDefaultWidth);
-            int scaledHeight = (int) Math.round(factor * frameDefaultHeight);
+	private double networkClippingEastingBorder() {
+		return Math.max(1, BORDER_FACTOR
+				* (quad.getMaxEasting() - quad.getMinEasting()));
+	}
 
-            this.setPreferredSize(new Dimension(scaledWidth, scaledHeight));
-        }
-    }
+	private double networkClippingNorthingBorder() {
+		return Math.max(1, BORDER_FACTOR
+				* (quad.getMaxNorthing() - quad.getMinNorthing()));
+	}
 
-    // -------------------- COORDINATE TRANSFORMATION --------------------
+	private double networkClippingMinEasting() {
+		return 0 - networkClippingEastingBorder();
+	}
 
-    private double networkClippingEastingBorder() {
-        return Math.max(1, BORDER_FACTOR
-                * (quad.getMaxEasting() - quad.getMinEasting()));
-    }
+	private double networkClippingMaxEasting() {
+		return quad.getMaxEasting() -quad.getMinEasting() + networkClippingEastingBorder();
+	}
 
-    private double networkClippingNorthingBorder() {
-        return Math.max(1, BORDER_FACTOR
-                * (quad.getMaxNorthing() - quad.getMinNorthing()));
-    }
+	private double networkClippingMinNorthing() {
+		return 0 - networkClippingNorthingBorder();
+	}
 
-    private double networkClippingMinEasting() {
-        return 0 - networkClippingEastingBorder();
-    }
+	private double networkClippingMaxNorthing() {
+		return quad.getMaxNorthing() - quad.getMinNorthing() + networkClippingNorthingBorder();
+	}
 
-    private double networkClippingMaxEasting() {
-        return quad.getMaxEasting() -quad.getMinEasting() + networkClippingEastingBorder();
-    }
+	private double networkClippingWidth() {
+		return networkClippingMaxEasting() - networkClippingMinEasting();
+	}
 
-    private double networkClippingMinNorthing() {
-        return 0 - networkClippingNorthingBorder();
-    }
+	private double networkClippingHeight() {
+		return networkClippingMaxNorthing() - networkClippingMinNorthing();
+	}
 
-    private double networkClippingMaxNorthing() {
-        return quad.getMaxNorthing() - quad.getMinNorthing() + networkClippingNorthingBorder();
-    }
+	private AffineTransform getBoxTransform() {
 
-    private double networkClippingWidth() {
-        return networkClippingMaxEasting() - networkClippingMinEasting();
-    }
+		// two original extreme coordinates ...
 
-    private double networkClippingHeight() {
-        return networkClippingMaxNorthing() - networkClippingMinNorthing();
-    }
+		double v1 = networkClippingMinEasting();
+		double w1 = networkClippingMinNorthing();
 
-    private AffineTransform getBoxTransform() {
+		double v2 = networkClippingMaxEasting();
+		double w2 = networkClippingMaxNorthing();
 
-        // two original extreme coordinates ...
+		// ... mapped onto two extreme picture coordinates ...
 
-        double v1 = networkClippingMinEasting();
-        double w1 = networkClippingMinNorthing();
+		Dimension prefSize = this.getPreferredSize();
 
-        double v2 = networkClippingMaxEasting();
-        double w2 = networkClippingMaxNorthing();
+		double x1 = 0;
+		double y1 = (int) prefSize.getHeight();
 
-        // ... mapped onto two extreme picture coordinates ...
+		double x2 = (int) prefSize.getWidth();
+		double y2 = 0;
 
-        Dimension prefSize = this.getPreferredSize();
+		// ... yields a simple affine transformation without shearing:
 
-        double x1 = 0;
-        double y1 = (int) prefSize.getHeight();
+		double m00 = (x1 - x2) / (v1 - v2);
+		double m02 = x1 - m00 * v1;
 
-        double x2 = (int) prefSize.getWidth();
-        double y2 = 0;
+		double m11 = (y1 - y2) / (w1 - w2);
+		double m12 = y1 - m11 * w1;
 
-        // ... yields a simple affine transformation without shearing:
+		return new AffineTransform(m00, 0.0, 0.0, m11, m02, m12);
+	}
 
-        double m00 = (x1 - x2) / (v1 - v2);
-        double m02 = x1 - m00 * v1;
+	// -------------------- PAINTING --------------------
 
-        double m11 = (y1 - y2) / (w1 - w2);
-        double m12 = y1 - m11 * w1;
+	@Override
+	public void paint(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
 
-        return new AffineTransform(m00, 0.0, 0.0, m11, m02, m12);
-    }
-
-    // --------------------
-//    public Point2D.Double getNetCoord (double x, double y) {
-//    	Point2D.Double result = new Point2D.Double();
-//        Dimension prefSize = getPreferredSize();
-//    	result.x = x /prefSize.width;
-//    	result.y = 1.- y /prefSize.height;
-//    	result.x *= (quad.getMaxEasting() - quad.getMinEasting());
-//    	result.y *= (quad.getMaxNorthing() - quad.getMinNorthing());
-//    	//result.x += network.minEasting();
-//    	//result.y += network.minNorthing();
-//
-//    	return result;
-//    }
-    // -------------------- PAINTING --------------------
-
-    @Override
-		public void paint(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g;
-
-        boolean useAntiAliasing = true;
+		boolean useAntiAliasing = true;
 
 		if (useAntiAliasing ) {
-        	g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
-        } else {
-        	g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF));
-        }
+			g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
+		} else {
+			g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF));
+		}
 
 		AffineTransform originalTransform = g2.getTransform();
 
-		//OTFSwingDrawable.boxTransform = getBoxTransform();
 		OTFSwingDrawable.g2d = g2;
 
 		g2.setStroke(new BasicStroke(Math.round(0.05 * linkWidth)));
@@ -329,21 +285,25 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		g2.setTransform(new AffineTransform());
 		mouseMan.drawElements(g2);
 		g2.setTransform(originalTransform);
-   }
+	}
 
+	@Override
 	public Component getComponent() {
 		return networkScrollPane;
 	}
 
+	@Override
 	public OTFClientQuad getQuad() {
 		return quad;
 	}
 
+	@Override
 	public void invalidate(int time) throws RemoteException {
 		this.sceneGraph = quad.getSceneGraph(time, null, this);
 		redraw();
 	}
 
+	@Override
 	public void redraw() {
 		networkScrollPane.invalidate();
 		networkScrollPane.repaint();
@@ -355,7 +315,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	 */
 	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuadReceiver{
 		protected final Point2D.Float[] quad = new Point2D.Float[4];
-//		protected float coloridx = 0;
+		//		protected float coloridx = 0;
 
 
 		Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end, int nrLanes){
@@ -370,10 +330,12 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			return new Point2D.Float((float)dx,(float)dy);
 		}
 
+		@Override
 		public void setQuad(float startX, float startY, float endX, float endY) {
 			setQuad(startX, startY,endX, endY, 1);
 		}
 
+		@Override
 		public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
 			this.quad[0] = new Point2D.Float(startX, startY);
 			this.quad[1] = new Point2D.Float(endX, endY);
@@ -384,7 +346,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 		@Override
 		public void setColor(float coloridx) {
-//			this.coloridx = coloridx;
+			//			this.coloridx = coloridx;
 		}
 
 		@Override
@@ -410,7 +372,6 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	/***
 	 * Drawer class for drawing agents
 	 */
-
 	public static class AgentDrawer extends OTFSwingDrawable implements OTFDataSimpleAgentReceiver{
 		//Anything above 50km/h should be yellow!
 		private final static ValueColorizer colorizer = new ValueColorizer(
@@ -421,6 +382,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		protected float startX, startY, color;
 		protected int state;
 
+		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			this.id = id;
 			this.startX = startX;
@@ -428,6 +390,8 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			this.color = color;
 			this.state = state;
 		}
+
+		@Override
 		public void setAgent( AgentSnapshotInfo agInfo ) {
 			this.id = agInfo.getId().toString().toCharArray();
 			this.startX = (float) agInfo.getEasting() ;
@@ -436,15 +400,15 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			this.state = agInfo.getAgentState().ordinal() ;
 		}
 
-//		protected void setColor(Graphics2D display) {
-//			Color color = colorizer.getColor(0.1 + 0.9*this.color);
-//			if ((state & 1) != 0) {
-//				color = Color.lightGray;
-//			}
-//			display.setColor(color);
-//
-//		}
-//
+		//		protected void setColor(Graphics2D display) {
+		//			Color color = colorizer.getColor(0.1 + 0.9*this.color);
+		//			if ((state & 1) != 0) {
+		//				color = Color.lightGray;
+		//			}
+		//			display.setColor(color);
+		//
+		//		}
+		//
 
 		@Override
 		public void onDraw(Graphics2D display) {
@@ -453,8 +417,8 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 			Point2D.Float pos = new Point2D.Float(startX, startY);
 			// draw agent...
-//			final int lane = (RANDOMIZE_LANES ? (agent.hashCode()
-//			% lanes + 1) : agent.getLane());
+			//			final int lane = (RANDOMIZE_LANES ? (agent.hashCode()
+			//			% lanes + 1) : agent.getLane());
 
 
 			final double agentWidth = linkWidth *0.9;
@@ -489,9 +453,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 				g2.setColor(Color.GREEN);
 				g2.drawRect(currentRect.x,
 						currentRect.y, currentRect.width, currentRect.height);
-				}
-
-
+			}
 		}
 
 		@Override
@@ -527,17 +489,17 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 				} else {
 					// try to find agent under mouse
 					// calc mouse pos to component pos
-			        //Rectangle rect = networkScrollPane.getViewport().getViewRect();
-			    	//Point2D.Double p =  getNetCoord(e.getX() + rect.getX(), e.getY()+ + rect.getY());
-//					String id = visnet.getAgentId(p);
-//					Plan plan = null;
-//					try {
-//						plan = host.getAgentPlan(id);
-//					} catch (Exception e1) {
-//						// _TODO Auto-generated catch block
-//						e1.printStackTrace();
-//					}
-//					if(plan != null) agentRenderer.setPlan(plan);
+					//Rectangle rect = networkScrollPane.getViewport().getViewRect();
+					//Point2D.Double p =  getNetCoord(e.getX() + rect.getX(), e.getY()+ + rect.getY());
+					//					String id = visnet.getAgentId(p);
+					//					Plan plan = null;
+					//					try {
+					//						plan = host.getAgentPlan(id);
+					//					} catch (Exception e1) {
+					//						// _TODO Auto-generated catch block
+					//						e1.printStackTrace();
+					//					}
+					//					if(plan != null) agentRenderer.setPlan(plan);
 
 					networkScrollPane.invalidate();
 					networkScrollPane.repaint();
@@ -588,6 +550,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 	}
 
+	@Override
 	public void handleClick(Rectangle currentRect, int button) {
 
 	}
