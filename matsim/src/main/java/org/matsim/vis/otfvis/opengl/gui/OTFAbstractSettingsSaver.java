@@ -59,7 +59,7 @@ import de.schlichtherle.io.DefaultArchiveDetector;
  *
  */
 public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
-	String fileName;
+	protected final String fileName;
 
 	private OTFVisConfig visConfig;
 
@@ -85,7 +85,11 @@ public abstract class OTFAbstractSettingsSaver implements OTFSettingsSaver {
 	}
 
 	public OTFAbstractSettingsSaver(OTFVisConfig visconf, String filename) {
-		this.fileName = filename;
+		if (filename.startsWith("file:")) {
+			this.fileName = filename.substring(5);
+		} else {
+			this.fileName = filename;
+		}
 		this.visConfig = visconf;
 	}
 
