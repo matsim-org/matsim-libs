@@ -19,15 +19,24 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
@@ -46,13 +55,17 @@ import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
  * @author droeder
  *
  */
-public class GershensonRunner {
+public class GershensonRunner implements AgentStuckEventHandler {
 	
 	private Map<Id, Id> corrGroups;
 	private Map<Id, List<Id>> compGroups;
 	
+	private Map<Integer, Double> averageTT;
+	
+	private AverageTTHandler handler1;
+	
 	// "D" run denver -- "G" run gershensonTestNetwork
-	private static final String config = "D";
+	private static final String config = "G";
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 
@@ -77,7 +90,7 @@ public class GershensonRunner {
 		controler.setOverwriteFiles(true);
 		Config config = controler.getConfig();
 		
-		this.addControlerListener(controler);
+		this.addListener(controler);
 		this.addQueueSimListener(controler);
 		controler.run();
 
@@ -87,25 +100,59 @@ public class GershensonRunner {
 		
 	}
 	
-	private void addControlerListener(final Controler controler) {
-		controler.addControlerListener(new StartupListener() {
+	private void addListener(final Controler c) {
+		
+		
+		averageTT = new HashMap<Integer, Double>();
+		
+		
+		
+		c.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				CalculateSignalGroups csg = new CalculateSignalGroups();
-				Map<Id, SignalGroupDefinition> groups = controler.getScenario().getSignalSystems().getSignalGroupDefinitions();
-				corrGroups = csg.calculateCorrespondingGroups(groups, controler.getNetwork());
-				compGroups = csg.calculateCompetingGroups(corrGroups, groups, controler.getNetwork());
+				Map<Id, SignalGroupDefinition> groups = c.getScenario().getSignalSystems().getSignalGroupDefinitions();
+				corrGroups = csg.calculateCorrespondingGroups(groups, c.getNetwork());
+				compGroups = csg.calculateCompetingGroups(corrGroups, groups, c.getNetwork());
+				handler1 = new AverageTTHandler(c.getPopulation().getPersons().size());
+				event.getControler().getEvents().addHandler(handler1);
+				
 				//enable live-visualization
-				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+				
+				//output of stucked vehicles
+				event.getControler().getEvents().addHandler(GershensonRunner.this);	
 			}
 			
 		}
-				
 		);
+		
+		c.addControlerListener(new IterationStartsListener() {
+			@Override
+			public void notifyIterationStarts(IterationStartsEvent event) {
+//				handler1.reset(c.getIterationNumber());
+			}
+		});
+		
+		c.addControlerListener(new IterationEndsListener() {
+			@Override
+			public void notifyIterationEnds(IterationEndsEvent event) {
+				handler1.setAverageIterationTime(event.getIteration());
+			}
+		});		
+		
+		c.addControlerListener(new ShutdownListener() {
+			@Override
+			public void notifyShutdown(ShutdownEvent event) {
+				handler1.writeChart(event.getControler().getControlerIO().getOutputFilename("averageTimePerIteration"));
+				
+			}
+		});
+		
 	}
 	
-	private void addQueueSimListener(final Controler controler) {
-		controler.getQueueSimulationListener().add(new SimulationInitializedListener<QSim>() {
+	private void addQueueSimListener(final Controler c) {
+		c.getQueueSimulationListener().add(new SimulationInitializedListener<QSim>() {
 			//add the adaptive controller as events listener
 			public void notifySimulationInitialized(SimulationInitializedEvent<QSim> e) {
 				QSim qs = e.getQueueSimulation();
@@ -113,22 +160,20 @@ public class GershensonRunner {
 					(GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				adaptiveController.setCorrGroups(corrGroups);
 				adaptiveController.setCompGroups(compGroups);
-				adaptiveController.init(controler.getScenario().getSignalSystems().getSignalGroupDefinitions(), e.getQueueSimulation().getQueueNetwork());
+				adaptiveController.init(c.getScenario().getSignalSystems().getSignalGroupDefinitions(), e.getQueueSimulation().getQueueNetwork());
 				
-				controler.getEvents().addHandler(adaptiveController);
+				c.getEvents().addHandler(adaptiveController);
 			}
 		});
 		//remove the adaptive controller
-		controler.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QSim>() {
+		c.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QSim>() {
 			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSim> e) {
 				QSim qs = e.getQueueSimulation();
 				GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-				controler.getEvents().removeHandler(adaptiveController);
-				
+				c.getEvents().removeHandler(adaptiveController);
 			}
 		});
-
-
+	
 	}
 	private void startVisualizer(Config config){
 		String[] args = {config.controler().getOutputDirectory() +
@@ -141,6 +186,15 @@ public class GershensonRunner {
 		
 		new GershensonRunner().runScenario(config);
 		
+	}
+
+	@Override
+	public void handleEvent(AgentStuckEvent event) {
+		log.error("got stuck event for agent: " + event.getPersonId() + " on Link " + event.getLinkId());
+	}
+
+	@Override
+	public void reset(int iteration) {
 	}
 	
 
