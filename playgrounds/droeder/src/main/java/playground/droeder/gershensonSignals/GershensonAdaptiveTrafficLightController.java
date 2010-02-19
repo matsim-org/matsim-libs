@@ -56,8 +56,8 @@ public class GershensonAdaptiveTrafficLightController extends
 
 	private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
 
-	private final double tMin = 20; // time in seconds
-	private final double minCarTime = 30; //
+	private final double tGreenMin = 25; // time in seconds
+	private final double minCarTime = 15; //
 
 	private Map<Id, Integer> vehOnLink = new HashMap<Id, Integer>();
 	private Map<Id, Map<Id, Integer>> vehOnLinkLanes = new HashMap<Id, Map<Id, Integer>>();
@@ -186,6 +186,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		double approachingRed = 0; // product of time and approaching cars
 		int approachingGreenLink = 0;
 		int approachingGreenLane = 0;
+		double carTime = 0;
 		
 
 		Map<Id, SignalGroupDefinition> groups = this.getSignalGroups();
@@ -221,6 +222,8 @@ public class GershensonAdaptiveTrafficLightController extends
 				}
 			}
 		}
+		
+		carTime = vehOnLink.get(signalGroup.getLinkRefId());
 
 		if (oldState.equals(SignalGroupState.RED)){
 			approachingRed = vehOnLink.get(groups.get(signalGroup.getId()).getLinkRefId()) * compGreenTime;
@@ -253,7 +256,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			if (approachingRed > 0 && approachingGreenLink == 0){ //16
 				return switchLight(signalGroup, oldState, time);
 			}else {
-				if ((time - compGreenTime) > tMin && vehOnLink.get(signalGroup.getLinkRefId()) > minCarTime){
+				if ((time - compGreenTime) > tGreenMin && carTime > minCarTime){
 						return switchLight(signalGroup, oldState, time);
 				}
 			}
