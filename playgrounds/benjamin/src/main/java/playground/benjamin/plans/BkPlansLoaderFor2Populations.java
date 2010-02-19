@@ -20,6 +20,7 @@
 package playground.benjamin.plans;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -36,34 +37,69 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
  * @author bkickhoefer after kn
  */
 
-public class BkPlansLoader {
+public class BkPlansLoaderFor2Populations {
 	
 
 	public void run(final String[] args) {
-		//instancing the scenario with a config (path to network and plans)
-		Scenario sc = new ScenarioFactoryImpl().createScenario();
-		Config c = sc.getConfig();
-		c.network().setInputFile("../matsim/examples/equil/network.xml");
-		c.plans().setInputFile("../matsim/output/multipleIterations10/output_plans.xml.gz");
+		//instancing the scenario1 with a config (path to network and plans)
+		Scenario sc1 = new ScenarioFactoryImpl().createScenario();
+		Config c1 = sc1.getConfig();
+		c1.network().setInputFile("../matsim/examples/equil/network.xml");
+		c1.plans().setInputFile("../matsim/output/multipleIterations10/output_plans.xml.gz");
 		
-		//loading the scenario and getting the population
-		ScenarioLoader sl = new ScenarioLoaderImpl(sc) ;
-		sl.loadScenario() ;
-		Population population = sc.getPopulation();
+		//loading the scenario1 and getting the population1
+		ScenarioLoader sl1 = new ScenarioLoaderImpl(sc1) ;
+		sl1.loadScenario() ;
+		Population population1 = sc1.getPopulation();
+
+	//===
+		
+		//instancing the scenario2 with a config (path to network and plans)
+		Scenario sc2 = new ScenarioFactoryImpl().createScenario();
+		Config c2 = sc2.getConfig();
+		c2.network().setInputFile("../matsim/examples/equil/network.xml");
+		c2.plans().setInputFile("../matsim/output/multipleIterations20/output_plans.xml.gz");
+		
+		//loading the scenario2 and getting the population2
+		ScenarioLoader sl2 = new ScenarioLoaderImpl(sc2) ;
+		sl2.loadScenario() ;
+		Population population2 = sc2.getPopulation();
+		
+//============================================================================================================		
 
 		//get the sorted scores from the plans
-		SortedMap<Id, Double> scores = getScoresFromPlans(population);
+		SortedMap<Id, Double> scores1 = getScoresFromPlans(population1);
+		SortedMap<Id, Double> scores2 = getScoresFromPlans(population2);
+		
+		//calculate the score differences per person
+		SortedMap<Id, Double> scoreDifferences = calculateScoreDifferences(scores1, scores2);
 		
 		//writing the output with the help of my scoreWriter
-		BkPopulationScoreWriter scoreWriter = new BkPopulationScoreWriter(scores);
-		scoreWriter.writeChart("../matsim/output/multipleIterations10/scorePerPerson.png");
-		scoreWriter.writeTxt("../matsim/output/multipleIterations10/scorePerPerson.txt");
+		BkPopulationScoreDifferenceWriter scoreWriter = new BkPopulationScoreDifferenceWriter(scoreDifferences);
+		scoreWriter.writeChart("../matsim/output/multipleIterations20/scoreDifferencePerPerson20-10.png");
+		scoreWriter.writeTxt("../matsim/output/multipleIterations20/scoreDifferencePerPerson20-10.txt");
 
 		System.out.println("done.");
 	}
 
+//============================================================================================================	
+	
+	private SortedMap<Id, Double> calculateScoreDifferences(SortedMap<Id, Double> scores1, SortedMap<Id, Double> scores2) {
+		SortedMap<Id, Double> result = new TreeMap<Id, Double>(new ComparatorImplementation());
+		
+		for (Id id : scores1.keySet()){
+			//value = map.get(key) !!!
+			Double score1 = scores1.get(id);
+			Double score2 = scores2.get(id);
+			Double scoreDifference = score2 - score1;
+			result.put(id, scoreDifference);
+		}		
+		
+		return result;
+	}
+
 	private SortedMap<Id, Double> getScoresFromPlans(Population population) {
-		//instancing the sorted map (comparator needed to compare Ids not as Strings but like Integers)
+		//instancing the sorted map (comparator - see below - is needed to compare Ids not as Strings but like Integers)
 		SortedMap<Id,Double> result = new TreeMap<Id, Double>(new ComparatorImplementation());
 		
 		//adding the ids and the scores to the map 
@@ -75,8 +111,11 @@ public class BkPlansLoader {
 		return result;
 	}
 
+//============================================================================================================		
+	
+	//main class
 	public static void main(final String[] args) {
-		BkPlansLoader app = new BkPlansLoader();
+		BkPlansLoaderFor2Populations app = new BkPlansLoaderFor2Populations();
 		app.run(args);
 	}
 

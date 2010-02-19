@@ -4,43 +4,42 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
-import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.io.IOUtils;
 
-public class BkPopulationScoreWriter {
+public class BkPopulationScoreDifferenceWriter {
 
-	private Map<Id, Double> idsScoresMap;
+	private Map<Id, Double> idsScoreDifferencesMap;
 
 	//constructor
-	public BkPopulationScoreWriter(Map<Id,Double> scores) {
-		this.idsScoresMap = scores;
+	public BkPopulationScoreDifferenceWriter(Map<Id,Double> scoreDifferences) {
+		this.idsScoreDifferencesMap = scoreDifferences;
 	}
 
 	public void writeChart(String filename) {
 		
 		//arrays (double is demanded by chart.addSeries) with size equal to the key-value-pairs of the idsScoresMap
-		double[] personIds = new double[idsScoresMap.size()];
-		double[] utilities = new double[idsScoresMap.size()];
+		double[] personIds = new double[idsScoreDifferencesMap.size()];
+		double[] utilityDifferences = new double[idsScoreDifferencesMap.size()];
 		
 		//functions that convert the Ids and the Scores from the map to 2 double arrays
 		convertPersonIdsToDoubleArray(personIds);
-		convertScoresToDoubleArray(utilities);
+		convertScoreDifferencesToDoubleArray(utilityDifferences);
 		
-		XYScatterChart chart = new XYScatterChart("utility per person", "personId", "utility from selected plan");
-		chart.addSeries("utility per person", personIds, utilities);	
+		XYScatterChart chart = new XYScatterChart("utility difference per person", "personId", "utility difference per person from selected plan");
+		chart.addSeries("utility difference per person", personIds, utilityDifferences);	
 		chart.saveAsPng(filename, 800, 600);
 		}
 
 	public void writeTxt(String filename) {
 		StringBuffer buffer = new StringBuffer();
 		
-		for (Id personId : idsScoresMap.keySet()){
+		for (Id personId : idsScoreDifferencesMap.keySet()){
 			buffer.append(personId);
 			buffer.append("\t");
-			buffer.append(idsScoresMap.get(personId).doubleValue());
+			buffer.append(idsScoreDifferencesMap.get(personId).doubleValue());
 			buffer.append("\n");
 		}
 		
@@ -57,16 +56,16 @@ public class BkPopulationScoreWriter {
 	
 	private void convertPersonIdsToDoubleArray(double[] personIds) {
 		int i = 0;
-		for (Id id : idsScoresMap.keySet()){
+		for (Id id : idsScoreDifferencesMap.keySet()){
 			personIds[i] = Double.parseDouble(id.toString());
 			i++;
 		}
 	}
 	
-	private void convertScoresToDoubleArray(double[] utilities) {
+	private void convertScoreDifferencesToDoubleArray(double[] utilityDifference) {
 		int i = 0;
-		for (Double score : idsScoresMap.values()){
-			utilities[i] = score;
+		for (Double scoreDiffernece : idsScoreDifferencesMap.values()){
+			utilityDifference[i] = scoreDiffernece;
 			i++;
 		}
 	}
