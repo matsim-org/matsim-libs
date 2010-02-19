@@ -19,8 +19,9 @@
 
 package playground.benjamin.plans;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Comparator;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,6 +37,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
  */
 
 public class BkPlansLoader {
+	
 
 	public void run(final String[] args) {
 		Scenario sc = new ScenarioFactoryImpl().createScenario();
@@ -48,30 +50,39 @@ public class BkPlansLoader {
 		sl.loadScenario() ;
 		Population population = sc.getPopulation();
 
-		Map<Id, Double> scores = getScoresFromPlans(population);
+		SortedMap<Id, Double> scores = getScoresFromPlans(population);
 		
 		
-		BkPopulationScoreWriter scorewriter = new BkPopulationScoreWriter(scores);
-		scorewriter.writeChart("../matsim/output/multipleIterations/scorePerPerson.png");
-		scorewriter.writeTxt("../matsim/output/multipleIterations/scorePerPerson.txt");
+		BkPopulationScoreWriter scoreWriter = new BkPopulationScoreWriter(scores);
+		scoreWriter.writeChart("../matsim/output/multipleIterations/scorePerPerson.png");
+		scoreWriter.writeTxt("../matsim/output/multipleIterations/scorePerPerson.txt");
 
 		System.out.println("done.");
 	}
 
-	private Map<Id, Double> getScoresFromPlans(Population population) {
-		Map<Id, Double> result = new HashMap<Id, Double>();
+	private SortedMap<Id, Double> getScoresFromPlans(Population population) {
+		SortedMap<Id,Double> result = new TreeMap<Id, Double>(new ComparatorImplementation());
 		for(Person person : population.getPersons().values()) {
 			Id id = person.getId();
 			Double score = person.getSelectedPlan().getScore();
 			result.put(id, score);
 		}
-		
 		return result;
 	}
 
 	public static void main(final String[] args) {
 		BkPlansLoader app = new BkPlansLoader();
 		app.run(args);
+	}
+
+	
+	private final class ComparatorImplementation implements Comparator<Id> {
+		@Override
+		public int compare(Id id1, Id id2) {
+			Integer i1 = Integer.parseInt(id1.toString());
+			Integer i2 = Integer.parseInt(id2.toString()); 
+			return i1.compareTo(i2);
+		}
 	}
 
 }

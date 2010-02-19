@@ -14,8 +14,8 @@ public class BkPopulationScoreWriter {
 	private Map<Id, Double> idsScoresMap;
 
 	//constructor
-	public BkPopulationScoreWriter(Map<Id, Double> idsScoresMap) {
-		this.idsScoresMap = idsScoresMap;
+	public BkPopulationScoreWriter(Map<Id,Double> scores) {
+		this.idsScoresMap = scores;
 	}
 
 	public void writeChart(String filename) {
