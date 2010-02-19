@@ -31,19 +31,14 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 
-
 /**
  * @author dgrether
- *
  */
 public class OTFFileSettingsSaver extends OTFAbstractSettingsSaver {
 
   private static final Logger log = Logger.getLogger(OTFFileSettingsSaver.class);
-	/**
-	 * @param visconf
-	 * @param filename
-	 */
-	public OTFFileSettingsSaver(OTFVisConfig visconf, String filename) {
+
+  public OTFFileSettingsSaver(OTFVisConfig visconf, String filename) {
 		super(visconf, filename);
 	}
 
@@ -64,13 +59,12 @@ public class OTFFileSettingsSaver extends OTFAbstractSettingsSaver {
 					// force this to 30 if zero!
 					cfg.setDelay_ms(cfg.getDelay_ms() == 0 ? 30: cfg.getDelay_ms());
 					OTFClientControl.getInstance().setOTFVisConfig(cfg);
-				} 
+				}
 			} catch (IOException e1) {
-				log.error("Not able to load config from file. This is not fatal.");
-				e1.printStackTrace();
+				log.error("Not able to load config from file. This is not fatal. file="+this.fileName, e1);
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			} 
+			}
 		// Test if loading worked, otherwise create default
 		if(OTFClientControl.getInstance().getOTFVisConfig() == null) {
 			log.info("No otfvis config loaded creating default otfvisconfig.");
@@ -79,6 +73,6 @@ public class OTFFileSettingsSaver extends OTFAbstractSettingsSaver {
 		conf = OTFClientControl.getInstance().getOTFVisConfig();
 		conf.clearModified();
 		return conf;
-	}		
-	
+	}
+
 }
