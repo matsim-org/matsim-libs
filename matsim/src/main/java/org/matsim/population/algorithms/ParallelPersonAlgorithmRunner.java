@@ -80,7 +80,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 				name = algo.getClass().getSimpleName();
 				counter = new Counter("[" + name + "] handled person # ");
 			}
-			PersonAlgoThread algothread = new PersonAlgoThread(i, algo, counter);
+			PersonAlgoThread algothread = new PersonAlgoThread(algo, counter);
 			Thread thread = new Thread(algothread, name + "." + i);
 			threads[i] = thread;
 			algoThreads[i] = algothread;
@@ -119,7 +119,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 		private final List<Person> persons = new LinkedList<Person>();
 		private final Counter counter;
 
-		public PersonAlgoThread(final int i, final AbstractPersonAlgorithm algo, final Counter counter) {
+		public PersonAlgoThread(final AbstractPersonAlgorithm algo, final Counter counter) {
 //			this.threadId = i;
 			this.personAlgo = algo;
 			this.counter = counter;
