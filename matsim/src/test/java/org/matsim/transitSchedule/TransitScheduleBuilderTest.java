@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.api.Departure;
@@ -64,7 +64,7 @@ public class TransitScheduleBuilderTest extends MatsimTestCase {
 	public void testCreateTransitRoute() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id id = new IdImpl(2);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(new IdImpl(3), new IdImpl(4), null);
+		NetworkRoute route = new LinkNetworkRouteImpl(new IdImpl(3), new IdImpl(4), null);
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitRouteStop stop1 = new TransitRouteStopImpl(null, 50, 60);
 		stops.add(stop1);

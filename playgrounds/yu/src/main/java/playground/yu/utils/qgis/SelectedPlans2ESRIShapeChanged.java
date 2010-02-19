@@ -43,7 +43,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -166,7 +166,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDistance();
 
-		List<Id> linkIds = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
+		List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 		Coordinate[] coords = new Coordinate[linkIds.size() + 1];
 		for (int i = 0; i < linkIds.size(); i++) {
 			Link link = this.network.getLinks().get(linkIds.get(i));

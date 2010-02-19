@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -222,7 +222,7 @@ public class KroutesCalculator {
 		TransitRouteStop trStopA =transitRoute.getStop(trStopFacilityA);
 		TransitRouteStop trStopB =transitRoute.getStop(trStopFacilityB);
 		double travelTime = trStopB.getArrivalOffset() - trStopA.getDepartureOffset();
-		NetworkRouteWRefs subRoute = RouteUtils.getSubRoute(transitRoute.getRoute(), nodeA, nodeB, this.plainNet);
+		NetworkRoute subRoute = RouteUtils.getSubRoute(transitRoute.getRoute(), nodeA, nodeB, this.plainNet);
 		return new PTtrip(transitRoute, subRoute, travelTime, this.plainNet);
 	}
 }

@@ -33,7 +33,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.testcases.MatsimTestCase;
@@ -52,8 +52,8 @@ public class VDSSignTest extends MatsimTestCase {
 	private static final Logger log = Logger.getLogger(VDSSignTest.class);
 
 	private Network network;
-	private NetworkRouteWRefs route2;
-	private NetworkRouteWRefs route1;
+	private NetworkRoute route2;
+	private NetworkRoute route1;
 	private EmptyControlInputImpl controlInput;
 
 	private int systemTime;
@@ -130,7 +130,7 @@ public class VDSSignTest extends MatsimTestCase {
 		log.debug("test's system time: " + this.systemTime);
 		this.controlInput.setNashTime(-1);
 		sign.calculateOutput(this.systemTime);
-		NetworkRouteWRefs r1 = sign.requestRoute();
+		NetworkRoute r1 = sign.requestRoute();
 //		log.debug("Route1 is: " + LogRouteUtils.getNodeRoute(r1));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route1, r1);
 		//however with the setting the links should be the same:
@@ -143,7 +143,7 @@ public class VDSSignTest extends MatsimTestCase {
 		this.controlInput.setNashTime(1);
 		this.incrementSystemTime();
 		sign.calculateOutput(this.systemTime);
-		NetworkRouteWRefs r2 = sign.requestRoute();
+		NetworkRoute r2 = sign.requestRoute();
 //		log.debug("Route2 is: " + LogRouteUtils.getNodeRoute(r2));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route2, r2);
 		//however with the setting the link should be the same:
@@ -164,14 +164,14 @@ public class VDSSignTest extends MatsimTestCase {
 		sign.simulationPrepared();
 		this.controlInput.setNashTime(-1);
 		sign.calculateOutput(this.systemTime);
-		NetworkRouteWRefs r1 = sign.requestRoute();
+		NetworkRoute r1 = sign.requestRoute();
 //		System.out.println("Route1 is: " + LogRouteUtils.getNodeRoute(r1));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route1, r1);
 		//same for route 2
 		this.incrementSystemTime();
 		this.controlInput.setNashTime(1);
 		sign.calculateOutput(this.systemTime);
-		NetworkRouteWRefs r2 = sign.requestRoute();
+		NetworkRoute r2 = sign.requestRoute();
 //		System.out.println("Route2 is: " + LogRouteUtils.getNodeRoute(r2));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route2, r2);
 		List<Node> rl1, rl2;
@@ -206,7 +206,7 @@ public class VDSSignTest extends MatsimTestCase {
 		//test control
 		this.controlInput.setNashTime(0);
 		sign.calculateOutput(this.systemTime);
-		NetworkRouteWRefs r = sign.requestRoute();
+		NetworkRoute r = sign.requestRoute();
 //		log.debug("Route is: " + LogRouteUtils.getNodeRoute(r));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route1, r);
 		assertNull("with a nash time of 0 the sign should be switched off!", r);
@@ -267,7 +267,7 @@ public class VDSSignTest extends MatsimTestCase {
 		this.controlInput.setNashTime(-1);
 		for (int i = messageHoldTime; i < 3*messageHoldTime; i++) {
 			sign.calculateOutput(i);
-			NetworkRouteWRefs r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route1, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			List<Node> nodes = RouteUtils.getNodes(r, this.network);
@@ -280,7 +280,7 @@ public class VDSSignTest extends MatsimTestCase {
 		this.controlInput.setNashTime(1);
 		for (int i = 3*messageHoldTime; i < 5*messageHoldTime; i++) {
 			sign.calculateOutput(i);
-			NetworkRouteWRefs r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route2, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			List<Node> nodes = RouteUtils.getNodes(r, this.network);
@@ -307,7 +307,7 @@ public class VDSSignTest extends MatsimTestCase {
 //		log.debug("Route is: " + LogRouteUtils.getNodeRoute(r));
 		for (int i = 0; i < controlEvents * messageHoldTime; i++) {
 			sign.calculateOutput(i);
-			NetworkRouteWRefs r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route1, sign.requestRoute());
 			//however with the setting the links should be the same:
 			List<Id> linkIds = r.getLinkIds();
@@ -324,7 +324,7 @@ public class VDSSignTest extends MatsimTestCase {
 		int stop = this.systemTime + controlEvents * messageHoldTime;
 		for (int i = start; i < stop; i++) {
 			sign.calculateOutput(i);
-			NetworkRouteWRefs r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route2, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			List<Node> nodes = RouteUtils.getNodes(r, this.network);
@@ -355,7 +355,7 @@ public class VDSSignTest extends MatsimTestCase {
 		stop = this.systemTime + messageHoldTime;
 		for (int i = start; i < stop; i++) {
 			sign.calculateOutput(i);
-			NetworkRouteWRefs r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route2, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			List<Node> nodes = RouteUtils.getNodes(r, this.network);
@@ -370,7 +370,7 @@ public class VDSSignTest extends MatsimTestCase {
 		stop = this.systemTime + 3 * messageHoldTime;
 		for (int i = start; i < stop; i++) {
 			sign.calculateOutput(i);
-			NetworkRouteWRefs r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route1, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			List<Node> nodes = RouteUtils.getNodes(r, this.network);
@@ -387,7 +387,7 @@ public class VDSSignTest extends MatsimTestCase {
 		stop = this.systemTime + messageHoldTime;
 		for (int i = start; i < stop; i++) {
 			sign.calculateOutput(i);
-			NetworkRouteWRefs r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route1, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			List<Node> nodes = RouteUtils.getNodes(r, this.network);
@@ -402,7 +402,7 @@ public class VDSSignTest extends MatsimTestCase {
 		stop = this.systemTime +  3 * messageHoldTime;
 		for (int i = start; i < stop; i++) {
 			sign.calculateOutput(i);
-			NetworkRouteWRefs r = sign.requestRoute();
+			NetworkRoute r = sign.requestRoute();
 			assertNotSame("routes should not be equal to those of ControlInput", this.route2, sign.requestRoute());
 			//however with the setting the nodes should be the same:
 			List<Node> nodes = RouteUtils.getNodes(r, this.network);

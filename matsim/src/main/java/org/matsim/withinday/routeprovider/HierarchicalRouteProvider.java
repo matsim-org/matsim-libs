@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -59,9 +59,9 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	}
 
 	@Override
-	public NetworkRouteWRefs requestRoute(final Link departureLink, final Link destinationLink, final double time) {
-		NetworkRouteWRefs subRoute;
-		NetworkRouteWRefs returnRoute = (NetworkRouteWRefs) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, departureLink.getId(), destinationLink.getId());
+	public NetworkRoute requestRoute(final Link departureLink, final Link destinationLink, final double time) {
+		NetworkRoute subRoute;
+		NetworkRoute returnRoute = (NetworkRoute) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, departureLink.getId(), destinationLink.getId());
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		Link tmpDepLink = departureLink;
 		for (RouteProvider rp : this.providers) {
@@ -91,7 +91,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 		return null;
 	}
 
-	private boolean isEndCompleteRoute(final NetworkRouteWRefs subRoute, final Link destinationLink) {
+	private boolean isEndCompleteRoute(final NetworkRoute subRoute, final Link destinationLink) {
 		List<Id> linkIds = subRoute.getLinkIds();
 		Link lastLink = this.network.getLinks().get(linkIds.get(linkIds.size() - 1));
 		Node endNode = lastLink.getToNode();
@@ -117,10 +117,10 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 
 	/**
 	 * As this implementation is backed by a AStarRouter the class provides Routes from everywhere to everywhere
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.core.network.LinkImpl, org.matsim.core.population.routes.NetworkRouteWRefs)
+	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.core.network.LinkImpl, org.matsim.core.population.routes.NetworkRoute)
 	 */
 	@Override
-	public boolean providesRoute(final Id currentLinkId, final NetworkRouteWRefs subRoute) {
+	public boolean providesRoute(final Id currentLinkId, final NetworkRoute subRoute) {
 		return true;
 	}
 

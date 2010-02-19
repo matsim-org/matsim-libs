@@ -27,7 +27,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListene
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
@@ -95,7 +95,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 				continue;
 			}
 			Plan plan = pers.getSelectedPlan();
-			List<Id> links = ((NetworkRouteWRefs) ((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).getRoute()).getLinkIds();
+			List<Id> links = ((NetworkRoute) ((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).getRoute()).getLinkIds();
 			traceAgentsRoute(links,pers.getId());
 			
 		}
@@ -169,7 +169,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 				continue;
 			}
 			Plan plan = pers.getSelectedPlan();
-			List<Id> links = ((NetworkRouteWRefs) ((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).getRoute()).getLinkIds();
+			List<Id> links = ((NetworkRoute) ((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).getRoute()).getLinkIds();
 			double cost = 0;
 			for (Id id : links) {
 				LinkInfo li = this.linkInfos.get(id);

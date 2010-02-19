@@ -44,7 +44,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRouteWRefs getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkLayer network) {
+	public NetworkRoute getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkLayer network) {
 		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
 		return new CompressedNetworkRouteImpl(fromLinkId, toLinkId, network, subsequent.getSubsequentLinks());
 	}
@@ -67,7 +67,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 		List<Id> linkIds = new ArrayList<Id>(5);
 		Collections.addAll(linkIds, link22.getId(), link12.getId(), link13.getId(), linkM24.getId());
-		NetworkRouteWRefs route = getNetworkRouteInstance(link1.getId(), link4.getId(), network);
+		NetworkRoute route = getNetworkRouteInstance(link1.getId(), link4.getId(), network);
 		route.setLinkIds(link1.getId(), linkIds, link4.getId());
 
 		List<Id> linksId2 = route.getLinkIds();
@@ -95,7 +95,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		subsequentLinks.put(link2.getId(), link3.getId());
 		subsequentLinks.put(link3.getId(), link4.getId());
 
-		NetworkRouteWRefs route = new CompressedNetworkRouteImpl(link0.getId(), link4.getId(), network, subsequentLinks);
+		NetworkRoute route = new CompressedNetworkRouteImpl(link0.getId(), link4.getId(), network, subsequentLinks);
 		route.setLinkIds(link0.getId(), linkIds, link4.getId());
 
 		List<Id> linksId2 = route.getLinkIds();
@@ -124,7 +124,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		subsequentLinks.put(link2.getId(), link3.getId());
 		subsequentLinks.put(link3.getId(), link4.getId());
 
-		NetworkRouteWRefs route = new CompressedNetworkRouteImpl(link0.getId(), link4.getId(), network, subsequentLinks);
+		NetworkRoute route = new CompressedNetworkRouteImpl(link0.getId(), link4.getId(), network, subsequentLinks);
 		// NO route.setLinks() here!
 
 		Assert.assertEquals("expected 0 links.", 0, route.getLinkIds().size());

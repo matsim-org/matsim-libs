@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.QSim;
 
@@ -136,8 +136,8 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 		Route alternativeRoute = nextLeg.getRoute();
 
 		// set VehicleId in original Route as well as in the alternative Route
-		((NetworkRouteWRefs)originalRoute).setVehicleId(withinDayPersonAgent.getVehicle().getId());
-		((NetworkRouteWRefs)alternativeRoute).setVehicleId(withinDayPersonAgent.getVehicle().getId());
+		((NetworkRoute)originalRoute).setVehicleId(withinDayPersonAgent.getVehicle().getId());
+		((NetworkRoute)alternativeRoute).setVehicleId(withinDayPersonAgent.getVehicle().getId());
 		
 //		if (alternativeRoute.getDistance() != originalRoute.getDistance())
 //		{
@@ -145,7 +145,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 //		}
 		
 		// create ReplanningEvent
-		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));
+		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRoute)alternativeRoute, (NetworkRoute)originalRoute));
 				
 		return true;
 	}

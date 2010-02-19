@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -249,7 +249,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 		this.redLine = this.builder.createTransitLine(this.scenario.createId("red"));
 		this.schedule.addTransitLine(this.redLine);
 		{ // route from left to right
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[2].getId(), this.links[6].getId(), this.network);
+			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[2].getId(), this.links[6].getId(), this.network);
 			List<Id> routeLinks = new ArrayList<Id>();
 			Collections.addAll(routeLinks, this.links[3].getId(), this.links[4].getId(), this.links[5].getId());
 			netRoute.setLinkIds(this.links[2].getId(), routeLinks, this.links[6].getId());
@@ -265,7 +265,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r>04"), 9.0*3600));
 		}
 		{ // route from right to left
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[11].getId(), this.links[15].getId(), this.network);
+			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[11].getId(), this.links[15].getId(), this.network);
 			List<Id> routeLinks = new ArrayList<Id>();
 			Collections.addAll(routeLinks, this.links[12].getId(), this.links[13].getId(), this.links[14].getId());
 			netRoute.setLinkIds(this.links[11].getId(), routeLinks, this.links[15].getId());
@@ -286,7 +286,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 		this.blueLine = this.builder.createTransitLine(this.scenario.createId("blue"));
 		this.schedule.addTransitLine(this.blueLine);
 		{ // route from left to right
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[0].getId(), this.links[8].getId(), this.network);
+			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[0].getId(), this.links[8].getId(), this.network);
 			List<Id> routeLinks = new ArrayList<Id>();
 			Collections.addAll(routeLinks, this.links[1].getId(), this.links[2].getId(), this.links[3].getId(), this.links[4].getId(), this.links[5].getId(), this.links[6].getId(), this.links[7].getId());
 			netRoute.setLinkIds(this.links[0].getId(), routeLinks, this.links[8].getId());
@@ -339,7 +339,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>15"), 9.0*3600 + 46.0*60));
 		}
 		{ // route from right to left
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[9].getId(), this.links[17].getId(), this.network);
+			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[9].getId(), this.links[17].getId(), this.network);
 			List<Id> routeLinks = new ArrayList<Id>();
 			Collections.addAll(routeLinks, this.links[10].getId(), this.links[11].getId(), this.links[12].getId(), this.links[13].getId(), this.links[14].getId(), this.links[15].getId(), this.links[16].getId());
 			netRoute.setLinkIds(this.links[9].getId(), routeLinks, this.links[17].getId());
@@ -397,7 +397,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 		this.greenLine = this.builder.createTransitLine(this.scenario.createId("green"));
 		this.schedule.addTransitLine(this.greenLine);
 		{ // route in circle in clockwise
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.links[25].getId(), this.links[25].getId(), this.network);
+			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[25].getId(), this.links[25].getId(), this.network);
 			List<Id> routeLinks = new ArrayList<Id>();
 			Collections.addAll(routeLinks, this.links[20].getId(), this.links[21].getId(), this.links[22].getId(), this.links[23].getId(), this.links[24].getId());
 			netRoute.setLinkIds(this.links[25].getId(), routeLinks, this.links[25].getId());

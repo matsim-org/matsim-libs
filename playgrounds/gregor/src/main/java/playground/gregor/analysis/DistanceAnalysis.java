@@ -55,7 +55,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -226,7 +226,7 @@ public class DistanceAnalysis {
 		for (Person person : persons) {
 			LegImpl leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
 			double l1 = leg.getRoute().getDistance();
-			List<Id> ls = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
+			List<Id> ls = ((NetworkRoute) leg.getRoute()).getLinkIds();
 			Id lId = ls.get(ls.size()-1);
 			String destS  = lId.toString().replace("el", "");
 			int dest = Integer.parseInt(destS);

@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 public class RouteUtilsTest {
 
@@ -44,7 +44,7 @@ public class RouteUtilsTest {
 		Link endLink = f.network.getLinks().get(f.ids[5]);
 		List<Id> linkIds = new ArrayList<Id>(4);
 		Collections.addAll(linkIds, f.ids[1], f.ids[2], f.ids[3], f.ids[4]);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), f.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), f.network);
 		route.setLinkIds(startLink.getId(), linkIds, endLink.getId());
 
 		List<Node> nodes = RouteUtils.getNodes(route, f.network);
@@ -62,7 +62,7 @@ public class RouteUtilsTest {
 		Link startLink = f.network.getLinks().get(f.ids[2]);
 		Link endLink = f.network.getLinks().get(f.ids[2]);
 		List<Id> links = new ArrayList<Id>(0);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), f.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), f.network);
 		route.setLinkIds(startLink.getId(), links, endLink.getId());
 
 		List<Node> nodes = RouteUtils.getNodes(route, f.network);
@@ -75,7 +75,7 @@ public class RouteUtilsTest {
 		Id startLinkId = f.ids[3];
 		Id endLinkId = f.ids[4];
 		List<Id> linkIds = new ArrayList<Id>(0);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLinkId, endLinkId, f.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId, f.network);
 		route.setLinkIds(startLinkId, linkIds, endLinkId);
 
 		List<Node> nodes = RouteUtils.getNodes(route, f.network);
@@ -93,7 +93,7 @@ public class RouteUtilsTest {
 		List<Id> linkIds = new ArrayList<Id>(6);
 		Collections.addAll(linkIds, f.ids[4], f.ids[5], id99, f.ids[0], f.ids[1], f.ids[2]);
 
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), f.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), f.network);
 		route.setLinkIds(startLink.getId(), linkIds, endLink.getId());
 
 		List<Node> nodes = RouteUtils.getNodes(route, f.network);
@@ -141,12 +141,12 @@ public class RouteUtilsTest {
 	@Test
 	public void testGetSubRoute() {
 		Fixture f = new Fixture();
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(f.ids[0], f.ids[5], f.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(f.ids[0], f.ids[5], f.network);
 		List<Id> linkIds = new ArrayList<Id>();
 		Collections.addAll(linkIds, f.ids[1], f.ids[2], f.ids[3], f.ids[4]);
 		route.setLinkIds(f.ids[0], linkIds, f.ids[5]);
 
-		NetworkRouteWRefs subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.ids[3]), f.network.getNodes().get(f.ids[5]), f.network);
+		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.ids[3]), f.network.getNodes().get(f.ids[5]), f.network);
 		Assert.assertEquals(2, subRoute.getLinkIds().size());
 		Assert.assertEquals(f.ids[2], subRoute.getStartLinkId());
 		Assert.assertEquals(f.ids[3], subRoute.getLinkIds().get(0));
@@ -157,12 +157,12 @@ public class RouteUtilsTest {
 	@Test
 	public void testGetSubRoute_fullRoute() {
 		Fixture f = new Fixture();
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(f.ids[0], f.ids[5], f.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(f.ids[0], f.ids[5], f.network);
 		List<Id> linkIds = new ArrayList<Id>();
 		Collections.addAll(linkIds, f.ids[1], f.ids[2], f.ids[3], f.ids[4]);
 		route.setLinkIds(f.ids[0], linkIds, f.ids[5]);
 
-		NetworkRouteWRefs subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.ids[1]), f.network.getNodes().get(f.ids[5]), f.network);
+		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.ids[1]), f.network.getNodes().get(f.ids[5]), f.network);
 		Assert.assertEquals(4, subRoute.getLinkIds().size());
 		Assert.assertEquals(f.ids[0], subRoute.getStartLinkId());
 		Assert.assertEquals(f.ids[1], subRoute.getLinkIds().get(0));
@@ -175,12 +175,12 @@ public class RouteUtilsTest {
 	@Test
 	public void testGetSubRoute_emptySubRoute() {
 		Fixture f = new Fixture();
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(f.ids[0], f.ids[5], f.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(f.ids[0], f.ids[5], f.network);
 		List<Id> linkIds = new ArrayList<Id>();
 		Collections.addAll(linkIds, f.ids[1], f.ids[2], f.ids[3], f.ids[4]);
 		route.setLinkIds(f.ids[0], linkIds, f.ids[5]);
 
-		NetworkRouteWRefs subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.ids[4]), f.network.getNodes().get(f.ids[4]), f.network);
+		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.ids[4]), f.network.getNodes().get(f.ids[4]), f.network);
 		Assert.assertEquals(0, subRoute.getLinkIds().size());
 		Assert.assertEquals(f.ids[3], subRoute.getStartLinkId());
 		Assert.assertEquals(f.ids[4], subRoute.getEndLinkId());
@@ -189,12 +189,12 @@ public class RouteUtilsTest {
 	@Test
 	public void testGetSubRoute_sameStartEnd() {
 		Fixture f = new Fixture();
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(f.ids[0], f.ids[5], f.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(f.ids[0], f.ids[5], f.network);
 		List<Id> linkIds = new ArrayList<Id>();
 		Collections.addAll(linkIds, f.ids[1], f.ids[2], f.ids[3], f.ids[4]);
 		route.setLinkIds(f.ids[0], linkIds, f.ids[5]);
 
-		NetworkRouteWRefs subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.ids[5]), f.network.getNodes().get(f.ids[4]), f.network);
+		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.ids[5]), f.network.getNodes().get(f.ids[4]), f.network);
 		Assert.assertEquals(0, subRoute.getLinkIds().size());
 		Assert.assertEquals(f.ids[4], subRoute.getStartLinkId());
 		Assert.assertEquals(f.ids[4], subRoute.getEndLinkId());

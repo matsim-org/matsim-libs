@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
@@ -142,7 +142,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(Constants.ROUTE_PROFILE);
 	}
 
-	private void writeRoute(final NetworkRouteWRefs route) throws IOException {
+	private void writeRoute(final NetworkRoute route) throws IOException {
 		if (route != null) {
 			this.writeStartTag(Constants.ROUTE, null);
 

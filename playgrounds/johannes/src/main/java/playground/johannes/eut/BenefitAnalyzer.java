@@ -44,7 +44,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -99,7 +99,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 				if (pe instanceof LegImpl) {
 					tripcounts++;
 					LegImpl leg = ((LegImpl) pe);
-					NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
+					NetworkRoute route = (NetworkRoute) leg.getRoute();
 					double totaltravelcosts = 0;
 					double totaltraveltime = 0;
 					
@@ -187,7 +187,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 
 	}
 
-	private double calcTravTime(TravelTime traveltimes, NetworkRouteWRefs route,
+	private double calcTravTime(TravelTime traveltimes, NetworkRoute route,
 			double starttime) {
 		double totaltt = 0;
 		for (Id linkId : route.getLinkIds()) {

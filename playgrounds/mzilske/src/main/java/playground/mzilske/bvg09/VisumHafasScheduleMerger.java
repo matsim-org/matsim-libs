@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -204,7 +204,7 @@ public class VisumHafasScheduleMerger {
 		List<Id> idRouteHafas = getIdRoute(route.getStops());
 		List<Id> idRouteVisum = listHafas2Visum(idRouteHafas);
 		for (TransitRoute candidateRoute : visumLine.getRoutes().values()) {
-			NetworkRouteWRefs networkRoute = tryToMatch(candidateRoute, idRouteVisum);
+			NetworkRoute networkRoute = tryToMatch(candidateRoute, idRouteVisum);
 			if (networkRoute != null) {
 				List<TransitRouteStop> outStops = new ArrayList<TransitRouteStop>();
 				for (TransitRouteStop stop : route.getStops()) {
@@ -232,8 +232,8 @@ public class VisumHafasScheduleMerger {
 		return idRoute;
 	}
 
-	private NetworkRouteWRefs tryToMatch(TransitRoute candidateRoute, List<Id> idRouteToMatch) {
-		NetworkRouteWRefs linkNetworkRoute = candidateRoute.getRoute();
+	private NetworkRoute tryToMatch(TransitRoute candidateRoute, List<Id> idRouteToMatch) {
+		NetworkRoute linkNetworkRoute = candidateRoute.getRoute();
 		List<Link> links = getAllLink(linkNetworkRoute);
 		ListIterator<Link> linkIterator = links.listIterator();
 		boolean firstStop = true;
@@ -263,7 +263,7 @@ public class VisumHafasScheduleMerger {
 		}
 		int lastLinkIndex = linkIterator.previousIndex();
 		List<Link> usedSegmentLinks = links.subList(firstLinkIndex, lastLinkIndex + 1);
-		NetworkRouteWRefs usedSegment = RouteUtils.createNetworkRoute(NetworkUtils.getLinkIds(usedSegmentLinks), this.outScenario.getNetwork());
+		NetworkRoute usedSegment = RouteUtils.createNetworkRoute(NetworkUtils.getLinkIds(usedSegmentLinks), this.outScenario.getNetwork());
 		return usedSegment;
 	}
 
@@ -276,7 +276,7 @@ public class VisumHafasScheduleMerger {
 		return null;
 	}
 
-	private List<Link> getAllLink(NetworkRouteWRefs linkNetworkRoute) {
+	private List<Link> getAllLink(NetworkRoute linkNetworkRoute) {
 		ArrayList<Link> links = new ArrayList<Link>();
 		links.add(this.outScenario.getNetwork().getLinks().get(linkNetworkRoute.getStartLinkId()));
 		links.addAll(NetworkUtils.getLinks(this.outScenario.getNetwork(), linkNetworkRoute.getLinkIds()));

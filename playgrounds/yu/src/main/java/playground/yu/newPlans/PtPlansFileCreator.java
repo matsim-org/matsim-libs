@@ -21,7 +21,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
@@ -150,7 +150,7 @@ public class PtPlansFileCreator {
 			a.setEndTime(Time.parseTime(endTime));
 			LegImpl leg = pl.createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));
-			NetworkRouteWRefs route = new LinkNetworkRouteImpl(null, null, this.network);
+			NetworkRoute route = new LinkNetworkRouteImpl(null, null, this.network);
 			leg.setRoute(route);
 			Id endLinkID = new IdImpl(endLinkId);
 			pl.createAndAddActivity("w", endLinkID);

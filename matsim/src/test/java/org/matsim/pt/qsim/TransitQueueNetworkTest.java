@@ -44,7 +44,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.qsim.SimpleTransitStopHandler;
 import org.matsim.pt.qsim.TransitDriver;
@@ -1035,7 +1035,7 @@ public class TransitQueueNetworkTest extends TestCase {
 				stop2.setLinkId(links[secondStopLocation].getId());
 			}
 			TransitLine tLine = builder.createTransitLine(id1);
-			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId(), network);
+			NetworkRoute netRoute = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId(), network);
 			netRoute.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
 			ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add(builder.createTransitRouteStop(stop1, 50, 60));

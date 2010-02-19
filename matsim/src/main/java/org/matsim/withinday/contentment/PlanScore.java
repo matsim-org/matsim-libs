@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.ptproject.qsim.QSimTimer;
@@ -140,7 +140,7 @@ public class PlanScore implements AgentContentment {
 		double totalDistance = 0;
 		double length = 0;
 
-		List<Id> linkIds = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
+		List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 		int posInRoute = 0;
 		//determine the actual position in the route
 		for (int j = 0; j < linkIds.size(); j++) {

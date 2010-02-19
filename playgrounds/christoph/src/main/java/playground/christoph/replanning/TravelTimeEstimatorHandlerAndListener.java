@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListene
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;
 import playground.christoph.events.handler.ExtendedAgentReplanEventHandler;
@@ -97,11 +97,11 @@ public class TravelTimeEstimatorHandlerAndListener implements
 	 * Using TreeMaps and PersonIds ensures that the results keep deterministic.
 	 */
 	private Map<Id, ReplaceRouteContainer> routesToReplace;
-	private Map<Id, NetworkRouteWRefs> routesToUpdate;
-	private Map<Id, NetworkRouteWRefs> routesToAdd;
-	private List<NetworkRouteWRefs> routesToRemove;
+	private Map<Id, NetworkRoute> routesToUpdate;
+	private Map<Id, NetworkRoute> routesToAdd;
+	private List<NetworkRoute> routesToRemove;
 
-	private Map<Id, NetworkRouteWRefs> activeRoutes; // PersonId
+	private Map<Id, NetworkRoute> activeRoutes; // PersonId
 
 	public TravelTimeEstimatorHandlerAndListener(Population population, Network network, int timeslice, int maxTime)
 	{
@@ -118,11 +118,11 @@ public class TravelTimeEstimatorHandlerAndListener implements
 		travelTimeEstimator = new TravelTimeEstimator(this);
 		
 		routesToReplace = new TreeMap<Id, ReplaceRouteContainer>();	// PersonId
-		routesToUpdate = new TreeMap<Id, NetworkRouteWRefs>();	// PersonId
-		routesToAdd = new TreeMap<Id, NetworkRouteWRefs>();	// PersonId
-		routesToRemove = new ArrayList<NetworkRouteWRefs>();
+		routesToUpdate = new TreeMap<Id, NetworkRoute>();	// PersonId
+		routesToAdd = new TreeMap<Id, NetworkRoute>();	// PersonId
+		routesToRemove = new ArrayList<NetworkRoute>();
 
-		activeRoutes = new HashMap<Id, NetworkRouteWRefs>();
+		activeRoutes = new HashMap<Id, NetworkRoute>();
 		routeInfos = new HashMap<Route, RouteInfo>();
 		
 		// If we use MyLinksImpls the counts are stored directly in the Links
@@ -203,7 +203,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 				{
 					Leg leg = (Leg) planElement;
 					
-					addRoute((NetworkRouteWRefs) leg.getRoute(), leg.getDepartureTime(), person.getId());
+					addRoute((NetworkRoute) leg.getRoute(), leg.getDepartureTime(), person.getId());
 				}
 			}
 		}
@@ -252,16 +252,16 @@ public class TravelTimeEstimatorHandlerAndListener implements
 	// implements QueueSimulationBeforeSimStepHandler
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent event)
 	{	
-		Iterator<NetworkRouteWRefs> iter;
+		Iterator<NetworkRoute> iter;
 		Iterator<ReplaceRouteContainer> iter2;
-		Iterator<Entry<Id, NetworkRouteWRefs>> iter3;
+		Iterator<Entry<Id, NetworkRoute>> iter3;
 				
 		iter2 = this.routesToReplace.values().iterator();
 		while (iter2.hasNext())
 		{	
 			ReplaceRouteContainer container = iter2.next();
-			NetworkRouteWRefs originalRoute = container.oldRoute;
-			NetworkRouteWRefs replannedRoute = container.newRoute;
+			NetworkRoute originalRoute = container.oldRoute;
+			NetworkRoute replannedRoute = container.newRoute;
 			boolean removedRoute = this.removeRoute(originalRoute);
 //			if (!removedRoute) log.error("Could not remove Route!");
 			this.addRoute(replannedRoute, event.getSimulationTime(), container.personId);
@@ -279,7 +279,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 		iter = this.routesToRemove.iterator();
 		while (iter.hasNext())
 		{
-			NetworkRouteWRefs originalRoute = iter.next();
+			NetworkRoute originalRoute = iter.next();
 			boolean removedRoute = this.removeRoute(originalRoute);
 			if (!removedRoute) log.error("Could not remove Route!");
 			iter.remove();
@@ -288,9 +288,9 @@ public class TravelTimeEstimatorHandlerAndListener implements
 		iter3 = this.routesToAdd.entrySet().iterator();
 		while (iter3.hasNext())
 		{
-			Entry<Id, NetworkRouteWRefs> entry = iter3.next();
+			Entry<Id, NetworkRoute> entry = iter3.next();
 			Id id = entry.getKey();
-			NetworkRouteWRefs replannedRoute = entry.getValue();
+			NetworkRoute replannedRoute = entry.getValue();
 			this.addRoute(replannedRoute, event.getSimulationTime(), id);
 			iter3.remove();
 		}
@@ -366,7 +366,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 			if (planElement instanceof Leg)
 			{
 				Leg leg = (Leg) planElement;
-				this.routesToRemove.add((NetworkRouteWRefs) leg.getRoute());
+				this.routesToRemove.add((NetworkRoute) leg.getRoute());
 			}
 		}
 		
@@ -389,7 +389,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 		Leg leg = getNextPersonLeg(event.getPersonId());
 		if (leg != null)
 		{
-			this.activeRoutes.put(event.getPersonId(), (NetworkRouteWRefs)leg.getRoute());
+			this.activeRoutes.put(event.getPersonId(), (NetworkRoute)leg.getRoute());
 		}
 		else
 		{
@@ -424,7 +424,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 	{
 		Id personId = event.getPersonId();
 
-		NetworkRouteWRefs route = this.activeRoutes.get(personId);
+		NetworkRoute route = this.activeRoutes.get(personId);
 		if (route != null)
 		{
 //			routesToUpdate.add(route);
@@ -439,10 +439,10 @@ public class TravelTimeEstimatorHandlerAndListener implements
 	// implements ExtendedAgentReplanEventHandler
 	public synchronized void handleEvent(ExtendedAgentReplanEventImpl event)
 	{		
-		NetworkRouteWRefs originalRoute = event.getOriginalRoute();
+		NetworkRoute originalRoute = event.getOriginalRoute();
 //		this.routesToRemove.add(originalRoute);
 
-		NetworkRouteWRefs replannedRoute = event.getReplannedRoute();
+		NetworkRoute replannedRoute = event.getReplannedRoute();
 //		this.routesToAdd.add(replannedRoute);
 
 		ReplaceRouteContainer routesToReplace = new ReplaceRouteContainer(originalRoute, replannedRoute, event.getPersonId());
@@ -469,7 +469,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 	/*
 	 * Implement this via a new Event? ReplanningEvent?
 	 */
-	private void addRoute(NetworkRouteWRefs route, double startTime, Id personId)
+	private void addRoute(NetworkRoute route, double startTime, Id personId)
 	{
 		RouteInfo routeInfo = new RouteInfo(route);
 		routeInfos.put(route, routeInfo);
@@ -714,7 +714,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 		 */
 		double[] times;
 
-		public RouteInfo(NetworkRouteWRefs route)
+		public RouteInfo(NetworkRoute route)
 		{
 			// this.route = route;
 
@@ -782,10 +782,10 @@ public class TravelTimeEstimatorHandlerAndListener implements
 	private class ReplaceRouteContainer
 	{
 		Id personId;
-		NetworkRouteWRefs oldRoute;
-		NetworkRouteWRefs newRoute;
+		NetworkRoute oldRoute;
+		NetworkRoute newRoute;
 		
-		public ReplaceRouteContainer(NetworkRouteWRefs oldRoute, NetworkRouteWRefs newRoute, Id personId)
+		public ReplaceRouteContainer(NetworkRoute oldRoute, NetworkRoute newRoute, Id personId)
 		{
 			this.oldRoute = oldRoute;
 			this.newRoute = newRoute;

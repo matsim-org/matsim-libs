@@ -26,7 +26,6 @@ import java.util.List;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Counter;
 
 /**
@@ -51,7 +50,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 	 */
 	public static void run(final Population population, final int numberOfThreads, final AbstractPersonAlgorithm algorithm) {
 		run(population, numberOfThreads, new PersonAlgorithmProvider() {
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
+			@Override public AbstractPersonAlgorithm getPersonAlgorithm() {
 				return algorithm;
 			}
 		});
@@ -61,7 +60,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 	 * Handles each person of the given <code>population</code> with a AbstractPersonAlgorithm provided by <code>algoProvider</code>,
 	 * using up to <code>numberOfThreads</code> threads to speed things up. This method will request a new instance of the
 	 * AbstractPersonAlgorithm for each thread it allocates, thus enabling the parallel use of non-thread-safe algorithms.
-	 * For thread-safe algorithms, {@link #run(PopulationImpl, int, AbstractPersonAlgorithm)} may be an easier method to use.
+	 * For thread-safe algorithms, {@link #run(Population, int, AbstractPersonAlgorithm)} may be an easier method to use.
 	 *
 	 * @param population
 	 * @param numberOfThreads
@@ -115,13 +114,13 @@ public abstract class ParallelPersonAlgorithmRunner {
 	 */
 	private static class PersonAlgoThread implements Runnable {
 
-		public final int threadId;
+//		public final int threadId;
 		private final AbstractPersonAlgorithm personAlgo;
 		private final List<Person> persons = new LinkedList<Person>();
 		private final Counter counter;
 
 		public PersonAlgoThread(final int i, final AbstractPersonAlgorithm algo, final Counter counter) {
-			this.threadId = i;
+//			this.threadId = i;
 			this.personAlgo = algo;
 			this.counter = counter;
 		}

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
@@ -56,7 +56,7 @@ public class TransitRouteTest extends MatsimTestCase {
 	 * @param mode
 	 * @return a new instance of a TransitRoute with the given attributes
 	 */
-	protected TransitRoute createTransitRoute(final Id id, final NetworkRouteWRefs route, final List<TransitRouteStop> stops, final TransportMode mode) {
+	protected TransitRoute createTransitRoute(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode) {
 		return new TransitRouteImpl(id, route, stops, mode);
 	}
 
@@ -64,7 +64,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		Id id = new IdImpl(9791);
 		Link fromLink = new FakeLink(new IdImpl(10), null, null);
 		Link toLink = new FakeLink(new IdImpl(5), null, null);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId(), null);
+		NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId(), null);
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);
 		stops.add(stop);
@@ -176,8 +176,8 @@ public class TransitRouteTest extends MatsimTestCase {
 		Link link1 = new FakeLink(new IdImpl(1), null, null);
 		Link link2 = new FakeLink(new IdImpl(2), null, null);
 		Link link3 = new FakeLink(new IdImpl(3), null, null);
-		NetworkRouteWRefs route1 = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), null);
-		NetworkRouteWRefs route2 = new LinkNetworkRouteImpl(link1.getId(), link3.getId(), null);
+		NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), null);
+		NetworkRoute route2 = new LinkNetworkRouteImpl(link1.getId(), link3.getId(), null);
 
 		f.tRoute.setRoute(route1);
 		assertEquals(route1, f.tRoute.getRoute());
@@ -189,7 +189,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		Id id = new IdImpl(9791);
 		Link fromLink = new FakeLink(new IdImpl(10), null, null);
 		Link toLink = new FakeLink(new IdImpl(5), null, null);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId(), null);
+		NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId(), null);
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0), false);
 		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(new IdImpl(2), new CoordImpl(0, 0), false);
@@ -243,7 +243,7 @@ public class TransitRouteTest extends MatsimTestCase {
 			Id id = new IdImpl(9791);
 			Link fromLink = new FakeLink(new IdImpl(10), null, null);
 			Link toLink = new FakeLink(new IdImpl(5), null, null);
-			NetworkRouteWRefs route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId(), null);
+			NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId(), null);
 			this.stops = new ArrayList<TransitRouteStop>();
 			TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);
 			this.stops.add(stop);

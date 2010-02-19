@@ -41,7 +41,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestCase;
@@ -97,7 +97,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		stops.add(stop1);
 		stops.add(stop2);
 
-		NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		NetworkRoute netRoute = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
 		netRoute.setLinkIds(link1.getId(), Collections.<Id>emptyList(), link2.getId());
 		TransitRoute tRoute1 = sBuilder.createTransitRoute(id1, netRoute, stops, TransportMode.bus);
 

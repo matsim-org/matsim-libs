@@ -34,7 +34,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -83,9 +83,9 @@ public class RouteSetGenerator {
 		((NodeImpl) link.getToNode()).removeInLink(link);
 	}
 
-	private boolean containsRoute(NetworkRouteWRefs route, LinkedList<NetworkRouteWRefs> routes) {
+	private boolean containsRoute(NetworkRoute route, LinkedList<NetworkRoute> routes) {
 		List<Node> nodes = RouteUtils.getNodes(route, this.network);
-		Iterator<NetworkRouteWRefs> r_it = routes.iterator();
+		Iterator<NetworkRoute> r_it = routes.iterator();
 		while (r_it.hasNext()) {
 			List<Node> ns = RouteUtils.getNodes(r_it.next(), this.network);
 			if (ns.size() == nodes.size()) {
@@ -99,7 +99,7 @@ public class RouteSetGenerator {
 		return false;
 	}
 
-	private boolean isLocalRoute(NetworkRouteWRefs route) {
+	private boolean isLocalRoute(NetworkRoute route) {
 		boolean isLocal = true;
 		for (Id routeLink2Id : route.getLinkIds()) {
 			LinkImpl routeLink = this.network.getLinks().get(routeLink2Id);
@@ -111,7 +111,7 @@ public class RouteSetGenerator {
 		return isLocal;
 	}
 
-	private final void calcRouteOnSubNet(final Node o, final Node d, final int k, final int l, final int time, final LinkedList<Id[]> linkIds, final LinkedList<NetworkRouteWRefs> nonLocalRoutes, final LinkedList<NetworkRouteWRefs> localRoutes) {
+	private final void calcRouteOnSubNet(final Node o, final Node d, final int k, final int l, final int time, final LinkedList<Id[]> linkIds, final LinkedList<NetworkRoute> nonLocalRoutes, final LinkedList<NetworkRoute> localRoutes) {
 
 		// the list to handle for the next level (level d+1) of the tree
 		LinkedList<Id[]> new_linkIds = new LinkedList<Id[]>();
@@ -128,7 +128,7 @@ public class RouteSetGenerator {
 //			System.out.println("    ---");
 //			System.out.println("    removed " + ls.length + " links from the net");
 			Path path = this.router.calcLeastCostPath(o,d,time);
-			NetworkRouteWRefs route = null;
+			NetworkRoute route = null;
 			if (path != null) {
 				route = new LinkNetworkRouteImpl(path.links.get(0).getId(), path.links.get(path.links.size()-1).getId(), this.network);
 				route.setLinkIds(path.links.get(0).getId(), NetworkUtils.getLinkIds(path.links), path.links.get(path.links.size()-1).getId());
@@ -181,13 +181,13 @@ public class RouteSetGenerator {
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final LinkedList<NetworkRouteWRefs> calcRouteSet(final NodeImpl o, final NodeImpl d, final int k, final int time, final int var_factor, final float localRoute_factor) {
+	public final LinkedList<NetworkRoute> calcRouteSet(final NodeImpl o, final NodeImpl d, final int k, final int time, final int var_factor, final float localRoute_factor) {
 		if (o.getId().equals(d.getId())) { Gbl.errorMsg("O == D not alloed!"); }
 		if (k < 1) { Gbl.errorMsg("k < 1 not allowed!"); }
 
-		LinkedList<NetworkRouteWRefs> routes = new LinkedList<NetworkRouteWRefs>(); // resulting k least cost routes
-		LinkedList<NetworkRouteWRefs> localRoutes = new LinkedList<NetworkRouteWRefs>(); // routes containing only local streets
-		LinkedList<NetworkRouteWRefs> nonLocalRoutes = new LinkedList<NetworkRouteWRefs>(); // all other routes
+		LinkedList<NetworkRoute> routes = new LinkedList<NetworkRoute>(); // resulting k least cost routes
+		LinkedList<NetworkRoute> localRoutes = new LinkedList<NetworkRoute>(); // routes containing only local streets
+		LinkedList<NetworkRoute> nonLocalRoutes = new LinkedList<NetworkRoute>(); // all other routes
 		LinkedList<Id[]> links = new LinkedList<Id[]>(); // removed links
 		Path path = this.router.calcLeastCostPath(o,d,time);
 		if (path == null) { throw new RuntimeException("There is no route from " + o.getId() + " to " + d.getId() + "!"); }
@@ -212,18 +212,18 @@ public class RouteSetGenerator {
 			nonLocalRoutes.remove(MatsimRandom.getRandom().nextInt(nonLocalRoutes.size()));
 		}
 		// add the least cost path at the beginning of the route
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(path.links.get(0).getId(), path.links.get(path.links.size()-1).getId(), this.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(path.links.get(0).getId(), path.links.get(path.links.size()-1).getId(), this.network);
 		route.setLinkIds(path.links.get(0).getId(), NetworkUtils.getLinkIds(path.links), path.links.get(path.links.size()-1).getId());
 		routes.addFirst(route);
 
 		// joining the resulting routes in one linked list which is returned by the algorithm
 
 		if (!localRoutes.isEmpty()) {
-			for (NetworkRouteWRefs localRoute : localRoutes){
+			for (NetworkRoute localRoute : localRoutes){
 				routes.add(localRoute);
 			}
 		}
-		for (NetworkRouteWRefs nonLocalRoute : nonLocalRoutes){
+		for (NetworkRoute nonLocalRoute : nonLocalRoutes){
 			routes.add(nonLocalRoute);
 		}
 		System.out.println("--- done. ---");

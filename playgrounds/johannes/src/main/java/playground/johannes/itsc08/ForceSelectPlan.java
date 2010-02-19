@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
@@ -46,7 +46,7 @@ public class ForceSelectPlan implements PlanSelector {
 		Plan plan = null;
 		for(Plan p : person.getPlans()) {
 			LegImpl leg = (LegImpl) p.getPlanElements().get(1);
-			if(((NetworkRouteWRefs) leg.getRoute()).getLinkIds().contains(linkId)) {
+			if(((NetworkRoute) leg.getRoute()).getLinkIds().contains(linkId)) {
 				plan = p;
 				break;
 			}

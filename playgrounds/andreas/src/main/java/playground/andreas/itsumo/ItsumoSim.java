@@ -35,7 +35,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.IOUtils;
 
 public class ItsumoSim extends ExternalMobsim {
@@ -137,7 +137,7 @@ public class ItsumoSim extends ExternalMobsim {
 							System.err.println ( " WARNING: Empty route.  Not sure if itsumo can deal with this.  Continuing anyway ... " ) ;
 							continue ;
 						}
-						NetworkRouteWRefs rr = (NetworkRouteWRefs) leg.getRoute();
+						NetworkRoute rr = (NetworkRoute) leg.getRoute();
 						for (Id linkId : rr.getLinkIds()) {
 							out.write("    <route>"); out.newLine();
 							out.write("     <laneset>" + linkId + "</laneset>"); out.newLine();

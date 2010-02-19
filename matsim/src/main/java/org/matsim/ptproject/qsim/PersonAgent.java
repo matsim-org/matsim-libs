@@ -32,7 +32,7 @@ import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
@@ -305,7 +305,7 @@ public class PersonAgent implements DriverAgent {
 			return this.cachedNextLinkId;
 		}
 		if (this.cachedRouteLinkIds == null) {
-			this.cachedRouteLinkIds = ((NetworkRouteWRefs) this.currentLeg.getRoute()).getLinkIds();
+			this.cachedRouteLinkIds = ((NetworkRoute) this.currentLeg.getRoute()).getLinkIds();
 		}
 
 		if (this.currentLinkIdIndex >= this.cachedRouteLinkIds.size() ) {

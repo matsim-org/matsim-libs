@@ -52,7 +52,7 @@ public class OTFClientSwing extends OTFClient {
 	private OTFFileSettingsSaver fileSettingsSaver;
 
 	public OTFClientSwing(String url) {
-		super("file:" + url);
+		super(url);
 		connect2.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect2.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
 		connect2.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
@@ -84,7 +84,7 @@ public class OTFClientSwing extends OTFClient {
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
 	    OTFVisConfig visconf = new OTFVisConfig();
-	    fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);  
+	    fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);
 	    visconf = fileSettingsSaver.openAndReadConfig();
 	    saver = new OTFLiveSettingsSaver(visconf, this.url);
 	    return visconf;
@@ -100,5 +100,5 @@ public class OTFClientSwing extends OTFClient {
 		}
 		new OTFClientSwing("file:" + arg0).run();
 
-	}		
+	}
 }

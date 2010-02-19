@@ -34,7 +34,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.DriverAgent;
@@ -113,7 +113,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 		 * Entries with a lower index have already been visited!
 		 */
 		int currentNodeIndex = withinDayPersonAgent.getCurrentNodeIndex();
-		NetworkRouteWRefs route = (NetworkRouteWRefs) currentLeg.getRoute();
+		NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
 
 		QVehicle vehicle = withinDayPersonAgent.getVehicle();
 
@@ -159,7 +159,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 		this.planAlgorithm.run(newPlan);
 
 		// get new calculated Route
-		NetworkRouteWRefs newRoute = (NetworkRouteWRefs) newLeg.getRoute();
+		NetworkRoute newRoute = (NetworkRoute) newLeg.getRoute();
 
 		// use VehicleId from existing Route
 		newRoute.setVehicleId(vehicle.getId());

@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.trafficmanagement;
 
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * @author dgrether
@@ -30,19 +30,19 @@ public interface ControlInput {
 
 	public double getNashTime();
 
-	public NetworkRouteWRefs getMainRoute();
+	public NetworkRoute getMainRoute();
 
-	public NetworkRouteWRefs getAlternativeRoute();
+	public NetworkRoute getAlternativeRoute();
 
 	public void init();
 
-	public int getNumberOfVehiclesOnRoute(NetworkRouteWRefs route);
+	public int getNumberOfVehiclesOnRoute(NetworkRoute route);
 
-	public void setMainRoute(NetworkRouteWRefs route);
+	public void setMainRoute(NetworkRoute route);
 
-	public void setAlternativeRoute(NetworkRouteWRefs route);
+	public void setAlternativeRoute(NetworkRoute route);
 
-	public double getMeasuredRouteTravelTime(NetworkRouteWRefs route);
+	public double getMeasuredRouteTravelTime(NetworkRoute route);
 
 	public void finishIteration();
 

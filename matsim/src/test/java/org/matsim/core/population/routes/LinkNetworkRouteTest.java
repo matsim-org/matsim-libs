@@ -36,7 +36,7 @@ import org.matsim.testcases.fakes.FakeLink;
 public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRouteWRefs getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkLayer network) {
+	public NetworkRoute getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkLayer network) {
 		return new LinkNetworkRouteImpl(fromLinkId, toLinkId, network);
 	}
 

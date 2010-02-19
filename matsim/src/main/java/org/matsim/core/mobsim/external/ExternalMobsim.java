@@ -41,7 +41,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandler;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.ExeRunner;
 
 public class ExternalMobsim {
@@ -149,7 +149,7 @@ public class ExternalMobsim {
 						handler.startLeg(leg, writer);
 						// route
 						if (leg.getRoute() != null) {
-							NetworkRouteWRefs r = (NetworkRouteWRefs) leg.getRoute();
+							NetworkRoute r = (NetworkRoute) leg.getRoute();
 							handler.startRoute(r, writer);
 							handler.endRoute(writer);
 						}

@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.QSimTimer;
@@ -70,13 +70,13 @@ public class VDSSign {
 
 	private Link directionLink;
 
-	private NetworkRouteWRefs currentRoute;
+	private NetworkRoute currentRoute;
 
-	private List<NetworkRouteWRefs> currentRouteSet;
+	private List<NetworkRoute> currentRouteSet;
 
-	private NetworkRouteWRefs mainRoute;
+	private NetworkRoute mainRoute;
 
-	private NetworkRouteWRefs alternativeRoute;
+	private NetworkRoute alternativeRoute;
 
 	private double complianceRate;
 
@@ -93,7 +93,7 @@ public class VDSSign {
 		// completes the routes, i.e. calculates out and inlinks
 		this.mainRoute = completeRoute(this.controlInput.getMainRoute());
 		this.alternativeRoute = completeRoute(this.controlInput.getAlternativeRoute());
-		this.currentRouteSet = new ArrayList<NetworkRouteWRefs>(this.controlEvents);
+		this.currentRouteSet = new ArrayList<NetworkRoute>(this.controlEvents);
 		if ((this.signOutput != null) && (event != null)) {
 			try {
 				this.signOutput.init(event);
@@ -259,7 +259,7 @@ public class VDSSign {
 	 * Returns the guidance message as a <code>Route</code>
 	 * @return current route
 	 */
-	public NetworkRouteWRefs requestRoute() {
+	public NetworkRoute requestRoute() {
 		double time = QSimTimer.getTime();
 		double trust = MatsimRandom.getRandom().nextDouble();
 		if (time > this.nextUpdate) {
@@ -289,8 +289,8 @@ public class VDSSign {
 		}
 	}
 
-	private NetworkRouteWRefs completeRoute(final NetworkRouteWRefs r) {
-		NetworkRouteWRefs ret = new LinkNetworkRouteImpl(null, null, null);
+	private NetworkRoute completeRoute(final NetworkRoute r) {
+		NetworkRoute ret = new LinkNetworkRouteImpl(null, null, null);
 		Link startLink = this.network.getLinks().get(r.getStartLinkId());
 		Node startNode = startLink.getFromNode();
 		ArrayList<Node> rNodes = new ArrayList<Node>();

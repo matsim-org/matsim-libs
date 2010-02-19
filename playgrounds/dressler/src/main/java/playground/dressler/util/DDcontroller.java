@@ -33,7 +33,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
@@ -92,7 +92,7 @@ public class DDcontroller {
 					System.out.println("Person " + person.getId() + " has no leg.");
 					continue;
 				}
-				NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
+				NetworkRoute route = (NetworkRoute) leg.getRoute();
 				if (route == null) {
 					System.out.println("Person " + person.getId() + " has no route.");
 					continue;

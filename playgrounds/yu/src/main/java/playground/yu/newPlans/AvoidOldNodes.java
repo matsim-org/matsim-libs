@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -67,7 +67,7 @@ public class AvoidOldNodes extends NewPopulation {
 			for (PlanElement pe : p.getPlanElements()) {
 				if (pe instanceof Leg) {
 					Leg bl = (Leg) pe;
-					NetworkRouteWRefs br = (NetworkRouteWRefs) bl.getRoute();
+					NetworkRoute br = (NetworkRoute) bl.getRoute();
 					if (br != null) {
 						tag: for (final Node n : RouteUtils.getNodes(br, this.network)) {
 							final String nId = n.getId().toString();

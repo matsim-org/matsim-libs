@@ -2,18 +2,18 @@ package playground.mmoyo.precalculation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.transitSchedule.api.TransitRoute;
 
 /**Describes simply a trip in a pt-vechicle*/
 public class PTtrip {
 	//-> use leg with infinite time values instead?
 	private TransitRoute transitRoute;
-	private NetworkRouteWRefs subRoute;
+	private NetworkRoute subRoute;
 	private double travelTime;
 	private final Network network;
 
-	public PTtrip(final TransitRoute transitRoute, final NetworkRouteWRefs subRoute, final double travelTime, final Network network) {
+	public PTtrip(final TransitRoute transitRoute, final NetworkRoute subRoute, final double travelTime, final Network network) {
 		this.transitRoute = transitRoute;
 		this.subRoute = subRoute;
 		this.travelTime= travelTime;
@@ -23,7 +23,7 @@ public class PTtrip {
 	public TransitRoute getTransitRoute() {
 		return transitRoute;
 	}
-	public NetworkRouteWRefs getRoute() {
+	public NetworkRoute getRoute() {
 		return subRoute;
 	}
 

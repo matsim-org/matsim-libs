@@ -52,7 +52,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.ptproject.qsim.QLink;
@@ -287,7 +287,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 					Leg leg = (Leg) pe;
 					// just look at car routes right now
 					if(leg.getMode() != TransportMode.car) continue;
-					for (Id id2 : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+					for (Id id2 : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 						if(id2.equals(this.queryLinkId) ) {
 							actPersons.add(plan);
 							break;
@@ -306,9 +306,9 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 				if ( pe instanceof Leg ) {
 					Leg leg = (Leg) pe ;
 					Route route = leg.getRoute();
-					if ( route instanceof NetworkRouteWRefs ) { // added in jun09, see below in "collectLinks". kai, jun09
+					if ( route instanceof NetworkRoute ) { // added in jun09, see below in "collectLinks". kai, jun09
 						List<Id> linkIds = new ArrayList<Id>();
-						for (Id linkId : ((NetworkRouteWRefs) route).getLinkIds() ) {
+						for (Id linkId : ((NetworkRoute) route).getLinkIds() ) {
 							linkIds.add(linkId);
 							if(linkId.equals(this.queryLinkId) ) {
 								// only if this specific route includes link, add the route
@@ -332,8 +332,8 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 				} else if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
 					RouteWRefs route = leg.getRoute() ;
-					if ( route instanceof NetworkRouteWRefs ) {
-						NetworkRouteWRefs nr = (NetworkRouteWRefs) route ;
+					if ( route instanceof NetworkRoute ) {
+						NetworkRoute nr = (NetworkRoute) route ;
 						for (Id linkId : nr.getLinkIds() ) {
 							addLink(linkId);
 						}

@@ -41,7 +41,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufInterpolator;
@@ -196,7 +196,7 @@ public class NullFallFacilityRollout {
 			Map<Id, TransitStopFacility> facilityTemplates,
 			TransitLine transitLine) throws InvalidLineException {
 		for (TransitRoute transitRouteI: transitLine.getRoutes().values()) {
-			NetworkRouteWRefs linkNetworkRoute = transitRouteI.getRoute();
+			NetworkRoute linkNetworkRoute = transitRouteI.getRoute();
 			Collection<Link> links = getAllLink(linkNetworkRoute, this.inScenario.getNetwork());
 			Iterator<Link> linkIterator = links.iterator();
 			for (TransitRouteStop stop : transitRouteI.getStops()) {
@@ -237,7 +237,7 @@ public class NullFallFacilityRollout {
 		return null;
 	}
 
-	private void dumpRoute(NetworkRouteWRefs linkNetworkRoute, Network network) {
+	private void dumpRoute(NetworkRoute linkNetworkRoute, Network network) {
 		Collection<Link> links = getAllLink(linkNetworkRoute, network);
 		for (Link link : links) {
 			log.error(link.getFromNode().getId() + " ---> " + link.getToNode().getId());
@@ -250,7 +250,7 @@ public class NullFallFacilityRollout {
 		}
 	}
 
-	private List<Link> getAllLink(NetworkRouteWRefs linkNetworkRoute, Network network) {
+	private List<Link> getAllLink(NetworkRoute linkNetworkRoute, Network network) {
 		ArrayList<Link> links = new ArrayList<Link>();
 		links.add(network.getLinks().get(linkNetworkRoute.getStartLinkId()));
 		for (Id linkId : linkNetworkRoute.getLinkIds()) {
@@ -354,7 +354,7 @@ public class NullFallFacilityRollout {
 		Collection<Node> usedNodes = new HashSet<Node>();
 		for (Umlauf umlauf : umlaeufe) {
 			for (UmlaufStueckI umlaufstueck : umlauf.getUmlaufStuecke()) {
-				NetworkRouteWRefs route = umlaufstueck.getCarRoute();
+				NetworkRoute route = umlaufstueck.getCarRoute();
 				for (Link link : getAllLink(route, this.inScenario.getNetwork())) {
 					usedNodes.add(link.getFromNode());
 					usedNodes.add(link.getToNode());

@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -65,15 +65,15 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 	}
 
 	@Override
-	public NetworkRouteWRefs requestRoute(final Link departureLink, final Link destinationLink,
+	public NetworkRoute requestRoute(final Link departureLink, final Link destinationLink,
 			final double time) {
 		Path path = this.landmarksAStar.calcLeastCostPath(departureLink.getToNode(), destinationLink.getFromNode(), time);
-		NetworkRouteWRefs route = (NetworkRouteWRefs) ((NetworkLayer) network).getFactory().createRoute(TransportMode.car, departureLink.getId(), destinationLink.getId());
+		NetworkRoute route = (NetworkRoute) ((NetworkLayer) network).getFactory().createRoute(TransportMode.car, departureLink.getId(), destinationLink.getId());
 		route.setLinkIds(departureLink.getId(), NetworkUtils.getLinkIds(path.links), destinationLink.getId());
 		return route;
 	}
 
-	public boolean providesRoute(final Id currentLinkId, final NetworkRouteWRefs subRoute) {
+	public boolean providesRoute(final Id currentLinkId, final NetworkRoute subRoute) {
 		return true;
 	}
 }

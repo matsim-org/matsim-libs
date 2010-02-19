@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
@@ -63,19 +63,19 @@ public class ReactRouteGuidance implements RouteProvider {
 	}
 
 	@Override
-	public boolean providesRoute(Id currentLinkId, NetworkRouteWRefs subRoute) {
+	public boolean providesRoute(Id currentLinkId, NetworkRoute subRoute) {
 		return true;
 	}
 
 	@Override
-	public synchronized NetworkRouteWRefs requestRoute(Link departureLink, Link destinationLink,
+	public synchronized NetworkRoute requestRoute(Link departureLink, Link destinationLink,
 			double time) {
 		if(linkcost.traveltimes instanceof EventBasedTTProvider) {
 			((EventBasedTTProvider)linkcost.traveltimes).requestLinkCost();
 		}
 		Path path = this.algorithm.calcLeastCostPath(departureLink.getToNode(),
 					destinationLink.getFromNode(), time);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(departureLink.getId(), destinationLink.getId(), network);
+		NetworkRoute route = new LinkNetworkRouteImpl(departureLink.getId(), destinationLink.getId(), network);
 		route.setLinkIds(departureLink.getId(), NetworkUtils.getLinkIds(path.links), destinationLink.getId());
 		return route;
 	}

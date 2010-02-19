@@ -8,7 +8,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufStueckI;
 import org.matsim.ptproject.qsim.QSim;
@@ -22,7 +22,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 	private final Umlauf umlauf;
 	private Iterator<UmlaufStueckI> iUmlaufStueck;
-	private NetworkRouteWRefs carRoute;
+	private NetworkRoute carRoute;
 	private double departureTime;
 	private final QSim sim;
 	private final LegImpl currentLeg = new LegImpl(TransportMode.car);
@@ -56,7 +56,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		init();
 	}
 
-	private void setWenden(NetworkRouteWRefs carRoute) {
+	private void setWenden(NetworkRoute carRoute) {
 		this.transitLine = null;
 		this.transitRoute = null;
 		setCarRoute(carRoute);
@@ -70,7 +70,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		setCarRoute(route.getRoute());
 	}
 
-	private void setCarRoute(NetworkRouteWRefs carRoute) {
+	private void setCarRoute(NetworkRoute carRoute) {
 		this.carRoute = carRoute;
 		this.currentLeg.setRoute(new NetworkRouteWrapper(this.carRoute)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 	}
@@ -103,7 +103,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public NetworkRouteWRefs getCarRoute() {
+	public NetworkRoute getCarRoute() {
 		return this.carRoute;
 	}
 

@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -90,10 +90,10 @@ public class EditRoutes {
 			// If the Route Object was replaced...
 			if (oldRoute != newRoute)
 			{
-				if (oldRoute instanceof NetworkRouteWRefs)
+				if (oldRoute instanceof NetworkRoute)
 				{
-					List<Id> linkIds = ((NetworkRouteWRefs) newRoute).getLinkIds();
-					((NetworkRouteWRefs) oldRoute).setLinkIds(newRoute.getStartLinkId(), linkIds, newRoute.getEndLinkId());
+					List<Id> linkIds = ((NetworkRoute) newRoute).getLinkIds();
+					((NetworkRoute) oldRoute).setLinkIds(newRoute.getStartLinkId(), linkIds, newRoute.getEndLinkId());
 					leg.setRoute(oldRoute);
 				}
 				else
@@ -142,9 +142,9 @@ public class EditRoutes {
 		}
 		else
 		{
-			if (oldRoute instanceof NetworkRouteWRefs)
+			if (oldRoute instanceof NetworkRoute)
 			{
-				List<Id> ids = ((NetworkRouteWRefs) oldRoute).getLinkIds();
+				List<Id> ids = ((NetworkRoute) oldRoute).getLinkIds();
 //				if (ids.size() <= currentNodeIndex - 1) currentLinkId = oldRoute.getEndLinkId();
 //				else currentLinkId = ids.get(currentNodeIndex - 1);
 				currentLinkId = ids.get(currentNodeIndex - 2);
@@ -168,9 +168,9 @@ public class EditRoutes {
 		List<Id> linkIds = new ArrayList<Id>();
 		
 		// Get those Links which have already been passed.
-		if (oldRoute instanceof NetworkRouteWRefs)
+		if (oldRoute instanceof NetworkRoute)
 		{
-			List<Id> oldLinkIds = ((NetworkRouteWRefs) oldRoute).getLinkIds();
+			List<Id> oldLinkIds = ((NetworkRoute) oldRoute).getLinkIds();
 			//TODO use correct index...
 			linkIds.addAll(oldLinkIds.subList(0, currentNodeIndex - 1));
 		}
@@ -201,9 +201,9 @@ public class EditRoutes {
 		Route newRoute = newLeg.getRoute();
 		
 		// Merge old and new Route.
-		if (newRoute instanceof NetworkRouteWRefs)
+		if (newRoute instanceof NetworkRoute)
 		{
-			linkIds.addAll(((NetworkRouteWRefs) newRoute).getLinkIds());
+			linkIds.addAll(((NetworkRoute) newRoute).getLinkIds());
 		}
 		else
 		{
@@ -212,9 +212,9 @@ public class EditRoutes {
 		}
 		
 		// Overwrite old Route
-		if (oldRoute instanceof NetworkRouteWRefs)
+		if (oldRoute instanceof NetworkRoute)
 		{
-			((NetworkRouteWRefs) oldRoute).setLinkIds(oldRoute.getStartLinkId(), linkIds, toActivity.getLinkId());
+			((NetworkRoute) oldRoute).setLinkIds(oldRoute.getStartLinkId(), linkIds, toActivity.getLinkId());
 		}
 		else
 		{

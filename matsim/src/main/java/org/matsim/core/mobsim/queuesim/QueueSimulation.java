@@ -56,7 +56,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
@@ -502,7 +502,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	protected void handleKnownLegModeDeparture(double now, DriverAgent agent, Id linkId, TransportMode mode) {
 		Leg leg = agent.getCurrentLeg();
 		if (mode.equals(TransportMode.car)) {
-			NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			Id vehicleId = route.getVehicleId();
 			if (vehicleId == null) {
 				vehicleId = agent.getPerson().getId(); // backwards-compatibility

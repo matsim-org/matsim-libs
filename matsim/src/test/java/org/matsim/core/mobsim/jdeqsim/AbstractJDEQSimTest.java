@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
 
 public abstract class AbstractJDEQSimTest extends MatsimTestCase {
@@ -120,7 +120,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 						// each leg ends with enter on act link
 						// => only for non empty car legs and non-cars legs this
 						// statement is true
-						if (leg.getMode().equals(TransportMode.car) && ((NetworkRouteWRefs) leg.getRoute()).getLinkIds().size() > 0) {
+						if (leg.getMode().equals(TransportMode.car) && ((NetworkRoute) leg.getRoute()).getLinkIds().size() > 0) {
 							assertTrue(list.get(index) instanceof LinkEnterEventImpl);
 							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
 									((LinkEnterEventImpl) list.get(index)).getLinkId().toString()));
@@ -157,7 +157,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 
 						// if car leg contains empty route, then this check is
 						// not applicable
-						if (((NetworkRouteWRefs) leg.getRoute()).getLinkIds().size() > 0) {
+						if (((NetworkRoute) leg.getRoute()).getLinkIds().size() > 0) {
 							// the first LinkEnterEvent is a AgentWait2LinkEvent
 							assertTrue(list.get(index) instanceof AgentWait2LinkEventImpl);
 							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
@@ -170,7 +170,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 							index++;
 						}
 
-						for (Id linkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+						for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 							// enter link and leave each link on route
 							assertTrue(list.get(index) instanceof LinkEnterEventImpl);
 							assertTrue(linkId.equals(	((LinkEnterEventImpl) list.get(index)).getLinkId()) );

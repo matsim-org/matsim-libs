@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
@@ -63,7 +63,7 @@ public class NewMultiModalNetworkWithoutBusLink {
 
 	private static void handleRoute(TransitRoute route, Network network) {
 		TransportMode tm = route.getTransportMode();
-		NetworkRouteWRefs nrwr = route.getRoute();
+		NetworkRoute nrwr = route.getRoute();
 		if (tm.equals(TransportMode.bus)) {
 			handleBusLink(network.getLinks().get(nrwr.getStartLinkId()));
 			for (Id linkId : nrwr.getLinkIds()) {

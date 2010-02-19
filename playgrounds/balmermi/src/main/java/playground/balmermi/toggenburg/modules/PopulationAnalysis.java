@@ -13,7 +13,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 public class PopulationAnalysis {
 	
@@ -57,8 +57,8 @@ public class PopulationAnalysis {
 				}
 				else {
 					LegImpl l = (LegImpl)e.get(i);
-					if (l.getRoute() instanceof NetworkRouteWRefs) {
-						NetworkRouteWRefs ll = (NetworkRouteWRefs)l.getRoute();
+					if (l.getRoute() instanceof NetworkRoute) {
+						NetworkRoute ll = (NetworkRoute)l.getRoute();
 						for (Id lid : ll.getLinkIds()) {
 							if (toggenLinks.contains(lid)) {
 								analyse = true;

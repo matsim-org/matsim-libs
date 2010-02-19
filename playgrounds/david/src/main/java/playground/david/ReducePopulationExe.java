@@ -47,7 +47,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -92,7 +92,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					LegImpl l = (LegImpl) actl.get(i);
 					if(l.getMode().equals(TransportMode.car) && l.getRoute() != null){
 
-						List<Id> ll = ((NetworkRouteWRefs) l.getRoute()).getLinkIds();
+						List<Id> ll = ((NetworkRoute) l.getRoute()).getLinkIds();
 						for(Id linkId : ll) {
 							usedlinkList.add(linkId);
 						}

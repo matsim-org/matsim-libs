@@ -49,7 +49,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -185,7 +185,7 @@ public class SelectedPlans2ESRIShape {
 	}
 
 	private Feature getLegFeature(final LegImpl leg, final String id) {
-		if (!(leg.getRoute() instanceof NetworkRouteWRefs)) {
+		if (!(leg.getRoute() instanceof NetworkRoute)) {
 			return null;
 		}
 		TransportMode mode = leg.getMode();
@@ -194,7 +194,7 @@ public class SelectedPlans2ESRIShape {
 		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDistance();
 
-		List<Id> linkIds = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
+		List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 		Coordinate [] coords = new Coordinate[linkIds.size() + 1];
 		for (int i = 0; i < linkIds.size(); i++) {
 			Link link = this.network.getLinks().get(linkIds.get(i));

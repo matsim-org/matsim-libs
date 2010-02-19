@@ -40,7 +40,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.withinday.trafficmanagement.ControlInput;
@@ -58,9 +58,9 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	protected final Network network;
 
-	protected NetworkRouteWRefs mainRoute;
+	protected NetworkRoute mainRoute;
 
-	protected NetworkRouteWRefs alternativeRoute;
+	protected NetworkRoute alternativeRoute;
 
 	protected Map<Id, Integer> numberOfAgents;
 
@@ -133,7 +133,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.writer = new ControlInputWriter(outputDirectory);
 	}
 
-	public abstract double getPredictedNashTime(NetworkRouteWRefs route);
+	public abstract double getPredictedNashTime(NetworkRoute route);
 
 	public double getNashTime() {
 		try {
@@ -158,23 +158,23 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.writer.close();
 	}
 
-	public NetworkRouteWRefs getMainRoute() {
+	public NetworkRoute getMainRoute() {
 		return this.mainRoute;
 	}
 
-	public NetworkRouteWRefs getAlternativeRoute() {
+	public NetworkRoute getAlternativeRoute() {
 		return this.alternativeRoute;
 	}
 
-	public void setAlternativeRoute(final NetworkRouteWRefs route) {
+	public void setAlternativeRoute(final NetworkRoute route) {
 		this.alternativeRoute = route;
 	}
 
-	public void setMainRoute(final NetworkRouteWRefs route) {
+	public void setMainRoute(final NetworkRoute route) {
 		this.mainRoute = route;
 	}
 
-	public int getNumberOfVehiclesOnRoute(final NetworkRouteWRefs route) {
+	public int getNumberOfVehiclesOnRoute(final NetworkRoute route) {
 		int ret = 0;
 		ret += this.numberOfAgents.get(route.getStartLinkId());
 		for (Id linkId : route.getLinkIds()) {
@@ -347,7 +347,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 	}
 
-	public double getFreeSpeedRouteTravelTime(final NetworkRouteWRefs route) {
+	public double getFreeSpeedRouteTravelTime(final NetworkRoute route) {
 		if (route == this.mainRoute)
 			return this.ttFreeSpeedMainRoute;
 		else if (route == this.alternativeRoute)
@@ -356,7 +356,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 			throw new IllegalArgumentException("This route object does not exist!");
 	}
 
-	public double getMeasuredRouteTravelTime(final NetworkRouteWRefs route) {
+	public double getMeasuredRouteTravelTime(final NetworkRoute route) {
 		if (route == this.mainRoute)
 			return this.lastTimeMainRoute;
 		else if (route == this.alternativeRoute)
@@ -365,7 +365,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 			throw new IllegalArgumentException("This route object does not exist!");
 	}
 
-	public Id getNaturalBottleNeckId(final NetworkRouteWRefs r) {
+	public Id getNaturalBottleNeckId(final NetworkRoute r) {
 		if (r == this.mainRoute) {
 			return this.mainRouteNaturalBottleNeckId;
 		}
@@ -416,7 +416,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 	}
 
-	protected double sumUpTTFreeSpeed(final Node node, final NetworkRouteWRefs route) {
+	protected double sumUpTTFreeSpeed(final Node node, final NetworkRoute route) {
 
 		double ttFS = 0;
 		for (Id linkId : route.getLinkIds()) {
@@ -466,14 +466,14 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	public void reset(final int iteration) {}
 
-	protected List<Id> getOutlinks(final NetworkRouteWRefs route) {
+	protected List<Id> getOutlinks(final NetworkRoute route) {
 		if (route == this.mainRoute) {
 			return this.outLinksMainRoute;
 		}
 		return this.outLinksAlternativeRoute;
 	}
 
-	protected List<Id> getInlinks(final NetworkRouteWRefs route) {
+	protected List<Id> getInlinks(final NetworkRoute route) {
 		if (route == this.mainRoute) {
 			return this.inLinksMainRoute;
 		}

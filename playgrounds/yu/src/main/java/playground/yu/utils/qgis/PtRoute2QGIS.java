@@ -42,7 +42,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -134,7 +134,7 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 
 			double width = getPtRouteWidth(ptRoute);
 
-			NetworkRouteWRefs route = ptRoute.getRoute();
+			NetworkRoute route = ptRoute.getRoute();
 
 			List<Link> links = new ArrayList<Link>();
 			Link startLink = this.network.getLinks().get(route.getStartLinkId());
@@ -251,7 +251,7 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 		}
 
 		private double getPtRouteWidth(TransitRoute ptRoute) {
-			NetworkRouteWRefs route = ptRoute.getRoute();
+			NetworkRoute route = ptRoute.getRoute();
 			List<Id> linkIds = route.getLinkIds();
 			int size = linkIds.size();
 

@@ -29,11 +29,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.LinkNetworkRoute;
 
 /**
- * Implementation of {@link NetworkRouteWRefs} which internally stores the route as a series of {@link Link}s.
+ * Implementation of {@link NetworkRoute} which internally stores the route as a series of {@link Link}s.
  *
  * @author mrieser
  */
-public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs, LinkNetworkRoute, Cloneable {
+public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, LinkNetworkRoute, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 	private ArrayList<Id> route = new ArrayList<Id>();
@@ -78,7 +78,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 	}
 
 	@Override
-	public NetworkRouteWRefs getSubRoute(Id fromLinkId, Id toLinkId) {
+	public NetworkRoute getSubRoute(Id fromLinkId, Id toLinkId) {
 		/**
 		 * the index where the link after fromLinkId can be found in the route:
 		 * fromIndex==0 --> fromLinkId == startLinkId,

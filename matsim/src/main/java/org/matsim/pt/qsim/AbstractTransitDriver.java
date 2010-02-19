@@ -31,7 +31,7 @@ import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.PersonAgent;
@@ -57,7 +57,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private ListIterator<TransitRouteStop> stopIterator;
 
 	public abstract void legEnds(final double now);
-	public abstract NetworkRouteWRefs getCarRoute();
+	public abstract NetworkRoute getCarRoute();
 	public abstract TransitLine getTransitLine();
 	public abstract TransitRoute getTransitRoute();
 	public abstract double getDepartureTime();
@@ -255,12 +255,12 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	 *
 	 * @author mrieser
 	 */
-	protected class NetworkRouteWrapper implements NetworkRouteWRefs, Cloneable {
+	protected class NetworkRouteWrapper implements NetworkRoute, Cloneable {
 
 		private static final long serialVersionUID = 1L;
-		private final NetworkRouteWRefs delegate;
+		private final NetworkRoute delegate;
 
-		public NetworkRouteWrapper(final NetworkRouteWRefs route) {
+		public NetworkRouteWrapper(final NetworkRoute route) {
 			this.delegate = route;
 		}
 
@@ -270,7 +270,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 
 		@Override
-		public NetworkRouteWRefs getSubRoute(final Id fromLinkId, final Id toLinkId) {
+		public NetworkRoute getSubRoute(final Id fromLinkId, final Id toLinkId) {
 			return this.delegate.getSubRoute(fromLinkId, toLinkId);
 		}
 

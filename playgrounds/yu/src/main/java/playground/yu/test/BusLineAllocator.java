@@ -56,7 +56,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -518,7 +518,7 @@ public class BusLineAllocator {
 					if (ptLinkCoordPairs == null)
 						ptLinkCoordPairs = new ArrayList<Tuple<Link, Tuple<Coord, Coord>>>();
 
-					NetworkRouteWRefs route = ptRoute.getRoute();
+					NetworkRoute route = ptRoute.getRoute();
 
 					hasStartLink = false;
 					// route. startLink
@@ -712,7 +712,7 @@ public class BusLineAllocator {
 			}
 		}
 		/*---------------------TRANSITROUTES--------------------------*/
-		Map<Id, NetworkRouteWRefs> idRoutes = convertResult2();
+		Map<Id, NetworkRoute> idRoutes = convertResult2();
 		for (TransitLine line : schedule.getTransitLines().values())
 			for (Entry<Id, TransitRoute> idRoutePair : line.getRoutes()
 					.entrySet()) {
@@ -757,8 +757,8 @@ public class BusLineAllocator {
 	/**
 	 * @return Map<ptRouteId,Route of a TransitRoute>
 	 */
-	private Map<Id, NetworkRouteWRefs> convertResult2() {
-		Map<Id, NetworkRouteWRefs> routes = new HashMap<Id, NetworkRouteWRefs>();
+	private Map<Id, NetworkRoute> convertResult2() {
+		Map<Id, NetworkRoute> routes = new HashMap<Id, NetworkRoute>();
 		for (Entry<Id, List<Tuple<Id, List<Id>/* path */>>> routeId_linkPathPair : paths
 				.entrySet()) {
 			List<Tuple<Id, List<Id>/* path */>> linkId_Paths = routeId_linkPathPair
@@ -778,7 +778,7 @@ public class BusLineAllocator {
 			/*-----with carNetwork-----*/
 			endLink = carNet.getLinks().get(routeLinks.removeLast());
 			startLink = carNet.getLinks().get(routeLinks.remove(0));
-			NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), carNet);
+			NetworkRoute route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), carNet);
 			route.setLinkIds(startLink.getId(), routeLinks, endLink.getId());
 			routes.put(routeId_linkPathPair.getKey()/* routeId */, route);
 		}

@@ -70,7 +70,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -100,7 +100,7 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link3.getId());
@@ -137,7 +137,7 @@ public class QueueSimulationTest extends TestCase {
 			ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 			a1.setEndTime((6+i)*3600);
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-			NetworkRouteWRefs route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+			NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -218,7 +218,7 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link1.getId());
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link1.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIdsNone, f.link1.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link1.getId());
@@ -359,7 +359,7 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600 - 500);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link3.getId());
@@ -382,7 +382,7 @@ public class QueueSimulationTest extends TestCase {
 			ActivityImpl a = plan.createAndAddActivity("h", f.link1.getId());
 			a.setEndTime(7*3600 - 1812);
 			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -426,7 +426,7 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600 - 500);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link3.getId());
@@ -439,7 +439,7 @@ public class QueueSimulationTest extends TestCase {
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -482,7 +482,7 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600 - 500);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link3.getId());
@@ -495,7 +495,7 @@ public class QueueSimulationTest extends TestCase {
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -508,7 +508,7 @@ public class QueueSimulationTest extends TestCase {
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link1.getId());
 			a2.setEndTime(7*3600 - 1812);
 			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -552,7 +552,7 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a2 = plan.createAndAddActivity("w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		LegImpl l2 = plan.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route2 = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+		NetworkRoute route2 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
 		plan.createAndAddActivity("l", f.link3.getId());
@@ -601,7 +601,7 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a2 = plan.createAndAddActivity("w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		LegImpl l2 = plan.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route2 = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+		NetworkRoute route2 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
 		plan.createAndAddActivity("l", f.link3.getId());
@@ -648,7 +648,7 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link2.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route1 = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+		NetworkRoute route1 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 		route1.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		route1.setVehicleId(id2);
 		l1.setRoute(route1);
@@ -703,7 +703,7 @@ public class QueueSimulationTest extends TestCase {
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
 		l1.setTravelTime(10);
-		NetworkRouteWRefs netRoute = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link1.getId());
+		NetworkRoute netRoute = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link1.getId());
 		List<Id> routeLinks = new ArrayList<Id>();
 		Collections.addAll(routeLinks, f.link2.getId(), f.link3.getId(), link4.getId());
 		netRoute.setLinkIds(f.link1.getId(), routeLinks, f.link1.getId());
@@ -756,7 +756,7 @@ public class QueueSimulationTest extends TestCase {
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
 		l1.setTravelTime(10);
-		NetworkRouteWRefs netRoute = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute netRoute = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		List<Id> routeLinks = new ArrayList<Id>();
 		Collections.addAll(routeLinks, f.link2.getId(), f.link3.getId(), link4.getId(), f.link1.getId(), f.link2.getId());
 		netRoute.setLinkIds(f.link1.getId(), routeLinks, f.link3.getId());
@@ -904,13 +904,13 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(8*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(f.link1.getId(), link5.getId(), f.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(f.link1.getId(), link5.getId(), f.network);
 		route.setLinkIds(new IdImpl(startLinkId), NetworkUtils.getLinkIds(linkIds), new IdImpl(endLinkId));
 		leg.setRoute(route);
 		ActivityImpl a2 = plan.createAndAddActivity("w", link5.getId());
 		a2.setEndTime(9*3600);
 		leg = plan.createAndAddLeg(TransportMode.car);
-		route = (NetworkRouteWRefs) f.network.getFactory().createRoute(TransportMode.car, link5.getId(), link6.getId());
+		route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, link5.getId(), link6.getId());
 		route.setLinkIds(link5.getId(), null, link6.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("h", link6.getId());

@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 public class CarDepartureHandler implements DepartureHandler {
 
@@ -30,7 +30,7 @@ public class CarDepartureHandler implements DepartureHandler {
 
 	private void handleCarDeparture(double now, DriverAgent agent, Id linkId,
 			Leg leg) {
-		NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
+		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Id vehicleId = route.getVehicleId();
 		if (vehicleId == null) {
 			vehicleId = agent.getPerson().getId(); // backwards-compatibility

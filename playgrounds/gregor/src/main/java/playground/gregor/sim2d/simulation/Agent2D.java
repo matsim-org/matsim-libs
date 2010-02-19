@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
@@ -105,7 +105,7 @@ public class Agent2D  {
 
 	public Link chooseNextLink() {
 		if (this.cacheRouteNodes == null) {
-			this.cacheRouteNodes = RouteUtils.getNodes((NetworkRouteWRefs) this.currentLeg.getRoute(), this.simulation.getNetwork());
+			this.cacheRouteNodes = RouteUtils.getNodes((NetworkRoute) this.currentLeg.getRoute(), this.simulation.getNetwork());
 			this.currentNodeIndex = 1;
 		}
 		if (this.currentNodeIndex >= this.cacheRouteNodes.size() ) {

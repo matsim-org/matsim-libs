@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * Represents a vehicle.
@@ -135,8 +135,8 @@ public class Vehicle extends SimUnit {
 
 	public void setCurrentLeg(LegImpl currentLeg) {
 		this.currentLeg = currentLeg;
-		if (currentLeg.getRoute() instanceof NetworkRouteWRefs) {
-			List<Id> linkIds = ((NetworkRouteWRefs) currentLeg.getRoute()).getLinkIds();
+		if (currentLeg.getRoute() instanceof NetworkRoute) {
+			List<Id> linkIds = ((NetworkRoute) currentLeg.getRoute()).getLinkIds();
 			currentLinkRoute = linkIds.toArray(new Id[linkIds.size()]);
 		} else {
 			currentLinkRoute = null;

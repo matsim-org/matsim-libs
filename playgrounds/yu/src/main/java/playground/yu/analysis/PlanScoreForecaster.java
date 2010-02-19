@@ -48,7 +48,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -127,7 +127,7 @@ public class PlanScoreForecaster {
 			}
 		}
 
-		NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
+		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Map<Id, LinkImpl> links = this.net.getLinks();
 		for (Id linkId : route.getLinkIds()) {
 			travelTime_s += ttc.getLinkTravelTime(links.get(linkId), departTime

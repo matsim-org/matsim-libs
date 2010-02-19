@@ -33,7 +33,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.testcases.MatsimTestCase;
@@ -440,7 +440,7 @@ public class TransitRouterTest extends TestCase {
 			{ // line 1
 				TransitLine tLine = sb.createTransitLine(this.scenario.createId("1"));
 				{
-					NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(link1.getId(), link1.getId(), network);
+					NetworkRoute netRoute = new LinkNetworkRouteImpl(link1.getId(), link1.getId(), network);
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 					stops.add(sb.createTransitRouteStop(this.stop1, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop2, 50, 50));
@@ -454,7 +454,7 @@ public class TransitRouterTest extends TestCase {
 			{ // line 2
 				TransitLine tLine = sb.createTransitLine(this.scenario.createId("2"));
 				{
-					NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(link2.getId(), link3.getId(), network);
+					NetworkRoute netRoute = new LinkNetworkRouteImpl(link2.getId(), link3.getId(), network);
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(3);
 					stops.add(sb.createTransitRouteStop(this.stop3, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop4, 50, 50));
@@ -469,7 +469,7 @@ public class TransitRouterTest extends TestCase {
 			{ // line 3
 				TransitLine tLine = sb.createTransitLine(this.scenario.createId("3"));
 				{
-					NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(link4.getId(), link4.getId(), network);
+					NetworkRoute netRoute = new LinkNetworkRouteImpl(link4.getId(), link4.getId(), network);
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 					stops.add(sb.createTransitRouteStop(this.stop6, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop7, 50, 50));

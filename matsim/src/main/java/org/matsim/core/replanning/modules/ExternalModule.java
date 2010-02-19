@@ -45,7 +45,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandler;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonCalcTimes;
@@ -131,7 +131,7 @@ public class ExternalModule implements PlanStrategyModule {
 					this.handler.startLeg(leg, this.writer);
 					// route
 					if (leg.getRoute() != null) {
-						NetworkRouteWRefs r = (NetworkRouteWRefs) leg.getRoute();
+						NetworkRoute r = (NetworkRoute) leg.getRoute();
 						this.handler.startRoute(r, this.writer);
 						this.handler.endRoute(this.writer);
 					}

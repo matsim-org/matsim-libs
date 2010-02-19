@@ -14,7 +14,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.andreas.bln.pop.NewPopulation;
 import playground.andreas.bln.pop.SharedNetScenario;
@@ -61,7 +61,7 @@ public class GeoFilterPersonPlan extends NewPopulation {
 
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if(planElement instanceof LegImpl){
-					for (Id linkId : ((NetworkRouteWRefs)((LegImpl) planElement).getRoute()).getLinkIds()) {
+					for (Id linkId : ((NetworkRoute)((LegImpl) planElement).getRoute()).getLinkIds()) {
 						if(this.targetNet.getLinks().containsValue(linkId)){
 							keepPlan = true;
 							break;

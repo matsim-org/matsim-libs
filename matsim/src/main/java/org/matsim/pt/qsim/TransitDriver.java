@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.transitSchedule.api.Departure;
@@ -41,7 +41,7 @@ public class TransitDriver extends AbstractTransitDriver {
 		return dummyPerson;
 	}
 
-	final NetworkRouteWRefs carRoute;
+	final NetworkRoute carRoute;
 	final TransitLine transitLine;
 	final TransitRoute transitRoute;
 	final double departureTime;
@@ -64,7 +64,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public NetworkRouteWRefs getCarRoute() {
+	public NetworkRoute getCarRoute() {
 		return carRoute;
 	}
 

@@ -68,7 +68,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -216,7 +216,7 @@ public class Controller extends WithindayControler {
 					double tt = 0;
 					Leg leg = (Leg)plan.getPlanElements().get(1);
 					Route route = leg.getRoute();
-					for(Id id : ((NetworkRouteWRefs) route).getLinkIds()) {
+					for(Id id : ((NetworkRoute) route).getLinkIds()) {
 						if(id.toString().equals("4")) {
 							
 							tt = observer.avr_route1TTs;

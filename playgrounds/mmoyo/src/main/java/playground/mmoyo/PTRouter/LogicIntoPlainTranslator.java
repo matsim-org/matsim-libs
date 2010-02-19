@@ -16,7 +16,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -86,7 +86,7 @@ public class LogicIntoPlainTranslator {
 					act.setLinkId(plainLink.getId());
 				}else{
 					LegImpl leg = (LegImpl)pe;
-					NetworkRouteWRefs logicRoute = (NetworkRouteWRefs)leg.getRoute();
+					NetworkRoute logicRoute = (NetworkRoute)leg.getRoute();
 					List<Node> plainNodes = convertNodesToPlain(RouteUtils.getNodes(logicRoute, this.plainNet));
 					logicRoute.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(plainNodes)), null);
 				}
@@ -97,10 +97,10 @@ public class LogicIntoPlainTranslator {
 	public List<Leg> convertToPlainLeg (List<Leg> logicLegList){
 		List<Leg> plainLegList = new ArrayList<Leg>();
 		for(Leg logicLeg : logicLegList){
-			NetworkRouteWRefs logicRoute= (NetworkRouteWRefs)logicLeg.getRoute();
+			NetworkRoute logicRoute= (NetworkRoute)logicLeg.getRoute();
 			List<Link> plainLinks = convertToPlain(NetworkUtils.getLinks(this.plainNet, logicRoute.getLinkIds()));
 			//if(plainLinks.size()>0){
-				NetworkRouteWRefs plainRoute = new LinkNetworkRouteImpl(null, null, null);
+				NetworkRoute plainRoute = new LinkNetworkRouteImpl(null, null, null);
 				plainRoute.setLinkIds(null, NetworkUtils.getLinkIds(plainLinks), null);
 				Leg plainLeg = new LegImpl(logicLeg.getMode());
 				plainLeg = logicLeg;
@@ -117,7 +117,7 @@ public class LogicIntoPlainTranslator {
 	public List<LegImpl> convertToPlainLegORIGINAL (List<LegImpl> logicLegList){
 		List<LegImpl> plainLegList = new ArrayList<LegImpl>();
 		for(LegImpl logicLeg : logicLegList){
-			NetworkRouteWRefs logicNetworkRoute= (NetworkRouteWRefs)logicLeg.getRoute();
+			NetworkRoute logicNetworkRoute= (NetworkRoute)logicLeg.getRoute();
 			List<Id> plainLinkList = new ArrayList<Id>();
 
 			for (Link link: NetworkUtils.getLinks(this.plainNet, logicNetworkRoute.getLinkIds())) {
@@ -125,7 +125,7 @@ public class LogicIntoPlainTranslator {
 					plainLinkList.add(link.getId());
 			}
 			if(plainLinkList.size()>0){
-				NetworkRouteWRefs plainRoute = new LinkNetworkRouteImpl(null, null, null);
+				NetworkRoute plainRoute = new LinkNetworkRouteImpl(null, null, null);
 				plainRoute.setLinkIds(null, plainLinkList, null);
 
 				LegImpl plainLeg = new LegImpl(TransportMode.pt);

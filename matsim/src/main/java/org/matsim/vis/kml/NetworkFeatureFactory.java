@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
@@ -135,7 +135,7 @@ public class NetworkFeatureFactory {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		folder.setName(leg.getMode().toString() + "_" + Time.writeTime(leg.getDepartureTime()));
 
-		for (Id linkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+		for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 			Link l = this.network.getLinks().get(linkId);
 
 			AbstractFeatureType abstractFeature = this.createLinkFeature(l, style);
@@ -145,7 +145,7 @@ public class NetworkFeatureFactory {
 				log.warn("Not yet implemented: Adding link KML features of type" + abstractFeature.getClass());
 			}
 		}
-		for (Node n : RouteUtils.getNodes((NetworkRouteWRefs) leg.getRoute(), network)) {
+		for (Node n : RouteUtils.getNodes((NetworkRoute) leg.getRoute(), network)) {
 
 			AbstractFeatureType abstractFeature = this.createNodeFeature(n, style);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {

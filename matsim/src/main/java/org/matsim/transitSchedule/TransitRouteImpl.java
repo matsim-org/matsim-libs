@@ -28,7 +28,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -43,7 +43,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 public class TransitRouteImpl implements TransitRoute {
 
 	private final Id routeId;
-	private NetworkRouteWRefs route;
+	private NetworkRoute route;
 	private final List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 	private String description = null;
 	private final Map<Id, Departure> departures = new TreeMap<Id, Departure>();
@@ -51,7 +51,7 @@ public class TransitRouteImpl implements TransitRoute {
 	private String lineRouteName;
 	private String direction;
 
-	protected TransitRouteImpl(final Id id, final NetworkRouteWRefs route, final List<TransitRouteStop> stops, final TransportMode mode) {
+	protected TransitRouteImpl(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode) {
 		this.routeId = id;
 		this.route = route;
 		this.stops.addAll(stops);
@@ -100,11 +100,11 @@ public class TransitRouteImpl implements TransitRoute {
 		return Collections.unmodifiableMap(this.departures);
 	}
 
-	public NetworkRouteWRefs getRoute() {
+	public NetworkRoute getRoute() {
 		return this.route;
 	}
 
-	public void setRoute(final NetworkRouteWRefs route) {
+	public void setRoute(final NetworkRoute route) {
 		this.route = route;
 	}
 

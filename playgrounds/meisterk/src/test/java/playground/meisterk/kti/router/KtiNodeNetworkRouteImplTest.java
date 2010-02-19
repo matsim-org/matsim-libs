@@ -33,7 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.AbstractNetworkRouteTest;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -53,7 +53,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 	}
 
 	@Override
-	protected NetworkRouteWRefs getNetworkRouteInstance(Id fromLinkId, Id toLinkId, NetworkLayer network) {
+	protected NetworkRoute getNetworkRouteInstance(Id fromLinkId, Id toLinkId, NetworkLayer network) {
 		return new KtiLinkNetworkRouteImpl(fromLinkId, toLinkId, network, this.config.planomat().getSimLegInterpretation());
 	}
 
@@ -73,7 +73,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : expectedDistances.keySet()) {
 
 			this.config.planomat().setSimLegInterpretation(simLegInterpretation);
-			NetworkRouteWRefs route = getNetworkRouteInstance(link1.getId(), link4.getId(), network);
+			NetworkRoute route = getNetworkRouteInstance(link1.getId(), link4.getId(), network);
 			route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("22 12 -23 3"), link4.getId());
 
 			Assert.assertEquals(
@@ -91,7 +91,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : expectedDistances.keySet()) {
 
 			this.config.planomat().setSimLegInterpretation(simLegInterpretation);
-			NetworkRouteWRefs route = getNetworkRouteInstance(link1.getId(), link1.getId(), network);
+			NetworkRoute route = getNetworkRouteInstance(link1.getId(), link1.getId(), network);
 			route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds(""), link1.getId());
 
 			Assert.assertEquals(

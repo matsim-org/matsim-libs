@@ -32,7 +32,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -74,7 +74,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		plan.createAndAddActivity("w", link5.getId());
 
-		NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link0.getId(), link5.getId());
+		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link0.getId(), link5.getId());
 		leg.setRoute(route);
 
 		// prepare route

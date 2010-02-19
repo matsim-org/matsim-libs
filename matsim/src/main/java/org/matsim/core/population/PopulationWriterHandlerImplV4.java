@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
@@ -350,8 +350,8 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");
-		if (route instanceof NetworkRouteWRefs) {
-			for (Node n : RouteUtils.getNodes((NetworkRouteWRefs) route, this.network)) {
+		if (route instanceof NetworkRoute) {
+			for (Node n : RouteUtils.getNodes((NetworkRoute) route, this.network)) {
 				out.write(n.getId().toString());
 				out.write(" ");
 			}

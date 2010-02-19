@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * @author dgrether
@@ -79,7 +79,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	public Route createRoute(final Id startLinkId, final Id endLinkId, final List<Id> currentRouteLinkIds) {
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLinkId, endLinkId, this.scenario.getNetwork());
+		NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId, this.scenario.getNetwork());
 		route.setLinkIds(startLinkId, currentRouteLinkIds, endLinkId);
 		return route;
 	}

@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 /**
- * Implementation of {@link NetworkRouteWRefs} that tries to minimize the amount of
+ * Implementation of {@link NetworkRoute} that tries to minimize the amount of
  * data needed to be stored for each route. This will give some memory savings,
  * allowing for larger scenarios (=more agents), especially on detailed
  * networks, but is likely a bit slower due to the more complex access of the
@@ -49,7 +49,7 @@ import org.matsim.api.core.v01.network.Network;
  *
  * @author mrieser
  */
-public class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs, Cloneable {
+public class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
 
 	private final static Logger log = Logger.getLogger(CompressedNetworkRouteImpl.class);
 
@@ -131,7 +131,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	}
 
 	@Override
-	public NetworkRouteWRefs getSubRoute(Id fromLinkId, Id toLinkId) {
+	public NetworkRoute getSubRoute(Id fromLinkId, Id toLinkId) {
 		List<Id> newLinkIds = new ArrayList<Id>(10);
 		boolean foundFromLink = fromLinkId.equals(this.getStartLinkId());
 		boolean collectLinks = foundFromLink;
@@ -169,7 +169,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 				throw new IllegalArgumentException("toLinkId is not part of this route.");
 			}
 		}
-		NetworkRouteWRefs subRoute = new CompressedNetworkRouteImpl(fromLinkId, toLinkId, this.network, this.subsequentLinks);
+		NetworkRoute subRoute = new CompressedNetworkRouteImpl(fromLinkId, toLinkId, this.network, this.subsequentLinks);
 		subRoute.setLinkIds(fromLinkId, newLinkIds, toLinkId);
 		return subRoute;
 	}

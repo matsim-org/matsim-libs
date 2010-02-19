@@ -26,7 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * Describes a route of a transit line, including its stops and the departures along this route.
@@ -58,9 +58,9 @@ public interface TransitRoute extends Identifiable {
 	 */
 	public abstract Map<Id, Departure> getDepartures();
 
-	public abstract NetworkRouteWRefs getRoute();
+	public abstract NetworkRoute getRoute();
 
-	public abstract void setRoute(final NetworkRouteWRefs route);
+	public abstract void setRoute(final NetworkRoute route);
 
 	/**
 	 * @return an immutable list of all stops of this route in the order along the route

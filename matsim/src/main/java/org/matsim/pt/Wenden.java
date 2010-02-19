@@ -1,15 +1,15 @@
 package org.matsim.pt;
 
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 
 public class Wenden implements UmlaufStueckI {
 
-	private NetworkRouteWRefs route;
+	private NetworkRoute route;
 	
-	public Wenden(NetworkRouteWRefs route) {
+	public Wenden(NetworkRoute route) {
 		this.route = route;
 	}
 
@@ -25,7 +25,7 @@ public class Wenden implements UmlaufStueckI {
 		return null;
 	}
 
-	public NetworkRouteWRefs getCarRoute() {
+	public NetworkRoute getCarRoute() {
 		return route;
 	}
 

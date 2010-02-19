@@ -25,7 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -58,7 +58,7 @@ public class GTH {
 		return this.geofac.createPolygon(lr,null);
 	}
 	
-	public Polygon getPolygonFromRoute(NetworkRouteWRefs r, Network network) {
+	public Polygon getPolygonFromRoute(NetworkRoute r, Network network) {
 
 		List<Id> linkRoute = r.getLinkIds();
 		Coordinate [] edges = new Coordinate [linkRoute.size() * 4];

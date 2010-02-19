@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
@@ -52,7 +52,7 @@ public class QueryAgentUtils {
 				Leg leg = (Leg) o;
 				if (leg.getMode().equals(TransportMode.car)) {
 					Node last = null;
-					for (Id linkId : ((NetworkRouteWRefs) leg.getRoute())
+					for (Id linkId : ((NetworkRoute) leg.getRoute())
 							.getLinkIds()) {
 						Link driven = net.getLinks().get(linkId);
 						Node node = driven.getFromNode();
@@ -97,7 +97,7 @@ public class QueryAgentUtils {
 			} else if (o instanceof LegImpl) {
 				LegImpl leg = (LegImpl) o;
 				if (leg.getMode().equals(TransportMode.car)) {
-					List<Id> route = ((NetworkRouteWRefs) leg.getRoute())
+					List<Id> route = ((NetworkRoute) leg.getRoute())
 							.getLinkIds();
 					count += route.size();
 					if (route.size() != 0)

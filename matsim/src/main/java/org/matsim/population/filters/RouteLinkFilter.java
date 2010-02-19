@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class RouteLinkFilter extends AbstractPlanFilter {
@@ -48,7 +48,7 @@ public class RouteLinkFilter extends AbstractPlanFilter {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl) pe;
-				for (Id linkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+				for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 					if (this.linkIds.contains(linkId)) {
 						return true;
 					}

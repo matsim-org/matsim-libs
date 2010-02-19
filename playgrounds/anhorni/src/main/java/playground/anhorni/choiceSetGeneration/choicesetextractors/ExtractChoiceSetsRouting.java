@@ -33,7 +33,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
@@ -135,13 +135,13 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		 */
 		double totalTravelDist = 0.0;
 		
-		Iterator<Id> routeLinkBefore_it = ((NetworkRouteWRefs) legBefore.getRoute()).getLinkIds().iterator();
+		Iterator<Id> routeLinkBefore_it = ((NetworkRoute) legBefore.getRoute()).getLinkIds().iterator();
 		while (routeLinkBefore_it.hasNext()) {		
 			Id lId = routeLinkBefore_it.next();
 			totalTravelDist += network.getLinks().get(lId).getLength();
 		}
 		
-		Iterator<Id> routeLinkAfter_it = ((NetworkRouteWRefs) legAfter.getRoute()).getLinkIds().iterator();
+		Iterator<Id> routeLinkAfter_it = ((NetworkRoute) legAfter.getRoute()).getLinkIds().iterator();
 		while (routeLinkAfter_it.hasNext()) {		
 			Id lId = routeLinkAfter_it.next();
 			totalTravelDist += network.getLinks().get(lId).getLength();

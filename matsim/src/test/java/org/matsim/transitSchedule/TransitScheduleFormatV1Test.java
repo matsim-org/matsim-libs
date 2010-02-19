@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -120,7 +120,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		assertEquals(schedule1, schedule2);
 
 		// now add route info to the schedule
-		NetworkRouteWRefs route = new LinkNetworkRouteImpl(l1.getId(), l4.getId(), network);
+		NetworkRoute route = new LinkNetworkRouteImpl(l1.getId(), l4.getId(), network);
 		List<Id> links = new ArrayList<Id>(2);
 		links.add(l2.getId());
 		links.add(l3.getId());
@@ -174,11 +174,11 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 					assertEquals("different awaitDepartureTime.", stopE.isAwaitDepartureTime(), stopA.isAwaitDepartureTime());
 				}
 
-				NetworkRouteWRefs netRouteE = routeE.getRoute();
+				NetworkRoute netRouteE = routeE.getRoute();
 				if (netRouteE == null) {
 					assertNull("bad network route, must be null.", routeA.getRoute());
 				} else {
-					NetworkRouteWRefs netRouteA = routeA.getRoute();
+					NetworkRoute netRouteA = routeA.getRoute();
 					assertNotNull("bad network route, must not be null.", netRouteA);
 					assertEquals("wrong start link.", netRouteE.getStartLinkId(), netRouteA.getStartLinkId());
 					assertEquals("wrong end link.", netRouteE.getEndLinkId(), netRouteA.getEndLinkId());

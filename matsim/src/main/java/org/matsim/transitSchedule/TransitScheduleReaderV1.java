@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
@@ -147,12 +147,12 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 				stops.add(routeStop);
 				routeStop.setAwaitDepartureTime(tStop.awaitDeparture);
 			}
-			NetworkRouteWRefs route = null;
+			NetworkRoute route = null;
 			if (this.currentRouteProfile.firstLinkId != null) {
 				if (this.currentRouteProfile.lastLinkId == null) {
 					this.currentRouteProfile.lastLinkId = this.currentRouteProfile.firstLinkId;
 				}
-				route = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.currentRouteProfile.firstLinkId, this.currentRouteProfile.lastLinkId);
+				route = (NetworkRoute) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.currentRouteProfile.firstLinkId, this.currentRouteProfile.lastLinkId);
 				route.setLinkIds(this.currentRouteProfile.firstLinkId, this.currentRouteProfile.linkIds, this.currentRouteProfile.lastLinkId);
 			}
 			TransitRoute transitRoute = new TransitRouteImpl(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);

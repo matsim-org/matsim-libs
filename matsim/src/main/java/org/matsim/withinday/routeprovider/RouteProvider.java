@@ -22,7 +22,7 @@ package org.matsim.withinday.routeprovider;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * @author jillenberger
@@ -44,7 +44,7 @@ public interface RouteProvider {
 	 *         able to find an appropriate route or if the provider rejected
 	 *         the request.
 	 */
-	public NetworkRouteWRefs requestRoute(Link departureLink, Link destinationLink, double time);
+	public NetworkRoute requestRoute(Link departureLink, Link destinationLink, double time);
 
 	/**
 	 * Each RouteProvider instance has a priority which should be a value in 0 .. 10, where
@@ -59,7 +59,7 @@ public interface RouteProvider {
 	 */
 	public void setPriority(int p);
 
-	public boolean providesRoute(Id currentLinkId, NetworkRouteWRefs subRoute);
+	public boolean providesRoute(Id currentLinkId, NetworkRoute subRoute);
 
 
 }

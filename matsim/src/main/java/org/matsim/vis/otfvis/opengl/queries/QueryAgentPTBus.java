@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -164,7 +164,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 				// handle leg
 				Leg leg = (Leg) pe;
 				//if (!leg.getMode().equals("car")) continue;
-				for (Id linkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+				for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 					drivenLinks.add(linkId);
 				}
 			}

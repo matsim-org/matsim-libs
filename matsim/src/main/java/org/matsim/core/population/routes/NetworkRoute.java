@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
  *
  * @author mrieser
  */
-public interface NetworkRouteWRefs extends RouteWRefs {
+public interface NetworkRoute extends RouteWRefs {
 
 	public void setLinkIds(final Id startLinkId, final List<Id> linkIds, final Id endLinkId);
 
@@ -55,7 +55,7 @@ public interface NetworkRouteWRefs extends RouteWRefs {
 	 * @param toLinkId
 	 * @return subroute of this route starting at fromLinkId and ending at toLinkId
 	 */
-	public NetworkRouteWRefs getSubRoute(final Id fromLinkId, final Id toLinkId);
+	public NetworkRoute getSubRoute(final Id fromLinkId, final Id toLinkId);
 
 	/**
 	 * Sets the id of the vehicle that should be used to drive along this route.

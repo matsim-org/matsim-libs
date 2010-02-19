@@ -21,7 +21,7 @@ package playground.christoph.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.PersonEventImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * @author cdobler
@@ -30,10 +30,10 @@ public class ExtendedAgentReplanEventImpl extends PersonEventImpl {
 
 	public static final String EVENT_TYPE = "extendedreplan";
 
-	private final NetworkRouteWRefs replannedRoute;
-	private final NetworkRouteWRefs originalRoute;
+	private final NetworkRoute replannedRoute;
+	private final NetworkRoute originalRoute;
 	
-	public ExtendedAgentReplanEventImpl(final double time, final Id agentId, final NetworkRouteWRefs alternativeRoute, final NetworkRouteWRefs originalRoute)
+	public ExtendedAgentReplanEventImpl(final double time, final Id agentId, final NetworkRoute alternativeRoute, final NetworkRoute originalRoute)
 	{
 		super(time, agentId);
 		this.replannedRoute = alternativeRoute;
@@ -46,12 +46,12 @@ public class ExtendedAgentReplanEventImpl extends PersonEventImpl {
 		return EVENT_TYPE;
 	}
 
-	public NetworkRouteWRefs getReplannedRoute()
+	public NetworkRoute getReplannedRoute()
 	{
 		return this.replannedRoute;
 	}
 
-	public NetworkRouteWRefs getOriginalRoute()
+	public NetworkRoute getOriginalRoute()
 	{
 		return this.originalRoute;
 	}

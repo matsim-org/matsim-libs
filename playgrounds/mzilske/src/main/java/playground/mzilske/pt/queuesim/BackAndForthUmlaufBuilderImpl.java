@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -131,7 +131,7 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 			throw new RuntimeException("No route found from node "
 					+ startNode.getId() + " to node " + endNode.getId() + ".");
 		}
-		NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory()
+		NetworkRoute route = (NetworkRoute) this.network.getFactory()
 				.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
 		route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(wendenPath.links), toLink.getId());
 		umlauf.getUmlaufStuecke().add(new Wenden(route));

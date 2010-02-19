@@ -47,7 +47,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -139,7 +139,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
-					for(Id linkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+					for(Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 						if(linkId.equals(predicateLink.getId()))
 							return true;
 					}

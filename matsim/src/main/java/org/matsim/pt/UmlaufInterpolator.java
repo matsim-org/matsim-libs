@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -30,7 +30,7 @@ public class UmlaufInterpolator {
 		List<UmlaufStueckI> umlaufStueckeOfThisUmlauf = umlauf.getUmlaufStuecke();
 		if (!umlaufStueckeOfThisUmlauf.isEmpty()) {
 			UmlaufStueckI previousUmlaufStueck = umlaufStueckeOfThisUmlauf.get(umlaufStueckeOfThisUmlauf.size() - 1);
-			NetworkRouteWRefs previousCarRoute = previousUmlaufStueck.getCarRoute();
+			NetworkRoute previousCarRoute = previousUmlaufStueck.getCarRoute();
 			Id fromLinkId = previousCarRoute.getEndLinkId();
 			Id toLinkId = umlaufStueck.getCarRoute().getStartLinkId();
 			if (!fromLinkId.equals(toLinkId)) {
@@ -54,7 +54,7 @@ public class UmlaufInterpolator {
 			throw new RuntimeException("No route found from node "
 					+ startNode.getId() + " to node " + endNode.getId() + ".");
 		}
-		NetworkRouteWRefs route = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory())
+		NetworkRoute route = (NetworkRoute) ((NetworkFactoryImpl) this.network.getFactory())
 				.createRoute(TransportMode.car, fromLinkId, toLinkId);
 		route.setLinkIds(fromLinkId, NetworkUtils.getLinkIds(wendenPath.links), toLinkId);
 		umlauf.getUmlaufStuecke().add(new Wenden(route));

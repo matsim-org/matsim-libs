@@ -19,7 +19,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -88,8 +88,8 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 					}
 
 				} else if(planElement instanceof Leg){
-					if(((Leg) planElement).getRoute() instanceof NetworkRouteWRefs){
-						for (Node node : RouteUtils.getNodes((NetworkRouteWRefs)((Leg) planElement).getRoute(), this.network)) {
+					if(((Leg) planElement).getRoute() instanceof NetworkRoute){
+						for (Node node : RouteUtils.getNodes((NetworkRoute)((Leg) planElement).getRoute(), this.network)) {
 
 							double nodeX = node.getCoord().getX();
 							double nodeY = node.getCoord().getY();

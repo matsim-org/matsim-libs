@@ -67,7 +67,7 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -195,7 +195,7 @@ public class Homework2 extends Controler {
 					double tt = 0;
 					LegImpl leg = (LegImpl)plan.getPlanElements().get(1);
 					RouteWRefs route = leg.getRoute();
-					for(Id id : ((NetworkRouteWRefs) route).getLinkIds()) {
+					for(Id id : ((NetworkRoute) route).getLinkIds()) {
 						if(id.toString().equals("4")) {
 							
 //							tt = observer.avr_route1TTs;

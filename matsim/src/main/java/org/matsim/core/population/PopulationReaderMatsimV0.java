@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -68,7 +68,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private PlanImpl currplan = null;
 	private LegImpl currleg = null;
 	private final Scenario scenario;
-	private NetworkRouteWRefs currroute = null;
+	private NetworkRoute currroute = null;
 
 	private ActivityImpl prevAct = null;
 	private String routeNodes = null;
@@ -203,7 +203,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute() {
-		this.currroute = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.prevAct.getLinkId(), this.prevAct.getLinkId());
+		this.currroute = (NetworkRoute) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.prevAct.getLinkId(), this.prevAct.getLinkId());
 		this.currleg.setRoute(this.currroute);
 	}
 

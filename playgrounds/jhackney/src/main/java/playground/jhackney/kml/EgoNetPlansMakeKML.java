@@ -64,7 +64,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -345,7 +345,7 @@ public class EgoNetPlansMakeKML {
 			if (o instanceof LegImpl) {
 				LegImpl leg = (LegImpl) o;
 	
-				for (Id routeLinkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
+				for (Id routeLinkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 					Link routeLink = network.getLinks().get(routeLinkId);
 					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
 	

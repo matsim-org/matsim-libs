@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
 
 /**
@@ -89,8 +89,8 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 				/*
 				 * Compare sequence of nodes.
 				 */
-				if (RouteUtils.getNodes((NetworkRouteWRefs) leg2.getRoute(), this.network).equals(
-						RouteUtils.getNodes((NetworkRouteWRefs) leg1.getRoute(), this.network))) {
+				if (RouteUtils.getNodes((NetworkRoute) leg2.getRoute(), this.network).equals(
+						RouteUtils.getNodes((NetworkRoute) leg1.getRoute(), this.network))) {
 					/*
 					 * Compare departure times.
 					 */

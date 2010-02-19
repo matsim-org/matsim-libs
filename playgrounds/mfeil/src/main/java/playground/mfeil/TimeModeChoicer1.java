@@ -41,7 +41,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
@@ -253,7 +253,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
 				l.add(((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().get(j));
 			}*/
-			List<Id> l = ((NetworkRouteWRefs) oldRoute).getLinkIds();
+			List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
 			r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
 			routes.add(r);
 		}
@@ -445,7 +445,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 
 				RouteWRefs oldRoute = ((LegImpl)(bestSolution.get(i))).getRoute();
 				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId(), this.network);
-				List<Id> l = ((NetworkRouteWRefs) oldRoute).getLinkIds();
+				List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
 				r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
 				((LegImpl)al.get(i)).setRoute(r);
 

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * Provides helper methods to work with routes.
@@ -43,7 +43,7 @@ public class RouteUtils {
 	 * @param network
 	 * @return
 	 */
-	public static List<Node> getNodes(final NetworkRouteWRefs route, final Network network) {
+	public static List<Node> getNodes(final NetworkRoute route, final Network network) {
 		List<Node> nodes = new ArrayList<Node>(route.getLinkIds().size() + 1);
 		if ((route.getLinkIds().size() > 0)) {
 			nodes.add(network.getLinks().get(route.getLinkIds().get(0)).getFromNode());
@@ -82,7 +82,7 @@ public class RouteUtils {
 		return null;
 	}
 
-	public static NetworkRouteWRefs getSubRoute(final NetworkRouteWRefs route, final Node fromNode, final Node toNode, final Network network) {
+	public static NetworkRoute getSubRoute(final NetworkRoute route, final Node fromNode, final Node toNode, final Network network) {
 		Id fromLinkId = null;
 		Id toLinkId = null;
 
@@ -104,7 +104,7 @@ public class RouteUtils {
 		return route.getSubRoute(fromLinkId, toLinkId);
 	}
 
-	public static NetworkRouteWRefs createNetworkRoute(List<Id> routeLinkIds, final Network network) {
+	public static NetworkRoute createNetworkRoute(List<Id> routeLinkIds, final Network network) {
 		Id startLinkId = routeLinkIds.get(0);
 		List<Id> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<Id>(0);
 		Id endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);

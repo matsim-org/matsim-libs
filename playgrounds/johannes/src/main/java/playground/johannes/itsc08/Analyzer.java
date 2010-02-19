@@ -60,7 +60,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -141,7 +141,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		for(Person p : event.getControler().getPopulation().getPersons().values()) {
 			for(Plan plan : p.getPlans()) {
 				LegImpl leg = (LegImpl) plan.getPlanElements().get(1);
-				if(((NetworkRouteWRefs) leg.getRoute()).getLinkIds().contains(id)) {
+				if(((NetworkRoute) leg.getRoute()).getLinkIds().contains(id)) {
 					riskyPlans.add(plan);
 				} else {
 					safePlans.add(plan);
@@ -325,7 +325,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			double triptime = event.getTime() - e.getTime();
 			traveltimes.put(event.getPersonId(), triptime);
 			Person person = this.controler.getPopulation().getPersons().get(event.getPersonId());
-			if (RouteUtils.getNodes((NetworkRouteWRefs) ((LegImpl)person.getSelectedPlan().getPlanElements().get(1)).getRoute(), this.network).get(1).getId().toString().equals("3")) {
+			if (RouteUtils.getNodes((NetworkRoute) ((LegImpl)person.getSelectedPlan().getPlanElements().get(1)).getRoute(), this.network).get(1).getId().toString().equals("3")) {
 				riskyTriptime += triptime;
 //				if(controler.getIteration() % 2 == 0) { //FIXME: needs to be consistent with IncidentGenerator!!!
 				if(inicidents.isBadDay()) {

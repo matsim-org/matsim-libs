@@ -1,6 +1,6 @@
 package org.matsim.pt;
 
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -30,7 +30,7 @@ public class UmlaufStueck implements UmlaufStueckI {
 		return departure;
 	}
 
-	public NetworkRouteWRefs getCarRoute() {
+	public NetworkRoute getCarRoute() {
 		return route.getRoute();
 	}
 

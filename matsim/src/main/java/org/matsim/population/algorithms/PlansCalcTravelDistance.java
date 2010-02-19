@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * Calculates the sum of the distance of all routes in a plan,
@@ -92,7 +92,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 
 				ArrayList<Id> linkIds = new ArrayList<Id>();
 
-				NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
+				NetworkRoute route = (NetworkRoute) leg.getRoute();
 				if (route == null) throw new Exception("route missing");
 
 				linkIds.add(route.getStartLinkId());

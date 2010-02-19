@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
 
 /**
@@ -66,7 +66,7 @@ public class PersonRouteFilter extends PersonFilterA {
 				for (PlanElement obj : acts_Legs) {
 					if (even) {
 						LegImpl leg = (LegImpl) obj;
-						NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
+						NetworkRoute route = (NetworkRoute) leg.getRoute();
 						if (route != null) {
 							List<Id> linkIds = route.getLinkIds();
 							if (linkIds != null)

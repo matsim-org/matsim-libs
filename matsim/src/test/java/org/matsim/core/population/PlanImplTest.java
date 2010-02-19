@@ -29,7 +29,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -233,7 +233,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals("person must not be copied.", new IdImpl(2), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		RouteWRefs route2 = ((LegImpl) plan.getPlanElements().get(1)).getRoute();
-		assertTrue(route2 instanceof NetworkRouteWRefs);
+		assertTrue(route2 instanceof NetworkRoute);
 		assertEquals(123.45, route2.getDistance(), EPSILON);
 		assertEquals(98.76, route2.getTravelTime(), EPSILON);
 	}

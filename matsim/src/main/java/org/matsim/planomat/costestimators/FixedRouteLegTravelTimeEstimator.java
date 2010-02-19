@@ -34,7 +34,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -100,7 +100,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 			if (mode.equals(TransportMode.car)) {
 				Link startLink = this.network.getLinks().get(actOrigin.getLinkId());
 				Link endLink = this.network.getLinks().get(actDestination.getLinkId());
-				NetworkRouteWRefs newRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+				NetworkRoute newRoute = (NetworkRoute) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 
 				// calculate free speed route and cache it
 				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
@@ -122,7 +122,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 			double now = departureTime;
 			now = this.processDeparture(actOrigin.getLinkId(), now);
 
-			NetworkRouteWRefs route = ((NetworkRouteWRefs) newLeg.getRoute());
+			NetworkRoute route = ((NetworkRoute) newLeg.getRoute());
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
 				now = this.processRouteTravelTime(NetworkUtils.getLinks(this.network, route.getLinkIds()), now);
 				now = this.processLink(this.network.getLinks().get(actDestination.getLinkId()), now);
@@ -155,7 +155,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 				LegImpl newLeg = new LegImpl(TransportMode.car);
 				Link startLink = this.network.getLinks().get(actOrigin.getLinkId());
 				Link endLink = this.network.getLinks().get(actDestination.getLinkId());
-				NetworkRouteWRefs newRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+				NetworkRoute newRoute = (NetworkRoute) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 
 				// calculate free speed route and cache it
 				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
@@ -176,7 +176,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 			double now = departureTime;
 			now = this.processDeparture(actOrigin.getLinkId(), now);
 
-			NetworkRouteWRefs route = ((NetworkRouteWRefs) this.fixedRoutes.get(legIndex).get(legIntermediate.getMode()).getRoute());
+			NetworkRoute route = ((NetworkRoute) this.fixedRoutes.get(legIndex).get(legIntermediate.getMode()).getRoute());
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
 				now = this.processRouteTravelTime(NetworkUtils.getLinks(this.network, route.getLinkIds()), now);
 				now = this.processLink(this.network.getLinks().get(actDestination.getLinkId()), now);
@@ -185,7 +185,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 				now = this.processRouteTravelTime(NetworkUtils.getLinks(this.network, route.getLinkIds()), now);
 			}
 
-			NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(
+			NetworkRoute networkRoute = (NetworkRoute) this.plansCalcRoute.getRouteFactory().createRoute(
 					TransportMode.car,
 					actOrigin.getLinkId(),
 					actDestination.getLinkId());
@@ -242,7 +242,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 					LegImpl leg = (LegImpl) planElement;
 					// TODO this should be possible for all types of routes. Then we could cache e.g. the original pt routes, too.
 					// however, LegImpl cloning constructor does not yet handle generic routes correctly
-					if (leg.getRoute() instanceof NetworkRouteWRefs) {
+					if (leg.getRoute() instanceof NetworkRoute) {
 						EnumMap<TransportMode, LegImpl> legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
 						legInformation.put(leg.getMode(), new LegImpl(leg));
 						this.fixedRoutes.put(((PlanImpl) this.plan).getActLegIndex(leg), legInformation);

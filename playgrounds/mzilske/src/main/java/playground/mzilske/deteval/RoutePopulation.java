@@ -41,7 +41,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -121,8 +121,8 @@ public class RoutePopulation {
 					for (PlanElement planElement : plan.getPlanElements()) {
 						if (planElement instanceof Leg) {
 							Leg leg = (Leg) planElement;
-							if (leg.getRoute() instanceof NetworkRouteWRefs) {
-								NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
+							if (leg.getRoute() instanceof NetworkRoute) {
+								NetworkRoute route = (NetworkRoute) leg.getRoute();
 								for (Id linkId : route.getLinkIds()) {
 									Link link = scenario.getNetwork().getLinks().get(linkId);
 									usedNodes.add(link.getFromNode());

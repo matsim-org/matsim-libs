@@ -40,7 +40,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.misc.Time;
@@ -133,7 +133,7 @@ public class BlockingStopDemo {
 
 		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
 		LinkImpl endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks-1]);
-		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 		ArrayList<Id> linkIdList = new ArrayList<Id>(nOfLinks);
 		for (int i = 1; i < nOfLinks-1; i++) {
 			linkIdList.add(this.ids[i]);
@@ -160,7 +160,7 @@ public class BlockingStopDemo {
 
 		startLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks]);
 		endLink = this.scenario.getNetwork().getLinks().get(this.ids[2*nOfLinks-1]);
-		networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 		linkIdList = new ArrayList<Id>(nOfLinks);
 		for (int i = nOfLinks+1; i < (2*nOfLinks - 1); i++) {
 			linkIdList.add(this.ids[i]);
@@ -245,8 +245,8 @@ public class BlockingStopDemo {
 
 		// car-drivers
 		NetworkImpl network = this.scenario.getNetwork();
-		NetworkRouteWRefs carRoute1 = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.ids[0], this.ids[nOfLinks-1]);
-		NetworkRouteWRefs carRoute2 = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.ids[nOfLinks], this.ids[2*nOfLinks-1]);
+		NetworkRoute carRoute1 = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.ids[0], this.ids[nOfLinks-1]);
+		NetworkRoute carRoute2 = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.ids[nOfLinks], this.ids[2*nOfLinks-1]);
 		List<Id> linkIds1 = new ArrayList<Id>(nOfLinks-2);
 		List<Id> linkIds2 = new ArrayList<Id>(nOfLinks-2);
 		for (int i = 1; i<nOfLinks-1; i++) {

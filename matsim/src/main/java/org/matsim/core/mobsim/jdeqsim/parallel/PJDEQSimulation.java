@@ -17,7 +17,7 @@ import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /*
  * TODO: (next steps):
@@ -118,8 +118,8 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
-					if (leg.getRoute() instanceof NetworkRouteWRefs) {
-						List<Id> linkIds = ((NetworkRouteWRefs) leg.getRoute()).getLinkIds();
+					if (leg.getRoute() instanceof NetworkRoute) {
+						List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 						Id[] currentLinkRoute = linkIds.toArray(new Id[linkIds.size()]);
 
 						for (Id linkId : currentLinkRoute) {
