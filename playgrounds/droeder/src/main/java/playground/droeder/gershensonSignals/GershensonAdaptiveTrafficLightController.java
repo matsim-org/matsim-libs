@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -41,6 +40,7 @@ import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
 import org.matsim.signalsystems.control.SignalGroupState;
@@ -67,7 +67,7 @@ public class GershensonAdaptiveTrafficLightController extends
 	private SortedMap<Id, Id> corrGroups;
 	private SortedMap<Id, SignalGroupState> oldState;
 	
-	private Network net;
+	private QNetwork net;
 
 	/**
 	 * dg hack this field should disappear in the near future
@@ -79,7 +79,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		super(controlInfo);
 	}
 
-	public void init(Map<Id, SignalGroupDefinition> groups, Network net){
+	public void init(Map<Id, SignalGroupDefinition> groups, QNetwork qNetwork){
 		for(SignalGroupDefinition sd : this.getSignalGroups().values()){
 			this.getSignalGroupStates().put(sd, SignalGroupState.RED);
 			switchedToGreen.put(sd.getId(), 0.0);
@@ -98,7 +98,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			}
 			vehOnLinkLanes.put(sd.getId(), m);
 		}
-		setNetwork(net);
+		setNetwork(qNetwork);
 	}
 		
 	@Override
@@ -202,7 +202,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 		
 		for (Id i : signalGroup.getToLinkIds()){
-			double outLinkDensity = net.getLinks().get(i).getCapacity(time);
+			double outLinkDensity = net.getLinks().get(i).getSpaceCap();
 			double actDensity = (vehOnLink.get(i)/outLinkDensity);
 			if((outLinkDensity * 0.9)< actDensity){
 				outLinkJam = true;
@@ -277,8 +277,8 @@ public class GershensonAdaptiveTrafficLightController extends
 		this.corrGroups = (SortedMap<Id, Id>) corrGroups;
 	}
 	
-	public void setNetwork (Network net){
-		this.net = net;
+	public void setNetwork (QNetwork qNetwork){
+		this.net = qNetwork;
 	}
 
 	public boolean switchLight (SignalGroupDefinition group, SignalGroupState oldState, double time){

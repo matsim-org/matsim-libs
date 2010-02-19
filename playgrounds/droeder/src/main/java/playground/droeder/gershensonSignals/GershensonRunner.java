@@ -96,7 +96,7 @@ public class GershensonRunner {
 				corrGroups = csg.calculateCorrespondingGroups(groups, controler.getNetwork());
 				compGroups = csg.calculateCompetingGroups(corrGroups, groups, controler.getNetwork());
 				//enable live-visualization
-//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 			}
 			
 		}
@@ -113,7 +113,7 @@ public class GershensonRunner {
 					(GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				adaptiveController.setCorrGroups(corrGroups);
 				adaptiveController.setCompGroups(compGroups);
-				adaptiveController.init(controler.getScenario().getSignalSystems().getSignalGroupDefinitions(), controler.getNetwork());
+				adaptiveController.init(controler.getScenario().getSignalSystems().getSignalGroupDefinitions(), e.getQueueSimulation().getQueueNetwork());
 				
 				controler.getEvents().addHandler(adaptiveController);
 			}
