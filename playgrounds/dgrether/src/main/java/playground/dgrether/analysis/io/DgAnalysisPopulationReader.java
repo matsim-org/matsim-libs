@@ -123,7 +123,7 @@ public class DgAnalysisPopulationReader {
 			final String secondPlanPath) {
 		return doPopulationAnalysis( networkPath, firstPlanPath, secondPlanPath, "selected" ) ;
 	}
-
+	@Deprecated
 	public DgAnalysisPopulation doPopulationAnalysis(final String networkPath, final String firstPlanPath,
 			final String secondPlanPath, final String whichPlan ) {
 		PopulationImpl population;
