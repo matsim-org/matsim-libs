@@ -121,7 +121,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 	
 	
 	private void checkLaneDefinitionRoutingConfiguration(Config config) {
-		if ((config.network().getLaneDefinitionsFile() != null) && 
+		if ((config.scenario().isUseLanes()) && 
 		    !config.controler().isLinkToLinkRoutingEnabled()){
 		  	log.warn("Using lanes without enabling linktolinkrouting might not lead to expected simulation results"); 
 		   }
