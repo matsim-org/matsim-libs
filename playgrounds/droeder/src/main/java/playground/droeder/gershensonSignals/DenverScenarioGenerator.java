@@ -136,6 +136,8 @@ private void createConfig(Config config) {
 		config.travelTimeCalculator().setTraveltimeBinSize(1);
 		config.controler().setLastIteration(iterations);
 		config.controler().setOutputDirectory(OUTPUTDIRECTORY);
+		
+		
 	
 
 
@@ -145,7 +147,11 @@ private void createConfig(Config config) {
 		config.getQSimConfigGroup().setSnapshotFile("cmcf.mvi");
 		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
+		config.getQSimConfigGroup().setRemoveStuckVehicles(true);
+		config.getQSimConfigGroup().setStartTime(6*3600);
+		config.getQSimConfigGroup().setEndTime(7*3600);
 		config.otfVis().setDrawLinkIds(true);
+		
 		// configure strategies for replanning
 		
 		config.strategy().setMaxAgentPlanMemorySize(4);

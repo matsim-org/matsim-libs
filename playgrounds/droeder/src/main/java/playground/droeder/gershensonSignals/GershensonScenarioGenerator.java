@@ -400,6 +400,7 @@ public class GershensonScenarioGenerator {
 		
 		config.network().setInputFile(NETWORKFILE);
 		config.plans().setInputFile(POPULATIONOUTPUTFILE);
+		config.controler().setLastIteration(iterations);
 	
 
 		// configure scoring for plans
