@@ -606,7 +606,7 @@ public class QLinkImpl implements QLink {
 //			if ( getVehPosCnt < 1 ) {
 //				getVehPosCnt++ ;
 //			}
-			String snapshotStyle = Gbl.getConfig().getQSimConfigGroup().getSnapshotStyle();
+			String snapshotStyle = queueNetwork.getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
 			if ("queue".equals(snapshotStyle)) {
 				getVehiclePositionsQueue(positions);
 			} else if ("equiDist".equals(snapshotStyle)) {
