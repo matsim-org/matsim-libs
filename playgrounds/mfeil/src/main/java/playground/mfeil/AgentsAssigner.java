@@ -270,7 +270,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			}
 		}
 		if (distance==Double.MAX_VALUE){
-			log.warn("No agent to assign from found for agent "+plan.getPerson().getId()+"!");
+			log.info("No agent to assign from found for agent "+plan.getPerson().getId()+"!");
 			this.nonassignedAgents.add(plan.getPerson().getId().toString());
 			return;
 		}
