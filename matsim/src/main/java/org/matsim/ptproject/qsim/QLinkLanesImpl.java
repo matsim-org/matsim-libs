@@ -503,16 +503,13 @@ public class QLinkLanesImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-//			log.warn( " entering getVehiclePositions ") ;
 			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 				lane.visdata.getVehiclePositions(time, positions);
 			}
-//			originalLane.visdata.getVehiclePositions(positions);
-
+			
 			int cnt = parkedVehicles.size();
 			if (cnt > 0) {
 				String snapshotStyle = queueNetwork.getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
-//				int nLanes = Math.round((float)Math.max(getLink().getNumberOfLanes(Time.UNDEFINED_TIME),1.0d));
 
 				double cellSize = 7.5;
 				double distFromFromNode = getLink().getLength();
@@ -525,14 +522,10 @@ public class QLinkLanesImpl implements QLink {
 				} else {
 					log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
 				}
-
 				// add the parked vehicles
 				int cnt2 = 0 ;
 				for (QVehicle veh : parkedVehicles.values()) {
 					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(), cnt2 ) ;
-//							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
-//					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(),
-//							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
 					positions.add(position);
 					distFromFromNode -= cellSize; cnt2++ ;
 				}
