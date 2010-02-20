@@ -65,7 +65,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private AverageTTHandler handler1;
 	
 	// "D" run denver -- "G" run gershensonTestNetwork
-	private static final String config = "G";
+	private static final String config = "D";
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 
@@ -145,7 +145,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			@Override
 			public void notifyShutdown(ShutdownEvent event) {
 				handler1.writeChart(event.getControler().getControlerIO().getOutputFilename("averageTimePerIteration"));
-				
+				handler1.writeChart2(event.getControler().getControlerIO().getOutputFilename("averageTimePerIteration2"));
 			}
 		});
 		

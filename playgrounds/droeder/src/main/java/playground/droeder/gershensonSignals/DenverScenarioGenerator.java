@@ -125,16 +125,19 @@ private void createConfig(Config config) {
 
 		// configure scoring for plans
 		config.charyparNagelScoring().setLateArrival(0.0);
-		config.charyparNagelScoring().setPerforming(6.0);
+		config.charyparNagelScoring().setPerforming(0.0);
 
 		// set it with f. strings
 		config.charyparNagelScoring().addParam("activityType_0", "h");
 		config.charyparNagelScoring().addParam("activityTypicalDuration_0",
-				"24:00:00");
+		"16:00:00");
+		config.charyparNagelScoring().addParam("activityType_1", "w");
+		config.charyparNagelScoring().addParam("activityTypicalDuration_1",
+				"08:00:00");
 
 		// configure controler
 		config.travelTimeCalculator().setTraveltimeBinSize(1);
-		config.controler().setLastIteration(iterations);
+		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(OUTPUTDIRECTORY);
 		
 		
@@ -148,7 +151,7 @@ private void createConfig(Config config) {
 		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		config.getQSimConfigGroup().setRemoveStuckVehicles(true);
-		config.getQSimConfigGroup().setStartTime(6*3600);
+//		config.getQSimConfigGroup().setStartTime(6*3600);
 		config.getQSimConfigGroup().setEndTime(7*3600);
 		config.otfVis().setDrawLinkIds(true);
 		
