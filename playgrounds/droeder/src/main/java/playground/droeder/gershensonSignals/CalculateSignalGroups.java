@@ -65,7 +65,8 @@ public class CalculateSignalGroups{
 					corrGroups.put(sd.getId(), null);
 				}
 			}
-		}		
+		}	
+		log.error(corrGroups.toString());
 		return corrGroups;
 	}
 	
@@ -75,20 +76,32 @@ public class CalculateSignalGroups{
 		for (Entry <Id, Id> ee : ids.entrySet()){
 			List<Id> l = new ArrayList<Id>();
 			for (SignalGroupDefinition sd : groups.values()){
-				if (sd.getId().equals(ee.getKey()) || sd.getId().equals(ee.getValue())){
-					
-				}else{
-					l.add(sd.getId());
+				
+				//new code
+				if(net.getLinks().get(groups.get(ee.getKey()).getLinkRefId()).getToNode().
+						equals(net.getLinks().get(sd.getLinkRefId()).getToNode())){
+					if (!(sd.getId().equals(ee.getKey()) || sd.getId().equals(ee.getValue()))){
+						l.add(sd.getId());
+					}
 				}
+			
+				// old code. it should be checked if Signalgrouplinks have the smae toNode
+//				if ((sd.getId().equals(ee.getKey()) || sd.getId().equals(ee.getValue()))){
+//					
+//				}else{
+//					l.add(sd.getId());
+//				}
 			}
 			cg.put(ee.getKey(), l);
 		}
+		log.error(cg.toString());
+		
 		return cg;
 	}
 	
 	public static Link calculateLink(Link inLink){
 		Coord coordInLink = getVector(inLink);
-		double temp = Math.PI / 2;
+		double temp = Math.PI *3/8;
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
 		Link l = null;
 		Map<Link, Double> linkAngle = new HashMap<Link, Double>();
@@ -110,7 +123,7 @@ public class CalculateSignalGroups{
 			if ((corrAngle - e.getValue()) < temp ){
 				temp = (corrAngle / 2) - e.getValue();
 				
-				if (inLink.getToNode().getInLinks().size() > 1){
+				if (inLink.getToNode().getInLinks().size() > 2){
 					l = e.getKey();
 				}else{
 					l = null;
