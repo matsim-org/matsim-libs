@@ -412,7 +412,7 @@ public class QLane {
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty() || transitQueueLaneFeature.isFeatureActive());
+		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty() || (this.toLanes != null && !this.bufferIsEmpty()) || transitQueueLaneFeature.isFeatureActive());
 		return active;
 	}
 
