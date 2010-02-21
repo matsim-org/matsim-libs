@@ -22,12 +22,17 @@ package playground.mfeil.analysis;
 
 
 
+import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,6 +40,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
@@ -271,6 +277,175 @@ public class ASPGeneral {
 		return pop;
 	}
 	
+	
+	// Analyzes a counts file
+	private void analyzeCounts (String countsFile){
+		log.info("Analyzing counts file ...");
+		
+		TreeMap<Integer, ArrayList<double[]>> data = new TreeMap<Integer, ArrayList<double[]>>();
+		
+		try {
+
+			FileReader fr = new FileReader(countsFile);
+			BufferedReader br = new BufferedReader(fr);
+			String line = null;
+			StringTokenizer tokenizer = null;
+			line = br.readLine(); // do not parse first line which just
+									// contains column headers
+			line = br.readLine();
+			int tokenId;
+			double tokenHour;
+			double tokenMATSim;
+			double tokenCounts;
+			double tokenDiff;
+			double counter = 1;
+			ArrayList<double[]> list = new ArrayList<double[]>();;
+			while (line != null) {		
+				
+				if (counter==1) list = new ArrayList<double[]>();
+				
+				tokenizer = new StringTokenizer(line);
+				tokenId = Integer.parseInt(tokenizer.nextToken());
+				
+				tokenHour = Double.parseDouble(tokenizer.nextToken());		
+				
+				String token = tokenizer.nextToken();
+				token = token.trim();
+	            token = token.replace(",",""); //filter out the commas
+	            tokenMATSim = Double.parseDouble(token);		
+	            
+	            token = tokenizer.nextToken();
+				token = token.trim();
+	            token = token.replace(",",""); //filter out the commas
+	            tokenCounts = Double.parseDouble(token);		
+	            
+	            token = tokenizer.nextToken();
+				token = token.trim();
+	            token = token.replace(",",""); //filter out the commas
+	            tokenDiff = Double.parseDouble(token);		
+				
+				list.add(new double[] {tokenHour,tokenMATSim,tokenCounts,tokenDiff});
+				if (counter==24) {
+					data.put(tokenId, list);
+					counter=0;
+				}
+				counter++;
+				
+				line = br.readLine();
+			}		
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		
+		this.stream.println();
+		this.stream.println("Counts");
+		this.stream.println();
+		
+		
+		// by counting point
+		for (int key : data.keySet()) {
+			double volumeMatsim=0;
+			double volumeCounts=0;
+			
+			this.stream.print(key+"\tHour\t");
+			for (int i=1;i<25;i++){
+				this.stream.print(i+"\t");
+			}
+			this.stream.println("Sum");
+			
+			this.stream.print("\tMATSim\t");
+			for (int i=1;i<25;i++){
+				if (data.get(key).get(i-1)[0]!=i) {
+					log.warn("Hour "+i+" and data field "+data.get(key).get(i-1)[0]+" do not match for entry "+key);
+				}
+				else {
+					volumeMatsim += data.get(key).get(i-1)[1];
+					this.stream.print(data.get(key).get(i-1)[1]+"\t");
+				}
+			}
+			this.stream.println(volumeMatsim);
+			
+			this.stream.print("\tCounts\t");
+			for (int i=1;i<25;i++){
+				if (data.get(key).get(i-1)[0]!=i) {
+					log.warn("Hour "+i+" and data field "+data.get(key).get(i-1)[0]+" do not match for entry "+key);
+				}
+				else {
+					volumeCounts += data.get(key).get(i-1)[2];
+					this.stream.print(data.get(key).get(i-1)[2]+"\t");
+				}
+			}
+			this.stream.println(volumeCounts);
+			
+			this.stream.print("\tDiff\t");
+			for (int i=1;i<25;i++){
+				if (data.get(key).get(i-1)[0]!=i) {
+					log.warn("Hour "+i+" and data field "+data.get(key).get(i-1)[0]+" do not match for entry "+key);
+				}
+				else {
+					this.stream.print(data.get(key).get(i-1)[3]+"\t");
+				}
+			}
+			this.stream.println((volumeMatsim-volumeCounts)/volumeCounts*100);
+		}
+		this.stream.println();
+		
+		
+		// by time
+		double totalMatsim = 0;
+		double totalCounts = 0;
+		double[] totalHoursMatsim = new double[24];
+		double[] totalHoursCounts = new double[24];
+		this.stream.print("Hour\t");
+		for (int i=1;i<25;i++){
+			this.stream.print(i+"\t");
+		}
+		this.stream.println("Sum");
+		
+		this.stream.print("Matsim\t");
+		for (int i=1;i<25;i++){
+			double volumeMatsim=0;
+			for (int key : data.keySet()) {
+				if (data.get(key).get(i-1)[0]!=i) {
+					log.warn("Hour "+i+" and data field "+data.get(key).get(i-1)[0]+" do not match for entry "+key);
+				}
+				else {
+					volumeMatsim += data.get(key).get(i-1)[1];
+				}
+			}
+			totalMatsim += volumeMatsim;
+			this.stream.print(volumeMatsim+"\t");
+			totalHoursMatsim[i-1] = volumeMatsim;
+		}
+		this.stream.println(totalMatsim);
+		
+		this.stream.print("Counts\t");
+		for (int i=1;i<25;i++){
+			double volumeCounts=0;
+			for (int key : data.keySet()) {
+				if (data.get(key).get(i-1)[0]!=i) {
+					log.warn("Hour "+i+" and data field "+data.get(key).get(i-1)[0]+" do not match for entry "+key);
+				}
+				else {
+					volumeCounts += data.get(key).get(i-1)[2];
+				}
+			}
+			totalCounts += volumeCounts;
+			this.stream.print(volumeCounts+"\t");
+			totalHoursCounts[i-1] = volumeCounts;
+		}
+		this.stream.println(totalCounts);
+		
+		this.stream.print("Diff\t");
+		for (int i=1;i<25;i++){
+			this.stream.print((totalHoursMatsim[i-1]-totalHoursCounts[i-1])/totalHoursCounts[i-1]*100+"\t");
+		}
+		this.stream.println((totalMatsim-totalCounts)/totalCounts*100);
+		
+		this.stream.println();
+		log.info("done.");
+	}
+	
 	public static void main(final String [] args) {
 		// Scenario files
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
@@ -280,11 +455,14 @@ public class ASPGeneral {
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 		
 		// Population files
-		final String populationFilenameMATSim = "/home/baug/mfeil/data/runs/run0922_initialdemand_20/output_plans.xml";
+		final String populationFilenameMATSim = "/home/baug/mfeil/data/runs/0995/output_plans.xml";
 		final String populationFilenameMZ = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
 		
+		// Counts file
+		final String counts = "/home/baug/mfeil/data/runs/0995/ITERS/it.50/50.countscompare.txt";
+		
 		// Output file
-		final String outputFile = "/home/baug/mfeil/data/runs/run0922_initialdemand_20/analysis.xls";	
+		final String outputFile = "/home/baug/mfeil/data/runs/0995/ITERS/it.50/50.analysis.xls";	
 		
 		// Settings
 		final boolean compareWithMZ = true; 
@@ -322,7 +500,7 @@ public class ASPGeneral {
 			asp.runMATSimTrips(scenarioMATSim.getPopulation());
 			asp.runMATSimTimings(scenarioMATSim.getPopulation());
 		}
-
+		asp.analyzeCounts(counts);
 		
 		log.info("Analysis of plan finished.");
 	}
