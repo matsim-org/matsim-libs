@@ -57,8 +57,9 @@ public class GershensonAdaptiveTrafficLightController extends
 
 	private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
 
-	private final double tGreenMin = 20; // time in seconds
-	private final double minCars = 8; //
+	private final double tGreenMin = 40; // time in seconds
+	private final double minCars = 12; //
+	private boolean compGroupsGreen = false;
 
 	private Map<Id, Integer> vehOnLink = new HashMap<Id, Integer>();
 	private Map<Id, Map<Id, Integer>> vehOnLinkLanes = new HashMap<Id, Map<Id, Integer>>();
@@ -180,7 +181,6 @@ public class GershensonAdaptiveTrafficLightController extends
 		//end dg hack
 
 
-		boolean compGroupsGreen = false;
 		boolean outLinkJam = false;
 		double compGreenTime = 0;
 		double approachingRed = 0; 
@@ -188,11 +188,14 @@ public class GershensonAdaptiveTrafficLightController extends
 		int approachingGreenLane = 0;
 		double cars = 0;
 		
+		compGroupsGreen = true;
+		
 
 		Map<Id, SignalGroupDefinition> groups = this.getSignalGroups();
 		SignalGroupState oldState = this.getSignalGroupStates().get(signalGroup);
 
-		// --------- initialize
+	// --------- initialize ---------------
+		// check if competing groups are green
 		for (Id i : compGroups.get(signalGroup.getId())){
 			if(this.getSignalGroupStates().get(groups.get(i)).equals(SignalGroupState.GREEN)){
 				compGroupsGreen = true;
@@ -202,16 +205,18 @@ public class GershensonAdaptiveTrafficLightController extends
 			}
 		}
 		
+		// calculate outlinkDensity --- should be changed, problem is that one Signalgroup 
+		// coordinates the Trafficlight for many toLinks and you don't know Agents Destination
 		for (Id i : signalGroup.getToLinkIds()){
 			double outLinkDensity = net.getLinks().get(i).getSpaceCap();
 			double actDensity = (vehOnLink.get(i)/outLinkDensity);
-			log.error(outLinkDensity + " " + actDensity);
-			if((outLinkDensity * 0.90)< actDensity){
+			if((outLinkDensity * 0.96)< actDensity){
 				outLinkJam = true;
 				break;
 			}
 		}
-
+		
+		//set number of cars, approaching a competing Link, if it is green
 		if (compGroupsGreen == true){
 			for (Id i : compGroups.get(signalGroup.getId())){
 				approachingGreenLink += vehOnLink.get((groups.get(i).getLinkRefId())).intValue();
@@ -224,36 +229,26 @@ public class GershensonAdaptiveTrafficLightController extends
 			}
 		}
 		
+		// set number of cars on refLink of signalGroup
 		cars = vehOnLink.get(signalGroup.getLinkRefId());
 
+		// 	set number of cars approaching a Red light
 		if (oldState.equals(SignalGroupState.RED)){
 			approachingRed = vehOnLink.get(groups.get(signalGroup.getId()).getLinkRefId());
 		}else{
 			approachingRed = 0;
 		}
 		
-		
-		
-		// calculate outLinkSpeed still missing
-
 		//------- end of initializing
 
-		//check if corresponding group is switched to green in this timestep. if so and no
-		//compGroup shows green, switch to green --- doesn't work
-//		if (!(switchedToGreen.get(corrGroups.get(signalGroup.getId())).equals(null)) &&
-//				switchedToGreen.get(corrGroups.get(signalGroup.getId())).equals(time) &&
-//				compGroupsGreen == false && oldState.equals(SignalGroupState.RED)){
-//			return switchLight(signalGroup, oldState, time);
-//		}
-//		for (Id i : compGroups.get(signalGroup.getId())){
-//			if (switchedToGreen.get(i).equals(time)){
-//				if (oldState.equals(SignalGroupState.GREEN)){
-//					return switchLight(signalGroup, oldState, compGreenTime);
-//				}else{
-//					return false;
-//				}
-//			}
-//		}
+		//check if this group was switched in this timestep. if so, return oldstate
+		if (switchedToGreen.get(signalGroup.getId()).equals(time)){
+			if(oldState.equals(SignalGroupState.GREEN)){
+				return true;
+			}else{
+				return false;
+			}
+		}
 		
 
 		// start algorithm
@@ -272,15 +267,10 @@ public class GershensonAdaptiveTrafficLightController extends
 			}
 
 		}
-		if(oldState.equals(SignalGroupState.GREEN)){ // if no condition fits for switching lights, return oldstate
-			if ( signalGroup.getId().equals(new IdImpl("200")) || signalGroup.getId().equals(new IdImpl("14500")) || signalGroup.getId().equals(new IdImpl("12100"))){
-				log.error(signalGroup.getId()+ " " + oldState);
-			}
+		 // if no condition fits for switching lights, return oldstate
+		if(oldState.equals(SignalGroupState.GREEN)){
 			return true;
 		}else{
-			if ( signalGroup.getId().equals(new IdImpl("200")) || signalGroup.getId().equals(new IdImpl("14500")) || signalGroup.getId().equals(new IdImpl("12100"))){
-				log.error(signalGroup.getId()+ " " + oldState);
-			}
 			return false;
 		}
 	}
@@ -301,15 +291,27 @@ public class GershensonAdaptiveTrafficLightController extends
 	public boolean switchLight (SignalGroupDefinition group, SignalGroupState oldState, double time){
 		if (oldState.equals(SignalGroupState.GREEN)){
 			this.getSignalGroupStates().put(group, SignalGroupState.RED);
-			if ( group.getId().equals(new IdImpl("200")) || group.getId().equals(new IdImpl("14500")) || group.getId().equals(new IdImpl("12100"))){
-				log.fatal(group.getId() + " was " + oldState + " for " + switchedToGreen.get(group.getId()) + " switched to Red");
+			if (!(corrGroups.get(group.getId()) == null)){
+				this.getSignalGroupStates().put(this.getSignalGroups().
+						get(corrGroups.get(group.getId())),SignalGroupState.RED);
+				switchedToGreen.put(corrGroups.get(group.getId()), 0.0);
+			}
+			for (Id i : compGroups.get(group.getId())){
+				switchedToGreen.put(i, time);
+				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.GREEN);
 			}
 			switchedToGreen.put(group.getId(), 0.0);
 			return false;
 		}else { //if (oldState.equals(SignalGroupState.RED)){
 			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
-			if ( group.getId().equals(new IdImpl("200")) || group.getId().equals(new IdImpl("14500")) || group.getId().equals(new IdImpl("12100"))){
-				log.error(group.getId() + " was " + oldState + " for " + switchedToGreen.get(group.getId()) + " switched to Green");
+			if (!(corrGroups.get(group.getId()) == null)){
+				this.getSignalGroupStates().put(this.getSignalGroups().
+						get(corrGroups.get(group.getId())),SignalGroupState.GREEN);
+				switchedToGreen.put(corrGroups.get(group.getId()), time);
+			}
+			for (Id i : compGroups.get(group.getId())){
+				switchedToGreen.put(i, 0.0);
+				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.RED);
 			}
 			switchedToGreen.put(group.getId(), time);
 			return true;
