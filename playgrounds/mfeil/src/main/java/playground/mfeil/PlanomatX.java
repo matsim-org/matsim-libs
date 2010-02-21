@@ -162,7 +162,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		List<String> actTypes							= this.finder.getActTypes(plan.getPerson());
 
 		/*
-		String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
+		String outputfile = Controler.getOutputFilename(plan.getPerson().getId()+"_detailed_log.xls");
 		Counter.counter++;
 		PrintStream stream;
 		try {
@@ -173,6 +173,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		}
 		stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
 		*/
+		
 		/*
 		double [] xs;
 		double [] ys 									= new double [MAX_ITERATIONS+1];
@@ -267,7 +268,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			/* Check whether differing plans are tabu*/
 			warningTabu = this.checkForTabuSolutions(tabuList, neighbourhood, infoOnNeighbourhood, tabuInNeighbourhood);
 			if (warningTabu) {
-				log.warn("No non-tabu solutions available for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
+				log.info("No non-tabu solutions available for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
 				break;
 			}
 
@@ -816,7 +817,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				if (actsToBeChanged[position[0]]>=actTypes.size()) actsToBeChanged[position[0]] = 0;
 				counter++;
 				if (counter>actTypes.size()) return (new int[]{1,0,0});
-			} while (type.equals(act.getType()) || (type.equalsIgnoreCase("home") && !this.checkForHomeSequenceChangeType(basePlan, position[0]*2))); // continue if either type is same as current one or if two home acts would fall together
+			} while (type.equals(act.getType()) || 
+					(type.equalsIgnoreCase("home") && !this.checkForHomeSequenceChangeType(basePlan, position[0]*2)) ||
+					(type.equalsIgnoreCase("education_kindergarten") && !this.checkForKindergarten(basePlan))); // continue if either type is same as current one or if two home acts would fall together 
 			act.setType(type);
 			if (act.getType().equalsIgnoreCase("home")){
 				act.setFacilityId(((Activity)(basePlan.getPlanElements().get(0))).getFacilityId());
@@ -1028,13 +1031,16 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 
 		boolean enter = true;
 		int counter = 0;
-		while (enter && (position!=1 || actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home"))){ // check whether act to be added is allowed while at position 1 everything is allowed to be inserted excpet for "home"
+		while (enter && (position!=1 || 
+				actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") || 
+				actTypes.get(actToBeAdded[position]).equalsIgnoreCase("education_kindergarten"))){ // check whether act to be added is allowed while at position 1 everything is allowed to be inserted excpet for "home"
 			if (counter>=actTypes.size()){
 				insertion[0]=true;
 				return insertion;
 			}
 			if (actTypes.get(actToBeAdded[position]).equals(((ActivityImpl)(basePlan.getPlanElements().get(position*2-2))).getType().toString()) || // ensures that no duplicate activity chains are created
-					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") && !this.checkForHomeSequenceInserting(basePlan, position*2))){
+					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") && !this.checkForHomeSequenceInserting(basePlan, position*2)) || 
+					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("education_kindergarten") && !checkForKindergarten(basePlan))){
 				if (actToBeAdded[position]+1>=actTypes.size()){
 					actToBeAdded[position] = 0;
 				}
@@ -1142,8 +1148,16 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				((ActivityImpl)(plan.getPlanElements().get(position+2))).getType().equalsIgnoreCase("home")) return false; // Insertion would be next to an home act
 		else return true; // Insertion is ok
 	}
+	
+	/* Checks whether max one kindergarten act type is in plan*/
+	private boolean checkForKindergarten (PlanImpl plan){
+		for (int i=2;i<plan.getPlanElements().size()-2;i+=2){
+			if (((ActivityImpl)(plan.getPlanElements().get(i))).getType().equalsIgnoreCase("education_kindergarten")) return false; // Insertion would be next to an home act
+		}
+		return true; // Insertion is ok
+	}
 
-
+	
 	private List<SubChain> getSubChains (PlanImpl plan, int first, int second){
 		ManageSubchains manager = new ManageSubchains();
 		if (second-first==1){	// one long subchain
