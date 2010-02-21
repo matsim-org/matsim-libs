@@ -259,6 +259,8 @@ public class MDSAM {
 						compare = ((ActivityImpl)(comparePlan.getPlanElements().get((j-1)*2))).getLinkId().toString();
 					}	
 				}
+				// if identity possible, always to prefer. Note that, according to Joh, the identity moves is disregarded in the 
+				// similarity sum although the position-sensitive MDSAM allocates a weight to identity moves.
 				if (i>0 && j>0 && table[k][i-1][j-1]>=table[k][i][j]-GW && orig.equals(compare)){
 					//System.out.println("Identity.");
 					i--;
@@ -267,11 +269,13 @@ public class MDSAM {
 				// check insertion {1,x}, rounding due to java inexactness
 				else if (j>0 &&	Math.abs(table[k][i][j-1]-(table[k][i][j]-GW))<0.001 && osetContains(oset,dimensions,k,1,j)){
 					//System.out.println("Insertion.");
+					goLeft = false;
 					j--;
 				}
 				// check deletion {2,x}
 				else if (i>0 &&	Math.abs(table[k][i-1][j]-(table[k][i][j]-GW))<0.001 && osetContains(oset,dimensions,k,2,i)){
 					//System.out.println("Deletion.");
+					goLeft = true;
 					i--;
 				}
 				// go new path (insertion) in zick zack
