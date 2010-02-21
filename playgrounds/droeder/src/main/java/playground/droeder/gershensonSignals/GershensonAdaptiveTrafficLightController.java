@@ -206,7 +206,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			double outLinkDensity = net.getLinks().get(i).getSpaceCap();
 			double actDensity = (vehOnLink.get(i)/outLinkDensity);
 			log.error(outLinkDensity + " " + actDensity);
-			if((outLinkDensity * 0.95)< actDensity){
+			if((outLinkDensity * 0.90)< actDensity){
 				outLinkJam = true;
 				break;
 			}
@@ -227,7 +227,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		cars = vehOnLink.get(signalGroup.getLinkRefId());
 
 		if (oldState.equals(SignalGroupState.RED)){
-			approachingRed = vehOnLink.get(groups.get(signalGroup.getId()).getLinkRefId()) * compGreenTime;
+			approachingRed = vehOnLink.get(groups.get(signalGroup.getId()).getLinkRefId());
 		}else{
 			approachingRed = 0;
 		}
@@ -306,7 +306,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			}
 			switchedToGreen.put(group.getId(), 0.0);
 			return false;
-		}else if (oldState.equals(SignalGroupState.RED)){
+		}else { //if (oldState.equals(SignalGroupState.RED)){
 			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
 			if ( group.getId().equals(new IdImpl("200")) || group.getId().equals(new IdImpl("14500")) || group.getId().equals(new IdImpl("12100"))){
 				log.error(group.getId() + " was " + oldState + " for " + switchedToGreen.get(group.getId()) + " switched to Green");
@@ -314,7 +314,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			switchedToGreen.put(group.getId(), time);
 			return true;
 		}
-		return false;
+//		return false;
 
 	}
 

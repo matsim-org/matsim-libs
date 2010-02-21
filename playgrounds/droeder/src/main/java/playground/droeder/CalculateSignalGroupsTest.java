@@ -37,6 +37,7 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 import playground.droeder.gershensonSignals.CalculateSignalGroups;
 import playground.droeder.gershensonSignals.DenverScenarioGenerator;
+import playground.droeder.gershensonSignals.GershensonScenarioGenerator;
 
 
 /**
@@ -57,6 +58,7 @@ public class CalculateSignalGroupsTest {
 	private static final Logger log = Logger.getLogger(CalculateSignalGroupsTest.class);
  
 	@Before public void init() {
+//		loader = new ScenarioLoaderImpl(GershensonScenarioGenerator.CONFIGOUTPUTFILE);
 		loader = new ScenarioLoaderImpl(DenverScenarioGenerator.CONFIGOUTPUTFILE);
 		scenario = (ScenarioImpl) loader.loadScenario();
 		net = scenario.getNetwork();
