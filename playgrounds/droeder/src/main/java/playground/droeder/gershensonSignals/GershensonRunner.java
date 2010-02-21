@@ -38,8 +38,10 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
@@ -118,7 +120,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				event.getControler().getEvents().addHandler(handler1);
 				
 				//enable live-visualization
-//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	
@@ -173,7 +175,15 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				c.getEvents().removeHandler(adaptiveController);
 			}
 		});
-	
+		
+//		c.getQueueSimulationListener().add(new SimulationAfterSimStepListener<QSim>() {
+//			public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent<QSim> e) {
+//				QSim qs = e.getQueueSimulation();
+//				qs.getQueueSimSignalEngine().
+//				qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1")).getSignalEngine()
+//			}
+//		});
+//	
 	}
 	private void startVisualizer(Config config){
 		String[] args = {config.controler().getOutputDirectory() +

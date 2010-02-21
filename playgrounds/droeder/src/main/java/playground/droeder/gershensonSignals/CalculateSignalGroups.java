@@ -128,7 +128,6 @@ public class CalculateSignalGroups{
 				}else{
 					l = null;
 				}
-				
 			}
 		}
 		return l;
