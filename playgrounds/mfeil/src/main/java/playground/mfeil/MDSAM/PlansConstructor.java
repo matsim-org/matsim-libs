@@ -96,12 +96,14 @@ public class PlansConstructor implements PlanStrategyModule{
 
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
-		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
-		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz0993a.xml.gz";
-		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans0993a.dat";
+		String version = "0997b";
+		this.inputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml"; // sonst "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
+		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mzASb.xml.gz";
+		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans"+version+".dat";
 		this.attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model0993a.mod";
-		this.outputFileSimsOverview = "/home/baug/mfeil/data/choiceSet/it0/simsOverview0993a.xls";
+		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model"+version+".mod";
+		this.outputFileSimsOverview = "/home/baug/mfeil/data/choiceSet/it0/simsOverview"+version+".xls";
+		this.outputFileSimsDetailLog = "/home/baug/mfeil/data/choiceSet/it0/simsDetails"+version+".xls";
 		this.population = new PopulationImpl(this.controler.getScenario());
 		this.sims = null;
 		this.network = controler.getNetwork();
@@ -116,10 +118,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.incomeDivided 		= "no";
 		this.incomeDividedLN	= "no";
 		this.incomeBoxCox 		= "yes";
-		this.age 				= "no";
+		this.age 				= "yes";
 		this.gender 			= "yes";
 		this.income 			= "no";
-		this.license 			= "no";
+		this.license 			= "yes";
 		this.carAvail 			= "no";
 		this.seasonTicket 		= "no";
 		this.travelDistance		= "no";
@@ -129,6 +131,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.bikeIn				= "yes";
 		this.munType			= "no";
 		this.innerHome			= "yes";
+		// if incomeBoxCox is set to yes, travelCost must be yes, too.
+		if (this.incomeBoxCox.equals("yes")) this.travelCost = "yes";
 		
 		this.noOfAlternatives 	= 20;
 		
@@ -179,11 +183,12 @@ public class PlansConstructor implements PlanStrategyModule{
 		//	this.reducePersonsIntelligently();
 
 	// Needs to always run
-		this.linkRouteOrigPlans();
+	//	this.linkRouteOrigPlans(); // sonst standard
 
 	// Type of enlarging plans set
 		//	this.enlargePlansSet();
-		this.enlargePlansSetWithRandomSelection("Random");
+		//this.enlargePlansSetWithRandomSelection("PlanomatX"); //sonst standard
+		this.routeAlternativePlans();
 
 	// Needs to always run
 		this.writePlans(this.outputFile);
@@ -250,6 +255,31 @@ public class PlansConstructor implements PlanStrategyModule{
 					}
 				}
 			}
+		}
+		log.info("done.");
+	}
+	
+	private void routeAlternativePlans (){
+		log.info("Adding routes and travel times to alternative plans...");
+		for (Person person : this.population.getPersons().values()) {
+			int counter = 0;
+			for (int i=0;i<person.getPlans().size();i++){
+				PlanImpl plan = (PlanImpl) person.getPlans().get(i);
+				counter++;
+				for (int j=1;j<plan.getPlanElements().size();j++){
+					if (j%2==1){
+						this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
+					}
+					else {
+						((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
+						if (j!=plan.getPlanElements().size()-1){
+							((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
+							((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
+						}
+					}
+				}
+			}
+			if (counter!=20)log.warn("Something went wrong when routing the alternative plans. Counter is "+counter);
 		}
 		log.info("done.");
 	}
