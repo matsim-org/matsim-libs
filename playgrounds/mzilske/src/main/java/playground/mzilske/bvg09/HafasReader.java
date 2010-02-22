@@ -86,8 +86,9 @@ public class HafasReader {
 		File file = new File(filename);
 		try {
 			Scanner scanner = new Scanner(file);
-			while (scanner.hasNextLine()) {
-				processLine(scanner.nextLine());
+			scanner.useDelimiter("\r\n|\n");
+			while (scanner.hasNext()) {
+				processLine(scanner.next());
 			}
 			enterRoute();
 			addLine();
