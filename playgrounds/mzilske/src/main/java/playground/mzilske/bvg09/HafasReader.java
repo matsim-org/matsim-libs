@@ -44,8 +44,9 @@ public class HafasReader {
 		HafasReader hafasReader = new HafasReader();
 		try {
 			Scanner scanner = new Scanner(new File(FILENAME));
-			while (scanner.hasNextLine()) {
-				String filename = scanner.nextLine();
+			scanner.useDelimiter("\r\n|\n");
+			while (scanner.hasNext()) {
+				String filename = scanner.next();
 				hafasReader.setFilename(PATH_PREFIX + filename);
 				hafasReader.readFile();
 			}
