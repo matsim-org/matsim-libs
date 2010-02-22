@@ -81,10 +81,6 @@ public class Retailer {
 		this.movedFacilities = strategy.moveFacilities(this.facilities, links);
 	}
 	
-	public final int countCustomers() {
-		return  0;
-	}
-	
 	public Map<Id,ActivityFacilityImpl> getMovedFacilities () {
 		return this.movedFacilities;
 	}

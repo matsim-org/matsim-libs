@@ -9,15 +9,20 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.ciarif.retailers.data.Consumer;
 import playground.ciarif.retailers.data.PersonRetailersImpl;
 import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
@@ -40,7 +45,7 @@ public class GravityModel
   private final RetailZones retailZones = new RetailZones();
   private final Map<Id, ActivityFacilityImpl> retailersFacilities;
   private TreeMap<Integer,String> first;
-  private final Map<Id, ? extends Person> persons;
+  private final Map<Id, PersonImpl> persons = new TreeMap<Id,PersonImpl>();
   private int counter=0;
   private int nextCounterMsg =1;
   
@@ -51,8 +56,10 @@ public class GravityModel
     this.retailersFacilities = retailerFacilities;
     this.controlerFacilities = controler.getFacilities();
     this.shops = this.findScenarioShops(this.controlerFacilities.getFacilities().values());
-    this.persons = (controler.getPopulation().getPersons());
-    
+    for (Person p:controler.getPopulation().getPersons().values()){
+    	PersonImpl pi = (PersonImpl)p;
+    	this.persons.put(pi.getId(), pi);
+    }    
   }
  
 public void init() {
@@ -71,7 +78,7 @@ public void init() {
 	Gbl.printMemoryUsage();
 	
 	for  (Person p:controler.getPopulation().getPersons().values()) {
-		PersonRetailersImpl pr = new PersonRetailersImpl(p);
+		PersonRetailersImpl pr = new PersonRetailersImpl((PersonImpl)p);
 		this.retailersPersons.put(pr.getId(), pr);
 	}
 }
@@ -272,7 +279,73 @@ public double computePotential(ArrayList<Integer> solution){
 		} 
 	}
   
-  	public void processPerson() {
+  private void createZonesFromPersonsActivitiesShops (int n) {
+		log.info("Zones are created");
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		for (Person p : persons.values()) {
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() < minx) { minx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() < miny) { miny = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() > maxx) { maxx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() > maxy) { maxy = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
+		}
+		for (ActivityFacility shop : shops.values()) {
+			if (shop.getCoord().getX() < minx) { minx = shop.getCoord().getX(); }
+			if (shop.getCoord().getY() < miny) { miny = shop.getCoord().getY(); }
+			if (shop.getCoord().getX() > maxx) { maxx = shop.getCoord().getX(); }
+			if (shop.getCoord().getY() > maxy) { maxy = shop.getCoord().getY(); }
+		}
+		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
+		log.info("Min x = " + minx );
+		log.info("Min y = " + miny );
+		log.info("Max x = " + maxx );
+		log.info("Max y = " + maxy );
+		
+			double x_width = (maxx - minx)/n;
+			double y_width = (maxy - miny)/n;
+			int a = 0;
+			int i = 0;
+			
+			while (i<n) {
+				int j = 0;
+				while (j<n) {
+					Id id = new IdImpl (a);
+					double x1= minx + i*x_width;
+					double x2= x1 + x_width;
+					double y1= miny + j*y_width;
+					double y2= y1 + y_width;
+					RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
+					for (Person p : persons.values() ) {
+						for (PlanElement pe:p.getSelectedPlan().getPlanElements()){
+							if (pe instanceof ActivityImpl) {
+								ActivityImpl act = (ActivityImpl) pe;
+								if (act.getType().equals("work") || act.getType().equals("home") || act.getType().equals("education")) {
+									Coord c = this.controlerFacilities.getFacilities().get(act.getFacilityId()).getCoord();	
+								}
+							}	
+						}
+						Coord c = this.controlerFacilities.getFacilities().get(((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacilityId()).getCoord();
+						if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
+							rz.addPersonToQuadTree(c,p);
+						}		
+					} 
+					for (ActivityFacility af : shops.values()) {
+						Coord c = af.getCoord();
+						if (c.getX()< x2 & c.getX()>=x1 & c.getY()<y2 & c.getY()>=y1) {
+							rz.addShopToQuadTree(c,af);
+						}
+					}	
+					this.retailZones.addRetailZone(rz);
+					a=a+1;
+					j=j+1;
+				}
+				i=i+1;
+			} 
+  }
+  
+  public void processPerson() {
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
 			this.nextCounterMsg *= 2;

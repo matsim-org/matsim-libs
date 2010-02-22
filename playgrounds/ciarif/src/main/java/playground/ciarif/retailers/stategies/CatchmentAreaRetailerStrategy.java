@@ -104,5 +104,6 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 				TreeMap<Id, LinkRetailersImpl> links) {
 			// TODO Auto-generated method stub
 			return null;
-		}	
+		}
+	
 }

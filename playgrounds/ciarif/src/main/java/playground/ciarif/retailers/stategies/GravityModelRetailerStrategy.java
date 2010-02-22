@@ -33,14 +33,46 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	private Controler controler;
 	private Map<Id,ActivityFacilityImpl> shops;
 	private RetailZones retailZones;
+	private ArrayList<Consumer> consumers;
+	private Map<Id,Integer> shops_keys;
 	private Map<Id, ActivityFacilityImpl> retailerFacilities;
 	private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap<Id, ActivityFacilityImpl>();
 
-	public GravityModelRetailerStrategy(Controler controler) { //TODO think better if it is necessary to give to all strategies the controler
+	public GravityModelRetailerStrategy(Controler controler) {//TODO think better if it is necessary to give to all strategies the controler
 		
 		this.controler = controler;
 	}
 	
+	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> retailerFacilities,TreeMap<Id, LinkRetailersImpl> freeLinks) {
+		
+		this.retailerFacilities = retailerFacilities;
+		GravityModel gm = new GravityModel(this.controler, retailerFacilities); 
+		gm.init();
+		this.shops= gm.getScenarioShops();
+		this.retailZones = gm.getRetailZones();
+		DenseDoubleMatrix2D prob_i_j = findProb();
+		double [] b= this.computeParameters (prob_i_j);
+		double[] b1 = {-1,1};
+		//double[] b1 = {-b[0],-b[1]};
+		gm.setBetas(b1);
+		RunRetailerGA rrGA = new RunRetailerGA();
+		TreeMap<Integer, String> first = this.createInitialLocationsForGA(this.mergeLinks(freeLinks));
+		gm.setFirst(first);
+		ArrayList<Integer> solution = rrGA.runGA(first.size(),gm);		
+		int count=0;
+		for (ActivityFacilityImpl af:this.retailerFacilities.values()) {
+			if (first.get(solution.get(count)) != (af.getLinkId().toString())) {
+				Utils.moveFacility(af,controler.getNetwork().getLinks().get(new IdImpl(first.get(solution.get(count)))),this.controler.getScenario().getWorld());
+				log.info("The facility " + af.getId() + " has been moved");
+				this.movedFacilities.put(af.getId(), af);
+				log.info("Link Id after = "+ af.getLinkId());
+				count=count+1;
+				log.info("Count= " + count);
+			}
+		}
+		return movedFacilities;
+	}
+
 	private TreeMap<Integer,String> createInitialLocationsForGA (TreeMap<Id,LinkRetailersImpl> availableLinks) {
 		
 		TreeMap<Integer,String> locations = new TreeMap<Integer,String> ();
@@ -66,7 +98,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		
 	}
 	
-	private double[] computeParameters(DenseDoubleMatrix2D prob_zone_shop, ArrayList<Consumer> consumers, Map<Id, Integer> shops_keys) {	
+	private double[] computeParameters(DenseDoubleMatrix2D prob_zone_shop) {	
 		
 		int number_of_consumers = consumers.size();
 		int number_of_retailer_shops = retailerFacilities.size();
@@ -112,36 +144,23 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	    olsmr.newSampleData(regressand_matrix.toArray(), variables_matrix.toArray());
 	    
 	    double[] b = olsmr.estimateRegressionParameters();
-	    log.info("Betas = " + b[0] + " " + b[1]);
-
+	    
+	    log.info("Betas = " + -b[0] + " " + -b[1]);
 	    return b;
-	  }
-
-	public Map<Id, ActivityFacilityImpl> getMovedFacilities() {
-		log.info("moved Facilities are: " + movedFacilities);
-		return this.movedFacilities;		
 	}
 
-	public Map<Id, ActivityFacilityImpl> moveFacilities(
-			Map<Id, ActivityFacilityImpl> retailerFacilities,
-			TreeMap<Id, LinkRetailersImpl> freeLinks) {
+	private DenseDoubleMatrix2D findProb () {
 		
-		this.retailerFacilities = retailerFacilities;
-		GravityModel gm = new GravityModel(this.controler, retailerFacilities); 
-		gm.init();
-		this.shops= gm.getScenarioShops();
-		this.retailZones = gm.getRetailZones();
-		Map<Id,Integer> shops_keys= new TreeMap<Id,Integer>();
-		ArrayList<Consumer> consumers = new ArrayList<Consumer>();
+		
+		this.consumers = new ArrayList<Consumer>();
 		DenseDoubleMatrix2D prob_i_j = new DenseDoubleMatrix2D (this.retailZones.getRetailZones().values().size(),shops.size());
+		
+		this.shops_keys= new TreeMap<Id,Integer>();
 		int consumer_count=0;
 		int j=0;
 		log.info("This scenario has " + shops.size() +" shops");
 		for (ActivityFacilityImpl f:this.shops.values()) { 
 			shops_keys.put(f.getId(),j);
-			
-			// gets the average probability of a person from a given zone going to a given shop 
-			//(it is the same for all persons of a given zone)
 			for (RetailZone rz : this.retailZones.getRetailZones().values()) {
 				//zone_count++;
 				double counter = 0;
@@ -162,7 +181,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 								if (first_shop && this.retailerFacilities.containsKey(f.getId())) {
 									Consumer consumer = new Consumer (consumer_count, p, rz.getId());
 									consumer.setShoppingFacility(f);
-									consumers.add(consumer);
+									this.consumers.add(consumer);
 									consumer_count++;
 								}
 								counter++;
@@ -176,32 +195,11 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 				}
 			}
 			j=j+1;
-		}	
 
-		double [] b= this.computeParameters (prob_i_j, consumers, shops_keys);
-		//double[] b = {-1, 1};
-		gm.setBetas(b);
-		RunRetailerGA rrGA = new RunRetailerGA();
-		TreeMap<Integer, String> first = this.createInitialLocationsForGA(this.mergeLinks(freeLinks));
-		gm.setFirst(first);
-		ArrayList<Integer> solution = rrGA.runGA(first.size(),gm);		
-		log.info("The optimized solution is: " + solution);
-		int count=0;
-		for (ActivityFacilityImpl af:this.retailerFacilities.values()) {
-			if (first.get(solution.get(count)) != (af.getLinkId().toString())) {
-				Utils.moveFacility(af,controler.getNetwork().getLinks().get(new IdImpl(first.get(solution.get(count)))),this.controler.getScenario().getWorld());
-				log.info("The facility " + af.getId() + " has been moved");
-				this.movedFacilities.put(af.getId(), af);
-				log.info("Link Id after = "+ af.getLinkId());
-				count=count+1;
-				log.info("Count= " + count);
-			}
 		}
-		return movedFacilities;
+		return prob_i_j;
 	}
 	
-	
-
 	private TreeMap<Id,LinkRetailersImpl> mergeLinks(TreeMap<Id,LinkRetailersImpl> freeLinks) {
 		
 		TreeMap<Id,LinkRetailersImpl> availableLinks = new TreeMap<Id,LinkRetailersImpl>();
@@ -213,6 +211,10 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		availableLinks.putAll(freeLinks);
 		return availableLinks;
 	}
-
 	
+	public Map<Id, ActivityFacilityImpl> getMovedFacilities() {
+		log.info("moved Facilities are: " + movedFacilities);
+		return this.movedFacilities;		
+	}
+
 }

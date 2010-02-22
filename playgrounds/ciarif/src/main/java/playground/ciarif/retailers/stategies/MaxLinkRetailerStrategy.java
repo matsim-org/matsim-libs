@@ -130,4 +130,5 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }	

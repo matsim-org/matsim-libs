@@ -6,13 +6,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 import playground.ciarif.retailers.models.GravityModel;
+import playground.ciarif.retailers.stategies.GravityModelRetailerStrategy;
 
 
 public class RunRetailerGA
 {
  public final static String CONFIG_GROUP = "Retailers";
  public final static String CONFIG_MATRICES_FOLDER = "matricesFolder";
+ 
+ private final static Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
  
  public ArrayList<Integer> runGA(int size, GravityModel gm)
  
@@ -23,7 +28,8 @@ public class RunRetailerGA
 	}
     int genomeLength = initialSolution.size();
     int populationSize = 20;
-    int numberOfGenerations = 40;
+    int numberOfGenerations = 100;
+    //int numberOfGenerations = 1;
     double elites = 0.1;
     //default: double mutants = 0.05;
     double mutants = 0.1;
@@ -59,6 +65,7 @@ public class RunRetailerGA
     //is taken from the config file
     //writeSolutionProgressToFile(solutionProgress, fileName);
     ArrayList<Integer> solution = ga.getIncumbent().getGenome();
+    log.info("The optimized solution is: " + solution);
     return solution;
   }
 

@@ -59,4 +59,5 @@ public class RandomRetailerStrategy implements RetailerStrategy {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }

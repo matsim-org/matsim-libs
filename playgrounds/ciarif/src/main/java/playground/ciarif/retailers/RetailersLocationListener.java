@@ -11,7 +11,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-
 import playground.ciarif.retailers.IO.FileRetailerReader;
 import playground.ciarif.retailers.IO.LinksRetailerReader;
 import playground.ciarif.retailers.IO.RetailersSummaryWriter;
@@ -29,6 +28,7 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	public final static String CONFIG_RETAILERS = "retailers";
 	public final static String CONFIG_STRATEGY_TYPE = "strategyType";
 	public final static String CONFIG_MODEL_ITERATION = "modelIteration";
+	public final static String CONFIG_RSW_OUTPUT_FILE = "rswOutputFile";
 	//public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
 	//public final static String CONFIG_RET_SUM_TABLE = "retailersSummaryTable";
 	
@@ -42,6 +42,7 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	private LinksRetailerReader lrr;
 	private RetailersSummaryWriter rsw;
 	private CountFacilityCustomers cfc;
+
 	
 	// public methods
 	
@@ -80,14 +81,29 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 			gravityModelIter = Integer.parseInt (modelIterParam);
 		}
 		// The model is run only every "n" iterations
-		//if (controler.getIteration()%gravityModelIter ==0 && controler.getIteration()>0){
+//		if (controler.getIteration()%10 ==0 && controler.getIteration()>0){
+//			this.rsw = new RetailersSummaryWriter("../matsim/output/triangle/RetailersSummary");
+//			this.cfc = new CountFacilityCustomers(controler.getPopulation().getPersons());
+//			
+//			for (Retailer r : this.retailers.getRetailers().values()) {
+//				rsw.write(r, controler.getIteration(), cfc);
+//			}
+//		}
+				
 		if (event.getIteration() ==gravityModelIter){
 			// TODO maybe need to add if sequential statement
-			this.rsw = new RetailersSummaryWriter("../matsim/output/RetailersSummary"); 
+			//TODO The file name below should be read from the config file
+			
+			String rswOutputFile = (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_RSW_OUTPUT_FILE));
+			if (rswOutputFile == null) {
+				throw new RuntimeException("The file to which the Retailers Summary should be written has not been set");
+			}
+			else {
+				this.rsw = new RetailersSummaryWriter (rswOutputFile);
+			}
 			this.cfc = new CountFacilityCustomers(controler.getPopulation().getPersons());
 			
 			for (Retailer r : this.retailers.getRetailers().values()) {
-				
 				rsw.write(r, event.getIteration(), cfc);
 				r.runStrategy(lrr.getFreeLinks());
 				lrr.updateFreeLinks();
@@ -96,10 +112,14 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 		}
 		
 		if (controler.getIterationNumber()== controler.getLastIteration()) {
+			
 			for (Retailer r : this.retailers.getRetailers().values()) {
-				rsw.write(r, controler.getIterationNumber(),cfc);
-				  
+
+				//log.info("cfc=" + this.cfc);
+				rsw.write(r, controler.getIterationNumber(),this.cfc);  
+
 			}
+			rsw.close();
 		}
 	}
 }
