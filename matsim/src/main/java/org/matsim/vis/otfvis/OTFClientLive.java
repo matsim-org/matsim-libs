@@ -73,9 +73,10 @@ public class OTFClientLive extends OTFClient {
 				frame.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 				((OTFOGLDrawer) mainDrawer).setQueryHandler(queryControl);
 			}
-			else {
-				throw new IllegalStateException("Server not in live mode!");
-			}
+//		Visualizing Transims-Veh-Files uses also this class, but is not in live mode
+//			else {
+//				throw new IllegalStateException("Server not in live mode!");
+//			}
 
 
 		} catch (RemoteException e) {
@@ -87,6 +88,5 @@ public class OTFClientLive extends OTFClient {
 	public void setConfig(OTFVisConfig otfVisConfig) {
 			this.visconf = otfVisConfig;
 	}
-
 
 }
