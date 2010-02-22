@@ -47,7 +47,7 @@ import org.matsim.core.utils.misc.RouteUtils;
  */
 public class Plansgenerator {
 	// =====================================================
-	private static final String chosenScenario = "portland";
+	private static final String chosenScenario = "cottbus";
 	// =====================================================
 	// ======== choose: denver / portland / cottbus ========
 	// =====================================================
@@ -155,7 +155,7 @@ public class Plansgenerator {
 	private void createCottbusFirst(final int HOME_END_TIME) {
 		int currentId = 1;
 		int duration = (int)(0.5 * 3600); // seconds
-		final int DEFAULT_CARS_PER_HOUR_PER_LANE = 4*2000;
+		final int DEFAULT_CARS_PER_HOUR_PER_LANE = 2000;
 
 		// #1 uni zu stadion
 		currentId = addCommodity(
@@ -204,11 +204,11 @@ public class Plansgenerator {
 				"24 36 29 30 31",currentId);
 		// #12 branitz zu peitz
 		currentId = addCommodity(
-				"642","622",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"642","622",HOME_END_TIME,duration,(int)(0.05*DEFAULT_CARS_PER_HOUR_PER_LANE),
 				"19 50 18 17 16 15",currentId);
 		// #13 peitz zu branitz
 		currentId = addCommodity(
-				"624","644",HOME_END_TIME,duration,(int)(0.1*DEFAULT_CARS_PER_HOUR_PER_LANE),
+				"624","644",HOME_END_TIME,duration,(int)(0.05*DEFAULT_CARS_PER_HOUR_PER_LANE),
 				"15 16 17 18 50 19",currentId);
 		// #14 branitz zu sielow
 		currentId = addCommodity(

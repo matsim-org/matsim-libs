@@ -35,8 +35,8 @@ import org.matsim.vis.otfvis.OTFVisQSim;
 public class CottbusController {
 	
 	public static void main (String[] args) {
-//		String scenario = "cottbus";
-		String scenario = "denver";
+		String scenario = "cottbus";
+//		String scenario = "denver";
 //		String scenario = "portland";
 						
 		String config = "./input/"+scenario+"/config.xml";
