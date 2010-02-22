@@ -46,23 +46,24 @@ public class QNetwork {
 	private final Map<Id, QNode> nodes;
 
 	private final Network networkLayer;
-	
+
 	private final QSim qSim ;
 
 	private final QNetworkFactory<QNode, QLink> queueNetworkFactory;
-	
+
 	public QNetwork(final QSim qs) {
-		this( qs, qs.getScenario().getNetwork(), new DefaultQueueNetworkFactory() ) ; 
+		this( qs, qs.getScenario().getNetwork(), new DefaultQueueNetworkFactory() ) ;
 	}
+
+	@Deprecated // use one of the other constructors
 	public QNetwork(final Network networkLayer2) {
 		this(null, networkLayer2, new DefaultQueueNetworkFactory());
 	}
+
 	public QNetwork(final QSim qs, final QNetworkFactory<QNode, QLink> factory ) {
 		this( qs, qs.getScenario().getNetwork(), factory ) ;
 	}
-	public QNetwork(final Network network, final QNetworkFactory<QNode, QLink> factory ) {
-		this( null, network, factory ) ;
-	}
+
 	private QNetwork(final QSim qs, final Network networkLayer, final QNetworkFactory<QNode, QLink> factory) {
 		this.qSim = qs ;
 		this.networkLayer = networkLayer;
@@ -79,7 +80,7 @@ public class QNetwork {
 			n.init();
 		}
 	}
-	
+
   public Network getNetworkLayer() {
 		return this.networkLayer;
 	}
@@ -114,5 +115,5 @@ public class QNetwork {
 	public QSim getQSim() {
 		return qSim;
 	}
-	
+
 }
