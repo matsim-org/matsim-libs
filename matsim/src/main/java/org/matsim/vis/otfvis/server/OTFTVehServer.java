@@ -29,9 +29,9 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.ptproject.qsim.QNetwork;
@@ -72,14 +72,13 @@ public class OTFTVehServer implements OTFServerRemote {
 
 		Gbl.startMeasurement();
 		ScenarioImpl scenario = new ScenarioImpl();
-
-		NetworkLayer net = scenario.getNetwork();
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(netFileName);
-		QNetwork qnet = new QNetwork(net);
+		QNetwork qnet = new QNetwork(scenario.getNetwork());
 
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		
+
 		OTFQSimServerQuadBuilder quadBuilder = new OTFQSimServerQuadBuilder(qnet);
 
 		this.quad =  quadBuilder.createAndInitOTFServerQuad(connect);
@@ -185,15 +184,18 @@ public class OTFTVehServer implements OTFServerRemote {
 		}
 	}
 
+	@Override
 	public int getLocalTime() throws RemoteException {
 		return (int)this.nextTime;
 	}
 
+	@Override
 	public OTFServerQuad2 getQuad(String id, OTFConnectionManager connect)
 			throws RemoteException {
 		return this.quad;
 	}
 
+	@Override
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
 		this.buf.position(0);
 		this.quad.writeConstData(this.buf);
@@ -204,23 +206,20 @@ public class OTFTVehServer implements OTFServerRemote {
 		return result;
 	}
 
-	public byte[] getQuadDynStateBuffer(String id, Rect bounds)
-			throws RemoteException {
+	@Override
+	public byte[] getQuadDynStateBuffer(String id, Rect bounds) throws RemoteException {
 		if (this.nextTime == -1) {
 			throw new RemoteException("nextTime == -1 in OTFTVehServer");
 		}
 		return this.timesteps.get((int)this.nextTime);
 	}
 
-
-	public byte[] getStateBuffer() throws RemoteException {
-		throw new RemoteException("getStateBuffer not implemented for OTFTVehServer");
-	}
-
+	@Override
 	public boolean isLive() throws RemoteException {
 		return false;
 	}
 
+	@Override
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
 		int lastTime = -1;
 		int foundTime = -1;
@@ -255,6 +254,7 @@ public class OTFTVehServer implements OTFServerRemote {
 		return true;
 	}
 
+	@Override
 	public Collection<Double> getTimeSteps() throws RemoteException {
 		return null;
 	}

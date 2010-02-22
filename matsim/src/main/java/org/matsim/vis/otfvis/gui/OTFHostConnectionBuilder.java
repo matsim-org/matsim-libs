@@ -31,6 +31,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.server.OTFNetworkServer;
 import org.matsim.vis.otfvis.server.OTFTVehServer;
 
 
@@ -41,9 +42,9 @@ import org.matsim.vis.otfvis.server.OTFTVehServer;
 public class OTFHostConnectionBuilder {
 
 	private static final Logger log = Logger.getLogger(OTFHostConnectionBuilder.class);
-	
+
 	private String address;
-	
+
 	private OTFServerRemote host = null;
 
 	public OTFServerRemote createRemoteServerConnection(final String address) throws RemoteException, InterruptedException, NotBoundException{
@@ -85,12 +86,15 @@ public class OTFHostConnectionBuilder {
 			String [] connparse = connection.split("@");
 			this.host = openTVehFile(connparse[1], connparse[0]);
 
+		} else if (type.equals("net")) {
+			this.host = openNetworkFile(connection);
+
 		} else {
 			throw new UnsupportedOperationException("Connctiontype " + type + " not known");
 		}
 		return host;
 	}
-	
+
 	private OTFServerRemote openSSL(String hostname, int port, String servername) throws InterruptedException, RemoteException, NotBoundException {
 		System.setProperty("javax.net.ssl.keyStore", "input/keystore");
 		System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
@@ -137,5 +141,9 @@ public class OTFHostConnectionBuilder {
 	private OTFServerRemote openTVehFile(String netname, String vehname) {
 		return new OTFTVehServer(netname,vehname);
 	}
-	
+
+	private OTFServerRemote openNetworkFile(String netname) {
+		return new OTFNetworkServer(netname);
+	}
+
 }
