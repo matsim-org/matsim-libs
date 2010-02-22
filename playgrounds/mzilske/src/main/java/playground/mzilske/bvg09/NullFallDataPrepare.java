@@ -132,25 +132,26 @@ public class NullFallDataPrepare {
 				if (!edgeTypeIdString.isEmpty()) {
 					IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
 				}
-				ArrayList<Float> tValues = new ArrayList<Float>();
-				for (String letter : Arrays.asList("B", "F", "P", "R", "S", "T", "U", "V")) {
-					String key = "T-OEVSYS(" + letter + ")";
-					String value = row.get(key);
-					if (value != null) {
-						float t = Float.parseFloat(value.substring(0, value.length() - 1));
-						if (t != 0.0) {
-							tValues.add(t);
-						}
-					}
-				}
-				float freespeed;
-				if (tValues.size() == 1) {
-					freespeed = tValues.get(0);
-				} else {
+				
+//				ArrayList<Float> tValues = new ArrayList<Float>();
+//				for (String letter : Arrays.asList("B", "F", "P", "R", "S", "T", "U", "V")) {
+//					String key = "T-OEVSYS(" + letter + ")";
+//					String value = row.get(key);
+//					if (value != null) {
+//						float t = Float.parseFloat(value.substring(0, value.length() - 1));
+//						if (t != 0.0) {
+//							tValues.add(t);
+//						}
+//					}
+//				}
+//				float freespeed;
+//				if (tValues.size() == 1) {
+//					freespeed = tValues.get(0);
+//				} else {
 					// Mehr als einer dieser Werte gesetzt.
-					throw new RuntimeException(tValues.toString());
-				}
-				network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length * 1000, freespeed, 2000, 1);			
+//					throw new RuntimeException(tValues.toString());
+//				}
+				network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length * 1000, FreeSpeedCalculator.calculateFreeSpeedForEdge(row), 2000, 1);			
 			}
 			
 		};
@@ -164,18 +165,18 @@ public class NullFallDataPrepare {
 		converter.setTransitLineFilter(transitLineFilter);
 		// configure how transport modes must be converted
 		// the ones for Berlin
-		converter.registerTransportMode("B", TransportMode.bus);
-		converter.registerTransportMode("F", TransportMode.walk);
-		converter.registerTransportMode("K", TransportMode.bus);
-		converter.registerTransportMode("L", TransportMode.other);
-		converter.registerTransportMode("P", TransportMode.car);
-		converter.registerTransportMode("R", TransportMode.bike);
-		converter.registerTransportMode("S", TransportMode.train);
-		converter.registerTransportMode("T", TransportMode.tram);
-		converter.registerTransportMode("U", TransportMode.train);
-		converter.registerTransportMode("V", TransportMode.other);
-		converter.registerTransportMode("W", TransportMode.bus);
-		converter.registerTransportMode("Z", TransportMode.train);
+		converter.registerTransportMode("B", TransportMode.bus); // Bus Berlin
+		converter.registerTransportMode("F", TransportMode.walk); // Fuss
+//		converter.registerTransportMode("K", TransportMode.bus);
+//		converter.registerTransportMode("L", TransportMode.other);
+		converter.registerTransportMode("P", TransportMode.bus); // Bus Umland
+		converter.registerTransportMode("R", TransportMode.train); // Regionalbahn
+		converter.registerTransportMode("S", TransportMode.train); // S-Bahn
+		converter.registerTransportMode("T", TransportMode.tram); // Tram Berlin
+		converter.registerTransportMode("U", TransportMode.train); // U-Bahn
+		converter.registerTransportMode("V", TransportMode.tram); // Tram Umland
+//		converter.registerTransportMode("W", TransportMode.bus);
+//		converter.registerTransportMode("Z", TransportMode.train);
 		converter.convert();
 	}
 
