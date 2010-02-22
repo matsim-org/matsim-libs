@@ -1,7 +1,9 @@
 package playground.mzilske.bvg09;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -85,10 +87,16 @@ public class HafasReader {
 	private void readFile() {
 		File file = new File(filename);
 		try {
-			Scanner scanner = new Scanner(file);
-			scanner.useDelimiter("\r\n|\n");
-			while (scanner.hasNext()) {
-				processLine(scanner.next());
+			FileReader fileReader = new FileReader(file);
+			BufferedReader br = new BufferedReader(fileReader);
+			try {
+				String line;
+				while((line = br.readLine()) != null) {
+//					System.out.println(line);
+					processLine(line);
+				}
+			} catch (IOException e) {
+				
 			}
 			enterRoute();
 			addLine();
@@ -120,13 +128,13 @@ public class HafasReader {
 			try {
 				arrivalTime = Integer.valueOf(nextLine.substring(29, 33));
 			} catch (NumberFormatException e) {
-				
+//				e.printStackTrace();
 			}
 			Integer departureTime = null;
 			try {
 				departureTime = Integer.valueOf(nextLine.substring(34, 38));
 			} catch (NumberFormatException e) {
-				
+//				e.printStackTrace();
 			}
 			if (departureTime == null) {
 				departureTime = arrivalTime;
