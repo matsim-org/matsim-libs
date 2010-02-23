@@ -443,26 +443,59 @@ public class ASPGeneral {
 		this.stream.println((totalMatsim-totalCounts)/totalCounts*100);
 		
 		this.stream.println();
+		
+		// for scatter charts
+		this.stream.println("\t7-8\t\t8-9\t\t17-18\t\t18-19");
+		this.stream.println("Id\tMATSim\tCounts\tMATSim\tCounts\tMATSim\tCounts\tMATSim\tCounts");
+		for (int key : data.keySet()) {
+			this.stream.print(key+"\t");
+			if (data.get(key).get(7)[0]!=8){
+				log.warn("Wrong 7-8 timings for scatter charts!");
+			}
+			else {
+				this.stream.print(data.get(key).get(7)[1]+"\t"+data.get(key).get(7)[2]+"\t");
+			}
+			if (data.get(key).get(8)[0]!=9){
+				log.warn("Wrong 8-9 timings for scatter charts!");
+			}
+			else {
+				this.stream.print(data.get(key).get(8)[1]+"\t"+data.get(key).get(8)[2]+"\t");
+			}
+			if (data.get(key).get(17)[0]!=18){
+				log.warn("Wrong 17-18 timings for scatter charts!");
+			}
+			else {
+				this.stream.print(data.get(key).get(17)[1]+"\t"+data.get(key).get(17)[2]+"\t");
+			}
+			if (data.get(key).get(18)[0]!=19){
+				log.warn("Wrong 18-19 timings for scatter charts!");
+			}
+			else {
+				this.stream.print(data.get(key).get(18)[1]+"\t"+data.get(key).get(18)[2]+"\t");
+			}
+			this.stream.println();
+		}
+		
 		log.info("done.");
 	}
 	
 	public static void main(final String [] args) {
 		// Scenario files
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
-		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
+		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network_0.7.xml";
 		
 		// Special MZ file so that weights of MZ persons can be read
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 		
 		// Population files
-		final String populationFilenameMATSim = "/home/baug/mfeil/data/runs/0995/output_plans.xml";
-		final String populationFilenameMZ = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
+		final String populationFilenameMATSim = "/home/baug/mfeil/data/runs/0995b_9/ITERS/it.10/10.plans.xml";
+		final String populationFilenameMZ = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mzAS0997b.xml";
 		
 		// Counts file
-		final String counts = "/home/baug/mfeil/data/runs/0995/ITERS/it.50/50.countscompare.txt";
+		final String counts = "/home/baug/mfeil/data/runs/0995b_9/ITERS/it.10/10.countscompare.txt";
 		
 		// Output file
-		final String outputFile = "/home/baug/mfeil/data/runs/0995/ITERS/it.50/50.analysis.xls";	
+		final String outputFile = "/home/baug/mfeil/data/runs/0995b_9/ITERS/it.10/10.analysis.xls";	
 		
 		// Settings
 		final boolean compareWithMZ = true; 
