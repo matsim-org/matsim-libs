@@ -29,13 +29,13 @@ public class JcElement {
 
 	public static enum JcFeatureType {
 		JUNCTION, RAILWAY
-	};
+	}
 	public JcFeatureType featType;
 
 	public static enum JunctionType {
 		JUNCTION, BIFURCATION, RAILWAY_CROSSING, COUNTRY_BORDER_CROSSING,
 		TRAIN_FERRY_CROSSING, INTERNAL_DATASET_BORDER_CROSSING
-	};
+	}
 	public JunctionType juntype;
 
 	public Coordinate c;
@@ -46,12 +46,12 @@ public class JcElement {
 
 	@Override
 	public final String toString() {
-		StringBuffer str = new StringBuffer();
-		str.append(this.getClass().getSimpleName()); str.append(':');
-		str.append("id="); str.append(id); str.append(';');
-		str.append("featType="); str.append(featType); str.append(';');
-		str.append("juntype="); str.append(juntype); str.append(';');
-		str.append("c="); str.append(c); str.append(';');
+		StringBuffer str = new StringBuffer(50);
+		str.append(this.getClass().getSimpleName()).append(':');
+		str.append("id=").append(id).append(';');
+		str.append("featType=").append(featType).append(';');
+		str.append("juntype=").append(juntype).append(';');
+		str.append("c=").append(c).append(';');
 		return str.toString();
 	}
 }

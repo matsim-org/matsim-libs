@@ -21,9 +21,9 @@
 package playground.balmermi.teleatlas;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -37,22 +37,28 @@ public class NetworkReaderTeleatlas45v101Test {
 	public void testJcElement() {
 		log.info(new JcElement());
 	}
-	
+
 	@Test
 	public void testNwElement() {
 		log.info(new NwElement());
 	}
-	
+
 	@Test
 	public void testJunctionParser() throws IOException {
-		NetworkReaderTeleatlas45v101 reader = new NetworkReaderTeleatlas45v101();
-		Map<Long,JcElement> junctions = reader.parseJc("D:/balmermi/My Documents/axonActive/Servers/Raumdaten/Geodaten/TeleAtlas/02_Base/02_Raw/che/che/jc.shp");
+		TeleatlasData data = new TeleatlasData();
+		NetworkReaderTeleatlas45v101 reader = new NetworkReaderTeleatlas45v101(data);
+		Assert.assertEquals(0, data.junctionElements.size());
+		reader.parseJc("D:/balmermi/My Documents/axonActive/Servers/Raumdaten/Geodaten/TeleAtlas/02_Base/02_Raw/che/che/jc.shp");
+		Assert.assertTrue(data.junctionElements.size() > 0);
 	}
 
 	@Test
 	public void testNetworkParser() throws IOException {
-		NetworkReaderTeleatlas45v101 reader = new NetworkReaderTeleatlas45v101();
-		Map<Long,JcElement> junctions = reader.parseJc("D:/balmermi/My Documents/axonActive/Servers/Raumdaten/Geodaten/TeleAtlas/02_Base/02_Raw/che/che/jc.shp");
-		Map<Long,NwElement> netElements = reader.parseNw("D:/balmermi/My Documents/axonActive/Servers/Raumdaten/Geodaten/TeleAtlas/02_Base/02_Raw/che/che/nw.shp",junctions);
+		TeleatlasData data = new TeleatlasData();
+		NetworkReaderTeleatlas45v101 reader = new NetworkReaderTeleatlas45v101(data);
+		reader.parseJc("D:/balmermi/My Documents/axonActive/Servers/Raumdaten/Geodaten/TeleAtlas/02_Base/02_Raw/che/che/jc.shp");
+		Assert.assertEquals(0, data.networkElements.size());
+		reader.parseNw("D:/balmermi/My Documents/axonActive/Servers/Raumdaten/Geodaten/TeleAtlas/02_Base/02_Raw/che/che/nw.shp");
+		Assert.assertTrue(data.networkElements.size() > 0);
 	}
 }

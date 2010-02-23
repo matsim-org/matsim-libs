@@ -21,7 +21,6 @@
 package playground.balmermi.teleatlas;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -32,9 +31,14 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import playground.balmermi.teleatlas.JcElement.JcFeatureType;
 import playground.balmermi.teleatlas.JcElement.JunctionType;
 import playground.balmermi.teleatlas.NwElement.FerryType;
+import playground.balmermi.teleatlas.NwElement.FormOfWay;
+import playground.balmermi.teleatlas.NwElement.Freeway;
 import playground.balmermi.teleatlas.NwElement.FunctionalRoadClass;
 import playground.balmermi.teleatlas.NwElement.NetTwoClass;
 import playground.balmermi.teleatlas.NwElement.NwFeatureType;
+import playground.balmermi.teleatlas.NwElement.OneWay;
+import playground.balmermi.teleatlas.NwElement.PrivateRoad;
+import playground.balmermi.teleatlas.NwElement.SpeedCategory;
 
 /**
  * <p>
@@ -52,8 +56,9 @@ import playground.balmermi.teleatlas.NwElement.NwFeatureType;
  * <li><strong>rr.shp</strong>: railways shape file</li>
  * </ul>
  * </p>
- * 
+ *
  * @author balmermi
+ * @author mrieser
  */
 public class NetworkReaderTeleatlas45v101 {
 
@@ -62,12 +67,14 @@ public class NetworkReaderTeleatlas45v101 {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(NetworkReaderTeleatlas45v101.class);
-	
+
+	private final TeleatlasData data;
+
 	/**
 	 * Feature Identification attribute of junction shape file
 	 */
 	private static final String JC_ID_NAME = "ID";
-	
+
 	/**
 	 * Feature Type attribute of junction shape file
 	 * <ul>
@@ -103,7 +110,7 @@ public class NetworkReaderTeleatlas45v101 {
 	 * </ul>
 	 */
 	private static final String NW_FEATTYP_NAME = "FEATTYP";
-	
+
 	/**
 	 * Ferry Type attribute of network shape file
 	 * <ul>
@@ -118,7 +125,7 @@ public class NetworkReaderTeleatlas45v101 {
 	 * From (Start) Junction Identification attribute of network shape file
 	 */
 	private static final String NW_FJNCTID_NAME = "F_JNCTID";
-	
+
 	/**
 	 * To (End) Junction Identification attribute of network shape file
 	 */
@@ -198,7 +205,7 @@ public class NetworkReaderTeleatlas45v101 {
 	 * </ul>
 	 */
 	private static final String NW_FREEWAY_NAME = "FREEWAY";
-	
+
 	/**
 	 * Private Road attribute of network shape file
 	 * <ul>
@@ -214,18 +221,7 @@ public class NetworkReaderTeleatlas45v101 {
 	 * </p>
 	 */
 	private static final String NW_PRIVATERD_NAME = "PRIVATERD";
-	
-	/**
-	 * Construction status attribute of network shape file
-	 * <ul>
-	 * <li><code>[Blank]</code>: Not under Construction (default)</li>
-	 * <li><code>FT</code>: Construction in positive Direction</li>
-	 * <li><code>N</code>: Construction in both Direction</li>
-	 * <li><code>TF</code>: Construction in negative Direction</li>
-	 * </ul>
-	 */
-	private static final String NW_CONSTATUS_NAME = "CONSTATUS";
-	
+
 	/**
 	 * Direction of Traffic Flow attribute of network shape file
 	 * <ul>
@@ -236,11 +232,6 @@ public class NetworkReaderTeleatlas45v101 {
 	 * </ul>
 	 */
 	private static final String NW_ONEWAY_NAME = "ONEWAY";
-
-	/**
-	 * Calculated average Speed (kilometers per hour) attribute of network shape file
-	 */
-	private static final String NW_SPEED_NAME = "KPH";
 
 	/**
 	 * Number of Lanes attribute of network shape file
@@ -261,19 +252,23 @@ public class NetworkReaderTeleatlas45v101 {
 	 * </ul>
 	 */
 	private static final String NW_SPEEDCAT_NAME = "SPEEDCAT";
-	
-	private static final String RR_ID_NAME = "ID";
-	private static final String RR_FJNCTID_NAME = "F_JNCTID";
-	private static final String RR_TJNCTID_NAME = "T_JNCTID";
-	private static final String RR_METERS_NAME = "METERS";
-	
+
+//	private static final String RR_ID_NAME = "ID";
+//	private static final String RR_FJNCTID_NAME = "F_JNCTID";
+//	private static final String RR_TJNCTID_NAME = "T_JNCTID";
+//	private static final String RR_METERS_NAME = "METERS";
+
 	//////////////////////////////////////////////////////////////////////
 	// methods
 	//////////////////////////////////////////////////////////////////////
-	
+
+	public NetworkReaderTeleatlas45v101(final TeleatlasData data) {
+		this.data = data;
+	}
+
 	/**
 	 * Extracts the Junction id from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet junction shape file (jc)
 	 * @return junction id as a Long
 	 * @throws IllegalArgumentException if no id is defined.
@@ -286,7 +281,7 @@ public class NetworkReaderTeleatlas45v101 {
 
 	/**
 	 * Extracts the Junction feature type from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet junction shape file (jc)
 	 * @return feature type
 	 * @throws IllegalArgumentException if the value is unknown (see {@link #JC_FEATTYP_NAME})
@@ -294,34 +289,34 @@ public class NetworkReaderTeleatlas45v101 {
 	private static final JcFeatureType extractJcFeatureType(final Feature f) {
 		int feattyp = Integer.parseInt(f.getAttribute(JC_FEATTYP_NAME).toString());
 		switch (feattyp) {
-		case 4120: return JcElement.JcFeatureType.JUNCTION;
-		case 4220: return JcElement.JcFeatureType.RAILWAY;
-		default: throw new IllegalArgumentException("At feature id '"+f.getID()+"': "+JC_FEATTYP_NAME+"="+feattyp+" not allowed.");
+			case 4120: return JcElement.JcFeatureType.JUNCTION;
+			case 4220: return JcElement.JcFeatureType.RAILWAY;
+			default: throw new IllegalArgumentException("At feature id '"+f.getID()+"': "+JC_FEATTYP_NAME+"="+feattyp+" not allowed.");
 		}
 	}
 
 	/**
 	 * Extracts the Junction junction type from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet junction shape file (jc)
 	 * @return junction type
 	 */
 	private static final JunctionType extractJcJunctionType(final Feature f) {
 		int jncttyp = Integer.parseInt(f.getAttribute(JC_JNCTTYP_NAME).toString());
 		switch (jncttyp) {
-		case 0: return JcElement.JunctionType.JUNCTION;
-		case 2: return JcElement.JunctionType.BIFURCATION;
-		case 3: return JcElement.JunctionType.RAILWAY_CROSSING;
-		case 4: return JcElement.JunctionType.COUNTRY_BORDER_CROSSING;
-		case 5: return JcElement.JunctionType.TRAIN_FERRY_CROSSING;
-		case 6: return JcElement.JunctionType.INTERNAL_DATASET_BORDER_CROSSING;
-		default: return JcElement.JunctionType.JUNCTION;
+			case 0: return JcElement.JunctionType.JUNCTION;
+			case 2: return JcElement.JunctionType.BIFURCATION;
+			case 3: return JcElement.JunctionType.RAILWAY_CROSSING;
+			case 4: return JcElement.JunctionType.COUNTRY_BORDER_CROSSING;
+			case 5: return JcElement.JunctionType.TRAIN_FERRY_CROSSING;
+			case 6: return JcElement.JunctionType.INTERNAL_DATASET_BORDER_CROSSING;
+			default: return JcElement.JunctionType.JUNCTION;
 		}
 	}
 
 	/**
 	 * Extracts the Network id from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet network shape file (nw)
 	 * @return network id as a Long
 	 * @throws IllegalArgumentException if no id is defined.
@@ -334,7 +329,7 @@ public class NetworkReaderTeleatlas45v101 {
 
 	/**
 	 * Extracts the Network feature type from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet network shape file (nw)
 	 * @return feature type
 	 * @throws IllegalArgumentException if the value is unknown (see {@link #NW_FEATTYP_NAME})
@@ -342,68 +337,64 @@ public class NetworkReaderTeleatlas45v101 {
 	private static final NwFeatureType extractNwFeatureType(final Feature f) {
 		int feattyp = Integer.parseInt(f.getAttribute(NW_FEATTYP_NAME).toString());
 		switch (feattyp) {
-		case 4110: return NwElement.NwFeatureType.ROAD_ELEMENT;
-		case 4130: return NwElement.NwFeatureType.FERRY_CONNECTION;
-		case 4165: return NwElement.NwFeatureType.ADDRESS_AREA_BOUNDARY;
-		default: throw new IllegalArgumentException("At feature id '"+f.getID()+"': "+NW_FEATTYP_NAME+"="+feattyp+" not allowed.");
+			case 4110: return NwElement.NwFeatureType.ROAD_ELEMENT;
+			case 4130: return NwElement.NwFeatureType.FERRY_CONNECTION;
+			case 4165: return NwElement.NwFeatureType.ADDRESS_AREA_BOUNDARY;
+			default: throw new IllegalArgumentException("At feature id '"+f.getID()+"': "+NW_FEATTYP_NAME+"="+feattyp+" not allowed.");
 		}
 	}
 
 	/**
 	 * Extracts the Network ferry type from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet network shape file (nw)
 	 * @return ferry type
 	 */
 	private static final FerryType extractNwFerryType(final Feature f) {
 		int ferrytype = Integer.parseInt(f.getAttribute(NW_FT_NAME).toString());
 		switch (ferrytype) {
-		case 0: return NwElement.FerryType.NO_FERRY;
-		case 1: return NwElement.FerryType.SHIP_HOVERCRAFT;
-		case 2: return NwElement.FerryType.TRAIN;
-		default: return NwElement.FerryType.NO_FERRY;
+			case 0: return NwElement.FerryType.NO_FERRY;
+			case 1: return NwElement.FerryType.SHIP_HOVERCRAFT;
+			case 2: return NwElement.FerryType.TRAIN;
+			default: return NwElement.FerryType.NO_FERRY;
 		}
 	}
 
 	/**
 	 * Extracts the Network from (start) junction identification from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet network shape file (nw)
-	 * @param junctions contains the map of given junctions (usually based on the corresponding junction shape file 'jc' created via {@link #parseJc(String)})
 	 * @return from junction as an {@link JcElement}
 	 * @throws IllegalArgumentException if no id is defined or junction is not part of the junction map.
 	 */
-	private static final JcElement extractNwFromJunction(final Feature f, final Map<Long,JcElement> junctions) {
-		if (junctions == null) { throw new IllegalArgumentException("No junction map given."); }
+	private final JcElement extractNwFromJunction(final Feature f) {
 		Object fromId = f.getAttribute(NW_FJNCTID_NAME);
 		if (fromId == null) { throw new IllegalArgumentException("At feature id '"+f.getID()+"': No "+NW_FJNCTID_NAME+" given."); }
 		Long id = new Long(fromId.toString());
-		JcElement j = junctions.get(id);
+		JcElement j = this.data.junctionElements.get(id);
 		if (j == null) { throw new IllegalArgumentException("At feature id '"+f.getID()+"' and from junction id '"+id+"': no entry found in junctions."); }
 		return j;
 	}
 
 	/**
 	 * Extracts the Network to (end) junction identification from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet network shape file (nw)
-	 * @param junctions contains the map of given junctions (usually based on the corresponding junction shape file 'jc' created via {@link #parseJc(String)})
 	 * @return to junction as an {@link JcElement}
 	 * @throws IllegalArgumentException if no id is defined or junction is not part of the junction map.
 	 */
-	private static final JcElement extractNwToJunction(final Feature f, final Map<Long,JcElement> junctions) {
-		if (junctions == null) { throw new IllegalArgumentException("No junction map given."); }
+	private final JcElement extractNwToJunction(final Feature f) {
 		Object toId = f.getAttribute(NW_TJNCTID_NAME);
 		if (toId == null) { throw new IllegalArgumentException("At feature id '"+f.getID()+"': No "+NW_TJNCTID_NAME+" given."); }
 		Long id = new Long(toId.toString());
-		JcElement j = junctions.get(id);
+		JcElement j = this.data.junctionElements.get(id);
 		if (j == null) { throw new IllegalArgumentException("At feature id '"+f.getID()+"' and to junction id '"+id+"': no entry found in junctions."); }
 		return j;
 	}
 
 	/**
 	 * Extracts the Network length from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet network shape file (nw)
 	 * @return length id as a Double
 	 * @throws IllegalArgumentException if length is <= 0.0.
@@ -416,7 +407,7 @@ public class NetworkReaderTeleatlas45v101 {
 
 	/**
 	 * Extracts the Network functional road class from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet network shape file (nw)
 	 * @return functional road class
 	 * @throws IllegalArgumentException if the value is unknown (see {@link #NW_FRC_NAME})
@@ -424,106 +415,212 @@ public class NetworkReaderTeleatlas45v101 {
 	private static final FunctionalRoadClass extractNwFRC(final Feature f) {
 		int frc = Integer.parseInt(f.getAttribute(NW_FRC_NAME).toString());
 		switch (frc) {
-		case -1: return NwElement.FunctionalRoadClass.UNDEFINED;
-		case 0: return NwElement.FunctionalRoadClass.MOTORWAY;
-		case 1: return NwElement.FunctionalRoadClass.MAJOR_ROAD_HIGH;
-		case 2: return NwElement.FunctionalRoadClass.MAJOR_ROAD_LOW;
-		case 3: return NwElement.FunctionalRoadClass.SECONDARY_ROAD;
-		case 4: return NwElement.FunctionalRoadClass.LOCAL_CONNECTING_ROAD;
-		case 5: return NwElement.FunctionalRoadClass.LOCAL_ROAD_HIGH;
-		case 6: return NwElement.FunctionalRoadClass.LOCAL_ROAD_MEDIUM;
-		case 7: return NwElement.FunctionalRoadClass.LOCAL_ROAD_LOW;
-		case 8: return NwElement.FunctionalRoadClass.OTHER_ROAD;
-		default: throw new IllegalArgumentException("At feature id '"+f.getID()+"': "+NW_FRC_NAME+"="+frc+" not allowed.");
+			case -1: return NwElement.FunctionalRoadClass.UNDEFINED;
+			case 0: return NwElement.FunctionalRoadClass.MOTORWAY;
+			case 1: return NwElement.FunctionalRoadClass.MAJOR_ROAD_HIGH;
+			case 2: return NwElement.FunctionalRoadClass.MAJOR_ROAD_LOW;
+			case 3: return NwElement.FunctionalRoadClass.SECONDARY_ROAD;
+			case 4: return NwElement.FunctionalRoadClass.LOCAL_CONNECTING_ROAD;
+			case 5: return NwElement.FunctionalRoadClass.LOCAL_ROAD_HIGH;
+			case 6: return NwElement.FunctionalRoadClass.LOCAL_ROAD_MEDIUM;
+			case 7: return NwElement.FunctionalRoadClass.LOCAL_ROAD_LOW;
+			case 8: return NwElement.FunctionalRoadClass.OTHER_ROAD;
+			default: throw new IllegalArgumentException("At feature id '"+f.getID()+"': "+NW_FRC_NAME+"="+frc+" not allowed.");
 		}
 	}
 
 	/**
 	 * Extracts the Network net 2 class from the given {@link Feature} object.
-	 * 
+	 *
 	 * @param f is a feature of the Tele Atlas MultiNet network shape file (nw)
 	 * @return net 2 class
 	 */
 	private static final NetTwoClass extractNwNet2Class(final Feature f) {
 		int n2c = Integer.parseInt(f.getAttribute(NW_NET2CLASS_NAME).toString());
 		switch (n2c) {
-		case -1: return NwElement.NetTwoClass.UNDEFINED;
-		case 0: return NwElement.NetTwoClass.MOTORWAY;
-		case 1: return NwElement.NetTwoClass.MAIN_AXIS;
-		case 2: return NwElement.NetTwoClass.CONNECTION_AXIS_HIGH;
-		case 3: return NwElement.NetTwoClass.CONNECTION_AXIS_LOW;
-		case 4: return NwElement.NetTwoClass.COUNTRYSIDE_LOCAL_ROAD_LOW;
-		case 5: return NwElement.NetTwoClass.PARKING_ACCESS_ROAD;
-		case 6: return NwElement.NetTwoClass.RESTRICTED_PEDESTRIAN;
-		default: return NwElement.NetTwoClass.UNDEFINED;
+			case -1: return NwElement.NetTwoClass.UNDEFINED;
+			case 0: return NwElement.NetTwoClass.MOTORWAY;
+			case 1: return NwElement.NetTwoClass.MAIN_AXIS;
+			case 2: return NwElement.NetTwoClass.CONNECTION_AXIS_HIGH;
+			case 3: return NwElement.NetTwoClass.CONNECTION_AXIS_LOW;
+			case 4: return NwElement.NetTwoClass.COUNTRYSIDE_LOCAL_ROAD_LOW;
+			case 5: return NwElement.NetTwoClass.PARKING_ACCESS_ROAD;
+			case 6: return NwElement.NetTwoClass.RESTRICTED_PEDESTRIAN;
+			default: return NwElement.NetTwoClass.UNDEFINED;
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// parse methods
-	//////////////////////////////////////////////////////////////////////
-
-	/**
-	 * parsing and extracting junction features 
-	 * @param jcShpFileName defines the path and name of the Tele Atlas MultiNet junction shape file (jc)
-	 * @return the map of id-unique junction elements
-	 * @throws IOException
-	 * @throws RuntimeException if the junction shape file does not respect uniqueness of junction feature identification attribute
-	 */
-	public final Map<Long,JcElement> parseJc(final String jcShpFileName) throws IOException, RuntimeException {
-		log.info("creating data structure from Tele Atlas MultiNet junction shape file '"+jcShpFileName+"'...");
-		Map<Long,JcElement> map = new HashMap<Long,JcElement>();
-
-		FeatureSource fs = ShapeFileReader.readDataFile(jcShpFileName);
-		for (Object o : fs.getFeatures()) {
-			Feature f = (Feature)o;
-
-			JcElement e = new JcElement();
-			e.c = f.getBounds().centre();
-			e.id = extractJcFeatureIdentification(f);
-			e.featType = extractJcFeatureType(f);
-			e.juntype = extractJcJunctionType(f);
-			
-			if (map.containsKey(e.id)) { throw new RuntimeException("id="+e.id+" already exists."); }
-			map.put(e.id,e);
-		}
-		log.info("=> "+map.size()+" elements parsed.");
-		log.info("done.");
-		return map;
+	private static final OneWay extractOneWay(final Feature f) {
+		String oneway = f.getAttribute(NW_ONEWAY_NAME).toString();
+		if ("FT".equals(oneway)) {
+			return OneWay.OPEN_FT;
+		} else if ("TF".equals(oneway)) {
+			return OneWay.OPEN_TF;
+		} else if ("N".equals(oneway)) {
+			return OneWay.CLOSED;
+		} else return OneWay.OPEN;
 	}
 
-	/**
-	 * parsing and extracting network features 
-	 * @param nwShpFileName defines the path and name of the Tele Atlas MultiNet network shape file (nw)
-	 * @param junctions holds the map of junction elements (usually based on the corresponding junction shape file 'jc' created via {@link #parseJc(String)})
-	 * @return the map of id-unique network elements
-	 * @throws IOException
-	 * @throws RuntimeException if the network shape file does not respect
-	 * uniqueness of network feature identification attribute or if from- or to-junction is not found
-	 */
-	public final Map<Long,NwElement> parseNw(final String nwShpFileName, final Map<Long,JcElement> junctions) throws IOException, RuntimeException {
-		log.info("creating data structure from Tele Atlas MultiNet network shape file '"+nwShpFileName+"'...");
-		Map<Long,NwElement> map = new HashMap<Long,NwElement>();
-
-		FeatureSource fs = ShapeFileReader.readDataFile(nwShpFileName);
-		for (Object o : fs.getFeatures()) {
-			Feature f = (Feature)o;
-
-			NwElement e = new NwElement();
-			e.id = extractNwFeatureIdentification(f);
-			e.featType = extractNwFeatureType(f);
-			e.ferryType = extractNwFerryType(f);
-			e.fromJunction = extractNwFromJunction(f,junctions);
-			e.toJunction = extractNwToJunction(f,junctions);
-			e.length = extractNwFeatureLength(f);
-			e.frc = extractNwFRC(f);
-			e.net2Class = extractNwNet2Class(f);
-			
-			if (map.containsKey(e.id)) { throw new RuntimeException("id="+e.id+" already exists."); }
-			map.put(e.id,e);
+	private static final SpeedCategory extractSpeedCategory(final Feature f) {
+		int cat = Integer.parseInt(f.getAttribute(NW_SPEEDCAT_NAME).toString());
+		switch (cat) {
+			case 1:
+				return SpeedCategory.GT130;
+			case 2:
+				return SpeedCategory.R101_130;
+			case 3:
+				return SpeedCategory.R91_100;
+			case 4:
+				return SpeedCategory.R71_90;
+			case 5:
+				return SpeedCategory.R51_70;
+			case 6:
+				return SpeedCategory.R31_50;
+			case 7:
+				return SpeedCategory.R11_30;
+			case 8:
+				return SpeedCategory.LT11;
+			default:
+				return SpeedCategory.OTHER;
 		}
-		log.info("=> "+map.size()+" elements parsed.");
-		log.info("done.");
-		return map;
 	}
+
+	private static final Integer extractNumberOfLanes(final Feature f) {
+		return Integer.valueOf(f.getAttribute(NW_LANES_NAME).toString());
+	}
+
+	private static final Freeway extractFreeway(final Feature f) {
+		int freeway = Integer.parseInt(f.getAttribute(NW_FREEWAY_NAME).toString());
+		switch (freeway) {
+			case 0:
+				return Freeway.NO_FREEWAY;
+			case 1:
+				return Freeway.FREEWAY;
+			default:
+				throw new IllegalArgumentException("At feature id '"+f.getID()+"': "+NW_FREEWAY_NAME+"="+freeway+" not allowed.");
+		}
+	}
+
+	private static final FormOfWay extractFormOfWay(final Feature f) {
+		int fow = Integer.parseInt(f.getAttribute(NW_FOW_NAME).toString());
+		switch (fow) {
+			case -1:
+				return FormOfWay.UNDEFINED;
+			case 1:
+				return FormOfWay.MOTORWAY;
+			case 2:
+				return FormOfWay.MULTI_CARRIAGEWAY;
+			case 3:
+				return FormOfWay.SINGLE_CARRIAGEWAY;
+			case 4:
+				return FormOfWay.ROUNDABOUT;
+			case 6:
+				return FormOfWay.ETA_PARKING_PLACE;
+			case 7:
+				return FormOfWay.ETA_PARKING_GARAGE;
+			case 8:
+				return FormOfWay.ETA_UNSTRUCT_TRAFFIC_SQUARE;
+			case 10:
+				return FormOfWay.SLIP_ROAD;
+			case 11:
+				return FormOfWay.SERVICE_ROAD;
+			case 12:
+				return FormOfWay.ENTRANCE_EXIT_CARPARK;
+			case 14:
+				return FormOfWay.PEDESTRIAN_ZONE;
+			case 15:
+				return FormOfWay.WALKWAY;
+			case 17:
+				return FormOfWay.SPECIAL_TRAFFIC_FIGURES;
+			case 20:
+				return FormOfWay.AUTHORITIES;
+			case 21:
+				return FormOfWay.CONNECTOR;
+			case 22:
+				return FormOfWay.CUL_DE_SAC;
+			default:
+				throw new IllegalArgumentException("At feature id '"+f.getID()+"': "+NW_FOW_NAME+"="+fow+" not allowed.");
+		}
+	}
+
+	private final static PrivateRoad extractPrivateRoad(final Feature f) {
+		int pr = Integer.parseInt(f.getAttribute(NW_PRIVATERD_NAME).toString());
+		if (pr == 0) {
+			return PrivateRoad.NO_SPECIAL_RESTRICTION;
+		}
+		return PrivateRoad.SPECIAL_RESTRICTION;
+	}
+
+//////////////////////////////////////////////////////////////////////
+// parse methods
+//////////////////////////////////////////////////////////////////////
+
+/**
+ * parsing and extracting junction features
+ * @param jcShpFileName defines the path and name of the Tele Atlas MultiNet junction shape file (jc)
+ * @throws IOException
+ * @throws RuntimeException if the junction shape file does not respect uniqueness of junction feature identification attribute
+ */
+public final void parseJc(final String jcShpFileName) throws IOException, RuntimeException {
+	log.info("creating data structure from Tele Atlas MultiNet junction shape file '"+jcShpFileName+"'...");
+	Map<Long,JcElement> map = this.data.junctionElements;
+
+	FeatureSource fs = ShapeFileReader.readDataFile(jcShpFileName);
+	for (Object o : fs.getFeatures()) {
+		Feature f = (Feature)o;
+
+		JcElement e = new JcElement();
+		e.c = f.getBounds().centre();
+		e.id = extractJcFeatureIdentification(f);
+		e.featType = extractJcFeatureType(f);
+		e.juntype = extractJcJunctionType(f);
+
+		if (map.containsKey(e.id)) { throw new RuntimeException("id="+e.id+" already exists."); }
+		map.put(e.id,e);
+	}
+	log.info("=> "+map.size()+" elements parsed.");
+	log.info("done.");
+}
+
+/**
+ * parsing and extracting network features, requires junctions to be loaded already
+ * @param nwShpFileName defines the path and name of the Tele Atlas MultiNet network shape file (nw)
+ * @throws IOException
+ * @throws RuntimeException if the network shape file does not respect
+ * uniqueness of network feature identification attribute or if from- or to-junction is not found
+ */
+public final void parseNw(final String nwShpFileName) throws IOException, RuntimeException {
+	log.info("creating data structure from Tele Atlas MultiNet network shape file '"+nwShpFileName+"'...");
+	if (this.data.junctionElements == null) {
+		throw new IllegalArgumentException("No junction map given.");
+	}
+
+	Map<Long,NwElement> map = this.data.networkElements;
+
+	FeatureSource fs = ShapeFileReader.readDataFile(nwShpFileName);
+	for (Object o : fs.getFeatures()) {
+		Feature f = (Feature)o;
+
+		NwElement e = new NwElement();
+		e.id = extractNwFeatureIdentification(f);
+		e.featType = extractNwFeatureType(f);
+		e.ferryType = extractNwFerryType(f);
+		e.fromJunction = extractNwFromJunction(f);
+		e.toJunction = extractNwToJunction(f);
+		e.length = extractNwFeatureLength(f);
+		e.frc = extractNwFRC(f);
+		e.net2Class = extractNwNet2Class(f);
+		e.oneway = extractOneWay(f);
+		e.speedCat = extractSpeedCategory(f);
+		e.freeway = extractFreeway(f);
+		e.nOfLanes = extractNumberOfLanes(f);
+		e.fow = extractFormOfWay(f);
+		e.privat = extractPrivateRoad(f);
+
+		if (map.containsKey(e.id)) { throw new RuntimeException("id="+e.id+" already exists."); }
+		map.put(e.id,e);
+	}
+	log.info("=> "+map.size()+" elements parsed.");
+	log.info("done.");
+}
 }

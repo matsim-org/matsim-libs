@@ -1,0 +1,309 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.balmermi.teleatlas;
+
+import java.io.IOException;
+import java.util.EnumSet;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.core.utils.misc.Counter;
+
+import playground.balmermi.teleatlas.NwElement.NwFeatureType;
+import playground.balmermi.teleatlas.NwElement.OneWay;
+
+import com.vividsolutions.jts.geom.Coordinate;
+
+/**
+ * Converts the data from a Tele Atlas network according to the specifications detailed in
+ * <em>Tele Atlas MultiNet Shapefile 4.5 Format Specifications Version Final v1.0.1, June 2009</em>
+ * into a MATSim compatible network.
+ *
+ * @author mrieser
+ * @author balmermi
+ */
+public class TeleatlasConverter45v101 {
+
+	private final static Logger log = Logger.getLogger(TeleatlasConverter45v101.class);
+
+	private final Scenario scenario;
+	private final Network network;
+	private final Counter nodeCounter = new Counter("Node #");
+	private final Counter linkCounter = new Counter("Link #");
+	private CoordinateTransformation coordTransform = new IdentityTransformation();
+
+	private final TeleatlasData data;
+
+	public TeleatlasConverter45v101(final Scenario scenario, final TeleatlasData data) {
+		this.scenario = scenario;
+		this.network = scenario.getNetwork();
+		this.data = data;
+	}
+
+	/**
+	 * Sets the Coordinate Transformation to be applied when converting data. By default,
+	 * the data from the Tele Atlas network is in WGS84.
+	 *
+	 * @param transformation if <code>null</code>, an {@link IdentityTransformation} is used
+	 */
+	public void setCoordinateTransformation(final CoordinateTransformation transformation) {
+		if (transformation == null) {
+			this.coordTransform = new IdentityTransformation();
+		} else {
+			this.coordTransform = transformation;
+		}
+	}
+
+	public void convertToNetwork() {
+		for (NwElement nwElement : this.data.networkElements.values()) {
+			if (NwFeatureType.ADDRESS_AREA_BOUNDARY.equals(nwElement.featType)) {
+				continue;
+			}
+			boolean createFTElement = true;
+			boolean createTFElement = true;
+
+			double length = nwElement.length.doubleValue();
+
+			Set<TransportMode> modesFT = getModesFT(nwElement);
+			Set<TransportMode> modesTF = getModesTF(nwElement);
+
+			double freespeed = getFreespeed(nwElement);
+			double nOfLanes = getNOfLanes(nwElement);
+			double capacity = getFlowCapacity(nwElement);
+
+			// find out if we need to create the links
+			if (modesFT.isEmpty()) {
+				createFTElement = false;
+			}
+			if (modesTF.isEmpty()) {
+				createTFElement = false;
+			}
+
+			// create the links
+			if (createFTElement) {
+				Link link = createLink(nwElement, "FT");
+				setLinkLength(link, length);
+				link.setCapacity(capacity);
+				link.setFreespeed(freespeed);
+				link.setNumberOfLanes(nOfLanes);
+				link.setAllowedModes(modesFT);
+			}
+			if (createTFElement) {
+				Link link = createLink(nwElement, "TF");
+				setLinkLength(link, length);
+				link.setCapacity(capacity);
+				link.setFreespeed(freespeed);
+				link.setNumberOfLanes(nOfLanes);
+				link.setAllowedModes(modesTF);
+			}
+		}
+	}
+
+	private Set<TransportMode> getModesFT(final NwElement nwElement) {
+		Set<TransportMode> modes = EnumSet.of(TransportMode.car, TransportMode.walk);
+
+		if ((OneWay.CLOSED.equals(nwElement.oneway) || OneWay.OPEN_TF.equals(nwElement.oneway))) {
+			modes.remove(TransportMode.car);
+		}
+
+		if (NwElement.Freeway.FREEWAY.equals(nwElement.freeway)) {
+			modes.remove(TransportMode.walk);
+		}
+		return modes;
+	}
+
+	private Set<TransportMode> getModesTF(final NwElement nwElement) {
+		Set<TransportMode> modes = EnumSet.of(TransportMode.car, TransportMode.walk);
+
+		if ((OneWay.CLOSED.equals(nwElement.oneway) || OneWay.OPEN_FT.equals(nwElement.oneway))) {
+			modes.remove(TransportMode.car);
+		}
+
+		if (NwElement.Freeway.FREEWAY.equals(nwElement.freeway)) {
+			modes.remove(TransportMode.walk);
+		}
+
+		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
+			modes.remove(TransportMode.walk);
+		}
+
+		return modes;
+	}
+
+	private double getFreespeed(final NwElement nwElement) {
+		switch (nwElement.speedCat) {
+			case LT11:
+				return 5.0 / 3.6;
+			case R11_30:
+				return 10.0 / 3.6;
+			case R31_50:
+				return 30.0 / 3.6;
+			case R51_70:
+				return 50.0 / 3.6;
+			case R71_90:
+				return 70.0 / 3.6;
+			case R91_100:
+				return 90.0 / 3.6;
+			case R101_130:
+				return 100.0 / 3.6;
+			case GT130:
+				return 110.0 / 3.6;
+		}
+		throw new IllegalArgumentException("It seems not all possible cases were covered.");
+	}
+
+	private int getNOfLanes(final NwElement nwElement) {
+		int nOfLanes = nwElement.nOfLanes.intValue();
+
+		switch (nwElement.frc) {
+			case MOTORWAY:
+				if (nOfLanes == 0) {
+					nOfLanes = 2;
+				}
+				break;
+			case MAJOR_ROAD_HIGH: // fall-through
+			case MAJOR_ROAD_LOW:
+				nOfLanes = 1;
+				break;
+			default:
+				nOfLanes = 1;
+				break;
+		}
+		return nOfLanes;
+	}
+
+	private double getFlowCapacity(final NwElement nwElement) {
+		int nOfLanes = getNOfLanes(nwElement);
+
+		switch (nwElement.frc) {
+			case MOTORWAY:
+			case MAJOR_ROAD_HIGH:
+			case MAJOR_ROAD_LOW:
+				return 2000.0 * nOfLanes;
+			case SECONDARY_ROAD:
+			case LOCAL_CONNECTING_ROAD:
+			case LOCAL_ROAD_HIGH:
+			case LOCAL_ROAD_MEDIUM:
+			case LOCAL_ROAD_LOW:
+				return 1000.0 * nOfLanes;
+			case OTHER_ROAD:
+			case UNDEFINED:
+				return 500.0 * nOfLanes;
+		}
+		throw new IllegalArgumentException("It seems not all possible cases were covered.");
+	}
+
+	private Link createLink(NwElement nwElement, String direction) {
+		JcElement fromJunction;
+		JcElement toJunction;
+		if ("FT".equals(direction)) {
+			fromJunction = nwElement.fromJunction;
+			toJunction = nwElement.toJunction;
+		} else if ("TF".equals(direction)) {
+			fromJunction = nwElement.toJunction;
+			toJunction = nwElement.fromJunction;
+		} else {
+			throw new IllegalArgumentException("direction must be FT or TF.");
+		}
+		Id fromId = this.scenario.createId(Long.toString(fromJunction.id));
+		Id toId = this.scenario.createId(Long.toString(toJunction.id));
+		Node fromNode = this.network.getNodes().get(fromId);
+		if (fromNode == null) {
+			fromNode = this.network.getFactory().createNode(fromId, convertCoordinate(fromJunction.c));
+			nodeCounter.incCounter();
+			this.network.addNode(fromNode);
+		}
+		Node toNode = this.network.getNodes().get(toId);
+		if (toNode == null) {
+			toNode = this.network.getFactory().createNode(toId, convertCoordinate(fromJunction.c));
+			nodeCounter.incCounter();
+			this.network.addNode(toNode);
+		}
+		Id linkId = this.scenario.createId(Long.toString(nwElement.id) + direction);
+		Link link = this.network.getFactory().createLink(linkId, fromId, toId);
+		linkCounter.incCounter();
+		this.network.addLink(link);
+		return link;
+	}
+
+	private void setLinkLength(final Link link, final double length) {
+		double minLength = CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+		if (minLength > length) {
+			link.setLength(minLength);
+		} else {
+			link.setLength(length);
+		}
+	}
+
+	private Coord convertCoordinate(Coordinate c) {
+		return this.coordTransform.transform(this.scenario.createCoord(c.x, c.y));
+	}
+
+	public static void main(String[] args) throws IOException, RuntimeException {
+		Gbl.printSystemInfo();
+
+		log.info("reading teleatlas data...");
+		TeleatlasData data = new TeleatlasData();
+		NetworkReaderTeleatlas45v101 reader = new NetworkReaderTeleatlas45v101(data);
+		reader.parseJc("/data/tmp/che/jc.shp");
+		reader.parseNw("/data/tmp/che/nw.shp");
+		log.info("Got information about #" + data.junctionElements.size() + " junctions.");
+		log.info("Got information about #" + data.networkElements.size() + " network elements.");
+		Gbl.printMemoryUsage();
+
+		log.info("start conversion...");
+		Scenario scenario = new ScenarioImpl();
+		TeleatlasConverter45v101 converter = new TeleatlasConverter45v101(scenario, data);
+		converter.setCoordinateTransformation(new WGS84toCH1903LV03());
+		converter.convertToNetwork();
+		log.info("# nodes created: " + scenario.getNetwork().getNodes().size());
+		log.info("# links created: " + scenario.getNetwork().getLinks().size());
+
+		log.info("write network...");
+		data = null;
+		reader = null;
+		new NetworkWriter(scenario.getNetwork()).writeFile("/data/tmp/che_network.xml");
+
+		log.info("clean network...");
+		new NetworkCleaner().run(scenario.getNetwork());
+
+		log.info("write cleaned network...");
+		new NetworkWriter(scenario.getNetwork()).writeFile("/data/tmp/che_network.cleaned.xml");
+		log.info("done.");
+
+//		scenario = null;
+//		org.matsim.run.OTFVis.main(new String[]{"/data/tmp/che_network.cleaned.xml"});
+	}
+}
