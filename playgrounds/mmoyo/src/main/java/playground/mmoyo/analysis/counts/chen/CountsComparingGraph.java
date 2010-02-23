@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 
+/** Joins graphs of kml files of different cost calculations in order to compare them **/
 public class CountsComparingGraph {
 	String dirPath;
 	String SEPARATOR = "/";
@@ -18,10 +19,9 @@ public class CountsComparingGraph {
 
 	private void compareGraphs() throws IOException{
 		File dir = new File(this.dirPath);    	
-		File headerFile = new File ("../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/comparingGraphs/volume_comparison/header.png");
-		
-		//assuming the iteration 0 
-		String ITERPATH = "/ITERS/it.0/graphs/stationCounts/";    //extract files from kml to  [graphs/stationCounts/]  or  [graphs/stationCounts/]  
+
+		//assuming the iteration 0  and that the graphs inside the kml file were extracted at this directory: 
+		String ITERPATH = "/ITERS/it.0/graphs/stationCounts/";    //[graphs/stationCounts/]  or  [graphs/stationCounts/]  
 		
 		//get algorithms names and graphs names
 		List<String> algList = new ArrayList <String>(); 
@@ -44,8 +44,28 @@ public class CountsComparingGraph {
 		}
 		
 		//merge graphs in one image
-		BufferedImage headImg = ImageIO.read(headerFile);
+		File headerFile = null;
+		File alighting_headerFile = new File ("../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/comparingGraphs/alighting_header.png");
+		File boarding_headerFile = new File ("../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/comparingGraphs/boarding_header.png");
+		File occupancy_headerFile = new File ("../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/comparingGraphs/occupancy_header.png");
+		
+		String aSuffix= "a";
+		String bSuffix= "b";
+		String oSuffix= "o";
 		for (String graphName : graphList ){
+			
+			//find out if it is boarding, alighting or occupancy
+			int sufPos = graphName.lastIndexOf(".")-1;
+			String suffix = graphName.substring(sufPos, sufPos+1);
+			headerFile = null;
+			if (suffix.equals(aSuffix)){
+	    	   headerFile = alighting_headerFile;
+			}else if (suffix.equals(bSuffix)){
+	    	   headerFile = boarding_headerFile;
+			}else if (suffix.equals(oSuffix)){
+				headerFile = occupancy_headerFile;
+			}
+	        BufferedImage headImg = ImageIO.read(headerFile);
 			
 			String file1Path = this.dirPath + SEPARATOR +  algList.get(0) + ITERPATH + graphName;
 			String file2Path = this.dirPath + SEPARATOR +  algList.get(1) + ITERPATH + graphName;
@@ -81,8 +101,9 @@ public class CountsComparingGraph {
 	}
 	
 	public static void main(String[] args) {
-		String dir = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/KMZ_counts_scalefactor50";
-	
+		//String dir = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/KMZ_counts_scalefactor50";
+		String dir = "../runs-svn/berlin-bvg09/router_runs/ten_percent/KMZ_counts_scalefactor10";
+		
 		CountsComparingGraph countsComparingGraph2 = new CountsComparingGraph(dir);
 
 		try {

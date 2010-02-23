@@ -10,33 +10,31 @@ import playground.mmoyo.PTRouter.PTValues;
 
 public class AllRouter {
 
-	/**routes all scenarios with the 3 cost calculations and increasing parameters coefficients**/
+	/**routes scenario with a defined cost calculations and increasing parameters coefficients**/
+
+	public AllRouter( ){
+				
+	}
+	
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
 		/*
 		Do not forget to set:
 		-name of scenario
 		-get ride of autos?
-		-split the plans?
+		-split plans?
 		-cost coefficients
 		-only plans inside the investigation area?
 		*/
-
 		
-		PTValues.scenario = "BerBran_1x_subset_xy2links_ptplansonly";
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/config_noRouted/configWithoutRouting_1x_subset_xy2links_ptplansonly.xml";
+		String configFile = args[0];
 		
-		PTValues.routerCalculator = 1;
-		PlanRouter.main(new String[]{configFile});
-				
-		PTValues.routerCalculator = 2;
-		PlanRouter.main(new String[]{configFile});
-
-
+		PTValues.scenario = "5x_95Time_5dist_60penalty";
 		PTValues.routerCalculator = 3;
-		PTValues.distanceCoefficient =0.15;
-		PTValues.timeCoefficient = 0.85;
-		PTValues.transferPenalty = 60.0;
+		PTValues.distanceCoefficient =0.5;
+		PTValues.timeCoefficient = 0.95;
+		PTValues.transferPenalty = 300.0;
 		PlanRouter.main(new String[]{configFile});
-
 	}
+
+	
 }
