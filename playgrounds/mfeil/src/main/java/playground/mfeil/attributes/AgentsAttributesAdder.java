@@ -446,7 +446,7 @@ public class AgentsAttributesAdder {
 	public void loadIncomeData(ScenarioImpl scenario){
 		log.info("   adding agents income data...");
 		
-		this.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income_MZoverall_weighted.txt");
+		this.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income_MZoverall_weighted_wo_sums.txt");
 		if (this.income.isEmpty()) {
 			log.warn("No income loaded!");
 			return; // No income loaded
@@ -464,7 +464,7 @@ public class AgentsAttributesAdder {
 				log.warn("No income information found for agent "+person.getId());
 			}
 			try{
-				person.getCustomAttributes().put("munType", this.getMunType().get(person.getId()));
+				person.getCustomAttributes().put("municipality", this.getMunType().get(person.getId()));
 			} catch (Exception e) {
 				log.warn("No munType information found for agent "+person.getId());
 			}
