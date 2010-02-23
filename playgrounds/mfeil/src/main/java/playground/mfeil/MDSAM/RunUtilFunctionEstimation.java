@@ -41,23 +41,16 @@ public class RunUtilFunctionEstimation {
 	public static void main(String[] args) {
 		log.info("Process started...");
 		
-		final String version = "0993";
+		final String version = "191";
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
+		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mzAS0997b.xml";
 		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans"+version+".dat";
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model"+version+".mod";
 		final String outputFileSimsOverview = "/home/baug/mfeil/data/choiceSet/it0/simsOverview"+version+".xls";
 		final String outputFileSimsDetailLog = "/home/baug/mfeil/data/choiceSet/it0/simsDetails"+version+".xls";
-	
-		
-/*		final String populationFilename = "./plans/output_plans.xml";
-		final String networkFilename = "./plans/network.xml";
-		final String facilitiesFilename = "./plans/facilities.xml";
-		final String outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims062.xls";
-		final String outputFile = "./plans/output_plans.dat";
-		*/
+
 		
 		String beta				= "yes";
 		String gamma			= "no";
@@ -65,15 +58,15 @@ public class RunUtilFunctionEstimation {
 		String incomeConstant 	= "no";
 		String incomeDivided	= "no";
 		String incomeDividedLN	= "no";
-		String incomeBoxCox		= "yes";
+		String incomeBoxCox		= "no";
 		String gender 			= "yes";
-		String age 				= "no";
-		String income	 		= "no";
-		String license 			= "no";
+		String age 				= "yes";
+		String income	 		= "yes";
+		String license 			= "yes";
 		String carAvail 		= "no";
 		String seasonTicket 	= "no";
 		String travelDistance	= "no"; 
-		String travelCost		= "no"; 
+		String travelCost		= "yes"; 
 		String travelConstant 	= "yes";
 		String beta_travel		= "no";
 		String bikeIn			= "yes";
