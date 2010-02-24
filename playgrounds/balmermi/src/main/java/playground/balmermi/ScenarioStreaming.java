@@ -92,15 +92,20 @@ public class ScenarioStreaming {
 
 		System.out.println("complete world...");
 		Set<String> exTxpes = new TreeSet<String>();
+		// teleatlas new
+		exTxpes.add("0");  // motorway
+		exTxpes.add("-1"); // not defined
+		exTxpes.add("-2"); // ferry
+
 		// teleatlas
-		exTxpes.add("0-4110-0"); // motorway
-		exTxpes.add("1-4110-0"); // motorway
-		exTxpes.add("2-4130-1"); // ferry
-		exTxpes.add("2-4130-2"); // train
-		exTxpes.add("3-4130-2"); // train
-		exTxpes.add("4-4130-1"); // ferry
-		exTxpes.add("4-4130-2"); // train
-		exTxpes.add("7-4130-1"); // ferry
+//		exTxpes.add("0-4110-0"); // motorway
+//		exTxpes.add("1-4110-0"); // motorway
+//		exTxpes.add("2-4130-1"); // ferry
+//		exTxpes.add("2-4130-2"); // train
+//		exTxpes.add("3-4130-2"); // train
+//		exTxpes.add("4-4130-1"); // ferry
+//		exTxpes.add("4-4130-2"); // train
+//		exTxpes.add("7-4130-1"); // ferry
 
 		// ivtch
 //		exTxpes.add("0"); exTxpes.add("1"); exTxpes.add("2"); exTxpes.add("3");

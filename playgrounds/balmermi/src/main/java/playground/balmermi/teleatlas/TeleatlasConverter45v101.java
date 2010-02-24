@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -113,6 +114,7 @@ public class TeleatlasConverter45v101 {
 			double freespeed = getFreespeed(nwElement);
 			double nOfLanes = getNOfLanes(nwElement);
 			double capacity = getFlowCapacity(nwElement);
+			String type = getType(nwElement);
 
 			// find out if we need to create the links
 			if (modesFT.isEmpty()) {
@@ -130,6 +132,7 @@ public class TeleatlasConverter45v101 {
 				link.setFreespeed(freespeed);
 				link.setNumberOfLanes(nOfLanes);
 				link.setAllowedModes(modesFT);
+				((LinkImpl)link).setType(type);
 			}
 			if (createTFElement) {
 				Link link = createLink(nwElement, "TF");
@@ -138,6 +141,7 @@ public class TeleatlasConverter45v101 {
 				link.setFreespeed(freespeed);
 				link.setNumberOfLanes(nOfLanes);
 				link.setAllowedModes(modesTF);
+				((LinkImpl)link).setType(type);
 			}
 		}
 	}
@@ -162,6 +166,11 @@ public class TeleatlasConverter45v101 {
 		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
 			modes.remove(TransportMode.car);
 		}
+		
+		if (NwElement.FormOfWay.SLIP_ROAD.equals(nwElement.fow) && !modes.contains(TransportMode.car)) {
+			modes.remove(TransportMode.walk);
+			modes.remove(TransportMode.bike);
+		}
 
 		return modes;
 	}
@@ -185,6 +194,11 @@ public class TeleatlasConverter45v101 {
 
 		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
 			modes.remove(TransportMode.car);
+		}
+
+		if (NwElement.FormOfWay.SLIP_ROAD.equals(nwElement.fow) && !modes.contains(TransportMode.car)) {
+			modes.remove(TransportMode.walk);
+			modes.remove(TransportMode.bike);
 		}
 
 		return modes;
@@ -214,7 +228,7 @@ public class TeleatlasConverter45v101 {
 
 	private int getNOfLanes(final NwElement nwElement) {
 		int nOfLanes = nwElement.nOfLanes.intValue();
-		nOfLanes = (int)Math.ceil(nOfLanes/2.0);
+//		nOfLanes = (int)Math.ceil(nOfLanes/2.0);
 
 		if (nOfLanes == 0) {
 			nOfLanes = 1;
@@ -248,6 +262,36 @@ public class TeleatlasConverter45v101 {
 		}
 	}
 
+	private String getType(final NwElement nwElement) {
+		if (NwElement.NwFeatureType.ROAD_ELEMENT.equals(nwElement.featType)) {
+			switch (nwElement.frc) {
+			case MOTORWAY:
+				return "0";
+			case MAJOR_ROAD_HIGH:
+				return "1";
+			case MAJOR_ROAD_LOW:
+				return "2";
+			case SECONDARY_ROAD:
+				return "3";
+			case LOCAL_CONNECTING_ROAD:
+				return "4";
+			case LOCAL_ROAD_HIGH:
+				return "5";
+			case LOCAL_ROAD_MEDIUM:
+				return "6";
+			case LOCAL_ROAD_LOW:
+				return "7";
+			case OTHER_ROAD:
+				return "8";
+			case UNDEFINED:
+				return "-1";
+			default:
+				throw new IllegalArgumentException("nwId="+nwElement.id+": frc="+nwElement.frc+" not allowed.");
+			}
+		}
+		return "-2";
+	}
+
 	private Link createLink(NwElement nwElement, String direction) {
 		JcElement fromJunction;
 		JcElement toJunction;
@@ -270,7 +314,7 @@ public class TeleatlasConverter45v101 {
 		}
 		Node toNode = this.network.getNodes().get(toId);
 		if (toNode == null) {
-			toNode = this.network.getFactory().createNode(toId, convertCoordinate(fromJunction.c));
+			toNode = this.network.getFactory().createNode(toId, convertCoordinate(toJunction.c));
 			nodeCounter.incCounter();
 			this.network.addNode(toNode);
 		}
