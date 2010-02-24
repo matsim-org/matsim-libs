@@ -33,14 +33,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.balmermi.modules.NetworkDoubleLinks;
 import playground.balmermi.teleatlas.NwElement.FormOfWay;
 import playground.balmermi.teleatlas.NwElement.NwFeatureType;
 import playground.balmermi.teleatlas.NwElement.OneWay;
@@ -158,7 +161,7 @@ public class TeleatlasConverter45v101 {
 		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
 			modes.remove(TransportMode.car);
 		}
-		
+
 		return modes;
 	}
 
@@ -211,7 +214,7 @@ public class TeleatlasConverter45v101 {
 	private int getNOfLanes(final NwElement nwElement) {
 		int nOfLanes = nwElement.nOfLanes.intValue();
 		nOfLanes = (int)Math.ceil(nOfLanes/2.0);
-		
+
 		if (nOfLanes == 0) {
 			nOfLanes = 1;
 			if (NwElement.FunctionalRoadClass.MOTORWAY.equals(nwElement.frc) ||
@@ -227,7 +230,7 @@ public class TeleatlasConverter45v101 {
 
 	private double getFlowCapacity(final NwElement nwElement) {
 		int nOfLanes = getNOfLanes(nwElement);
-		
+
 		switch (nwElement.net2Class) {
 		case MOTORWAY:
 		case MAIN_AXIS:
@@ -320,6 +323,14 @@ public class TeleatlasConverter45v101 {
 
 		log.info("write cleaned network...");
 		new NetworkWriter(scenario.getNetwork()).writeFile("/data/tmp/che_network.cleaned.xml");
+
+		log.info("fix double links...");
+		new NetworkDoubleLinks("-d").run((NetworkLayer) scenario.getNetwork());
+
+		log.info("write final version of network...");
+		new NetworkWriter(scenario.getNetwork()).writeFile("/data/tmp/che_network.final.xml");
+		new NetworkWriteAsTable("").run((NetworkLayer) scenario.getNetwork());
+
 		log.info("done.");
 
 //		scenario = null;
