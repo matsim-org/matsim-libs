@@ -19,6 +19,7 @@
 
 package playground.balmermi.teleatlas;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
@@ -294,13 +295,17 @@ public class TeleatlasConverter45v101 {
 	}
 
 	public static void main(String[] args) throws IOException, RuntimeException {
+		if (args.length != 2) { log.info("TeleatlasConverter45v101 indir outdir"); System.exit(1); }
 		Gbl.printSystemInfo();
+		
+		String indir = args[0];
+		String outdir = args[1];
 
 		log.info("reading teleatlas data...");
 		TeleatlasData data = new TeleatlasData();
 		NetworkReaderTeleatlas45v101 reader = new NetworkReaderTeleatlas45v101(data);
-		reader.parseJc("/data/tmp/che/jc.shp");
-		reader.parseNw("/data/tmp/che/nw.shp");
+		reader.parseJc(indir+"/jc.shp");
+		reader.parseNw(indir+"/nw.shp");
 		log.info("Got information about #" + data.junctionElements.size() + " junctions.");
 		log.info("Got information about #" + data.networkElements.size() + " network elements.");
 		Gbl.printMemoryUsage();
@@ -314,22 +319,30 @@ public class TeleatlasConverter45v101 {
 		log.info("# links created: " + scenario.getNetwork().getLinks().size());
 
 		log.info("write network...");
+		File outputDir = new File(outdir+"/base");
+		outputDir.mkdir();
 		data = null;
 		reader = null;
-		new NetworkWriter(scenario.getNetwork()).writeFile("/data/tmp/che_network.xml");
+		new NetworkWriter(scenario.getNetwork()).writeFile(outputDir.toString()+"/network.xml");
+		new NetworkWriteAsTable(outputDir.toString()).run((NetworkLayer) scenario.getNetwork());
 
 		log.info("clean network...");
 		new NetworkCleaner().run(scenario.getNetwork());
 
 		log.info("write cleaned network...");
-		new NetworkWriter(scenario.getNetwork()).writeFile("/data/tmp/che_network.cleaned.xml");
+		outputDir = new File(outdir+"/cleaned");
+		outputDir.mkdir();
+		new NetworkWriter(scenario.getNetwork()).writeFile(outputDir.toString()+"/network.xml");
+		new NetworkWriteAsTable(outputDir.toString()).run((NetworkLayer) scenario.getNetwork());
 
 		log.info("fix double links...");
-		new NetworkDoubleLinks("-d").run((NetworkLayer) scenario.getNetwork());
+		new NetworkDoubleLinks("d").run((NetworkLayer)scenario.getNetwork());
 
 		log.info("write final version of network...");
-		new NetworkWriter(scenario.getNetwork()).writeFile("/data/tmp/che_network.final.xml");
-		new NetworkWriteAsTable("").run((NetworkLayer) scenario.getNetwork());
+		outputDir = new File(outdir+"/final");
+		outputDir.mkdir();
+		new NetworkWriter(scenario.getNetwork()).writeFile(outputDir.toString()+"/network.xml");
+		new NetworkWriteAsTable(outputDir.toString()).run((NetworkLayer) scenario.getNetwork());
 
 		log.info("done.");
 
