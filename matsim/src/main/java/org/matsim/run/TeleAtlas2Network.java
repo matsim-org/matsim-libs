@@ -80,7 +80,6 @@ public class TeleAtlas2Network {
 			System.out.println("writing txt files...");
 			NetworkWriteAsTable nwat = new NetworkWriteAsTable(outputDir);
 			nwat.run(network);
-			nwat.close();
 			System.out.println("done.");
 		}
 		if (writeNetworkShapeFile) {
