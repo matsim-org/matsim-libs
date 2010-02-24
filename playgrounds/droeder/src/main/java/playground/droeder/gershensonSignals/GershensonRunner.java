@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,16 +38,17 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
+
+import playground.droeder.charts.DaBarChart;
+import playground.droeder.handler.AverageTTHandler;
 
 
 
@@ -59,10 +60,18 @@ import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
  */
 public class GershensonRunner implements AgentStuckEventHandler {
 	
+	private int u = 0;
+	private int n = 0;
+	
 	private Map<Id, Id> corrGroups;
 	private Map<Id, List<Id>> compGroups;
 	
 	private Map<Integer, Double> averageTT;
+	private static double avTT = 0;
+	
+	private static Map<Integer, Map<Integer, Double>> nAndUT = new LinkedHashMap<Integer, Map<Integer,Double>>();
+	private static LinkedHashMap<Number, Number> nAndT = new LinkedHashMap<Number, Number>();
+	
 	
 	private AverageTTHandler handler1;
 	
@@ -105,10 +114,6 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private void addListener(final Controler c) {
 		
 		
-		averageTT = new HashMap<Integer, Double>();
-		
-		
-		
 		c.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
@@ -120,7 +125,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				event.getControler().getEvents().addHandler(handler1);
 				
 				//enable live-visualization
-//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	
@@ -132,22 +137,21 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		c.addControlerListener(new IterationStartsListener() {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
-//				handler1.reset(c.getIterationNumber());
+				handler1.reset(event.getIteration());
 			}
 		});
 		
 		c.addControlerListener(new IterationEndsListener() {
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
-				handler1.setAverageIterationTime(event.getIteration());
+				avTT = handler1.getAverageTravelTime();
 			}
 		});		
 		
 		c.addControlerListener(new ShutdownListener() {
 			@Override
 			public void notifyShutdown(ShutdownEvent event) {
-				handler1.writeChart(event.getControler().getControlerIO().getOutputFilename("averageTimePerIteration"));
-				handler1.writeChart2(event.getControler().getControlerIO().getOutputFilename("averageTimePerIteration2"));
+				
 			}
 		});
 		
@@ -162,6 +166,8 @@ public class GershensonRunner implements AgentStuckEventHandler {
 					(GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				adaptiveController.setCorrGroups(corrGroups);
 				adaptiveController.setCompGroups(compGroups);
+				adaptiveController.setMinCar(n);
+				adaptiveController.setGreenMin(u);
 				adaptiveController.init(c.getScenario().getSignalSystems().getSignalGroupDefinitions(), e.getQueueSimulation().getQueueNetwork());
 				
 				c.getEvents().addHandler(adaptiveController);
@@ -192,10 +198,35 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		OTFVis.main(args);
 	}
 	
+	public void setU (int u){
+		this.u = u;
+	}
+	public void setN (int n){
+		this.n = n;
+	}
+	
 	public static void main(String[] args) {
+		DaBarChart chartWriter = new DaBarChart();
 		
-		new GershensonRunner().runScenario(config);
-		
+		GershensonRunner runner = new GershensonRunner();
+		runner.setN(23);
+		runner.setU(12);
+		runner.runScenario(config);
+				
+//		for (int u = 12; u < 18; u++){
+//			nAndT = new LinkedHashMap<Number, Number>();
+//			for (int n = 19; n < 25; n++){
+//				runner = new GershensonRunner();
+//				Gbl.reset();
+//				runner.setU(u);
+//				runner.setN(n);
+//				runner.runScenario(config);
+//				nAndT.put(n, avTT);
+//			}
+//			chartWriter.addSeries("u=" + String.valueOf(u), nAndT);
+////			nAndUT.put(n, uAndT);
+//		}	
+//		new DaChartWriter().writeChart(DaPaths.DATA + "tOverN", 1600, 1024, chartWriter.createChart("avTT Denver", "n", "t"));
 	}
 
 	@Override

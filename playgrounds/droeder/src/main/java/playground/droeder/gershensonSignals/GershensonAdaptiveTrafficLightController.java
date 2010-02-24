@@ -57,8 +57,9 @@ public class GershensonAdaptiveTrafficLightController extends
 
 	private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
 
-	private final double tGreenMin = 40; // time in seconds
-	private final double minCars = 12; //
+	private int tGreenMin = 0; // time in seconds
+	private int minCars = 0; //
+	private double capFactor = 0.99;
 	private boolean compGroupsGreen = false;
 
 	private Map<Id, Integer> vehOnLink = new HashMap<Id, Integer>();
@@ -205,18 +206,18 @@ public class GershensonAdaptiveTrafficLightController extends
 			}
 		}
 		
-		// calculate outlinkDensity --- should be changed, problem is that one Signalgroup 
+		// calculate outlinkCapacity --- should be changed, problem is that one Signalgroup 
 		// coordinates the Trafficlight for many toLinks and you don't know Agents Destination
 		for (Id i : signalGroup.getToLinkIds()){
-			double outLinkDensity = net.getLinks().get(i).getSpaceCap();
-			double actDensity = (vehOnLink.get(i)/outLinkDensity);
-			if((outLinkDensity * 0.96)< actDensity){
+			double outLinkCapacity = net.getLinks().get(i).getSpaceCap();
+			double actStorage = vehOnLink.get(i);
+			if((outLinkCapacity*capFactor)< actStorage){
 				outLinkJam = true;
 				break;
 			}
 		}
 		
-		//set number of cars, approaching a competing Link, if it is green
+		//set number of cars, approaching a competing Link in a short distance, if it is green
 		if (compGroupsGreen == true){
 			for (Id i : compGroups.get(signalGroup.getId())){
 				approachingGreenLink += vehOnLink.get((groups.get(i).getLinkRefId())).intValue();
@@ -318,6 +319,14 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 //		return false;
 
+	}
+	
+	public void setMinCar (int minCars){
+		this.minCars = minCars;
+	}
+	
+	public void setGreenMin (int tGreenMin){
+		this.tGreenMin = tGreenMin;
 	}
 
 }

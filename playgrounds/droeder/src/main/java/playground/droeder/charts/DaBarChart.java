@@ -17,10 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder;
+package playground.droeder.charts;
 
 import java.awt.Color;
+import java.awt.Paint;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,77 +34,51 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.xy.XYDataset;
+import org.matsim.core.utils.io.IOUtils;
+
+import playground.droeder.DaColorScheme;
 
 /**
  * @author droeder
  *
  */
-public class DaChartWriter {
-	  private XYSeriesCollection datasetXY;
+public class DaBarChart {
+	  private DefaultCategoryDataset dataset;
+	  private JFreeChart jChart;
 	  
-	  private void createDataSetXY(){
-		  this.datasetXY = new XYSeriesCollection();
+	  public DaBarChart(){
+		  this.dataset = new DefaultCategoryDataset();
 	  }
 	  
-	  
-	  public XYSeries createXySeries(String seriesName, Map<Number, Number> data){
-		  XYSeries series = new XYSeries(seriesName, false, true);
+	  public void addSeries(String category, Map<Number, Number> data){
 		  for (Entry<Number, Number> e : data.entrySet()){
-			  series.add(e.getKey(), e.getValue());
+			  dataset.addValue(e.getValue(), category, String.valueOf(e.getKey()));
 		  }
-		  return series;
-	  }
-
-	  public void addXySeries(XYSeries series) {
-		  if (this.datasetXY == null) {
-		      createDataSetXY();
-		    }
-		  this.datasetXY.addSeries(series);
 	  }
 
 	  
 	  public JFreeChart createChart(String title, String xAxis, String yAxis) {
-//	    XYPlot plot = new XYPlot();
-//	    plot.setDataset(0, this.getDataset());
-//	    JFreeChart chart = new JFreeChart("", plot);
-//	    chart.setBackgroundPaint(ChartColor.WHITE);
-//	    chart.setTextAntiAlias(true);
-////	    chart.removeLegend();
-		JFreeChart chart = ChartFactory.createXYLineChart(title, xAxis, yAxis, this.datasetXY, PlotOrientation.HORIZONTAL , true, false, false);
+		JFreeChart chart = ChartFactory.createBarChart(title, xAxis, yAxis, dataset, PlotOrientation.VERTICAL, true, false, false);
+		CategoryPlot plot = chart.getCategoryPlot();
 		
-		XYPlot plot = chart.getXYPlot();
-		plot.setBackgroundPaint(Color.white);
-		plot.setDomainGridlinePaint(Color.black);
-		plot.setDomainGridlinesVisible(true);
-		plot.setRangeGridlinePaint(Color.black);
+	    plot.setBackgroundPaint(Color.white);
+	    plot.setDomainGridlinePaint(Color.lightGray);
+	    plot.setRangeGridlinePaint(Color.black);
+		
+		final BarRenderer renderer = (BarRenderer) plot.getRenderer();
+		
+		renderer.findRangeBounds(dataset);
+		DaColorScheme cs = new DaColorScheme();
+		for(int i=1; i< 1+dataset.getRowCount(); i++){
+			renderer.setSeriesPaint(i, cs.getColor(i));
+		}
+		this.jChart = chart;
 		return chart;
 
 	  }
 	  
-	  public XYSeriesCollection getDataset() {
-	    if (this.datasetXY == null) {
-	      createDataSetXY();
-	    }
-	    return this.datasetXY;
-	  }
-	  
-		public static void writeChart(String filename, Integer width, Integer height, JFreeChart jchart){
-			writeToPng(filename, width, height, jchart);
-		}
-		
-		private static void writeToPng(String path, Integer width, Integer height, JFreeChart jchart) {
-			String title = path + jchart.getTitle().toString() + ".png";
-			
-			try {
-				ChartUtilities.saveChartAsPNG(new File(title), jchart, width, height, null, true, 9);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	  
-
-
 }
