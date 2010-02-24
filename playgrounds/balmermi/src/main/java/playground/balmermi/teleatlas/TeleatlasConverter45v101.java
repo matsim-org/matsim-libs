@@ -41,8 +41,10 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.balmermi.teleatlas.NwElement.FormOfWay;
 import playground.balmermi.teleatlas.NwElement.NwFeatureType;
 import playground.balmermi.teleatlas.NwElement.OneWay;
+import playground.balmermi.teleatlas.NwElement.PrivateRoad;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -88,7 +90,12 @@ public class TeleatlasConverter45v101 {
 
 	public void convertToNetwork() {
 		for (NwElement nwElement : this.data.networkElements.values()) {
-			if (NwFeatureType.ADDRESS_AREA_BOUNDARY.equals(nwElement.featType)) {
+			if (NwFeatureType.ADDRESS_AREA_BOUNDARY.equals(nwElement.featType) ||
+					FormOfWay.ETA_PARKING_PLACE.equals(nwElement.fow) ||
+					FormOfWay.ETA_PARKING_GARAGE.equals(nwElement.fow) ||
+					FormOfWay.ENTRANCE_EXIT_CARPARK.equals(nwElement.fow) ||
+					FormOfWay.AUTHORITIES.equals(nwElement.fow) ||
+					PrivateRoad.SPECIAL_RESTRICTION.equals(nwElement.privat)) {
 				continue;
 			}
 			boolean createFTElement = true;
@@ -132,7 +139,7 @@ public class TeleatlasConverter45v101 {
 	}
 
 	private Set<TransportMode> getModesFT(final NwElement nwElement) {
-		Set<TransportMode> modes = EnumSet.of(TransportMode.car, TransportMode.walk);
+		Set<TransportMode> modes = EnumSet.of(TransportMode.car, TransportMode.walk, TransportMode.bike);
 
 		if ((OneWay.CLOSED.equals(nwElement.oneway) || OneWay.OPEN_TF.equals(nwElement.oneway))) {
 			modes.remove(TransportMode.car);
@@ -140,17 +147,23 @@ public class TeleatlasConverter45v101 {
 
 		if (NwElement.Freeway.FREEWAY.equals(nwElement.freeway)) {
 			modes.remove(TransportMode.walk);
+			modes.remove(TransportMode.bike);
+		}
+
+		if (NwElement.FunctionalRoadClass.MOTORWAY.equals(nwElement.frc) || NwElement.FunctionalRoadClass.MAJOR_ROAD_HIGH.equals(nwElement.frc)) {
+			modes.remove(TransportMode.walk);
+			modes.remove(TransportMode.bike);
 		}
 
 		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
 			modes.remove(TransportMode.car);
 		}
-
+		
 		return modes;
 	}
 
 	private Set<TransportMode> getModesTF(final NwElement nwElement) {
-		Set<TransportMode> modes = EnumSet.of(TransportMode.car, TransportMode.walk);
+		Set<TransportMode> modes = EnumSet.of(TransportMode.car, TransportMode.walk, TransportMode.bike);
 
 		if ((OneWay.CLOSED.equals(nwElement.oneway) || OneWay.OPEN_FT.equals(nwElement.oneway))) {
 			modes.remove(TransportMode.car);
@@ -158,6 +171,12 @@ public class TeleatlasConverter45v101 {
 
 		if (NwElement.Freeway.FREEWAY.equals(nwElement.freeway)) {
 			modes.remove(TransportMode.walk);
+			modes.remove(TransportMode.bike);
+		}
+
+		if (NwElement.FunctionalRoadClass.MOTORWAY.equals(nwElement.frc) || NwElement.FunctionalRoadClass.MAJOR_ROAD_HIGH.equals(nwElement.frc)) {
+			modes.remove(TransportMode.walk);
+			modes.remove(TransportMode.bike);
 		}
 
 		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
@@ -191,43 +210,38 @@ public class TeleatlasConverter45v101 {
 
 	private int getNOfLanes(final NwElement nwElement) {
 		int nOfLanes = nwElement.nOfLanes.intValue();
-
-		switch (nwElement.frc) {
-			case MOTORWAY:
-				if (nOfLanes == 0) {
-					nOfLanes = 2;
-				}
-				break;
-			case MAJOR_ROAD_HIGH: // fall-through
-			case MAJOR_ROAD_LOW:
-				nOfLanes = 1;
-				break;
-			default:
-				nOfLanes = 1;
-				break;
+		nOfLanes = (int)Math.ceil(nOfLanes/2.0);
+		
+		if (nOfLanes == 0) {
+			nOfLanes = 1;
+			if (NwElement.FunctionalRoadClass.MOTORWAY.equals(nwElement.frc) ||
+					NwElement.FunctionalRoadClass.MAJOR_ROAD_HIGH.equals(nwElement.frc) ||
+					NwElement.FormOfWay.MOTORWAY.equals(nwElement.fow) ||
+					NwElement.FormOfWay.MULTI_CARRIAGEWAY.equals(nwElement.fow) ||
+					NwElement.NetTwoClass.MOTORWAY.equals(nwElement.net2Class)) {
+				nOfLanes = 2;
+			}
 		}
 		return nOfLanes;
 	}
 
 	private double getFlowCapacity(final NwElement nwElement) {
 		int nOfLanes = getNOfLanes(nwElement);
-
-		switch (nwElement.frc) {
-			case MOTORWAY:
-			case MAJOR_ROAD_HIGH:
-			case MAJOR_ROAD_LOW:
-				return 2000.0 * nOfLanes;
-			case SECONDARY_ROAD:
-			case LOCAL_CONNECTING_ROAD:
-			case LOCAL_ROAD_HIGH:
-			case LOCAL_ROAD_MEDIUM:
-			case LOCAL_ROAD_LOW:
-				return 1000.0 * nOfLanes;
-			case OTHER_ROAD:
-			case UNDEFINED:
-				return 500.0 * nOfLanes;
+		
+		switch (nwElement.net2Class) {
+		case MOTORWAY:
+		case MAIN_AXIS:
+		case CONNECTION_AXIS_HIGH:
+			return 2000.0 * nOfLanes;
+		case CONNECTION_AXIS_LOW:
+			return 1000.0 * nOfLanes;
+		case COUNTRYSIDE_LOCAL_ROAD_LOW:
+		case PARKING_ACCESS_ROAD:
+		case RESTRICTED_PEDESTRIAN:
+			return 600.0 * nOfLanes;
+		default:
+			throw new IllegalArgumentException("nwId="+nwElement.id+": net2Class="+nwElement.net2Class+" not allowed.");
 		}
-		throw new IllegalArgumentException("It seems not all possible cases were covered.");
 	}
 
 	private Link createLink(NwElement nwElement, String direction) {
