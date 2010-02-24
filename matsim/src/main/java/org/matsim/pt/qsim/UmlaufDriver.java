@@ -28,6 +28,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	private final LegImpl currentLeg = new LegImpl(TransportMode.car);
 	private TransitLine transitLine;
 	private TransitRoute transitRoute;
+	private Departure departure;
 
 	public UmlaufDriver(Umlauf umlauf,
 			TransitStopAgentTracker thisAgentTracker,
@@ -59,6 +60,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	private void setWenden(NetworkRoute carRoute) {
 		this.transitLine = null;
 		this.transitRoute = null;
+		this.departure = null;
 		setCarRoute(carRoute);
 	}
 
@@ -66,6 +68,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 			final Departure departure) {
 		this.transitLine = line;
 		this.transitRoute = route;
+		this.departure = departure;
 		this.departureTime = departure.getDepartureTime();
 		setCarRoute(route.getRoute());
 	}
@@ -115,6 +118,11 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	@Override
 	public TransitRoute getTransitRoute() {
 		return this.transitRoute;
+	}
+
+	@Override
+	public Departure getDeparture() {
+		return this.departure;
 	}
 
 }

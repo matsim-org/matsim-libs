@@ -44,6 +44,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	final NetworkRoute carRoute;
 	final TransitLine transitLine;
 	final TransitRoute transitRoute;
+	final Departure departure;
 	final double departureTime;
 	private final LegImpl currentLeg = new LegImpl(TransportMode.car);
 
@@ -52,6 +53,7 @@ public class TransitDriver extends AbstractTransitDriver {
 		this.departureTime = departure.getDepartureTime();
 		this.transitLine = line;
 		this.transitRoute = route;
+		this.departure = departure;
 		this.carRoute = route.getRoute();
 		this.currentLeg.setRoute(getWrappedCarRoute()); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		init();
@@ -91,6 +93,11 @@ public class TransitDriver extends AbstractTransitDriver {
 	@Override
 	public Id getDestinationLinkId() {
 		return this.currentLeg.getRoute().getEndLinkId();
+	}
+
+	@Override
+	public Departure getDeparture() {
+		return this.departure;
 	}
 
 }

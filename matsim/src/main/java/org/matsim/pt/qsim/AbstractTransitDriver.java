@@ -36,6 +36,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.PersonAgent;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -60,6 +61,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public abstract NetworkRoute getCarRoute();
 	public abstract TransitLine getTransitLine();
 	public abstract TransitRoute getTransitRoute();
+	public abstract Departure getDeparture();
 	public abstract double getDepartureTime();
 
 	public AbstractTransitDriver(Person personImpl, QSim sim, final TransitStopHandler stopHandler, TransitStopAgentTracker agentTracker2) {
@@ -152,7 +154,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		EventsManager events = this.sim.getEventsManager();
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
-			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId(), now - getDepartureTime() - this.currentStop.getDepartureOffset()));
+			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId(), now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
 		}
 	}
 
@@ -175,7 +177,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	private void depart(final double now) {
 		EventsManager events = this.sim.getEventsManager();
-		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), this.currentStop.getStopFacility().getId(), now - getDepartureTime() - this.currentStop.getDepartureOffset()));
+		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), this.currentStop.getStopFacility().getId(), now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
 		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
 		if(this.nextStop == null) {
 			assertVehicleIsEmpty();
