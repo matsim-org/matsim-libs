@@ -31,11 +31,14 @@ import org.matsim.core.api.internal.MatsimPopulationObject;
  */
 public interface Route extends Serializable, MatsimPopulationObject {
 
+	/** @deprecated  use RouteUtils.calcDistance()  */
+	@Deprecated
 	public double getDistance();
 
+	// once getDistance is removed in the code, remove this as well
 	public void setDistance(final double distance);
 
-	/** @deprecated -- use leg.getTravelTime() instead. kai, aug09 */ 
+	/** @deprecated -- use leg.getTravelTime() instead. kai, aug09 */
 	@Deprecated
 	public double getTravelTime();
 
