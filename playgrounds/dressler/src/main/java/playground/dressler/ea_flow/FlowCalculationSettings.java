@@ -340,7 +340,7 @@ public class FlowCalculationSettings {
 
         	}            	
         }
-            
+        
         for (NodeImpl node : this._network.getNodes().values()) {            	
         	try {
         		int i = Integer.parseInt(node.getId().toString());
@@ -360,7 +360,7 @@ public class FlowCalculationSettings {
         System.out.println("Minimize");
         System.out.println("totaltraveltime: ");
 
-        String Sobj = " ";        	
+        StringBuilder Sobj = new StringBuilder(" ");        	
         for (NodeImpl node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
@@ -371,16 +371,27 @@ public class FlowCalculationSettings {
         		for (Link link : node.getOutLinks().values()) {
         			for (int t = 0; t < this.TimeHorizon - this.getLength(link); t++) {
         				String tmp = edgeToVariable(link, t, newNodeNames);
-        				if (tmp != null) 
-        					Sobj += " -" + t + " " + tmp;
+        				if (tmp != null) {
+        					// append " -" + t + " " + tmp
+        					Sobj.append(" -");
+        				    Sobj.append(t);
+        				    Sobj.append(" ");
+        				    Sobj.append(tmp);
+        				}
         			}
         		}
 
         		for (Link link : node.getInLinks().values()) {
         			for (int t = 0; t < this.TimeHorizon - this.getLength(link); t++) {
         				String tmp = edgeToVariable(link, t, newNodeNames);
-        				if (tmp != null) 
-        					Sobj += " +" + (t + this.getLength(link)) + " " + tmp;
+        				if (tmp != null) {
+        					//Sobj += " +" + (t + this.getLength(link)) + " " + tmp;
+        					Sobj.append(" + ");
+        					Sobj.append((t + this.getLength(link)));
+        					Sobj.append(" ");
+        					Sobj.append(tmp);
+        				}
+        				
         			}
         		}
 
@@ -402,25 +413,34 @@ public class FlowCalculationSettings {
         	// write flow conservation for each time step        	
         	for (int t = 0; t < this.TimeHorizon; t++) {        		
         		System.out.println("flow_conservation#" + newNodeNames.get(node) + "@t" + t + ":");
-        		String S = " ";
+        		StringBuilder S = new StringBuilder(" ");
         		for (Link link : node.getOutLinks().values()) {
         			String tmp = edgeToVariable(link, t, newNodeNames);
-        			if (tmp != null) 
-        				S += " + " + tmp; 
+        			if (tmp != null) { 
+        				//S += " + " + tmp;
+        				S.append(" + ");
+        				S.append(tmp);
+        			}
         		}
         		for (Link link : node.getInLinks().values()) {
         			String tmp = edgeToVariable(link, t - this.getLength(link), newNodeNames);
-        			if (tmp != null) 
-        				S += " - " + tmp;
+        			if (tmp != null) { 
+        				// S += " - " + tmp;
+        				S.append(" - ");
+        				S.append(tmp);
+        			}
         		}
 
 
         		if (d > 0) {
-        			S += " >= 0";
+        			//S += " >= 0";
+        			S.append(" >= 0");
         		} else if (d < 0) {
-        			S += " <= 0";
+        			//S += " <= 0";
+        			S.append(" <= 0");
         		} else {
-        			S += " = 0";
+        			//S += " = 0";
+        			S.append(" = 0");
         		}
         		System.out.println(S);
         	}
@@ -433,30 +453,40 @@ public class FlowCalculationSettings {
         		}  else {
         		  System.out.println("demand@" + newNodeNames.get(node) + ":");
         		}
-        		String S = " ";        	
+        		StringBuilder S = new StringBuilder(" ");        	
         		// write supply / demand constraint    
         		
         		for (Link link : node.getOutLinks().values()) {
         			for (int t = 0; t < this.TimeHorizon - this.getLength(link); t++) {
         				String tmp = edgeToVariable(link, t, newNodeNames);
-        				if (tmp != null) 
-        					S += " + " + tmp;
+        				if (tmp != null) {
+        					//S += " + " + tmp;
+        					S.append(" + ");
+            				S.append(tmp);
+        				}
         			}
         		}
 
         		for (Link link : node.getInLinks().values()) {
         			for (int t = 0; t < this.TimeHorizon - this.getLength(link); t++) {
         				String tmp = edgeToVariable(link, t, newNodeNames);
-        				if (tmp != null) 
-        					S += " - " + tmp;
+        				if (tmp != null) {
+        					//S += " - " + tmp;
+        					S.append(" - ");
+            				S.append(tmp);
+        				}
         			}
         		}
 
 
         		if (d > 0) {
-        			S += " = " + d;;
+        			//S += " = " + d;;
+        			S.append(" = ");
+        			S.append(d);
         		} else  { // note: d < 0
-        			S += " >= " + d;
+        			//S += " >= " + d;
+        			S.append(" >= ");
+        			S.append(d);
         		}			
         		System.out.println(S);
         	}

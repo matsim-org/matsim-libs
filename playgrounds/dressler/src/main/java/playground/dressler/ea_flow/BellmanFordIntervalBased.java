@@ -596,8 +596,10 @@ public class BellmanFordIntervalBased {
 		System.out.println("Running BellmanFord in Forward mode.");
 		
 		// queue to save nodes we have to scan
-		TaskComparator taskcomp = new TaskComparator();
-		Queue<BFTask> queue = new PriorityQueue<BFTask>((1), taskcomp);
+		//TaskComparator taskcomp = new TaskComparator();
+		//Queue<BFTask> queue = new PriorityQueue<BFTask>((1), taskcomp);
+		// DEBUG! BFS instead of Priority Queue
+		Queue<BFTask> queue = new LinkedList<BFTask>();
 
 		//set fresh labels, initialize queue
 		refreshLabels(queue);
@@ -638,8 +640,14 @@ public class BellmanFordIntervalBased {
 			}
 				
 			if (task.time > cutofftime) {
-				System.out.println("Beyond cut-off time, stopping.");
-				break;
+				//System.out.println("Beyond cut-off time, stopping.");
+				//break;
+				
+				// TODO CHANGE ME BACK TO PRIORITY QUEUE WHEN NEEDED!
+				
+				//System.out.println("Ignoring too late task in BFS!");
+				continue;
+
 			}
 			
 			Node v = task.node.getRealNode();
@@ -684,11 +692,16 @@ public class BellmanFordIntervalBased {
 				// Clean Up before we do anything!
 				// TODO Effectiveness?
 				// DISABLED FOR TESTING
-				//gain += _labels.get(v).cleanup();
+				// gain += _labels.get(v).cleanup();
 
 				VertexInterval inter = this._labels.get(v).getIntervalAt(task.ival.getLowBound());
-				if (inter.isScanned() || !inter.getReachable()) {
-					System.out.println("Node " + v.getId() + " was already scanned or not reachable ...");
+				if (!inter.getReachable()) {
+					System.out.println("Node " + v.getId() + " was not reachable!");
+					continue;
+				}
+				
+				if (inter.isScanned()) {
+					// don't scan again ... can happen with vertex cleanup
 					continue;
 				}
 				inter.setScanned(true);
@@ -830,7 +843,7 @@ public class BellmanFordIntervalBased {
 			
 			// TODO does this help? 
 			// DISABLED FOR TESTING
-			//gain += _labels.get(v).cleanup();
+			gain += _labels.get(v).cleanup();
 			
 			if (task.node instanceof VirtualSink) {
 				// we want to arrive at lastArrival
@@ -885,10 +898,17 @@ public class BellmanFordIntervalBased {
 				// As long as no cleanup happens in between, this should be safe.
 				
 				VertexInterval inter = this._labels.get(v).getIntervalAt(task.ival.getLowBound());
-				if (inter.isScanned() || !inter.getReachable()) {
-					System.out.println("Node " + v.getId() + " was already scanned or not reachable ...");
+				
+				if (!inter.getReachable()) {
+					System.out.println("Node " + v.getId() + " was not reachable!");
 					continue;
-				}				
+				}
+				
+				if (inter.isScanned()) {
+					// don't scan again ... can happen with vertex cleanup
+					continue;
+				}
+								
 				inter.setScanned(true);
 				
 				// visit neighbors

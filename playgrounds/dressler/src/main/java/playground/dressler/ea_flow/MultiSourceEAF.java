@@ -60,7 +60,7 @@ public class MultiSourceEAF {
 	 * debug flag and the algorithm to use
 	 */
 	private static boolean _debug = false;
-	static boolean useReverse = false;
+	static boolean useReverse = true;
 	
 
 	
@@ -213,7 +213,7 @@ public class MultiSourceEAF {
 
 				// BIG DEBUG
 								
-				if (lasttime == 244) {
+				/*if (lasttime == 244) {
 					Flow.debug(1);
 				
 					System.out.println("Checking consistency before augmenting a single path:");
@@ -226,13 +226,13 @@ public class MultiSourceEAF {
 
 						throw new RuntimeException("Flow and stored TEPs disagree!"); 
 					}
-				}
+				}*/
 
 				
 				int augment = fluss.augment(path);
 				
 				// BIG DEBUG
-				if (lasttime == 244) {
+				/*if (lasttime == 244) {
 					System.out.println("Checking consistency after augmenting a single path:");
 					System.out.println("path " + path);
 					if (!fluss.checkTEPsAgainstFlow()) {
@@ -244,7 +244,7 @@ public class MultiSourceEAF {
 						throw new RuntimeException("Flow and stored TEPs disagree!"); 
 					}
 					Flow.debug(0);
-				}
+				}*/
 
 				
 				if (augment > 0) {
@@ -276,11 +276,11 @@ public class MultiSourceEAF {
 				System.out.println();
 				
 				// DEBUG
-				System.out.println("Checking consistency once in a while ...");
+				/*System.out.println("Checking consistency once in a while ...");
 				if (!fluss.checkTEPsAgainstFlow()) {
 					throw new RuntimeException("Flow and stored TEPs disagree!"); 
 				}
-				System.out.println("Everything seems to be okay.");
+				System.out.println("Everything seems to be okay.");*/
 			}
 
 		}
@@ -379,11 +379,11 @@ public class MultiSourceEAF {
 		}
 
 		String networkfile = null;
-		networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
+		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
 		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
-		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
+		networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
@@ -392,7 +392,7 @@ public class MultiSourceEAF {
 		//networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
 
 		String plansfile = null;
-		plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
+		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
 		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
@@ -421,11 +421,11 @@ public class MultiSourceEAF {
 
 		// Rounding is now done according to timestep and flowFactor!
 		int timestep = 10; 
-		double flowFactor = 0.1;
+		double flowFactor = 1.0;
 
 		
-		//String sinkid = "supersink"; //siouxfalls, problem
-		String sinkid = "en1";  //padang, line, swissold
+		String sinkid = "supersink"; //siouxfalls, problem
+		//String sinkid = "en1";  //padang, line, swissold
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
@@ -457,8 +457,6 @@ public class MultiSourceEAF {
 				}
 			}
 		}
-
-		
 		
 		int totaldemands = 0;
 		for (int i : demands.values()) {
@@ -478,7 +476,7 @@ public class MultiSourceEAF {
 		settings = new FlowCalculationSettings(network, sinkid, demands, timestep, flowFactor);
 
 		// set additional parameters, mostly for the LP
-		settings.TimeHorizon = 400;
+		settings.TimeHorizon = 1700;
 		//settings.MaxRounds = 101;
 		
 

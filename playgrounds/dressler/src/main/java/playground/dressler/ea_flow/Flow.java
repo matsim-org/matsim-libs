@@ -23,6 +23,7 @@ package playground.dressler.ea_flow;
 //java imports
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -524,18 +525,85 @@ public class Flow {
 
 	}
 	
+	
 	/**
-	 * Method to remove loops in a TEP
+	 * Method to resolve opposing edges in a TEP
+	 * It is assumed that the edges of an opposing pair only occur once in the path!
+	 * (other edges can occur more than once)  
+	 * This does not adjust the flow!
+	 * @param TEP The TimeExpandedPath on which loops should be removed. It is no longer to be used afterwards!
+	 * @return a TimeExpandedPath without loops, but it might be new or the original TEP 
+	 */
+	public TimeExpandedPath removeOpposing(TimeExpandedPath TEP) {
+		
+		TimeExpandedPath newTEP = new TimeExpandedPath();
+		newTEP.setFlow(TEP.getFlow());
+		
+		Iterator<PathStep> iter, search;
+		
+		iter = TEP.getPathSteps().listIterator();
+		
+		boolean didsomething = false;
+		
+		while (iter.hasNext()) {
+			PathStep step = iter.next();
+						
+			// is there an opposing step?
+			// if so, we continue strictly after it
+			search = TEP.getPathSteps().listIterator();
+			
+			//System.out.println("Looking for opposing of " + step);
+			while (search.hasNext()) {
+				PathStep other = search.next();
+				// do they oppose each other?
+				if (step.getForward() != other.getForward() &&  step.equalsNoCheckForward(other)) {
+					if (_debug > 0) {
+						System.out.println("Found opposing!");
+						System.out.println("Original step: " + step);
+					}
+					// jump to the step after this.					
+					iter = search;					
+					if (iter.hasNext()) {
+					  step = iter.next();
+					} else {
+					  step = null;
+					}
+					didsomething = true;
+					if (_debug > 0) {
+						System.out.println("Opposing step: " + other);
+					}
+					break;
+				}
+			}
+			
+			if (step != null) { // this only happens if the opposing step was the very last step
+			   newTEP.append(step);	
+			}
+		}
+		
+		if (_debug > 0) {
+			if (didsomething) {
+				System.out.println("Before removeOpposing: ");
+				System.out.println(TEP);
+				System.out.println("After removeOpposing: ");
+				System.out.println(newTEP);
+			}
+		}
+		return newTEP;
+	}
+	
+	
+	/**
+	 * Method to remove loops in a TEP that does not contain opposing edges!
+	 * (opposing edges would be removed as well, but that might cause havoc!)
 	 * This does not adjust the flow!
 	 * @param TEP The TimeExpandedPath on which loops should be removed. It is no longer to be used afterwards!
 	 * @return a TimeExpandedPath without loops, but it might be new or the original TEP 
 	 */
 	
-	public TimeExpandedPath unloop(TimeExpandedPath TEP) {
+	public TimeExpandedPath unloopNoOpposing(TimeExpandedPath TEP) {
 		/* check for loops in the path!
-		 * these can be pairwise opposing residual edges
-		 * or visiting the same time-expanded node twice
-		 * be careful with sourceoutflow-nodes ...
+		 * any time-expanded node visited twice qualifies!		
 		 */
 		
 		boolean hadtofixloop;
@@ -671,7 +739,8 @@ public class Flow {
 			/* remove loops
 			 */
 			
-			TEP = unloop(TEP);
+			TEP = removeOpposing(TEP);
+			TEP = unloopNoOpposing(TEP);
 			
 			boolean onlyForward = true;
 
@@ -844,7 +913,7 @@ public class Flow {
 			// add the good flows:
 			// check for loops and adjust the flow
 			for (TimeExpandedPath good : goodTEPs) {
-			  good = unloop(good);
+			  good = unloopNoOpposing(good);
 			  this._TimeExpandedPaths.add(good);
 			  dumbaugment(good, good.getFlow());
 			}
