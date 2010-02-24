@@ -21,6 +21,7 @@
 package org.matsim.core.utils.io;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -59,8 +60,8 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 	private String xmlSystemId = null;
 
 	public MatsimFileTypeGuesser(final String fileName) throws IOException {
-		String name = fileName.toLowerCase();
-		if (name.endsWith(".xml.gz") || name.toLowerCase().endsWith(".xml")) {
+		String name = fileName.toLowerCase(Locale.ROOT);
+		if (name.endsWith(".xml.gz") || name.endsWith(".xml")) {
 			guessFileTypeXml(fileName);
 			// I think the following would also be useful for the API, but with which name?
 			String shortSystemId = null;
@@ -87,11 +88,11 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 				}
 			}
 
-		} else if (name.endsWith(".txt.gz") || name.toLowerCase().endsWith(".txt")) {
+		} else if (name.endsWith(".txt.gz") || name.endsWith(".txt")) {
 			this.fileType = FileType.Events;
-		} else if (name.endsWith(".mvi.gz") || name.toLowerCase().endsWith(".mvi")) {
+		} else if (name.endsWith(".mvi.gz") || name.endsWith(".mvi")) {
 			this.fileType = FileType.OTFVis;
-		} else if (name.endsWith(".veh.gz") || name.toLowerCase().endsWith(".veh")) {
+		} else if (name.endsWith(".veh.gz") || name.endsWith(".veh")) {
 			this.fileType = FileType.TransimsVehicle;
 		}
 	}
@@ -130,7 +131,6 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 			reader.setErrorHandler(handler);
 			reader.setEntityResolver(handler);
 			reader.parse(input);
-			parser.parse(input, new XmlHandler());
 		} catch (SAXException e) {
 			throw new IOException("SAXException: " + e.getMessage());
 		} catch (ParserConfigurationException e) {
@@ -140,26 +140,28 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 			this.xmlSystemId = e.systemId;
 			log.debug("Detected public id: " + this.xmlPublicId);
 			log.debug("Detected system Id: " + this.xmlSystemId);
-			if ("events".equals(e.rootTag)) {
-				this.fileType = FileType.Events;
-			} else if ("lightSignalSystems".equals(e.rootTag)){
-				this.fileType = FileType.SignalSystems;
-			}	else if ("lightSignalSystemConfiguration".equals(e.rootTag)){
-				this.fileType = FileType.SignalSystemConfigs;
-			} else if ("signalSystems".equals(e.rootTag)){
-				this.fileType = FileType.SignalSystems;
-			}	else if ("signalSystemConfig".equals(e.rootTag)){
-				this.fileType = FileType.SignalSystemConfigs;
-			}	else if ("laneDefinitions".equals(e.rootTag)){
-				this.fileType = FileType.LaneDefinitions;
-			}	else if ("counts".equals(e.rootTag)){
-				this.fileType = FileType.Counts;
-			} else if ("transitSchedule".equals(e.rootTag)) {
-				this.fileType = FileType.TransitSchedule;
-			} else {
-				log.warn("got unexpected rootTag: " + e.rootTag);
+			if (e.rootTag != null) {
+				log.debug("Detected root tag: " +  e.rootTag);
+				if 	("events".equals(e.rootTag)) {
+					this.fileType = FileType.Events;
+				} else if ("lightSignalSystems".equals(e.rootTag)) {
+					this.fileType = FileType.SignalSystems;
+				}	else if ("lightSignalSystemConfiguration".equals(e.rootTag)) {
+					this.fileType = FileType.SignalSystemConfigs;
+				} else if ("signalSystems".equals(e.rootTag)) {
+					this.fileType = FileType.SignalSystems;
+				}	else if ("signalSystemConfig".equals(e.rootTag)) {
+					this.fileType = FileType.SignalSystemConfigs;
+				}	else if ("laneDefinitions".equals(e.rootTag)) {
+					this.fileType = FileType.LaneDefinitions;
+				}	else if ("counts".equals(e.rootTag)) {
+					this.fileType = FileType.Counts;
+				} else if ("transitSchedule".equals(e.rootTag)) {
+					this.fileType = FileType.TransitSchedule;
+				} else {
+					log.warn("got unexpected rootTag: " + e.rootTag);
+				}
 			}
-			log.debug("Detected root tag: " +  e.rootTag);
 		}
 	}
 

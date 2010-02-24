@@ -20,21 +20,27 @@
 
 package org.matsim.core.utils.io;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.testcases.MatsimTestCase;
 
 /**
  * @author mrieser
  */
-public class MatsimFileTypeGuesserTest extends MatsimTestCase {
+public class MatsimFileTypeGuesserTest {
 
 	private final static Logger log = Logger.getLogger(MatsimFileTypeGuesserTest.class);
 
+	@Test
 	public void testNetworkV1Dtd() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/scenarios/equil/network.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Network, g.getGuessedFileType());
@@ -42,6 +48,7 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals("http://www.matsim.org/files/dtd/network_v1.dtd", g.getSystemId());
 	}
 
+	@Test
 	public void testConfigV1Dtd() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/scenarios/equil/config.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Config, g.getGuessedFileType());
@@ -49,6 +56,7 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals("http://www.matsim.org/files/dtd/config_v1.dtd", g.getSystemId());
 	}
 
+	@Test
 	public void testPlansV4Dtd() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/scenarios/equil/plans100.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Population, g.getGuessedFileType());
@@ -56,6 +64,7 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals("http://www.matsim.org/files/dtd/plans_v4.dtd", g.getSystemId());
 	}
 
+	@Test
 	public void testCountsV1Xsd() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("examples/equil/counts100.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Counts, g.getGuessedFileType());
@@ -63,6 +72,7 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals("http://matsim.org/files/dtd/counts_v1.xsd", g.getSystemId());
 	}
 
+	@Test
 	public void testEventsV1Txt() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/events/EventsReadersTest/events.txt");
 		assertEquals(MatsimFileTypeGuesser.FileType.Events, g.getGuessedFileType());
@@ -70,6 +80,7 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertNull(g.getSystemId());
 	}
 
+	@Test
 	public void testEventsV1Xml() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/core/events/EventsReadersTest/events.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Events, g.getGuessedFileType());
@@ -77,6 +88,7 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertNull(g.getSystemId());
 	}
 
+	@Test
 	public void testLaneDefinitionsV11XML() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/signalsystems/testLaneDefinitions_v1.1.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.LaneDefinitions, g.getGuessedFileType());
@@ -85,6 +97,7 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11, g.getSystemId());
 	}
 
+	@Test
 	public void testSignalSystemsV11XML() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/signalsystems/testSignalSystems_v1.1.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.SignalSystems, g.getGuessedFileType());
@@ -93,6 +106,7 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals(MatsimSignalSystemsReader.SIGNALSYSTEMS11, g.getSystemId());
 	}
 
+	@Test
 	public void testSignalSystemConfigurationsV11XML() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/signalsystems/testSignalSystemConfigurations_v1.1.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.SignalSystemConfigs, g.getGuessedFileType());
@@ -101,6 +115,7 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals(MatsimSignalSystemConfigurationsReader.SIGNALSYSTEMSCONFIG11, g.getSystemId());
 	}
 
+	@Test
 	public void testTransitScheduleV1XML() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.TransitSchedule, g.getGuessedFileType());
@@ -109,10 +124,9 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals("http://www.matsim.org/files/dtd/transitSchedule_v1.dtd", g.getSystemId());
 	}
 
-
-
 	// TODO needs more test for Households, Transims-Veh, OTFVis, ...
 
+	@Test
 	public void testNotExistant() {
 		try {
 			new MatsimFileTypeGuesser("examples/equil/dummy.xml");
