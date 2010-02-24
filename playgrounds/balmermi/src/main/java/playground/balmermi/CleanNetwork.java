@@ -74,7 +74,6 @@ public class CleanNetwork {
 		
 		NetworkWriteAsTable nwat = new NetworkWriteAsTable("../../output/");
 		nwat.run(network);
-		nwat.close();
 		
 		new CountsWriter(counts).writeFile("../../output/output_counts.xml.gz");
 		new NetworkWriter(network).writeFile("../../output/output_network.xml.gz");
