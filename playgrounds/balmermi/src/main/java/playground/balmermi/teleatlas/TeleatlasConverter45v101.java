@@ -141,6 +141,11 @@ public class TeleatlasConverter45v101 {
 		if (NwElement.Freeway.FREEWAY.equals(nwElement.freeway)) {
 			modes.remove(TransportMode.walk);
 		}
+
+		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
+			modes.remove(TransportMode.car);
+		}
+
 		return modes;
 	}
 
@@ -156,7 +161,7 @@ public class TeleatlasConverter45v101 {
 		}
 
 		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
-			modes.remove(TransportMode.walk);
+			modes.remove(TransportMode.car);
 		}
 
 		return modes;
