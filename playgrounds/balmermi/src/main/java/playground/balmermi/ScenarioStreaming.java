@@ -96,6 +96,13 @@ public class ScenarioStreaming {
 		exTxpes.add("0");  // motorway
 		exTxpes.add("-1"); // not defined
 		exTxpes.add("-2"); // ferry
+		exTxpes.add("-3"); 
+		exTxpes.add("-4"); 
+		exTxpes.add("-5"); 
+		exTxpes.add("-6"); 
+		exTxpes.add("-7"); 
+		exTxpes.add("-8"); 
+		exTxpes.add("-9"); 
 
 		// teleatlas
 //		exTxpes.add("0-4110-0"); // motorway

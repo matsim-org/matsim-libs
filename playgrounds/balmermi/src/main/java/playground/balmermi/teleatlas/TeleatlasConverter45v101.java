@@ -132,7 +132,9 @@ public class TeleatlasConverter45v101 {
 				link.setFreespeed(freespeed);
 				link.setNumberOfLanes(nOfLanes);
 				link.setAllowedModes(modesFT);
-				((LinkImpl)link).setType(type);
+				if (modesFT.size() == 3) { ((LinkImpl)link).setType(type); }
+				else if (type.startsWith("-")) { ((LinkImpl)link).setType(type); }
+				else { ((LinkImpl)link).setType("-"+type); }
 			}
 			if (createTFElement) {
 				Link link = createLink(nwElement, "TF");
@@ -142,6 +144,9 @@ public class TeleatlasConverter45v101 {
 				link.setNumberOfLanes(nOfLanes);
 				link.setAllowedModes(modesTF);
 				((LinkImpl)link).setType(type);
+				if (modesTF.size() == 3) { ((LinkImpl)link).setType(type); }
+				else if (type.startsWith("-")) { ((LinkImpl)link).setType(type); }
+				else { ((LinkImpl)link).setType("-"+type); }
 			}
 		}
 	}
