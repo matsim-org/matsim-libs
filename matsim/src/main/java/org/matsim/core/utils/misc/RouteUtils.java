@@ -104,6 +104,24 @@ public class RouteUtils {
 		return route.getSubRoute(fromLinkId, toLinkId);
 	}
 
+
+	/**
+	 * Calculates the distance of the complete route, <b>excluding</b> the distance traveled
+	 * on the start- and end-link of the route.
+	 *
+	 * @param route
+	 * @param network
+	 * @return
+	 */
+	public static double calcDistance(final NetworkRoute route, final Network network) {
+		double dist = 0;
+		for (Id linkId : route.getLinkIds()) {
+			dist += network.getLinks().get(linkId).getLength();
+		}
+		return dist;
+	}
+
+
 	public static NetworkRoute createNetworkRoute(List<Id> routeLinkIds, final Network network) {
 		Id startLinkId = routeLinkIds.get(0);
 		List<Id> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<Id>(0);

@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class RouteUtilsTest {
 
@@ -198,6 +199,72 @@ public class RouteUtilsTest {
 		Assert.assertEquals(0, subRoute.getLinkIds().size());
 		Assert.assertEquals(f.ids[4], subRoute.getStartLinkId());
 		Assert.assertEquals(f.ids[4], subRoute.getEndLinkId());
+	}
+
+	@Test
+	public void testCalcDistance() {
+		Fixture f = new Fixture();
+		f.network.getLinks().get(f.ids[0]).setLength(100.0);
+		f.network.getLinks().get(f.ids[1]).setLength(200.0);
+		f.network.getLinks().get(f.ids[2]).setLength(300.0);
+		f.network.getLinks().get(f.ids[3]).setLength(400.0);
+		f.network.getLinks().get(f.ids[4]).setLength(500.0);
+		f.network.getLinks().get(f.ids[5]).setLength(600.0);
+		NetworkRoute route = new LinkNetworkRouteImpl(f.ids[0], f.ids[5], f.network);
+		List<Id> linkIds = new ArrayList<Id>();
+		Collections.addAll(linkIds, f.ids[1], f.ids[2], f.ids[3]);
+		route.setLinkIds(f.ids[0], linkIds, f.ids[4]);
+		Assert.assertEquals(900.0, RouteUtils.calcDistance(route, f.network), MatsimTestUtils.EPSILON);
+		// modify the route
+		linkIds.add(f.ids[4]);
+		route.setLinkIds(f.ids[0], linkIds, f.ids[5]);
+		Assert.assertEquals(1400.0, RouteUtils.calcDistance(route, f.network), MatsimTestUtils.EPSILON);
+	}
+
+	@Test
+	public void testCalcDistance_sameStartEndRoute() {
+		Fixture f = new Fixture();
+		f.network.getLinks().get(f.ids[0]).setLength(100.0);
+		f.network.getLinks().get(f.ids[1]).setLength(200.0);
+		f.network.getLinks().get(f.ids[2]).setLength(300.0);
+		f.network.getLinks().get(f.ids[3]).setLength(400.0);
+		f.network.getLinks().get(f.ids[4]).setLength(500.0);
+		f.network.getLinks().get(f.ids[5]).setLength(600.0);
+		NetworkRoute route = new LinkNetworkRouteImpl(f.ids[3], f.ids[3], f.network);
+		List<Id> linkIds = new ArrayList<Id>();
+		route.setLinkIds(f.ids[3], linkIds, f.ids[3]);
+		Assert.assertEquals(0.0, RouteUtils.calcDistance(route, f.network), MatsimTestUtils.EPSILON);
+	}
+
+	@Test
+	public void testCalcDistance_subsequentStartEndRoute() {
+		Fixture f = new Fixture();
+		f.network.getLinks().get(f.ids[0]).setLength(100.0);
+		f.network.getLinks().get(f.ids[1]).setLength(200.0);
+		f.network.getLinks().get(f.ids[2]).setLength(300.0);
+		f.network.getLinks().get(f.ids[3]).setLength(400.0);
+		f.network.getLinks().get(f.ids[4]).setLength(500.0);
+		f.network.getLinks().get(f.ids[5]).setLength(600.0);
+		NetworkRoute route = new LinkNetworkRouteImpl(f.ids[2], f.ids[3], f.network);
+		List<Id> linkIds = new ArrayList<Id>();
+		route.setLinkIds(f.ids[2], linkIds, f.ids[3]);
+		Assert.assertEquals(0.0, RouteUtils.calcDistance(route, f.network), MatsimTestUtils.EPSILON);
+	}
+
+	@Test
+	public void testCalcDistance_oneLinkRoute() {
+		Fixture f = new Fixture();
+		f.network.getLinks().get(f.ids[0]).setLength(100.0);
+		f.network.getLinks().get(f.ids[1]).setLength(200.0);
+		f.network.getLinks().get(f.ids[2]).setLength(300.0);
+		f.network.getLinks().get(f.ids[3]).setLength(400.0);
+		f.network.getLinks().get(f.ids[4]).setLength(500.0);
+		f.network.getLinks().get(f.ids[5]).setLength(600.0);
+		NetworkRoute route = new LinkNetworkRouteImpl(f.ids[2], f.ids[4], f.network);
+		List<Id> linkIds = new ArrayList<Id>();
+		linkIds.add(f.ids[3]);
+		route.setLinkIds(f.ids[2], linkIds, f.ids[4]);
+		Assert.assertEquals(400.0, RouteUtils.calcDistance(route, f.network), MatsimTestUtils.EPSILON);
 	}
 
 	private static class Fixture {
