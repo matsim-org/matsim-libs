@@ -17,13 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.plans;
+package playground.benjamin;
 
 import java.util.Comparator;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -34,13 +34,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.benjamin.charts.BkChartWriter;
-import playground.benjamin.charts.BkPopulationScoreDifferenceWriter;
+import playground.benjamin.charts.types.BkDeltaUtilsChart;
 
 /**
- * @author bkickhoefer after kn
+ * @author bkickhoefer after kn and dgrether
  */
 
-public class BkPlansLoaderFor2Populations {
+public class BkAnalysis {
+	
+	private static final Logger log = Logger.getLogger(BkAnalysis.class);
 	
 
 	public void run(final String[] args) {
@@ -70,38 +72,23 @@ public class BkPlansLoaderFor2Populations {
 		
 //============================================================================================================		
 
-		//get the sorted scores from the plans
+		//get the scores from the plans (sorted by personId)
 		SortedMap<Id, Double> scores1 = getScoresFromPlans(population1);
 		SortedMap<Id, Double> scores2 = getScoresFromPlans(population2);
 		
-		//calculate the score differences per person
-		SortedMap<Id, Double> scoreDifferences = calculateScoreDifferences(scores1, scores2);
+		//BkDeltaUtilsChart for score difference calculations and creation of series and dataset
+		BkDeltaUtilsChart deltaUtilsChart = new BkDeltaUtilsChart(scores1, scores2);
 		
-			//writing the output with the help of my scoreWriter
-			BkPopulationScoreDifferenceWriter scoreWriter = new BkPopulationScoreDifferenceWriter(scoreDifferences);
-			scoreWriter.writeChart("../matsim/output/multipleIterations20/scoreDifferencePerPerson20-10.png");
-			scoreWriter.writeTxt("../matsim/output/multipleIterations20/scoreDifferencePerPerson20-10.txt");
+		//BkChartWriter gets an jchart object from BkDeltaUtilsChart to write the chart:
+		BkChartWriter.writeChart("../matsim/output/multipleIterations20/deltaUtilsPerPerson_20-10", deltaUtilsChart.createChart());
 		
-		System.out.println("Charts and tables written.");
+		log.info( "\n" + "******************************" + "\n"
+				       + "Chart(s) and table(s) written." + "\n"
+				       + "******************************");
 	}
 
 //============================================================================================================	
 	
-	//this calculates the score differences
-	private SortedMap<Id, Double> calculateScoreDifferences(SortedMap<Id, Double> scores1, SortedMap<Id, Double> scores2) {
-		SortedMap<Id, Double> result = new TreeMap<Id, Double>(new ComparatorImplementation());
-		
-		for (Id id : scores1.keySet()){
-			//value = map.get(key) !!!
-			Double score1 = scores1.get(id);
-			Double score2 = scores2.get(id);
-			Double scoreDifference = score2 - score1;
-			result.put(id, scoreDifference);
-		}		
-		
-		return result;
-	}
-
 	private SortedMap<Id, Double> getScoresFromPlans(Population population) {
 		//instancing the sorted map (comparator - see below - is needed to compare Ids not as Strings but as Integers)
 		SortedMap<Id,Double> result = new TreeMap<Id, Double>(new ComparatorImplementation());
@@ -119,7 +106,7 @@ public class BkPlansLoaderFor2Populations {
 	
 	//main class
 	public static void main(final String[] args) {
-		BkPlansLoaderFor2Populations app = new BkPlansLoaderFor2Populations();
+		BkAnalysis app = new BkAnalysis();
 		app.run(args);
 	}
 

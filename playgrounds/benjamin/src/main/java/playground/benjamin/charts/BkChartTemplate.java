@@ -42,6 +42,7 @@ public class BkChartTemplate {
     double yvalue = 0;
     
     this.dataset = new XYSeriesCollection();
+    // 1. boolean = autosort, 2. boolean = allow multiple x-values
     XYSeries series = new XYSeries("Series name", false, true);
     this.dataset.addSeries(series);
     series.add(xvalue, yvalue);

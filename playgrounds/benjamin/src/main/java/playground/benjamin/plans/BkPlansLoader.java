@@ -32,6 +32,8 @@ import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
+import playground.benjamin.charts.BkPopulationScoreWriter;
+
 /**
  * @author bkickhoefer after kn
  */
