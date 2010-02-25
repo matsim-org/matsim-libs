@@ -67,16 +67,27 @@ public class FacilitiesAddDataPulsBuildings {
 
 			String curr_line = null;
 			while ((curr_line = br.readLine()) != null) {
+
+				// datapuls 2008
+				// geopostid  str_name  hnr  plz  ort  bfs_gde_nr  kanton  rechts_koord  hoch_koord  hh_total  hh_efh  kk_klasse  pers_ist
+				// 0          1         2    3    4    5           6       7             8           9         10      11         12
+				if (line_cnt==0) { line_cnt++; continue; }
+				String[] entries = curr_line.split(",", -1);
+				Coord coord = new CoordImpl(entries[entries.length-6].trim(),entries[entries.length-5].trim());
+				double cap = Double.parseDouble(entries[entries.length-1].trim());
+				if (cap < 1.0) { cap = 1.0; }
+				Id id = new IdImpl(entries[0].trim());
+
+				// datapuls 2008
 				// BFS_GDE_NR  KANTON  RT_KOORD  HOCH_KOORD  ANZPRS  ANZHH  ANZKND  ANZAUSL  ANTAUSL  KKKL  KKKT  HHKLS1  HHKLS2  HHKLS3  HHKLS4  ALTKLS1  ALTKLS2  ALTKLS3  ALTKLS4  ALTKLS5  ALTER  ANTERWPRS  ANTERWLOS  GTYP  DKBAUPER  MPPBAUPER  RPBAUPER1  RPBAUPER2  RPBAUPER3  RPBAUPER4  RPBAUPER5  RPBAUPER6  RPBAUPER7  RPBAUPER8  MPPRENPER  RPRENPER0  RPRENPER5  RPRENPER6  RPRENPER7  LINKID
 				// 6002        VS      642300    128800      8       2      3       0        .0000    1     53    0       0       0       2       3        2        2        0        1        33     .5070      .0540      2     6         3          .0000      .0769      .1538      .2308      .1538      .3846      .0000      .0000      6          .6154      .0000      .0769      .3077      91436663
 				// 0           1       2         3           4       5      6       7        8        9     10    11      12      13      14      15       16       17       18       19       20     21         22         23    24        25         26         27         28         29         30         31         32         33         34         35         36         37         38         39
-				String[] entries = curr_line.split("\t", -1);
+//				String[] entries = curr_line.split("\t", -1);
+//				Coord coord = new CoordImpl(entries[2].trim(),entries[3].trim());
+//				double cap = Double.parseDouble(entries[4].trim());
+//				if (cap < 1.0) { cap = 1.0; }
+//				Id id = new IdImpl(entries[39].trim());
 
-				Coord coord = new CoordImpl(entries[2].trim(),entries[3].trim());
-				double cap = Double.parseDouble(entries[4].trim());
-				if (cap < 1.0) { cap = 1.0; }
-				Id id = new IdImpl(entries[39].trim());
-				
 				ActivityFacilityImpl af = facilities.createFacility(id,coord);
 				ActivityOptionImpl ao = af.createActivityOption("home");
 				ao.setCapacity(cap);

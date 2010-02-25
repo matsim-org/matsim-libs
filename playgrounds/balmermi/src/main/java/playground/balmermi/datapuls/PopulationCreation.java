@@ -31,6 +31,7 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 
 import playground.balmermi.datapuls.modules.PlansCreateFromDataPuls;
+import playground.balmermi.datapuls.modules.PlansCreateFromDataPuls2010;
 
 public class PopulationCreation {
 
@@ -86,7 +87,7 @@ public class PopulationCreation {
 		System.out.println("done. (creating datapuls population)");
 
 		System.out.println("running modules...");
-		new PlansCreateFromDataPuls(args[2],sl.getScenario(),datapulsFacilities).run(datapulsPopulation,datapulsKnowledges);
+		new PlansCreateFromDataPuls2010(args[2],sl.getScenario(),datapulsFacilities).run(datapulsPopulation,datapulsKnowledges);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (running modules)");
 
