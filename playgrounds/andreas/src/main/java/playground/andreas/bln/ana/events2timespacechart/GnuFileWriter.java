@@ -38,13 +38,13 @@ public class GnuFileWriter {
 			this.writer.write("set timefmt \"%H:%M:%S\""); this.writer.newLine();
 
 			this.writer.write("set xtics rotate \"00:00:00\", 1800, \"30:00:00\""); this.writer.newLine();
-			this.writer.write("set xrange [\"03:00:00\" :  \"23:00:00\"]"); this.writer.newLine();
+			this.writer.write("set xrange [\"08:00:00\" :  \"10:00:00\"]"); this.writer.newLine();
 		
 			this.writer.write(writeYTics(stopIdDistanceMap, stopIdNameMap)); this.writer.newLine();
 			
 			this.writer.write("set key off"); this.writer.newLine();
 			this.writer.write("set xlabel \"Zeit [HH:MM:SS]\" 0, 0"); this.writer.newLine();
-			this.writer.write("set ylabel \"ID der Haltestelle [ ]\" 0, 0"); this.writer.newLine();
+			this.writer.write("set ylabel \"Haltestelle [ ]\" 0, 0"); this.writer.newLine();
 			
 			this.writer.write("set style line 1  linetype 1 linecolor rgb \"blue\"  linewidth 2.000 pointtype 1 pointsize default"); this.writer.newLine();
 			this.writer.write("set style line 2  linetype 1 linecolor rgb \"red\"  linewidth 2.000 pointtype 2 pointsize default"); this.writer.newLine();
