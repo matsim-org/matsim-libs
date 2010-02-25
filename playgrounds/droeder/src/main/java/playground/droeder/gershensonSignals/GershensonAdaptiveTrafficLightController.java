@@ -57,10 +57,10 @@ public class GershensonAdaptiveTrafficLightController extends
 
 	private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
 
-	private int tGreenMin = 0; // time in seconds
-	private int minCars = 0; //
-	private double capFactor = 0.99;
-	private boolean compGroupsGreen = false;
+	private int tGreenMin; // time in seconds
+	private int minCars; //
+	private double capFactor = 0.90;
+	private boolean compGroupsGreen;
 
 	private Map<Id, Integer> vehOnLink = new HashMap<Id, Integer>();
 	private Map<Id, Map<Id, Integer>> vehOnLinkLanes = new HashMap<Id, Map<Id, Integer>>();
@@ -239,6 +239,8 @@ public class GershensonAdaptiveTrafficLightController extends
 		}else{
 			approachingRed = 0;
 		}
+		
+		
 		
 		//------- end of initializing
 

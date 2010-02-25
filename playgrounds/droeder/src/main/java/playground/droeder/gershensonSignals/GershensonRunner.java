@@ -38,6 +38,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
@@ -47,7 +48,9 @@ import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
+import playground.droeder.DaPaths;
 import playground.droeder.charts.DaBarChart;
+import playground.droeder.charts.DaChartWriter;
 import playground.droeder.handler.AverageTTHandler;
 
 
@@ -60,8 +63,8 @@ import playground.droeder.handler.AverageTTHandler;
  */
 public class GershensonRunner implements AgentStuckEventHandler {
 	
-	private int u = 0;
-	private int n = 0;
+	private int u;
+	private int n;
 	
 	private Map<Id, Id> corrGroups;
 	private Map<Id, List<Id>> compGroups;
@@ -206,16 +209,16 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	}
 	
 	public static void main(String[] args) {
-		DaBarChart chartWriter = new DaBarChart();
+		DaBarChart barChart = new DaBarChart();
 		
 		GershensonRunner runner = new GershensonRunner();
-		runner.setN(23);
-		runner.setU(12);
+		runner.setN(8);
+		runner.setU(1);
 		runner.runScenario(config);
 				
-//		for (int u = 12; u < 18; u++){
+//		for (int u = 21; u < 31; u++){
 //			nAndT = new LinkedHashMap<Number, Number>();
-//			for (int n = 19; n < 25; n++){
+//			for (int n = 1; n < 11; n++){
 //				runner = new GershensonRunner();
 //				Gbl.reset();
 //				runner.setU(u);
@@ -223,10 +226,44 @@ public class GershensonRunner implements AgentStuckEventHandler {
 //				runner.runScenario(config);
 //				nAndT.put(n, avTT);
 //			}
-//			chartWriter.addSeries("u=" + String.valueOf(u), nAndT);
+//			barChart.addSeries("u=" + String.valueOf(u), nAndT);
 ////			nAndUT.put(n, uAndT);
 //		}	
-//		new DaChartWriter().writeChart(DaPaths.DATA + "tOverN", 1600, 1024, chartWriter.createChart("avTT Denver", "n", "t"));
+//		new DaChartWriter().writeChart(DaPaths.DATA + "u21-30_n1-10", 1600, 1024, barChart.createChart("avTT Denver", "n", "t"));
+//		nAndT.clear();
+//		
+//		barChart = new DaBarChart();
+//		for (int u = 21; u < 31; u++){
+//			nAndT = new LinkedHashMap<Number, Number>();
+//			for (int n = 11; n < 21; n++){
+//				runner = new GershensonRunner();
+//				Gbl.reset();
+//				runner.setU(u);
+//				runner.setN(n);
+//				runner.runScenario(config);
+//				nAndT.put(n, avTT);
+//			}
+//			barChart.addSeries("u=" + String.valueOf(u), nAndT);
+////			nAndUT.put(n, uAndT);
+//		}	
+//		new DaChartWriter().writeChart(DaPaths.DATA + "u21-30_n11-20", 1600, 1024, barChart.createChart("avTT Denver", "n", "t"));
+//		nAndT.clear();
+//		
+//		barChart = new DaBarChart();
+//		for (int u = 21; u < 31; u++){
+//			nAndT = new LinkedHashMap<Number, Number>();
+//			for (int n = 21; n < 31; n++){
+//				runner = new GershensonRunner();
+//				Gbl.reset();
+//				runner.setU(u);
+//				runner.setN(n);
+//				runner.runScenario(config);
+//				nAndT.put(n, avTT);
+//			}
+//			barChart.addSeries("u=" + String.valueOf(u), nAndT);
+////			nAndUT.put(n, uAndT);
+//		}	
+//		new DaChartWriter().writeChart(DaPaths.DATA + "u21-30_n21-30", 1600, 1024, barChart.createChart("avTT Denver", "n", "t"));
 	}
 
 	@Override

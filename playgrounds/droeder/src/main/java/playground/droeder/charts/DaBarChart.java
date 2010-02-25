@@ -54,8 +54,8 @@ public class DaBarChart {
 		  this.dataset = new DefaultCategoryDataset();
 	  }
 	  
-	  public void addSeries(String category, Map<Number, Number> data){
-		  for (Entry<Number, Number> e : data.entrySet()){
+	  public void addSeries(String category, Map<Number, Number> seriesAndX){
+		  for (Entry<Number, Number> e : seriesAndX.entrySet()){
 			  dataset.addValue(e.getValue(), category, String.valueOf(e.getKey()));
 		  }
 	  }
@@ -76,7 +76,6 @@ public class DaBarChart {
 		for(int i=1; i< 1+dataset.getRowCount(); i++){
 			renderer.setSeriesPaint(i, cs.getColor(i));
 		}
-		this.jChart = chart;
 		return chart;
 
 	  }
