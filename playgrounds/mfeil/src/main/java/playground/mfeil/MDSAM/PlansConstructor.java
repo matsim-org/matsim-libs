@@ -198,7 +198,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		//	this.sims = this.mdsam.runPopulation();
 		//	this.writeSims(this.outputFileSims);
 
-	// Type of writing the Biogeme file
+	// Type of writing the Biogeme dat file
 		//	this.writePlansForBiogeme(this.outputFileBiogeme);
 		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
 		//		this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
@@ -782,7 +782,7 @@ public class PlansConstructor implements PlanStrategyModule{
 
 
 	//****************************************************************************************
-	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
+	// Writes a Biogeme dat file that fits "protected void enlargePlansSetWithRandomSelection ()"
 	//****************************************************************************************
 	
 	
@@ -939,7 +939,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			boolean bike = false;
 			boolean walk = false;
 			for (int j=0;j<java.lang.Math.max(this.actChains.get(i).size()-1,1);j+=2){
-				stream.print("x"+(i+1)+""+(j+1)+"\t");
+				stream.print("x"+(i+1)+"_"+(j+1)+"\t");
 				counterFirst++;
 			}
 			for (int j=1;j<this.actChains.get(i).size()-1;j+=2){
