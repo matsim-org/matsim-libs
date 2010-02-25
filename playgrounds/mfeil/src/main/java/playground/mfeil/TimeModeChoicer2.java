@@ -157,7 +157,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 					else {		*/
 						// TODO Check whether allowed?
 					basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
-						log.warn("No valid initial solution found for person "+plan.getPerson().getId()+"!");
+			//			log.warn("No valid initial solution found for person "+plan.getPerson().getId()+"!");
 						return;
 			//		}
 				}
