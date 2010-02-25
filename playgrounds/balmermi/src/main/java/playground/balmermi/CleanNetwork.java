@@ -24,24 +24,14 @@ import java.util.EnumSet;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkAdaptLength;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsWriter;
-import org.matsim.counts.MatsimCountsReader;
-
-import playground.balmermi.modules.NetworkDoubleLinks;
-import playground.balmermi.modules.NetworkShiftFreespeed;
-import playground.balmermi.modules.NetworkThinner;
 
 public class CleanNetwork {
 
@@ -53,18 +43,24 @@ public class CleanNetwork {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("../../../input/network.xml.gz");
+		new MatsimNetworkReader(scenario).readFile(args[0]);
 		
 //		Counts counts = new Counts();
 //		new MatsimCountsReader(counts).readFile("../../input/counts.xml.gz");
 
-		Network subNet = new NetworkLayer();
+		NetworkLayer subNet = new NetworkLayer();
 		
 		new TransportModeNetworkFilter(network).filter(subNet,EnumSet.of(TransportMode.car));
 //		new NetworkAdaptLength().run(network);
 //		new NetworkDoubleLinks("-dl").run(network);
 //		new NetworkThinner().run(network,counts);
-		new NetworkCleaner().run(network);
+		new NetworkCleaner().run(subNet);
+		
+		for (LinkImpl l : network.getLinks().values()) {
+			LinkImpl l2 = subNet.getLinks().get(l.getId());
+			l2.setOrigId(l.getOrigId());
+			l2.setType(l.getType());
+		}
 
 //		new NetworkShiftFreespeed().run(network);
 //		
@@ -80,11 +76,11 @@ public class CleanNetwork {
 //			}
 //		}
 		
-		NetworkWriteAsTable nwat = new NetworkWriteAsTable("../../../output/");
-		nwat.run(network);
+		NetworkWriteAsTable nwat = new NetworkWriteAsTable(args[1]);
+		nwat.run(subNet);
 		
 //		new CountsWriter(counts).writeFile("../../output/output_counts.xml.gz");
-		new NetworkWriter(network).writeFile("../../../output/output_network.xml.gz");
+		new NetworkWriter(subNet).writeFile(args[1]+"/network.xml.gz");
 	}
 
 	//////////////////////////////////////////////////////////////////////
