@@ -20,6 +20,8 @@
 
 package org.matsim.planomat.costestimators;
 
+import junit.framework.TestCase;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,35 +40,29 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestCase;
 
-public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCase {
+public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 
 	private static final Id FIRST_LINK_ID = new IdImpl("1002");
 	private static final Id HIGHWAY_LINK_ID = new IdImpl("4005");
-	
-	private final static Logger logger = Logger.getLogger(LinearInterpolationLegTravelTimeEstimatorTest.class);
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+	private final static Logger logger = Logger.getLogger(LinearInterpolationLegTravelTimeEstimatorTest.class);
 
 	public void testGetLegTravelTimeEstimation() {
 
-		Config config = super.loadConfig(null);
+		Config config = new Config();
+		config.addCoreModules();
 
 		NetworkLayer network = this.createNetwork();
-		logger.info(network.toString());
-		
+
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(network, 900);
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, config.charyparNagelScoring());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(
-				config.plansCalcRoute(), 
-				network, 
-				linkTravelCostEstimator, 
+				config.plansCalcRoute(),
+				network,
+				linkTravelCostEstimator,
 				linkTravelTimeEstimator);
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
@@ -78,28 +74,28 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 				network);
 
 		testee.setDoLogging(true);
-		
+
 		Id dummyPersonId = new IdImpl(123456);
 		ActivityImpl homeActivity = new ActivityImpl("home", new IdImpl("1002"));
 		homeActivity.setCoord(new CoordImpl(5000.0, 10000.0));
 		ActivityImpl workActivity = new ActivityImpl("work", new IdImpl("5006"));
 		workActivity.setCoord(new CoordImpl(35000.0, 10000.0));
-		
+
 		for (TransportMode mode : new TransportMode[]{TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk, TransportMode.car}) {
 			logger.info(mode.toString());
-			for (String str : new String[] { 
-					"06:10:00", 
+			for (String str : new String[] {
+					"06:10:00",
 					"07:00:00",
-					"08:15:00", 
-					"23:00:00", 
+					"08:15:00",
+					"23:00:00",
 					"06:15:00"}) {
 
 				LegImpl legIntermediate = new LegImpl(mode);
-				
+
 				double travelTime = testee.getLegTravelTimeEstimation(
 						dummyPersonId, Time.parseTime(str), homeActivity,
 						workActivity, legIntermediate, Boolean.FALSE);
-				
+
 				switch(mode) {
 				case car:
 					assertEquals(Time.parseTime("02:00:00"), travelTime);
@@ -113,38 +109,40 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 				case walk:
 					assertEquals(Time.parseTime("10:00:00"), travelTime);
 					break;
+				default:
+					fail("unexpected mode.");
 				}
-				
+
 				logger.info(str + "\t" + Time.writeTime(travelTime));
-				
+
 			}
 			logger.info("");
 		}
 		logger.info("");
-		
+
 		testee.resetPlanSpecificInformation();
-		
+
 		// now let's repeat the same stuff with some events that indicate a very long travel time on the highway
 		// the result must be the free speed travel time of the alternate route
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(linkTravelTimeEstimator);
-		
+
 		events.processEvent(new LinkEnterEventImpl(Time.parseTime("06:50:00"), dummyPersonId, HIGHWAY_LINK_ID));
 		events.processEvent(new LinkLeaveEventImpl(Time.parseTime("07:49:00"), dummyPersonId, HIGHWAY_LINK_ID));
-		
+
 		LegImpl legIntermediate = new LegImpl(TransportMode.car);
-		for (String str : new String[] { 
-				"06:10:00", 
+		for (String str : new String[] {
+				"06:10:00",
 				"07:00:00",
-				"08:15:00", 
-				"23:00:00", 
+				"08:15:00",
+				"23:00:00",
 				"06:15:00"}) {
-			
+
 			double travelTime = testee.getLegTravelTimeEstimation(
 					dummyPersonId, Time.parseTime(str), homeActivity,
 					workActivity, legIntermediate, Boolean.FALSE);
 			logger.info(str + "\t" + Time.writeTime(travelTime));
-			
+
 			if (str.equals("06:10:00")) {
 				assertEquals("02:20:00", Time.writeTime(travelTime));
 			} else if (str.equals("06:15:00")) {
@@ -152,40 +150,27 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 			} else {
 				assertEquals("02:00:00", Time.writeTime(travelTime));
 			}
-			
+
 		}
 		logger.info("");
-		
+
 	}
-	
+
 	private NetworkLayer createNetwork() {
 
 		NetworkLayer network = new NetworkLayer();
 
-		for (int nodeId = 1; nodeId <= 6; nodeId++) {
-			double x = 0.0, y = 0.0;
-			switch(nodeId) {
-			case 1:
-				x = 0.0; y = 10000.0; break;
-			case 2:
-				x = 10000.0; y = 10000.0; break;
-			case 3:
-				x = 20000.0; y = 20000.0; break;
-			case 4:
-				x = 20000.0; y = 0.0; break;
-			case 5:
-				x = 30000.0; y = 10000.0; break;
-			case 6:
-				x = 40000.0; y = 10000.0; break;
-			}
-			network.createAndAddNode(new IdImpl(nodeId), new CoordImpl(x, y));
-			logger.info(network.getNodes().get(new IdImpl(nodeId)).toString());
-		}
+		network.addNode(network.getFactory().createNode(new IdImpl(1), new CoordImpl(    0.0, 10000.0)));
+		network.addNode(network.getFactory().createNode(new IdImpl(2), new CoordImpl(10000.0, 10000.0)));
+		network.addNode(network.getFactory().createNode(new IdImpl(3), new CoordImpl(20000.0, 20000.0)));
+		network.addNode(network.getFactory().createNode(new IdImpl(4), new CoordImpl(20000.0,     0.0)));
+		network.addNode(network.getFactory().createNode(new IdImpl(5), new CoordImpl(30000.0, 10000.0)));
+		network.addNode(network.getFactory().createNode(new IdImpl(6), new CoordImpl(40000.0, 10000.0)));
 
 		for (int[] nodePair : new int[][]{{1, 2}, {2, 3}, {2, 4}, {3, 5}, {4, 5}, {5, 6}}) {
-			
+
 			IdImpl linkId = new IdImpl(nodePair[0] * 1000 + nodePair[1]);
-			
+
 			double freespeed = 0.0;
 			if (linkId.equals(HIGHWAY_LINK_ID)) {
 				freespeed = 100.0 / 3.6;
@@ -194,21 +179,19 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 			} else {
 				freespeed = 50.0 / 3.6;
 			}
-			
+
 			network.createAndAddLink(
-					linkId, 
-					network.getNodes().get(new IdImpl(nodePair[0])), 
-					network.getNodes().get(new IdImpl(nodePair[1])), 
-					40000.0, 
-					freespeed, 
-					1000.0, 
+					linkId,
+					network.getNodes().get(new IdImpl(nodePair[0])),
+					network.getNodes().get(new IdImpl(nodePair[1])),
+					40000.0,
+					freespeed,
+					1000.0,
 					1);
-			
-			logger.info(network.getLinks().get(linkId).toString());
 		}
 
 		return network;
-		
+
 	}
-	
+
 }
