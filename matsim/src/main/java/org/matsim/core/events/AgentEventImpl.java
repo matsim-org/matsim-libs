@@ -28,8 +28,8 @@ import org.matsim.core.api.experimental.events.AgentEvent;
 
 public abstract class AgentEventImpl extends PersonEventImpl implements AgentEvent {
 
-	public static final String ATTRIBUTE_LINK = "link";	
-	public static final String ATTRIBUTE_LEGMODE = "legMode";	
+	public static final String ATTRIBUTE_LINK = "link";
+	public static final String ATTRIBUTE_LEGMODE = "legMode";
 
 	private final Id linkId;
 	private final TransportMode legMode;
@@ -43,7 +43,7 @@ public abstract class AgentEventImpl extends PersonEventImpl implements AgentEve
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		attr.put(ATTRIBUTE_LINK, (this.linkId == null ? null : this.linkId.toString()));
 		attr.put(ATTRIBUTE_LEGMODE, (this.legMode == null ? null : this.legMode.toString()));
 		return attr;
 	}
@@ -51,9 +51,9 @@ public abstract class AgentEventImpl extends PersonEventImpl implements AgentEve
 	public TransportMode getLegMode() {
 		return this.legMode;
 	}
-	
+
 	public Id getLinkId() {
 		return this.linkId;
 	}
-	
+
 }

@@ -328,7 +328,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
 		}
 		this.activityEndsList.clear();
 

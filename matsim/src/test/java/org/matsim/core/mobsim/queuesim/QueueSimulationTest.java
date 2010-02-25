@@ -252,9 +252,11 @@ public class QueueSimulationTest extends TestCase {
 
 	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
 		public final ArrayList<LinkEnterEvent> events = new ArrayList<LinkEnterEvent>();
+		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			this.events.add(event);
 		}
+		@Override
 		public void reset(final int iteration) {
 			this.events.clear();
 		}
@@ -933,12 +935,12 @@ public class QueueSimulationTest extends TestCase {
 		NetworkImpl network = scenario.getNetwork();
 		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
 		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
-		network.getNodes().put(node1.getId(), node1);
-		network.getNodes().put(node2.getId(), node2);
+		network.addNode(node1);
+		network.addNode(node2);
 		LinkImpl link = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link.setFreespeed(10.0);
 		link.setCapacity(2000.0);
-		network.getLinks().put(link.getId(), link);
+		network.addLink(link);
 
 		// build simple population with 1 person with 1 plan with 1 leg
 		PopulationImpl population = scenario.getPopulation();
@@ -979,6 +981,96 @@ public class QueueSimulationTest extends TestCase {
 	}
 
 	/**
+	 * Tests that cleanupSim() works correctly without generating NullPointerExceptions,
+	 * even if there are still agents somewhere in the simulation.
+	 *
+	 * @author mrieser
+	 */
+	public void testCleanupSim_EarlyEnd() {
+		ScenarioImpl scenario = new ScenarioImpl();
+		Config config = scenario.getConfig();
+
+		double simEndTime = 8.0*3600;
+
+		// build simple network with 2 links
+		NetworkImpl network = scenario.getNetwork();
+		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
+		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
+		NodeImpl node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		LinkImpl link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		link1.setFreespeed(10.0); // freespeed-traveltime = 100s
+		link1.setCapacity(2000.0);
+		network.addLink(link1);
+		LinkImpl link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		link2.setFreespeed(10.0); // freespeed-traveltime = 100s
+		link2.setCapacity(2000.0);
+		network.addLink(link2);
+
+		// build simple population with 3 persons with 1 plan with 1 leg
+		PopulationImpl population = scenario.getPopulation();
+		PopulationFactory pb = population.getFactory();
+		// person 1 : on the road when simulation ends
+		Person person1 = pb.createPerson(scenario.createId("1"));
+		Plan plan1 = pb.createPlan();
+		Activity act1_1 = pb.createActivityFromLinkId("h", link1.getId());
+		act1_1.setEndTime(simEndTime - 20);
+		Leg leg1 = pb.createLeg(TransportMode.car);
+		NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		leg1.setRoute(route1);
+		leg1.setTravelTime(5.0*3600);
+		Activity act1_2 = pb.createActivityFromLinkId("w", link2.getId());
+		plan1.addActivity(act1_1);
+		plan1.addLeg(leg1);
+		plan1.addActivity(act1_2);
+		person1.addPlan(plan1);
+		population.addPerson(person1);
+		// person 2 : on teleportation when simulation ends
+		Person person2 = pb.createPerson(scenario.createId("2"));
+		Plan plan2 = pb.createPlan();
+		Activity act2_1 = pb.createActivityFromLinkId("h", link1.getId());
+		act2_1.setEndTime(simEndTime - 1000);
+		Leg leg2 = pb.createLeg(TransportMode.walk);
+		GenericRoute route2 = new GenericRouteImpl(link1.getId(), link2.getId());
+		leg2.setRoute(route2);
+		leg2.setTravelTime(2000);
+		Activity act2_2 = pb.createActivityFromLinkId("w", link2.getId());
+		plan2.addActivity(act2_1);
+		plan2.addLeg(leg2);
+		plan2.addActivity(act2_2);
+		person2.addPlan(plan2);
+		population.addPerson(person2);
+		// person 3 : still at home when simulation ends
+		Person person3 = pb.createPerson(scenario.createId("3"));
+		Plan plan3 = pb.createPlan();
+		Activity act3_1 = pb.createActivityFromLinkId("h", link1.getId());
+		act3_1.setEndTime(simEndTime + 1000);
+		Leg leg3 = pb.createLeg(TransportMode.walk);
+		GenericRoute route3 = new GenericRouteImpl(link1.getId(), link2.getId());
+		leg3.setRoute(route3);
+		leg3.setTravelTime(1000);
+		Activity act3_2 = pb.createActivityFromLinkId("w", link2.getId());
+		plan3.addActivity(act3_1);
+		plan3.addLeg(leg3);
+		plan3.addActivity(act3_2);
+		person3.addPlan(plan3);
+		population.addPerson(person3);
+
+		EventsManagerImpl events = new EventsManagerImpl();
+		FirstLastEventCollector collector = new FirstLastEventCollector();
+		events.addHandler(collector);
+
+		// run the simulation
+		QueueSimulation sim = new QueueSimulation(scenario, events);
+		config.simulation().setEndTime(simEndTime);
+		sim.run();
+		assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		// besides this, the important thing is that no (Runtime)Exception is thrown during this test
+	}
+
+	/**
 	 * A simple events handler that counts the number of enter link events on one specific link.
 	 * Used by some tests in the class.
 	 *
@@ -991,10 +1083,12 @@ public class QueueSimulationTest extends TestCase {
 			this.linkId = linkId;
 		}
 
+		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) this.counter++;
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			this.counter = 0;
 		}
@@ -1008,6 +1102,7 @@ public class QueueSimulationTest extends TestCase {
 		public Event firstEvent = null;
 		public Event lastEvent = null;
 
+		@Override
 		public void handleEvent(final Event event) {
 			if (firstEvent == null) {
 				firstEvent = event;
@@ -1015,6 +1110,7 @@ public class QueueSimulationTest extends TestCase {
 			lastEvent = event;
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			firstEvent = null;
 			lastEvent = null;
@@ -1035,9 +1131,11 @@ public class QueueSimulationTest extends TestCase {
 			if (event.getLevel() == Level.ERROR) this.cntERROR++;
 		}
 
+		@Override
 		public void close() {
 		}
 
+		@Override
 		public boolean requiresLayout() {
 			return false;
 		}

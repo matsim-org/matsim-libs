@@ -357,12 +357,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
-			TransportMode currentLegMode = null;
-			if (agent.getCurrentLeg() != null) {
-				currentLegMode = agent.getCurrentLeg().getMode();
-			}
 			if (agent.getDestinationLinkId() != null) {
-				events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), currentLegMode));
+				events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
 			}
 		}
 		this.activityEndsList.clear();
@@ -521,7 +517,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			queueSimulationFeature.afterActivityBegins(agent, planElementIndex);
 		}
 	}
-	
+
 	private void addToAgentsInActivities(final DriverAgent agent) {
 		if (agent instanceof PersonAgent) {
 			PersonAgent pa = (PersonAgent) agent;
@@ -551,7 +547,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			}
 		}
 	}
-	
+
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
 			DriverAgent agent = this.activityEndsList.peek();
@@ -687,5 +683,5 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public double getTimeOfDay() {
 		return QSimTimer.getTime() ;
 	}
-	
+
 }
