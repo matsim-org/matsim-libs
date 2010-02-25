@@ -57,7 +57,7 @@ public final class TransportModeNetworkFilter {
 	 * @param subNetwork the network object where to store the extracted subnetwork
 	 * @param extractModes set of modes that should be contained in the subnetwork
 	 */
-	public void extract(final Network subNetwork, final Set<TransportMode> extractModes) {
+	public void filter(final Network subNetwork, final Set<TransportMode> extractModes) {
 		NetworkFactory factory = subNetwork.getFactory();
 		for (Link link : this.fullNetwork.getLinks().values()) {
 			Set<TransportMode> intersection = EnumSet.copyOf(extractModes);
