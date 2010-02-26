@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CompleteSampleAnalyzer.java
+ * EstimatorTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,10 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
-import java.io.File;
+import gnu.trove.TIntDoubleHashMap;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 
@@ -30,27 +37,49 @@ import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
  * @author illenberger
  *
  */
-public class CompleteSampleAnalyzer extends SampleAnalyzer {
+public class EstimatorTask extends AnalyzerTask {
 
-	private int numVertex;
+	private final Estimator estimator;
 	
-	public CompleteSampleAnalyzer(Graph graph, Map<String, AnalyzerTask> tasks, String output) {
-		super(tasks, output);
-		numVertex = graph.getVertices().size();
+	public EstimatorTask(Estimator estimator) {
+		this.estimator = estimator;
 	}
 	
 	@Override
-	public boolean afterSampling(Sampler<?, ?, ?> sampler) {
-		if(sampler.getNumSampledVertices() >= numVertex) {
-			File file = makeDirectories(getRootDirectory() + "/complete");
-			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
+	public void analyze(Graph graph, Map<String, Double> stats) {
+		TIntDoubleHashMap probas = new TIntDoubleHashMap();
+		TIntDoubleHashMap weights = new TIntDoubleHashMap();
+		
+		for(Vertex vertex : graph.getVertices()) {
+			if(((SampledVertex)vertex).isSampled()) {
+				probas.put(vertex.getNeighbours().size(), estimator.getProbability((SampledVertex) vertex));
+				weights.put(vertex.getNeighbours().size(), estimator.getWeight((SampledVertex)vertex));
+			}
 		}
-		return true;
+		
+		writeValues(probas, "propa");
+		writeValues(weights, "weight");
 	}
 
-	@Override
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler) {		
-		return true;
+	private void writeValues(TIntDoubleHashMap values, String valName) {
+		int[] keys = values.keys();
+		Arrays.sort(keys);
+		
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(String.format("%1$s/%2$s.txt", getOutputDirectory(), valName)));
+			writer.write("k\t");
+			writer.write(valName);
+			writer.newLine();
+			for(int key : keys) {
+				writer.write(String.valueOf(key));
+				writer.write("\t");
+				writer.write(String.valueOf(values.get(key)));
+				writer.newLine();
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-
 }

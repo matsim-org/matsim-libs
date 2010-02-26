@@ -252,7 +252,7 @@ public class GraphBuilderTXT {
 		
 		KMLObjectDetailComposite<SpatialVertex> detail = new KMLObjectDetailComposite<SpatialVertex>();
 		detail.addObjectDetail(new KMLSocialDescriptor());
-		detail.addObjectDetail(new KMLVertexId());
+//		detail.addObjectDetail(new KMLVertexId());
 		kmlwriter.setKmlVertexDetail(detail);
 		
 		kmlwriter.write(graph.getDelegate(), "/Users/jillenberger/Work/work/socialnets/data/ivt2009/graph/components.kmz");

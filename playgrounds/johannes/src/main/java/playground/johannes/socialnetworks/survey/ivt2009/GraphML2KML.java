@@ -23,11 +23,11 @@ import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
-import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
 
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSampledComponents;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSnowballDescriptor;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.KMLVertexId;
 

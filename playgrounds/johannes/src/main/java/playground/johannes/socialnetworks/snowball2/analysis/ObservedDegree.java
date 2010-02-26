@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphProjectionBuilder.java
+ * SampledDegree.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2;
+package playground.johannes.socialnetworks.snowball2.analysis;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
-import org.matsim.contrib.sna.graph.GraphProjectionFactory;
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.Collection;
+import java.util.Set;
+
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.Degree;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+
+
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends
-		GraphProjectionBuilder<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> {
-	
-	public SampledGraphProjectionBuilder() {
-		super(new SampledGraphProjectionFactory<G, V, E>());
+public class ObservedDegree extends Degree {
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Distribution distribution(Set<? extends Vertex> vertices) {
+		return super.distribution(SnowballPartitions.<SampledVertex>createSampledPartition((Set<SampledVertex>)vertices));
 	}
 
-	/**
-	 * @param factory
-	 */
-	public SampledGraphProjectionBuilder(
-			GraphProjectionFactory<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> factory) {
-		super(factory);
-		// TODO Auto-generated constructor stub
+	@SuppressWarnings("unchecked")
+	@Override
+	public TObjectDoubleHashMap<Vertex> values(Collection<? extends Vertex> vertices) {
+		return (TObjectDoubleHashMap<Vertex>) super.values(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>) vertices));
 	}
+
 }

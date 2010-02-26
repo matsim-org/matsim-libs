@@ -24,7 +24,7 @@ package playground.johannes.socialnetworks.graph.analysis;
  * @author illenberger
  *
  */
-public class StandardAnalyzerTask extends GraphAnalyzerTaskComposite {
+public class StandardAnalyzerTask extends AnalyzerTaskComposite {
 
 	public StandardAnalyzerTask() {
 		addTask(new GraphSizeTask());

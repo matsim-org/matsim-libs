@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphProjectionBuilder.java
+ * SampledSpatialGraphIOTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2;
+package playground.johannes.graph;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
-import org.matsim.contrib.sna.graph.GraphProjectionFactory;
-import org.matsim.contrib.sna.graph.Vertex;
+import java.io.IOException;
+
+import org.matsim.contrib.sna.TestCaseUtils;
+import org.matsim.core.utils.misc.CRCChecksum;
+
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraph;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
+
+import junit.framework.TestCase;
 
 /**
- * @author illenberger
+ * @author jillenberger
  *
  */
-public class SampledGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends
-		GraphProjectionBuilder<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> {
-	
-	public SampledGraphProjectionBuilder() {
-		super(new SampledGraphProjectionFactory<G, V, E>());
-	}
+public class SampledSpatialGraphIOTest extends TestCase {
 
-	/**
-	 * @param factory
-	 */
-	public SampledGraphProjectionBuilder(
-			GraphProjectionFactory<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> factory) {
-		super(factory);
-		// TODO Auto-generated constructor stub
+	private static final String INPUT_FILE = TestCaseUtils.getPackageInputDirecoty(SampledSpatialGraphIOTest.class) + "sampledgraph.graphml.gz";
+	
+	private static final String OUTPUT_FILE = TestCaseUtils.getOutputDirectory() + "tmpgraph.graphml";
+
+	public void test() throws IOException {
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
+		SampledSpatialGraph graph = reader.readGraph(INPUT_FILE);
+		
+		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
+		writer.write(graph, OUTPUT_FILE);
+		
+		double reference = CRCChecksum.getCRCFromFile(INPUT_FILE);
+		double actual = CRCChecksum.getCRCFromFile(OUTPUT_FILE);
+		
+		assertEquals(reference, actual);
 	}
 }

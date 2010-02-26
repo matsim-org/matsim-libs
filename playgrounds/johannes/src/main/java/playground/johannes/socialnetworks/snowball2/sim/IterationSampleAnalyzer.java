@@ -20,6 +20,7 @@
 package playground.johannes.socialnetworks.snowball2.sim;
 
 import java.io.File;
+import java.util.Map;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 
@@ -31,11 +32,8 @@ public class IterationSampleAnalyzer extends SampleAnalyzer {
 
 	private int lastIteration;
 
-	private String output;
-	
-	public IterationSampleAnalyzer(String output, AnalyzerTask observed, AnalyzerTask estimated) {
-		super(observed, estimated);
-		this.output = output;
+	public IterationSampleAnalyzer(Map<String, AnalyzerTask> tasks, String output) {
+		super(tasks, output);
 		lastIteration = 0;
 	}
 	
@@ -47,8 +45,7 @@ public class IterationSampleAnalyzer extends SampleAnalyzer {
 	@Override
 	public boolean beforeSampling(Sampler<?, ?, ?> sampler) {
 		if(sampler.getIteration() > lastIteration) {
-			File file = new File(String.format("%1$s/it.%2$s", output, lastIteration));
-			file.mkdirs();
+			File file = makeDirectories(String.format("%1$s/it.%2$s", getRootDirectory(), lastIteration));
 			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
 			lastIteration = sampler.getIteration();
 		}

@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import gnu.trove.TIntIntHashMap;
+
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
@@ -27,19 +32,79 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
  * @author illenberger
  *
  */
-public class SnowballEstimator {
+public class Estimator1 implements Estimator, SamplerListener {
 
-	private double share;
+	private final int N;
 	
-	public void update(SampledGraph graph, int iteration) {
-		int count = 0;
+	private int n;
+	
+	private int iteration;
+	
+	private double norm;
+	
+	private int lastIteration;
+	
+	public Estimator1(int N) {
+		this.N = N;
+	}
+	
+	public void update(SampledGraph graph) {
+		iteration = 0;
+		TIntIntHashMap sampleSize = new TIntIntHashMap();
+		Collection<SampledVertex> samples = new ArrayList<SampledVertex>(graph.getVertices().size());
+		/*
+		 * count samples per iteration
+		 */
 		for(Vertex vertex : graph.getVertices()) {
-			if(((SampledVertex) vertex).isSampled() && ((SampledVertex) vertex).getIterationSampled() < iteration)
-				count++;
+			sampleSize.adjustOrPutValue(((SampledVertex)vertex).getIterationSampled(), 1, 1);
+			iteration = Math.max(iteration, ((SampledVertex)vertex).getIterationSampled());
+			samples.add((SampledVertex)vertex);
 		}
+		/*
+		 * count samples
+		 */
+		n = 0;
+		if(iteration == 0) {
+			n = sampleSize.get(0);
+		} else {
+			for(int i = 0; i < iteration; i++) {
+				n += sampleSize.get(i);
+			}
+		}
+		/*
+		 * calculate normalization constant
+		 */
+		double wsum = 0;
+		for(SampledVertex vertex : samples) {
+			wsum += 1/getProbability(vertex);
+		}
+		
+		norm = samples.size()/wsum;
 	}
 	
 	public double getProbability(SampledVertex vertex) {
-		return 1 - Math.pow(1 - share, vertex.getNeighbours().size());
+		if(iteration == 0)
+			return n/(double)N;
+		else
+			return 1 - Math.pow(1 - n/(double)N, vertex.getNeighbours().size());
+	}
+	
+	@Override
+	public double getWeight(SampledVertex vertex) {
+		return 1 / getProbability(vertex) * norm;
+	}
+
+	@Override
+	public boolean afterSampling(Sampler<?, ?, ?> sampler) {
+		return true;
+	}
+
+	@Override
+	public boolean beforeSampling(Sampler<?, ?, ?> sampler) {
+		if(sampler.getIteration() > lastIteration) {
+			update(sampler.getSampledGraph());
+			lastIteration = sampler.getIteration();
+		}
+		return true;
 	}
 }

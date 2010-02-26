@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDistance.java
+ * SampledSpatialGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,58 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial.analysis;
+package playground.johannes.socialnetworks.snowball2.spatial;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.johannes.socialnetworks.graph.spatial.Distance;
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialVertex;
 
 /**
+ * Implementation of {@link SampledSpatialGraph} with a {@link SpatialSparseGraph}.
+ * 
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
+public class SampledSpatialSparseGraph extends SpatialSparseGraph implements SampledSpatialGraph {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		/*
-		 * I think it makes no difference to directly calling super(vertices)
-		 * since each edge is only counted once. joh13/1/10
-		 */
-		return super.distribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	/**
+	 * Creates a new sampled spatial sparse graph with the given coordinate
+	 * reference system.
+	 * 
+	 * @param crs
+	 *            a coordinate reference system.
+	 */
+	public SampledSpatialSparseGraph(CoordinateReferenceSystem crs) {
+		super(crs);
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * @see {@link SpatialSparseGraph#getEdges()}
+	 */
 	@Override
-	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(SnowballPartitions.<SampledSpatialVertex>createSampledPartition((Set<SampledSpatialVertex>)vertices));
+	@SuppressWarnings("unchecked")
+	public Set<? extends SampledSpatialSparseEdge> getEdges() {
+		return (Set<? extends SampledSpatialSparseEdge>) super.getEdges();
+	}
+
+	/**
+	 * @see {@link SpatialSparseGraph#getVertices()}
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public Set<? extends SampledSpatialSparseVertex> getVertices() {
+		return (Set<? extends SampledSpatialSparseVertex>) super.getVertices();
+	}
+
+	/**
+	 * @see {@link SpatialSparseGraph#getEdge(SparseVertex, SparseVertex)}
+	 */
+	@Override
+	public SampledSpatialSparseEdge getEdge(SparseVertex v1, SparseVertex v2) {
+		return (SampledSpatialSparseEdge) super.getEdge(v1, v2);
 	}
 
 }

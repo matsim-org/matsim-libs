@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphProjectionBuilder.java
+ * Components.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,63 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2;
+package playground.johannes.socialnetworks.graph.analysis;
 
-import org.matsim.contrib.sna.graph.Edge;
+import gnu.trove.TIntArrayList;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
-import org.matsim.contrib.sna.graph.GraphProjectionFactory;
-import org.matsim.contrib.sna.graph.Vertex;
+
+import playground.johannes.socialnetworks.graph.matrix.Dijkstra;
+import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends
-		GraphProjectionBuilder<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> {
-	
-	public SampledGraphProjectionBuilder() {
-		super(new SampledGraphProjectionFactory<G, V, E>());
-	}
+public class Components {
 
-	/**
-	 * @param factory
-	 */
-	public SampledGraphProjectionBuilder(
-			GraphProjectionFactory<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> factory) {
-		super(factory);
-		// TODO Auto-generated constructor stub
+	public int countComponents(Graph graph) {
+		return extractComponents(new AdjacencyMatrix(graph)).size();
+	}
+	
+	private List<TIntArrayList> extractComponents(AdjacencyMatrix y) {
+		boolean[] pending = new boolean[y.getVertexCount()];
+		Arrays.fill(pending, true);
+		
+		List<TIntArrayList> components = new ArrayList<TIntArrayList>();
+		Dijkstra router = new Dijkstra(y);
+		for(int i = 0; i < pending.length; i++) {
+			if(pending[i] == true) {
+				TIntArrayList reachable = router.run(i, -1);
+				reachable.add(i);
+				components.add(reachable);
+				for (int k = 0; k < reachable.size(); k++) {
+					pending[reachable.get(k)] = false;
+				}
+			}
+		}
+		
+		Collections.sort(components, new Comparator<TIntArrayList>() {
+
+			@Override
+			public int compare(TIntArrayList o1, TIntArrayList o2) {
+				int result = o2.size() - o1.size();
+				if(result == 0) {
+					if(o1 == o2)
+						return 0;
+					else
+						return o2.hashCode() - o1.hashCode();
+				} else
+					return result;
+			}
+		});
+		
+		return components;
 	}
 }

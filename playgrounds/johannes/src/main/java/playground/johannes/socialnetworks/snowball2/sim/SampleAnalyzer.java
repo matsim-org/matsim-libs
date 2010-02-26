@@ -22,6 +22,7 @@ package playground.johannes.socialnetworks.snowball2.sim;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
@@ -33,33 +34,36 @@ import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
  */
 public abstract class SampleAnalyzer implements SamplerListener {
 
-	private AnalyzerTask observed;
+	private Map<String, AnalyzerTask> tasks;
 	
-	private AnalyzerTask estimated;
+	private String rootDirectory;
 	
-	public SampleAnalyzer(AnalyzerTask observed, AnalyzerTask estimated) {
-		this.observed = observed;
-		this.estimated = estimated;
+	public SampleAnalyzer(Map<String, AnalyzerTask> tasks, String rootDirectory) {
+		this.tasks = tasks;
+		this.rootDirectory = rootDirectory;
 	}
 
+	protected String getRootDirectory() {
+		return rootDirectory;
+	}
+	
 	protected void analyse(SampledGraphProjection<?, ?, ?> graph, String output) {
 		try {
-			String obsOutput = String.format("%1$s/obs/", output);
-			File file = new File(obsOutput);
-			file.mkdirs();
-			observed.setOutputDirectoy(file.getAbsolutePath());
-			Map<String, Double> stats = GraphAnalyzer.analyze(graph, observed);
-			GraphAnalyzer.writeStats(stats, file.getAbsolutePath() + "/stats.txt");
-			
-			String estimOutput = String.format("%1$s/estim/", output);
-			file = new File(estimOutput);
-			file.mkdirs();
-			estimated.setOutputDirectoy(file.getAbsolutePath());
-			stats = GraphAnalyzer.analyze(graph, estimated);
-			GraphAnalyzer.writeStats(stats, file.getAbsolutePath() + "/stats.txt");
-		
+			for(Entry<String, AnalyzerTask> task : tasks.entrySet()) {
+				String taskOutput = String.format("%1$s/%2$s/", output, task.getKey());
+				File file = makeDirectories(taskOutput);
+				task.getValue().setOutputDirectoy(file.getAbsolutePath());
+				Map<String, Double> stats = GraphAnalyzer.analyze(graph, task.getValue());
+				GraphAnalyzer.writeStats(stats, file.getAbsolutePath() + "/stats.txt");
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	protected File makeDirectories(String path) {
+		File file = new File(path);
+		file.mkdirs();
+		return file;
 	}
 }

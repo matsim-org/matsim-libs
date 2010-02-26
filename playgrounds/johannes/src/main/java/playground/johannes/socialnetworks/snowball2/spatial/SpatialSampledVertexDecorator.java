@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDistance.java
+ * SampledSpatialVertexDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,67 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.analysis;
+package playground.johannes.socialnetworks.snowball2.spatial;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.spatial.Distance;
 import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
-import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledVertexDecorator;
+
+import com.vividsolutions.jts.geom.Point;
+
 
 /**
+ * An extension of {@link SampledVertexDecorator} that implements {@link SpatialVertex}.
+ * 
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
+public class SpatialSampledVertexDecorator<V extends SpatialVertex> extends SampledVertexDecorator<V> implements SpatialVertex {
 
+	/**
+	 * Creates an isolated spatial sampled vertex decorator that decorates <tt>delegate</tt>. 
+	 * @param delegate the original vertex.
+	 */
+	protected SpatialSampledVertexDecorator(V delegate) {
+		super(delegate);
+	}
+
+	/**
+	 * @see {@link SampledVertexDecorator#getEdges()}
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		return super.distribution(extractDelegates(vertices));
+	public List<? extends SpatialSampledEdgeDecorator<?>> getEdges() {
+		return (List<? extends SpatialSampledEdgeDecorator<?>>) super.getEdges();
 	}
 
+	/**
+	 * @see {@link SampledVertexDecorator#getNeighbours()}
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Distribution vertexAccumulatedDistribution(
-			Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(extractDelegates(vertices));
+	public List<? extends SpatialSampledVertexDecorator<V>> getNeighbours() {
+		return (List<? extends SpatialSampledVertexDecorator<V>>) super.getNeighbours();
 	}
 
-	private Set<SpatialVertex> extractDelegates(Set<? extends SpatialVertex> vertices) {
-		Set<SpatialSampledVertexDecorator<? extends SpatialVertex>> partition =
-			SnowballPartitions.<SpatialSampledVertexDecorator<? extends SpatialVertex>>
-			createSampledPartition((Set<SpatialSampledVertexDecorator<? extends SpatialVertex>>)vertices);
-		
-		Set<SpatialVertex> delegates = new HashSet<SpatialVertex>();
-		for(SampledVertexDecorator<? extends SpatialVertex> v : partition)
-			delegates.add(v.getDelegate());
-		
-		return delegates;
-//		return null;
+	/**
+	 * @see {@link SpatialVertex#getCoordinate()}
+	 * @deprecated
+	 */
+	@Override
+	public Coord getCoordinate() {
+		return getDelegate().getCoordinate();
 	}
+
+	/**
+	 * @see {@link SpatialVertex#getPoint()}
+	 */
+	@Override
+	public Point getPoint() {
+		return getDelegate().getPoint();
+	}
+
 }

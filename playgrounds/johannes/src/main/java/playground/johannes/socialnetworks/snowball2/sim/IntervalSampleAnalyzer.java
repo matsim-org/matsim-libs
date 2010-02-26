@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSpatialGraphProjectionBuilder.java
+ * IntervalSampleAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,39 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial;
+package playground.johannes.socialnetworks.snowball2.sim;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialGraphProjectionBuilder;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraphFactory;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
+import java.io.File;
+import java.util.Map;
 
-import com.vividsolutions.jts.geom.Geometry;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class SampledSpatialGraphProjectionBuilder<G extends SampledSpatialGraph, V extends SampledSpatialVertex, E extends SampledSpatialEdge>
-		extends SpatialGraphProjectionBuilder<G, V, E> {
+public class IntervalSampleAnalyzer extends SampleAnalyzer {
 
-	/**
-	 * Creates a new sampled spatial graph projection builder with a
-	 * {@link SampledSpatialGraphFactory}.
-	 */
-	public SampledSpatialGraphProjectionBuilder() {
-		super(new SampledSpatialGraphProjectionFactory<G, V, E>());
+	private int interval;
+	
+	public IntervalSampleAnalyzer(int interval, Map<String, AnalyzerTask> tasks, String output) {
+		super(tasks, output);
+		this.interval = interval;
 	}
 
-	/**
-	 * @see {@link SpatialGraphProjectionBuilder#decorate(org.matsim.contrib.sna.graph.spatial.SpatialGraph, Geometry)}
-	 */
 	@Override
-	public SampledSpatialGraphProjection<G, V, E> decorate(G delegate,
-			Geometry geometry) {
-		return (SampledSpatialGraphProjection<G, V, E>) super.decorate(
-				delegate, geometry);
+	public boolean afterSampling(Sampler<?, ?, ?> sampler) {
+		if(sampler.getNumSampledVertices() % interval == 0) {
+			File file = makeDirectories(String.format("%1$s/vertex.%2$s", getRootDirectory(), sampler.getNumSampledVertices()));
+			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
+		}
+		return true;
+	}
+
+	@Override
+	public boolean beforeSampling(Sampler<?, ?, ?> sampler) {
+		return true;
 	}
 
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphProjectionBuilder.java
+ * Estimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2;
+package playground.johannes.socialnetworks.snowball2.sim;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
-import org.matsim.contrib.sna.graph.GraphProjectionFactory;
-import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends
-		GraphProjectionBuilder<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> {
-	
-	public SampledGraphProjectionBuilder() {
-		super(new SampledGraphProjectionFactory<G, V, E>());
-	}
+public interface Estimator {
 
-	/**
-	 * @param factory
-	 */
-	public SampledGraphProjectionBuilder(
-			GraphProjectionFactory<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> factory) {
-		super(factory);
-		// TODO Auto-generated constructor stub
-	}
+	public void update(SampledGraph graph);
+	
+	public double getProbability(SampledVertex vertex);
+	
+	public double getWeight(SampledVertex vertex);
 }

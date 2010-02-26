@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledDegree.java
+ * ComponentsTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial.analysis;
+package playground.johannes.graph;
 
-import gnu.trove.TObjectDoubleHashMap;
+import junit.framework.TestCase;
 
-import java.util.Collection;
-import java.util.Set;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
-
+import playground.johannes.socialnetworks.graph.Partitions;
+import playground.johannes.socialnetworks.graph.analysis.Components;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDegree extends Degree {
+public class ComponentsTest extends TestCase {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Distribution distribution(Set<? extends Vertex> vertices) {
-		return super.distribution(SnowballPartitions.<SampledVertex>createSampledPartition((Set<SampledVertex>)vertices));
+	public void test() {
+		SparseGraphMLReader reader = new SparseGraphMLReader();
+		Graph graph = reader.readGraph("/Users/jillenberger/Work/shared-svn/projects/socialnets/data/socialnetworks/cond-mat-2005/cond-mat-2005.graphml");
+		Components components = new Components();
+		long time = System.currentTimeMillis();
+		System.out.println(String.valueOf(components.countComponents(graph)));
+		System.out.println("Time " + (System.currentTimeMillis() - time));
+		
+		time = System.currentTimeMillis();
+		System.out.println(Partitions.disconnectedComponents(graph).size());
+		System.out.println("Time " + (System.currentTimeMillis() - time));
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public TObjectDoubleHashMap<Vertex> values(Collection<? extends Vertex> vertices) {
-		return (TObjectDoubleHashMap<Vertex>) super.values(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>) vertices));
-	}
-
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphAnalyzerTask.java
+ * Estimator2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,18 +17,54 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.socialnetworks.snowball2.sim;
 
-import java.util.Map;
-
-import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
- * @deprecated
+ *
  */
-public interface GraphAnalyzerTask {
+public class Estimator2 extends Estimator1 {
 
-	public void analyze(Graph graph, Map<String, Double> stats);
+	private final int interval;
 	
+	private final int N;
+	
+	private double p_random;
+	
+	public Estimator2(int N, int interval) {
+		super(N);
+		this.N = N;
+		this.interval = interval;
+	}
+	
+	@Override
+	public double getWeight(SampledVertex vertex) {
+		return p_random/getProbability(vertex);
+	}
+
+	@Override
+	public void update(SampledGraph graph) {
+		int count = 0;
+		for(Vertex vertex : graph.getVertices()) {
+			if(((SampledVertex)vertex).isSampled())
+				count++;
+		}
+		
+		p_random = count/(double)N;
+
+		super.update(graph);
+	}
+
+	@Override
+	public boolean afterSampling(Sampler<?, ?, ?> sampler) {
+		if(sampler.getNumSampledVertices() % interval == 0) {
+			update(sampler.getSampledGraph());
+		}
+		return true;
+	}
+
 }

@@ -20,44 +20,54 @@
 package playground.johannes.socialnetworks.snowball2.spatial;
 
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialEdgeDecorator;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.core.utils.collections.Tuple;
+
+import playground.johannes.socialnetworks.snowball2.SampledEdgeDecorator;
 
 
 /**
- * A decorator for sampled spatial edges.
+ * An extension to {@link SampledEdgeDecorator} that implements {@link SpatialEdge}.
  * 
  * @author illenberger
  *
  */
-public class SampledSpatialEdgeDecorator<E extends SampledSpatialEdge> extends SpatialEdgeDecorator<E>
-		implements SampledSpatialEdge {
+public class SpatialSampledEdgeDecorator<E extends SpatialEdge> extends SampledEdgeDecorator<E>
+		implements SpatialEdge {
 
 	/**
 	 * Creates an orphaned edge decorator which decorates <tt>delegate</tt>.
 	 * 
 	 * @param delegate
 	 */
-	protected SampledSpatialEdgeDecorator(E delegate) {
+	protected SpatialSampledEdgeDecorator(E delegate) {
 		super(delegate);
 	}
 
 	/**
-	 * @see {@link SpatialEdgeDecorator#getOpposite(Vertex)}
+	 * @see {@link SampledEdgeDecorator#getOpposite(Vertex)}
 	 */
 	@Override
-	public SampledSpatialVertexDecorator<?> getOpposite(Vertex v) {
-		return (SampledSpatialVertexDecorator<?>) super.getOpposite(v);
+	public SpatialSampledVertexDecorator<?> getOpposite(Vertex v) {
+		return (SpatialSampledVertexDecorator<?>) super.getOpposite(v);
 	}
 
 	/**
-	 * @see {@link SpatialEdgeDecorator#getVertices()}
+	 * @see {@link SampledEdgeDecorator#getVertices()}
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Tuple<? extends SampledSpatialVertexDecorator<?>, ? extends SampledSpatialVertexDecorator<?>> getVertices() {
-		return (Tuple<? extends SampledSpatialVertexDecorator<?>, ? extends SampledSpatialVertexDecorator<?>>) super.getVertices();
+	public Tuple<? extends SpatialSampledVertexDecorator<?>, ? extends SpatialSampledVertexDecorator<?>> getVertices() {
+		return (Tuple<? extends SpatialSampledVertexDecorator<?>, ? extends SpatialSampledVertexDecorator<?>>) super.getVertices();
+	}
+
+	/**
+	 * @see {@link SpatialEdge#length()}
+	 */
+	@Override
+	public double length() {
+		// TODO Auto-generated method stub
+		return getDelegate().length();
 	}
 
 }

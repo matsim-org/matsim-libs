@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StandardAnalyzerTask.java
+ * SampledSpatialGraphProjectionBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,41 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.socialnetworks.snowball2.spatial;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
-import org.matsim.contrib.sna.graph.Graph;
+import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class GraphAnalyzerTaskComposite extends AnalyzerTask {
+public class SpatialSampledGraphProjectionBuilder<G extends SpatialGraph, V extends SpatialVertex, E extends SpatialEdge>
+		extends SampledGraphProjectionBuilder<G, V, E> {
 
-	private List<AnalyzerTask> tasks;
-	
-	public GraphAnalyzerTaskComposite() {
-		tasks = new ArrayList<AnalyzerTask>();
+	/**
+	 * Creates a new spatial sampled graph projection builder with a
+	 * {@link SpatialSampledGraphFactory}.
+	 */
+	public SpatialSampledGraphProjectionBuilder() {
+		super(new SpatialSampledGraphProjectionFactory<G, V, E>());
 	}
-	
-	public void addTask(AnalyzerTask task) {
-		tasks.add(task);
-	}
-	
-	@Override
-	public void setOutputDirectoy(String output) {
-		for(AnalyzerTask task : tasks) {
-			task.setOutputDirectoy(output);
-		}
-	}
-	
-	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-		for(AnalyzerTask task : tasks)
-			task.analyze(graph, stats);
-	}
-
 }

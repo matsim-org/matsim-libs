@@ -19,55 +19,56 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialGraphProjectionFactory;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+
+import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionFactory;
 
 
 /**
- * Implementation of GraphProjectionFactory to create instances of SampledSpatialGraphProjection,
- * SampledSpatialVertexDecorator and SampledSpatialEdgeDecorator.
+ * Implementation of GraphProjectionFactory to create instances of SpatialSampledGraphProjection,
+ * SpatialSampledVertexDecorator and SampledSampledSpatialEdgeDecorator.
  * @author illenberger
  *
  */
-public class SampledSpatialGraphProjectionFactory <G extends SampledSpatialGraph, V extends SampledSpatialVertex, E extends SampledSpatialEdge>
-							extends SpatialGraphProjectionFactory<G, V, E> {
+public class SpatialSampledGraphProjectionFactory <G extends SpatialGraph, V extends SpatialVertex, E extends SpatialEdge>
+							extends SampledGraphProjectionFactory<G, V, E> {
 
 	/**
-	 * Creates and returns a sampled spatial edge decorator that decorates <tt>delegate</tt>.
+	 * Creates and returns a spatial sampled edge decorator that decorates <tt>delegate</tt>.
 	 * 
 	 * @param delegate the original edge.
 	 * 
 	 * @return a sampled spatial edge decorator.
 	 */
 	@Override
-	public SampledSpatialEdgeDecorator<E> createEdge(E delegate) {
-		return new SampledSpatialEdgeDecorator<E>(delegate);
+	public SpatialSampledEdgeDecorator<E> createEdge(E delegate) {
+		return new SpatialSampledEdgeDecorator<E>(delegate);
 	}
 
 	/**
-	 * Creates and returns an empty sampled spatial graph projection on <tt>delegate</tt>.
+	 * Creates and returns an empty spatial sampled graph projection on <tt>delegate</tt>.
 	 * 
 	 * @param delegate the original graph.
 	 * 
 	 * @return an empty sampled spatial graph projection.
 	 */
 	@Override
-	public SampledSpatialGraphProjection<G, V, E> createGraph(G delegate) {
-		return new SampledSpatialGraphProjection<G, V, E>(delegate);
+	public SpatialSampledGraphProjection<G, V, E> createGraph(G delegate) {
+		return new SpatialSampledGraphProjection<G, V, E>(delegate);
 	}
 
 	/**
-	 * Creates and returns a sampled spatial vertex decorator that decorates <tt>delegate</tt>.
+	 * Creates and returns a spatial sampled vertex decorator that decorates <tt>delegate</tt>.
 	 * 
 	 * @param delegate the original vertex.
 	 * 
 	 * @return a new sampled spatial vertex decorator.
 	 */
 	@Override
-	public SampledSpatialVertexDecorator<V> createVertex(V delegate) {
-		return new SampledSpatialVertexDecorator<V>(delegate);
+	public SpatialSampledVertexDecorator<V> createVertex(V delegate) {
+		return new SpatialSampledVertexDecorator<V>(delegate);
 	}
 
 }

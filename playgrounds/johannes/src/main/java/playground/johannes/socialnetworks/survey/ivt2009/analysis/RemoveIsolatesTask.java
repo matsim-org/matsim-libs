@@ -27,9 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
-import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
-import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLWriter;
+
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraph;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
 
 /**
  * @author illenberger

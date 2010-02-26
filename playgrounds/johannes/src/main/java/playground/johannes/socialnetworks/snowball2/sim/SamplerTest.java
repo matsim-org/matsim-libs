@@ -19,15 +19,20 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.DegreeTask;
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.GraphSizeTask;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.SampledDegree;
+import playground.johannes.socialnetworks.snowball2.analysis.EstimatedDegree;
+import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.WaveSizeTask;
 
 /**
@@ -48,20 +53,35 @@ public class SamplerTest {
 		VertexPartition seedGen = new RandomSeedGenerator(50, 4711);
 		sampler.setSeedGenerator(seedGen);
 		
-		GraphAnalyzerTaskComposite tasks = new GraphAnalyzerTaskComposite();
+		AnalyzerTaskComposite obsTasks = new AnalyzerTaskComposite();
 		DegreeTask task = new DegreeTask();
-		task.setModule(new SampledDegree());
-		tasks.addTask(task);
-		tasks.addTask(new GraphSizeTask());
-		tasks.addTask(new WaveSizeTask());
+		task.setModule(new ObservedDegree());
+		obsTasks.addTask(task);
+		obsTasks.addTask(new GraphSizeTask());
+		obsTasks.addTask(new WaveSizeTask());
 		
+		Estimator1 estimator = new Estimator1(graph.getVertices().size());
+		AnalyzerTaskComposite estimTasks = new AnalyzerTaskComposite();
+		task = new DegreeTask();
+		task.setModule(new EstimatedDegree(estimator));
+		estimTasks.addTask(task);
+		estimTasks.addTask(new GraphSizeTask());
+		estimTasks.addTask(new WaveSizeTask());
 		
-		IterationSampleAnalyzer listener = new IterationSampleAnalyzer("/Users/jillenberger/Work/work/socialnets/snowball/output", tasks, tasks);
-		CompleteSampleAnalyzer cListener = new CompleteSampleAnalyzer(graph, "/Users/jillenberger/Work/work/socialnets/snowball/output", tasks, tasks);
+		Map<String, AnalyzerTask> tasks = new HashMap<String, AnalyzerTask>();
+		tasks.put("obs", obsTasks);
+		tasks.put("estim", estimTasks);
+		
+		IterationSampleAnalyzer listener = new IterationSampleAnalyzer(tasks, "/Users/jillenberger/Work/work/socialnets/snowball/output");
+		CompleteSampleAnalyzer cListener = new CompleteSampleAnalyzer(graph, tasks, "/Users/jillenberger/Work/work/socialnets/snowball/output");
+		IntervalSampleAnalyzer interval = new IntervalSampleAnalyzer(10000, tasks, "/Users/jillenberger/Work/work/socialnets/snowball/output");
 		
 		SamplerListenerComposite composite = new SamplerListenerComposite();
+		composite.addComponent(estimator);
 		composite.addComponent(listener);
 		composite.addComponent(cListener);
+		composite.addComponent(interval);
+		
 		
 		sampler.setListener(composite);
 		

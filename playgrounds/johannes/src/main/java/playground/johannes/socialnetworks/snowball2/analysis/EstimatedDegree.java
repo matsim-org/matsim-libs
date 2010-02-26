@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphProjectionBuilder.java
+ * EstimatedDegree.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2;
+package playground.johannes.socialnetworks.snowball2.analysis;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
-import org.matsim.contrib.sna.graph.GraphProjectionFactory;
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.Collection;
+import java.util.Set;
+
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.Degree;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.socialnetworks.snowball2.sim.Estimator;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends
-		GraphProjectionBuilder<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> {
+public class EstimatedDegree extends Degree {
+
+	private Estimator estimator;
 	
-	public SampledGraphProjectionBuilder() {
-		super(new SampledGraphProjectionFactory<G, V, E>());
+	public EstimatedDegree(Estimator estimator) {
+		this.estimator = estimator;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Distribution distribution(Set<? extends Vertex> vertices) {
+		Distribution distr = new Distribution();
+		
+		Set<SampledVertex> samples = SnowballPartitions.<SampledVertex>createSampledPartition((Set<SampledVertex>)vertices);
+		for(SampledVertex vertex : samples) {
+			distr.add(vertex.getNeighbours().size(), estimator.getWeight(vertex));
+		}
+		
+		return distr;
 	}
 
-	/**
-	 * @param factory
-	 */
-	public SampledGraphProjectionBuilder(
-			GraphProjectionFactory<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> factory) {
-		super(factory);
-		// TODO Auto-generated constructor stub
+	@SuppressWarnings("unchecked")
+	@Override
+	public TObjectDoubleHashMap<Vertex> values(Collection<? extends Vertex> vertices) {
+		return (TObjectDoubleHashMap<Vertex>) super.values(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>) vertices));
 	}
+
 }

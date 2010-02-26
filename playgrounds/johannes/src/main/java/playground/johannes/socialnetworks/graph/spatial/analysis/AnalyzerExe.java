@@ -32,7 +32,7 @@ import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -61,7 +61,7 @@ public class AnalyzerExe {
 		
 		SpatialGraph graphPrj = builder.decorate(graph, geometry);
 		
-		GraphAnalyzerTaskComposite task = new SpatialAnalyzerTask(zones);
+		AnalyzerTaskComposite task = new SpatialAnalyzerTask(zones);
 		task.setOutputDirectoy("/Users/jillenberger/Work/work/socialnets/data/ivt2009/analysis/tmp/");
 		GraphAnalyzer.analyze(graphPrj, task);
 	}

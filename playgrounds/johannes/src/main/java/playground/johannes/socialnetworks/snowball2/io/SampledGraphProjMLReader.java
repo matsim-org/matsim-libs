@@ -53,6 +53,10 @@ public class SampledGraphProjMLReader<G extends Graph, V extends Vertex, E exten
 		this.delegateReader = delegateReader;
 	}
 	
+	public void setGraphProjectionBuilder(SampledGraphProjectionBuilder<G, V, E> builder) {
+		this.builder = builder;
+	}
+	
 	@Override
 	public SampledGraphProjection<G, V, E> readGraph(String file) {
 		parent = new File(file).getParent();
@@ -100,7 +104,8 @@ public class SampledGraphProjMLReader<G extends Graph, V extends Vertex, E exten
 			throw new RuntimeException("Delegate file not specified!");
 		
 		delegate = delegateReader.readGraph(String.format("%1$s/%2$s", parent, filename));
-		builder = new SampledGraphProjectionBuilder<G, V, E>();
+		if(builder == null)
+			builder = new SampledGraphProjectionBuilder<G, V, E>();
 		
 		return builder.createGraph(delegate);
 	}

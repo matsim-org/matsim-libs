@@ -22,65 +22,74 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraphProjection;
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialEdge;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 
 /**
- * Extension of {@link SpatialGraphProjection} that implements
- * {@link SampledGraph}.
+ * Extension of {@link SampledGraphProjection} that implements
+ * {@link SpatialGraph}.
  * 
- * @see {@link SpatialGraphProjection}
- * @see {@link SampledGraph}
+ * @see {@link SampledGraphProjection}
+ * @see {@link SpatialGraph}
  * @author illenberger
  * 
  */
-public class SampledSpatialGraphProjection <G extends SampledSpatialGraph, V extends SampledSpatialVertex, E extends SampledSpatialEdge> extends
-		SpatialGraphProjection<G, V, E> implements SampledSpatialGraph {
+public class SpatialSampledGraphProjection <G extends SpatialGraph, V extends SpatialVertex, E extends SpatialEdge> extends
+		SampledGraphProjection<G, V, E> implements SpatialGraph {
 
 	/**
 	 * Creates an empty spatial sampled graph projection.
 	 * 
 	 * @param delegate the original graph.
 	 */
-	public SampledSpatialGraphProjection(G delegate) {
+	public SpatialSampledGraphProjection(G delegate) {
 		super(delegate);
 	}
 	
 	/**
-	 * @see {@link SpatialGraphProjection#getEdges()}
+	 * @see {@link SampledGraphProjection#getEdges()}
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends SampledSpatialEdgeDecorator<E>> getEdges() {
-		return (Set<? extends SampledSpatialEdgeDecorator<E>>) super.getEdges();
+	public Set<? extends SpatialSampledEdgeDecorator<E>> getEdges() {
+		return (Set<? extends SpatialSampledEdgeDecorator<E>>) super.getEdges();
 	}
 
 	/**
-	 * @see {@link SpatialGraphProjection#getVertices()}
+	 * @see {@link SampledGraphProjection#getVertices()}
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends SampledSpatialVertexDecorator<V>> getVertices() {
-		return (Set<? extends SampledSpatialVertexDecorator<V>>) super.getVertices();
+	public Set<? extends SpatialSampledVertexDecorator<V>> getVertices() {
+		return (Set<? extends SpatialSampledVertexDecorator<V>>) super.getVertices();
 	}
 
 	/**
-	 * @see {@link SpatialGraphProjection#getEdge(SparseVertex, SparseVertex)}
+	 * @see {@link SampledGraphProjection#getEdge(SparseVertex, SparseVertex)}
 	 */
 	@Override
-	public SampledSpatialEdgeDecorator<E> getEdge(SparseVertex v_i, SparseVertex v_j) {
-		return (SampledSpatialEdgeDecorator<E>) super.getEdge(v_i, v_j);
+	public SpatialSampledEdgeDecorator<E> getEdge(SparseVertex v_i, SparseVertex v_j) {
+		return (SpatialSampledEdgeDecorator<E>) super.getEdge(v_i, v_j);
 	}
 
 	/**
-	 * @see {@link SpatialGraphProjection#getVertex(org.matsim.contrib.sna.graph.spatial.SpatialVertex)}
+	 * @see {@link SampledGraphProjection#getVertex(org.matsim.contrib.sna.graph.spatial.SpatialVertex)}
 	 */
 	@Override
-	public SampledSpatialVertexDecorator<V> getVertex(V v) {
-		return (SampledSpatialVertexDecorator<V>) super.getVertex(v);
+	public SpatialSampledVertexDecorator<V> getVertex(V v) {
+		return (SpatialSampledVertexDecorator<V>) super.getVertex(v);
+	}
+
+	/**
+	 * @see {@link SpatialGraph#getCoordinateReferenceSysten()}
+	 */
+	@Override
+	public CoordinateReferenceSystem getCoordinateReferenceSysten() {
+		return getDelegate().getCoordinateReferenceSysten();
 	}
 
 }

@@ -25,13 +25,14 @@ import org.geotools.referencing.CRS;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraph;
-import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLReader;
-import org.matsim.contrib.sna.snowball.spatial.io.SampledSpatialGraphMLWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraph;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
 
 /**
  * @author illenberger

@@ -21,14 +21,14 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import org.matsim.contrib.sna.gis.ZoneLayer;
 
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialAnalyzerTask extends GraphAnalyzerTaskComposite {
+public class SpatialAnalyzerTask extends AnalyzerTaskComposite {
 
 	public SpatialAnalyzerTask(ZoneLayer zones) {
 		addTask(new StandardAnalyzerTask());
