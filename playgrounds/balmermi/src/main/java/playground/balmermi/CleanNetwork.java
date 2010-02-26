@@ -58,8 +58,10 @@ public class CleanNetwork {
 		
 		for (LinkImpl l : network.getLinks().values()) {
 			LinkImpl l2 = subNet.getLinks().get(l.getId());
-			l2.setOrigId(l.getOrigId());
-			l2.setType(l.getType());
+			if (l2 != null) {
+				l2.setOrigId(l.getOrigId());
+				l2.setType(l.getType());
+			}
 		}
 
 //		new NetworkShiftFreespeed().run(network);
