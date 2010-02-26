@@ -63,11 +63,14 @@ public class DaBarChart {
 	  
 	  public JFreeChart createChart(String title, String xAxis, String yAxis) {
 		JFreeChart chart = ChartFactory.createBarChart(title, xAxis, yAxis, dataset, PlotOrientation.VERTICAL, true, false, false);
+		DaAxisBuilder axis = new DaAxisBuilder();
 		CategoryPlot plot = chart.getCategoryPlot();
 		
 	    plot.setBackgroundPaint(Color.white);
 	    plot.setDomainGridlinePaint(Color.lightGray);
 	    plot.setRangeGridlinePaint(Color.black);
+	    plot.setDomainAxis(axis.createCategoryAxis(xAxis));
+	    plot.setRangeAxis(axis.createValueAxis(yAxis));
 		
 		final BarRenderer renderer = (BarRenderer) plot.getRenderer();
 		

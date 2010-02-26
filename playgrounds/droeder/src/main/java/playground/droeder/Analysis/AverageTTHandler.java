@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.handler;
+package playground.droeder.Analysis;
 
 import java.io.File;
 import java.io.IOException;
