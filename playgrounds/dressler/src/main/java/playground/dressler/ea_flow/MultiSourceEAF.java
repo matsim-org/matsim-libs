@@ -60,9 +60,6 @@ public class MultiSourceEAF {
 	 * debug flag and the algorithm to use
 	 */
 	private static boolean _debug = false;
-	static boolean useReverse = true;
-	
-
 	
 	public static void debug(final boolean debug){
 		_debug=debug;
@@ -72,6 +69,7 @@ public class MultiSourceEAF {
 	{
 		this.setupStatusInfo();
 	}
+	
 	/**
 	 * A method to read a file containing the information on demands in an evacuation scenario for a given network
 	 * the syntax of the file is as follows:
@@ -130,7 +128,7 @@ public class MultiSourceEAF {
 		}
 		
 		if (missing > 0) {
-			System.out.println("Missed some start link! Ignored " + missing + " people.");
+			System.out.println("Missed some start links! Ignored " + missing + " people.");
 		}
 
 		return allnodes;
@@ -166,22 +164,28 @@ public class MultiSourceEAF {
 		BellmanFordIntervalBased routingAlgo = new BellmanFordIntervalBased(settings, fluss);
 			
 		int i;
-		long gain = 0;
+		long EdgeGain = 0;
+		long VertexGain = 0;
 		int lasttime = 0;
 		
-		boolean tryReverse = useReverse;
+		boolean tryReverse;
+		
+		tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		
 		for (i=1; i<=settings.MaxRounds; i++){
 			timer1 = System.currentTimeMillis();
 			
-			System.out.println("Iteration " + i);
+			//System.out.println("Iteration " + i);
 			
 			// THE IMPORTANT FUNCTION CALL HAPPENS HERE //
+			routingAlgo.startNewIter();
 			if (tryReverse) {
 				result = routingAlgo.doCalculationsReverse(lasttime);
 			} else {
-			  result = routingAlgo.doCalculations();
+			    result = routingAlgo.doCalculationsForward();
 			}
+			
+			VertexGain += routingAlgo.vertexGain;
 			
 			timer2 = System.currentTimeMillis();
 			timeMBF += timer2 - timer1;
@@ -205,47 +209,13 @@ public class MultiSourceEAF {
 					
 					// time has increased, might be worth trying the reverse search again
 					// if it is enabled at all
-					tryReverse = useReverse;
+					tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 				}
 				String tempstr2 = "";
 				
 				tempstr2 = path.toString() + "\n";					
-
-				// BIG DEBUG
-								
-				/*if (lasttime == 244) {
-					Flow.debug(1);
-				
-					System.out.println("Checking consistency before augmenting a single path:");
-					System.out.println("path " + path);
-					if (!fluss.checkTEPsAgainstFlow()) {
-						System.out.println("All paths so far:");
-						for (TimeExpandedPath tempTEP : fluss.getPaths()) {
-							System.out.println(tempTEP);
-						}
-
-						throw new RuntimeException("Flow and stored TEPs disagree!"); 
-					}
-				}*/
-
 				
 				int augment = fluss.augment(path);
-				
-				// BIG DEBUG
-				/*if (lasttime == 244) {
-					System.out.println("Checking consistency after augmenting a single path:");
-					System.out.println("path " + path);
-					if (!fluss.checkTEPsAgainstFlow()) {
-						System.out.println("All paths so far:");
-						for (TimeExpandedPath tempTEP : fluss.getPaths()) {
-							System.out.println(tempTEP);
-						}
-
-						throw new RuntimeException("Flow and stored TEPs disagree!"); 
-					}
-					Flow.debug(0);
-				}*/
-
 				
 				if (augment > 0) {
 					tempstr += tempstr2;
@@ -260,27 +230,31 @@ public class MultiSourceEAF {
 			}
 			
 			timer3 = System.currentTimeMillis();
-			gain += fluss.cleanUp();
+			EdgeGain += fluss.cleanUp();
 			
 			timeAugment += timer3 - timer2;
 			
 			
-			if (i % 100 == 0) {					
+			if (i % 100 == 0) {		
+				System.out.println();
 				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-				System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
-				System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
+				System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
+				System.out.println("CleanUp got rid of  " + VertexGain + " vertex intervals so far.");
 				//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 				System.out.println("last path: " + tempstr);
 				System.out.println(routingAlgo.measure());	
 				System.out.println(fluss.measure());
 				System.out.println();
-				
-				// DEBUG
-				/*System.out.println("Checking consistency once in a while ...");
-				if (!fluss.checkTEPsAgainstFlow()) {
-					throw new RuntimeException("Flow and stored TEPs disagree!"); 
+			}
+			
+			if (settings.checkConsistency > 0) {
+				if (i % settings.checkConsistency == 0) {
+					System.out.println("Checking consistency once in a while ...");
+					if (!fluss.checkTEPsAgainstFlow()) {
+						throw new RuntimeException("Flow and stored TEPs disagree!"); 
+					}
+					System.out.println("Everything seems to be okay.");
 				}
-				System.out.println("Everything seems to be okay.");*/
 			}
 
 		}
@@ -290,8 +264,8 @@ public class MultiSourceEAF {
 		System.out.println("");
 		System.out.println("");
 		System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-		System.out.println("CleanUp got rid of " + gain + " edge intervalls so far.");
-		System.out.println("CleanUp got rid of  " + routingAlgo.gain + " vertex intervals so far.");
+		System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
+		System.out.println("CleanUp got rid of  " + VertexGain + " vertex intervals so far.");
 		//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 		System.out.println("last path: " + tempstr);
 		System.out.println(routingAlgo.measure());	
@@ -382,8 +356,8 @@ public class MultiSourceEAF {
 		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
 		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
-		//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
-		networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
+		networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
+		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
@@ -417,15 +391,15 @@ public class MultiSourceEAF {
 
 
 		
-		int uniformDemands = 500;
+		int uniformDemands = 100;
 
 		// Rounding is now done according to timestep and flowFactor!
 		int timestep = 10; 
 		double flowFactor = 1.0;
 
 		
-		String sinkid = "supersink"; //siouxfalls, problem
-		//String sinkid = "en1";  //padang, line, swissold
+		//String sinkid = "supersink"; //siouxfalls, problem
+		String sinkid = "en1";  //padang, line, swissold .. en1 fuer forward
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
@@ -456,7 +430,21 @@ public class MultiSourceEAF {
 					demands.put(node, Math.max(uniformDemands,0));
 				}
 			}
+			
+			// Hack for those networks with en1->en2 
+			// set demand of en2 to 0, because it cannot be satisfied if en1 is the sink
+			if (sinkid.equals("en1")) {				
+				Node sink2 = network.getNodes().get(new IdImpl("en2"));
+				if (sink2 != null) {
+					Integer d = demands.get(sink2);
+					if (d != null && d > 0) {
+						demands.put(sink2, 0);
+					}
+				}				
+			}
 		}
+		
+		
 		
 		int totaldemands = 0;
 		for (int i : demands.values()) {
@@ -475,12 +463,18 @@ public class MultiSourceEAF {
 
 		settings = new FlowCalculationSettings(network, sinkid, demands, timestep, flowFactor);
 
-		// set additional parameters, mostly for the LP
-		settings.TimeHorizon = 1700;
+		// set additional parameters, mostly TimeHorizon for the LP
+		//settings.TimeHorizon = 1800;
 		//settings.MaxRounds = 101;
+		//settings.checkConsistency = 100;		
+		//settings.useVertexCleanup = true;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE; // default
 		
-
+		settings.printStatus();
+		
 		//settings.writeLP();
+		//settings.writeNET(false);
 		
 		Flow fluss;
 		fluss = calcEAFlow(settings);

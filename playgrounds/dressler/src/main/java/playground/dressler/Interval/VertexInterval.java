@@ -40,16 +40,20 @@ public class VertexInterval extends Interval {
 	/**
 	 * shows whether the vertex is reacheable during the time interval
 	 */
-	private boolean reachable = false;
+	boolean reachable = false;
 	
-	private boolean scanned = false;
+	boolean scanned = false;
 
 
 	/**
-	 * predecessor in a shortest path
-	 * the times stored in the step are valid for arrival at the low bound!
+	 * predecessor or successor in a shortest path
+	 * the times stored in the step are valid for arrival at the low bound if predecessor
+	 * or for departure at the low bound if successor
 	 */
-	private PathStep _breadcrumb=null;
+	//PathStep _breadcrumb=null;
+	
+	PathStep _succ=null;
+	PathStep _pred=null;
 	
 
 //---------------------------METHODS----------------------------//
@@ -77,7 +81,9 @@ public class VertexInterval extends Interval {
 		// dummy values
 		this.reachable = false;
 		this.scanned = false;
-		this._breadcrumb = null;
+		//this._breadcrumb = null;
+		this._pred = null;
+		this._succ = null;
 	}
 	
 	/**
@@ -92,7 +98,10 @@ public class VertexInterval extends Interval {
 		super(l,r);	
 		this.reachable = other.reachable;
 		this.scanned = other.scanned;
-		this._breadcrumb = other._breadcrumb.copyShiftedToArrival(l);
+		this._pred = other._pred;
+		this._succ = other._succ;
+
+		//this._breadcrumb = other._breadcrumb.copyShiftedToArrival(l);
 	}
 
 	/**
@@ -103,6 +112,14 @@ public class VertexInterval extends Interval {
 	public VertexInterval(final Interval j) {
 		super(j.getLowBound(),j.getHighBound());
 		
+	}
+	
+	public VertexInterval(final VertexInterval j) {
+		super(j.getLowBound(),j.getHighBound());		
+		this.reachable = j.reachable;
+		this.scanned = j.scanned;
+		this._pred = j._pred;
+		this._succ = j._succ;		
 	}
 
 //------------------------Getter Setter----------------------//
@@ -128,7 +145,7 @@ public class VertexInterval extends Interval {
 	 * @param pred predesessor vertex
 	 */
 	public void setPredecessor(final PathStep pred){
-		this._breadcrumb=pred;
+		this._pred=pred;
 	}
 	
 	/**
@@ -136,8 +153,25 @@ public class VertexInterval extends Interval {
 	 * @return predecessor vertex 
 	 */
 	public PathStep getPredecessor(){
-		return this._breadcrumb;
+		return this._pred;
 	}
+	
+	/**
+	 * Setter for the successor in a shortest path
+	 * @param succ succesor vertex
+	 */
+	public void setSuccessor(final PathStep succ){
+		this._succ=succ;
+	}
+	
+	/**
+	 * Getter for the successor in a shortest path
+	 * @return successor PathStep 
+	 */
+	public PathStep getSuccessor(){
+		return this._succ;
+	}
+	
 	
 	
 	/**
@@ -157,17 +191,92 @@ public class VertexInterval extends Interval {
 	}
 	
 	/**
-	 * Set the fields of the VertexInterval reachable true, scanned false, and the _breadrumb to breadcrumb
-	 * This performs no checks at all!
-	 * @param bread which is set as breadcrumb. It is never shifted anymore.
+	 * Should the other VertexInterval be replaced with this?
+	 * Note that in intricate situations of being better "here and there",
+	 * the method has to be called on subintervals after the first returned interval again.    
+	 * @param other a VertexInterval
+	 * @return null if not, and the first subinterval of other that should be replaced otherwise 
 	 */
-	public void setArrivalAttributes (final PathStep bread)
+	public Interval isBetterThan(final VertexInterval other) {
+		if (!other.reachable) {
+			int l = Math.max(this._l, other._l);
+			int r = Math.min(this._r, other._r);
+			if (l < r) {
+			  return new Interval(l, r);
+			}
+		} 
+		
+		return null;		
+	}
+	
+	/**
+	 * Can this VertexInterval be combined with other?
+	 * Times or interval bounds are not checked!
+	 * @param other VertexInterval to compare to
+	 * @return true iff the intervalls agree on their arrival properties
+	 */
+	public boolean continuedBy(final VertexInterval other) {
+		if (this.scanned != other.scanned) return false;
+		if (this.reachable != other.reachable) return false;
+		
+		if (this._pred == null) {
+			if (other._pred != null) return false;			
+		} else {
+			if (!this._pred.continuedBy(other._pred)) return false;
+		}
+		
+		if (this._succ == null) {
+			if (other._succ != null) return false;
+		} else {
+		   if (!this._succ.continuedBy(other._succ)) return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Set the fields of the VertexInterval reachable true, scanned false, and the _pred to pred
+	 * This performs no checks at all!
+	 * Note that this is not suitable for the Reverse search anymore! 
+	 * @param pred which is set as predecessor. It is never shifted anymore.
+	 */	
+	public void setArrivalAttributesForward (final PathStep pred)
 	{
 		// we might have already scanned this interval
 		// but someone insists on relabelling it.
 		this.scanned = false;
 		this.reachable = true;
-		this._breadcrumb = bread;
+		this._pred = pred;
+	}
+	
+	/**
+	 * Set the fields of the VertexInterval reachable true, scanned false, and the _pred to pred
+	 * This performs no checks at all!
+	 * @param succ which is set as successor. It is never shifted anymore.
+	 */		
+	public void setArrivalAttributesReverse (final PathStep succ)
+	{
+		// we might have already scanned this interval
+		// but someone insists on relabelling it.
+		this.scanned = false;
+		this.reachable = true;
+		this._succ = succ;
+	}
+	
+	/**
+	 * Set the fields of the VertexInterval to the one given.
+	 * Predecessor or Successor are only updated if they are not null. 
+	 * @param other The VertexInterval from which the settings are copied 
+	 */
+	public void setArrivalAttributes (final VertexInterval other)
+	{
+		this.scanned = other.scanned;
+		this.reachable = other.reachable;
+		if (other._pred != null) 
+		  this._pred = other._pred;
+		
+		if (other._succ != null)
+		  this._succ = other._succ;
 	}
 	
 //----------------------------SPLITTING----------------------------//
@@ -184,12 +293,15 @@ public class VertexInterval extends Interval {
 		VertexInterval k = new VertexInterval(j);
 		k.reachable = this.reachable;
 		k.scanned = this.scanned;
-		if (this._breadcrumb == null) {
+		k._pred = this._pred;
+		k._succ = this._succ;
+
+		/*if (this._breadcrumb == null) {
 			k._breadcrumb = null;
 		} else {
 			// should hardly ever occur, if at all.
 		    k._breadcrumb = this._breadcrumb.copyShifted(k.getLowBound() - this.getLowBound());
-		}
+		}*/
 		
 		return k;
 	}
@@ -202,6 +314,6 @@ public class VertexInterval extends Interval {
 	 
 	public String toString()
 	{
-		return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned + "; breadcrumb: " + this._breadcrumb;
+		return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned + "; pred: " + this._pred + " succ: " + this._succ;
 	}
 }

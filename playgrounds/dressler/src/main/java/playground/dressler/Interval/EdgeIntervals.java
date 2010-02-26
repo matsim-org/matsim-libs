@@ -86,23 +86,6 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	
 	/**
 	 * Gives a list of intervals when the other end of the link can be reached.
-	 * If primal, these are incoming times + length.
-	 * Otherwise, these are incoming times - length.
-	 * This is for the default "forward" search.
-	 * @param incoming Interval where we can start
-	 * @param capacity Capacity of the Link
-	 * @param primal indicates whether we use an original or residual edge 
-	 * @param TimeHorizon for easy reference
-	 * @return plain old Interval
-	 */
-	public ArrayList<Interval> propagate(final Interval incoming,
-			final int capacity, final boolean primal, int timehorizon) {
-		
-		return this.propagate(incoming, capacity, primal, false, timehorizon);
-	}
-	
-	/**
-	 * Gives a list of intervals when the other end of the link can be reached.
 	 * This is supposed to work for forward or reverse search.
 	 * @param incoming Interval where we can start
 	 * @param capacity Capacity of the Link

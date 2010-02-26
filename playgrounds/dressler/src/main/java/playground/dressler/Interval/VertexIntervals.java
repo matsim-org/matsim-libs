@@ -24,9 +24,6 @@ package playground.dressler.Interval;
 //java imports
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import org.matsim.api.core.v01.network.Link;
-
 import playground.dressler.ea_flow.PathStep;
 
 /**
@@ -70,6 +67,15 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 */
 	public PathStep getPred(int t){
 		return getIntervalAt(t).getPredecessor().copyShiftedToArrival(t);
+	}
+	
+	/**
+	 * Gives the successor Link on the Vertex at time t
+	 * @param t time
+	 * @return flow at t
+	 */
+	public PathStep getSucc(int t){
+		return getIntervalAt(t).getSuccessor().copyShiftedToStart(t);
 	}
 	
 
@@ -125,6 +131,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 *         It will always be shifted to the beginning of the interval, according to reverse
 	 * @param reverse Is this for the reverse search?
 	 * @return (possibly empty) list of changed intervals
+	 * @deprecated
 	 */
     public ArrayList<VertexInterval> setTrueList(ArrayList<Interval> arrive, PathStep pred, final boolean reverse) {
 		
@@ -154,9 +161,9 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 *         It will always be shifted to the beginning of the interval, according to reverse
 	 * @param reverse Is this for the reverse search?  
 	 * @return null or list of changed intervals iff anything was changed
+	 * @deprecated
 	 */
 	public ArrayList<VertexInterval> setTrueList(Interval arrive, PathStep pred, final boolean reverse){
-		// TODO Test !
 		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();		
 		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
 				
@@ -177,69 +184,100 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 					current = this.getIntervalAt(arrive.getHighBound()-1);
 				}
 				
-				
-				/*if(arrive.contains(current))
-				{
-					//if arrive contains current, we relabel it completely
-					// nothing has to be done about it.
-					
-					if (!reverse) {
-						current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
-					} else {
-						current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
-					}
-					changed.add(current);
-				}
-				else if(current.contains(arrive))
-				{
-					//if arrive is contained..
-					//we adapt current, so that our lowbound equals
-					//the low bound of the arrive interval..
-					if(current.getLowBound() < arrive.getLowBound())
-					{
-						current = this.splitAt(arrive.getLowBound());
-					}
-					//or we set our highbound to the highbound of arrival
-					if(current.getHighBound() > arrive.getHighBound())
-					{
-						this.splitAt(arrive.getHighBound());
-						current = this.getIntervalAt(arrive.getHighBound()-1);
-					}
-					// current now has exactly the same bounds as arrive
-					// so relabel it completely
-
-					if (!reverse) {
-						current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
-					} else {
-						current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
-					}						
-					changed.add(current);
-					
-				}
-				else
-				{
-					//ourInterval intersects arrive, but is neither contained nor does it contain
-					//arrive. thus they overlap somewhere
-					//if the lowerBound of arrive, is greater than our lower bound
-					//we set our lower bound to the bound of arrive
-					if(arrive.getLowBound() > current.getLowBound() && arrive.getLowBound() < current.getHighBound())
-					{
-						current = this.splitAt(arrive.getLowBound());
-					}
-					//we adapt our highbound, so that they are the same
-					if(arrive.getHighBound() < current.getHighBound())
-					{
-						this.splitAt(arrive.getHighBound());
-						current = this.getIntervalAt(arrive.getHighBound()-1);
-					}
-				}*/
-				
 				// and set the attributes
 				if (!reverse) {
-					current.setArrivalAttributes(pred.copyShiftedToArrival(current.getLowBound()));
+					//current.setArrivalAttributesForward(pred.copyShiftedToArrival(current.getLowBound()));
+					current.setArrivalAttributesForward(pred);
 				} else {
-					current.setArrivalAttributes(pred.copyShiftedToStart(current.getLowBound()));
+					//current.setArrivalAttributesReverse(pred.copyShiftedToStart(current.getLowBound()));
+					current.setArrivalAttributesReverse(pred);
 				}
+				changed.add(current);
+			}
+
+
+			if (isLast(current)) {
+				break;
+			}			
+			current = this.getIntervalAt(current.getHighBound());
+		}	
+		return changed;
+	}
+	
+	 public ArrayList<VertexInterval> setTrueList(ArrayList<VertexInterval> arrive) {
+			
+	    	ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();
+	    	
+			if (arrive == null || arrive.isEmpty()) { return changed; }
+			
+			// there used to be condensing here ...
+			// but propagate already condenses these days
+			
+			Iterator<VertexInterval> iterator = arrive.iterator();
+			VertexInterval i;
+									
+			while(iterator.hasNext()) {
+				i = iterator.next();	        
+			    changed.addAll(setTrueList(i));
+			}
+					
+			return changed;
+		}
+	 
+	 public ArrayList<VertexInterval> setTrueList(ArrayList<Interval> arrive, VertexInterval arriveProperties) {
+			
+	    	ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();
+	    	
+			if (arrive == null || arrive.isEmpty()) { return changed; }
+			
+			// there used to be condensing here ...
+			// but propagate already condenses these days
+			
+			Iterator<Interval> iterator = arrive.iterator();
+			Interval i;
+			VertexInterval temp = new VertexInterval(arriveProperties);
+									
+			while(iterator.hasNext()) {
+				i = iterator.next();
+				temp._l = i._l;
+				temp._r = i._r;
+			    changed.addAll(setTrueList(temp));
+			}
+					
+			return changed;
+		}
+	
+	/**
+	 * Sets arrival true for all time steps where arrive is better than the existing interval
+	 * @param arrive VertexInterval suitable to be copied to this vertex  
+	 * @return null or list of changed intervals iff anything was changed
+	 */
+	public ArrayList<VertexInterval> setTrueList(VertexInterval arrive){
+		// TODO Test !
+		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();	
+		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
+				
+		while(current.getLowBound() < arrive.getHighBound()){
+
+			// only do something if current was not reachable or can be improved			
+			Interval improvement = arrive.isBetterThan(current); 
+			if (improvement != null) {
+				
+				// let's modify the interval to look just right
+				if(current.getLowBound() < improvement.getLowBound()) {
+					current = this.splitAt(improvement.getLowBound());
+				}
+				
+				if(current.getHighBound() > improvement.getHighBound())
+				{
+					this.splitAt(improvement.getHighBound());
+					// pick the interval again to be on the safe side
+					current = this.getIntervalAt(improvement.getHighBound()-1);
+				}
+				
+				// and set the attributes
+				current.setArrivalAttributes(arrive);
+				
 				changed.add(current);
 			}
 
@@ -273,15 +311,17 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		  j = this.getIntervalAt(i.getHighBound());
 		  if(i.getHighBound() != j.getLowBound())
 			  throw new RuntimeException("error in cleanup!");
-		  if (i.getReachable() == j.getReachable() 
-				  && i.isScanned() == j.isScanned()
-				  && i.getPredecessor().continuedBy(j.getPredecessor())) {
+		  //if (i.getReachable() == j.getReachable() 
+		  //		  && i.isScanned() == j.isScanned()) {
+		  
+		  if (i.continuedBy(j)) {			  
 			  // FIXME use a safer method for removing things!
 			  _tree.remove(i);
 			  _tree.remove(j);
 			  j = new VertexInterval(i.getLowBound(), j.getHighBound(), i);
 			  _tree.insert(j);			  
 			  gain++;
+
 		  } 
 		  i = j;
 		}

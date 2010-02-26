@@ -468,14 +468,34 @@ public class Flow {
 		
 		for (Node source : this._sources) {
 			boolean thisisbad = false;
-			for (int t = 0; t < this._timeHorizon; t++) {
+			
+			int timeToStopChecking;
+			
+			if (this._sourceoutflow.get(source).getLast().getFlow() == 0) {
+				timeToStopChecking = this._sourceoutflow.get(source).getLast().getLowBound();
+			} else {
+				timeToStopChecking = this._sourceoutflow.get(source).getLast().getHighBound();
+			}
+			
+			if (tempflow._sourceoutflow.get(source).getLast().getFlow() == 0) {
+				timeToStopChecking = Math.max(timeToStopChecking, tempflow._sourceoutflow.get(source).getLast().getLowBound());
+			} else {
+				timeToStopChecking = Math.max(timeToStopChecking, tempflow._sourceoutflow.get(source).getLast().getHighBound());
+			}
+			
+			if (timeToStopChecking > this._timeHorizon) {
+				System.out.println("Weird. There is flow beyond the TimeHorizon!");
+				thisisbad = true;
+			}			
+			
+			for (int t = 0; t < timeToStopChecking; t++) {
 				if (tempflow._sourceoutflow.get(source).getFlowAt(t) != this._sourceoutflow.get(source).getFlowAt(t)) {
 					thisisbad = true;
+					System.out.println("Flows differ on source: " + source.getId());
 					break;
 				}
 			}
-			if (thisisbad) {
-				System.out.println("Flows differ on source: " + source.getId());
+			if (thisisbad) {				
 				System.out.println("Original flow believes: ");
 				System.out.println(this._sourceoutflow.get(source));
 				System.out.println("Reconstructed flow believes: ");
@@ -487,14 +507,34 @@ public class Flow {
 		for (Link edge : this._network.getLinks().values()) {
 			//System.out.println("Checking edge " + edge.getId() + " ...");
 			boolean thisisbad = false;
-			for (int t = 0; t < this._timeHorizon; t++) {
+			
+			int timeToStopChecking;
+			
+			if (this._flow.get(edge).getLast().getFlow() == 0) {
+				timeToStopChecking = this._flow.get(edge).getLast().getLowBound();
+			} else {
+				timeToStopChecking = this._flow.get(edge).getLast().getHighBound();
+			}
+			
+			if (tempflow._flow.get(edge).getLast().getFlow() == 0) {
+				timeToStopChecking = Math.max(timeToStopChecking, tempflow._flow.get(edge).getLast().getLowBound());
+			} else {
+				timeToStopChecking = Math.max(timeToStopChecking, tempflow._flow.get(edge).getLast().getHighBound());
+			}
+			
+			if (timeToStopChecking > this._timeHorizon) {
+				System.out.println("Weird. There is flow beyond the TimeHorizon!");
+				thisisbad = true;
+			}
+			
+			for (int t = 0; t < timeToStopChecking; t++) {
 				if (tempflow._flow.get(edge).getFlowAt(t) != this._flow.get(edge).getFlowAt(t)) {
 					thisisbad = true;
+					System.out.println("Flows differ on edge: " + edge.getId() + " " + edge.getFromNode().getId() + "-->" + edge.getToNode().getId());
 					break;
 				}
 			}
-			if (thisisbad) {
-				System.out.println("Flows differ on edge: " + edge.getId() + " " + edge.getFromNode().getId() + "-->" + edge.getToNode().getId());
+			if (thisisbad) {				
 				System.out.println("Original flow believes: ");
 				System.out.println(this._flow.get(edge));
 				System.out.println("Reconstructed flow believes: ");

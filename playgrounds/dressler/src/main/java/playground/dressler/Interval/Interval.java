@@ -37,12 +37,12 @@ implements Comparable<Interval>
 	/**
 	 * lowbound 
 	 */
-	private int _l;
+	int _l;
 	
 	/**
 	 * highbound 
 	 */
-	private int _r;
+	int _r;
 
 	/**
 	 *mode of opennes with the folowing meaning:
