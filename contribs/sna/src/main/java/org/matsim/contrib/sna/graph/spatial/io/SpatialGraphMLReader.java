@@ -28,9 +28,6 @@ import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialGraphBuilder;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseGraph;
-import org.matsim.contrib.sna.snowball.spatial.SampledSpatialSparseVertex;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.Attributes;
 
