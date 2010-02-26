@@ -79,7 +79,8 @@ public class BkChartWriter {
 					XYDataset xyds = xy.getDataset(i);
 					for (int seriesIndex = 0; seriesIndex < xyds.getSeriesCount(); seriesIndex ++) {
 						writer.newLine();
-						writer.write("Series" + xyds.getSeriesKey(seriesIndex).toString());
+						writer.write("Series " + "'" + xyds.getSeriesKey(seriesIndex).toString());
+						writer.write("'");
 						writer.newLine();
 						int items = xyds.getItemCount(seriesIndex);
 						for (int itemsIndex = 0; itemsIndex < items; itemsIndex++){

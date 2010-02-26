@@ -13,35 +13,31 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 
+import playground.benjamin.Row;
 
 
-public class BkDeltaUtilsChart {
+
+public class BkDeltaUtilsChartGeneral {
 
 	private XYSeriesCollection dataset;
-	private SortedMap<Id, Double> scores1;
-	private SortedMap<Id, Double> scores2;
-
-	//constructor
-	public BkDeltaUtilsChart(SortedMap<Id, Double> scores1,	SortedMap<Id, Double> scores2) {
-		this.scores1 = scores1;
-		this.scores2 = scores2;
-		//call for dataset creation
-		this.dataset = createDeltaScoreDataset();
+	private SortedMap<Id, Row> populationInformation;
+	
+	//constructor for row approach
+	public BkDeltaUtilsChartGeneral(SortedMap<Id, Row> populationInformation) {
+		this.populationInformation = populationInformation;
+		this.dataset = createNeededDataset();
 	}
-		
+	
 //============================================================================================================	
 	
-	public XYSeriesCollection createDeltaScoreDataset(){
+	private XYSeriesCollection createNeededDataset() {
 		//instancing the dataset 
 		XYSeriesCollection ds = new XYSeriesCollection();
 		
-		//call to add xy-series to the dataset (several series can be included) with an argument from type XYSeries
-		             //call to create a xy-series from the sorted map
-		ds.addSeries(this.createSeries("Delta utils per person", calculateScoreDifferences(scores1, scores2)));
-		return ds;	
+		ds.addSeries(this.createSeries("Delta utils per person", Id2Scores(populationInformation)));
+		return ds;
 	}
 	
-	//create xy-series with id and score difference from map
 	private XYSeries createSeries(final String title, SortedMap<Id, Double> result) {
 		XYSeries series = new XYSeries(title, false, true);
 		for (Id id : result.keySet()) {
@@ -49,20 +45,26 @@ public class BkDeltaUtilsChart {
 		}
 		return series;
 	}
-
-	//this calculates the score differences
-	private SortedMap<Id, Double> calculateScoreDifferences(SortedMap<Id, Double> scores1, SortedMap<Id, Double> scores2) {
+	
+	/**
+	 * Dependent on what to plot this method has to be adapted
+	 * @param populationInformation (Map from Id to Row (all desired information))
+	 * @return Map from Id to the chosen information (e.g. scoreDiff)
+	 * 
+	 * 		the return could also be sth like Map<income, scoreDiff>
+	 */
+	private SortedMap<Id, Double> Id2Scores(SortedMap<Id, Row> populationInformation) {
 		SortedMap<Id, Double> result = new TreeMap<Id, Double>(new ComparatorImplementation());
 		
-		for (Id id : scores1.keySet()){
-			//value = map.get(key) !!!
-			Double score1 = scores1.get(id);
-			Double score2 = scores2.get(id);
-			Double scoreDifference = score2 - score1;
-			result.put(id, scoreDifference);
-		}		
-		return result;
-	}
+		for (Id id : populationInformation.keySet()){
+			Row row = populationInformation.get(id);
+			Double scoreDiff = row.getScoreDiff();
+			result.put(id, scoreDiff);
+		}
+		return result ;
+	}	
+	
+//============================================================================================================		
 	
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot(this.dataset, new NumberAxis("PersonId"), new NumberAxis("Delta utils"), null);
