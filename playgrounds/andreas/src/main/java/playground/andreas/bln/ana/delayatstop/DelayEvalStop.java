@@ -53,7 +53,7 @@ public class DelayEvalStop {
 		
 		DelayEvalStop delayEval = new DelayEvalStop();
 		delayEval.setTreshold_s(60);
-		delayEval.readEvents("E:/_out/veh/0.events.xml.gz");
+		delayEval.readEvents("E:/_out/m3_traffic_jam/ITERS/it.0/0.events.xml.gz");
 
 	}
 	
@@ -114,13 +114,13 @@ public class DelayEvalStop {
 			
 				DelayCountBox delBox = this.delayMapTerm.get(Integer.valueOf((int) event.getTime()/3600));
 				DelayCountBox delBoxTreshold = this.delayMapTermTreshold.get(Integer.valueOf((int) event.getTime()/3600));
-				if(event.getDelay() > this.treshold){
+				if(event.getDelay() < -1 * this.treshold){
 					delBoxTreshold.addEntry(event.getDelay());
 				} else {
 					delBoxTreshold.addEntry(0.0);
 				}
 				
-				delBox.addEntry(Math.max(0.0, event.getDelay()));
+				delBox.addEntry(Math.min(0.0, event.getDelay()));
 			
 				this.delayMapTerm.put(Integer.valueOf((int) event.getTime()/3600), delBox);
 				this.delayMapTermTreshold.put(Integer.valueOf((int) event.getTime()/3600), delBoxTreshold); 
@@ -153,7 +153,7 @@ public class DelayEvalStop {
 			
 			if(this.delayMap.size() == this.delayMapTerm.size()){
 				
-				System.out.println("Stunde, Anzahl der Abfahrten, Verspätung je Abfahrt, Verspätung je Abfahrt > " + this.treshold + " s,  , Anzahl der Ankünfte, Verspätung je Ankunft, Verspätung je Ankunft > " + this.treshold + " s");
+				System.out.println("Stunde, Anzahl der Abfahrten, Verspätung je Abfahrt, Verspätung je Abfahrt > " + this.treshold + " s,  , Anzahl der Ankünfte, Verfrühung je Ankunft, Verfrühung je Ankunft < " + this.treshold + " s");
 				for (int i = 0; i < this.delayMap.size(); i++) {
 					StringBuffer string = new StringBuffer();
 					string.append(i + "-" + (i+1) + ", ");
