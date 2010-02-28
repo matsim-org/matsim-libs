@@ -12,7 +12,8 @@ public class Initializer {
 	}
 	
 	public void init(MatsimTestCase testCase) {
-		String	path = testCase.getPackageInputDirectory() + "config.xml";		
+		System.out.println(testCase.getPackageInputDirectory());
+		String path = "mfeil/"+ testCase.getPackageInputDirectory() + "config.xml";		
 		testCase.loadConfig(path);
 		this.controler = new ControlerForTests(Gbl.getConfig());
 		this.controler.setOverwriteFiles(true);		

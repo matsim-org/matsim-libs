@@ -85,7 +85,7 @@ public class PlanomatXTest extends MatsimTestCase{
 		
 		// Import expected output plan into population
 		this.scenario_input.getPopulation().getPersons().clear();
-		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"PLX_expected_output.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile("mfeil/"+this.getPackageInputDirectory()+"PLX_expected_output.xml");
 				
 		// Compare the two plans; <1 because of double rounding errors
 		for (int i=0;i<plan.getPlanElements().size();i++){
