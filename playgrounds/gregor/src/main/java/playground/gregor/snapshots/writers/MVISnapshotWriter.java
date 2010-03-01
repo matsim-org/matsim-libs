@@ -65,22 +65,23 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 import playground.gregor.otf.readerwriter.InundationDataFromBinaryFileReader;
+import playground.gregor.snapshots.OTFSnapshotGenerator;
 
 
 public class MVISnapshotWriter extends OTFFileWriter{
 	//private final   String netFileName = "";
 //	private  String vehFileName = "";
 	//private  String outFileName = "";
-	public static final String CVSROOT = "../../../../../workspace/vsp-cvs";
-	private static final String BG_IMG_ROOT = CVSROOT + "/studies/padang/imagery/sliced/";
+//	public static final String CVSROOT = "../../../../../workspace/vsp-cvs";
+//	private static final String BG_IMG_ROOT = CVSROOT + "/studies/padang/imagery/sliced/";
 	//	final String BUILDINGS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_buildings.shp";
 //		final String LINKS_FILE =  CVSROOT + "/studies/padang/gis/network_v20080618/links.shp";
 		
 	//	final String NODES_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_nodes.shp";
-	final String BUILDINGS_FILE =  "../../../../inputs/gis/shelters.shp";
-	final String LINKS_FILE = "../../../../inputs/gis/links.shp";
-	final String NODES_FILE = "../../../../inputs/gis/nodes.shp";
-	final String REGION_FILE =  "../../../../inputs/gis/region.shp";
+	final String BUILDINGS_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/studies/countries/id/padang/gis/vis/shelters.shp";
+	final String LINKS_FILE = OTFSnapshotGenerator.SHARED_SVN + "/studies/countries/id/padang/gis/vis/links.shp";
+	final String NODES_FILE = OTFSnapshotGenerator.SHARED_SVN + "/studies/countries/id/padang/gis/vis/nodes.shp";
+	final String REGION_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/studies/countries/id/padang/gis/vis/region.shp";
 	final private static float [] regionColor = new float [] {.9f,.92f,.82f,1.f};
 	final private static float [] buildingsColor = new float [] {1.f,.5f,.0f,.8f};
 	final private static float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
@@ -101,7 +102,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 
 	public MVISnapshotWriter(ScenarioImpl sc) {
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QNetwork(sc.getNetwork())),"../../../../outputs/output/movie.mvi", new OTFFileWriterQSimConnectionManagerFactory());
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QNetwork(sc.getNetwork())),OTFSnapshotGenerator.RUNS_SVN + "/output/test.mvi", new OTFFileWriterQSimConnectionManagerFactory());
 	}
 
 

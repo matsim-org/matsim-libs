@@ -31,7 +31,10 @@ import playground.gregor.snapshots.writers.SnapshotGenerator;
 
 public class OTFSnapshotGenerator {
 
-	private final static String lsFile = "../../../../../workspace/vsp-cvs/studies/padang/gis/network_v20080618/d_ls.shp";
+	public final static String SHARED_SVN = "../../../../../arbeit/svn/shared-svn";
+	public final static String RUNS_SVN = "../../../../../arbeit/svn/runs-svn/run1006";
+	
+	private final static String lsFile = SHARED_SVN + "/studies/countries/id/padang/gis/network_v20080618/d_ls.shp";
 
 	private final static double VIS_OUTPUT_SAMPLE = 1.;
 	
@@ -43,18 +46,19 @@ public class OTFSnapshotGenerator {
 	
 	public OTFSnapshotGenerator() {
 		
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("../../../../outputs/output/output_config.xml.gz");
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(RUNS_SVN + "/output/output_config.xml.gz");
 		
 		this.scenario = sl.getScenario();
-		this.scenario.getConfig().network().setInputFile("../../../../outputs/output/output_network.xml.gz");
+		this.scenario.getConfig().network().setInputFile(RUNS_SVN + "/output/output_network.xml.gz");
 		this.scenario.getConfig().simulation().setSnapshotFormat("otfvis");
 		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
-		this.scenario.getConfig().simulation().setEndTime(4*3600+30*60);
+//		this.scenario.getConfig().simulation().setEndTime(4*3600+30*60);
+		this.scenario.getConfig().simulation().setEndTime(5*3600);
 		this.scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		
-		this.scenario.getConfig().evacuation().setBuildingsFile("../../../../inputs/networks/evac_zone_buildings_v20090728.shp");
+		this.scenario.getConfig().evacuation().setBuildingsFile(SHARED_SVN + "/studies/countries/id/padang/gis/buildings_v20090728/evac_zone_buildings_v20090728.shp");
 //		this.scenario.getConfig().evacuation().setSampleSize("0.1");
-//		this.scenario.getConfig().controler().setLastIteration(0);
+		this.scenario.getConfig().controler().setLastIteration(0);
 		int it = this.scenario.getConfig().controler().getLastIteration();
 		sl.loadNetwork();
 		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + it + "/" + it + ".events.txt.gz";
@@ -77,6 +81,7 @@ public class OTFSnapshotGenerator {
 		DestinationDependentColorizer d = new DestinationDependentColorizer();
 		ev.addHandler(d);
 		EvacuationLinksTeleporter e = new EvacuationLinksTeleporter();
+//		AllAgentsTeleporter aat = new AllAgentsTeleporter();
 		TimeDependentColorizer t = new TimeDependentColorizer();
 		ev.addHandler(t);
 //		EventsImpl evII = new EventsImpl();
@@ -127,6 +132,9 @@ public class OTFSnapshotGenerator {
 		sg.addColorizer(d);
 		sg.addColorizer(e);
 		sg.addColorizer(t);
+		
+//		sg.addColorizer(aat);
+		
 		new EventsReaderTXTv1(ev).readFile(this.eventsFile);
 		sg.finish();
 	}
@@ -137,7 +145,7 @@ public class OTFSnapshotGenerator {
 		try {
 			fts = ShapeFileReader.readDataFile(lsFile);
 		} catch (final Exception e) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch block/run1006
 			e.printStackTrace();
 		}
 		final Collection<Feature> fa = new ArrayList<Feature>();

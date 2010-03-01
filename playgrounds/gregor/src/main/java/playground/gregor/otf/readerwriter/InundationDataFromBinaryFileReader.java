@@ -7,8 +7,7 @@ import java.io.ObjectInputStream;
 
 import org.matsim.evacuation.otfvis.readerwriter.InundationData;
 
-
-import playground.gregor.MY_STATIC_STUFF;
+import playground.gregor.snapshots.OTFSnapshotGenerator;
 
 
 public class InundationDataFromBinaryFileReader {
@@ -19,7 +18,7 @@ public class InundationDataFromBinaryFileReader {
 		try {
 //			o = new ObjectInputStream(new FileInputStream("../../inputs/flooding/flooding_old.dat"));
 //			o = new ObjectInputStream(new FileInputStream(this.file));
-			o = new ObjectInputStream(new FileInputStream(MY_STATIC_STUFF.SWW_ROOT + "/flooding.dat"));
+			o = new ObjectInputStream(new FileInputStream(OTFSnapshotGenerator.SHARED_SVN + "/studies/countries/id/padang/inundation/20100201_sz_pc_2b_tide_subsidence/flooding.dat"));
 			InundationData data = (InundationData) o.readObject();
 			o.close();
 			return data;
