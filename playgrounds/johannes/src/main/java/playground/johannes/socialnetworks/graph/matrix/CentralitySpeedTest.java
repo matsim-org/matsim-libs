@@ -47,7 +47,7 @@ public class CentralitySpeedTest extends TestCase {
 		
 		logger.info("Calculation centrality measures...");
 		long time = System.currentTimeMillis();
-		Centrality c = new Centrality();
+		MatrixCentrality c = new MatrixCentrality();
 		c.run(y);
 		logger.info("Done. Took " + (System.currentTimeMillis() - time) + " ms");
 		

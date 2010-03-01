@@ -34,22 +34,29 @@ import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 
 /**
  * @author illenberger
- *
+ * 
  */
 public class Components {
 
+	/**
+	 * Counts the number of disconnected components in the graph.
+	 * 
+	 * @param graph
+	 *            a graph.
+	 * @return the number of disconnected components.
+	 */
 	public int countComponents(Graph graph) {
 		return extractComponents(new AdjacencyMatrix(graph)).size();
 	}
-	
+
 	private List<TIntArrayList> extractComponents(AdjacencyMatrix y) {
 		boolean[] pending = new boolean[y.getVertexCount()];
 		Arrays.fill(pending, true);
-		
+
 		List<TIntArrayList> components = new ArrayList<TIntArrayList>();
 		Dijkstra router = new Dijkstra(y);
-		for(int i = 0; i < pending.length; i++) {
-			if(pending[i] == true) {
+		for (int i = 0; i < pending.length; i++) {
+			if (pending[i] == true) {
 				TIntArrayList reachable = router.run(i, -1);
 				reachable.add(i);
 				components.add(reachable);
@@ -58,14 +65,14 @@ public class Components {
 				}
 			}
 		}
-		
+
 		Collections.sort(components, new Comparator<TIntArrayList>() {
 
 			@Override
 			public int compare(TIntArrayList o1, TIntArrayList o2) {
 				int result = o2.size() - o1.size();
-				if(result == 0) {
-					if(o1 == o2)
+				if (result == 0) {
+					if (o1 == o2)
 						return 0;
 					else
 						return o2.hashCode() - o1.hashCode();
@@ -73,7 +80,7 @@ public class Components {
 					return result;
 			}
 		});
-		
+
 		return components;
 	}
 }

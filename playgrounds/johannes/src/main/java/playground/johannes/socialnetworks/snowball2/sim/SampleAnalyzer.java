@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
@@ -49,6 +52,7 @@ public abstract class SampleAnalyzer implements SamplerListener {
 	
 	protected void analyse(SampledGraphProjection<?, ?, ?> graph, String output) {
 		try {
+			Logger.getRootLogger().setLevel(Level.WARN);
 			for(Entry<String, AnalyzerTask> task : tasks.entrySet()) {
 				String taskOutput = String.format("%1$s/%2$s/", output, task.getKey());
 				File file = makeDirectories(taskOutput);
@@ -56,6 +60,7 @@ public abstract class SampleAnalyzer implements SamplerListener {
 				Map<String, Double> stats = GraphAnalyzer.analyze(graph, task.getValue());
 				GraphAnalyzer.writeStats(stats, file.getAbsolutePath() + "/stats.txt");
 			}
+			Logger.getRootLogger().setLevel(Level.ALL);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

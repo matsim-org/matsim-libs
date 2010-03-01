@@ -25,10 +25,7 @@ import gnu.trove.TIntIntIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
@@ -39,7 +36,7 @@ import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
  * @author illenberger
  *
  */
-public class Centrality {
+public class MatrixCentrality {
 	
 	private double[] vertexCloseness;
 	

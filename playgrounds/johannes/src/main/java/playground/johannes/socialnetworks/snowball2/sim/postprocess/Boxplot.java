@@ -48,12 +48,12 @@ public class Boxplot {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		File rootDir = new File("/Users/jillenberger/Work/work/socialnets/snowball/output");
+		File rootDir = new File("/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/output");
 		final String dumpPattern = "it.";
-		String analyzerKey = "estim";
+		String analyzerKey = "estim1";
 		String propertyKey = "k_mean";
-		String outputTable = "/Users/jillenberger/Work/work/socialnets/snowball/output/boxplot.txt";
-		String outputAvr = "/Users/jillenberger/Work/work/socialnets/snowball/output/averags.txt";
+		String outputTable = "/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/boxplot.txt";
+		String outputAvr = "/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/averags.txt";
 		/*
 		 * Create a filename filter to filter only the dumps of interest.
 		 */

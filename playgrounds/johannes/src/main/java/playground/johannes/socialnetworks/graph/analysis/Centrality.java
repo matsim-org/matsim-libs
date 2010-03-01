@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphCentrao.java
+ * Centrality.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,14 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph;
+package playground.johannes.socialnetworks.graph.analysis;
 
-import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.math.Distribution;
 
-import gnu.trove.TIntIntIterator;
-import gnu.trove.TObjectIntHashMap;
 import playground.johannes.socialnetworks.graph.matrix.MatrixCentrality;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 
@@ -32,58 +30,27 @@ import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
  * @author illenberger
  *
  */
-public class GraphCentrality {
+public class Centrality {
 
-	private Graph g;
+	private AdjacencyMatrixDecorator<Vertex> y;
 	
-	private TObjectIntHashMap<Edge> edgeBetweenness;
+	private MatrixCentrality mCentrality;
 	
-	public GraphCentrality(Graph g) {
-		this.g = g;
+	public void init(Graph graph) {
+		y = new AdjacencyMatrixDecorator<Vertex>(graph);
+		mCentrality = new MatrixCentrality();
+		mCentrality.run(y);
 	}
 	
-	public TObjectIntHashMap<Edge> getEdgeBetweenness() {
-		return edgeBetweenness;
+	public Distribution closenessDistribution() {
+		return new Distribution(mCentrality.getVertexCloseness());
 	}
 	
-	public void calculate() {
-		AdjacencyMatrixDecorator<? extends Vertex> y = new AdjacencyMatrixDecorator<Vertex>(g);
-		
-		MatrixCentrality c = new MatrixCentrality();
-		c.run(y);
-	
-		int sum = 0;
-		for(int i = 0; i < c.getVertexBetweenness().length; i++) {
-			sum += c.getVertexBetweenness()[i];
+	public Distribution vertexBetweennessDistribution() {
+		Distribution distr = new Distribution();
+		for(int i = 0; i < mCentrality.getVertexBetweenness().length; i++) {
+			distr.add(mCentrality.getVertexBetweenness()[i]);
 		}
-//		for(int i = 0; i < c.getVertexBetweenness().length; i++) {
-//			System.out.println((i+1) + " " + c.getVertexBetweenness()[i]/(float)sum);
-//		}
-		
-		edgeBetweenness = new TObjectIntHashMap<Edge>();
-		
-		for(int i = 0; i < y.getVertexCount(); i++) {
-			Vertex v1 = y.getVertex(i);
-			
-			if(c.getEdgeBetweenness()[i] != null) {
-				TIntIntIterator it = c.getEdgeBetweenness()[i].iterator();
-				for(int k = 0; k < c.getEdgeBetweenness()[i].size(); k++) {
-					it.advance();
-					Vertex v2 = y.getVertex(it.key());
-					Edge e = getEdge(v1, v2);
-					edgeBetweenness.put(e, it.value());
-				}
-			}
-		}
-	}
-	
-	private Edge getEdge(Vertex v1, Vertex v2) {
-		for(Edge e : v1.getEdges()) {
-			if(e.getOpposite(v1).equals(v2)) {
-				return e;
-			}
-		}
-		
-		return null;
+		return distr;
 	}
 }

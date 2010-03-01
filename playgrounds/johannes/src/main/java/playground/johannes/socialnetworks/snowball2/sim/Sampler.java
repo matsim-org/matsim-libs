@@ -23,6 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.EdgeDecorator;
 import org.matsim.contrib.sna.graph.Graph;
@@ -43,6 +45,8 @@ import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
  *
  */
 public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
+	
+	private static final Logger logger = Logger.getLogger(Sampler.class);
 	
 	private TaggedGraph taggedGraph;
 	
@@ -90,6 +94,8 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		 * loop until no recruits are available
 		 */
 		while(!recruits.isEmpty()) {
+			logger.info(String.format("Sampling iteration %1$s.", iteration));
+			
 			List<TaggedVertex> newRecruits = new LinkedList<TaggedVertex>();
 			for(TaggedVertex vertex : recruits) {
 				if(!listener.beforeSampling(this))
@@ -113,6 +119,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 			recruits = newRecruits;
 			iteration++;
 		}
+		logger.info("Done.");
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -42,7 +42,7 @@ public class CentralityTest extends TestCase {
 		y.addEdge(3, 4);
 		y.addEdge(3, 5);
 		
-		Centrality c = new Centrality();
+		MatrixCentrality c = new MatrixCentrality();
 		c.run(y);
 		
 		assertEquals(0, c.getVertexBetweenness()[0]);

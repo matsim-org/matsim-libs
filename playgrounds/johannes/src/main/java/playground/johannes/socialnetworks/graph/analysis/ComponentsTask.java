@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CalcCentrality.java
+ * ComponentsTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.matrix;
+package playground.johannes.socialnetworks.graph.analysis;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+import java.util.Map;
 
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
+import org.matsim.contrib.sna.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public class CalcCentrality {
+public class ComponentsTask extends ModuleAnalyzerTask<Components> {
 
-	private static final Logger logger = Logger.getLogger(CalcCentrality.class);
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialSparseGraph graph = reader.readGraph("/Volumes/hertz:ils-raid/socialnets/mcmc/runs/run45/output/2000000000/graph.graphml"); 
-		logger.info("Converting matrix...");
-		AdjacencyMatrixDecorator<SparseVertex> y = new AdjacencyMatrixDecorator<SparseVertex>(graph);
-		
-		logger.info("Calculation centrality measures...");
-		long time = System.currentTimeMillis();
-		MatrixCentrality c = new MatrixCentrality();
-		c.run(y);
-		logger.info("Done. Took " + (System.currentTimeMillis() - time) + " ms");
-		
-		logger.info(String.format("Mean closeness is %1$s.", c.getMeanVertexCloseness()));
-
+	private static final String NUM_COMPONENTS = "n_components";
+	
+	public ComponentsTask() {
+		setModule(new Components());
+	}
+	
+	@Override
+	public void analyze(Graph graph, Map<String, Double> stats) {
+		int numComponents = module.countComponents(graph);
+		stats.put(NUM_COMPONENTS, new Double(numComponents));		
 	}
 
 }

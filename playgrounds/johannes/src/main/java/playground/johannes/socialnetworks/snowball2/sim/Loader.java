@@ -72,6 +72,7 @@ public class Loader {
 		Map<String, Estimator> estimators = new HashMap<String, Estimator>();
 		estimators.put("estim1", new Estimator1(graph.getVertices().size()));
 		estimators.put("estim2", new Estimator2(graph.getVertices().size(), interval));
+		estimators.put("estim3", new Estimator3(interval, graph.getVertices().size()));
 		/*
 		 * Load analyzers.
 		 */
@@ -116,9 +117,9 @@ public class Loader {
 
 	private static Config loadConfig(String file) {
 		Config config = new Config();
+		config.addCoreModules();
 		MatsimConfigReader reader = new MatsimConfigReader(config);
 		reader.readFile(file);
-		config.addCoreModules();
 		return config;
 	}
 	

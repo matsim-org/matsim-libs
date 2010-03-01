@@ -21,10 +21,10 @@ package playground.johannes.graph;
 
 import junit.framework.TestCase;
 
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.sna.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.sna.graph.SparseVertex;
 
-import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.graph.analysis.Components;
 
 /**
@@ -34,15 +34,25 @@ import playground.johannes.socialnetworks.graph.analysis.Components;
 public class ComponentsTest extends TestCase {
 
 	public void test() {
-		SparseGraphMLReader reader = new SparseGraphMLReader();
-		Graph graph = reader.readGraph("/Users/jillenberger/Work/shared-svn/projects/socialnets/data/socialnetworks/cond-mat-2005/cond-mat-2005.graphml");
-		Components components = new Components();
-		long time = System.currentTimeMillis();
-		System.out.println(String.valueOf(components.countComponents(graph)));
-		System.out.println("Time " + (System.currentTimeMillis() - time));
+		SparseGraphBuilder builder = new SparseGraphBuilder();
+		SparseGraph graph = builder.createGraph();
 		
-		time = System.currentTimeMillis();
-		System.out.println(Partitions.disconnectedComponents(graph).size());
-		System.out.println("Time " + (System.currentTimeMillis() - time));
+		for(int i = 1; i < 10; i+=2) {
+			makeComponent(graph, builder, i);
+		}
+		
+		Components components = new Components();
+		assertEquals(5, components.countComponents(graph));
+	}
+	
+	private static void makeComponent(SparseGraph graph, SparseGraphBuilder builder, int size) {
+		if(size > 0) {
+			SparseVertex v_i = builder.addVertex(graph);
+			for(int i = 1; i < size; i++) {
+				SparseVertex v_j = builder.addVertex(graph);
+				builder.addEdge(graph, v_i, v_j);
+				v_i = v_j;
+			}
+		}
 	}
 }
