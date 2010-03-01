@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.LinkNetworkRoute;
 
 /**
@@ -40,10 +39,6 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 	private double travelCost = Double.NaN;
 	private Id vehicleId = null;
 
-	@Deprecated
-	public LinkNetworkRouteImpl(final Id startLinkId, final Id endLinkId, final Network network) {
-		this(startLinkId, endLinkId);
-	}
 	public LinkNetworkRouteImpl(final Id startLinkId, final Id endLinkId) {
 		super(startLinkId, endLinkId);
 	}

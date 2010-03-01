@@ -180,7 +180,7 @@ import org.matsim.core.utils.misc.Time;
 		person.addPlan(plan);
 		plan.createAndAddActivity("h", homeLinkId).setEndTime(Time.parseTime(startTime));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = new LinkNetworkRouteImpl(homeLinkId, workLinkId, null);
+		NetworkRoute route = new LinkNetworkRouteImpl(homeLinkId, workLinkId);
 		route.setLinkIds(homeLinkId, routeLinkIds, workLinkId);
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", workLinkId);

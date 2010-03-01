@@ -136,7 +136,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
 
-		LinkNetworkRouteImpl subRoute = new LinkNetworkRouteImpl(vehicle.getCurrentLink().getId(), route.getEndLinkId(), this.network);
+		LinkNetworkRouteImpl subRoute = new LinkNetworkRouteImpl(vehicle.getCurrentLink().getId(), route.getEndLinkId());
 
 		// put the new route in a new leg
 		Leg newLeg = new LegImpl(currentLeg.getMode());

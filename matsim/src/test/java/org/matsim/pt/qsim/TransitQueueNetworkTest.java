@@ -46,11 +46,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.fakes.FakeAgent;
-import org.matsim.pt.qsim.SimpleTransitStopHandler;
-import org.matsim.pt.qsim.TransitDriver;
-import org.matsim.pt.qsim.TransitQSimulation;
-import org.matsim.pt.qsim.TransitQVehicle;
-import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.ptproject.qsim.PersonAgent;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QLinkImpl;
@@ -1013,7 +1008,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			Activity act = pb.createActivityFromLinkId("home", id1);
 			plan.addActivity(act);
 			Leg leg = pb.createLeg(TransportMode.car);
-			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId(), scenario.getNetwork());
+			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId());
 			List<Id> linkIds_2 = new ArrayList<Id>();
 			linkIds_2.add(links[2].getId());
 			route.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
@@ -1035,7 +1030,7 @@ public class TransitQueueNetworkTest extends TestCase {
 				stop2.setLinkId(links[secondStopLocation].getId());
 			}
 			TransitLine tLine = builder.createTransitLine(id1);
-			NetworkRoute netRoute = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId(), network);
+			NetworkRoute netRoute = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId());
 			netRoute.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
 			ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add(builder.createTransitRouteStop(stop1, 50, 60));
@@ -1096,7 +1091,7 @@ public class TransitQueueNetworkTest extends TestCase {
 				act2.setEndTime(120);
 				plan2.addActivity(act2);
 				Leg leg2 = pb.createLeg(TransportMode.car);
-				LinkNetworkRouteImpl route2 = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId(), network);
+				LinkNetworkRouteImpl route2 = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId());
 				route2.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
 				leg2.setRoute(route2);
 				plan2.addLeg(leg2);

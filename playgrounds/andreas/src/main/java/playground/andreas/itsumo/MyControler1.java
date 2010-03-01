@@ -128,7 +128,7 @@ public class MyControler1 extends Controler {
 				act1a.setLinkId(link9.getId());
 				act1a.setEndTime(0*60*60.);
 				LegImpl leg = plan1.createAndAddLeg(TransportMode.car);
-				NetworkRoute route = new LinkNetworkRouteImpl(link9.getId(), link15.getId(), network);
+				NetworkRoute route = new LinkNetworkRouteImpl(link9.getId(), link15.getId());
 				route.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, "3 4"))), link15.getId());
 				leg.setRoute(route);
 				ActivityImpl act1b = plan1.createAndAddActivity("h", new CoordImpl(200., 200.));
@@ -141,7 +141,7 @@ public class MyControler1 extends Controler {
 				act2a.setLinkId(link9.getId());
 				act2a.setEndTime(0*60*60.);
 				LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
-				NetworkRoute route2 = new LinkNetworkRouteImpl(link9.getId(), link15.getId(), network);
+				NetworkRoute route2 = new LinkNetworkRouteImpl(link9.getId(), link15.getId());
 				route2.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, "3 6 4"))), link15.getId());
 				leg2.setRoute(route2);
 				ActivityImpl act2b = plan1.createAndAddActivity("h", new CoordImpl(200., 200.));

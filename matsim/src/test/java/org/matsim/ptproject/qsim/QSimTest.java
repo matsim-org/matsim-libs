@@ -902,7 +902,7 @@ public class QSimTest extends TestCase {
 		Link link5 = f.network.createAndAddLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
 		Link link6 = f.network.createAndAddLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
 
-		f.network.getFactory().setRouteFactory(TransportMode.car, new LinkNetworkRouteFactory(f.network));
+		f.network.getFactory().setRouteFactory(TransportMode.car, new LinkNetworkRouteFactory());
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
 		PersonImpl person = new PersonImpl(new IdImpl(0));
@@ -1023,7 +1023,7 @@ public class QSimTest extends TestCase {
 		Activity act1_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act1_1.setEndTime(simEndTime - 20);
 		Leg leg1 = pb.createLeg(TransportMode.car);
-		NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 		leg1.setRoute(route1);
 		leg1.setTravelTime(5.0*3600);
 		Activity act1_2 = pb.createActivityFromLinkId("w", link2.getId());

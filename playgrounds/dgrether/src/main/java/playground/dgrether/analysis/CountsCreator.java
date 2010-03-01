@@ -62,23 +62,23 @@ public class CountsCreator {
 		this.network = scenario.getNetwork();
 		loadNetwork(networkPath, scenario);
 		log.info("  creating routes...");
-		NetworkRoute r1 = new LinkNetworkRouteImpl(null, null, this.network);
+		NetworkRoute r1 = new LinkNetworkRouteImpl(null, null);
 		//the nodes of carls master thesis main route
 //		r1.setRoute("9232  1563  1558  1562  1564  1000597  1565  1525  1519  1518 1776  1780  1000498  1000497  1786  1000470  1794  1795  1797  1806  1809  1811  1758  1757  1754");
 		//the nodes of davids otf scenario
 //		r1.setRoute("9296 9298 9294 9282 9281");
 		//the new route
 		r1.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "1341 5268 1342 1348 1349 1375 1585 1581 1583"))), null);
-		NetworkRoute r2 = new LinkNetworkRouteImpl(null, null, this.network);
+		NetworkRoute r2 = new LinkNetworkRouteImpl(null, null);
 		//the nodes of carls master thesis alternative route
 //		r2.setRoute("9231 9234 9243 9218 9189 9210 9193 9206 9283 9295 9299 9297 9285 9288 9305");
 		//the nodes of davids otf scenario
 //		r2.setRoute("9286 1725 1727 1722 1718 9284 9281");
 		//the new routes
 		r2.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "1583 1588 1597 1596 1591 1593 1600 2216 1603 1601 9250 9254"))), null);
-		NetworkRoute r3 = new LinkNetworkRouteImpl(null, null, this.network);
+		NetworkRoute r3 = new LinkNetworkRouteImpl(null, null);
 		r3.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "1583 1587 1641 1644 1645 1648 5210 2420 9275 9272"))), null);
-		NetworkRoute r4 = new LinkNetworkRouteImpl(null, null, this.network);
+		NetworkRoute r4 = new LinkNetworkRouteImpl(null, null);
 		r4.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "1370 9180 9183 9181 9261 9265 9269 9408 9409 9404 9400 9403 9402 9398 9394 9414 9276"))), null);
 
 		log.info("  creating routes done");

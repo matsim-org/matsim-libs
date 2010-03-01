@@ -76,7 +76,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 
 			realRouteNodeList.remove(realRouteNodeList.size() - 1);
 
-			NetworkRoute wrappedRoute = new LinkNetworkRouteImpl(null, null, wrappedNetwork);
+			NetworkRoute wrappedRoute = new LinkNetworkRouteImpl(null, null);
 			wrappedRoute.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(realRouteNodeList)), null);
 			wrappedRoute.setTravelTime(path.travelTime);
 
@@ -84,7 +84,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			travTime = path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			NetworkRoute route = new LinkNetworkRouteImpl(null, null, wrappedNetwork);
+			NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;

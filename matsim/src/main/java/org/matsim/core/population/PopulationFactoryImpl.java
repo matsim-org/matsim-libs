@@ -80,7 +80,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	public Route createRoute(final Id startLinkId, final Id endLinkId, final List<Id> currentRouteLinkIds) {
-		NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId, this.scenario.getNetwork());
+		NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, currentRouteLinkIds, endLinkId);
 		route.setDistance(RouteUtils.calcDistance(route, this.scenario.getNetwork()));
 		return route;

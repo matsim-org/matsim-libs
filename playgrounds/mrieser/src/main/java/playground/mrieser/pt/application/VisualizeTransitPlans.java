@@ -187,7 +187,7 @@ public class VisualizeTransitPlans {
 		TransitStopFacility accessStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getAccessStopId());
 		TransitStopFacility egressStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getEgressStopId());
 
-		NetworkRoute netRoute = new LinkNetworkRouteImpl(accessStop.getLinkId(), egressStop.getLinkId(), this.realScenario.getNetwork());
+		NetworkRoute netRoute = new LinkNetworkRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 		List<Link> links = new ArrayList<Link>();
 		boolean include = false;
 		TransitStopFacility prevStop = null;

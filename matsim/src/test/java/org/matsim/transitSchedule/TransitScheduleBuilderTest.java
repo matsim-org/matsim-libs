@@ -64,7 +64,7 @@ public class TransitScheduleBuilderTest extends MatsimTestCase {
 	public void testCreateTransitRoute() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id id = new IdImpl(2);
-		NetworkRoute route = new LinkNetworkRouteImpl(new IdImpl(3), new IdImpl(4), null);
+		NetworkRoute route = new LinkNetworkRouteImpl(new IdImpl(3), new IdImpl(4));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitRouteStop stop1 = new TransitRouteStopImpl(null, 50, 60);
 		stops.add(stop1);

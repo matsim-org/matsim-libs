@@ -189,7 +189,7 @@ public class CMCFScenarioGeneratorNoReroute {
 			act1.setEndTime(homeEndTime);
 			// leg to home
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-			NetworkRoute route = new LinkNetworkRouteImpl(l1.getId(), l6.getId(), this.network);
+			NetworkRoute route = new LinkNetworkRouteImpl(l1.getId(), l6.getId());
 			if (!isAlternativeRouteEnabled) {
 				route.setLinkIds(l1.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "2 3 5 6"))), l6.getId());
 			}

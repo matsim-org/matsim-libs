@@ -130,7 +130,7 @@ public class RouteSetGenerator {
 			Path path = this.router.calcLeastCostPath(o,d,time);
 			NetworkRoute route = null;
 			if (path != null) {
-				route = new LinkNetworkRouteImpl(path.links.get(0).getId(), path.links.get(path.links.size()-1).getId(), this.network);
+				route = new LinkNetworkRouteImpl(path.links.get(0).getId(), path.links.get(path.links.size()-1).getId());
 				route.setLinkIds(path.links.get(0).getId(), NetworkUtils.getLinkIds(path.links), path.links.get(path.links.size()-1).getId());
 			}
 
@@ -212,7 +212,7 @@ public class RouteSetGenerator {
 			nonLocalRoutes.remove(MatsimRandom.getRandom().nextInt(nonLocalRoutes.size()));
 		}
 		// add the least cost path at the beginning of the route
-		NetworkRoute route = new LinkNetworkRouteImpl(path.links.get(0).getId(), path.links.get(path.links.size()-1).getId(), this.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(path.links.get(0).getId(), path.links.get(path.links.size()-1).getId());
 		route.setLinkIds(path.links.get(0).getId(), NetworkUtils.getLinkIds(path.links), path.links.get(path.links.size()-1).getId());
 		routes.addFirst(route);
 

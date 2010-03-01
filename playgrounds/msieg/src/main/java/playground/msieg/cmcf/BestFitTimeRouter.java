@@ -98,7 +98,7 @@ public class BestFitTimeRouter extends CMCFRouter {
 
 					assert(person != null && leg != null);
 
-					LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), this.network);
+					LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId());
 					route.setLinkIds(	leg.getRoute().getStartLinkId(), NetworkUtils.getLinkIds(path), leg.getRoute().getEndLinkId());
 					leg.setRoute(route);
 					double depTime = ((PlanImpl) person.getSelectedPlan()).getFirstActivity().getStartTime()

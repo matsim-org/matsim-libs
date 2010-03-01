@@ -145,9 +145,9 @@ public class Plansgenerator {
 		currentId = addCommodity(
 				"28","130",HOME_END_TIME,duration,(int)(0.24*DEFAULT_CARS_PER_HOUR_PER_LANE),
 				"16 15 14 13",currentId);
-		
+
 	}
-	
+
 	/**
 	 * generates agents for cottbus scenario
 	 * @param HOME_END_TIME
@@ -345,7 +345,7 @@ public class Plansgenerator {
 			a.setEndTime(homeEndtime);
 			//leg to work
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-			NetworkRoute route = new LinkNetworkRouteImpl(start.getId(), target.getId(), this.network);
+			NetworkRoute route = new LinkNetworkRouteImpl(start.getId(), target.getId());
 			route.setLinkIds(start.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, ROUTE))), target.getId());
 			leg.setRoute(route);
 			//work

@@ -89,7 +89,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		ArrayList <LinkNetworkRouteImpl> routes = new ArrayList<LinkNetworkRouteImpl>();
 		for (int i=1;i<plan.getPlanElements().size();i=i+2){
 			RouteWRefs oldRoute = ((LegImpl)(plan.getPlanElements().get(i))).getRoute();
-			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId(), this.network);
+			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
 
 		/*	List<Id> l = new ArrayList<Id>();
 			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
@@ -319,7 +319,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 				((Leg)al.get(i)).setMode(((LegImpl)(bestSolution.get(i))).getMode());
 
 				RouteWRefs oldRoute = ((LegImpl)(bestSolution.get(i))).getRoute();
-				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId(), this.network);
+				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
 				List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
 				r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
 				((LegImpl)al.get(i)).setRoute(r);
@@ -330,6 +330,4 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 	}
 
 }
-
-
 

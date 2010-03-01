@@ -75,7 +75,7 @@ public class BestFitRouter extends CMCFRouter {
 			//path is found, therefore reroute:
 			assert(path != null);
 			if (path != null) {
-				LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), this.network);
+				LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId());
 				route.setLinkIds(	leg.getRoute().getStartLinkId(), NetworkUtils.getLinkIds(path), leg.getRoute().getEndLinkId());
 				leg.setRoute(route);
 				flowValues.put(path, flowValues.get(path) < 1 ? 0 : flowValues.get(path)-1);

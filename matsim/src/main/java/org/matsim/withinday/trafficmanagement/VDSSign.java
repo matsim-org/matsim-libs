@@ -290,7 +290,7 @@ public class VDSSign {
 	}
 
 	private NetworkRoute completeRoute(final NetworkRoute r) {
-		NetworkRoute ret = new LinkNetworkRouteImpl(null, null, null);
+		NetworkRoute ret = new LinkNetworkRouteImpl(null, null);
 		Link startLink = this.network.getLinks().get(r.getStartLinkId());
 		Node startNode = startLink.getFromNode();
 		ArrayList<Node> rNodes = new ArrayList<Node>();

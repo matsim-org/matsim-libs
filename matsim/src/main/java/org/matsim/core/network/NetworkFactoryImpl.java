@@ -48,7 +48,7 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 	public NetworkFactoryImpl(NetworkLayer network) {
 		this.network = network;
 		this.linkFactory = new LinkFactoryImpl();
-		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory(this.network));
+		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory());
 		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
 	}
 

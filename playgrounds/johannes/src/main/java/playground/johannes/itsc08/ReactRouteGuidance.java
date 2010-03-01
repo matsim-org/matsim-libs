@@ -75,7 +75,7 @@ public class ReactRouteGuidance implements RouteProvider {
 		}
 		Path path = this.algorithm.calcLeastCostPath(departureLink.getToNode(),
 					destinationLink.getFromNode(), time);
-		NetworkRoute route = new LinkNetworkRouteImpl(departureLink.getId(), destinationLink.getId(), network);
+		NetworkRoute route = new LinkNetworkRouteImpl(departureLink.getId(), destinationLink.getId());
 		route.setLinkIds(departureLink.getId(), NetworkUtils.getLinkIds(path.links), destinationLink.getId());
 		return route;
 	}

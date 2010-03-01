@@ -157,7 +157,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		PlanImpl newPlan = new PlanImpl (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(null, null, null);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(null, null);
 		List<Id> links1 = new ArrayList<Id>();
 		links1.add(new IdImpl("1"));
 		links1.add(new IdImpl("2"));

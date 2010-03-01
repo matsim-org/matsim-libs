@@ -150,7 +150,7 @@ public class PtPlansFileCreator {
 			a.setEndTime(Time.parseTime(endTime));
 			LegImpl leg = pl.createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));
-			NetworkRoute route = new LinkNetworkRouteImpl(null, null, this.network);
+			NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 			leg.setRoute(route);
 			Id endLinkID = new IdImpl(endLinkId);
 			pl.createAndAddActivity("w", endLinkID);

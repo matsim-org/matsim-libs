@@ -110,7 +110,7 @@ public class DaganzoScenarioGenerator {
 	public static boolean isAlternativeRouteEnabled = false;
 
 	private static final boolean isUsePlansOnly = true;
-	
+
 	private static final boolean isUseLanes = true;
 
 	private static final boolean isUseSignalSystems = true;
@@ -119,7 +119,7 @@ public class DaganzoScenarioGenerator {
 	private static final int iterations2 = 0;
 
 	private static final int ttBinSize = 1;
-	
+
 	private static final String controllerClass = AdaptiveController.class.getCanonicalName();
 
 	private Id id1, id2, id4, id5, id6, id7;
@@ -232,7 +232,7 @@ public class DaganzoScenarioGenerator {
           p.setSelectedPlan(plan);
           plan2.setSelected(false);
         }
-        
+
 			}
 			else {
 			  plan = this.createPlan(isAlternativeRouteEnabled, factory, homeEndTime, network);
@@ -242,8 +242,8 @@ public class DaganzoScenarioGenerator {
 			population.addPerson(p);
 		}
 	}
-	
-	private Plan createPlan(boolean useAlternativeRoute, PopulationFactory factory, 
+
+	private Plan createPlan(boolean useAlternativeRoute, PopulationFactory factory,
 	    double homeEndTime, Network network){
     Plan plan = factory.createPlan();
     // home
@@ -258,7 +258,7 @@ public class DaganzoScenarioGenerator {
     // leg to home
     LegImpl leg = (LegImpl) factory.createLeg(TransportMode.car);
     // TODO check this
-    LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(id1, id7, network);
+    LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(id1, id7);
     if (useAlternativeRoute) {
       route.setLinkIds(id1, NetworkUtils.getLinkIds("2 3 5 6"), id7);
     }
@@ -307,7 +307,7 @@ public class DaganzoScenarioGenerator {
 //    config.getQSimConfigGroup().setSnapshotFormat(null);
 		// configure strategies for replanning
 		config.strategy().setMaxAgentPlanMemorySize(4);
-		
+
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(
 				IdFactory.get(1));
 		selectExp.setModuleName("ChangeExpBeta");

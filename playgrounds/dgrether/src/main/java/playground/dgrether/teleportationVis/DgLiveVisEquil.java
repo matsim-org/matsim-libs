@@ -88,7 +88,7 @@ public class DgLiveVisEquil {
 			Leg leg = fac.createLeg(TransportMode.walk);
 			leg.setTravelTime(600.0 - id1);
 
-			leg.setRoute(new LinkNetworkRouteImpl(link1.getId(), link6.getId(), sc.getNetwork()));
+			leg.setRoute(new LinkNetworkRouteImpl(link1.getId(), link6.getId()));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			plan.addActivity(act1);

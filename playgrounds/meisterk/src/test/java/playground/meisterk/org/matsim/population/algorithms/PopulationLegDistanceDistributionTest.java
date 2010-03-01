@@ -67,7 +67,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 
 		Leg leg = testPlan.createAndAddLeg(TransportMode.car);
 
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), scenario.getNetwork());
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId());
 		route.setDistance(1200.0);
 
 		leg.setRoute(route);

@@ -906,7 +906,7 @@ public class QueueSimulationTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(8*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = new LinkNetworkRouteImpl(f.link1.getId(), link5.getId(), f.network);
+		NetworkRoute route = new LinkNetworkRouteImpl(f.link1.getId(), link5.getId());
 		route.setLinkIds(new IdImpl(startLinkId), NetworkUtils.getLinkIds(linkIds), new IdImpl(endLinkId));
 		leg.setRoute(route);
 		ActivityImpl a2 = plan.createAndAddActivity("w", link5.getId());
@@ -1018,7 +1018,7 @@ public class QueueSimulationTest extends TestCase {
 		Activity act1_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act1_1.setEndTime(simEndTime - 20);
 		Leg leg1 = pb.createLeg(TransportMode.car);
-		NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 		leg1.setRoute(route1);
 		leg1.setTravelTime(5.0*3600);
 		Activity act1_2 = pb.createActivityFromLinkId("w", link2.getId());

@@ -368,7 +368,7 @@ public class PTActWriter {
 	}
 
 	private LegImpl newPTLeg(final TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
-		NetworkRoute legRoute = new LinkNetworkRouteImpl(null, null, null);
+		NetworkRoute legRoute = new LinkNetworkRouteImpl(null, null);
 
 		if (mode!=TransportMode.walk){
 			legRoute.setLinkIds(null, NetworkUtils.getLinkIds(routeLinks), null);

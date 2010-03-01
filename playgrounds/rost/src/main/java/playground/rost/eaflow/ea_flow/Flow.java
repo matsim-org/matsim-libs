@@ -681,7 +681,7 @@ public class Flow {
 //						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
 						Link startLink = _network.getLinks().get(ids.get(0));
 						Link endLink = _network.getLinks().get(ids.get(ids.size()-1));
-						route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), _network);
+						route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId());
 
 						List<Id> routeLinkIds = null;
 						if (ids.size() > 1) {

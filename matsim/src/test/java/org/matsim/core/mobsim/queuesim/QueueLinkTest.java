@@ -114,7 +114,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		p.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
-		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId(), f.scenario.getNetwork()));
+		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonAgent driver = new PersonAgent(p, qsim);
@@ -171,7 +171,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		p.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
-		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId(), f.scenario.getNetwork()));
+		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonAgent driver = new PersonAgent(p, qsim);
@@ -217,7 +217,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		p.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
-		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId(), f.scenario.getNetwork()));
+		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonAgent driver = new PersonAgent(p, qsim);

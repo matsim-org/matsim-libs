@@ -184,7 +184,7 @@ public class Controller extends Controler {
 //			NetworkLayer network = event.getControler().getNetwork();
 			Random random = new Random(config.global().getRandomSeed());
 
-			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory(event.getControler().getNetwork());
+			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 			LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) factory.createRoute(new IdImpl("1"), new IdImpl("6"));
 			List<Id> linkIds = new ArrayList<Id>();
 			linkIds.add(new IdImpl("1.2"));

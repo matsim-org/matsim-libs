@@ -126,7 +126,7 @@ public class RouteUtils {
 		Id startLinkId = routeLinkIds.get(0);
 		List<Id> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<Id>(0);
 		Id endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLinkId, endLinkId, network);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);
 		return route;
 	}

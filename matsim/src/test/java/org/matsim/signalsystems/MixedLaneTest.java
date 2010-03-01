@@ -199,7 +199,7 @@ public class MixedLaneTest extends TestCase {
 		act.setEndTime(3600.0);
 		plan.addActivity(act);
 		Leg leg = pb.createLeg(TransportMode.car);
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(link0.getId(), link2.getId(), null);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(link0.getId(), link2.getId());
 		List<Id> routeList = new ArrayList<Id>();
 		routeList.add(link1.getId());
 		route.setLinkIds(link0.getId(), routeList, link2.getId());
@@ -215,7 +215,7 @@ public class MixedLaneTest extends TestCase {
 		act.setEndTime(3600.0);
 		plan.addActivity(act);
 		leg = pb.createLeg(TransportMode.car);
-		route = new LinkNetworkRouteImpl(link0.getId(), link3.getId(), null);
+		route = new LinkNetworkRouteImpl(link0.getId(), link3.getId());
 		route.setLinkIds(link0.getId(), routeList, link3.getId());
 		leg.setRoute(route);
 		plan.addLeg(leg);

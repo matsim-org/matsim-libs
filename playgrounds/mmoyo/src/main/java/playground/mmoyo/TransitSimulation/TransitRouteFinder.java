@@ -98,7 +98,7 @@ public class TransitRouteFinder {
 			routeNodeList.add(link.getToNode());
 		}
 
-		NetworkRoute legRoute = new LinkNetworkRouteImpl(null, null, null);
+		NetworkRoute legRoute = new LinkNetworkRouteImpl(null, null);
 		legRoute.setDistance(distance);
 		legRoute.setLinkIds(null, NetworkUtils.getLinkIds(routeLinks), null);
 		legRoute.setTravelTime(travTime);

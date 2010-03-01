@@ -778,7 +778,7 @@ public class BusLineAllocator {
 			/*-----with carNetwork-----*/
 			endLink = carNet.getLinks().get(routeLinks.removeLast());
 			startLink = carNet.getLinks().get(routeLinks.remove(0));
-			NetworkRoute route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId(), carNet);
+			NetworkRoute route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId());
 			route.setLinkIds(startLink.getId(), routeLinks, endLink.getId());
 			routes.put(routeId_linkPathPair.getKey()/* routeId */, route);
 		}

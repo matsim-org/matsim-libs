@@ -100,7 +100,7 @@ public class LogicIntoPlainTranslator {
 			NetworkRoute logicRoute= (NetworkRoute)logicLeg.getRoute();
 			List<Link> plainLinks = convertToPlain(NetworkUtils.getLinks(this.plainNet, logicRoute.getLinkIds()));
 			//if(plainLinks.size()>0){
-				NetworkRoute plainRoute = new LinkNetworkRouteImpl(null, null, null);
+				NetworkRoute plainRoute = new LinkNetworkRouteImpl(null, null);
 				plainRoute.setLinkIds(null, NetworkUtils.getLinkIds(plainLinks), null);
 				Leg plainLeg = new LegImpl(logicLeg.getMode());
 				plainLeg = logicLeg;
@@ -125,7 +125,7 @@ public class LogicIntoPlainTranslator {
 					plainLinkList.add(link.getId());
 			}
 			if(plainLinkList.size()>0){
-				NetworkRoute plainRoute = new LinkNetworkRouteImpl(null, null, null);
+				NetworkRoute plainRoute = new LinkNetworkRouteImpl(null, null);
 				plainRoute.setLinkIds(null, plainLinkList, null);
 
 				LegImpl plainLeg = new LegImpl(TransportMode.pt);

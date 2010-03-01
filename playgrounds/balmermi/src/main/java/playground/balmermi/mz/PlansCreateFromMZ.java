@@ -223,7 +223,7 @@ public class PlansCreateFromMZ {
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
-					NetworkRoute route = new LinkNetworkRouteImpl(null, null, null);
+					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
@@ -243,7 +243,7 @@ public class PlansCreateFromMZ {
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
-					NetworkRoute route = new LinkNetworkRouteImpl(null, null, null);
+					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());

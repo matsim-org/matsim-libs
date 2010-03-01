@@ -97,7 +97,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		stops.add(stop1);
 		stops.add(stop2);
 
-		NetworkRoute netRoute = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		NetworkRoute netRoute = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 		netRoute.setLinkIds(link1.getId(), Collections.<Id>emptyList(), link2.getId());
 		TransitRoute tRoute1 = sBuilder.createTransitRoute(id1, netRoute, stops, TransportMode.bus);
 

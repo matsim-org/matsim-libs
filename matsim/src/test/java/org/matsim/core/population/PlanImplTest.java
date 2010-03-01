@@ -222,7 +222,7 @@ public class PlanImplTest extends MatsimTestCase {
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new CoordImpl(100, 200));
-		RouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
+		RouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 

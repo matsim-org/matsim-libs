@@ -86,7 +86,7 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act1);
 
 			Leg leg1Car = builder.createLeg(TransportMode.car);
-			LinkNetworkRouteImpl routeCar = new LinkNetworkRouteImpl(id1, id4, this.scenario.getNetwork());
+			LinkNetworkRouteImpl routeCar = new LinkNetworkRouteImpl(id1, id4);
 			//this would be so nice
 			List<Id> linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id2);
@@ -102,7 +102,7 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act2);
 
 			Leg leg2Car = builder.createLeg(TransportMode.car);
-			routeCar = new LinkNetworkRouteImpl(id4, id1, this.scenario.getNetwork());
+			routeCar = new LinkNetworkRouteImpl(id4, id1);
 			//in a beautiful world we would do...
 			linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id5);

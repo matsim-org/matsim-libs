@@ -51,7 +51,7 @@ public class AdjList {
 				}
 
 		 		/**sets also route as nodes.*/
-				NetworkRoute nodeRoute = new LinkNetworkRouteImpl(null, null, null);
+				NetworkRoute nodeRoute = new LinkNetworkRouteImpl(null, null);
 				nodeRoute.setLinkIds(null, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(nodeList)), null);
 				transitRoute.setRoute(nodeRoute);
 			}

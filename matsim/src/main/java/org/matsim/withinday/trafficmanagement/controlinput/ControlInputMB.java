@@ -466,7 +466,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		Link firstLinkInRS = this.network.getLinks().get(firstLinkIdInRS);
 		Link bottleNeck = this.network.getLinks().get(bottleNeckId);
 		if (firstLinkInRS == bottleNeck) {
-			routeSegment = new LinkNetworkRouteImpl(firstLinkIdInRS, bottleNeckId, this.network);
+			routeSegment = new LinkNetworkRouteImpl(firstLinkIdInRS, bottleNeckId);
 		} else {
 			routeSegment = wholeRoute.getSubRoute(firstLinkInRS.getId(), bottleNeck.getId());
 		}

@@ -173,7 +173,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		}
 		stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
 		*/
-		
+
 		/*
 		double [] xs;
 		double [] ys 									= new double [MAX_ITERATIONS+1];
@@ -753,7 +753,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			LegImpl legHelp;
 			legHelp = new LegImpl (TransportMode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
 			//legHelp.setTravelTime(3600);
-			legHelp.setRoute(new LinkNetworkRouteImpl(actHelp.getLinkId(), actHelp.getLinkId(), this.network));
+			legHelp.setRoute(new LinkNetworkRouteImpl(actHelp.getLinkId(), actHelp.getLinkId()));
 
 			actslegs.add(legHelp);
 			actslegs.add(actHelp);
@@ -817,9 +817,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				if (actsToBeChanged[position[0]]>=actTypes.size()) actsToBeChanged[position[0]] = 0;
 				counter++;
 				if (counter>actTypes.size()) return (new int[]{1,0,0});
-			} while (type.equals(act.getType()) || 
+			} while (type.equals(act.getType()) ||
 					(type.equalsIgnoreCase("home") && !this.checkForHomeSequenceChangeType(basePlan, position[0]*2)) ||
-					(type.equalsIgnoreCase("education_kindergarten") && !this.checkForKindergarten(basePlan))); // continue if either type is same as current one or if two home acts would fall together 
+					(type.equalsIgnoreCase("education_kindergarten") && !this.checkForKindergarten(basePlan))); // continue if either type is same as current one or if two home acts would fall together
 			act.setType(type);
 			if (act.getType().equalsIgnoreCase("home")){
 				act.setFacilityId(((Activity)(basePlan.getPlanElements().get(0))).getFacilityId());
@@ -1031,15 +1031,15 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 
 		boolean enter = true;
 		int counter = 0;
-		while (enter && (position!=1 || 
-				actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") || 
+		while (enter && (position!=1 ||
+				actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") ||
 				actTypes.get(actToBeAdded[position]).equalsIgnoreCase("education_kindergarten"))){ // check whether act to be added is allowed while at position 1 everything is allowed to be inserted excpet for "home"
 			if (counter>=actTypes.size()){
 				insertion[0]=true;
 				return insertion;
 			}
 			if (actTypes.get(actToBeAdded[position]).equals(((ActivityImpl)(basePlan.getPlanElements().get(position*2-2))).getType().toString()) || // ensures that no duplicate activity chains are created
-					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") && !this.checkForHomeSequenceInserting(basePlan, position*2)) || 
+					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") && !this.checkForHomeSequenceInserting(basePlan, position*2)) ||
 					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("education_kindergarten") && !checkForKindergarten(basePlan))){
 				if (actToBeAdded[position]+1>=actTypes.size()){
 					actToBeAdded[position] = 0;
@@ -1148,7 +1148,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				((ActivityImpl)(plan.getPlanElements().get(position+2))).getType().equalsIgnoreCase("home")) return false; // Insertion would be next to an home act
 		else return true; // Insertion is ok
 	}
-	
+
 	/* Checks whether max one kindergarten act type is in plan*/
 	private boolean checkForKindergarten (PlanImpl plan){
 		for (int i=2;i<plan.getPlanElements().size()-2;i+=2){
@@ -1157,7 +1157,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		return true; // Insertion is ok
 	}
 
-	
+
 	private List<SubChain> getSubChains (PlanImpl plan, int first, int second){
 		ManageSubchains manager = new ManageSubchains();
 		if (second-first==1){	// one long subchain
