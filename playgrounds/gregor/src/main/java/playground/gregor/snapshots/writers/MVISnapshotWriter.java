@@ -88,7 +88,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 	final private static float [] nodesColor = new float [] {.4f,.4f,.4f,.7f};
 
 	private final AgentWriterXYAzimuth writer = new AgentWriterXYAzimuth();
-	private final boolean insertWave = true;
+	private final boolean insertWave = false;
 	
 	private final String label = "run1006: Nash approach";
 
@@ -102,7 +102,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 
 	public MVISnapshotWriter(ScenarioImpl sc) {
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QNetwork(sc.getNetwork())),OTFSnapshotGenerator.RUNS_SVN + "/output/test.mvi", new OTFFileWriterQSimConnectionManagerFactory());
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QNetwork(sc.getNetwork())),OTFSnapshotGenerator.RUNS_SVN + "/test.mvi", new OTFFileWriterQSimConnectionManagerFactory());
 	}
 
 

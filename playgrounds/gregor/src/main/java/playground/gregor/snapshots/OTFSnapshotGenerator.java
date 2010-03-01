@@ -18,7 +18,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
 
-import playground.gregor.MY_STATIC_STUFF;
 import playground.gregor.snapshots.postprocessors.ConfluenceArrowsFromEvents;
 import playground.gregor.snapshots.postprocessors.DestinationDependentColorizer;
 import playground.gregor.snapshots.postprocessors.EvacuationLinksTeleporter;
@@ -32,7 +31,8 @@ import playground.gregor.snapshots.writers.SnapshotGenerator;
 public class OTFSnapshotGenerator {
 
 	public final static String SHARED_SVN = "../../../../../arbeit/svn/shared-svn";
-	public final static String RUNS_SVN = "../../../../../arbeit/svn/runs-svn/run1006";
+//	public final static String RUNS_SVN = "../../../../../arbeit/svn/runs-svn/run1006/output";
+	public final static String RUNS_SVN = "../../../matsim/test/output/org/matsim/evacuation/run/MarginalRiskCostControllerTest/testMarginalRiskCostController";
 	
 	private final static String lsFile = SHARED_SVN + "/studies/countries/id/padang/gis/network_v20080618/d_ls.shp";
 
@@ -46,10 +46,10 @@ public class OTFSnapshotGenerator {
 	
 	public OTFSnapshotGenerator() {
 		
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(RUNS_SVN + "/output/output_config.xml.gz");
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(RUNS_SVN + "/output_config.xml.gz");
 		
 		this.scenario = sl.getScenario();
-		this.scenario.getConfig().network().setInputFile(RUNS_SVN + "/output/output_network.xml.gz");
+		this.scenario.getConfig().network().setInputFile(RUNS_SVN + "/output_network.xml.gz");
 		this.scenario.getConfig().simulation().setSnapshotFormat("otfvis");
 		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
 //		this.scenario.getConfig().simulation().setEndTime(4*3600+30*60);
@@ -58,16 +58,16 @@ public class OTFSnapshotGenerator {
 		
 		this.scenario.getConfig().evacuation().setBuildingsFile(SHARED_SVN + "/studies/countries/id/padang/gis/buildings_v20090728/evac_zone_buildings_v20090728.shp");
 //		this.scenario.getConfig().evacuation().setSampleSize("0.1");
-		this.scenario.getConfig().controler().setLastIteration(0);
+//		this.scenario.getConfig().controler().setLastIteration(0);
 		int it = this.scenario.getConfig().controler().getLastIteration();
 		sl.loadNetwork();
-		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + it + "/" + it + ".events.txt.gz";
+		this.eventsFile = RUNS_SVN + "/ITERS/it." + it + "/" + it + ".events.txt.gz";
 		
 //		this.txtSnapshotFile = "../../outputs/output/snapshots.txt.gz";
 	}
 
 	public OTFSnapshotGenerator(String[] args) {
-		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + args[1] + "/" + args[1] + ".events.txt.gz"; 
+		this.eventsFile = RUNS_SVN + "/ITERS/it." + args[1] + "/" + args[1] + ".events.txt.gz"; 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		this.scenario = sl.getScenario();
