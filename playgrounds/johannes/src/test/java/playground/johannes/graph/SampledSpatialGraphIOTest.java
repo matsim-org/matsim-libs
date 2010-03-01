@@ -21,35 +21,34 @@ package playground.johannes.graph;
 
 import java.io.IOException;
 
-import org.matsim.contrib.sna.TestCaseUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.testcases.MatsimTestCase;
 
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
 
-import junit.framework.TestCase;
-
 /**
  * @author jillenberger
  *
  */
-public class SampledSpatialGraphIOTest extends TestCase {
+public class SampledSpatialGraphIOTest extends MatsimTestCase {
 
-//	private static final String INPUT_FILE = TestCaseUtils.getPackageInputDirecoty(SampledSpatialGraphIOTest.class) + "sampledgraph.graphml.gz";
-//	
-//	private static final String OUTPUT_FILE = TestCaseUtils.getOutputDirectory() + "tmpgraph.graphml";
-//
-//	public void test() throws IOException {
-//		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-//		SampledSpatialGraph graph = reader.readGraph(INPUT_FILE);
-//		
-//		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
-//		writer.write(graph, OUTPUT_FILE);
-//		
-//		double reference = CRCChecksum.getCRCFromFile(INPUT_FILE);
-//		double actual = CRCChecksum.getCRCFromFile(OUTPUT_FILE);
-//		
-//		assertEquals(reference, actual);
-//	}
+	public void test() throws IOException {
+
+		final String INPUT_FILE = super.getPackageInputDirectory() + "sampledgraph.graphml.gz";
+
+		final String OUTPUT_FILE = super.getOutputDirectory() + "tmpgraph.graphml";
+
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
+		SampledSpatialGraph graph = reader.readGraph(INPUT_FILE);
+
+		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
+		writer.write(graph, OUTPUT_FILE);
+
+		double reference = CRCChecksum.getCRCFromFile(INPUT_FILE);
+		double actual = CRCChecksum.getCRCFromFile(OUTPUT_FILE);
+
+		assertEquals(reference, actual);
+	}
 }
