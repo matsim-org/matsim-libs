@@ -76,10 +76,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	protected final String					modeChoice;
 	protected final TransportMode[]			possibleModes;
 	protected List<LinkNetworkRouteImpl> 	routes;
-	private final Network network;
+	private final Network 					network;
 	protected PrintStream 					stream;
 	boolean 								printing = false;
-  private ControlerIO controlerIO;
+	protected ControlerIO 					controlerIO;
 
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -127,7 +127,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 
-		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
+		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
 
 		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
 		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
@@ -158,7 +158,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 
 		//meisterk
 		this.config 				= controler.getConfig().planomat();
-		this.legTravelTimeEstimatorFactory = null;
+	//	this.legTravelTimeEstimatorFactory = null;
 	}
 
 	// Constructor for test case
@@ -859,11 +859,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 
 		double travelTime;
 		for (int i=1;i<=plan.getPlanElements().size()-2;i=i+2){
-		//	log.info("Urspr�ngliche Reisezeit: "+(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()-((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime()));
 			((LegImpl)(plan.getPlanElements().get(i))).setDepartureTime(now);
-//			statement was replaced by the one below
-//			travelTime = this.estimator.getInterpolation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (LegImpl)(plan.getPlanElements().get(i)));
-		//	log.info("clean schedule leg "+plan.getActLegIndex(plan.getPlanElements().get(i)));
 			travelTime = this.estimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(),
 					now,
@@ -874,14 +870,12 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			if (((LegImpl)(plan.getPlanElements().get(i))).getMode()!=TransportMode.car){
 				((LegImpl)(plan.getPlanElements().get(i))).setRoute(this.routes.get((i/2)));
 			}
-			//log.info("Neue Reisezeit: "+travelTime);
 			((LegImpl)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
 			((LegImpl)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 
 			if (i!=plan.getPlanElements().size()-2){
 				((ActivityImpl)(plan.getPlanElements().get(i+1))).setStartTime(now);
-				//travelTime = java.lang.Math.max(((Leg)(plan.getPlanElements().get(i+2))).getDepartureTime()-((Leg)(plan.getPlanElements().get(i))).getArrivalTime()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
 				travelTime = java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime.get(((ActivityImpl)(plan.getPlanElements().get(i+1))).getType()));
 				((ActivityImpl)(plan.getPlanElements().get(i+1))).setDuration(travelTime);
 				((ActivityImpl)(plan.getPlanElements().get(i+1))).setEndTime(now+travelTime);
