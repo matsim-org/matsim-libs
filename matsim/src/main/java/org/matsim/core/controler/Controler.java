@@ -691,7 +691,7 @@ public class Controler {
 
 		// optional: travel distance stats
 		try {
-			this.travelDistanceStats = new TravelDistanceStats(this.population,
+			this.travelDistanceStats = new TravelDistanceStats(this.population, this.network,
 					this.controlerIO.getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
 			this.addControlerListener(this.travelDistanceStats);
 		} catch (FileNotFoundException e) {

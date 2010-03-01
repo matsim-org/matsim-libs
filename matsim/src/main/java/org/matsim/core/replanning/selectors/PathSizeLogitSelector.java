@@ -35,6 +35,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.RouteUtils;
 
 /**
  * select an existing Plan according to the Path Size Logit (e.g. Frejinger, E. and Bierlaire, M.: Capturing Correlation
@@ -108,7 +109,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 					LegImpl leg = (LegImpl) pe;
 					currentEndTime = leg.getDepartureTime();
 					NetworkRoute r = (NetworkRoute) leg.getRoute();
-					pathSize += r.getDistance();
+					pathSize += RouteUtils.calcDistance(r, this.network);
 					for (Id linkId : r.getLinkIds()){
 						ArrayList<Double> lit = linksInTime.get(linkId);
 						if (lit == null){

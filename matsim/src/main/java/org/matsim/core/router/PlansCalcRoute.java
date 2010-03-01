@@ -44,6 +44,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -256,12 +257,14 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
+			route.setDistance(RouteUtils.calcDistance(route, this.network));
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
+			route.setDistance(0.0);
 			leg.setRoute(route);
 			travTime = 0;
 		}

@@ -8,36 +8,38 @@ import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.StyleType;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.kml.NetworkFeatureFactory;
 
 public class MyFeatureFactory extends NetworkFeatureFactory{
-	
+
 	// TODO [AN] visibility DG
 	private static final String STARTUL = "<ul>";
 	private static final String ENDUL = "</ul>";
 	private static final String STARTLI = "<li>";
 	private static final String ENDLI = "</li>";
 
-	private static final Logger log = Logger.getLogger(NetworkFeatureFactory.class);
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	private CoordinateTransformation coordTransform;
-	
+	private final Network network;
+
 	public MyFeatureFactory(CoordinateTransformation coordTransform, Network network) {
 		super(coordTransform, network);
 		this.coordTransform = coordTransform;
+		this.network = network;
 	}
 
-	
+
 	@Override
 	public AbstractFeatureType createActFeature(ActivityImpl act, StyleType style) {
 
@@ -52,16 +54,17 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		p.setStyleUrl(style.getId());
 		return p;
 	}
-	
+
 	public AbstractFeatureType createPTLinkFeature(final Coord from, final Coord to, LegImpl leg, StyleType networkStyle) {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
-		folder.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + leg.getRoute().getDistance());
+		double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) : Double.NaN);
+		folder.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);
 
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		p.setName(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
 
 		Coord centerCoord = this.coordTransform.transform((new CoordImpl(from.getX() + (to.getX() - from.getX())/2, from.getY() + (to.getY() - from.getY())/2)));
-		
+
 		Coord fromCoord = this.coordTransform.transform(from);
 		Coord toCoord = this.coordTransform.transform(to);
 		LineStringType line = this.kmlObjectFactory.createLineStringType();
@@ -70,7 +73,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		p.setAbstractGeometryGroup(this.kmlObjectFactory.createLineString(line));
 		p.setStyleUrl(networkStyle.getId());
 		p.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
-		
+
 		PlacemarkType pointPlacemark = this.kmlObjectFactory.createPlacemarkType();
 		PointType point = this.kmlObjectFactory.createPointType();
 		point.getCoordinates().add(Double.toString(centerCoord.getX()) + "," + Double.toString(centerCoord.getY()) + ",0.0");
@@ -80,10 +83,10 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 
 		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(pointPlacemark));
 		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(p));
-		
+
 		return folder;
 	}
-	
+
 	public AbstractFeatureType createCarLinkFeature(final Link l, StyleType networkStyle) {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		String description = this.createLinkDescription(l);
@@ -100,7 +103,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		p.setAbstractGeometryGroup(this.kmlObjectFactory.createLineString(line));
 		p.setStyleUrl(networkStyle.getId());
 		p.setDescription(description);
-		
+
 		PlacemarkType pointPlacemark = this.kmlObjectFactory.createPlacemarkType();
 		Coord centerCoord = this.coordTransform.transform(l.getCoord());
 		PointType point = this.kmlObjectFactory.createPointType();
@@ -111,19 +114,20 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 
 		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(pointPlacemark));
 		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(p));
-		
+
 		return folder;
 	}
-	
+
 	public AbstractFeatureType createWalkLinkFeature(final Coord from, final Coord to, LegImpl leg, StyleType networkStyle) {
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
-		p.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + leg.getRoute().getDistance());
-		
+		double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) : Double.NaN);
+		p.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);
+
 		if(((GenericRouteImpl) leg.getRoute()).getRouteDescription().equalsIgnoreCase("")){
 			p.setDescription("sorry no route, made a beeline to the destination");
 		} else {
 			p.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
-		}		
+		}
 
 		Coord fromCoord = this.coordTransform.transform(from);
 		Coord toCoord = this.coordTransform.transform(to);
@@ -132,10 +136,10 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		line.getCoordinates().add(Double.toString(toCoord.getX()) + "," + Double.toString(toCoord.getY()) + ",0.0");
 		p.setAbstractGeometryGroup(this.kmlObjectFactory.createLineString(line));
 		p.setStyleUrl(networkStyle.getId());
-		
+
 		return p;
 	}
-	
+
 	// TODO [AN] visibility DG
 	private String createLinkDescription(Link l) {
 		StringBuilder buffer = new StringBuilder(100);
@@ -186,7 +190,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 
 		return buffer.toString();
 	}
-	
+
 	private String createActDescription(ActivityImpl act) {
 		StringBuilder buffer = new StringBuilder(100);
 //		buffer.append(NetworkFeatureFactory.STARTCDATA);

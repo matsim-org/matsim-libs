@@ -92,14 +92,6 @@ public class ExperimentalTransitRouteTest extends TestCase {
 		assertEquals(traveltime, route.getTravelTime(), MatsimTestCase.EPSILON);
 	}
 
-	public void testDistance() {
-		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
-		assertTrue(Double.isNaN(route.getDistance()));
-		double distance = 123.45;
-		route.setDistance(distance);
-		assertEquals(distance, route.getDistance(), MatsimTestCase.EPSILON);
-	}
-
 	public void testSetRouteDescription_PtRoute() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
 		route.setRouteDescription(null, "PT1===5===11===1980===1055", null);

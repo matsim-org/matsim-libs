@@ -53,6 +53,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -156,7 +157,11 @@ public class SelectedPlans2ESRIShape {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
-					if (leg.getRoute().getDistance() > 0) {
+					if (leg.getRoute() instanceof NetworkRoute) {
+						if (RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) > 0) {
+							fts.add(getLegFeature(leg, id));
+						}
+					} else if (leg.getRoute().getDistance() > 0) {
 						fts.add(getLegFeature(leg, id));
 					}
 				}
@@ -192,7 +197,7 @@ public class SelectedPlans2ESRIShape {
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
 		Double arrTime = leg.getArrivalTime();
-		Double dist = leg.getRoute().getDistance();
+		Double dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
 
 		List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 		Coordinate [] coords = new Coordinate[linkIds.size() + 1];

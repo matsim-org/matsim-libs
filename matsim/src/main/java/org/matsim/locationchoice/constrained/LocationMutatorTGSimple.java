@@ -36,7 +36,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
@@ -79,13 +81,13 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		double travelDistancePost = 0.0;
 
 		if (legPre.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePre = legPre.getRoute().getDistance();
+			travelDistancePre = RouteUtils.calcDistance((NetworkRoute) legPre.getRoute(), this.network);
 		}
 		else {
 			travelDistancePre = ((CoordImpl)actPre.getCoord()).calcDistance(actToMove.getCoord());
 		}
 		if (legPost.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePost = legPost.getRoute().getDistance();
+			travelDistancePost = RouteUtils.calcDistance((NetworkRoute) legPost.getRoute(), this.network);
 		}
 		else {
 			travelDistancePost = ((CoordImpl)actToMove.getCoord()).calcDistance(actPost.getCoord());

@@ -48,8 +48,10 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
@@ -191,7 +193,8 @@ public class KMLPersonPlanWriter {
 					ArrayList<Id> tempLinkList = getLinkIdsOfCarLeg(leg);
 
 					FolderType routeLinksFolder = this.kmlObjectFactory.createFolderType();
-					routeLinksFolder.setName(leg.getMode().toString() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + leg.getRoute().getDistance());
+					double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) : Double.NaN);
+					routeLinksFolder.setName(leg.getMode().toString() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);
 
 					if(tempLinkList.size() != 0){
 						routeLinksFolder.setDescription("see attached route");

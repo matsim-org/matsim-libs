@@ -223,7 +223,6 @@ public class PlanImplTest extends MatsimTestCase {
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new CoordImpl(100, 200));
 		RouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link2.getId(), network);
-		route.setDistance(123.45);
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 
@@ -234,7 +233,6 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		RouteWRefs route2 = ((LegImpl) plan.getPlanElements().get(1)).getRoute();
 		assertTrue(route2 instanceof NetworkRoute);
-		assertEquals(123.45, route2.getDistance(), EPSILON);
 		assertEquals(98.76, route2.getTravelTime(), EPSILON);
 	}
 
@@ -251,7 +249,6 @@ public class PlanImplTest extends MatsimTestCase {
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new CoordImpl(100, 200));
 		RouteWRefs route = new GenericRouteImpl(link1.getId(), link2.getId());
-		route.setDistance(123.45);
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 
@@ -262,7 +259,6 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		RouteWRefs route2 = ((LegImpl) plan.getPlanElements().get(1)).getRoute();
 		assertTrue(route2 instanceof GenericRoute);
-		assertEquals(123.45, route2.getDistance(), EPSILON);
 		assertEquals(98.76, route2.getTravelTime(), EPSILON);
 	}
 

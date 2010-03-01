@@ -39,11 +39,13 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 	private ArrayList<Id> route = new ArrayList<Id>();
 	private double travelCost = Double.NaN;
 	private Id vehicleId = null;
-	protected final Network network;
 
+	@Deprecated
 	public LinkNetworkRouteImpl(final Id startLinkId, final Id endLinkId, final Network network) {
+		this(startLinkId, endLinkId);
+	}
+	public LinkNetworkRouteImpl(final Id startLinkId, final Id endLinkId) {
 		super(startLinkId, endLinkId);
-		this.network = network;
 	}
 
 	@Override
@@ -52,22 +54,6 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 		ArrayList<Id> tmp = cloned.route;
 		cloned.route = new ArrayList<Id>(tmp); // deep copy of route
 		return cloned;
-	}
-
-	@Override
-	public double getDistance() {
-		if (Double.isNaN(super.getDistance())) {
-			super.setDistance(this.calcDistance());
-		}
-		return super.getDistance();
-	}
-
-	protected double calcDistance() {
-		double dist = 0;
-		for (Id linkId : this.route) {
-			dist += this.network.getLinks().get(linkId).getLength();
-		}
-		return dist;
 	}
 
 	@Override
@@ -119,7 +105,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 				throw new IllegalArgumentException("Cannot create subroute because toLinkId is not part of the route.");
 			}
 		}
-		LinkNetworkRouteImpl ret = new LinkNetworkRouteImpl(fromLinkId, toLinkId, this.network);
+		LinkNetworkRouteImpl ret = new LinkNetworkRouteImpl(fromLinkId, toLinkId);
 		if (toIndex > fromIndex) {
 			ret.setLinkIds(fromLinkId, this.route.subList(fromIndex, toIndex), toLinkId);
 		} else {

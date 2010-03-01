@@ -207,28 +207,6 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	}
 
 	@Override
-	public double getDistance() {
-		double dist = super.getDistance();
-		if (Double.isNaN(dist)) {
-			dist = calcDistance();
-		}
-		return dist;
-	}
-
-	private double calcDistance() {
-		if (this.modCount != this.routeModCountState) {
-			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
-			return 99999.999;
-		}
-		double dist = 0;
-		for (Id linkId: getLinkIds()) {
-			dist += this.network.getLinks().get(linkId).getLength();
-		}
-		setDistance(dist);
-		return dist;
-	}
-
-	@Override
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}

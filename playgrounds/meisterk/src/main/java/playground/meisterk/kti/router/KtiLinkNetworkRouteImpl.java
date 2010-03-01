@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.utils.misc.RouteUtils;
 
 /**
  * Temporary solution to calculate the route distance as it is simulated in the JEDQSim.
@@ -32,21 +33,22 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
  * TODO Generalize in MATSim that routes are handled consistently with their interpretation in the traffic simulation.
  *
  * @author meisterk
- *
  */
 public class KtiLinkNetworkRouteImpl extends LinkNetworkRouteImpl {
 
 	final private PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
+	final private Network network;
 
 	public KtiLinkNetworkRouteImpl(Id fromLinkId, Id toLinkId, Network network, SimLegInterpretation simLegInterpretation) {
-		super(fromLinkId, toLinkId, network);
+		super(fromLinkId, toLinkId);
+		this.network = network;
 		this.simLegInterpretation = simLegInterpretation;
 	}
 
 	@Override
-	public double calcDistance() {
+	public double getDistance() {
 
-		double distance = super.calcDistance();
+		double distance = RouteUtils.calcDistance(this, this.network);
 
 		if (!this.getStartLinkId().equals(this.getEndLinkId())) {
 			switch (this.simLegInterpretation) {

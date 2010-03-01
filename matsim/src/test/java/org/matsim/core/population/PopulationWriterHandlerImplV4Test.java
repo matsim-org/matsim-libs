@@ -53,7 +53,6 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		LegImpl leg = (LegImpl) pb.createLeg(TransportMode.undefined);
 		RouteWRefs route = new GenericRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(123);
-		route.setDistance(9876.54);
 		leg.setRoute(route);
 		plan.addLeg(leg);
 		plan.addActivity(pb.createActivityFromLinkId("h", new IdImpl(1)));
@@ -69,7 +68,6 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		LegImpl leg2 = (LegImpl) person2.getPlans().get(0).getPlanElements().get(1);
 		RouteWRefs route2 = leg2.getRoute();
 		assertEquals(123, route2.getTravelTime(), EPSILON); // if this succeeds, we know that writing/reading the data works
-		assertEquals(9876.54, route2.getDistance(), EPSILON);
 	}
 
 }

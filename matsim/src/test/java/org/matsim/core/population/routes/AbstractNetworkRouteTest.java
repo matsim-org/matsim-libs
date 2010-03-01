@@ -97,14 +97,15 @@ public abstract class AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetDist() {
+	public void testGetDistance() {
 		NetworkLayer network = createTestNetwork();
 		Id link1 = new IdImpl("1");
 		Id link4 = new IdImpl("4");
 		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
 		route.setLinkIds(link1, NetworkUtils.getLinkIds("22 12 -23 3"), link4);
+		route.setDistance(1234.5);
 
-		Assert.assertEquals("different distance calculated.", 4000.0, route.getDistance(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong difference.", 1234.5, route.getDistance(), MatsimTestCase.EPSILON);
 	}
 
 	@Test

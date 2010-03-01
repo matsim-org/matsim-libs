@@ -12,13 +12,13 @@ import org.matsim.core.population.PersonImpl;
 public class PersonTimeDistanceCalculator {
 
 	private static double planTravelTime;
-	private static double planTravelDistance;
+//	private static double planTravelDistance;
 	private static int numberOfLegs;
 
 
 	private static void init() {
 		planTravelTime=0.0;
-		planTravelDistance=0.0;
+//		planTravelDistance=0.0;
 		numberOfLegs=0;
 	}
 
@@ -30,7 +30,7 @@ public class PersonTimeDistanceCalculator {
 			if (pe instanceof LegImpl) {
 				final LegImpl leg = (LegImpl) pe;
 				planTravelTime+=leg.getTravelTime();
-				planTravelDistance+=leg.getRoute().getDistance();
+//				planTravelDistance+=leg.getRoute().getDistance();
 				numberOfLegs++;
 			}
 		}
@@ -40,9 +40,9 @@ public class PersonTimeDistanceCalculator {
 		return planTravelTime;
 	}
 
-	public static double getPlanTravelDistance() {
-		return planTravelDistance;
-	}
+//	public static double getPlanTravelDistance() {
+//		return planTravelDistance;
+//	}
 
 	public static int getNumberOfLegs() {
 		return numberOfLegs;

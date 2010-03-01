@@ -59,7 +59,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 
 	@Override
 	@Test
-	public void testGetDist() {
+	public void testGetDistance() {
 
 		HashMap<PlanomatConfigGroup.SimLegInterpretation, Double> expectedDistances = new HashMap<PlanomatConfigGroup.SimLegInterpretation, Double>();
 		expectedDistances.put(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, 5000.0);

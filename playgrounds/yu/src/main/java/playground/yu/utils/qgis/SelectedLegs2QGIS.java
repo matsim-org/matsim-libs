@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -17,24 +17,23 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author yu
- * 
  */
 public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 
-	/**
-	 * @param population
-	 * @param crs
-	 * @param outputDir
-	 */
+	private final Network network;
+
 	public SelectedLegs2QGIS(PopulationImpl population, Network network,
 			CoordinateReferenceSystem crs, String outputDir) {
 		super(population, network, crs, outputDir);
+		this.network = network;
 	}
 
 	@Override
@@ -47,7 +46,8 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof LegImpl) {
 						LegImpl leg = (LegImpl) pe;
-						if (leg.getRoute().getDistance() > 0) {
+						double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) : 0.0);
+						if (dist > 0) {
 							fts.add(getLegFeature(leg, id));
 						}
 					}

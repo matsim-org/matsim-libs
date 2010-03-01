@@ -76,7 +76,7 @@ public class CalcAverageTripLengthTest {
 
 		catl = new CalcAverageTripLength(network);
 		catl.run(plan);
-		Assert.assertEquals(500.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(700.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
 
 		// don't reset catl, modify route, test average
 		linkIds.remove(1);
@@ -84,7 +84,7 @@ public class CalcAverageTripLengthTest {
 		((ActivityImpl) act2).setLinkId(l3.getId());
 
 		catl.run(plan);
-		Assert.assertEquals(400.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(500.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
