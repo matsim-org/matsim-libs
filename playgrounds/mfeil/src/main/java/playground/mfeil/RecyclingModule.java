@@ -69,7 +69,7 @@ public class RecyclingModule implements PlanStrategyModule{
 	private final Knowledges 						knowledges;
 	private final ActivityTypeFinder 				finder;
 	
-	private final int iterations, noOfAssignmentAgents, noOfSoftCoefficients;
+	private final int iterationsFirstTime, iterationsFurtherTimes, noOfAssignmentAgents, noOfSoftCoefficients;
 	private final DistanceCoefficients 				coefficients;
 	private ArrayList<double[]> 					tabuList;
 	private final String primActsDistance, homeLocationDistance, municipality, sex, age, license, car_avail, employed; 
@@ -93,7 +93,8 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.noOfSchedulingAgents	= 100;
 		this.noOfAssignmentAgents	= 500;
 		this.finder					= finder;		
-		this.iterations 			= 20;
+		this.iterationsFirstTime 	= 20;
+		this.iterationsFurtherTimes = 5;
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
 		this.municipality			= "yes";
@@ -167,13 +168,19 @@ public class RecyclingModule implements PlanStrategyModule{
 		agents = new OptimizedAgents (list[0], this.knowledges);
 		
 		/* Detect optimal coefficients metric */
-		Statistics.prt=false;
-		if ((this.controler.getIterationNumber() ==1)	&&	(this.noOfSoftCoefficients>1)) this.detectCoefficients();
+	//	Statistics.prt=false;
+		if (this.controler.getIterationNumber()%10==1	&&	this.noOfSoftCoefficients>1) {
+			Statistics.prt=false;
+			this.detectCoefficients();
+			Statistics.prt=true;
+			this.calculate();
+			this.rescheduleNonassigedAgents();
+		}
 		else {
 			this.calculate();
 			this.rescheduleNonassigedAgents();
 		}
-		Statistics.prt=true;
+	//	Statistics.prt=true;
 		
 		/* Print statistics of individual optimization */
 		assignment.println("Iteration "+this.controler.getIterationNumber());
@@ -304,21 +311,12 @@ public class RecyclingModule implements PlanStrategyModule{
 		}
 	
 		/* Further iterations */
-		for (int i=1;i<this.iterations+1;i++){
+		int iter;
+		if (this.controler.getIterationNumber()==1) iter=this.iterationsFirstTime;
+		else iter=this.iterationsFurtherTimes;
+		for (int i=1;i<iter+1;i++){
 			log.info("Metric detection: iteration "+i);
 			scoreIter = -Double.MAX_VALUE;
-			
-		/*	System.out.print("coefIterBase:");
-			for (int z=0;z<coefSet.length;z++){
-				System.out.print(coefIterBase[z]+" ");
-			}
-			System.out.println();
-			System.out.print("modified:");
-			for (int z=0;z<coefSet.length;z++){
-				System.out.print(modified[z]+" ");
-			}
-			System.out.println();
-		*/	
 			
 			for (int z=0;z<coefSet.length;z++){
 				coefAux = coefIterBase[z]; 
