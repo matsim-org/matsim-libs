@@ -220,13 +220,26 @@ public class ASPGeneral {
 	private void runMATSimTrips (PopulationImpl pop){
 		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
 		ts.printHeader(this.stream);
-		ts.runPopulation("MATSim", pop, this.stream, null);
+		ts.runAggregateStats("MATSim", pop, this.stream, null);
 	}
 	
 	private void runMZTrips (PopulationImpl pop){
 		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
-		ts.runPopulation("MZ_weighted", pop, this.stream, this.personsWeights);
-		ts.runPopulation("MZ_unweighted", pop, this.stream, null);
+		ts.runAggregateStats("MZ_weighted", pop, this.stream, this.personsWeights);
+		ts.runAggregateStats("MZ_unweighted", pop, this.stream, null);
+		this.stream.println();
+	}
+	
+	private void runMATSimDistances (PopulationImpl pop){
+		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
+		ts.printHeader(this.stream);
+		ts.runDisaggregateStats("MATSim", pop, this.stream, null);
+	}
+	
+	private void runMZDistances (PopulationImpl pop){
+		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
+		ts.runDisaggregateStats("MZ_weighted", pop, this.stream, this.personsWeights);
+		ts.runDisaggregateStats("MZ_unweighted", pop, this.stream, null);
 		this.stream.println();
 	}
 	
@@ -488,14 +501,14 @@ public class ASPGeneral {
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 		
 		// Population files
-		final String populationFilenameMATSim = "/home/baug/mfeil/data/runs/0995b_9/ITERS/it.10/10.plans.xml";
+		final String populationFilenameMATSim = "/home/baug/mfeil/data/runs/0995b_9/output_plans.xml";
 		final String populationFilenameMZ = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mzAS0997b.xml";
 		
 		// Counts file
-		final String counts = "/home/baug/mfeil/data/runs/0995b_9/ITERS/it.10/10.countscompare.txt";
+		final String counts = "/home/baug/mfeil/data/runs/0995b_9/ITERS/it.50/50.countscompare.txt";
 		
 		// Output file
-		final String outputFile = "/home/baug/mfeil/data/runs/0995b_9/ITERS/it.10/10.analysis.xls";	
+		final String outputFile = "/home/baug/mfeil/data/runs/0995b_9/ITERS/it.50/50.analysis.xls";	
 		
 		// Settings
 		final boolean compareWithMZ = true; 
@@ -526,6 +539,8 @@ public class ASPGeneral {
 			asp.compareMATSimAndMZActivityChains();
 			asp.runMATSimTrips(scenarioMATSim.getPopulation());
 			asp.runMZTrips(pop);
+			asp.runMATSimDistances(scenarioMATSim.getPopulation());
+			asp.runMZDistances(pop);
 			asp.runMATSimTimings(scenarioMATSim.getPopulation());
 			asp.runMZTimings(pop);
 		}

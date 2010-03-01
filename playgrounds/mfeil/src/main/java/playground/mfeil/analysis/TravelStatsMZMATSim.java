@@ -74,12 +74,12 @@ public class TravelStatsMZMATSim {
 		aaa.runMZ(attributesInputFile);
 		Map<Id, Double> personsWeights = aaa.getAgentsWeight();
 		
-		this.runPopulation("MZ_weighted", populationMZ, stream, personsWeights);
-		this.runPopulation("MZ_unweighted", populationMZ, stream, null);
-		this.runPopulation("MATSim", populationMATSim, stream, null);
+		this.runAggregateStats("MZ_weighted", populationMZ, stream, personsWeights);
+		this.runAggregateStats("MZ_unweighted", populationMZ, stream, null);
+		this.runAggregateStats("MATSim", populationMATSim, stream, null);
 	}
 		
-	public void runPopulation (String name, PopulationImpl population, PrintStream stream, final Map<Id, Double> personsWeights){
+	public void runAggregateStats (String name, PopulationImpl population, PrintStream stream, final Map<Id, Double> personsWeights){
 		
 		// Initiate output
 		double aveTripDistanceCarPop1 = 0;
@@ -115,7 +115,6 @@ public class TravelStatsMZMATSim {
 					else log.warn("A car leg of person "+person.getId()+" has no route!");
 					aveTripTimeCarPop1 += weight*leg.getTravelTime();
 					duration += leg.getTravelTime();
-					if (person.getId().toString().equals("114951")) log.info("car leg mit weight "+weight+" und tt "+Time.writeTime(leg.getTravelTime()));
 					counterCar+=weight;
 				}
 				else if (leg.getMode().equals(TransportMode.pt)) {
@@ -123,7 +122,6 @@ public class TravelStatsMZMATSim {
 					else log.warn("A pt leg of person "+person.getId()+" has no route!");
 					aveTripTimePTPop1 += weight*leg.getTravelTime();
 					duration += leg.getTravelTime();
-					if (person.getId().toString().equals("114951")) log.info("pt leg mit weight "+weight+" und tt "+Time.writeTime(leg.getTravelTime()));
 					counterPT+=weight;
 				}
 				else if (leg.getMode().equals(TransportMode.walk)) {
@@ -131,7 +129,6 @@ public class TravelStatsMZMATSim {
 					else log.warn("A walk leg of person "+person.getId()+" has no route!");
 					aveTripTimeWalkPop1 += weight*leg.getTravelTime();
 					duration += leg.getTravelTime();
-					if (person.getId().toString().equals("114951")) log.info("bike leg mit weight "+weight+" und tt "+Time.writeTime(leg.getTravelTime()));
 					counterWalk+=weight;
 				}
 				else if (leg.getMode().equals(TransportMode.bike)) {
@@ -139,7 +136,6 @@ public class TravelStatsMZMATSim {
 					else log.warn("A bike leg of person "+person.getId()+" has no route!");
 					aveTripTimeBikePop1 += weight*leg.getTravelTime();
 					duration += leg.getTravelTime();
-					if (person.getId().toString().equals("114951")) log.info("walk leg mit weight "+weight+" und tt "+Time.writeTime(leg.getTravelTime()));
 					counterBike+=weight;
 				}
 				else log.warn("Undefined transport mode for person "+plan.getPerson().getId()+": "+leg.getMode());
@@ -162,6 +158,86 @@ public class TravelStatsMZMATSim {
 		stream.print(Double.parseDouble(counterBike+"")/counterAll+"\t");
 		stream.println(counterAll);
 	}		
+	
+	public void runDisaggregateStats (String name, PopulationImpl population, PrintStream stream, final Map<Id, Double> personsWeights){
+		
+		double[][]stats = new double[14][5]; // 14 distance classes, 4 modes and 1 count
+		double counterAll = 0;
+		
+		stream.println("Distance stats");
+		
+		for (Person person : population.getPersons().values()) {
+			
+			double weight = -1;
+			if (personsWeights!=null) weight = personsWeights.get(person.getId());
+			else weight = 1;
+			counterAll += weight;
+			
+			Plan plan = person.getSelectedPlan();
+			for (int i=1;i<plan.getPlanElements().size();i+=2){
+				LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
+				if (leg.getMode().equals(TransportMode.car)) {
+					if (leg.getRoute()!=null) {
+						double distance = leg.getRoute().getDistance();
+						int distanceClass = this.getClass (distance);
+						stats[distanceClass][0] += weight;
+						stats[distanceClass][4] += weight;
+					}
+					else log.warn("A car leg of person "+person.getId()+" has no route!");
+				}
+				else if (leg.getMode().equals(TransportMode.pt)) {
+					if (leg.getRoute()!=null) {
+						double distance = leg.getRoute().getDistance();
+						int distanceClass = this.getClass (distance);
+						stats[distanceClass][1] += weight;
+						stats[distanceClass][4] += weight;
+					}
+					else log.warn("A pt leg of person "+person.getId()+" has no route!");
+				}
+				else if (leg.getMode().equals(TransportMode.walk)) {
+					if (leg.getRoute()!=null) {
+						double distance = leg.getRoute().getDistance();
+						int distanceClass = this.getClass (distance);
+						stats[distanceClass][3] += weight;
+						stats[distanceClass][4] += weight;
+					}
+					else log.warn("A walk leg of person "+person.getId()+" has no route!");
+				}
+				else if (leg.getMode().equals(TransportMode.bike)) {
+					if (leg.getRoute()!=null) {
+						double distance = leg.getRoute().getDistance();
+						int distanceClass = this.getClass (distance);
+						stats[distanceClass][2] += weight;
+						stats[distanceClass][4] += weight;
+					}
+					else log.warn("A bike leg of person "+person.getId()+" has no route!");
+				}
+				else log.warn("Undefined transport mode for person "+plan.getPerson().getId()+": "+leg.getMode());
+			}
+		}
+		for (int i=0;i<14;i++){ 
+			if (i==0) stream.println(name+"\t0\t"+stats[0][0]+"\t"+stats[0][1]+"\t"+stats[0][2]+"\t"+stats[0][3]+"\t"+stats[0][4]);
+			else stream.println("\t"+i+"\t"+stats[i][0]+"\t"+stats[i][1]+"\t"+stats[i][2]+"\t"+stats[i][3]+"\t"+stats[i][4]);
+		}
+	
+	}		
+	
+	private int getClass (double distance){
+		if (distance == 0) return 0;
+		if (distance < 100) return 1;
+		if (distance < 200) return 2;
+		if (distance < 500) return 3;
+		if (distance < 1000) return 4;
+		if (distance < 2000) return 5;
+		if (distance < 5000) return 6;
+		if (distance < 10000) return 7;
+		if (distance < 20000) return 8;
+		if (distance < 50000) return 9;
+		if (distance < 100000) return 10;
+		if (distance < 200000) return 11;
+		if (distance < 500000) return 12;
+		else return 13;
+	}
 		
 	
 	public static void main(final String [] args) {
