@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,13 +66,38 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		super (controler, estimatorFactory, scorer);
 		this.MAX_ITERATIONS 		= 30;
 		this.STOP_CRITERION			= 5;
-		this.network = controler.getNetwork();
+		this.network 				= controler.getNetwork();
+		this.printing 				= false;
 	}
 
 
 	// TODO: this is bad programming style... needs to be improved!
 	@Override
 	public void run (Plan basePlan){
+
+		if (printing){
+			String outputfile = this.controlerIO.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+basePlan.getPerson().getId()+".xls");
+			Counter.timeOptCounter++;
+			try {
+				stream = new PrintStream (new File(outputfile));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				return;
+			}
+			stream.print(basePlan.getScore()+"\t");
+			for (int z= 0;z<basePlan.getPlanElements().size();z=z+2){
+				ActivityImpl act = (ActivityImpl)basePlan.getPlanElements().get(z);
+				stream.print(act.getType()+"\t");
+			}
+			stream.println();
+			stream.print("\t");
+			for (int z= 0;z<basePlan.getPlanElements().size();z=z+2){
+				ActivityImpl act = (ActivityImpl)basePlan.getPlanElements().get(z);
+				stream.print(act.getDuration()+"\t");
+			}
+			stream.println();
+		}
+
 
 		/*Do nothing if the plan has only one or two activities (=24h home)*/
 		if (basePlan.getPlanElements().size()<=3) return;
@@ -90,29 +118,24 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		for (int i=1;i<plan.getPlanElements().size();i=i+2){
 			RouteWRefs oldRoute = ((LegImpl)(plan.getPlanElements().get(i))).getRoute();
 			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
-
 		/*	List<Id> l = new ArrayList<Id>();
 			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
 				l.add(((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().get(j));
 			}*/
 			List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
-
 			r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
 			routes.add(r);
 		}
 		this.routes = routes;
 
 		// meisterk
+		//for (int z=1;z<plan.getPlanElements().size();z+=2) System.out.println("initial leg "+plan.getActLegIndex(plan.getPlanElements().get(z)));
 		this.estimator = this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				plan,
 				this.config.getSimLegInterpretation(),
 				this.config.getRoutingCapability(),
 				this.router,
 				this.network);
-
-		/* Replace delivered plan by copy since delivered plan must not be changed until valid solution has been found */
-		//PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
-		//plan.copyPlan(basePlan);
 
 		/* Analysis of subtours */
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(config);
@@ -129,7 +152,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 			}
 		}
 
-		/* Initial clean-up of plan for the case actslegs is not sound*/
+		/* Initial clean-up of plan in case actslegs is not sound*/
 		double move = this.cleanSchedule (((ActivityImpl)(plan.getPlanElements().get(0))).getEndTime(), plan);
 		int loops=1;
 		while (move!=0.0){
@@ -139,27 +162,20 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 				}
 				move = this.cleanSchedule(this.minimumTime.get(((ActivityImpl)plan.getPlanElements().get(0)).getType()), plan);
 				if (move!=0.0){
-					/*
-					// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
-					PlanomatXPlan planAux = new PlanomatXPlan(basePlan.getPerson());
-					planAux.copyPlan(basePlan);
-					double tmpScore = -100000;
-					if (this.possibleModes.length>0){
-						tmpScore = this.chooseModeAllChains(planAux, basePlan.getPlanElements(), planAnalyzeSubtours, subtourDis);
-					}
-
-					if (tmpScore!=-100000) {
-						log.warn("Valid initial solution found by full mode choice run.");
-						// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
-						basePlan.copyPlan(planAux);
-						break;
-					}
-					else {		*/
-						// TODO Check whether allowed?
+					// TODO Check whether allowed?
 					basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
-			//			log.warn("No valid initial solution found for person "+plan.getPerson().getId()+"!");
-						return;
-			//		}
+				//	log.info("No valid initial solution found for person "+plan.getPerson().getId()+"!");
+				/*	for (int i=0;i<plan.getPlanElements().size();i++){
+						if (i%2==0){
+							ActivityImpl act = ((ActivityImpl) (plan.getPlanElements().get(i)));
+							log.info("act "+i+" = "+act.getType()+", "+act.getStartTime()+", "+act.calculateDuration()+", "+act.getEndTime());
+						}
+						else{
+							LegImpl leg = ((LegImpl) (plan.getPlanElements().get(i)));
+							log.info("leg "+i+" = "+leg.getMode()+", "+leg.getRoute().getDistance()+", "+leg.getDepartureTime()+", "+leg.getTravelTime()+", "+leg.getArrivalTime());
+						}
+					}*/
+					return;
 				}
 			}
 			loops++;
@@ -190,28 +206,6 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		int currentIteration							= 1;
 		int lastImprovement 							= 0;
 
-		/*
-		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
-		Counter.timeOptCounter++;
-		PrintStream stream;
-		try {
-			stream = new PrintStream (new File(outputfile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		stream.print(plan.getScore()+"\t");
-		for (int z= 0;z<plan.getPlanElements().size();z=z+2){
-		Activity act = (Activity)plan.getPlanElements().get(z);
-			stream.print(act.getType()+"\t");
-		}
-		stream.println();
-		stream.print("\t");
-		for (int z= 0;z<plan.getPlanElements().size();z=z+2){
-			stream.print(((Activity)(plan.getPlanElements()).get(z)).getDuration()+"\t");
-		}
-		stream.println();
-		*/
 
 		/* Copy the plan into all fields of the array neighbourhood */
 		for (int i = 0; i < initialNeighbourhood.length; i++){
@@ -255,7 +249,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		/* Do Tabu Search iterations */
 		for (currentIteration = 2; currentIteration<=MAX_ITERATIONS;currentIteration++){
 
-		//	stream.println("Iteration "+currentIteration);
+			if (printing) stream.println("Iteration "+currentIteration);
 
 			this.createNeighbourhood(plan, neighbourhood, score, moves, position, planAnalyzeSubtours, subtourDis);
 			pointer = this.findBestSolution (neighbourhood, score, moves, position);
@@ -295,7 +289,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 
 
 		/* Update the plan with the final solution */
-	//	stream.println("Selected solution\t"+bestScore);
+		if (printing) stream.println("Selected solution\t"+bestScore);
 		List<? extends PlanElement> al = basePlan.getPlanElements();
 		basePlan.setScore(bestScore);
 
@@ -313,10 +307,10 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 				time = ((LegImpl)(bestSolution.get(i))).getTravelTime();
 				((LegImpl)al.get(i)).setTravelTime(time);
 				time = ((LegImpl)(bestSolution.get(i))).getDepartureTime();
-				((Leg)al.get(i)).setDepartureTime(time);
+				((LegImpl)al.get(i)).setDepartureTime(time);
 				time = ((LegImpl)(bestSolution.get(i))).getArrivalTime();
 				((LegImpl)al.get(i)).setArrivalTime(time);
-				((Leg)al.get(i)).setMode(((LegImpl)(bestSolution.get(i))).getMode());
+				((LegImpl)al.get(i)).setMode(((LegImpl)(bestSolution.get(i))).getMode());
 
 				RouteWRefs oldRoute = ((LegImpl)(bestSolution.get(i))).getRoute();
 				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
@@ -327,6 +321,10 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 			}
 		}
 		this.cleanRoutes(basePlan);
+	}
+	
+	public double getHomeMinimumTime (){
+		return this.minimumTime.get("home");
 	}
 
 }
