@@ -46,8 +46,8 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
-	private EventsToFacilityLoad eventsToFacilityLoad;
-	private TreeMap<Id, FacilityPenalty> facilityPenalties = null;
+	private EventsToFacilityLoad eventsToFacilityLoad = null;
+	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 
 	//--------------------------------------------------------------------------------------------------
 
