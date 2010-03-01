@@ -36,20 +36,20 @@ import junit.framework.TestCase;
  */
 public class SampledSpatialGraphIOTest extends TestCase {
 
-	private static final String INPUT_FILE = TestCaseUtils.getPackageInputDirecoty(SampledSpatialGraphIOTest.class) + "sampledgraph.graphml.gz";
-	
-	private static final String OUTPUT_FILE = TestCaseUtils.getOutputDirectory() + "tmpgraph.graphml";
-
-	public void test() throws IOException {
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph(INPUT_FILE);
-		
-		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
-		writer.write(graph, OUTPUT_FILE);
-		
-		double reference = CRCChecksum.getCRCFromFile(INPUT_FILE);
-		double actual = CRCChecksum.getCRCFromFile(OUTPUT_FILE);
-		
-		assertEquals(reference, actual);
-	}
+//	private static final String INPUT_FILE = TestCaseUtils.getPackageInputDirecoty(SampledSpatialGraphIOTest.class) + "sampledgraph.graphml.gz";
+//	
+//	private static final String OUTPUT_FILE = TestCaseUtils.getOutputDirectory() + "tmpgraph.graphml";
+//
+//	public void test() throws IOException {
+//		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
+//		SampledSpatialGraph graph = reader.readGraph(INPUT_FILE);
+//		
+//		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
+//		writer.write(graph, OUTPUT_FILE);
+//		
+//		double reference = CRCChecksum.getCRCFromFile(INPUT_FILE);
+//		double actual = CRCChecksum.getCRCFromFile(OUTPUT_FILE);
+//		
+//		assertEquals(reference, actual);
+//	}
 }
