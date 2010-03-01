@@ -69,7 +69,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected Knowledges 						knowledges;
 	private final ActivityTypeFinder 			finder;
 	protected static final Logger 				log = Logger.getLogger(AgentsAssigner.class);
-		
+	private static final int					trialsLCTimings = 3;
 	
 	private final DistanceCoefficients coefficients;
 	private String primActsDistance, homeLocation, municipality, age, sex, license, car_avail, employed;
@@ -133,18 +133,16 @@ public class AgentsAssigner implements PlanAlgorithm{
 		for (int j=0;j<agents.getNumberOfAgents();j++){
 
 			/* Hard constraints */
-			
 			// All prim acts in potential agent's plan
 			for (int i=0;i<this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size();i++){
-				//if (j==0) log.warn((i+1)+" act in prim acts of person "+plan.getPerson().getId()+" is "+this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(i).getType());
 				boolean in = false;
-				for (int x=0;x<agents.getAgentPlan(j).getPlanElements().size()-2;x=x+2){
+				for (int x=0;x<agents.getAgentPlan(j).getPlanElements().size();x=x+2){
 					// try statement with print block to analyze some strange exceptions in Zurich scenario
 					try {
-					if (((ActivityImpl)(agents.getAgentPlan(j).getPlanElements().get(x))).getType().equals(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(i).getType())){
-						in = true;
-						break;
-					}
+						if (((ActivityImpl)(agents.getAgentPlan(j).getPlanElements().get(x))).getType().equals(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(i).getType())){
+							in = true;
+							break;
+						}
 					} catch (Exception e){
 						log.warn(e);
 						log.warn("Acts im Plan des schon optimierten Agenten:");
@@ -275,10 +273,17 @@ public class AgentsAssigner implements PlanAlgorithm{
 			return;
 		}
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
-		this.locator.handlePlan(plan);
-		this.timer.run(plan);  // includes to write the new score to the plan
-		if (plan.getScore()==-100000) {
+		int counterLCTimings = 0;
+		do {
+			this.locator.handlePlan(plan);
+			this.timer.run(plan);  // includes to write the new score to the plan
+			counterLCTimings++;
+		} while (plan.getScore()==-100000 && counterLCTimings <= AgentsAssigner.trialsLCTimings);
+		
+		// ... nothing helps, call PlanomatX again
+		if (plan.getScore()==-100000){
 			this.nonassignedAgents.add(plan.getPerson().getId().toString());
+			log.info("No valid plan assignment possible for person "+plan.getPerson().getId()+" having received person's "+agents.getAgentPlan(assignedAgent).getPerson().getId());
 			return;
 		}
 		
@@ -327,7 +332,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 				al.remove(j);
 			}
 		}
-		// bestPlan.getPlanElements().size() == 0
+		// bestPlan.getPlanElements().size() == 1
 		else if(al.size()>bestPlan.getPlanElements().size()){ 
 			for (int j = 1; j<al.size();j=j+0){
 				al.remove(j);
@@ -358,6 +363,14 @@ public class AgentsAssigner implements PlanAlgorithm{
 			al.remove(i);
 			al.add(i, bestPlan.getPlanElements().get(i));	
 			}
+		}
+		
+		// finally, adjust first home duration if al.size()!=1
+		if (al.size()>1){
+		//	((ActivityImpl)al.get(0)).setEndTime(((TimeModeChoicer2)this.timer).getHomeMinimumTime());
+		//	((ActivityImpl)al.get(0)).setDuration(((TimeModeChoicer2)this.timer).getHomeMinimumTime());
+			((ActivityImpl)al.get(0)).setEndTime(6*3600);
+			((ActivityImpl)al.get(0)).setDuration(6*3600);
 		}
 	}
 }
