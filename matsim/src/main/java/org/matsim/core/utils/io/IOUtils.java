@@ -71,7 +71,7 @@ public class IOUtils {
 	public static void initOutputDirLogging(final String outputDirectory, final List<LoggingEvent> logEvents) throws IOException {
 		IOUtils.initOutputDirLogging(outputDirectory, logEvents, null);
 	}
-	
+
 	/**
 	 * Can be used to add a prefix (e.g. specifying the runId) to the logfiles
 	 * @see IOUtils#initOutputDirLogging(String, List);
@@ -79,7 +79,7 @@ public class IOUtils {
 	public static void initOutputDirLogging(final String outputDirectory, final List<LoggingEvent> logEvents, final String runIdPrefix) throws IOException {
 		String prefix = runIdPrefix;
 		if (prefix == null) {
-			prefix = ""; 
+			prefix = "";
 		}
 		else{
 			prefix = prefix + ".";
@@ -108,7 +108,7 @@ public class IOUtils {
 			}
 		}
 	}
-	
+
 	/**
 	 * Call this method to close the log file streams opened by a call of IOUtils.initOutputDirLogging().
 	 * This avoids problems concerning open streams after the termination of the program.
@@ -409,7 +409,9 @@ public class IOUtils {
 			if (outDirContents[i].isDirectory()) {
 				deleteDir(outDirContents[i]);
 			}
-			if (!outDirContents[i].delete()) {
+			if (!outDirContents[i].delete() && outDirContents[i].exists()) {
+				// some file systems do not immediately delete directories (because of caches or whatever)
+				// so we do not trust the return value of "delete()" alone, but make additional checks before issuing a warning
 				log.error("Could not delete " + outDirContents[i].getAbsolutePath());
 			}
 		}
