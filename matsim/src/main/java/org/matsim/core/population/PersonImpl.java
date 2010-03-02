@@ -50,7 +50,7 @@ public class PersonImpl implements Person {
 	private String isEmployed;
 
 	private TreeSet<String> travelcards = null;
-	private Desires desires = null;
+	protected Desires desires = null;
 
 	private Plan selectedPlan = null;
 
