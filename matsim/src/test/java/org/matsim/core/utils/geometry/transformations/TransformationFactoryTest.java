@@ -20,14 +20,12 @@
 
 package org.matsim.core.utils.geometry.transformations;
 
+import junit.framework.TestCase;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
-import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.testcases.MatsimTestCase;
 
-public class TransformationFactoryTest extends MatsimTestCase {
+public class TransformationFactoryTest extends TestCase {
 
 	private final static Logger log = Logger.getLogger(TransformationFactoryTest.class);
 
@@ -54,7 +52,7 @@ public class TransformationFactoryTest extends MatsimTestCase {
 	 * Test if a correct, GeoTools' Well-Known-Text (WKT) is correctly recognized,
 	 * instead of our shortcut names.
 	 */
-	public final void testUnknownWellTransformation() {
+	public final void testUnknownWKTTransformation() {
 		final String wgs84utm35s = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
 		final String wgs84 = "GEOGCS[\"WGS84\", DATUM[\"WGS84\", SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], PRIMEM[\"Greenwich\", 0.0], UNIT[\"degree\",0.017453292519943295], AXIS[\"Longitude\",EAST], AXIS[\"Latitude\",NORTH]]";
 		CoordinateTransformation transformation1 = TransformationFactory.getCoordinateTransformation(wgs84utm35s, TransformationFactory.WGS84);
@@ -90,5 +88,25 @@ public class TransformationFactoryTest extends MatsimTestCase {
 		} catch (IllegalArgumentException expected) {
 			log.info("Catched expected Exception: " + expected.getMessage());
 		}
+	}
+
+	public final void testIdentityTransformation() {
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.ATLANTIS, TransformationFactory.ATLANTIS);
+		assertTrue(transformation instanceof IdentityTransformation);
+	}
+
+	public final void testToCH1903LV03() {
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
+		assertTrue(transformation instanceof WGS84toCH1903LV03);
+	}
+
+	public final void testFromCH1903LV03() {
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03, TransformationFactory.WGS84);
+		assertTrue(transformation instanceof CH1903LV03toWGS84);
+	}
+
+	public final void testFromAtlantis() {
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.ATLANTIS, TransformationFactory.WGS84);
+		assertTrue(transformation instanceof AtlantisToWGS84);
 	}
 }
