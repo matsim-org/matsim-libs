@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -58,23 +59,17 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.BasicVehicleImpl;
@@ -697,7 +692,12 @@ public class QueueSimulationTest extends TestCase {
 	 */
 	public void testCircleAsRoute() {
 		Fixture f = new Fixture();
-		Link link4 = f.network.createAndAddLink(new IdImpl(4), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
+		Link link4 = f.network.getFactory().createLink(new IdImpl(4), f.node4.getId(), f.node1.getId()); // close the network
+		link4.setLength(1000.0);
+		link4.setFreespeed(100.0);
+		link4.setCapacity(6000);
+		link4.setNumberOfLanes(1);
+		f.network.addLink(link4);
 
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan = person.createAndAddPlan(true);
@@ -750,7 +750,12 @@ public class QueueSimulationTest extends TestCase {
 	 */
 	public void testRouteWithEndLinkTwice() {
 		Fixture f = new Fixture();
-		Link link4 = f.network.createAndAddLink(new IdImpl(4), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
+		Link link4 = f.network.getFactory().createLink(new IdImpl(4), f.node4.getId(), f.node1.getId()); // close the network
+		link4.setLength(1000.0);
+		link4.setFreespeed(100.0);
+		link4.setCapacity(6000);
+		link4.setNumberOfLanes(1);
+		f.network.addLink(link4);
 
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan = person.createAndAddPlan(true);
@@ -893,12 +898,33 @@ public class QueueSimulationTest extends TestCase {
 		Fixture f = new Fixture();
 
 		/* enhance network */
-		Node node5 = f.network.createAndAddNode(new IdImpl("5"), new CoordImpl(3100, 0));
-		Node node6 = f.network.createAndAddNode(new IdImpl("6"), new CoordImpl(3200, 0));
-		Node node7 = f.network.createAndAddNode(new IdImpl("7"), new CoordImpl(3300, 0));
-		f.network.createAndAddLink(new IdImpl("4"), f.node4, node5, 1000, 10, 6000, 2);
-		Link link5 = f.network.createAndAddLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
-		Link link6 = f.network.createAndAddLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
+		Node node5 = f.network.getFactory().createNode(f.scenario.createId("5"), f.scenario.createCoord(3100, 0));
+		Node node6 = f.network.getFactory().createNode(f.scenario.createId("6"), f.scenario.createCoord(3200, 0));
+		Node node7 = f.network.getFactory().createNode(f.scenario.createId("7"), f.scenario.createCoord(3300, 0));
+		f.network.addNode(node5);
+		f.network.addNode(node6);
+		f.network.addNode(node7);
+
+		Link link4 = f.network.getFactory().createLink(new IdImpl(4), f.node4.getId(), f.node1.getId()); // close the network
+		link4.setLength(1000.0);
+		link4.setFreespeed(100.0);
+		link4.setCapacity(6000);
+		link4.setNumberOfLanes(1);
+		f.network.addLink(link4);
+
+		Link link5 = f.network.getFactory().createLink(new IdImpl(5), f.node4.getId(), f.node1.getId()); // close the network
+		link5.setLength(100.0);
+		link5.setFreespeed(10.0);
+		link5.setCapacity(60000);
+		link5.setNumberOfLanes(9);
+		f.network.addLink(link5);
+
+		Link link6 = f.network.getFactory().createLink(new IdImpl(6), f.node4.getId(), f.node1.getId()); // close the network
+		link6.setLength(100.0);
+		link6.setFreespeed(10.0);
+		link6.setCapacity(60000);
+		link6.setNumberOfLanes(9);
+		f.network.addLink(link6);
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
 		PersonImpl person = new PersonImpl(new IdImpl(0));
@@ -933,17 +959,17 @@ public class QueueSimulationTest extends TestCase {
 
 		// build simple network with 1 link
 		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
+		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
+		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
 		network.addNode(node1);
 		network.addNode(node2);
-		LinkImpl link = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link.setFreespeed(10.0);
 		link.setCapacity(2000.0);
 		network.addLink(link);
 
 		// build simple population with 1 person with 1 plan with 1 leg
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 		Person person = pb.createPerson(scenario.createId("1"));
 		Plan plan = pb.createPlan();
@@ -994,23 +1020,23 @@ public class QueueSimulationTest extends TestCase {
 
 		// build simple network with 2 links
 		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
-		NodeImpl node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
+		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
+		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
+		Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		LinkImpl link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link1.setFreespeed(10.0); // freespeed-traveltime = 100s
 		link1.setCapacity(2000.0);
 		network.addLink(link1);
-		LinkImpl link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
 		link2.setFreespeed(10.0); // freespeed-traveltime = 100s
 		link2.setCapacity(2000.0);
 		network.addLink(link2);
 
 		// build simple population with 3 persons with 1 plan with 1 leg
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 		// person 1 : on the road when simulation ends
 		Person person1 = pb.createPerson(scenario.createId("1"));
@@ -1157,7 +1183,7 @@ public class QueueSimulationTest extends TestCase {
 	private static final class Fixture {
 		final ScenarioImpl scenario;
 		final Config config;
-		final NetworkLayer network;
+		final NetworkImpl network;
 		final Node node1;
 		final Node node2;
 		final Node node3;
@@ -1165,7 +1191,7 @@ public class QueueSimulationTest extends TestCase {
 		final Link link1;
 		final Link link2;
 		final Link link3;
-		final PopulationImpl plans;
+		final Population plans;
 		final ArrayList<Id> linkIdsNone;
 		final ArrayList<Id> linkIds2;
 
@@ -1178,14 +1204,32 @@ public class QueueSimulationTest extends TestCase {
 
 			/* build network */
 			this.network = scenario.getNetwork();
-			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
-			this.node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-			this.node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-			this.node3 = this.network.createAndAddNode(new IdImpl("3"), new CoordImpl(1100, 0));
-			this.node4 = this.network.createAndAddNode(new IdImpl("4"), new CoordImpl(1200, 0));
-			this.link1 = this.network.createAndAddLink(new IdImpl("1"), this.node1, this.node2, 100, 100, 60000, 9);
-			this.link2 = this.network.createAndAddLink(new IdImpl("2"), this.node2, this.node3, 1000, 100, 6000, 2);
-			this.link3 = this.network.createAndAddLink(new IdImpl("3"), this.node3, this.node4, 100, 100, 60000, 9);
+			this.node1 = this.network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0, 0));
+			this.node2 = this.network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(100, 0));
+			this.node3 = this.network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(1100, 0));
+			this.node4 = this.network.getFactory().createNode(scenario.createId("4"), scenario.createCoord(1200, 0));
+			this.network.addNode(this.node1);
+			this.network.addNode(this.node2);
+			this.network.addNode(this.node3);
+			this.network.addNode(this.node4);
+			this.link1 = this.network.getFactory().createLink(scenario.createId("1"), this.node1.getId(), this.node2.getId());
+			this.link1.setLength(100);
+			this.link1.setFreespeed(100);
+			this.link1.setCapacity(60000);
+			this.link1.setNumberOfLanes(9);
+			this.link2 = this.network.getFactory().createLink(scenario.createId("2"), this.node2.getId(), this.node3.getId());
+			this.link2.setLength(1000);
+			this.link2.setFreespeed(100);
+			this.link2.setCapacity(6000);
+			this.link2.setNumberOfLanes(2);
+			this.link3 = this.network.getFactory().createLink(scenario.createId("3"), this.node3.getId(), this.node4.getId());
+			this.link3.setLength(100);
+			this.link3.setFreespeed(100);
+			this.link3.setCapacity(60000);
+			this.link3.setNumberOfLanes(9);
+			this.network.addLink(this.link1);
+			this.network.addLink(this.link2);
+			this.network.addLink(this.link3);
 
 			/* build plans */
 			this.plans = scenario.getPopulation();

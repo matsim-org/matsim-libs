@@ -23,7 +23,10 @@ package org.matsim.analysis;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
@@ -32,7 +35,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.misc.Time;
@@ -43,15 +45,15 @@ public class CalcLegTimesTest extends MatsimTestCase {
 	public static final String BASE_FILE_NAME = "tripdurations.txt";
 	public static final Id DEFAULT_PERSON_ID = new IdImpl(123);
 	public static final Id DEFAULT_LINK_ID = new IdImpl(456);
-	
-	private PopulationImpl population = null;
-	private NetworkLayer network = null;
-	
+
+	private Population population = null;
+	private Network network = null;
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		super.loadConfig(null);
-		
+
 		this.population = new ScenarioImpl().getPopulation();
 		PersonImpl person = new PersonImpl(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);
@@ -66,9 +68,16 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		plan.createAndAddLeg(TransportMode.undefined);
 		plan.createAndAddActivity("act5", new CoordImpl(200.0, 200.0));
 		this.network = new NetworkLayer();
-		Node fromNode = this.network.createAndAddNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
-		Node toNode = this.network.createAndAddNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));
-		this.network.createAndAddLink(DEFAULT_LINK_ID, fromNode, toNode, Math.sqrt(20000.0), 13.333, 2000, 1);
+		Node fromNode = this.network.getFactory().createNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
+		this.network.addNode(fromNode);
+		Node toNode = this.network.getFactory().createNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));
+		this.network.addNode(toNode);
+		Link link = this.network.getFactory().createLink(DEFAULT_LINK_ID, fromNode.getId(), toNode.getId());
+		link.setLength(Math.sqrt(20000.0));
+		link.setFreespeed(13.333);
+		link.setCapacity(2000);
+		link.setNumberOfLanes(1);
+		this.network.addLink(link);
 	}
 
 	@Override
@@ -79,21 +88,21 @@ public class CalcLegTimesTest extends MatsimTestCase {
 	}
 
 	public void testNoEvents() {
-		
+
 		CalcLegTimes testee = new CalcLegTimes(this.population);
-		
+
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(testee);
-		
+
 		// add events to handle here
-		
+
 		this.runTest(testee);
 	}
 
 	public void testAveraging() {
-		
+
 		CalcLegTimes testee = new CalcLegTimes(this.population);
-		
+
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(testee);
 
@@ -108,24 +117,24 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		leg.setArrivalTime(Time.parseTime("07:10:00"));
 		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		
+
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("31:12:00"));
 		leg.setArrivalTime(Time.parseTime("31:22:00"));
 		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		
+
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
 		leg.setArrivalTime(Time.parseTime("30:12:01"));
 		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		
+
 		this.runTest(testee);
 	}
-	
+
 	protected void runTest(CalcLegTimes calcLegTimes) {
-		
+
 		calcLegTimes.writeStats(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
 		// actual test: compare checksums of the files

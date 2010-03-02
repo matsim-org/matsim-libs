@@ -28,23 +28,27 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * 
+ *
  * ParallelEvents allows parallelization for events handling.
  * Usage: First create an object of this class. Before each iteration, call initProcessing.
  * After each iteration, call finishProcessing. This has already been incorporated into
  * the Controller.
- * 
-   Usage via config.xml: 
-   <module name="parallelEventHandling">
-		<param name="numberOfThreads"        value="2" />
-   </module>
-	
-	optionally you can also specify the estimated number of events per iteration:
-    <param name="estimatedNumberOfEvents"        value="10000000" />
-    (not really needed, but can make performance slightly faster in larger simulations).
+ *
+ * Usage via config.xml:
+ * <pre>
+ * <module name="parallelEventHandling">
+ *  <param name="numberOfThreads" value="2" />
+ * </module>
+ * </pre>
+ *
+ * optionally you can also specify the estimated number of events per iteration:
+ * <pre>
+ *  <param name="estimatedNumberOfEvents" value="10000000" />
+ * </pre>
+ * (not really needed, but can make performance slightly faster in larger simulations).
  * @see http://www.matsim.org/node/238
  * @author rashid_waraich
- * 
+ *
  */
 public class ParallelEventsManagerImpl extends EventsManagerImpl {
 
@@ -62,7 +66,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	// quite well for larger simulations with 10 million events
 	private int preInputBufferMaxLength = 100000;
 
-	
+
 	/**
 	 * @param numberOfThreads -
 	 *            specify the number of threads used for the events handler
@@ -72,7 +76,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param numberOfThreads
 	 * @param estimatedNumberOfEvents
 	 * Only use this constructor for larger simulations (20M+ events).
@@ -81,7 +85,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 		preInputBufferMaxLength = estimatedNumberOfEvents / 10;
 		init(numberOfThreads);
 	}
-	
+
 	@Override
 	public void processEvent(final Event event) {
 		for (int i = 0; i < eventsProcessThread.length; i++) {
@@ -89,17 +93,16 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 		}
 	}
 
-	
+
 	@Override
 	public void addHandler(final EventHandler handler) {
 		synchronized (this) {
 			events[numberOfAddedEventsHandler].addHandler(handler);
-			numberOfAddedEventsHandler = (numberOfAddedEventsHandler + 1)
-					% numberOfThreads;
+			numberOfAddedEventsHandler = (numberOfAddedEventsHandler + 1) % numberOfThreads;
 		}
 	}
-	
-	
+
+
 	@Override
 	public void resetHandlers(final int iteration) {
 		synchronized (this) {
@@ -108,8 +111,8 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 			}
 		}
 	}
-	
-	
+
+
 	@Override
 	public void resetCounter() {
 		synchronized (this) {
@@ -118,8 +121,8 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 			}
 		}
 	}
-	
-	
+
+
 	@Override
 	public void removeHandler(final EventHandler handler) {
 		synchronized (this) {
@@ -128,8 +131,8 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 			}
 		}
 	}
-	
-	
+
+
 	@Override
 	public void clearHandlers() {
 		synchronized (this) {
@@ -138,8 +141,8 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 			}
 		}
 	}
-	
-	
+
+
 	@Override
 	public void printEventHandlers() {
 		synchronized (this) {
@@ -161,7 +164,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	}
 
 	// When one simulation iteration is finish, it must call this method,
-	// so that it can communicate to the threads, that the simulation is 
+	// so that it can communicate to the threads, that the simulation is
 	// finished and that it can await the event handler threads.
 	@Override
 	public void finishProcessing() {
@@ -177,7 +180,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 			e.printStackTrace();
 		}
 	}
-	
+
 	// create event handler threads
 	// prepare for next iteration
 	@Override
@@ -189,5 +192,5 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 			new Thread(eventsProcessThread[i], "Events-" + i).start();
 		}
 	}
-	
+
 }

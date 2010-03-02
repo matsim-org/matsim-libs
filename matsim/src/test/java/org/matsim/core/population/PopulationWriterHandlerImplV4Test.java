@@ -22,11 +22,12 @@ package org.matsim.core.population;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -39,12 +40,12 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl(super.loadConfig(null));
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
-		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
-		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
+		Link link1 = network.getLinks().get(new IdImpl(1));
+		Link link2 = network.getLinks().get(new IdImpl(2));
 
 		ScenarioImpl tmpScenario = new ScenarioImpl();
 		tmpScenario.setNetwork(network);
-		PopulationImpl pop = tmpScenario.getPopulation();
+		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		PersonImpl person = (PersonImpl) pb.createPerson(new IdImpl(1));
 		PlanImpl plan = (PlanImpl) pb.createPlan();
@@ -62,7 +63,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		String filename = getOutputDirectory() + "population.xml";
 		new PopulationWriter(pop, network).writeV4(filename);
 
-		PopulationImpl pop2 = scenario.getPopulation();
+		Population pop2 = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(filename);
 		Person person2 = pop2.getPersons().get(new IdImpl(1));
 		LegImpl leg2 = (LegImpl) person2.getPlans().get(0).getPlanElements().get(1);

@@ -32,8 +32,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
@@ -42,8 +44,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -74,31 +74,38 @@ public class ControlerTest extends MatsimTestCase {
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
-		PopulationImpl population = f.scenario.getPopulation();
-		PersonImpl person1 = null;
+		Population population = f.scenario.getPopulation();
+		PopulationFactory factory = population.getFactory();
+		Person person1 = null;
 
-		person1 = new PersonImpl(new IdImpl(1));
-		PlanImpl plan1 = person1.createAndAddPlan(true);
-		Activity a1 = plan1.createAndAddActivity("h", f.link1.getId());
+		person1 = factory.createPerson(f.scenario.createId("1"));
+		Plan plan1 = factory.createPlan();
+		person1.addPlan(plan1);
+		Activity a1 = factory.createActivityFromLinkId("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
-		LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
+		plan1.addActivity(a1);
+		Leg leg1 = factory.createLeg(TransportMode.car);
+		plan1.addLeg(leg1);
 		NetworkRoute route1 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		leg1.setRoute(route1);
 		ArrayList<Id> linkIds = new ArrayList<Id>();
 		linkIds.add(f.link2.getId());
 		route1.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
-		plan1.createAndAddActivity("h", f.link3.getId());
+		plan1.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
 		population.addPerson(person1);
 
-		PersonImpl person2 = new PersonImpl(new IdImpl(2));
-		PlanImpl plan2 = person2.createAndAddPlan(true);
-		Activity a2 = plan2.createAndAddActivity("h", f.link1.getId());
+		Person person2 = factory.createPerson(f.scenario.createId("2"));
+		Plan plan2 = factory.createPlan();
+		person2.addPlan(plan2);
+		Activity a2 = factory.createActivityFromLinkId("h", f.link1.getId());
 		a2.setEndTime(7.0*3600);
-		LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
+		plan2.addActivity(a2);
+		Leg leg2 = factory.createLeg(TransportMode.car);
+		plan2.addLeg(leg2);
 		NetworkRoute route2 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		leg2.setRoute(route2);
 		route2.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
-		plan2.createAndAddActivity("h", f.link3.getId());
+		plan2.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
 		population.addPerson(person2);
 
 		// Complete the configuration for our test case
@@ -187,27 +194,34 @@ public class ControlerTest extends MatsimTestCase {
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		PopulationImpl population = f.scenario.getPopulation();
-		PersonImpl person1 = null;
-		LegImpl leg1 = null;
-		LegImpl leg2 = null;
+		Population population = f.scenario.getPopulation();
+		PopulationFactory factory = population.getFactory();
+		Person person1 = null;
+		Leg leg1 = null;
+		Leg leg2 = null;
 
-		person1 = new PersonImpl(new IdImpl(1));
+		person1 = factory.createPerson(f.scenario.createId("1"));
 		// --- plan 1 ---
-		PlanImpl plan1 = person1.createAndAddPlan(true);
-		Activity a1 = plan1.createAndAddActivity("h", f.link1.getId());//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		Plan plan1 = factory.createPlan();
+		person1.addPlan(plan1);
+		Activity a1 = factory.createActivityFromLinkId("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
-		leg1 = plan1.createAndAddLeg(TransportMode.car);
+		plan1.addActivity(a1);
+		leg1 = factory.createLeg(TransportMode.car);
+		plan1.addLeg(leg1);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		plan1.createAndAddActivity("h", f.link3.getId());
+		plan1.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
 		// --- plan 2 ---
-		PlanImpl plan2 = person1.createAndAddPlan(true);
-		Activity a2 = plan2.createAndAddActivity("h", f.link1.getId());//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		Plan plan2 = factory.createPlan();
+		person1.addPlan(plan2);
+		Activity a2 = factory.createActivityFromLinkId("h", f.link1.getId());
 		a2.setEndTime(7.0*3600);
+		plan2.addActivity(a2);
 
-		leg2 = plan2.createAndAddLeg(TransportMode.car);
+		leg2 = factory.createLeg(TransportMode.car);
+		plan2.addLeg(leg2);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		plan2.createAndAddActivity("h", f.link3.getId());
+		plan2.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
 		population.addPerson(person1);
 
 		// Complete the configuration for our test case
@@ -245,7 +259,8 @@ public class ControlerTest extends MatsimTestCase {
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Population population = f.scenario.getPopulation();
-		PersonImpl person1 = null;
+		PopulationFactory factory = population.getFactory();
+		Person person1 = null;
 		Activity act1a = null;
 		Activity act1b = null;
 		Activity act2a = null;
@@ -255,19 +270,27 @@ public class ControlerTest extends MatsimTestCase {
 
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
-		Plan plan1 = person1.createAndAddPlan(true);
-		act1a = ((PlanImpl) plan1).createAndAddActivity("h", new CoordImpl(-50.0, 10.0));
+		Plan plan1 = factory.createPlan();
+		person1.addPlan(plan1);
+		act1a = factory.createActivityFromCoord("h", f.scenario.createCoord(-50.0, 10.0));
 		act1a.setEndTime(7.0*3600);
-		leg1 = ((PlanImpl) plan1).createAndAddLeg(TransportMode.car);
+		plan1.addActivity(act1a);
+		leg1 = factory.createLeg(TransportMode.car);
+		plan1.addLeg(leg1);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act1b = ((PlanImpl) plan1).createAndAddActivity("h", new CoordImpl(1075.0, -10.0));
+		act1b = factory.createActivityFromCoord("h", f.scenario.createCoord(1075.0, -10.0));
+		plan1.addActivity(act1b);
 		// --- plan 2 ---
-		Plan plan2 = person1.createAndAddPlan(true);
-		act2a = ((PlanImpl) plan2).createAndAddActivity("h", new CoordImpl(-50.0, -10.0));
+		Plan plan2 = factory.createPlan();
+		person1.addPlan(plan2);
+		act2a = factory.createActivityFromCoord("h", f.scenario.createCoord(-50.0, -10.0));
 		act2a.setEndTime(7.9*3600);
-		leg2 = ((PlanImpl) plan2).createAndAddLeg(TransportMode.car);
+		plan2.addActivity(act2a);
+		leg2 = factory.createLeg(TransportMode.car);
+		plan2.addLeg(leg2);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act2b = ((PlanImpl) plan2).createAndAddActivity("h", new CoordImpl(1111.1, 10.0));
+		act2b = factory.createActivityFromCoord("h", f.scenario.createCoord(1111.1, 10.0));
+		plan2.addActivity(act2b);
 		population.addPerson(person1);
 
 		// Complete the configuration for our test case

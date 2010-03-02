@@ -159,6 +159,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setOutputDirectory(getOutputDirectory() + "/basecase/");
 		Controler controler1 = new Controler(config);
 		controler1.setCreateGraphs(false);
+		controler1.setWriteEventsInterval(0);
 		controler1.run();
 		double scoreBasecase = controler1.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore().doubleValue();
 
@@ -169,6 +170,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setOutputDirectory(getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);
 		controler2.setCreateGraphs(false);
+		controler2.setWriteEventsInterval(0);
 		controler2.run();
 		double scoreTollcase = controler2.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore().doubleValue();
 
