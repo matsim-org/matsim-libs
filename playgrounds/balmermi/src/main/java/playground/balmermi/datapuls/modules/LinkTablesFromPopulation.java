@@ -68,8 +68,8 @@ public final class LinkTablesFromPopulation {
 		for (TransportMode mode : analyzedModes) {
 			this.writers.put(mode, new HashMap<Integer, BufferedWriter>());
 		}
-		this.speeds.put(TransportMode.walk, config.getWalkSpeedFactor());
-		this.speeds.put(TransportMode.bike, config.getBikeSpeedFactor());
+		this.speeds.put(TransportMode.walk, config.getWalkSpeed());
+		this.speeds.put(TransportMode.bike, config.getBikeSpeed());
 	}
 	
 	public void run(final Population population) throws IOException {
