@@ -125,11 +125,11 @@
       <name>Geotools repository</name>
       <url>http://maven.geotools.fr/repository</url>
     </repository>
-    <repository>
+    <!--<repository>
       <id>ibiblio</id>
       <name>Ibiblio - the public's library and digital archive</name>
       <url>http://www.ibiblio.org/maven2</url>
-    </repository>
+    </repository>-->
     <repository>
       <id>org.codehaus.mojo</id>
       <url>http://repository.codehaus.org/org/codehaus/mojo/</url>
