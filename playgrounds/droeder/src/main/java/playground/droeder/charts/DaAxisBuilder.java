@@ -31,15 +31,16 @@ import org.jfree.chart.axis.ValueAxis;
  */
 public class DaAxisBuilder {
 	
+	
 	private Font labelFont = new Font(Font.SANS_SERIF, Font.BOLD, 18);
 	private Font axisFont = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 	
 	
 	public CategoryAxis createCategoryAxis(String xLabel) {
 		CategoryAxis categoryAxis = new CategoryAxis(xLabel);
-		categoryAxis.setCategoryMargin(0.15); // percentage of space between categories
-		categoryAxis.setLowerMargin(0.01); // percentage of space before first bar
-		categoryAxis.setUpperMargin(0.01); // percentage of space after last bar
+		categoryAxis.setCategoryMargin(0.07); // percentage of space between categories
+		categoryAxis.setLowerMargin(0.03); // percentage of space before first bar
+		categoryAxis.setUpperMargin(0.03); // percentage of space after last bar
 		categoryAxis.setLabelFont(labelFont);
 		categoryAxis.setTickLabelFont(axisFont);
 		return categoryAxis;
@@ -49,6 +50,14 @@ public class DaAxisBuilder {
 		ValueAxis valueAxis = new NumberAxis(yLabel);
 		valueAxis.setLabelFont(labelFont);
 		valueAxis.setTickLabelFont(axisFont);
+		valueAxis.setUpperMargin(100);
+		return valueAxis;
+	}
+	public ValueAxis createValueAxis(String yLabel, double yMax) {
+		ValueAxis valueAxis = new NumberAxis(yLabel);
+		valueAxis.setLabelFont(labelFont);
+		valueAxis.setTickLabelFont(axisFont);
+		valueAxis.setUpperBound(yMax);
 		return valueAxis;
 	}
 
@@ -56,7 +65,7 @@ public class DaAxisBuilder {
 	public Font getLabelFont() {
 		return labelFont;
 	}
-
+	
 	
 	public Font getAxisFont() {
 		return axisFont;

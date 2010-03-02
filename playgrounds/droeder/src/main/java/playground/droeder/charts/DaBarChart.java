@@ -73,14 +73,34 @@ public class DaBarChart {
 	    plot.setRangeAxis(axis.createValueAxis(yAxis));
 		
 		final BarRenderer renderer = (BarRenderer) plot.getRenderer();
-		
 		renderer.findRangeBounds(dataset);
 		DaColorScheme cs = new DaColorScheme();
-		for(int i=1; i< 1+dataset.getRowCount(); i++){
+		for(int i=0; i< 1+dataset.getRowCount(); i++){
 			renderer.setSeriesPaint(i, cs.getColor(i));
 		}
 		return chart;
 
 	  }
+	  
+	  public JFreeChart createChart(String title, String xAxis, String yAxis, double yMax) {
+			JFreeChart chart = ChartFactory.createBarChart(title, xAxis, yAxis, dataset, PlotOrientation.VERTICAL, true, false, false);
+			DaAxisBuilder axis = new DaAxisBuilder();
+			CategoryPlot plot = chart.getCategoryPlot();
+			
+		    plot.setBackgroundPaint(Color.white);
+		    plot.setDomainGridlinePaint(Color.lightGray);
+		    plot.setRangeGridlinePaint(Color.black);
+		    plot.setDomainAxis(axis.createCategoryAxis(xAxis));
+		    plot.setRangeAxis(axis.createValueAxis(yAxis, yMax));
+			
+			final BarRenderer renderer = (BarRenderer) plot.getRenderer();
+			renderer.findRangeBounds(dataset);
+			DaColorScheme cs = new DaColorScheme();
+			for(int i=0; i< 1+dataset.getRowCount(); i++){
+				renderer.setSeriesPaint(i, cs.getColor(i));
+			}
+			return chart;
+
+		  }
 	  
 }

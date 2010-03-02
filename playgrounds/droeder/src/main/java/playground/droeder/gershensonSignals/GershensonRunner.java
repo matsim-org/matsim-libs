@@ -83,7 +83,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private CarsOnLinkLaneHandler handler2;
 	
 	// "D" run denver -- "G" run gershensonTestNetwork
-	private static final String config = "G";
+	private static final String config = "D";
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 
@@ -135,7 +135,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				event.getControler().getEvents().addHandler(handler2);
 				
 				//enable live-visualization
-				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	
@@ -218,28 +218,32 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	}
 	public static void main(String[] args) {
 		DaBarChart barChart = new DaBarChart();
+		double cap = 0;
 		
 		GershensonRunner runner = new GershensonRunner();
 //		runner.setN(24);
 //		runner.setU(15);
 //		runner.runScenario(config);
 		
-		for (int cap = 0; cap <17; cap = cap + 2){
-			runner.setCap(0.8 + (cap/100));
-			for (int u = 5; u < 18; u++){
+		for (int c = 0; c < 20; c++){
+			barChart = new DaBarChart();
+			cap = (80.00+(double)c)/100.00;
+			for (int u = 4; u < 18; u++){
 				nAndT = new LinkedHashMap<Number, Number>();
-				for (int n = 8; n < 20; n++){
+				for (int n = 8; n < 21; n++){
 					runner = new GershensonRunner();
 					Gbl.reset();
 					runner.setU(u);
 					runner.setN(n);
+					runner.setCap(cap);
 					runner.runScenario(config);
 					nAndT.put(n, avTT);
 				}
 				barChart.addSeries("u=" + String.valueOf(u), nAndT);
 	//			nAndUT.put(n, uAndT);
 			}	
-			new DaChartWriter().writeChart(DaPaths.DENVER+"Charts_10_02_26\\" + "u5-17_n8-20_cap" + Double.toString(0.8+(cap/100)), 1600, 1024, barChart.createChart("avTT Denver", "n", "t"));
+			new DaChartWriter().writeChart(DaPaths.OUTPUT+"DENVER\\Charts_10_03_02\\" + "u4-17_n8-20_cap" + 
+					String.valueOf(cap), 1600, 1024, barChart.createChart("capacityFactor = " + String.valueOf(cap), "number of waiting cars n [ ]", "average travelTime t [s]", 1800));
 		}
 	}
 

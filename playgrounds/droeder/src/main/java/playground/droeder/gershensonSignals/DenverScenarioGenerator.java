@@ -152,7 +152,7 @@ private void createConfig(Config config) {
 		config.getQSimConfigGroup().setStuckTime(10000);
 		config.getQSimConfigGroup().setRemoveStuckVehicles(true);
 //		config.getQSimConfigGroup().setStartTime(6*3600);
-		config.getQSimConfigGroup().setEndTime(9*3600);
+		config.getQSimConfigGroup().setEndTime(15*3600);
 		config.otfVis().setDrawLinkIds(true);
 		
 		// configure strategies for replanning

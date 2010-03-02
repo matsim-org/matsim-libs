@@ -29,18 +29,24 @@ import org.jfree.util.Log;
  */
 public class DaColorScheme {
 	
-	public Color c1 = new Color(0, 0 ,102);
-	public Color c2 = new Color(0, 102, 0);
-	public Color c3 = new Color(102,0,0);
-	public Color c4 = new Color(0,102,102);
-	public Color c5 = new Color(102,102,0);
-	public Color c6 = new Color(102,102,102);
-	public Color c7 = new Color(0,102,51);
-	public Color c8 = new Color(0,51,102);
-	public Color c9 = new Color(51,0,102);
+	private Color c0 = new Color(102,0,51);
+	private Color c1 = new Color(0, 0 ,102);
+	private Color c2 = new Color(0, 102, 0);
+	private Color c3 = new Color(102,0,0);
+	private Color c4 = new Color(0,102,102);
+	private Color c5 = new Color(102,102,0);
+	private Color c6 = new Color(51,0,102);
+	private Color c7 = new Color(102,102,102);
+	private Color c8 = new Color(0,51,102);
+	private Color c9 = new Color(0,102,51);
+	private Color c10 = new Color(51,51,102);
+	private Color c11 = new Color(51,102,51);
+	private Color c12 = new Color(102,51,51);
 	
 	public Color getColor(int i){
-		if(i == 1){
+		if(i==0){
+			return c0;
+		}else if(i==1){
 			return c1;
 		}else if(i==2){
 			return c2;
@@ -58,6 +64,12 @@ public class DaColorScheme {
 			return c8;
 		}else if(i==9){
 			return c9;
+		}else if(i==10){
+			return c10;
+		}else if(i==11){
+			return c11;
+		}else if(i==12){
+			return c12;
 		}else{
 			Log.error("no color for this argument");
 			return new Color(0);
