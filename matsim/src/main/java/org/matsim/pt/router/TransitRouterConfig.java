@@ -55,8 +55,11 @@ public class TransitRouterConfig {
 	
 	public double marginalUtilityOfTravelTimeTransit = -6.0 / 3600.0;
 	
+	public double marginalUtilityOfTravelDistanceTransit = -0.0;
+	
 	/**
 	 * The additional costs to be added when an agent switches lines.
 	 */
 	public double costLineSwitch = 60.0 * -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle
+	
 }

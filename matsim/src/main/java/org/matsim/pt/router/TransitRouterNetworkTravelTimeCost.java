@@ -57,7 +57,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 			// it's a transfer link (walk)
 			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeWalk + this.config.costLineSwitch;
 		} else {
-			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeTransit;
+			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeTransit - link.getLength() * this.config.marginalUtilityOfTravelDistanceTransit;
 		}
 //		System.out.println(((LinkWrapper)link).link.fromNode.stop.getStopFacility().getId() + " c " + ((LinkWrapper)link).link.toNode.stop.getStopFacility().getId() + " = " + cost);
 		return cost;
