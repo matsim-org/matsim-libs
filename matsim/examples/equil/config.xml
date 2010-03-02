@@ -27,7 +27,7 @@
 		<param name="endTime" value="00:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims, otfvis -->
+		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
 	</module>
 
 	<module name="planCalcScore">
