@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimTestCase4.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,17 +22,19 @@ package org.matsim.testcases;
 import java.io.File;
 
 import org.junit.Assert;
-import org.junit.rules.TestName;
+import org.junit.rules.TestWatchman;
+import org.junit.runners.model.FrameworkMethod;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.
+ * Inspired by JUnit's rule TestName
  *
  * @author mrieser
  */
-public class MatsimTestUtils extends TestName {
+public class MatsimTestUtils extends TestWatchman {
 
 	/** A constant for the exactness when comparing doubles. */
 	public static final double EPSILON = 1e-10;
@@ -58,6 +59,9 @@ public class MatsimTestUtils extends TestName {
 	private String packageInputDirectory;
 
 	private boolean outputDirCreated = false;
+
+	private Class<?> testClass = null;
+	private String testMethodName = null;
 
 	public MatsimTestUtils() {
 		Gbl.reset(); // make sure we start with a clean environment
@@ -100,7 +104,7 @@ public class MatsimTestUtils extends TestName {
 	 */
 	public String getOutputDirectory() {
 		if (this.outputDirectory == null) {
-			this.outputDirectory = "test/output/" + this.getClass().getCanonicalName().replace('.', '/') + "/" + getMethodName() + "/";
+			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName() + "/";
 		}
 		createOutputDirectory();
 		return this.outputDirectory;
@@ -113,7 +117,7 @@ public class MatsimTestUtils extends TestName {
 	 */
 	public String getInputDirectory() {
 		if (this.inputDirectory == null) {
-			this.inputDirectory = getClassInputDirectory() + super.getMethodName() + "/";
+			this.inputDirectory = getClassInputDirectory() + getMethodName() + "/";
 		}
 		return this.inputDirectory;
 	}
@@ -124,7 +128,7 @@ public class MatsimTestUtils extends TestName {
 	 */
 	public String getClassInputDirectory() {
 		if (this.classInputDirectory == null) {
-			this.classInputDirectory = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/";
+			this.classInputDirectory = "test/input/" + this.testClass.getCanonicalName().replace('.', '/') + "/";
 		}
 		return this.classInputDirectory;
 	}
@@ -141,13 +145,31 @@ public class MatsimTestUtils extends TestName {
 		return this.packageInputDirectory;
 	}
 
-	@Override
+	/**
+	 * @return the name of the currently-running test method
+	 */
 	public String getMethodName() {
-		String name = super.getMethodName();
-		if (name == null) {
+		if (this.testMethodName == null) {
 			throw new RuntimeException("MatsimTestUtils.getMethodName() can only be used in actual test, not in constructor or elsewhere!");
 		}
-		return name;
+		return this.testMethodName;
+	}
+
+	/* inspired by
+	 * @see org.junit.rules.TestName#starting(org.junit.runners.model.FrameworkMethod)
+	 */
+	@Override
+	public void starting(FrameworkMethod method) {
+		super.starting(method);
+		this.testClass = method.getMethod().getDeclaringClass();
+		this.testMethodName = method.getName();
+	}
+
+	@Override
+	public void finished(FrameworkMethod method) {
+		super.finished(method);
+		this.testClass = null;
+		this.testMethodName = null;
 	}
 
 }
