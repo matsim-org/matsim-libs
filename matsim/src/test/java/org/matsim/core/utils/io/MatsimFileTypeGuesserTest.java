@@ -65,6 +65,14 @@ public class MatsimFileTypeGuesserTest {
 	}
 
 	@Test
+	public void testFacilitiesV1Dtd() throws IOException {
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/scenarios/equil/facilities.xml");
+		assertEquals(MatsimFileTypeGuesser.FileType.Facilities, g.getGuessedFileType());
+		assertNull(g.getPublicId());
+		assertEquals("http://www.matsim.org/files/dtd/facilities_v1.dtd", g.getSystemId());
+	}
+
+	@Test
 	public void testCountsV1Xsd() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("examples/equil/counts100.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Counts, g.getGuessedFileType());
