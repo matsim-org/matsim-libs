@@ -145,13 +145,12 @@ public class AgentsAssigner implements PlanAlgorithm{
 						}
 					} catch (Exception e){
 						log.warn(e);
-						log.warn("Acts im Plan des schon optimierten Agenten:");
+						log.warn("Acts im Plan des schon optimierten Agenten "+agents.getAgentPlan(j).getPerson().getId()+":");
 						for (int k=0;k<agents.getAgentPlan(j).getPlanElements().size();k++) {
-							if (agents.getAgentPlan(j).getPlanElements().get(k).getClass().getName().equals("org.matsim.population.Act")) log.warn(((ActivityImpl)(agents.getAgentPlan(j).getPlanElements().get(k))).getType()+" ");
-							else log.warn(((LegImpl)(agents.getAgentPlan(j).getPlanElements().get(k))).getMode()+" ");
+							log.warn(agents.getAgentPlan(j).getPlanElements().get(k));
 						}
 						System.out.println();
-						log.warn("Primacts im Knowledge des zuzuordnenden Agenten:");
+						log.warn("Primacts im Knowledge des zuzuordnenden Agenten "+plan.getPerson().getId()+":");
 						for (int k=0;k< this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size();k++){
 							if (this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getClass().getName().equals("org.matsim.population.Act")) log.warn(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getType()+" ");
 							else log.warn("Leg but undefined. ");
