@@ -47,7 +47,7 @@ public class NodeImpl implements Node {
 
 	protected Coord coord;
 	protected final Id id;
-	
+
 	private final static Logger log = Logger.getLogger(NodeImpl.class);
 
 	//////////////////////////////////////////////////////////////////////
@@ -73,23 +73,6 @@ public class NodeImpl implements Node {
 		this.coord = null;
 	}
 
-	public int compareTo(final NodeImpl o) {
-		return this.id.toString().compareTo(o.getId().toString());
-	}
-
-	@Override
-	public boolean equals(final Object other) {
-		if (other instanceof NodeImpl) {
-			return this.id.equals(((NodeImpl)other).id);
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return this.id.hashCode();
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// add / set methods
 	//////////////////////////////////////////////////////////////////////
@@ -101,7 +84,7 @@ public class NodeImpl implements Node {
 	public final void setType(final String type) {
 		this.type = type == null ? null : type.intern();
 	}
-	
+
 	private static int cnt2 = 0 ;
 	public final boolean addInLink(Link inlink) {
 		Id linkid = inlink.getId();
@@ -215,15 +198,15 @@ public class NodeImpl implements Node {
 		return this.id;
 	}
 
-	
+
 	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
 		ois.defaultReadObject();
-	
+
 		inlinks = new LinkedHashMap<Id, Link>(4, 0.95f);
 		outlinks = new LinkedHashMap<Id, Link>(4, 0.95f);
 
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
