@@ -1,6 +1,9 @@
 package playground.ciarif.retailers;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -8,6 +11,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -80,15 +84,6 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 		else {
 			gravityModelIter = Integer.parseInt (modelIterParam);
 		}
-		// The model is run only every "n" iterations
-//		if (controler.getIteration()%10 ==0 && controler.getIteration()>0){
-//			this.rsw = new RetailersSummaryWriter("../matsim/output/triangle/RetailersSummary");
-//			this.cfc = new CountFacilityCustomers(controler.getPopulation().getPersons());
-//			
-//			for (Retailer r : this.retailers.getRetailers().values()) {
-//				rsw.write(r, controler.getIteration(), cfc);
-//			}
-//		}
 				
 		if (event.getIteration() ==gravityModelIter){
 			// TODO maybe need to add if sequential statement
@@ -107,7 +102,8 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 				rsw.write(r, event.getIteration(), cfc);
 				r.runStrategy(lrr.getFreeLinks());
 				lrr.updateFreeLinks();
-				new ReRoutePersons().run(r.getMovedFacilities(), controler.getNetwork(), controler.getPopulation().getPersons(), pcrl, controler.getFacilities());  
+				Map<Id, PersonImpl> persons = (Map<Id, PersonImpl>)controler.getPopulation().getPersons();
+				new ReRoutePersons().run(r.getMovedFacilities(), controler.getNetwork(), persons, pcrl, controler.getFacilities());  
 			}
 		}
 		
@@ -115,7 +111,7 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 			
 			for (Retailer r : this.retailers.getRetailers().values()) {
 
-				//log.info("cfc=" + this.cfc);
+				log.info("cfc=" + this.cfc);
 				rsw.write(r, controler.getIterationNumber(),this.cfc);  
 
 			}

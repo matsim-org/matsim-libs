@@ -16,6 +16,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 
+import playground.ciarif.retailers.IO.FileRetailerReader;
 import playground.ciarif.retailers.RetailerGA.RunRetailerGA;
 import playground.ciarif.retailers.data.Consumer;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
@@ -28,6 +29,10 @@ import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO check the arguments that are passed from this class to 
 	//the GravityModel class, in particular if it is really necessary to pass the controler. Have also a look to variables here, it shouldn't happen that fields here are the same as in the GravityModel class
+	public final static String CONFIG_GROUP = "Retailers";
+	public static final String COMPUTE_BETAS = "computeParameters";
+	public static final String GENERATIONS = "numberOfGenerations";
+	public static final String POPULATION = "PopulationSize";
 	public static final String NAME = "gravityModelRetailerStrategy";
 	private final static Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
 	private Controler controler;
@@ -51,11 +56,23 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		this.shops= gm.getScenarioShops();
 		this.retailZones = gm.getRetailZones();
 		DenseDoubleMatrix2D prob_i_j = findProb();
-		double [] b= this.computeParameters (prob_i_j);
-		double[] b1 = {-1,1};
-		//double[] b1 = {-b[0],-b[1]};
+		String computeBetas = controler.getConfig().findParam(CONFIG_GROUP,COMPUTE_BETAS);
+		if (computeBetas == null) {log.warn("In config file, param = "+COMPUTE_BETAS+" in module = "+CONFIG_GROUP+" not defined, this will be interpreted as a 'Yes' by the program");
+			computeBetas = "yes";
+		}
+		double [] b = {1,-1};
+		if (computeBetas.equals("yes")) {
+			log.info("Betas of the Gravity Model are explicitly calculated");
+			b= this.computeParameters (prob_i_j);
+		}
+		double[] b1 = {-b[0],-b[1]};
+		
 		gm.setBetas(b1);
-		RunRetailerGA rrGA = new RunRetailerGA();
+		Integer populationSize = Integer.parseInt(controler.getConfig().findParam(CONFIG_GROUP,POPULATION));
+		if (populationSize == null) {log.warn("In config file, param = "+POPULATION+" in module = "+CONFIG_GROUP+" not defined, the value '10' will be used as default for this parameter");}
+		Integer numberGenerations = Integer.parseInt(controler.getConfig().findParam(CONFIG_GROUP,GENERATIONS));
+		if (numberGenerations == null) {log.warn("In config file, param = "+GENERATIONS+" in module = "+CONFIG_GROUP+" not defined, the value '100' will be used as default for this parameter");}
+		RunRetailerGA rrGA = new RunRetailerGA(populationSize, numberGenerations);
 		TreeMap<Integer, String> first = this.createInitialLocationsForGA(this.mergeLinks(freeLinks));
 		gm.setFirst(first);
 		ArrayList<Integer> solution = rrGA.runGA(first.size(),gm);		
@@ -145,7 +162,6 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	    
 	    double[] b = olsmr.estimateRegressionParameters();
 	    
-	    log.info("Betas = " + -b[0] + " " + -b[1]);
 	    return b;
 	}
 

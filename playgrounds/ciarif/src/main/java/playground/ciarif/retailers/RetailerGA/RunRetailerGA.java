@@ -16,10 +16,16 @@ public class RunRetailerGA
 {
  public final static String CONFIG_GROUP = "Retailers";
  public final static String CONFIG_MATRICES_FOLDER = "matricesFolder";
- 
+ private int numberOfGenerations = 0;
+ private int populationSize = 0;
  private final static Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
  
- public ArrayList<Integer> runGA(int size, GravityModel gm)
+ public RunRetailerGA(Integer populationSize, Integer numberGenerations) {
+	this.numberOfGenerations = numberGenerations;
+	this.populationSize = populationSize;
+}
+
+public ArrayList<Integer> runGA(int size, GravityModel gm)
  
   {
 	ArrayList<Integer> initialSolution = new ArrayList<Integer>();
@@ -27,9 +33,6 @@ public class RunRetailerGA
 		initialSolution.add(i);
 	}
     int genomeLength = initialSolution.size();
-    int populationSize = 20;
-    int numberOfGenerations = 100;
-    //int numberOfGenerations = 1;
     double elites = 0.1;
     //default: double mutants = 0.05;
     double mutants = 0.1;

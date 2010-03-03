@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -21,8 +20,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import playground.ciarif.retailers.data.Consumer;
 import playground.ciarif.retailers.data.PersonRetailersImpl;
 import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
@@ -57,99 +54,103 @@ public class GravityModel
     this.controlerFacilities = controler.getFacilities();
     this.shops = this.findScenarioShops(this.controlerFacilities.getFacilities().values());
     for (Person p:controler.getPopulation().getPersons().values()){
+    	
     	PersonImpl pi = (PersonImpl)p;
     	this.persons.put(pi.getId(), pi);
     }    
+ 
   }
  
-public void init() {
-	  
-	//String type_of_partition = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_PARTITION);
-	int number_of_zones =0;
-	int n = (int)Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP,CONFIG_ZONES));
-	//if (type_of_partition.equals("symmetric")){
-	number_of_zones = (int) Math.pow(n,2);
-	//}
-	//else {throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" at the moment can only take the value 'symmetric'!"); }
-	//TODO Define the asymmetric version, at the moment only the symmetric is possible
-	if (number_of_zones == 0) { throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" not defined!");}
-	this.createZonesFromPersonsShops(n);
-	this.findScenarioShops(this.controlerFacilities.getFacilities().values());
-	Gbl.printMemoryUsage();
-	
-	for  (Person p:controler.getPopulation().getPersons().values()) {
-		PersonRetailersImpl pr = new PersonRetailersImpl((PersonImpl)p);
-		this.retailersPersons.put(pr.getId(), pr);
+	public void init() {
+		  
+		//String type_of_partition = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_PARTITION);
+		int number_of_zones =0;
+		int n = (int)Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP,CONFIG_ZONES));
+		//if (type_of_partition.equals("symmetric")){
+		number_of_zones = (int) Math.pow(n,2);
+		//}
+		//else {throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" at the moment can only take the value 'symmetric'!"); }
+		//TODO Define the asymmetric version, at the moment only the symmetric is possible
+		if (number_of_zones == 0) { throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" not defined!");}
+		this.createZonesFromPersonsShops(n);
+		//this.createZonesFromFacilities(n);
+		this.findScenarioShops(this.controlerFacilities.getFacilities().values());
+		Gbl.printMemoryUsage();
+		
+		for  (PersonImpl pi:this.persons.values()) {
+			PersonRetailersImpl pr = new PersonRetailersImpl(pi);
+			this.retailersPersons.put(pr.getId(), pr);
+		}
 	}
-}
 
-public double computePotential(ArrayList<Integer> solution){
+	public double computePotential(ArrayList<Integer> solution){
+		
+		double global_likelihood = 0;
+	    int a = 0;
+	    
+	    for (ActivityFacility c : this.retailersFacilities.values()) {
+	    String linkId = this.first.get(solution.get(a));
+	    Coord coord = this.controler.getNetwork().getLinks().get(new IdImpl(linkId)).getCoord();
+		++a;
+		double loc_likelihood = 0.0D;
+		
+			for (PersonRetailersImpl pr : this.retailersPersons.values()) {
+	        
+				double pers_sum_potential = 0.0D;
+				double pers_potential = 0.0D;
+				double pers_likelihood = 0.0D;
+	        
+				ActivityFacility firstFacility = this.controlerFacilities.getFacilities().get(((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacilityId());
+				double dist1 = ((ActivityFacilityImpl) firstFacility).calcDistance(coord);
+				if (dist1 == 0.0D) {
+	        	dist1 = 10.0D;
+				}
+				pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOptions().get("shop").getCapacity().doubleValue(), this.betas[1]);
+	        
+	        	if (pr.getGlobalShopsUtility()==0) {
+	        		this.processPerson();
+	        	
+	        		for (ActivityFacility s : this.shops.values()) {
+	        			double dist = 0.0D;
+	        			int count=0;
+		         
+	        			for (ActivityFacility af: this.retailersFacilities.values()){
+			          
+	        				if (af.equals(s)){
+	        					int index = count;
+	        					Coord coord1 = this.controler.getNetwork().getLinks().get(new IdImpl(this.first.get(solution.get(index)))).getCoord();
+			            
+	        					dist = ((ActivityFacilityImpl) firstFacility).calcDistance(coord1);
+	        					if (dist == 0.0D) {
+	        						dist = 10.0D;
+	        					}
+	        				}
+	        				else if (CoordUtils.calcDistance(s.getCoord(), ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
+			        	  dist = 10.0D;
+	        				} 
+			          
+	        				else {
+	        					dist = CoordUtils.calcDistance(s.getCoord(), ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord());
+	        				}
+	        				++count;
+	        			} 
+		
+		          double potential = Math.pow(dist, this.betas[0]) + Math.pow(s.getActivityOptions().get("shop").getCapacity().doubleValue(), this.betas[1]);
+		          ;
+		          pers_sum_potential += potential;
+	        	}
+	        	pr.setGlobalShopsUtility(pers_sum_potential);
+	        }    
+	        pers_likelihood = pers_potential / pr.getGlobalShopsUtility();
+	        loc_likelihood += pers_likelihood;
+	      }
 	
-	double global_likelihood = 0;
-    int a = 0;
-    
-    for (ActivityFacility c : this.retailersFacilities.values()) {
-    String linkId = this.first.get(solution.get(a));
-    Coord coord = this.controler.getNetwork().getLinks().get(new IdImpl(linkId)).getCoord();
-	++a;
-	double loc_likelihood = 0.0D;
-	
-	for (PersonRetailersImpl pr : this.retailersPersons.values()) {
-        
-		double pers_sum_potential = 0.0D;
-        double pers_potential = 0.0D;
-        double pers_likelihood = 0.0D;
-        
-        ActivityFacility firstFacility = this.controlerFacilities.getFacilities().get(((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacilityId());
-       	double dist1 = ((ActivityFacilityImpl) firstFacility).calcDistance(coord);
-        if (dist1 == 0.0D) {
-        	dist1 = 10.0D;
-        }
-        pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOptions().get("shop").getCapacity().doubleValue(), this.betas[1]);
-        
-        if (pr.getGlobalShopsUtility()==0) {
-        	this.processPerson();
-        	
-        	for (ActivityFacility s : this.shops.values()) {
-	          double dist = 0.0D;
-	          int count=0;
-	         
-	          for (ActivityFacility af: this.retailersFacilities.values()){
-		          
-	        	  if (af.equals(s)){
-		            int index = count;
-		            Coord coord1 = this.controler.getNetwork().getLinks().get(new IdImpl(this.first.get(solution.get(index)))).getCoord();
-		            
-		            dist = ((ActivityFacilityImpl) firstFacility).calcDistance(coord1);
-		            if (dist == 0.0D) {
-		            	dist = 10.0D;
-		            }
-		          }
-		          else if (CoordUtils.calcDistance(s.getCoord(), ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
-		        	  dist = 10.0D;
-		          } 
-		          
-		          else {
-		            dist = CoordUtils.calcDistance(s.getCoord(), ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord());
-		          }
-		          ++count;
-	          } 
-	
-	          double potential = Math.pow(dist, this.betas[0]) + Math.pow(s.getActivityOptions().get("shop").getCapacity().doubleValue(), this.betas[1]);
-	          ;
-	          pers_sum_potential += potential;
-        	}
-        	pr.setGlobalShopsUtility(pers_sum_potential);
-        }    
-        pers_likelihood = pers_potential / pr.getGlobalShopsUtility();
-        loc_likelihood += pers_likelihood;
-      }
-
-      global_likelihood += loc_likelihood;
-    }
-    
-    return global_likelihood;
-  }
+	      global_likelihood += loc_likelihood;
+	     
+	    }
+	    
+	    return global_likelihood;
+	  }
   
   private Map<Id,ActivityFacilityImpl> findScenarioShops (Collection<? extends ActivityFacility> controlerFacilities) {
 	  
@@ -167,7 +168,7 @@ public double computePotential(ArrayList<Integer> solution){
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (Person p : persons.values()) {
+		for (PersonImpl p : this.persons.values()) {
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() < minx) { minx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() < miny) { miny = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() > maxx) { maxx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
@@ -203,7 +204,7 @@ public double computePotential(ArrayList<Integer> solution){
 					double y1= miny + j*y_width;
 					double y2= y1 + y_width;
 					RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
-					for (Person p : persons.values() ) {
+					for (PersonImpl p : persons.values() ) {
 						Coord c = this.controlerFacilities.getFacilities().get(((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacilityId()).getCoord();
 						if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
 							rz.addPersonToQuadTree(c,p);
@@ -366,6 +367,7 @@ public double computePotential(ArrayList<Integer> solution){
 	  }
 	  public boolean setBetas (double [] betas){
 		  this.betas=betas;
+		  log.info("Betas = " + betas[0] + " " + betas[1]);
 		  return true;
 	  }
 	  

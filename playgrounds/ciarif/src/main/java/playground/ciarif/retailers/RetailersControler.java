@@ -23,8 +23,8 @@ import org.matsim.core.controler.Controler;
 
 import playground.meisterk.kti.controler.KTIControler;
 
-public class RetailersControler extends Controler {
-//public class RetailersControler extends KTIControler {//
+//public class RetailersControler extends Controler {
+public class RetailersControler extends KTIControler {
 
 	public RetailersControler(String[] args) {
 		super(args);
