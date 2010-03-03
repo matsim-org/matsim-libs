@@ -8,10 +8,10 @@
 	</module>
 
   <module name="planscalcroute" >
-    <param name="bikeSpeedFactor" value="4.166666666666667" />
+    <param name="bikeSpeed" value="4.166666666666667" />
     <param name="ptSpeedFactor" value="2.0" />
-    <param name="undefinedModeSpeedFactor" value="13.88888888888889" />
-    <param name="walkSpeedFactor" value="0.8333333333333333" />
+    <param name="undefinedModeSpeed" value="13.88888888888889" />
+    <param name="walkSpeed" value="0.8333333333333333" />
   </module>
 
 	<module name="controler">
