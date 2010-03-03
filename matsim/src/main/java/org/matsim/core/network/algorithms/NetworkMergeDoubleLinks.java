@@ -22,70 +22,86 @@ package org.matsim.core.network.algorithms;
 
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkMergeDoubleLinks implements NetworkRunnable {
 
+	public enum MergeType {
+		/** no merge, instead remove additionals (random) */
+		REMOVE,
+		/** additive merge (sum cap, max freespeed, sum lanes, max length) */
+		ADDITIVE,
+		/** max merge (max cap, max freespeed, max langes, max length */
+		MAXIMUM }
+
+	private final static Logger log = Logger.getLogger(NetworkMergeDoubleLinks.class);
+
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	// 0 := no merge, instead remove additionals (random)
-	// 1 := additive merge (sum cap, max freespeed, sum lanes, max length)
-	// 2 := max merge (max cap, max freespeed, max lanes, max length)
-	private static final int mergetype = 2;
+	private final MergeType mergetype;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public NetworkMergeDoubleLinks() {
-		super();
+		this(MergeType.MAXIMUM);
+	}
+
+	public NetworkMergeDoubleLinks(final MergeType mergetype) {
+		this.mergetype = mergetype;
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void mergeLink2IntoLink1(LinkImpl link1, LinkImpl link2, NetworkLayer network) {
-		if (mergetype == 0) {
-			System.out.println("        Link id=" + link2.getId() + " removed because of Link id=" + link1.getId());
-			network.removeLink(link2);
-		}
-		else if (mergetype == 1) {
-			System.out.println("        Link id=" + link2.getId() + " merged (additive) into Link id=" + link1.getId());
-			double cap = link1.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + link2.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-			double fs = Math.max(link1.getFreespeed(Time.UNDEFINED_TIME),link2.getFreespeed(Time.UNDEFINED_TIME));
-			int lanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link1) + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2);
-			double length = Math.max(link1.getLength(),link2.getLength());
-//			String origid = "add-merge(" + link1.getId() + "," + link2.getId() + ")";
-			link1.setCapacity(cap);
-			link1.setFreespeed(fs);
-			link1.setNumberOfLanes(lanes);
-			link1.setLength(length);
-			network.removeLink(link2);
-		}
-		else if (mergetype == 2) {
-			System.out.println("        Link id=" + link2.getId() + " merged (maximum) into Link id=" + link1.getId());
-			double cap = Math.max(link1.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME),link2.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
-			double fs = Math.max(link1.getFreespeed(Time.UNDEFINED_TIME),link2.getFreespeed(Time.UNDEFINED_TIME));
-			int lanes = Math.max(NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link1), NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2));
-			double length = Math.max(link1.getLength(),link2.getLength());
-//			String origid = "max-merge(" + link1.getId() + "," + link2.getId() + ")";
-			link1.setCapacity(cap);
-			link1.setFreespeed(fs);
-			link1.setNumberOfLanes(lanes);
-			link1.setLength(length);
-			network.removeLink(link2);
-		}
-		else {
-			Gbl.errorMsg("'mergetype' not known!");
+	private final void mergeLink2IntoLink1(LinkImpl link1, LinkImpl link2, NetworkImpl network) {
+		switch (this.mergetype) {
+			case REMOVE:
+				log.info("        Link id=" + link2.getId() + " removed because of Link id=" + link1.getId());
+				network.removeLink(link2);
+				break;
+			case ADDITIVE:
+			{
+				log.info("        Link id=" + link2.getId() + " merged (additive) into Link id=" + link1.getId());
+				double cap = link1.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + link2.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+				double fs = Math.max(link1.getFreespeed(Time.UNDEFINED_TIME),link2.getFreespeed(Time.UNDEFINED_TIME));
+				int lanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link1) + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2);
+				double length = Math.max(link1.getLength(),link2.getLength());
+				//			String origid = "add-merge(" + link1.getId() + "," + link2.getId() + ")";
+				link1.setCapacity(cap);
+				link1.setFreespeed(fs);
+				link1.setNumberOfLanes(lanes);
+				link1.setLength(length);
+				network.removeLink(link2);
+			}
+			break;
+			case MAXIMUM:
+				log.info("        Link id=" + link2.getId() + " merged (maximum) into Link id=" + link1.getId());
+				{
+					double cap = Math.max(link1.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME),link2.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+					double fs = Math.max(link1.getFreespeed(Time.UNDEFINED_TIME),link2.getFreespeed(Time.UNDEFINED_TIME));
+					int lanes = Math.max(NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link1), NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2));
+					double length = Math.max(link1.getLength(),link2.getLength());
+					//			String origid = "max-merge(" + link1.getId() + "," + link2.getId() + ")";
+					link1.setCapacity(cap);
+					link1.setFreespeed(fs);
+					link1.setNumberOfLanes(lanes);
+					link1.setLength(length);
+					network.removeLink(link2);
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("'mergetype' not known!");
 		}
 	}
 
@@ -93,9 +109,7 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkLayer network) {
-		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-
+	public void run(NetworkImpl network) {
 		for (NodeImpl n : network.getNodes().values()) {
 			Iterator<?> l1_it = n.getOutLinks().values().iterator();
 			while (l1_it.hasNext()) {
@@ -115,7 +129,5 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 				}
 			}
 		}
-
-		System.out.println("    done.");
 	}
 }
