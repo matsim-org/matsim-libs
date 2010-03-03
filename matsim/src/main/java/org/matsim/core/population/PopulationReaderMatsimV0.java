@@ -21,6 +21,7 @@
 package org.matsim.core.population;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -61,6 +62,9 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private final static String ACT = "act";
 	private final static String LEG = "leg";
 	private final static String ROUTE = "route";
+
+	private final static String ATTR_X100 = "x100";
+	private final static String ATTR_Y100 = "y100";
 
 	private final Population plans;
 	private final Network network;
@@ -173,12 +177,12 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		if (atts.getValue("link") != null) {
 			Id linkId = this.scenario.createId(atts.getValue("link"));
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
-			if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
-				coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));
+			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
+				coord = new CoordImpl(atts.getValue(ATTR_X100), atts.getValue(ATTR_Y100));
 				act.setCoord(coord);
 			}
-		} else if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
-			coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));
+		} else if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
+			coord = new CoordImpl(atts.getValue(ATTR_X100), atts.getValue(ATTR_Y100));
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), coord);
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
@@ -196,7 +200,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	}
 
 	private void startLeg(final Attributes atts) {
-		this.currleg = this.currplan.createAndAddLeg(TransportMode.valueOf(atts.getValue("mode").toLowerCase()));
+		this.currleg = this.currplan.createAndAddLeg(TransportMode.valueOf(atts.getValue("mode").toLowerCase(Locale.ROOT)));
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
 		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));

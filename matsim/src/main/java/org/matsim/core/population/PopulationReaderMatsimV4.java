@@ -22,6 +22,7 @@ package org.matsim.core.population;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -77,6 +78,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final static String ACT = "act";
 	private final static String LEG = "leg";
 	private final static String ROUTE = "route";
+
+	private final static String ATTR_TYPE = "type";
 
 	private final Scenario scenario;
 	private final Population plans;
@@ -228,7 +231,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startTravelcard(final Attributes atts) {
-		this.currperson.addTravelcard(atts.getValue("type"));
+		this.currperson.addTravelcard(atts.getValue(ATTR_TYPE));
 	}
 
 	private void startDesires(final Attributes atts) {
@@ -236,7 +239,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startActDur(final Attributes atts) {
-		this.currdesires.putActivityDuration(atts.getValue("type"),atts.getValue("dur"));
+		this.currdesires.putActivityDuration(atts.getValue(ATTR_TYPE),atts.getValue("dur"));
 	}
 
 	private void startKnowledge(final Attributes atts) {
@@ -245,11 +248,11 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startActivityFacility(final Attributes atts) {
-		this.curracttype = atts.getValue("type");
+		this.curracttype = atts.getValue(ATTR_TYPE);
 	}
 
 	private void startLocation(final Attributes atts) {
-		String type = atts.getValue("type");
+		String type = atts.getValue(ATTR_TYPE);
 		String id = atts.getValue("id");
 		String x = atts.getValue("x");
 		String y = atts.getValue("y");
@@ -292,7 +295,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			this.currplan.setScore(score);
 		}
 
-		String type = atts.getValue("type");
+		String type = atts.getValue(ATTR_TYPE);
 		if (type == null) {
 			this.currplan.setType(PlanImpl.Type.UNDEFINED);
 		}
@@ -324,14 +327,14 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		Coord coord = null;
 		if (atts.getValue("link") != null) {
 			Id linkId = this.scenario.createId(atts.getValue("link"));
-			this.curract = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
+			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_TYPE), linkId);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 			coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
-			this.curract = this.currplan.createAndAddActivity(atts.getValue("type"), coord);
+			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_TYPE), coord);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
 		}
@@ -368,7 +371,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startLeg(final Attributes atts) {
-		String mode = atts.getValue("mode").toLowerCase();
+		String mode = atts.getValue("mode").toLowerCase(Locale.ROOT);
 		if (mode.equals("undef")) {
 			mode = "undefined";
 		}

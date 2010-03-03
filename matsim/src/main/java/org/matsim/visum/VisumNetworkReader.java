@@ -43,6 +43,18 @@ public class VisumNetworkReader {
 	private int language = 0;
 
 	/* collection of localized strings: [0] english, [1] german */
+
+	// reusable strings
+
+	private final String[] GENERAL_DCODE = {"DIRECTIONCODE", "RICHTUNGCODE"};
+	private final String[] GENERAL_INDEX = {"INDEX", "INDEX"};
+	private final String[] GENERAL_NAME = {"NAME", "NAME"};
+	private final String[] GENERAL_NO = {"NO", "NR"};
+	private final String[] GENERAL_LINENAME = {"LINENAME", "LINNAME"};
+	private final String[] GENERAL_LINEROUTENAME = {"LINEROUTENAME", "LINROUTENAME"};
+
+	// specific strings
+
 	private final String[] TABLE_EDGETYPE = {ATTRIBUTE_UNKNOWN, "$STRECKENTYP:"};
 	private final String[] TABLE_STOP = {"$STOP:", "$HALTESTELLE:"};
 	private final String[] TABLE_STOPAREA = {"$STOPAREA:", "$HALTESTELLENBEREICH:"};
@@ -56,70 +68,70 @@ public class VisumNetworkReader {
 	private final String[] TABLE_VEHUNIT = {"$VEHUNIT:", "$FZGEINHEIT:"};
 	private final String[] TABLE_VEHCOMB = {"$VEHCOMB:", "$FZGKOMB:"};
 	private final String[] TABLE_VEHUNITTOVEHCOMB = {"$VEHUNITTOVEHCOMB:", "$FZGEINHEITZUFZGKOMB:"};
-	
+
 	private final String[] ATTRIBUTE_EDGETYPE_NO = {ATTRIBUTE_UNKNOWN, "NR"};
 	private final String[] ATTRIBUTE_EDGETYPE_KAPIV = {ATTRIBUTE_UNKNOWN, "KAPIV"};
 	private final String[] ATTRIBUTE_EDGETYPE_V0IV = {ATTRIBUTE_UNKNOWN, "V0IV"};
-	
-	private final String[] ATTRIBUTE_STOP_NO = {"NO", "NR"};
-	private final String[] ATTRIBUTE_STOP_NAME = {"NAME", "NAME"};
+
+	private final String[] ATTRIBUTE_STOP_NO = GENERAL_NO;
+	private final String[] ATTRIBUTE_STOP_NAME = GENERAL_NAME;
 	private final String[] ATTRIBUTE_STOP_XCOORD = {"XCOORD", "XKOORD"};
 	private final String[] ATTRIBUTE_STOP_YCOORD = {"YCOORD", "YKOORD"};
 
-	private final String[] ATTRIBUTE_STOPAREA_NO = {"NO", "NR"};
+	private final String[] ATTRIBUTE_STOPAREA_NO = GENERAL_NO;
 	private final String[] ATTRIBUTE_STOPAREA_STOPNO = {"STOPNO", "HSTNR"};
 
-	private final String[] ATTRIBUTE_STOPPT_NO = {"NO", "NR"};
+	private final String[] ATTRIBUTE_STOPPT_NO = GENERAL_NO;
 	private final String[] ATTRIBUTE_STOPPT_STOPAREANO = {"STOPAREANO", "HSTBERNR"};
-	private final String[] ATTRIBUTE_STOPPT_NAME =  {"NAME", "NAME"};
+	private final String[] ATTRIBUTE_STOPPT_NAME =  GENERAL_NAME;
 	private final String[] ATTRIBUTE_STOPPT_RLNO = {"LINKNO", "STRNR"};
 	private final String[] ATTRIBUTE_STOPPT_NODE = {ATTRIBUTE_UNKNOWN, "KNOTNR"};
 
-	private final String[] ATTRIBUTE_LR_NAME = {"NAME", "NAME"};
-	private final String[] ATTRIBUTE_LR_LINENAME = {"LINENAME", "LINNAME"};
-	private final String[] ATTRIBUTE_LR_DCODE = {"DIRECTIONCODE", "RICHTUNGCODE"};
+	private final String[] ATTRIBUTE_LR_NAME = GENERAL_NAME;
+	private final String[] ATTRIBUTE_LR_LINENAME = GENERAL_LINENAME;
+	private final String[] ATTRIBUTE_LR_DCODE = GENERAL_DCODE;
 	private final String[] ATTRIBUTE_LR_TAKT = {ATTRIBUTE_UNKNOWN, "TAKT_TAG_HVZ"};
 
-	private final String[] ATTRIBUTE_L_NAME = {"NAME", "NAME"};
+	private final String[] ATTRIBUTE_L_NAME = GENERAL_NAME;
 	private final String[] ATTRIBUTE_L_TCODE = {"TSYSCODE", "VSYSCODE"};
 	private final String[] ATTRIBUTE_L_VEHCOMBNO = {"VEHCOMBNO", "FZGKOMBNR"};
 
-	private final String[] ATTRIBUTE_LRI_LRNAME = {"LINEROUTENAME", "LINROUTENAME"};
-	private final String[] ATTRIBUTE_LRI_LNAME = {"LINENAME", "LINNAME"};
-	private final String[] ATTRIBUTE_LRI_ID = {"INDEX", "INDEX"};
-	private final String[] ATTRIBUTE_LRI_DCODE = {"DIRECTIONCODE", "RICHTUNGCODE"};
+	private final String[] ATTRIBUTE_LRI_LRNAME = GENERAL_LINEROUTENAME;
+	private final String[] ATTRIBUTE_LRI_LNAME = GENERAL_LINENAME;
+	private final String[] ATTRIBUTE_LRI_ID = GENERAL_INDEX;
+	private final String[] ATTRIBUTE_LRI_DCODE = GENERAL_DCODE;
 	private final String[] ATTRIBUTE_LRI_NODEID = {ATTRIBUTE_UNKNOWN, "KNOTNR"};
 	private final String[] ATTRIBUTE_LRI_SPNO = {"STOPPOINTNO", "HPUNKTNR"};
 
-	private final String[] ATTRIBUTE_TP_LNAME ={"LINENAME", "LINNAME"};
-	private final String[] ATTRIBUTE_TP_LRNAME = {"LINEROUTENAME", "LINROUTENAME"};
-	private final String[] ATTRIBUTE_TP_ID ={"NAME", "NAME"};
-	private final String[] ATTRIBUTE_TP_DCODE ={"DIRECTIONCODE", "RICHTUNGCODE"};
+	private final String[] ATTRIBUTE_TP_LNAME = GENERAL_LINENAME;
+	private final String[] ATTRIBUTE_TP_LRNAME = GENERAL_LINEROUTENAME;
+	private final String[] ATTRIBUTE_TP_ID = GENERAL_NAME;
+	private final String[] ATTRIBUTE_TP_DCODE = GENERAL_DCODE;
 	private final String[] ATTRIBUTE_TP_VEHCOMBNO = {"VEHCOMBNO", "FZGKOMBNR"};
 
-	private final String[] ATTRIBUTE_TPI_LNAME ={"LINENAME", "LINNAME"};
-	private final String[] ATTRIBUTE_TPI_LRNAME = {"LINEROUTENAME", "LINROUTENAME"};
-	private final String[] ATTRIBUTE_TPI_ID ={"INDEX", "INDEX"};
-	private final String[] ATTRIBUTE_TPI_TPNAME ={"TIMEPROFILENAME", "FZPROFILNAME"};
-	private final String[] ATTRIBUTE_TPI_DCODE ={"DIRECTIONCODE", "RICHTUNGCODE"};
-	private final String[] ATTRIBUTE_TPI_ARR ={"ARR", "ANKUNFT"};
-	private final String[] ATTRIBUTE_TPI_DEP ={"DEP", "ABFAHRT"};
-	private final String[] ATTRIBUTE_TPI_LRIINDEX ={"LRITEMINDEX", "LRELEMINDEX"};
+	private final String[] ATTRIBUTE_TPI_LNAME = GENERAL_LINENAME;
+	private final String[] ATTRIBUTE_TPI_LRNAME = GENERAL_LINEROUTENAME;
+	private final String[] ATTRIBUTE_TPI_ID = GENERAL_INDEX;
+	private final String[] ATTRIBUTE_TPI_TPNAME = {"TIMEPROFILENAME", "FZPROFILNAME"};
+	private final String[] ATTRIBUTE_TPI_DCODE = GENERAL_DCODE;
+	private final String[] ATTRIBUTE_TPI_ARR = {"ARR", "ANKUNFT"};
+	private final String[] ATTRIBUTE_TPI_DEP = {"DEP", "ABFAHRT"};
+	private final String[] ATTRIBUTE_TPI_LRIINDEX = {"LRITEMINDEX", "LRELEMINDEX"};
 
-	private final String[] ATTRIBUTE_D_LNAME ={"LINENAME", "LINNAME"};
-	private final String[] ATTRIBUTE_D_LRNAME = {"LINEROUTENAME", "LINROUTENAME"};
-	private final String[] ATTRIBUTE_D_ID ={"NO", "NR"};
-	private final String[] ATTRIBUTE_D_TPNAME ={"TIMEPROFILENAME", "FZPROFILNAME"};
-	private final String[] ATTRIBUTE_D_DEP ={"DEP", "ABFAHRT"};
-	private final String[] ATTRIBUTE_D_DCODE ={"DIRECTIONCODE", "RICHTUNGCODE"};
+	private final String[] ATTRIBUTE_D_LNAME = GENERAL_LINENAME;
+	private final String[] ATTRIBUTE_D_LRNAME = GENERAL_LINEROUTENAME;
+	private final String[] ATTRIBUTE_D_ID = GENERAL_NO;
+	private final String[] ATTRIBUTE_D_TPNAME = {"TIMEPROFILENAME", "FZPROFILNAME"};
+	private final String[] ATTRIBUTE_D_DEP = {"DEP", "ABFAHRT"};
+	private final String[] ATTRIBUTE_D_DCODE = GENERAL_DCODE;
 
-	private final String[] ATTRIBUTE_VEHUNIT_ID = {"NO", "NR"};
+	private final String[] ATTRIBUTE_VEHUNIT_ID = GENERAL_NO;
 	private final String[] ATTRIBUTE_VEHUNIT_CODE = {"CODE", "CODE"};
 	private final String[] ATTRIBUTE_VEHUNIT_SEATCAP = {"SEATCAP", "SITZPL"};
 	private final String[] ATTRIBUTE_VEHUNIT_TOTALCAP = {"TOTALCAP", "GESAMTPL"};
 
-	private final String[] ATTRIBUTE_VEHCOMB_NO = {"NO", "NR"};
-	private final String[] ATTRIBUTE_VEHCOMB_NAME = {"NAME", "NAME"};
+	private final String[] ATTRIBUTE_VEHCOMB_NO = GENERAL_NO;
+	private final String[] ATTRIBUTE_VEHCOMB_NAME = GENERAL_NAME;
 
 	private final String[] ATTRIBUTE_VEHUNITTOVEHCOMB_VEHCOMBNO = {"VEHCOMBNO", "FZGKOMBNR"};
 	private final String[] ATTRIBUTE_VEHUNITTOVEHCOMB_VEHUNITNO = {"VEHUNITNO", "FZGEINHEITNR"};
@@ -130,14 +142,7 @@ public class VisumNetworkReader {
 	}
 
 	public void read(final String filename) throws FileNotFoundException, IOException {
-		BufferedReader reader;
-		try {
-			reader = IOUtils.getBufferedReader(filename);
-		} catch (FileNotFoundException e) {
-			throw e;
-		} catch (IOException e) {
-			throw e;
-		}
+		BufferedReader reader = IOUtils.getBufferedReader(filename);
 
 		try {
 			String line = reader.readLine();
@@ -178,7 +183,7 @@ public class VisumNetworkReader {
 				} else if (line.startsWith(this.TABLE_VEHUNITTOVEHCOMB[this.language])) {
 					readVehicleUnitToVehicleCombination(line, reader);
 				} else if (line.startsWith("$")) {
-					readUnknownTable(line, reader);
+					readUnknownTable(reader);
 				} else {
 					throw new IOException("can not interpret line: " + line);
 				}
@@ -230,7 +235,7 @@ public class VisumNetworkReader {
 		final int idxNo = getAttributeIndex(this.ATTRIBUTE_EDGETYPE_NO[this.language], attributes);
 		final int idxKapIV = getAttributeIndex(this.ATTRIBUTE_EDGETYPE_KAPIV[this.language], attributes);
 		final int idxV0IV = getAttributeIndex(this.ATTRIBUTE_EDGETYPE_V0IV[this.language], attributes);
-		
+
 		String line = reader.readLine();
 		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
@@ -465,7 +470,7 @@ public class VisumNetworkReader {
 		}
 	}
 
-	private void readUnknownTable(final String tableAttributes, final BufferedReader reader) throws IOException {
+	private void readUnknownTable(final BufferedReader reader) throws IOException {
 		String line = reader.readLine();
 		while (line != null && line.length() > 0) {
 
