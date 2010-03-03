@@ -255,6 +255,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			}*/
 			List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
 			r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
+			r.setDistance(oldRoute.getDistance());
 			routes.add(r);
 		}
 		this.routes = routes;
@@ -447,6 +448,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
 				List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
 				r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
+				r.setDistance(oldRoute.getDistance());
 				((LegImpl)al.get(i)).setRoute(r);
 
 			}

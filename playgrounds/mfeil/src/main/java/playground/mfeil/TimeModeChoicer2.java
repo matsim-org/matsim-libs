@@ -39,6 +39,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.PlanScorer;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
@@ -124,6 +125,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 			}*/
 			List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
 			r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
+			r.setDistance(oldRoute.getDistance());
 			routes.add(r);
 		}
 		this.routes = routes;
@@ -316,8 +318,8 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
 				List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
 				r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
+				r.setDistance(oldRoute.getDistance());
 				((LegImpl)al.get(i)).setRoute(r);
-
 			}
 		}
 		this.cleanRoutes(basePlan);
