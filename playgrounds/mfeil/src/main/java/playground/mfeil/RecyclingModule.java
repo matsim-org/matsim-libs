@@ -98,9 +98,9 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
 		this.municipality			= "yes";
-		this.sex 					= "no";
-		this.age 					= "no";
-		this.license 				= "no";
+		this.sex 					= "yes";
+		this.age 					= "yes";
+		this.license 				= "yes";
 		this.car_avail 				= "no";
 		this.employed 				= "no";
 		this.softCoef 				= this.detectSoftCoefficients();

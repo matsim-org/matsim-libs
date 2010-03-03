@@ -70,7 +70,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	private static final Logger 			log = Logger.getLogger(PlanomatX.class);
 	private final String					finalOpt;
 	private final ActivityTypeFinder 		finder;
-	private final double					LC_minimum_time = 900;
+	private final double					LC_minimum_time = 1;
 
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final Knowledges knowledges;
