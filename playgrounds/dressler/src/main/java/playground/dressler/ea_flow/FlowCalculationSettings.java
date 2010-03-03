@@ -42,14 +42,18 @@ public class FlowCalculationSettings {
 	/* some constants */
 	public static final int SEARCHALGO_FORWARD = 1;
 	public static final int SEARCHALGO_REVERSE = 2;
+	public static final int SEARCHALGO_MIXED = 3;
 	
 	/* default settings */
 	public int searchAlgo = SEARCHALGO_REVERSE;
 	public boolean useVertexCleanup = false;
 	public int TimeHorizon = 654321; // should be safe
 	public int MaxRounds = 654321;	// should be safe
-	public int checkConsistency = 0; // after how many iterations should consistency be checked? 0 = off 
+	public int checkConsistency = 0; // after how many iterations should consistency be checked? 0 = off
+	public boolean checkTouchedNodes = true; // should Flow.UnfoldAndAugment() try to shortcut the search for suitable forward steps?
 	
+	public boolean keepPaths = true; // should TEPs be stored at all?
+	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
 	
 	/* interal storage for the network parameters */ 
 	private HashMap<Link, Integer> _capacities;
@@ -186,16 +190,25 @@ public class FlowCalculationSettings {
 		System.out.println("Edges rounded to zero length: " + this._roundedtozerolength);
 		System.out.println("Edges rounded to zero capacity: " + this._roundedtozerocapacity);
 		
-		if (this.searchAlgo == FlowCalculationSettings.SEARCHALGO_FORWARD) {
-		  System.out.println("Algorithm to use: Forward Search");
-		} else if (this.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE) {
-		  System.out.println("Algorithm to use: Reverse Search");
-		} else {
-		  System.out.println("Algorithm to use: Unkown (" + this.searchAlgo +")");
+		switch (this.searchAlgo) {
+		  case FlowCalculationSettings.SEARCHALGO_FORWARD: 
+			  System.out.println("Algorithm to use: Forward Search"); 
+			  break;
+		  case FlowCalculationSettings.SEARCHALGO_REVERSE:
+			  System.out.println("Algorithm to use: Reverse Search");
+			  break;
+		  case FlowCalculationSettings.SEARCHALGO_MIXED:
+			  System.out.println("Algorithm to use: Mixed Search");
+			  break;
+		  default:
+			  System.out.println("Algorithm to use: Unkown (" + this.searchAlgo +")");
 		}
-		
+		  
 		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);
 		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
+		System.out.println("Use touched nodes hashmaps: " + this.checkTouchedNodes);
+		System.out.println("Keep paths at all: " + this.keepPaths);
+		System.out.println("Unfold stored paths: " + this.unfoldPaths);
 		System.out.println("===================================");
 	}
 	

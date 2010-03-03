@@ -200,8 +200,9 @@ public class BellmanFordIntervalBased {
 	
 	/**
 	 * refreshes all _labels and _sourcelabels before one run of the algorithm
+	 * and fill the queue
 	 */
-	private void refreshLabels(Queue<BFTask> queue){		
+	private void refreshLabelsForward(Queue<BFTask> queue){		
 		this._labels = new HashMap<Node, VertexIntervals>();
 		this._sourcelabels = new HashMap<Node, VertexInterval>();
 		
@@ -226,6 +227,7 @@ public class BellmanFordIntervalBased {
 	
 	/**
 	 * refreshes all _labels and _sourcelabels, before one run of the algorithm
+	 * and fill the queue
 	 */
 	private void refreshLabelsReverse(Queue<BFTask> queue){		
 		this._labels = new HashMap<Node, VertexIntervals>();
@@ -247,15 +249,47 @@ public class BellmanFordIntervalBased {
 		}		
 	}		
 	
-	private void refreshLabelsMixed(Queue<BFTask> queue){
-	  // TODO stub!	  
-	}
+	
+	/**
+	 * refreshes all _labels and _sourcelabels, before one run of the algorithm
+	 * and fill the queue
+	 */
+	private void refreshLabelsMixed(Queue<BFTask> queue){		
+		this._labels = new HashMap<Node, VertexIntervals>();
+		this._sourcelabels = new HashMap<Node, VertexInterval>();
 		
+		for(Node node: this._network.getNodes().values()){
+			VertexInterval temp1 = new VertexInterval(0,this._settings.TimeHorizon);
+			VertexIntervals label = new VertexIntervals(temp1);
+			_labels.put(node, label);
+			
+			if (this._settings.isSource(node)) {
+				// mark sources reachable and add them to the queue
+				VertexInterval temp2 = new VertexInterval(0, this._settings.TimeHorizon);
+				if (this._flow.isActiveSource(node)){				
+					queue.add(new BFTask(new VirtualSource(node), temp2, false));
+					temp2.setScanned(false);
+					temp2.setReachable(true);
+				} else {
+					temp2.setScanned(false);
+					temp2.setReachable(false);
+				}
+				this._sourcelabels.put(node, temp2);
+			}
+
+			// also add sinks to the queue
+			if (this._settings.isSink(node)) {
+			    queue.add(new BFTask(new VirtualSink(node), 0, true));
+			}
+		}		
+	}	
+	
+	
 	/**
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	private Collection<TimeExpandedPath> constructRoutes() throws BFException {
+	private Collection<TimeExpandedPath> constructRoutesForward() throws BFException {
 		
 		if (_debug > 0) {
 		  System.out.println("Constructing routes ...");
@@ -269,7 +303,7 @@ public class BellmanFordIntervalBased {
 		
 				
 		for (Node superSink : this._flow.getSinks()) {
-			VertexInterval superSinkLabel = this._labels.get(superSink).getFirstPossible();
+			VertexInterval superSinkLabel = this._labels.get(superSink).getFirstPossibleForward();
 			if (superSinkLabel != null) {
 				int superSinkTime = superSinkLabel.getLowBound();
 				earliestArrivalTime = Math.min(earliestArrivalTime, superSinkTime);
@@ -288,7 +322,7 @@ public class BellmanFordIntervalBased {
 		for (Node superSink : this._flow.getSinks()) {
 
 			//VertexIntervalls tolabels = this._labels.get(to);
-			VertexInterval superSinkLabel = this._labels.get(superSink).getFirstPossible();
+			VertexInterval superSinkLabel = this._labels.get(superSink).getFirstPossibleForward();
 			if (superSinkLabel == null) {
 				// unreachable sink
 				continue;
@@ -337,7 +371,7 @@ public class BellmanFordIntervalBased {
 				//System.out.println("sinkNode: " + sinkNode.getId());
 				
 				Node toNode = sinkNode;
-				VertexInterval toLabel = this._labels.get(toNode).getFirstPossible();
+				VertexInterval toLabel = this._labels.get(toNode).getFirstPossibleForward();
 				
 
 				// should not happen
@@ -486,6 +520,132 @@ public class BellmanFordIntervalBased {
 			} else {
 				System.out.println("Weird. Did not find the sink!!!");
 			}
+		}
+
+		return result;
+	}
+	
+	/**
+	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
+	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
+	 */
+	private Collection<TimeExpandedPath> constructRoutesMixed() throws BFException {
+		
+		if (_debug > 0) {
+			System.out.println("Constructing routes from mixed labels ...");
+		}
+		
+		LinkedList<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
+		
+		/* First we need to determine vertices (more specific: VertexIntervals)
+		   that are labelled both forward and backwards.
+		   That might take some time ... */
+		
+		List<VertexInterval> intersection = new ArrayList<VertexInterval>(); 
+		
+		for (Node node : this._network.getNodes().values()) {
+			VertexIntervals VIs = this._labels.get(node);
+			if (VIs == null) {
+				continue;
+			}
+			
+			VertexInterval current = VIs.getIntervalAt(0);
+			while(!VIs.isLast(current)){
+				if (current.getPredecessor() != null) {
+					// it should be in particular reachable in this case									
+					if (current.getSuccessor() != null) {
+					  intersection.add(current);
+					  break; // we want only the earliest one
+					}											
+				} 
+				current = VIs.getNext(current);							
+			}
+		}
+
+		
+		//System.out.println("size of intersection set: " + intersection.size());
+		
+		if (intersection.isEmpty()) {
+			// We didn't find anything. Maybe the reverse search started to early?
+			// Well, let's just do the route construction from forward search
+			
+			return constructRoutesForward();
+		}
+		
+		
+		
+		for (VertexInterval reachabletwice: intersection) {
+			// the following can only work if the PathSteps stored are shifted correctly!
+			
+			//start constructing the TimeExpandedPath
+			TimeExpandedPath TEP = new TimeExpandedPath();		
+			
+			
+			// first go from the start interval back to the source  
+			PathStep pred = reachabletwice.getPredecessor();
+			
+			// TODO ... if reachabletwice is larger than one unit, one could try to derive
+			// multiple paths through it.
+			int toTime = reachabletwice.getLowBound();
+
+			// include the superSink, whenever we start one step too early
+
+			while (pred != null) {
+				pred = pred.copyShiftedToArrival(toTime);
+				toTime = pred.getStartTime();
+				
+				TEP.prepend(pred);
+
+				Node toNode = pred.getStartNode().getRealNode();
+				VertexInterval toLabel;
+
+				if (pred instanceof StepEdge) {			  		
+					toLabel = this._labels.get(toNode).getIntervalAt(toTime);			 
+				} else if (pred instanceof StepSourceFlow) {
+					if (pred.getForward()) {
+						toLabel = this._sourcelabels.get(toNode);				  
+					} else {
+						toLabel = this._labels.get(toNode).getIntervalAt(toTime);
+					}
+				} else {
+					throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
+				}
+				pred = toLabel.getPredecessor();
+			}
+			
+			// then go from the start interval to the sink
+			
+			PathStep succ = reachabletwice.getSuccessor();
+			int fromTime = reachabletwice.getLowBound();
+
+			while (succ != null) {				
+				succ = succ.copyShiftedToStart(fromTime);
+				//System.out.println("succ: " + succ);
+				TEP.append(succ);
+
+				Node fromNode = succ.getArrivalNode().getRealNode();
+				fromTime = succ.getArrivalTime();
+				
+				VertexInterval fromLabel;
+
+				if (succ instanceof StepEdge) {			  		
+					fromLabel = this._labels.get(fromNode).getIntervalAt(fromTime);			 
+				} else if (succ instanceof StepSourceFlow) {
+					if (succ.getForward()) {
+						fromLabel = this._labels.get(fromNode).getIntervalAt(fromTime);						
+					} else {
+						fromLabel = this._sourcelabels.get(fromNode);				  
+					}
+				} else if (succ instanceof StepSinkFlow) {
+					// TODO sinklabels do not exist yet ... but would be a null successor
+					break; 					
+				} else {
+					throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
+				}
+				succ = fromLabel.getSuccessor();
+			}
+			
+			result.add(TEP);
 		}
 
 		return result;
@@ -810,7 +970,7 @@ public class BellmanFordIntervalBased {
 		Queue<BFTask> queue = new LinkedList<BFTask>();
 
 		//set fresh labels, initialize queue
-		refreshLabels(queue);
+		refreshLabelsForward(queue);
 		
 		//System.out.println(this._labels);
 		//System.out.println(this._sourcelabels);
@@ -898,7 +1058,7 @@ public class BellmanFordIntervalBased {
 		
 		Collection<TimeExpandedPath> TEPs = null; 
 		try{ 
-			TEPs  = constructRoutes();		
+			TEPs  = constructRoutesForward();		
 		}catch (BFException e){
 			System.out.println("stop reason: " + e.getMessage());
 		}
@@ -1027,7 +1187,7 @@ public class BellmanFordIntervalBased {
 		if (_debug > 0) {
 			System.out.println("Running BellmanFord in Mixed mode.");
 		} else {
-			System.out.print("<");
+			System.out.print("*");
 		}
 		
 		// queue to save nodes we have to scan
@@ -1041,8 +1201,7 @@ public class BellmanFordIntervalBased {
 
 		//set fresh labels, initialize queue
 		
-		// TODO
-		refreshLabelsMixed(queue);
+		refreshLabelsMixed(queue);		
 		
 		//System.out.println(this._labels);
 		//System.out.println(this._sourcelabels);
@@ -1070,21 +1229,77 @@ public class BellmanFordIntervalBased {
 			if (task == null) {
 				break;
 			}
-				
-			if (!task.reverse && task.time > cutofftimeForward) {
-				System.out.println("Beyond cut-off time, stopping.");
-				break;
-			}
 			
 			Node v = task.node.getRealNode();
 			
-			if (task.reverse) {
-				// TODO!
-				// do a reverse search step
+			if (task.reverse) { // do a reverse step
+				if (task.time > cutofftimeReverse) {
+					// the algorithm should never get here?
+					System.out.println("Beyond cut-off time, ignoring.");
+					continue;
+				}
 				
-			} else {
-				// TODO!
-			    // do a forward step
+				if (task.node instanceof VirtualSink) {
+					
+					queue.addAll(processSinkReverse(v, lastArrival));
+					
+				} else 	if (task.node instanceof VirtualSource) {
+					
+					queue.addAll(processSourceForward(v));
+					
+				} else if (task.node instanceof VirtualNormalNode) {
+					
+					if (this._settings.useVertexCleanup) { 			
+						// Effectiveness with this implementation is questionable
+						this.vertexGain += _labels.get(v).cleanup();
+					}
+
+					processNormalNodeReverse(v, task.ival.getLowBound());
+
+				} else {
+					throw new RuntimeException("Unsupported instance of VirtualNode in BellmanFordIntervalBased");
+				}
+				
+			} else { // do a forward step
+				if (task.time > cutofftimeForward) {
+					//System.out.println("Beyond cut-off time, stopping.");
+					//break;
+					
+					// TODO CHANGE ME BACK TO PRIORITY QUEUE WHEN NEEDED!
+					
+					//System.out.println("Ignoring too late task in BFS!");
+					continue;
+
+				}
+				
+				if (this._settings.isSink(v)) {
+					// keep scanning until strictly later to give more sinks a chance to be found!
+					// despite the priority queue, this could be called multiple times:
+					// all current intervalls could be at cutofftime, but still have a 
+					// residual edge to scan, which will lead to an earlier discovery of the sink
+					if (task.time < cutofftimeForward) {				  
+					  cutofftimeForward = task.time;	
+					  if (_debug > 0) {
+					    System.out.println("Setting new cutoff time: " + cutofftimeForward);
+					  }
+					}				
+				} else if (task.node instanceof VirtualSource) {
+					// send out of source v
+					queue.addAll(processSourceForward(v));
+					
+				} else if (task.node instanceof VirtualNormalNode) {
+					
+					if (this._settings.useVertexCleanup) { 			
+						// Effectiveness with this implementation is questionable
+						this.vertexGain += _labels.get(v).cleanup();
+					}
+
+					queue.addAll(processNormalNodeForward(v, task.ival.getLowBound()));
+					
+				} else {
+					throw new RuntimeException("Unsupported instance of VirtualNode in BellmanFordIntervalBased");
+				}
+							
 			}
 			
 			
@@ -1104,7 +1319,7 @@ public class BellmanFordIntervalBased {
 		boolean foundsome = false; 
 		Collection<TimeExpandedPath> TEPs = null; 
 		try{ 
-			TEPs  = constructRoutesReverse();
+			TEPs  = constructRoutesMixed();
 			foundsome = true;
 		}catch (BFException e){
 			System.out.println("stop reason: " + e.getMessage());

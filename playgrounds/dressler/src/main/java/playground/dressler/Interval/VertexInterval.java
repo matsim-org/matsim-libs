@@ -198,13 +198,25 @@ public class VertexInterval extends Interval {
 	 * @return null if not, and the first subinterval of other that should be replaced otherwise 
 	 */
 	public Interval isBetterThan(final VertexInterval other) {
+		boolean isbetter = false;
+		
 		if (!other.reachable) {
+			isbetter = true;
+		} // having more breadcrumbs than other is also better 
+		else if (this._pred != null && other._pred == null) {
+			isbetter = true;
+		}
+		else if (this._succ != null && other._succ == null) {
+			isbetter = true;
+		}
+		
+		if (isbetter) {
 			int l = Math.max(this._l, other._l);
 			int r = Math.min(this._r, other._r);
 			if (l < r) {
 			  return new Interval(l, r);
 			}
-		} 
+		}
 		
 		return null;		
 	}

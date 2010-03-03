@@ -95,10 +95,10 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 *  the node is reachable from the source
 	 * @return specified VertexInterval or null if none exist
 	 */
-	public VertexInterval getFirstPossible(){
+	public VertexInterval getFirstPossibleForward(){
 		VertexInterval result = this.getIntervalAt(0);
 		while(!this.isLast(result)){
-			if (result.getReachable()){
+			if (result.getReachable() && result.getPredecessor() != null){
 				return result;
 			}else{
 				result=this.getNext(result);
@@ -115,7 +115,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 * @return minimal time or Integer.MAX_VALUE if it is not reachable at all
 	 */
 	public int firstPossibleTime(){
-		VertexInterval test =this.getFirstPossible();
+		VertexInterval test =this.getFirstPossibleForward();
 		if(test!=null){
 			return test.getLowBound();
 		}else{
@@ -275,10 +275,16 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 					current = this.getIntervalAt(improvement.getHighBound()-1);
 				}
 				
+				boolean wasreachable = current.reachable;
 				// and set the attributes
 				current.setArrivalAttributes(arrive);
 				
-				changed.add(current);
+				// if this was already reachable, it just got a new breadcrumb
+				// there's no need to scan it because of this
+				// FIXME 
+				// with costs, this is a wrong assumption!
+				// rather the functions should decide this ... somehow
+				if (!wasreachable) changed.add(current);
 			}
 
 

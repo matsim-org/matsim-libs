@@ -179,12 +179,28 @@ public class MultiSourceEAF {
 			
 			// THE IMPORTANT FUNCTION CALL HAPPENS HERE //
 			routingAlgo.startNewIter();
-			if (tryReverse) {
-				result = routingAlgo.doCalculationsReverse(lasttime);
-			} else {
-			    result = routingAlgo.doCalculationsForward();
-			}
-			
+			switch (settings.searchAlgo) {
+	            case FlowCalculationSettings.SEARCHALGO_FORWARD: {
+	            	result = routingAlgo.doCalculationsForward();
+	            	break;
+	            }
+	            case FlowCalculationSettings.SEARCHALGO_REVERSE: {
+	            	if (tryReverse) {
+	    				result = routingAlgo.doCalculationsReverse(lasttime);
+	    			} else {
+	    			    result = routingAlgo.doCalculationsForward();
+	    			}
+	            	break;
+	            }
+	            case FlowCalculationSettings.SEARCHALGO_MIXED: {
+	            	result = routingAlgo.doCalculationsMixed(lasttime); 
+	            	break;
+	            }
+	            default: {
+	            	throw new RuntimeException("Unkown search algorithm!");	            	
+	            }
+	        }
+			 
 			VertexGain += routingAlgo.vertexGain;
 			
 			timer2 = System.currentTimeMillis();
@@ -195,7 +211,7 @@ public class MultiSourceEAF {
 					// try forward next time to determine new arrvivaltime
 					tryReverse = false;
 				} else { 
-				  // forward search didn't find anything
+				  // forward or mixed search didn't find anything
 				  // that's it, we are done.
 				  break;
 				}
@@ -348,60 +364,109 @@ public class MultiSourceEAF {
 		//EdgeIntervall.debug(false);
 		Flow.debug(0);
 		
+		
+		
+		String networkfile;
+		String plansfile = null;
+		String demandsfile = null;
+		String outputplansfile = null;
+		String sinkid;
+		int uniformDemands = 0;
+		
+		// Rounding is now done according to timestep and flowFactor!
+		int timeStep; 
+		double flowFactor;
+
+		int instance = 4; 
+		// 1 = siouxfalls, demand 500
+		// 2 = swissold, demand 100
+		// 3 = padang, demand 5
+		// 4 = padang, with 10% plans
+		
+		
+		if (instance == 1) {
+			networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
+			uniformDemands = 500;
+			timeStep = 10;
+			flowFactor = 1.0;
+			sinkid = "supersink";
+		} else if (instance == 2) {
+			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
+			uniformDemands = 100;
+			timeStep = 10;
+			flowFactor = 1.0;
+			sinkid = "en1";
+		} else if (instance == 3) {
+			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
+			uniformDemands = 5;
+			timeStep = 10;
+			flowFactor = 1.0;
+			sinkid = "en1";
+		} else if (instance == 4) {
+			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
+			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
+			timeStep = 10;
+			flowFactor = 0.1;
+			sinkid = "en1";
+		} else {
+			// custom instance
+			
+			//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
+			//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
+			//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
+			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
+			//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
+
+			//***---------MANU------**//
+			//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
+			//networkfile = "/Users/manuel/testdata/simple/line_net.xml";
+			//networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
+			//networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
+
+			//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
+			//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
+			//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
+			//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
+			//plansfile = "/Users/manuel/testdata/simple/elfen_1_plan.xml";
+			//plansfile = "/Users/manuel/testdata/padangcomplete/plans/padang_plans_10p.xml";
+
+
+
+			//demandsfile = "/Users/manuel/Documents/meine_EA/manu/manu2.dem";
+			//demandsfile = "/homes/combi/dressler/V/code/meine_EA/problem_demands.dem";
+
+
+			//outputplansfile = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans_10p_5s.xml";
+			//outputplansfile = "./examples/meine_EA/swissold_plans_5s_demands_100.xml";
+			//outputplansfile = "./examples/meine_EA/padang_plans_100p_flow_2s.xml";
+			//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_euclid_demands_100_empty.xml";
+
+			//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_demand_100_emptylegs.xml";
+			//outputplansfile = "/homes/combi/dressler/stuff/testplans.xml";
+			//outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
+			//outputplansfile = "/Users/manuel/tester/ws3_testoutput.xml";
+
+
+			uniformDemands = 100;
+
+
+			timeStep = 10; 
+			flowFactor = 1.0;
+
+			//String sinkid = "supersink"; //siouxfalls, problem
+			sinkid = "en1";  //padang, line, swissold .. en1 fuer forward
+
+		}
+		
+		
+		//timeStep = 5;
+
+		ScenarioImpl scenario = new ScenarioImpl();
+		
 		if(_debug){
 			System.out.println("starting to read input");
 		}
-
-		String networkfile = null;
-		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
-		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
-		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
-		networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
-		//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
-
-		//***---------MANU------**//
-		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
-		//networkfile = "/Users/manuel/testdata/simple/line_net.xml";
-		//networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
-		//networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
-
-		String plansfile = null;
-		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
-		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
-		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
-		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
-		//plansfile = "/Users/manuel/testdata/simple/elfen_1_plan.xml";
-		//plansfile = "/Users/manuel/testdata/padangcomplete/plans/padang_plans_10p.xml";
-
-
-		String demandsfile = null;
-		//demandsfile = "/Users/manuel/Documents/meine_EA/manu/manu2.dem";
-		//demandsfile = "/homes/combi/dressler/V/code/meine_EA/problem_demands.dem";
-
-		String outputplansfile = null;
-		//outputplansfile = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans_10p_5s.xml";
-		//outputplansfile = "./examples/meine_EA/swissold_plans_5s_demands_100.xml";
-		//outputplansfile = "./examples/meine_EA/padang_plans_100p_flow_2s.xml";
-		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_euclid_demands_100_empty.xml";
-
-		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_demand_100_emptylegs.xml";
-		//outputplansfile = "/homes/combi/dressler/stuff/testplans.xml";
-		//outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
-		//outputplansfile = "/Users/manuel/tester/ws3_testoutput.xml";
-
-
 		
-		int uniformDemands = 100;
-
-		// Rounding is now done according to timestep and flowFactor!
-		int timestep = 10; 
-		double flowFactor = 1.0;
-
-		
-		//String sinkid = "supersink"; //siouxfalls, problem
-		String sinkid = "en1";  //padang, line, swissold .. en1 fuer forward
-
-		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
 		NetworkLayer network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
@@ -461,15 +526,18 @@ public class MultiSourceEAF {
 			System.out.println("reading input done");
 		}
 
-		settings = new FlowCalculationSettings(network, sinkid, demands, timestep, flowFactor);
+		settings = new FlowCalculationSettings(network, sinkid, demands, timeStep, flowFactor);
 
 		// set additional parameters, mostly TimeHorizon for the LP
 		//settings.TimeHorizon = 1800;
 		//settings.MaxRounds = 101;
 		//settings.checkConsistency = 100;		
 		//settings.useVertexCleanup = true;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE; // default
+		settings.checkTouchedNodes = true;
+		settings.keepPaths = true; // do not store paths at all!
+		settings.unfoldPaths = true; // simply store them
 		
 		settings.printStatus();
 		
@@ -485,7 +553,9 @@ public class MultiSourceEAF {
 			totalcost += i*arrivals[i];
 		}
 		
-		System.out.println("Total cost: " + totalcost);		
+		System.out.println("Total cost: " + totalcost);
+		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
+		
 		System.out.println(fluss.arrivalsToString());
 		System.out.println(fluss.arrivalPatternToString());
 		System.out.println("unsatisfied demands:");
@@ -495,8 +565,6 @@ public class MultiSourceEAF {
 				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
 			}
 		}
-
-		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
 
 		if(outputplansfile!=null){
 			PopulationImpl output = fluss.createPopulation(plansfile);				

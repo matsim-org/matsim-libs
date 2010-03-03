@@ -485,7 +485,7 @@ public class TimeExpandedPath {
 	 *  method to rebuild the set of touched nodes
 	 */
 	public void rebuildTouchedNodes() {
-	  this.nodesTouched = new HashSet<Node>();
+	  this.nodesTouched = new HashSet<Node>(3*this._steps.size()/2); // effectively a bit too big!
 	  for (PathStep step : this._steps) {
 		  this.nodesTouched.add(step.getStartNode().getRealNode());
 		  this.nodesTouched.add(step.getArrivalNode().getRealNode());
@@ -501,9 +501,6 @@ public class TimeExpandedPath {
 	public boolean doesTouch(Node node) {
 		// careful ... this might not be up to date if the TEP was changed!
 		
-		// DEBUG for speed test 
-		//return true;
-		
 		if (this.nodesTouched == null) {
 			rebuildTouchedNodes();
 		}
@@ -512,15 +509,12 @@ public class TimeExpandedPath {
 	
 	
 	/*
-	 * method to check whether the real associated with the virtual node is used at all in the path
+	 * method to check whether the real node associated with the virtual node is used at all in the path
 	 * this only works reliable if touchednodes is updated after any change
 	 * which is not done automatically!
 	 */	
 	public boolean doesTouch(VirtualNode node) {
 		// careful ... this might not be up to date if the TEP was changed!
-		
-		// DEBUG for speed test 
-		//return true;
 		
 		if (this.nodesTouched == null) {
 			rebuildTouchedNodes();

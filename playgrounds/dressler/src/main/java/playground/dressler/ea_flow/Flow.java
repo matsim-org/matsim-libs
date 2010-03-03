@@ -107,8 +107,15 @@ public class Flow {
 	 * total flow augmented so far
 	 */
 	private int totalflow;
-
-
+	
+	
+	/*
+	 * enable or disable the touched nodes hashmaps in the TEPs
+	 */
+	private boolean _checkTouchedNodes;
+	
+	private boolean _storepaths;
+	private boolean _unfoldpaths;
 
 	/**
 	 * TODO use debug mode
@@ -132,6 +139,11 @@ public class Flow {
 		this._network = settings.getNetwork();
 		this._flow = new HashMap<Link,EdgeIntervals>();
 		this._sourceoutflow = new HashMap<Node, SourceIntervals>();
+		
+		this._checkTouchedNodes = settings.checkTouchedNodes;
+		
+		this._storepaths = settings.keepPaths;
+		this._unfoldpaths = settings.unfoldPaths;
 
 		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();
 		this._demands = new HashMap<Node, Integer>();
@@ -147,7 +159,9 @@ public class Flow {
 				this._sourceoutflow.put(node, new SourceIntervals(temp));
 				this._demands.put(node, i);
 			} else if (this._settings.isSink(node)) {
-				this._sinks.add(node);
+				int i = this._settings.getDemand(node);				
+				this._sinks.add(node);				
+				this._demands.put(node, i);
 			}
 		}
 		// initialize EdgeIntervalls
@@ -171,11 +185,51 @@ public class Flow {
 	 */
 	public boolean isActiveSource(final Node node) {
 		Integer i = _demands.get(node);
-		if (i== null){
+		if (i== null) {
 			return false;
-		}else{
+		} else {
 			return (i > 0);
 		}
+	}
+	
+	/**
+	 * decides whether a Node is a non-active (depleted) Source
+	 * @param node Node to check for
+	 * @return true iff node is a Source now with demand 0
+	 */
+	public boolean isNonActiveSource(final Node node){
+		if (this._settings.isSource(node)) {
+		  Integer i = this._demands.get(node);
+		  return (i != null && i == 0);
+		}
+		return false;
+	}
+	
+	/**
+	 * Method to determine whether a Node is a Sink with some demand left
+	 * @param node Node that is checked
+	 * @return true iff Node is a sink and has demand left (i.e. demand < 0)
+	 */
+	public boolean isActiveSink(final Node node) {
+		Integer i = _demands.get(node);
+		if (i== null) {
+			return false;
+		} else {
+			return (i < 0);
+		}
+	}
+	
+	/**
+	 * decides whether a Node is a non-active (full) Sink
+	 * @param node Node to check for
+	 * @return true iff node is a Sink now with demand 0
+	 */
+	public boolean isNonActiveSink(final Node node){
+		if (this._settings.isSink(node)) {
+		  Integer i = this._demands.get(node);
+		  return (i != null && i == 0);
+		}
+		return false;
 	}
 
 	/**
@@ -277,12 +331,17 @@ public class Flow {
 		  return 0;
 	  }
 
-	  unfoldandaugment(TEP);
-
-	  // old way to do it ... bad
-	  //dumbaugment(TEP, gamma); // throws exceptions if something is wrong
-	  //this.unfold(TEP);
-
+	  if (this._storepaths) {
+		  if (this._unfoldpaths) {
+			  unfoldandaugment(TEP);			  
+		  } else {
+			  dumbaugment(TEP, gamma);
+			  this._TimeExpandedPaths.addFirst(TEP);
+		  }
+	  } else {
+		  dumbaugment(TEP, gamma);
+	  }
+	  
 	  this.totalflow += gamma;
 
 	  return gamma; // should be correct.
@@ -319,7 +378,7 @@ public class Flow {
 			Integer demand = this._demands.get(source);
 
 			if (demand == null) {
-				throw new IllegalArgumentException("Startnode is no source four StepSourceFlow " + step);
+				throw new IllegalArgumentException("Startnode is no source for StepSourceFlow " + step);
 			}
 
 			if (ssf.getForward()) {
@@ -339,11 +398,29 @@ public class Flow {
 			}
 
 		} else if (step instanceof StepSinkFlow) {
-			// FIXME cannot handle residual stepsinkflow yet!
+			StepSinkFlow ssf = (StepSinkFlow) step;
+			Node sink;
+
+			if (ssf.getForward()) {
+				sink = ssf.getArrivalNode().getRealNode();
+			} else {
+				sink = ssf.getStartNode().getRealNode();
+			}
+			Integer demand = this._demands.get(sink);
+			
+			if (demand == null) {
+				throw new IllegalArgumentException("Startnode is no sink for StepSinkFlow " + step);
+			}
+
 			if (!step.getForward()) {
+				// FIXME cannot handle residual stepsinkflow yet!
 				throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
 			} else {
-				// FIXME, adjust demand of sink
+				demand += gamma;
+				if (demand > 0) {
+					throw new IllegalArgumentException("too much flow sent into sink " + step);
+				}
+				this._demands.put(sink, demand);
 			}
 		} else {
 			throw new RuntimeException("Unsupported kind of PathStep!");
@@ -355,6 +432,7 @@ public class Flow {
 	 * Method to change just the flow values on the step, no checking is done!
 	 * @param step The Step
 	 * @param gamma Amount of flow to augment, positive or negative!
+	 * @deprecated
 	 */
 
 	private void augmentStepUnsafe(PathStep step, int gamma) {
@@ -768,6 +846,7 @@ public class Flow {
 			}
 
 
+			// TODO turn off at some point again ...
 		    //if (_debug > 0) {
 				if (!TEP.check()) {
 					System.out.println("Bad unprocessed TEP!");
@@ -814,11 +893,13 @@ public class Flow {
 
 					   // FIXME this seems to slow down rather than speed up the augmenting!
 					   // That is somewhat surprising, though. Needs more testing.
-					  /* if (!otherTEP.doesTouch(step.getStartNode()) || !otherTEP.doesTouch(step.getArrivalNode())) {
-						   // this path cannot contain the reverse of step
-						   //System.out.println("Skipped checking a path!");
-						   continue;
-					   }*/
+					   if (this._checkTouchedNodes) {
+						   if (!otherTEP.doesTouch(step.getStartNode()) || !otherTEP.doesTouch(step.getArrivalNode())) {
+							   // this path cannot contain the reverse of step
+							   //System.out.println("Skipped checking a path!");
+							   continue;
+						   }
+					   }
 
  					   // DEBUG
 					   if (otherTEP.getFlow() == 0) {
@@ -954,7 +1035,9 @@ public class Flow {
 			// check for loops and adjust the flow
 			for (TimeExpandedPath good : goodTEPs) {
 			  good = unloopNoOpposing(good);
-			  this._TimeExpandedPaths.add(good);
+			  // paths are probably (it's a for loop) read from the beginning again
+			  // addFirst is better than addLast: interact with recently added TEPs
+			  this._TimeExpandedPaths.addFirst(good);
 			  dumbaugment(good, good.getFlow());
 			}
 			goodTEPs.clear();
@@ -1382,18 +1465,7 @@ public class Flow {
 		}*/
 	}
 
-	/**
-	 * decides whether a Node is a non-active (depleted) Source
-	 * @param node Node to check for
-	 * @return true iff node is a Source now with demand 0
-	 */
-	public boolean isNonActiveSource(final Node node){
-		if (this._settings.isSource(node)) { // superfluous ... only sources are in _demands
-		  Integer i = this._demands.get(node);
-		  return (i != null && i == 0);
-		}
-		return false;
-	}
+	
 
 ////////////////////////////////////////////////////////////////////////////////////
 //-----------evaluation methods---------------------------------------------------//
