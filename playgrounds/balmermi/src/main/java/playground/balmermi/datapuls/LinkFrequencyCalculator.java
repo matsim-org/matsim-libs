@@ -48,17 +48,30 @@ public class LinkFrequencyCalculator {
 			freqs.put(lid,new ArrayList<Integer>());
 		}
 
+		Map<Integer,File> eventFiles = new TreeMap<Integer, File>();
 		for (File eventfile : inDir.listFiles()) {
 			if (eventfile.getName().contains("events")) {
-				System.out.println("processing "+eventfile+"...");
-				reader.readFile(eventfile.toString());
-				for (Id lid : fa.getFrequencies().keySet()) {
-					freqs.get(lid).add(fa.getFrequencies().get(lid).size());
-				}
-				System.out.println("done. (processing)");
+				System.out.println("gathering "+eventfile+"...");
+				String [] entries = eventfile.getName().split("[//\\.]");
+				for (int i=0; i<entries.length; i++) { System.out.print("["+entries[i]+"]"); }
+				Integer it = Integer.parseInt(entries[entries.length-4]);
+				eventFiles.put(it,eventfile);
+				System.out.print("\n");
+				System.out.println("done. (gathering)");
 			}
 		}
 		
+		for (Integer it : eventFiles.keySet()) {
+			File eventfile = eventFiles.get(it);
+			System.out.println("processing "+eventfile+"...");
+			reader.readFile(eventfile.toString());
+			for (Id lid : fa.getFrequencies().keySet()) {
+				freqs.get(lid).add(fa.getFrequencies().get(lid).size());
+			}
+			System.out.println("done. (processing)");
+		}
+		
+		System.out.println("writing output...");
 		FileWriter fw = new FileWriter(outDir+"/linkFrequencies.txt");
 		BufferedWriter out = new BufferedWriter(fw);
 		out.write("linkId");
@@ -71,5 +84,6 @@ public class LinkFrequencyCalculator {
 		}
 		out.close();
 		fw.close();
+		System.out.println("done. (writing)");
 	}
 }

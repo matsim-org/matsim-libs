@@ -132,6 +132,7 @@ public final class LinkTablesFromPopulation {
 
 	private BufferedWriter getWriter(final TransportMode mode, final double time) {
 		int timeBin = ((int) time) / timeBinSize;
+		if (time > 24*3600*2) { return null; }
 		BufferedWriter writer = this.writers.get(mode).get(Integer.valueOf(timeBin));
 		if (writer == null) {
 			String filename = "/linkAnalysis_"+mode.toString()+"_"+(timeBin*this.timeBinSize)+"-"+((timeBin+1)*this.timeBinSize)+".txt.gz";
@@ -153,17 +154,19 @@ public final class LinkTablesFromPopulation {
 			final String fromActType, final Id fromFacilityId, 
 			final String toActType, final Id toFacilityId) throws IOException {
 		BufferedWriter writer = getWriter(mode, time);
-		writer.write(linkId.toString());
-		writer.write("\t");
-		writer.write(personId.toString());
-		writer.write("\t");
-		writer.write(fromActType);
-		writer.write("\t");
-		writer.write(fromFacilityId.toString());
-		writer.write("\t");
-		writer.write(toActType);
-		writer.write("\t");
-		writer.write(toFacilityId.toString());
-		writer.write("\n");
+		if (writer != null) {
+			writer.write(linkId.toString());
+			writer.write("\t");
+			writer.write(personId.toString());
+			writer.write("\t");
+			writer.write(fromActType);
+			writer.write("\t");
+			writer.write(fromFacilityId.toString());
+			writer.write("\t");
+			writer.write(toActType);
+			writer.write("\t");
+			writer.write(toFacilityId.toString());
+			writer.write("\n");
+		}
 	}
 }
