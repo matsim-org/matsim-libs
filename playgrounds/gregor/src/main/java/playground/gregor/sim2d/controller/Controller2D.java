@@ -25,7 +25,6 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
-import org.matsim.world.algorithms.WorldCheck;
 
 import playground.gregor.sim2d.otfdebug.drawer.Agent2DDrawer;
 import playground.gregor.sim2d.otfdebug.drawer.ForceArrowDrawer;
@@ -120,10 +119,6 @@ public class Controller2D extends Controler {
 			this.network = this.loader.getScenario().getNetwork();
 			this.population = this.loader.getScenario().getPopulation();
 			this.scenarioLoaded = true;
-
-			if (this.getScenario().getWorld() != null) {
-				new WorldCheck().run(this.getScenario().getWorld());
-			}
 		}
 	}
 

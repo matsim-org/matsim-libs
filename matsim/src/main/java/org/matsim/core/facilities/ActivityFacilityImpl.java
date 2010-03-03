@@ -106,10 +106,10 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 	public final void moveTo(Coord newCoord) {
 		log.info("moving facility id="+id+" from "+center+" to "+newCoord+"...");
 		center.setXY(newCoord.getX(),newCoord.getY());
-		if (layer.getUpRule() != null) {
+		if (layer.getUpLayer() != null) {
 			log.info("  removed "+up_mapping.size()+" up-mappings (zone).");
 			removeAllUpMappings();
-			ZoneLayer zones = (ZoneLayer)layer.getUpRule().getUpLayer();
+			ZoneLayer zones = (ZoneLayer)layer.getUpLayer();
 			ArrayList<MappedLocation> nearestZones = zones.getNearestLocations(center);
 			if (!nearestZones.isEmpty()) { // facility does belong to a zone
 				// choose the first of the list (The list is generated via a defined order of the zones,
@@ -123,10 +123,10 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 				}
 			}
 		}
-		if (layer.getDownRule() != null) {
+		if (layer.getDownLayer() != null) {
 			log.info("  removed "+down_mapping.size()+" down-mappings (link).");
 			removeAllDownMappings();
-			NetworkLayer network = (NetworkLayer)layer.getDownRule().getDownLayer();
+			NetworkLayer network = (NetworkLayer)layer.getDownLayer();
 			Link l = network.getNearestRightEntryLink(center);
 			addDownMapping((LinkImpl) l);
 			((LinkImpl) l).addUpMapping(this);

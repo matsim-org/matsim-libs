@@ -47,9 +47,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldConnectLocations;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class DilutedZurichFilter {
 
@@ -101,10 +99,7 @@ public class DilutedZurichFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  running world modules... ");
-		new WorldCheck().run(world);
 		new WorldConnectLocations().run(world);
-		new WorldMappingInfo().run(world);
-		new WorldCheck().run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

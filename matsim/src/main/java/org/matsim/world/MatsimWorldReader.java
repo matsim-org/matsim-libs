@@ -39,6 +39,8 @@ import org.xml.sax.SAXException;
  */
 public class MatsimWorldReader extends MatsimXmlParser {
 
+	private final static Logger log = Logger.getLogger(MatsimWorldReader.class);
+
 	private final static String WORLD_V0 = "world_v0.dtd";
 	private final static String WORLD_V1 = "world_v1.dtd";
 	private final static String WORLD_V2 = "world_v2.dtd";
@@ -86,15 +88,13 @@ public class MatsimWorldReader extends MatsimXmlParser {
 	@Override
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
-		if (WORLD_V0.equals(doctype)) {
-			this.delegate = new WorldReaderMatsimV0(this.scenario);
-			Logger.getLogger(MatsimWorldReader.class).info("using world_v0-reader.");
-		} else if (WORLD_V1.equals(doctype)) {
-			this.delegate = new WorldReaderMatsimV1(this.scenario);
-			Logger.getLogger(MatsimWorldReader.class).info("using world_v1-reader.");
-		} else if (WORLD_V2.equals(doctype)) {
+		if (WORLD_V2.equals(doctype)) {
 			this.delegate = new WorldReaderMatsimV2(this.scenario);
-			Logger.getLogger(MatsimWorldReader.class).info("using world_v2-reader.");
+			log.info("using world_v2-reader.");
+		} else if (WORLD_V0.equals(doctype)) {
+			throw new IllegalArgumentException("world_v0.dtd is no longer supported..");
+		} else if (WORLD_V1.equals(doctype)) {
+			throw new IllegalArgumentException("world_v1.dtd is no longer supported..");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}

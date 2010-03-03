@@ -85,11 +85,11 @@ public class WorldWriter extends MatsimXmlWriter implements MatsimFileWriter {
 		}
 	}
 
-	private final void writeRule(final MappingRule m) {
-		if ((m.getDownLayer() instanceof ZoneLayer)) {
+	private final void writeRule(final Layer downLayer, final Layer upLayer) {
+		if (downLayer instanceof ZoneLayer) {
 			try {
-				this.writerhandler.startMapping(m, this.writer);
-				Iterator<? extends MappedLocation> dz_it = m.getDownLayer().getLocations().values().iterator();
+				this.writerhandler.startMapping(downLayer, upLayer, this.writer);
+				Iterator<? extends MappedLocation> dz_it = downLayer.getLocations().values().iterator();
 				while (dz_it.hasNext()) {
 					Zone dz = (Zone)dz_it.next();
 					Iterator<MappedLocation> uz_it = dz.getUpMapping().values().iterator();
@@ -106,9 +106,6 @@ public class WorldWriter extends MatsimXmlWriter implements MatsimFileWriter {
 			catch (IOException e) {
 				Gbl.errorMsg(e);
 			}
-		}
-		else {
-			log.info("[m=" + m + "," + "downLayer_type=" + m.getDownLayer().getType() + ": Layer not written. Therefore, rule is not written]");
 		}
 	}
 
@@ -128,20 +125,16 @@ public class WorldWriter extends MatsimXmlWriter implements MatsimFileWriter {
 			Layer l = this.world.getBottomLayer();
 			if (l != null) {
 				this.writeLayer(l, this.writer);
-				while (l.getUpRule() != null) {
-					l = l.getUpRule().getUpLayer();
+				while (l.getUpLayer() != null) {
+					l = l.getUpLayer();
 					this.writeLayer(l, this.writer);
 				}
 			}
 			l = this.world.getBottomLayer();
 			if (l != null) {
-				if (l.getUpRule() != null) {
-					MappingRule m = l.getUpRule();
-					this.writeRule(m);
-					while (m.getUpLayer().getUpRule() != null) {
-						m = m.getUpLayer().getUpRule();
-						this.writeRule(m);
-					}
+				while (l.getUpLayer() != null) {
+					this.writeRule(l, l.getUpLayer());
+					l = l.getUpLayer();
 				}
 			}
 			this.writerhandler.endWorld(this.writer);

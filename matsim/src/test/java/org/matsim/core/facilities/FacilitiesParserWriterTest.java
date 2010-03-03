@@ -30,8 +30,6 @@ import org.matsim.facilities.algorithms.FacilitiesSummary;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class FacilitiesParserWriterTest extends MatsimTestCase {
 
@@ -55,11 +53,6 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		new FacilitiesSummary().run(facilities);
 		new FacilitiesCalcMinDist().run(facilities);
 		new FacilitiesCombine().run(facilities);
-		System.out.println("  done.");
-
-		System.out.println("  running world modules... ");
-		new WorldCheck().run(world);
-		new WorldMappingInfo().run(world);
 		System.out.println("  done.");
 	}
 
@@ -153,10 +146,6 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		world.complete();
 		System.out.println("  done.");
 
-		System.out.println("  running world modules... ");
-		new WorldCheck().run(world);
-		System.out.println("  done.");
-
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
@@ -195,10 +184,6 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
 		world.complete();
-		System.out.println("  done.");
-
-		System.out.println("  running world modules... ");
-		new WorldCheck().run(world);
 		System.out.println("  done.");
 
 		TriangleScenario.writeConfig(this.config);

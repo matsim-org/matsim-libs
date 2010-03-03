@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 
 /**
@@ -43,8 +42,8 @@ public class LayerImpl implements Serializable, Layer {
 	private final Id type;
 	private String name;
 
-	transient MappingRule upRule = null; // to aggregate
-	transient MappingRule downRule = null; // to disaggregate
+	transient Layer upLayer = null;
+	transient Layer downLayer = null;
 
 	final TreeMap<Id, MappedLocation> locations = new TreeMap<Id,MappedLocation>();
 
@@ -61,20 +60,16 @@ public class LayerImpl implements Serializable, Layer {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	@Deprecated // use of mapping rules is discouraged
-	public final void setUpRule(final MappingRule up_rule) {
-		if (up_rule == null) {
-			Gbl.errorMsg(this.toString() + "[up_rule=null not allowed.]");
-		}
-		this.upRule = up_rule;
+	public final void setUpLayer(final Layer up_layer) {
+		this.upLayer = up_layer;
 	}
 
+	@Override
 	@Deprecated // use of mapping rules is discouraged
-	public final void setDownRule(final MappingRule down_rule) {
-		if (down_rule == null) {
-			Gbl.errorMsg(this.toString() + "[down_rule=null not allowed.]");
-		}
-		this.downRule = down_rule;
+	public final void setDownLayer(final Layer layer) {
+		this.downLayer = layer;
 	}
 
 	public final void setName(final String name) {
@@ -85,58 +80,41 @@ public class LayerImpl implements Serializable, Layer {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	@Deprecated // use of mapping rules is discouraged
-	public final boolean removeUpRule() {
-		if (this.upRule == null) { return true; }
-
-//		if (this.upRule.getUpLayer().downRule == null) { Gbl.errorMsg("This should never happen!"); }
-		if (this.upRule.getUpLayer().getDownRule() == null) { Gbl.errorMsg("This should never happen!"); }
+	public final boolean removeUpLayer() {
+		if (this.upLayer == null) { return true; }
 
 		Iterator<MappedLocation> l_it = this.locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllUpMappings(); }
 
-//		l_it = this.upRule.getUpLayer().locations.values().iterator(); // manually replaced by following two lines.  kai, jul09
-		Map<Id,MappedLocation> lll = (Map<Id, MappedLocation>) this.upRule.getUpLayer().getLocations();
+		Map<Id,MappedLocation> lll = (Map<Id, MappedLocation>) this.upLayer.getLocations();
 		l_it = lll.values().iterator();
 
 		while (l_it.hasNext()) { l_it.next().removeAllDownMappings(); }
 
-//		this.upRule.getUpLayer().downRule = null;
-		this.upRule.getUpLayer().forceDownRuleToNull();
+		this.upLayer.setDownLayer(null);
 
-		this.upRule = null;
+		this.upLayer = null;
 		return true;
 
 	}
 
-	@Deprecated // do not use; this is here only for re-factoring purposes.  kai, jul09
-	public void forceDownRuleToNull() {
-		this.downRule = null ;
-	}
-
-	@Deprecated // do not use; this is here only for re-factoring purposes.  kai, jul09
-	public void forceUpRuleToNull() {
-		this.upRule = null ;
-	}
-
+	@Override
 	@Deprecated // use of mapping rules is discouraged
-	public final boolean removeDownRule() {
-		if (this.downRule == null) { return true; }
-		if (this.downRule.getDownLayer().getUpRule() == null) { Gbl.errorMsg("This should never happen!"); }
+	public final boolean removeDownLayer() {
+		if (this.downLayer == null) { return true; }
 
 		Iterator<MappedLocation> l_it = this.locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllDownMappings(); }
 
-//		l_it = this.downRule.getDownLayer().locations.values().iterator(); // manually replaced by following two lines.  kai, jul09
-		Map<Id,MappedLocation> lll = (Map<Id, MappedLocation>) this.downRule.getDownLayer().getLocations();
+		Map<Id,MappedLocation> lll = (Map<Id, MappedLocation>) this.downLayer.getLocations();
 		l_it = lll.values().iterator();
 
 		while (l_it.hasNext()) { l_it.next().removeAllUpMappings(); }
 
-//		this.downRule.getDownLayer().upRule = null; // manually replaced by following line.  kai, jul09
-		this.downRule.getDownLayer().forceUpRuleToNull() ;
-
-		this.upRule = null;
+		this.downLayer.setUpLayer(null);
+		this.upLayer = null;
 		throw new UnsupportedOperationException(" the previous line is what I found but I think it should be this.downRule=null.  kai, jul09" ) ;
 //		return true;
 
@@ -155,14 +133,16 @@ public class LayerImpl implements Serializable, Layer {
 		return this.name;
 	}
 
+	@Override
 	@Deprecated // use of mapping rules is discouraged
-	public final MappingRule getUpRule() {
-		return this.upRule;
+	public final Layer getUpLayer() {
+		return this.upLayer;
 	}
 
+	@Override
 	@Deprecated // use of mapping rules is discouraged
-	public final MappingRule getDownRule() {
-		return this.downRule;
+	public final Layer getDownLayer() {
+		return this.downLayer;
 	}
 
 	public final MappedLocation getLocation(final Id location_id) {
@@ -221,8 +201,6 @@ public class LayerImpl implements Serializable, Layer {
 	public String toString() {
 		return "[type=" + this.type + "]" +
 		       "[name=" + this.name + "]" +
-		       "[up_rule=" + this.upRule + "]" +
-		       "[down_rule=" + this.downRule + "]" +
 		       "[nof_locations=" + this.locations.size() + "]";
 	}
 }

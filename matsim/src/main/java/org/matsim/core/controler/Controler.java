@@ -125,7 +125,6 @@ import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.world.WorldWriter;
-import org.matsim.world.algorithms.WorldCheck;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -606,10 +605,6 @@ public class Controler {
 			this.network = this.scenarioData.getNetwork();
 			this.population = this.scenarioData.getPopulation();
 			this.scenarioLoaded = true;
-
-			if (this.getScenario().getWorld() != null) {
-				new WorldCheck().run(this.getScenario().getWorld());
-			}
 		}
 	}
 

@@ -104,10 +104,8 @@ public class WorldWriterHandlerImplV2 implements WorldWriterHandler {
 	// <mapping ... > ... </mapping>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startMapping(final MappingRule mappingRule, final BufferedWriter out) throws IOException {
-		out.write("\t<mapping");
-		out.write(" mapping_rule=\"" + mappingRule.toString() + "\"");
-		out.write(">\n");
+	public void startMapping(final Layer downLayer, final Layer upLayer, final BufferedWriter out) throws IOException {
+		out.write("\t<mapping mapping_rule=\"" + downLayer.getType() + "[m]-[m]" + upLayer.getType() + "\">\n");
 	}
 
 	public void endMapping(final BufferedWriter out) throws IOException {

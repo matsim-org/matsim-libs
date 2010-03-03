@@ -29,9 +29,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldConnectLocations;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class WorldParserWriterTest extends MatsimTestCase {
 
@@ -56,10 +54,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 	private final void runModules(final World world) {
 		System.out.println("  running world modules... ");
-		new WorldCheck().run(world);
 		new WorldConnectLocations().run(world);
-		new WorldMappingInfo().run(world);
-		new WorldCheck().run(world);
 		System.out.println("  done.");
 	}
 
@@ -91,6 +86,17 @@ public class WorldParserWriterTest extends MatsimTestCase {
 	// tests
 	//////////////////////////////////////////////////////////////////////
 
+	public void testParserWriter0() {
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		World world = scenario.getWorld();
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
+		worldReader.readFile(this.config.world().getInputFile());
+
+		TriangleScenario.writeWorld(world);
+
+		this.compareOutputWorld();
+	}
+
 	public void testParserWriter1() {
 
 		System.out.println("running testParserWriter1()...");
@@ -105,7 +111,6 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		this.runModules(world);
 
 		TriangleScenario.writeWorld(world);
-		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 
@@ -139,7 +144,6 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -175,7 +179,6 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -212,7 +215,6 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -250,7 +252,6 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -288,7 +289,6 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -326,7 +326,6 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();

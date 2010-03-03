@@ -37,8 +37,6 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
-import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
@@ -109,27 +107,13 @@ public class IIDMGeneration {
 
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  running world modules... ");
-		new WorldCheck().run(world);
-		new WorldMappingInfo().run(world);
-		log.info("  done.");
-
-		//////////////////////////////////////////////////////////////////////
-
 		log.info("  parsing f2z_mapping... ");
 		new WorldParseFacilityZoneMapping(indir+"/f2z_mapping.txt").run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  running world modules... ");
-		new WorldCheck().run(world);
-		new WorldMappingInfo().run(world);
-		log.info("  done.");
-
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("  reding plans xml file... ");
+		log.info("  reading plans xml file... ");
 		PopulationImpl pop = scenario.getPopulation();
 		Knowledges knowledges =  scenario.getKnowledges();
 		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());

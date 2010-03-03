@@ -35,8 +35,6 @@ import org.matsim.world.Layer;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
-import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
@@ -104,13 +102,6 @@ public class PopulationCreation {
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  running world modules... ");
-		new WorldCheck().run(world);
-		new WorldMappingInfo().run(world);
-		System.out.println("  done.");
-
-		//////////////////////////////////////////////////////////////////////
-
 		System.out.println("  running household modules... ");
 		new HouseholdsCreateFromCensus2000(indir+"/ETHZ_Pers.tab",facilities,municipalities).run(households, municipalityLayer);
 		System.out.println("  done.");
@@ -119,8 +110,6 @@ public class PopulationCreation {
 
 		System.out.println("  running world modules... ");
 		new WorldFacilityZoneMapping(households).run(world);
-		new WorldCheck().run(world);
-		new WorldMappingInfo().run(world);
 		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(world);
 		System.out.println("  done.");
 

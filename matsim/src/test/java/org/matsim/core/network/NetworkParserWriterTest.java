@@ -34,8 +34,6 @@ import org.matsim.examples.TriangleScenario;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 /**
  *
@@ -70,11 +68,6 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		new NetworkMergeDoubleLinks().run(network);
 		new NetworkCalcTopoType().run(network);
 		new NetworkSummary().run(network);
-		log.info("  done.");
-
-		log.info("  running world modules... ");
-		new WorldCheck().run(world);
-		new WorldMappingInfo().run(world);
 		log.info("  done.");
 	}
 
@@ -143,10 +136,6 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		world.complete();
 		log.info("  done.");
 
-		log.info("  running world modules... ");
-		new WorldCheck().run(world);
-		log.info("  done.");
-
 		log.info("  reading network xml file as a layer of the world... ");
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
@@ -185,10 +174,6 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
 		world.complete();
-		log.info("  done.");
-
-		log.info("  running world modules... ");
-		new WorldCheck().run(world);
 		log.info("  done.");
 
 		TriangleScenario.writeConfig(this.config);

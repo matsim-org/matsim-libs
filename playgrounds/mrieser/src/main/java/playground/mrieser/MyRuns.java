@@ -766,10 +766,7 @@ public class MyRuns {
 //		new NetworkWriter(scenario.getNetwork()).writeFile("/Users/mrieser/Downloads/switzerland.xml");
 //		OTFVis.main(new String[]{"/Users/mrieser/Downloads/switzerland.xml"});
 
-		int j = 3;
-		System.out.println(j);
-		setValue(j);
-		System.out.println(j);
+		System.out.println(System.getProperty("eventHandler"));
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();

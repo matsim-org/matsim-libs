@@ -14,9 +14,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldConnectLocations;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class PlanRemoveUnselected {
 
@@ -80,10 +78,7 @@ public class PlanRemoveUnselected {
 
 		World world = scenario.getWorld();
 		world.complete();
-		new WorldCheck().run(world);
 		new WorldConnectLocations().run(world);
-		new WorldMappingInfo().run(world);
-		new WorldCheck().run(world);
 		log.info("world checking done.");
 
 

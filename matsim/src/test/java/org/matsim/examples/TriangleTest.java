@@ -44,8 +44,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
-import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class TriangleTest extends MatsimTestCase {
 
@@ -130,11 +128,6 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 		log.info("1. VALIDATE AND COMPLETE THE WORLD");
 		log.info("\n");
-
-		log.info("  running world modules... ");
-		new WorldCheck().run(world);
-		new WorldMappingInfo().run(world);
-		log.info("  done.");
 
 		log.info("\n");
 		log.info("2. SUMMARY INFORMATION OF THE NETWORK");

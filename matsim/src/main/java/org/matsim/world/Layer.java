@@ -17,17 +17,17 @@ public interface Layer {
 	public String getName();
 
 	@Deprecated
-	// use of mapping rules is discouraged
-	public MappingRule getUpRule();
+	// use of mapping layers is discouraged
+	public Layer getUpLayer();
 
 	@Deprecated
-	// use of mapping rules is discouraged
-	public MappingRule getDownRule();
+	// use of mapping layers is discouraged
+	public Layer getDownLayer();
 
 	public MappedLocation getLocation(final Id location_id);
 
 	/**
-	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in 
+	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in
 	 * most cases.
 	 *
 	 * @param coord A coordinate to which the nearest location should be returned.
@@ -38,16 +38,16 @@ public interface Layer {
 	public ArrayList<MappedLocation> getNearestLocations(final Coord coord);
 
 	/**
-	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in 
+	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in
 	 * most cases.
-	 * 
+	 *
 	 * @param coord A coordinate to which the nearest location should be returned.
 	 * @param excludeLocation A location that should be ignored when finding the nearest location. Useful to
 	 * find the nearest neighbor of the excluded location.
 	 *
 	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
 	 * the same minimal distance, all of them are returned.
-	 * 
+	 *
 	 */
 	public ArrayList<MappedLocation> getNearestLocations(final Coord coord, final Location excludeLocation);
 
@@ -56,21 +56,15 @@ public interface Layer {
 	public String toString();
 
 	@Deprecated
-	public boolean removeUpRule();
+	public boolean removeUpLayer();
 
 	@Deprecated
-	public boolean removeDownRule();
+	public boolean removeDownLayer();
 
 	@Deprecated
-	public void setUpRule(final MappingRule up_rule);
+	public void setUpLayer(final Layer up_layer);
 
 	@Deprecated
-	public void setDownRule(final MappingRule down_rule);
-
-	@Deprecated
-	public void forceDownRuleToNull();
-
-	@Deprecated
-	public void forceUpRuleToNull();
+	public void setDownLayer(final Layer down_layer);
 
 }

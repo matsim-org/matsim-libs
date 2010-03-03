@@ -23,7 +23,6 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -70,11 +69,10 @@ public class WorldFacilityZoneMapping {
 		log.info("    running " + this.getClass().getName() + " module...");
 
 		world.complete();
-		
+
 		if (world.getLayers().size() != 2) { Gbl.errorMsg("World must contian 2 layers!"); }
 		ActivityFacilitiesImpl fs = (ActivityFacilitiesImpl)world.getBottomLayer();
 		ZoneLayer ms = (ZoneLayer)world.getTopLayer();
-		if (!fs.getUpRule().getUpLayer().equals(ms)) { Gbl.errorMsg("Incorrect mapping!"); }
 
 		// add mapping as given in the census2000
 		for (Household h : this.households.getHouseholds().values()) {
@@ -83,7 +81,7 @@ public class WorldFacilityZoneMapping {
 			world.addMapping(z,f);
 			if (!z.contains(f.getCoord())) { log.warn("      mapping via census info produces dist(f["+f.getId()+"]->z["+z.getId()+"])="+z.calcDistance(f.getCoord())); }
 		}
-		
+
 		// add mapping for the remaining facilities (non home facilities)
 		for (ActivityFacilityImpl f : fs.getFacilities().values()) {
 			if (f.getUpMapping().size() == 0) {

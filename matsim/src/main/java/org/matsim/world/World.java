@@ -43,7 +43,7 @@ public class World {
 	private String name = null;
 
 	private final Map<Id, Layer> layers = new TreeMap<Id, Layer>();
-	private final Map<String, MappingRule> rules = new TreeMap<String, MappingRule>();
+//	private final Map<String, MappingRule> rules = new TreeMap<String, MappingRule>();
 
 	private Layer top_layer = null;
 	private Layer bottom_layer = null;
@@ -62,7 +62,7 @@ public class World {
 	public final void complete() {
 		complete(new HashSet<String>());
 	}
-	
+
 	@Deprecated
 	public final void complete(Set<String> excludingLinkTypes) {
 		// 1. remove rules and mappings containing network and/or facility layers
@@ -90,24 +90,22 @@ public class World {
 		}
 		// 2.2 set the top and bottom layer reference
 		if (zlayers.size() == 0) {
-			if (!this.rules.isEmpty()) { throw new RuntimeException("data inconsistency"); }
 			this.top_layer = null;
 			this.bottom_layer = null;
 		}
 		else { // zlayers.size() > 0
-			if (zlayers.size() != (this.rules.size()+1)) { throw new RuntimeException("data inconsistency"); }
 			// 2.2.1. find the top layer
 			this.top_layer = null;
 			for (int i=0; i<zlayers.size(); i++) {
 				Layer l = zlayers.get(i);
-				if (zlayers.get(i).getUpRule() == null) { this.top_layer = l; }
+				if (zlayers.get(i).getUpLayer() == null) { this.top_layer = l; }
 			}
 			if (this.top_layer == null) { throw new RuntimeException("data inconsistency"); }
 			// 2.2.2. find the bottom layer
 			int step_cnt = 1;
 			this.bottom_layer = this.top_layer;
-			while (this.bottom_layer.getDownRule() != null) {
-				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
+			while (this.bottom_layer.getDownLayer() != null) {
+				this.bottom_layer = this.bottom_layer.getDownLayer();
 				step_cnt++;
 			}
 			if (step_cnt != zlayers.size()) { throw new RuntimeException("data inconsistency"); }
@@ -118,8 +116,8 @@ public class World {
 				this.top_layer = this.bottom_layer = f_layer;
 			}
 			else {
-				this.createMappingRule(f_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
-				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
+				this.createMapping(f_layer, this.bottom_layer);
+				this.bottom_layer = this.bottom_layer.getDownLayer();
 			}
 		}
 		// 4. create mapping rule (but no facility<->link mappings) for the net layer
@@ -132,8 +130,8 @@ public class World {
 //				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
 //			}  // it's the same as the "else" below
 			else {
-				this.createMappingRule(n_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
-				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
+				this.createMapping(n_layer, this.bottom_layer);
+				this.bottom_layer = this.bottom_layer.getDownLayer();
 			}
 		}
 		// 5. connect the locations from neighbor layers
@@ -147,30 +145,28 @@ public class World {
 	@Deprecated
 	private final boolean removeMappingRule(final Id l1_id, final Id l2_id) {
 		if ((this.layers.get(l1_id) == null) || (this.layers.get(l2_id) == null)) { return false; }
-		Layer down_layer = null;
-		Layer up_layer = null;
-		if (this.getMappingRule(l1_id,l2_id) != null) {
-			down_layer = this.layers.get(l1_id);
-			up_layer = this.layers.get(l2_id);
+		Layer down_layer = this.layers.get(l1_id);
+		Layer up_layer = this.layers.get(l2_id);
+
+		if (down_layer.getUpLayer() != up_layer) {
+			if (down_layer.getDownLayer() == up_layer) {
+				// we mixed the two, switch them
+				Layer tmp = down_layer;
+				down_layer = up_layer;
+				up_layer = tmp;
+			} else {
+				// something is wrong, nothing to do, just finish work here
+				return true;
+			}
 		}
-		else if (this.getMappingRule(l2_id,l1_id) != null) {
-			up_layer = this.layers.get(l1_id);
-			down_layer = this.layers.get(l2_id);
-		}
-		else {
-			return true;
-		}
-		down_layer.removeUpRule();
-		up_layer.removeDownRule();
-		if (this.rules.remove(down_layer.getType().toString() + up_layer.getType().toString()) == null) {
-			throw new RuntimeException("This should never happen!");
-		}
+		down_layer.removeUpLayer();
+		up_layer.removeDownLayer();
 		return true;
 	}
 
 	@Deprecated
 	public final boolean removeMapping(MappedLocation loc1, MappedLocation loc2) {
-		if (this.getMappingRule(loc1.getLayer(),loc2.getLayer()) != null) {
+		if (loc1.getLayer().getUpLayer() == loc2.getLayer()) {
 			// loc1 = down_loc; loc2 = up_loc
 			if (loc1.getUpMapping().containsKey(loc2.getId()) && loc2.getDownMapping().containsKey(loc1.getId())) {
 				loc1.getUpMapping().remove(loc2.getId());
@@ -181,7 +177,7 @@ public class World {
 				log.warn("loc1="+loc1+",loc2="+loc2+": mapping not found.");
 				return false;
 			}
-		} else if (this.getMappingRule(loc2.getLayer(),loc1.getLayer()) != null) {
+		} else if (loc1.getLayer().getDownLayer() == loc2.getLayer()) {
 			// loc1 = up_loc; loc2 = down_loc
 			if (loc1.getDownMapping().containsKey(loc2.getId()) && loc2.getUpMapping().containsKey(loc1.getId())) {
 				loc1.getDownMapping().remove(loc2.getId());
@@ -197,7 +193,7 @@ public class World {
 			return false;
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// create methods
 	//////////////////////////////////////////////////////////////////////
@@ -213,10 +209,9 @@ public class World {
 	}
 
 	@Deprecated
-	public final MappingRule createMappingRule(final String mapping_rule) {
-		MappingRule m = new MappingRule(mapping_rule,this.layers);
-		this.rules.put(m.getDownLayer().getType().toString() + m.getUpLayer().getType().toString(), m);
-		return m;
+	public final void createMapping(final Layer downLayer, final Layer upLayer) {
+		downLayer.setUpLayer(upLayer);
+		upLayer.setDownLayer(downLayer);
 	}
 
 	@Deprecated
@@ -246,7 +241,7 @@ public class World {
 
 	@Deprecated
 	public void setFacilityLayer(final ActivityFacilitiesImpl facilityLayer) {
-		if (facilityLayer == null) { 
+		if (facilityLayer == null) {
 			throw new IllegalArgumentException("facilityLayer=null not allowed!");
 		}
 		this.layers.put(ActivityFacilitiesImpl.LAYER_TYPE, facilityLayer);
@@ -268,14 +263,14 @@ public class World {
 	//////////////////////////////////////////////////////////////////////
 	// add methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	@Deprecated
 	public final boolean addMapping(MappedLocation loc1, MappedLocation loc2) {
-		if (this.getMappingRule(loc1.getLayer(),loc2.getLayer()) != null) {
+		if (loc1.getLayer().getUpLayer() == loc2.getLayer()) {
 			// loc1 = down_loc; loc2 = up_loc
 			loc1.addUpMapping(loc2);
 			loc2.addDownMapping(loc1);
-		} else if (this.getMappingRule(loc2.getLayer(),loc1.getLayer()) != null) {
+		} else if (loc1.getLayer().getDownLayer() == loc2.getLayer()) {
 			// loc1 = up_loc; loc2 = down_loc
 			loc1.addDownMapping(loc2);
 			loc2.addUpMapping(loc1);
@@ -287,14 +282,14 @@ public class World {
 	}
 
 	@Deprecated
-	protected final void addMapping(final MappingRule mapping_rule, final Id down_zone_id, final Id up_zone_id) {
-		Zone down_zone = (Zone)mapping_rule.getDownLayer().getLocation(down_zone_id);
-		Zone up_zone   = (Zone)mapping_rule.getUpLayer().getLocation(up_zone_id);
+	protected final void addMapping(final Layer downLayer, final Layer upLayer, final Id down_zone_id, final Id up_zone_id) {
+		Zone down_zone = (Zone)downLayer.getLocation(down_zone_id);
+		Zone up_zone   = (Zone)upLayer.getLocation(up_zone_id);
 		if (down_zone == null) {
-			throw new RuntimeException(this.toString() + "[mapping_rule=" + mapping_rule + ",down_zone_id=" + down_zone_id + " down_zone does not exist]");
+			throw new RuntimeException(this.toString() + "[down_zone_id=" + down_zone_id + " down_zone does not exist]");
 		}
 		if (up_zone == null) {
-			throw new RuntimeException(this.toString() + "[mapping_rule=" + mapping_rule + ",up_zone_id=" + up_zone_id + " down_zone does not exist]");
+			throw new RuntimeException(this.toString() + "[up_zone_id=" + up_zone_id + " down_zone does not exist]");
 		}
 		down_zone.addUpMapping(up_zone);
 		up_zone.addDownMapping(down_zone);
@@ -323,21 +318,6 @@ public class World {
 	}
 
 	@Deprecated
-	public final Map<String,MappingRule> getRules() {
-		return this.rules;
-	}
-
-	@Deprecated
-	protected final MappingRule getMappingRule(final Id down_id, final Id up_id) {
-		return this.rules.get(down_id.toString() + up_id.toString());
-	}
-
-	@Deprecated
-	protected final MappingRule getMappingRule(final Layer down_layer, final Layer up_layer) {
-		return this.getMappingRule(down_layer.getType(),up_layer.getType());
-	}
-
-	@Deprecated
 	public final Layer getBottomLayer() {
 		if ((this.bottom_layer == null) && !this.layers.isEmpty()) {
 			throw new RuntimeException("bottom_layer = null while world contains layers!");
@@ -361,7 +341,6 @@ public class World {
 	public final String toString() {
 		return "[name=" + this.name + "]" +
 				"[nof_layers=" + this.layers.size() + "]" +
-				"[nof_rules=" + this.rules.size() + "]" +
 				"[top_layer=" + this.top_layer + "]" +
 				"[bottom_layer=" + this.bottom_layer + "]";
 	}

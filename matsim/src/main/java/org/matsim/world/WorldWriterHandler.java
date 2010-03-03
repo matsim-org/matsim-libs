@@ -55,7 +55,7 @@ interface WorldWriterHandler extends WriterHandler {
 	// <mapping ... > ... </mapping>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startMapping(final MappingRule mappingRule, final BufferedWriter out) throws IOException;
+	public void startMapping(final Layer downLayer, final Layer upLayer, final BufferedWriter out) throws IOException;
 
 	public void endMapping(final BufferedWriter out) throws IOException;
 

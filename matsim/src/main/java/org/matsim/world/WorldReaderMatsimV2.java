@@ -24,6 +24,7 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -45,7 +46,8 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	private Scenario scenario;
 	private World world;
 	private ZoneLayer currLayer = null;
-	private MappingRule currMappingRule = null;
+	private Layer currUpLayer = null;
+	private Layer currDownLayer = null;
 
 	public WorldReaderMatsimV2(final ScenarioImpl scenario) {
 		this.scenario = scenario;
@@ -76,8 +78,6 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 			this.world = null;
 		} else if (LAYER.equals(name)) {
 			this.currLayer = null;
-		} else if (MAPPING.equals(name)) {
-			this.currMappingRule = null;
 		}
 	}
 
@@ -95,11 +95,16 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	}
 
 	private void startMapping(final Attributes atts) {
-		this.currMappingRule = this.world.createMappingRule(atts.getValue("mapping_rule"));
+		String [] strings = atts.getValue("mapping_rule").split("\\[|\\]-\\[|\\]");
+		this.currDownLayer = this.world.getLayer(new IdImpl(strings[0]));
+		this.currUpLayer = this.world.getLayer(new IdImpl(strings[3]));
+		this.currDownLayer.setUpLayer(this.currUpLayer);
+		this.currUpLayer.setDownLayer(this.currDownLayer);
 	}
 
 	private void startRef(final Attributes atts) {
-		this.world.addMapping(this.currMappingRule, scenario.createId(atts.getValue("down_zone_id")), scenario.createId(atts.getValue("up_zone_id")));
+		this.world.addMapping(this.currDownLayer, this.currUpLayer, scenario.createId(atts.getValue("down_zone_id")), scenario.createId(atts.getValue("up_zone_id")));
+
 	}
 
 }

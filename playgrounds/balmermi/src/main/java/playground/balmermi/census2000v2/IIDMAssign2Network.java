@@ -39,9 +39,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldConnectLocations;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 import playground.balmermi.census2000v2.modules.PersonAssignToNetwork;
 
@@ -109,10 +107,7 @@ public class IIDMAssign2Network {
 		excludingLinkTypes.add("90"); excludingLinkTypes.add("91"); excludingLinkTypes.add("92"); excludingLinkTypes.add("93");
 		excludingLinkTypes.add("94"); excludingLinkTypes.add("95"); excludingLinkTypes.add("96"); excludingLinkTypes.add("97");
 		excludingLinkTypes.add("98"); excludingLinkTypes.add("99");
-		new WorldCheck().run(world);
 		new WorldConnectLocations(excludingLinkTypes).run(world);
-		new WorldMappingInfo().run(world);
-		new WorldCheck().run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

@@ -89,12 +89,6 @@ public abstract class AbstractLocation implements MappedLocation {
 
 	@Deprecated
 	public final void addUpMapping(final MappedLocation other) {
-		if (this.layer.getUpRule() == null) {
-			Gbl.errorMsg(this.toString() + "[other=" + other + " has no up_rule]");
-		}
-		if (!this.layer.getUpRule().getUpLayer().equals(other.getLayer())) {
-			Gbl.errorMsg(this.toString() + "[other=" + other + " has wrong layer]");
-		}
 		Id other_id = other.getId();
 		if (!this.up_mapping.containsKey(other_id)) {
 			this.up_mapping.put(other_id,other);
@@ -103,12 +97,6 @@ public abstract class AbstractLocation implements MappedLocation {
 
 	@Deprecated
 	public final void addDownMapping(final MappedLocation other) {
-		if (this.layer.getDownRule() == null) {
-			Gbl.errorMsg(this.toString() + "[other=" + other + " has no down_rule]");
-		}
-		if (!this.layer.getDownRule().getDownLayer().equals(other.getLayer())) {
-			Gbl.errorMsg(this.toString() + "[other=" + other + " has wrong layer]");
-		}
 		Id other_id = other.getId();
 		if (!this.down_mapping.containsKey(other_id)) {
 			this.down_mapping.put(other_id,other);

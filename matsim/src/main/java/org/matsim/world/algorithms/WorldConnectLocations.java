@@ -330,8 +330,8 @@ public class WorldConnectLocations {
 
 		if (world.getLayers().size() > 1) {
 			Layer downLayer = world.getBottomLayer();
-			while (downLayer.getUpRule() != null) {
-				Layer upLayer = downLayer.getUpRule().getUpLayer();
+			while (downLayer.getUpLayer() != null) {
+				Layer upLayer = downLayer.getUpLayer();
 				if (downLayer.getLocations().isEmpty() || upLayer.getLocations().isEmpty()) {
 					log.warn("downLayer="+downLayer.getType()+", upLayer="+upLayer.getType()+
 					         ": mapping cannot be set since at least one of the layers does not contain any locations. (this may not be fatal)");

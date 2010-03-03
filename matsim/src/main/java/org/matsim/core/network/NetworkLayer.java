@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
-import org.matsim.world.MappingRule;
 
 public class NetworkLayer extends NetworkImpl implements Layer {
 	// yyyy I would say that this should be moved to org.matsim.world.  Right now, however, it needs to be used quite a lot
@@ -95,8 +94,8 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 
 	@Deprecated
 	@Override
-	public MappingRule getDownRule() {
-		return layerDelegate.getDownRule();
+	public Layer getDownLayer() {
+		return layerDelegate.getDownLayer();
 	}
 
 	@Override
@@ -132,8 +131,8 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 
 	@Deprecated
 	@Override
-	public MappingRule getUpRule() {
-		return layerDelegate.getUpRule();
+	public Layer getUpLayer() {
+		return layerDelegate.getUpLayer();
 	}
 
 	@Override
@@ -143,38 +142,26 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 
 	@Deprecated
 	@Override
-	public final boolean removeUpRule() {
-		return layerDelegate.removeUpRule();
+	public final boolean removeUpLayer() {
+		return layerDelegate.removeUpLayer();
 	}
 
 	@Deprecated
 	@Override
-	public final boolean removeDownRule() {
-		return layerDelegate.removeDownRule();
+	public final boolean removeDownLayer() {
+		return layerDelegate.removeDownLayer();
 	}
 
 	@Deprecated
 	@Override
-	public final void setUpRule(final MappingRule up_rule) {
-		layerDelegate.setUpRule( up_rule ) ;
+	public final void setUpLayer(final Layer up_Layer) {
+		layerDelegate.setUpLayer( up_Layer ) ;
 	}
 
 	@Deprecated
 	@Override
-	public final void setDownRule(final MappingRule down_rule) {
-		layerDelegate.setDownRule( down_rule ) ;
-	}
-
-	@Deprecated
-	@Override
-	public void forceDownRuleToNull() {
-		layerDelegate.forceDownRuleToNull();
-	}
-
-	@Deprecated
-	@Override
-	public void forceUpRuleToNull() {
-		layerDelegate.forceUpRuleToNull() ;
+	public final void setDownLayer(final Layer down_Layer) {
+		layerDelegate.setDownLayer( down_Layer ) ;
 	}
 
 }

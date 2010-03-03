@@ -112,7 +112,7 @@ public class WorldCreateRasterLayer {
 		System.out.println("      done.");
 
 		System.out.println("      creating mapping rule...");
-		/*MappingRule mappingrule = */world.createMappingRule(layer.getType() + "[*]-[?]" + zonelayer.getType());
+		/*MappingRule mappingrule = */world.createMapping(layer, zonelayer);
 		world.complete();
 		System.out.println("      done.");
 
