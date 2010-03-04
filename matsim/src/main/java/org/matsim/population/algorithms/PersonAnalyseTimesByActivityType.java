@@ -82,8 +82,8 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 	@Override
 	public void run(final Person person) {
 
-//		this.analyseDepartures(person);
-//		this.analyseArrivals(person);
+		this.analyseDepartures(person);
+		this.analyseArrivals(person);
 		this.analyseTraveling(person);
 
 	}

@@ -24,7 +24,6 @@ import java.awt.geom.Point2D.Double;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
@@ -42,8 +41,6 @@ import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
 public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFWriterFactory<QLinkLanesImpl>{
-
-	private static final Logger log = Logger.getLogger(OTFLaneWriter.class);
 
   public static final boolean DRAW_LINK_TO_LINK_LINES = true;
 

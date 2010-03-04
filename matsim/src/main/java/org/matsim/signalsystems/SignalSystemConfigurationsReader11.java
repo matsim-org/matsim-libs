@@ -21,6 +21,7 @@ package org.matsim.signalsystems;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -28,6 +29,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptivePlanbasedSignalSystemControlInfoType;
@@ -53,43 +55,48 @@ import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
- *
  */
 public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 
+	private final static Logger log = Logger.getLogger(SignalSystemConfigurationsReader11.class);
+
   private XMLSignalSystemConfig xmlLssConfig;
-	
+
   private SignalSystemConfigurationsFactory builder;
 
 	private SignalSystemConfigurations lssConfigurations;
-  
+
 	public SignalSystemConfigurationsReader11(SignalSystemConfigurations lssConfigs, String schemaLocation) {
 		super(schemaLocation);
 		this.lssConfigurations = lssConfigs;
 		this.builder = this.lssConfigurations.getFactory();
 	}
-	
+
 	@Override
 	public void readFile(final String filename) throws ParserConfigurationException, IOException, JAXBException, SAXException {
   	JAXBContext jc;
 			jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystemsconfig11.ObjectFactory.class);
-//			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
 			//validate file
 			super.validateFile(filename, u);
-			
-			xmlLssConfig = (XMLSignalSystemConfig)u.unmarshal( 
-					new FileInputStream( filename ) );
+
+			InputStream stream = new FileInputStream(filename);
+			xmlLssConfig = (XMLSignalSystemConfig)u.unmarshal(stream);
+			try {
+				stream.close();
+			} catch (IOException e) {
+				log.warn("Could not close stream.", e);
+			}
 
 		//convert the parsed xml-instances to basic instances
 			for (XMLSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getSignalSystemConfiguration()){
 				SignalSystemConfiguration blssc = builder.createSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
-				
+
 				XMLSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getSignalSystemControlInfo();
 				SignalSystemControlInfo controlInfo;
 				controlInfo = convertXmlControlInfoToBasic(xmlcit);
 				blssc.setSignalSystemControlInfo(controlInfo);
-				
+
 				this.lssConfigurations.getSignalSystemConfigurations().put(blssc.getSignalSystemId(), blssc);
 			} // end outer for
 	}
@@ -99,10 +106,10 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 		SignalSystemControlInfo controlInfo = null;
 		if (xmlcit instanceof XMLPlanbasedSignalSystemControlInfoType) {
 			XMLPlanbasedSignalSystemControlInfoType xmlpcit = (XMLPlanbasedSignalSystemControlInfoType) xmlcit;
-			
+
 			PlanBasedSignalSystemControlInfo pcontrolInfo = builder.createPlanBasedSignalSystemControlInfo();
 			controlInfo = pcontrolInfo;
-			
+
 			for (XMLSignalSystemPlanType xmlplan : xmlpcit.getSignalSystemPlan()) {
 				pcontrolInfo.addPlan(convertXmlPlanToBasic(xmlplan));
 			}
@@ -131,9 +138,9 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 		return controlInfo;
 
 	}
-	
+
 	private SignalSystemPlan convertXmlPlanToBasic(XMLSignalSystemPlanType xmlplan){
-		SignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));					
+		SignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));
 		plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
 		plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
 		if (xmlplan.getCycleTime() != null) {
@@ -156,13 +163,13 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 				groupConfig.setInterGreenTimeRoughcast(xmlgroupconfig.getInterGreenTimeRoughcast().getSec());
 			if (xmlgroupconfig.getInterGreenTimeDropping() != null)
 				groupConfig.setInterGreenTimeDropping(xmlgroupconfig.getInterGreenTimeDropping().getSec());
-			
+
 			plan.addLightSignalGroupConfiguration(groupConfig);
-		}		
+		}
 		return plan;
 	}
-	
-	
+
+
 
 	private double getSeconds(XMLGregorianCalendar daytime) {
 		double sec = daytime.getHour() * 3600.0;

@@ -21,6 +21,7 @@ package org.matsim.signalsystems;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -42,12 +43,10 @@ import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
- * 
  */
 public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 
-	private static final Logger log = Logger
-			.getLogger(SignalSystemsReader11.class);
+	private static final Logger log = Logger.getLogger(SignalSystemsReader11.class);
 
 	private SignalSystems lightSignalSystems;
 
@@ -71,8 +70,13 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 		// validate XML file
 		super.validateFile(filename, u);
 		log.info("starting unmarshalling " + filename);
-		xmlLssDefinition = (XMLSignalSystems) u.unmarshal(new FileInputStream(
-				filename));
+		InputStream stream = new FileInputStream(filename);
+		xmlLssDefinition = (XMLSignalSystems) u.unmarshal(stream);
+		try {
+			stream.close();
+		} catch (IOException e) {
+			log.warn("Could not close stream.", e);
+		}
 
 		SignalSystemDefinition lssdef;
 		for (XMLSignalSystemDefinitionType xmllssDef : xmlLssDefinition

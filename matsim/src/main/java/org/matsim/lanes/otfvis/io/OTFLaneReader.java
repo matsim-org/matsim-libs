@@ -23,7 +23,6 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -34,14 +33,11 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
 /**
  * @author dgrether
- *
  */
 public class OTFLaneReader extends OTFDataReader {
 
-	private static final Logger log = Logger.getLogger(OTFLaneReader.class);
-	
 	protected OTFLaneSignalDrawer drawer;
-	
+
 	public OTFLaneReader() {
 	}
 
@@ -69,7 +65,7 @@ public class OTFLaneReader extends OTFDataReader {
 				data.setId(ByteBufferUtils.getString(in));
 				data.setEndPoint(in.getDouble(), in.getDouble());
 				this.drawer.getLaneData().put(data.getId(), data);
-				
+
 				if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES){
 					int numberOfToLinks = in.getInt();
 					for (int j = 0; j < numberOfToLinks; j++) {
@@ -94,8 +90,8 @@ public class OTFLaneReader extends OTFDataReader {
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 		// nothing to do as lanes are non dynamical data
 	}
-	
 
-	
-	
+
+
+
 }

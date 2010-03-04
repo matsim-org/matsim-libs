@@ -22,21 +22,16 @@ package org.matsim.signalsystems.otfvis.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
 /**
- *
  * @author dgrether
  */
 public class OTFSignalReader extends OTFLaneReader {
 
-  private static final Logger log = Logger.getLogger(OTFSignalReader.class);
-
   public OTFSignalReader() {
-	  log.error("new SignalReader instance!!!");
 	}
 
 	@Override

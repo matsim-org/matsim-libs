@@ -21,6 +21,7 @@ package org.matsim.signalsystems;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -45,7 +46,6 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.signalsystems.systems.SignalSystemDefinition;
 import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.signalsystems.systems.SignalSystemsFactory;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -56,7 +56,7 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 
 	private static final Logger log = Logger
 			.getLogger(LightSignalSystemsReader10.class);
-	
+
 	private SignalSystems lightSignalSystems;
 	private LaneDefinitions laneDefinitions;
 
@@ -86,8 +86,13 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 			// validate XML file
 			super.validateFile(filename, u);
 			log.info("starting unmarshalling " + filename);
-			xmlLssDefinition = (XMLLightSignalSystems) u
-					.unmarshal(new FileInputStream(filename));
+			InputStream stream = new FileInputStream(filename);
+			xmlLssDefinition = (XMLLightSignalSystems) u.unmarshal(stream);
+			try {
+				stream.close();
+			} catch (IOException e) {
+				log.warn("Could not close stream.", e);
+			}
 
 			//convert the parsed xml-instances to basic instances
 			LanesToLinkAssignment l2lAssignment;

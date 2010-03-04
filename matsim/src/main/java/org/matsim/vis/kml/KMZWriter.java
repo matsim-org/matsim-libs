@@ -171,7 +171,7 @@ public class KMZWriter {
 	}
 
 	/**
-	 * Adds some data as a file to the kmz.
+	 * Adds some data as a file to the kmz. The data stream will be closed at the end of the method.
 	 *
 	 * @param data the data to add to the kmz
 	 * @param inZipFilename the filename used for the file in the kmz file

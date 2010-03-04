@@ -22,28 +22,20 @@ package org.matsim.signalsystems.otfvis.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.ptproject.qsim.QLane;
 import org.matsim.ptproject.qsim.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 
-
 /**
  * @author dgrether
- *
  */
 public class OTFSignalWriter extends OTFLaneWriter {
-	
-	private static final Logger log = Logger.getLogger(OTFSignalWriter.class);
-	
-	/**
-	 * 
-	 */
+
 	public OTFSignalWriter() {
 	}
-	
+
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {
 		int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
@@ -60,10 +52,10 @@ public class OTFSignalWriter extends OTFLaneWriter {
 			}
 		}
 	}
-	
+
 	@Override
 	public OTFDataWriter<QLinkLanesImpl> getWriter() {
 		return new OTFSignalWriter();
 	}
-	
+
 }

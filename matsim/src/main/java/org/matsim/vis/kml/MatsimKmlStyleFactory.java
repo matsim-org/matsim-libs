@@ -47,15 +47,15 @@ public class MatsimKmlStyleFactory {
 
 	public static final byte[] MATSIMRED = new byte[]{(byte) 255, (byte) 15, (byte) 15, (byte) 190};
 //	public static final Color MATSIMBLUE = new Color(190, 190, 80, 90);
-	public static final byte[] MATSIMGREY = new byte[]{(byte) 210, (byte) 70, (byte) 50, (byte) 50};
-	public static final byte[] MATSIMWHITE = new byte[]{(byte) 230, (byte) 230, (byte) 230, (byte) 230};
+	protected static final byte[] MATSIMGREY = new byte[]{(byte) 210, (byte) 70, (byte) 50, (byte) 50};
+	protected static final byte[] MATSIMWHITE = new byte[]{(byte) 230, (byte) 230, (byte) 230, (byte) 230};
 	/**
 	 * the kmz writer
 	 */
 	private KMZWriter writer = null;
 
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
-	
+
 	private DocumentType document;
 
 	private StyleType defaultnetworknodestyle;

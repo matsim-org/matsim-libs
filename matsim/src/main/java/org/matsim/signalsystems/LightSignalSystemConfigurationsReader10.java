@@ -21,6 +21,7 @@ package org.matsim.signalsystems;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -28,6 +29,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLAdaptiveLightSignalSystemControlInfoType;
@@ -43,7 +45,6 @@ import org.matsim.signalsystems.config.SignalSystemConfiguration;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.config.SignalSystemConfigurationsFactory;
 import org.matsim.signalsystems.config.SignalSystemPlan;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -54,18 +55,20 @@ import org.xml.sax.SAXException;
 @Deprecated
 public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser {
 
+	private final static Logger log = Logger.getLogger(LightSignalSystemConfigurationsReader10.class);
+
   private XMLLightSignalSystemConfig xmlLssConfig;
-	
+
   private SignalSystemConfigurationsFactory builder;
 
 	private SignalSystemConfigurations lssConfigurations;
-  
+
 	public LightSignalSystemConfigurationsReader10(SignalSystemConfigurations lssConfigs, String schemaLocation) {
 		super(schemaLocation);
 		this.lssConfigurations = lssConfigs;
 		this.builder = lssConfigs.getFactory();
 	}
-	
+
 	@Override
 	public void readFile(final String filename) throws ParserConfigurationException, IOException, JAXBException, SAXException {
   	JAXBContext jc;
@@ -74,22 +77,27 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 			Unmarshaller u = jc.createUnmarshaller();
 			//validate file
 			super.validateFile(filename, u);
-			
-			xmlLssConfig = (XMLLightSignalSystemConfig)u.unmarshal( 
-					new FileInputStream( filename ) );
+
+			InputStream stream = new FileInputStream(filename);
+			xmlLssConfig = (XMLLightSignalSystemConfig)u.unmarshal(stream);
+			try {
+				stream.close();
+			} catch (IOException e) {
+				log.warn("Could not close stream.", e);
+			}
 
 		//convert the parsed xml-instances to basic instances
 			for (XMLLightSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getLightSignalSystemConfiguration()){
 				SignalSystemConfiguration blssc = builder.createSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
-				
+
 				XMLLightSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getLightSignalSystemControlInfo();
 				if (xmlcit instanceof XMLPlanbasedlightSignalSystemControlInfoType) {
 					XMLPlanbasedlightSignalSystemControlInfoType xmlpcit = (XMLPlanbasedlightSignalSystemControlInfoType) xmlcit;
-					
+
 					PlanBasedSignalSystemControlInfo controlInfo = builder.createPlanBasedSignalSystemControlInfo();
-					
+
 					for (XMLLightSignalSystemPlanType xmlplan : xmlpcit.getLightSignalSystemPlan()) {
-						SignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));					
+						SignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));
 						plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
 						plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
 						if (xmlplan.getCirculationTime() != null) {
@@ -106,18 +114,18 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 								groupConfig.setInterGreenTimeRoughcast(xmlgroupconfig.getInterimTimeRoughcast().getSec());
 							if (xmlgroupconfig.getInterimTimeDropping() != null)
 								groupConfig.setInterGreenTimeDropping(xmlgroupconfig.getInterimTimeDropping().getSec());
-							
+
 							plan.addLightSignalGroupConfiguration(groupConfig);
 						}
 						controlInfo.addPlan(plan);
-						
+
 					}
 					blssc.setSignalSystemControlInfo(controlInfo);
 				}
 				else if (xmlcit instanceof XMLAdaptiveLightSignalSystemControlInfoType) {
 					throw new UnsupportedOperationException("Implemented in version 1.1 of data format, please convert!");
 				}
-				
+
 				this.lssConfigurations.getSignalSystemConfigurations().put(blssc.getSignalSystemId(), blssc);
 			} // end outer for
 	}
@@ -128,5 +136,5 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 		sec += daytime.getSecond();
 		return sec;
 	}
-	
+
 }

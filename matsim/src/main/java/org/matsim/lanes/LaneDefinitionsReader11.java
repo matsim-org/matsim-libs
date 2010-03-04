@@ -21,6 +21,7 @@ package org.matsim.lanes;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -35,7 +36,6 @@ import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
-
 import org.xml.sax.SAXException;
 
 
@@ -46,12 +46,12 @@ import org.xml.sax.SAXException;
  *
  */
 public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
-	
+
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader11.class);
-	
+
 	private LaneDefinitions laneDefinitions;
-	
+
 	private LaneDefinitionsFactory builder;
 	/**
 	 * @param schemaLocation
@@ -78,9 +78,13 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 			// validate XML file
 			super.validateFile(filename, u);
 			log.info("starting unmarshalling " + filename);
-			xmlLaneDefinitions = (XMLLaneDefinitions) u
-					.unmarshal(new FileInputStream(filename));
-
+			InputStream stream = new FileInputStream(filename);
+			xmlLaneDefinitions = (XMLLaneDefinitions) u.unmarshal(stream);
+			try {
+				stream.close();
+			} catch (IOException e) {
+				log.warn("Could not close stream.", e);
+			}
 			//convert the parsed xml-instances to basic instances
 			LanesToLinkAssignment l2lAssignment;
 			Lane lane = null;
