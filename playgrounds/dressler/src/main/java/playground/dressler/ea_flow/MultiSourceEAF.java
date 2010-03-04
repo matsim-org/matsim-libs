@@ -170,6 +170,8 @@ public class MultiSourceEAF {
 		
 		boolean tryReverse;
 		
+		LinkedList<TimeExpandedPath> successfulPaths = new LinkedList<TimeExpandedPath>();
+		
 		tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		
 		for (i=1; i<=settings.MaxRounds; i++){
@@ -205,28 +207,88 @@ public class MultiSourceEAF {
 			
 			timer2 = System.currentTimeMillis();
 			timeMBF += timer2 - timer1;
-			if (result == null || result.isEmpty()){
-				if (tryReverse) { 
-					// backward search didn't find anything.
-					// try forward next time to determine new arrvivaltime
-					tryReverse = false;
-				} else { 
-				  // forward or mixed search didn't find anything
-				  // that's it, we are done.
-				  break;
-				}
-			}
+			
+			boolean trySuccessfulPaths = false;
 			tempstr = "";
 			int zeroaugment = 0;
 			
-			for(TimeExpandedPath path : result){
-				if (path.getArrival() > lasttime) {
-					lasttime = path.getArrival();
+			
+			if (result == null || result.isEmpty()){
+				if (tryReverse) { 
+					// backward search didn't find anything.
+					// we should try forward next time to determine new arrvivaltime
+					lasttime += 1; // guess new time
+					tryReverse = false;
+					trySuccessfulPaths = true; // before we do the forward search, we can simply repeat paths!					
+				} else { 
+					// forward or mixed search didn't find anything
+					// that's it, we are done.
+					break;
+				}
+			} else {
+				// lazy way to get some element ...
+				for(TimeExpandedPath path : result) {
+					if (path.getArrival() > lasttime) {
+						// time has increased!
+						
+						lasttime = path.getArrival();
+
+						// might be worth trying the reverse search again
+						// if it is enabled at all
+						tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
+
+						// recall the list of successful paths and add them first!
+						// it cannot hurt much ...
+						trySuccessfulPaths = true;
+
+					}				
+					// we just needed one element
+					break;
+				}
+			}
+			
+			if (trySuccessfulPaths) {
+				LinkedList<TimeExpandedPath> newSP = new LinkedList<TimeExpandedPath>();
+				
+				for(TimeExpandedPath path : successfulPaths){
+					String tempstr2 = "";
 					
-					// time has increased, might be worth trying the reverse search again
-					// if it is enabled at all
+					int latestused = path.shiftToArrival(lasttime);
+					
+					// some integrity checks
+					if (latestused >= settings.TimeHorizon || path.getPathSteps().getFirst().getStartTime() < 0) {
+						zeroaugment += 1;
+						continue;
+					}
+										
+					tempstr2 = path.toString() + "\n";					
+					
+					int augment = fluss.augment(path);
+					
+					if (augment > 0) {
+						tempstr += tempstr2;
+						tempstr += "augmented " + augment + "\n";
+						
+						// remember this path for the next timelayer						
+						newSP.addLast(path); // keep the order!
+					} else {
+						zeroaugment += 1;
+					}
+				}
+				System.out.println("Had Repeated paths: " + successfulPaths.size());
+				System.out.println("Sucess: " + newSP.size() + ", zeroaugment: " + zeroaugment);				
+				successfulPaths = newSP;
+				
+				if (!newSP.isEmpty()) {
+					// we augmented succesfully!
+					// in case the reverse search didn't find anything,
+					// we now know that we can arrive at the old lasttime + 1 (now just lasttime)
+					// so try again!
 					tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 				}
+			}
+			
+			for(TimeExpandedPath path : result){
 				String tempstr2 = "";
 				
 				tempstr2 = path.toString() + "\n";					
@@ -236,6 +298,9 @@ public class MultiSourceEAF {
 				if (augment > 0) {
 					tempstr += tempstr2;
 					tempstr += "augmented " + augment + "\n";
+					
+					// remember this path for the next timelayer
+					successfulPaths.addLast(path); // keep the order
 				} else {
 					zeroaugment += 1;
 				}
@@ -252,8 +317,9 @@ public class MultiSourceEAF {
 			
 			
 			if (i % 100 == 0) {		
+				long timecurrent = System.currentTimeMillis();
 				System.out.println();
-				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: Total: " + (timecurrent - timeStart) / 1000 + ", Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 				System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
 				System.out.println("CleanUp got rid of  " + VertexGain + " vertex intervals so far.");
 				//System.out.println("removed on the fly:" + VertexIntervalls.rem);
@@ -377,7 +443,8 @@ public class MultiSourceEAF {
 		int timeStep; 
 		double flowFactor;
 
-		int instance = 4; 
+		int instance = 1; 
+		// 0 = custom
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -532,12 +599,13 @@ public class MultiSourceEAF {
 		//settings.TimeHorizon = 1800;
 		//settings.MaxRounds = 101;
 		//settings.checkConsistency = 100;		
-		//settings.useVertexCleanup = true;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE; // default
+		settings.useVertexCleanup = false;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
 		settings.checkTouchedNodes = true;
 		settings.keepPaths = true; // do not store paths at all!
-		settings.unfoldPaths = true; // simply store them
+		settings.unfoldPaths = true; // unfold stored paths into forward paths
 		
 		settings.printStatus();
 		

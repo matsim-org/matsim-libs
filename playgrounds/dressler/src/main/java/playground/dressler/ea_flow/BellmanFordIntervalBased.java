@@ -842,19 +842,6 @@ public class BellmanFordIntervalBased {
 		List<BFTask> queue = new ArrayList<BFTask>();
 		
 		// visit neighbors
-		// link is outgoing edge of v => backward edges have v as successor
-		for (Link link : v.getOutLinks().values()) {					
-			Node w = link.getToNode();
-			
-			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, false, true, this._settings.TimeHorizon);
-			
-			if (changed == null) continue;
-			
-			for(VertexInterval changedinterval : changed){
-				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, true));
-			}					
-			
-		}
 		
 		// link is incoming edge of v => forward edges have v as successor
 		for (Link link : v.getInLinks().values()) {
@@ -869,6 +856,22 @@ public class BellmanFordIntervalBased {
 			}
 
 		}
+		
+		// link is outgoing edge of v => backward edges have v as successor
+		for (Link link : v.getOutLinks().values()) {					
+			Node w = link.getToNode();
+			
+			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, false, true, this._settings.TimeHorizon);
+			
+			if (changed == null) continue;
+			
+			for(VertexInterval changedinterval : changed){
+				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, true));
+			}					
+			
+		}
+		
+		
 
 		// treat sources.
 		// here it does not matter if they are active or not
@@ -915,7 +918,7 @@ public class BellmanFordIntervalBased {
 		return queue;
 	}
 	
-	protected List<BFTask> processSourceReverse(Node v, int lastArrival) {
+	protected List<BFTask> processSourceReverse(Node v) {
 		// active sources are the end of the search
 		// nonactive sources are just transit nodes, and need to scan residual edges.
 		if (!this._flow.isNonActiveSource(v)) {
@@ -1026,7 +1029,12 @@ public class BellmanFordIntervalBased {
 				}				
 			} else if (task.node instanceof VirtualSource) {
 				// send out of source v
-				queue.addAll(processSourceForward(v));
+				
+				List<BFTask> tempqueue = processSourceForward(v); 
+				
+				if (tempqueue != null) {
+				  queue.addAll(tempqueue);
+				}
 				
 			} else if (task.node instanceof VirtualNormalNode) {
 				
@@ -1035,7 +1043,11 @@ public class BellmanFordIntervalBased {
 					this.vertexGain += _labels.get(v).cleanup();
 				}
 
-				queue.addAll(processNormalNodeForward(v, task.ival.getLowBound()));
+				List<BFTask> tempqueue = processNormalNodeForward(v, task.ival.getLowBound());
+
+				if (tempqueue != null) {
+					queue.addAll(tempqueue);
+				}
 				
 			} else {
 				throw new RuntimeException("Unsupported instance of VirtualNode in BellmanFordIntervalBased");
@@ -1131,11 +1143,19 @@ public class BellmanFordIntervalBased {
 			
 			if (task.node instanceof VirtualSink) {
 				
-				queue.addAll(processSinkReverse(v, lastArrival));
+				List<BFTask> tempqueue = processSinkReverse(v, lastArrival); 
+
+				if (tempqueue != null) {
+					queue.addAll(tempqueue);
+				}
 				
 			} else 	if (task.node instanceof VirtualSource) {
-				
-				queue.addAll(processSourceForward(v));
+
+				List<BFTask> tempqueue = processSourceReverse(v); 
+
+				if (tempqueue != null) {
+					queue.addAll(tempqueue);
+				}
 				
 			} else if (task.node instanceof VirtualNormalNode) {
 				
@@ -1144,7 +1164,11 @@ public class BellmanFordIntervalBased {
 					this.vertexGain += _labels.get(v).cleanup();
 				}
 
-				processNormalNodeReverse(v, task.ival.getLowBound());
+				List<BFTask> tempqueue = processNormalNodeReverse(v, task.ival.getLowBound());
+				
+				if (tempqueue != null) {
+					queue.addAll(tempqueue);
+				}
 
 			} else {
 				throw new RuntimeException("Unsupported instance of VirtualNode in BellmanFordIntervalBased");
@@ -1241,11 +1265,19 @@ public class BellmanFordIntervalBased {
 				
 				if (task.node instanceof VirtualSink) {
 					
-					queue.addAll(processSinkReverse(v, lastArrival));
+					List<BFTask> tempqueue = processSinkReverse(v, lastArrival); 
+
+					if (tempqueue != null) {
+						queue.addAll(tempqueue);
+					}
 					
 				} else 	if (task.node instanceof VirtualSource) {
 					
-					queue.addAll(processSourceForward(v));
+					List<BFTask> tempqueue = processSourceReverse(v); 
+
+					if (tempqueue != null) {
+						queue.addAll(tempqueue);
+					}
 					
 				} else if (task.node instanceof VirtualNormalNode) {
 					
@@ -1254,7 +1286,11 @@ public class BellmanFordIntervalBased {
 						this.vertexGain += _labels.get(v).cleanup();
 					}
 
-					processNormalNodeReverse(v, task.ival.getLowBound());
+					List<BFTask> tempqueue = processNormalNodeReverse(v, task.ival.getLowBound());
+					
+					if (tempqueue != null) {
+						queue.addAll(tempqueue);
+					}
 
 				} else {
 					throw new RuntimeException("Unsupported instance of VirtualNode in BellmanFordIntervalBased");
@@ -1285,7 +1321,11 @@ public class BellmanFordIntervalBased {
 					}				
 				} else if (task.node instanceof VirtualSource) {
 					// send out of source v
-					queue.addAll(processSourceForward(v));
+					List<BFTask> tempqueue = processSourceForward(v); 
+					
+					if (tempqueue != null) {
+					  queue.addAll(tempqueue);
+					}
 					
 				} else if (task.node instanceof VirtualNormalNode) {
 					
@@ -1294,7 +1334,11 @@ public class BellmanFordIntervalBased {
 						this.vertexGain += _labels.get(v).cleanup();
 					}
 
-					queue.addAll(processNormalNodeForward(v, task.ival.getLowBound()));
+					List<BFTask> tempqueue = processNormalNodeForward(v, task.ival.getLowBound());
+
+					if (tempqueue != null) {
+						queue.addAll(tempqueue);
+					}
 					
 				} else {
 					throw new RuntimeException("Unsupported instance of VirtualNode in BellmanFordIntervalBased");

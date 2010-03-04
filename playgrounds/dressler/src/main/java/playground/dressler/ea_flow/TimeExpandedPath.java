@@ -349,6 +349,32 @@ public class TimeExpandedPath {
 		TimeExpandedPath._debug=debug;
 	}
 
+	/* changes all steps so that the last step arrives at newArrival
+	 * @param newArrival time to arrive
+	 * @return the latest time used in the new path, usually this is newArrival  
+	 */
+	public int shiftToArrival(int newArrival) {
+		int latestUsed = 0;
+
+		if (this._steps == null || this._steps.isEmpty()) {
+			return -1;
+		}
+
+		int shift = newArrival - this._steps.getLast().getArrivalTime();
+
+		LinkedList<PathStep> newSteps = new LinkedList<PathStep>();
+
+		for (PathStep step : this._steps) {
+			PathStep newStep = step.copyShifted(shift);
+			newSteps.addLast(newStep);  
+			latestUsed = Math.max(latestUsed, newStep.getStartTime());
+			latestUsed = Math.max(latestUsed, newStep.getArrivalTime());
+		}
+
+		this._steps = newSteps;
+
+		return latestUsed;
+	}
 
 	/**
 	 * print the path

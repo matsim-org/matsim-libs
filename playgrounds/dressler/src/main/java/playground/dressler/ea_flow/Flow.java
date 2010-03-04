@@ -297,6 +297,11 @@ public class Flow {
 			} else {
 				throw new RuntimeException("Unsupported kind of PathStep!");
 			}
+			
+			// no need for further scanning, if this path is already useless
+			if (result == 0) {
+				return 0;
+			}
 
 		}
 		//System.out.println(""+ result);
