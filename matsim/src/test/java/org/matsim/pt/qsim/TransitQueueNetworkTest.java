@@ -50,7 +50,7 @@ import org.matsim.ptproject.qsim.PersonAgent;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QLinkImpl;
 import org.matsim.ptproject.qsim.QNetwork;
-import org.matsim.ptproject.qsim.QSimEngine;
+import org.matsim.ptproject.qsim.QSimEngineImpl;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.ptproject.qsim.QueueVehicleImpl;
@@ -946,7 +946,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
 	}
 
-	protected static class TestSimEngine extends QSimEngine {
+	protected static class TestSimEngine extends QSimEngineImpl {
 		TestSimEngine(final QNetwork queueNetwork) {
 			super(queueNetwork, new Random(511));
 		}
