@@ -25,6 +25,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -145,7 +147,7 @@ public class MultiSourceEAF {
 		Flow fluss;
 		
 
-		Collection<TimeExpandedPath> result = null;
+		List<TimeExpandedPath> result = null;
 		fluss = new Flow(settings);
 		
 		String tempstr = "";
@@ -180,7 +182,7 @@ public class MultiSourceEAF {
 			//System.out.println("Iteration " + i);
 			
 			// THE IMPORTANT FUNCTION CALL HAPPENS HERE //
-			routingAlgo.startNewIter();
+			routingAlgo.startNewIter(lasttime);
 			switch (settings.searchAlgo) {
 	            case FlowCalculationSettings.SEARCHALGO_FORWARD: {
 	            	result = routingAlgo.doCalculationsForward();
@@ -211,6 +213,7 @@ public class MultiSourceEAF {
 			boolean trySuccessfulPaths = false;
 			tempstr = "";
 			int zeroaugment = 0;
+			int goodaugment = 0;
 			
 			
 			if (result == null || result.isEmpty()){
@@ -247,7 +250,9 @@ public class MultiSourceEAF {
 				}
 			}
 			
-			if (trySuccessfulPaths) {
+			int totalsizeaugmented = 0;
+			
+			if (trySuccessfulPaths && settings.useRepeatedPaths) {
 				LinkedList<TimeExpandedPath> newSP = new LinkedList<TimeExpandedPath>();
 				
 				for(TimeExpandedPath path : successfulPaths){
@@ -271,12 +276,18 @@ public class MultiSourceEAF {
 						
 						// remember this path for the next timelayer						
 						newSP.addLast(path); // keep the order!
+						goodaugment += 1;
+						totalsizeaugmented += path.getPathSteps().size();
 					} else {
 						zeroaugment += 1;
 					}
 				}
-				System.out.println("Had Repeated paths: " + successfulPaths.size());
-				System.out.println("Sucess: " + newSP.size() + ", zeroaugment: " + zeroaugment);				
+				
+				if (_debug) {
+					System.out.println("Had Repeated paths: " + successfulPaths.size());
+					System.out.println("Sucess: " + newSP.size() + ", zeroaugment: " + zeroaugment);
+				}
+				
 				successfulPaths = newSP;
 				
 				if (!newSP.isEmpty()) {
@@ -288,6 +299,31 @@ public class MultiSourceEAF {
 				}
 			}
 			
+			
+			
+			/* sort the paths first by the number of steps used!			
+			  helps a little for mixed search ...
+			 and a lot for reverse search.
+			 none for forward? maybe because all paths are augmented anyway */
+			if (settings.sortPathsBeforeAugmenting) {
+				Collections.sort(result, new Comparator<TimeExpandedPath>() {
+					public int compare(TimeExpandedPath first, TimeExpandedPath second) {
+						int v1 = first.getPathSteps().size();	        	   
+						int v2 = second.getPathSteps().size();
+						if (v1 > v2) {
+							return 1;
+						} else if (v1 == v2) {
+							return 0;
+						} else {
+							return -1;
+						}
+
+					}
+				});
+			}
+			
+			//System.out.println(result);
+						
 			for(TimeExpandedPath path : result){
 				String tempstr2 = "";
 				
@@ -301,11 +337,21 @@ public class MultiSourceEAF {
 					
 					// remember this path for the next timelayer
 					successfulPaths.addLast(path); // keep the order
+					
+					goodaugment += 1;
+					totalsizeaugmented += path.getPathSteps().size();
 				} else {
 					zeroaugment += 1;
 				}
 			}
+			
+			tempstr += "Good augment on " + goodaugment + " paths.\n";
 			tempstr += "Zero augment on " + zeroaugment + " paths.\n";
+			if (goodaugment > 0) {
+				tempstr += "Avg size of augmented path " + totalsizeaugmented / (float) goodaugment + ".\n";
+			}
+			
+			
 			if (_debug) {				
 				System.out.println(tempstr);				
 			}
@@ -314,7 +360,6 @@ public class MultiSourceEAF {
 			EdgeGain += fluss.cleanUp();
 			
 			timeAugment += timer3 - timer2;
-			
 			
 			if (i % 100 == 0) {		
 				long timecurrent = System.currentTimeMillis();
@@ -443,7 +488,7 @@ public class MultiSourceEAF {
 		int timeStep; 
 		double flowFactor;
 
-		int instance = 1; 
+		int instance = 2; 
 		// 0 = custom
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
@@ -596,13 +641,15 @@ public class MultiSourceEAF {
 		settings = new FlowCalculationSettings(network, sinkid, demands, timeStep, flowFactor);
 
 		// set additional parameters, mostly TimeHorizon for the LP
-		//settings.TimeHorizon = 1800;
+		//settings.TimeHorizon = 1240;
 		//settings.MaxRounds = 101;
 		//settings.checkConsistency = 100;		
 		settings.useVertexCleanup = false;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
+		settings.useRepeatedPaths = true;
+		settings.sortPathsBeforeAugmenting = true;
 		settings.checkTouchedNodes = true;
 		settings.keepPaths = true; // do not store paths at all!
 		settings.unfoldPaths = true; // unfold stored paths into forward paths

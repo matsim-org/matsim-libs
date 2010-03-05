@@ -52,8 +52,12 @@ public class FlowCalculationSettings {
 	public int checkConsistency = 0; // after how many iterations should consistency be checked? 0 = off
 	public boolean checkTouchedNodes = true; // should Flow.UnfoldAndAugment() try to shortcut the search for suitable forward steps?
 	
+	public boolean sortPathsBeforeAugmenting = true; // try to augment shorter (#steps) first? 
 	public boolean keepPaths = true; // should TEPs be stored at all?
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
+	public boolean useRepeatedPaths = true; // try to repeat paths
+	
+	public boolean trackUnreachableVertices = true;
 	
 	/* interal storage for the network parameters */ 
 	private HashMap<Link, Integer> _capacities;
@@ -204,11 +208,15 @@ public class FlowCalculationSettings {
 			  System.out.println("Algorithm to use: Unkown (" + this.searchAlgo +")");
 		}
 		  
+		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
 		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);
+		System.out.println("Use repeated paths: " + this.useRepeatedPaths);
+		System.out.println("Sort paths before augmenting: " + this.sortPathsBeforeAugmenting);
 		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
 		System.out.println("Use touched nodes hashmaps: " + this.checkTouchedNodes);
 		System.out.println("Keep paths at all: " + this.keepPaths);
 		System.out.println("Unfold stored paths: " + this.unfoldPaths);
+		
 		System.out.println("===================================");
 	}
 	

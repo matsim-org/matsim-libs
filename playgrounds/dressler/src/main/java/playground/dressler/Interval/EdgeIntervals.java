@@ -259,6 +259,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 			i = getIntervalAt(t); // just to be safe
 		}
 		i.augment(gamma, u);
+		
 	}
 	
 	/**

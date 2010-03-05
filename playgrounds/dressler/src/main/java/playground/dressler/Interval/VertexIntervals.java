@@ -104,9 +104,11 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 				result=this.getNext(result);
 			}
 		}
-		if (result.getReachable()){
+		
+		if (result.getReachable() && result.getPredecessor() != null){
 			return result;
-		}	
+		}
+		
 		return null;
 	}
 	

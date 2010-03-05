@@ -75,6 +75,16 @@ public class BellmanFordIntervalBased {
 	 */
 	HashMap<Node, VertexIntervals> _labels;
 	
+	/*
+	 * data structure to remember when a vertex cannot be reached at all
+	 * (either from the source or the sink, though only from the source is used right now)
+	 * more precisely: <= unreachable(node) is unreachable.
+	 * so initialize with -1 
+	 */
+	
+	private HashMap<Node, Integer> _unreachable;
+	
+	
 	/**
 	 * data structure to keep one label on each source
 	 */
@@ -83,6 +93,8 @@ public class BellmanFordIntervalBased {
 	
 	//private static int _warmstart;
 	//private LinkedList<Node> _warmstartlist;
+	
+	private int _oldLastArrival = -1; // will get changed on the first iteration
 	
 	/**
 	 * debug variable, the higher the value the more it tells
@@ -113,6 +125,16 @@ public class BellmanFordIntervalBased {
 		this._settings = settings;
 		this._flow = flow;
 		this._network = settings.getNetwork();
+		
+		if (this._settings.trackUnreachableVertices) {
+			if (this._unreachable == null) {
+			  this._unreachable = new HashMap<Node, Integer>(3 * this._network.getNodes().size() / 2);
+			}
+			
+			for (Node node : this._network.getNodes().values()) {
+				this._unreachable.put(node, -1);
+			}
+		}		
 	}
 	
 	
@@ -203,8 +225,8 @@ public class BellmanFordIntervalBased {
 	 * and fill the queue
 	 */
 	private void refreshLabelsForward(Queue<BFTask> queue){		
-		this._labels = new HashMap<Node, VertexIntervals>();
-		this._sourcelabels = new HashMap<Node, VertexInterval>();
+		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
+		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
 		
 		for(Node node: this._network.getNodes().values()){
 			VertexInterval temp1 = new VertexInterval(0,this._settings.TimeHorizon);
@@ -230,8 +252,8 @@ public class BellmanFordIntervalBased {
 	 * and fill the queue
 	 */
 	private void refreshLabelsReverse(Queue<BFTask> queue){		
-		this._labels = new HashMap<Node, VertexIntervals>();
-		this._sourcelabels = new HashMap<Node, VertexInterval>();
+		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
+		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
 		
 		for(Node node: this._network.getNodes().values()){
 			VertexInterval temp1 = new VertexInterval(0,this._settings.TimeHorizon);
@@ -255,8 +277,8 @@ public class BellmanFordIntervalBased {
 	 * and fill the queue
 	 */
 	private void refreshLabelsMixed(Queue<BFTask> queue){		
-		this._labels = new HashMap<Node, VertexIntervals>();
-		this._sourcelabels = new HashMap<Node, VertexInterval>();
+		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
+		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
 		
 		for(Node node: this._network.getNodes().values()){
 			VertexInterval temp1 = new VertexInterval(0,this._settings.TimeHorizon);
@@ -289,7 +311,7 @@ public class BellmanFordIntervalBased {
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	private Collection<TimeExpandedPath> constructRoutesForward() throws BFException {
+	private List<TimeExpandedPath> constructRoutesForward() throws BFException {
 		
 		if (_debug > 0) {
 		  System.out.println("Constructing routes ...");
@@ -438,7 +460,7 @@ public class BellmanFordIntervalBased {
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	private Collection<TimeExpandedPath> constructRoutesReverse() throws BFException {
+	private List<TimeExpandedPath> constructRoutesReverse() throws BFException {
 		
 		if (_debug > 0) {
 			System.out.println("Constructing routes ...");
@@ -477,7 +499,7 @@ public class BellmanFordIntervalBased {
 			//start constructing the TimeExpandedPath
 			TimeExpandedPath TEP = new TimeExpandedPath();		
 			
-			int fromTime = 0;
+			
 
 			Node fromNode = source;
 			VertexInterval fromLabel = sourceLabel;
@@ -485,6 +507,10 @@ public class BellmanFordIntervalBased {
 			PathStep succ;
 
 			succ = fromLabel.getSuccessor();
+			
+			int fromTime = 0; // TODO maybe it's better to leave the sink as late as possible?
+			// if it is an active source, we can leave at any time!
+			// does this help?
 
 			boolean reachedsink = false;
 			while (succ != null) {				
@@ -529,7 +555,7 @@ public class BellmanFordIntervalBased {
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	private Collection<TimeExpandedPath> constructRoutesMixed() throws BFException {
+	private List<TimeExpandedPath> constructRoutesMixed() throws BFException {
 		
 		if (_debug > 0) {
 			System.out.println("Constructing routes from mixed labels ...");
@@ -879,12 +905,36 @@ public class BellmanFordIntervalBased {
 		if (this._settings.isSource(v)) {
 			// we've found a source, mark it
 			VertexInterval vi = this._sourcelabels.get(v);
-			if (!vi.getReachable()) {
-				PathStep succ = new StepSourceFlow(v, inter.getLowBound(), true);
-				vi.setArrivalAttributesReverse(succ);
-				// well, if it's an active source, this will not do anything
-				// we do it anyway, it doesn't really hurt.
-				queue.add(new BFTask(new VirtualSource(v), 0, true));
+			
+			// maybe we should "leave" the source as late as possible?
+			// no, that does seem to make it a lot worse!
+			PathStep succ = new StepSourceFlow(v, inter.getLowBound(), true);
+			//PathStep succ = new StepSourceFlow(v, inter.getHighBound() - 1, true);
+			
+			if (this._flow.isActiveSource(v)) {
+				// mark it as reachable if it was unreachable 
+
+				// note: trying to arriva as late as possible hurts the performance!
+				/* if (!vi.getReachable() 
+						|| vi.getSuccessor() == null
+						|| vi.getSuccessor().getArrivalTime() < succ.getArrivalTime()) {
+				*/
+
+				if (!vi.getReachable()) {
+					vi.setArrivalAttributesReverse(succ);
+
+				}	
+			} else { // isNonActiveSource(v) == true
+				if (!vi.getReachable()) {
+					
+					vi.setArrivalAttributesReverse(succ);
+					
+					// only non active sources need to propagate
+					// (active sources would just get ignored anyway)
+					if (this._flow.isNonActiveSource(v)) {
+					  queue.add(new BFTask(new VirtualSource(v), 0, true));
+					}
+				}
 			}
 		}			
 		
@@ -903,6 +953,8 @@ public class BellmanFordIntervalBased {
 		// (lastArrival, lastArrival + 1) == bad, do not use
 		
 		VertexInterval arrive = new VertexInterval(0, lastArrival + 1);
+		//VertexInterval arrive = new VertexInterval(lastArrival, lastArrival + 1);
+		
 		PathStep succ = new StepSinkFlow(v, lastArrival, true);
 		arrive.setSuccessor(succ);
 		arrive.setReachable(true);
@@ -924,7 +976,7 @@ public class BellmanFordIntervalBased {
 		if (!this._flow.isNonActiveSource(v)) {
 			return null;
 		}
-
+		
 		VertexInterval inter = this._sourcelabels.get(v);
 		
 		// already scanned or not reachable (neither should occur ...)
@@ -959,7 +1011,7 @@ public class BellmanFordIntervalBased {
 	 * main bellman ford algorithm calculating a shortest TimeExpandedPath
 	 * @return maybe multiple TimeExpandedPath from active source(s) to the sink if it exists
 	 */
-	public Collection<TimeExpandedPath> doCalculationsForward() {
+	public List<TimeExpandedPath> doCalculationsForward() {
 		if (_debug > 0) {
 		  System.out.println("Running BellmanFord in Forward mode.");
 		} else {
@@ -1032,8 +1084,8 @@ public class BellmanFordIntervalBased {
 				
 				List<BFTask> tempqueue = processSourceForward(v); 
 				
-				if (tempqueue != null) {
-				  queue.addAll(tempqueue);
+				if (tempqueue != null) {					
+				  queue.addAll(tempqueue);				  
 				}
 				
 			} else if (task.node instanceof VirtualNormalNode) {
@@ -1068,7 +1120,7 @@ public class BellmanFordIntervalBased {
 		//System.out.println("final labels: \n");
 		//printStatus();
 		
-		Collection<TimeExpandedPath> TEPs = null; 
+		List<TimeExpandedPath> TEPs = null; 
 		try{ 
 			TEPs  = constructRoutesForward();		
 		}catch (BFException e){
@@ -1088,7 +1140,7 @@ public class BellmanFordIntervalBased {
 	 *         Also, it only helps if the sink is still reachable at that time. Otherwise, nothing will be found.  
 	 * @return maybe multiple TimeExpandedPath from active source(s) to the sink if it exists
 	 */
-	public Collection<TimeExpandedPath> doCalculationsReverse(int lastArrival) {
+	public List<TimeExpandedPath> doCalculationsReverse(int lastArrival) {
 		if (_debug > 0) {
 			System.out.println("Running BellmanFord in Reverse mode.");
 		} else {
@@ -1189,7 +1241,7 @@ public class BellmanFordIntervalBased {
 		//printStatus();
 		
 		boolean foundsome = false; 
-		Collection<TimeExpandedPath> TEPs = null; 
+		List<TimeExpandedPath> TEPs = null; 
 		try{ 
 			TEPs  = constructRoutesReverse();
 			foundsome = true;
@@ -1207,7 +1259,7 @@ public class BellmanFordIntervalBased {
 	 * @param lastArrival The time the flow reached the sink in the last iteration.
 	 * @return maybe multiple TimeExpandedPath from active source(s) to the sink if it exists
 	 */
-	public Collection<TimeExpandedPath> doCalculationsMixed(int lastArrival) {
+	public List<TimeExpandedPath> doCalculationsMixed(int lastArrival) {
 		if (_debug > 0) {
 			System.out.println("Running BellmanFord in Mixed mode.");
 		} else {
@@ -1263,6 +1315,7 @@ public class BellmanFordIntervalBased {
 					continue;
 				}
 				
+				
 				if (task.node instanceof VirtualSink) {
 					
 					List<BFTask> tempqueue = processSinkReverse(v, lastArrival); 
@@ -1285,7 +1338,14 @@ public class BellmanFordIntervalBased {
 						// Effectiveness with this implementation is questionable
 						this.vertexGain += _labels.get(v).cleanup();
 					}
-
+					
+					if (this._settings.trackUnreachableVertices) {
+						if (task.ival.getHighBound() <= this._unreachable.get(v)) {
+							//System.out.println("Skipping a task!");
+							continue;
+						}
+					}
+					
 					List<BFTask> tempqueue = processNormalNodeReverse(v, task.ival.getLowBound());
 					
 					if (tempqueue != null) {
@@ -1360,8 +1420,28 @@ public class BellmanFordIntervalBased {
 		//System.out.println("final labels: \n");
 		//printStatus();
 		
+		// update the unreachable marks!
+		
+		if (this._settings.trackUnreachableVertices) {
+			for (Node node : this._network.getNodes().values()) {
+				VertexInterval iv =this._labels.get(node).getFirstPossibleForward();
+				int t;
+				if (iv != null) {
+				  t = iv.getLowBound(); // this is just reachable
+				  t -= 1; // this is not
+				} else {
+					// not reachable at all so far, up to the current "timehorizon"
+					t = cutofftimeForward;
+				}
+				if (t > this._unreachable.get(node)) {
+					this._unreachable.put(node, t);
+				}
+			}
+		}
+		
+		
 		boolean foundsome = false; 
-		Collection<TimeExpandedPath> TEPs = null; 
+		List<TimeExpandedPath> TEPs = null; 
 		try{ 
 			TEPs  = constructRoutesMixed();
 			foundsome = true;
@@ -1450,12 +1530,14 @@ public class BellmanFordIntervalBased {
 		print.append("Regular lables");
 		for (Node node : this._network.getNodes().values()){
 			VertexIntervals inter = this._labels.get(node);
-			int t = inter.firstPossibleTime();
+			print.append(node.getId() + ":");
+			print.append(inter.toString());
+			/*int t = inter.firstPossibleTime();
 			if (t == Integer.MAX_VALUE) {
 				print.append(node.getId().toString() + " t: "+ "inf." +"\n");
 			} else {
 				print.append(node.getId().toString() + " t: "+ t +" pred: "+ inter.getIntervalAt(t).getPredecessor() + " succ: " + inter.getIntervalAt(t).getSuccessor() + "\n");				
-			}
+			}*/
 		}
 		
 		print.append("Source labels");
@@ -1501,8 +1583,13 @@ public class BellmanFordIntervalBased {
 
 
 	/* reset status information of the algo for the next iter */
-	public void startNewIter() {
+	public void startNewIter(int lastArrival) {
 		this.vertexGain = 0;
+		if (lastArrival > this._oldLastArrival) {
+			// reset some status information
+			// nothing needed currently
+		}
+		
 	}
 	
 

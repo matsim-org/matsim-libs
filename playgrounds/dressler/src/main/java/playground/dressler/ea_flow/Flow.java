@@ -325,6 +325,7 @@ public class Flow {
 	 * @return Amount of flow that was really augmented. Should be gamma under most circumstances.
 	 */
 	public int augment(TimeExpandedPath TEP, int gamma){
+			
 	  if (TEP.hadToFixSourceLinks()) {
 	    System.out.println("TimeExpandedPath should start with PathEdge of type SourceOutflow! Fixed.");
 	  }
