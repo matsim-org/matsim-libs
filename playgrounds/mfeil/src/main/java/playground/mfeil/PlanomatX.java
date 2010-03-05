@@ -20,6 +20,9 @@
 package playground.mfeil;
 
 import java.util.ArrayList;
+import java.io.PrintStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -29,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -75,6 +79,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final Knowledges knowledges;
 	private final Network network;
+	private		 ControlerIO				controlerIO;
+	private boolean printing = false;
+	private PrintStream 					stream;
 
 
 	//////////////////////////////////////////////////////////////////////
@@ -86,7 +93,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 		this.network = controler.getNetwork();
-
+		this.controlerIO			= controler.getControlerIO();
 		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
 
 		this.finder 				= finder;
@@ -133,7 +140,12 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		//////////////////////////////////////////////////////////////////////
 		// Initialization
 		//////////////////////////////////////////////////////////////////////
-
+		
+		//log.info("PlX person "+plan.getPerson().getId());
+		if (plan.getPerson().getId().toString().equals("1062251") ||
+				plan.getPerson().getId().toString().equals("4773280")) this.printing = true;
+		else this.printing = false;
+		
 		MatsimRandom.getLocalInstance();
 
 		long runStartTime = System.currentTimeMillis();
@@ -161,18 +173,18 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		/* Activity types that may be included */
 		List<String> actTypes							= this.finder.getActTypes(plan.getPerson());
 
-		/*
-		String outputfile = Controler.getOutputFilename(plan.getPerson().getId()+"_detailed_log.xls");
-		Counter.counter++;
-		PrintStream stream;
-		try {
-			stream = new PrintStream (new File(outputfile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
+		if (printing){
+			String outputfile = this.controlerIO.getOutputFilename(plan.getPerson().getId()+"_detailed_log.xls");
+			Counter.counter++;
+			try {
+				this.stream = new PrintStream (new File(outputfile));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				return;
+			}
+			stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
 		}
-		stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
-		*/
+		
 
 		/*
 		double [] xs;
@@ -211,6 +223,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			this.router.run(plan);
 		}
 		this.timer.run(plan);
+		if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
+			plan.setScore(this.scorer.getScore(plan));
+		}
 		while (plan.getScore().doubleValue()==-100000){
 
 			/* Remove last secondary activity to make plan shorter*/
@@ -248,7 +263,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 
 		/* Write the given plan into the tabuList*/
 		tabuList.add(neighbourhood[NEIGHBOURHOOD_SIZE]);
-	//	stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
+		if (printing) this.stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
 	//	ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
 
 		// TODO muss dann wieder raus! Nur fuer Planomat!
@@ -260,7 +275,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		/* Do Tabu Search iterations*/
 		int currentIteration;
 		for (currentIteration = 1; currentIteration<=MAX_ITERATIONS;currentIteration++){
-	//		stream.println("Iteration "+currentIteration);
+			if (printing) this.stream.println("Iteration "+currentIteration);
 
 			/* Define the neighbourhood*/
 			this.createNeighbourhood(neighbourhood, infoOnNeighbourhood, actTypes, primActs);
@@ -331,20 +346,20 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 					else if (solution.getPlanElements().size()==13) solution13.add(solution);
 					else solutionLong.add(solution);
 				}
-				/*
-				stream.print(neighbourhood[x].getScore()+"\t");
-				stream.print(infoOnNeighbourhood[x][0]+"\t");
-				stream.print(tabuInNeighbourhood[x]+"\t");
-				stream.print(scoredInNeighbourhood[x]+"\t");
-				for (int i= 0;i<neighbourhood[x].getPlanElements().size();i=i+2){
-					ActivityImpl act = (ActivityImpl)neighbourhood[x].getPlanElements().get(i);
-					if (i!=neighbourhood[x].getPlanElements().size()-1) stream.print(act.getType()+"\t"+((LegImpl)(neighbourhood[x].getPlanElements()).get(i+1)).getMode()+"\t");
-					else stream.print(act.getType()+"\t");
+				if (printing){
+					stream.print(neighbourhood[x].getScore()+"\t");
+					stream.print(infoOnNeighbourhood[x][0]+"\t");
+					stream.print(tabuInNeighbourhood[x]+"\t");
+					stream.print(scoredInNeighbourhood[x]+"\t");
+					for (int i= 0;i<neighbourhood[x].getPlanElements().size();i=i+2){
+						ActivityImpl act = (ActivityImpl)neighbourhood[x].getPlanElements().get(i);
+						if (i!=neighbourhood[x].getPlanElements().size()-1) stream.print(act.getType()+"\t"+((LegImpl)(neighbourhood[x].getPlanElements()).get(i+1)).getMode()+"\t");
+						else stream.print(act.getType()+"\t");
+					}
+					stream.print(infoOnNeighbourhood[x][1]+"\t");
+					stream.print(infoOnNeighbourhood[x][2]+"\t");
+					stream.println();
 				}
-				stream.print(infoOnNeighbourhood[x][1]+"\t");
-				stream.print(infoOnNeighbourhood[x][2]+"\t");
-				stream.println();
-				*/
 			}
 
 			/* Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList*/
@@ -355,7 +370,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 
 			/* Statistics*/
 	//		ys[currentIteration]=bestIterSolution.getScore();
-	//		stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());
+			if (printing) this.stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());
 			if (bestIterSolution.getScore().doubleValue()>bestScore) bestScore=bestIterSolution.getScore().doubleValue();
 	//		if (currentIteration%5==0) scoreStat.add(bestScore);
 
@@ -382,7 +397,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		plan.setScore(tabuList.get(tabuList.size()-1).getScore());
 
 
-	//	stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
+		if (printing) this.stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
 
 	//	xs = new double [currentIteration];
 	//	for (int i = 0;i<xs.length;i++)xs[i]=i+1;
@@ -391,14 +406,16 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			this.finalTimer.run(tabuList.get(tabuList.size()-1));
 			tabuList.get(tabuList.size()-1).setScore(this.scorer.getScore(tabuList.get(tabuList.size()-1)));
 	//		scoreStat.add(tabuList.get(tabuList.size()-1).getScore());
-	/*		stream.print(tabuList.get(tabuList.size()-1).getScore()+"\t\t\t\t");
-			for (int i= 0;i<tabuList.get(tabuList.size()-1).getPlanElements().size();i=i+2){
-				ActivityImpl act = (ActivityImpl)tabuList.get(tabuList.size()-1).getPlanElements().get(i);
-				if (i!=tabuList.get(tabuList.size()-1).getPlanElements().size()-1) stream.print(act.getType()+"\t"+((LegImpl)(tabuList.get(tabuList.size()-1).getPlanElements()).get(i+1)).getMode()+"\t");
-				else stream.print(act.getType()+"\t");
+			if (printing){
+				this.stream.print(tabuList.get(tabuList.size()-1).getScore()+"\t\t\t\t");
+				for (int i= 0;i<tabuList.get(tabuList.size()-1).getPlanElements().size();i=i+2){
+					ActivityImpl act = (ActivityImpl)tabuList.get(tabuList.size()-1).getPlanElements().get(i);
+					if (i!=tabuList.get(tabuList.size()-1).getPlanElements().size()-1) this.stream.print(act.getType()+"\t"+((LegImpl)(tabuList.get(tabuList.size()-1).getPlanElements()).get(i+1)).getMode()+"\t");
+					else stream.print(act.getType()+"\t");
+				}
+				this.stream.println();
 			}
-			stream.println();
-	*/	}
+		}
 
 		if(al.size()>tabuList.get(tabuList.size()-1).getPlanElements().size()){
 			int i;
@@ -432,11 +449,11 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		chart.addMatsimLogo();
 		chart.saveAsPng(Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"scorestats_.png"), 800, 600);
 		*/
-		/*
-		stream.println ("Dauer der run() Methode: "+(System.currentTimeMillis()-runStartTime));
-		stream.println("Anzahl der Planomat-Aufrufe: "+numberTimerCalls);
-		stream.close();
-		*/
+		if (printing){
+			this.stream.println ("Dauer der run() Methode: "+(System.currentTimeMillis()-runStartTime));
+			this.stream.println("Anzahl der Planomat-Aufrufe: "+numberTimerCalls);
+			this.stream.close();
+		}
 
 	/*	statistics.print(plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberTimerCalls+"\t");
 		for (int i=0;i<scoreStat.size();i++){
@@ -785,7 +802,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			else { // second loop onwards, increase to three acts
 				this.insertAct(1, actsToBeAdded, basePlan, actTypes); // no need to check for homeActInserted, cannot happen
 				position[0]++;
-				if (position[0]>actTypes.size()){ // // Add all available actTypes but "home", including the one reduction from above
+				if (position[0]>actTypes.size()){ // Add all available actTypes but "home", including the one reduction from above
 					position[0]=-1;
 				}
 				return (new int[]{0,1,-1});
