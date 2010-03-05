@@ -78,12 +78,17 @@ public class LightSignalSystemConfigurationsReader10 extends MatsimJaxbXmlParser
 			//validate file
 			super.validateFile(filename, u);
 
-			InputStream stream = new FileInputStream(filename);
-			xmlLssConfig = (XMLLightSignalSystemConfig)u.unmarshal(stream);
+			InputStream stream = null;
 			try {
-				stream.close();
-			} catch (IOException e) {
-				log.warn("Could not close stream.", e);
+				stream = new FileInputStream(filename);
+				xmlLssConfig = (XMLLightSignalSystemConfig)u.unmarshal(stream);
+			}
+			finally {
+				try {
+					if (stream != null) { stream.close();	}
+				} catch (IOException e) {
+					log.warn("Could not close stream.", e);
+				}
 			}
 
 		//convert the parsed xml-instances to basic instances

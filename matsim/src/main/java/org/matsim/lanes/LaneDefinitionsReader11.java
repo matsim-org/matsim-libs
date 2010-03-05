@@ -78,12 +78,17 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 			// validate XML file
 			super.validateFile(filename, u);
 			log.info("starting unmarshalling " + filename);
-			InputStream stream = new FileInputStream(filename);
-			xmlLaneDefinitions = (XMLLaneDefinitions) u.unmarshal(stream);
+			InputStream stream = null;
 			try {
-				stream.close();
-			} catch (IOException e) {
-				log.warn("Could not close stream.", e);
+				stream = new FileInputStream(filename);
+				xmlLaneDefinitions = (XMLLaneDefinitions) u.unmarshal(stream);
+			}
+			finally {
+				try {
+					if (stream != null) { stream.close();	}
+				} catch (IOException e) {
+					log.warn("Could not close stream.", e);
+				}
 			}
 			//convert the parsed xml-instances to basic instances
 			LanesToLinkAssignment l2lAssignment;
