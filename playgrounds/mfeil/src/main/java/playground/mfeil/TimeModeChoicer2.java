@@ -75,6 +75,11 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 	// TODO: this is bad programming style... needs to be improved!
 	@Override
 	public void run (Plan basePlan){
+		
+	//	log.info("Tmc2 person "+basePlan.getPerson().getId());
+		if (basePlan.getPerson().getId().toString().equals("1062251") ||
+				basePlan.getPerson().getId().toString().equals("4773280")) this.printing = true;
+		else this.printing = false;
 
 		if (printing){
 			String outputfile = this.controlerIO.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+basePlan.getPerson().getId()+".xls");
@@ -100,8 +105,11 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		}
 
 
-		/*Do nothing if the plan has only one or two activities (=24h home)*/
-		if (basePlan.getPlanElements().size()<=3) return;
+		/* Only score if the plan has only one or two activities (=24h home)*/
+		if (basePlan.getPlanElements().size()<=3) {
+			basePlan.setScore(this.scorer.getScore(basePlan));
+			return;
+		}
 
 		/* Replace delivered plan by copy since delivered plan must not be changed until valid solution has been found */
 		PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
