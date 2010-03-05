@@ -21,6 +21,7 @@
 package playground.mfeil;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -30,9 +31,15 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  * @author mfeil
  */
 public class JohScoringFunctionEstimationFactory implements ScoringFunctionFactory {
+	
+	Network network;
+	
+	public JohScoringFunctionEstimationFactory (Network network){
+		this.network = network;
+	}
 		
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
-		return new JohScoringFunctionEstimation(plan);
+		return new JohScoringFunctionEstimation(plan, network);
 	}
 
 }

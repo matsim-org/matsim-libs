@@ -49,13 +49,13 @@ import playground.mfeil.JohScoringFunctionEstimationFactory;
 public class EstimationValidation {
 
 	private final PopulationImpl population;
-	private final PlanScorer scorer;
+	private PlanScorer scorer;
 	private static final Logger log = Logger.getLogger(EstimationValidation.class);
 
 
 	public EstimationValidation(final PopulationImpl population) {
 		this.population = population;
-		this.scorer = new PlanScorer (new JohScoringFunctionEstimationFactory());
+//		this.scorer = new PlanScorer (new JohScoringFunctionEstimationFactory());
 	}
 	
 	public void run(String outputFile){

@@ -21,7 +21,8 @@
 package playground.mfeil;
 
 import java.util.TreeMap;
-
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -32,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.core.population.PersonImpl;
 
@@ -89,18 +91,18 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 0995b_6
-	private static double beta_time_car = -5.00; //war -6.01 
-	private static double beta_time_pt = 0.0559; 
+	// Settings of 0995b_16
+	private static double beta_time_car = -6.01; 
+	private static double beta_time_pt = -1.0; // war 0.0559
 	private static double beta_time_bike = -1.32;
 	private static double beta_time_walk = -1.13;
 	
 	private static double constantPt = -0.559;
-	private static double constantBike = -0.5;
-	private static double constantWalk = 0.780;
+	private static double constantBike = -0.4;
+	private static double constantWalk = 0.78;
 	
-	private static double beta_cost_car = 0.2; 
-	private static double beta_cost_pt = -1.5;
+	private static double beta_cost_car = 0.106; 
+	private static double beta_cost_pt = -0.109;
 	
 	private static double lambda_cost_income_car = 0.0779;
 	private static double lambda_cost_income_pt = -0.298;
@@ -129,22 +131,22 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	
 	private static final double uMax_home = 5.41; 
 	private static final double uMax_innerHome = 1.0; 
-	private static final double uMax_work= 6;  
+	private static final double uMax_work= 7.0;  
 	private static final double uMax_education = 4.0;
 	private static final double uMax_shopping = 0.2; 
-	private static final double uMax_leisure = 2.34;  
+	private static final double uMax_leisure = 2.1;  
 	
 	private static final double alpha_home = 12;
-	private static final double alpha_innerHome = 2;
-	private static final double alpha_work = 8;
-	private static final double alpha_education = 6;
+	private static final double alpha_innerHome = 1.9;
+	private static final double alpha_work = 4;
+	private static final double alpha_education = 3.5;
 	private static final double alpha_shopping = 0.7;
-	private static final double alpha_leisure = 2;
+	private static final double alpha_leisure = 1.7;
 	
 	private static final double beta_home = 0.429;
 	private static final double beta_innerHome = 17.8;
 	private static final double beta_work = 0.568;
-	private static final double beta_education = 2.5;
+	private static final double beta_education = 1.5;
 	private static final double beta_shopping = 5;
 	private static final double beta_leisure = 5;
 	
@@ -162,9 +164,13 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double beta_age_shopping = 0;
 	private static final double beta_age_leisure = 0;
 	
+	private final Network network;
+	
 	
 		
-	public JohScoringFunctionEstimation(final Plan plan) {
+	public JohScoringFunctionEstimation(final Plan plan, final Network network) {
+		this.network = network;
+		
 		init();
 		this.reset();
 		
@@ -371,12 +377,16 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		if (duration>=0) {
 			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().startsWith(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType().substring(0, 1))) gamma = 1;
-			tmpScore += (1 + beta_female_act * this.female + params.getBetaAge() * this.age + repeat * gamma) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
+			double interScore = (1 + beta_female_act * this.female + params.getBetaAge() * this.age + repeat * gamma) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
+			tmpScore += interScore;
 		} else {
-			log.warn("In duration<0 loop - this must not happen! (Person "+plan.getPerson().getId()+" at act position "+this.index);
-			int gamma = 0;
+	/*		int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().startsWith(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType().substring(0, 1))) gamma = 1;
-			tmpScore -= Math.max(0, factorOfLateArrival * (1 + beta_female_act * this.female + params.getBetaAge() * this.age + repeat * gamma) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma()))));
+			double interScore = Math.max(0, factorOfLateArrival * (1 + beta_female_act * this.female + params.getBetaAge() * this.age + repeat * gamma) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma()))));
+			tmpScore -= interScore;
+			log.warn("In duration<0 loop - this must not happen! (Person "+plan.getPerson().getId()+" at act position "+this.index+" with duration "+duration+" and utility "+interScore);
+	*/
+			tmpScore -= 100;
 		}
 
 		// disutility if stopping too early
@@ -409,7 +419,11 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
-		double dist = leg.getRoute().getDistance()/1000; // distance in kilometers
+		double dist;
+		if (!leg.getMode().toString().equals(TransportMode.car.toString())) dist = leg.getRoute().getDistance()/1000; // distance in kilometers
+		else dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+		if ((dist+"").equalsIgnoreCase("nan")) log.warn("dist von person "+plan.getPerson().getId()+" mit mode "+leg.getMode()+" und route "+leg.getRoute().getDistance()+", "+leg.getRoute().getStartLinkId()+", "+leg.getRoute().getEndLinkId()+" ist NaN.");
+		
 		
 		if (TransportMode.car.equals(leg.getMode())) {
 			// income_averageIncome_ratio needs to be non-zero if lambda_cost_income_car is negative, potential division by 0 otherwise
@@ -477,8 +491,8 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 		type = "leisure";
 		actParams = new JohActUtilityParametersExtended("leisure", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure, beta_age_leisure);
-		actParams.setOpeningTime(18*3600);
-		actParams.setClosingTime(21*3600);			
+		actParams.setOpeningTime(15*3600);
+		actParams.setClosingTime(20.5*3600);			
 		utilParams.put(type, actParams);
 		
 		
@@ -571,8 +585,8 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 		type = "l";
 		actParams = new JohActUtilityParametersExtended("l", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure, beta_age_leisure);
-		actParams.setOpeningTime(18*3600);
-		actParams.setClosingTime(21*3600);			
+		actParams.setOpeningTime(15*3600);
+		actParams.setClosingTime(20.5*3600);			
 		utilParams.put(type, actParams);
 		
 		type = "e";
