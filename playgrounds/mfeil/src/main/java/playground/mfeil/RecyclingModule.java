@@ -94,13 +94,13 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.noOfAssignmentAgents	= 500;
 		this.finder					= finder;		
 		this.iterationsFirstTime 	= 20;
-		this.iterationsFurtherTimes = 5;
+		this.iterationsFurtherTimes = 0;
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
-		this.municipality			= "yes";
-		this.sex 					= "yes";
+		this.municipality			= "no";
+		this.sex 					= "no";
 		this.age 					= "yes";
-		this.license 				= "yes";
+		this.license 				= "no";
 		this.car_avail 				= "no";
 		this.employed 				= "no";
 		this.softCoef 				= this.detectSoftCoefficients();
@@ -243,10 +243,15 @@ public class RecyclingModule implements PlanStrategyModule{
 			assignment.println();
 		}
 		for (int i=0;i<Statistics.list.size();i++){
-			for (int j=0;j<Statistics.list.get(i).size();j++){
+			if (Statistics.list.get(i)!=null) {
+				for (int j=0;j<Statistics.list.get(i).size();j++){
 				assignment.print(Statistics.list.get(i).get(j)+"\t");
+				}
+				assignment.println();
 			}
-			assignment.println();
+			else {
+				log.warn("Statistics.list.get("+i+") == null");
+			}
 		}
 		assignment.println();
 		if (this.nonassignedAgents.size()>0){
