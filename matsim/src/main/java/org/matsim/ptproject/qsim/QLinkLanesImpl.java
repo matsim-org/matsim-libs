@@ -464,7 +464,7 @@ public class QLinkLanesImpl implements QLink {
 	}
 
 	/**
-	 * @return the QueueLanes of this QueueLink
+	 * @return the QLanes of this QueueLink
 	 */
 	public List<QLane> getQueueLanes(){
 		return this.queueLanes;
