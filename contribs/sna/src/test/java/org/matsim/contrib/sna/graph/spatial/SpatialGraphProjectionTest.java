@@ -60,6 +60,7 @@ public class SpatialGraphProjectionTest extends TestCase {
 		coordinates[4] = coordinates[0];
 		
 		Geometry geometry = geometryFactory.createLinearRing(coordinates);
+		geometry.setSRID(21781);
 		/*
 		 * Create a spatial graph with vertices inside and outside the geometry.
 		 */
