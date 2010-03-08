@@ -28,7 +28,8 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
@@ -40,7 +41,7 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  *
  */
 public class GershensonAdaptiveTrafficLightController extends
-			AdaptiveSignalSystemControlerImpl implements EventHandler {
+			AdaptiveSignalSystemControlerImpl implements EventHandler, SimulationBeforeSimStepListener {
 
 	private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
 
@@ -68,10 +69,6 @@ public class GershensonAdaptiveTrafficLightController extends
 
 	private QNetwork net;
 
-	/**
-	 * dg hack this field should disappear in the near future
-	 */
-	private Tuple<SignalGroupDefinition, Double> lastCallOfIsGreen;
 
 	public GershensonAdaptiveTrafficLightController(AdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);
@@ -167,45 +164,44 @@ public class GershensonAdaptiveTrafficLightController extends
 			approachingRed = 0;
 		}
 	}
+	
+  @Override
+  public SignalGroupState getSignalGroupState(double seconds,
+      SignalGroupDefinition signalGroup) {
+    return this.getSignalGroupStates().get(signalGroup);
+  }
 
-	@Override
-	public boolean givenSignalGroupIsGreen(double time, SignalGroupDefinition signalGroup) {
-		//start dg hack
-		if (this.lastCallOfIsGreen != null && (this.lastCallOfIsGreen.getFirst().equals(signalGroup) && this.lastCallOfIsGreen.getSecond().doubleValue() == time)){
-			if (this.getSignalGroupStates().get(signalGroup).equals(SignalGroupState.GREEN)){
-				return true;
-			}
-			else if (this.getSignalGroupStates().get(signalGroup).equals(SignalGroupState.RED)){
-				return false;
-			}
-		}
-		else {
-			this.lastCallOfIsGreen = new Tuple<SignalGroupDefinition, Double>(signalGroup, time);
-		}
-		//end dg hack
+  @Override
+  public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+    for (SignalGroupDefinition sg : this.getSignalGroups().values()){
+      this.updateSignalGroupState(e.getSimulationTime(), sg);
+    }
+  }
 
+
+	private void updateSignalGroupState(double time, SignalGroupDefinition signalGroup) {
 		this.initIsGreen(time, signalGroup);
 		//check if this group was switched in this timestep. if so, return oldstate
 		if (switchedToGreen.get(signalGroup.getId()).equals(time)){
 			if(oldState.equals(SignalGroupState.GREEN)){
-				return true;
+				this.getSignalGroupStates().put(signalGroup, SignalGroupState.GREEN);
 			}else{
-				return false;
+			  this.getSignalGroupStates().put(signalGroup, SignalGroupState.RED);
 			}
 		}
 
 		// algorithm starts
 		if ((outLinkJam == true) && oldState.equals(SignalGroupState.GREEN)){ //Rule 5 + 6
-			return this.switchLight(signalGroup, oldState, time);
+			this.switchLight(signalGroup, oldState, time);
 		}else if(outLinkJam == false ){ // 12
 			if (compGroupsGreen == false && oldState.equals(SignalGroupState.RED)){ // Rule 6
-				return this.switchLight(signalGroup, oldState, time);
+			  this.switchLight(signalGroup, oldState, time);
 			}
 			if (approachingRed > 0 && approachingGreenLink == 0){ // Rule 4
-				return switchLight(signalGroup, oldState, time);
+				switchLight(signalGroup, oldState, time);
 			}else if(!(approachingGreenLane > 0)){  //Rule 3
 				if ((time - compGreenTime) > tGreenMin && carsOnRefLink > minCars){ // Rule 1 + 2
-						return this.switchLight(signalGroup, oldState, time);
+				  this.switchLight(signalGroup, oldState, time);
 				}
 			}
 		}
@@ -213,13 +209,14 @@ public class GershensonAdaptiveTrafficLightController extends
 
 		// if no condition fits for switching lights, return oldstate
 		if(oldState.equals(SignalGroupState.GREEN)){
-			return true;
-		}else{
-			return false;
+		  this.getSignalGroupStates().put(signalGroup, SignalGroupState.GREEN);
+		}
+		else{
+		  this.getSignalGroupStates().put(signalGroup, SignalGroupState.RED);
 		}
 	}
 
-	public boolean switchLight (SignalGroupDefinition group, SignalGroupState oldState, double time){
+	public void switchLight (SignalGroupDefinition group, SignalGroupState oldState, double time){
 		if (oldState.equals(SignalGroupState.GREEN)){
 			this.getSignalGroupStates().put(group, SignalGroupState.RED);
 			if (!(corrGroups.get(group.getId()) == null)){
@@ -232,7 +229,7 @@ public class GershensonAdaptiveTrafficLightController extends
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.GREEN);
 			}
 			switchedToGreen.put(group.getId(), 0.0);
-			return false;
+			this.getSignalGroupStates().put(group, SignalGroupState.RED);
 		}else { //if (oldState.equals(SignalGroupState.RED)){
 			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
 			if (!(corrGroups.get(group.getId()) == null)){
@@ -245,7 +242,7 @@ public class GershensonAdaptiveTrafficLightController extends
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.RED);
 			}
 			switchedToGreen.put(group.getId(), time);
-			return true;
+			this.getSignalGroupStates().put(group, SignalGroupState.RED);
 		}
 //		return false;
 
