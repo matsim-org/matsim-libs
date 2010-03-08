@@ -12,6 +12,9 @@
  * <ul>
  *   <li>SignalSystemController implementations are responsible to throw the
  *   appropriate SignalGroupStateChangedEvents.</li>
+ *   <li>SingalSystemController used by the QSim of MATSim are automatically
+ *   registered as a SimulationListener if one of the SimulationListener interfaces
+ *   is implemented<li>
  * </ul>
  * 
  * <h3>Plan Based Signal Control<h3>
