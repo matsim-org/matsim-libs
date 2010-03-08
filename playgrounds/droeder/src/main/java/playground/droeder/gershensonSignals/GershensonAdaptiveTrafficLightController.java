@@ -74,7 +74,8 @@ public class GershensonAdaptiveTrafficLightController extends
 		super(controlInfo);
 	}
 
-	/** initializes the adaptive controller. set defaultParameters for minGreenTime u = 15, minCarsApproaching n = 24 and capFactor = 0.9
+	/**initializes the adaptive controller. set defaultParameters for minGreenTime u = 15, 
+	 * minCarsApproaching n = 24 and capFactor = 0.9
 	 *
 	 * Parameters could be changed with setParameters
 	 *
@@ -84,7 +85,7 @@ public class GershensonAdaptiveTrafficLightController extends
 	 * @param net
 	 * @param handler
 	 */
-	public void init(Map<Id, SignalGroupDefinition> groups, Map<Id, Id> corrGroups,
+	public void init(Map<Id, Id> corrGroups,
 			Map<Id, List<Id>> compGroups, QNetwork net, CarsOnLinkLaneHandler handler){
 		for(SignalGroupDefinition sd : this.getSignalGroups().values()){
 			this.getSignalGroupStates().put(sd, SignalGroupState.RED);
@@ -145,6 +146,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		if (compGroupsGreen == true){
 			for (Id i : compGroups.get(signalGroup.getId())){
 				approachingGreenLink += vehOnLink.get((groups.get(i).getLinkRefId())).intValue();
+//				approachingGreenLink += handler.getVehInD(time, groups.get(i).getLinkRefId());
 				for (Entry<Id, Integer> e : vehOnLinkLanes.get(i).entrySet()){
 					approachingGreenLane += e.getValue().intValue();
 				}
@@ -156,10 +158,12 @@ public class GershensonAdaptiveTrafficLightController extends
 
 		// set number of cars on refLink of signalGroup
 		carsOnRefLink = vehOnLink.get(signalGroup.getLinkRefId());
+//		carsOnRefLink = handler.getVehInD(time, signalGroup.getLinkRefId());
 
 		// 	set number of cars approaching a Red light
 		if (oldState.equals(SignalGroupState.RED)){
 			approachingRed = vehOnLink.get(groups.get(signalGroup.getId()).getLinkRefId());
+//			approachingRed = handler.getVehInD(time, signalGroup.getLinkRefId());
 		}else{
 			approachingRed = 0;
 		}

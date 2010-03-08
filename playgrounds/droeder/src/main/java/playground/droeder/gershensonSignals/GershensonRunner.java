@@ -45,6 +45,8 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QLinkLanesImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
@@ -54,6 +56,7 @@ import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
 import playground.droeder.charts.DaBarChart;
 import playground.droeder.charts.DaChartWriter;
+import playground.yu.newPlans.NewIdPlan;
 
 
 
@@ -68,6 +71,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private int u;
 	private int n;
 	private double cap;
+	private double d;
 	
 	private Map<Id, Id> corrGroups;
 	private Map<Id, List<Id>> compGroups;
@@ -130,7 +134,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				corrGroups = csg.calculateCorrespondingGroups(groups, c.getNetwork());
 				compGroups = csg.calculateCompetingGroups(corrGroups, groups, c.getNetwork());
 				handler1 = new AverageTTHandler(c.getPopulation().getPersons().size());
-				handler2 = new CarsOnLinkLaneHandler(groups);
+				handler2 = new CarsOnLinkLaneHandler(groups, d);
 				event.getControler().getEvents().addHandler(handler1);
 				event.getControler().getEvents().addHandler(handler2);
 				
@@ -175,11 +179,11 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				QSim qs = e.getQueueSimulation();
 				GershensonAdaptiveTrafficLightController adaptiveController = 
 					(GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-				adaptiveController.init(c.getScenario().getSignalSystems().getSignalGroupDefinitions(), corrGroups, compGroups, e.getQueueSimulation().getQueueNetwork(), handler2);
+				adaptiveController.init(corrGroups, compGroups, e.getQueueSimulation().getQueueNetwork(), handler2);
 				adaptiveController.setParameters(n, u, cap);
+				handler2.setQNetwork(e.getQueueSimulation().getQueueNetwork());
 				
 				c.getEvents().addHandler(adaptiveController);
-				
 			}
 		});
 		//remove the adaptive controller
@@ -216,35 +220,42 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	public void setCap (double cap){
 		this.cap = cap;
 	}
+	public void setD (double d){
+		this.d = d;
+	}
+	
+	
 	public static void main(String[] args) {
-		DaBarChart barChart = new DaBarChart();
-		double cap = 0;
+//		DaBarChart barChart = new DaBarChart();
+//		double cap = 0;
 		
 		GershensonRunner runner = new GershensonRunner();
-//		runner.setN(24);
-//		runner.setU(15);
-//		runner.runScenario(config);
+		runner.setN(15);
+		runner.setU(3);
+		runner.setCap(0.90);
+		runner.setD(100);
+		runner.runScenario(config);
 		
-		for (int c = 0; c < 20; c++){
-			barChart = new DaBarChart();
-			cap = (80.00+(double)c)/100.00;
-			for (int u = 4; u < 18; u++){
-				nAndT = new LinkedHashMap<Number, Number>();
-				for (int n = 8; n < 21; n++){
-					runner = new GershensonRunner();
-					Gbl.reset();
-					runner.setU(u);
-					runner.setN(n);
-					runner.setCap(cap);
-					runner.runScenario(config);
-					nAndT.put(n, avTT);
-				}
-				barChart.addSeries("u=" + String.valueOf(u), nAndT);
-	//			nAndUT.put(n, uAndT);
-			}	
-			new DaChartWriter().writeChart(DaPaths.OUTPUT+"DENVER\\Charts_10_03_02\\" + "u4-17_n8-20_cap" + 
-					String.valueOf(cap), 1600, 1024, barChart.createChart("capacityFactor = " + String.valueOf(cap), "number of waiting cars n [ ]", "average travelTime t [s]", 1800));
-		}
+//		for (int c = 0; c < 20; c++){
+//			barChart = new DaBarChart();
+//			cap = (80.00+(double)c)/100.00;
+//			for (int u = 4; u < 18; u++){
+//				nAndT = new LinkedHashMap<Number, Number>();
+//				for (int n = 8; n < 21; n++){
+//					runner = new GershensonRunner();
+//					Gbl.reset();
+//					runner.setU(u);
+//					runner.setN(n);
+//					runner.setCap(cap);
+//					runner.runScenario(config);
+//					nAndT.put(n, avTT);
+//				}
+//				barChart.addSeries("u=" + String.valueOf(u), nAndT);
+//	//			nAndUT.put(n, uAndT);
+//			}	
+//			new DaChartWriter().writeChart(DaPaths.OUTPUT+"DENVER\\Charts_10_03_02\\" + "u4-17_n8-20_cap" + 
+//					String.valueOf(cap), 1600, 1024, barChart.createChart("capacityFactor = " + String.valueOf(cap), "number of waiting cars n [ ]", "average travelTime t [s]", 1800));
+//		}
 	}
 
 	@Override

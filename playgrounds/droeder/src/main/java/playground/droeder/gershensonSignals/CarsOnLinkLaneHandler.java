@@ -21,6 +21,7 @@ package playground.droeder.gershensonSignals;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -35,6 +36,8 @@ import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
@@ -46,9 +49,18 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 			LinkEnterEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler{
 	
 	private Map<Id, Integer> vehOnLink = new HashMap<Id, Integer>();
+	private Map<Id, Integer> vehInD = new HashMap<Id, Integer>();
 	private Map<Id, Map<Id, Integer>> vehOnLinkLanes = new HashMap<Id, Map<Id, Integer>>(); 
 	
-	public CarsOnLinkLaneHandler(Map<Id, SignalGroupDefinition> groups){
+	private Map<Id, Map<Id, CarLocator>> locateCars =  new HashMap<Id, Map<Id, CarLocator>>();
+	private Map<Id, CarLocator> m;
+	
+	private QNetwork net;
+	private double d = 100;
+	
+	
+	public CarsOnLinkLaneHandler(Map<Id, SignalGroupDefinition> groups, double d){
+		this.d = d;
 		
 		for (SignalGroupDefinition sd : groups.values()){
 			vehOnLink.put(sd.getLinkRefId(), 0);
@@ -56,6 +68,10 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 				if (!vehOnLink.containsKey(id)){
 					vehOnLink.put(id, 0);
 				}
+				if (!vehInD.containsKey(id)){
+					vehInD.put(id, 0);
+				}
+				
 			}
 			Map<Id, Integer> m = new HashMap<Id, Integer>();
 			for (Id id : sd.getLaneIds()){
@@ -63,6 +79,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 			}
 			vehOnLinkLanes.put(sd.getId(), m);
 		}
+		
 	}
 	
 	@Override
@@ -98,13 +115,22 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 			i = i + 1;
 			vehOnLink.put(e.getLinkId(), Integer.valueOf(i));
 		}
+		
+		m = locateCars.get(e.getLinkId());
+		m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
 	}
+	
 	@Override
 	public void handleEvent(LinkLeaveEvent e) {
 		if (vehOnLink.containsKey(e.getLinkId())){
 			int i = vehOnLink.get(e.getLinkId()).intValue();
 			i = i - 1;
 			vehOnLink.put(e.getLinkId(), Integer.valueOf(i));
+		}
+		
+		m = locateCars.get(e.getLinkId());
+		if (m.containsKey(e.getPersonId())){
+			m.remove(e.getPersonId());
 		}
 	}
 	@Override
@@ -114,6 +140,14 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 			i = i + 1;
 			vehOnLink.put(e.getLinkId(), Integer.valueOf(i));
 		}
+		
+		m = locateCars.get(e.getLinkId());
+		if (m.containsKey(e.getPersonId())){
+			m.get(e.getPersonId()).agentEndsActivity();
+		}else{
+			m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
+			m.get(e.getPersonId()).agentEndsActivity();
+		}
 	}
 	@Override
 	public void handleEvent(AgentArrivalEvent e){
@@ -122,6 +156,9 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 			i = i - 1;
 			vehOnLink.put(e.getLinkId(), Integer.valueOf(i));
 		}
+		
+		m = locateCars.get(e.getLinkId());
+		m.get(e.getPersonId()).agentStartsActivity();
 	}
 	
 	public Map<Id, Integer> getVehOnLink(){
@@ -130,6 +167,23 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	
 	public Map<Id, Map<Id, Integer>> getVehOnLinkLanes(){
 		return this.vehOnLinkLanes;
+	}
+	
+	public double getVehInD(double time, Id id){
+		double i = 0;
+		for (CarLocator c : locateCars.get(id).values()){
+			if(c.agentIsInD(time) == true){
+				i++;
+			}
+		}
+		return i;
+	}
+	
+	public void setQNetwork(QNetwork net){
+		this.net = net;
+		for(Entry<Id, QLink> e: net.getLinks().entrySet()){
+			locateCars.put(e.getKey(), new HashMap<Id, CarLocator>());
+		}
 	}
 
 }
