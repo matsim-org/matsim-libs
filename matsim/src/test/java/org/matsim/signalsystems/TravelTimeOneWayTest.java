@@ -93,8 +93,6 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 				group.setDropping(dropping);
 			}
 			QSim sim = new QSim(data, events);
-			sim.setLaneDefinitions(lanedefs);
-			sim.setSignalSystems(lssDefs, lssConfigs);
 			sim.run();
 //			results.put(Integer.valueOf(dropping), eventHandler.beginningOfLink2);
 			log.debug("circulationTime: " + circulationTime);
@@ -125,8 +123,6 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 		QSim sim = new QSim(data, events);
-		sim.setLaneDefinitions(data.getLaneDefinitions());
-		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemConfigurations());
 		sim.run();
 		// log.debug("tF = 60s, " +
 		// this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure + ", " +

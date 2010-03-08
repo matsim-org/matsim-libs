@@ -21,9 +21,9 @@ package org.matsim.signalsystems.control;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.events.SignalGroupStateChangedEventImpl;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
@@ -43,7 +43,8 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  * @author aneumann
  *
  */
-public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystemController implements SignalSystemController, SimulationAfterSimStepListener, SimulationInitializedListener {
+public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystemController implements SignalSystemController, 
+  SimulationInitializedListener, SimulationBeforeSimStepListener {
 	
 	private static final Logger log = Logger
 			.getLogger(DefaultPlanBasedSignalSystemController.class);
@@ -75,8 +76,18 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 		return false;
 	}
 	
+  @Override
+  public SignalGroupState getSignalGroupState(double seconds,
+      SignalGroupDefinition signalGroup) {
+    return this.getSignalGroupStates().get(signalGroup);
+  }
 	
-	private void updateSignalGroupStates(double time) {
+  @Override
+  public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+    this.updateState(e.getSimulationTime());
+  }
+  
+  private void updateState(double time) {
 		SignalSystemPlan activePlan = this.plans.getPlans().values().iterator().next();
 		if (activePlan == null) {
 			String message = "No active plan for signalsystem id " + config.getSignalSystemId();
@@ -144,12 +155,9 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 		}
 	}
 
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) { 
-		//+1 to update the green state for the next timestep
-		this.updateSignalGroupStates(e.getSimulationTime() + 1.0);
-	}
 
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		this.updateSignalGroupStates(QSimTimer.getSimStartTime());
+		this.updateState(QSimTimer.getSimStartTime());
 	}
+
 }

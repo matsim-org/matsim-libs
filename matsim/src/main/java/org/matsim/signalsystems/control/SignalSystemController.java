@@ -27,22 +27,45 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
 /**
+ * All signal system controller implementations must implement this interface. 
+ * If the specific controller is a listener of SimulationEvents it is automatically
+ * attached by QSim as listener.
+ * @see AbstractSignalSystemController for a default implementation of some methods
+ * specified by this interface
  * @author dgrether
  *
  */
 public interface SignalSystemController {
-
-	public boolean givenSignalGroupIsGreen(double time, SignalGroupDefinition signalGroup);
-	
+  /**
+   * Get the signalGroupState for the given SignalGroupDefinition and the given time.
+   * @param seconds May be ignored if the state is calculated before/after every step of the simulation
+   * @return SignalGroupState
+   */
+  public SignalGroupState getSignalGroupState(double seconds, SignalGroupDefinition signalGroup);
+	/**
+	 * @param seconds the default for the cycle time
+	 */
 	public void setDefaultCycleTime(Double seconds);
-	
+	/**
+	 * @param seconds the default for the synchronization offset
+	 */
 	public void setDefaultSynchronizationOffset(Double seconds);
-	
+	/**
+	 * @param seconds the default for the inter-green time
+	 */
 	public void setDefaultInterGreenTime(Double seconds);
-	
+	/**
+	 * @return a SortedMap of all SignalGroupDefinition instances controlled by this
+	 * controller sorted and accessible by their Id
+	 */
 	public SortedMap<Id, SignalGroupDefinition> getSignalGroups();
-
+	/**
+	 * @return the SignalEngine instance controlling this controller
+	 */
 	public SignalEngine getSignalEngine();
-	
+	/**
+	 * Setter for the SignalEngine this controller is attached to
+	 * @param signalEngine 
+	 */
 	public void setSignalEngine(SignalEngine signalEngine);
 }

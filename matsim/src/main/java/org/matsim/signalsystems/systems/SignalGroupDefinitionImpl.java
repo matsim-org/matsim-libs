@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.control.SignalSystemController;
 
 /**
@@ -109,12 +110,14 @@ public class SignalGroupDefinitionImpl implements SignalGroupDefinition {
 	public void setResponsibleLSAControler(SignalSystemController signalSystemControler) {
 		this.signalSystemControler = signalSystemControler;		
 	}
-	
 	/**
 	 * @see org.matsim.signalsystems.systems.SignalGroupDefinition#isGreen()
 	 */
 	public boolean isGreen(double time){
-		return this.signalSystemControler.givenSignalGroupIsGreen(time, this);
+	  SignalGroupState state = this.signalSystemControler.getSignalGroupState(time, this);
+		return (state.equals(SignalGroupState.GREEN) || 
+		    state.equals(SignalGroupState.REDYELLOW));
+//		return this.signalSystemControler.givenSignalGroupIsGreen(time, this);
 	}
 	
 }

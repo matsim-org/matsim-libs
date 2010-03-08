@@ -62,8 +62,6 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		QSim sim = new QSim(scenario, events);
-		sim.setLaneDefinitions(scenario.getLaneDefinitions());
-		sim.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
 		sim.run();
 		eventsXmlWriter.closeFile();
 		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
@@ -94,8 +92,6 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		events.addHandler(eventsXmlWriter);
 		
 		QSim sim = new QSim(data, events);
-		sim.setLaneDefinitions(data.getLaneDefinitions());
-		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemConfigurations());
 		sim.run();
 		eventsXmlWriter.closeFile();
 		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
