@@ -118,6 +118,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 		
 		m = locateCars.get(e.getLinkId());
 		m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
+		locateCars.put(e.getLinkId(), m);
 	}
 	
 	@Override
@@ -132,6 +133,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 		if (m.containsKey(e.getPersonId())){
 			m.remove(e.getPersonId());
 		}
+		locateCars.put(e.getLinkId(), m);
 	}
 	@Override
 	public void handleEvent(AgentDepartureEvent e) {
@@ -148,6 +150,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 			m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
 			m.get(e.getPersonId()).agentEndsActivity();
 		}
+		locateCars.put(e.getLinkId(), m);
 	}
 	@Override
 	public void handleEvent(AgentArrivalEvent e){
@@ -159,6 +162,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 		
 		m = locateCars.get(e.getLinkId());
 		m.get(e.getPersonId()).agentStartsActivity();
+		locateCars.put(e.getLinkId(), m);
 	}
 	
 	public Map<Id, Integer> getVehOnLink(){

@@ -160,27 +160,27 @@ public class GershensonAdaptiveTrafficLightController extends
 		carsOnRefLink = vehOnLink.get(signalGroup.getLinkRefId());
 //		carsOnRefLink = handler.getVehInD(time, signalGroup.getLinkRefId());
 
-		// 	set number of cars approaching a Red light
-		if (oldState.equals(SignalGroupState.RED)){
-			approachingRed = vehOnLink.get(groups.get(signalGroup.getId()).getLinkRefId());
-//			approachingRed = handler.getVehInD(time, signalGroup.getLinkRefId());
-		}else{
-			approachingRed = 0;
-		}
+//		// 	set number of cars approaching a Red light
+//		if (oldState.equals(SignalGroupState.RED)){
+//			approachingRed = vehOnLink.get(groups.get(signalGroup.getId()).getLinkRefId());
+////			approachingRed = handler.getVehInD(time, signalGroup.getLinkRefId());
+//		}else{
+//			approachingRed = 0;
+//		}
 	}
 	
-  @Override
-  public SignalGroupState getSignalGroupState(double seconds,
-      SignalGroupDefinition signalGroup) {
-    return this.getSignalGroupStates().get(signalGroup);
-  }
+	@Override
+	public SignalGroupState getSignalGroupState(double seconds,
+		SignalGroupDefinition signalGroup) {
+		return this.getSignalGroupStates().get(signalGroup);
+	}
 
-  @Override
-  public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
-    for (SignalGroupDefinition sg : this.getSignalGroups().values()){
-      this.updateSignalGroupState(e.getSimulationTime(), sg);
-    }
-  }
+	@Override
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+		for (SignalGroupDefinition sg : this.getSignalGroups().values()){
+			this.updateSignalGroupState(e.getSimulationTime(), sg);
+		}
+	}
 
 
 	private void updateSignalGroupState(double time, SignalGroupDefinition signalGroup) {
@@ -201,7 +201,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			if (compGroupsGreen == false && oldState.equals(SignalGroupState.RED)){ // Rule 6
 			  this.switchLight(signalGroup, oldState, time);
 			}
-			if (approachingRed > 0 && approachingGreenLink == 0){ // Rule 4
+			if (carsOnRefLink > 0 && approachingGreenLink == 0){ // Rule 4
 				switchLight(signalGroup, oldState, time);
 			}else if(!(approachingGreenLane > 0)){  //Rule 3
 				if ((time - compGreenTime) > tGreenMin && carsOnRefLink > minCars){ // Rule 1 + 2
