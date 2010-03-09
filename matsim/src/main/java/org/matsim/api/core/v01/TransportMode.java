@@ -27,5 +27,5 @@ package org.matsim.api.core.v01;
  * Enumeration of transport modes known to MATSim.
  */
 public enum TransportMode {
-	miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, other, undefined
+	miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, transit_walk, other, undefined
 }

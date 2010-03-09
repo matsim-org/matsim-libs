@@ -56,9 +56,9 @@ public class TransitRouterTest extends TestCase {
 		Coord toCoord = f.scenario.createCoord(16100, 5050);
 		List<Leg> legs = router.calcRoute(fromCoord, toCoord, 5.0*3600);
 		assertEquals(3, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
-		assertEquals(TransportMode.walk, legs.get(2).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
 		assertEquals(f.scenario.createId("0"), ptRoute.getAccessStopId());
@@ -83,7 +83,7 @@ public class TransitRouterTest extends TestCase {
 		Coord toCoord = f.scenario.createCoord(4100, 5050);
 		List<Leg> legs = router.calcRoute(fromCoord, toCoord, 5.0*3600);
 		assertEquals(1, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 		double actualTravelTime = 0.0;
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();
@@ -101,7 +101,7 @@ public class TransitRouterTest extends TestCase {
 		Coord toCoord = f.scenario.createCoord(8000, 3000);
 		List<Leg> legs = router.calcRoute(fromCoord, toCoord, 5.0*3600);
 		assertEquals(1, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 		double actualTravelTime = 0.0;
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();
@@ -139,11 +139,11 @@ public class TransitRouterTest extends TestCase {
 		Coord toCoord = f.scenario.createCoord(16100, 10050);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(3800, 5100), toCoord, 6.0*3600);
 		assertEquals(5, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
-		assertEquals(TransportMode.walk, legs.get(2).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertEquals(TransportMode.pt, legs.get(3).getMode());
-		assertEquals(TransportMode.walk, legs.get(4).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
 		assertEquals(f.scenario.createId("0"), ptRoute.getAccessStopId());
@@ -173,10 +173,10 @@ public class TransitRouterTest extends TestCase {
 		Coord toCoord = f.scenario.createCoord(28100, 4950);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(3800, 5100), toCoord, 5.0*3600 + 40.0*60);
 		assertEquals(4, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
 		assertEquals(TransportMode.pt, legs.get(2).getMode());
-		assertEquals(TransportMode.walk, legs.get(3).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(3).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
 		assertEquals(f.scenario.createId("0"), ptRoute.getAccessStopId());
@@ -213,21 +213,21 @@ public class TransitRouterTest extends TestCase {
 		TransitRouter router = new TransitRouter(f.schedule, config);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60);
 		assertEquals(5, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
 		assertEquals(f.redLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
-		assertEquals(TransportMode.walk, legs.get(2).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertEquals(TransportMode.pt, legs.get(3).getMode());
 		assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
-		assertEquals(TransportMode.walk, legs.get(4).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 
 		config.costLineSwitch = 300.0 * -config.marginalUtilityOfTravelTimeTransit; // corresponds to 5 minutes transit travel time
 		legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60);
 		assertEquals(3, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
 		assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
-		assertEquals(TransportMode.walk, legs.get(2).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 	}
 
 	public void testAfterMidnight() {
@@ -239,9 +239,9 @@ public class TransitRouterTest extends TestCase {
 		Coord toCoord = f.scenario.createCoord(16100, 5050);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(3800, 5100), toCoord, 25.0*3600);
 		assertEquals(3, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
-		assertEquals(TransportMode.walk, legs.get(2).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
 		assertEquals(f.scenario.createId("0"), ptRoute.getAccessStopId());
@@ -263,9 +263,9 @@ public class TransitRouterTest extends TestCase {
 		TransitRouter router = new TransitRouter(f.schedule);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(-2000, 0), f.scenario.createCoord(+42000, 0), 5.5*3600); // should map to stops A and I
 		assertEquals(3, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
-		assertEquals(TransportMode.walk, legs.get(2).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
 		assertEquals(f.scenario.createId("0"), ptRoute.getAccessStopId());
@@ -284,13 +284,13 @@ public class TransitRouterTest extends TestCase {
 		TransitRouter router = new TransitRouter(f.schedule, f.routerConfig);
 		List<Leg> legs = router.calcRoute(f.coord1, f.coord7, 990);
 		assertEquals(5, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
 		assertEquals(f.stop1.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getAccessStopId());
 		assertEquals(f.stop2.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getEgressStopId());
 		assertEquals(f.stop1.getLinkId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getStartLinkId());
 		assertEquals(f.stop2.getLinkId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getEndLinkId());
-		assertEquals(TransportMode.walk, legs.get(2).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertEquals(TransportMode.pt, legs.get(3).getMode());
 		assertEquals(f.stop2.getLinkId(), legs.get(2).getRoute().getStartLinkId());
 		assertEquals(f.stop6.getLinkId(), legs.get(2).getRoute().getEndLinkId());
@@ -298,7 +298,7 @@ public class TransitRouterTest extends TestCase {
 		assertEquals(f.stop7.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getEgressStopId());
 		assertEquals(f.stop6.getLinkId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getStartLinkId());
 		assertEquals(f.stop7.getLinkId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getEndLinkId());
-		assertEquals(TransportMode.walk, legs.get(4).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 	}
 
 	/**
@@ -313,7 +313,7 @@ public class TransitRouterTest extends TestCase {
 		TransitRouter router = new TransitRouter(f.schedule, f.routerConfig);
 		List<Leg> legs = router.calcRoute(f.coord2, f.coord4, 990);
 		assertEquals(1, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 	}
 
 	/**
@@ -329,7 +329,7 @@ public class TransitRouterTest extends TestCase {
 		TransitRouter router = new TransitRouter(f.schedule, f.routerConfig);
 		List<Leg> legs = router.calcRoute(f.coord2, f.coord6, 990);
 		assertEquals(1, legs.size());
-		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 	}
 
 	/**

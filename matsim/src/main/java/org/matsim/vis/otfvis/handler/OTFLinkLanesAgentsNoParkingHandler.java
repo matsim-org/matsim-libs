@@ -28,14 +28,6 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 
-
-/**
- * OTFLinkAgentsNoParkingHandler transmits the number of lanes as const data
- * I do not think this is used.
- * 
- * @author david
- *
- */
 public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 
 	static public class Writer extends  OTFLinkAgentsHandler.Writer {

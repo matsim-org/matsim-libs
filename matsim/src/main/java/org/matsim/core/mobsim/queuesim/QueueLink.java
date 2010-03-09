@@ -574,9 +574,8 @@ public class QueueLink {
      *
      * @return A measure for the number of vehicles being delayed on this link.
      */
-    public double getDisplayableTimeCapValue() {
+    public double getDisplayableTimeCapValue(double now) {
       int count = QueueLink.this.buffer.size();
-      double now = SimulationTimer.getTime();
       for (QueueVehicle veh : QueueLink.this.vehQueue) {
         // Check if veh has reached destination
         if (veh.getEarliestLinkExitTime() <= now) {

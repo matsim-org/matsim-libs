@@ -25,13 +25,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
@@ -46,43 +43,12 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  */
 public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink> {
 
-	private static final long serialVersionUID = 6541770536927245851L;
+	private static final long serialVersionUID = -7916541567386865404L;
 
-	public static boolean showParked = false;
+	public static final boolean showParked = false;
 	
 	protected static final transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 
-	public void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
-		String id = pos.getId().toString();
-		ByteBufferUtils.putString(out, id);
-		out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
-		out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
-		if (pos.getAgentState()== AgentState.PERSON_AT_ACTIVITY) {
-			// What is the next legs mode?
-			QueueVehicle veh = src.getVehicle(pos.getId());
-			if (veh == null) {
-				out.putInt(1);
-			} else {
-				DriverAgent driver = veh.getDriver(); 
-				Leg leg = driver.getCurrentLeg();
-				if (leg != null) {
-					if(leg.getMode() == TransportMode.pt) {
-						out.putInt(2);
-					} else if(leg.getMode() == TransportMode.bus) {
-						out.putInt(3);
-					} else {
-						out.putInt(1);
-					}
-				} else {						
-					out.putInt(1);
-				}
-			}
-		} else {
-			out.putInt(0);
-		}
-		out.putFloat((float)pos.getColorValueBetweenZeroAndOne());
-	}
-	
 	protected void writeAllAgents(ByteBuffer out) {
 		// Write additional agent data
 
@@ -98,43 +64,54 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 		} else {
 			int valid = 0;
 			for (AgentSnapshotInfo pos : positions) {
-				if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY) valid++;
+				if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY)
+					valid++;
 			}
 			out.putInt(valid);
 
 			for (AgentSnapshotInfo pos : positions) {
-				if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY) writeAgent(pos, out);
+				if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY)
+					writeAgent(pos, out);
 			}
 		}
 
 	}
 
 	@Override
-	public void writeDynData(ByteBuffer out) throws IOException {
-		out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue());
-		writeAllAgents(out);
+	public void writeConstData(ByteBuffer out) throws IOException {
+		String id = this.src.getLink().getId().toString();
+		ByteBufferUtils.putString(out, id);
+		Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
+				this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+		Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
+				this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+		
+		out.putFloat((float) linkStart.x); 
+		out.putFloat((float) linkStart.y);
+		out.putFloat((float) linkEnd.x); 
+		out.putFloat((float) linkEnd.y);
+		out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
 	}
 	
-		@Override
-		public void writeConstData(ByteBuffer out) throws IOException {
-			String id = this.src.getLink().getId().toString();
-			ByteBufferUtils.putString(out, id);
-			//subtract minEasting/Northing somehow!
-			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
-					this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
-					this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-			
-			out.putFloat((float) linkStart.x); 
-			out.putFloat((float) linkStart.y);
-			out.putFloat((float) linkEnd.x); 
-			out.putFloat((float) linkEnd.y);
+	@Override
+	public void writeDynData(ByteBuffer out) throws IOException {
+		out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(QSimTimer.getTime()));
+		writeAllAgents(out);
+	}
 
-			out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
-		}
+	@Override
+	public OTFDataWriter<QueueLink> getWriter() {
+		return new OTFQueueSimLinkAgentsWriter();
+	}
 
-		public OTFDataWriter<QueueLink> getWriter() {
-			return new OTFQueueSimLinkAgentsWriter();
-		}
+	public void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
+		String id = pos.getId().toString();
+		ByteBufferUtils.putString(out, id);
+		out.putFloat((float) (pos.getEasting() - OTFServerQuad2.offsetEast));
+		out.putFloat((float) (pos.getNorthing() - OTFServerQuad2.offsetNorth));
+		out.putInt(pos.getUserDefined());
+		out.putFloat((float) pos.getColorValueBetweenZeroAndOne());
+		out.putInt(pos.getAgentState().ordinal());
+	}
 	
 }

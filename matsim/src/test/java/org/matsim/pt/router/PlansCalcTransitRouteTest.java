@@ -67,14 +67,14 @@ public class PlansCalcTransitRouteTest extends TestCase {
 
 		List<PlanElement> pes = plan.getPlanElements();
 		assertEquals(11, pes.size());
-		assertEquals(TransportMode.walk, ((Leg) pes.get(1)).getMode());
+		assertEquals(TransportMode.transit_walk, ((Leg) pes.get(1)).getMode());
 		assertEquals(f.schedule.getFacilities().get(f.scenario.createId("0")).getLinkId(), ((Activity) pes.get(2)).getLinkId());
 		assertEquals(TransportMode.pt, ((Leg) pes.get(3)).getMode());
 		assertEquals(f.schedule.getFacilities().get(f.scenario.createId("4")).getLinkId(), ((Activity) pes.get(4)).getLinkId());
-		assertEquals(TransportMode.walk, ((Leg) pes.get(5)).getMode());
+		assertEquals(TransportMode.transit_walk, ((Leg) pes.get(5)).getMode());
 		assertEquals(f.schedule.getFacilities().get(f.scenario.createId("18")).getLinkId(), ((Activity) pes.get(6)).getLinkId());
 		assertEquals(TransportMode.pt, ((Leg) pes.get(7)).getMode());
 		assertEquals(f.schedule.getFacilities().get(f.scenario.createId("19")).getLinkId(), ((Activity) pes.get(8)).getLinkId());
-		assertEquals(TransportMode.walk, ((Leg) pes.get(9)).getMode());
+		assertEquals(TransportMode.transit_walk, ((Leg) pes.get(9)).getMode());
 	}
 }

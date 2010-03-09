@@ -124,7 +124,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		connections.add(entry);
 	}
 
-	public void connectQueueLinkToWriter(Class<OTFQueueSimLinkAgentsWriter> writer) {
+	public void connectQueueLinkToWriter(Class<? extends OTFQueueSimLinkAgentsWriter> writer) {
 		Entry entry = new Entry(QueueLink.class, writer);
 		connections.add(entry);
 	}

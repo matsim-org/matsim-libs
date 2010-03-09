@@ -714,8 +714,7 @@ public class QLane {
 		}
 
 
-		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, 
-				final Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getVehiclePositions(final Collection<AgentSnapshotInfo> positions) {
 //			log.warn( " entering getVehiclePositions ") ;
 
 			String snapshotStyle = Gbl.getConfig().getQSimConfigGroup().getSnapshotStyle();

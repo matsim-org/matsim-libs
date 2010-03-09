@@ -42,7 +42,7 @@ public interface VisData {
 	 *
 	 * @return A measure for the number of vehicles being delayed on this link.
 	 */
-	public double getDisplayableTimeCapValue();
+	public double getDisplayableTimeCapValue(double now);
 
 	public Collection<AgentOnLink> getDrawableCollection();
 

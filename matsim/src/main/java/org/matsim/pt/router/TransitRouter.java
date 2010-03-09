@@ -120,7 +120,7 @@ public class TransitRouter {
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();
-			Leg leg = new LegImpl(TransportMode.walk);
+			Leg leg = new LegImpl(TransportMode.transit_walk);
 			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.beelineWalkSpeed;
 			Route walkRoute = new GenericRouteImpl(null, null);
 			leg.setRoute(walkRoute);
@@ -170,7 +170,7 @@ public class TransitRouter {
 						transitRouteStart = ((TransitRouterNetworkLink) link).getFromNode().stop;
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
-								leg = new LegImpl(TransportMode.walk);
+								leg = new LegImpl(TransportMode.transit_walk);
 								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.beelineWalkSpeed;
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
@@ -178,7 +178,7 @@ public class TransitRouter {
 								time += walkTime;
 								legs.add(leg);
 							} else { // accessStop == null, so it must be the first walk-leg
-								leg = new LegImpl(TransportMode.walk);
+								leg = new LegImpl(TransportMode.transit_walk);
 								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord()) / this.config.beelineWalkSpeed;
 								leg.setTravelTime(walkTime);
 								time += walkTime;
@@ -208,7 +208,7 @@ public class TransitRouter {
 			accessStop = egressStop;
 		}
 		if (prevLink != null) {
-			leg = new LegImpl(TransportMode.walk);
+			leg = new LegImpl(TransportMode.transit_walk);
 			double walkTime;
 			if (accessStop == null) {
 				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.beelineWalkSpeed;
@@ -221,7 +221,7 @@ public class TransitRouter {
 		if (transitLegCnt == 0) {
 			// it seems, the agent only walked
 			legs.clear();
-			leg = new LegImpl(TransportMode.walk);
+			leg = new LegImpl(TransportMode.transit_walk);
 			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.beelineWalkSpeed;
 			leg.setTravelTime(walkTime);
 			legs.add(leg);

@@ -55,7 +55,7 @@ public class TransitActsRemover implements PlanAlgorithm {
 				}
 			} else if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
-				if (TransportMode.walk.equals(leg.getMode())) {
+				if (TransportMode.transit_walk.equals(leg.getMode())) {
 					leg.setMode(TransportMode.pt);
 					leg.setRoute(null);
 				}

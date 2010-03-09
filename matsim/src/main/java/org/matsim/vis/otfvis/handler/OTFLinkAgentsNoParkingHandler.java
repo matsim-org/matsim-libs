@@ -46,7 +46,7 @@ public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 		protected void writeAllAgents(ByteBuffer out) {
 			// Write additional agent data
 			positions.clear();
-			src.getVisData().getVehiclePositions(QSimTimer.getTime(), positions);
+			src.getVisData().getVehiclePositions(positions);
 			int valid = 0;
 			for (AgentSnapshotInfo pos : positions) {
 				if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY) valid++;

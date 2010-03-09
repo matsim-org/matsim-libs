@@ -43,8 +43,7 @@ public interface VisData {
 	 */
 	public double getDisplayableTimeCapValue(double time);
 
-	public Collection<AgentSnapshotInfo> getVehiclePositions(double time, 
-			final Collection<AgentSnapshotInfo> positions);
+	public Collection<AgentSnapshotInfo> getVehiclePositions(final Collection<AgentSnapshotInfo> positions);
 
 /* I don't think these two methods should be part of the interface!
  * Only getVehiclePositions() should be in the interface, how the

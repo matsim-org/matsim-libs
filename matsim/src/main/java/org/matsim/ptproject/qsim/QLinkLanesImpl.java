@@ -502,9 +502,9 @@ public class QLinkLanesImpl implements QLink {
 			return originalLane.visdata.getDisplayableTimeCapValue(time);
 		}
 
-		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getVehiclePositions(final Collection<AgentSnapshotInfo> positions) {
 			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
-				lane.visdata.getVehiclePositions(time, positions);
+				lane.visdata.getVehiclePositions(positions);
 			}
 			
 			int cnt = parkedVehicles.size();

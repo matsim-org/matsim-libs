@@ -92,7 +92,7 @@ public class QNetwork {
 	public Collection<AgentSnapshotInfo> getVehiclePositions(double time) {
 		Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 		for (QLink link : this.links.values()) {
-			link.getVisData().getVehiclePositions(time, positions);
+			link.getVisData().getVehiclePositions(positions);
 		}
 		return positions;
 	}

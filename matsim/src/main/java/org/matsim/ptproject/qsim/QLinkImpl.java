@@ -602,7 +602,7 @@ public class QLinkImpl implements QLink {
 			return count * 2.0 / QLinkImpl.this.storageCapacity;
 		}
 
-		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getVehiclePositions(final Collection<AgentSnapshotInfo> positions) {
 //			if ( getVehPosCnt < 1 ) {
 //				getVehPosCnt++ ;
 //			}
@@ -791,112 +791,112 @@ public class QLinkImpl implements QLink {
 			return queueEnd;
 		}
 
+		/**
+		 * place other driving cars according the following rule:
+		 * - calculate the time how long the vehicle is on the link already
+		 * - calculate the position where the vehicle should be if it could drive with freespeed
+		 * - if the position is already within the congestion queue, add it to the queue with slow speed
+		 * - if the position is not within the queue, just place the car  with free speed at that place
+		 */
+		private void positionOtherDrivingVehicles(
+				final Collection<AgentSnapshotInfo> positions, double now,
+				double queueEnd, Link link, double vehLen) {
+			double lastDistance = Integer.MAX_VALUE;
+			double ttfs = link.getLength() / link.getFreespeed(now);
+			for (QVehicle veh : QLinkImpl.this.vehQueue) {
+				double travelTime = now - veh.getLinkEnterTime();
+				double distanceOnLink = (ttfs == 0.0 ? 0.0
+						: ((travelTime / ttfs) * link.getLength()));
+				if (distanceOnLink > queueEnd) { // vehicle is already in queue
+					distanceOnLink = queueEnd;
+					queueEnd -= vehLen;
+				}
+				if (distanceOnLink >= lastDistance) {
+					/*
+					 * we have a queue, so it should not be possible that one vehicles
+					 * overtakes another. additionally, if two vehicles entered at the same
+					 * time, they would be drawn on top of each other. we don't allow this,
+					 * so in this case we put one after the other. Theoretically, this could
+					 * lead to vehicles placed at negative distance when a lot of vehicles
+					 * all enter at the same time on an empty link. not sure what to do
+					 * about this yet... just setting them to 0 currently.
+					 */
+					distanceOnLink = lastDistance - vehLen;
+					if (distanceOnLink < 0)
+						distanceOnLink = 0.0;
+				}
+				int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
+				double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
+				int tmpLane ;
+				try {
+					tmpLane = Integer.parseInt(veh.getId().toString()) ;
+				} catch ( NumberFormatException ee ) {
+					tmpLane = veh.getId().hashCode() ;
+				}
+				int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+		
+				if ( cnt < 10 ) {
+					cnt++ ;
+					log.warn(veh) ;
+				}
+		
+				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
+				for (PersonAgentI passenger : peopleInVehicle) {
+					PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
+							lane );
+					passengerPosition.setColorValueBetweenZeroAndOne( speed ) ;
+					if ( passenger.getPerson().getId().toString().startsWith("pt") ) {
+						passengerPosition.setAgentState( AgentState.TRANSIT_DRIVER ) ;
+					} else {
+						passengerPosition.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
+					}
+					positions.add(passengerPosition);
+				}
+		
+				lastDistance = distanceOnLink;
+			}
+		}
+
+		/**
+		 * Put the vehicles from the waiting list in positions. Their actual
+		 * position doesn't matter, so they are just placed to the coordinates of
+		 * the from node
+		 */
+		private int positionVehiclesFromWaitingList(
+				final Collection<AgentSnapshotInfo> positions, Link link,
+				double cellSize) {
+			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
+			for (QVehicle veh : QLinkImpl.this.waitingList) {
+				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
+				for (PersonAgentI person : peopleInVehicle) {
+					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLinkImpl.this.getLink(),
+							/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+					if ( person.getPerson().getId().toString().startsWith("pt") ) {
+						position.setAgentState( AgentState.TRANSIT_DRIVER ) ;
+					} else {
+						position.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
+					}
+					positions.add(position);
+				}
+			}
+			return lane;
+		}
+
+		private Collection<PersonAgentI> getPeopleInVehicle(QVehicle vehicle) {
+			Collection<PersonAgentI> passengers = transitQueueLaneFeature.getPassengers(vehicle);
+			if (passengers.isEmpty()) {
+				return Collections.singletonList((PersonAgentI) vehicle.getDriver());
+			} else {
+				ArrayList<PersonAgentI> people = new ArrayList<PersonAgentI>();
+				people.add(vehicle.getDriver());
+				people.addAll(passengers);
+				return people;
+			}
+		}
+
 	}
 
 	private static int cnt = 0 ;
-	/**
-	 * place other driving cars according the following rule:
-	 * - calculate the time how long the vehicle is on the link already
-	 * - calculate the position where the vehicle should be if it could drive with freespeed
-	 * - if the position is already within the congestion queue, add it to the queue with slow speed
-	 * - if the position is not within the queue, just place the car  with free speed at that place
-	 */
-	private void positionOtherDrivingVehicles(
-			final Collection<AgentSnapshotInfo> positions, double now,
-			double queueEnd, Link link, double vehLen) {
-		double lastDistance = Integer.MAX_VALUE;
-		double ttfs = link.getLength() / link.getFreespeed(now);
-		for (QVehicle veh : QLinkImpl.this.vehQueue) {
-			double travelTime = now - veh.getLinkEnterTime();
-			double distanceOnLink = (ttfs == 0.0 ? 0.0
-					: ((travelTime / ttfs) * link.getLength()));
-			if (distanceOnLink > queueEnd) { // vehicle is already in queue
-				distanceOnLink = queueEnd;
-				queueEnd -= vehLen;
-			}
-			if (distanceOnLink >= lastDistance) {
-				/*
-				 * we have a queue, so it should not be possible that one vehicles
-				 * overtakes another. additionally, if two vehicles entered at the same
-				 * time, they would be drawn on top of each other. we don't allow this,
-				 * so in this case we put one after the other. Theoretically, this could
-				 * lead to vehicles placed at negative distance when a lot of vehicles
-				 * all enter at the same time on an empty link. not sure what to do
-				 * about this yet... just setting them to 0 currently.
-				 */
-				distanceOnLink = lastDistance - vehLen;
-				if (distanceOnLink < 0)
-					distanceOnLink = 0.0;
-			}
-			int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
-			double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
-			int tmpLane ;
-			try {
-				tmpLane = Integer.parseInt(veh.getId().toString()) ;
-			} catch ( NumberFormatException ee ) {
-				tmpLane = veh.getId().hashCode() ;
-			}
-			int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-
-			if ( cnt < 10 ) {
-				cnt++ ;
-				log.warn(veh) ;
-			}
-
-			Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
-			for (PersonAgentI passenger : peopleInVehicle) {
-				PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
-						lane );
-				passengerPosition.setColorValueBetweenZeroAndOne( speed ) ;
-				if ( passenger.getPerson().getId().toString().startsWith("pt") ) {
-					passengerPosition.setAgentState( AgentState.TRANSIT_DRIVER ) ;
-				} else {
-					passengerPosition.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
-				}
-				positions.add(passengerPosition);
-			}
-
-			lastDistance = distanceOnLink;
-		}
-	}
-
-	private Collection<PersonAgentI> getPeopleInVehicle(QVehicle vehicle) {
-		Collection<PersonAgentI> passengers = transitQueueLaneFeature.getPassengers(vehicle);
-		if (passengers.isEmpty()) {
-			return Collections.singletonList((PersonAgentI) vehicle.getDriver());
-		} else {
-			ArrayList<PersonAgentI> people = new ArrayList<PersonAgentI>();
-			people.add(vehicle.getDriver());
-			people.addAll(passengers);
-			return people;
-		}
-	}
-
-	/**
-	 * Put the vehicles from the waiting list in positions. Their actual
-	 * position doesn't matter, so they are just placed to the coordinates of
-	 * the from node
-	 */
-	private int positionVehiclesFromWaitingList(
-			final Collection<AgentSnapshotInfo> positions, Link link,
-			double cellSize) {
-		int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
-		for (QVehicle veh : QLinkImpl.this.waitingList) {
-			Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
-			for (PersonAgentI person : peopleInVehicle) {
-				PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLinkImpl.this.getLink(),
-						/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-				if ( person.getPerson().getId().toString().startsWith("pt") ) {
-					position.setAgentState( AgentState.TRANSIT_DRIVER ) ;
-				} else {
-					position.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
-				}
-				positions.add(position);
-			}
-		}
-		return lane;
-	}
-
 	@Override
 	public void addAgentInActivity(PersonAgentI agent) {
 		agentsInActivities.put(agent.getPerson().getId(), agent);
