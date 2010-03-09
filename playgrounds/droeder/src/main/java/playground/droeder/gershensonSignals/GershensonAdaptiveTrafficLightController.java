@@ -189,23 +189,29 @@ public class GershensonAdaptiveTrafficLightController extends
 		if (switchedToGreen.get(signalGroup.getId()).equals(time)){
 			if(oldState.equals(SignalGroupState.GREEN)){
 				this.getSignalGroupStates().put(signalGroup, SignalGroupState.GREEN);
+				return;
 			}else{
 			  this.getSignalGroupStates().put(signalGroup, SignalGroupState.RED);
+			  return;
 			}
 		}
 
 		// algorithm starts
 		if ((outLinkJam == true) && oldState.equals(SignalGroupState.GREEN)){ //Rule 5 + 6
 			this.switchLight(signalGroup, oldState, time);
-		}else if(outLinkJam == false ){ // 12
+			return;
+		} else if(outLinkJam == false ){ // 12
 			if (compGroupsGreen == false && oldState.equals(SignalGroupState.RED)){ // Rule 6
 			  this.switchLight(signalGroup, oldState, time);
+			  return;
 			}
 			if (carsOnRefLink > 0 && approachingGreenLink == 0){ // Rule 4
 				switchLight(signalGroup, oldState, time);
+				return;
 			}else if(!(approachingGreenLane > 0)){  //Rule 3
 				if ((time - compGreenTime) > tGreenMin && carsOnRefLink > minCars){ // Rule 1 + 2
 				  this.switchLight(signalGroup, oldState, time);
+				  return;
 				}
 			}
 		}
@@ -214,9 +220,11 @@ public class GershensonAdaptiveTrafficLightController extends
 		// if no condition fits for switching lights, return oldstate
 		if(oldState.equals(SignalGroupState.GREEN)){
 		  this.getSignalGroupStates().put(signalGroup, SignalGroupState.GREEN);
+		  return;
 		}
 		else{
 		  this.getSignalGroupStates().put(signalGroup, SignalGroupState.RED);
+		  return;
 		}
 	}
 
