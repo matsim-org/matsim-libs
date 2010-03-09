@@ -27,6 +27,8 @@ import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.SignalGroupStateChangedEventImpl;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
 import org.matsim.signalsystems.control.SignalGroupState;
@@ -38,7 +40,8 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  *
  */
 public class AdaptiveController extends
-		AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, LaneLeaveEventHandler{
+		AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, 
+		LaneLeaveEventHandler, SimulationBeforeSimStepListener {
 	
 	private static final Logger log = Logger.getLogger(AdaptiveController.class);
 
@@ -99,5 +102,18 @@ public class AdaptiveController extends
 
 	public void reset(int iteration) {
 	}
+
+  @Override
+  public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public SignalGroupState getSignalGroupState(double seconds,
+      SignalGroupDefinition signalGroup) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }
