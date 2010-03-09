@@ -51,7 +51,8 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);	
-		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenario()).getKnowledges());
+	//	this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenario()).getKnowledges());
+		this.locator = new LMwCSCustomized(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenario()).getKnowledges());
 		
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
