@@ -34,7 +34,10 @@ public class DgSatellicNetworkVisualizer {
    * @param args
    */
   public static void main(String[] args) {
-    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network.xml.gz";
+//    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab.xml";
+    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_bs.xml";
+//    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab_bs.xml";
+//    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_cleaned.xml.gz";
     String[] a = {net};
     OTFVis.playNetwork(a);
     

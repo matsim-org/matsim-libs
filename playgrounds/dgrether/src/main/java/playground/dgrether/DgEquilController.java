@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.dgrether;
 
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -36,7 +38,11 @@ public class DgEquilController {
 	 */
 	public static void main(String[] args) {
 		
-		final String config = DgPaths.EXAMPLEBASE + "equil/configPlans100.xml";
+		final String configfile = DgPaths.EXAMPLEBASE + "equil/configPlans100.xml";
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader confReader = new MatsimConfigReader(config);
+		confReader.readFile(configfile);
 		
 //		final int iteration = 0;
 		final int iteration = 0;
@@ -55,7 +61,7 @@ public class DgEquilController {
 			}
 		});
 		
-		controler.run();
+//		controler.run();
 		
 		
 		
