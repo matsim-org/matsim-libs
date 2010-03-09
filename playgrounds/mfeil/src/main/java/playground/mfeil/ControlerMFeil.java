@@ -21,10 +21,16 @@ package playground.mfeil;
 
 
 
+import java.io.FileNotFoundException;
+
+import java.io.IOException;
+
+import org.matsim.analysis.ScoreStats;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.PlanomatModule;
@@ -35,6 +41,8 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.counts.CountControlerListener;
+import org.matsim.counts.Counts;
 import org.matsim.locationchoice.LocationChoice;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
@@ -42,6 +50,8 @@ import playground.mfeil.MDSAM.PlansConstructor;
 import playground.mfeil.MDSAM.PlansEvaluator;
 import playground.mfeil.MDSAM.PlansVariatorInitializer;
 import playground.mfeil.attributes.AgentsAttributesAdder;
+import playground.mfeil.analysis.TravelStats;
+import playground.mfeil.analysis.ASPGeneral;
 
 
 /**
@@ -49,6 +59,12 @@ import playground.mfeil.attributes.AgentsAttributesAdder;
  * Adjusting the Controler in order to call the PlanomatX. Replaces also the StrategyManagerConfigLoader.
  */
 public class ControlerMFeil extends Controler {
+	
+	private boolean createGraphs = true;
+	private ScoreStats scoreStats = null;
+	private TravelStats travelStats = null;
+	private Counts counts = null;
+	public static final String FILENAME_TRAVELTIMESTATS = "traveltimestats.txt";
 
 	public ControlerMFeil (String [] args){
 		super(args);
@@ -165,8 +181,42 @@ public class ControlerMFeil extends Controler {
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
 		//return new PlanomatXScoringFunctionFactory(this.getConfig().charyparNagelScoring());
-		return new JohScoringFunctionFactory();
-		//return new JohScoringFunctionEstimationFactory(this.network);
+		//return new JohScoringFunctionFactory();
+		return new JohScoringFunctionEstimationFactory(this.network);
 	}
+	
+	@Override
+	protected void loadControlerListeners() {
+		// optional: LegHistogram
+		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
 
+		// optional: score stats
+		try {
+			this.scoreStats = new ScoreStats(this.population, super.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
+			this.addControlerListener(this.scoreStats);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		// optional: travel distance stats
+		try {
+			this.travelStats = new TravelStats(this, this.population, this.network,
+					super.getControlerIO().getOutputFilename(FILENAME_TRAVELDISTANCESTATS), super.getControlerIO().getOutputFilename(FILENAME_TRAVELTIMESTATS), this.createGraphs);
+			this.addControlerListener(this.travelStats);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+		
+		// load counts, if requested
+		if (this.config.counts().getCountsFileName() != null) {
+			CountControlerListener ccl = new CountControlerListener(this.config);
+			this.addControlerListener(ccl);
+			this.counts = ccl.getCounts();
+		}
+	}
 }
