@@ -117,7 +117,6 @@ public class SignalGroupDefinitionImpl implements SignalGroupDefinition {
 	  SignalGroupState state = this.signalSystemControler.getSignalGroupState(time, this);
 		return (state.equals(SignalGroupState.GREEN) || 
 		    state.equals(SignalGroupState.REDYELLOW));
-//		return this.signalSystemControler.givenSignalGroupIsGreen(time, this);
 	}
 	
 }
