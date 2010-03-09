@@ -27,19 +27,21 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-
+import org.matsim.core.network.NetworkImpl;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -71,6 +73,77 @@ public class ASPGeneral {
 	private ASPActivityChains spMZ;
 	private Map<Id, Double> personsWeights;
 	private PrintStream stream;
+	
+	
+	public ASPGeneral (final int iter, final int lastIter, final String directory, final NetworkImpl network) {
+		/*	// Scenario files
+			final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+			final String networkFilename = "/home/baug/mfeil/data/Zurich10/network_0.7.xml";
+			
+			// Special MZ file so that weights of MZ persons can be read
+			final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
+			
+			// Population files
+			final String populationFilenameMATSim;
+			if (iter.equals("50")) populationFilenameMATSim = "/home/baug/mfeil/output/output_plans.xml";
+			else populationFilenameMATSim = "/home/baug/mfeil/output/output_plans.xml";
+			final String populationFilenameMZ = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mzAS0997b.xml";
+			
+			// Counts file
+			final String counts = "/home/baug/mfeil/data/runs/0995b_18rec/ITERS/it.70/70.countscompare.txt";
+			
+			// Output file
+			final String outputFile = "/home/baug/mfeil/output/plx.analysis.xls";	
+		*/	
+		final String facilitiesFilename = "../matsim/test/scenarios/chessboard/facilities.xml";
+		final String populationFilenameMATSim;
+		populationFilenameMATSim = directory+"/ITERS/it."+iter+"/"+iter+".plans.xml";
+		final String counts = directory+"/ITERS/it."+iter+"/"+iter+".countscompare.txt";
+		final String outputFile = directory+"/"+iter+".analysis.xls";	
+		final String populationFilenameMZ = null;
+		final String attributesInputFile = null;
+			
+		// Settings
+		final boolean compareWithMZ = true; 		
+		
+		
+		// Start calculations
+		ScenarioImpl scenarioMATSim = new ScenarioImpl();
+		scenarioMATSim.setNetwork(network);
+		new MatsimFacilitiesReader(scenarioMATSim).readFile(facilitiesFilename);
+		new MatsimPopulationReader(scenarioMATSim).readFile(populationFilenameMATSim);
+			
+		ScenarioImpl scenarioMZ = null;
+		if (compareWithMZ){
+			scenarioMZ = new ScenarioImpl();
+			scenarioMZ.setNetwork(network);
+			new MatsimFacilitiesReader(scenarioMZ).readFile(facilitiesFilename);
+			new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
+		}
+			
+		this.initiatePrinter(outputFile);
+		this.runMATSimActivityChains(scenarioMATSim.getPopulation());
+			
+		if (compareWithMZ) {
+			PopulationImpl pop = this.reducePopulation(scenarioMZ.getPopulation(), attributesInputFile);
+			this.reducePopulation(scenarioMZ.getPopulation(), attributesInputFile);
+			this.runMZActivityChains(pop);
+			this.compareMATSimAndMZActivityChains();
+			this.runMATSimTrips(scenarioMATSim.getPopulation());
+			this.runMZTrips(pop);
+			this.runMATSimDistances(scenarioMATSim.getPopulation());
+			this.runMZDistances(pop);
+			this.runMATSimTimings(scenarioMATSim.getPopulation());
+			this.runMZTimings(pop);
+		}
+		else {
+			this.runMATSimTrips(scenarioMATSim.getPopulation());
+			this.runMATSimTimings(scenarioMATSim.getPopulation());
+		}
+		this.analyzeCounts(counts);
+		
+		log.info("Analysis of plan finished.");
+	}
 	
 	private void runMATSimActivityChains (PopulationImpl population){
 		log.info("Analyzing MATSim population...");
@@ -492,8 +565,11 @@ public class ASPGeneral {
 		log.info("done.");
 	}
 	
-	public static void main(final String [] args) {
-		// Scenario files
+	public static void main(final String [] args) {	
+		int iter = 100;
+		int lastIter = iter;
+		String directory = "Test1";
+		/*	// Scenario files
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network_0.7.xml";
 		
@@ -501,56 +577,25 @@ public class ASPGeneral {
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 		
 		// Population files
-		final String populationFilenameMATSim = "/home/baug/mfeil/data/runs/0995b_9/output_plans.xml";
+		final String populationFilenameMATSim;
+		if (iter.equals("50")) populationFilenameMATSim = "/home/baug/mfeil/output/output_plans.xml";
+		else populationFilenameMATSim = "/home/baug/mfeil/output/output_plans.xml";
 		final String populationFilenameMZ = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mzAS0997b.xml";
 		
 		// Counts file
-		final String counts = "/home/baug/mfeil/data/runs/0995b_9/ITERS/it.50/50.countscompare.txt";
+		final String counts = "/home/baug/mfeil/data/runs/0995b_18rec/ITERS/it.70/70.countscompare.txt";
 		
 		// Output file
-		final String outputFile = "/home/baug/mfeil/data/runs/0995b_9/ITERS/it.50/50.analysis.xls";	
+		final String outputFile = "/home/baug/mfeil/output/plx.analysis.xls";	
+	*/	
 		
-		// Settings
-		final boolean compareWithMZ = true; 
-		
-	
+		final String networkFilename = "../matsim/test/scenarios/chessboard/network.xml";
 		
 		// Start calculations
 		ScenarioImpl scenarioMATSim = new ScenarioImpl();
 		new MatsimNetworkReader(scenarioMATSim).readFile(networkFilename);
-		new MatsimFacilitiesReader(scenarioMATSim).readFile(facilitiesFilename);
-		new MatsimPopulationReader(scenarioMATSim).readFile(populationFilenameMATSim);
 		
-		ScenarioImpl scenarioMZ = null;
-		if (compareWithMZ){
-			scenarioMZ = new ScenarioImpl();
-			scenarioMZ.setNetwork(scenarioMATSim.getNetwork());
-			new MatsimFacilitiesReader(scenarioMZ).readFile(facilitiesFilename);
-			new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
-		}
-		
-		ASPGeneral asp = new ASPGeneral();
-		asp.initiatePrinter(outputFile);
-		asp.runMATSimActivityChains(scenarioMATSim.getPopulation());
-		
-		if (compareWithMZ) {
-			PopulationImpl pop = asp.reducePopulation(scenarioMZ.getPopulation(), attributesInputFile);
-			asp.runMZActivityChains(pop);
-			asp.compareMATSimAndMZActivityChains();
-			asp.runMATSimTrips(scenarioMATSim.getPopulation());
-			asp.runMZTrips(pop);
-			asp.runMATSimDistances(scenarioMATSim.getPopulation());
-			asp.runMZDistances(pop);
-			asp.runMATSimTimings(scenarioMATSim.getPopulation());
-			asp.runMZTimings(pop);
-		}
-		else {
-			asp.runMATSimTrips(scenarioMATSim.getPopulation());
-			asp.runMATSimTimings(scenarioMATSim.getPopulation());
-		}
-		asp.analyzeCounts(counts);
-		
-		log.info("Analysis of plan finished.");
+		new ASPGeneral(iter, lastIter, directory, scenarioMATSim.getNetwork()) ;
 	}
 
 }
