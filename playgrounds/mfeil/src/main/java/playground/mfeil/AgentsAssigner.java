@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -77,6 +76,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	private final ActivityTypeFinder 			finder;
 	protected static final Logger 				log = Logger.getLogger(AgentsAssigner.class);
 	private static final int					trialsLCTimings = 5;
+	private static final double					LC_minimum_time_AA = 300.0;
 	
 	private final DistanceCoefficients coefficients;
 	private String primActsDistance, homeLocation, municipality, age, sex, license, car_avail, employed;
@@ -413,7 +413,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			LegImpl leg = ((LegImpl)(al.get(i)));
 			
 			// if travel time = 0 (=same facility) set to 1 sec because LC does nothing, otherwise
-			if (leg.getTravelTime()==0) leg.setTravelTime(300);
+			if (leg.getTravelTime()==0) leg.setTravelTime(LC_minimum_time_AA);
 			// divide by ptSpeedFactor 
 			else if (leg.getMode().toString().equals(TransportMode.pt.toString())) {
 				leg.setTravelTime(leg.getTravelTime()/this.controler.getConfig().plansCalcRoute().getPtSpeedFactor());

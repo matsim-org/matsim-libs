@@ -76,32 +76,25 @@ public class ASPGeneral {
 	
 	
 	public ASPGeneral (final int iter, final int lastIter, final String directory, final NetworkImpl network) {
-		/*	// Scenario files
-			final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
-			final String networkFilename = "/home/baug/mfeil/data/Zurich10/network_0.7.xml";
-			
-			// Special MZ file so that weights of MZ persons can be read
-			final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-			
-			// Population files
-			final String populationFilenameMATSim;
-			if (iter.equals("50")) populationFilenameMATSim = "/home/baug/mfeil/output/output_plans.xml";
-			else populationFilenameMATSim = "/home/baug/mfeil/output/output_plans.xml";
-			final String populationFilenameMZ = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mzAS0997b.xml";
-			
-			// Counts file
-			final String counts = "/home/baug/mfeil/data/runs/0995b_18rec/ITERS/it.70/70.countscompare.txt";
-			
-			// Output file
-			final String outputFile = "/home/baug/mfeil/output/plx.analysis.xls";	
-		*/	
-		final String facilitiesFilename = "../matsim/test/scenarios/chessboard/facilities.xml";
-		final String populationFilenameMATSim;
-		populationFilenameMATSim = directory+"/ITERS/it."+iter+"/"+iter+".plans.xml";
+		// Scenario files
+		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+	//	final String facilitiesFilename = "../matsim/test/scenarios/chessboard/facilities.xml";
+	//	final String networkFilename = "/home/baug/mfeil/data/Zurich10/network_0.7.xml";
+		
+		// Special MZ file so that weights of MZ persons can be read
+		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
+		
+		// Population files
+		final String populationFilenameMZ = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mzAS0997b.xml";
+		
+		// Counts file
+	//	final String counts = "/home/baug/mfeil/data/runs/0995b_18rec/ITERS/it.70/70.countscompare.txt";
 		final String counts = directory+"/ITERS/it."+iter+"/"+iter+".countscompare.txt";
+		final String populationFilenameMATSim = directory+"/ITERS/it."+iter+"/"+iter+".plans.xml";
+		
+		// Output file
+	//	final String outputFile = "/home/baug/mfeil/output/plx.analysis.xls";	
 		final String outputFile = directory+"/"+iter+".analysis.xls";	
-		final String populationFilenameMZ = null;
-		final String attributesInputFile = null;
 			
 		// Settings
 		final boolean compareWithMZ = true; 		

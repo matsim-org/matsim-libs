@@ -35,7 +35,7 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 
 public class LMwCSCustomized extends LocationMutatorwChoiceSet {
 	
-	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
+//	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
 
 	
 	public LMwCSCustomized(final Network network, Controler controler, Knowledges kn) {
@@ -50,7 +50,12 @@ public class LMwCSCustomized extends LocationMutatorwChoiceSet {
 		for (ActivityFacility fac: choiceSet){
 			if (fac.getCoord().equals(startCoord)) {
 				choiceSet.remove(fac);
-				log.info("Removed fac "+fac.getId()+" at link "+fac.getLinkId()+" from choice set with start coord "+startCoord.getX()+"/"+startCoord.getY());
+	//			log.info("Removed fac "+fac.getId()+" at link "+fac.getLinkId()+" from choice set with start coord "+startCoord.getX()+"/"+startCoord.getY());
+				break;
+			}
+			else if (fac.getCoord().equals(endCoord)) {
+				choiceSet.remove(fac);
+	//			log.info("Removed fac "+fac.getId()+" at link "+fac.getLinkId()+" from choice set with start coord "+endCoord.getX()+"/"+endCoord.getY());
 				break;
 			}
 		}

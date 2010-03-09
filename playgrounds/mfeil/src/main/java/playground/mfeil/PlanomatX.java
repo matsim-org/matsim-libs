@@ -39,8 +39,10 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.ManageSubchains;
@@ -74,13 +76,13 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	private static final Logger 			log = Logger.getLogger(PlanomatX.class);
 	private final String					finalOpt;
 	private final ActivityTypeFinder 		finder;
-	private final double					LC_minimum_time = 1;
+	private final double					LC_minimum_time = 1.0;
 
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final Knowledges knowledges;
 	private final Network network;
 	private		 ControlerIO				controlerIO;
-	private boolean printing = false;
+	private boolean 						printing = false;
 	private PrintStream 					stream;
 
 
@@ -141,10 +143,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		// Initialization
 		//////////////////////////////////////////////////////////////////////
 		
-		//log.info("PlX person "+plan.getPerson().getId());
-		if (plan.getPerson().getId().toString().equals("1062251") ||
-				plan.getPerson().getId().toString().equals("4773280")) this.printing = true;
-		else this.printing = false;
+	//	log.info("PlX person "+plan.getPerson().getId());
+	//	if (plan.getPerson().getId().toString().equals("145")) this.printing = true;
+	//	else this.printing = false;
 		
 		MatsimRandom.getLocalInstance();
 
@@ -468,6 +469,15 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		}
 		statistics.println();
 		statistics.close();*/
+	
+	/*
+		double dis = 0;
+		for (int y = 1;y<al.size();y+=2) {
+			LegImpl leg = ((LegImpl)(al.get(y)));
+			if (!leg.getMode().toString().equals(TransportMode.car.toString())) dis += leg.getRoute().getDistance(); // distance in kilometers
+			else dis += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+		}
+		log.info("PLX: dis für person "+plan.getPerson().getId()+" = "+dis);*/
 	}
 
 
@@ -1195,7 +1205,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (LegImpl)plan.getPlanElements().get((first-1)*2+1));
 				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (LegImpl)plan.getPlanElements().get(first*2+1));
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first+1)*2), null);
-			}
+				}
 			if (second!=-1){
 				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
 				if (((LegImpl)plan.getPlanElements().get((second-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((second-1)*2+1)).setTravelTime(this.LC_minimum_time);

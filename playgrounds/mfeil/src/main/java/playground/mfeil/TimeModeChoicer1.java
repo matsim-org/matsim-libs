@@ -206,10 +206,9 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 
 	public void run (Plan basePlan){
 		
-	//	log.info("Tmc1 person "+basePlan.getPerson().getId());
-		if (basePlan.getPerson().getId().toString().equals("1062251") ||
-				basePlan.getPerson().getId().toString().equals("4773280")) this.printing = true;
-		else this.printing = false;
+	//	if (basePlan.getPerson().getId().toString().equals("1062251") ||
+	//			basePlan.getPerson().getId().toString().equals("4773280")) this.printing = true;
+	//	else this.printing = false;
 
 		if (printing){
 			String outputfile = this.controlerIO.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+basePlan.getPerson().getId()+".xls");
