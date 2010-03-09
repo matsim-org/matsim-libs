@@ -30,14 +30,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.PlanScorer;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -94,13 +98,13 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.noOfAssignmentAgents	= 500;
 		this.finder					= finder;		
 		this.iterationsFirstTime 	= 20;
-		this.iterationsFurtherTimes = 0;
+		this.iterationsFurtherTimes = 5;
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
 		this.municipality			= "no";
-		this.sex 					= "no";
+		this.sex 					= "yes";
 		this.age 					= "yes";
-		this.license 				= "no";
+		this.license 				= "yes";
 		this.car_avail 				= "no";
 		this.employed 				= "no";
 		this.softCoef 				= this.detectSoftCoefficients();
@@ -174,11 +178,11 @@ public class RecyclingModule implements PlanStrategyModule{
 			this.detectCoefficients();
 			Statistics.prt=true;
 			this.calculate();
-			this.rescheduleNonassigedAgents();
+			if (!this.nonassignedAgents.isEmpty()) this.rescheduleNonassigedAgents();
 		}
 		else {
 			this.calculate();
-			this.rescheduleNonassigedAgents();
+			if (!this.nonassignedAgents.isEmpty()) this.rescheduleNonassigedAgents();
 		}
 	//	Statistics.prt=true;
 		
@@ -186,7 +190,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		assignment.println("Iteration "+this.controler.getIterationNumber());
 		assignment.println("Individual optimization");
 		for (int i=0;i<list[0].size();i++){
-			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScore()+"\t");
+			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScore()+"\t"+this.getDistance(list[0].get(i))+"\t");
 			for (int j=0;j<list[0].get(i).getPlanElements().size();j+=2){
 				assignment.print(((ActivityImpl)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
 			}
@@ -307,12 +311,13 @@ public class RecyclingModule implements PlanStrategyModule{
 		
 		/* Iteration 0 */
 		scoreIter = this.calculate();		// calculate score of initial set
-		scoreIter = this.rescheduleNonassigedAgents();		// in case some agents were not assignable
+		if (!this.nonassignedAgents.isEmpty()) scoreIter = this.rescheduleNonassigedAgents();		// in case some agents were not assignable
 		scoreBest = scoreIter;	
 		for (int z=0;z<coefSet.length;z++){
-			coefAux = this.coefficients.getSingleCoef(z);  // set previous iteration's coef
+			coefAux = this.coefficients.getSingleCoef(z);  // set base coef
 			coefIterBase[z] = coefAux;
 			coefSet[z] = coefAux;
+			coefBest [z] = coefAux;
 		}
 	
 		/* Further iterations */
@@ -413,7 +418,6 @@ public class RecyclingModule implements PlanStrategyModule{
 			log.info("Iteration's score = "+scoreIter);
 		}
 			
-
 		this.coefficients.setCoef(coefBest);
 		log.info("");
 		log.info("Final coefficients:");
@@ -566,6 +570,16 @@ public class RecyclingModule implements PlanStrategyModule{
 	
 	public OptimizedAgents getOptimizedAgents (){
 		return this.agents;
+	}
+	
+	private double getDistance(Plan plan){
+		double distance = 0;
+		for (int i=1;i<plan.getPlanElements().size();i+=2){
+			LegImpl leg = ((LegImpl)(plan.getPlanElements().get(i)));
+			if (!leg.getMode().toString().equals(TransportMode.car.toString())) distance += leg.getRoute().getDistance(); // distance in kilometers
+			else distance += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+		}
+		return distance;	
 	}
 
 }
