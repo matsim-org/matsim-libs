@@ -26,9 +26,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -36,9 +38,12 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -64,12 +69,14 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected final Controler					controler;
 	protected final PlanAlgorithm 				timer;
 	protected final LocationMutatorwChoiceSet 	locator;
+	protected final PlansCalcRoute				router;
+	protected final Network						network;
 	protected final RecyclingModule				module;
 	protected LinkedList<String>				nonassignedAgents;
 	protected Knowledges 						knowledges;
 	private final ActivityTypeFinder 			finder;
 	protected static final Logger 				log = Logger.getLogger(AgentsAssigner.class);
-	private static final int					trialsLCTimings = 3;
+	private static final int					trialsLCTimings = 5;
 	
 	private final DistanceCoefficients coefficients;
 	private String primActsDistance, homeLocation, municipality, age, sex, license, car_avail, employed;
@@ -80,14 +87,9 @@ public class AgentsAssigner implements PlanAlgorithm{
 			DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
 		
 		this.controler				= controler;
-		PlansCalcRoute router 		= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-
+		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		this.network				= controler.getNetwork();
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
-//		FixedRouteLegTravelTimeEstimator legTravelTimeEstimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-//				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
-//				PlanomatConfigGroup.RoutingCapability.fixedRoute,
-//				router);
-
 		this.timer					= new TimeModeChoicer2(controler, legTravelTimeEstimatorFactory, scorer);
 		this.locator 				= locator;
 		this.finder					= finder;
@@ -152,8 +154,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 						System.out.println();
 						log.warn("Primacts im Knowledge des zuzuordnenden Agenten "+plan.getPerson().getId()+":");
 						for (int k=0;k< this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size();k++){
-							if (this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getClass().getName().equals("org.matsim.population.Act")) log.warn(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getType()+" ");
-							else log.warn("Leg but undefined. ");
+							this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k);
 						}
 						System.out.println();
 						continue optimizedAgentsLoop;	// if exception occurs go to next agent whatsoever the exception is.
@@ -272,17 +273,47 @@ public class AgentsAssigner implements PlanAlgorithm{
 			return;
 		}
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
-		int counterLCTimings = 0;
-		do {
-			this.locator.handlePlan(plan);
-			this.timer.run(plan);  // includes to write the new score to the plan
-			counterLCTimings++;
-		} while (plan.getScore()==-100000 && counterLCTimings <= AgentsAssigner.trialsLCTimings);
+	//	do {
+	//		this.locator.handlePlan(plan);
+	//		this.timer.run(plan);  // includes to write the new score to the plan
+	//		counterLCTimings++;
+	//	} while (plan.getScore()==-100000 && counterLCTimings <= AgentsAssigner.trialsLCTimings);
+		
+		ArrayList<PlanImpl> setOfLCplans = new ArrayList<PlanImpl>();
+		double bestDis = Double.MAX_VALUE;
+		int pointerToBestDis = -1;
+		for (int z=0;z<trialsLCTimings;z++) {
+			PlanImpl LCplan = new PlanImpl(plan.getPerson());
+			LCplan.copyPlan(plan);
+			this.locator.handlePlan(LCplan);
+			this.router.run(LCplan);
+			double dis = 0;
+			for (int y = 1;y<LCplan.getPlanElements().size();y+=2) {
+				LegImpl leg = ((LegImpl)(LCplan.getPlanElements().get(y)));
+				if (!leg.getMode().toString().equals(TransportMode.car.toString())) dis += leg.getRoute().getDistance(); // distance in kilometers
+				else dis += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+			}
+			if (dis<bestDis) {
+				bestDis = dis;
+				pointerToBestDis = z;
+			}
+			setOfLCplans.add(LCplan);
+		}
+	//	log.info("beste Distanz für Person "+plan.getPerson().getId()+" = "+bestDis+", von Person "+agents.getAgentPlan(assignedAgent).getPerson().getId());
+		plan.getPlanElements().clear();
+		for (int y=0;y<setOfLCplans.get(pointerToBestDis).getPlanElements().size();y++){
+			if (y%2==0) plan.addActivity(((ActivityImpl)(setOfLCplans.get(pointerToBestDis).getPlanElements().get(y))));
+			else plan.addLeg(((LegImpl)(setOfLCplans.get(pointerToBestDis).getPlanElements().get(y))));
+		}
+		this.timer.run(plan);  // includes to write the new score to the plan		
 		
 		// ... nothing helps, call PlanomatX again
 		if (plan.getScore()==-100000){
-			this.nonassignedAgents.add(plan.getPerson().getId().toString());
 			log.info("No valid plan assignment possible for person "+plan.getPerson().getId()+" having received person's "+agents.getAgentPlan(assignedAgent).getPerson().getId());
+			if (!this.nonassignedAgents.contains(plan.getPerson().getId().toString())){
+				this.nonassignedAgents.add(plan.getPerson().getId().toString());
+				log.info("Adding person "+plan.getPerson().getId()+" to list of non-assigned agents.");
+			}
 			return;
 		}
 		
@@ -291,10 +322,12 @@ public class AgentsAssigner implements PlanAlgorithm{
 			prt.add(plan.getPerson().getId().toString());
 			prt.add(agents.getAgentPerson(assignedAgent).getId().toString());
 			prt.add(plan.getScore().toString());
+			prt.add(bestDis+"");
 			for (int y=0;y<plan.getPlanElements().size();y+=2){
 				prt.add(((ActivityImpl)(plan.getPlanElements().get(y))).getType());
 			}
 			Statistics.list.add(prt);	
+		//	log.info("added person "+plan.getPerson().getId()+" to Statistics.");
 		}	
 	}
 	
@@ -320,6 +353,9 @@ public class AgentsAssigner implements PlanAlgorithm{
 				}
 			}
 		}
+	//	for (int i=1;i<bestPlan.getPlanElements().size()-1;i+=2){
+	//		((LegImpl)(bestPlan.getPlanElements().get(i))).setTravelTime(1);
+	//	}
 		
 		if(bestPlan.getPlanElements().size()!=1 && al.size()>bestPlan.getPlanElements().size()){ 
 			int i;
@@ -364,12 +400,32 @@ public class AgentsAssigner implements PlanAlgorithm{
 			}
 		}
 		
-		// finally, adjust first home duration if al.size()!=1
+		// adjust first home duration if al.size()!=1
 		if (al.size()>1){
-		//	((ActivityImpl)al.get(0)).setEndTime(((TimeModeChoicer2)this.timer).getHomeMinimumTime());
-		//	((ActivityImpl)al.get(0)).setDuration(((TimeModeChoicer2)this.timer).getHomeMinimumTime());
 			((ActivityImpl)al.get(0)).setEndTime(6*3600);
 			((ActivityImpl)al.get(0)).setDuration(6*3600);
+		}
+		
+		// adjust travel time budget for location choice:
+		// travel times need to be translated back to car travel time since LC is based on car travel time
+		// not translating results in too long distances traveled and a bias of the schedule recycling (compared to PlanomatX)
+		for (int i = 1;i<al.size();i+=2) {
+			LegImpl leg = ((LegImpl)(al.get(i)));
+			
+			// if travel time = 0 (=same facility) set to 1 sec because LC does nothing, otherwise
+			if (leg.getTravelTime()==0) leg.setTravelTime(300);
+			// divide by ptSpeedFactor 
+			else if (leg.getMode().toString().equals(TransportMode.pt.toString())) {
+				leg.setTravelTime(leg.getTravelTime()/this.controler.getConfig().plansCalcRoute().getPtSpeedFactor());
+			}
+			// bikeSpeed * 1.5 [see strange distance calculation in PlansCalcRoute] / ( 25.3km/h * 1.2) [see LC]
+			else if (leg.getMode().toString().equals(TransportMode.bike.toString())) {
+				leg.setTravelTime(leg.getTravelTime()*this.controler.getConfig().plansCalcRoute().getBikeSpeed()*1.5/(25.3/3.6*1.2));
+			}
+			// walkSpeed * 1.5 [see strange distance calculation in PlansCalcRoute] / ( 25.3km/h * 1.2) [see LC]
+			else if (leg.getMode().toString().equals(TransportMode.walk.toString())) {
+				leg.setTravelTime(leg.getTravelTime()*this.controler.getConfig().plansCalcRoute().getWalkSpeed()*1.5/(25.3/3.6*1.2));
+			}
 		}
 	}
 }
