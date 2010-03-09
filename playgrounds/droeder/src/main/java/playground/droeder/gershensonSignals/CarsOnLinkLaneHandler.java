@@ -32,11 +32,13 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QLinkLanesImpl;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
@@ -56,10 +58,12 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	private Map<Id, CarLocator> m;
 	
 	private QNetwork net;
-	private double d = 100;
-	
-	
-	public CarsOnLinkLaneHandler(Map<Id, SignalGroupDefinition> groups, double d){
+	private double d;
+
+	/*  dMax is the maximum length of d, if d is longer then linkLength d is set d linkLength.
+	 *  If dMax is shorter then laneLength, d is set to 2.5*laneLength or linkLenth if the link is to short
+	 */
+	public CarsOnLinkLaneHandler(Map<Id, SignalGroupDefinition> groups, double dMax){
 		this.d = d;
 		
 		for (SignalGroupDefinition sd : groups.values()){
@@ -71,7 +75,6 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 				if (!vehInD.containsKey(id)){
 					vehInD.put(id, 0);
 				}
-				
 			}
 			Map<Id, Integer> m = new HashMap<Id, Integer>();
 			for (Id id : sd.getLaneIds()){
@@ -79,13 +82,13 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 			}
 			vehOnLinkLanes.put(sd.getId(), m);
 		}
-		
 	}
 	
 	@Override
 	public void reset(int iteration) {
 		iteration = 0;
 	}
+	
 	@Override
 	public void handleEvent(LaneEnterEvent e) {
 		Map<Id, Integer> m = vehOnLinkLanes.get(e.getLinkId());
@@ -118,7 +121,6 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 		
 		m = locateCars.get(e.getLinkId());
 		m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
-		locateCars.put(e.getLinkId(), m);
 	}
 	
 	@Override
@@ -133,7 +135,6 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 		if (m.containsKey(e.getPersonId())){
 			m.remove(e.getPersonId());
 		}
-		locateCars.put(e.getLinkId(), m);
 	}
 	@Override
 	public void handleEvent(AgentDepartureEvent e) {
@@ -150,7 +151,6 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 			m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
 			m.get(e.getPersonId()).agentEndsActivity();
 		}
-		locateCars.put(e.getLinkId(), m);
 	}
 	@Override
 	public void handleEvent(AgentArrivalEvent e){
@@ -162,7 +162,6 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 		
 		m = locateCars.get(e.getLinkId());
 		m.get(e.getPersonId()).agentStartsActivity();
-		locateCars.put(e.getLinkId(), m);
 	}
 	
 	public Map<Id, Integer> getVehOnLink(){

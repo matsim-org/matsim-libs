@@ -46,7 +46,7 @@ public class GershensonAdaptiveTrafficLightController extends
 	private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
 
 	private int tGreenMin =  0; // time in seconds
-	private int minCars = 0; //
+	private int minCarsTime = 0; //
 	private double capFactor = 0;
 
 	private boolean outLinkJam;
@@ -54,7 +54,7 @@ public class GershensonAdaptiveTrafficLightController extends
 	private double approachingRed;
 	private int approachingGreenLink;
 	private int approachingGreenLane;
-	private double carsOnRefLink;
+	private double carsOnRefLinkTime;
 	private boolean compGroupsGreen;
 	private SignalGroupState oldState;
 
@@ -75,7 +75,7 @@ public class GershensonAdaptiveTrafficLightController extends
 	}
 
 	/**initializes the adaptive controller. set defaultParameters for minGreenTime u = 15, 
-	 * minCarsApproaching n = 24 and capFactor = 0.9
+	 * min (CarsApproaching*waitingTime) n = 300 and capFactor = 0.9
 	 *
 	 * Parameters could be changed with setParameters
 	 *
@@ -95,8 +95,8 @@ public class GershensonAdaptiveTrafficLightController extends
 		if(this.tGreenMin == 0){
 			this.tGreenMin = 15;
 		}
-		if(this.minCars == 0){
-			this.minCars = 24;
+		if(this.minCarsTime == 0){
+			this.minCarsTime = 300;
 		}
 		if(this.capFactor == 0){
 			this.capFactor = 0.9;
@@ -114,7 +114,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		this.approachingRed = 0;
 		this.approachingGreenLink = 0;
 		this.approachingGreenLane = 0;
-		this.carsOnRefLink = 0;
+		this.carsOnRefLinkTime = 0;
 		this.compGroupsGreen = true;
 		this.oldState = this.getSignalGroupStates().get(signalGroup);
 
@@ -135,7 +135,8 @@ public class GershensonAdaptiveTrafficLightController extends
 		// coordinates the Trafficlight for many toLinks and you don't know Agents Destination
 		for (Id i : signalGroup.getToLinkIds()){
 			double outLinkCapacity = net.getLinks().get(i).getSpaceCap();
-			double actStorage = vehOnLink.get(i);
+//			double actStorage = vehOnLink.get(i);
+			double actStorage = handler.getVehInD(time, i);
 			if((outLinkCapacity*capFactor)< actStorage){
 				outLinkJam = true;
 				break;
@@ -145,8 +146,8 @@ public class GershensonAdaptiveTrafficLightController extends
 		//set number of cars, approaching a competing Link in a short distance, if it is green
 		if (compGroupsGreen == true){
 			for (Id i : compGroups.get(signalGroup.getId())){
-				approachingGreenLink += vehOnLink.get((groups.get(i).getLinkRefId())).intValue();
-//				approachingGreenLink += handler.getVehInD(time, groups.get(i).getLinkRefId());
+//				approachingGreenLink += vehOnLink.get((groups.get(i).getLinkRefId())).intValue();
+				approachingGreenLink += handler.getVehInD(time, groups.get(i).getLinkRefId());
 				for (Entry<Id, Integer> e : vehOnLinkLanes.get(i).entrySet()){
 					approachingGreenLane += e.getValue().intValue();
 				}
@@ -157,16 +158,16 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 
 		// set number of cars on refLink of signalGroup
-		carsOnRefLink = vehOnLink.get(signalGroup.getLinkRefId());
-//		carsOnRefLink = handler.getVehInD(time, signalGroup.getLinkRefId());
+//		this.carsOnRefLinkTime = vehOnLink.get(signalGroup.getLinkRefId())*compGreenTime;
+		this.carsOnRefLinkTime = handler.getVehInD(time, signalGroup.getLinkRefId())*compGreenTime;
 
-//		// 	set number of cars approaching a Red light
-//		if (oldState.equals(SignalGroupState.RED)){
-//			approachingRed = vehOnLink.get(groups.get(signalGroup.getId()).getLinkRefId());
-////			approachingRed = handler.getVehInD(time, signalGroup.getLinkRefId());
-//		}else{
-//			approachingRed = 0;
-//		}
+		// 	product of the number of cars approaching a Red light and the time a light is red
+		if (this.oldState.equals(SignalGroupState.RED)){
+//			approachingRed = vehOnLink.get(signalGroup.getLinkRefId());
+			this.approachingRed = handler.getVehInD(time, signalGroup.getLinkRefId());
+		}else{
+			this.approachingRed = 0;
+		}
 	}
 	
 	@Override
@@ -205,11 +206,11 @@ public class GershensonAdaptiveTrafficLightController extends
 			  this.switchLight(signalGroup, oldState, time);
 			  return;
 			}
-			if (carsOnRefLink > 0 && approachingGreenLink == 0){ // Rule 4
+			if (approachingRed > 0 && approachingGreenLink == 0){ // Rule 4
 				switchLight(signalGroup, oldState, time);
 				return;
 			}else if(!(approachingGreenLane > 0)){  //Rule 3
-				if ((time - compGreenTime) > tGreenMin && carsOnRefLink > minCars){ // Rule 1 + 2
+				if ((time - compGreenTime) > tGreenMin && carsOnRefLinkTime > minCarsTime){ // Rule 1 + 2
 				  this.switchLight(signalGroup, oldState, time);
 				  return;
 				}
@@ -241,7 +242,7 @@ public class GershensonAdaptiveTrafficLightController extends
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.GREEN);
 			}
 			switchedToGreen.put(group.getId(), 0.0);
-			this.getSignalGroupStates().put(group, SignalGroupState.RED);
+
 		} else { //if (oldState.equals(SignalGroupState.RED)){
 			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
 			if (!(corrGroups.get(group.getId()) == null)){
@@ -254,14 +255,13 @@ public class GershensonAdaptiveTrafficLightController extends
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.RED);
 			}
 			switchedToGreen.put(group.getId(), time);
-			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
 		}
 //		return false;
 
 	}
 
 	public void setParameters (int minCars, int tGreenMin, double capFactor){
-		this.minCars = minCars;
+		this.minCarsTime = minCars;
 		this.tGreenMin = tGreenMin;
 		this.capFactor = capFactor;
 	}

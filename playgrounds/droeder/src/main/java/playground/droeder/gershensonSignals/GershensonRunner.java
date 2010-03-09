@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -39,24 +38,16 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QLinkLanesImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
-import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
-import playground.droeder.charts.DaBarChart;
-import playground.droeder.charts.DaChartWriter;
-import playground.yu.newPlans.NewIdPlan;
 
 
 
@@ -87,7 +78,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private CarsOnLinkLaneHandler handler2;
 	
 	// "D" run denver -- "G" run gershensonTestNetwork
-	private static final String config = "D";
+	private static final String config = "G";
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 
@@ -139,7 +130,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				event.getControler().getEvents().addHandler(handler2);
 				
 				//enable live-visualization
-//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	
@@ -179,8 +170,8 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				QSim qs = e.getQueueSimulation();
 				GershensonAdaptiveTrafficLightController adaptiveController = 
 					(GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-				adaptiveController.init(corrGroups, compGroups, e.getQueueSimulation().getQueueNetwork(), handler2);
 				adaptiveController.setParameters(n, u, cap);
+				adaptiveController.init(corrGroups, compGroups, e.getQueueSimulation().getQueueNetwork(), handler2);
 				handler2.setQNetwork(e.getQueueSimulation().getQueueNetwork());
 				
 				c.getEvents().addHandler(adaptiveController);
@@ -230,10 +221,10 @@ public class GershensonRunner implements AgentStuckEventHandler {
 //		double cap = 0;
 		
 		GershensonRunner runner = new GershensonRunner();
-		runner.setN(15);
-		runner.setU(3);
+		runner.setN(30);
+		runner.setU(20);
 		runner.setCap(0.90);
-		runner.setD(100);
+		runner.setD(150);
 		runner.runScenario(config);
 		
 //		for (int c = 0; c < 20; c++){

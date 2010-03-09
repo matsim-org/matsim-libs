@@ -19,40 +19,60 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
+import loci.formats.Log;
+
+import org.apache.log4j.Logger;
+import org.matsim.ptproject.qsim.QLane;
 import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QLinkLanesImpl;
 
 /**
  * @author droeder
  *
  */
 public class CarLocator {
-	private QLink link;
+	private QLinkLanesImpl link;
 	private boolean parking = false;
 	private double enterTime;
-	private double earliestD;
+	private double earliestInD;
 	private double d;
 	
+	private static final Logger log = Logger.getLogger(CarLocator.class);
+
 	public CarLocator(QLink link, double enterTime, double d){
-		this.link = link;
+		this.link = (QLinkLanesImpl) link;
 		this.enterTime = enterTime;
 		this.d = d;
+		this.checkD();
 		this.earliestD();
 	}
-	
+	private void checkD(){
+		for (QLane ql : link.getQueueLanes()){
+			if(!(ql.equals(link.getOriginalLane())) && (ql.getMeterFromLinkEnd()>this.d)){
+				this.d = 2.5 * ql.getMeterFromLinkEnd();
+				log.info("d was shorter than lane. Set to " + this.d);
+				break;
+			}
+		}
+		if(this.d>link.getLink().getLength()){
+			this.d = link.getLink().getLength();
+			log.info("parameter d must not longer then linkLength, d set to " + link.getLink().getLength());
+		}
+	}
 	private void earliestD (){
-		this.earliestD = enterTime+(this.link.getLink().getLength()-d)/this.link.getLink().getFreespeed(this.enterTime);		
+		this.earliestInD = enterTime+(this.link.getLink().getLength()-d)/this.link.getLink().getFreespeed(this.enterTime);		
 	}
 	
 	public void agentStartsActivity(){
-		parking = true;
+		this.parking = true;
 	}
 	
 	public void agentEndsActivity(){
-		parking = false;
+		this.parking = false;
 	}
 	
 	public boolean agentIsInD(double time){
-		if (earliestD<time && parking==false){
+		if (this.earliestInD<time && parking==false){
 			return true;
 		}else{
 			return false;
