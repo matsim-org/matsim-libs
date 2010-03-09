@@ -177,7 +177,7 @@ public class GershensonAdaptiveTrafficLightController extends
 
 	@Override
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
-		for (SignalGroupDefinition sg : this.getSignalGroups().values()){
+	  for (SignalGroupDefinition sg : this.getSignalGroups().values()){
 			this.updateSignalGroupState(e.getSimulationTime(), sg);
 		}
 	}
@@ -190,7 +190,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			if(oldState.equals(SignalGroupState.GREEN)){
 				this.getSignalGroupStates().put(signalGroup, SignalGroupState.GREEN);
 				return;
-			}else{
+			} else{
 			  this.getSignalGroupStates().put(signalGroup, SignalGroupState.RED);
 			  return;
 			}
@@ -242,7 +242,7 @@ public class GershensonAdaptiveTrafficLightController extends
 			}
 			switchedToGreen.put(group.getId(), 0.0);
 			this.getSignalGroupStates().put(group, SignalGroupState.RED);
-		}else { //if (oldState.equals(SignalGroupState.RED)){
+		} else { //if (oldState.equals(SignalGroupState.RED)){
 			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
 			if (!(corrGroups.get(group.getId()) == null)){
 				this.getSignalGroupStates().put(this.getSignalGroups().
@@ -254,7 +254,7 @@ public class GershensonAdaptiveTrafficLightController extends
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.RED);
 			}
 			switchedToGreen.put(group.getId(), time);
-			this.getSignalGroupStates().put(group, SignalGroupState.RED);
+			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
 		}
 //		return false;
 
