@@ -56,6 +56,7 @@ public class BKickIncome2Controler extends BKickControler {
 
 	@Override
 	protected void setUp() {
+	  this.scenarioData.getConfig().global().setNumberOfThreads(1);
 		this.hhdb = new PersonHouseholdMapping(this.getScenario().getHouseholds());
 		ScoringFunctionFactory scoringFactory = new BKickIncome2ScoringFunctionFactory(this.getScenario().getConfig().charyparNagelScoring(), hhdb, this.getNetwork());
 		setTravelCostCalculatorFactory(new Income2TravelCostCalculatorFactory());
