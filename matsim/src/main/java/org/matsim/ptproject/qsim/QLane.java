@@ -1013,4 +1013,9 @@ public class QLane {
 	public QLink getQueueLink() {
 		return queueLink;
 	}
+	
+	public double getLength(){
+	  return this.length;
+	}
+	
 }
