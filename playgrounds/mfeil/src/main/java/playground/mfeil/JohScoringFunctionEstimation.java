@@ -91,7 +91,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 0995b_16
+	// Settings of 0995b_18
 	private static double beta_time_car = -6.01; 
 	private static double beta_time_pt = -1.0; // war 0.0559
 	private static double beta_time_bike = -1.32;
@@ -421,7 +421,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist;
 		if (!leg.getMode().toString().equals(TransportMode.car.toString())) dist = leg.getRoute().getDistance()/1000; // distance in kilometers
-		else dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+		else dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network)/1000;
 		if ((dist+"").equalsIgnoreCase("nan")) log.warn("dist von person "+plan.getPerson().getId()+" mit mode "+leg.getMode()+" und route "+leg.getRoute().getDistance()+", "+leg.getRoute().getStartLinkId()+", "+leg.getRoute().getEndLinkId()+" ist NaN.");
 		
 		
