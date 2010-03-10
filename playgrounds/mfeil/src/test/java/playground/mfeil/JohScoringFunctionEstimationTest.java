@@ -20,31 +20,32 @@
 
 package playground.mfeil;
 
-import org.matsim.testcases.MatsimTestCase;
 import org.apache.log4j.Logger;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.testcases.MatsimTestCase;
 
 
 
 public class JohScoringFunctionEstimationTest extends MatsimTestCase{
-	
+
 	private static final Logger log = Logger.getLogger(JohScoringFunctionEstimationTest.class);
 	private JohScoringFunctionEstimation testee;
 	private PlanImpl plan;
 
 	@Override
 	protected void setUp() throws Exception {
-		super.setUp();		
+		super.setUp();
 		this.init();
-		this.testee = new JohScoringFunctionEstimation (new PlanImpl());
+		this.testee = new JohScoringFunctionEstimation (this.plan, new NetworkLayer());
 	}
-	
+
 	private void init(){
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		person.setAge(20);
@@ -53,7 +54,9 @@ public class JohScoringFunctionEstimationTest extends MatsimTestCase{
 		person.setEmployed("yes");
 		person.setLicence("yes");
 		person.addTravelcard("halbtax");
-		
+
+		this.plan = person.createAndAddPlan(true);
+
 		ActivityImpl act0 = new ActivityImpl("home", new CoordImpl(0,0));
 		act0.setEndTime(30000);
 		LegImpl leg1 = new LegImpl (TransportMode.car);
@@ -73,7 +76,7 @@ public class JohScoringFunctionEstimationTest extends MatsimTestCase{
 		leg7.setArrivalTime(63001);
 		ActivityImpl act8 = new ActivityImpl("home", new CoordImpl(0,0));
 		act8.setEndTime(86400);
-		
+
 		this.plan.addActivity(act0);
 		this.plan.addLeg(leg1);
 		this.plan.addActivity(act2);
@@ -84,8 +87,8 @@ public class JohScoringFunctionEstimationTest extends MatsimTestCase{
 		this.plan.addLeg(leg7);
 		this.plan.addActivity(act8);
 	}
-	
-	
+
+
 	public void testRun (){
 		log.info("Running JohScoringFunctionEstimation test...");
 		double testeeScore = this.testee.getScore();
@@ -95,8 +98,8 @@ public class JohScoringFunctionEstimationTest extends MatsimTestCase{
 		double scoreAct6 = (1+0.169) * (0 + (0.681-0)/(java.lang.Math.pow(1+1*java.lang.Math.exp(5.00*(0.264-(3600/3600))),1/1)));
 		double scoreAct8 = (1+0.169) * (0 + (4.94-0)/(java.lang.Math.pow(1+1*java.lang.Math.exp(0.360*(8.31-(23399/3600))),1/1)));
 	//	double scoreLeg1 = (1+0.158) * -4.08 * 1100/3600 + 0.0569 * 0.15 * dist/1000;
-		
-		
+
+
 		log.info("... done.");
-	}	
+	}
 }
