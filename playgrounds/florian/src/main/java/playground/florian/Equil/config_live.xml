@@ -4,20 +4,20 @@
 
 
 	<module name="network">
-		<param name="inputNetworkFile" value="../../inputs/padang_net_car_v20090602.xml" />
+		<param name="inputNetworkFile" value="./src/main/java/playground/florian/Equil/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../../inputs/population2.xml" />
+		<param name="inputPlansFile" value="./src/main/java/playground/florian/Equil/plans100.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="../../output/Aktueller_Output2" />
+		<param name="outputDirectory" value="./src/main/java/playground/florian/Equil/Output_live" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="100" />
+		<param name="lastIteration" value="1" />
 	</module>
 
-	<module name="simulation">
+	<module name="qsim" >
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name = "snapshotFormat"	value = "otfvis"/> <!-- netvis, googleearth, transims -->
 		<param name="startTime" value="00:00:00" />
