@@ -105,6 +105,9 @@ public class BellmanFordIntervalBased {
 	
 	private int _roundpolls = 0;
 	
+	private long _totalnonpolls = 0L;
+	private long _roundnonpolls = 0;
+	
 	public long vertexGain = 0L; 
 	
 	/*private long _prepstart=0;
@@ -680,6 +683,7 @@ public class BellmanFordIntervalBased {
 	/**
 	 * method for updating the labels of Node to during one iteration of the algorithm
 	 * @param from a Task with a VertexInterval
+	 * @param ival an Interval during which the from vertex is reachable, no checks performed
 	 * @param to Node to which we want to go 
 	 * @param over Link upon which we travel
 	 * @param original indicates, weather we use an original or residual edge
@@ -690,55 +694,45 @@ public class BellmanFordIntervalBased {
 			VertexIntervals labelto = _labels.get(to);
 			EdgeIntervals flowover = this._flow.getFlow(over);
 			ArrayList<VertexInterval> changed;
-						
-			// just to make sure that the VertexInterval is still good
-			// it might even pick up a larger interval (or smaller if something weird happened)
-			VertexInterval start = _labels.get(from).getIntervalAt(ival.getLowBound());
-			
-			// we don't check if this is scanned because scanned gets set before relabel is called!
-			// but checking reachable won't hurt
-			if(start.getReachable()){
-				ArrayList<Interval> arrive;
 
-				VertexInterval arriveProperties = new VertexInterval();
-				arriveProperties.setReachable(true);				
-				
-				if (!reverse) {
-					// Create predecessor. It is not shifted correctly.
-					PathStep pred;
-					if (original) {
-						pred = new StepEdge(over, 0, this._settings.getLength(over), original);
-					} else {
-						pred = new StepEdge(over, this._settings.getLength(over), 0, original);				
-					}
-					arriveProperties.setPredecessor(pred);
+
+			ArrayList<Interval> arrive;
+
+			VertexInterval arriveProperties = new VertexInterval();
+			arriveProperties.setReachable(true);				
+
+			if (!reverse) {
+				// Create predecessor. It is not shifted correctly.
+				PathStep pred;
+				if (original) {
+					pred = new StepEdge(over, 0, this._settings.getLength(over), original);
 				} else {
-					// Create successor. It is not shifted correctly.			
-					PathStep succ;
-					if (original) {
-						succ = new StepEdge(over, 0, this._settings.getLength(over), original);
-					} else {
-						succ = new StepEdge(over, this._settings.getLength(over), 0, original);				
-					}
-					arriveProperties.setSuccessor(succ);
+					pred = new StepEdge(over, this._settings.getLength(over), 0, original);				
 				}
-				
-
-				
-				arrive = flowover.propagate(start, this._settings.getCapacity(over),original, reverse, timehorizon);
-				
-
-				if(arrive != null && !arrive.isEmpty()){
-					changed = labelto.setTrueList(arrive, arriveProperties);
-					return changed;
-				}else{					
-					return null;
-				}					
+				arriveProperties.setPredecessor(pred);
 			} else {
-				System.out.println("Weird. Relabel called for unreachable interval!");
-				return null;
+				// Create successor. It is not shifted correctly.			
+				PathStep succ;
+				if (original) {
+					succ = new StepEdge(over, 0, this._settings.getLength(over), original);
+				} else {
+					succ = new StepEdge(over, this._settings.getLength(over), 0, original);				
+				}
+				arriveProperties.setSuccessor(succ);
 			}
-			
+
+
+
+			arrive = flowover.propagate(ival, this._settings.getCapacity(over),original, reverse, timehorizon);
+
+
+			if(arrive != null && !arrive.isEmpty()){
+				changed = labelto.setTrueList(arrive, arriveProperties);
+				return changed;
+			}else{					
+				return null;
+			}					
+
 
 	}
 
@@ -780,18 +774,34 @@ public class BellmanFordIntervalBased {
 	
 	protected List<BFTask> processNormalNodeForward(Node v, int t) {
 		
-		VertexInterval inter = this._labels.get(v).getIntervalAt(t);
 		
-		if (!inter.getReachable()) {
-			System.out.println("Node " + v.getId() + " was not reachable!");
-			return null;
-		}
+		Interval inter;
 		
-		if (inter.isScanned()) {
-			// don't scan again ... can happen with vertex cleanup
-			return null;
+		if (this._settings.useImplicitVertexCleanup) {
+			inter = getUnscannedInterSetScanned(v, t, false);
+			if (inter == null) {
+				this._totalnonpolls++;
+				this._roundnonpolls++;
+				return null;
+			}
+		} else {
+			VertexInterval temp = this._labels.get(v).getIntervalAt(t);
+			
+			if (!temp.getReachable() || temp.getPredecessor() == null) {
+				System.out.println("Node " + v.getId() + " was not reachable or had no predecessor!");
+				return null;
+			}
+			
+			if (temp.isScanned()) {
+				// don't scan again ... can happen with vertex cleanup
+				this._totalnonpolls++;
+				this._roundnonpolls++;
+				return null;
+			}
+			temp.setScanned(true);
+			inter = temp;
 		}
-		inter.setScanned(true);
+
 		
 		List<BFTask> queue = new ArrayList<BFTask>();
 		
@@ -801,11 +811,11 @@ public class BellmanFordIntervalBased {
 			Node w = link.getToNode();
 			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, true, false, this._settings.TimeHorizon);
 			if (changed == null) continue;
-			//if (!this._settings.isSink(w)) {
-				for(VertexInterval changedinterval : changed){
-					queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));
-				}					
-			//}
+
+			for(VertexInterval changedinterval : changed){
+				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));
+			}					
+
 		}
 		// link is incoming edge of v => backward edge
 		for (Link link : v.getInLinks().values()) {
@@ -813,11 +823,9 @@ public class BellmanFordIntervalBased {
 			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, false, false, this._settings.TimeHorizon);
 			if (changed == null) continue;
 
-			//if (!this._settings.isSink(w)) {
-				for(VertexInterval changedinterval : changed){
-					queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));
-				}
-			//}
+			for(VertexInterval changedinterval : changed){
+				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));
+			}
 		}
 		
 		// treat empty sources! 
@@ -847,23 +855,101 @@ public class BellmanFordIntervalBased {
 		return queue;
 	}
 	
-	protected List<BFTask> processNormalNodeReverse(Node v, int t) {
-		// set scanned
-		// As long as no cleanup happens in between, this should be safe.
+	/** Return the (usually) largest interval around t that is unscanned but reachable
+	 * This also sets those intervals to scanned!
+	 * @param v The node where we are looking.
+	 * @param t Time that the interval should contain
+	 * @param reverse Is this for the reverse search?
+	 * @return an interval containing t, or null
+	 */
+	private Interval getUnscannedInterSetScanned(Node v, int t, boolean reverse) {
 		
-		VertexInterval inter = this._labels.get(v).getIntervalAt(t);
-		
-		if (!inter.getReachable()) {
-			System.out.println("Node " + v.getId() + " was not reachable!");
-			return null;
+		VertexIntervals label = this._labels.get(v);
+		VertexInterval inter = label.getIntervalAt(t);
+
+		// safety check, should not happen
+		if (!reverse) {
+			if (!inter.getReachable() || inter.getPredecessor() == null) {
+				System.out.println("Node " + v.getId() + " was not reachable or had no predecessor!");
+				return null;
+			} 
+		} else {
+			if (!inter.getReachable() || inter.getSuccessor() == null) {
+				System.out.println("Node " + v.getId() + " was not reachable or had no successor!");
+				return null;
+
+			}
 		}
-		
+
 		if (inter.isScanned()) {
-			// don't scan again ... can happen with vertex cleanup
+			// don't scan again ... can happen with vertex cleanup or this method
 			return null;
 		}
-						
 		inter.setScanned(true);
+		
+		int low = inter.getLowBound();
+		int high = inter.getHighBound();
+		
+		VertexInterval tempi;
+		while (low > 0) {
+			tempi = label.getIntervalAt(low - 1);
+			if (tempi.getReachable() && !tempi.isScanned()
+				&& (     (!reverse && tempi.getPredecessor() != null) 
+					  || (reverse && tempi.getSuccessor() != null) ) ) {					 
+				tempi.setScanned(true);
+				low = tempi.getLowBound();
+			} else {
+				break;
+			}
+		}
+				
+		tempi = inter;
+		
+		while (!label.isLast(tempi)) {
+			tempi = label.getIntervalAt(high);
+			if (tempi.getReachable() && !tempi.isScanned()
+				&& (     (!reverse && tempi.getPredecessor() != null) 
+					  || (reverse && tempi.getSuccessor() != null) ) ) {					 
+				
+				tempi.setScanned(true);
+				high = tempi.getHighBound();
+			} else {
+				break;
+			}
+		}
+		
+		return new Interval(low, high); 
+	}
+
+
+	protected List<BFTask> processNormalNodeReverse(Node v, int t) {
+		
+		Interval inter;
+
+		if (this._settings.useImplicitVertexCleanup) {
+			inter = getUnscannedInterSetScanned(v, t, true);
+			if (inter == null) {
+				this._totalnonpolls++;
+				this._roundnonpolls++;
+				return null;
+			}
+		} else {
+			VertexInterval temp = this._labels.get(v).getIntervalAt(t);
+
+			if (!temp.getReachable() || temp.getSuccessor() == null) {
+				System.out.println("Node " + v.getId() + " was not reachable or had no successor!");
+				return null;
+			}
+
+			if (temp.isScanned()) {
+				// don't scan again ... can happen with vertex cleanup
+				this._totalnonpolls++;
+				this._roundnonpolls++;
+				return null;
+			}
+			temp.setScanned(true);
+			inter = temp;
+		}
 		
 		List<BFTask> queue = new ArrayList<BFTask>();
 		
@@ -1040,8 +1126,10 @@ public class BellmanFordIntervalBased {
 
 		// main loop
 		int gain = 0;
-		this._roundpolls=0;
-		this._calcstart=System.currentTimeMillis();
+		this._roundpolls = 0;
+		this._roundnonpolls = 0;
+		this._calcstart = System.currentTimeMillis();
+		
 		while (true) {
 			//System.out.println("The queue is: ");
 			//System.out.println(queue);
@@ -1110,6 +1198,28 @@ public class BellmanFordIntervalBased {
 				printStatus();
 			}
 		}
+		
+		
+		// update the unreachable marks if this is not a pure forward search;
+		
+		if (this._settings.trackUnreachableVertices) {
+			for (Node node : this._network.getNodes().values()) {
+				VertexInterval iv =this._labels.get(node).getFirstPossibleForward();
+				int t;
+				if (iv != null) {
+				  t = iv.getLowBound() - 1; // lowbound is just reachable, -1 is not				  
+				} else {
+					// not reachable at all so far
+					t = cutofftime;					
+				}
+				if (t > this._unreachable.get(node)) {
+					this._unreachable.put(node, t);
+				}
+			}
+		}
+		
+		
+		
 		
 		this._calcend= System.currentTimeMillis();
 		this._totalcalctime+=(this._calcend-this._calcstart);
@@ -1214,6 +1324,13 @@ public class BellmanFordIntervalBased {
 				if (this._settings.useVertexCleanup) { 			
 					// Effectiveness with this implementation is questionable
 					this.vertexGain += _labels.get(v).cleanup();
+				}
+				
+				if (this._settings.trackUnreachableVertices) {
+					if (task.ival.getHighBound() <= this._unreachable.get(v)) {
+						//System.out.println("Skipping a task!");
+						continue;
+					}
 				}
 
 				List<BFTask> tempqueue = processNormalNodeReverse(v, task.ival.getLowBound());
@@ -1337,14 +1454,7 @@ public class BellmanFordIntervalBased {
 					if (this._settings.useVertexCleanup) { 			
 						// Effectiveness with this implementation is questionable
 						this.vertexGain += _labels.get(v).cleanup();
-					}
-					
-					if (this._settings.trackUnreachableVertices) {
-						if (task.ival.getHighBound() <= this._unreachable.get(v)) {
-							//System.out.println("Skipping a task!");
-							continue;
-						}
-					}
+					}									
 					
 					List<BFTask> tempqueue = processNormalNodeReverse(v, task.ival.getLowBound());
 					
@@ -1419,25 +1529,6 @@ public class BellmanFordIntervalBased {
 		
 		//System.out.println("final labels: \n");
 		//printStatus();
-		
-		// update the unreachable marks!
-		
-		if (this._settings.trackUnreachableVertices) {
-			for (Node node : this._network.getNodes().values()) {
-				VertexInterval iv =this._labels.get(node).getFirstPossibleForward();
-				int t;
-				if (iv != null) {
-				  t = iv.getLowBound(); // this is just reachable
-				  t -= 1; // this is not
-				} else {
-					// not reachable at all so far, up to the current "timehorizon"
-					t = cutofftimeForward;
-				}
-				if (t > this._unreachable.get(node)) {
-					this._unreachable.put(node, t);
-				}
-			}
-		}
 		
 		
 		boolean foundsome = false; 
@@ -1553,12 +1644,14 @@ public class BellmanFordIntervalBased {
 
 	public String measure() {
 		String result=
+		//"  Calctime (ms): "+(this._calcend-this._calcstart)+
 		"  Polls: "+this._roundpolls+
-		//"\n      Preptime (ms): "+(this._prepend-this._prepstart)+
-		"\n  Calctime (ms): "+(this._calcend-this._calcstart)+
+		"\n  Nonpolls: "+this._roundnonpolls+
+		//"\n      Preptime (ms): "+(this._prepend-this._prepstart)+		
 		"\n  Totalpolls: "+(this._totalpolls)+
+		"\n  Totalnonpolls: "+(this._totalnonpolls);
 		//"\n  Totalpreptime (s): "+(this._totalpreptime/1000)+
-		"\n  Totalcalctime (s): "+(this._totalcalctime/1000);
+		//"\n  Totalcalctime (s): "+(this._totalcalctime/1000);
 		
 		// statistics for VertexIntervalls
 		// min, max, avg size

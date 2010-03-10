@@ -51,6 +51,7 @@ import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.VertexIntervals;
+import playground.dressler.util.ImportSimpleNetwork;
 
 /**
  * @author Manuel Schneider
@@ -81,7 +82,7 @@ public class MultiSourceEAF {
 	 * @return A HashMap<Node,Integer> containing the demands for every node in the file
 	 * @throws IOException if file reading fails
 	 */
-	private static HashMap<Node,Integer> readDemands(final NetworkLayer network, final String filename) throws IOException{
+	public static HashMap<Node,Integer> readDemands(final NetworkLayer network, final String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		HashMap<Node,Integer> demands = new HashMap<Node,Integer>();
 		String inline = null;
@@ -93,8 +94,7 @@ public class MultiSourceEAF {
 		}
 		return demands;
 	}
-
-
+	
 
 	/**
 	 * generates demand from an population by placing demand 1 for every person on the node in the Persons first plan first activity edges ToNode
@@ -102,7 +102,7 @@ public class MultiSourceEAF {
 	 * @param filename path of the Population file
 	 * @return
 	 */
-	private static HashMap<Node,Integer> readPopulation(final Scenario scenario, final String filename){
+	public static HashMap<Node,Integer> readPopulation(final Scenario scenario, final String filename){
 		new MatsimPopulationReader(scenario).readFile(filename);
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
 		
@@ -171,6 +171,7 @@ public class MultiSourceEAF {
 		int lasttime = 0;
 		
 		boolean tryReverse;
+		int lastForward = 0; // for trackUnreachable, to do a forward step once in a while
 		
 		LinkedList<TimeExpandedPath> successfulPaths = new LinkedList<TimeExpandedPath>();
 		
@@ -186,13 +187,18 @@ public class MultiSourceEAF {
 			switch (settings.searchAlgo) {
 	            case FlowCalculationSettings.SEARCHALGO_FORWARD: {
 	            	result = routingAlgo.doCalculationsForward();
+	            	lastForward = lasttime;
 	            	break;
 	            }
 	            case FlowCalculationSettings.SEARCHALGO_REVERSE: {
-	            	if (tryReverse) {
+	            	// FIXME an arbitrary constant ...
+	            	// run reverse, unless we want to update the unreachable vertices
+	            	boolean needForward = settings.trackUnreachableVertices && (lastForward <= lasttime - 3); 
+	            	if (tryReverse && !needForward) {
 	    				result = routingAlgo.doCalculationsReverse(lasttime);
 	    			} else {
 	    			    result = routingAlgo.doCalculationsForward();
+	    			    lastForward = lasttime; // not perfectly precise ... oh well
 	    			}
 	            	break;
 	            }
@@ -477,11 +483,12 @@ public class MultiSourceEAF {
 		
 		
 		
-		String networkfile;
+		String networkfile = null;
 		String plansfile = null;
 		String demandsfile = null;
 		String outputplansfile = null;
 		String sinkid;
+		String simplenetworkfile = null;
 		int uniformDemands = 0;
 		
 		// Rounding is now done according to timestep and flowFactor!
@@ -493,8 +500,8 @@ public class MultiSourceEAF {
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
-		// 4 = padang, with 10% plans
-		
+		// 4 = padang, with 10% plans		
+		// else = something else
 		
 		if (instance == 1) {
 			networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
@@ -526,7 +533,7 @@ public class MultiSourceEAF {
 			//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
 			//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 			//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
-			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
+			//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
 			//networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 
 			//***---------MANU------**//
@@ -558,11 +565,12 @@ public class MultiSourceEAF {
 			//outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
 			//outputplansfile = "/Users/manuel/tester/ws3_testoutput.xml";
 
-
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/problem.dat";
+			
 			uniformDemands = 100;
 
 
-			timeStep = 10; 
+			timeStep = 1; 
 			flowFactor = 1.0;
 
 			//String sinkid = "supersink"; //siouxfalls, problem
@@ -571,25 +579,37 @@ public class MultiSourceEAF {
 		}
 		
 		
-		//timeStep = 5;
-
-		ScenarioImpl scenario = new ScenarioImpl();
-		
 		if(_debug){
 			System.out.println("starting to read input");
 		}
 		
-		//read network
+		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
-		networkReader.readFile(networkfile);
-		Node sink = network.getNodes().get(new IdImpl(sinkid));
-		if (sink == null){
-			System.out.println("sink not found");
+		HashMap<Node, Integer> demands = null;
+		Node sink = null;
+		
+		//read network
+		if (networkfile != null) {
+			scenario = new ScenarioImpl();
+			network = scenario.getNetwork();
+			MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+			networkReader.readFile(networkfile);
+			sink = network.getNodes().get(new IdImpl(sinkid));
+			if (sink == null){
+				System.out.println("sink not found");
+			}
+		} else if (simplenetworkfile != null) {
+			ImportSimpleNetwork importer = new ImportSimpleNetwork(simplenetworkfile);
+			try {
+				network = importer.getNetwork();
+				demands = importer.getDemands();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		//read demands
-		HashMap<Node, Integer> demands;
+		
 		if(plansfile!=null){
 			demands = readPopulation(scenario, plansfile);
 		}else if (demandsfile != null){
@@ -599,6 +619,8 @@ public class MultiSourceEAF {
 				e.printStackTrace();
 				return;
 			}
+		} else if (simplenetworkfile != null) {
+			// we should already have read those ...
 		} else {
 			// uniform demands
 			demands = new HashMap<Node, Integer>();
@@ -625,39 +647,51 @@ public class MultiSourceEAF {
 		
 		int totaldemands = 0;
 		for (int i : demands.values()) {
-			totaldemands += i;
+			if (i > 0) 
+			  totaldemands += i;
 		}
-		System.out.println("Total demand is " + totaldemands);
-
+		
 		//check if demands and sink are set
 		if (demands.isEmpty() ) {
 			System.out.println("demands not found");
 		}
 		
 		if(_debug){
+			System.out.println("Total source demand is " + totaldemands);
 			System.out.println("reading input done");
 		}
 
-		settings = new FlowCalculationSettings(network, sinkid, demands, timeStep, flowFactor);
+		
+		if (sink == null) {			
+			settings = new FlowCalculationSettings(network, demands, timeStep, flowFactor);
+		} else {
+			settings = new FlowCalculationSettings(network, sinkid, demands, timeStep, flowFactor);
+		}
 
 		// set additional parameters, mostly TimeHorizon for the LP
 		//settings.TimeHorizon = 1240;
 		//settings.MaxRounds = 101;
 		//settings.checkConsistency = 100;		
 		settings.useVertexCleanup = false;
+		settings.useImplicitVertexCleanup = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
 		settings.useRepeatedPaths = true;
+		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
+		settings.trackUnreachableVertices = false && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
 		settings.sortPathsBeforeAugmenting = true;
 		settings.checkTouchedNodes = true;
 		settings.keepPaths = true; // do not store paths at all!
 		settings.unfoldPaths = true; // unfold stored paths into forward paths
 		
+		
 		settings.printStatus();
 		
 		//settings.writeLP();
 		//settings.writeNET(false);
+		
+		
 		
 		Flow fluss;
 		fluss = calcEAFlow(settings);

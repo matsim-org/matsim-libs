@@ -47,6 +47,7 @@ public class FlowCalculationSettings {
 	/* default settings */
 	public int searchAlgo = SEARCHALGO_REVERSE;
 	public boolean useVertexCleanup = false;
+	public boolean useImplicitVertexCleanup = true; // unite vertex intervals before propagating?
 	public int TimeHorizon = 654321; // should be safe
 	public int MaxRounds = 654321;	// should be safe
 	public int checkConsistency = 0; // after how many iterations should consistency be checked? 0 = off
@@ -57,7 +58,7 @@ public class FlowCalculationSettings {
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
 	public boolean useRepeatedPaths = true; // try to repeat paths
 	
-	public boolean trackUnreachableVertices = true;
+	public boolean trackUnreachableVertices = false; // only works in REVERSE, wastes time otherwise
 	
 	/* interal storage for the network parameters */ 
 	private HashMap<Link, Integer> _capacities;
@@ -74,7 +75,7 @@ public class FlowCalculationSettings {
 	private int _totaldemandsinks;
 	
 	private int _roundedtozerocapacity;
-	private int _roundedtozerolength;
+	private int _roundedtozerolength;	
 	
 	
  
@@ -210,6 +211,7 @@ public class FlowCalculationSettings {
 		  
 		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
 		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);
+		System.out.println("Use implicit vertex cleanup: " + this.useImplicitVertexCleanup);
 		System.out.println("Use repeated paths: " + this.useRepeatedPaths);
 		System.out.println("Sort paths before augmenting: " + this.sortPathsBeforeAugmenting);
 		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
@@ -306,8 +308,9 @@ public class FlowCalculationSettings {
 		Flow.debug(0);
 	}	
 	
-	public void writeSimpleLPData() {
+	public void writeSimpleNetwork() {
 		// write simple data format to sysout
+		// representing the dynamic graph, not the time-expanded graph
 		System.out.println("% generated from matsim data");            
         System.out.println("N " + this._network.getNodes().size());
         System.out.println("TIME " + this.TimeHorizon);
