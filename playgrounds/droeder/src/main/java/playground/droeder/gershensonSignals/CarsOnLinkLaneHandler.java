@@ -61,10 +61,10 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	private double d;
 
 	/*  dMax is the maximum length of d, if d is longer then linkLength d is set d linkLength.
-	 *  If dMax is shorter then laneLength, d is set to 2.5*laneLength or linkLenth if the link is to short
+	 *  if dMax is shorter then laneLength, d is set to laneLength.
 	 */
 	public CarsOnLinkLaneHandler(Map<Id, SignalGroupDefinition> groups, double dMax){
-		this.d = d;
+		this.d = dMax;
 		
 		for (SignalGroupDefinition sd : groups.values()){
 			vehOnLink.put(sd.getLinkRefId(), 0);
@@ -150,6 +150,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 		}else{
 			m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
 			m.get(e.getPersonId()).agentEndsActivity();
+			m.get(e.getPersonId()).setEarliestD(e.getTime());
 		}
 	}
 	@Override

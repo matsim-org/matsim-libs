@@ -48,8 +48,8 @@ public class CarLocator {
 	}
 	private void checkD(){
 		for (QLane ql : link.getQueueLanes()){
-			if(!(ql.equals(link.getOriginalLane())) && (ql.getMeterFromLinkEnd()>this.d)){
-				this.d = 2.5 * ql.getMeterFromLinkEnd();
+			if(!((ql.equals(link.getOriginalLane()))) && (ql.getLength()>this.d)){
+				this.d = ql.getLength();
 				log.info("d was shorter than lane. Set to " + this.d);
 				break;
 			}
@@ -60,7 +60,7 @@ public class CarLocator {
 		}
 	}
 	private void earliestD (){
-		this.earliestInD = enterTime+(this.link.getLink().getLength()-d)/this.link.getLink().getFreespeed(this.enterTime);		
+		this.earliestInD = enterTime+(this.link.getLink().getLength()-this.d)/this.link.getLink().getFreespeed(this.enterTime);		
 	}
 	
 	public void agentStartsActivity(){
@@ -70,9 +70,12 @@ public class CarLocator {
 	public void agentEndsActivity(){
 		this.parking = false;
 	}
+	public void setEarliestD(double time){
+		this.earliestInD = time;
+	}
 	
 	public boolean agentIsInD(double time){
-		if (this.earliestInD<time && parking==false){
+		if ((this.earliestInD<time) && (parking==false)){
 			return true;
 		}else{
 			return false;

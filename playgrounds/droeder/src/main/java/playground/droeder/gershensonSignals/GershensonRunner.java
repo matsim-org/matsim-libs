@@ -38,8 +38,10 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
@@ -78,7 +80,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private CarsOnLinkLaneHandler handler2;
 	
 	// "D" run denver -- "G" run gershensonTestNetwork
-	private static final String config = "G";
+	private static final String config = "D";
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 
@@ -175,6 +177,9 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				handler2.setQNetwork(e.getQueueSimulation().getQueueNetwork());
 				
 				c.getEvents().addHandler(adaptiveController);
+				
+//				qs.getQueueNetwork().getQueueLink(new IdImpl("35")).getLink().setFreespeed(0.5);
+				
 			}
 		});
 		//remove the adaptive controller
@@ -189,11 +194,9 @@ public class GershensonRunner implements AgentStuckEventHandler {
 //		c.getQueueSimulationListener().add(new SimulationAfterSimStepListener<QSim>() {
 //			public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent<QSim> e) {
 //				QSim qs = e.getQueueSimulation();
-//				qs.getQueueSimSignalEngine().
-//				qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1")).getSignalEngine()
 //			}
 //		});
-//	
+	
 	}
 	private void startVisualizer(Config config){
 		String[] args = {config.controler().getOutputDirectory() +
@@ -221,10 +224,10 @@ public class GershensonRunner implements AgentStuckEventHandler {
 //		double cap = 0;
 		
 		GershensonRunner runner = new GershensonRunner();
-		runner.setN(30);
-		runner.setU(20);
+		runner.setN(300);
+		runner.setU(6);
 		runner.setCap(0.90);
-		runner.setD(150);
+		runner.setD(100);
 		runner.runScenario(config);
 		
 //		for (int c = 0; c < 20; c++){

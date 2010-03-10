@@ -172,36 +172,36 @@ public class GershensonScenarioGenerator {
 
 		//lanes for link 11
 		LanesToLinkAssignment lanesForLink11 = factory.createLanesToLinkAssignment(id11);
-//		Lane link11lane1 = factory.createLane(id1);
+		Lane link11lane1 = factory.createLane(id1);
 		Lane link11lane2 = factory.createLane(id2);
 //		Lane link11lane3 = factory.createLane(id3);
 
-//		link11lane1.addToLinkId(id17);
-//		link11lane1.setNumberOfRepresentedLanes(1);
+		link11lane1.addToLinkId(id12);
+		link11lane1.setNumberOfRepresentedLanes(1);
 		link11lane2.addToLinkId(id12);
 		link11lane2.setNumberOfRepresentedLanes(1);
 //		link11lane3.addToLinkId(id14);
 //		link11lane3.setNumberOfRepresentedLanes(1);
 
-//		lanesForLink11.addLane(link11lane1);
+		lanesForLink11.addLane(link11lane1);
 		lanesForLink11.addLane(link11lane2);
 //		lanesForLink11.addLane(link11lane3);
 		lanes.addLanesToLinkAssignment(lanesForLink11);
 
 		//lanes for link 13
 		LanesToLinkAssignment lanesForLink13 = factory.createLanesToLinkAssignment(id13);
-//		Lane link13lane1 = factory.createLane(id1);
+		Lane link13lane1 = factory.createLane(id1);
 		Lane link13lane2 = factory.createLane(id2);
 //		Lane link13lane3 = factory.createLane(id3);
 
-//		link13lane1.addToLinkId(id12);
-//		link13lane1.setNumberOfRepresentedLanes(1);
+		link13lane1.addToLinkId(id14);
+		link13lane1.setNumberOfRepresentedLanes(1);
 		link13lane2.addToLinkId(id14);
 		link13lane2.setNumberOfRepresentedLanes(1);
 //		link13lane3.addToLinkId(id15);
 //		link13lane3.setNumberOfRepresentedLanes(1);
 
-//		lanesForLink13.addLane(link13lane1);
+		lanesForLink13.addLane(link13lane1);
 		lanesForLink13.addLane(link13lane2);
 //		lanesForLink13.addLane(link13lane3);
 		lanes.addLanesToLinkAssignment(lanesForLink13);
@@ -274,17 +274,17 @@ public class GershensonScenarioGenerator {
 		systems.addSignalSystemDefinition(definition);
 		//create signal group for traffic on link 11
 		SignalGroupDefinition groupLink11 = factory.createSignalGroupDefinition(id11, id1);
-//		groupLink11.addLaneId(id1);
+		groupLink11.addLaneId(id1);
 		groupLink11.addLaneId(id2);
 //		groupLink11.addLaneId(id3);
-//		groupLink11.addToLinkId(id12);
-		groupLink11.addToLinkId(id14);
+		groupLink11.addToLinkId(id12);
+//		groupLink11.addToLinkId(id14);
 //		groupLink11.addToLinkId(id17);
 
 
 		//create signal group for traffic on link 13
 		SignalGroupDefinition groupLink13 = factory.createSignalGroupDefinition(id13, id2);
-//		groupLink13.addLaneId(id1);
+		groupLink13.addLaneId(id1);
 		groupLink13.addLaneId(id2);
 //		groupLink13.addLaneId(id3);
 //		groupLink13.addToLinkId(id12);

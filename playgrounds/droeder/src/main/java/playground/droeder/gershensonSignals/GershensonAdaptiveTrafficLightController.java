@@ -186,6 +186,7 @@ public class GershensonAdaptiveTrafficLightController extends
 
 	private void updateSignalGroupState(double time, SignalGroupDefinition signalGroup) {
 		this.initIsGreen(time, signalGroup);
+		
 		//check if this group was switched in this timestep. if so, return oldstate
 		if (switchedToGreen.get(signalGroup.getId()).equals(time)){
 			if(oldState.equals(SignalGroupState.GREEN)){
@@ -201,7 +202,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		if ((outLinkJam == true) && oldState.equals(SignalGroupState.GREEN)){ //Rule 5 + 6
 			this.switchLight(signalGroup, oldState, time);
 			return;
-		} else if(outLinkJam == false ){ // 12
+		} else if(outLinkJam == false ){
 			if (compGroupsGreen == false && oldState.equals(SignalGroupState.RED)){ // Rule 6
 			  this.switchLight(signalGroup, oldState, time);
 			  return;
@@ -218,20 +219,19 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 		// algorithm ends
 
-		// if no condition fits for switching lights, return oldstate
-		if(oldState.equals(SignalGroupState.GREEN)){
-		  this.getSignalGroupStates().put(signalGroup, SignalGroupState.GREEN);
-		  return;
-		}
-		else{
-		  this.getSignalGroupStates().put(signalGroup, SignalGroupState.RED);
-		  return;
-		}
+//		// if no condition fits for switching lights, return oldstate
+//		if(oldState.equals(SignalGroupState.GREEN)){
+//		  this.getSignalGroupStates().put(signalGroup, SignalGroupState.GREEN);
+//		  return;
+//		}
+//		else{
+//		  this.getSignalGroupStates().put(signalGroup, SignalGroupState.RED);
+//		  return;
+//		}
 	}
 
 	public void switchLight (SignalGroupDefinition group, SignalGroupState oldState, double time){
 		if (oldState.equals(SignalGroupState.GREEN)){
-			this.getSignalGroupStates().put(group, SignalGroupState.RED);
 			if (!(corrGroups.get(group.getId()) == null)){
 				this.getSignalGroupStates().put(this.getSignalGroups().
 						get(corrGroups.get(group.getId())),SignalGroupState.RED);
@@ -241,10 +241,10 @@ public class GershensonAdaptiveTrafficLightController extends
 				switchedToGreen.put(i, time);
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.GREEN);
 			}
+			this.getSignalGroupStates().put(group, SignalGroupState.RED);
 			switchedToGreen.put(group.getId(), 0.0);
 
 		} else { //if (oldState.equals(SignalGroupState.RED)){
-			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
 			if (!(corrGroups.get(group.getId()) == null)){
 				this.getSignalGroupStates().put(this.getSignalGroups().
 						get(corrGroups.get(group.getId())),SignalGroupState.GREEN);
@@ -254,16 +254,16 @@ public class GershensonAdaptiveTrafficLightController extends
 				switchedToGreen.put(i, 0.0);
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.RED);
 			}
+			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
 			switchedToGreen.put(group.getId(), time);
 		}
-//		return false;
-
 	}
 
-	public void setParameters (int minCars, int tGreenMin, double capFactor){
+	public void setParameters (int minCars, int tGreenMinTime, double capFactor){
 		this.minCarsTime = minCars;
-		this.tGreenMin = tGreenMin;
+		this.tGreenMin = tGreenMinTime;
 		this.capFactor = capFactor;
+		log.info("parameters for adaptive controler set. capFactor="+this.capFactor+" u=" + this.tGreenMin + " n=" + this.minCarsTime);
 	}
 
 	public void reset(int iteration) {
