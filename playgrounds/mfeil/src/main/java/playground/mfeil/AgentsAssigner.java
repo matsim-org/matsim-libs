@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -37,7 +38,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
@@ -58,13 +58,13 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
  * (= non-optimized agent copies the plan of the most similar optimized agent).
  */
 
-public class AgentsAssigner implements PlanAlgorithm{ 
-	
-	
+public class AgentsAssigner implements PlanAlgorithm{
+
+
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
-		
+
 	protected final Controler					controler;
 	protected final PlanAlgorithm 				timer;
 	protected final LocationMutatorwChoiceSet 	locator;
@@ -77,15 +77,15 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected static final Logger 				log = Logger.getLogger(AgentsAssigner.class);
 	private static final int					trialsLCTimings = 5;
 	private static final double					LC_minimum_time_AA = 300.0;
-	
+
 	private final DistanceCoefficients coefficients;
 	private String primActsDistance, homeLocation, municipality, age, sex, license, car_avail, employed;
-	
-	
+
+
 	public AgentsAssigner (Controler controler, DepartureDelayAverageCalculator 	tDepDelayCalc,
 			LocationMutatorwChoiceSet locator, PlanScorer scorer, ActivityTypeFinder finder, RecyclingModule recyclingModule,
 			DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
-		
+
 		this.controler				= controler;
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.network				= controler.getNetwork();
@@ -96,7 +96,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.module					= recyclingModule;
 		this.nonassignedAgents		= nonassignedAgents;
 		this.knowledges = (controler.getScenario()).getKnowledges();
-		
+
 		this.coefficients = coefficients;
 		this.primActsDistance	="no";
 		this.homeLocation		="no";
@@ -113,24 +113,24 @@ public class AgentsAssigner implements PlanAlgorithm{
 			if (this.coefficients.getNamesOfCoef().get(i).equals("sex")) this.sex="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("license")) this.license="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("car_avail")) this.car_avail="yes";
-			if (this.coefficients.getNamesOfCoef().get(i).equals("employed")) this.employed="yes";			
+			if (this.coefficients.getNamesOfCoef().get(i).equals("employed")) this.employed="yes";
 		}
-		
+
 	}
-	
-		
+
+
 	//////////////////////////////////////////////////////////////////////
 	// run() method
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public void run (Plan plan){
-		
+
 		OptimizedAgents agents = this.module.getOptimizedAgents();
-		
+
 		double distance = Double.MAX_VALUE;
 		double distanceAgent;
 		int assignedAgent = -1;
-		
+
 		optimizedAgentsLoop:
 		for (int j=0;j<agents.getNumberOfAgents();j++){
 
@@ -164,7 +164,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 					continue optimizedAgentsLoop;
 				}
 			}
-			
+
 			// All act types complying with those eligible to the agent (see ActivityTypeFinder)
 			List<String> actTypes = this.finder.getActTypes(plan.getPerson());
 			for (int i=2;i<agents.getAgentPlan(j).getPlanElements().size()-2;i+=2){ // "home" does not need to be checked
@@ -172,9 +172,9 @@ public class AgentsAssigner implements PlanAlgorithm{
 					continue optimizedAgentsLoop;
 				}
 			}
-			
+
 			// Further hard constraints
-				
+
 			// Gender
 			if (this.sex=="yes"){
 				try{
@@ -184,7 +184,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 					Statistics.noSexAssignment = true;
 				}
 			}
-			
+
 			// License
 			if (this.license=="yes"){
 				try{
@@ -194,7 +194,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 					Statistics.noLicenseAssignment = true;
 				}
 			}
-			
+
 			// Car availability
 			if (this.car_avail=="yes"){
 				try{
@@ -204,7 +204,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 					Statistics.noCarAvailAssignment = true;
 				}
 			}
-			
+
 			// Employment status
 			if (this.employed=="yes"){
 				try{
@@ -214,10 +214,10 @@ public class AgentsAssigner implements PlanAlgorithm{
 					Statistics.noEmploymentAssignment = true;
 				}
 			}
-						
-			
+
+
 			/* Distance (=soft) fitness */
-			
+
 			distanceAgent=0;
 			// Distance between primary activities
 			if (this.primActsDistance=="yes"){
@@ -228,18 +228,18 @@ public class AgentsAssigner implements PlanAlgorithm{
 					}
 					tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()-1).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(0).getLocation().getCoord());
 				}
-				distanceAgent+=	this.coefficients.getSingleCoef("primActsDistance")*(java.lang.Math.abs(tmpDistance-this.module.getOptimizedAgents().getAgentDistance(j)));		
+				distanceAgent+=	this.coefficients.getSingleCoef("primActsDistance")*(java.lang.Math.abs(tmpDistance-this.module.getOptimizedAgents().getAgentDistance(j)));
 			}
-			
+
 			// Distance between home location of potential agent to copy from and home location of agent in question
-			if (this.homeLocation=="yes"){			
+			if (this.homeLocation=="yes"){
 				double homelocationAgentX = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities("home", true).get(0).getFacility().getCoord().getX();
 				double homelocationAgentY = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities("home", true).get(0).getFacility().getCoord().getY();
-			
+
 				distanceAgent += this.coefficients.getSingleCoef("homeLocationDistance")*java.lang.Math.sqrt(java.lang.Math.pow((this.knowledges.getKnowledgesByPersonId().get(agents.getAgentPerson(j).getId()).getActivities("home", true).get(0).getFacility().getCoord().getX()-homelocationAgentX),2)+
 						java.lang.Math.pow((this.knowledges.getKnowledgesByPersonId().get(agents.getAgentPerson(j).getId()).getActivities("home", true).get(0).getFacility().getCoord().getY()-homelocationAgentY),2));
 			}
-			
+
 			// Municipality type
 			if (this.municipality=="yes"){
 				if (plan.getPerson().getCustomAttributes()!=null && plan.getPerson().getCustomAttributes().containsKey("municipality")){
@@ -247,12 +247,12 @@ public class AgentsAssigner implements PlanAlgorithm{
 				}
 				else Statistics.noMunicipalityAssignment = true;
 			}
-			
+
 			// TODO @mfeil: exception handling missing
 			if (this.age=="yes"){
 				distanceAgent+= this.coefficients.getSingleCoef("age")* java.lang.Math.abs(((PersonImpl)(plan.getPerson())).getAge()-((PersonImpl)(agents.getAgentPerson(j))).getAge());
 			}
-			
+
 			if (distanceAgent<distance){
 				/*if (Statistics.prt==true){
 					if (agents.filling[j]>0){
@@ -278,7 +278,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	//		this.timer.run(plan);  // includes to write the new score to the plan
 	//		counterLCTimings++;
 	//	} while (plan.getScore()==-100000 && counterLCTimings <= AgentsAssigner.trialsLCTimings);
-		
+
 		ArrayList<PlanImpl> setOfLCplans = new ArrayList<PlanImpl>();
 		double bestDis = Double.MAX_VALUE;
 		int pointerToBestDis = -1;
@@ -299,14 +299,14 @@ public class AgentsAssigner implements PlanAlgorithm{
 			}
 			setOfLCplans.add(LCplan);
 		}
-	//	log.info("beste Distanz für Person "+plan.getPerson().getId()+" = "+bestDis+", von Person "+agents.getAgentPlan(assignedAgent).getPerson().getId());
+	//	log.info("beste Distanz fuer Person "+plan.getPerson().getId()+" = "+bestDis+", von Person "+agents.getAgentPlan(assignedAgent).getPerson().getId());
 		plan.getPlanElements().clear();
 		for (int y=0;y<setOfLCplans.get(pointerToBestDis).getPlanElements().size();y++){
 			if (y%2==0) plan.addActivity(((ActivityImpl)(setOfLCplans.get(pointerToBestDis).getPlanElements().get(y))));
 			else plan.addLeg(((LegImpl)(setOfLCplans.get(pointerToBestDis).getPlanElements().get(y))));
 		}
-		this.timer.run(plan);  // includes to write the new score to the plan		
-		
+		this.timer.run(plan);  // includes to write the new score to the plan
+
 		// ... nothing helps, call PlanomatX again
 		if (plan.getScore()==-100000){
 			log.info("No valid plan assignment possible for person "+plan.getPerson().getId()+" having received person's "+agents.getAgentPlan(assignedAgent).getPerson().getId());
@@ -316,7 +316,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			}
 			return;
 		}
-		
+
 		if (Statistics.prt==true) {
 			ArrayList<String> prt = new ArrayList<String>();
 			prt.add(plan.getPerson().getId().toString());
@@ -326,17 +326,17 @@ public class AgentsAssigner implements PlanAlgorithm{
 			for (int y=0;y<plan.getPlanElements().size();y+=2){
 				prt.add(((ActivityImpl)(plan.getPlanElements().get(y))).getType());
 			}
-			Statistics.list.add(prt);	
+			Statistics.list.add(prt);
 		//	log.info("added person "+plan.getPerson().getId()+" to Statistics.");
-		}	
+		}
 	}
-	
-	
+
+
 	protected void writePlan (Plan in, Plan out){
 		PlanImpl bestPlan = new org.matsim.core.population.PlanImpl (in.getPerson());
 		bestPlan.copyPlan(in);
 		List<PlanElement> al = out.getPlanElements();
-	
+
 		ArrayList<ActivityOptionImpl> primActs = new ArrayList<ActivityOptionImpl>(this.knowledges.getKnowledgesByPersonId().get(out.getPerson().getId()).getActivities(true));
 		for (int i=2;i<bestPlan.getPlanElements().size()-2;i+=2){
 			if (!primActs.isEmpty()){
@@ -356,19 +356,19 @@ public class AgentsAssigner implements PlanAlgorithm{
 	//	for (int i=1;i<bestPlan.getPlanElements().size()-1;i+=2){
 	//		((LegImpl)(bestPlan.getPlanElements().get(i))).setTravelTime(1);
 	//	}
-		
-		if(bestPlan.getPlanElements().size()!=1 && al.size()>bestPlan.getPlanElements().size()){ 
+
+		if(bestPlan.getPlanElements().size()!=1 && al.size()>bestPlan.getPlanElements().size()){
 			int i;
 			for (i = 2; i<bestPlan.getPlanElements().size()-2;i++){
 				al.remove(i);
-				al.add(i, bestPlan.getPlanElements().get(i));	
+				al.add(i, bestPlan.getPlanElements().get(i));
 			}
 			for (int j = i; j<al.size()-2;j=j+0){
 				al.remove(j);
 			}
 		}
 		// bestPlan.getPlanElements().size() == 1
-		else if(al.size()>bestPlan.getPlanElements().size()){ 
+		else if(al.size()>bestPlan.getPlanElements().size()){
 			for (int j = 1; j<al.size();j=j+0){
 				al.remove(j);
 			}
@@ -379,9 +379,9 @@ public class AgentsAssigner implements PlanAlgorithm{
 			int i;
 			for (i = 2; i<al.size()-2;i++){
 				al.remove(i);
-				al.add(i, bestPlan.getPlanElements().get(i));	
+				al.add(i, bestPlan.getPlanElements().get(i));
 			}
-			for (int j = i; j<bestPlan.getPlanElements().size()-2;j++){			
+			for (int j = i; j<bestPlan.getPlanElements().size()-2;j++){
 				al.add(j, bestPlan.getPlanElements().get(j));
 			}
 		}
@@ -389,32 +389,32 @@ public class AgentsAssigner implements PlanAlgorithm{
 		else if(al.size()<bestPlan.getPlanElements().size()){
 			ActivityImpl actHelp = new ActivityImpl((ActivityImpl)al.get(0));
 			al.add(actHelp);
-			for (int j = 1; j<bestPlan.getPlanElements().size()-1;j++){			
+			for (int j = 1; j<bestPlan.getPlanElements().size()-1;j++){
 				al.add(j, bestPlan.getPlanElements().get(j));
 			}
-		}		
+		}
 		else {
 			for (int i = 2; i<al.size()-2;i++){
 			al.remove(i);
-			al.add(i, bestPlan.getPlanElements().get(i));	
+			al.add(i, bestPlan.getPlanElements().get(i));
 			}
 		}
-		
+
 		// adjust first home duration if al.size()!=1
 		if (al.size()>1){
 			((ActivityImpl)al.get(0)).setEndTime(6*3600);
 			((ActivityImpl)al.get(0)).setDuration(6*3600);
 		}
-		
+
 		// adjust travel time budget for location choice:
 		// travel times need to be translated back to car travel time since LC is based on car travel time
 		// not translating results in too long distances traveled and a bias of the schedule recycling (compared to PlanomatX)
 		for (int i = 1;i<al.size();i+=2) {
 			LegImpl leg = ((LegImpl)(al.get(i)));
-			
+
 			// if travel time = 0 (=same facility) set to 1 sec because LC does nothing, otherwise
 			if (leg.getTravelTime()==0) leg.setTravelTime(LC_minimum_time_AA);
-			// divide by ptSpeedFactor 
+			// divide by ptSpeedFactor
 			else if (leg.getMode().toString().equals(TransportMode.pt.toString())) {
 				leg.setTravelTime(leg.getTravelTime()/this.controler.getConfig().plansCalcRoute().getPtSpeedFactor());
 			}
@@ -429,4 +429,4 @@ public class AgentsAssigner implements PlanAlgorithm{
 		}
 	}
 }
-	
+
