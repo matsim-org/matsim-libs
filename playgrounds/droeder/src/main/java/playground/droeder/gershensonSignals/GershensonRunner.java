@@ -132,7 +132,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				event.getControler().getEvents().addHandler(handler2);
 				
 				//enable live-visualization
-				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	
@@ -178,8 +178,6 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				
 				c.getEvents().addHandler(adaptiveController);
 				
-//				qs.getQueueNetwork().getQueueLink(new IdImpl("35")).getLink().setFreespeed(0.5);
-				
 			}
 		});
 		//remove the adaptive controller
@@ -198,12 +196,13 @@ public class GershensonRunner implements AgentStuckEventHandler {
 //		});
 	
 	}
-	private void startVisualizer(Config config){
-		String[] args = {config.controler().getOutputDirectory() +
-				"/ITERS/it." + config.controler().getLastIteration() +
-				"/" + config.controler().getLastIteration() + ".otfvis.mvi"};
-		OTFVis.main(args);
-	}
+	
+//	private void startVisualizer(Config config){
+//		String[] args = {config.controler().getOutputDirectory() +
+//				"/ITERS/it." + config.controler().getLastIteration() +
+//				"/" + config.controler().getLastIteration() + ".otfvis.mvi"};
+//		OTFVis.main(args);
+//	}
 	
 	public void setU (int u){
 		this.u = u;

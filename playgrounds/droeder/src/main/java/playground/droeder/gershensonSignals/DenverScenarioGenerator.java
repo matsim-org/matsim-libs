@@ -19,14 +19,30 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.event.ChangeEvent;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEventsWriter;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
@@ -34,6 +50,7 @@ import org.matsim.signalsystems.config.SignalSystemConfiguration;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.config.SignalSystemConfigurationsFactory;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.world.Layer;
 
 import playground.droeder.DaPaths;
 
@@ -54,6 +71,7 @@ public class DenverScenarioGenerator {
 	private static final String PLANSINPUTFILE = INPUT + "plans.xml"; 
 	
 	// OUTPUT
+	private static final String CHANGEEVENTSFILE = OUTPUT +"changeEventsFile.xml";
 	public static final String CONFIGOUTPUTFILE = OUTPUT + "denverConfig.xml";
 	private static final String SIGNALSYSTEMCONFIG = OUTPUT + "signalSystemConfig.xml";
 	private static final String OUTPUTDIRECTORY = OUTPUT;
@@ -76,6 +94,7 @@ public class DenverScenarioGenerator {
 		conf.scenario().setUseLanes(true);
 		conf.network().setLaneDefinitionsFile(LANESINPUTFILE);
 		
+		
 		// set plans
 		conf.plans().setInputFile(PLANSINPUTFILE);
 		
@@ -89,6 +108,8 @@ public class DenverScenarioGenerator {
 		createSignalSystemsConfig(sc);
 		conf.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIG);
 		
+		//create changeEvents
+		this.createChangeEvents(sc);
 		
 		//create and write config
 		createConfig(conf);
@@ -116,9 +137,30 @@ public class DenverScenarioGenerator {
 		ssConfigsWriter.writeFile(SIGNALSYSTEMCONFIG);
 	}
 	
+	private void createChangeEvents (ScenarioImpl sc){
+		Network net = sc.getNetwork();
+		List<NetworkChangeEvent> ce = new LinkedList<NetworkChangeEvent>();
+		NetworkChangeEvent nce;
+		
+		nce = new NetworkChangeEvent(6*3600 + 90);
+		nce.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR,0.1));
+		nce.addLink(net.getLinks().get(sc.createId("35")));
+		ce.add(nce);
+		
+		nce = new NetworkChangeEvent(6*3600 + 390);
+		nce.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 10));
+		nce.addLink(net.getLinks().get(sc.createId("35")));
+		ce.add(nce);
+		
+		NetworkChangeEventsWriter ceWriter = new NetworkChangeEventsWriter();
+		ceWriter.write(CHANGEEVENTSFILE, ce);
+	}
+	
 private void createConfig(Config config) {
 		
 		config.network().setInputFile(NETWORKFILE);
+		config.network().setChangeEventInputFile(CHANGEEVENTSFILE);
+		config.network().setTimeVariantNetwork(true);
 		config.plans().setInputFile(PLANSINPUTFILE);
 	
 
@@ -138,8 +180,8 @@ private void createConfig(Config config) {
 		config.travelTimeCalculator().setTraveltimeBinSize(1);
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(OUTPUTDIRECTORY);
-		
-		
+		config.controler().setLinkToLinkRoutingEnabled(true);
+		config.controler().setWriteEventsInterval(0);
 	
 
 

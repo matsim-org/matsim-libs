@@ -60,7 +60,6 @@ public class GershensonAdaptiveTrafficLightController extends
 
 	private CarsOnLinkLaneHandler handler;
 
-	private Map<Id, Integer> vehOnLink = new HashMap<Id, Integer>();
 	private Map<Id, Map<Id, Integer>> vehOnLinkLanes = new HashMap<Id, Map<Id, Integer>>();
 	private Map<Id, Double> switchedToGreen = new HashMap<Id, Double>();
 
@@ -119,7 +118,6 @@ public class GershensonAdaptiveTrafficLightController extends
 		this.oldState = this.getSignalGroupStates().get(signalGroup);
 
 		Map<Id, SignalGroupDefinition> groups = this.getSignalGroups();
-		vehOnLink = handler.getVehOnLink();
 		vehOnLinkLanes = handler.getVehOnLinkLanes();
 
 		// check if competing groups are green
@@ -135,7 +133,6 @@ public class GershensonAdaptiveTrafficLightController extends
 		// coordinates the Trafficlight for many toLinks and you don't know Agents Destination
 		for (Id i : signalGroup.getToLinkIds()){
 			double outLinkCapacity = net.getLinks().get(i).getSpaceCap();
-//			double actStorage = vehOnLink.get(i);
 			double actStorage = handler.getVehInD(time, i);
 			if((outLinkCapacity*capFactor)< actStorage){
 				outLinkJam = true;
@@ -146,7 +143,6 @@ public class GershensonAdaptiveTrafficLightController extends
 		//set number of cars, approaching a competing Link in a short distance, if it is green
 		if (compGroupsGreen == true){
 			for (Id i : compGroups.get(signalGroup.getId())){
-//				approachingGreenLink += vehOnLink.get((groups.get(i).getLinkRefId())).intValue();
 				approachingGreenLink += handler.getVehInD(time, groups.get(i).getLinkRefId());
 				for (Entry<Id, Integer> e : vehOnLinkLanes.get(i).entrySet()){
 					approachingGreenLane += e.getValue().intValue();
@@ -158,12 +154,10 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 
 		// set number of cars on refLink of signalGroup
-//		this.carsOnRefLinkTime = vehOnLink.get(signalGroup.getLinkRefId())*compGreenTime;
 		this.carsOnRefLinkTime = handler.getVehInD(time, signalGroup.getLinkRefId())*compGreenTime;
 
 		// 	product of the number of cars approaching a Red light and the time a light is red
 		if (this.oldState.equals(SignalGroupState.RED)){
-//			approachingRed = vehOnLink.get(signalGroup.getLinkRefId());
 			this.approachingRed = handler.getVehInD(time, signalGroup.getLinkRefId());
 		}else{
 			this.approachingRed = 0;
@@ -199,20 +193,20 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 
 		// algorithm starts
-		if ((outLinkJam == true) && oldState.equals(SignalGroupState.GREEN)){ //Rule 5 + 6
-			this.switchLight(signalGroup, oldState, time);
+		if ((this.outLinkJam == true) && this.oldState.equals(SignalGroupState.GREEN)){ //Rule 5 + 6
+			this.switchLight(signalGroup, time);
 			return;
-		} else if(outLinkJam == false ){
-			if (compGroupsGreen == false && oldState.equals(SignalGroupState.RED)){ // Rule 6
-			  this.switchLight(signalGroup, oldState, time);
+		} else if(this.outLinkJam == false ){
+			if (this.compGroupsGreen == false && this.oldState.equals(SignalGroupState.RED)){ // Rule 6
+			  this.switchLight(signalGroup, time);
 			  return;
 			}
-			if (approachingRed > 0 && approachingGreenLink == 0){ // Rule 4
-				switchLight(signalGroup, oldState, time);
+			if (this.approachingRed > 0 && this.approachingGreenLink == 0){ // Rule 4
+				switchLight(signalGroup, time);
 				return;
-			}else if(!(approachingGreenLane > 0)){  //Rule 3
-				if ((time - compGreenTime) > tGreenMin && carsOnRefLinkTime > minCarsTime){ // Rule 1 + 2
-				  this.switchLight(signalGroup, oldState, time);
+			}else if(!(this.approachingGreenLane > 0)){  //Rule 3
+				if ((time - this.compGreenTime) > this.tGreenMin && this.carsOnRefLinkTime > this.minCarsTime){ // Rule 1 + 2
+				  this.switchLight(signalGroup, time);
 				  return;
 				}
 			}
@@ -230,32 +224,32 @@ public class GershensonAdaptiveTrafficLightController extends
 //		}
 	}
 
-	public void switchLight (SignalGroupDefinition group, SignalGroupState oldState, double time){
-		if (oldState.equals(SignalGroupState.GREEN)){
-			if (!(corrGroups.get(group.getId()) == null)){
+	private void switchLight (SignalGroupDefinition group, double time){
+		if (this.oldState.equals(SignalGroupState.GREEN)){
+			if (!(this.corrGroups.get(group.getId()) == null)){
 				this.getSignalGroupStates().put(this.getSignalGroups().
-						get(corrGroups.get(group.getId())),SignalGroupState.RED);
-				switchedToGreen.put(corrGroups.get(group.getId()), 0.0);
+						get(this.corrGroups.get(group.getId())),SignalGroupState.RED);
+				this.switchedToGreen.put(this.corrGroups.get(group.getId()), 0.0);
 			}
-			for (Id i : compGroups.get(group.getId())){
-				switchedToGreen.put(i, time);
+			for (Id i : this.compGroups.get(group.getId())){
+				this.switchedToGreen.put(i, time);
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.GREEN);
 			}
 			this.getSignalGroupStates().put(group, SignalGroupState.RED);
-			switchedToGreen.put(group.getId(), 0.0);
+			this.switchedToGreen.put(group.getId(), 0.0);
 
 		} else { //if (oldState.equals(SignalGroupState.RED)){
-			if (!(corrGroups.get(group.getId()) == null)){
+			if (!(this.corrGroups.get(group.getId()) == null)){
 				this.getSignalGroupStates().put(this.getSignalGroups().
-						get(corrGroups.get(group.getId())),SignalGroupState.GREEN);
-				switchedToGreen.put(corrGroups.get(group.getId()), time);
+						get(this.corrGroups.get(group.getId())),SignalGroupState.GREEN);
+				this.switchedToGreen.put(this.corrGroups.get(group.getId()), time);
 			}
-			for (Id i : compGroups.get(group.getId())){
-				switchedToGreen.put(i, 0.0);
+			for (Id i : this.compGroups.get(group.getId())){
+				this.switchedToGreen.put(i, 0.0);
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.RED);
 			}
 			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
-			switchedToGreen.put(group.getId(), time);
+			this.switchedToGreen.put(group.getId(), time);
 		}
 	}
 
