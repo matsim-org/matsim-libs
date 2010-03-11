@@ -91,14 +91,14 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 171
+	// Settings of 2
 	private static double beta_time_car = -3.77; 
-	private static double beta_time_pt = 0.563; // war 0.0559
+	private static double beta_time_pt = -0.8; // war 0.563
 	private static double beta_time_bike = -1.07;
 	private static double beta_time_walk = -1.48;
 	
 	private static double constantPt = -0.578;
-	private static double constantBike = 0.145;
+	private static double constantBike = -0.4;
 	private static double constantWalk = 0.854;
 	
 	private static double beta_cost_car = 0.0374; 
@@ -120,7 +120,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double licenseBike = 0.0;	
 	private static double licenseWalk = 0.0;	
 	
-	private static double repeat = 0.0;
+	private static double repeat = -0.5;
 	
 	private static final double uMin_home = 0;
 	private static final double uMin_innerHome = 0;
@@ -130,25 +130,25 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double uMin_leisure = 0;
 	
 	private static final double uMax_home = 9.58; 
-	private static final double uMax_innerHome = 1.92; 
-	private static final double uMax_work= 4.97;  
+	private static final double uMax_innerHome = 1.5; 
+	private static final double uMax_work= 12;  
 	private static final double uMax_education = 5.09;
-	private static final double uMax_shopping = 1.94; 
-	private static final double uMax_leisure = 1.92;  
+	private static final double uMax_shopping = 0.5; 
+	private static final double uMax_leisure = 3;  
 	
-	private static final double alpha_home = 5.32;
-	private static final double alpha_innerHome = 0.249;
-	private static final double alpha_work = 3.86;
-	private static final double alpha_education = 1.49;
-	private static final double alpha_shopping = 0.0453;
-	private static final double alpha_leisure = 0.0488;
+	private static final double alpha_home = 12;
+	private static final double alpha_innerHome = 1.9;
+	private static final double alpha_work = 4;
+	private static final double alpha_education = 3.5;
+	private static final double alpha_shopping = 0.7;
+	private static final double alpha_leisure = 1.7;
 	
 	private static final double beta_home = 0.249;
 	private static final double beta_innerHome = 15.2;
 	private static final double beta_work = 0.491;
 	private static final double beta_education = 2.29;
-	private static final double beta_shopping = 100;
-	private static final double beta_leisure = 100;
+	private static final double beta_shopping = 5;
+	private static final double beta_leisure = 5;
 	
 	private static final double gamma_home = 1;
 	private static final double gamma_innerHome = 1;
