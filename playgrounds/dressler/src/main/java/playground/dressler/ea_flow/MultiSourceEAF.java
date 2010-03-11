@@ -311,43 +311,47 @@ public class MultiSourceEAF {
 			  helps a little for mixed search ...
 			 and a lot for reverse search.
 			 none for forward? maybe because all paths are augmented anyway */
-			if (settings.sortPathsBeforeAugmenting) {
-				Collections.sort(result, new Comparator<TimeExpandedPath>() {
-					public int compare(TimeExpandedPath first, TimeExpandedPath second) {
-						int v1 = first.getPathSteps().size();	        	   
-						int v2 = second.getPathSteps().size();
-						if (v1 > v2) {
-							return 1;
-						} else if (v1 == v2) {
-							return 0;
-						} else {
-							return -1;
-						}
+			if (result != null && !result.isEmpty()) {
+				if (settings.sortPathsBeforeAugmenting) {
+					System.out.println(result);
+					Collections.sort(result, new Comparator<TimeExpandedPath>() {
+						public int compare(TimeExpandedPath first, TimeExpandedPath second) {
+							int v1 = first.getPathSteps().size();	        	   
+							int v2 = second.getPathSteps().size();
+							if (v1 > v2) {
+								return 1;
+							} else if (v1 == v2) {
+								return 0;
+							} else {
+								return -1;
+							}
 
-					}
-				});
+						}
+					});
+				}
 			}
 			
 			//System.out.println(result);
-						
-			for(TimeExpandedPath path : result){
-				String tempstr2 = "";
-				
-				tempstr2 = path.toString() + "\n";					
-				
-				int augment = fluss.augment(path);
-				
-				if (augment > 0) {
-					tempstr += tempstr2;
-					tempstr += "augmented " + augment + "\n";
-					
-					// remember this path for the next timelayer
-					successfulPaths.addLast(path); // keep the order
-					
-					goodaugment += 1;
-					totalsizeaugmented += path.getPathSteps().size();
-				} else {
-					zeroaugment += 1;
+			if (result != null && !result.isEmpty()) {			
+				for(TimeExpandedPath path : result){
+					String tempstr2 = "";
+
+					tempstr2 = path.toString() + "\n";					
+
+					int augment = fluss.augment(path);
+
+					if (augment > 0) {
+						tempstr += tempstr2;
+						tempstr += "augmented " + augment + "\n";
+
+						// remember this path for the next timelayer
+						successfulPaths.addLast(path); // keep the order
+
+						goodaugment += 1;
+						totalsizeaugmented += path.getPathSteps().size();
+					} else {
+						zeroaugment += 1;
+					}
 				}
 			}
 			
@@ -370,7 +374,7 @@ public class MultiSourceEAF {
 			if (i % 100 == 0) {		
 				long timecurrent = System.currentTimeMillis();
 				System.out.println();
-				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: Total: " + (timecurrent - timeStart) / 1000 + ", Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+				System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: Total " + (timecurrent - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 				System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
 				System.out.println("CleanUp got rid of  " + VertexGain + " vertex intervals so far.");
 				//System.out.println("removed on the fly:" + VertexIntervalls.rem);
@@ -396,7 +400,7 @@ public class MultiSourceEAF {
 		long timeStop = System.currentTimeMillis();
 		System.out.println("");
 		System.out.println("");
-		System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+		System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: Total " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 		System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
 		System.out.println("CleanUp got rid of  " + VertexGain + " vertex intervals so far.");
 		//System.out.println("removed on the fly:" + VertexIntervalls.rem);
@@ -495,7 +499,7 @@ public class MultiSourceEAF {
 		int timeStep; 
 		double flowFactor;
 
-		int instance = 2; 
+		int instance = 5; 
 		// 0 = custom
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
@@ -565,7 +569,11 @@ public class MultiSourceEAF {
 			//outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
 			//outputplansfile = "/Users/manuel/tester/ws3_testoutput.xml";
 
-			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/problem.dat";
+			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/problem.dat";
+			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/demo.zet.dat";
+			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/audimax.zet.dat";
+			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
 			
 			uniformDemands = 100;
 
@@ -679,7 +687,7 @@ public class MultiSourceEAF {
 		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
 		settings.useRepeatedPaths = true;
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
-		settings.trackUnreachableVertices = false && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
+		settings.trackUnreachableVertices = true && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
 		settings.sortPathsBeforeAugmenting = true;
 		settings.checkTouchedNodes = true;
 		settings.keepPaths = true; // do not store paths at all!
@@ -690,7 +698,7 @@ public class MultiSourceEAF {
 		
 		//settings.writeLP();
 		//settings.writeNET(false);
-		
+		//settings.writeSimpleNetwork();
 		
 		
 		Flow fluss;

@@ -1207,14 +1207,24 @@ public class BellmanFordIntervalBased {
 				VertexInterval iv =this._labels.get(node).getFirstPossibleForward();
 				int t;
 				if (iv != null) {
-				  t = iv.getLowBound() - 1; // lowbound is just reachable, -1 is not				  
+				  t = iv.getLowBound() - 1; // lowbound is just reachable, -1 is not
+				  
+ 				  // the following can happen, and that part of the network was not scanned fully!
+				  // so the labels are unreliable!
+				  if (t > cutofftime) {
+					  t = cutofftime; 
+				  }				  
 				} else {
 					// not reachable at all so far
 					t = cutofftime;					
 				}
-				if (t > this._unreachable.get(node)) {
-					this._unreachable.put(node, t);
+				
+				// DEBUG
+				if (t < this._unreachable.get(node)) {
+					System.out.println("Huh, new unreachable < old unreachable " + node.getId() + " time t " + t + " old unreachable " + this._unreachable.get(node));
 				}
+				
+				this._unreachable.put(node, t);
 			}
 		}
 		
