@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder;
+package playground.droeder.gershensonSignals;
 
 import static org.junit.Assert.assertEquals;
 
