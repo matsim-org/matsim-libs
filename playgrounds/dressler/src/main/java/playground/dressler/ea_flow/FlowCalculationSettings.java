@@ -34,6 +34,7 @@ import org.matsim.core.network.NodeImpl;
 
 //playground imports
 import playground.dressler.Interval.EdgeIntervals;
+import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.Interval.VertexIntervals;
 
@@ -58,7 +59,12 @@ public class FlowCalculationSettings {
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
 	public boolean useRepeatedPaths = true; // try to repeat paths
 	
-	public boolean trackUnreachableVertices = false; // only works in REVERSE, wastes time otherwise
+	public boolean trackUnreachableVertices = true && (searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);; // only works in REVERSE, wastes time otherwise
+	
+	
+	/* when are links available? not included means "always" */
+	public HashMap<Link, Interval> whenAvailable = null;
+	
 	
 	/* interal storage for the network parameters */ 
 	private HashMap<Link, Integer> _capacities;
@@ -73,6 +79,7 @@ public class FlowCalculationSettings {
 	private HashMap<Node, Integer> _demands;
 	private int _totaldemandsources;
 	private int _totaldemandsinks;
+	
 	
 	private int _roundedtozerocapacity;
 	private int _roundedtozerolength;	

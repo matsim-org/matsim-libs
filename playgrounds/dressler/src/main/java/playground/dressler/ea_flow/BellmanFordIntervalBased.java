@@ -723,7 +723,7 @@ public class BellmanFordIntervalBased {
 
 
 
-			arrive = flowover.propagate(ival, this._settings.getCapacity(over),original, reverse, timehorizon);
+			arrive = flowover.propagate(ival, original, reverse, timehorizon);
 
 
 			if(arrive != null && !arrive.isEmpty()){
@@ -1679,7 +1679,7 @@ public class BellmanFordIntervalBased {
 			min = Math.min(min, size);
 			max = Math.max(max, size);
 		}
-		result += "\n  Size of VertexIntervalls (min/avg/max): " + min + " / " + sum / (double) this._network.getNodes().size() + " / " + max + "\n"; 
+		result += "\n  Size of VertexIntervalls (min/avg/max): " + min + " / " + sum / (double) this._flow.getSources().size()+ " / " + max + "\n"; 
 		return result;
 	}
 

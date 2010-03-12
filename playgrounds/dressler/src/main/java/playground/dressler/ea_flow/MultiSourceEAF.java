@@ -145,7 +145,6 @@ public class MultiSourceEAF {
 	 */
 	public static Flow calcEAFlow(FlowCalculationSettings settings) {	
 		Flow fluss;
-		
 
 		List<TimeExpandedPath> result = null;
 		fluss = new Flow(settings);
@@ -171,6 +170,7 @@ public class MultiSourceEAF {
 		int lasttime = 0;
 		
 		boolean tryReverse;
+		boolean usedForwardSearch = false;
 		int lastForward = 0; // for trackUnreachable, to do a forward step once in a while
 		
 		LinkedList<TimeExpandedPath> successfulPaths = new LinkedList<TimeExpandedPath>();
@@ -193,12 +193,13 @@ public class MultiSourceEAF {
 	            case FlowCalculationSettings.SEARCHALGO_REVERSE: {
 	            	// FIXME an arbitrary constant ...
 	            	// run reverse, unless we want to update the unreachable vertices
-	            	boolean needForward = settings.trackUnreachableVertices && (lastForward <= lasttime - 3); 
+	            	boolean needForward = settings.trackUnreachableVertices && (lastForward <= lasttime - 3);
 	            	if (tryReverse && !needForward) {
 	    				result = routingAlgo.doCalculationsReverse(lasttime);
+	    				usedForwardSearch = false;
 	    			} else {
-	    			    result = routingAlgo.doCalculationsForward();
-	    			    lastForward = lasttime; // not perfectly precise ... oh well
+	    			    result = routingAlgo.doCalculationsForward();	    			    	    			    
+	    			    usedForwardSearch = true;
 	    			}
 	            	break;
 	            }
@@ -242,19 +243,25 @@ public class MultiSourceEAF {
 						
 						lasttime = path.getArrival();
 
-						// might be worth trying the reverse search again
-						// if it is enabled at all
-						tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
-
 						// recall the list of successful paths and add them first!
 						// it cannot hurt much ...
-						trySuccessfulPaths = true;
+						trySuccessfulPaths = true;						
 
-					}				
+					}	
+					
+					// even if this did not increase lasttime 
+					// (because it was increased preemptively last iteration)
+					// we now can try the reverse search again
+					// if it is enabled at all
+					tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
+					if (usedForwardSearch) {
+						lastForward = lasttime;
+					}
+					
 					// we just needed one element
 					break;
 				}
-			}
+			}			
 			
 			int totalsizeaugmented = 0;
 			
@@ -312,8 +319,7 @@ public class MultiSourceEAF {
 			 and a lot for reverse search.
 			 none for forward? maybe because all paths are augmented anyway */
 			if (result != null && !result.isEmpty()) {
-				if (settings.sortPathsBeforeAugmenting) {
-					System.out.println(result);
+				if (settings.sortPathsBeforeAugmenting) {					
 					Collections.sort(result, new Comparator<TimeExpandedPath>() {
 						public int compare(TimeExpandedPath first, TimeExpandedPath second) {
 							int v1 = first.getPathSteps().size();	        	   
@@ -491,7 +497,7 @@ public class MultiSourceEAF {
 		String plansfile = null;
 		String demandsfile = null;
 		String outputplansfile = null;
-		String sinkid;
+		String sinkid = null;
 		String simplenetworkfile = null;
 		int uniformDemands = 0;
 		
@@ -504,7 +510,8 @@ public class MultiSourceEAF {
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
-		// 4 = padang, with 10% plans		
+		// 4 = padang, with 10% plans	
+		// 5 = probeevakuierung telefunken
 		// else = something else
 		
 		if (instance == 1) {
@@ -531,6 +538,10 @@ public class MultiSourceEAF {
 			timeStep = 10;
 			flowFactor = 0.1;
 			sinkid = "en1";
+		} else if (instance == 5) {
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
+			timeStep = 1; 
+			flowFactor = 1.0;			
 		} else {
 			// custom instance
 			
@@ -677,17 +688,17 @@ public class MultiSourceEAF {
 		}
 
 		// set additional parameters, mostly TimeHorizon for the LP
-		//settings.TimeHorizon = 1240;
+		//settings.TimeHorizon = 850;
 		//settings.MaxRounds = 101;
 		//settings.checkConsistency = 100;		
-		settings.useVertexCleanup = false;
+		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
 		settings.useRepeatedPaths = true;
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
-		settings.trackUnreachableVertices = true && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
+		//settings.trackUnreachableVertices = true && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
 		settings.sortPathsBeforeAugmenting = true;
 		settings.checkTouchedNodes = true;
 		settings.keepPaths = true; // do not store paths at all!

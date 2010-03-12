@@ -12,7 +12,7 @@ public class Intervals<T extends Interval > {
 	 * reference to the last Interval
 	 */
 	 T _last; 
-	
+	 
 	/**
 	 * flag for debug mode
 	 */

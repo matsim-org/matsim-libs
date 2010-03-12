@@ -44,6 +44,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.dressler.Interval.EdgeInterval;
 import playground.dressler.Interval.EdgeIntervals;
+import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.SourceIntervals;
 /**
  * Class representing a dynamic flow on an network with multiple sources and a single sink
@@ -166,8 +167,30 @@ public class Flow {
 		}
 		// initialize EdgeIntervalls
 		for (Link edge : this._network.getLinks().values()) {
-			EdgeInterval temp =new EdgeInterval(0,settings.TimeHorizon);
-			this._flow.put(edge, new EdgeIntervals(temp, this._settings.getLength(edge)));
+			int low = 0;
+			int high = settings.TimeHorizon;
+			// Intervals expects that it starts at 0, so we cannot restrict ourselves
+			// to just the available interval ...
+			EdgeInterval temp = new EdgeInterval(low, high);
+			
+			Interval available;
+			if (this._settings.whenAvailable != null) {
+				available = this._settings.whenAvailable.get(edge); 
+			} else {
+				available = null;
+			}
+			
+			if (available != null) {
+				low = Math.max(low, available.getLowBound());
+				high = Math.min(high, available.getHighBound());				
+			}
+			
+			available = new Interval(low, high);
+			
+			EdgeIntervals edgeflow = new EdgeIntervals(temp, this._settings.getLength(edge), 
+					 this._settings.getCapacity(edge), available);
+			
+			this._flow.put(edge, edgeflow);
 		}
 
 		this._timeHorizon = settings.TimeHorizon;
@@ -367,10 +390,11 @@ public class Flow {
 			Link edge = se.getEdge();
 
 			if(se.getForward()){
-				this._flow.get(edge).augment(se.getStartTime(), gamma, this._settings.getCapacity(edge));
+				this._flow.get(edge).augment(se.getStartTime(), gamma);
 			}	else {
-				this._flow.get(edge).augment(se.getArrivalTime(), -gamma, this._settings.getCapacity(edge));
+				this._flow.get(edge).augment(se.getArrivalTime(), -gamma);
 			}
+			
 		} else if (step instanceof StepSourceFlow) {
 			StepSourceFlow ssf = (StepSourceFlow) step;
 			Node source;

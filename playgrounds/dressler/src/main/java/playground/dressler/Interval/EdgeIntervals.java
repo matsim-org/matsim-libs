@@ -50,6 +50,16 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	 */
 	public final int _traveltime;
 	
+	/**
+	 * availability for easy access
+	 */
+	public final Interval _whenAvailable;
+	
+	/**
+	 * availability for easy access
+	 */
+	public final int _capacity;
+	
 	
 	/**
 	 * debug flag
@@ -64,9 +74,14 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	 * Default Constructor Constructs an object containing only 
 	 * the given interval, and stores the traveltime
 	 */
-	public EdgeIntervals(EdgeInterval interval, final int traveltime){
+	public EdgeIntervals(EdgeInterval interval, final int traveltime, final int capacity, final Interval whenAvailable){
 		super(interval); 
-		this._traveltime=traveltime;
+		this._traveltime = traveltime;
+		this._capacity = capacity;
+		
+		// Intervals expects that it starts at 0, so we cannot restrict ourselves
+		// to just the available interval ...
+		this._whenAvailable = whenAvailable;
 	}
 
 
@@ -88,14 +103,13 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	 * Gives a list of intervals when the other end of the link can be reached.
 	 * This is supposed to work for forward or reverse search.
 	 * @param incoming Interval where we can start
-	 * @param capacity Capacity of the Link
 	 * @param primal indicates whether we use an original or residual edge
 	 * @param reverse indicates whether we want to search forward or backward 
 	 * @param TimeHorizon for easy reference
 	 * @return plain old Interval
 	 */
 	public ArrayList<Interval> propagate(final Interval incoming,
-			final int capacity, final boolean primal, final boolean reverse, int timehorizon){
+			final boolean primal, final boolean reverse, int timehorizon){
 
 		ArrayList<Interval> result = new ArrayList<Interval>();
 
@@ -131,16 +145,14 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 		int high = -1;						
 		boolean collecting = false;
 		
+		int effectiveStart = Math.max(incoming.getLowBound() + inputoffset, this._whenAvailable.getLowBound());
+		int effectiveEnd = Math.min(incoming.getHighBound() + inputoffset, this._whenAvailable.getHighBound());
 		
-		if (incoming.getLowBound() + inputoffset < 0) {
-		  current = this.getIntervalAt(0);
-		} else {
-		  current = this.getIntervalAt(incoming.getLowBound() + inputoffset);
-		}
-		
-		while (current.getLowBound() < incoming.getHighBound() + inputoffset) {
+		current = this.getIntervalAt(effectiveStart);
+
+		while (current.getLowBound() < effectiveEnd) {
 			int flow = current.getFlow();
-			if ((primal && flow < capacity) || (!primal && flow > 0)) {				
+			if ((primal && flow < this._capacity) || (!primal && flow > 0)) {				
 				if (collecting) {
 					high = current.getHighBound();
 				} else {
@@ -151,10 +163,10 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 
 			} else {
 				if (collecting) { // finish the Interval
-					low = Math.max(low, incoming.getLowBound() + inputoffset);
+					low = Math.max(low, effectiveStart);
 					low += outputoffset;
 					low = Math.max(low, 0);
-					high = Math.min(high, incoming.getHighBound() + inputoffset);
+					high = Math.min(high, effectiveEnd);
 					high += outputoffset;
 					high = Math.min(high, timehorizon);
 
@@ -174,10 +186,10 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 		}
 
 		if (collecting) { // finish the Interval
-			low = Math.max(low, incoming.getLowBound() + inputoffset);
+			low = Math.max(low, effectiveStart);
 			low += outputoffset;
 			low = Math.max(low, 0);
-			high = Math.min(high, incoming.getHighBound() + inputoffset);
+			high = Math.min(high, effectiveEnd);
 			high += outputoffset;
 			high = Math.min(high, timehorizon);
 
@@ -235,16 +247,15 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	 * increeases the flow into an edge from time t to t+1 by f if capacity is obeyed
 	 * @param t raising time
 	 * @param f aumount of flow to augment (can be negative)
-	 * @param u capcity of the edge
 	 */
-	public void augment(final int t,final int gamma,final int u){
+	public void augment(final int t, final int gamma){
 		if (t<0){
 			throw new IllegalArgumentException("negative time: "+ t);
 		}
 		EdgeInterval i = getIntervalAt(t);
-		if (i.getFlow() + gamma > u){
+		if (i.getFlow() + gamma > this._capacity){
 			throw new IllegalArgumentException("too much flow! flow: " + i.getFlow() + " + " +
-					gamma + " > " + u);
+					gamma + " > " + this._capacity);
 		}
 		if (i.getFlow() + gamma < 0){
 			throw new IllegalArgumentException("negative flow! flow: " + i.getFlow() + " + " +
@@ -258,7 +269,7 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 			splitAt(t+1);
 			i = getIntervalAt(t); // just to be safe
 		}
-		i.augment(gamma, u);
+		i.augment(gamma, this._capacity);
 		
 	}
 	
