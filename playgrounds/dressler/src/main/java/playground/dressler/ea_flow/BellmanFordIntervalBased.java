@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FakeTravelTimeCost.java
+ * BellmanFordIntervalBased.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -40,7 +40,7 @@ import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.Interval.VertexInterval;
 import playground.dressler.Interval.VertexIntervals;
-import playground.dressler.ea_flow.FlowCalculationSettings;
+import playground.dressler.control.FlowCalculationSettings;
 
 
 /**
@@ -56,19 +56,19 @@ public class BellmanFordIntervalBased {
 	/**
 	 * data structure to hold the present flow
 	 */
-	private Flow _flow;
+	Flow _flow;
  
 	/**
 	 * the calculation settings, providing most of the information
 	 */
-	private FlowCalculationSettings _settings;
+	FlowCalculationSettings _settings;
 	
 	/**
 	 * The network on which we find routes. We expect the network not to change
 	 * between runs!
 	 * This is simply for quick access.
 	 */
-	private final NetworkLayer _network;
+	final NetworkLayer _network;
 
 	/**
 	 * data structure to keep distance labels on nodes during and after one iteration of the shortest TimeExpandedPath Algorithm
@@ -82,7 +82,7 @@ public class BellmanFordIntervalBased {
 	 * so initialize with -1 
 	 */
 	
-	private HashMap<Node, Integer> _unreachable;
+	HashMap<Node, Integer> _unreachable;
 	
 	
 	/**
@@ -94,29 +94,30 @@ public class BellmanFordIntervalBased {
 	//private static int _warmstart;
 	//private LinkedList<Node> _warmstartlist;
 	
-	private int _oldLastArrival = -1; // will get changed on the first iteration
+	int _oldLastArrival = -1; // will get changed on the first iteration
 	
 	/**
 	 * debug variable, the higher the value the more it tells
 	 */
-	private static int _debug = 0;
+	static int _debug = 0;
 
-	private long _totalpolls = 0L;
+	long _totalpolls = 0L;
 	
-	private int _roundpolls = 0;
+	int _roundpolls = 0;
 	
-	private long _totalnonpolls = 0L;
-	private long _roundnonpolls = 0;
+	long _totalnonpolls = 0L;
+	long _roundnonpolls = 0;
 	
-	public long vertexGain = 0L; 
+	long _vertexGain = 0L;
+	long _totalVertexGain = 0L;
 	
 	/*private long _prepstart=0;
 	private long _prepend=0;
 	private long _totalpreptime=0;*/
 	
-	private long _calcstart=0;
-	private long _calcend=0;
-	private long _totalcalctime=0;
+	long _calcstart=0;
+	long _calcend=0;
+	long _totalcalctime=0;
 	
 	//--------------------CONSTRUCTORS-------------------------------------//
 	
@@ -159,7 +160,7 @@ public class BellmanFordIntervalBased {
 		//BellmanFordIntervalBased._warmstart = warmstart;
 	}
 	
-	private class BFTask  {		
+	class BFTask  {		
 		public int time;
 		public Interval ival;
 		public VirtualNode node;
@@ -194,7 +195,7 @@ public class BellmanFordIntervalBased {
 	}
 	
 	// Comparator needs total order!!!
-	private class TaskComparator implements Comparator<BFTask> {
+	class TaskComparator implements Comparator<BFTask> {
 		public int compare(BFTask first, BFTask second) {
 			if (first.time < second.time) return -1; 
 			if (first.time > second.time) return 1;
@@ -226,8 +227,8 @@ public class BellmanFordIntervalBased {
 	/**
 	 * refreshes all _labels and _sourcelabels before one run of the algorithm
 	 * and fill the queue
-	 */
-	private void refreshLabelsForward(Queue<BFTask> queue){		
+	 */	
+	void refreshLabelsForward(Queue<BFTask> queue){		
 		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
 		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
 		
@@ -254,7 +255,7 @@ public class BellmanFordIntervalBased {
 	 * refreshes all _labels and _sourcelabels, before one run of the algorithm
 	 * and fill the queue
 	 */
-	private void refreshLabelsReverse(Queue<BFTask> queue){		
+	void refreshLabelsReverse(Queue<BFTask> queue){		
 		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
 		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
 		
@@ -279,7 +280,7 @@ public class BellmanFordIntervalBased {
 	 * refreshes all _labels and _sourcelabels, before one run of the algorithm
 	 * and fill the queue
 	 */
-	private void refreshLabelsMixed(Queue<BFTask> queue){		
+	void refreshLabelsMixed(Queue<BFTask> queue){		
 		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
 		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
 		
@@ -314,7 +315,7 @@ public class BellmanFordIntervalBased {
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	private List<TimeExpandedPath> constructRoutesForward() throws BFException {
+	List<TimeExpandedPath> constructRoutesForward() throws BFException {
 		
 		if (_debug > 0) {
 		  System.out.println("Constructing routes ...");
@@ -463,7 +464,7 @@ public class BellmanFordIntervalBased {
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	private List<TimeExpandedPath> constructRoutesReverse() throws BFException {
+	List<TimeExpandedPath> constructRoutesReverse() throws BFException {
 		
 		if (_debug > 0) {
 			System.out.println("Constructing routes ...");
@@ -558,7 +559,7 @@ public class BellmanFordIntervalBased {
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	private List<TimeExpandedPath> constructRoutesMixed() throws BFException {
+	List<TimeExpandedPath> constructRoutesMixed() throws BFException {
 		
 		if (_debug > 0) {
 			System.out.println("Constructing routes from mixed labels ...");
@@ -737,7 +738,7 @@ public class BellmanFordIntervalBased {
 	}
 
 	
-	protected List<BFTask> processSourceForward(Node v) {
+	List<BFTask> processSourceForward(Node v) {
 		// send out of source v
 		// just set the regular label on v
 				
@@ -772,7 +773,9 @@ public class BellmanFordIntervalBased {
 		return queue;
 	}
 	
-	protected List<BFTask> processNormalNodeForward(Node v, int t) {
+	
+	
+	List<BFTask> processNormalNodeForward(Node v, int t) {
 		
 		
 		Interval inter;
@@ -862,7 +865,10 @@ public class BellmanFordIntervalBased {
 	 * @param reverse Is this for the reverse search?
 	 * @return an interval containing t, or null
 	 */
-	private Interval getUnscannedInterSetScanned(Node v, int t, boolean reverse) {
+	Interval getUnscannedInterSetScanned(Node v, int t, boolean reverse) {
+		
+		// FIXME
+		// This cannot consider costs yet!
 		
 		VertexIntervals label = this._labels.get(v);
 		VertexInterval inter = label.getIntervalAt(t);
@@ -922,7 +928,7 @@ public class BellmanFordIntervalBased {
 	}
 
 
-	protected List<BFTask> processNormalNodeReverse(Node v, int t) {
+	List<BFTask> processNormalNodeReverse(Node v, int t) {
 		
 		Interval inter;
 
@@ -1027,7 +1033,7 @@ public class BellmanFordIntervalBased {
        return queue;	
 	}
 	
-	protected List<BFTask> processSinkReverse(Node v, int lastArrival) {
+	List<BFTask> processSinkReverse(Node v, int lastArrival) {
 		// we want to arrive at lastArrival
 		// propagate that to the associated real node
 		
@@ -1056,7 +1062,7 @@ public class BellmanFordIntervalBased {
 		return queue;
 	}
 	
-	protected List<BFTask> processSourceReverse(Node v) {
+	List<BFTask> processSourceReverse(Node v) {
 		// active sources are the end of the search
 		// nonactive sources are just transit nodes, and need to scan residual edges.
 		if (!this._flow.isNonActiveSource(v)) {
@@ -1126,8 +1132,6 @@ public class BellmanFordIntervalBased {
 
 		// main loop
 		int gain = 0;
-		this._roundpolls = 0;
-		this._roundnonpolls = 0;
 		this._calcstart = System.currentTimeMillis();
 		
 		while (true) {
@@ -1180,7 +1184,7 @@ public class BellmanFordIntervalBased {
 				
 				if (this._settings.useVertexCleanup) { 			
 					// Effectiveness with this implementation is questionable
-					this.vertexGain += _labels.get(v).cleanup();
+					this._vertexGain += _labels.get(v).cleanup();
 				}
 
 				List<BFTask> tempqueue = processNormalNodeForward(v, task.ival.getLowBound());
@@ -1290,7 +1294,7 @@ public class BellmanFordIntervalBased {
 
 		// main loop
 		//int gain = 0;
-		this._roundpolls=0;
+
 		this._calcstart=System.currentTimeMillis();
 		while (true) {
 			//System.out.println("The queue is: ");
@@ -1333,7 +1337,7 @@ public class BellmanFordIntervalBased {
 				
 				if (this._settings.useVertexCleanup) { 			
 					// Effectiveness with this implementation is questionable
-					this.vertexGain += _labels.get(v).cleanup();
+					this._vertexGain += _labels.get(v).cleanup();
 				}
 				
 				if (this._settings.trackUnreachableVertices) {
@@ -1361,7 +1365,7 @@ public class BellmanFordIntervalBased {
 		this._calcend= System.currentTimeMillis();
 		this._totalcalctime+=(this._calcend-this._calcstart);
 		if (_debug>3) {
-		  System.out.println("Removed " + this.vertexGain + " intervals.");
+		  System.out.println("Removed " + this._vertexGain + " intervals.");
 		}
 		
 		//System.out.println("final labels: \n");
@@ -1418,8 +1422,8 @@ public class BellmanFordIntervalBased {
 
 		// main loop
 		//int gain = 0;
-		this._roundpolls=0;
 		this._calcstart=System.currentTimeMillis();
+		
 		while (true) {
 			//System.out.println("The queue is: ");
 			//System.out.println(queue);
@@ -1463,7 +1467,7 @@ public class BellmanFordIntervalBased {
 					
 					if (this._settings.useVertexCleanup) { 			
 						// Effectiveness with this implementation is questionable
-						this.vertexGain += _labels.get(v).cleanup();
+						this._vertexGain += _labels.get(v).cleanup();
 					}									
 					
 					List<BFTask> tempqueue = processNormalNodeReverse(v, task.ival.getLowBound());
@@ -1511,7 +1515,7 @@ public class BellmanFordIntervalBased {
 					
 					if (this._settings.useVertexCleanup) { 			
 						// Effectiveness with this implementation is questionable
-						this.vertexGain += _labels.get(v).cleanup();
+						this._vertexGain += _labels.get(v).cleanup();
 					}
 
 					List<BFTask> tempqueue = processNormalNodeForward(v, task.ival.getLowBound());
@@ -1534,7 +1538,7 @@ public class BellmanFordIntervalBased {
 		this._calcend= System.currentTimeMillis();
 		this._totalcalctime+=(this._calcend-this._calcstart);
 		if (_debug>3) {
-		  System.out.println("Removed " + this.vertexGain + " intervals.");
+		  System.out.println("Removed " + this._vertexGain + " intervals.");
 		}
 		
 		//System.out.println("final labels: \n");
@@ -1626,7 +1630,7 @@ public class BellmanFordIntervalBased {
 	 * prints the Status on the console
 	 *
 	 */
-	private void printStatus() {
+	void printStatus() {
 		StringBuilder print = new StringBuilder();
 		print.append("Regular lables");
 		for (Node node : this._network.getNodes().values()){
@@ -1655,11 +1659,13 @@ public class BellmanFordIntervalBased {
 	public String measure() {
 		String result=
 		//"  Calctime (ms): "+(this._calcend-this._calcstart)+
-		"  Polls: "+this._roundpolls+
-		"\n  Nonpolls: "+this._roundnonpolls+
-		//"\n      Preptime (ms): "+(this._prepend-this._prepstart)+		
-		"\n  Totalpolls: "+(this._totalpolls)+
-		"\n  Totalnonpolls: "+(this._totalnonpolls);
+		"  Polls: " + this._roundpolls +
+		"\n  Nonpolls: " + this._roundnonpolls +
+		//"\n      Preptime (ms): "+(this._prepend-this._prepstart)+
+		"\n  VertexCleanUp: " + this._vertexGain + 
+		"\n  Totalpolls: " + (this._totalpolls) +
+		"\n  Totalnonpolls: " + (this._totalnonpolls) +
+		"\n  Total VertexCleanUp: " + this._totalVertexGain;
 		//"\n  Totalpreptime (s): "+(this._totalpreptime/1000)+
 		//"\n  Totalcalctime (s): "+(this._totalcalctime/1000);
 		
@@ -1687,7 +1693,9 @@ public class BellmanFordIntervalBased {
 
 	/* reset status information of the algo for the next iter */
 	public void startNewIter(int lastArrival) {
-		this.vertexGain = 0;
+		this._vertexGain = 0;
+		this._roundpolls=0;
+		this._roundnonpolls = 0;
 		if (lastArrival > this._oldLastArrival) {
 			// reset some status information
 			// nothing needed currently

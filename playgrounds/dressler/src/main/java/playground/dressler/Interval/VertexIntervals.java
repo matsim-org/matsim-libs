@@ -134,7 +134,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 * @param reverse Is this for the reverse search?
 	 * @return (possibly empty) list of changed intervals
 	 * @deprecated
-	 */
+	 *//*
     public ArrayList<VertexInterval> setTrueList(ArrayList<Interval> arrive, PathStep pred, final boolean reverse) {
 		
     	ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();
@@ -155,7 +155,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		return changed;
 	}
 
-    /**
+    *//**
 	 * Sets arrival true for all time steps in arrive and sets predecessor to link for each time t
 	 * where it was null beforehand
 	 * @param arrive Interval at which node is reachable
@@ -163,8 +163,8 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 *         It will always be shifted to the beginning of the interval, according to reverse
 	 * @param reverse Is this for the reverse search?  
 	 * @return null or list of changed intervals iff anything was changed
-	 * @deprecated
-	 */
+	 * @ deprecated
+	 *//*
 	public ArrayList<VertexInterval> setTrueList(Interval arrive, PathStep pred, final boolean reverse){
 		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();		
 		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
@@ -204,9 +204,9 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 			current = this.getIntervalAt(current.getHighBound());
 		}	
 		return changed;
-	}
+	}*/
 	
-	 public ArrayList<VertexInterval> setTrueList(ArrayList<VertexInterval> arrive) {
+	public ArrayList<VertexInterval> setTrueList(ArrayList<VertexInterval> arrive) {
 			
 	    	ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();
 	    	
@@ -255,7 +255,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 * @return null or list of changed intervals iff anything was changed
 	 */
 	public ArrayList<VertexInterval> setTrueList(VertexInterval arrive){
-		// TODO Test !
+		
 		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();	
 		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
 				
@@ -277,16 +277,21 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 					current = this.getIntervalAt(improvement.getHighBound()-1);
 				}
 				
-				boolean wasreachable = current.reachable;
-				// and set the attributes
-				current.setArrivalAttributes(arrive);
 				
-				// if this was already reachable, it just got a new breadcrumb
-				// there's no need to scan it because of this
-				// FIXME 
-				// with costs, this is a wrong assumption!
-				// rather the functions should decide this ... somehow
-				if (!wasreachable) changed.add(current);
+				// if it was not yet reachable, we definitely have to scan.
+				boolean needsScanning = !current.getReachable();
+				
+				// set the attributes and maybe there is a reason to scan again
+				// note: this is not flexible enough for a full mixed search ...
+				// but that could probably be done quicker in two passes anyway
+				if (current.setArrivalAttributes(arrive)) {
+					needsScanning = true;
+				}
+
+				if (needsScanning) {
+					current.setScanned(false);
+					changed.add(current);
+				}
 			}
 
 

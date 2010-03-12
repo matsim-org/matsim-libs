@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 
-package playground.dressler.ea_flow;
+package playground.dressler.control;
 
 //matsim imports
 import java.util.HashMap;
@@ -292,28 +292,6 @@ public class FlowCalculationSettings {
 	public int getTotalDemand() {
 		return this._totaldemandsources;
 	}
-	
-	public static void enableDebuggingForAllFlowRelatedClasses()
-	{
-		MultiSourceEAF.debug(true);
-		//BellmanFordVertexIntervalls.debug(3);
-		BellmanFordIntervalBased.debug(3);
-		VertexIntervals.debug(3);
-		EdgeIntervals.debug(3);
-		SourceIntervals.debug(3);
-		Flow.debug(3);
-	}
-	
-	public static void disableDebuggingForAllFlowRelatedClasses()
-	{
-		MultiSourceEAF.debug(false);
-		//BellmanFordVertexIntervalls.debug(0);
-		BellmanFordIntervalBased.debug(0);
-		VertexIntervals.debug(0);
-		EdgeIntervals.debug(0);
-		SourceIntervals.debug(0);
-		Flow.debug(0);
-	}	
 	
 	public void writeSimpleNetwork() {
 		// write simple data format to sysout

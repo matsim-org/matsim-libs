@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import javax.management.RuntimeErrorException;
 
 //playground imports
-import playground.dressler.ea_flow.FlowCalculationSettings;
+import playground.dressler.control.FlowCalculationSettings;
 
 /**
  * class representing the flow of an edge in a Time Expanded Network

@@ -278,9 +278,10 @@ public class VertexInterval extends Interval {
 	/**
 	 * Set the fields of the VertexInterval to the one given.
 	 * Predecessor or Successor are only updated if they are not null. 
-	 * @param other The VertexInterval from which the settings are copied 
+	 * @param other The VertexInterval from which the settings are copied
+	 * @return if there is an unusual reason to scan again ... this is never true here, but would be if costs get upgraded  
 	 */
-	public void setArrivalAttributes (final VertexInterval other)
+	public boolean setArrivalAttributes (final VertexInterval other)
 	{
 		this.scanned = other.scanned;
 		this.reachable = other.reachable;
@@ -289,6 +290,8 @@ public class VertexInterval extends Interval {
 		
 		if (other._succ != null)
 		  this._succ = other._succ;
+		
+		return false;
 	}
 	
 //----------------------------SPLITTING----------------------------//

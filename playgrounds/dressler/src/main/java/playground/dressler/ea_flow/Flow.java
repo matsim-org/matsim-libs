@@ -46,6 +46,7 @@ import playground.dressler.Interval.EdgeInterval;
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.SourceIntervals;
+import playground.dressler.control.FlowCalculationSettings;
 /**
  * Class representing a dynamic flow on an network with multiple sources and a single sink
  * @author Manuel Schneider

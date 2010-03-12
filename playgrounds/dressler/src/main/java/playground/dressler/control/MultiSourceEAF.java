@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dressler.ea_flow;
+package playground.dressler.control;
 
 //java imports
 import java.io.BufferedReader;
@@ -50,7 +50,11 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.Interval.EdgeIntervals;
+import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.Interval.VertexIntervals;
+import playground.dressler.ea_flow.BellmanFordIntervalBased;
+import playground.dressler.ea_flow.Flow;
+import playground.dressler.ea_flow.TimeExpandedPath;
 import playground.dressler.util.ImportSimpleNetwork;
 
 /**
@@ -72,6 +76,29 @@ public class MultiSourceEAF {
 	{
 		this.setupStatusInfo();
 	}
+	
+	public static void enableDebuggingForAllFlowRelatedClasses()
+	{
+		MultiSourceEAF.debug(true);
+		//BellmanFordVertexIntervalls.debug(3);
+		BellmanFordIntervalBased.debug(3);
+		VertexIntervals.debug(3);
+		EdgeIntervals.debug(3);
+		SourceIntervals.debug(3);
+		Flow.debug(3);
+	}
+	
+	public static void disableDebuggingForAllFlowRelatedClasses()
+	{
+		MultiSourceEAF.debug(false);
+		//BellmanFordVertexIntervalls.debug(0);
+		BellmanFordIntervalBased.debug(0);
+		VertexIntervals.debug(0);
+		EdgeIntervals.debug(0);
+		SourceIntervals.debug(0);
+		Flow.debug(0);
+	}	
+	
 	
 	/**
 	 * A method to read a file containing the information on demands in an evacuation scenario for a given network
@@ -166,7 +193,6 @@ public class MultiSourceEAF {
 			
 		int i;
 		long EdgeGain = 0;
-		long VertexGain = 0;
 		int lasttime = 0;
 		
 		boolean tryReverse;
@@ -212,8 +238,6 @@ public class MultiSourceEAF {
 	            }
 	        }
 			 
-			VertexGain += routingAlgo.vertexGain;
-			
 			timer2 = System.currentTimeMillis();
 			timeMBF += timer2 - timer1;
 			
@@ -381,8 +405,7 @@ public class MultiSourceEAF {
 				long timecurrent = System.currentTimeMillis();
 				System.out.println();
 				System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: Total " + (timecurrent - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-				System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
-				System.out.println("CleanUp got rid of  " + VertexGain + " vertex intervals so far.");
+				System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");				
 				//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 				System.out.println("last path: " + tempstr);
 				System.out.println(routingAlgo.measure());	
@@ -408,7 +431,6 @@ public class MultiSourceEAF {
 		System.out.println("");
 		System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: Total " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 		System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
-		System.out.println("CleanUp got rid of  " + VertexGain + " vertex intervals so far.");
 		//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 		System.out.println("last path: " + tempstr);
 		System.out.println(routingAlgo.measure());	
@@ -510,7 +532,8 @@ public class MultiSourceEAF {
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
-		// 4 = padang, with 10% plans	
+		// 4 = padang, with 10% plans, 10s steps
+		// 41 = padang, with 100% plans, 1s steps ...
 		// 5 = probeevakuierung telefunken
 		// else = something else
 		
@@ -537,6 +560,12 @@ public class MultiSourceEAF {
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
 			timeStep = 10;
 			flowFactor = 0.1;
+			sinkid = "en1";
+		} else if (instance == 41) {
+			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
+			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced.xml.gz";
+			timeStep = 1;
+			flowFactor = 1.0;
 			sinkid = "en1";
 		} else if (instance == 5) {
 			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
@@ -692,9 +721,9 @@ public class MultiSourceEAF {
 		//settings.MaxRounds = 101;
 		//settings.checkConsistency = 100;		
 		//settings.useVertexCleanup = false;
-		settings.useImplicitVertexCleanup = true;
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
+		settings.useImplicitVertexCleanup = false;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
 		settings.useRepeatedPaths = true;
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
