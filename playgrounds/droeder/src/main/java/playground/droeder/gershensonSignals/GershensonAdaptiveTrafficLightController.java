@@ -144,7 +144,7 @@ public class GershensonAdaptiveTrafficLightController extends
 		if (compGroupsGreen == true){
 			for (Id i : compGroups.get(signalGroup.getId())){
 				approachingGreenLink += handler.getVehInD(time, groups.get(i).getLinkRefId());
-				for (Entry<Id, Integer> e : vehOnLinkLanes.get(i).entrySet()){
+				for (Entry<Id, Integer> e : vehOnLinkLanes.get(this.getSignalGroups().get(i).getLinkRefId()).entrySet()){
 					approachingGreenLane += e.getValue().intValue();
 				}
 				if(compGreenTime < (time - switchedToGreen.get(i))){
@@ -253,9 +253,9 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 	}
 
-	public void setParameters (int minCars, int tGreenMinTime, double capFactor){
-		this.minCarsTime = minCars;
-		this.tGreenMin = tGreenMinTime;
+	public void setParameters (int minCarsTime, int tGreenMin, double capFactor){
+		this.minCarsTime = minCarsTime;
+		this.tGreenMin = tGreenMin;
 		this.capFactor = capFactor;
 		log.info("parameters for adaptive controler set. capFactor="+this.capFactor+" u=" + this.tGreenMin + " n=" + this.minCarsTime);
 	}

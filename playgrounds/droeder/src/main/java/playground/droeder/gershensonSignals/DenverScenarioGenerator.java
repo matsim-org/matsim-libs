@@ -160,7 +160,7 @@ private void createConfig(Config config) {
 		
 		config.network().setInputFile(NETWORKFILE);
 		config.network().setChangeEventInputFile(CHANGEEVENTSFILE);
-		config.network().setTimeVariantNetwork(true);
+		config.network().setTimeVariantNetwork(false);
 		config.plans().setInputFile(PLANSINPUTFILE);
 	
 

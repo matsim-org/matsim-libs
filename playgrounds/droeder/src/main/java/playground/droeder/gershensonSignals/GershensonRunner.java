@@ -23,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import opendap.util.dasTools;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -49,6 +51,7 @@ import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
+import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
 
 
@@ -92,7 +95,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			log.info("start gershensonTest");
 			GershensonScenarioGenerator gsg = new GershensonScenarioGenerator();
 			gsg.createScenario();
-			conf = gsg.CONFIGOUTPUTFILE;		
+			conf = DaPaths.GTEST + "gershensonConfigFile.xml";		
 		}else if (configFile == "D"){
 			log.info("start Denver");
 			DenverScenarioGenerator dsg = new DenverScenarioGenerator();

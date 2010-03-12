@@ -59,19 +59,24 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	
 	private QNetwork net;
 	private double d;
+	private Map<Id, SignalGroupDefinition> groups;
 
 	/*  dMax is the maximum length of d, if d is longer then linkLength d is set d linkLength.
 	 *  if dMax is shorter then laneLength, d is set to laneLength.
 	 */
 	public CarsOnLinkLaneHandler(Map<Id, SignalGroupDefinition> groups, double dMax){
 		this.d = dMax;
+		this.groups = groups;
+		this.reset(0);
 		
-		for (SignalGroupDefinition sd : groups.values()){
-			vehOnLink.put(sd.getLinkRefId(), 0);
+	}
+	
+	@Override
+	public void reset(int iteration) {
+
+		for (SignalGroupDefinition sd : this.groups.values()){
+			vehInD.put(sd.getLinkRefId(), 0);
 			for (Id id : sd.getToLinkIds()){
-				if (!vehOnLink.containsKey(id)){
-					vehOnLink.put(id, 0);
-				}
 				if (!vehInD.containsKey(id)){
 					vehInD.put(id, 0);
 				}
@@ -80,13 +85,8 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 			for (Id id : sd.getLaneIds()){
 				m.put(id, 0);
 			}
-			vehOnLinkLanes.put(sd.getId(), m);
+			vehOnLinkLanes.put(sd.getLinkRefId(), m);
 		}
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		iteration = 0;
 	}
 	
 	@Override

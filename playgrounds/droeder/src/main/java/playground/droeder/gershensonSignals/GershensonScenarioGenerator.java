@@ -68,11 +68,11 @@ import playground.droeder.DaPaths;
 public class GershensonScenarioGenerator {
 	public static final String INPUT = DaPaths.GTEST;
 	public static final String OUTPUT =DaPaths.GTEST;
-	public static final String NETWORKFILE = INPUT + "gershensonTestNetwork1.xml";
-	public static final String CONFIGOUTPUTFILE = OUTPUT + "gershensonConfigFile.xml";
-	public static final String LANESOUTPUTFILE = OUTPUT + "gershensonLanes.xml";
-	public static final String SIGNALSYSTEMSOUTPUTFILE = OUTPUT + "gershensonSignalSystems.xml";
-	public static final String SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE = OUTPUT + "gershensonSignalSystemsConfig.xml";
+	public static final String NETWORKFILE = INPUT + "gershensonTestNetwork2.xml";
+	public static final String CONFIGOUTPUTFILE = OUTPUT + "gershensonConfigFile2.xml";
+	public static final String LANESOUTPUTFILE = OUTPUT + "gershensonLanes2.xml";
+	public static final String SIGNALSYSTEMSOUTPUTFILE = OUTPUT + "gershensonSignalSystems2.xml";
+	public static final String SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE = OUTPUT + "gershensonSignalSystemsConfig2.xml";
 	public static final String POPULATIONOUTPUTFILE = OUTPUT + "gershensonPopulation.xml";
 	private static final String PLANSOUTPUTFILE = OUTPUT + "gershensonPlans.xml";
 	private static final String OUTPUTDIRECTORY = DaPaths.OUTPUT ;
@@ -174,73 +174,73 @@ public class GershensonScenarioGenerator {
 		LanesToLinkAssignment lanesForLink11 = factory.createLanesToLinkAssignment(id11);
 		Lane link11lane1 = factory.createLane(id1);
 		Lane link11lane2 = factory.createLane(id2);
-//		Lane link11lane3 = factory.createLane(id3);
+		Lane link11lane3 = factory.createLane(id3);
 
 		link11lane1.addToLinkId(id12);
 		link11lane1.setNumberOfRepresentedLanes(1);
 		link11lane2.addToLinkId(id12);
 		link11lane2.setNumberOfRepresentedLanes(1);
-//		link11lane3.addToLinkId(id14);
-//		link11lane3.setNumberOfRepresentedLanes(1);
+		link11lane3.addToLinkId(id14);
+		link11lane3.setNumberOfRepresentedLanes(1);
 
 		lanesForLink11.addLane(link11lane1);
 		lanesForLink11.addLane(link11lane2);
-//		lanesForLink11.addLane(link11lane3);
+		lanesForLink11.addLane(link11lane3);
 		lanes.addLanesToLinkAssignment(lanesForLink11);
 
 		//lanes for link 13
 		LanesToLinkAssignment lanesForLink13 = factory.createLanesToLinkAssignment(id13);
 		Lane link13lane1 = factory.createLane(id1);
 		Lane link13lane2 = factory.createLane(id2);
-//		Lane link13lane3 = factory.createLane(id3);
+		Lane link13lane3 = factory.createLane(id3);
 
 		link13lane1.addToLinkId(id14);
 		link13lane1.setNumberOfRepresentedLanes(1);
 		link13lane2.addToLinkId(id14);
 		link13lane2.setNumberOfRepresentedLanes(1);
-//		link13lane3.addToLinkId(id15);
-//		link13lane3.setNumberOfRepresentedLanes(1);
+		link13lane3.addToLinkId(id15);
+		link13lane3.setNumberOfRepresentedLanes(1);
 
 		lanesForLink13.addLane(link13lane1);
 		lanesForLink13.addLane(link13lane2);
-//		lanesForLink13.addLane(link13lane3);
+		lanesForLink13.addLane(link13lane3);
 		lanes.addLanesToLinkAssignment(lanesForLink13);
 
 //		//lanes for link 16
-//		LanesToLinkAssignment lanesForLink16 = factory.createLanesToLinkAssignment(id16);
-//		Lane link16lane1 = factory.createLane(id1);
-//		Lane link16lane2 = factory.createLane(id2);
-//		Lane link16lane3 = factory.createLane(id3);
-//
-//		link16lane1.addToLinkId(id14);
-//		link16lane1.setNumberOfRepresentedLanes(1);
-//		link16lane2.addToLinkId(id15);
-//		link16lane2.setNumberOfRepresentedLanes(1);
-//		link16lane3.addToLinkId(id17);
-//		link16lane3.setNumberOfRepresentedLanes(1);
-//
-//		lanesForLink16.addLane(link16lane1);
-//		lanesForLink16.addLane(link16lane2);
-//		lanesForLink16.addLane(link16lane3);
-//		lanes.addLanesToLinkAssignment(lanesForLink16);
+		LanesToLinkAssignment lanesForLink16 = factory.createLanesToLinkAssignment(id16);
+		Lane link16lane1 = factory.createLane(id1);
+		Lane link16lane2 = factory.createLane(id2);
+		Lane link16lane3 = factory.createLane(id3);
+
+		link16lane1.addToLinkId(id14);
+		link16lane1.setNumberOfRepresentedLanes(1);
+		link16lane2.addToLinkId(id15);
+		link16lane2.setNumberOfRepresentedLanes(1);
+		link16lane3.addToLinkId(id17);
+		link16lane3.setNumberOfRepresentedLanes(1);
+
+		lanesForLink16.addLane(link16lane1);
+		lanesForLink16.addLane(link16lane2);
+		lanesForLink16.addLane(link16lane3);
+		lanes.addLanesToLinkAssignment(lanesForLink16);
 //
 //		//lanes for link 18
-//		LanesToLinkAssignment lanesForLink18 = factory.createLanesToLinkAssignment(id18);
-//		Lane link18lane1 = factory.createLane(id1);
-//		Lane link18lane2 = factory.createLane(id2);
-//		Lane link18lane3 = factory.createLane(id3);
-//
-//		link18lane1.addToLinkId(id15);
-//		link18lane1.setNumberOfRepresentedLanes(1);
-//		link18lane2.addToLinkId(id17);
-//		link18lane2.setNumberOfRepresentedLanes(1);
-//		link18lane3.addToLinkId(id12);
-//		link18lane3.setNumberOfRepresentedLanes(1);
-//
-//		lanesForLink18.addLane(link18lane1);
-//		lanesForLink18.addLane(link18lane2);
-//		lanesForLink18.addLane(link18lane3);
-//		lanes.addLanesToLinkAssignment(lanesForLink18);
+		LanesToLinkAssignment lanesForLink18 = factory.createLanesToLinkAssignment(id18);
+		Lane link18lane1 = factory.createLane(id1);
+		Lane link18lane2 = factory.createLane(id2);
+		Lane link18lane3 = factory.createLane(id3);
+
+		link18lane1.addToLinkId(id15);
+		link18lane1.setNumberOfRepresentedLanes(1);
+		link18lane2.addToLinkId(id17);
+		link18lane2.setNumberOfRepresentedLanes(1);
+		link18lane3.addToLinkId(id12);
+		link18lane3.setNumberOfRepresentedLanes(1);
+
+		lanesForLink18.addLane(link18lane1);
+		lanesForLink18.addLane(link18lane2);
+		lanesForLink18.addLane(link18lane3);
+		lanes.addLanesToLinkAssignment(lanesForLink18);
 
 		return lanes;
 	}
@@ -255,8 +255,8 @@ public class GershensonScenarioGenerator {
 		AdaptiveSignalSystemControlInfo controlInfo = factory.createAdaptiveSignalSystemControlInfo();
 		controlInfo.addSignalGroupId(id1);
 		controlInfo.addSignalGroupId(id2);
-//		controlInfo.addSignalGroupId(id3);
-//		controlInfo.addSignalGroupId(id4);
+		controlInfo.addSignalGroupId(id3);
+		controlInfo.addSignalGroupId(id4);
 		controlInfo.setAdaptiveControlerClass(controllerClass);
 		systemConfig.setSignalSystemControlInfo(controlInfo);
 
@@ -269,59 +269,59 @@ public class GershensonScenarioGenerator {
 		SignalSystems systems = scenario.getSignalSystems();
 		SignalSystemsFactory factory = systems.getFactory();
 
-		//create the signal system no 1
+//		create the signal system no 1
 		SignalSystemDefinition definition = factory.createSignalSystemDefinition(id1);
 		systems.addSignalSystemDefinition(definition);
-		//create signal group for traffic on link 11
+//		create signal group for traffic on link 11
 		SignalGroupDefinition groupLink11 = factory.createSignalGroupDefinition(id11, id1);
 		groupLink11.addLaneId(id1);
 		groupLink11.addLaneId(id2);
-//		groupLink11.addLaneId(id3);
+		groupLink11.addLaneId(id3);
 		groupLink11.addToLinkId(id12);
-//		groupLink11.addToLinkId(id14);
-//		groupLink11.addToLinkId(id17);
+		groupLink11.addToLinkId(id14);
+		groupLink11.addToLinkId(id17);
 
 
 		//create signal group for traffic on link 13
 		SignalGroupDefinition groupLink13 = factory.createSignalGroupDefinition(id13, id2);
 		groupLink13.addLaneId(id1);
 		groupLink13.addLaneId(id2);
-//		groupLink13.addLaneId(id3);
-//		groupLink13.addToLinkId(id12);
+		groupLink13.addLaneId(id3);
+		groupLink13.addToLinkId(id12);
 		groupLink13.addToLinkId(id14);
-//		groupLink13.addToLinkId(id15);
+		groupLink13.addToLinkId(id15);
 
 //		//create signal group for traffic on link 16
-//		SignalGroupDefinition groupLink16 = factory.createSignalGroupDefinition(id16, id3);
-//		groupLink16.addLaneId(id1);
-//		groupLink16.addLaneId(id2);
-//		groupLink16.addLaneId(id3);
-//		groupLink16.addToLinkId(id14);
-//		groupLink16.addToLinkId(id15);
-//		groupLink16.addToLinkId(id17);
+		SignalGroupDefinition groupLink16 = factory.createSignalGroupDefinition(id16, id3);
+		groupLink16.addLaneId(id1);
+		groupLink16.addLaneId(id2);
+		groupLink16.addLaneId(id3);
+		groupLink16.addToLinkId(id14);
+		groupLink16.addToLinkId(id15);
+		groupLink16.addToLinkId(id17);
 //
 //		//create signal group for traffic on link 18
-//		SignalGroupDefinition groupLink18 = factory.createSignalGroupDefinition(id18, id4);
-//		groupLink18.addLaneId(id1);
-//		groupLink18.addLaneId(id2);
-//		groupLink18.addLaneId(id3);
-//		groupLink18.addToLinkId(id15);
-//		groupLink18.addToLinkId(id17);
-//		groupLink18.addToLinkId(id12);
+		SignalGroupDefinition groupLink18 = factory.createSignalGroupDefinition(id18, id4);
+		groupLink18.addLaneId(id1);
+		groupLink18.addLaneId(id2);
+		groupLink18.addLaneId(id3);
+		groupLink18.addToLinkId(id15);
+		groupLink18.addToLinkId(id17);
+		groupLink18.addToLinkId(id12);
 
 
 		//adding groups to the system
 		groupLink11.setSignalSystemDefinitionId(id1);
 		groupLink13.setSignalSystemDefinitionId(id1);
-//		groupLink16.setSignalSystemDefinitionId(id1);
-//		groupLink18.setSignalSystemDefinitionId(id1);
+		groupLink16.setSignalSystemDefinitionId(id1);
+		groupLink18.setSignalSystemDefinitionId(id1);
 
 
 		//adding signalGroupDefinitions to the container
 		systems.addSignalGroupDefinition(groupLink11);
 		systems.addSignalGroupDefinition(groupLink13);
-//		systems.addSignalGroupDefinition(groupLink16);
-//		systems.addSignalGroupDefinition(groupLink18);
+		systems.addSignalGroupDefinition(groupLink16);
+		systems.addSignalGroupDefinition(groupLink18);
 
 
 		return systems;

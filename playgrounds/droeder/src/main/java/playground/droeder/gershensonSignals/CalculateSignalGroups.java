@@ -40,8 +40,6 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  *
  */
 public class CalculateSignalGroups{
-	private static final Logger log = Logger.getLogger(CalculateSignalGroups.class);
-	
 	
 	public Map<Id, Id> calculateCorrespondingGroups(Map<Id, SignalGroupDefinition> groups, Network net){
 		SortedMap<Id, Id> corrGroups = new TreeMap<Id, Id>();
@@ -65,7 +63,6 @@ public class CalculateSignalGroups{
 				}
 			}
 		}	
-		log.error(corrGroups.toString());
 		return corrGroups;
 	}
 	
@@ -93,7 +90,6 @@ public class CalculateSignalGroups{
 			}
 			cg.put(ee.getKey(), l);
 		}
-		log.error(cg.toString());
 		
 		return cg;
 	}
