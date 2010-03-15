@@ -55,7 +55,7 @@ public class OTFClientSwing extends OTFClient {
 	private OTFFileSettingsSaver fileSettingsSaver;
 
 	public OTFClientSwing(String url) {
-		super(url);
+		super("file:" + url);
 		connect2.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect2.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
 		connect2.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
