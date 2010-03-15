@@ -9,9 +9,6 @@ public class LiveStarter {
 	
 	
 	public static void main(String[] args) {
-		OTFVisController ot = new OTFVisController(config);
-		ot.run();
-
+		OTFVis.playConfig(config);
 	}
-
 }
