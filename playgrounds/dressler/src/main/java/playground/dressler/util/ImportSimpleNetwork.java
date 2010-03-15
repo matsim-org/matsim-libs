@@ -108,6 +108,15 @@ public class ImportSimpleNetwork {
 				
 				i = Integer.valueOf(line[2].trim());
 				addNodeIfNecessary(i);
+			} else if (line[0].equals("V")) {
+				// this line has coordinates.
+				// update them if necessary
+				
+				int i = Integer.valueOf(line[1].trim());
+				addNodeIfNecessary(i);
+				double x = Double.valueOf(line[3].trim());
+				double y = Double.valueOf(line[4].trim());
+				((NodeImpl) _newnodes.get(i)).setCoord((Coord) new CoordImpl(x, y)); 
 			}
 		}
 		in.close();

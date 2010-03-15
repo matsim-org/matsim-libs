@@ -284,4 +284,19 @@ public class VertexIntervalWithCost extends VertexInterval {
 		return k;
 	}
 	
+	public boolean isSameCost(int c, boolean rel) {
+		if (this.costIsRelative == rel) {
+		  return cost == c;
+		} else {
+			if (this.length() != 1) {
+				return false;
+			} else { // interval of length 1, might still have the right cost stored in the wrong format
+				if (rel) { // but this.cost is absolute
+					return  c == this.cost - this._l; 
+				} else { // but this.cost is relative
+					return c == this._l + this.cost;  
+				}
+			}
+		}
+	}
 }

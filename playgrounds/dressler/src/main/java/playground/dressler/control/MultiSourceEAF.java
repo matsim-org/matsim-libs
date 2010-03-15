@@ -191,8 +191,8 @@ public class MultiSourceEAF {
 		long timeStart = System.currentTimeMillis();
 
 		BellmanFordIntervalBased routingAlgo;
-		//BellmanFordIntervalBased routingAlgo = new BellmanFordIntervalBased(settings, fluss);
-		routingAlgo = new BellmanFordIntervalBasedWithCost(settings, fluss);
+		routingAlgo = new BellmanFordIntervalBased(settings, fluss);
+		//routingAlgo = new BellmanFordIntervalBasedWithCost(settings, fluss);
 			
 		int i;
 		long EdgeGain = 0;
@@ -530,7 +530,7 @@ public class MultiSourceEAF {
 		int timeStep; 
 		double flowFactor;
 
-		int instance = 1; 
+		int instance = 2; 
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -719,14 +719,14 @@ public class MultiSourceEAF {
 		}
 
 		// set additional parameters, mostly TimeHorizon for the LP
-		//settings.TimeHorizon = 850;
+		//settings.TimeHorizon = 350;
 		//settings.MaxRounds = 101;
 		//settings.checkConsistency = 100;		
 		//settings.useVertexCleanup = false;
-		settings.useImplicitVertexCleanup = false;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		settings.useImplicitVertexCleanup = true;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
 		settings.useRepeatedPaths = true;
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		//settings.trackUnreachableVertices = true && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
@@ -769,6 +769,7 @@ public class MultiSourceEAF {
 			PopulationImpl output = fluss.createPopulation(plansfile);				
 			new PopulationWriter(output, network).writeFile(outputplansfile);
 		}
+		
 		
 		if(_debug){
 			System.out.println("done");

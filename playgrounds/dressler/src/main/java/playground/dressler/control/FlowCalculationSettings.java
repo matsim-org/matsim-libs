@@ -328,15 +328,18 @@ public class FlowCalculationSettings {
         }
             
         for (NodeImpl node : this._network.getNodes().values()) {
+        	int d = 0;
         	if (this._demands.containsKey(node)) {
-        		int d = this._demands.get(node);
+        		d = this._demands.get(node);        		
+        		// for backwards compatibility we output the old S and T labels.
         		if (d > 0) {
         			System.out.println("S " + newNodeNames.get(node) + " " + d);            			
         		}
         		if (d < 0) {
         			System.out.println("T " + newNodeNames.get(node) + " " + (-d));            			
-        		}
+        		}        		
         	}
+        	System.out.println("V " + newNodeNames.get(node) + " " + d + " " + node.getCoord().getX() + " " + node.getCoord().getY());
         }
 
         System.out.println("% E from to capacity length");
