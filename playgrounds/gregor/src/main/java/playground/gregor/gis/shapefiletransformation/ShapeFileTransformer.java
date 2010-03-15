@@ -83,8 +83,8 @@ public class ShapeFileTransformer {
 	}
 
 	public static void main(String [] args) {
-		String inFile = "./tmp/region.shp";
-		String outFile = "./tmp/regionII.shp";
+		String inFile = "/home/laemmel/arbeit/tmp/Dyn_Exp_3Tageszeiten.shp";
+		String outFile = "/home/laemmel/arbeit/tmp/tmp/Dyn_Exp_3Tageszeiten.shp";
 		try {
 			new ShapeFileTransformer(inFile,outFile).run();
 		} catch (IOException e) {
