@@ -31,7 +31,8 @@ import playground.dressler.ea_flow.PathStep;
  * @author Manuel Schneider
  *
  */
-public class VertexIntervals extends Intervals<VertexInterval> {
+/* extneds Intervals<VertexIntervalWithCost> ? */ 
+public class VertexIntervalsWithCost extends VertexIntervals {
 
 //------------------------FIELDS----------------------------------//
 	
@@ -54,11 +55,11 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 * Default Constructor Constructs an object containing only 
 	 * the given interval
 	 */
-	public VertexIntervals(VertexInterval interval){
+	public VertexIntervalsWithCost(VertexIntervalWithCost interval){
 		super(interval);
 	}
+	
 
-	//------------------------------METHODS-----------------------//
 	
 	/**
 	 * Gives the predecessor Link on the Vertex at time t
@@ -79,12 +80,15 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	}
 	
 
+//------------------------------GETTER-----------------------//
+
+
 	/**
 	 * setter for debug mode
 	 * @param debug debug mode true is on
 	 */
 	public static void debug(int debug){
-		VertexIntervals._debug=debug;
+		VertexIntervalsWithCost._debug=debug;
 	}
 	
 	/**
@@ -92,13 +96,13 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 *  the node is reachable from the source
 	 * @return specified VertexInterval or null if none exist
 	 */
-	public VertexInterval getFirstPossibleForward(){
-		VertexInterval result = this.getIntervalAt(0);
+	public VertexIntervalWithCost getFirstPossibleForward(){
+		VertexIntervalWithCost result = (VertexIntervalWithCost) this.getIntervalAt(0);
 		while(!this.isLast(result)){
 			if (result.getReachable() && result.getPredecessor() != null){
 				return result;
 			}else{
-				result=this.getNext(result);
+				result = (VertexIntervalWithCost) this.getNext(result);
 			}
 		}
 		
@@ -114,7 +118,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 	 * @return minimal time or Integer.MAX_VALUE if it is not reachable at all
 	 */
 	public int firstPossibleTime(){
-		VertexInterval test =this.getFirstPossibleForward();
+		VertexIntervalWithCost test =this.getFirstPossibleForward();
 		if(test!=null){
 			return test.getLowBound();
 		}else{
@@ -122,87 +126,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		}
 	}
 
-	/**
-	 * Sets arrival true for all intervals in arrive and sets predecessor to link for each time t
-	 * where it was null beforehand
-	 * @param arrive Intervals at which node is reachable
-	 * @param pred PathStep to set as breadcrumb (predecessor or successor)
-	 *         It will always be shifted to the beginning of the interval, according to reverse
-	 * @param reverse Is this for the reverse search?
-	 * @return (possibly empty) list of changed intervals
-	 * @deprecated
-	 *//*
-    public ArrayList<VertexInterval> setTrueList(ArrayList<Interval> arrive, PathStep pred, final boolean reverse) {
-		
-    	ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();
-    	
-		if (arrive == null || arrive.isEmpty()) { return changed; }
-		
-		// there used to be condensing here ...
-		// but propagate already condenses these days
-		
-		Iterator<Interval> iterator = arrive.iterator();
-		Interval i;
-								
-		while(iterator.hasNext()) {
-			i = iterator.next();	        
-		    changed.addAll(setTrueList(i, pred, reverse));
-		}
-				
-		return changed;
-	}
-
-    *//**
-	 * Sets arrival true for all time steps in arrive and sets predecessor to link for each time t
-	 * where it was null beforehand
-	 * @param arrive Interval at which node is reachable
-	 * @param pred PathStep to set as breadcrumb (predecessor or successor)
-	 *         It will always be shifted to the beginning of the interval, according to reverse
-	 * @param reverse Is this for the reverse search?  
-	 * @return null or list of changed intervals iff anything was changed
-	 * @ deprecated
-	 *//*
-	public ArrayList<VertexInterval> setTrueList(Interval arrive, PathStep pred, final boolean reverse){
-		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();		
-		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
-				
-		while(current.getLowBound() < arrive.getHighBound()){
-
-			// only do something if current was not reachable yet
-			if(!current.getReachable()) {
-				
-				// let's modify the interval to look jus right
-				if(current.getLowBound() < arrive.getLowBound()) {
-					current = this.splitAt(arrive.getLowBound());
-				}
-				
-				if(current.getHighBound() > arrive.getHighBound())
-				{
-					this.splitAt(arrive.getHighBound());
-					// pick the interval again to be on the safe side
-					current = this.getIntervalAt(arrive.getHighBound()-1);
-				}
-				
-				// and set the attributes
-				if (!reverse) {
-					//current.setArrivalAttributesForward(pred.copyShiftedToArrival(current.getLowBound()));
-					current.setArrivalAttributesForward(pred);
-				} else {
-					//current.setArrivalAttributesReverse(pred.copyShiftedToStart(current.getLowBound()));
-					current.setArrivalAttributesReverse(pred);
-				}
-				changed.add(current);
-			}
-
-
-			if (isLast(current)) {
-				break;
-			}			
-			current = this.getIntervalAt(current.getHighBound());
-		}	
-		return changed;
-	}*/
-	
+   /* @Override
 	public ArrayList<VertexInterval> setTrueList(ArrayList<VertexInterval> arrive) {
 			
 	    	ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();
@@ -212,8 +136,8 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 			// there used to be condensing here ...
 			// but propagate already condenses these days
 			
-			Iterator<VertexInterval> iterator = arrive.iterator();
-			VertexInterval i;
+			Iterator<VertexIntervalWithCost> iterator = arrive.iterator();
+			VertexIntervalWithCost i;
 									
 			while(iterator.hasNext()) {
 				i = iterator.next();	        
@@ -222,10 +146,13 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 					
 			return changed;
 		}
-	 
-	 public ArrayList<VertexInterval> setTrueList(ArrayList<Interval> arrive, VertexInterval arriveProperties) {
+		
+	 */
+	
+	
+	/* public ArrayList<VertexIntervalWithCost> setTrueList(ArrayList<Interval> arrive, VertexIntervalWithCost arriveProperties) {
 			
-	    	ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();
+	    	ArrayList<VertexIntervalWithCost> changed = new ArrayList<VertexIntervalWithCost>();
 	    	
 			if (arrive == null || arrive.isEmpty()) { return changed; }
 			
@@ -234,27 +161,27 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 			
 			Iterator<Interval> iterator = arrive.iterator();
 			Interval i;
-			//VertexInterval temp = new VertexInterval(arriveProperties);
+			VertexIntervalWithCost temp = new VertexIntervalWithCost(arriveProperties);
 									
 			while(iterator.hasNext()) {
 				i = iterator.next();
-				arriveProperties._l = i._l;
-				arriveProperties._r = i._r;
-			    changed.addAll(setTrueList(arriveProperties));
+				temp._l = i._l;
+				temp._r = i._r;
+			    changed.addAll(setTrueList(temp));
 			}
 					
 			return changed;
-		}
+		}*/
 	
 	/**
 	 * Sets arrival true for all time steps where arrive is better than the existing interval
 	 * @param arrive VertexInterval suitable to be copied to this vertex  
 	 * @return null or list of changed intervals iff anything was changed
-	 */
+	 *//*
 	public ArrayList<VertexInterval> setTrueList(VertexInterval arrive){
 		
 		ArrayList<VertexInterval> changed = new ArrayList<VertexInterval>();	
-		VertexInterval current = this.getIntervalAt(arrive.getLowBound());
+		VertexIntervalWithCost current = (VertexIntervalWithCost) this.getIntervalAt(arrive.getLowBound());
 				
 		while(current.getLowBound() < arrive.getHighBound()){
 
@@ -264,14 +191,14 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 				
 				// let's modify the interval to look just right
 				if(current.getLowBound() < improvement.getLowBound()) {
-					current = this.splitAt(improvement.getLowBound());
+					current =(VertexIntervalWithCost) this.splitAt(improvement.getLowBound());
 				}
 				
 				if(current.getHighBound() > improvement.getHighBound())
 				{
 					this.splitAt(improvement.getHighBound());
 					// pick the interval again to be on the safe side
-					current = this.getIntervalAt(improvement.getHighBound()-1);
+					current = (VertexIntervalWithCost) this.getIntervalAt(improvement.getHighBound()-1);
 				}
 				
 				
@@ -299,8 +226,10 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		}	
 		return changed;
 	}
+	*/
 	
-
+	
+//------------------------Clean Up--------------------------------//
 
 	/**
 	 * unifies adjacent intervals, call only when you feel it is safe to do
@@ -313,10 +242,10 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		//System.out.println("VertexIntervals.cleanup()");
 		//System.out.println(this.toString());
 		
-		VertexInterval i, j;
-		i = getIntervalAt(0);		
+		VertexIntervalWithCost i, j;
+		i = (VertexIntervalWithCost) getIntervalAt(0);		
 		while (i.getHighBound() < timestop) {		  
-		  j = this.getIntervalAt(i.getHighBound());
+		  j = (VertexIntervalWithCost) this.getIntervalAt(i.getHighBound());
 		  if(i.getHighBound() != j.getLowBound())
 			  throw new RuntimeException("error in cleanup!");
 		  //if (i.getReachable() == j.getReachable() 
@@ -326,7 +255,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 			  // FIXME use a safer method for removing things!
 			  _tree.remove(i);
 			  _tree.remove(j);
-			  j = new VertexInterval(i.getLowBound(), j.getHighBound(), i);
+			  j = new VertexIntervalWithCost(i.getLowBound(), j.getHighBound(), i);
 			  _tree.insert(j);			  
 			  gain++;
 
@@ -338,87 +267,4 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 		return gain;
 	}
 
-	
-	/**
-	 * Checks whether the given VertexInterval is the last
-	 * @param o EgeInterval which it test for 
-	 * @return true if getLast.equals(o)
-	 */
-	@Override
-	public boolean isLast(VertexInterval o){
-		return super.isLast(o);
-		
-		//TODO check if other fields are equal 
-	}
-	
-	
-	/*	*//**
-		 * Gives the first reachable but unscanned VertexInterval 
-		 * @return the VertexInterval or null if it does not exist
-		 *//*
-		public VertexInterval getFirstUnscannedInterval()
-		{
-			int lowBound = 0;
-			VertexInterval vI;
-			do
-			{
-				vI = this.getIntervalAt(lowBound);
-				if(vI.getReachable() &&  !vI.isScanned())
-					return vI;
-				lowBound = vI.getHighBound();
-				if (isLast(vI)) {
-					break;
-				}
-			} while (!isLast(vI));
-			return null;
-		}
-		*/
-	/*	*//**
-		 * Returns the lowbound of the first unscanned but reachable VertexInterval
-		 * @return the Value of the lowbound or null if it does not exist
-		 *//*
-		public Integer getFirstTimePointWithDistTrue()
-		{
-			VertexInterval vInterval = this.getFirstUnscannedInterval();
-			if(vInterval == null)
-				return null;
-			else
-				return vInterval.getLowBound();
-		}*/
-	
-	/**
-	 * Sets arrival true for all time steps in arrive and sets predecessor to link for each time t
-	 * where it was null beforehand
-	 * @deprecated setTrueList does the same and better
-	 * @param arrive VertexIntervals at which node is reachable
-	 * @param pred Predecessor PathStep. It will always be shifted to the beginning of the interval
-	 * @return true iff anything was changed
-	 *//*
-	public boolean setTrue(ArrayList<Interval> arrive, PathStep pred) {
-		boolean changed = false;
-		boolean temp;
-		// there used to be condensing here ...
-		// but propagate already condenses these days
-		for(int i=0; i< arrive.size(); i++){
-		  temp = setTrue(arrive.get(i), pred);
-		  changed = changed || temp;
-		}
-		return changed;
-	}*/
-	
-
-	
-/*	*//**
-	 * Sets arrival true for all time steps in arrive that were not reachable and sets the predecessor to pred
-	 * @deprecated setTrueList does the same and better  
-	 * @param arrive Interval at which node is reachable
-	 * @param pred Predecessor PathStep. It will always be shifted to the beginning of the interval
-	 * @return true iff anything was changed
-	 *//*
-	public boolean setTrue(Interval arrive, PathStep pred){
-		// slightly slower, but easier to manage if this just calls the new setTrueList
-		ArrayList<VertexInterval> temp = setTrueList(arrive, pred);
-		return (temp != null && !temp.isEmpty());
-	}*/
-	
 }

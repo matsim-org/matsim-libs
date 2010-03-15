@@ -53,6 +53,7 @@ import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.Interval.VertexIntervals;
 import playground.dressler.ea_flow.BellmanFordIntervalBased;
+import playground.dressler.ea_flow.BellmanFordIntervalBasedWithCost;
 import playground.dressler.ea_flow.Flow;
 import playground.dressler.ea_flow.TimeExpandedPath;
 import playground.dressler.util.ImportSimpleNetwork;
@@ -189,7 +190,9 @@ public class MultiSourceEAF {
 		long timer1, timer2, timer3;
 		long timeStart = System.currentTimeMillis();
 
-		BellmanFordIntervalBased routingAlgo = new BellmanFordIntervalBased(settings, fluss);
+		BellmanFordIntervalBased routingAlgo;
+		//BellmanFordIntervalBased routingAlgo = new BellmanFordIntervalBased(settings, fluss);
+		routingAlgo = new BellmanFordIntervalBasedWithCost(settings, fluss);
 			
 		int i;
 		long EdgeGain = 0;
@@ -527,15 +530,14 @@ public class MultiSourceEAF {
 		int timeStep; 
 		double flowFactor;
 
-		int instance = 5; 
-		// 0 = custom
+		int instance = 1; 
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
 		// 4 = padang, with 10% plans, 10s steps
 		// 41 = padang, with 100% plans, 1s steps ...
 		// 5 = probeevakuierung telefunken
-		// else = something else
+		// else = custom ...
 		
 		if (instance == 1) {
 			networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";

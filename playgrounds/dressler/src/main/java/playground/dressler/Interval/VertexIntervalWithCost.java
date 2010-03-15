@@ -22,10 +22,12 @@
 package playground.dressler.Interval;
 
 //matsim imports
-import org.matsim.api.core.v01.network.Link;
+// none currently ...
 
 import playground.dressler.ea_flow.PathStep;
 
+// TODO
+// might be safer to change it to "extends Interval" and rewrite most stuff ...
 public class VertexIntervalWithCost extends VertexInterval {
 
 	/**
@@ -36,9 +38,56 @@ public class VertexIntervalWithCost extends VertexInterval {
 	public boolean costIsRelative = true;
 	public int cost = 0;
 	
+	
+	//----------------------CONSTRUCTORS------------------------------//	
+	
+	public VertexIntervalWithCost() {
+		super();
+	}
+	
 	public VertexIntervalWithCost(final int l,final int r) {
 		super(l, r);
 	}
+
+	/**
+	 * construct an VertexInterval from l to r with the settings of other
+	 * the Predecessor will be shifted to the new value of l
+	 * @param l lowbound
+	 * @param r highbound
+	 * @param other Interval to copy settings from
+	 */
+	public VertexIntervalWithCost(final int l,final int r,final VertexIntervalWithCost other)
+	{
+		super(l,r);	
+		this.reachable = other.reachable;
+		this.scanned = other.scanned;
+		this._pred = other._pred;
+		this._succ = other._succ;
+		this.cost = other.cost;
+		this.costIsRelative = other.costIsRelative;
+	}
+
+	/**
+	 * creates a VertexInterval instance as a copy of an Interval
+	 * not reachable, not scanned, no predecessor
+	 * @param j Interval to copy
+	 */
+	public VertexIntervalWithCost(final Interval j) {
+		super(j.getLowBound(),j.getHighBound());
+		
+	}
+	
+	public VertexIntervalWithCost(final VertexIntervalWithCost j) {
+		super(j.getLowBound(),j.getHighBound());		
+		this.reachable = j.reachable;
+		this.scanned = j.scanned;
+		this._pred = j._pred;
+		this._succ = j._succ;
+		this.cost = j.cost;
+		this.costIsRelative = j.costIsRelative;
+	}
+	
+	//------------------------------METHODS-----------------------//
 	
 	/**
 	 * Should the other VertexInterval be replaced with this?
@@ -49,10 +98,7 @@ public class VertexIntervalWithCost extends VertexInterval {
 	 * @param other a VertexInterval
 	 * @return null if not, and the first subinterval of other that should be replaced otherwise 
 	 */
-	public Interval isBetterThan(final VertexInterval other) {
-		// argh.
-		if (!(other instanceof VertexIntervalWithCost)) return super.isBetterThan(other);
-		
+	public Interval isBetterThan(final VertexIntervalWithCost other) {
 		VertexIntervalWithCost temp = (VertexIntervalWithCost) other;  
 		
 		boolean isbetter = false;
@@ -146,14 +192,21 @@ public class VertexIntervalWithCost extends VertexInterval {
 	 * @param other The VertexInterval from which the settings are copied
 	 * @return if there is an unusual reason to scan again ... this is never true here, but would be if costs get upgraded  
 	 */
-	public boolean setArrivalAttributes (final VertexInterval other)
+	public boolean setArrivalAttributes (final VertexIntervalWithCost other)
 	{
 		// argh.
 		if (!(other instanceof VertexIntervalWithCost)) return super.setArrivalAttributes(other);
 		
+		boolean needsRescanning = false;
+		
 		VertexIntervalWithCost temp = (VertexIntervalWithCost) other;
 		
 		this.scanned = temp.scanned;
+		
+		if (!this.reachable && other.reachable) {
+			needsRescanning = true;
+		}
+		
 		this.reachable = temp.reachable;
 		if (temp._pred != null) 
 		  this._pred = temp._pred;
@@ -164,7 +217,7 @@ public class VertexIntervalWithCost extends VertexInterval {
 		this.costIsRelative = temp.costIsRelative;
 		this.cost = temp.cost;
 		
-		return false;
+		return needsRescanning;
 	}
 	
 	/**
@@ -176,7 +229,7 @@ public class VertexIntervalWithCost extends VertexInterval {
 	 * @param other VertexInterval to compare to
 	 * @return true iff the intervalls agree on their arrival properties
 	 */
-	public boolean continuedBy(final VertexInterval o) {
+	public boolean continuedBy(final VertexIntervalWithCost o) {
 		// argh.
 		if (!(o instanceof VertexIntervalWithCost)) return super.setArrivalAttributes(o);
 		
@@ -223,5 +276,12 @@ public class VertexIntervalWithCost extends VertexInterval {
 		return true;
 	}
 	
+	
+	@Override
+	public VertexIntervalWithCost splitAt(int t){		
+		Interval j = super.splitAt(t);
+		VertexIntervalWithCost k = new VertexIntervalWithCost(j.getLowBound(), j.getHighBound(), this);
+		return k;
+	}
 	
 }
