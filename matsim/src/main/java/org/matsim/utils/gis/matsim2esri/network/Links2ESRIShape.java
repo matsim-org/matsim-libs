@@ -82,7 +82,8 @@ public class Links2ESRIShape {
 		String netfile = null ;
 		String outputFileLs = null ;
 		String outputFileP = null ;
-		
+		String defaultCRS = "DHDN_GK4";
+		boolean commonWealth = false; //to render Commonwealth networks correctly (e.g. drive on left-hand side of the road)
 		if ( args.length == 0 ) {
 			netfile = "./examples/equil/network.xml";
 //		String netfile = "./test/scenarios/berlin/network.xml.gz";
@@ -93,13 +94,24 @@ public class Links2ESRIShape {
 			netfile = args[0] ;
 			outputFileLs = args[1] ;
 			outputFileP  = args[2] ;
+		} else if ( args.length == 4 ) {
+			netfile = args[0] ;
+			outputFileLs = args[1] ;
+			outputFileP  = args[2] ;
+			defaultCRS   = args[3] ;
+		} else if ( args.length == 5 ) {
+			netfile = args[0] ;
+			outputFileLs = args[1] ;
+			outputFileP  = args[2] ;
+			defaultCRS   = args[3] ;
+			commonWealth = Boolean.parseBoolean(args[4]) ;
 		} else {
 			log.error("Arguments cannot be interpreted.  Aborting ...") ;
 			System.exit(-1) ;
 		}
 		
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
+		scenario.getConfig().global().setCoordinateSystem(defaultCRS);
 
 		log.info("loading network from " + netfile);
 		final NetworkLayer network = scenario.getNetwork();
@@ -112,8 +124,8 @@ public class Links2ESRIShape {
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
 		new Links2ESRIShape(network,outputFileLs, builder).write();
 
-		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		builder.setWidthCoefficient(0.001);
+		CoordinateReferenceSystem crs = MGC.getCRS(defaultCRS);
+		builder.setWidthCoefficient((commonWealth ? -1 : 1) * 0.003);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
