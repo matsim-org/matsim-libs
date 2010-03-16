@@ -1,4 +1,4 @@
-package playground.mmoyo.analysis.comp;
+package playground.mmoyo.TransitSimulation;
 
 import java.io.IOException;
 
@@ -10,19 +10,15 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
-import org.matsim.pt.utils.CreateVehiclesForSchedule;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTValues;
-import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
-import playground.mmoyo.analysis.PTLegIntoPlanConverter;
+import playground.mmoyo.utils.FileCompressor;
+import playground.mmoyo.utils.PlanFragmenter;
+import playground.mmoyo.utils.TransScenarioLoader;
 
 /**reads a config file, routes the transit plans and writes a routed plans file*/
 public class PlanRouter {
@@ -30,15 +26,12 @@ public class PlanRouter {
 	public PlanRouter(ScenarioImpl scenario) {
 
 		//Get rid of only car plans
-		//PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.pt, false ) ;
-		//plansFilter.run(scenario.getPopulation()) ;
-
-		//split pt connections into plans
-		//new PTLegIntoPlanConverter().run(scenario);
+		PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.car, PlansFilterByLegMode.FilterType.removeAllPlansWithMode) ;
+		plansFilter.run(scenario.getPopulation()) ;
 
 		PlansCalcRoute router= null;
-		String routedPlansFile = "../playgrounds/mmoyo/output";
-
+		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory();
+		
 		/**route plans*/
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
@@ -48,23 +41,29 @@ public class PlanRouter {
 		switch (PTValues.routerCalculator){
 			case 1:  //rieser
 				router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += ("/routedPlans_" + PTValues.scenario + ".xml");
+				routedPlansFile += ("/routedPlans_" + PTValues.scenarioName + ".xml");
 				break;
 			case 2:	 //moyo time
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += ("/moyo_routedPlans_time_" + PTValues.scenario + ".xml" );
+				routedPlansFile += ("/moyo_routedPlans_time_" + PTValues.scenarioName + ".xml" );
 				break;
 			case 3:	 //moyo parameterized
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += ("/moyo_routedPlans_parameterized_" + PTValues.scenario + ".xml");
+				routedPlansFile += ("/moyo_routedPlans_parameterized_" + PTValues.scenarioName + ".xml");
 				 break;
 			default:
 		}
 		router.run(scenario.getPopulation());
 
+		//fragment plans
+		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));		
+
 		System.out.println("writing output plan file..." + routedPlansFile);
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()) ;
 		popwriter.write(routedPlansFile) ;
+
+		new FileCompressor().run(routedPlansFile);  
+		
 		System.out.println("done");
 	}
 	
@@ -79,22 +78,9 @@ public class PlanRouter {
 			//configFile = "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/config.xml";
 		}
 
-		/**load scenario */
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
-		ScenarioImpl scenario = scenarioLoader.getScenario();
-		scenario.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-		scenarioLoader.loadScenario();
-	
-		////////load transit schedule by config/////////////////
-		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
-		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
-		/////////////////////////////////////
+		ScenarioImpl scenarioImpl = new TransScenarioLoader ().loadScenario(configFile); 
 		
-		
-		new PlanRouter(scenario);
+		new PlanRouter(scenarioImpl);
 		System.out.println("total duration: " + (System.currentTimeMillis()-startTime));
 	}
 	

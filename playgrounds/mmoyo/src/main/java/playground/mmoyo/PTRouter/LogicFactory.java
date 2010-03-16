@@ -3,19 +3,17 @@ package playground.mmoyo.PTRouter;
 //import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.TreeMap;
+import java.util.LinkedList;
+import java.util.List;
 
-//import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-//import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -26,7 +24,6 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
  * Reads a TransitSchedule and creates from it:
- *-Plain network: A ptNode represent a station. A link represents a simple connection between stations 
  * -logic layer network: with sequences of independent nodes for each TansitLine, includes transfer links
  * -A PTRouter object containing departure information according to the logicTransitSchedule
  * -logicToPlainConverter: translates logic nodes and links into plain nodes and links. 
@@ -36,7 +33,6 @@ public class LogicFactory{
 	private NetworkLayer logicNet= new NetworkLayer();
 	private NetworkLayer plainNet= new NetworkLayer();
 	private LogicIntoPlainTranslator logicToPlainTranslator; 
-	//03 dic private Map<Id,List<PTNode>> facilityNodeMap = new TreeMap<Id,List<PTNode>>(); /* <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
 	
 	long newLinkId=0;
 	long newTransfLinkId=0;
@@ -53,30 +49,23 @@ public class LogicFactory{
 				Node lastLogicNode = null;
 				Node lastPlainNode=null;
 				
-				
-				/**Creates an array of Transit Route departures*/
+				//Creates an array of Transit Route departures
 				int departuresSize= transitRoute.getDepartures().size();
 				double[] departuresArray =new double[departuresSize];
 				int i=0;
 				for (Departure departure : transitRoute.getDepartures().values()){
 					departuresArray[i++]=departure.getDepartureTime();
-					//03 dici++;
 				}
 				
-				//iterates in each transit stop to create nodes and links */
+				//iterates in each transit stop to create nodes and links
 				int transitStopIndex=0;
 				double lastDepartureOffset=0;
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) { 
 					TransitStopFacility transitStopFacility = transitRouteStop.getStopFacility(); 
 					
-					/**Creates nodes*/
-					//plain node
+					//Creates nodes
 					Node plainNode= createPlainNode(transitStopFacility);
 					
-					//logicNode
-					//Coord coord = transitStopFacility.getCoord();			03 dic
-					//Id idStopFacility = transitStopFacility.getId();    03 dic
-					//Id logicId= new IdImpl(newStopId++); 
 					Station logicStation= new Station (new IdImpl(newStopId++), transitStopFacility.getCoord());
 					logicStation.setTransitRoute(transitRoute);
 					logicStation.setTransitLine(transitLine);
@@ -85,19 +74,9 @@ public class LogicFactory{
 					if (transitStopIndex==transitRoute.getStops().size()-1)logicStation.setLastStation(true);
 					logicNet.addNode(logicStation);
 					 
-					//fills the facilityNodeMap to create transfer links
-					/* 03 dic
-					if (!facilityNodeMap.containsKey(idStopFacility)){
-						List<PTNode> nodeStationArray = new ArrayList<PTNode>();
-						facilityNodeMap.put(idStopFacility, nodeStationArray);
-					}
-					facilityNodeMap.get(idStopFacility).add(logicNode);
-					 */
-
-					/**Creates links*/
+					//Creates links
 					if (transitStopIndex>0){
 						Link plainLink= createPlainLink(lastPlainNode, plainNode);
-						//03 dic Id logicLinkId = new IdImpl(newLinkId++);
 						PTLink logicLink = new PTLink(new IdImpl(newLinkId++), lastLogicNode, logicStation, logicNet, PTValues.STANDARD_STR);
 						logicLink.setTravelTime(transitRouteStop.getDepartureOffset() -lastDepartureOffset);
 						logicLink.setPlainLink(plainLink);
@@ -108,7 +87,7 @@ public class LogicFactory{
 						logicStation.setFirstStation(true);
 					}
 
-					/**saves departures in an array for each node*/
+					//saves departures in an array for each node
 					double[] nodeDeparturesArray =new double[departuresSize];
 					for (int j=0; j<departuresSize; j++){
 						double departureTime =departuresArray[j] + transitRouteStop.getDepartureOffset();
@@ -126,27 +105,12 @@ public class LogicFactory{
 			}
 		}
 		
-		//create transfer links
-		/*03 dic
-		for (List<PTNode> chList : facilityNodeMap.values()){ 
-			for (PTNode fromNode : chList) {
-				for (PTNode toNode : chList){ 
-					if (fromNode.getTransitLine() != toNode.getTransitLine()){  //If they belongs to Same Line they won't be joined. This condition also joining the same node
-						if (!fromNode.isFirstStation() && !toNode.isLastStation()){ //make sure that they will joing two standard links
-							new PTLink(new IdImpl("T" + ++newLinkId), fromNode, toNode, logicNet, "Transfer", avWalkSpeed );
-						}
-					}
-				}
-			}
-		}
-		facilityNodeMap = null;
-		*/
 	
-		//create transfer and DetTransfer links
-		
+	
+		//create transfer and DetTransfer links	ORIGINAL
 		final String DETTRANS_PREFIX ="DT";
 		final String TRANS_PREFIX ="T";
-		
+		/* This is the one working, commented only to tyr the compavility of multinode router
 		for (NodeImpl centerNode: logicNet.getNodes().values()){
 			Collection<NodeImpl> nearNodes= logicNet.getNearestNodes(centerNode.getCoord(), PTValues.DETTRANSFER_RANGE );
 			for (NodeImpl nearNode : nearNodes){
@@ -163,6 +127,29 @@ public class LogicFactory{
 				}
 			}
 		}
+		*/
+		
+		////////////Temporarly to match the multinode dikjstra router///////////////////////////////////////////////////////////////////////////////
+		List<Tuple<NodeImpl, NodeImpl>> toBeAdded = new LinkedList<Tuple<NodeImpl, NodeImpl>>();
+		// connect all stops with walking links if they're located less than beelineWalkConnectionDistance from each other
+		for (NodeImpl node : logicNet.getNodes().values()) {
+			if (node.getInLinks().size() > 0) { // only add links from this node to other nodes if agents actually can arrive here
+				for (NodeImpl node2 : logicNet.getNearestNodes(node.getCoord(), PTValues.DETTRANSFER_RANGE)) {
+					if ((node != node2) && (node2.getOutLinks().size() > 0)) { // only add links to other nodes when agents can depart there
+						Station fromNode= (Station)node;
+						Station toNode =  (Station)node2;
+						if ((fromNode.getTransitLine() != toNode.getTransitLine()) || (fromNode.getTransitStopFacility() != toNode.getTransitStopFacility())) {
+							// do not yet add them to the network, as this would change in/out-links
+							toBeAdded.add(new Tuple<NodeImpl, NodeImpl>(node, node2));
+						}
+					}
+				}
+			}
+		}
+		for (Tuple<NodeImpl, NodeImpl> tuple : toBeAdded) {
+			new PTLink(new IdImpl(TRANS_PREFIX + ++newTransfLinkId), tuple.getFirst(), tuple.getSecond(), logicNet, PTValues.TRANSFER_STR);
+		}
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		System.out.println("duration of logic net creation: " + (System.currentTimeMillis()-startTime));
 	}

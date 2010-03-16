@@ -1,4 +1,4 @@
-package playground.mmoyo.analysis.comp;
+package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -54,9 +54,9 @@ public class PlanRepeater {
 			population.addPerson(personClon);
 		}
 		
-		//write this strange plan in output
+		//write this strange population in output
 		System.out.println("writing output plan file...");
-		new PopulationWriter(population, scenarioImpl.getNetwork()).writeFile("../playgrounds/mmoyo/output/repeatedPlans" + repetitions + ".xml");
+		new PopulationWriter(population, scenarioImpl.getNetwork()).writeFile(scenarioImpl.getConfig().controler().getOutputDirectory() + repetitions + ".xml");
 		System.out.println("Done");
 	
 	}

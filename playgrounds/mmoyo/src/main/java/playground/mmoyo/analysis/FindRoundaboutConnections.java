@@ -14,7 +14,8 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.mmoyo.PTRouter.PTValues;
-import playground.mmoyo.analysis.comp.PlanRouter;
+import playground.mmoyo.TransitSimulation.PlanRouter;
+import playground.mmoyo.utils.TransScenarioLoader;
 
 /**finds connections with transfer point that are farther than the destination point **/ 
 public class FindRoundaboutConnections {
@@ -72,7 +73,8 @@ public class FindRoundaboutConnections {
 	}
 	
 	public static void main(String[] args) {
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/fragmented/config/config_routedPlans_MoyoParameterized.xml";
+		//String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/fragmented/config/config_routedPlans_MoyoParameterized.xml";
+		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/fragmented/config/config_routedPlans.xml";
 		//if (args[0]!= null) configFile = args[0];
 		
 		ScenarioImpl scenario = new TransScenarioLoader().loadScenario(configFile);
@@ -80,7 +82,7 @@ public class FindRoundaboutConnections {
 		
 		System.out.println("writing detoured population plan file in output folder..." );
 		PopulationWriter popwriter = new PopulationWriter(detouredPopulation, scenario.getNetwork());
-		popwriter.write("../playgrounds/mmoyo/output/detouredPopulation60.xml") ;
+		popwriter.write(scenario.getConfig().controler().getOutputDirectory() + "/detouredPopulation60.xml") ;
 		System.out.println("done");
 	}
 	

@@ -1,4 +1,4 @@
-package playground.mmoyo.analysis.comp;
+package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;

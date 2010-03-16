@@ -1,24 +1,4 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * ScenarioPlayer.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
-package playground.mmoyo.analysis.counts;
+package playground.mmoyo.analysis.counts.rieser;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -86,10 +66,6 @@ public class OccupancyCounts {
 					System.out.println("		route : "  +  route.getId());
 				}
 		}
-		
-		
-		
-		
 		//////////////////
 		
 		EventsManagerImpl events = new EventsManagerImpl();
@@ -137,7 +113,7 @@ public class OccupancyCounts {
 		}
 	
 		try { 
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("../playgrounds/mmoyo/output/" + new File( scenario.getConfig().plans().getInputFile() ).getName() + "_counts.txt")); 
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(scenario.getConfig().controler().getOutputDirectory() + "/" + new File( scenario.getConfig().plans().getInputFile() ).getName() + "_counts.txt")); 
 			 for(i = 0; i < data.length; i++) {
 	              bufferedWriter.write(data[i]);
 	        }    
@@ -149,7 +125,5 @@ public class OccupancyCounts {
 		} catch (IOException e) {
 			
 		} 
-		
 	}
-
 }

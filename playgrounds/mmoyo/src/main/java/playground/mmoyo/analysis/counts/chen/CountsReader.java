@@ -27,34 +27,32 @@ public class CountsReader {
 	}
 	
 	private void readValues(){
-		  try {
-			  FileReader fileReader =  new FileReader(this.countsTextFile);
-			  //TODO:correct this : reads first row 
-			  BufferedReader bufferedReader = new BufferedReader(fileReader);
-			  String row = bufferedReader.readLine();		//TODO : include the first row inside the iteration 
-			  String[] values = row.split(SEPARATOR);				
-			  Id id= new IdImpl (values[1]);
-			  while(row != null) {
-				  row = bufferedReader.readLine();
-				  	if(row != null && row != NULL_STRING) {				
-				  		values = row.split(SEPARATOR); 
-				  		if (values[0].equals(STOP_ID_STRING_0)){     
-				  			id = new IdImpl (values[1]);
-				  		}else if (values[0].equals(HEAD_STRING_0)){    
-				  			//it does nothing, correct this condition	
-				  		}else{
-						    	if (!count.containsKey(id)){
-					    		count.put(id, new TreeMap< String, double[]>() );   
-					    	}
-					    	count.get(id).put(values[0], new double[] {Double.parseDouble(values[3]), Double.parseDouble(values[2])} );
-
-				  		}
-				  	}
-			 }
-			  bufferedReader.close();
-			  fileReader.close();
-
-	    }catch(Exception e) { 
+		try {
+			FileReader fileReader =  new FileReader(this.countsTextFile);
+			//->:correct this : reads first row 
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			String row = bufferedReader.readLine();		//TODO : include the first row inside the iteration 
+			String[] values = row.split(SEPARATOR);				
+			Id id= new IdImpl (values[1]);
+			while(row != null) {
+				row = bufferedReader.readLine();
+				if(row != null && row != NULL_STRING) {				
+					values = row.split(SEPARATOR); 
+					if (values[0].equals(STOP_ID_STRING_0)){     
+						id = new IdImpl (values[1]);
+					}else if (values[0].equals(HEAD_STRING_0)){    
+					  //it does nothing, correct this condition	
+					}else{
+						if (!count.containsKey(id)){
+							count.put(id, new TreeMap< String, double[]>() );   
+						}
+						count.get(id).put(values[0], new double[] {Double.parseDouble(values[3]), Double.parseDouble(values[2])} );
+					}
+				}
+			}
+			bufferedReader.close();
+			fileReader.close();
+		}catch(Exception e) { 
 	    	System.out.println(e.toString());
 	    	e.printStackTrace();
 	    }

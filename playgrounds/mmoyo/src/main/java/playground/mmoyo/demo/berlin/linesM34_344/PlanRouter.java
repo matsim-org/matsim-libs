@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.EventsManagerFactoryImpl;
@@ -14,23 +13,18 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
-import playground.mrieser.OTFDemo;
+import playground.mmoyo.utils.TransScenarioLoader;
 
-@Deprecated
 public class PlanRouter {
 
-	private static final String SERVERNAME = "ScenarioPlayer";
 	private boolean useMoyoRouter  = true;     //true= PtRouter(MMoyo)   false= transitRouter
 
 	public PlanRouter(ScenarioImpl scenario) {
@@ -81,12 +75,6 @@ public class PlanRouter {
 		}
 
 		/**load scenario */
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
-		ScenarioImpl scenario = scenarioLoader.getScenario();
-		scenario.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-		scenarioLoader.loadScenario();
-		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
-		//new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getVehicles()).run();
-		new PlanRouter(scenario);
+		new PlanRouter(new TransScenarioLoader().loadScenario(configFile));
 	}
 }

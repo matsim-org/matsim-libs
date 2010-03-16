@@ -1,4 +1,4 @@
-package playground.mmoyo.analysis;
+package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -14,17 +16,17 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.PtConstants;
 
-/**Plan fragmenter: reads a plan with pt-plans and convert each pt-connection into a plan, each new plan has a index suffix*/
-public class PTLegIntoPlanConverter {
+/**reads a pt routed population and convert each pt-connection into a plan, each new plan has a index suffix*/
+public class PlanFragmenter {
 
-	public PTLegIntoPlanConverter() {
+	public PlanFragmenter() {
 	}
 	
-	public void run(ScenarioImpl scenario){
+	public PopulationImpl run(Population population){
 		ScenarioImpl tempScenario =new ScenarioImpl();
 		PopulationImpl newPopulation = new PopulationImpl(tempScenario);
 
-		for (Person person : scenario.getPopulation().getPersons().values()) {
+		for (Person person : population.getPersons().values()) {
 			char suffix = 'a';
 			Person clonPerson=null;
 			Plan newPlan=null;
@@ -61,19 +63,25 @@ public class PTLegIntoPlanConverter {
 				}
 			}
 		}
-
-		scenario.setPopulation(newPopulation);
-		tempScenario= null;
+		//tempScenario= null;
+		return newPopulation;
 	}
 
 	public static void main(String[] args) {
-		String configFile = args[0];
-		//String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/routed_plans/routed_configs/config_900s_small_rieser.xml";
+		//String configFile = args[0];
+		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_5x_subset_xy2links_ptplansonly/config/config_Berlin5x_moyo.xml";
 
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
-		new PTLegIntoPlanConverter().run(scenario);
+		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));
+		
+		String outputFile = "../playgrounds/mmoyo/output/Berlin5x_20_moyo85_15Fragmented.xml";
+		System.out.println("writing output plan file..." + outputFile);
+		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
+		popwriter.write(outputFile) ;
+		System.out.println("done");
+		
 	}
 
 }

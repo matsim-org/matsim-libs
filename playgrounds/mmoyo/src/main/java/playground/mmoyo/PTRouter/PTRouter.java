@@ -62,6 +62,9 @@ public class PTRouter{
 		this.destinationNode=  new Station(new IdImpl(DESTINATION_ID), firstCoord);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
 		this.logicNet.addNode(originNode);
 		this.logicNet.addNode(destinationNode);
+		
+		System.out.println("logicNet.getNodes():" + logicNet.getNodes().size());
+		System.out.println("logicNet.getLinks():" + logicNet.getLinks().size());
 	}
 
 	/**Calculates pt route between acts*/
@@ -133,9 +136,9 @@ public class PTRouter{
 		originNode.setCoord(coord1);
 		destinationNode.setCoord(coord2);
 
-		Collection <NodeImpl> nearOriginStops = findnStations (originNode);
-		Collection <NodeImpl> nearDestinationStops = findnStations (destinationNode);
-
+		Collection <NodeImpl> nearOriginStops = find2Stations (originNode);
+		Collection <NodeImpl> nearDestinationStops = find2Stations (destinationNode);
+		
 		nearOriginStops.remove(destinationNode);
 		nearDestinationStops.remove(originNode);
 
@@ -152,22 +155,35 @@ public class PTRouter{
 		}
 		//logicNet.removeNode(origin);
 		//logicNet.removeNode(destination);
-		//System.out.println("route search duration: " + (System.currentTimeMillis()-startTime));
 		return path;
 	}
 
-	/** looks for  a number of near stations around a node*/
+	/**looks for a number of near stations around a node*/
 	private Collection <NodeImpl> findnStations(final NodeImpl node){
 		Collection <NodeImpl> nearStations;
 		double walkRange = PTValues.FIRST_WALKRANGE;
 		do{
 			nearStations = logicNet.getNearestNodes(node.getCoord(), walkRange);  //walkRange
-			walkRange += 300;
+			walkRange += PTValues.WALKRANGE_EXT;
 		} while (nearStations.size()<PTValues.INI_STATIONS_NUM);
 		nearStations.remove(node);
 		return nearStations;
 	}
 
+	//looks at least two stations, this is to match the multiNodeDijstra router
+	private Collection <NodeImpl> find2Stations (final Node node){   
+		Collection <NodeImpl> nearStations = logicNet.getNearestNodes(node.getCoord(), PTValues.FIRST_WALKRANGE);  //walkRange
+		if (nearStations.size() < 2) {
+			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
+			Node nearestNode = this.logicNet.getNearestNode(node.getCoord());
+			double distance = CoordUtils.calcDistance(node.getCoord(), nearestNode.getCoord());
+			nearStations = logicNet.getNearestNodes(node.getCoord(), distance + PTValues.WALKRANGE_EXT);
+		}
+		nearStations.remove(node);
+		return nearStations; 
+	}
+	
+	
 	public List <LinkImpl> createWalkingLinks(NodeImpl walkNode, Collection <NodeImpl> nearNodes, boolean to){
 		List<LinkImpl> newWalkLinks = new ArrayList<LinkImpl>();
 		int x=0;
@@ -283,39 +299,6 @@ public class PTRouter{
 		}
 	}
 
-
-	///////////////////////////////// Methods for Counter/////////////////
-	double timeCoeficient;
-	double distanceCoeficient;
-	double transferPenalty;
-
-	public PTRouter(final NetworkLayer logicNet, final double timeCoeficient, final double distanceCoeficient, final double transferPenalty) {
-		this.logicNet = logicNet;
-		this.ptTravelTime =new PTTravelTime();
-		this.ptTravelCost = new PTTravelCost(ptTravelTime, timeCoeficient, distanceCoeficient, transferPenalty);
-		this.timeCoeficient = timeCoeficient;
-		this.distanceCoeficient = distanceCoeficient;
-		this.transferPenalty = transferPenalty;
-		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);
-		this.originNode=  new Station(new IdImpl(ORIGIN_ID), null);		//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
-		this.destinationNode=  new Station(new IdImpl(DESTINATION_ID), null);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
-		this.logicNet.addNode(originNode);
-		this.logicNet.addNode(destinationNode);
-
-	}
-
-	public double getTimeCoeficient(){
-		return this.timeCoeficient;
-	}
-
-	public double getDistanceCoeficient(){
-		return this.distanceCoeficient;
-	}
-
-	public double getTransferPenalty(){
-		return this.transferPenalty;
-	}
-	////////////////////////////////////////////////////////////////////////////////////////
 
 }
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans>
+<!-- ====================================================================== -->
+	<person id="1">
+		<plan>
+			<act type="h" x="1150.0" y="1100.0" link="20" end_time="07:55:00" />
+			<leg mode="pt" />
+			<act type="w" x="8850.0" y="8900.0" link="19"/>
+		</plan>	
+	</person>
+ <!-- ====================================================================== -->
+</plans>

@@ -26,19 +26,24 @@ public class PTTravelTime implements TravelTime {
 			waitingTime= getTransferTime((Station)link.getToNode(), time + ptLink.getWalkTime());
 			travelTime= ptLink.getWalkTime() + waitingTime; 
 			break;
+		
 		case 3:  //"Transfer"
 			travelTime= getTransferTime((Station)link.getToNode(),time); //2 minutes to allow the passenger walk between ptv's!!!!! 
 			break;
+		
 		case 2: //  "Standard"
 			travelTime = ptLink.getTravelTime(); // it is stored in seconds
 			break;
+		
 		case 1:   //access
 			waitingTime= getTransferTime((Station)link.getToNode(), time + ptLink.getWalkTime());
 			travelTime= ptLink.getWalkTime() + waitingTime; 
 			break;
+	
 		case 5: //"Egress" 
 			travelTime= ptLink.getWalkTime();
 			break;
+	
 		default:
 			 throw new NullPointerException("The link does not have a defined type" + link.getId());
 		}
@@ -70,11 +75,10 @@ public class PTTravelTime implements TravelTime {
 		return transferTime;
 	}
 
-	/**
+	/*
 	*A binary search returns the next departure in a node after a given time 
-	*If the time is greater than the last departure, 
-	*returns the first departure(of the next day)*/
-	public double nextDepartureB(Station node,  double time){//,
+	*If the time is greater than the last departure, returns the first departure(of the next day)*/
+	public double nextDepartureB(Station node,  double time){
 		double[]arrDep= node.getArrDep();
 		int length = arrDep.length;
 		int index =  Arrays.binarySearch(arrDep, time);

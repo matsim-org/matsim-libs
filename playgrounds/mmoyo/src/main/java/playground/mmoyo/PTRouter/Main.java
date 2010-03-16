@@ -155,10 +155,6 @@ public class Main {
 				
 				break;
 			
-			case 10:
-				/**shows statistics of population routing */
-				TravParameterAnalysis counter= new TravParameterAnalysis(PLANFILE, logicFactory);
-				break;
 			case 11:
 				new TransitRouteValidator(transitSchedule);
 				break;

@@ -88,8 +88,8 @@ public class ScenarioPlayer {
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
 		final EventsManager events = (new EventsManagerFactoryImpl()).createEventsManager() ;
-		EventWriterXML writer = new EventWriterXML("../playgrounds/mmoyo/output/testEvents.xml");
-		EventWriterTXT writertxt = new EventWriterTXT("../playgrounds/mmoyo/output/testEvents.txt");
+		EventWriterXML writer = new EventWriterXML(scenario.getConfig().controler().getOutputDirectory() + "/testEvents.xml");
+		EventWriterTXT writertxt = new EventWriterTXT(scenario.getConfig().controler().getOutputDirectory() + "/testEvents.txt");
 		events.addHandler(writer);
 		events.addHandler(writertxt);
 
