@@ -181,7 +181,7 @@ public class StepSinkFlow implements PathStep {
 	public PathStep copyShiftedToArrival(int newArrival) {
 		// forward ... always arrives at 0/TimeHorizon/whenever the sink is
 		if (this.forward) {
-		  return new StepSinkFlow(this.node, this.time, true);
+			return new StepSinkFlow(this.node, this.time, true);
 		}
 		
 		// residual ...  update when the reverse flow exits the sink

@@ -281,6 +281,7 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 				// set the attributes and maybe there is a reason to scan again
 				// note: this is not flexible enough for a full mixed search ...
 				// but that could probably be done quicker in two passes anyway
+				
 				if (current.setArrivalAttributes(arrive)) {
 					needsScanning = true;
 				}

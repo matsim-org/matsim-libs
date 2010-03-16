@@ -79,7 +79,8 @@ public class FlowCalculationSettings {
 	private HashMap<Node, Integer> _demands;
 	private int _totaldemandsources;
 	private int _totaldemandsinks;
-	
+	private int _numsources;
+	private int _numsinks;
 	
 	private int _roundedtozerocapacity;
 	private int _roundedtozerolength;	
@@ -178,13 +179,17 @@ public class FlowCalculationSettings {
 	private void setDemands() {
 		this._totaldemandsources = 0;
 		this._totaldemandsinks = 0;
+		this._numsources = 0;
+		this._numsinks = 0;
 		for (Node node : this._network.getNodes().values()) {
 			Integer i = this._demands.get(node);
 			if (i != null) {
 				if (i > 0) {
 					this._totaldemandsources += i;
-				} else {
+					this._numsources++;
+				} else if (i < 0) {
 					this._totaldemandsinks += -i;
+					this._numsinks++;
 				}
 				
 			}
@@ -195,6 +200,7 @@ public class FlowCalculationSettings {
 	public void printStatus() {
 		System.out.println("==== Flow Calculation Settings ====");		
 		System.out.println("Network has " + this._network.getNodes().size() + " nodes and " + this._network.getLinks().size() + " edges.");
+		System.out.println("Number sources: " + this._numsources + " | sinks: " + this._numsinks);
 		System.out.println("Total demand sources: " + this._totaldemandsources + " | sinks: " + this._totaldemandsinks);
 		System.out.println("Time Horizon: " + this.TimeHorizon);
 		System.out.println("Timestep: " + this._timeStep);		

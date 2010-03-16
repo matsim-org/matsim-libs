@@ -76,7 +76,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	@Override
 	void refreshLabelsForward(Queue<BFTask> queue) {
 		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
-		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
+		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._flow.getSources().size() / 2);
+		this._sinklabels = new HashMap<Node, VertexInterval>(3 * this._flow.getSinks().size() / 2);
+
 
 		for (Node node : this._network.getNodes().values()) {
 			VertexIntervalWithCost temp1 = new VertexIntervalWithCost(0, this._settings.TimeHorizon);
@@ -88,11 +90,18 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 					queue.add(new BFTask(new VirtualSource(node), temp2, false));
 					temp2.setScanned(false);
 					temp2.setReachable(true);
+					temp2.costIsRelative = false;
+					temp2.cost = 0;
 				} else {
 					temp2.setScanned(false);
 					temp2.setReachable(false);
 				}
 				this._sourcelabels.put(node, temp2);
+			}
+			
+			if (this._settings.isSink(node)) {
+				VertexIntervalWithCost temp2 = new VertexIntervalWithCost(0, this._settings.TimeHorizon);								
+				this._sinklabels.put(node, temp2);
 			}
 		}
 	}
@@ -104,7 +113,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	@Override
 	void refreshLabelsReverse(Queue<BFTask> queue) {
 		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
-		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
+		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._flow.getSources().size() / 2);
+		this._sinklabels = new HashMap<Node, VertexInterval>(3 * this._flow.getSinks().size() / 2);
 
 		for (Node node : this._network.getNodes().values()) {
 			VertexIntervalWithCost temp1 = new VertexIntervalWithCost(0, this._settings.TimeHorizon);
@@ -118,7 +128,14 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			}
 
 			if (this._settings.isSink(node)) {
-				queue.add(new BFTask(new VirtualSink(node), 0, true));
+				VertexIntervalWithCost temp2 = new VertexIntervalWithCost(0, this._settings.TimeHorizon);
+				temp2.costIsRelative = false; // all entering times have 0 cost, but the next step will set the correct cost
+				temp2.cost = 0; // no cost yet.
+				if (this._flow.isActiveSink(node)) {
+					queue.add(new BFTask(new VirtualSink(node), 0, true));
+					temp2.setReachable(true);										
+				}				
+				this._sinklabels.put(node, temp2);
 			}
 		}
 	}
@@ -154,6 +171,13 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				this._settings.TimeHorizon);
 		arrive.setPredecessor(pred);
 		arrive.setReachable(true);
+		
+		// Set the cost
+		// Since the outgoing arcs have costs corresponding to their arrival time,
+		// this is a relative cost modified by the absolute cost of the source.
+		arrive.costIsRelative = true;
+		arrive.cost = inter.getAbsoluteCost(0);
+		
 		ArrayList<VertexInterval> changed = this._labels.get(v).setTrueList(arrive);
 		for (VertexInterval changedintervall : changed) {
 			queue.add(new BFTask(new VirtualNormalNode(v, 0), changedintervall, false));
@@ -199,12 +223,15 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		}
 
 		List<BFTask> queue = new ArrayList<BFTask>();
+		
+		// we need a representative of the interval to determine the cost
+		VertexIntervalWithCost label = (VertexIntervalWithCost) this._labels.get(v).getIntervalAt(inter.getLowBound());		
 
 		// visit neighbors
 		// link is outgoing edge of v => forward edge
 		for (Link link : v.getOutLinks().values()) {
 			Node w = link.getToNode();
-			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, true, false, this._settings.TimeHorizon);
+			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, true, false, this._settings.TimeHorizon, label.cost, label.costIsRelative);
 			if (changed == null)
 				continue;
 
@@ -216,7 +243,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		// link is incoming edge of v => backward edge
 		for (Link link : v.getInLinks().values()) {
 			Node w = link.getFromNode();
-			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, false, false, this._settings.TimeHorizon);
+			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, false, false, this._settings.TimeHorizon,label.cost, label.costIsRelative);
 			if (changed == null)
 				continue;
 
@@ -233,18 +260,47 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				SourceIntervals si = this._flow.getSourceOutflow(v);
 				Interval arrive = si.canSendFlowBack(inter);
 				if (arrive != null) {
-
-					// indeed, we need to process this source
+					// we could reach the source
 					VertexIntervalWithCost temp = new VertexIntervalWithCost(0, this._settings.TimeHorizon);
-					temp.setScanned(false);
-					temp.setReachable(true);
-
-					queue.add(new BFTask(new VirtualSource(v), temp, false));
-
+					
+					temp.costIsRelative = false;
+					// the earliest time is the cheapest
+					temp.cost = label.getAbsoluteCost(arrive.getLowBound());
+					
 					StepSourceFlow pred = new StepSourceFlow(v, arrive.getLowBound(), false);
+					temp.setArrivalAttributesForward(pred);
+					
 					VertexIntervalWithCost sourcelabel = (VertexIntervalWithCost) this._sourcelabels.get(v);
-					sourcelabel.setArrivalAttributesForward(pred);
+					
+					// is it worth updating?
+					if (temp.isBetterThan(sourcelabel) != null) {
+						sourcelabel.setArrivalAttributes(temp);
+						queue.add(new BFTask(new VirtualSource(v), temp, false));
+					}
 				}
+			}
+		}
+		
+		// treat sinks
+		if (this._settings.isSink(v)) {
+			// the first time when we can go to the sink will also be the cheapest!
+			int reachsink = inter.getLowBound();
+			
+			VertexIntervalWithCost oldlabel = (VertexIntervalWithCost) this._sinklabels.get(v);
+			
+			// this recreates the right interval for the sink
+			// does it really call the right method, though?
+			VertexIntervalWithCost newlabel = new VertexIntervalWithCost((Interval) oldlabel);
+			
+			PathStep pred = new StepSinkFlow(v, reachsink, true);
+
+			newlabel.setArrivalAttributesForward(pred);
+			newlabel.costIsRelative = false;
+			newlabel.cost = ((VertexIntervalWithCost) this._labels.get(v).getIntervalAt(reachsink)).getAbsoluteCost(reachsink);
+						
+			if (newlabel.isBetterThan(oldlabel) != null) {
+				oldlabel.setArrivalAttributes(newlabel);
+				queue.add(new BFTask(new VirtualSink(v), reachsink, false));
 			}
 		}
 
@@ -373,8 +429,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		for (Link link : v.getInLinks().values()) {
 			Node w = link.getFromNode();
 
+			// FIXME update to costs
 			ArrayList<VertexInterval> changed = relabel(v, inter, w, link,
-					true, true, this._settings.TimeHorizon);
+					true, true, this._settings.TimeHorizon, -1000, false);
 
 			if (changed == null)
 				continue;
@@ -389,8 +446,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		for (Link link : v.getOutLinks().values()) {
 			Node w = link.getToNode();
 
+			// FIXME update to costs
 			ArrayList<VertexInterval> changed = relabel(v, inter, w, link,
-					false, true, this._settings.TimeHorizon);
+					false, true, this._settings.TimeHorizon, -1000, false);
 
 			if (changed == null)
 				continue;
@@ -446,6 +504,56 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		return new Pair<List<BFTask>, Interval>(queue, inter);	
 	}
 
+	/**
+	 * Scans a sink in the forward search. 
+	 * @param v the sink we are looking at
+	 * @return
+	 */
+	protected List<BFTask> processSinkForward(Node v) {
+		VertexIntervalWithCost label = (VertexIntervalWithCost) this._sinklabels.get(v);
+		
+		if (label.isScanned() || !label.getReachable()) {
+			System.out.println("Sink " + v.getId()
+					+ " was already scanned or not reachable ...");
+			return null;
+		}
+		label.setScanned(true);
+		
+		// active sinks do not need to propagate anything
+		if (this._flow.isActiveSink(v)) {				
+			this._totalnonpolls++;
+			this._roundnonpolls++;
+			return null;
+		} 
+		
+		// So this is a nonactive sink.
+
+		ArrayList<Interval> sendBackWhen = this._flow.getSinkFlow(v).canSendFlowBackAll(this._settings.TimeHorizon);
+
+		// predecessor depends on the time, but should get adjusted
+		PathStep pred = new StepSinkFlow(v, 0, false);
+		
+		VertexIntervalWithCost arriveProperties = new VertexIntervalWithCost();
+		arriveProperties.setArrivalAttributesForward(pred);
+		
+		// Set the cost
+		// The arcs to the sinks do not have costs, so the cost is absolute.
+		arriveProperties.costIsRelative = false;
+		arriveProperties.cost = label.getAbsoluteCost(0); 
+			
+		ArrayList<VertexInterval> changed = this._labels.get(v).setTrueList(sendBackWhen, arriveProperties);
+		
+		if (changed == null)
+			return null;
+
+		List<BFTask> queue = new ArrayList<BFTask>();
+
+		for (VertexInterval changedintervall : changed) {
+			queue.add(new BFTask(new VirtualNormalNode(v, changedintervall.getLowBound()), changedintervall, true));
+		}
+		return queue;
+	}
+
 	@Override
 	protected List<BFTask> processSinkReverse(Node v, int lastArrival) {
 		// we want to arrive at lastArrival
@@ -484,6 +592,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		// nonactive sources are just transit nodes, and need to scan residual
 		// edges.
 		if (!this._flow.isNonActiveSource(v)) {
+			this._totalnonpolls++;
+			this._roundnonpolls++;
 			return null;
 		}
 
@@ -497,8 +607,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		}
 		inter.setScanned(true);
 
-		ArrayList<Interval> sendBackWhen = this._flow.getSourceOutflow(v)
-				.canSendFlowBackAll(this._settings.TimeHorizon);
+		ArrayList<Interval> sendBackWhen = this._flow.getSourceOutflow(v).canSendFlowBackAll(this._settings.TimeHorizon);
 
 		// successor depends on the time, but should get adjusted
 
@@ -517,6 +626,11 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		}
 		return queue;
 	}
+	
+	@Override
+	public List<TimeExpandedPath> doCalculationsMixed(int lastArrival) {
+		throw new RuntimeException("Mixed search with cost is not supported!");
+	}
 
 	/**
 	 * main bellman ford algorithm calculating a shortest TimeExpandedPath
@@ -525,6 +639,12 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	 *         if it exists
 	 */
 	public List<TimeExpandedPath> doCalculationsForward() {
+		/* The essential idea is that the costs are on all edges,  
+		 * but not on the edges into the sink.
+		 * Putting the costs just on the edges into the sinks would be okay as well,
+		 * but does not work with the data structures. (Relative costs would decrease
+		 * instead of increase.)
+		 */
 		if (_debug > 0) {
 			System.out.println("Running BellmanFord in Forward mode with Costs.");
 		} else {
@@ -574,20 +694,23 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
 			Node v = task.node.getRealNode();
 
-			if (this._settings.isSink(v)) {
-				/* keep scanning until strictly later to give more sinks a
-				 chance to be found!
-				 despite the priority queue, this could be called multiple times:
-				 all current intervalls could be at cutofftime, but still have a
-				 residual edge to scan, which will lead to an earlier
-				 discovery of the sink */
-				if (task.time < cutofftime) {
+			if (task.node instanceof VirtualSink) {
+				// TODO check ... is this still okay with costs (due to capacitated sinks)?
+				// we always lower the best arrival time when we reach an active sink
+				if (task.time < cutofftime && this._flow.isActiveSink(v)) {
 					cutofftime = task.time;
 					if (_debug > 0) {
 						System.out.println("Setting new cutoff time: "
 								+ cutofftime);
 					}
 				}
+				
+				List<BFTask> tempqueue = processSinkForward(v);
+				
+				if (tempqueue != null) {
+					queue.addAll(tempqueue);
+				}
+
 			} else if (task.node instanceof VirtualSource) {
 				// send out of source v
 
@@ -664,19 +787,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			System.out.println("Removed " + gain + " intervals.");
 		}
 
-		// System.out.println("final labels: \n");
-		// printStatus();
-
-		// BIG DEBUG FIXME remove again
-		// check if all labels have the correct type
-		for (Node node : this._labels.keySet()) {
-			VertexIntervalsWithCost label = (VertexIntervalsWithCost) this._labels.get(node);
-			VertexIntervalWithCost i = (VertexIntervalWithCost) label.getIntervalAt(0);
-			while (!label.isLast(i)) {
-				i = (VertexIntervalWithCost) label.getNext(i);
-			}
-		}
-		// END OF BIG DEBUG
+		//System.out.println("final labels: \n");
+		//printStatus();
 
 		List<TimeExpandedPath> TEPs = null;
 		try {
@@ -1023,7 +1135,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	 */
 	void printStatus() {
 		StringBuilder print = new StringBuilder();
-		print.append("Regular lables");
+		print.append("Regular lables\n");
 		for (Node node : this._network.getNodes().values()) {
 			VertexIntervalsWithCost inter = (VertexIntervalsWithCost) this._labels
 					.get(node);
@@ -1038,9 +1150,15 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			 */
 		}
 
-		print.append("Source labels");
+		print.append("Source labels\n");
 		for (Node node : this._flow.getSources()) {
 			VertexIntervalWithCost inter = (VertexIntervalWithCost) this._sourcelabels
+					.get(node);
+			print.append(node.getId().toString() + " " + inter + "\n");
+		}
+		print.append("Sink labels\n");
+		for (Node node : this._flow.getSinks()) {
+			VertexIntervalWithCost inter = (VertexIntervalWithCost) this._sinklabels
 					.get(node);
 			print.append(node.getId().toString() + " " + inter + "\n");
 		}
@@ -1095,8 +1213,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	}
 
 	/**
-	 * method for updating the labels of Node to during one iteration of the
-	 * algorithm
+	 * Method for updating the labels of node "to" during one iteration of the
+	 * algorithm.
 	 * 
 	 * @param from
 	 *            a Task with a VertexInterval
@@ -1108,14 +1226,18 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	 * @param over
 	 *            Link upon which we travel
 	 * @param original
-	 *            indicates, weather we use an original or residual edge
+	 *            indicates, whether we use an original or residual edge
 	 * @param reverse
 	 *            Is this for the reverse search?
+	 * @param timehorizon
+	 * 			  The time horizon to consider.
+	 * @param cost, costIsRelative
+	 * 		      The cost at the "from" node.
 	 * @return null or the list of labels that have changed
 	 */
 	private ArrayList<VertexInterval> relabel(Node from, Interval ival,
 			Node to, Link over, boolean original, boolean reverse,
-			int timehorizon) {
+			int timehorizon, int cost, boolean costIsRelative) {
 		VertexIntervals labelto = (VertexIntervalsWithCost) _labels.get(to);
 		EdgeIntervals flowover = this._flow.getFlow(over);
 		ArrayList<VertexInterval> changed;
@@ -1134,6 +1256,22 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				pred = new StepEdge(over, this._settings.getLength(over), 0, original);
 			}
 			arriveProperties.setPredecessor(pred);
+			
+			// Set the cost
+			// it is always of the same type
+			arriveProperties.costIsRelative = costIsRelative;
+			arriveProperties.cost = cost;
+			
+			// relative cost does not have to be adjusted by time
+			// absolute cost must be adjusted
+			if (!costIsRelative) {
+				if (original) {
+					arriveProperties.cost += this._settings.getLength(over);
+				} else {
+					arriveProperties.cost -= this._settings.getLength(over);
+				}
+			}
+			
 		} else {
 			// Create successor. It is not shifted correctly.
 			PathStep succ;
@@ -1143,6 +1281,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				succ = new StepEdge(over, this._settings.getLength(over), 0, original);
 			}
 			arriveProperties.setSuccessor(succ);
+			
+			// FIXME cost is missing
 		}
 
 		arrive = flowover.propagate(ival, original, reverse, timehorizon);
@@ -1155,5 +1295,281 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		}
 
 	}
+	
+	/**
+	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
+	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
+	 */
+	@Override
+	List<TimeExpandedPath> constructRoutesForward() throws BFException {
+				
+		if (_debug > 0) {
+		  System.out.println("Constructing routes with cost ...");
+		}
+		
+		// HashSet does not seem to be deterministic! Don't use it. 
+		//Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
+		LinkedList<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
+		
+		// find the minimum cost to reach a sink
+		int mincost = Integer.MAX_VALUE;		
+
+		for (Node superSink : this._flow.getSinks()) {
+			if (this._flow.isNonActiveSink(superSink)) {
+				// we cannot go here
+				continue;
+			}
+			VertexIntervalWithCost superSinkLabel = (VertexIntervalWithCost) this._sinklabels.get(superSink);
+			mincost = Math.min(mincost, superSinkLabel.getAbsoluteCost(0));						
+		}
+		
+		if (mincost == Integer.MAX_VALUE) {
+		  throw new BFException("Sink cannot be reached!");
+		}
+		
+		// FIXME handle timehorizon ..
+		// FIXME handle stepsinkflows 
+		
+		for (Node superSink : this._flow.getSinks()) {
+
+			if (this._flow.isNonActiveSink(superSink)) {
+				// we cannot go here
+				continue;
+			}
+			
+			VertexIntervalWithCost superSinkLabel = (VertexIntervalWithCost) this._sinklabels.get(superSink);
+			
+			if (!superSinkLabel.getReachable() || mincost < superSinkLabel.getAbsoluteCost(0)) {
+				// this sink is not the best destination
+				continue;
+			}
+
+			int superSinkTime = superSinkLabel.getPredecessor().getStartTime();
+			
+			// collect all reachable sinks, that are connected by a zero transit time
+			LinkedList<Node> realSinksToSendTo = new LinkedList<Node>();
+			HashMap<Node, Link> edgesToSuperSink = new HashMap<Node, Link>();
+
+
+			// It would be better to set the real sinks in the input!
+			// This doesn't really go well with the sinklabels ...
+			boolean notasupersink = false;
+			for(Link link : superSink.getInLinks().values()) {
+				Node realSink = link.getFromNode();
+				// while not strictly necessary, we only want sinks and not just generic predecessors 
+				if (this._settings.getLength(link) == 0) {					
+					VertexIntervalWithCost realSinkIntervall = (VertexIntervalWithCost) this._labels.get(realSink).getIntervalAt(superSinkTime);
+					// are we reachable and is there capacity left?
+					
+					if (!(this._flow.getFlow(link).getFlowAt(superSinkTime) < this._settings.getCapacity(link))) {
+						notasupersink = true;
+						continue;
+					}
+					
+					// Is this node reachable at the required time?
+					if(!realSinkIntervall.getReachable()) {
+						continue;
+					}
+					
+					// and is it still an active sink?
+					if (this._flow.isNonActiveSink(superSink)) {
+						// we cannot go here
+						continue;
+					}
+					
+					// Is the cost right?
+					if (mincost < realSinkIntervall.getAbsoluteCost(superSinkTime)) {
+						// cost too high
+						continue;
+					}
+
+					realSinksToSendTo.add(realSink);
+					edgesToSuperSink.put(realSink, link);
+
+				} else {
+					// there was some predecessor that didn't look like a sink 
+					notasupersink = true;
+				}
+			}
+
+			if (notasupersink) {
+				// put the supersink in there, because it really has interesting edges coming in
+				// that is, edges that have non-zero length or finite capacity 
+				realSinksToSendTo.add(superSink);
+			}
+
+			for (Node sinkNode : realSinksToSendTo) {
+				//System.out.println("sinkNode: " + sinkNode.getId());
+
+				Node toNode = sinkNode;
+				VertexIntervalWithCost toLabel;
+
+				// exactly when we want to arrives
+				int toTime = superSinkTime;		
+
+
+				//start constructing the TimeExpandedPath
+				TimeExpandedPath TEP = new TimeExpandedPath();		
+
+				PathStep pred;
+
+				// is this the supersink?
+				if (sinkNode.equals(superSink)) {
+					toLabel = (VertexIntervalWithCost) this._sinklabels.get(sinkNode);
+					pred = toLabel.getPredecessor();
+				} else {
+					toLabel = (VertexIntervalWithCost) this._labels.get(toNode).getIntervalAt(superSinkTime);
+					
+					// include the superSink, whenever we start one step too early
+					pred = new StepSinkFlow(superSink, toTime, true);
+					TEP.prepend(pred);					
+					
+					// set the first step that can be handled normally 
+					pred = new StepEdge(edgesToSuperSink.get(toNode), toTime, toTime, true);					
+				}
+				
+				while (pred != null) {
+					pred = pred.copyShiftedToArrival(toTime);
+					
+					TEP.prepend(pred);			
+
+					toNode = pred.getStartNode().getRealNode();
+					toTime = pred.getStartTime();
+
+					if (pred instanceof StepEdge) {			  		
+						toLabel = (VertexIntervalWithCost) this._labels.get(toNode).getIntervalAt(toTime);			 
+					} else if (pred instanceof StepSourceFlow) {
+						if (pred.getForward()) {
+							toLabel = (VertexIntervalWithCost) this._sourcelabels.get(toNode);				  
+						} else {
+							toLabel = (VertexIntervalWithCost) this._labels.get(toNode).getIntervalAt(toTime);
+						}
+					} else if (pred instanceof StepSinkFlow) {
+						if (pred.getForward()) {
+							toLabel = (VertexIntervalWithCost) this._labels.get(toNode).getIntervalAt(toTime);
+						} else {
+							toLabel = (VertexIntervalWithCost) this._sinklabels.get(toNode);
+						}
+					} else {
+						throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
+					}
+					pred = toLabel.getPredecessor();
+
+				}
+
+				//System.out.println("Adding " + TEP);
+				result.add(TEP);
+			}
+		}
+		//System.out.println(result);
+		return result;
+	}
+	
+	
+	/**
+	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
+	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
+	 */
+	@Override
+	List<TimeExpandedPath> constructRoutesReverse() throws BFException {
+		
+		if (_debug > 0) {
+			System.out.println("Constructing routes with cost ...");
+		}
+		
+		// FIXME handle stepsinkflows
+		
+		// HashSet does not seem to be deterministic! Don't use it.
+		//Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
+		LinkedList<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
+
+		// find the minimum cost to reach a source
+		int mincost = Integer.MAX_VALUE;
+		for (Node source: this._flow.getSources()) {
+			if (!this._flow.isActiveSource(source)) {
+				// inactive source, cannot start a path here
+				continue;
+			}
+
+			VertexInterval sourceLabel = this._sourcelabels.get(source);
+			if (sourceLabel == null || !sourceLabel.getReachable()) {
+				// unreachable source
+				continue;
+			}
+			
+			mincost = Math.min(mincost, ((VertexIntervalWithCost) sourceLabel).getAbsoluteCost(0));
+		}				
+		
+		for (Node source: this._flow.getSources()) {
+			if (!this._flow.isActiveSource(source)) {
+				// inactive source, cannot start a path here
+				continue;
+			}
+
+			//VertexIntervalls tolabels = this._labels.get(to);
+			VertexInterval sourceLabel = this._sourcelabels.get(source);
+			if (sourceLabel == null || !sourceLabel.getReachable()) {
+				// unreachable source
+				continue;
+			}			
+			
+			if (mincost < ((VertexIntervalWithCost) sourceLabel).getAbsoluteCost(0)) {
+				// the source is reachable, but not at minimum cost
+				continue;
+			}
+
+			//start constructing the TimeExpandedPath
+			TimeExpandedPath TEP = new TimeExpandedPath();		
+
+			Node fromNode = source;
+			VertexInterval fromLabel = sourceLabel;
+
+			PathStep succ;
+
+			succ = fromLabel.getSuccessor();
+			
+			int fromTime = 0; // TODO maybe it's better to leave the sink as late as possible?
+			// if it is an active source, we can leave at any time!
+			// does this help?
+
+			boolean reachedsink = false;
+			while (succ != null) {				
+				succ = succ.copyShiftedToStart(fromTime);
+				//System.out.println("succ: " + succ);
+				TEP.append(succ);
+
+				fromNode = succ.getArrivalNode().getRealNode();
+				fromTime = succ.getArrivalTime();
+
+				if (succ instanceof StepEdge) {			  		
+					fromLabel = this._labels.get(fromNode).getIntervalAt(fromTime);			 
+				} else if (succ instanceof StepSourceFlow) {
+					if (succ.getForward()) {
+						fromLabel = this._labels.get(fromNode).getIntervalAt(fromTime);						
+					} else {
+						fromLabel = this._sourcelabels.get(fromNode);				  
+					}
+				} else if (succ instanceof StepSinkFlow) {
+					// TODO sinklabels do not exist yet ... but would be a null successor
+					reachedsink = true;
+					break; 					
+				} else {
+					throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
+				}
+				succ = fromLabel.getSuccessor();
+			}
+			
+			// This should always happen if a source is marked reachable at all
+			if (reachedsink) {
+				//System.out.println(TEP);
+				result.add(TEP);
+			} else {
+				System.out.println("Weird. Did not find the sink!!!");
+			}
+		}
+
+		return result;
+	}
+	
 
 }

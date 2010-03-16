@@ -191,8 +191,8 @@ public class MultiSourceEAF {
 		long timeStart = System.currentTimeMillis();
 
 		BellmanFordIntervalBased routingAlgo;
-		routingAlgo = new BellmanFordIntervalBased(settings, fluss);
-		//routingAlgo = new BellmanFordIntervalBasedWithCost(settings, fluss);
+		//routingAlgo = new BellmanFordIntervalBased(settings, fluss);
+		routingAlgo = new BellmanFordIntervalBasedWithCost(settings, fluss);
 			
 		int i;
 		long EdgeGain = 0;
@@ -370,7 +370,7 @@ public class MultiSourceEAF {
 					String tempstr2 = "";
 
 					tempstr2 = path.toString() + "\n";					
-
+					
 					int augment = fluss.augment(path);
 
 					if (augment > 0) {
@@ -402,7 +402,7 @@ public class MultiSourceEAF {
 			timer3 = System.currentTimeMillis();
 			EdgeGain += fluss.cleanUp();
 			
-			timeAugment += timer3 - timer2;
+			timeAugment += timer3 - timer2;			
 			
 			if (i % 100 == 0) {		
 				long timecurrent = System.currentTimeMillis();
@@ -530,7 +530,7 @@ public class MultiSourceEAF {
 		int timeStep; 
 		double flowFactor;
 
-		int instance = 2; 
+		int instance = 6; 
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -615,7 +615,8 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/demo.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/audimax.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
-			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
+			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks2.dat";
 			
 			uniformDemands = 100;
 
@@ -719,15 +720,15 @@ public class MultiSourceEAF {
 		}
 
 		// set additional parameters, mostly TimeHorizon for the LP
-		//settings.TimeHorizon = 350;
-		//settings.MaxRounds = 101;
+		//settings.TimeHorizon = 3;
+		//settings.MaxRounds = 5;
 		//settings.checkConsistency = 100;		
 		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		settings.useRepeatedPaths = true;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
+		settings.useRepeatedPaths = false; // not compatible with costs!
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		//settings.trackUnreachableVertices = true && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
 		settings.sortPathsBeforeAugmenting = true;

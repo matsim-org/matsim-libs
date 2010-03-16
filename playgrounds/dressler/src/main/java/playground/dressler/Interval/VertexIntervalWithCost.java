@@ -186,17 +186,19 @@ public class VertexIntervalWithCost extends VertexInterval {
 		this._succ = succ;
 	}
 	
+	
 	/**
 	 * Set the fields of the VertexInterval to the one given.
 	 * Predecessor or Successor are only updated if they are not null. 
 	 * @param other The VertexInterval from which the settings are copied
 	 * @return if there is an unusual reason to scan again ... this is never true here, but would be if costs get upgraded  
 	 */
-	public boolean setArrivalAttributes (final VertexIntervalWithCost other)
+	@Override
+	public boolean setArrivalAttributes (final VertexInterval other)
 	{
 		// argh.
 		if (!(other instanceof VertexIntervalWithCost)) return super.setArrivalAttributes(other);
-		
+				
 		boolean needsRescanning = false;
 		
 		VertexIntervalWithCost temp = (VertexIntervalWithCost) other;
@@ -219,7 +221,7 @@ public class VertexIntervalWithCost extends VertexInterval {
 		
 		return needsRescanning;
 	}
-	
+
 	/**
 	 * Can this VertexInterval be combined with other?
 	 * Times or interval bounds are not checked
@@ -298,5 +300,18 @@ public class VertexIntervalWithCost extends VertexInterval {
 				}
 			}
 		}
+	}
+	
+	public int getAbsoluteCost(int t) {
+		if (!this.costIsRelative) {
+		  return this.cost;
+		} else {
+			return t + this.cost;
+		}
+	}
+	
+	public String toString()
+	{
+		return super.toString() + " cost: " + this.cost + " cost is relative: " + this.costIsRelative;
 	}
 }

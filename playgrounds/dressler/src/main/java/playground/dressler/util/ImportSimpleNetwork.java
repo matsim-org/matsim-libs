@@ -154,6 +154,10 @@ public class ImportSimpleNetwork {
 				int v = Integer.valueOf(line[1].trim());
 				int d = Integer.valueOf(line[2].trim());
 				_demands.put(_newnodes.get(v),-d);
+			} else if (line[0].equals("V")) {
+				int v = Integer.valueOf(line[1].trim());
+				int d = Integer.valueOf(line[2].trim());
+				_demands.put(_newnodes.get(v),d);
 			}
 		}		
 		in.close();

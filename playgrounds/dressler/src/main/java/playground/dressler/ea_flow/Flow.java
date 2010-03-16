@@ -274,16 +274,33 @@ public class Flow {
 	 */
 	private int bottleNeckCapacity(final TimeExpandedPath TimeExpandedPath){
 		//check if first node is a source
-		Node source = TimeExpandedPath.getSource();
-		if(!this._demands.containsKey(source)){
+		Node temp;
+		temp = TimeExpandedPath.getSource();
+		Integer demand = this._demands.get(temp);
+		if(demand == null || demand < 0){
 			throw new IllegalArgumentException("Startnode is no source " + TimeExpandedPath);
 		}
-		int result = this._demands.get(source);
-		if(result == 0) {
+		
+		int result = demand;
+		
+		if (result == 0) {
 			// this may actually happen now that many paths are constructed that orginate
 			// in the same source (for the forward search).
 			return 0;
 		}
+		
+		// check if the final node is a sink
+		temp = TimeExpandedPath.getSink();
+		demand = this._demands.get(temp);
+		if(demand == null || demand > 0){
+			throw new IllegalArgumentException("Endnode is no sink " + TimeExpandedPath);
+		}
+		result = Math.min(result, -demand);
+		
+		if(result == 0) {
+			return 0;
+		}
+		
 		//go through the path edges
 		//System.out.println("augmenting path: ");
 
@@ -326,13 +343,15 @@ public class Flow {
 				StepSinkFlow ssf = (StepSinkFlow) step;
 				Node sink;
 
+				// the same node anyway ...
 				if (ssf.getForward()) {
 					sink = ssf.getArrivalNode().getRealNode();
 				} else {
 					sink = ssf.getStartNode().getRealNode();
 				}				
 				
-				// TODO check this case 
+				// Flow through a sink is not capped by the demand of the sink.
+				// The final destination was already checked in the beginning.
 				if (!step.getForward()) {
 					SinkIntervals si = this._sinkflow.get(sink);
 					if (si == null) {
@@ -345,13 +364,7 @@ public class Flow {
 						}
 					}
 					//throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
-				} else {					
-					// inflow into sink is uncapped, except by the demand of the sink					
-					Integer demand = this._demands.get(sink);					
-					if (-demand < result) {
-						result = -demand;						
-					}
-				}
+				} // inflow into sink is uncapped
 			} else {
 				throw new RuntimeException("Unsupported kind of PathStep!");
 			}

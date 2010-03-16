@@ -179,6 +179,18 @@ public class TimeExpandedPath {
 	}
 	
 	/**
+	 * Method to find the last node in a path
+	 * This function ignores virtual nodes! 
+	 * @return first Node 
+	 */
+	public Node getSink(){
+		PathStep step = this._steps.getLast();
+
+		return step.getArrivalNode().getRealNode();
+	}
+	
+	
+	/**
 	 * returns a subpath of the path from "from" to "to"
 	 * @param fromNode from
 	 * @param toNode to
