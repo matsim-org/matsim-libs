@@ -55,7 +55,7 @@ public class VisumNetworkReader {
 
 	// specific strings
 
-	private final String[] TABLE_EDGETYPE = {ATTRIBUTE_UNKNOWN, "$STRECKENTYP:"};
+	private final String[] TABLE_LINKTYPE = {"$LINKTYPE:", "$STRECKENTYP:"};
 	private final String[] TABLE_STOP = {"$STOP:", "$HALTESTELLE:"};
 	private final String[] TABLE_STOPAREA = {"$STOPAREA:", "$HALTESTELLENBEREICH:"};
 	private final String[] TABLE_STOPPOINT = {"$STOPPOINT:", "$HALTEPUNKT:"};
@@ -69,9 +69,9 @@ public class VisumNetworkReader {
 	private final String[] TABLE_VEHCOMB = {"$VEHCOMB:", "$FZGKOMB:"};
 	private final String[] TABLE_VEHUNITTOVEHCOMB = {"$VEHUNITTOVEHCOMB:", "$FZGEINHEITZUFZGKOMB:"};
 
-	private final String[] ATTRIBUTE_EDGETYPE_NO = {ATTRIBUTE_UNKNOWN, "NR"};
-	private final String[] ATTRIBUTE_EDGETYPE_KAPIV = {ATTRIBUTE_UNKNOWN, "KAPIV"};
-	private final String[] ATTRIBUTE_EDGETYPE_V0IV = {ATTRIBUTE_UNKNOWN, "V0IV"};
+	private final String[] ATTRIBUTE_LINKTYPE_NO = GENERAL_NO;
+	private final String[] ATTRIBUTE_LINKTYPE_KAPIV = {"CAPPRT", "KAPIV"};
+	private final String[] ATTRIBUTE_LINKTYPE_V0IV = {"V0PRT", "V0IV"};
 
 	private final String[] ATTRIBUTE_STOP_NO = GENERAL_NO;
 	private final String[] ATTRIBUTE_STOP_NAME = GENERAL_NAME;
@@ -85,7 +85,7 @@ public class VisumNetworkReader {
 	private final String[] ATTRIBUTE_STOPPT_STOPAREANO = {"STOPAREANO", "HSTBERNR"};
 	private final String[] ATTRIBUTE_STOPPT_NAME =  GENERAL_NAME;
 	private final String[] ATTRIBUTE_STOPPT_RLNO = {"LINKNO", "STRNR"};
-	private final String[] ATTRIBUTE_STOPPT_NODE = {ATTRIBUTE_UNKNOWN, "KNOTNR"};
+	private final String[] ATTRIBUTE_STOPPT_NODE = {"NODENO", "KNOTNR"};
 
 	private final String[] ATTRIBUTE_LR_NAME = GENERAL_NAME;
 	private final String[] ATTRIBUTE_LR_LINENAME = GENERAL_LINENAME;
@@ -100,7 +100,7 @@ public class VisumNetworkReader {
 	private final String[] ATTRIBUTE_LRI_LNAME = GENERAL_LINENAME;
 	private final String[] ATTRIBUTE_LRI_ID = GENERAL_INDEX;
 	private final String[] ATTRIBUTE_LRI_DCODE = GENERAL_DCODE;
-	private final String[] ATTRIBUTE_LRI_NODEID = {ATTRIBUTE_UNKNOWN, "KNOTNR"};
+	private final String[] ATTRIBUTE_LRI_NODEID = {"NODENO", "KNOTNR"};
 	private final String[] ATTRIBUTE_LRI_SPNO = {"STOPPOINTNO", "HPUNKTNR"};
 
 	private final String[] ATTRIBUTE_TP_LNAME = GENERAL_LINENAME;
@@ -158,7 +158,7 @@ public class VisumNetworkReader {
 					readVersion(line, reader);
 				} else if (line.startsWith(this.TABLE_STOP[this.language])) {
 					readStops(line, reader);
-				} else if (line.startsWith(this.TABLE_EDGETYPE[this.language])) {
+				} else if (line.startsWith(this.TABLE_LINKTYPE[this.language])) {
 					readEdgeTypes(line, reader);
 				} else if (line.startsWith(this.TABLE_STOPAREA[this.language])) {
 					readStopAreas(line, reader);
@@ -231,10 +231,10 @@ public class VisumNetworkReader {
 	}
 
 	private void readEdgeTypes(String tableAttributes, BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_EDGETYPE[this.language].length()), ';');
-		final int idxNo = getAttributeIndex(this.ATTRIBUTE_EDGETYPE_NO[this.language], attributes);
-		final int idxKapIV = getAttributeIndex(this.ATTRIBUTE_EDGETYPE_KAPIV[this.language], attributes);
-		final int idxV0IV = getAttributeIndex(this.ATTRIBUTE_EDGETYPE_V0IV[this.language], attributes);
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_LINKTYPE[this.language].length()), ';');
+		final int idxNo = getAttributeIndex(this.ATTRIBUTE_LINKTYPE_NO[this.language], attributes);
+		final int idxKapIV = getAttributeIndex(this.ATTRIBUTE_LINKTYPE_KAPIV[this.language], attributes);
+		final int idxV0IV = getAttributeIndex(this.ATTRIBUTE_LINKTYPE_V0IV[this.language], attributes);
 
 		String line = reader.readLine();
 		while (line != null && line.length() > 0) {
