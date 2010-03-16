@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -40,6 +41,8 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  *
  */
 public class CalculateSignalGroups{
+	
+	private static final Logger log = Logger.getLogger(CalculateSignalGroups.class);
 	
 	public Map<Id, Id> calculateCorrespondingGroups(Map<Id, SignalGroupDefinition> groups, Network net){
 		SortedMap<Id, Id> corrGroups = new TreeMap<Id, Id>();
@@ -63,6 +66,7 @@ public class CalculateSignalGroups{
 				}
 			}
 		}	
+		log.error(corrGroups.toString());
 		return corrGroups;
 	}
 	
@@ -90,7 +94,7 @@ public class CalculateSignalGroups{
 			}
 			cg.put(ee.getKey(), l);
 		}
-		
+		log.error(cg.toString());
 		return cg;
 	}
 	

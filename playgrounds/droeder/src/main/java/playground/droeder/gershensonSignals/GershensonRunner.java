@@ -95,7 +95,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			log.info("start gershensonTest");
 			GershensonScenarioGenerator gsg = new GershensonScenarioGenerator();
 			gsg.createScenario();
-			conf = DaPaths.GTEST + "gershensonConfigFile.xml";		
+			conf = DaPaths.GTEST + "gershensonConfigFile2.xml";		
 		}else if (configFile == "D"){
 			log.info("start Denver");
 			DenverScenarioGenerator dsg = new DenverScenarioGenerator();
@@ -135,7 +135,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				event.getControler().getEvents().addHandler(handler2);
 				
 				//enable live-visualization
-//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	

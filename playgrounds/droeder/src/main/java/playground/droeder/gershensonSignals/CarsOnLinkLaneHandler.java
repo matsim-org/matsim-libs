@@ -23,13 +23,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -48,10 +51,12 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  *
  */
 public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEventHandler, 
-			LinkEnterEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler{
+			LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler{
+	
+	private static final Logger log = Logger
+			.getLogger(CarsOnLinkLaneHandler.class);
 	
 	private Map<Id, Integer> vehOnLink = new HashMap<Id, Integer>();
-	private Map<Id, Integer> vehInD = new HashMap<Id, Integer>();
 	private Map<Id, Map<Id, Integer>> vehOnLinkLanes = new HashMap<Id, Map<Id, Integer>>(); 
 	
 	private Map<Id, Map<Id, CarLocator>> locateCars =  new HashMap<Id, Map<Id, CarLocator>>();
@@ -61,7 +66,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	private double d;
 	private Map<Id, SignalGroupDefinition> groups;
 
-	/*  dMax is the maximum length of d, if d is longer then linkLength d is set d linkLength.
+	/*  dMax is the maximum length of d, if d is longer then linkLength d is set to linkLength.
 	 *  if dMax is shorter then laneLength, d is set to laneLength.
 	 */
 	public CarsOnLinkLaneHandler(Map<Id, SignalGroupDefinition> groups, double dMax){
@@ -75,12 +80,6 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	public void reset(int iteration) {
 
 		for (SignalGroupDefinition sd : this.groups.values()){
-			vehInD.put(sd.getLinkRefId(), 0);
-			for (Id id : sd.getToLinkIds()){
-				if (!vehInD.containsKey(id)){
-					vehInD.put(id, 0);
-				}
-			}
 			Map<Id, Integer> m = new HashMap<Id, Integer>();
 			for (Id id : sd.getLaneIds()){
 				m.put(id, 0);
@@ -113,73 +112,58 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
-		if (vehOnLink.containsKey(e.getLinkId())){
-			int i = vehOnLink.get(e.getLinkId()).intValue();
-			i = i + 1;
-			vehOnLink.put(e.getLinkId(), Integer.valueOf(i));
-		}
-		
 		m = locateCars.get(e.getLinkId());
 		m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
 	}
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent e) {
-		if (vehOnLink.containsKey(e.getLinkId())){
-			int i = vehOnLink.get(e.getLinkId()).intValue();
-			i = i - 1;
-			vehOnLink.put(e.getLinkId(), Integer.valueOf(i));
-		}
-		
 		m = locateCars.get(e.getLinkId());
 		if (m.containsKey(e.getPersonId())){
 			m.remove(e.getPersonId());
 		}
 	}
+	
 	@Override
-	public void handleEvent(AgentDepartureEvent e) {
-		if (vehOnLink.containsKey(e.getLinkId())){
-			int i = vehOnLink.get(e.getLinkId()).intValue();
-			i = i + 1;
-			vehOnLink.put(e.getLinkId(), Integer.valueOf(i));
-		}
-		
+	public void handleEvent(AgentWait2LinkEvent e) {
 		m = locateCars.get(e.getLinkId());
-		if (m.containsKey(e.getPersonId())){
-			m.get(e.getPersonId()).agentEndsActivity();
-		}else{
-			m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
-			m.get(e.getPersonId()).agentEndsActivity();
-			m.get(e.getPersonId()).setEarliestD(e.getTime());
-		}
+		m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
+		m.get(e.getPersonId()).setEarliestD(e.getTime());
+		
 	}
+	
 	@Override
 	public void handleEvent(AgentArrivalEvent e){
-		if (vehOnLink.containsKey(e.getLinkId())){
-			int i = vehOnLink.get(e.getLinkId()).intValue();
-			i = i - 1;
-			vehOnLink.put(e.getLinkId(), Integer.valueOf(i));
-		}
-		
 		m = locateCars.get(e.getLinkId());
-		m.get(e.getPersonId()).agentStartsActivity();
+		if (m.containsKey(e.getPersonId())){
+			m.remove(e.getPersonId());
+		}
 	}
 	
-	public Map<Id, Integer> getVehOnLink(){
-		return this.vehOnLink;
+	public Integer getVehOnLinkLanes(Id id){
+		Integer i = 0;
+		for (Entry<Id, Integer> e : vehOnLinkLanes.get(id).entrySet()){
+			i += e.getValue();
+		}
+		return i;
 	}
 	
-	public Map<Id, Map<Id, Integer>> getVehOnLinkLanes(){
-		return this.vehOnLinkLanes;
-	}
-	
-	public double getVehInD(double time, Id id){
+	public double getVehInD(double time, Id linkId){
 		double i = 0;
-		for (CarLocator c : locateCars.get(id).values()){
+		for (CarLocator c : locateCars.get(linkId).values()){
 			if(c.agentIsInD(time) == true){
-				i++;
+				i = i+1;
 			}
 		}
+		return i;
+	}
+	
+	public double getVehOnLink(Id linkId){
+		double i = 0;
+		for (CarLocator c : locateCars.get(linkId).values()){
+			i++;
+		}
+		
 		return i;
 	}
 	

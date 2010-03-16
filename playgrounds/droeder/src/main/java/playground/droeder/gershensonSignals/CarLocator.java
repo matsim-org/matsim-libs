@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
-import loci.formats.Log;
 
 import org.apache.log4j.Logger;
 import org.matsim.ptproject.qsim.QLane;
@@ -32,7 +31,6 @@ import org.matsim.ptproject.qsim.QLinkLanesImpl;
  */
 public class CarLocator {
 	private QLinkLanesImpl link;
-	private boolean parking = false;
 	private double enterTime;
 	private double earliestInD;
 	private double d;
@@ -60,22 +58,15 @@ public class CarLocator {
 		}
 	}
 	private void earliestD (){
-		this.earliestInD = enterTime+(this.link.getLink().getLength()-this.d)/this.link.getLink().getFreespeed(this.enterTime);		
+		this.earliestInD = enterTime+((this.link.getLink().getLength()-this.d)/this.link.getLink().getFreespeed(this.enterTime));		
 	}
 	
-	public void agentStartsActivity(){
-		this.parking = true;
-	}
-	
-	public void agentEndsActivity(){
-		this.parking = false;
-	}
 	public void setEarliestD(double time){
 		this.earliestInD = time;
 	}
 	
 	public boolean agentIsInD(double time){
-		if ((this.earliestInD<time) && (parking==false)){
+		if ((this.earliestInD<time)){
 			return true;
 		}else{
 			return false;
