@@ -53,7 +53,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String scaleFactor = "1";
 	private String recursionTravelSpeedChange = "0.1";
 	private String recursionTravelSpeed = "8.5";
-	private String maxRecursions = "0";
+	private String maxRecursions = "1";
 	private String fixByActType = "false";
 	private String simple_tg = "false";
 	private String centerNode = "null";
