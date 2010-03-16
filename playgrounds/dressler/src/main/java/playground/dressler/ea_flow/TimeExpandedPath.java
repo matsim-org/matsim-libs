@@ -329,7 +329,8 @@ public class TimeExpandedPath {
 	 * @return arrival time
 	 */
 	public int getArrival(){
-		return this._steps.getLast().getArrivalTime();
+		// weird, but for a StepSinkFlow, the departure time is when the sink is entered.
+		return this._steps.getLast().getStartTime(); 
 	}
 	
 	
@@ -360,7 +361,7 @@ public class TimeExpandedPath {
 			return -1;
 		}
 
-		int shift = newArrival - this._steps.getLast().getArrivalTime();
+		int shift = newArrival - this.getArrival();
 
 		LinkedList<PathStep> newSteps = new LinkedList<PathStep>();
 

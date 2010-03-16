@@ -50,6 +50,13 @@ import playground.dressler.ea_flow.BellmanFordIntervalBased.BFTask;
 
 public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
+	/**
+	 * data structure to keep one label on each sink
+	 */
+
+	HashMap<Node, VertexInterval> _sinklabels;
+	
+	
 	// --------------------CONSTRUCTORS-------------------------------------//
 
 	/**

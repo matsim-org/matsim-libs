@@ -419,11 +419,16 @@ public class BellmanFordIntervalBased {
 				if (!toNode.equals(superSink)) {				
 					pred = new StepEdge(edgesToSuperSink.get(toNode), toTime, toTime, true);
 					TEP.append(pred);
+					// step into the sink
+					pred = new StepSinkFlow(superSink, toTime, true);
+					TEP.append(pred);
+				} else {
+					// step into the sink
+					pred = new StepSinkFlow(sinkNode, toTime, true);
+					TEP.append(pred);
 				}
 				
-				// step into the sink
-				pred = new StepSinkFlow(superSink, toTime, true);
-				TEP.append(pred);
+				
 
 
 				pred = toLabel.getPredecessor();
@@ -1672,12 +1677,13 @@ public class BellmanFordIntervalBased {
 			}*/
 		}
 		
-		print.append("Source labels");
+		print.append("\n Source labels");
 		for (Node node : this._flow.getSources()) {
 			VertexInterval inter = this._sourcelabels.get(node);
 			print.append(node.getId().toString() + " " + inter  +"\n");			
 		}
 		print.append("\n");
+		
 		System.out.println(print.toString());	
 	}
 

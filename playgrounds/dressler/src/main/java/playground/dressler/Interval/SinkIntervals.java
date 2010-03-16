@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*												   *
- * SourceIntervals.java													   *
+ * SinkIntervals.java													   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -28,11 +28,11 @@ import java.util.ArrayList;
 //playground imports
 
 /**
- * class representing the flow out of a source in the Time Expanded Network
+ * Class representing the flow into a sink in the Time Expanded Network
  * @author Manuel Schneider, Daniel Dressler
  *
  */
-public class SourceIntervals extends Intervals<EdgeInterval> {
+public class SinkIntervals extends Intervals<EdgeInterval> {
 
 //**********************************FIELDS*****************************************//
 	
@@ -49,7 +49,7 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 	 * Default Constructor Constructs an object containing only 
 	 * one EdgeInterval [0,Integer.MAX_VALUE) with flow equal to 0
 	 */
-	public SourceIntervals(EdgeInterval interval){
+	public SinkIntervals(EdgeInterval interval){
 		super(interval);
 	}
 
@@ -78,12 +78,12 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 	 * @param debug debug mode true is on
 	 */
 	public static void debug(final int debug){
-		SourceIntervals._debug=debug;
+		SinkIntervals._debug=debug;
 	}
 
 
 	/**
-	 * Checks whether flow coming out of the source can be sent back   
+	 * Checks whether flow is entering the sink within incoming
 	 * @param incoming The interval on which one arrives.
 	 * @return the first interval with flow on it (within incoming), or null 
 	 */
@@ -114,8 +114,7 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 	}
 	
 	/**
-	 * Gives a list of intervals when flow into the source can be undone.
-	 * This is for the reverse seach.
+	 * Gives a list of intervals when flow into the sink can be undone.
 	 * @param timeHorizon for easy reference
 	 * @return plain old ArrayList of Interval
 	 */
@@ -183,19 +182,19 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 		EdgeInterval i, j;
 		i = getIntervalAt(0);
 		while (i != null) {
-		  if (i.getHighBound() == timestop) break;	
-		  j = this.getIntervalAt(i.getHighBound());
-		  
-		  if ((i.getHighBound() == j.getLowBound()) && 
-				  (i.getFlow() == j.getFlow())) {
-			  // FIXME use a safer method for removing things!
-			  _tree.remove(i);
-			  _tree.remove(j);
-			  _tree.insert(new EdgeInterval(i.getLowBound(), j.getHighBound(), i.getFlow()));
-			  gain++;
-		  }else{
-			  i = j;
-		  }		 		 
+			if (i.getHighBound() == timestop) break;	
+			j = this.getIntervalAt(i.getHighBound());
+
+			if ((i.getHighBound() == j.getLowBound()) && 
+					(i.getFlow() == j.getFlow())) {
+				// FIXME use a safer method for removing things!
+				_tree.remove(i);
+				_tree.remove(j);
+				_tree.insert(new EdgeInterval(i.getLowBound(), j.getHighBound(), i.getFlow()));
+				gain++;
+			} else {
+				i = j;
+			}		 		 
 		}
 		this._last = i; // we might have to update it, just do it always
 		return gain;
@@ -240,7 +239,7 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 	 */
 	public void augmentUnsafe(final int t, final int gamma){
 		EdgeInterval i = getIntervalAt(t);
-		
+
 		if(i.getLowBound() < t){
 			i= splitAt(t);
 		}

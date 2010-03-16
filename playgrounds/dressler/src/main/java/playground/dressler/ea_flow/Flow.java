@@ -45,6 +45,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import playground.dressler.Interval.EdgeInterval;
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
+import playground.dressler.Interval.SinkIntervals;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.control.FlowCalculationSettings;
 /**
@@ -78,6 +79,11 @@ public class Flow {
 	 * Source outflow, somewhat like holdover for sources
 	 */
 	private HashMap<Node, SourceIntervals> _sourceoutflow;
+	
+	/**
+	 * Flow into sinks
+	 */
+	private HashMap<Node, SinkIntervals> _sinkflow;
 
 	/**
 	 * TimeExpandedTimeExpandedPath representation of flow on the network
@@ -95,7 +101,8 @@ public class Flow {
 	private final ArrayList<Node> _sinks;
 
 	/**
-	 * stores unsatisfied demands for each source
+	 * stores unsatisfied demands for each vertex.
+	 * positive means source, negative means sink
 	 */
 	private Map<Node,Integer> _demands;
 
@@ -141,6 +148,7 @@ public class Flow {
 		this._network = settings.getNetwork();
 		this._flow = new HashMap<Link,EdgeIntervals>();
 		this._sourceoutflow = new HashMap<Node, SourceIntervals>();
+		this._sinkflow = new HashMap<Node, SinkIntervals>();
 		
 		this._checkTouchedNodes = settings.checkTouchedNodes;
 		
@@ -161,9 +169,11 @@ public class Flow {
 				this._sourceoutflow.put(node, new SourceIntervals(temp));
 				this._demands.put(node, i);
 			} else if (this._settings.isSink(node)) {
-				int i = this._settings.getDemand(node);				
-				this._sinks.add(node);				
-				this._demands.put(node, i);
+				int i = this._settings.getDemand(node);
+				this._sinks.add(node);
+				EdgeInterval temp = new EdgeInterval(0,this._settings.TimeHorizon);
+				this._sinkflow.put(node, new SinkIntervals(temp));
+				this._demands.put(node, i);				
 			}
 		}
 		// initialize EdgeIntervalls
@@ -313,11 +323,35 @@ public class Flow {
 				   (the demand of the original source is accounted for,
 				   demand of sources we pass through does not matter) */
 			} else if (step instanceof StepSinkFlow) {
-				// FIXME cannot handle residual stepsinkflow yet!
+				StepSinkFlow ssf = (StepSinkFlow) step;
+				Node sink;
+
+				if (ssf.getForward()) {
+					sink = ssf.getArrivalNode().getRealNode();
+				} else {
+					sink = ssf.getStartNode().getRealNode();
+				}				
+				
+				// TODO check this case 
 				if (!step.getForward()) {
-					throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
+					SinkIntervals si = this._sinkflow.get(sink);
+					if (si == null) {
+						System.out.println("Weird. Sink of StepSinkFlow has no sinkflow!");
+						return 0;
+					} else {
+						cap = si.getFlowAt(ssf.getStartTime());
+						if (cap < result) {
+							result = cap;
+						}
+					}
+					//throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
+				} else {					
+					// inflow into sink is uncapped, except by the demand of the sink					
+					Integer demand = this._demands.get(sink);					
+					if (-demand < result) {
+						result = -demand;						
+					}
 				}
-				// else no cap, because inflow into sink is uncapped
 			} else {
 				throw new RuntimeException("Unsupported kind of PathStep!");
 			}
@@ -400,6 +434,7 @@ public class Flow {
 			StepSourceFlow ssf = (StepSourceFlow) step;
 			Node source;
 
+			// doesn't really matter, both retun the source ...
 			if (ssf.getForward()) {
 				source = ssf.getStartNode().getRealNode();
 			} else {
@@ -432,6 +467,7 @@ public class Flow {
 			StepSinkFlow ssf = (StepSinkFlow) step;
 			Node sink;
 
+			// doesn't really matter, both retun the sink ...
 			if (ssf.getForward()) {
 				sink = ssf.getArrivalNode().getRealNode();
 			} else {
@@ -443,15 +479,21 @@ public class Flow {
 				throw new IllegalArgumentException("Startnode is no sink for StepSinkFlow " + step);
 			}
 
+			// FIXME check handling of sinkflow
 			if (!step.getForward()) {
-				// FIXME cannot handle residual stepsinkflow yet!
-				throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
+				//throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
+				demand -= gamma;
+				this._demands.put(sink, demand);
+				// there isn't any upper capacity on this link
+				this._sinkflow.get(sink).augment(step.getArrivalTime(), -gamma, Integer.MAX_VALUE);
 			} else {
 				demand += gamma;
 				if (demand > 0) {
 					throw new IllegalArgumentException("too much flow sent into sink " + step);
 				}
 				this._demands.put(sink, demand);
+				// there isn't any upper capacity on this link
+				this._sinkflow.get(sink).augment(step.getStartTime(), gamma, Integer.MAX_VALUE);
 			}
 		} else {
 			throw new RuntimeException("Unsupported kind of PathStep!");
@@ -466,7 +508,7 @@ public class Flow {
 	 * @deprecated
 	 */
 
-	private void augmentStepUnsafe(PathStep step, int gamma) {
+	/*private void augmentStepUnsafe(PathStep step, int gamma) {
 
 		// FIXME really bad style ...
 		if (step instanceof StepEdge) {
@@ -508,7 +550,7 @@ public class Flow {
 			throw new RuntimeException("Unsupported kind of PathStep!");
 		}
 
-	}
+	}*/
 
 	/**
 	 * Method to check the flow on the edge associated with step
@@ -557,6 +599,7 @@ public class Flow {
 			}
 
 		} else {
+			// TODO check sink steps!
 			throw new RuntimeException("Unsupported kind of PathStep!");
 		}
 	}
@@ -612,6 +655,8 @@ public class Flow {
 				everythingOkay = false;
 			}
 		}
+		
+		// TODO check sink labels
 
 		for (Link edge : this._network.getLinks().values()) {
 			//System.out.println("Checking edge " + edge.getId() + " ...");
@@ -876,15 +921,14 @@ public class Flow {
                }
 			}
 
-
-			// TODO turn off at some point again ...
-		    //if (_debug > 0) {
+			
+		    if (_debug > 0) {
 				if (!TEP.check()) {
 					System.out.println("Bad unprocessed TEP!");
 					System.out.println(TEP);
 					throw new RuntimeException("Bad unprocessed TEP!");
 				}
-			//}
+			}
 
 			/* remove loops
 			 */
@@ -1106,13 +1150,13 @@ public class Flow {
 	 * method to resolve residual edges in TEP
 	 * @param TEP A TimeExpandedPath
 	 */
-	@Deprecated
-	private void unfold(TimeExpandedPath TEPtoAdd){
+	
+	/*private void unfold(TimeExpandedPath TEPtoAdd){
 		// FIXME this is broken! Do not use!
 		System.out.println("flow.unfold() is broken. Do not use it!");
 
 		// this function could be quite slow ...
-		/*
+		
 		 * Paths in flow._timeexpandedpaths are always good, i.e. use just forward steps.
 		 * The current path may contain loops! (Not from the BellmanFord,
 		 *   but from unfolding with other paths.) These must be removed first.
@@ -1123,7 +1167,7 @@ public class Flow {
 		 *
 		 * FIXME removing loops changes the flow on the edges!
 		 * make sure that this function always keeps the flow and the TEP collection in sync!
-		 */
+		 
 
 		// TEPs that need processing
 		LinkedList<TimeExpandedPath> unfinishedTEPs = new LinkedList<TimeExpandedPath>();
@@ -1171,11 +1215,11 @@ public class Flow {
 				}
 			//}
 
-			/* check for loops in the path!
+			 check for loops in the path!
 			 * these can be pairwise opposing residual edges
 			 * or visiting the same time-expanded node twice
 			 * be careful with sourceoutflow-nodes ...
-			 */
+			 
 
 			boolean hadtofixloop;
 			do {
@@ -1223,9 +1267,9 @@ public class Flow {
 						if (!inloop) {
 							newTEP.append(step);
 						} else {
-							/* FIXME adjust flow on edges to be in sync with TEP collection!
+							 FIXME adjust flow on edges to be in sync with TEP collection!
 						   However, removing the flow might temporarily exceed [0, u] boundaries
-						   if the TEP could unfold with itself */
+						   if the TEP could unfold with itself 
 							augmentStepUnsafe(step, -TEP.getFlow());
 							wasinvolvedinloop.add(step);
 						}
@@ -1422,23 +1466,23 @@ public class Flow {
 			}
 
 
-			/*// DEBUG
+			// DEBUG
 			for (TimeExpandedPath tempTEP : goodTEPs) {
 			  if (tempTEP.getFlow() == 0) {
 				 System.out.println("Bad goodPath.getFlow() == 0... " + tempTEP);
 				 throw new RuntimeException("Bad goodPath.getFlow() == 0");
 			  }
-			}*/
+			}
 
 			this._TimeExpandedPaths.addAll(goodTEPs);
 			goodTEPs.clear();
 
-			/*if (_debug > 0) {
+			if (_debug > 0) {
 				System.out.println("All paths so far:");
 				for (TimeExpandedPath tempTEP : this._TimeExpandedPaths) {
 					System.out.println(tempTEP);
 				}
-			}*/
+			}
 		}
 
 		// just to be sure
@@ -1457,16 +1501,16 @@ public class Flow {
 					System.out.println(tempTEP);
 				}
 
-				/*System.out.println("All paths so far:");
+				System.out.println("All paths so far:");
 				for (TimeExpandedPath tempTEP : this._TimeExpandedPaths) {
 					System.out.println(tempTEP);
-				}*/
+				}
 
-				/*System.out.println("with all loops: " + TEPtoProcess);
+				System.out.println("with all loops: " + TEPtoProcess);
 				//System.out.println("before removing the last loop: " + TEP);
 				//System.out.println("Bad unlooped new TEP: " + newTEP);
 				System.out.println("Bad unlooped new TEP: " + TEP);
-				System.out.println("problem step: " + step);*/
+				System.out.println("problem step: " + step);
 
 				if (step instanceof StepEdge) {
 				  System.out.println("Flow on edge of the problem step: ");
@@ -1483,7 +1527,7 @@ public class Flow {
 		// }
 
 		// BIG DEBUG
-		/*System.out.println("Checking consistency at end of Unfold");
+		System.out.println("Checking consistency at end of Unfold");
 		if (!this.checkTEPsAgainstFlow()) {
 			System.out.println("problem path: " + TEPtoAdd);
 
@@ -1493,8 +1537,8 @@ public class Flow {
 			}
 
 			throw new RuntimeException("Flow and stored TEPs disagree!");
-		}*/
-	}
+		}
+	}*/
 
 	
 
@@ -1731,6 +1775,11 @@ public class Flow {
 			 if (si != null)
 			   gain += si.cleanup();
 		}
+		for (Node node : this._sinkflow.keySet()) {
+			 SinkIntervals si = this._sinkflow.get(node);
+			 if (si != null)
+			   gain += si.cleanup();
+		}
 		return gain;
 	}
 
@@ -1768,6 +1817,10 @@ public class Flow {
 
 	public SourceIntervals getSourceOutflow(Node node) {
 		return this._sourceoutflow.get(node);
+	}
+	
+	public SinkIntervals getSinkFlow(Node node) {
+		return this._sinkflow.get(node);
 	}
 
 	/**
@@ -1848,7 +1901,19 @@ public class Flow {
 			min = Math.min(min, size);
 			max = Math.max(max, size);
 		}
-		result += "  Size of SourceIntervalls (min/avg/max): " + min + " / " + sum / (double) this._network.getNodes().size() + " / " + max + "\n";
+		result += "  Size of SourceIntervalls (min/avg/max): " + min + " / " + sum / (double) this.getSources().size() + " / " + max + "\n";
+		
+		sum = 0;
+		max = 0;
+		min = Integer.MAX_VALUE;
+		for (SinkIntervals i : this._sinkflow.values()) {
+			int size = i.getSize();
+			sum += size;
+			min = Math.min(min, size);
+			max = Math.max(max, size);
+		}
+		result += "  Size of SinkIntervalls (min/avg/max): " + min + " / " + sum / (double) this.getSinks().size() + " / " + max + "\n";
+		
 		return result;
 	}
 

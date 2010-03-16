@@ -91,18 +91,18 @@ public class StepSinkFlow implements PathStep {
 	 */
 	public int getStartTime() {
 		if (this.forward) {
-			return 0;
-		} else {
 			return time;
+		} else {
+			return 0;
 		}
 	}
 	
 	public int getArrivalTime()
 	{
 		if (!this.forward) {
-			return 0;
-		} else {
 			return time;
+		} else {
+			return 0; // Maybe time as well, but the sink is not really located at any time.
 		}
 	}
 	
@@ -173,13 +173,13 @@ public class StepSinkFlow implements PathStep {
 		  return new StepSinkFlow(this.node, newStart, true);
 		}
 		
-		// residual ... always starts at TimeHorizon
+		// residual ... always starts at 0/TimeHorizon/whenever the sink is
 		return new StepSinkFlow(this.node, this.time, false);
 	}
 
 	@Override
 	public PathStep copyShiftedToArrival(int newArrival) {
-		// forward ... always arrives at TimeHorizon
+		// forward ... always arrives at 0/TimeHorizon/whenever the sink is
 		if (this.forward) {
 		  return new StepSinkFlow(this.node, this.time, true);
 		}
