@@ -284,6 +284,7 @@ public class Controler {
 		Logger.getRootLogger().addAppender(this.collectLogMessagesAppender);
 		Gbl.printSystemInfo();
 		Gbl.printBuildInfo();
+		log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
 		this.configFileName = configFileName;
 		this.dtdFileName = dtdFileName;
 
@@ -377,34 +378,34 @@ public class Controler {
 		String divider = "###################################################";
 		String marker = "### ";
 
-		for (iteration = firstIteration; (iteration <= lastIteration) && (this.state == ControlerState.Running); iteration++) {
+		for (this.iteration = firstIteration; (this.iteration <= lastIteration) && (this.state == ControlerState.Running); this.iteration++) {
 			log.info(divider);
-			log.info(marker + "ITERATION " + iteration + " BEGINS");
-			this.stopwatch.setCurrentIteration(iteration);
+			log.info(marker + "ITERATION " + this.iteration + " BEGINS");
+			this.stopwatch.setCurrentIteration(this.iteration);
 			this.stopwatch.beginOperation("iteration");
-			makeIterationPath(iteration);
+			makeIterationPath(this.iteration);
 			resetRandomNumbers();
 
-			this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
-			if (iteration > firstIteration) {
+			this.controlerListenerManager.fireControlerIterationStartsEvent(this.iteration);
+			if (this.iteration > firstIteration) {
 				this.stopwatch.beginOperation("replanning");
-				this.controlerListenerManager.fireControlerReplanningEvent(iteration);
+				this.controlerListenerManager.fireControlerReplanningEvent(this.iteration);
 				this.stopwatch.endOperation("replanning");
 			}
-			this.controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
+			this.controlerListenerManager.fireControlerBeforeMobsimEvent(this.iteration);
 			this.stopwatch.beginOperation("mobsim");
 			resetRandomNumbers();
 			runMobSim();
 			this.stopwatch.endOperation("mobsim");
-			this.controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
-			this.controlerListenerManager.fireControlerScoringEvent(iteration);
-			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
+			this.controlerListenerManager.fireControlerAfterMobsimEvent(this.iteration);
+			this.controlerListenerManager.fireControlerScoringEvent(this.iteration);
+			this.controlerListenerManager.fireControlerIterationEndsEvent(this.iteration);
 			this.stopwatch.endOperation("iteration");
 			this.stopwatch.write(this.controlerIO.getOutputFilename("stopwatch.txt"));
-			log.info(marker + "ITERATION " + iteration + " ENDS");
+			log.info(marker + "ITERATION " + this.iteration + " ENDS");
 			log.info(divider);
 		}
-		iteration = null;
+		this.iteration = null;
 	}
 
 	protected void shutdown(final boolean unexpected) {
@@ -720,7 +721,7 @@ public class Controler {
 	}
 
 	private void resetRandomNumbers() {
-		MatsimRandom.reset(this.config.global().getRandomSeed() + iteration);
+		MatsimRandom.reset(this.config.global().getRandomSeed() + this.iteration);
 		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
 		// "not-randomness" is the first
 		// draw...
@@ -776,7 +777,7 @@ public class Controler {
 			}
 		} else {
 			ExternalMobsim sim = new ExternalMobsim(this.scenarioData, this.events);
-			sim.setControlerIO(controlerIO);
+			sim.setControlerIO(this.controlerIO);
 			sim.setIterationNumber(this.getIterationNumber());
 			sim.run();
 		}
@@ -1214,7 +1215,7 @@ public class Controler {
 
 
 	public ControlerIO getControlerIO() {
-		return controlerIO;
+		return this.controlerIO;
 	}
 
 	/**
@@ -1222,11 +1223,11 @@ public class Controler {
 	 * null if the Controler is in the startup/shutdown process
 	 */
 	public Integer getIterationNumber() {
-		return iteration;
+		return this.iteration;
 	}
 
   public MobsimFactory getMobsimFactory() {
-    return mobsimFactory;
+    return this.mobsimFactory;
   }
 
   public void setMobsimFactory(MobsimFactory mobsimFactory) {
