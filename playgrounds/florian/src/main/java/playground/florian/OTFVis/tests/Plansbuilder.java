@@ -21,14 +21,14 @@ public class Plansbuilder {
 
 	public static void main(String[] args) {
 		
-		// Öffne Szenario
+		// Oeffne Szenario
 		ScenarioImpl sc = new ScenarioImpl();
 		NetworkImpl net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(NETWORK);
 		PopulationImpl pop = sc.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		
-		// Gestalte Pläne
+		// Gestalte Plaene
 		for(int i=0;i<201;i++){
 			Id id =new IdImpl(i);
 			PersonImpl person = (PersonImpl) pb.createPerson(id);
