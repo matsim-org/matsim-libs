@@ -41,11 +41,7 @@ import playground.dressler.control.FlowCalculationSettings;
 import playground.dressler.ea_flow.BellmanFordIntervalBased.BFTask;
 
 /**
- * Implementation of the Moore-Bellman-Ford Algorithm for a static network! i =
- * 1 .. n for all e = (v,w) if l(w) > l(v) + c(e) then l(w) = l(v) + c(e), p(w)
- * = v.
- * 
- * @author Manuel Schneider
+ * @author Daniel Dressler, Manuel Schneider
  */
 
 public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
@@ -147,15 +143,14 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
 		VertexIntervalWithCost inter = (VertexIntervalWithCost) this._sourcelabels.get(v);
 
-		// already scanned or not reachable (neither should occur ...)
+		// not reachable (should not occur ...)
 		if (!inter.getReachable()) {
 			System.out.println("Source " + v.getId() + " was not reachable!");
 			return null;
 		}
 
 		if (inter.isScanned()) {
-			// don't scan again ... but for a source, this should not happen
-			// anyway
+			// don't scan again
 			return null;
 		}
 		inter.setScanned(true);
@@ -263,9 +258,12 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 					// we could reach the source
 					VertexIntervalWithCost temp = new VertexIntervalWithCost(0, this._settings.TimeHorizon);
 					
+					temp.setScanned(false);
 					temp.costIsRelative = false;
-					// the earliest time is the cheapest
-					temp.cost = label.getAbsoluteCost(arrive.getLowBound());
+					
+					// The earliest time is the cheapest.
+					// We still need to subtract the travel time, though.
+					temp.cost = label.getAbsoluteCost(arrive.getLowBound()) - arrive.getLowBound();
 					
 					StepSourceFlow pred = new StepSourceFlow(v, arrive.getLowBound(), false);
 					temp.setArrivalAttributesForward(pred);
@@ -295,11 +293,12 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			PathStep pred = new StepSinkFlow(v, reachsink, true);
 
 			newlabel.setArrivalAttributesForward(pred);
+			newlabel.setScanned(false);
 			newlabel.costIsRelative = false;
 			newlabel.cost = ((VertexIntervalWithCost) this._labels.get(v).getIntervalAt(reachsink)).getAbsoluteCost(reachsink);
 						
 			if (newlabel.isBetterThan(oldlabel) != null) {
-				oldlabel.setArrivalAttributes(newlabel);
+				oldlabel.setArrivalAttributes(newlabel);				
 				queue.add(new BFTask(new VirtualSink(v), reachsink, false));
 			}
 		}
@@ -512,11 +511,19 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	protected List<BFTask> processSinkForward(Node v) {
 		VertexIntervalWithCost label = (VertexIntervalWithCost) this._sinklabels.get(v);
 		
-		if (label.isScanned() || !label.getReachable()) {
-			System.out.println("Sink " + v.getId()
-					+ " was already scanned or not reachable ...");
+		if (label.isScanned()) {
+			// nothing to do
+			this._totalnonpolls++;
+			this._roundnonpolls++;
 			return null;
 		}
+		
+		// this should not happen
+		if (!label.getReachable()) {
+			System.out.println("Sink " + v + " was not reachable!");
+			return null;
+		}
+					
 		label.setScanned(true);
 		
 		// active sinks do not need to propagate anything

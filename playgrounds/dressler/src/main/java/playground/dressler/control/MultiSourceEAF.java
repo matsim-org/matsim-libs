@@ -24,15 +24,11 @@ package playground.dressler.control;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -50,7 +46,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.Interval.EdgeIntervals;
-import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.Interval.VertexIntervals;
 import playground.dressler.ea_flow.BellmanFordIntervalBased;
@@ -60,7 +55,7 @@ import playground.dressler.ea_flow.TimeExpandedPath;
 import playground.dressler.util.ImportSimpleNetwork;
 
 /**
- * @author Manuel Schneider
+ * @author Daniel Dressler, Manuel Schneider 
  *
  */
 public class MultiSourceEAF {
@@ -74,11 +69,6 @@ public class MultiSourceEAF {
 		_debug=debug;
 	}
 
-	public MultiSourceEAF()
-	{
-		this.setupStatusInfo();
-	}
-	
 	public static void enableDebuggingForAllFlowRelatedClasses()
 	{
 		MultiSourceEAF.debug(true);
@@ -133,8 +123,12 @@ public class MultiSourceEAF {
 	 */
 	public static HashMap<Node,Integer> readPopulation(final Scenario scenario, final String filename){
 		new MatsimPopulationReader(scenario).readFile(filename);
+		return parsePopulation(scenario);
+	}
+	
+	public static HashMap<Node,Integer> parsePopulation(final Scenario scenario) {
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
-		
+
 		int missing = 0;
 
 		for(Person person : scenario.getPopulation().getPersons().values() ){
@@ -143,7 +137,7 @@ public class MultiSourceEAF {
 			if(((PlanImpl) plan).getFirstActivity().getLinkId()==null){
 				continue;
 			}
-			
+
 			Link link = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
 			if (link == null) {
 				missing += 1;				
@@ -157,7 +151,7 @@ public class MultiSourceEAF {
 				allnodes.put(node, 1);
 			}
 		}
-		
+
 		if (missing > 0) {
 			System.out.println("Missed some start links! Ignored " + missing + " people.");
 		}
@@ -167,7 +161,6 @@ public class MultiSourceEAF {
 
 	/**
 	 * THE ONLY FUNCTION WHICH REALLY CALCULATES A FLOW
-	 * and provides status info
 	 *
 	 * @param settings 
 	 * @return a Flow object
@@ -449,59 +442,6 @@ public class MultiSourceEAF {
 		return fluss;
 	}
 
-	protected List<String> progressTitles;
-
-	/**
-	 * 	must not (!) get accessed unsychronized
-	 */
-	protected Map<String, String> progressInfos;
-
-	protected boolean isFinished;
-
-	protected void setupStatusInfo()
-	{
-		isFinished = false;
-		progressTitles = new LinkedList<String>();
-		progressTitles.add("Iteration");
-		progressTitles.add("Time");
-		progressTitles.add("Last Arrival");
-		progressTitles.add("Total Flow");
-		progressTitles.add("Found Paths");
-		progressTitles.add("Paths / Iteration");
-		progressInfos = new HashMap<String, String>();
-		for(String key : progressTitles)
-		{
-			progressInfos.put(key, "");
-		}
-	}
-
-	protected void setProgressInfo(String key, String value)
-	{
-		synchronized(progressInfos)
-		{
-			progressInfos.put(key, value);
-		}
-	}
-
-	public List<String> getListOfKeys() {
-		return progressTitles;
-	}
-
-	public String getProgressInformation(String key) {
-		synchronized(progressInfos)
-		{
-			return progressInfos.get(key);
-		}
-	}
-
-	public String getTitle() {
-		return "Flow Calculation";
-	}
-
-	public boolean isFinished() {
-		return isFinished;
-	}
-
 
 	/**
 	 * main method to run an EAF algorithm on the specified scenario
@@ -535,7 +475,7 @@ public class MultiSourceEAF {
 		int timeStep; 
 		double flowFactor;
 
-		int instance = 6; 
+		int instance = 1; 
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -621,7 +561,7 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/audimax.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
-			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks2.dat";
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
 			
 			uniformDemands = 100;
 
@@ -718,42 +658,54 @@ public class MultiSourceEAF {
 		}
 
 		
-		if (sink == null) {			
-			settings = new FlowCalculationSettings(network, demands, timeStep, flowFactor);
-		} else {
-			settings = new FlowCalculationSettings(network, sinkid, demands, timeStep, flowFactor);
-		}
-
-		// set additional parameters, mostly TimeHorizon for the LP
+		settings = new FlowCalculationSettings();
+		settings.setNetwork(network);
+		settings.setDemands(demands);
+		settings.supersink = sink;
+		settings.timeStep = timeStep; // default 1
+		settings.flowFactor = flowFactor; // default 1.0
+		
+		// set additional parameters
 		//settings.TimeHorizon = 3;
-		//settings.MaxRounds = 5;
+		//settings.MaxRounds = 95;
 		//settings.checkConsistency = 100;		
 		//settings.useVertexCleanup = false;
-		settings.useSinkCapacities = true;
-		settings.useImplicitVertexCleanup = true;
-		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		//settings.useSinkCapacities = true;
+		//settings.useImplicitVertexCleanup = true;
+		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		settings.useRepeatedPaths = false && !settings.useSinkCapacities; // not compatible with costs!
+		//settings.useRepeatedPaths = true; // not compatible with costs!		
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
-		//settings.trackUnreachableVertices = true && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
-		settings.sortPathsBeforeAugmenting = true;
-		settings.checkTouchedNodes = true;
-		settings.keepPaths = true; // do not store paths at all!
-		settings.unfoldPaths = true; // unfold stored paths into forward paths
+		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
+		//settings.sortPathsBeforeAugmenting = true;
+		//settings.checkTouchedNodes = true;
+		//settings.keepPaths = true; // do not store paths at all!
+		//settings.unfoldPaths = true; // unfold stored paths into forward paths
 		
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
 		
+		Flow fluss;	
+		
+		
+		/* --------- the actual work starts --------- */
+		
+		boolean settingsOkay = settings.prepare();
 		settings.printStatus();
 		
+		if(!settingsOkay) {
+			System.out.println("Something was bad, aborting.");
+			return;
+		}
+				
 		//settings.writeLP();
 		//settings.writeNET(false);
 		//settings.writeSimpleNetwork();
 		
+		fluss = MultiSourceEAF.calcEAFlow(settings);
 		
-		Flow fluss;
-		fluss = calcEAFlow(settings);
+		/* --------- the actual work is done --------- */
 		
 		int[] arrivals = fluss.arrivals();
 		long totalcost = 0;
@@ -774,8 +726,9 @@ public class MultiSourceEAF {
 			}
 		}
 
+		
 		if(outputplansfile!=null){
-			PopulationImpl output = fluss.createPopulation(plansfile);				
+			PopulationImpl output = fluss.createPopulation(plansfile);					
 			new PopulationWriter(output, network).writeFile(outputplansfile);
 		}
 		

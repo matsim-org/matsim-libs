@@ -40,44 +40,52 @@ import playground.dressler.Interval.VertexIntervals;
 
 public class FlowCalculationSettings {
 
+	/* ---------------- public settings ---------------- */
+	
 	/* some constants */
 	public static final int SEARCHALGO_FORWARD = 1;
 	public static final int SEARCHALGO_REVERSE = 2;
 	public static final int SEARCHALGO_MIXED = 3;
 	
-	/* default settings */
+	/* default scaling parameters */
+	public int timeStep = 1;		
+	public double flowFactor = 1.0;
+	
+	/* deault timeouts */
+	public int TimeHorizon = 7654321; // should be safe
+	public int MaxRounds = 7654321;	// should be safe up to 3.8m flow units	
+	
+	/* default search settings */
 	public boolean useSinkCapacities = true;
-	public int searchAlgo = SEARCHALGO_REVERSE;
+	public int searchAlgo = SEARCHALGO_FORWARD;
 	public boolean useVertexCleanup = false;
 	public boolean useImplicitVertexCleanup = true; // unite vertex intervals before propagating?
-	public int TimeHorizon = 654321; // should be safe
-	public int MaxRounds = 654321;	// should be safe
 	public int checkConsistency = 0; // after how many iterations should consistency be checked? 0 = off
 	public boolean checkTouchedNodes = true; // should Flow.UnfoldAndAugment() try to shortcut the search for suitable forward steps?
 	
 	public boolean sortPathsBeforeAugmenting = true; // try to augment shorter (#steps) first? 
 	public boolean keepPaths = true; // should TEPs be stored at all?
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
-	public boolean useRepeatedPaths = true; // try to repeat paths
+	public boolean useRepeatedPaths = true && !useSinkCapacities; // try to repeat paths
 	
 	public boolean trackUnreachableVertices = true && (searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);; // only works in REVERSE, wastes time otherwise
 	
 	
 	/* when are links available? not included means "always" */
 	public HashMap<Link, Interval> whenAvailable = null;
+	public Node supersink = null;
 	
+	/* ---------------  private data from now on --------------- */
 	
 	/* interal storage for the network parameters */ 
 	private HashMap<Link, Integer> _capacities;
 	private HashMap<Link, Integer> _lengths;
 	
-	private int _timeStep;		
-	private double _flowFactor;
-	
 	private NetworkLayer _network;
 	
 	// leave these untouched!
-	private HashMap<Node, Integer> _demands;
+	private HashMap<Node, Integer> _demands = null;
+	
 	private int _totaldemandsources;
 	private int _totaldemandsinks;
 	private int _numsources;
@@ -85,63 +93,102 @@ public class FlowCalculationSettings {
 	
 	private int _roundedtozerocapacity;
 	private int _roundedtozerolength;	
-	
+	private boolean _ready = false;
 	
  
-	
-    /* Constructor to set the parameters for the EAF calculation 
-     * @param network The MATSim network
-     * @param demands The demands. Sources are > 0, Sinks are < 0
-     * @param timeStep The granularity of the time-expanded network 
-     * @param flowFactor Link Capacities will be scaled by this (in addition to accounting for timeStep)
-     */
-	FlowCalculationSettings (NetworkLayer network, HashMap<Node, Integer> demands, int timeStep, double flowFactor) {
-		this._network = network;
-		this._demands = demands;
-		this._timeStep = timeStep;		
-		this._flowFactor = flowFactor;
+	/**
+	 * Constructor that prepares the default settings, but no network or anything yet.
+	 */
+	FlowCalculationSettings () {
 		
-		scaleParameters();
-		
-		setDemands();
-		
-		//printStatus();
+	}
+
+	/**
+	 * Applies and checks the settings and creates all necessary data structures.
+	 * @return true iff everything is okay
+	 */	
+	public boolean prepare() {
+		return prepare(false); // default is to prepare just once
 	}
 	
-
-    /* Constructor to set the parameters for the EAF calculation 
-     * @param network The MATSim network
-     * @param sinkId  The ID of the supersink. It will get demand equal to minus the total demand of the sources. 
-     * @param demands The demands. Should be >= 0 ! Note that the demand of supersink will be overwritten. 
-     * @param timeStep The granularity of the time-expanded network 
-     * @param flowFactor Link Capacities will be scaled by this (in addition to accounting for timeStep) 
-     */
-	FlowCalculationSettings (NetworkLayer network, String sinkId, HashMap<Node, Integer> demands, int timeStep, double flowFactor) {
+	public void setNetwork(NetworkLayer network) {
 		this._network = network;
+	}
+	
+	public void setDemands(HashMap<Node, Integer> demands) {
 		this._demands = demands;
-		this._timeStep = timeStep;
-		this._flowFactor = flowFactor;
+	}
+	
+	
+	
+	/**
+	 * Applies and checks the settings and creates all necessary data structures.
+	 * @param force If true, the data will always be recreated.
+	 * @return true iff everything is okay
+	 */
+	public boolean prepare(boolean force) {
+		
+		// don't do the work twice ...
+		if (this._ready && !force) {
+			return true;
+		}
+		
+		// basic checks
+		if (this._network == null) {
+			System.out.println("No network given!");
+			return false;
+		}
+		
+		if (this._demands == null) {
+			System.out.println("No demands given!");
+			return false;
+		}
 
-		Node superSink = network.getNodes().get(new IdImpl(sinkId));  
-		if (superSink == null) {		  
-			throw new RuntimeException("Sink " + sinkId + " not found in network!");
+		// check search settings for bad combinations
+		if (this.useSinkCapacities) {
+			if (this.searchAlgo != this.SEARCHALGO_FORWARD) {
+				System.out.println("Only FORWARD search works with sink capacities enabled!");
+				return false;
+			}
+			if (this.useRepeatedPaths) {
+				System.out.println("Repeated paths cannot be used with sink capacities enabled!");
+				return false;
+			}
+		}
+		
+		if (this.searchAlgo != this.SEARCHALGO_REVERSE && this.trackUnreachableVertices) {
+			System.out.println("TrackUnreachableVertices does not make sense with anything but REVERSE search! I will disable it now.");
+			this.trackUnreachableVertices = false;
 		}
 		
 		scaleParameters();
 		
-		int totaldemand = 0;
-		for (Node node : this._network.getNodes().values()) {
-			Integer i = this._demands.get(node);
-			if (i != null && i > 0)
-			  totaldemand += i; 
-		}
-		demands.put(superSink, -totaldemand);
+		if (this.supersink != null) {
+			int totaldemand = 0;
+			int overrideerrors = 0;
+			for (Node node : this._network.getNodes().values()) {
+				Integer i = this._demands.get(node);
+				if (i != null && i > 0)
+				  totaldemand += i; 
+				if (i != null && i < 0) {
+					if (!node.equals(supersink)) {
+					  this._demands.put(node, 0);
+					  overrideerrors++;
+					}
+				}
+			}			
+			this._demands.put(this.supersink, -totaldemand);
+			if (overrideerrors > 0) {
+				System.out.println("Warning! " + overrideerrors + " sink(s) were removed because a supersink was specified.");
+			}
+		} 
 		
-		setDemands();
+		prepareDemands();
 		
-		//printStatus();
+		this._ready = true;
+		
+		return true;
 	}
-	
 	
 	private void scaleParameters() {
 		this._capacities = new HashMap<Link, Integer>();
@@ -155,7 +202,7 @@ public class FlowCalculationSettings {
 		for (Link link : this._network.getLinks().values()){
 			
 			// from long to int ...
-			int newTravelTime = (int) Math.round(link.getLength() / (link.getFreespeed(0.) * this._timeStep));
+			int newTravelTime = (int) Math.round(link.getLength() / (link.getFreespeed(0.) * this.timeStep));
 			if (newTravelTime == 0 && link.getLength() != 0d) {				
 				this._roundedtozerolength++; 
 			}
@@ -163,7 +210,7 @@ public class FlowCalculationSettings {
 			this._lengths.put(link, newTravelTime);
 			
 			
-			long newcapacity = Math.round(link.getCapacity(1.) * this._timeStep * this._flowFactor / capperiod);
+			long newcapacity = Math.round(link.getCapacity(1.) * this.timeStep * this.flowFactor / capperiod);
 			
 			// no one uses that much capacity for real ...
 			if (newcapacity > Integer.MAX_VALUE) {
@@ -177,22 +224,36 @@ public class FlowCalculationSettings {
 		}		
 	}
 	
-	private void setDemands() {
+	private void prepareDemands() {
 		this._totaldemandsources = 0;
 		this._totaldemandsinks = 0;
 		this._numsources = 0;
 		this._numsinks = 0;
+		
+		// find all sources
 		for (Node node : this._network.getNodes().values()) {
 			Integer i = this._demands.get(node);
 			if (i != null) {
 				if (i > 0) {
 					this._totaldemandsources += i;
 					this._numsources++;
-				} else if (i < 0) {
-					this._totaldemandsinks += -i;
+				} 
+			}
+		}
+		
+		// find all sinks and give them infinite capacity if needed
+		for (Node node : this._network.getNodes().values()) {
+			Integer i = this._demands.get(node);
+			if (i != null) {
+				if (i < 0) {
 					this._numsinks++;
-				}
-				
+					if (this.useSinkCapacities) {
+					  this._totaldemandsinks += -i;
+					} else {
+					  this._demands.put(node, -this._totaldemandsources);
+					  this._totaldemandsinks += this._totaldemandsources;
+					}					
+				} 
 			}
 		}
 	
@@ -200,12 +261,15 @@ public class FlowCalculationSettings {
 	
 	public void printStatus() {
 		System.out.println("==== Flow Calculation Settings ====");		
+		if (!this._ready) {
+			System.out.println("WARNING: Prepare() has not run successfully yet.");
+		}
 		System.out.println("Network has " + this._network.getNodes().size() + " nodes and " + this._network.getLinks().size() + " edges.");
 		System.out.println("Number sources: " + this._numsources + " | sinks: " + this._numsinks);
 		System.out.println("Total demand sources: " + this._totaldemandsources + " | sinks: " + this._totaldemandsinks);
 		System.out.println("Time Horizon: " + this.TimeHorizon);
-		System.out.println("Timestep: " + this._timeStep);		
-		System.out.println("FlowFactor: " + this._flowFactor);
+		System.out.println("Timestep: " + this.timeStep);		
+		System.out.println("FlowFactor: " + this.flowFactor);
 		System.out.println("Edges rounded to zero length: " + this._roundedtozerolength);
 		System.out.println("Edges rounded to zero capacity: " + this._roundedtozerocapacity);
 		
@@ -222,16 +286,18 @@ public class FlowCalculationSettings {
 		  default:
 			  System.out.println("Algorithm to use: Unkown (" + this.searchAlgo +")");
 		}
+		
+		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);		
 		  
 		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
 		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);
 		System.out.println("Use implicit vertex cleanup: " + this.useImplicitVertexCleanup);
 		System.out.println("Use repeated paths: " + this.useRepeatedPaths);
-		System.out.println("Sort paths before augmenting: " + this.sortPathsBeforeAugmenting);
-		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
+		System.out.println("Sort paths before augmenting: " + this.sortPathsBeforeAugmenting);		
 		System.out.println("Use touched nodes hashmaps: " + this.checkTouchedNodes);
 		System.out.println("Keep paths at all: " + this.keepPaths);
 		System.out.println("Unfold stored paths: " + this.unfoldPaths);
+		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
 		
 		System.out.println("===================================");
 	}
@@ -253,22 +319,10 @@ public class FlowCalculationSettings {
 	public int getLength(Link edge) {
 	  return this._lengths.get(edge);
 	}
-	
-	/**
-	 * Returns the set timestep.
-	 * @return the set timestep. 
-	 */
-	public int getTimeStep() {
-		return this._timeStep;
-	}
-	
+		
 	public NetworkLayer getNetwork() {
 		return this._network;
 	}   
-	
-	/*public Node getSink() {
-		return this._superSink;
-	}*/
 	
 	/**
 	 * decides whether a node is or was a sink
@@ -529,7 +583,7 @@ public class FlowCalculationSettings {
         	}
         	
         	
-        	// TODO this could be weaved into the step above ... for a little speedup (<= factor 2)
+        	// this could be weaved into the step above ... for a little speedup (<= factor 2)
         	if (d != 0) {
         		if (d > 0) {
         		  System.out.println("supply@" + newNodeNames.get(node) + ":");

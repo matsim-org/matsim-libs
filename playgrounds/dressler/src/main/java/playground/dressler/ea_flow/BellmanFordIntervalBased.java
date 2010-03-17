@@ -45,9 +45,6 @@ import playground.dressler.control.FlowCalculationSettings;
 
 
 /**
- * Implementation of the Moore-Bellman-Ford Algorithm for a static network! i =
- * 1 .. n for all e = (v,w) if l(w) > l(v) + c(e) then l(w) = l(v) + c(e), p(w) =
- * v.
  * @author Manuel Schneider
  */
 
@@ -1157,11 +1154,6 @@ public class BellmanFordIntervalBased {
 			}
 				
 			if (task.time > cutofftime) {
-				//System.out.println("Beyond cut-off time, stopping.");
-				//break;
-				
-				// TODO CHANGE ME BACK TO PRIORITY QUEUE WHEN NEEDED!
-				
 				//System.out.println("Ignoring too late task in BFS!");
 				continue;
 
@@ -1171,17 +1163,15 @@ public class BellmanFordIntervalBased {
 			
 			if (this._settings.isSink(v)) {
 				/* keep scanning until strictly later to give more sinks a
-				 chance to be found!
-				 despite the priority queue, this could be called multiple times:
-				 all current intervalls could be at cutofftime, but still have a
-				 residual edge to scan, which will lead to an earlier
-				 discovery of the sink */
-				if (task.time < cutofftime) {				  
-				  cutofftime = task.time;	
-				  if (_debug > 0) {
-				    System.out.println("Setting new cutoff time: " + cutofftime);
-				  }
-				}				
+				 chance to be found! */
+				if (this._flow.isActiveSink(v)) {
+					if (task.time < cutofftime) {				  
+						cutofftime = task.time;	
+						if (_debug > 0) {
+							System.out.println("Setting new cutoff time: " + cutofftime);
+						}
+					}
+				}
 			} else if (task.node instanceof VirtualSource) {
 				// send out of source v
 				
@@ -1509,11 +1499,6 @@ public class BellmanFordIntervalBased {
 				
 			} else { // do a forward step
 				if (task.time > cutofftimeForward) {
-					//System.out.println("Beyond cut-off time, stopping.");
-					//break;
-					
-					// TODO CHANGE ME BACK TO PRIORITY QUEUE WHEN NEEDED!
-					
 					//System.out.println("Ignoring too late task in BFS!");
 					continue;
 
@@ -1521,15 +1506,14 @@ public class BellmanFordIntervalBased {
 				
 				if (this._settings.isSink(v)) {
 					// keep scanning until strictly later to give more sinks a chance to be found!
-					// despite the priority queue, this could be called multiple times:
-					// all current intervalls could be at cutofftime, but still have a 
-					// residual edge to scan, which will lead to an earlier discovery of the sink
-					if (task.time < cutofftimeForward) {				  
-					  cutofftimeForward = task.time;	
-					  if (_debug > 0) {
-					    System.out.println("Setting new cutoff time: " + cutofftimeForward);
-					  }
-					}				
+					if (this._flow.isActiveSink(v)) {
+						if (task.time < cutofftimeForward) {				  
+							cutofftimeForward = task.time;	
+							if (_debug > 0) {
+								System.out.println("Setting new cutoff time: " + cutofftimeForward);
+							}
+						}				
+					}
 				} else if (task.node instanceof VirtualSource) {
 					// send out of source v
 					List<BFTask> tempqueue = processSourceForward(v); 
