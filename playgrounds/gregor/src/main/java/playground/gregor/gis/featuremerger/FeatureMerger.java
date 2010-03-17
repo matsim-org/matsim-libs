@@ -28,9 +28,9 @@ public class FeatureMerger {
 	
 	public static void main (String [] args) {
 		
-		String inOld = MY_STATIC_STUFF.SVN_ROOT + "/shared-svn/studies/countries/id/padang/gis/buildings_v20090403/buildings_v20090403.shp";
+		String inOld = MY_STATIC_STUFF.SVN_ROOT + "/shared-svn/studies/countries/id/padang/gis/buildings_v20090728/evac_zone_buildings_v20090728.shp";
 		String inNew = MY_STATIC_STUFF.SVN_ROOT + "/shared-svn/studies/countries/id/padang/gis/buildings_v20100315/raw_buildings_v20100315.shp";
-		String out = MY_STATIC_STUFF.SVN_ROOT + "/shared-svn/studies/countries/id/padang/gis/buildings_v20100315/buildings_v20100315.shp";
+		String out = MY_STATIC_STUFF.SVN_ROOT + "/shared-svn/studies/countries/id/padang/gis/buildings_v20100315/evac_zone_buildings_v20100315.shp";
 		
 		Map<Integer,Feature> ftsOld = getOldFeatureMap(inOld);
 		
@@ -66,15 +66,19 @@ public class FeatureMerger {
 			Integer afternoon = (Integer) ft.getAttribute("POPAF");
 			Integer night = (Integer) ft.getAttribute("POPNT");
 			Feature oldFt = ftsOld.get(id);
-			if (oldFt == null) {
-				System.err.println("Building does not exist!!");
-				continue;
+			
+			Integer floor = 1;
+			Integer space = 0;
+			Integer quakeProof = 0;
+			Double minWidth = 0.;
+			if (oldFt != null) {
+				floor = (Integer) oldFt.getAttribute("floor");
+				space = (Integer) oldFt.getAttribute("capacity");
+				quakeProof = (Integer) oldFt.getAttribute("quakeProof");
+				minWidth = (Double) oldFt.getAttribute("minWidth");
 			}
-			Integer floor = (Integer) oldFt.getAttribute("floor");
-			Double space = (Double) oldFt.getAttribute("space");
-			Integer quakeProof = (Integer) oldFt.getAttribute("quakeProof");
 			try {
-				Feature f = featureType.create(new Object [] {oldFt.getDefaultGeometry(),id,night,morning,floor,space,quakeProof,afternoon});
+				Feature f = featureType.create(new Object [] {ft.getDefaultGeometry(),id,night,morning,floor,space,quakeProof, minWidth,afternoon});
 				outColl.add(f);
 			} catch (IllegalAttributeException e) {
 				e.printStackTrace();
