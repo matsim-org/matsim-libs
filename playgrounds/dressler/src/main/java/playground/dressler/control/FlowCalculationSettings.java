@@ -46,6 +46,7 @@ public class FlowCalculationSettings {
 	public static final int SEARCHALGO_MIXED = 3;
 	
 	/* default settings */
+	public boolean useSinkCapacities = true;
 	public int searchAlgo = SEARCHALGO_REVERSE;
 	public boolean useVertexCleanup = false;
 	public boolean useImplicitVertexCleanup = true; // unite vertex intervals before propagating?

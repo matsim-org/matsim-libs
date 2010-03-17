@@ -186,7 +186,8 @@ public class Flow {
 			
 			Interval available;
 			if (this._settings.whenAvailable != null) {
-				available = this._settings.whenAvailable.get(edge); 
+				available = this._settings.whenAvailable.get(edge);
+				// could still be null, which means "always"
 			} else {
 				available = null;
 			}

@@ -696,6 +696,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
 			if (task.node instanceof VirtualSink) {
 				// TODO check ... is this still okay with costs (due to capacitated sinks)?
+				// Should be. For active sinks we can ensure that the network is empty afterwards. 
 				// we always lower the best arrival time when we reach an active sink
 				if (task.time < cutofftime && this._flow.isActiveSink(v)) {
 					cutofftime = task.time;

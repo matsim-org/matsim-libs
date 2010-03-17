@@ -50,6 +50,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.Interval.EdgeIntervals;
+import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.Interval.VertexIntervals;
 import playground.dressler.ea_flow.BellmanFordIntervalBased;
@@ -191,8 +192,12 @@ public class MultiSourceEAF {
 		long timeStart = System.currentTimeMillis();
 
 		BellmanFordIntervalBased routingAlgo;
-		//routingAlgo = new BellmanFordIntervalBased(settings, fluss);
-		routingAlgo = new BellmanFordIntervalBasedWithCost(settings, fluss);
+		if (settings.useSinkCapacities) {
+			routingAlgo = new BellmanFordIntervalBasedWithCost(settings, fluss);
+		} else {
+		  routingAlgo = new BellmanFordIntervalBased(settings, fluss);
+		}
+		
 			
 		int i;
 		long EdgeGain = 0;
@@ -724,11 +729,12 @@ public class MultiSourceEAF {
 		//settings.MaxRounds = 5;
 		//settings.checkConsistency = 100;		
 		//settings.useVertexCleanup = false;
+		settings.useSinkCapacities = true;
 		settings.useImplicitVertexCleanup = true;
 		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		settings.useRepeatedPaths = false; // not compatible with costs!
+		settings.useRepeatedPaths = false && !settings.useSinkCapacities; // not compatible with costs!
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		//settings.trackUnreachableVertices = true && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
 		settings.sortPathsBeforeAugmenting = true;
@@ -736,6 +742,8 @@ public class MultiSourceEAF {
 		settings.keepPaths = true; // do not store paths at all!
 		settings.unfoldPaths = true; // unfold stored paths into forward paths
 		
+		//settings.whenAvailable = new HashMap<Link, Interval>();
+		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
 		
 		settings.printStatus();
 		
