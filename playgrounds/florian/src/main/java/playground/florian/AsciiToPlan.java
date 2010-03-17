@@ -45,7 +45,7 @@ public class AsciiToPlan {
 		StringBuffer kette = new StringBuffer();
 
 
-		//�ffne ASCII Input File
+		//Oeffne ASCII Input File
 		try {
 			in = new BufferedReader(new FileReader(new File(INPUT_FILE)));
 		} catch (FileNotFoundException e) {
