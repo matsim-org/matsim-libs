@@ -50,12 +50,14 @@ public class LMwCSCustomized extends LocationMutatorwChoiceSet {
 		for (ActivityFacility fac: choiceSet){
 			if (fac.getCoord().equals(startCoord)) {
 				choiceSet.remove(fac);
-	//			log.info("Removed fac "+fac.getId()+" at link "+fac.getLinkId()+" from choice set with start coord "+startCoord.getX()+"/"+startCoord.getY());
+//				log.info("Removed fac "+fac.getId()+" at link "+fac.getLinkId()+" from choice set with start coord "+startCoord.getX()+"/"+startCoord.getY());
 				break;
 			}
-			else if (fac.getCoord().equals(endCoord)) {
+		}
+		for (ActivityFacility fac: choiceSet){
+			if (fac.getCoord().equals(endCoord)) {
 				choiceSet.remove(fac);
-	//			log.info("Removed fac "+fac.getId()+" at link "+fac.getLinkId()+" from choice set with start coord "+endCoord.getX()+"/"+endCoord.getY());
+//				log.info("Removed fac "+fac.getId()+" at link "+fac.getLinkId()+" from choice set with start coord "+endCoord.getX()+"/"+endCoord.getY());
 				break;
 			}
 		}
