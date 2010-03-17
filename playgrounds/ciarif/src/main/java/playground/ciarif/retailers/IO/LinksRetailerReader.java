@@ -123,6 +123,7 @@ public class LinksRetailerReader {
 				Link fLink = this.controler.getNetwork().getLinks().get(af.getLinkId());
 				LinkRetailersImpl link = new LinkRetailersImpl(fLink, (NetworkLayer) controler.getNetwork());
 				links.put(link.getId(),link);
+				log.info(("The facility " + af.getId()+ " is currently on the link: " + link.getId()));
 			}
 		}
 		this.currentLinks=links;

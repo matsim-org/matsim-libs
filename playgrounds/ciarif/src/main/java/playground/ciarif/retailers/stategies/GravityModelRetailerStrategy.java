@@ -98,19 +98,20 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 			
 			locations.put(intCount,af.getLinkId().toString());
 			intCount = intCount+1;
-			//log.info("The facility with Id: " + integer + " has been added");
+			log.info("The facility with Id: " + af.getId() + " has been added, this is located on the link: " + af.getLinkId());
 		}
-		
 		for (LinkRetailersImpl l:availableLinks.values()) {
-			if (locations.containsValue(l.getId())) {}
+			if (locations.containsValue(l.getId().toString())) { 
+				log.info("The Link: " + l.getId() + " is already on the list");
+			}
 			else {
 				locations.put(intCount,l.getId().toString());
 				intCount = intCount+1;
-				//log.info("The facility with Id: " + Integer.parseInt(l.getId().toString()) + " has been added");
+				log.info("The Link: " + l.getId() + " has been added");
 			}
 		}
 		
-		log.info("Initial Locations = " + locations);
+		log.info("Initial Locations (with Free Links) = " + locations);
 		return locations;
 		
 	}
@@ -222,10 +223,11 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		for (ActivityFacilityImpl af: this.retailerFacilities.values()){
 			Id id = af.getLinkId();
 			LinkRetailersImpl link = new LinkRetailersImpl(controler.getNetwork().getLinks().get(id),(NetworkLayer) controler.getNetwork());
-			availableLinks.put(link.getId(),link);
+			availableLinks.put(id,link);
 		}
 		availableLinks.putAll(freeLinks);
 		return availableLinks;
+		
 	}
 	
 	public Map<Id, ActivityFacilityImpl> getMovedFacilities() {

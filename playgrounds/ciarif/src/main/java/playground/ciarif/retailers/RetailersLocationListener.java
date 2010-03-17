@@ -32,8 +32,9 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	public final static String CONFIG_RETAILERS = "retailers";
 	public final static String CONFIG_STRATEGY_TYPE = "strategyType";
 	public final static String CONFIG_MODEL_ITERATION = "modelIteration";
+	public static final String CONFIG_ANALYSIS_FREQUENCY = "analysisFrequency"; 
 	public final static String CONFIG_RSW_OUTPUT_FILE = "rswOutputFile";
-	//public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
+	//public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable"; //TODO Look if they make sense anymore, try to use them again or delete it
 	//public final static String CONFIG_RET_SUM_TABLE = "retailersSummaryTable";
 	
 	//private variables
@@ -66,15 +67,25 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 		this.lrr = new LinksRetailerReader (controler, retailers);
 		lrr.init();
 		
+		String rswOutputFile = (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_RSW_OUTPUT_FILE));
+		if (rswOutputFile == null) {
+			throw new RuntimeException("The file to which the Retailers Summary should be written has not been set");
+		}
+		else {
+			this.rsw = new RetailersSummaryWriter (rswOutputFile);
+		}
+		this.cfc = new CountFacilityCustomers(controler.getPopulation().getPersons());
+		
 	}
 	
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		if (parallel) {
-			
-		}
+		
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		
+		
+		
 		int gravityModelIter =0;
 		String modelIterParam = (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_MODEL_ITERATION));
 		if (modelIterParam == null) {
@@ -84,26 +95,35 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 		else {
 			gravityModelIter = Integer.parseInt (modelIterParam);
 		}
-				
-		if (event.getIteration() ==gravityModelIter){
+		
+		int analysisFrequency =0;
+		String AnalysisFrequencyParam = (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_ANALYSIS_FREQUENCY));
+		if (AnalysisFrequencyParam == null) {
+			log.warn("The frequency with which the analysis should be run has not been set, the analysis will be only performed when the model will run and at the last iteration");
+			analysisFrequency = controler.getLastIteration();
+		}
+		else {
+			analysisFrequency = Integer.parseInt (AnalysisFrequencyParam);
+		}
+		
+		if (event.getIteration() == gravityModelIter){
 			// TODO maybe need to add if sequential statement
 			//TODO The file name below should be read from the config file
 			
-			String rswOutputFile = (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_RSW_OUTPUT_FILE));
-			if (rswOutputFile == null) {
-				throw new RuntimeException("The file to which the Retailers Summary should be written has not been set");
-			}
-			else {
-				this.rsw = new RetailersSummaryWriter (rswOutputFile);
-			}
-			this.cfc = new CountFacilityCustomers(controler.getPopulation().getPersons());
-			
 			for (Retailer r : this.retailers.getRetailers().values()) {
-				rsw.write(r, event.getIteration(), cfc);
+				this.rsw.write(r, event.getIteration(), this.cfc);
 				r.runStrategy(lrr.getFreeLinks());
 				lrr.updateFreeLinks();
 				Map<Id, PersonImpl> persons = (Map<Id, PersonImpl>)controler.getPopulation().getPersons();
 				new ReRoutePersons().run(r.getMovedFacilities(), controler.getNetwork(), persons, pcrl, controler.getFacilities());  
+			}
+		}
+		if (controler.getIterationNumber()!=0 && controler.getIterationNumber()%analysisFrequency==0 && controler.getIterationNumber()!= gravityModelIter && controler.getIterationNumber()!= controler.getLastIteration() ) {
+		
+			for (Retailer r : this.retailers.getRetailers().values()) {
+			
+				rsw.write(r, controler.getIterationNumber(),this.cfc);  
+			
 			}
 		}
 		
@@ -111,7 +131,6 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 			
 			for (Retailer r : this.retailers.getRetailers().values()) {
 
-				log.info("cfc=" + this.cfc);
 				rsw.write(r, controler.getIterationNumber(),this.cfc);  
 
 			}
