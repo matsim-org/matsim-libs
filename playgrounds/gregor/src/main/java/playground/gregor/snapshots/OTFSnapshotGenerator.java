@@ -32,7 +32,7 @@ public class OTFSnapshotGenerator {
 
 	public final static String SHARED_SVN = "../../../../../arbeit/svn/shared-svn";
 //	public final static String RUNS_SVN = "../../../../../arbeit/svn/runs-svn/run1006/output";
-	public final static String RUNS_SVN = "../../../matsim/test/output/org/matsim/evacuation/run/MarginalRiskCostControllerTest/testMarginalRiskCostController";
+	public final static String RUNS_SVN = "../../../matsim/test/output/org/matsim/evacuation/run/ShelterEvacuationControllerTest/testShelterEvacuationController";
 	
 	private final static String lsFile = SHARED_SVN + "/studies/countries/id/padang/gis/network_v20080618/d_ls.shp";
 
@@ -56,7 +56,8 @@ public class OTFSnapshotGenerator {
 		this.scenario.getConfig().simulation().setEndTime(5*3600);
 		this.scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		
-		this.scenario.getConfig().evacuation().setBuildingsFile(SHARED_SVN + "/studies/countries/id/padang/gis/buildings_v20090728/evac_zone_buildings_v20090728.shp");
+//		this.scenario.getConfig().evacuation().setBuildingsFile(SHARED_SVN + "/studies/countries/id/padang/gis/buildings_v20090728/evac_zone_buildings_v20090728.shp");
+		this.scenario.getConfig().evacuation().setBuildingsFile("../../../matsim/test/input/org/matsim/evacuation/data/buildings.shp");
 //		this.scenario.getConfig().evacuation().setSampleSize("0.1");
 //		this.scenario.getConfig().controler().setLastIteration(0);
 		int it = this.scenario.getConfig().controler().getLastIteration();
