@@ -23,8 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import opendap.util.dasTools;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -40,19 +38,18 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
-import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
 import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
+import playground.droeder.charts.DaBarChart;
+import playground.droeder.charts.DaChartWriter;
 
 
 
@@ -84,6 +81,8 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	
 	// "D" run denver -- "G" run gershensonTestNetwork
 	private static final String config = "D";
+	// "G" for GershensonController -- "I" for InterimController
+	private static final String controller = "G";
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 
@@ -99,8 +98,13 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		}else if (configFile == "D"){
 			log.info("start Denver");
 			DenverScenarioGenerator dsg = new DenverScenarioGenerator();
+			if(controller == "G"){
+				dsg.controllerClass =  GershensonAdaptiveTrafficLightController.class.getCanonicalName();
+			}else if(controller =="I"){
+				dsg.controllerClass  = AdaptiveInterimSignalController.class.getCanonicalName();
+			}
 			dsg.createScenario();
-			conf = dsg.CONFIGOUTPUTFILE;
+			conf = DaPaths.OUTPUT + "Denver\\denverConfig.xml";
 		}else {
 			conf = configFile;
 		}
@@ -135,7 +139,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				event.getControler().getEvents().addHandler(handler2);
 				
 				//enable live-visualization
-				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	
@@ -172,14 +176,22 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		c.getQueueSimulationListener().add(new SimulationInitializedListener<QSim>() {
 			//add the adaptive controller as events listener
 			public void notifySimulationInitialized(SimulationInitializedEvent<QSim> e) {
+//				AdaptiveSignalSystemControlerImpl adaptiveController;
 				QSim qs = e.getQueueSimulation();
-				GershensonAdaptiveTrafficLightController adaptiveController = 
-					(GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-				adaptiveController.setParameters(n, u, cap);
-				adaptiveController.init(corrGroups, compGroups, e.getQueueSimulation().getQueueNetwork(), handler2);
+				if (controller == "G"){
+					GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+					adaptiveController.setParameters(n, u, cap);
+					adaptiveController.init(corrGroups, compGroups, e.getQueueSimulation().getQueueNetwork(), handler2);
+					c.getEvents().addHandler(adaptiveController);				
+				}else{
+					AdaptiveInterimSignalController adaptiveController = (AdaptiveInterimSignalController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+					adaptiveController.setParameters(n, u, cap);
+					adaptiveController.init(corrGroups, compGroups, e.getQueueSimulation().getQueueNetwork(), handler2);
+					c.getEvents().addHandler(adaptiveController);
+				}
+				
 				handler2.setQNetwork(e.getQueueSimulation().getQueueNetwork());
 				
-				c.getEvents().addHandler(adaptiveController);
 				
 			}
 		});
@@ -187,8 +199,14 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		c.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QSim>() {
 			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSim> e) {
 				QSim qs = e.getQueueSimulation();
-				GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-				c.getEvents().removeHandler(adaptiveController);
+				if (controller == "G"){
+					GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+					c.getEvents().removeHandler(adaptiveController);
+				}else{
+					AdaptiveInterimSignalController adaptiveController = (AdaptiveInterimSignalController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+					c.getEvents().removeHandler(adaptiveController);
+
+				}
 			}
 		});
 		
@@ -222,35 +240,37 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	
 	
 	public static void main(String[] args) {
-//		DaBarChart barChart = new DaBarChart();
-//		double cap = 0;
+		DaBarChart barChart = new DaBarChart();
+		double cap = 0.90;
 		
 		GershensonRunner runner = new GershensonRunner();
-		runner.setN(300);
-		runner.setU(6);
+		runner.setN(50);
+		runner.setU(60);
 		runner.setCap(0.90);
 		runner.setD(100);
 		runner.runScenario(config);
 		
-//		for (int c = 0; c < 20; c++){
+//		for (int c = 0; c < 16; c++){
 //			barChart = new DaBarChart();
 //			cap = (80.00+(double)c)/100.00;
-//			for (int u = 4; u < 18; u++){
-//				nAndT = new LinkedHashMap<Number, Number>();
-//				for (int n = 8; n < 21; n++){
-//					runner = new GershensonRunner();
-//					Gbl.reset();
-//					runner.setU(u);
-//					runner.setN(n);
-//					runner.setCap(cap);
-//					runner.runScenario(config);
-//					nAndT.put(n, avTT);
-//				}
-//				barChart.addSeries("u=" + String.valueOf(u), nAndT);
-//	//			nAndUT.put(n, uAndT);
-//			}	
-//			new DaChartWriter().writeChart(DaPaths.OUTPUT+"DENVER\\Charts_10_03_02\\" + "u4-17_n8-20_cap" + 
-//					String.valueOf(cap), 1600, 1024, barChart.createChart("capacityFactor = " + String.valueOf(cap), "number of waiting cars n [ ]", "average travelTime t [s]", 1800));
+			for (int u = 5; u < 30; u = u + 2){
+				nAndT = new LinkedHashMap<Number, Number>();
+				for (int n = 10; n < 401; n = n+10){
+					runner = new GershensonRunner();
+					Gbl.reset();
+					runner.setU(u);
+					runner.setN(n);
+					runner.setCap(cap);
+					runner.setD(100);
+					runner.runScenario(config);
+					nAndT.put(n, avTT);
+					System.err.println("u=" + u + " n=" + n);
+				}
+				barChart.addSeries("u=" + String.valueOf(u), nAndT);
+	//			nAndUT.put(n, uAndT);
+			}	
+			new DaChartWriter().writeChart(DaPaths.OUTPUT+"DENVER\\Charts_10_03_17\\" + "n150-400_u8-18_cap" + 
+					String.valueOf(cap), 1600, 1024, barChart.createChart("capacityFactor = " + String.valueOf(cap), "waitingCars * redTime [1*s]", "average travelTime t [s]", 1800));
 //		}
 	}
 

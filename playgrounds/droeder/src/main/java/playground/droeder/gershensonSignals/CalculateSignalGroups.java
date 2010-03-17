@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 /**
@@ -66,7 +67,6 @@ public class CalculateSignalGroups{
 				}
 			}
 		}	
-		log.error(corrGroups.toString());
 		return corrGroups;
 	}
 	
@@ -94,7 +94,6 @@ public class CalculateSignalGroups{
 			}
 			cg.put(ee.getKey(), l);
 		}
-		log.error(cg.toString());
 		return cg;
 	}
 	
@@ -131,6 +130,35 @@ public class CalculateSignalGroups{
 			}
 		}
 		return l;
+	}
+	
+	public Map<Id, Id> calculateMainOutlinks(Network net){
+		Map<Id, Id> mainOutLinks = new HashMap<Id, Id>();
+		Coord coordInLink;
+		Coord coordOutLink;
+		double temp;
+		double thetaOutLink;
+		double thetaInLink;
+		double thetaDiff;
+		
+		for (Link l : net.getLinks().values()){
+			coordInLink = getVector(l);
+			thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
+		
+			temp = Math.PI;
+			mainOutLinks.put(l.getId(), null);
+			for (Link ol : l.getToNode().getOutLinks().values()){
+				coordOutLink = getVector(ol);
+				thetaOutLink = Math.atan2(coordOutLink.getY(), coordOutLink.getX());
+				thetaDiff = Math.abs(thetaOutLink-thetaInLink);
+				
+				if ((temp> thetaDiff) && !(l.getFromNode().equals(ol.getToNode()))){
+					temp = thetaDiff;
+					mainOutLinks.put(l.getId(), ol.getId());
+				}
+			}
+		}
+		return mainOutLinks;
 	}
 	
 	private static Coord getVector(Link link){

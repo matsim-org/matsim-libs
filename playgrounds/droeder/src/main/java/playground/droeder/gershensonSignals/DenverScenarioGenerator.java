@@ -77,8 +77,8 @@ public class DenverScenarioGenerator {
 	private static final String OUTPUTDIRECTORY = OUTPUT;
 	
 	// DEFINITIONS
-	private static final String controllerClass = GershensonAdaptiveTrafficLightController.class.getCanonicalName();
-	private static final int iterations = 10;
+	protected static String controllerClass;
+	private static final int iterations = 1;
 	Id id1 = new IdImpl("1");
 	Id id2 = new IdImpl("2");
 	
@@ -191,7 +191,7 @@ private void createConfig(Config config) {
 		config.getQSimConfigGroup().setSnapshotFile("cmcf.mvi");
 		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
-		config.getQSimConfigGroup().setStuckTime(10000);
+		config.getQSimConfigGroup().setStuckTime(20000);
 		config.getQSimConfigGroup().setRemoveStuckVehicles(true);
 //		config.getQSimConfigGroup().setStartTime(6*3600);
 		config.getQSimConfigGroup().setEndTime(7*3600);
