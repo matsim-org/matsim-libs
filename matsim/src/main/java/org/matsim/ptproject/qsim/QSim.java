@@ -383,6 +383,10 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		if ((this.networkChangeEventsQueue != null) && (this.networkChangeEventsQueue.size() > 0)) {
 			handleNetworkChangeEvents(time);
 		}
+    if (this.signalEngine != null) {
+      this.signalEngine.beforeSimStep(time);
+    }
+
 	}
 
 	/**

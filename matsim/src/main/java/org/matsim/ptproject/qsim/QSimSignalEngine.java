@@ -99,6 +99,17 @@ public class QSimSignalEngine implements SignalEngine {
 			initSignalSystemController(this.signalSystemsConfig);
 		}
 	}
+	
+  public void beforeSimStep(double time) {
+    for (SignalGroupDefinition signalGroup : this.signalSystems.getSignalGroupDefinitions().values()) {
+      Id linkId = signalGroup.getLinkRefId();
+      QLinkLanesImpl qlink = (QLinkLanesImpl) this.network.getQueueLink(linkId);
+      for (QLane qlane : qlink.getToNodeQueueLanes()){
+        qlane.updateGreenState(time);
+      }
+    }
+  }
+
 
 	/**
 	 * @see org.matsim.signalsystems.mobsim.SignalEngine#getSignalSystemControlerBySystemId()
@@ -257,5 +268,6 @@ public class QSimSignalEngine implements SignalEngine {
 	public EventsManager getEvents() {
 		return this.events;
 	}
+
 
 }

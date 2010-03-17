@@ -52,7 +52,6 @@ public class QLaneNode extends QNode {
     if (this.isSignalized()) {
       for (QLink link : this.inLinksArrayCache){
         for (QLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
-          lane.updateGreenState(now);
           if (lane.isThisTimeStepGreen()){
             while (!lane.bufferIsEmpty()) {
               QVehicle veh = lane.getFirstFromBuffer();
