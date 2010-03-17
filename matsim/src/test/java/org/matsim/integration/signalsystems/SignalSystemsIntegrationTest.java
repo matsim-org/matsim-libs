@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.integration.signalsystems;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -31,7 +32,9 @@ import org.matsim.testcases.MatsimTestCase;
  *
  */
 public class SignalSystemsIntegrationTest extends MatsimTestCase {
-
+  
+  private static final Logger log = Logger.getLogger(SignalSystemsIntegrationTest.class);
+  
 	private final static String CONFIG_FILE_NAME = "signalSystemsIntegrationConfig.xml";
 
 	public void testSignalSystems() {
@@ -42,10 +45,16 @@ public class SignalSystemsIntegrationTest extends MatsimTestCase {
 		c.setCreateGraphs(false);
 		c.run();
 		
-		String iterationOutput = this.getOutputDirectory() + "/ITERS/it.10/";
+		String iterationOutput = this.getOutputDirectory() + "ITERS/it.10/";
+		
+		String eventsFileIn = this.getInputDirectory() + "10.events.xml.gz";
+		String eventsFileOut = iterationOutput + "10.events.xml.gz";
+		
+		log.info("comparing " + eventsFileIn + " " + eventsFileOut);
+		
 		assertEquals("different events files", 
-				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "10.events.xml.gz"), 
-				CRCChecksum.getCRCFromFile(iterationOutput + "10.events.xml.gz"));
+				CRCChecksum.getCRCFromFile(eventsFileIn), 
+				CRCChecksum.getCRCFromFile(eventsFileOut));
 
 		assertEquals("different population files", 
 				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "10.plans.xml.gz"), 
