@@ -53,7 +53,7 @@ public class AsciiToPlan {
 			e.printStackTrace();
 
 		}
-		System.out.println("�ffnen der Datei erfolgreich!");
+		System.out.println("Oeffnen der Datei erfolgreich!");
 		//lese 1. Zeile ein
 		String zeile = null;
 		try {
