@@ -12,7 +12,7 @@ import org.jfree.chart.JFreeChart;
 public class ScoreToChartTest{
 	 
 
-	public static final String stylesheet = "./src/main/java/playground/florian/JFreeTest/scores-JFree.xsl"; 
+	public static final String stylesheet = "./test/input/playground/florian/JFreeTest/scores-JFree.xsl"; 
 
 
 	public static JFreeChart createChartFromXMLScore(String filename) {

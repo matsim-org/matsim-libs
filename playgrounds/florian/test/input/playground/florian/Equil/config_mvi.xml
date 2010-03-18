@@ -8,7 +8,7 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="./src/main/java/playground/florian/Equil/plans100.xml" />
+		<param name="inputPlansFile" value="./src/main/java/playground/florian/Equil/plans2.xml" />
 	</module>
 
 	<module name="controler">
@@ -20,8 +20,8 @@
 	<module name="qsim" >
 		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name = "snapshotFormat"	value = "otfvis"/> <!-- netvis, googleearth, transims -->
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="12:00:00" />
+		<param name="startTime" value="06:00:00" />
+		<param name="endTime" value="07:00:00" />
 		
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.1" />
