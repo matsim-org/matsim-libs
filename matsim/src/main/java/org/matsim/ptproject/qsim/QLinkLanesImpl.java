@@ -545,4 +545,16 @@ public class QLinkLanesImpl implements QLink {
 		agentsInActivities.remove(agent.getPerson().getId());
 	}
 
+
+  @Override
+  public double getBufferLastMovedTime() {
+    throw new UnsupportedOperationException();
+  }
+
+
+  @Override
+  public QVehicle popFirstFromBuffer() {
+    throw new UnsupportedOperationException();
+  }
+
 }

@@ -114,7 +114,7 @@ public class QNode {
 		if (this.signalized) {
 			for (QLink link : this.inLinksArrayCache){
 				for (QLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
-					lane.updateGreenState(now);
+//					lane.updateGreenState(now);
 					if (lane.isThisTimeStepGreen()){
 		        while (!lane.bufferIsEmpty()) {
 		          QVehicle veh = lane.getFirstFromBuffer();
@@ -170,7 +170,7 @@ public class QNode {
     if (link instanceof QLinkImpl){
       while (!link.bufferIsEmpty()) {
         QVehicle veh = ((QLinkImpl) link).getFirstFromBuffer();
-        if (!moveVehicleOverNode(veh, (QLinkImpl) link, now)) {
+        if (!moveVehicleOverNode(veh, link, now)) {
           break;
         }
       }
@@ -187,11 +187,19 @@ public class QNode {
     }
   }
 	
-	protected boolean moveVehicleOverNode(QVehicle veh, QLane lane,
-      double now) {
-	  throw new UnsupportedOperationException("Must be subclassed to use this method!");
-	};
+//	protected boolean moveVehicleOverNode(QVehicle veh, QLane lane,
+//      double now) {
+//	  throw new UnsupportedOperationException("Must be subclassed to use this method!");
+//	};
 
+	
+	protected void checkNextLinkSemantics(Link currentLink, Link nextLink, QVehicle veh){
+    if (currentLink.getToNode() != nextLink.getFromNode()) {
+      throw new RuntimeException("Cannot move vehicle " + veh.getId() +
+          " from link " + currentLink.getId() + " to link " + nextLink.getId());
+    }
+	}
+	
   // ////////////////////////////////////////////////////////////////////
   // Queue related movement code
   // ////////////////////////////////////////////////////////////////////
@@ -202,21 +210,15 @@ public class QNode {
    * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
    * otherwise (e.g. in case where the next link is jammed)
    */
-  protected boolean moveVehicleOverNode(final QVehicle veh, final QLinkImpl currentLane, final double now) {
+  protected boolean moveVehicleOverNode(final QVehicle veh, final QBufferItem currentLane, final double now) {
     Id nextLinkId = veh.getDriver().chooseNextLinkId();
-    Link currentLink = currentLane.getLink();
-
+    Link currentLink = veh.getCurrentLink();
+    
     // veh has to move over node
     if (nextLinkId != null) {
-      Link nextLink = this.queueNetwork.getNetworkLayer().getLinks().get(nextLinkId);
-
-      if (currentLink.getToNode() != nextLink.getFromNode()) {
-        throw new RuntimeException("Cannot move vehicle " + veh.getId() +
-            " from link " + currentLink.getId() + " to link " + nextLinkId);
-      }
-      
       QLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
-
+      Link nextLink = nextQueueLink.getLink();
+      this.checkNextLinkSemantics(currentLink, nextLink, veh);
       if (nextQueueLink.hasSpace()) {
         (currentLane).popFirstFromBuffer();
         veh.getDriver().moveOverNode();
@@ -226,7 +228,7 @@ public class QNode {
 
       // check if veh is stuck!
 
-      if ((now - currentLane.bufferLastMovedTime) > Simulation.getStuckTime()) {
+      if ((now - currentLane.getBufferLastMovedTime()) > Simulation.getStuckTime()) {
         /* We just push the vehicle further after stucktime is over, regardless
          * of if there is space on the next link or not.. optionally we let them
          * die here, we have a config setting for that!

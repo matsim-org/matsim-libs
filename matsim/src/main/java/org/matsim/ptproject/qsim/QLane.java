@@ -66,7 +66,7 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * @author aneumann
  * @author mrieser
  */
-public class QLane {
+public class QLane implements QBufferItem {
 
 	private static final Logger log = Logger.getLogger(QLane.class);
 
@@ -119,7 +119,7 @@ public class QLane {
 	private double buffercap_accumulate = 1.0;
 
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
-	/*package*/ double bufferLastMovedTime = Time.UNDEFINED_TIME;
+	private double bufferLastMovedTime = Time.UNDEFINED_TIME;
 
 	private final QLink queueLink;
 	/**
@@ -317,7 +317,7 @@ public class QLane {
 		}
 	}
 
-	protected boolean bufferIsEmpty() {
+	public boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
 	}
 
@@ -553,7 +553,7 @@ public class QLane {
 				|| (this.buffercap_accumulate >= 1.0)));
 	}
 
-	/*package*/ QVehicle popFirstFromBuffer() {
+	public QVehicle popFirstFromBuffer() {
 		double now = QSimTimer.getTime();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
@@ -1016,5 +1016,10 @@ public class QLane {
 	public double getLength(){
 	  return this.length;
 	}
+
+  @Override
+  public double getBufferLastMovedTime() {
+    return this.bufferLastMovedTime;
+  }
 	
 }

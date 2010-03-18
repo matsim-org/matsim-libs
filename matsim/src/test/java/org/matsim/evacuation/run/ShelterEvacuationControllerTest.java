@@ -19,11 +19,14 @@
 
 package org.matsim.evacuation.run;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ShelterEvacuationControllerTest extends MatsimTestCase{
 
+  private static final Logger log = Logger.getLogger(ShelterEvacuationControllerTest.class);
+  
 	public void testShelterEvacuationController() {
 		String config = getInputDirectory() + "config.xml";
 		String refEventsFile = getInputDirectory() + "events.txt.gz";
@@ -34,6 +37,9 @@ public class ShelterEvacuationControllerTest extends MatsimTestCase{
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(10);
 		controler.run();
+		log.info("comparing events files: ");
+		log.info(refEventsFile);
+		log.info(testEventsFile);
 		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(refEventsFile),	CRCChecksum.getCRCFromFile(testEventsFile));
 	}
 

@@ -91,7 +91,7 @@ public class QLinkImpl implements QLink {
 	private double freespeedTravelTime = Double.NaN;
 
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
-	/*package*/ double bufferLastMovedTime = Time.UNDEFINED_TIME;
+	private double bufferLastMovedTime = Time.UNDEFINED_TIME;
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
@@ -248,6 +248,7 @@ public class QLinkImpl implements QLink {
 
 	public void addDepartingVehicle(QVehicle vehicle) {
 		this.waitingList.add(vehicle);
+		vehicle.setCurrentLink(this.getLink());
 		this.activateLink();
 	}
 
@@ -556,7 +557,8 @@ public class QLinkImpl implements QLink {
 		}
 		this.getToQueueNode().activateNode();
 	}
-	/*package*/ QVehicle popFirstFromBuffer() {
+	
+	public QVehicle popFirstFromBuffer() {
 		double now = QSimTimer.getTime();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
@@ -906,5 +908,10 @@ public class QLinkImpl implements QLink {
 	public void removeAgentInActivity(PersonAgentI agent) {
 		agentsInActivities.remove(agent.getPerson().getId());
 	}
+
+  @Override
+  public double getBufferLastMovedTime() {
+    return this.bufferLastMovedTime;
+  }
 
 }

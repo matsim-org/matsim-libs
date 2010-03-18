@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QLanesNetworkFactory
+ * QSimFunctionalInterface
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.ptproject.qsim;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 
-
-public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLink> {
-
-  private QNetworkFactory<QNode, QLink> delegate;
-
-  public QLanesNetworkFactory(QNetworkFactory<QNode, QLink> delegate){
-    this.delegate = delegate;
-  }
-
-  @Override
-  public QLinkLanesImpl newQueueLink(Link link, QNetwork queueNetwork,
-      QNode queueNode) {
-    return new QLinkLanesImpl(link, queueNetwork, queueNode);
-  }
-
-  @Override
-  public QNode newQueueNode(Node node, QNetwork queueNetwork) {
-    return this.delegate.newQueueNode(node, queueNetwork);
-  }
+/**
+ * Marker interface for other interfaces that are not related with
+ * design decisions and are written solely to make QSim work.
+ * @author dgrether
+ */
+public interface QSimFunctionalInterface {
 
 }

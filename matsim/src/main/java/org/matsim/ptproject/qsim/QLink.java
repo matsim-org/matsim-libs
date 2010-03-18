@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public interface QLink {
+public interface QLink extends QBufferItem {
 
   /**
    *  Is called after link has been read completely 
@@ -88,8 +88,6 @@ public interface QLink {
   public QNetwork getQueueNetwork();
 
   public boolean hasSpace();
- 
-  public boolean bufferIsEmpty();
   
   public void clearVehicles();
   
