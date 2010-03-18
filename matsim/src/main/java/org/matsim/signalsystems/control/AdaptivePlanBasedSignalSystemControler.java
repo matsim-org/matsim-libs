@@ -21,7 +21,6 @@ package org.matsim.signalsystems.control;
 
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.signalsystems.config.SignalSystemConfiguration;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 
 /**
@@ -39,7 +38,4 @@ public abstract class AdaptivePlanBasedSignalSystemControler extends
 	@Override
   public abstract void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e);
 
-	@Override
-	public abstract boolean givenSignalGroupIsGreen(double time, SignalGroupDefinition signalGroup);
-	
 }

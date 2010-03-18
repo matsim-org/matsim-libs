@@ -64,17 +64,6 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 		this.plans = (PlanBasedSignalSystemControlInfo)config.getControlInfo();
 	}
 	
-	/**
-	 * @see org.matsim.signalsystems.control.SignalSystemController#givenSignalGroupIsGreen(org.matsim.signalsystems.systems.SignalGroupDefinition)
-	 */
-	public boolean givenSignalGroupIsGreen(double time, 
-			SignalGroupDefinition signalGroup) {
-		SignalGroupState state = this.getSignalGroupStates().get(signalGroup);
-		if (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.REDYELLOW)){
-			return true;
-		}
-		return false;
-	}
 	
   @Override
   public SignalGroupState getSignalGroupState(double seconds,
