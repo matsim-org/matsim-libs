@@ -171,7 +171,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
     this.agentFactory = new AgentFactory(this);
     this.notTeleportedModes.add(TransportMode.car);
-    this.simEngine = new QSimEngineImpl(this.network, MatsimRandom.getRandom());
+    this.simEngine = new QSimEngineImpl(this, MatsimRandom.getRandom());
     installCarDepartureHandler();
 	}
 
@@ -655,7 +655,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	public void setQueueNetwork(QNetwork net) {
 		this.network = net;
-		this.simEngine = new QSimEngineImpl(this.network, MatsimRandom.getRandom());
+		this.simEngine = new QSimEngineImpl(this, MatsimRandom.getRandom());
 	}
 
 	public PopulationImpl getPopulation() {

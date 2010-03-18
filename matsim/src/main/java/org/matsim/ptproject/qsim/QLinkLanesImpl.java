@@ -407,10 +407,6 @@ public class QLinkLanesImpl implements QLink {
 		return total;
 	}
 
-//	public Queue<QueueVehicle> getVehiclesInBuffer() {
-//		return this.originalLane.getVehiclesInBuffer();
-//	}
-
 	/**
 	 * One should think about the need for this method
 	 * because it is only called by one testcase

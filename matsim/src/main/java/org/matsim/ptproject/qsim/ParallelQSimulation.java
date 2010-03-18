@@ -39,6 +39,6 @@ public class ParallelQSimulation extends QSim{
 	  int numOfThreads = conf.getNumberOfThreads();
 	  
 	  // use the ParallelQueueSimEngine
-	  this.simEngine = new ParallelQSimEngine(this.network, MatsimRandom.getRandom(), numOfThreads);
+	  this.simEngine = new ParallelQSimEngine(this, MatsimRandom.getRandom(), numOfThreads);
 	}
 }

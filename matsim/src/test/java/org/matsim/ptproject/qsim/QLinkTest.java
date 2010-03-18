@@ -238,13 +238,12 @@ public class QLinkTest extends MatsimTestCase {
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2, 0));
 		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
-		QNetwork queueNetwork = new QNetwork(network);
-		QSimEngineImpl simEngine = new QSimEngineImpl(queueNetwork, MatsimRandom.getRandom());
-		QLinkImpl qlink = (QLinkImpl) queueNetwork.getQueueLink(new IdImpl("1"));
-		qlink.setLinkActivator(simEngine);
-		qlink.finishInit();
-
 		QSim qsim = new QSim(scenario, new EventsManagerImpl());
+		QNetwork queueNetwork = new QNetwork(network);
+		QSimEngineImpl simEngine = new QSimEngineImpl(qsim, MatsimRandom.getRandom());
+		QLinkImpl qlink = (QLinkImpl) queueNetwork.getQueueLink(new IdImpl("1"));
+		qlink.setQSimEngine(simEngine);
+
 		QueueVehicleImpl v1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		PlanImpl plan = p.createAndAddPlan(true);
@@ -373,14 +372,13 @@ public class QLinkTest extends MatsimTestCase {
 			Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1001, 0));
 			this.link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 			this.link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
+			QSim sim = new QSim(scenario, new EventsManagerImpl());
 			this.queueNetwork = new QNetwork(network);
-			QSimEngineImpl engine = new QSimEngineImpl(this.queueNetwork, MatsimRandom.getRandom());
+			QSimEngineImpl engine = new QSimEngineImpl(sim, MatsimRandom.getRandom());
 			this.qlink1 = (QLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("1"));
-			this.qlink1.setLinkActivator(engine);
-			this.qlink1.finishInit();
+			this.qlink1.setQSimEngine(engine);
 			this.qlink2 = (QLinkImpl) this.queueNetwork.getQueueLink(new IdImpl("2"));
-			this.qlink2.setLinkActivator(engine);
-			this.qlink2.finishInit();
+			this.qlink2.setQSimEngine(engine);
 
 			this.basicVehicle = new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType")));
 		}

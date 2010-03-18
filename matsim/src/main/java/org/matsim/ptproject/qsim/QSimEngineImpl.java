@@ -22,7 +22,6 @@ package org.matsim.ptproject.qsim;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -57,29 +56,26 @@ public class QSimEngineImpl implements QSimEngine{
 	/*package*/ final ArrayList<QLink> simActivateThis = new ArrayList<QLink>();
 
 	private final Random random;
+  private final QSim qsim;
 
-	public QSimEngineImpl(final QNetwork network, final Random random) {
-		this(network.getLinks().values(), network.getNodes().values(), random);
-	}
-
-	/*package*/ QSimEngineImpl(final Collection<QLink> links, final Collection<QNode> nodes, final Random random) {
-		this.random = random;
-		this.allLinks = new ArrayList<QLink>(links);
-
-		this.simNodesArray = nodes.toArray(new QNode[nodes.size()]);
-		//dg[april08] as the order of nodes has an influence on the simulation
-		//results they are sorted to avoid indeterministic simulations
-		Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
-			public int compare(final QNode o1, final QNode o2) {
-				return o1.getNode().getId().compareTo(o2.getNode().getId());
-			}
-		});
-		for (QLink link : this.allLinks) {
-			link.setQSimEngine(this);
-		}
-		if (simulateAllLinks) {
-			this.simLinksArray.addAll(this.allLinks);
-		}
+	public QSimEngineImpl(final QSim sim, final Random random) {
+    this.random = random;
+    this.allLinks = new ArrayList<QLink>(sim.getQueueNetwork().getLinks().values());
+    this.qsim = sim;
+    this.simNodesArray = sim.getQueueNetwork().getNodes().values().toArray(new QNode[sim.getQueueNetwork().getNodes().values().size()]);
+    //dg[april08] as the order of nodes has an influence on the simulation
+    //results they are sorted to avoid indeterministic simulations
+    Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
+      public int compare(final QNode o1, final QNode o2) {
+        return o1.getNode().getId().compareTo(o2.getNode().getId());
+      }
+    });
+    for (QLink link : this.allLinks) {
+      link.setQSimEngine(this);
+    }
+    if (simulateAllLinks) {
+      this.simLinksArray.addAll(this.allLinks);
+    }
 	}
 
 	public void afterSim() {
@@ -150,4 +146,9 @@ public class QSimEngineImpl implements QSimEngine{
 	public int getNumberOfSimulatedLinks() {
 		return this.simLinksArray.size();
 	}
+
+  @Override
+  public QSim getQSim() {
+    return this.qsim;
+  }
 }

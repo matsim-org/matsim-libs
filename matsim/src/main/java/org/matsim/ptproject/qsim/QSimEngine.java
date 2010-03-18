@@ -39,4 +39,9 @@ public interface QSimEngine extends LinkActivator{
 	 * Do some clean up.
 	 */
 	public void afterSim();
+	
+	/**
+	 * @return the QSim instance
+	 */
+	public QSim getQSim();
 }

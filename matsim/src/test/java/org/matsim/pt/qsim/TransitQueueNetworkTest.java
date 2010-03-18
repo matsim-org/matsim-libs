@@ -50,6 +50,7 @@ import org.matsim.ptproject.qsim.PersonAgent;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QLinkImpl;
 import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimEngineImpl;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.ptproject.qsim.QVehicle;
@@ -947,8 +948,8 @@ public class TransitQueueNetworkTest extends TestCase {
 	}
 
 	protected static class TestSimEngine extends QSimEngineImpl {
-		TestSimEngine(final QNetwork queueNetwork) {
-			super(queueNetwork, new Random(511));
+		TestSimEngine(final QSim sim) {
+			super(sim, new Random(511));
 		}
 		@Override
 		public void simStep(final double time) { // make it public
@@ -1046,7 +1047,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			this.qlink1 = (QLinkImpl) qnet.getQueueLink(id1);
 			this.qlink2 = (QLinkImpl) qnet.getQueueLink(id2);
 			this.qlink3 = (QLinkImpl) qnet.getQueueLink(id3);
-			this.simEngine = new TestSimEngine(qnet);
+			this.simEngine = new TestSimEngine(qsim);
 			TransitStopAgentTracker tracker = qsim.getAgentTracker();
 			tracker.addAgentToStop(new FakeAgent(null, null), stop1); // just add some agent so the transit vehicle has to stop
 			if (stop2 != null) {

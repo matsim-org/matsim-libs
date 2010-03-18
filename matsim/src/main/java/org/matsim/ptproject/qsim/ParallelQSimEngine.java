@@ -21,7 +21,6 @@
 package org.matsim.ptproject.qsim;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
@@ -56,16 +55,11 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	private CyclicBarrier startBarrier;
 	private CyclicBarrier endBarrier;
 	
-	/*package*/ ParallelQSimEngine(Collection<QLink> links, Collection<QNode> nodes, Random random, int numOfThreads)
-	{
-		super(links, nodes, random);
-					
-		initQSimEngineThreads(numOfThreads);
-	}
 
-	public ParallelQSimEngine(final QNetwork network, final Random random, int numOfThreads)
+	public ParallelQSimEngine(final QSim sim, final Random random, int numOfThreads)
 	{
-		this(network.getLinks().values(), network.getNodes().values(), random, numOfThreads);
+	  super(sim, random);
+		initQSimEngineThreads(numOfThreads);
 	}
 	
 	/**
@@ -189,7 +183,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++)
 		{
-			QSimEngineThread thread = new QSimEngineThread(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, this.endBarrier);
+			QSimEngineThread thread = new QSimEngineThread(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, this.endBarrier, this.getQSim());
 			thread.setName("QSimEngineThread" + i);
 
 			thread.setExtendedQueueNodeArray(this.parallelNodesArrays[i]);

@@ -76,7 +76,7 @@ public interface QLink extends QBufferItem {
   public QNode getToQueueNode();
   
   public QNetwork getQueueNetwork();
-
+  
   public boolean hasSpace();
   
   public void clearVehicles();
