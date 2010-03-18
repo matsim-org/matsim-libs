@@ -44,8 +44,15 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
 public class CalculateSignalGroups{
 	
 	private static final Logger log = Logger.getLogger(CalculateSignalGroups.class);
+	private Map<Id, SignalGroupDefinition> groups;
+	private Network net;
 	
-	public Map<Id, Id> calculateCorrespondingGroups(Map<Id, SignalGroupDefinition> groups, Network net){
+	public CalculateSignalGroups(Map<Id, SignalGroupDefinition> groups, Network net){
+		this.groups = groups;
+		this.net = net;
+	}
+	
+	public Map<Id, Id> calculateCorrespondingGroups(){
 		SortedMap<Id, Id> corrGroups = new TreeMap<Id, Id>();
 		Link l;
 		//Iteration over all Signalgroupdefinitions
@@ -70,10 +77,10 @@ public class CalculateSignalGroups{
 		return corrGroups;
 	}
 	
-	public Map<Id, List<Id>> calculateCompetingGroups(Map<Id, Id> ids, Map<Id, SignalGroupDefinition> groups, Network net){
+	public Map<Id, List<Id>> calculateCompetingGroups(Map<Id, Id> corrIds){
 		Map<Id, List<Id>> cg = new TreeMap<Id,List<Id>>();
 		
-		for (Entry <Id, Id> ee : ids.entrySet()){
+		for (Entry <Id, Id> ee : corrIds.entrySet()){
 			List<Id> l = new ArrayList<Id>();
 			for (SignalGroupDefinition sd : groups.values()){
 				
@@ -97,7 +104,7 @@ public class CalculateSignalGroups{
 		return cg;
 	}
 	
-	public static Link calculateLink(Link inLink){
+	private static Link calculateLink(Link inLink){
 		Coord coordInLink = getVector(inLink);
 		double corrAngle = (Math.PI);
 		double temp = Math.PI *3/8;
@@ -132,7 +139,7 @@ public class CalculateSignalGroups{
 		return l;
 	}
 	
-	public Map<Id, Id> calculateMainOutlinks(Network net){
+	public Map<Id, Id> calculateMainOutlinks(){
 		Map<Id, Id> mainOutLinks = new HashMap<Id, Id>();
 		Coord coordInLink;
 		Coord coordOutLink;
@@ -141,20 +148,20 @@ public class CalculateSignalGroups{
 		double thetaInLink;
 		double thetaDiff;
 		
-		for (Link l : net.getLinks().values()){
-			coordInLink = getVector(l);
+		for(SignalGroupDefinition sg: groups.values()){
+			coordInLink = getVector(net.getLinks().get(sg.getLinkRefId()));
 			thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
-		
 			temp = Math.PI;
-			mainOutLinks.put(l.getId(), null);
-			for (Link ol : l.getToNode().getOutLinks().values()){
-				coordOutLink = getVector(ol);
+			mainOutLinks.put(sg.getLinkRefId(), null);
+
+			for(Id i : sg.getToLinkIds()){
+				coordOutLink = getVector(net.getLinks().get(i));
 				thetaOutLink = Math.atan2(coordOutLink.getY(), coordOutLink.getX());
 				thetaDiff = Math.abs(thetaOutLink-thetaInLink);
-				
-				if ((temp> thetaDiff) && !(l.getFromNode().equals(ol.getToNode()))){
+			
+				if (temp>thetaDiff){
 					temp = thetaDiff;
-					mainOutLinks.put(l.getId(), ol.getId());
+					mainOutLinks.put(sg.getLinkRefId(), i);
 				}
 			}
 		}

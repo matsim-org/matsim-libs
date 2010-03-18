@@ -25,6 +25,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
@@ -61,19 +63,30 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	
 	private Map<Id, Map<Id, CarLocator>> locateCars =  new HashMap<Id, Map<Id, CarLocator>>();
 	private Map<Id, CarLocator> m;
+	private Map<Id, Double> dForLinks;
 	
-	private QNetwork net;
+	private QNetwork qNet;
 	private double d;
 	private Map<Id, SignalGroupDefinition> groups;
 
 	/*  dMax is the maximum length of d, if d is longer then linkLength d is set to linkLength.
-	 *  if dMax is shorter then laneLength, d is set to laneLength.
 	 */
-	public CarsOnLinkLaneHandler(Map<Id, SignalGroupDefinition> groups, double dMax){
+	public CarsOnLinkLaneHandler(Map<Id, SignalGroupDefinition> groups, double dMax, Network net){
 		this.d = dMax;
 		this.groups = groups;
 		this.reset(0);
-		
+		this.checkD(net);
+	}
+	
+	private void checkD(Network net){
+		this.dForLinks = new HashMap<Id, Double>();
+		for(Link l: net.getLinks().values()){
+			if(l.getLength()<d){
+				this.dForLinks.put(l.getId(), l.getLength());
+			}else{
+				this.dForLinks.put(l.getId(), d);
+			}
+		}
 	}
 	
 	@Override
@@ -113,7 +126,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		m = locateCars.get(e.getLinkId());
-		m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
+		m.put(e.getPersonId(), new CarLocator(qNet.getLinks().get(e.getLinkId()), e.getTime(), this.dForLinks.get(e.getLinkId())));
 	}
 	
 	@Override
@@ -127,7 +140,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	@Override
 	public void handleEvent(AgentWait2LinkEvent e) {
 		m = locateCars.get(e.getLinkId());
-		m.put(e.getPersonId(), new CarLocator(net.getLinks().get(e.getLinkId()), e.getTime(), this.d));
+		m.put(e.getPersonId(), new CarLocator(qNet.getLinks().get(e.getLinkId()), e.getTime(), this.dForLinks.get(e.getLinkId())));
 		m.get(e.getPersonId()).setEarliestD(e.getTime());
 		
 	}
@@ -168,7 +181,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	}
 	
 	public void setQNetwork(QNetwork net){
-		this.net = net;
+		this.qNet = net;
 		for(Entry<Id, QLink> e: net.getLinks().entrySet()){
 			locateCars.put(e.getKey(), new HashMap<Id, CarLocator>());
 		}

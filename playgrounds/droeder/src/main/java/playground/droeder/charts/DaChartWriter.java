@@ -48,7 +48,7 @@ public class DaChartWriter {
 		String title = path + jchart.getTitle().toString() + ".png";
 		
 		try {
-			ChartUtilities.saveChartAsPNG(new File(title), jchart, width, height, null, true, 9);
+			ChartUtilities.saveChartAsPNG(new File(title), jchart, width, height, null, true, 5);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -85,7 +85,7 @@ public class DaChartWriter {
 						}
 					}
 				}
-			} catch(ClassCastException e){ //else instanceof CategoryPlot
+			} catch(ClassCastException e){ //else instanceOf CategoryPlot
 				CategoryPlot cp = chart.getCategoryPlot();
 				String header = "CategoryRowKey \t CategoryColumnKey \t CategoryRowIndex \t CategoryColumnIndex \t Value";
 				writer.write(header);

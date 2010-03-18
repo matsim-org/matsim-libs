@@ -45,6 +45,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListene
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
 import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
@@ -65,9 +66,11 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private int n;
 	private double cap;
 	private double d;
+	private int maxGreen;
 	
 	private Map<Id, Id> corrGroups;
 	private Map<Id, List<Id>> compGroups;
+	private Map<Id, Id> mainOutLinks;
 	
 	private Map<Integer, Double> averageTT;
 	private static double avTT = 0;
@@ -80,7 +83,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private CarsOnLinkLaneHandler handler2;
 	
 	// "D" run denver -- "G" run gershensonTestNetwork
-	private static final String config = "D";
+	private static final String config = "G";
 	// "G" for GershensonController -- "I" for InterimController
 	private static final String controller = "G";
 	
@@ -129,12 +132,13 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		c.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				CalculateSignalGroups csg = new CalculateSignalGroups();
 				Map<Id, SignalGroupDefinition> groups = c.getScenario().getSignalSystems().getSignalGroupDefinitions();
-				corrGroups = csg.calculateCorrespondingGroups(groups, c.getNetwork());
-				compGroups = csg.calculateCompetingGroups(corrGroups, groups, c.getNetwork());
+				CalculateSignalGroups csg = new CalculateSignalGroups(groups, c.getNetwork());
+				corrGroups = csg.calculateCorrespondingGroups();
+				compGroups = csg.calculateCompetingGroups(corrGroups);
+				mainOutLinks = csg.calculateMainOutlinks();
 				handler1 = new AverageTTHandler(c.getPopulation().getPersons().size());
-				handler2 = new CarsOnLinkLaneHandler(groups, d);
+				handler2 = new CarsOnLinkLaneHandler(groups, d, c.getNetwork());
 				event.getControler().getEvents().addHandler(handler1);
 				event.getControler().getEvents().addHandler(handler2);
 				
@@ -180,13 +184,13 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				QSim qs = e.getQueueSimulation();
 				if (controller == "G"){
 					GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-					adaptiveController.setParameters(n, u, cap);
-					adaptiveController.init(corrGroups, compGroups, e.getQueueSimulation().getQueueNetwork(), handler2);
+					adaptiveController.setParameters(n, u, cap, maxGreen);
+					adaptiveController.init(corrGroups, compGroups, mainOutLinks, e.getQueueSimulation().getQueueNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);				
 				}else{
 					AdaptiveInterimSignalController adaptiveController = (AdaptiveInterimSignalController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-					adaptiveController.setParameters(n, u, cap);
-					adaptiveController.init(corrGroups, compGroups, e.getQueueSimulation().getQueueNetwork(), handler2);
+					adaptiveController.setParameters(n, u, cap, 0);
+					adaptiveController.init(corrGroups, compGroups, mainOutLinks,e.getQueueSimulation().getQueueNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);
 				}
 				
@@ -237,40 +241,51 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	public void setD (double d){
 		this.d = d;
 	}
+	public void setMaxGreen(int maxGreen){
+		this.maxGreen = maxGreen;
+	}
 	
 	
 	public static void main(String[] args) {
 		DaBarChart barChart = new DaBarChart();
-		double cap = 0.90;
+		double cap ;
+		double temp;
 		
 		GershensonRunner runner = new GershensonRunner();
-		runner.setN(50);
-		runner.setU(60);
+		runner.setN(30);
+		runner.setU(15);
 		runner.setCap(0.90);
-		runner.setD(100);
+		runner.setD(150);
+		runner.setMaxGreen(60);
 		runner.runScenario(config);
 		
-//		for (int c = 0; c < 16; c++){
-//			barChart = new DaBarChart();
-//			cap = (80.00+(double)c)/100.00;
-			for (int u = 5; u < 30; u = u + 2){
-				nAndT = new LinkedHashMap<Number, Number>();
-				for (int n = 10; n < 401; n = n+10){
-					runner = new GershensonRunner();
-					Gbl.reset();
-					runner.setU(u);
-					runner.setN(n);
-					runner.setCap(cap);
-					runner.setD(100);
-					runner.runScenario(config);
-					nAndT.put(n, avTT);
-					System.err.println("u=" + u + " n=" + n);
-				}
-				barChart.addSeries("u=" + String.valueOf(u), nAndT);
-	//			nAndUT.put(n, uAndT);
-			}	
-			new DaChartWriter().writeChart(DaPaths.OUTPUT+"DENVER\\Charts_10_03_17\\" + "n150-400_u8-18_cap" + 
-					String.valueOf(cap), 1600, 1024, barChart.createChart("capacityFactor = " + String.valueOf(cap), "waitingCars * redTime [1*s]", "average travelTime t [s]", 1800));
+//		for (int d = 80; d<151; d = d+10){
+//			for (int c = 0; c < 16; c++){
+//				temp = 0;
+//				barChart = new DaBarChart();
+//				cap = (80.00+(double)c)/100.00;
+//				for (int u = 5; u < 30; u = u + 2){
+//					nAndT = new LinkedHashMap<Number, Number>();
+//					for (int n = 10; n < 401; n = n+10){
+//						runner = new GershensonRunner();
+//						Gbl.reset();
+//						runner.setU(u);
+//						runner.setN(n);
+//						runner.setCap(cap);
+//						runner.setD(d);
+//						runner.setMaxGreen(0);
+//						runner.runScenario(config);
+//						nAndT.put(n, avTT);
+//						if(avTT>temp){
+//							temp = avTT;
+//						}
+//					}
+//					barChart.addSeries("u=" + String.valueOf(u), nAndT);
+//		//			nAndUT.put(n, uAndT);
+//				}	
+//				new DaChartWriter().writeChart(DaPaths.OUTPUT+"DENVER\\Charts_10_03_17.2\\" + "n10-400_u5-30_cap" + 
+//						String.valueOf(cap) + "_d" + String.valueOf(d), 2560, 1600, barChart.createChart("capacityFactor = " + String.valueOf(cap) + " d = " + String.valueOf(d), "waitingCars * redTime [1*s]", "average travelTime t [s]", temp));
+//			}
 //		}
 	}
 

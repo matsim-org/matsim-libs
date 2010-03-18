@@ -81,7 +81,7 @@ public class GershensonScenarioGenerator {
 	private static final boolean isUseSignalSystems = true;
 
 	private static final String controllerClass = GershensonAdaptiveTrafficLightController.class.getCanonicalName();
-	private static final int iterations = 10;
+	private static final int iterations = 0;
 
 
 
@@ -398,7 +398,6 @@ public class GershensonScenarioGenerator {
 
 		config.network().setInputFile(NETWORKFILE);
 		config.plans().setInputFile(POPULATIONOUTPUTFILE);
-		config.controler().setLastIteration(iterations);
 
 
 		// configure scoring for plans
