@@ -104,8 +104,8 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 	private void createAndScheduleVehicleAndDriver(Umlauf umlauf,
 			BasicVehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
-		UmlaufDriver driver = new UmlaufDriver(umlauf, thisAgentTracker, this.queueSimulation, this.stopHandlerFactory.createTransitStopHandler());
 		TransitQVehicle veh = new TransitQVehicle(vehicle, 5);
+		UmlaufDriver driver = new UmlaufDriver(umlauf, thisAgentTracker, this.queueSimulation, this.stopHandlerFactory.createTransitStopHandler(veh.getBasicVehicle()));
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		QLink qlink = this.queueSimulation.getNetwork().getQueueLink(driver
@@ -123,11 +123,11 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
-					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this.queueSimulation, this.stopHandlerFactory.createTransitStopHandler());
 					if (departure.getVehicleId() == null) {
 						throw new NullPointerException("no vehicle id set for departure " + departure.getId() + " in route " + route.getId() + " from line " + line.getId());
 					}
 					TransitQVehicle veh = new TransitQVehicle(vehicles.getVehicles().get(departure.getVehicleId()), 5);
+					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this.queueSimulation, this.stopHandlerFactory.createTransitStopHandler(veh.getBasicVehicle()));
 					veh.setDriver(driver);
 					driver.setVehicle(veh);
 					QLink qlink = this.queueSimulation.getNetwork().getQueueLink(driver.getCurrentLeg().getRoute().getStartLinkId());

@@ -19,11 +19,13 @@
 
 package org.matsim.pt.qsim;
 
+import org.matsim.vehicles.BasicVehicle;
+
 public class ComplexTransitStopHandlerFactory implements TransitStopHandlerFactory {
 
 	@Override
-	public TransitStopHandler createTransitStopHandler() {
-		return new ComplexTransitStopHandler();
+	public TransitStopHandler createTransitStopHandler(BasicVehicle vehicle) {
+		return new ComplexTransitStopHandler(vehicle);
 	}
 
 }

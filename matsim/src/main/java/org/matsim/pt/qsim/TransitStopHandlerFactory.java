@@ -19,11 +19,13 @@
 
 package org.matsim.pt.qsim;
 
+import org.matsim.vehicles.BasicVehicle;
+
 /**
  * @author mrieser
  */
 public interface TransitStopHandlerFactory {
 
-	public TransitStopHandler createTransitStopHandler();
+	public TransitStopHandler createTransitStopHandler(BasicVehicle vehicle);
 
 }
