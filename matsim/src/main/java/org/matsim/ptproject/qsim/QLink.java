@@ -27,19 +27,11 @@ import org.matsim.api.core.v01.network.Link;
 
 public interface QLink extends QBufferItem {
 
-  /**
-   *  Is called after link has been read completely 
-   * @deprecated implementation not doing anything
-   */
-  @Deprecated
-  public void finishInit();
-
-  public void setLinkActivator(final LinkActivator linkActivator);
+  public void setQSimEngine(final QSimEngine linkActivator);
   
   public void activateLink();
 
   public Link getLink();
-
   
   /**
    * Adds a vehicle to the link, called by
@@ -64,8 +56,6 @@ public interface QLink extends QBufferItem {
   public double getSpaceCap();
   
   public LinkedList<QVehicle> getVehQueue();
-
-//  public Queue<QueueVehicle> getVehiclesInBuffer();
 
   /**
    * This method returns the normalized capacity of the link, i.e. the capacity
@@ -98,15 +88,6 @@ public interface QLink extends QBufferItem {
   public void addAgentInActivity(PersonAgentI agent);
 
   public void removeAgentInActivity(PersonAgentI agent);
-
-  
-  /**
-   * @deprecated can be removed see implementation
-   * @param now
-   * @param veh
-   */
-  @Deprecated
-  public void processVehicleArrival(final double now, final QVehicle veh);
   
   public void addDepartingVehicle(QVehicle vehicle);
 

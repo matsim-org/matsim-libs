@@ -84,7 +84,7 @@ public class QLinkImpl implements QLink {
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
-	private LinkActivator linkActivator = null;
+	private QSimEngine qsimEngine = null;
 
 	private double length = Double.NaN;
 
@@ -149,17 +149,13 @@ public class QLinkImpl implements QLink {
 		this.calculateCapacities();
 	}
 
-	/** Is called after link has been read completely */
-	public void finishInit() {
-		this.active = false;
-	}
-	public void setLinkActivator(final LinkActivator linkActivator) {
-		this.linkActivator = linkActivator;
+	public void setQSimEngine(final QSimEngine linkActivator) {
+		this.qsimEngine = linkActivator;
 	}
 
 	public void activateLink() {
 		if (!this.active) {
-			this.linkActivator.activateLink(this);
+			this.qsimEngine.activateLink(this);
 			this.active = true;
 		}
 	}
@@ -308,7 +304,7 @@ public class QLinkImpl implements QLink {
 				// Check if veh has reached destination:
 				if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
 					driver.legEnds(now);
-					this.processVehicleArrival(now, veh);
+					this.addParkedVehicle(veh);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
 					this.usedStorageCapacity -= veh.getSizeInEquivalents();
@@ -350,15 +346,6 @@ public class QLinkImpl implements QLink {
 			}
 		}
 	}
-	public void processVehicleArrival(final double now, final QVehicle veh) {
-		//		QueueSimulation.getEvents().processEvent(
-		//				new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
-		//						this.getLink(), veh.getDriver().getCurrentLeg()));
-		// Need to inform the veh that it now reached its destination.
-		//		veh.getDriver().legEnds(now);
-		addParkedVehicle(veh);
-	}
-
 
 	public boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();

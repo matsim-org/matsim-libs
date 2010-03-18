@@ -75,8 +75,7 @@ public class QSimEngineImpl implements QSimEngine{
 			}
 		});
 		for (QLink link : this.allLinks) {
-			link.finishInit();
-			link.setLinkActivator(this);
+			link.setQSimEngine(this);
 		}
 		if (simulateAllLinks) {
 			this.simLinksArray.addAll(this.allLinks);

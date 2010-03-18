@@ -280,12 +280,7 @@ public class QLinkLanesImpl implements QLink {
 		}
 	}
 
-	/** Is called after link has been read completely */
-	public void finishInit() {
-		this.active = false;
-	}
-
-	public void setLinkActivator(final LinkActivator linkActivator) {
+	public void setQSimEngine(final QSimEngine linkActivator) {
 		this.linkActivator = linkActivator;
 	}
 
@@ -352,16 +347,6 @@ public class QLinkLanesImpl implements QLink {
 		this.active = ret;
 		return ret;
 	}
-
-	public void processVehicleArrival(final double now, final QVehicle veh) {
-//		QueueSimulation.getEvents().processEvent(
-//				new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
-//						this.getLink(), veh.getDriver().getCurrentLeg()));
-		// Need to inform the veh that it now reached its destination.
-//		veh.getDriver().legEnds(now);
-		addParkedVehicle(veh);
-	}
-
 
 	public boolean bufferIsEmpty() {
 		//if there is only one lane...

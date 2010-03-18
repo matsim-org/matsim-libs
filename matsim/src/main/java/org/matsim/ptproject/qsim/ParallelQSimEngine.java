@@ -283,7 +283,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 				for (Link outLink : n.getOutLinks().values())
 				{
 					QLink qLink = node.getQueueNode().queueNetwork.getQueueLink(outLink.getId());
-					qLink.setLinkActivator(this.threads[thread]);
+					qLink.setQSimEngine(this.threads[thread]);
 				}
 			}
 			thread++;

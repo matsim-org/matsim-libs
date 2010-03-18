@@ -384,7 +384,7 @@ public class QLane implements QBufferItem {
 				// Check if veh has reached destination:
 				if ((driver.getDestinationLinkId().equals(this.queueLink.getLink().getId())) && (driver.chooseNextLinkId() == null)) {
 					driver.legEnds(now);
-					((QLinkLanesImpl)this.queueLink).processVehicleArrival(now, veh);
+					this.queueLink.addParkedVehicle(veh);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
 					this.usedStorageCapacity -= veh.getSizeInEquivalents();
