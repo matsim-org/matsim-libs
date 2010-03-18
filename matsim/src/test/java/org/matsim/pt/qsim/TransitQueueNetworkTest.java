@@ -1066,6 +1066,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			this.qlink1.addParkedVehicle(this.transitVehicle);
 			this.transitVehicle.setEarliestLinkExitTime(100);
 			this.transitVehicle.setDriver(tDriver);
+			this.transitVehicle.setStopHandler(new SimpleTransitStopHandler());
 			tDriver.setVehicle(this.transitVehicle);
 			tDriver.activityEnds(100);
 
@@ -1119,7 +1120,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
 		public FakeTransitDriver(final TransitLine line, final TransitRoute route, final Departure departure,
 				final TransitStopAgentTracker agentTracker, final TransitQSimulation sim) {
-			super(line, route, departure, agentTracker, sim, new SimpleTransitStopHandler());
+			super(line, route, departure, agentTracker, sim);
 		}
 
 		@Override

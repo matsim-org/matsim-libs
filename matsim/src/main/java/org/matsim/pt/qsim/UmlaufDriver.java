@@ -32,9 +32,8 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 	public UmlaufDriver(Umlauf umlauf,
 			TransitStopAgentTracker thisAgentTracker,
-			QSim transitQueueSimulation,
-			TransitStopHandler stopHandler) {
-		super(createDummyPerson(umlauf), transitQueueSimulation, stopHandler, thisAgentTracker);
+			QSim transitQueueSimulation) {
+		super(createDummyPerson(umlauf), transitQueueSimulation, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.sim = transitQueueSimulation;
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();

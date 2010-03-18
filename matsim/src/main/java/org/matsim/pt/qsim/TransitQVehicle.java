@@ -34,6 +34,7 @@ public class TransitQVehicle extends QueueVehicleImpl implements TransitVehicle 
 
 	private final int passengerCapacity;
 	private final List<PassengerAgent> passengers = new LinkedList<PassengerAgent>();
+	private TransitStopHandler stopHandler;
 
 	public TransitQVehicle(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
 		super(basicVehicle, sizeInEquivalents);
@@ -65,5 +66,12 @@ public class TransitQVehicle extends QueueVehicleImpl implements TransitVehicle 
 		return removed;
 	}
 	
+	public void setStopHandler(TransitStopHandler stopHandler) {
+		this.stopHandler = stopHandler;
+	}
+
+	public TransitStopHandler getStopHandler() {
+		return this.stopHandler;
+	}
 
 }

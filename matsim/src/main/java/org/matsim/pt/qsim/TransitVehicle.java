@@ -60,5 +60,7 @@ public interface TransitVehicle {
 	public BasicVehicle getBasicVehicle();
 
 	public DriverAgent getDriver();
+	
+	public TransitStopHandler getStopHandler();
 
 }

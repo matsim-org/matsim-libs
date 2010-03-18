@@ -48,8 +48,8 @@ public class TransitDriver extends AbstractTransitDriver {
 	final double departureTime;
 	private final LegImpl currentLeg = new LegImpl(TransportMode.car);
 
-	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final QSim sim, final TransitStopHandler stopHandler) {
-		super(createDummyPerson(line, route, departure), sim, stopHandler, agentTracker);
+	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final QSim sim) {
+		super(createDummyPerson(line, route, departure), sim, agentTracker);
 		this.departureTime = departure.getDepartureTime();
 		this.transitLine = line;
 		this.transitRoute = route;

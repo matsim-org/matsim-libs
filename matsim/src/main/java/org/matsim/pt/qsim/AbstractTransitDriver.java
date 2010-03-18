@@ -47,7 +47,6 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private static final Logger log = Logger.getLogger(AbstractTransitDriver.class);
 
 	private TransitVehicle vehicle = null;
-	private final TransitStopHandler stopHandler;
 
 	private int nextLinkIndex = 0;
 	private final TransitStopAgentTracker agentTracker;
@@ -64,9 +63,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public abstract Departure getDeparture();
 	public abstract double getDepartureTime();
 
-	public AbstractTransitDriver(Person personImpl, QSim sim, final TransitStopHandler stopHandler, TransitStopAgentTracker agentTracker2) {
+	public AbstractTransitDriver(Person personImpl, QSim sim, TransitStopAgentTracker agentTracker2) {
 		super();
-		this.stopHandler = stopHandler;
 		this.dummyPerson = personImpl;
 		this.sim = sim;
 		this.agentTracker = agentTracker2;
@@ -113,7 +111,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		ArrayList<PassengerAgent> passengersLeaving = findPassengersLeaving(stop);
 		int freeCapacity = this.vehicle.getPassengerCapacity() - this.vehicle.getPassengers().size() + passengersLeaving.size();
 		List<PassengerAgent> passengersEntering = findPassengersEntering(stop, freeCapacity);
-		double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersEntering, this);
+		double stopTime = this.vehicle.getStopHandler().handleTransitStop(stop, now, passengersLeaving, passengersEntering, this);
 		if(stopTime == 0.0){
 			stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
 		}

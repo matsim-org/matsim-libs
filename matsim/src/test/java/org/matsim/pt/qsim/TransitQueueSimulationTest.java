@@ -547,6 +547,7 @@ public class TransitQueueSimulationTest {
 
 			TransitQVehicle veh = new TransitQVehicle(new BasicVehicleImpl(this.driver.getPerson().getId(), vehicleType), 5);
 			veh.setDriver(this.driver);
+			veh.setStopHandler(new SimpleTransitStopHandler());
 			this.driver.setVehicle(veh);
 			this.departure.setVehicleId(veh.getBasicVehicle().getId());
 			QLink qlink = this.network.getQueueLink(this.driver.getCurrentLeg().getRoute().getStartLinkId());
@@ -563,7 +564,7 @@ public class TransitQueueSimulationTest {
 
 		public SpyDriver(final TransitLine line, final TransitRoute route, final Departure departure,
 				final TransitStopAgentTracker agentTracker, final TransitQSimulation sim) {
-			super(line, route, departure, agentTracker, sim, new SimpleTransitStopHandler());
+			super(line, route, departure, agentTracker, sim);
 		}
 
 		@Override
