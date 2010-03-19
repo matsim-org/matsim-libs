@@ -24,12 +24,17 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
+import org.matsim.households.HouseholdsImpl;
+import org.matsim.households.HouseholdsWriterV10;
+import org.matsim.households.Income.IncomePeriod;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -37,29 +42,31 @@ public class GeneratePopulation {
 	
 	private static Logger logger = Logger.getLogger(GeneratePopulation.class);
 
-	private static final String MID_PERSONENDATENSATZ = "../detailedEval/MidMUC_2002/MiD2002_Personendatensatz_MUC.csv";
+	private static final String MID_PERSONENDATENSATZ = "../detailedEval/eingangsdaten/MidMUC_2002/MiD2002_Personendatensatz_MUC.csv";
 	
-	private static final String MID_WEGEDATENSATZ = "../detailedEval/MidMUC_2002/MiD2002_Wegedatensatz_MUC.csv";
+	private static final String MID_HAUSHALTSDATENSATZ = "../detailedEval/eingangsdaten/MidMUC_2002/MiD2002_Haushaltsdatensatz_MUC.csv";
 	
-	private static final String MID_WEGEKODIERUNG = "../detailedEval/MidMUC_2002/MiD2002_Wegekodierung_MUC-LH.csv";
+	private static final String MID_WEGEDATENSATZ = "../detailedEval/eingangsdaten/MidMUC_2002/MiD2002_Wegedatensatz_MUC.csv";
 	
-	private static final String MID_SCHWERPUNKTE = "../detailedEval/Muenchen_Schwerpunkte-Verkehrszellen.csv";
-	
+	private static final String MID_WEGEKODIERUNG = "../detailedEval/eingangsdaten/MidMUC_2002/MiD2002_Wegekodierung_MUC-LH.csv";
+		
 	private static final String MID_VERKEHRSZELLEN = "../detailedEval/Net/shapeFromVISUM/Verkehrszellen_Umrisse_zone.shp";
-	
-	private static final String PLANS = "../detailedEval/pop/plans.xml";
 
+	private static final String PLANS = "../detailedEval/pop/plans.xml";
+	
+	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/households.xml";
+	
 	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 140000;
 
 	private Scenario scenario = new ScenarioImpl();
 	
-	private Map<String, Collection<Person>> households = new HashMap<String, Collection<Person>>();
+	private Map<String, Case> cases = new HashMap<String, Case>();
+	
+	private Households households = new HouseholdsImpl();
 	
 	private Map<Id, Person> persons = new HashMap<Id, Person>();
 	
 	private Map<Id, Plan> plans = new HashMap<Id, Plan>();
-
-	private Map<String, Coord> schwerpunkte = new HashMap<String, Coord>();
 	
 	private Map<Integer, Feature> verkehrszellen = new HashMap<Integer, Feature>();
 	
@@ -68,21 +75,37 @@ public class GeneratePopulation {
 	public static void main(String[] args) throws IOException {
 		GeneratePopulation generatePopulation = new GeneratePopulation();
 		generatePopulation.parseVerkehrszellen();
+		generatePopulation.parseHouseholds();
 		generatePopulation.parsePersons();
-		generatePopulation.parseSchwerpunkte();
 		generatePopulation.parsePlans();
 		generatePopulation.addPlans();
 		generatePopulation.dropPlanlessPeople();
-		generatePopulation.multiplyPopulation();
+		// generatePopulation.multiplyPopulation();
 		generatePopulation.addPopulationToScenario();
+		generatePopulation.addAndWriteHouseholds();
 		generatePopulation.writePlans();
 	}	
 
+	private void addAndWriteHouseholds() throws IOException {
+		for (String caseid : cases.keySet()) {
+			IdImpl householdId = new IdImpl(caseid);
+			Household household = households.getFactory().createHousehold(householdId);
+			Case caze = cases.get(caseid);
+			for (Person person : caze.members) {
+				household.getMemberIds().add(person.getId());
+			}
+			household.setIncome(households.getFactory().createIncome(caze.income, IncomePeriod.year));
+			households.getHouseholds().put(householdId, household);
+		}
+		HouseholdsWriterV10 writer = new HouseholdsWriterV10(households);
+		writer.writeFile(HOUSEHOLDS_FILE);
+	}
+
 	private void dropPlanlessPeople() {
-		Iterator<Map.Entry<String, Collection<Person>>> i = households.entrySet().iterator();
+		Iterator<Map.Entry<String, Case>> i = cases.entrySet().iterator();
 		while (i.hasNext()) {
-			Map.Entry<String, Collection<Person>> household = i.next();
-			Iterator<Person> ii = household.getValue().iterator();
+			Map.Entry<String, Case> household = i.next();
+			Iterator<Person> ii = household.getValue().members.iterator();
 			while (ii.hasNext()) {
 				Person person = ii.next();
 				if (person.getPlans().isEmpty()) {
@@ -97,26 +120,11 @@ public class GeneratePopulation {
 	}
 
 	private void addPopulationToScenario() {
-		for (Collection<Person> haushalt : households.values()) {
-			for (Person person : haushalt) {
+		for (Case haushalt : cases.values()) {
+			for (Person person : haushalt.members) {
 				scenario.getPopulation().addPerson(person);
 			}
 		}
-	}
-
-	private void parseSchwerpunkte() throws IOException {
-		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
-		tabFileParserConfig.setFileName(MID_SCHWERPUNKTE);
-		tabFileParserConfig.setDelimiterTags(new String[] {";"});
-		new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
-
-			@Override
-			public void startRow(String[] row) {
-				Coord coord = scenario.createCoord(Double.parseDouble(row[1]), Double.parseDouble(row[2]));
-				schwerpunkte.put(row[0], coord);
-			}
-		
-		});
 	}
 	
 	private void parseVerkehrszellen() {
@@ -214,7 +222,8 @@ public class GeneratePopulation {
 			parseAndAddLeg(kRow, dRow);
 		}
 	}
-	
+
+
 	private static final int K_CASEID = 0;
 
 	private static final int K_PID = 1;
@@ -230,6 +239,8 @@ public class GeneratePopulation {
 	private static final int D_W04 = 6; // Wegzweck
 	
 	private static final int D_W05 = 61; // Hauptverkehrsmittel
+	
+	private static final int D_WEGDAUER = 56;
 
 	private Random rnd = new Random();
 
@@ -244,9 +255,10 @@ public class GeneratePopulation {
 			plan = factory.createPlan();
 			plans.put(personId, plan);
 			String cellNumberString = kRow[K_VONVBEZ];
-			Coord coord = makeCoordinate(cellNumberString);
+			int cellNumber = Integer.parseInt(cellNumberString);
+			Coord coord = createCentroidCoordIfAvailable(cellNumber);
 			Activity firstHomeActivity = factory.createActivityFromCoord("home", coord);
-			activity2verkehrszelle.put(firstHomeActivity, Integer.parseInt(cellNumberString));
+			activity2verkehrszelle.put(firstHomeActivity, cellNumber);
 			plan.addActivity(firstHomeActivity);
 			previousActivity = firstHomeActivity;
 		} else {
@@ -257,16 +269,19 @@ public class GeneratePopulation {
 		int m = Integer.parseInt(dRow[D_W03_MS]);
 		previousActivity.setEndTime(m * 60 + h * 60 * 60);
 		Leg leg = factory.createLeg(parseLegMode(dRow[D_W05]));
+		final double travelTime = Double.parseDouble(dRow[D_WEGDAUER]);
+		if (travelTime > 999990) {
+			System.out.println("Zeit falsch.");
+		} else {
+			leg.setTravelTime(travelTime * 60);
+		}
 		plan.addLeg(leg);
 		String cellNumberString = kRow[K_NACHVBEZ];
-		Coord coord = makeCoordinate(cellNumberString);
+		int cellNumber = Integer.parseInt(cellNumberString);
+		Coord coord = createCentroidCoordIfAvailable(cellNumber);
 		Activity activity = factory.createActivityFromCoord(parseActivityType(dRow[D_W04], plan), coord);
-		activity2verkehrszelle.put(activity, Integer.parseInt(cellNumberString));
+		activity2verkehrszelle.put(activity, cellNumber);
 		plan.addActivity(activity);
-	}
-
-	private Coord makeCoordinate(String cellNumber) {
-		return schwerpunkte.get(cellNumber);
 	}
 
 	private TransportMode parseLegMode(String hauptverkehrsmittel) {
@@ -372,6 +387,58 @@ public class GeneratePopulation {
 		Activity lastActivity = (Activity) plan.getPlanElements().get(nPlanElements - 1);
 		return lastActivity;
 	}
+	
+	private void parseHouseholds() throws IOException {
+		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
+		tabFileParserConfig.setFileName(MID_HAUSHALTSDATENSATZ);
+		tabFileParserConfig.setDelimiterTags(new String[] {";"});
+		new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
+
+			private static final int CASEID = 0;
+			
+			private static final int H_H07 = 120;
+			
+			private static final int H_H071 = 121; // Einkommen in DM
+			
+			private static final int H_H072 = 125; // Einkommen in Euro
+			
+			@Override
+			public void startRow(String[] row) {
+				check(row);
+				if(!first) {
+					parseAndAddHousehold(scenario, row);
+				} else {
+					// This is the header. Nothing to do.
+				}
+				first = false;
+			}
+
+			private void parseAndAddHousehold(Scenario scenario, String[] row) {
+				Case household = new Case();
+				String caseid = row[CASEID];
+				int DMorEuro = Integer.parseInt(row[H_H07]);
+				if (DMorEuro == 1) {
+					int incomeInTDM = Integer.parseInt(row[H_H071]);
+					if (incomeInTDM > 0 && incomeInTDM < 95) {
+						household.income = (incomeInTDM * 1000) / 2; // TDM to Euro
+					} else {
+						household.income = -1;
+					}
+				} else if (DMorEuro == 2) {
+					int incomeInTEur = Integer.parseInt(row[H_H072]);
+					if (incomeInTEur > 0 && incomeInTEur < 95) {
+						household.income = (incomeInTEur * 1000); // TDM to Euro
+					} else {
+						household.income = -1;
+					}
+				} else {
+					household.income = -1;
+				}
+				cases.put(caseid, household);
+			}
+			
+		});
+	}
 
 	private void parsePersons()
 			throws IOException {
@@ -423,12 +490,8 @@ public class GeneratePopulation {
 					// unknown
 				}
 				
-				Collection<Person> household = households.get(caseid);
-				if (household == null) {
-					household = new ArrayList<Person>();
-					households.put(caseid, household);
-				}
-				household.add(person);
+				Case household = cases.get(caseid);
+				household.members.add(person);
 				persons.put(id, person);
 			}
 			
@@ -438,28 +501,28 @@ public class GeneratePopulation {
 	private void multiplyPopulation() {
 		Integer householdId = 0;
 		Integer personId = 0;
-		Map<String, Collection<Person>> householdSeeds = new HashMap<String, Collection<Person>>(households);
-		households.clear();
+		Map<String, Case> householdSeeds = new HashMap<String, Case>(cases);
+		cases.clear();
 		persons.clear();
-		HashMap<String, Collection<Person>> newHaushalte = new HashMap<String, Collection<Person>>(); 
+		HashMap<String, Case> newHaushalte = new HashMap<String, Case>(); 
 		while (personId < NUMBER_OF_SIMULATED_PEOPLE) {
-			for (Map.Entry<String, Collection<Person>> haushalt : householdSeeds.entrySet()) {
+			for (Map.Entry<String, Case> haushalt : householdSeeds.entrySet()) {
 				Integer homeCell = determineHomeCell(haushalt.getValue());
 				Coord homeCoord = createRandomCoord(homeCell);
-				Collection<Person> haushaltCopy = new ArrayList<Person>();
-				for (Person person : haushalt.getValue()) {
+				Case haushaltCopy = new Case();
+				for (Person person : haushalt.getValue().members) {
 					Person newPerson = copyPersonWithNewLocationsInSameCell(homeCoord, person, (personId++).toString());
-					haushaltCopy.add(newPerson);
+					haushaltCopy.members.add(newPerson);
 					persons.put(newPerson.getId(), newPerson);
 				}
 				newHaushalte.put((householdId++).toString(), haushaltCopy);
 			}
 		}
-		households.putAll(newHaushalte);
+		cases.putAll(newHaushalte);
 	}
 
-	private Integer determineHomeCell(Collection<Person> haushalt) {
-		for (Person person : haushalt) {
+	private Integer determineHomeCell(Case haushalt) {
+		for (Person person : haushalt.members) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement planElement : plan.getPlanElements()) {
 					if (planElement instanceof Activity) {
@@ -511,33 +574,20 @@ public class GeneratePopulation {
 		Point point = getRandomPointInFeature(rnd, verkehrszellen.get(integer));
 		return scenario.createCoord(point.getX(), point.getY());
 	}
+	
+	private Coord createCentroidCoordIfAvailable(Integer integer) {
+		Feature verkehrszelle = verkehrszellen.get(integer);
+		if (verkehrszelle != null) {
+			Point point = verkehrszelle.getDefaultGeometry().getCentroid();
+			return scenario.createCoord(point.getX(), point.getY());
+		} else {
+			return null;
+		}
+	}
 
 	private void writePlans() {
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		populationWriter.write(PLANS);
-	}
-
-	private static abstract class CheckingTabularFileHandler implements TabularFileHandler {
-		
-		boolean first = true;
-		
-		int numColumns = -1;
-		
-		protected void check(String[] row) {
-			if (first) {
-				numColumns = row.length;
-				System.out.println("Header: ");
-				for (String entry : row) {
-					System.out.print(entry);
-					System.out.print(" ");
-				}
-				System.out.println();
-			}
-			if (numColumns != row.length) {
-				throw new RuntimeException("Parse error. Expected: "+numColumns+" Got: "+row.length);
-			}
-		}
-		
 	}
 
 	private Id createPersonId(String caseid, String pid) {
