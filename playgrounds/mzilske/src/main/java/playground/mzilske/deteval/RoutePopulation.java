@@ -42,7 +42,6 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.ptproject.qsim.DetermineUsedNetworkParts;
 
 /**
  * Assigns each activity in each plan of each person in the population a link
