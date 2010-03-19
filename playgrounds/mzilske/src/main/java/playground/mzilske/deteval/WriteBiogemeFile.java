@@ -29,9 +29,9 @@ public class WriteBiogemeFile {
 
 	private static final String NET = "../detailedEval/pop/befragte-personen/cropped-network.xml";
 	
-	private static final String PLANS = "../detailedEval/pop/befragte-personen/routed-plans.xml";
+	private static final String PLANS = "../detailedEval/pop/befragte-personen/plans.xml";
 
-	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/households.xml";
+	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/befragte-personen/households.xml";
 
 	private static final String MID_WEGEDATENSATZ = "../detailedEval/eingangsdaten/MidMUC_2002/MiD2002_Wegedatensatz_MUC.csv";
 

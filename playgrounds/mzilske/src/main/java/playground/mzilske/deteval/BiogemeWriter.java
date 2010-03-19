@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -59,9 +60,10 @@ public class BiogemeWriter {
 		biogemeFileWriter.close();
 	}
 
-	private void writeChoiceLineIfPossible(Household household, Id personId, Leg leg,
-			int legIdx) {
-		double income = household.getIncome().getIncome();
+	private void writeChoiceLineIfPossible(Household household, Id personId, Leg leg, int legIdx) {
+		double householdIncome = household.getIncome().getIncome();
+		double personalIncome = distributeHouseholdIncomeOnMembers(household, personId);
+		
 		String id = personId.toString() + "." + legIdx;
 		if (leg.getMode() == TransportMode.car) {
 			Double distance = leg2travelDistance.get(leg);
@@ -72,7 +74,7 @@ public class BiogemeWriter {
 					double t_pt = carTime2ptTime(leg.getTravelTime());
 					double c_car = distance2carCost(distance);
 					double c_pt = distance2ptCost(distance);
-					writeBiogemeLine(choice, id, t_car, t_pt, c_car, c_pt, income);
+					writeBiogemeLine(choice, id, t_car, t_pt, c_car, c_pt, householdIncome, personalIncome);
 				} else {
 					System.out.println("NaN");
 				}
@@ -87,28 +89,34 @@ public class BiogemeWriter {
 				if (!Double.isNaN(t_car)) {
 					double c_car = distance2carCost(distance);
 					double c_pt = distance2ptCost(distance);
-					writeBiogemeLine(choice, id, t_car, t_pt, c_car, c_pt, income);
+					writeBiogemeLine(choice, id, t_car, t_pt, c_car, c_pt, householdIncome, personalIncome);
 				} else {
 					System.out.println("NaN");
 				}
 			}
 		}
 	}
+
+	private double distributeHouseholdIncomeOnMembers(Household household, Id member) {	
+		// in this case, household income is equally distributed to all members in the household
+		double personalIncome = household.getIncome().getIncome() / household.getMemberIds().size();
+		return personalIncome;
+	}
 	
-	private void writeBiogemeLine(int choice, String id, double t_car,
-			double t_pt, double c_car, double c_pt, double income) {
-		NumberFormat numberFormat = NumberFormat.getInstance();
+	private void writeBiogemeLine(int choice, String id, double t_car, double t_pt, double c_car, double c_pt, double householdIncome, double personalIncome) {
+		NumberFormat numberFormat = NumberFormat.getInstance(Locale.ENGLISH);
+		numberFormat.setGroupingUsed(false);
 		numberFormat.setMaximumFractionDigits(2);
-		if (income != -1 && t_car < 999990) {
+		if (householdIncome != -1 && t_car < 999990) {
 			biogemeFileWriter.println(choice + " " + id + " " + t_car
 					+ " " + t_pt + " " + numberFormat.format(c_car)
-					+ " " + numberFormat.format(c_pt) + " " + income);
+					+ " " + numberFormat.format(c_pt) + " " + householdIncome + " " + personalIncome);
 		}
 	}
 	
 	
 	private void writeBiogemeHeader() {
-		biogemeFileWriter.println("choice id t_car t_pt c_car c_pt household_income");
+		biogemeFileWriter.println("choice id t_car t_pt c_car c_pt household_income personal_income");
 	}
 
 	private double distance2ptCost(double distance) {
