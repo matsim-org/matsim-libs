@@ -188,8 +188,10 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	 * @return The resulting tasks and the processed interval (containing t)
 	 */
 	Pair<List<BFTask>, Interval> processNormalNodeForward(Node v, int t) {
-
-		Interval inter;
+		
+		this.Tpickintervaltime.onoff();
+		
+		Interval inter;	
 
 		if (this._settings.useImplicitVertexCleanup) {
 			Pair<Boolean, Interval> todo = getUnscannedInterSetScanned(v, t, false);
@@ -197,6 +199,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			if (!todo.first) { // we don't have anything todo
 				this._totalnonpolls++;
 				this._roundnonpolls++;
+				
+				this.Tpickintervaltime.onoff(); // don't forget that ...
 				return new Pair<List<BFTask>, Interval>(null, inter);
 			}
 		} else {
@@ -211,6 +215,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				// don't scan again ... can happen with vertex cleanup
 				this._totalnonpolls++;
 				this._roundnonpolls++;
+				
+				this.Tpickintervaltime.onoff(); // don't forget that ...
 				return new Pair<List<BFTask>, Interval>(null, temp);
 			}
 			temp.setScanned(true);
@@ -222,6 +228,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		// we need a representative of the interval to determine the cost
 		VertexIntervalWithCost label = (VertexIntervalWithCost) this._labels.get(v).getIntervalAt(inter.getLowBound());		
 
+		this.Tpickintervaltime.onoff();
+		this.Tforwardtime.onoff();
+		
 		// visit neighbors
 		// link is outgoing edge of v => forward edge
 		for (Link link : v.getOutLinks().values()) {
@@ -235,6 +244,10 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			}
 
 		}
+		
+		this.Tforwardtime.onoff();
+		this.Tbackwardtime.onoff();
+				
 		// link is incoming edge of v => backward edge
 		for (Link link : v.getInLinks().values()) {
 			Node w = link.getFromNode();
@@ -246,6 +259,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));
 			}
 		}
+		
+		this.Tbackwardtime.onoff();
+		this.Temptysourcestime.onoff();
 
 		// treat empty sources!
 		if (this._flow.isNonActiveSource(v)) {
@@ -279,6 +295,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			}
 		}
 		
+		this.Temptysourcestime.onoff();
+		this.Tupdatesinkstime.onoff();
+		
 		// treat sinks
 		if (this._settings.isSink(v)) {
 			// the first time when we can go to the sink will also be the cheapest!
@@ -302,6 +321,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				queue.add(new BFTask(new VirtualSink(v), reachsink, false));
 			}
 		}
+		
+		this.Tupdatesinkstime.onoff();		
 
 		return new Pair<List<BFTask>, Interval>(queue, inter);
 	}
@@ -658,6 +679,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			System.out.print(">");
 		}
 
+		this.Tcalc.onoff();
+		
 		// queue to save nodes we have to scan
 		// TaskComparator taskcomp = new TaskComparator();
 		// Queue<BFTask> queue = new PriorityQueue<BFTask>((1), taskcomp);
@@ -678,8 +701,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
 		// main loop
 		int gain = 0;
-		this._calcstart = System.currentTimeMillis();
+		
 
+		
 		while (true) {
 			// System.out.println("The queue is: ");
 			// System.out.println(queue);
@@ -700,8 +724,11 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			}
 
 			Node v = task.node.getRealNode();
-
+			
 			if (task.node instanceof VirtualSink) {
+				
+				this.Tsinktime.onoff();
+				
 				// TODO check ... is this still okay with costs (due to capacitated sinks)?
 				// Should be. For active sinks we can ensure that the network is empty afterwards. 
 				// we always lower the best arrival time when we reach an active sink
@@ -718,18 +745,27 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				if (tempqueue != null) {
 					queue.addAll(tempqueue);
 				}
+				
+				this.Tsinktime.onoff();				
 
 			} else if (task.node instanceof VirtualSource) {
+				
 				// send out of source v
+				
+				this.Tsourcetime.onoff();
 
 				List<BFTask> tempqueue = processSourceForward(v);
 
 				if (tempqueue != null) {
 					queue.addAll(tempqueue);
 				}
-
+				
+				this.Tsourcetime.onoff();
+				
 			} else if (task.node instanceof VirtualNormalNode) {
 
+				this.Tnormaltime.onoff();
+				
 				if (this._settings.useVertexCleanup) {
 					// Effectiveness with this implementation is questionable
 					this._vertexGain += _labels.get(v).cleanup();
@@ -745,6 +781,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 					}
 					low = ret.second.getHighBound() + 1;
 				}
+				
+				this.Tnormaltime.onoff();				
 
 			} else {
 				throw new RuntimeException(
@@ -788,24 +826,25 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				this._unreachable.put(node, t);
 			}
 		}
-
-		this._calcend = System.currentTimeMillis();
-		this._totalcalctime += (this._calcend - this._calcstart);
-		if (_debug > 3) {
-			System.out.println("Removed " + gain + " intervals.");
-		}
-
+		
+		
+				
 		//System.out.println("final labels: \n");
 		//printStatus();
 
-		List<TimeExpandedPath> TEPs = null;
+		this.Tconstructroutetime.onoff();
+		
+		List<TimeExpandedPath> TEPs = null;		
 		try {
-			TEPs = constructRoutesForward();
+			TEPs = constructRoutesForward();			
 		} catch (BFException e) {
 			System.out.println("stop reason: " + e.getMessage());
 		}
+		this.Tconstructroutetime.onoff();
+		
+		this.Tcalc.onoff();
+		
 		// System.out.println(TEPs);
-
 		return TEPs;
 
 	}
@@ -854,7 +893,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		// main loop
 		// int gain = 0;
 
-		this._calcstart = System.currentTimeMillis();
+		this.Tcalc.onoff();
 		while (true) {
 			// System.out.println("The queue is: ");
 			// System.out.println(queue);
@@ -926,11 +965,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				printStatus();
 			}
 		}
-		this._calcend = System.currentTimeMillis();
-		this._totalcalctime += (this._calcend - this._calcstart);
-		if (_debug > 3) {
-			System.out.println("Removed " + this._vertexGain + " intervals.");
-		}
+		this.Tcalc.onoff();
 
 		// System.out.println("final labels: \n");
 		// printStatus();
@@ -946,12 +981,14 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		}
 		// END OF BIG DEBUG
 
+		this.Tconstructroutetime.onoff();
 		List<TimeExpandedPath> TEPs = null;
 		try {
 			TEPs = constructRoutesReverse();
 		} catch (BFException e) {
 			System.out.println("stop reason: " + e.getMessage());
 		}
+		this.Tconstructroutetime.onoff();
 
 		return TEPs;
 
@@ -1174,51 +1211,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		System.out.println(print.toString());
 	}
 
-	public String measure() {
-		String result =
-		// "  Calctime (ms): "+(this._calcend-this._calcstart)+
-		"  Polls: " + this._roundpolls + "\n  Nonpolls: "
-				+ this._roundnonpolls
-				+
-				// "\n      Preptime (ms): "+(this._prepend-this._prepstart)+
-				"\n  Totalpolls: " + (this._totalpolls) + "\n  Totalnonpolls: "
-				+ (this._totalnonpolls);
-		// "\n  Totalpreptime (s): "+(this._totalpreptime/1000)+
-		// "\n  Totalcalctime (s): "+(this._totalcalctime/1000);
-
-		// statistics for VertexIntervalls
-		// min, max, avg size
-		int min = Integer.MAX_VALUE;
-		int max = 0;
-		long sum = 0;
-		for (Node node : this._network.getNodes().values()) {
-			int size = this._labels.get(node).getSize();
-			// // DEBUG
-			// if (size > 100) {
-			// System.out.println("Large node label in node: " + node);
-			// System.out.println(this._labels.get(node));
-			// }
-			sum += size;
-			min = Math.min(min, size);
-			max = Math.max(max, size);
-		}
-		result += "\n  Size of VertexIntervalls (min/avg/max): " + min + " / "
-				+ sum / (double) this._flow.getSources().size() + " / " + max
-				+ "\n";
-		return result;
-	}
-
-	/* reset status information of the algo for the next iter */
-	public void startNewIter(int lastArrival) {
-		this._vertexGain = 0;
-		this._roundpolls = 0;
-		this._roundnonpolls = 0;
-		if (lastArrival > this._oldLastArrival) {
-			// reset some status information
-			// nothing needed currently
-		}
-
-	}
+	
 
 	/**
 	 * Method for updating the labels of node "to" during one iteration of the
@@ -1290,13 +1283,17 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			}
 			arriveProperties.setSuccessor(succ);
 			
-			// FIXME cost is missing
+			// FIXME cost is missing for REVERSE search
 		}
 
+		this.Tpropagate.onoff();
 		arrive = flowover.propagate(ival, original, reverse, timehorizon);
-
+		this.Tpropagate.onoff();
+		
 		if (arrive != null && !arrive.isEmpty()) {
+			this.Tsettrue.onoff();
 			changed = labelto.setTrueList(arrive, arriveProperties);
+			this.Tsettrue.onoff();
 			return changed;
 		} else {
 			return null;

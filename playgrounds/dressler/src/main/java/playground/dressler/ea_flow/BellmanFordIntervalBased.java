@@ -42,6 +42,7 @@ import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.Interval.VertexInterval;
 import playground.dressler.Interval.VertexIntervals;
 import playground.dressler.control.FlowCalculationSettings;
+import playground.dressler.util.CPUTimer;
 
 
 /**
@@ -99,6 +100,9 @@ public class BellmanFordIntervalBased {
 	 */
 	static int _debug = 0;
 
+	/*
+	 * lots of "profiling" data ...
+	 */
 	long _totalpolls = 0L;
 	
 	int _roundpolls = 0;
@@ -113,9 +117,25 @@ public class BellmanFordIntervalBased {
 	private long _prepend=0;
 	private long _totalpreptime=0;*/
 	
-	long _calcstart=0;
-	long _calcend=0;
-	long _totalcalctime=0;
+	CPUTimer Tcalc = new CPUTimer("Calc");
+
+	CPUTimer Tpolltime = new CPUTimer("+Polltime");
+	
+	CPUTimer Tnormaltime = new CPUTimer("+-normal nodes");
+	CPUTimer Tsourcetime = new CPUTimer("+-source nodes");
+	CPUTimer Tsinktime = new CPUTimer("+-sink nodes");
+		
+	// details for the processnormalnode
+	CPUTimer Tpickintervaltime = new CPUTimer(" +-Pickintervall");
+	CPUTimer Tforwardtime = new CPUTimer(" +-forward");
+	CPUTimer Tbackwardtime = new CPUTimer(" +-backward");
+	CPUTimer Tpropagate = new CPUTimer("  *-propagate");
+	CPUTimer Tsettrue = new CPUTimer("  *-settrue");
+	CPUTimer Temptysourcestime = new CPUTimer(" +-emptysources");
+	CPUTimer Tupdatesinkstime = new CPUTimer(" +-updatesinks");
+	
+	CPUTimer Tconstructroutetime = new CPUTimer("+construct routes");
+	
 	
 	//--------------------CONSTRUCTORS-------------------------------------//
 	
@@ -1138,7 +1158,8 @@ public class BellmanFordIntervalBased {
 
 		// main loop
 		int gain = 0;
-		this._calcstart = System.currentTimeMillis();
+		
+		this.Tcalc.onoff();
 		
 		while (true) {
 			//System.out.println("The queue is: ");
@@ -1243,11 +1264,7 @@ public class BellmanFordIntervalBased {
 		
 		
 		
-		this._calcend= System.currentTimeMillis();
-		this._totalcalctime+=(this._calcend-this._calcstart);
-		if (_debug>3) {
-		  System.out.println("Removed " + gain + " intervals.");
-		}
+		this.Tcalc.onoff();
 		
 		//System.out.println("final labels: \n");
 		//printStatus();
@@ -1303,7 +1320,7 @@ public class BellmanFordIntervalBased {
 		// main loop
 		//int gain = 0;
 
-		this._calcstart=System.currentTimeMillis();
+		this.Tcalc.onoff();
 		while (true) {
 			//System.out.println("The queue is: ");
 			//System.out.println(queue);
@@ -1375,11 +1392,8 @@ public class BellmanFordIntervalBased {
 				printStatus();
 			}
 		}
-		this._calcend= System.currentTimeMillis();
-		this._totalcalctime+=(this._calcend-this._calcstart);
-		if (_debug>3) {
-		  System.out.println("Removed " + this._vertexGain + " intervals.");
-		}
+		
+		this.Tcalc.onoff();
 		
 		//System.out.println("final labels: \n");
 		//printStatus();
@@ -1435,7 +1449,7 @@ public class BellmanFordIntervalBased {
 
 		// main loop
 		//int gain = 0;
-		this._calcstart=System.currentTimeMillis();
+		this.Tcalc.onoff();
 		
 		while (true) {
 			//System.out.println("The queue is: ");
@@ -1551,8 +1565,8 @@ public class BellmanFordIntervalBased {
 				printStatus();
 			}
 		}
-		this._calcend= System.currentTimeMillis();
-		this._totalcalctime+=(this._calcend-this._calcstart);
+		
+		this.Tcalc.onoff();
 		if (_debug>3) {
 		  System.out.println("Removed " + this._vertexGain + " intervals.");
 		}
@@ -1675,14 +1689,25 @@ public class BellmanFordIntervalBased {
 
 	public String measure() {
 		String result=
-		//"  Calctime (ms): "+(this._calcend-this._calcstart)+
-		"  Polls: " + this._roundpolls +
-		"\n  Nonpolls: " + this._roundnonpolls +
-		//"\n      Preptime (ms): "+(this._prepend-this._prepstart)+
-		"\n  VertexCleanUp: " + this._vertexGain + 
-		"\n  Totalpolls: " + (this._totalpolls) +
-		"\n  Totalnonpolls: " + (this._totalnonpolls) +
-		"\n  Total VertexCleanUp: " + this._totalVertexGain;
+			"  Polls: " + this._roundpolls +
+			"\n  Nonpolls: " + this._roundnonpolls +
+			//"\n      Preptime (ms): "+(this._prepend-this._prepstart)+
+			"\n  VertexCleanUp: " + this._vertexGain +
+			"\n  " + this.Tcalc +
+			"\n  " + this.Tnormaltime +
+			"\n  " + this.Tpickintervaltime +
+			"\n  " + this.Tforwardtime +
+			"\n  " + this.Tbackwardtime +
+			"\n  " + this.Tpropagate +
+			"\n  " + this.Tsettrue +
+			"\n  " + this.Temptysourcestime +
+			"\n  " + this.Tupdatesinkstime + 
+			"\n  " + this.Tsourcetime +
+			"\n  " + this.Tsinktime +
+			"\n  " + this.Tconstructroutetime + 
+			"\n\n  Totalpolls: " + (this._totalpolls) +
+			"\n  Totalnonpolls: " + (this._totalnonpolls) +
+			"\n  Total VertexCleanUp: " + this._totalVertexGain;
 		//"\n  Totalpreptime (s): "+(this._totalpreptime/1000)+
 		//"\n  Totalcalctime (s): "+(this._totalcalctime/1000);
 		
@@ -1713,6 +1738,20 @@ public class BellmanFordIntervalBased {
 		this._vertexGain = 0;
 		this._roundpolls=0;
 		this._roundnonpolls = 0;
+		
+		this.Tcalc.newiter();
+		this.Tnormaltime.newiter();
+		this.Tpickintervaltime.newiter();
+		this.Tforwardtime.newiter();
+		this.Tbackwardtime.newiter();
+		this.Temptysourcestime.newiter();
+		this.Tupdatesinkstime.newiter(); 
+		this.Tsourcetime.newiter();
+		this.Tsinktime.newiter();
+		this.Tconstructroutetime.newiter(); 
+		this.Tpropagate.newiter();
+		this.Tsettrue.newiter();
+		
 		if (lastArrival > this._oldLastArrival) {
 			// reset some status information
 			// nothing needed currently

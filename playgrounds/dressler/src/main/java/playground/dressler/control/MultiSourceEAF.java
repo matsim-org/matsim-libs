@@ -191,6 +191,7 @@ public class MultiSourceEAF {
 		  routingAlgo = new BellmanFordIntervalBased(settings, fluss);
 		}
 		
+		int VERBOSITY = 100;
 			
 		int i;
 		long EdgeGain = 0;
@@ -402,7 +403,7 @@ public class MultiSourceEAF {
 			
 			timeAugment += timer3 - timer2;			
 			
-			if (i % 100 == 0) {		
+			if (i % VERBOSITY == 0) {		
 				long timecurrent = System.currentTimeMillis();
 				System.out.println();
 				System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: Total " + (timecurrent - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
@@ -469,18 +470,22 @@ public class MultiSourceEAF {
 		String outputplansfile = null;
 		String sinkid = null;
 		String simplenetworkfile = null;
+		String shelterfile = null;
 		int uniformDemands = 0;
 		
 		// Rounding is now done according to timestep and flowFactor!
 		int timeStep; 
 		double flowFactor;
 
-		int instance = 1; 
+		int instance = 41; 
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
 		// 4 = padang, with 10% plans, 10s steps
 		// 41 = padang, with 100% plans, 1s steps ...
+		// 42 = padang, v2010, with 100% plans (no shelters yet)
+		// 43 = padang, v2010, with 100% plans, 10s steps (no shelters yet)
+		// 44 = padang, v2010, with 100% plans, 5s steps (no shelters yet)
 		// 5 = probeevakuierung telefunken
 		// else = custom ...
 		
@@ -493,7 +498,7 @@ public class MultiSourceEAF {
 		} else if (instance == 2) {
 			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
 			uniformDemands = 100;
-			timeStep = 10;
+			timeStep = 100;
 			flowFactor = 1.0;
 			sinkid = "en1";
 		} else if (instance == 3) {
@@ -513,7 +518,26 @@ public class MultiSourceEAF {
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced.xml.gz";
 			timeStep = 1;
 			flowFactor = 1.0;
-			sinkid = "en1";
+			sinkid = "en1";			
+		} else if (instance == 42) {
+			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
+			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
+			timeStep = 1;
+			flowFactor = 1.0;
+			sinkid = "en1";			
+			shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
+		} else if (instance == 43) {
+			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
+			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
+			timeStep = 10;
+			flowFactor = 1.0;
+			sinkid = "en1";			
+		} else if (instance == 44) {
+				networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
+				plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
+				timeStep = 5;
+				flowFactor = 1.0;
+				sinkid = "en1";			
 		} else if (instance == 5) {
 			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
 			timeStep = 1; 
@@ -639,13 +663,18 @@ public class MultiSourceEAF {
 			}
 		}
 		
-		
+		// TODO parse shelterfile
 		
 		int totaldemands = 0;
 		for (int i : demands.values()) {
 			if (i > 0) 
 			  totaldemands += i;
 		}
+
+		// TODO
+		// Careful, padang has shelters AND a supersink.
+		// so take care of the supersink here and don't tell the settings about it.
+
 		
 		//check if demands and sink are set
 		if (demands.isEmpty() ) {
@@ -670,7 +699,7 @@ public class MultiSourceEAF {
 		//settings.MaxRounds = 95;
 		//settings.checkConsistency = 100;		
 		//settings.useVertexCleanup = false;
-		//settings.useSinkCapacities = true;
+		//settings.useSinkCapacities = false;
 		//settings.useImplicitVertexCleanup = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
