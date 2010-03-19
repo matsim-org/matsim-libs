@@ -52,9 +52,9 @@ public class GeneratePopulation {
 		
 	private static final String MID_VERKEHRSZELLEN = "../detailedEval/Net/shapeFromVISUM/Verkehrszellen_Umrisse_zone.shp";
 
-	private static final String PLANS = "../detailedEval/pop/plans.xml";
+	private static final String PLANS = "../detailedEval/pop/befragte-personen/plans.xml";
 	
-	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/households.xml";
+	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/befragte-personen/households.xml";
 	
 	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 140000;
 
