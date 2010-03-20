@@ -37,10 +37,12 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -53,7 +55,7 @@ import playground.dgrether.analysis.charts.DgDefaultAxisBuilder;
  *
  */
 public class AverageTTHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-		AgentArrivalEventHandler, AgentDepartureEventHandler{
+		AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler{
 	
 	private double travelTime = 0.0;
 	private int popSize;
@@ -62,29 +64,42 @@ public class AverageTTHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 		this.popSize = popSize;
 	}
 	
+	@Override
 	public void reset(int iteration) {
 		this.travelTime = 0.0;
 	}
 	
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		this.travelTime -= event.getTime();
 	}
 	
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		this.travelTime += event.getTime();
 	}
 	
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		this.travelTime += event.getTime();
 	}
 	
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		this.travelTime -= event.getTime();
+		this.travelTime -= event.getTime();		
+	}
+
+	@Override
+	public void handleEvent(AgentWait2LinkEvent event) {
+//		this.travelTime -= event.getTime();
 	}
 	
 	public double getAverageTravelTime() {
 		return this.travelTime / this.popSize;
 	}
+
+
+
 	
 
 	

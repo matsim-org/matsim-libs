@@ -197,6 +197,7 @@ private void createConfig(Config config) {
 		config.getQSimConfigGroup().setEndTime(7*3600);
 		config.otfVis().setDrawLinkIds(true);
 		
+		
 		// configure strategies for replanning
 		
 		config.strategy().setMaxAgentPlanMemorySize(4);

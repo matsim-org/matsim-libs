@@ -31,6 +31,7 @@ public interface DaPaths {
 	
 	final String INPUT = DATA + "input\\";
 	final String OUTPUT = DATA + "output\\";
+	final String DENVEROUT = OUTPUT + "DENVER\\";
 	
 	
 

@@ -49,6 +49,7 @@ import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
 import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
+import playground.droeder.Analysis.SignalGroupStateTimeHandler;
 import playground.droeder.charts.DaBarChart;
 import playground.droeder.charts.DaChartWriter;
 
@@ -81,9 +82,10 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	
 	private AverageTTHandler handler1;
 	private CarsOnLinkLaneHandler handler2;
+	private SignalGroupStateTimeHandler handler3;
 	
 	// "D" run denver -- "G" run gershensonTestNetwork
-	private static final String config = "G";
+	private static final String config = "D";
 	// "G" for GershensonController -- "I" for InterimController
 	private static final String controller = "G";
 	
@@ -108,7 +110,10 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			}
 			dsg.createScenario();
 			conf = DaPaths.OUTPUT + "Denver\\denverConfig.xml";
-		}else {
+		}else if (configFile == "opti"){
+			conf = DaPaths.OUTPUT + "Denver\\denverConfig.xml";
+		}
+		else{
 			conf = configFile;
 		}
 		
@@ -137,13 +142,18 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				corrGroups = csg.calculateCorrespondingGroups();
 				compGroups = csg.calculateCompetingGroups(corrGroups);
 				mainOutLinks = csg.calculateMainOutlinks();
+				
 				handler1 = new AverageTTHandler(c.getPopulation().getPersons().size());
 				handler2 = new CarsOnLinkLaneHandler(groups, d, c.getNetwork());
+				handler3 = new SignalGroupStateTimeHandler();
+				
+				handler3.init(groups);
 				event.getControler().getEvents().addHandler(handler1);
 				event.getControler().getEvents().addHandler(handler2);
+				event.getControler().getEvents().addHandler(handler3);
 				
 				//enable live-visualization
-//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	
@@ -157,6 +167,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				handler1.reset(event.getIteration());
 				handler2.reset(event.getIteration());
+				handler3.reset(event.getIteration());
 			}
 		});
 		
@@ -164,6 +175,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				avTT = handler1.getAverageTravelTime();
+				handler3.writeToTxt(DaPaths.DENVEROUT + "ITERS\\it." + event.getIteration() + "\\greenTimes2.txt");
 			}
 		});		
 		
@@ -195,7 +207,8 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				}
 				
 				handler2.setQNetwork(e.getQueueSimulation().getQueueNetwork());
-				
+
+				qs.getEventsManager().addHandler(handler3);
 				
 			}
 		});
@@ -222,12 +235,6 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	
 	}
 	
-//	private void startVisualizer(Config config){
-//		String[] args = {config.controler().getOutputDirectory() +
-//				"/ITERS/it." + config.controler().getLastIteration() +
-//				"/" + config.controler().getLastIteration() + ".otfvis.mvi"};
-//		OTFVis.main(args);
-//	}
 	
 	public void setU (int u){
 		this.u = u;
@@ -244,6 +251,9 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	public void setMaxGreen(int maxGreen){
 		this.maxGreen = maxGreen;
 	}
+	public double getAvTT(){
+		return this.avTT;
+	}
 	
 	
 	public static void main(String[] args) {
@@ -252,11 +262,11 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		double temp;
 		
 		GershensonRunner runner = new GershensonRunner();
-		runner.setN(30);
-		runner.setU(15);
-		runner.setCap(0.90);
-		runner.setD(150);
-		runner.setMaxGreen(60);
+		runner.setN(142);
+		runner.setU(21);
+		runner.setCap(0.63);
+		runner.setD(45);
+		runner.setMaxGreen(30);
 		runner.runScenario(config);
 		
 //		for (int d = 80; d<151; d = d+10){
