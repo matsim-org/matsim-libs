@@ -96,6 +96,8 @@ public class EvacuationConfigGroup extends Module {
 	private static final String SOCIAL_COST_OPTIMIZATION = "socialCostOptimization";
 
 	private static final String GENERATE_EVAC_NET_FROM_SWW_FILE = "generateEvacNetFromSWWFile";
+	
+	private static final String LOAD_POPULATION_FROM_SHAPE_FILE = "loadPopulationFromShapeFile";
 
 	/**
 	 * file name of the buildings shape file
@@ -138,6 +140,8 @@ public class EvacuationConfigGroup extends Module {
 	private boolean socialCostOptimization = false;
 
 	private boolean generateEvacNetFromSWWFile = false;
+	
+	private boolean loadPopulationFromShapeFile = false;
 
 
 
@@ -179,9 +183,13 @@ public class EvacuationConfigGroup extends Module {
 			return Boolean.toString(isSocialCostOptimization());
 		}else if (GENERATE_EVAC_NET_FROM_SWW_FILE.equals(key)) {
 			return Boolean.toString(isGenerateEvacNetFromSWWFile());
+		}else if (LOAD_POPULATION_FROM_SHAPE_FILE.equals(key)) {
+			return Boolean.toString(isLoadPopulationFromShapeFile());
 		}
 		throw new IllegalArgumentException(key);
 	}
+
+
 
 	@Override
 	public void addParam(final String key, final String value) {
@@ -219,6 +227,8 @@ public class EvacuationConfigGroup extends Module {
 			setBufferSize(value);
 		}else if(GENERATE_EVAC_NET_FROM_SWW_FILE.equals(key)){
 			setGenerateEvacNetFromSWWFile(value);
+		}else if(LOAD_POPULATION_FROM_SHAPE_FILE.equals(key)){
+			setLoadPopulationFromShapeFile(value);
 		}else {
 			throw new IllegalArgumentException(key);
 		}
@@ -243,6 +253,7 @@ public class EvacuationConfigGroup extends Module {
 		map.put(SAMPLE_SIZE, getValue(SAMPLE_SIZE));
 		map.put(BUFFER_SIZE, getValue(BUFFER_SIZE));
 		map.put(GENERATE_EVAC_NET_FROM_SWW_FILE, getValue(GENERATE_EVAC_NET_FROM_SWW_FILE));
+		map.put(LOAD_POPULATION_FROM_SHAPE_FILE, getValue(LOAD_POPULATION_FROM_SHAPE_FILE));
 		return map;
 	}
 
@@ -337,6 +348,14 @@ public class EvacuationConfigGroup extends Module {
 		this.generateEvacNetFromSWWFile = Boolean.parseBoolean(generateEvacNetFromSWWFile);
 	}
 
+	public boolean isLoadPopulationFromShapeFile() {
+		return this.loadPopulationFromShapeFile;
+	}
+	
+	private void setLoadPopulationFromShapeFile(String loadPopulationFromShapeFile) {
+		this.loadPopulationFromShapeFile = Boolean.parseBoolean(loadPopulationFromShapeFile);
+	}
+	
 	/**
 	 *
 	 * @return the shapes of the buildings
