@@ -80,7 +80,7 @@ public class DataPrepare {
 						throw new RuntimeException("Duplicate edge.");
 					}
 				}
-				double length = Double.parseDouble(row.get("LAENGE").replace(',', '.'));
+				double length = Double.parseDouble(row.get("LAENGE").replace(',', '.')) * 1000;
 				String edgeTypeIdString = row.get("TYPNR");
 				IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
 				double freespeed = getFreespeedTravelTime(edgeTypeId);

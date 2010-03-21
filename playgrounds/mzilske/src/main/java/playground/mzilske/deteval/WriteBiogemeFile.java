@@ -28,7 +28,11 @@ public class WriteBiogemeFile {
 	private static final String CLUSTERING_FILE = "../detailedEval/pop/befragte-personen/clustering.txt";
 
 	private static final String NET = "../detailedEval/pop/befragte-personen/cropped-network.xml";
-	
+
+	private static final String SURVEY_PLANS = "../detailedEval/pop/befragte-personen/plans.xml";
+
+	private static final String ROUTED_PLANS = "../detailedEval/pop/befragte-personen/routed-plans.xml";
+
 	private static final String PLANS = "../detailedEval/pop/befragte-personen/plans.xml";
 
 	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/befragte-personen/households.xml";
@@ -43,11 +47,13 @@ public class WriteBiogemeFile {
 	
 	private static final int D_W08 = 49; // Wegstrecke in km
 
-	private Scenario scenario = new ScenarioImpl();
+	private Scenario scenarioWithSurveyData = new ScenarioImpl();
+	
+	private Scenario scenarioWithRoutedPlans = new ScenarioImpl();
 
 	private Households households = new HouseholdsImpl();
 
-	private BiogemeWriter biogemeWriter = new BiogemeWriter(scenario,
+	private BiogemeWriter biogemeWriter = new BiogemeWriter(scenarioWithSurveyData.getPopulation(), scenarioWithRoutedPlans.getPopulation(),
 			households);
 
 	private void parseClustering() throws IOException {
@@ -69,14 +75,20 @@ public class WriteBiogemeFile {
 					}
 
 					private void parseAndAddClustering(String[] row) {
-						Person sourcePerson = scenario.getPopulation()
-								.getPersons().get(scenario.createId(row[0]));
+						Person sourcePerson = scenarioWithSurveyData.getPopulation()
+								.getPersons().get(scenarioWithSurveyData.createId(row[0]));
+						if (sourcePerson == null) {
+							return;
+						}
 						int sourceLegIdx = Integer.parseInt(row[1]);
 						Leg sourceLeg = (Leg) sourcePerson.getPlans()
 								.iterator().next().getPlanElements().get(
 										sourceLegIdx);
-						Person targetPerson = scenario.getPopulation()
-								.getPersons().get(scenario.createId(row[2]));
+						Person targetPerson = scenarioWithSurveyData.getPopulation()
+								.getPersons().get(scenarioWithSurveyData.createId(row[2]));
+						if (targetPerson == null) {
+							return;
+						}
 						int targetLegIdx = Integer.parseInt(row[3]);
 						Leg targetLeg = (Leg) targetPerson.getPlans()
 								.iterator().next().getPlanElements().get(
@@ -93,7 +105,7 @@ public class WriteBiogemeFile {
 			String pid = dRow[D_PID];
 			int weg = Integer.parseInt(dRow[D_WEG]);
 			Id personId = createPersonId(caseid, pid);
-			Person person = scenario.getPopulation().getPersons().get(personId);
+			Person person = scenarioWithSurveyData.getPopulation().getPersons().get(personId);
 			if (person != null) {
 				Plan plan = person.getPlans().iterator().next();
 				Leg leg = (Leg) plan.getPlanElements().get(2*weg-1);
@@ -126,7 +138,7 @@ public class WriteBiogemeFile {
 	}
 	
 	private Id createPersonId(String caseid, String pid) {
-		return scenario.createId(caseid + "." + pid);
+		return scenarioWithRoutedPlans.createId(caseid + "." + pid);
 	}
 
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
@@ -142,10 +154,12 @@ public class WriteBiogemeFile {
 	}
 
 	private void readPopulation() throws SAXException, ParserConfigurationException, IOException {
-		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario);
+		PopulationReaderMatsimV4 populationReader1 = new PopulationReaderMatsimV4(scenarioWithSurveyData);
+		populationReader1.readFile(SURVEY_PLANS);
+		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenarioWithRoutedPlans);
 		networkReader.parse(NET);
-		PopulationReaderMatsimV4 populationReader = new PopulationReaderMatsimV4(scenario);
-		populationReader.readFile(PLANS);
+		PopulationReaderMatsimV4 populationReader2 = new PopulationReaderMatsimV4(scenarioWithRoutedPlans);
+		populationReader2.readFile(ROUTED_PLANS);
 		HouseholdsReaderV10 householdsReader = new HouseholdsReaderV10(households);
 		householdsReader.readFile(HOUSEHOLDS_FILE);
 	}

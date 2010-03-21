@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -32,12 +32,15 @@ public class BiogemeWriter {
 
 	private Map<Leg, Leg> clustering = new HashMap<Leg, Leg>();
 	
-	private Scenario scenario;
+	private Population populationWithRoutedPlans;
+	
+	private Population populationWithSurveyData;
 	
 	private Households households;
 	
-	public BiogemeWriter(Scenario scenario, Households households) {
-		this.scenario = scenario;
+	public BiogemeWriter(Population populationWithSurveyData, Population populationWithRoutedPlans, Households households) {
+		this.populationWithSurveyData = populationWithSurveyData;
+		this.populationWithRoutedPlans = populationWithRoutedPlans;
 		this.households = households;
 	}
 
@@ -47,13 +50,16 @@ public class BiogemeWriter {
 		for (Entry<Id, Household> entry: households.getHouseholds().entrySet()) {
 			Household household = entry.getValue();
 			for (Id personId : household.getMemberIds()) {
-				Person person = scenario.getPopulation().getPersons().get(personId);
-				Plan plan = person.getPlans().iterator().next();
-				for (PlanElement planElement : plan.getPlanElements()) {
+				Person personWithSurveyData = populationWithSurveyData.getPersons().get(personId);
+				Person personWithRoutedPlan = populationWithRoutedPlans.getPersons().get(personId);
+				Plan planWithSurveyData = personWithSurveyData.getPlans().iterator().next();
+				Plan routedPlan = personWithRoutedPlan.getPlans().iterator().next();
+				for (PlanElement planElement : planWithSurveyData.getPlanElements()) {
 					if (planElement instanceof Leg) {
-						Leg leg = (Leg) planElement;
-						int legIdx = plan.getPlanElements().indexOf(leg);
-						writeChoiceLineIfPossible(household, personId, leg, legIdx);
+						Leg legWithSurveyData = (Leg) planElement;
+						int legIdx = planWithSurveyData.getPlanElements().indexOf(legWithSurveyData);
+						Leg routedLeg = (Leg) routedPlan.getPlanElements().get(legIdx);
+						writeChoiceLineIfPossible(household, personId, legWithSurveyData, routedLeg, legIdx);
 					}
 				}
 			}
@@ -61,19 +67,20 @@ public class BiogemeWriter {
 		biogemeFileWriter.close();
 	}
 
-	private void writeChoiceLineIfPossible(Household household, Id personId, Leg leg,
-			int legIdx) {
+	private void writeChoiceLineIfPossible(Household household, Id personId, Leg legWithSurveyData,
+			Leg routedLeg, int legIdx) {
 		double householdIncome = household.getIncome().getIncome();
 		double personalIncome = distributeHouseholdIncomeToMembers(household);
 		DecimalFormat decimalFormat = new DecimalFormat("00");
 		String id = household.getId().toString() + "000" + decimalFormat.format(household.getMemberIds().indexOf(personId) +1);
-		if (leg.getMode() == TransportMode.car) {
-			Double distance = leg2travelDistance.get(leg);
+		if (legWithSurveyData.getMode() == TransportMode.car) {
+			Double distance = leg2travelDistance.get(legWithSurveyData);
 			if (distance != null && distance < 99990 ) {
 				int choice = 1;
-				double t_car = leg.getTravelTime();
+				double t_car = legWithSurveyData.getTravelTime();
 				if (!Double.isNaN(t_car)) {
-					double t_pt = carTime2ptTime(leg.getTravelTime());
+					double freeSpeedCarTravelTime = routedLeg.getTravelTime();
+					double t_pt = carTime2ptTime(freeSpeedCarTravelTime);
 					double c_car = distance2carCost(distance);
 					double c_pt = distance2ptCost(distance);
 					writeBiogemeLine(choice, id, legIdx, t_car, t_pt, c_car, c_pt, householdIncome, personalIncome);
@@ -81,12 +88,12 @@ public class BiogemeWriter {
 					System.out.println("NaN");
 				}
 			}
-		} else if (leg.getMode() == TransportMode.pt) {
-			Leg substituteCarLeg = clustering.get(leg);
+		} else if (legWithSurveyData.getMode() == TransportMode.pt) {
+			Leg substituteCarLeg = clustering.get(legWithSurveyData);
 			Double distance = leg2travelDistance.get(substituteCarLeg);
 			if (substituteCarLeg != null && distance != null && distance < 99990) {
 				int choice = 2;
-				double t_pt = leg.getTravelTime();
+				double t_pt = legWithSurveyData.getTravelTime();
 				double t_car = substituteCarLeg.getTravelTime();
 				if (!Double.isNaN(t_car)) {
 					double c_car = distance2carCost(distance);

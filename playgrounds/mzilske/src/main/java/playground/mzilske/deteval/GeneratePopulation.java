@@ -56,6 +56,10 @@ public class GeneratePopulation {
 	
 	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/befragte-personen/households.xml";
 	
+//	private static final String PLANS = "../detailedEval/pop/140k-synthetische-personen/plans.xml";
+//	
+//	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/140k-synthetische-personen/households.xml";
+	
 	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 140000;
 
 	private Scenario scenario = new ScenarioImpl();
@@ -80,7 +84,7 @@ public class GeneratePopulation {
 		generatePopulation.parsePlans();
 		generatePopulation.addPlans();
 		generatePopulation.dropPlanlessPeople();
-		// generatePopulation.multiplyPopulation();
+	//	generatePopulation.multiplyPopulation();
 		generatePopulation.addPopulationToScenario();
 		generatePopulation.addAndWriteHouseholds();
 		generatePopulation.writePlans();
@@ -162,6 +166,9 @@ public class GeneratePopulation {
 					Activity activity = (Activity) planElement;
 					if (activity.getCoord() == null) {
 						logger.warn("Dumped a plan because of a coordinateless activity.");
+						isGood = false;
+					} else if (activity.getEndTime() == 362340) { //  99:99 Uhr
+						logger.warn("Dumped a plan because of invalid activity time.");
 						isGood = false;
 					}
 				}
@@ -267,7 +274,8 @@ public class GeneratePopulation {
 		}
 		int h = Integer.parseInt(dRow[D_W03_HS]);
 		int m = Integer.parseInt(dRow[D_W03_MS]);
-		previousActivity.setEndTime(m * 60 + h * 60 * 60);
+		int endTimeInSeconds = m * 60 + h * 60 * 60;
+		previousActivity.setEndTime(endTimeInSeconds);
 		Leg leg = factory.createLeg(parseLegMode(dRow[D_W05]));
 		final double travelTime = Double.parseDouble(dRow[D_WEGDAUER]);
 		if (travelTime > 999990) {
@@ -504,7 +512,7 @@ public class GeneratePopulation {
 		Map<String, Case> householdSeeds = new HashMap<String, Case>(cases);
 		cases.clear();
 		persons.clear();
-		HashMap<String, Case> newHaushalte = new HashMap<String, Case>(); 
+		HashMap<String, Case> newCases = new HashMap<String, Case>(); 
 		while (personId < NUMBER_OF_SIMULATED_PEOPLE) {
 			for (Map.Entry<String, Case> haushalt : householdSeeds.entrySet()) {
 				Integer homeCell = determineHomeCell(haushalt.getValue());
@@ -515,10 +523,10 @@ public class GeneratePopulation {
 					haushaltCopy.members.add(newPerson);
 					persons.put(newPerson.getId(), newPerson);
 				}
-				newHaushalte.put((householdId++).toString(), haushaltCopy);
+				newCases.put((householdId++).toString(), haushaltCopy);
 			}
 		}
-		cases.putAll(newHaushalte);
+		cases.putAll(newCases);
 	}
 
 	private Integer determineHomeCell(Case haushalt) {
