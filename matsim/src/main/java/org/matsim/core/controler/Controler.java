@@ -115,6 +115,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
+import org.matsim.households.HouseholdsWriterV10;
+import org.matsim.lanes.LaneDefinitionsWriter11;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -124,6 +126,8 @@ import org.matsim.ptproject.qsim.ParallelQSimFactory;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.signalsystems.SignalSystemConfigurationsWriter11;
+import org.matsim.signalsystems.SignalSystemsWriter11;
 import org.matsim.world.WorldWriter;
 
 /**
@@ -135,13 +139,21 @@ import org.matsim.world.WorldWriter;
  */
 public class Controler {
 
-	private static final String DIRECTORY_ITERS = "ITERS";
-	/* package */static final String FILENAME_EVENTS_TXT = "events.txt.gz";
-	/* package */static final String FILENAME_EVENTS_XML = "events.xml.gz";
+	public static final String DIRECTORY_ITERS = "ITERS";
+	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
+	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt";
 	public static final String FILENAME_SCORESTATS = "scorestats.txt";
 	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats.txt";
+	public static final String FILENAME_POPULATION = "output_plans.xml.gz";
+	public static final String FILENAME_NETWORK = "output_network.xml.gz";
+	public static final String FILENAME_HOUSEHOLDS = "output_households.xml.gz";
+	public static final String FILENAME_LANES = "output_lanes.xml.gz";
+	public static final String FILENAME_SIGNALSYSTEMS = "output_signalsystems.xml.gz";
+	public static final String FILENAME_SIGNALSYSTEMS_CONFIG = "output_signalsystem_configuration.xml.gz";
+  public static final String FILENAME_CONFIG = "output_config.xml.gz";
 
+	
 	private enum ControlerState {
 		Init, Running, Shutdown, Finished
 	}
@@ -419,13 +431,13 @@ public class Controler {
 			}
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 			// dump plans
-			new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).writeFile(this.controlerIO.getOutputFilename("output_plans.xml.gz"));
+			new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).writeFile(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
 			// dump network
-			new NetworkWriter(this.network).writeFile(this.controlerIO.getOutputFilename("output_network.xml.gz"));
+			new NetworkWriter(this.network).writeFile(this.controlerIO.getOutputFilename(FILENAME_NETWORK));
 			// dump world
 			new WorldWriter(this.getScenario().getWorld()).writeFile(this.controlerIO.getOutputFilename("output_world.xml.gz"));
 			// dump config
-			new ConfigWriter(this.config).writeFile(this.controlerIO.getOutputFilename("output_config.xml.gz"));
+			new ConfigWriter(this.config).writeFile(this.controlerIO.getOutputFilename(FILENAME_CONFIG));
 			// dump facilities
 			ActivityFacilities facilities = this.getFacilities();
 			if (facilities != null) {
@@ -433,6 +445,22 @@ public class Controler {
 			}
 			if (this.network.getFactory().isTimeVariant()) {
 				new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
+			}
+			if (this.config.scenario().isUseHouseholds()){
+			  try {
+          new HouseholdsWriterV10(this.scenarioData.getHouseholds()).writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
+        } catch (FileNotFoundException e) {
+          e.printStackTrace();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+			}
+			if (this.config.scenario().isUseLanes()){
+			  new LaneDefinitionsWriter11(this.scenarioData.getLaneDefinitions()).writeFile(this.controlerIO.getOutputFilename(FILENAME_LANES));
+			}
+			if (this.config.scenario().isUseSignalSystems()){
+			  new SignalSystemsWriter11(this.scenarioData.getSignalSystems()).writeFile(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS));
+			  new SignalSystemConfigurationsWriter11(this.scenarioData.getSignalSystemConfigurations()).writeFile(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS_CONFIG));
 			}
 
 			if (unexpected) {
