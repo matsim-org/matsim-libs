@@ -197,16 +197,16 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				if (controller == "G"){
 					GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 					adaptiveController.setParameters(n, u, cap, maxGreen);
-					adaptiveController.init(corrGroups, compGroups, mainOutLinks, e.getQueueSimulation().getQueueNetwork(), handler2);
+					adaptiveController.init(corrGroups, compGroups, mainOutLinks, e.getQueueSimulation().getQNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);				
 				}else{
 					AdaptiveInterimSignalController adaptiveController = (AdaptiveInterimSignalController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 					adaptiveController.setParameters(n, u, cap, 0);
-					adaptiveController.init(corrGroups, compGroups, mainOutLinks,e.getQueueSimulation().getQueueNetwork(), handler2);
+					adaptiveController.init(corrGroups, compGroups, mainOutLinks,e.getQueueSimulation().getQNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);
 				}
 				
-				handler2.setQNetwork(e.getQueueSimulation().getQueueNetwork());
+				handler2.setQNetwork(e.getQueueSimulation().getQNetwork());
 
 				qs.getEventsManager().addHandler(handler3);
 				
