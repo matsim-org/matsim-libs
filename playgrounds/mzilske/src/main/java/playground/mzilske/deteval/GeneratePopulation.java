@@ -48,9 +48,9 @@ public class GeneratePopulation {
 	
 	private static final String MID_WEGEDATENSATZ = "../detailedEval/eingangsdaten/MidMUC_2002/MiD2002_Wegedatensatz_MUC.csv";
 	
-	private static final String MID_WEGEKODIERUNG = "../detailedEval/eingangsdaten/MidMUC_2002/MiD2002_Wegekodierung_MUC-LH.csv";
+	private static final String MID_WEGEKODIERUNG = "../detailedEval/eingangsdaten/MidMUC_2002/Mid2002_Wegekodierung_MUC-LH.csv";
 		
-	private static final String MID_VERKEHRSZELLEN = "../detailedEval/Net/shapeFromVISUM/Verkehrszellen_Umrisse_zone.shp";
+	private static final String MID_VERKEHRSZELLEN = "../detailedEval/Net/shapeFromVISUM/Verkehrszellen_Umrisse_zone.SHP";
 
 	private static final String PLANS = "../detailedEval/pop/befragte-personen/plans.xml";
 	
