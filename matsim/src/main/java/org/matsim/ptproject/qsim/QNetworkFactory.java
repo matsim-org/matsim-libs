@@ -30,6 +30,6 @@ public interface QNetworkFactory<QN extends QNode, QL extends QLink> {
 
 	public QN newQueueNode(Node node, QNetwork queueNetwork);
 
-	public QL newQueueLink(Link link, QNetwork queueNetwork, QN queueNode);
+	public QL newQueueLink(Link link, QSimEngine simEngine, QN queueNode);
 
 }

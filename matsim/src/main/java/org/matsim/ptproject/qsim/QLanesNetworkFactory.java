@@ -33,9 +33,9 @@ public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLink> {
   }
 
   @Override
-  public QLinkLanesImpl newQueueLink(Link link, QNetwork queueNetwork,
+  public QLinkLanesImpl newQueueLink(Link link, QSimEngine engine,
       QNode queueNode) {
-    return new QLinkLanesImpl(link, queueNetwork, queueNode);
+    return new QLinkLanesImpl(link, engine, queueNode);
   }
 
   @Override

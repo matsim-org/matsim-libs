@@ -47,22 +47,26 @@ public class QSimEngineImpl implements QSimEngine{
 	/*package*/ static boolean simulateAllLinks = false;
 	/*package*/ static boolean simulateAllNodes = false;
 
-	/*package*/ final List<QLink> allLinks;
+	/*package*/  List<QLink> allLinks;
 	/** This is the collection of links that have to be moved in the simulation */
-	/*package*/ final List<QLink> simLinksArray = new ArrayList<QLink>();
+	/*package*/  List<QLink> simLinksArray = new ArrayList<QLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
-	/*package*/ final QNode[] simNodesArray;
+	/*package*/  QNode[] simNodesArray;
 	/** This is the collection of links that have to be activated in the current time step */
-	/*package*/ final ArrayList<QLink> simActivateThis = new ArrayList<QLink>();
+	/*package*/  ArrayList<QLink> simActivateThis = new ArrayList<QLink>();
 
 	private final Random random;
   private final QSim qsim;
 
 	public QSimEngineImpl(final QSim sim, final Random random) {
     this.random = random;
-    this.allLinks = new ArrayList<QLink>(sim.getQueueNetwork().getLinks().values());
     this.qsim = sim;
-    this.simNodesArray = sim.getQueueNetwork().getNodes().values().toArray(new QNode[sim.getQueueNetwork().getNodes().values().size()]);
+	}
+	
+  @Override
+  public void onPrepareSim() {
+    this.allLinks = new ArrayList<QLink>(this.qsim.getQNetwork().getLinks().values());
+    this.simNodesArray = this.qsim.getQNetwork().getNodes().values().toArray(new QNode[this.qsim.getQNetwork().getNodes().values().size()]);
     //dg[april08] as the order of nodes has an influence on the simulation
     //results they are sorted to avoid indeterministic simulations
     Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
@@ -70,13 +74,12 @@ public class QSimEngineImpl implements QSimEngine{
         return o1.getNode().getId().compareTo(o2.getNode().getId());
       }
     });
-    for (QLink link : this.allLinks) {
-      link.setQSimEngine(this);
-    }
     if (simulateAllLinks) {
       this.simLinksArray.addAll(this.allLinks);
     }
-	}
+    
+  }
+
 
 	public void afterSim() {
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
@@ -151,4 +154,5 @@ public class QSimEngineImpl implements QSimEngine{
   public QSim getQSim() {
     return this.qsim;
   }
+
 }

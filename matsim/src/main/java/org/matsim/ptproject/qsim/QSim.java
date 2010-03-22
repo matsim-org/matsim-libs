@@ -93,7 +93,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	protected PopulationImpl population;
 	protected QNetwork network;
-	protected Network networkLayer;
+	private Network networkLayer;
 	private static EventsManager events = null;
 	protected  SimStateWriterI netStateWriter = null;
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
@@ -147,6 +147,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
     this.population = (PopulationImpl) sc.getPopulation();
     this.networkLayer = sc.getNetwork();
     Config config = sc.getConfig();
+    this.simEngine = new QSimEngineImpl(this, MatsimRandom.getRandom());
+
     if (config.scenario().isUseLanes()) {
       if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
         throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
@@ -171,7 +173,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
     this.agentFactory = new AgentFactory(this);
     this.notTeleportedModes.add(TransportMode.car);
-    this.simEngine = new QSimEngineImpl(this, MatsimRandom.getRandom());
     installCarDepartureHandler();
 	}
 
@@ -217,8 +218,9 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		//do iterations
 		boolean cont = true;
+		double time = QSimTimer.getTime();
 		while (cont) {
-			double time = QSimTimer.getTime();
+			time = QSimTimer.getTime();
 			beforeSimStep(time);
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 			cont = doSimStep(time);
@@ -229,7 +231,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			}
 		}
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
-		cleanupSim();
+		cleanupSim(time);
 		//delete reference to clear memory
 		this.listenerManager = null;
 	}
@@ -282,11 +284,11 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		if (events == null) {
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
-
+		this.simEngine.onPrepareSim();
 		prepareLanes();
 
 		if (this.signalEngine != null) {
-			this.signalEngine.prepareSignalSystems();
+			this.signalEngine.onPrepareSim();
 		}
 
 
@@ -343,7 +345,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	/**
 	 * Close any files, etc.
 	 */
-	protected void cleanupSim() {
+	protected void cleanupSim(double seconds) {
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
 			queueSimulationFeature.beforeCleanupSim();
 		}
@@ -627,7 +629,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		}
 	}
 
-	public QNetwork getQueueNetwork() {
+	public QNetwork getQNetwork() {
 		return this.network;
 	}
 

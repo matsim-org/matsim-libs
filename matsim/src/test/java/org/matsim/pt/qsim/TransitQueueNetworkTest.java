@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 import junit.framework.TestCase;
 
@@ -47,11 +46,9 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.ptproject.qsim.PersonAgent;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QLinkImpl;
 import org.matsim.ptproject.qsim.QNetwork;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QSimEngineImpl;
+import org.matsim.ptproject.qsim.QSimEngine;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.ptproject.qsim.QueueVehicleImpl;
@@ -84,9 +81,12 @@ public class TransitQueueNetworkTest extends TestCase {
 		Fixture f = new Fixture(1, false, 0, false);
 
 		f.simEngine.simStep(100);
+		assertEquals(2, f.qlink1.getAllVehicles().size());
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 
 		f.simEngine.simStep(101);
+    assertEquals(1, f.qlink1.getAllVehicles().size());
+    assertEquals(1, f.qlink2.getAllVehicles().size());
 		f.simEngine.simStep(102);
 		Collection<QVehicle> allVehicles = f.qlink2.getAllVehicles();
 		assertEquals(1, allVehicles.size());
@@ -947,22 +947,14 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
 	}
 
-	protected static class TestSimEngine extends QSimEngineImpl {
-		TestSimEngine(final QSim sim) {
-			super(sim, new Random(511));
-		}
-		@Override
-		public void simStep(final double time) { // make it public
-			super.simStep(time);
-		}
-		@Override
-		public void activateLink(final QLink link) { // make it public
-			super.activateLink(link);
-		}
-	}
+//	protected static class TestSimEngine extends QSimEngineImpl {
+//		TestSimEngine(final QSim sim) {
+//			super(sim, new Random(511));
+//		}
+//	}
 
 	protected static class Fixture {
-		public final TestSimEngine simEngine;
+		public final QSimEngine simEngine;
 		public final QLinkImpl qlink1, qlink2, qlink3;
 		public final TransitQVehicle transitVehicle;
 		public final QVehicle normalVehicle, normalVehicle2;
@@ -1043,11 +1035,13 @@ public class TransitQueueNetworkTest extends TestCase {
 
 			// setup: simulation
 			TransitQSimulation qsim = new TransitQSimulation(scenario, new EventsManagerImpl());
-			QNetwork qnet = qsim.getQueueNetwork();
+			QNetwork qnet = qsim.getQNetwork();
 			this.qlink1 = (QLinkImpl) qnet.getQueueLink(id1);
 			this.qlink2 = (QLinkImpl) qnet.getQueueLink(id2);
 			this.qlink3 = (QLinkImpl) qnet.getQueueLink(id3);
-			this.simEngine = new TestSimEngine(qsim);
+			this.simEngine = qsim.getQSimEngine();
+//			this.simEngine = new TestSimEngine(qsim);
+			this.simEngine.onPrepareSim();
 			TransitStopAgentTracker tracker = qsim.getAgentTracker();
 			tracker.addAgentToStop(new FakeAgent(null, null), stop1); // just add some agent so the transit vehicle has to stop
 			if (stop2 != null) {

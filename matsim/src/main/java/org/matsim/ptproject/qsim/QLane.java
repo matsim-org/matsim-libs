@@ -244,7 +244,7 @@ public class QLane implements QBufferItem {
 		}
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * numberOfLanes)
-				/ ((NetworkImpl) ((QLinkLanesImpl)this.queueLink).getQueueNetwork().getNetworkLayer()).getEffectiveCellSize() * storageCapFactor;
+				/ ((NetworkImpl) ((QLinkLanesImpl)this.queueLink).getQSimEngine().getQSim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -812,7 +812,7 @@ public class QLane implements QBufferItem {
 			Link link = QLane.this.queueLink.getLink();
 			double queueEnd = getInitialQueueEnd();
 			double storageCapFactor = Gbl.getConfig().getQSimConfigGroup().getStorageCapFactor();
-			double cellSize = ((NetworkImpl)QLane.this.queueLink.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
+			double cellSize = ((NetworkImpl)QLane.this.queueLink.getQSimEngine().getQSim().getQNetwork().getNetworkLayer()).getEffectiveCellSize();
 			double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
 			queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
 			positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);

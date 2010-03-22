@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 
 public interface QLink extends QBufferItem {
 
-  public void setQSimEngine(final QSimEngine linkActivator);
+  public QSimEngine getQSimEngine();
   
   public void activateLink();
 
@@ -74,8 +74,6 @@ public interface QLink extends QBufferItem {
   // before the interface was introduced
   
   public QNode getToQueueNode();
-  
-  public QNetwork getQueueNetwork();
   
   public boolean hasSpace();
   

@@ -47,7 +47,7 @@ import org.matsim.signalsystems.systems.SignalSystemDefinition;
 import org.matsim.signalsystems.systems.SignalSystems;
 
 
-public class QSimSignalEngine implements SignalEngine {
+public class QSimSignalEngine implements SignalEngine, SimEngine {
 
 
 	private static final Logger log = Logger.getLogger(QSimSignalEngine.class);
@@ -79,7 +79,7 @@ public class QSimSignalEngine implements SignalEngine {
 
 	public QSimSignalEngine(QSim sim) {
 		this.simulation = sim;
-		this.network = sim.getQueueNetwork();
+		this.network = sim.getQNetwork();
 		this.events = sim.getEventsManager();
 	}
 
@@ -91,7 +91,8 @@ public class QSimSignalEngine implements SignalEngine {
 	/**
 	 * Initialize the signal systems
 	 */
-	protected void prepareSignalSystems() {
+	@Override
+	public void onPrepareSim() {
 		if (this.signalSystems != null) {
 			initSignalSystems(this.signalSystems);
 		}
@@ -268,6 +269,16 @@ public class QSimSignalEngine implements SignalEngine {
 	public EventsManager getEvents() {
 		return this.events;
 	}
+
+  @Override
+  public void afterSim() {
+    //nothing to do
+  }
+
+  @Override
+  public QSim getQSim() {
+    return this.simulation;
+  }
 
 
 }

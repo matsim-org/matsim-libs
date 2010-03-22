@@ -29,6 +29,9 @@ public class ShelterEvacuationControllerTest extends MatsimTestCase{
   
 	public void testShelterEvacuationController() {
 		String config = getInputDirectory() + "config.xml";
+    String refEventsFileIt0 = getInputDirectory() + "0.events.xml.gz";
+    String testEventsFileIt0 = getOutputDirectory() +"ITERS/it.0/0.events.xml.gz";
+
 		String refEventsFile = getInputDirectory() + "10.events.xml.gz";
 		String testEventsFile = getOutputDirectory() +"ITERS/it.10/10.events.xml.gz";
 
@@ -37,6 +40,12 @@ public class ShelterEvacuationControllerTest extends MatsimTestCase{
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(10);
 		controler.run();
+    //it 0
+		log.info("comparing events files: ");
+    log.info(refEventsFileIt0);
+    log.info(testEventsFileIt0);
+    assertEquals("different events-files.", CRCChecksum.getCRCFromFile(refEventsFileIt0),  CRCChecksum.getCRCFromFile(testEventsFileIt0));
+    //it 10
 		log.info("comparing events files: ");
 		log.info(refEventsFile);
 		log.info(testEventsFile);

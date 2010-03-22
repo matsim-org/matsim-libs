@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * SimEngine
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,27 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.ptproject.qsim;
-
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 
 
 /**
  * @author dgrether
+ * @TODO rename QSimEngine to QSimNetorkEngine and this to QSimEngine
  */
-/*package*/ final class DefaultQueueNetworkFactory implements QNetworkFactory<QNode, QLink> {
-
-	public QLink newQueueLink(final Link link, final QSimEngine simEngine, final QNode toQueueNode) {
-		return new QLinkImpl(link, simEngine, toQueueNode);
-	}
-
-	/**
-	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#newQueueNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
-	 */
-	public QNode newQueueNode(final Node node, final QNetwork queueNetwork) {
-		return new QNode(node, queueNetwork);
-	}
-
+public interface SimEngine {
+  /**
+   * 
+   * @return the QSim instance
+   */
+  public QSim getQSim();
+  /**
+   * called in a predefined Order when the simulation is started
+   */
+  public void onPrepareSim();
+  /**
+   * Do some clean up.
+   */
+  public void afterSim();
+  
 }

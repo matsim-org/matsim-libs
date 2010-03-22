@@ -26,8 +26,6 @@ import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -270,16 +268,15 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		int thread = 0;
 		for (ExtendedQueueNode[] array : parallelNodesArrays)
 		{
-			for (ExtendedQueueNode node : array)
-			{
-				Node n = node.getQueueNode().getNode();
-
-				for (Link outLink : n.getOutLinks().values())
-				{
-					QLink qLink = node.getQueueNode().queueNetwork.getQueueLink(outLink.getId());
-					qLink.setQSimEngine(this.threads[thread]);
-				}
-			}
+//			for (ExtendedQueueNode node : array)
+//			{
+//				Node n = node.getQueueNode().getNode();
+//
+//				for (Link outLink : n.getOutLinks().values())
+//				{
+//					QLink qLink = node.getQueueNode().queueNetwork.getQueueLink(outLink.getId());
+//				}
+//			}
 			thread++;
 		}
 	}

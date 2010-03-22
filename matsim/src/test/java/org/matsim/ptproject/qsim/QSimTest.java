@@ -663,7 +663,8 @@ public class QSimTest extends TestCase {
 
 		/* prepare sim */
 		QSim sim = new QSim(f.scenario, events);
-		QNetwork qnet = sim.getQueueNetwork();
+		QNetwork qnet = sim.getQNetwork();
+		sim.prepareSim();
 		QLink qlink2 = qnet.getQueueLink(id2);
 		QLink qlink3 = qnet.getQueueLink(new IdImpl(3));
 

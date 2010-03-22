@@ -310,8 +310,8 @@ public class PersonAgent implements DriverAgent {
 
 		if (this.currentLinkIdIndex >= this.cachedRouteLinkIds.size() ) {
 			// we have no more information for the route, so we should have arrived at the destination link
-			Link currentLink = this.simulation.networkLayer.getLinks().get(this.currentLinkId);
-			Link destinationLink = this.simulation.networkLayer.getLinks().get(this.destinationLinkId);
+			Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
+			Link destinationLink = this.simulation.getScenario().getNetwork().getLinks().get(this.destinationLinkId);
 			if (currentLink.getToNode().equals(destinationLink.getFromNode())) {
 				this.cachedNextLinkId = destinationLink.getId();
 				return this.cachedNextLinkId;
@@ -325,8 +325,8 @@ public class PersonAgent implements DriverAgent {
 		}
 
 		this.cachedNextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex); //save time in later calls, if link is congested
-		Link currentLink = this.simulation.networkLayer.getLinks().get(this.currentLinkId);
-		Link nextLink = this.simulation.networkLayer.getLinks().get(this.cachedNextLinkId);
+		Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
+		Link nextLink = this.simulation.getScenario().getNetwork().getLinks().get(this.cachedNextLinkId);
 		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
 			return this.cachedNextLinkId;
 		}

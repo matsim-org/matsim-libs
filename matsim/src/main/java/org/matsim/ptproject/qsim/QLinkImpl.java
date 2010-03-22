@@ -68,10 +68,6 @@ public class QLinkImpl implements QLink {
 	 */
 	private final Link link;
 	/**
-	 * Reference to the QueueNetwork instance this link belongs to.
-	 */
-	private final QNetwork queueNetwork;
-	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
 	private final QNode toQueueNode;
@@ -140,17 +136,13 @@ public class QLinkImpl implements QLink {
 	 * @param queueNetwork
 	 * @param toNode
 	 */
-	public QLinkImpl(final Link link2, final QNetwork queueNetwork, final QNode toNode) {
+	public QLinkImpl(final Link link2, QSimEngine engine, final QNode toNode) {
 		this.link = link2;
-		this.queueNetwork = queueNetwork;
 		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed(Time.UNDEFINED_TIME);
+		this.qsimEngine = engine;
 		this.calculateCapacities();
-	}
-
-	public void setQSimEngine(final QSimEngine linkActivator) {
-		this.qsimEngine = linkActivator;
 	}
 
 	public void activateLink() {
@@ -370,19 +362,19 @@ public class QLinkImpl implements QLink {
 	private void calculateFlowCapacity(final double time) {
 		this.simulatedFlowCapacity = ((LinkImpl)this.getLink()).getFlowCapacity(time);
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * QSimTimer.getSimTickTime() * Gbl.getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * QSimTimer.getSimTickTime() * this.getQSimEngine().getQSim().scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = Gbl.getConfig().getQSimConfigGroup().getStorageCapFactor();
+		double storageCapFactor = this.getQSimEngine().getQSim().scenario.getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 
 		double numberOfLanes = this.getLink().getNumberOfLanes(time);
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * numberOfLanes)
-		/ ((NetworkImpl) this.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize() * storageCapFactor;
+		/ ((NetworkImpl) this.qsimEngine.getQSim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -462,6 +454,10 @@ public class QLinkImpl implements QLink {
 	public double getSpaceCap() {
 		return this.storageCapacity;
 	}
+	
+	public QSimEngine getQSimEngine(){
+	  return this.qsimEngine;
+	}
 
 	//	public Queue<QueueVehicle> getVehiclesInBuffer() {
 	//		return this.originalLane.getVehiclesInBuffer();
@@ -479,10 +475,6 @@ public class QLinkImpl implements QLink {
 
 	public Link getLink() {
 		return this.link;
-	}
-
-	public QNetwork getQueueNetwork() {
-		return this.queueNetwork;
 	}
 
 	public QNode getToQueueNode() {
@@ -595,7 +587,7 @@ public class QLinkImpl implements QLink {
 //			if ( getVehPosCnt < 1 ) {
 //				getVehPosCnt++ ;
 //			}
-			String snapshotStyle = queueNetwork.getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
+			String snapshotStyle = getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
 			if ("queue".equals(snapshotStyle)) {
 				getVehiclePositionsQueue(positions);
 			} else if ("equiDist".equals(snapshotStyle)) {
@@ -731,7 +723,7 @@ public class QLinkImpl implements QLink {
 			Link link = QLinkImpl.this.getLink();
 			double queueEnd = getInitialQueueEnd();
 			double storageCapFactor = Gbl.getConfig().getQSimConfigGroup().getStorageCapFactor();
-			double cellSize = ((NetworkImpl)QLinkImpl.this.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
+			double cellSize = ((NetworkImpl)QLinkImpl.this.getQSimEngine().getQSim().getQNetwork().getNetworkLayer()).getEffectiveCellSize();
 			double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
 			queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
 			positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);

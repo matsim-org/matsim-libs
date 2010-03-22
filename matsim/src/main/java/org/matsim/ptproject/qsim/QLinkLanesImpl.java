@@ -110,10 +110,6 @@ public class QLinkLanesImpl implements QLink {
 	 */
 	private final Link link;
 	/**
-	 * Reference to the QueueNetwork instance this link belongs to.
-	 */
-	private final QNetwork queueNetwork;
-	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
 	private final QNode toQueueNode;
@@ -143,7 +139,7 @@ public class QLinkLanesImpl implements QLink {
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
-	private LinkActivator linkActivator = null;
+	private QSimEngine qsimEngine = null;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -152,11 +148,10 @@ public class QLinkLanesImpl implements QLink {
 	 * @param toNode
 	 * @see QLink#createLanes(List)
 	 */
-	public QLinkLanesImpl(final Link link2, final QNetwork queueNetwork, final QNode toNode) {
+	public QLinkLanesImpl(final Link link2, QSimEngine engine, final QNode toNode) {
 		this.link = link2;
-		this.queueNetwork = queueNetwork;
 		this.toQueueNode = toNode;
-
+		this.qsimEngine = engine;
 		this.originalLane = new QLane(this, null);
 		this.queueLanes = new ArrayList<QLane>();
 		this.queueLanes.add(this.originalLane);
@@ -233,7 +228,7 @@ public class QLinkLanesImpl implements QLink {
 	 */
 	private void setToLinks(QLane lane, List<Id> toLinkIds) {
 		for (Id linkId : toLinkIds) {
-			QLink link = this.getQueueNetwork().getQueueLink(linkId);
+			QLink link = this.getQSimEngine().getQSim().getQNetwork().getQueueLink(linkId);
 			if (link == null) {
 				String message = "Cannot find Link with Id: " + linkId + " in network. ";
 				log.error(message);
@@ -280,13 +275,9 @@ public class QLinkLanesImpl implements QLink {
 		}
 	}
 
-	public void setQSimEngine(final QSimEngine linkActivator) {
-		this.linkActivator = linkActivator;
-	}
-
 	public void activateLink() {
 		if (!this.active) {
-			this.linkActivator.activateLink(this);
+			this.qsimEngine.activateLink(this);
 			this.active = true;
 		}
 	}
@@ -424,10 +415,6 @@ public class QLinkLanesImpl implements QLink {
 		return this.link;
 	}
 
-	public QNetwork getQueueNetwork() {
-		return this.queueNetwork;
-	}
-
 	public QNode getToQueueNode() {
 		return this.toQueueNode;
 	}
@@ -444,6 +431,10 @@ public class QLinkLanesImpl implements QLink {
 		return this.originalLane.getSimulatedFlowCapacity();
 	}
 
+	public QSimEngine getQSimEngine(){
+    return this.qsimEngine;
+  }
+	
 	/**
 	 * @return the QLanes of this QueueLink
 	 */
@@ -490,7 +481,7 @@ public class QLinkLanesImpl implements QLink {
 			
 			int cnt = parkedVehicles.size();
 			if (cnt > 0) {
-				String snapshotStyle = queueNetwork.getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
+				String snapshotStyle = getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
 
 				double cellSize = 7.5;
 				double distFromFromNode = getLink().getLength();

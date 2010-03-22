@@ -27,7 +27,7 @@ package org.matsim.ptproject.qsim;
  * @author dgrether
  */
 
-public interface QSimEngine extends LinkActivator{
+public interface QSimEngine extends LinkActivator, SimEngine{
 
 	/**
 	 * Implements one simulation step, called from simulation framework
@@ -35,13 +35,4 @@ public interface QSimEngine extends LinkActivator{
 	 */
 	public void simStep(final double time);
 		
-	/**
-	 * Do some clean up.
-	 */
-	public void afterSim();
-	
-	/**
-	 * @return the QSim instance
-	 */
-	public QSim getQSim();
 }

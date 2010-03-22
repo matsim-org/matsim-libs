@@ -212,4 +212,9 @@ public class QSimEngineThread extends Thread implements QSimEngine{
     return this.qsim;
   }
 
+  @Override
+  public void onPrepareSim() {
+    //currently nothing to do
+  }
+
 }

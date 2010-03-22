@@ -41,7 +41,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
-import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisQSim;
@@ -219,7 +219,6 @@ public class OTFVis {
 			printUsage();
 			return;
 		}
-		Gbl.createConfig(null);
 		String eventFile = args[1];
 		String networkFile = args[2];
 		String mviFile = args[3];
@@ -228,10 +227,12 @@ public class OTFVis {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
 		Scenario scenario = new ScenarioImpl();
+		Gbl.setConfig(scenario.getConfig());
 		Network net = scenario.getNetwork();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
-		OTFEvent2MVI converter = new OTFEvent2MVI(new QNetwork(net), eventFile, mviFile, snapshotPeriod);
+		QSim sim = new QSim(scenario, new EventsManagerImpl());
+		OTFEvent2MVI converter = new OTFEvent2MVI(sim.getQNetwork(), eventFile, mviFile, snapshotPeriod);
 		converter.convert();
 	}
 	
