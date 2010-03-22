@@ -35,6 +35,7 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income.IncomePeriod;
+import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -56,11 +57,13 @@ public class GeneratePopulation {
 	
 	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/befragte-personen/households.xml";
 	
-//	private static final String PLANS = "../detailedEval/pop/140k-synthetische-personen/plans.xml";
-//	
-//	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/140k-synthetische-personen/households.xml";
+	private static final String CLONED_PLANS = "../detailedEval/pop/140k-synthetische-personen/plans.xml";
+
+	private static final String CLONED_HOUSEHOLDS_FILE = "../detailedEval/pop/140k-synthetische-personen/households.xml";
 	
 	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 140000;
+	
+	private Random random = new Random();
 
 	private Scenario scenario = new ScenarioImpl();
 	
@@ -77,6 +80,11 @@ public class GeneratePopulation {
 	private Map<Activity, Integer> activity2verkehrszelle = new HashMap<Activity, Integer>();
 
 	public static void main(String[] args) throws IOException {
+		generateSurveyPopulation();
+		generateFullPopulation();
+	}
+
+	private static void generateSurveyPopulation() throws IOException {
 		GeneratePopulation generatePopulation = new GeneratePopulation();
 		generatePopulation.parseVerkehrszellen();
 		generatePopulation.parseHouseholds();
@@ -84,13 +92,36 @@ public class GeneratePopulation {
 		generatePopulation.parsePlans();
 		generatePopulation.addPlans();
 		generatePopulation.dropPlanlessPeople();
-	//	generatePopulation.multiplyPopulation();
 		generatePopulation.addPopulationToScenario();
-		generatePopulation.addAndWriteHouseholds();
-		generatePopulation.writePlans();
-	}	
+		generatePopulation.addAndWriteHouseholds(HOUSEHOLDS_FILE);
+		generatePopulation.writePlans(PLANS);
+	}
 
-	private void addAndWriteHouseholds() throws IOException {
+	private static void generateFullPopulation() throws IOException {
+		GeneratePopulation generatePopulation = new GeneratePopulation();
+		generatePopulation.parseVerkehrszellen();
+		generatePopulation.parseHouseholds();
+		generatePopulation.parsePersons();
+		generatePopulation.parsePlans();
+		generatePopulation.addPlans();
+		generatePopulation.dropPlanlessPeople();
+		generatePopulation.multiplyPopulation();
+		generatePopulation.addPopulationToScenario();
+		generatePopulation.mutateTimes();
+		generatePopulation.addAndWriteHouseholds(CLONED_HOUSEHOLDS_FILE);
+		generatePopulation.writePlans(CLONED_PLANS);
+	}	
+	
+	private void mutateTimes() {
+		PlanMutateTimeAllocation planMutateTimeAllocation = new PlanMutateTimeAllocation(15 * 60, random);
+		planMutateTimeAllocation.setUseActivityDurations(false);
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Plan plan = person.getPlans().iterator().next();
+			planMutateTimeAllocation.run(plan);
+		}
+	}
+
+	private void addAndWriteHouseholds(String householdsFile) throws IOException {
 		for (String caseid : cases.keySet()) {
 			IdImpl householdId = new IdImpl(caseid);
 			Household household = households.getFactory().createHousehold(householdId);
@@ -102,7 +133,7 @@ public class GeneratePopulation {
 			households.getHouseholds().put(householdId, household);
 		}
 		HouseholdsWriterV10 writer = new HouseholdsWriterV10(households);
-		writer.writeFile(HOUSEHOLDS_FILE);
+		writer.writeFile(householdsFile);
 	}
 
 	private void dropPlanlessPeople() {
@@ -131,6 +162,7 @@ public class GeneratePopulation {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void parseVerkehrszellen() {
 		FeatureSource fts;
 		try {
@@ -570,6 +602,7 @@ public class GeneratePopulation {
 				} else if (planElement instanceof Leg) {
 					Leg leg = (Leg) planElement;
 					Leg newLeg = scenario.getPopulation().getFactory().createLeg(leg.getMode());
+					newLeg.setTravelTime(leg.getTravelTime());
 					newPlan.addLeg(newLeg);
 				}
 			}
@@ -593,9 +626,9 @@ public class GeneratePopulation {
 		}
 	}
 
-	private void writePlans() {
+	private void writePlans(String plansFile) {
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write(PLANS);
+		populationWriter.write(plansFile);
 	}
 
 	private Id createPersonId(String caseid, String pid) {
