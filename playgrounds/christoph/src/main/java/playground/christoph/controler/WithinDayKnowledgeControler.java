@@ -97,7 +97,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		 * Calculate the TravelTime based on the actual load of the links. Use only 
 		 * the TravelTime to find the LeastCostPath.
 		 */
-		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
+		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQNetwork());
 		KnowledgeTravelTimeWrapper travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
 		travelTimeWrapper.checkNodeKnowledge(true);
 		
