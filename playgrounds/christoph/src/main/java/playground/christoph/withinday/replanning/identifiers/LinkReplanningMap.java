@@ -60,7 +60,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	
 	public LinkReplanningMap(QSim qSim)
 	{
-		this.qNetwork = qSim.getQueueNetwork();
+		this.qNetwork = qSim.getQNetwork();
 		
 		//Add LinkReplanningMap to the QueueSimulation's EventsManager
 		qSim.getEventsManager().addHandler(this);
