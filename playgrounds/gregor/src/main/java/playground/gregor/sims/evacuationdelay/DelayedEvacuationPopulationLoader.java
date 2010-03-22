@@ -13,7 +13,7 @@ public class DelayedEvacuationPopulationLoader extends EvacuationPopulationFromS
 	private final DelayedEvacuationStartTimeCalculator startTimer;
 
 	public DelayedEvacuationPopulationLoader(List<Building> buildings,ScenarioImpl scenario) {
-		super(buildings, scenario);
+		super(scenario.getPopulation(),buildings, scenario);
 		double baseTime = scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.day ? 12 * 3600 : 3 * 3600;
 		this.startTimer = new DelayedEvacuationStartTimeCalculator(baseTime,scenario.getConfig().evacuation().getShorelineFile(), scenario.getNetwork());
 	}
