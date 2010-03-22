@@ -45,7 +45,7 @@ public class InitialIdentifierImpl extends InitialIdentifier{
 	{
 		List<DriverAgent> agentsToReplan = new ArrayList<DriverAgent>();
 		
-		for (QLink qLink : simulation.getQueueNetwork().getLinks().values())
+		for (QLink qLink : simulation.getQNetwork().getLinks().values())
 		{
 			for (QVehicle vehicle : qLink.getAllVehicles())
 			{
