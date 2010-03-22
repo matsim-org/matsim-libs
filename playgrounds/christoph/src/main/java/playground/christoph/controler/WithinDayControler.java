@@ -374,7 +374,7 @@ public class WithinDayControler extends Controler {
 		{
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
 			
-			for (QLink queueLink : sim.getQueueNetwork().getLinks().values())
+			for (QLink queueLink : sim.getQNetwork().getLinks().values())
 			{
 				for (QVehicle queueVehicle : queueLink.getAllVehicles())
 				{
