@@ -106,6 +106,7 @@ public class BiogemeWriter {
 		}
 	}
 
+	// this distributes the household income on its members - in this case equally...
 	private double distributeHouseholdIncomeToMembers(Household household) {
 		double personalIncome = household.getIncome().getIncome() / household.getMemberIds().size();
 		return personalIncome;
