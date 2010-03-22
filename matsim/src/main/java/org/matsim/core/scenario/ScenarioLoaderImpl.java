@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -101,6 +102,9 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 	 */
 	@Override
 	public Scenario loadScenario() {
+	  String currentDir = new File("tmp").getAbsolutePath();
+	  currentDir = currentDir.substring(0, currentDir.length() - 3);
+	  log.info("loading scenario from base directory: " + currentDir);
 		this.loadWorld();
 		this.loadNetwork();
 		this.loadActivityFacilities();
