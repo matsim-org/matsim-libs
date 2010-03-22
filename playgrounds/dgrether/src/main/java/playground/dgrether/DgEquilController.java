@@ -24,7 +24,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.run.OTFVis;
 
 
 /**
@@ -38,20 +37,28 @@ public class DgEquilController {
 	 */
 	public static void main(String[] args) {
 		
+	  final boolean useQSim = false;
+	  
 		final String configfile = DgPaths.EXAMPLEBASE + "equil/configPlans100.xml";
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader confReader = new MatsimConfigReader(config);
 		confReader.readFile(configfile);
 		
+		
 //		final int iteration = 0;
 		final int iteration = 0;
 		
 		Controler controler = new Controler(config);
-		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		controler.getConfig().getQSimConfigGroup().setSnapshotFormat("otfvis");
-    controler.getConfig().getQSimConfigGroup().setSnapshotPeriod(60.0);
-    controler.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+		if (useQSim){
+		  controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		  controler.getConfig().getQSimConfigGroup().setSnapshotFormat("otfvis");
+		  controler.getConfig().getQSimConfigGroup().setSnapshotPeriod(60.0);
+		  controler.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+		}
+		else {
+		  controler.getConfig().simulation().setSnapshotPeriod(1.0);
+		}
 		
 		controler.setOverwriteFiles(true);
 		
@@ -61,16 +68,16 @@ public class DgEquilController {
 			}
 		});
 		
-//		controler.run();
+		controler.addControlerListener(new DgOTFVisConfigWriter());
+		controler.run();
 		
-		
-		
-		String filename = controler.getConfig().controler().getOutputDirectory();
-		
-		filename += "/ITERS/it."+iteration+"/" + iteration + ".otfvis.mvi";
+		String outdir = controler.getConfig().controler().getOutputDirectory();
+		String filename = outdir + "/ITERS/it."+iteration+"/" + iteration + ".otfvis.mvi";
 		System.out.println(filename);
-		OTFVis.main(new String[] {filename});
-		
+		DgOTFVisReplayLastIteration.main(new String[]{outdir + "/" + Controler.FILENAME_CONFIG});
+//		OTFVis.playConfig(filename + "/" + DgOTFVisConfigWriter.OTFVIS_LAST_ITERATION_CONFIG);
+//		OTFVis.main(new String[] {filename});
+//		new OTFClientSwing(filename).start();
 		
 	}
 

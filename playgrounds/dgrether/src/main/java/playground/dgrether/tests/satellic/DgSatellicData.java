@@ -30,7 +30,7 @@ public interface DgSatellicData {
 
   public final String BASEDIR = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/";
   
-  public final String NETWORK = BASEDIR + "demand/network.xml.gz";
+  public final String NETWORK = BASEDIR + "demand/network_cleaned.xml.gz";
   
   public final String EMPTY_POPULATION = BASEDIR + "demand/plans1.xml";
   
