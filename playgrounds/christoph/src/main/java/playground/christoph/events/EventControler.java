@@ -182,7 +182,7 @@ public class EventControler extends Controler {
 	protected void initReplanningRouter() {
 		replanners = new ArrayList<PlanAlgorithm>();
 
-		KnowledgeTravelTimeCalculator travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
+		KnowledgeTravelTimeCalculator travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getQNetwork());
 		TravelTimeDistanceCostCalculator travelCostCalculator = new TravelTimeDistanceCostCalculator(travelTimeCalculator, new CharyparNagelScoringConfigGroup());
 
 		// AStarLandmarks
@@ -217,7 +217,7 @@ public class EventControler extends Controler {
 
 		// Use a Wrapper - by doing this, already available MATSim
 		// CostCalculators can be used
-		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
+		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQNetwork());
 		KnowledgeTravelTimeWrapper travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
 
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
@@ -316,7 +316,7 @@ public class EventControler extends Controler {
 		createHandlersAndListeners();
 
 		// fully initialize & add LinkVehiclesCounter
-		linkVehiclesCounter.setQueueNetwork(sim.getQueueNetwork());
+		linkVehiclesCounter.setQueueNetwork(sim.getQNetwork());
 
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
