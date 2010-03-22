@@ -131,7 +131,8 @@ public class DDcontroller {
 		}
 
 		if (otfvis) {
-			QNetwork qnet = new QNetwork(network);
+      QSim sim = new QSim(scenario, new EventsManagerImpl());
+      QNetwork qnet = sim.getQNetwork();
 
 			String eventFile = "./output/events.txt";
 			OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 60);
