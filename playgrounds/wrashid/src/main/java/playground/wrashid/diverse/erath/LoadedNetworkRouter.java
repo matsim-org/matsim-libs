@@ -20,6 +20,15 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ArgumentParser;
 
+/**
+ * Use this tool, if you want to find out the travel times for certain routes for a previous run.
+ * 
+ * input: network, events file, plans (only those, which you want to find out the route/distance/estimated travel time)
+ * output: plans file with the route, distance and estimated tavel time filled in. 
+ * @author wrashid
+ *
+ */
+
 public class LoadedNetworkRouter {
 
 	Config config;
@@ -57,10 +66,10 @@ public class LoadedNetworkRouter {
 	}
 	
 	public void run(final String[] args) {
-		String networkFile="";
-		String eventsFile="";
-		String inputPlansFile="";
-		String outputPlansFile="";
+		String networkFile="/var/tmp/erathal/network.car.xml.gz";
+		String eventsFile="/var/tmp/erathal/200.events.txt.gz";
+		String inputPlansFile="/var/tmp/erathal/TestPlanFile.xml";
+		String outputPlansFile="/var/tmp/erathal/outputPlanFile.xml";
 		
 		parseArguments(args);
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
@@ -68,11 +77,11 @@ public class LoadedNetworkRouter {
 		NetworkImpl network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();
 
-		final PopulationImpl plans = sl.getScenario().getPopulation();		plans.setIsStreaming(true);
+		final PopulationImpl plans = sl.getScenario().getPopulation();
+		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
-		plansWriter.startStreaming(this.config.plans().getOutputFile());
-		
+		plansWriter.startStreaming(outputPlansFile);
 		
 		// add algorithm to map coordinates to links
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
@@ -87,7 +96,7 @@ public class LoadedNetworkRouter {
 		
 		// add algorithm to write out the plans
 		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(this.config.plans().getInputFile());
+		plansReader.readFile(inputPlansFile);
 		plans.printPlansCount();
 		plansWriter.closeStreaming();
 
