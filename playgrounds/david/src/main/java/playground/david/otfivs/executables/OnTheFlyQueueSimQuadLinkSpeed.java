@@ -64,11 +64,11 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QSim{
 	}
 
 	@Override
-	protected void cleanupSim() {
+	protected void cleanupSim(double time) {
 //		if (myOTFServer != null) myOTFServer.stop();
 		this.myOTFServer.cleanup();
 		this.myOTFServer = null;
-		super.cleanupSim();
+		super.cleanupSim(time);
 	}
 
 	@Override
