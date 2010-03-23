@@ -58,6 +58,72 @@ import com.vividsolutions.jts.geom.Coordinate;
  * <em>Tele Atlas MultiNet Shapefile 4.5 Format Specifications Version Final v1.0.1, June 2009</em>
  * into a MATSim compatible network.
  *
+ * From Tele Atlas, only the Network (nw) and Junction (jc) data was used.
+ * The following rules were applied to convert the attributes from the Tele Atlas network
+ * to attributes in the MATSim network:
+ *
+ * <dl>
+ * <dt>Ignored network elemens</dt>
+ * <dd>Network elements meeting at least one of the following criteria are ignored:
+ *     <ul>
+ *       <li>NW.FEATTYP = 4165 (Address Area Boundary)</li>
+ *       <li>NW.FOW = 6 (Parking Place)</li>
+ *       <li>NW.FOW = 7 (Parking Garage)</li>
+ *       <li>NW.FOW = 12 (Entrance/Exit to/from car park)</li>
+ *       <li>NW.FOW = 20 (Authorities)</li>
+ *       <li>NW.PRIVATERD = 2 (Private Road with Generic Restriction)</li>
+ *     </ul>
+ * </dd>
+ * <dt>capacity</dt>
+ * <dd>NW.NET2CLASS<br />
+ *     Classes 0, 1, 2: capacity = 2000 veh/hour per lane<br />
+ *     Class 3: capacity = 1000 veh/hour per lane<br />
+ *     Classes 4-6: 600 veh/hour per lane
+ * </dd>
+ * <dt>freespeed</dt>
+ * <dd>NW.SPEEDCAT<br />
+ *     Category 1: 110 km/h<br />
+ *     Category 2: 100 km/h<br />
+ *     Category 3: 90 km/h<br />
+ *     Category 4: 70 km/h<br />
+ *     Category 5: 50 km/h<br />
+ *     Category 6: 30 km/h<br />
+ *     Category 7: 10 km/h<br />
+ *     Category 8: 5 km/h<br />
+ * </dd>
+ * <dt>number of lanes</dt>
+ * <dd>If NW.LANES > 0, use that value.
+ *     If NW.LANES = 0, then assume number-of-lanes = 1, except for the following cases:
+ *     <ul>
+ *     <li>NW.FRC = 0 (Motoryway, Freeway, Other Major Road)</li>
+ *     <li>NW.FRC = 1 (Major Road Less Important than Motorway)</li>
+ *     <li>NW.FOW = 1 (Motorway)</li>
+ *     <li>NW.FOW = 2 (Multi-Carriageway)</li>
+ *     <li>NW.NET2CLASS = 0</li>
+ *     </ul>
+ *     In any of the above cases, number-of-lanes is assumed to be 2.
+ * </dd>
+ * <dt>modes</dt>
+ * <dd>By default, {@link TransportMode#car}, {@link TransportMode#bike}, {@link TransportMode#walk}
+ *     are set as the default allowed modes.<br />
+ *     If the road is a Freeway or Motorway (NW.FREEWAY = 1 or NW.FRC = 0 or NW.FRC = 1), walk and bike are removed, leaving only car available.
+ *     If the road is part of a pedestrian zone (NW.FOW = 14 or NW.FOW = 15), car is removed, leaving walk and bike only.
+ *     If the road is a one-way road (NW.ONEWAY = FT or NW.ONEWAY = TF or NW.ONEWAY = N), car is removed, leaving walk and bike only.
+ *     If the road is a slip-road (NW.FOW = 10) where car is not allowed (e.g. due to one-way restriction on such roads), walk and bike are removed as well, such that the link is not converted at all.
+ * </dd>
+ * <dt>Road direction</dt>
+ * <dd>By default, each Network Element with Feature type 4110 and 4130 (NW.FEATTYP) is
+ *     converted into two links in MATSim, one leading from F_JNCTID to T_JNCTID, and the
+ *     other one leading in the opposite direction (from T_JNCTID to F_JNCTID). Depending
+ *     on the value of NW.ONEWAY, only links for one direction may be created.
+ * </dd>
+ * <dt>length</dt>
+ * <dd>By default, the value of NW.METERS is used. If that value is shorter than the
+ *     direct distance between the from- and to-Junction, than the length of the direct
+ *     distance is taken.
+ * </dd>
+ * </dl>
+ *
  * @author mrieser
  * @author balmermi
  */
@@ -171,7 +237,7 @@ public class TeleatlasConverter45v101 {
 		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
 			modes.remove(TransportMode.car);
 		}
-		
+
 		if (NwElement.FormOfWay.SLIP_ROAD.equals(nwElement.fow) && !modes.contains(TransportMode.car)) {
 			modes.remove(TransportMode.walk);
 			modes.remove(TransportMode.bike);
@@ -314,18 +380,18 @@ public class TeleatlasConverter45v101 {
 		Node fromNode = this.network.getNodes().get(fromId);
 		if (fromNode == null) {
 			fromNode = this.network.getFactory().createNode(fromId, convertCoordinate(fromJunction.c));
-			nodeCounter.incCounter();
+			this.nodeCounter.incCounter();
 			this.network.addNode(fromNode);
 		}
 		Node toNode = this.network.getNodes().get(toId);
 		if (toNode == null) {
 			toNode = this.network.getFactory().createNode(toId, convertCoordinate(toJunction.c));
-			nodeCounter.incCounter();
+			this.nodeCounter.incCounter();
 			this.network.addNode(toNode);
 		}
 		Id linkId = this.scenario.createId(Long.toString(nwElement.id) + direction);
 		Link link = this.network.getFactory().createLink(linkId, fromId, toId);
-		linkCounter.incCounter();
+		this.linkCounter.incCounter();
 		this.network.addLink(link);
 		return link;
 	}
@@ -346,7 +412,7 @@ public class TeleatlasConverter45v101 {
 	public static void main(String[] args) throws IOException, RuntimeException {
 		if (args.length != 2) { log.info("TeleatlasConverter45v101 indir outdir"); System.exit(1); }
 		Gbl.printSystemInfo();
-		
+
 		String indir = args[0];
 		String outdir = args[1];
 
