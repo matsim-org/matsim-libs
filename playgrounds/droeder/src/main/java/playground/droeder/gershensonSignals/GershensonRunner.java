@@ -38,20 +38,17 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
-import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
 import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
 import playground.droeder.Analysis.SignalSystems.SignalGroupStateTimeHandler;
 import playground.droeder.charts.DaBarChart;
-import playground.droeder.charts.DaChartWriter;
 
 
 
@@ -200,16 +197,16 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				if (controller == "G"){
 					GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 					adaptiveController.setParameters(n, u, cap, maxGreen);
-					adaptiveController.init(corrGroups, compGroups, mainOutLinks, e.getQueueSimulation().getQueueNetwork(), handler2);
+					adaptiveController.init(corrGroups, compGroups, mainOutLinks, e.getQueueSimulation().getQNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);				
 				}else{
 					AdaptiveInterimSignalController adaptiveController = (AdaptiveInterimSignalController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 					adaptiveController.setParameters(n, u, cap, 0);
-					adaptiveController.init(corrGroups, compGroups, mainOutLinks,e.getQueueSimulation().getQueueNetwork(), handler2);
+					adaptiveController.init(corrGroups, compGroups, mainOutLinks,e.getQueueSimulation().getQNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);
 				}
 				
-				handler2.setQNetwork(e.getQueueSimulation().getQueueNetwork());
+				handler2.setQNetwork(e.getQueueSimulation().getQNetwork());
 
 				qs.getEventsManager().addHandler(handler3);
 				
