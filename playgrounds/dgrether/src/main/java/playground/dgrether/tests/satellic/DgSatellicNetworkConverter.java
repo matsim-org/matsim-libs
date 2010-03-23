@@ -22,7 +22,7 @@ package playground.dgrether.tests.satellic;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.dgrether.DgPaths;
-import playground.yu.utils.qgis.MATSimNet2QGIS;
+
 
 
 /**
@@ -40,9 +40,10 @@ public class DgSatellicNetworkConverter {
 //    reader.readFile(net);
 //    String srs = "+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs";
     String srs = TransformationFactory.WGS84;
-    MATSimNet2QGIS mn2q = new MATSimNet2QGIS(net, srs);
-    mn2q.writeShapeFile(netOut);
-    
+
+//    MATSimNet2QGIS mn2q = new MATSimNet2QGIS(net, srs);
+//    mn2q.writeShapeFile(netOut);
+//    
 //    NetworkWriteAsTable tableWriter = new NetworkWriteAsTable(netOut);
 //    tableWriter.run((NetworkLayer) sc.getNetwork());
     
