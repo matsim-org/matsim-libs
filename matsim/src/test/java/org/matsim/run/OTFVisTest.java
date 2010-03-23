@@ -28,14 +28,7 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file
@@ -54,12 +47,9 @@ public class OTFVisTest {
 		eventsFilename = utils.getInputDirectory() + "events.txt.gz", //
 		mviFilename = utils.getOutputDirectory() + "events.mvi";
 
-		Scenario scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
-		new OTFEvent2MVI(new QSim(scenario, new EventsManagerImpl())
-				.getQNetwork(), eventsFilename, mviFilename, 300/* snapshotPeriod */)
-				.convert();
+		String[] args = {"-convert", eventsFilename, networkFilename, mviFilename, "300"};
+		OTFVis.main(args);
+		
 		File f = new File(mviFilename);
 		Assert.assertTrue("No mvi file written!", f.exists());
 	}
