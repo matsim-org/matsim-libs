@@ -20,17 +20,17 @@
 package org.matsim.evacuation.run;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class ShelterEvacuationControllerTest extends MatsimTestCase{
 
-  private static final Logger log = Logger.getLogger(ShelterEvacuationControllerTest.class);
-  
+	private static final Logger log = Logger.getLogger(ShelterEvacuationControllerTest.class);
+
 	public void testShelterEvacuationController() {
 		String config = getInputDirectory() + "config.xml";
-    String refEventsFileIt0 = getInputDirectory() + "0.events.xml.gz";
-    String testEventsFileIt0 = getOutputDirectory() +"ITERS/it.0/0.events.xml.gz";
+		String refEventsFileIt0 = getInputDirectory() + "0.events.xml.gz";
+		String testEventsFileIt0 = getOutputDirectory() +"ITERS/it.0/0.events.xml.gz";
 
 		String refEventsFile = getInputDirectory() + "10.events.xml.gz";
 		String testEventsFile = getOutputDirectory() +"ITERS/it.10/10.events.xml.gz";
@@ -40,16 +40,20 @@ public class ShelterEvacuationControllerTest extends MatsimTestCase{
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(10);
 		controler.run();
-    //it 0
+		//it 0
 		log.info("comparing events files: ");
-    log.info(refEventsFileIt0);
-    log.info(testEventsFileIt0);
-    assertEquals("different events-files.", CRCChecksum.getCRCFromFile(refEventsFileIt0),  CRCChecksum.getCRCFromFile(testEventsFileIt0));
-    //it 10
+		log.info(refEventsFileIt0);
+		log.info(testEventsFileIt0);
+		EventsFileComparator e = new EventsFileComparator(refEventsFileIt0, testEventsFileIt0);
+		int i = e.compareEvents();
+		assertEquals("different events-files.",0, i);
+		//it 10
 		log.info("comparing events files: ");
 		log.info(refEventsFile);
 		log.info(testEventsFile);
-		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(refEventsFile),	CRCChecksum.getCRCFromFile(testEventsFile));
+		e= new EventsFileComparator(refEventsFile, testEventsFile);
+		i = e.compareEvents();
+		assertEquals("different events-files.",0, i);
 	}
 
 }
