@@ -29,9 +29,10 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 
 public class HafasReader {
 	
-	private static String PATH_PREFIX = "../berlin-bvg09/urdaten/BVG-Fahrplan_2008/Daten/1_Mo-Do/";
-	private static String FILENAME = "../berlin-bvg09/pt/nullfall_M44_344_U8/alldat";
-	private static String OUT_FILENAME = "../berlin-bvg09/pt/nullfall_M44_344_U8/transitSchedule-HAFAS.xml";
+	private static String PATH_PREFIX = "D:/Berlin/BVG/berlin-bvg09/urdaten/BVG-Fahrplan_2008/Daten/1_Mo-Do/";
+	private static String FILENAME = "D:/Berlin/BVG/berlin-bvg09/urdaten/BVG-Fahrplan_2008/Daten/1_Mo-Do/alldat";
+//	private static String FILENAME = "D:/Berlin/BVG/berlin-bvg09/pt/nullfall_M44_344_U8/alldat";
+	private static String OUT_FILENAME = "E:/_out/nullfall_berlin_brandenburg/transitSchedule-HAFAS.xml";
 	private String filename;
 	private Collection<TransitRoute> routes = new ArrayList<TransitRoute>();
 	private List<TransitRouteStop> currentStops = new ArrayList<TransitRouteStop>();

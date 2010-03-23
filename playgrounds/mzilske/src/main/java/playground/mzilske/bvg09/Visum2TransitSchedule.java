@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -117,8 +118,14 @@ public class Visum2TransitSchedule {
 			vehCombination = this.visum.vehicleCombinations.get(line.vehCombNo);
 		}
 		if (vehCombination == null) {
-			vehType = defaultVehicleType;
-			log.warn("Could not find vehicle combination with id=" + timeProfile.vehCombNr + " used in line " + line.id.toString() + ". Using the first vehicle type available!");				
+			log.warn("Could not find vehicle combination with id=" + timeProfile.vehCombNr + " used in line " + line.id.toString() + ". Using default type " + line.tCode + " vehicle.");
+			vehType = this.vehicles.getVehicleTypes().get(new IdImpl(line.tCode));
+			
+			if(vehType == null){
+				vehType = defaultVehicleType;
+				log.warn("Could not find default vehicle for line type " + line.tCode + " used in line " + line.id.toString() + ". Using the first vehicle type available!");	
+			}			
+			
 		} else {
 			vehType = this.vehicles.getVehicleTypes().get(new IdImpl(vehCombination.id));
 		}
@@ -192,6 +199,11 @@ public class Visum2TransitSchedule {
 			capacity.setStandingRoom(Integer.valueOf(vehComb.numOfVehicles * (vu.passengerCapacity - vu.seats)));
 			type.setCapacity(capacity);
 			this.vehicles.getVehicleTypes().put(type.getId(), type);
+		}
+		
+		// add default types
+		for (Entry<String, BasicVehicleType> entry : DefaultVehTypes.getDefaultVehicleTypes().entrySet()) {
+			this.vehicles.getVehicleTypes().put(new IdImpl(entry.getKey()), entry.getValue());
 		}
 	}
 

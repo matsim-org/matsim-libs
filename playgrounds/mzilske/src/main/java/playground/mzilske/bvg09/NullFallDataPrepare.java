@@ -66,9 +66,10 @@ public class NullFallDataPrepare {
 
 	private static final Logger log = Logger.getLogger(NullFallDataPrepare.class);
 
-	private static String OutPath = "../berlin-bvg09/pt/nullfall_M44_344_U8/";
-	private static String InVisumNetFile = "../berlin-bvg09/urdaten/nullfall2009-05-25.net";
-	private static List<String> transitLineFilter = Arrays.asList("U-8","B-M44","B-344");
+	private static String OutPath = "e:/_out/nullfall_berlin_brandenburg/";
+	private static String InVisumNetFile = "d:/Berlin/BVG/berlin-bvg09/urdaten/nullfall2009-05-25.net";
+//	private static List<String> transitLineFilter = Arrays.asList("U-8","B-M44","B-344");
+	private static List<String> transitLineFilter = null;
 
 	// OUTPUT FILES
 	private static String OutNetworkFile = OutPath + "intermediateNetwork.xml";
@@ -151,7 +152,8 @@ public class NullFallDataPrepare {
 					// Mehr als einer dieser Werte gesetzt.
 //					throw new RuntimeException(tValues.toString());
 //				}
-				network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length * 1000, FreeSpeedCalculator.calculateFreeSpeedForEdge(row), 2000, 1);			
+				// capacity of 2000 isn't enough for areas with heavy pt traffic (zoo, spandau, alex)
+				network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length * 1000, FreeSpeedCalculator.calculateFreeSpeedForEdge(row), 20000, 1);			
 			}
 			
 		};
@@ -209,8 +211,14 @@ public class NullFallDataPrepare {
 			while (i.hasNext()) {
 				VisumNetwork.LineRouteItem nextLineRouteItem = i.next();
 				Link link = findLink(previousLineRouteItem, nextLineRouteItem);
-				linkIds.add(link.getId());
-				previousLineRouteItem = nextLineRouteItem;
+				// check if stop was on link instead of node
+				if(link == null){
+					log.warn("No link found. Skipping to next node. Please check line " + transitLine.getId() + " manually.");
+					continue;					
+				} else {
+					linkIds.add(link.getId());
+					previousLineRouteItem = nextLineRouteItem;
+				}
 			}
 			NetworkRoute linkNetworkRoute = RouteUtils.createNetworkRoute(linkIds, this.scenario.getNetwork());
 			transitRouteI.setRoute(linkNetworkRoute);
@@ -288,7 +296,8 @@ public class NullFallDataPrepare {
 			}
 		}
 		if (foundLink == null) {
-			throw new RuntimeException();
+//			throw new RuntimeException();
+			log.warn("There was no link found from " + prevNode + " to " + node + " Could be a stop situated on a link instead on a node.");
 		}
 		return foundLink;
 	}

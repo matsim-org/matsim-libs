@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -36,7 +37,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
@@ -77,12 +77,13 @@ public class NullFallFacilityRollout {
 
 	private static final Logger log = Logger.getLogger(NullFallFacilityRollout.class);
 
-	private static String path = "../berlin-bvg09/pt/nullfall_M44_344_U8/";
+	private static String path = "E:/_out/nullfall_berlin_brandenburg/";
 
 	private static String InNetworkFile = path + "intermediateNetwork.xml";
 	private static String InTransitScheduleFile = path + "mergedTransitSchedule.xml";
-	private static String InVisumNetFile = "../berlin-bvg09/urdaten/nullfall2009-05-25.net";
+	private static String InVisumNetFile = "D:/Berlin/BVG/berlin-bvg09/urdaten/nullfall2009-05-25.net";
 	private static String OutNetworkFile = path + "network.xml";
+//	private static String OutNetworkFile = "E:/_out/nullfall_berlin_brandenburg/network.xml";
 	private static String OutTransitScheduleFile = path + "transitSchedule.xml";
 	private static String OutVehicleFile = path + "vehicles.xml";
 
@@ -326,6 +327,17 @@ public class NullFallFacilityRollout {
 	private void emptyVehicles() {
 		outScenario.getVehicles().getVehicles().clear();
 	}
+	
+	private Map<Id, BasicVehicleType> readVehicles(){
+		Map<String, BasicVehicleType> vehicleTypeMap = DefaultVehTypes.getDefaultVehicleTypes();
+		Map<Id, BasicVehicleType> lineId2VehTypeMap = new HashMap<Id, BasicVehicleType>();
+		
+		for (Entry<Id, org.matsim.visum.VisumNetwork.TransitLine> entry : this.vNetwork.lines.entrySet()) {			
+			lineId2VehTypeMap.put(entry.getKey(), vehicleTypeMap.get(entry.getValue().tCode));			
+		}
+		
+		return lineId2VehTypeMap;
+	}
 
 	private void buildUmlaeufe() {
 		Collection<TransitLine> transitLines = outScenario.getTransitSchedule().getTransitLines().values();
@@ -339,32 +351,36 @@ public class NullFallFacilityRollout {
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		outScenario.getVehicles().getVehicleTypes().put(vehicleType.getId(),
-				vehicleType);
 
+		Map<Id, BasicVehicleType> lineId2VehTypeMap = this.readVehicles();		
+		
 		long vehId = 0;
 		for (Umlauf umlauf : umlaeufe) {
+			if(lineId2VehTypeMap.containsKey(umlauf.getLineId())){
+				vehicleType = lineId2VehTypeMap.get(umlauf.getLineId());
+			}			
 			BasicVehicle veh = vb.createVehicle(new IdImpl("veh_"+ Long.toString(vehId++)), vehicleType);
+			outScenario.getVehicles().getVehicleTypes().put(vehicleType.getId(), vehicleType);
 			outScenario.getVehicles().getVehicles().put(veh.getId(), veh);
 			umlauf.setVehicleId(veh.getId());
 		}
 	}
 
 	private void removeUnusedNetworkParts() {
-		Collection<Node> usedNodes = new HashSet<Node>();
+		Collection<Id> usedNodes = new HashSet<Id>();
 		for (Umlauf umlauf : umlaeufe) {
 			for (UmlaufStueckI umlaufstueck : umlauf.getUmlaufStuecke()) {
 				NetworkRoute route = umlaufstueck.getCarRoute();
 				for (Link link : getAllLink(route, this.inScenario.getNetwork())) {
-					usedNodes.add(link.getFromNode());
-					usedNodes.add(link.getToNode());
+					usedNodes.add(link.getFromNode().getId());
+					usedNodes.add(link.getToNode().getId());
 				}
 			}
 		}
-		Collection<Node> allNodes = new ArrayList<Node>(outScenario.getNetwork().getNodes().values());
-		for (Node node : allNodes) {
+		Collection<Id> allNodes = new ArrayList<Id>(outScenario.getNetwork().getNodes().keySet());
+		for (Id node : allNodes) {
 			if (!usedNodes.contains(node)) {
-				outScenario.getNetwork().removeNode(node);
+				outScenario.getNetwork().removeNode(outScenario.getNetwork().getNodes().get(node));
 			}
 		}
 		Collection<TransitStopFacility> allFacilities = new ArrayList<TransitStopFacility>(outScenario.getTransitSchedule().getFacilities().values());
