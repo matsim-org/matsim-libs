@@ -66,10 +66,10 @@ public class LoadedNetworkRouter {
 	}
 	
 	public void run(final String[] args) {
-		String networkFile="/var/tmp/erathal/network.car.xml.gz";
-		String eventsFile="/var/tmp/erathal/200.events.txt.gz";
-		String inputPlansFile="/var/tmp/erathal/TestPlanFile.xml";
-		String outputPlansFile="/var/tmp/erathal/outputPlanFile.xml";
+		String networkFile="/home/erathal/MatSimRouting/network.car.xml.gz";
+		String eventsFile="/home/erathal/MatSimRouting/50.events.txt.gz";
+		String inputPlansFile="/home/erathal/MatSimRouting/inputPlanFile.xml";
+		String outputPlansFile="/home/erathal/MatSimRouting/outputPlanFile.xml";
 		
 		parseArguments(args);
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
