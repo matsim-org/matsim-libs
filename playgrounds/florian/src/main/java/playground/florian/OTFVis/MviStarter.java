@@ -1,24 +1,33 @@
 package playground.florian.OTFVis;
 
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.otfvis.OTFClientSwing;
+import org.matsim.vis.otfvis.OTFDoubleMVI;
 
 
 public class MviStarter {
 
-//	private static String config = "./src/main/java/playground/florian/OTFVis/tests/config.xml";
-//	private static String mviFile = "./src/main/java/playground/florian/MVIs/500.events.mvi";
+	private static String config = "./test/input/playground/florian/Equil/config_mvi.xml";
+	private static String mviFile = "./src/main/java/playground/florian/Equil/Output_mvi/ITERS/it.0/0.otfvis.mvi";
+	private static String mviFile2 = "./src/main/java/playground/florian/Equil/Output_mvi/ITERS/it.100/100.otfvis.mvi";
 	
 	
 	public static void main(String[] args) {
-//		Controler con = new Controler(config);
-//		con.setOverwriteFiles(true);
+		Controler con = new Controler(config);
+		con.setOverwriteFiles(true);
+//		con.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+//		con.getConfig().getQSimConfigGroup().setSnapshotFormat("otfvis");
+//		con.getConfig().getQSimConfigGroup().setSnapshotPeriod(60.0);
+//		con.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
 //		con.run();
-//		String[] movies = new String[2];
-//		movies[0] = mviFile;
+		String[] movies = new String[2];
+		movies[0] = mviFile;
+		movies[1]= mviFile2;
 //		OTFVis.playMVI(movies);
-//		new OTFClientSwing(mviFile).start();
+//		OTFDoubleMVI.main(movies);
+		new OTFClientSwing(mviFile).start();
 	}
 
 }

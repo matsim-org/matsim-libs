@@ -4,24 +4,24 @@
 
 
 	<module name="network">
-		<param name="inputNetworkFile" value="./src/main/java/playground/florian/Equil/network.xml" />
+		<param name="inputNetworkFile" value="./test/input/playground/florian/Equil/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="./src/main/java/playground/florian/Equil/plans2.xml" />
+		<param name="inputPlansFile" value="./test/input/playground/florian/Equil/plans100.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./src/main/java/playground/florian/Equil/Output_mvi" />
+		<param name="outputDirectory" value="./Output/Equil/Output_mvi" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="1" />
+		<param name="lastIteration" value="10" />
 	</module>
 
-	<module name="qsim" >
+	<module name="simulation" >
 		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name = "snapshotFormat"	value = "otfvis"/> <!-- netvis, googleearth, transims -->
-		<param name="startTime" value="06:00:00" />
-		<param name="endTime" value="07:00:00" />
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
 		
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.1" />

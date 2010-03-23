@@ -8,26 +8,35 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value=".\src\main\java\playground\florian\OTFVis\tests\network.xml" />
+		<param name="inputNetworkFile" value="./test/input/playground/florian/OTFVis/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value=".\src\main\java\playground\florian\OTFVis\tests\plans200.xml" />
+		<param name="inputPlansFile" value="./test/input/playground/florian/OTFVis/plans200.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value=".\src\main\java\playground\florian\OTFVis\tests\Output" />
+		<param name="outputDirectory" value="./Output/OTFVisTests/Sim" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="1" />
 	</module>
 
-	<module name="qsim">
+	<module name="simulation">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
+	</module>
+	
+	<module name="otfvis" >
+		<!-- The (initial) size of the agents.  Only a range of numbers is allowed, otherwise otfvis aborts rather ungracefully, or displays no agents at all. -->
+		<param name="agentSize" value="300.0" />
+		<param name="leftMouseFunc" value="Zoom" />
+		<param name="middleMouseFunc" value="Pan" />
+		<param name="rightMouseFunc" value="Select" />
+		<param name="showTeleportation" value="false" />
 	</module>
 
 	<module name="planCalcScore">
