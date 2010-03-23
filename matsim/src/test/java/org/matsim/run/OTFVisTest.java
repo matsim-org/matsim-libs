@@ -34,6 +34,7 @@ import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file
+ * !please use "-Xmx630m"!
  * 
  * @author yu
  * 
