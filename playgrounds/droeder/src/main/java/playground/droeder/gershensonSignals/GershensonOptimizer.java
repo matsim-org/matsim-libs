@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -98,7 +97,7 @@ public class GershensonOptimizer {
 									}else{
 										s = new Solution(s2.getU(), s3.getN(), s4.getMaxGreen(), s5.getCap(), s1.getD());
 									}
-									if (s.getU() < s.getMaxGreen()){
+									if (s.getU() < s.getMaxGreen() && !(recombinated.containsKey(s))){
 										recombinated.put(i, s);
 										System.out.println(i);
 										i = i+1;
@@ -152,11 +151,11 @@ public class GershensonOptimizer {
 		Map<Integer, Solution> temp = new HashMap<Integer, Solution>();
 		Map<Integer, Solution> best = new HashMap<Integer, Solution>();
 		GershensonRunner runner;
-		String folder = DaPaths.DENVEROUT + "recombination10\\";
+		String folder = DaPaths.OUTPUT + "denver\\recombination13\\";
 		int i;
-		int b = 98;
+		int b = 5;
 		
-		for (int ii = 1; ii<251; ii++){
+		for (int ii = 1; ii<10; ii++){
 			temp.put(ii, g.init());
 		}
 		for (Entry<Integer, Solution> e  : temp.entrySet()){
@@ -266,12 +265,24 @@ class Solution{
 	public double getTime(){
 		return this.time;
 	}
-	
+	@Override
 	public String toString(){
 		String temp;
 		temp = "time=" + time + " d=" + d + " cap=" + cap + " u=" + u + " n=" + n;
 		return temp;
+	}
+	
+	@Override
+	public boolean equals(Object o){
+		if (!(o instanceof Solution)) return false;
+		Solution s = (Solution) o;
 		
+		if (this.cap == s.getCap() && this.d == s.getD() && this.maxGreen == s.getMaxGreen() 
+				&& this.n == s.getN() && this.u == s.getU()){
+			return true;
+		} else{
+			return false;
+		}
 	}
 	
 }

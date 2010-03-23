@@ -49,7 +49,7 @@ import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
 import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
-import playground.droeder.Analysis.SignalGroupStateTimeHandler;
+import playground.droeder.Analysis.SignalSystems.SignalGroupStateTimeHandler;
 import playground.droeder.charts.DaBarChart;
 import playground.droeder.charts.DaChartWriter;
 
@@ -69,6 +69,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private double d;
 	private int maxGreen;
 	
+	
 	private Map<Id, Id> corrGroups;
 	private Map<Id, List<Id>> compGroups;
 	private Map<Id, Id> mainOutLinks;
@@ -84,7 +85,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private CarsOnLinkLaneHandler handler2;
 	private SignalGroupStateTimeHandler handler3;
 	
-	// "D" run denver -- "G" run gershensonTestNetwork
+	// "D" run denver -- "G" run gershensonTestNetwork --- "C" run cottbus
 	private static final String config = "D";
 	// "G" for GershensonController -- "I" for InterimController
 	private static final String controller = "G";
@@ -99,7 +100,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			log.info("start gershensonTest");
 			GershensonScenarioGenerator gsg = new GershensonScenarioGenerator();
 			gsg.createScenario();
-			conf = DaPaths.GTEST + "gershensonConfigFile2.xml";		
+			conf = DaPaths.DASTUDIES + "gershenson\\gershensonConfigFile2.xml";		
 		}else if (configFile == "D"){
 			log.info("start Denver");
 			DenverScenarioGenerator dsg = new DenverScenarioGenerator();
@@ -109,9 +110,12 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				dsg.controllerClass  = AdaptiveInterimSignalController.class.getCanonicalName();
 			}
 			dsg.createScenario();
-			conf = DaPaths.OUTPUT + "Denver\\denverConfig.xml";
+			conf = DaPaths.OUTPUT + "denver\\denverConfig.xml";
 		}else if (configFile == "opti"){
-			conf = DaPaths.OUTPUT + "Denver\\denverConfig.xml";
+			conf = DaPaths.OUTPUT + "denver\\denverConfig.xml";
+		}
+		else if (configFile == "C"){
+			conf = DaPaths.OUTPUT + "cottbus\\cottbusConfig.xml";
 		}
 		else{
 			conf = configFile;
@@ -147,13 +151,12 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				handler2 = new CarsOnLinkLaneHandler(groups, d, c.getNetwork());
 				handler3 = new SignalGroupStateTimeHandler();
 				
-				handler3.init(groups);
 				event.getControler().getEvents().addHandler(handler1);
 				event.getControler().getEvents().addHandler(handler2);
 				event.getControler().getEvents().addHandler(handler3);
 				
 				//enable live-visualization
-				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	
@@ -175,7 +178,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				avTT = handler1.getAverageTravelTime();
-				handler3.writeToTxt(DaPaths.DENVEROUT + "ITERS\\it." + event.getIteration() + "\\greenTimes2.txt");
+				handler3.writeToTxt(DaPaths.OUTPUT+ "denver\\ITERS\\it." + event.getIteration() + "\\greenTimes.txt");
 			}
 		});		
 		
@@ -197,16 +200,16 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				if (controller == "G"){
 					GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 					adaptiveController.setParameters(n, u, cap, maxGreen);
-					adaptiveController.init(corrGroups, compGroups, mainOutLinks, e.getQueueSimulation().getQNetwork(), handler2);
+					adaptiveController.init(corrGroups, compGroups, mainOutLinks, e.getQueueSimulation().getQueueNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);				
 				}else{
 					AdaptiveInterimSignalController adaptiveController = (AdaptiveInterimSignalController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 					adaptiveController.setParameters(n, u, cap, 0);
-					adaptiveController.init(corrGroups, compGroups, mainOutLinks,e.getQueueSimulation().getQNetwork(), handler2);
+					adaptiveController.init(corrGroups, compGroups, mainOutLinks,e.getQueueSimulation().getQueueNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);
 				}
 				
-				handler2.setQNetwork(e.getQueueSimulation().getQNetwork());
+				handler2.setQNetwork(e.getQueueSimulation().getQueueNetwork());
 
 				qs.getEventsManager().addHandler(handler3);
 				

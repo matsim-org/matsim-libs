@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.events.SignalGroupStateChangedEventImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
@@ -137,10 +138,14 @@ public class GershensonAdaptiveTrafficLightController extends
 		}
 		
 		// calculate outlinkCapacity for the mainOutlink and check if there is a trafficJam
-		double outLinkCapacity = net.getLinks().get(mainOutLinks.get(signalGroup.getLinkRefId())).getSpaceCap();
-		double actStorage = handler.getVehOnLink(mainOutLinks.get(signalGroup.getLinkRefId()));
-		if((outLinkCapacity*capFactor)< actStorage){
-			outLinkJam = true;
+		if (!(mainOutLinks.get(signalGroup.getLinkRefId()) ==  null)){
+			double outLinkCapacity = net.getLinks().get(mainOutLinks.get(signalGroup.getLinkRefId())).getSpaceCap();
+			double actStorage = handler.getVehOnLink(mainOutLinks.get(signalGroup.getLinkRefId()));
+			if((outLinkCapacity*capFactor)< actStorage){
+				outLinkJam = true;
+			}
+		} else {
+			outLinkJam = false;
 		}
 		
 		// check competing links for trafficJam
@@ -188,7 +193,6 @@ public class GershensonAdaptiveTrafficLightController extends
 	  for (SignalGroupDefinition sg : this.getSignalGroups().values()){
 			this.updateSignalGroupState(e.getSimulationTime(), sg);
 	  }
-	  
 	  
 //	  //experimental, switch links with higher demand first
 //	  HashMap<Id, Double> map = new HashMap<Id, Double>();
@@ -258,6 +262,12 @@ public class GershensonAdaptiveTrafficLightController extends
 //		  return;
 //		}
 	}
+	
+	private void fireChangeEvent(double time, Id signalSystem, Id signalgroup, SignalGroupState newState){
+		this.getSignalEngine().getEvents().processEvent(
+	              new SignalGroupStateChangedEventImpl(time, signalSystem, 
+	                  signalgroup, newState));
+	}
 
 	private void switchRedGreen (SignalGroupDefinition group, double time){
 		if (this.oldState.equals(SignalGroupState.GREEN)){
@@ -265,26 +275,38 @@ public class GershensonAdaptiveTrafficLightController extends
 				this.getSignalGroupStates().put(this.getSignalGroups().
 						get(this.corrGroups.get(group.getId())),SignalGroupState.RED);
 				this.switchedToGreen.put(this.corrGroups.get(group.getId()), time);
+				fireChangeEvent(time, this.getSignalGroups().get(corrGroups.get(group.getId())).getSignalSystemDefinitionId(), 
+						corrGroups.get(group.getId()), SignalGroupState.RED);
 			}
 			for (Id i : this.compGroups.get(group.getId())){
 				this.switchedToGreen.put(i, time);
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.GREEN);
+				fireChangeEvent(time, this.getSignalGroups().get(i).getSignalSystemDefinitionId(), 
+						i, SignalGroupState.GREEN);
 			}
 			this.getSignalGroupStates().put(group, SignalGroupState.RED);
 			this.switchedToGreen.put(group.getId(), time);
+			fireChangeEvent(time, this.getSignalGroups().get(group.getId()).getSignalSystemDefinitionId(), 
+					group.getId(), SignalGroupState.RED);
 
 		} else { //if (oldState.equals(SignalGroupState.RED)){
 			if (!(this.corrGroups.get(group.getId()) == null)){
 				this.getSignalGroupStates().put(this.getSignalGroups().
 						get(this.corrGroups.get(group.getId())),SignalGroupState.GREEN);
 				this.switchedToGreen.put(this.corrGroups.get(group.getId()), time);
+				fireChangeEvent(time, this.getSignalGroups().get(corrGroups.get(group.getId())).getSignalSystemDefinitionId(), 
+						corrGroups.get(group.getId()), SignalGroupState.GREEN);
 			}
 			for (Id i : this.compGroups.get(group.getId())){
 				this.switchedToGreen.put(i, time);
 				this.getSignalGroupStates().put(this.getSignalGroups().get(i),SignalGroupState.RED);
+				fireChangeEvent(time, this.getSignalGroups().get(i).getSignalSystemDefinitionId(), 
+						i, SignalGroupState.RED);
 			}
 			this.getSignalGroupStates().put(group, SignalGroupState.GREEN);
 			this.switchedToGreen.put(group.getId(), time);
+			fireChangeEvent(time, this.getSignalGroups().get(group.getId()).getSignalSystemDefinitionId(), 
+					group.getId(), SignalGroupState.GREEN);
 		}
 	}
 	
@@ -292,8 +314,6 @@ public class GershensonAdaptiveTrafficLightController extends
 	 * use this method to set parameters minimumGreenTime u, minimum of the product cars and waitingTime n, the capacityFactor for trafficJam on the outlink
 	 * and the maximumGreenTime ( 0 == disable maximumGreenTime)
 	 */
-	
-
 	public void setParameters (int minCarsTime, int tGreenMin, double capFactor, int maxGreenTime){
 		this.minCarsTime = minCarsTime;
 		this.tGreenMin = tGreenMin;

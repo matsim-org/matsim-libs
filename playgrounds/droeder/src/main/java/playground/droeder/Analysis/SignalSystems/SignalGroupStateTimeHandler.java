@@ -17,11 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis;
+package playground.droeder.Analysis.SignalSystems;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -42,42 +43,63 @@ public class SignalGroupStateTimeHandler implements
 		SignalGroupStateChangedEventHandler {
 	
 	Map <Id, TreeMap<Double, Double>> idGreenStateTime = new TreeMap<Id, TreeMap<Double, Double>>();
+	Map <Id, SignalGroupStateData> idData = new HashMap<Id, SignalGroupStateData>();
+	SignalGroupStateData data = null;
 	
-	public void init(Map<Id, SignalGroupDefinition> groups){
-		for (SignalGroupDefinition s: groups.values()){
-			idGreenStateTime.put(s.getId(), new TreeMap<Double, Double>());
-		}
-	}
 
 	@Override
 	public void handleEvent(SignalGroupStateChangedEvent e) {
-		TreeMap<Double, Double> temp1 = idGreenStateTime.get(e.getSignalGroupId());
-		if(e.getNewState().equals(SignalGroupState.GREEN)){
-			temp1.put(((int)(e.getTime()*100.00))/100.00, null);
-		}else if (e.getNewState().equals(SignalGroupState.RED)){
-			temp1.lastEntry().setValue(((int)(e.getTime()*100.00))/100.00);
+		if(!(idData.containsKey(e.getSignalGroupId()))){
+			idData.put(e.getSignalGroupId(), new SignalGroupStateData());
 		}
-		idGreenStateTime.put(e.getSignalGroupId(), temp1);
-
+		data = idData.get(e.getSignalGroupId());
+		data.processStateChange(e);
+		idData.put(e.getSignalGroupId(), data);
+//		
+//		TreeMap<Double, Double> temp1 = idGreenStateTime.get(e.getSignalGroupId());
+//		if(e.getNewState().equals(SignalGroupState.GREEN)){
+//			temp1.put(((int)(e.getTime()*100.00))/100.00, null);
+//		}else if (e.getNewState().equals(SignalGroupState.RED)){
+//			if (temp1.isEmpty()){
+//				temp1.put(((int)(e.getTime()*100.00))/100.00, ((int)(e.getTime()*100.00))/100.00);
+//			}else{
+//				temp1.lastEntry().setValue(((int)(e.getTime()*100.00))/100.00);
+//			}
+//		}
+//		idGreenStateTime.put(e.getSignalGroupId(), temp1);
 	}
 	
 	public void writeToTxt (String fileName){
-		System.out.println(idGreenStateTime.toString());
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
-			for(Entry<Id, TreeMap<Double, Double>> e: idGreenStateTime.entrySet()){
+			
+			for (Entry<Id, SignalGroupStateData> e : idData.entrySet()){
 				writer.write("id" + "\t" + e.getKey());
 				writer.newLine();
-				for (Entry<Double, Double> ee : e.getValue().entrySet()){
-					writer.write(ee.getKey() +"\t");
+				for (Entry<Double, SignalGroupState> data : e.getValue().getStateTimeMap().entrySet()){
+					writer.write(data.getKey() + "\t");
 				}
 				writer.newLine();
-				for (Entry<Double, Double> ee : e.getValue().entrySet()){
-					writer.write(ee.getValue() +"\t");
+				for (Entry<Double, SignalGroupState> data : e.getValue().getStateTimeMap().entrySet()){
+					writer.write(String.valueOf(data.getValue()) + "\t");
 				}
 				writer.newLine();
 				writer.newLine();
 			}
+			
+//			for(Entry<Id, TreeMap<Double, Double>> e: idGreenStateTime.entrySet()){
+//				writer.write("id" + "\t" + e.getKey());
+//				writer.newLine();
+//				for (Entry<Double, Double> ee : e.getValue().entrySet()){
+//					writer.write(ee.getKey() +"\t");
+//				}
+//				writer.newLine();
+//				for (Entry<Double, Double> ee : e.getValue().entrySet()){
+//					writer.write(ee.getValue() +"\t");
+//				}
+//				writer.newLine();
+//				writer.newLine();
+//			}
 			
 			writer.close();
 

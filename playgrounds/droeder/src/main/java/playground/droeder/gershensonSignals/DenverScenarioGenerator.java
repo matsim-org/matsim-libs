@@ -62,8 +62,8 @@ public class DenverScenarioGenerator {
 	
 	private static final Logger log = Logger.getLogger(DenverScenarioGenerator.class);
 
-	private static final String INPUT = DaPaths.DENVER;
-	private static final String OUTPUT =DaPaths.OUTPUT + "Denver\\";
+	private static final String INPUT = DaPaths.DGSTUDIES + "denver\\";
+	private static final String OUTPUT =DaPaths.OUTPUT + "denver\\";
 	//INPUT
 	private static final String NETWORKFILE = INPUT + "networkDenver.xml";
 	private static final String LANESINPUTFILE = INPUT + "laneDefinitions.xml";
@@ -74,10 +74,10 @@ public class DenverScenarioGenerator {
 	private static final String CHANGEEVENTSFILE = OUTPUT +"changeEventsFile.xml";
 	public static final String CONFIGOUTPUTFILE = OUTPUT + "denverConfig.xml";
 	private static final String SIGNALSYSTEMCONFIG = OUTPUT + "signalSystemConfig.xml";
-	private static final String OUTPUTDIRECTORY = OUTPUT;
+	private static final String OUTPUTDIRECTORY = OUTPUT ;
 	
 	// DEFINITIONS
-	protected static String controllerClass;
+	protected static String controllerClass = GershensonAdaptiveTrafficLightController.class.getCanonicalName();
 	private static final int iterations = 1;
 	Id id1 = new IdImpl("1");
 	Id id2 = new IdImpl("2");
@@ -109,7 +109,7 @@ public class DenverScenarioGenerator {
 		conf.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIG);
 		
 		//create changeEvents
-		this.createChangeEvents(sc);
+//		this.createChangeEvents(sc);
 		
 		//create and write config
 		createConfig(conf);
@@ -137,24 +137,24 @@ public class DenverScenarioGenerator {
 		ssConfigsWriter.writeFile(SIGNALSYSTEMCONFIG);
 	}
 	
-	private void createChangeEvents (ScenarioImpl sc){
-		Network net = sc.getNetwork();
-		List<NetworkChangeEvent> ce = new LinkedList<NetworkChangeEvent>();
-		NetworkChangeEvent nce;
-		
-		nce = new NetworkChangeEvent(6*3600 + 90);
-		nce.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR,0.1));
-		nce.addLink(net.getLinks().get(sc.createId("35")));
-		ce.add(nce);
-		
-		nce = new NetworkChangeEvent(6*3600 + 390);
-		nce.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 10));
-		nce.addLink(net.getLinks().get(sc.createId("35")));
-		ce.add(nce);
-		
-		NetworkChangeEventsWriter ceWriter = new NetworkChangeEventsWriter();
-		ceWriter.write(CHANGEEVENTSFILE, ce);
-	}
+//	private void createChangeEvents (ScenarioImpl sc){
+//		Network net = sc.getNetwork();
+//		List<NetworkChangeEvent> ce = new LinkedList<NetworkChangeEvent>();
+//		NetworkChangeEvent nce;
+//		
+//		nce = new NetworkChangeEvent(6*3600 + 90);
+//		nce.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR,0.1));
+//		nce.addLink(net.getLinks().get(sc.createId("35")));
+//		ce.add(nce);
+//		
+//		nce = new NetworkChangeEvent(6*3600 + 390);
+//		nce.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 10));
+//		nce.addLink(net.getLinks().get(sc.createId("35")));
+//		ce.add(nce);
+//		
+//		NetworkChangeEventsWriter ceWriter = new NetworkChangeEventsWriter();
+//		ceWriter.write(CHANGEEVENTSFILE, ce);
+//	}
 	
 private void createConfig(Config config) {
 		
@@ -194,7 +194,7 @@ private void createConfig(Config config) {
 		config.getQSimConfigGroup().setStuckTime(20000);
 		config.getQSimConfigGroup().setRemoveStuckVehicles(true);
 //		config.getQSimConfigGroup().setStartTime(6*3600);
-		config.getQSimConfigGroup().setEndTime(7*3600);
+//		config.getQSimConfigGroup().setEndTime(7*3600);
 		config.otfVis().setDrawLinkIds(true);
 		
 		

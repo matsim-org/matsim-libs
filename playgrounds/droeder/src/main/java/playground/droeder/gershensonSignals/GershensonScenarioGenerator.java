@@ -66,8 +66,8 @@ import playground.droeder.DaPaths;
  */
 
 public class GershensonScenarioGenerator {
-	public static final String INPUT = DaPaths.GTEST;
-	public static final String OUTPUT =DaPaths.GTEST;
+	public static final String INPUT = DaPaths.DASTUDIES + "gershenson\\";
+	public static final String OUTPUT =DaPaths.DASTUDIES + "gershenson\\";
 	public static final String NETWORKFILE = INPUT + "gershensonTestNetwork2.xml";
 	public static final String CONFIGOUTPUTFILE = OUTPUT + "gershensonConfigFile2.xml";
 	public static final String LANESOUTPUTFILE = OUTPUT + "gershensonLanes2.xml";
@@ -75,7 +75,7 @@ public class GershensonScenarioGenerator {
 	public static final String SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE = OUTPUT + "gershensonSignalSystemsConfig2.xml";
 	public static final String POPULATIONOUTPUTFILE = OUTPUT + "gershensonPopulation.xml";
 	private static final String PLANSOUTPUTFILE = OUTPUT + "gershensonPlans.xml";
-	private static final String OUTPUTDIRECTORY = DaPaths.OUTPUT ;
+	private static final String OUTPUTDIRECTORY = DaPaths.OUTPUT + "gershenson\\";
 
 	private static final boolean isUseLanes = true;
 	private static final boolean isUseSignalSystems = true;

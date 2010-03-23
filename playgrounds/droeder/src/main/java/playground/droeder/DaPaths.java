@@ -25,13 +25,15 @@ package playground.droeder;
  */
 public interface DaPaths {
 	
-	final String DATA = "D:\\Dokumente\\Uni\\Bachelorarbeit\\Eclipse\\";
-	final String DENVER = "D:\\Eclipse Workspace\\MATSim2\\Denver\\";
-	final String GTEST = "D:\\VSP\\shared-svn.droeder\\gerhenson\\";
+	final String VSP =  "D:\\VSP\\";
+	final String SHAREDSVN = VSP + "shared-svn\\";
+	final String STUDIES = SHAREDSVN + "studies\\";
 	
-	final String INPUT = DATA + "input\\";
-	final String OUTPUT = DATA + "output\\";
-	final String DENVEROUT = OUTPUT + "DENVER\\";
+	final String DGSTUDIES = STUDIES + "dgrether\\";
+	final String DASTUDIES = STUDIES + "droeder\\";
+	
+	final String OUTPUT = VSP + "output\\";
+	
 	
 	
 
