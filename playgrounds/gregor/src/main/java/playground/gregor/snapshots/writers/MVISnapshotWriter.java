@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.geotools.data.FeatureSource;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.EventsManagerFactoryImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -55,6 +56,7 @@ import org.matsim.evacuation.otfvis.readerwriter.TextutreDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataWriter;
 import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
@@ -77,10 +79,10 @@ public class MVISnapshotWriter extends OTFFileWriter{
 //		final String LINKS_FILE =  CVSROOT + "/studies/padang/gis/network_v20080618/links.shp";
 		
 	//	final String NODES_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_nodes.shp";
-	final String BUILDINGS_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/studies/countries/id/padang/gis/vis/shelters.shp";
-	final String LINKS_FILE = OTFSnapshotGenerator.SHARED_SVN + "/studies/countries/id/padang/gis/vis/links.shp";
-	final String NODES_FILE = OTFSnapshotGenerator.SHARED_SVN + "/studies/countries/id/padang/gis/vis/nodes.shp";
-	final String REGION_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/studies/countries/id/padang/gis/vis/region.shp";
+	final String BUILDINGS_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/shelters.shp";
+	final String LINKS_FILE = OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/links.shp";
+	final String NODES_FILE = OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/nodes.shp";
+	final String REGION_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/region.shp";
 	final private static float [] regionColor = new float [] {.9f,.92f,.82f,1.f};
 	final private static float [] buildingsColor = new float [] {1.f,.5f,.0f,.8f};
 	final private static float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
@@ -101,7 +103,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 
 	public MVISnapshotWriter(ScenarioImpl sc) {
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QNetwork(sc.getNetwork())),OTFSnapshotGenerator.RUNS_SVN + "/test.mvi", new OTFFileWriterConnectionManagerFactory());
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QNetwork(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()))),OTFSnapshotGenerator.RUNS_SVN + "/test.mvi", new OTFFileWriterConnectionManagerFactory());
 	}
 
 
