@@ -25,7 +25,17 @@ import org.matsim.core.utils.misc.ArgumentParser;
  * 
  * input: network, events file, plans (only those, which you want to find out the route/distance/estimated travel time)
  * output: plans file with the route, distance and estimated tavel time filled in. 
+ * 
+ * ===============
+ * inorder to set it up for a different user:
+ * 1.) change root path (and package it as a jar file)
+ * 2.) place all files (network, config, events, input (plan) there
+ * 3.) change the path of the network in the config file accordingly
+ * 
+ * 
  * @author wrashid
+ *
+ *
  *
  */
 
@@ -69,7 +79,7 @@ public class LoadedNetworkRouter {
 		String rootPath="/home/erathal/MatSimRouting/";
 		//String rootPath="/home/wrashid/erath/";
 		
-		String networkFile=rootPath + "network.car.xml.gz";
+		//String networkFile=rootPath + "network.car.xml.gz";
 		String eventsFile=rootPath + "50.events.txt.gz";
 		String inputPlansFile=rootPath + "inputPlanFile.xml";
 		String outputPlansFile=rootPath + "outputPlanFile.xml";
