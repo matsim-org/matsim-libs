@@ -159,7 +159,7 @@ public abstract class OTFClient extends Thread {
 			}
 
 			public void actionPerformed(final ActionEvent e) {
-				save.saveSettingsAs();
+				save.saveSettingsAs(OTFClientControl.getInstance().getOTFVisConfig());
 			}
 		};
 		fileMenu.add(saveAsAction);

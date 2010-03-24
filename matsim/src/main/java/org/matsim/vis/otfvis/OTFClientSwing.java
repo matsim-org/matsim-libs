@@ -85,12 +85,12 @@ public class OTFClientSwing extends OTFClient {
 
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
+	    saver = new SettingsSaver(this.url);
 	    OTFVisConfig visconf = new OTFVisConfig();
 	    fileSettingsSaver = new ReadOTFSettingsFromMovie(this.url);
 	    if (this.url.endsWith(".mvi")) {
 	    	visconf = fileSettingsSaver.openAndReadConfig();
 	    }
-	    saver = new SettingsSaver(visconf, this.url);
 	    return visconf;
 	}
 

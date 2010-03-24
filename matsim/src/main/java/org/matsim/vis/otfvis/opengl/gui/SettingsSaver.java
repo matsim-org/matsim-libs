@@ -48,35 +48,27 @@ public class SettingsSaver {
 	private static final Logger log = Logger.getLogger(SettingsSaver.class);
 
 	private final String fileName;
-
-	private OTFVisConfig visConfig;
 	
-	public SettingsSaver(OTFVisConfig visconf, String filename) {
+	public SettingsSaver(String filename) {
 		if (filename.startsWith("file:")) {
 			this.fileName = filename.substring(5);
 		} else {
 			this.fileName = filename;
 		}
-		this.visConfig = visconf;
 	}
 
 	private File chooseFile(boolean saveIt) {
-		File erg = null;
 		File selFile = new File(fileName + ".vcfg");
-		JFileChooser fc;
-
-		String path = selFile.getParent();
-
-		fc = new JFileChooser(path);
+		File currentDirectory = selFile.getAbsoluteFile().getParentFile();
+		JFileChooser fc = new JFileChooser(currentDirectory);
 		fc.setSelectedFile(selFile);
-		if (saveIt)
+		if (saveIt) {
 			fc.setDialogType(JFileChooser.SAVE_DIALOG);
-
+		}
 		fc.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File f) {
-				return f.isDirectory()
-						|| f.getName().toLowerCase().endsWith(".vcfg");
+				return f.isDirectory() || f.getName().toLowerCase().endsWith(".vcfg");
 			}
 
 			@Override
@@ -84,16 +76,15 @@ public class SettingsSaver {
 				return "OTFVis Config File (*.vcfg)";
 			}
 		});
-
 		int state = saveIt ? fc.showSaveDialog(null) : fc.showOpenDialog(null);
-
 		if (state == JFileChooser.APPROVE_OPTION) {
-			erg = fc.getSelectedFile();
+			File selectedFile = fc.getSelectedFile();
+			return selectedFile;
 		} else {
 			log.info("Auswahl abgebrochen");
+			return null;
 		}
 
-		return erg;
 	}
 
 	private OTFVisConfig readConfigFromFile(File file) {
@@ -103,12 +94,12 @@ public class SettingsSaver {
 		}
 		try {
 			inFile = new ObjectInputStream(new FileInputStream(file));
-			this.visConfig = (OTFVisConfig) inFile.readObject();
+			OTFVisConfig visConfig = (OTFVisConfig) inFile.readObject();
 			log.info("Config read from file : " + file.getAbsolutePath());
-			log.info("Config has " + this.visConfig.getZooms().size()
+			log.info("Config has " + visConfig.getZooms().size()
 					+ " zoom entries...");
-			this.dumpConfig();
-			return this.visConfig;
+			dumpConfig(visConfig);
+			return visConfig;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -120,20 +111,20 @@ public class SettingsSaver {
 				"Not able to read config from file: " + file.getPath());
 	}
 
-	public void saveSettingsAs() {
+	public void saveSettingsAs(OTFVisConfig visConfig) {
 		File file = chooseFile(true);
 		if (file != null) {
 			OutputStream out;
 			try {
 				out = new FileOutputStream(file);
 				ObjectOutputStream outFile = new ObjectOutputStream(out);
-				this.visConfig.clearModified();
-				outFile.writeObject(this.visConfig);
+				visConfig.clearModified();
+				outFile.writeObject(visConfig);
 				outFile.close();
-				log.info("Config has " + this.visConfig.getZooms().size()
+				log.info("Config has " + visConfig.getZooms().size()
 						+ " zoom entries");
 				log.info("Config written to file...");
-				this.dumpConfig();
+				dumpConfig(visConfig);
 				out.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -148,21 +139,24 @@ public class SettingsSaver {
 		return readConfigFromFile(file);
 	}
 
-	private void dumpConfig() {
+	private void dumpConfig(OTFVisConfig visConfig) {
 		log.info("OTFVis config dump:");
 		StringWriter writer = new StringWriter();
 		Config tmpConfig = new Config();
-		tmpConfig.addModule(OTFVisConfig.GROUP_NAME, this.visConfig);
+		tmpConfig.addModule(OTFVisConfig.GROUP_NAME, visConfig);
 		PrintWriter pw = new PrintWriter(writer);
 		new ConfigWriter(tmpConfig).writeStream(pw);
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 	}
 
-	public void tryToReadSettingsFile() {
+	public OTFVisConfig tryToReadSettingsFile() {
 		File file = new File(fileName + ".vcfg");
+		System.out.println(file.getAbsolutePath());
 		if (file.exists()) {
-			readConfigFromFile(file);
+			return readConfigFromFile(file);
+		} else {
+			return null;
 		}
 	}
 	

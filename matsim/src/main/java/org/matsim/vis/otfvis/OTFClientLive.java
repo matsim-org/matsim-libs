@@ -40,7 +40,7 @@ public class OTFClientLive extends OTFClient {
 
 	private OTFConnectionManager connect = new OTFConnectionManager();
 
-  private OTFVisConfig visconf;
+	private OTFVisConfig visconf;
 
 
 	public OTFClientLive(String url, OTFConnectionManager connect) {
@@ -50,12 +50,15 @@ public class OTFClientLive extends OTFClient {
 
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
-	  if (visconf == null) {
+		saver = new SettingsSaver("otfsettings");
+		OTFVisConfig settingsFromFile = saver.tryToReadSettingsFile();
+		if (settingsFromFile != null) {
+			visconf = settingsFromFile;
+		}
+		if (visconf == null) {
 			log.warn("No otfvis config set, using defaults");
 			visconf = new OTFVisConfig();
 		}
-		saver = new SettingsSaver(visconf, "otfsettings");
-		saver.tryToReadSettingsFile();
 		visconf.setCachingAllowed(false); // no use to cache in live mode
 		return visconf;
 	}
@@ -80,7 +83,7 @@ public class OTFClientLive extends OTFClient {
 	}
 
 	public void setConfig(OTFVisConfig otfVisConfig) {
-			this.visconf = otfVisConfig;
+		this.visconf = otfVisConfig;
 	}
 
 }

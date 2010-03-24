@@ -123,7 +123,7 @@ public class OTFClientFile extends OTFClient {
 		if (visconf == null) {
 			visconf = new OTFVisConfig();
 		}
-		saver = new SettingsSaver(visconf, this.url);
+		saver = new SettingsSaver(this.url);
 		return visconf;
 	}
 
