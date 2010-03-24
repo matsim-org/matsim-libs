@@ -27,8 +27,8 @@ import java.nio.ByteBuffer;
 import javax.media.opengl.GL;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.matsim.vis.otfvis.data.ClassCountExecutor;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFClientQuad.ClassCountExecutor;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.opengl.drawer.OGLProvider;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.FastColorizer;
@@ -99,7 +99,7 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 
 		if (this.myDrawer != null){
 			OTFClientQuad clientQ = this.myDrawer.getQuad();
-			OTFClientQuad.ClassCountExecutor counter = new ClassCountExecutor(OTFDefaultLinkHandler.class);
+			ClassCountExecutor counter = new ClassCountExecutor(OTFDefaultLinkHandler.class);
 			clientQ.execute(null, counter);
 			double linkcount = counter.getCount();
 

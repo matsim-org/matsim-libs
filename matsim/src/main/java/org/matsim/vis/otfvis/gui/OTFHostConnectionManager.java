@@ -114,7 +114,7 @@ public class OTFHostConnectionManager {
 		}
 	}
 
-	protected boolean preCacheCurrentTime(int time, OTFTimeLine timeLine) throws IOException {
+	private boolean preCacheCurrentTime(int time, OTFTimeLine timeLine) throws IOException {
 		boolean result = getOTFServer().requestNewTime(time, OTFServerRemote.TimePreference.LATER);
 
 		for(OTFDrawer handler : getDrawer().values()) {
