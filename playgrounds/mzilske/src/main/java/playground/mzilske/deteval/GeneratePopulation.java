@@ -550,6 +550,7 @@ public class GeneratePopulation {
 				Integer homeCell = determineHomeCell(haushalt.getValue());
 				Coord homeCoord = createRandomCoord(homeCell);
 				Case haushaltCopy = new Case();
+				haushaltCopy.income = haushalt.getValue().income;
 				for (Person person : haushalt.getValue().members) {
 					Person newPerson = copyPersonWithNewLocationsInSameCell(homeCoord, person, (personId++).toString());
 					haushaltCopy.members.add(newPerson);
