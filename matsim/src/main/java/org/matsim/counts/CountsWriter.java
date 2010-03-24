@@ -106,11 +106,17 @@ public class CountsWriter extends MatsimXmlWriter implements MatsimFileWriter {
 
 		public int compare(final Count c1, final Count c2) {
 			
-			int i1 = Integer.parseInt(c1.getCsId().substring(c1.getCsId().length()-3));
-			int i2 = Integer.parseInt(c2.getCsId().substring(c2.getCsId().length()-3));
-			if (i1 < i2) return -1;
-			else if (i1 > i2) return 1;
-			else return 0;
+			// This seemed to be intended for a rather special case with a rather special
+			// numbering of counts...  michaz mar 10
+			
+//			int i1 = Integer.parseInt(c1.getCsId().substring(c1.getCsId().length()-3));
+//			int i2 = Integer.parseInt(c2.getCsId().substring(c2.getCsId().length()-3));
+//			if (i1 < i2) return -1;
+//			else if (i1 > i2) return 1;
+//			else return 0;
+			
+			
+			return c1.getCsId().compareTo(c2.getCsId());
 		}
 	}
 }
