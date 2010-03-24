@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Counter;
 
 public class NetworkClusterAnalysis {
 	private final static Logger log = Logger.getLogger(NetworkClusterAnalysis.class);
@@ -63,7 +62,7 @@ public class NetworkClusterAnalysis {
 	 * @param modes
 	 */
 	public List<Map<Id, Link>> run(final Set<TransportMode> modes) {
-		final Map<Id, Link> visitedLinks = new TreeMap<Id, Link>();
+		final Map<Id, Link> visitedLinks = new HashMap<Id, Link>((int) (this.network.getLinks().size() * 1.5));
 
 		final List<Map<Id, Link>> clusters = new ArrayList<Map<Id, Link>>();
 
@@ -73,14 +72,15 @@ public class NetworkClusterAnalysis {
 		log.info("  checking " + this.network.getNodes().size() + " nodes and " +
 				this.network.getLinks().size() + " links for dead-ends...");
 		Iterator<? extends Link> iter = this.network.getLinks().values().iterator();
-		Counter c = new Counter("checking link ");
 		while (iter.hasNext() ) {
-			c.incCounter();
 			Link startLink = iter.next();
-			if (!visitedLinks.containsKey(startLink.getId())) {
+			if ((!visitedLinks.containsKey(startLink.getId())) && (intersectingSets(modes, startLink.getAllowedModes()))) {
 				Map<Id, Link> cluster = this.findCluster(startLink, modes);
-				visitedLinks.putAll(cluster);
-				clusters.add(cluster);
+				if (cluster.size() > 0) {
+					visitedLinks.putAll(cluster);
+					clusters.add(cluster);
+					log.info("Found cluster with " + cluster.size() + " links. Totally covered links: " + visitedLinks.size());
+				}
 			}
 		}
 		return clusters;
@@ -97,12 +97,16 @@ public class NetworkClusterAnalysis {
 	 */
 	private Map<Id, Link> findCluster(final Link startLink, final Set<TransportMode> modes) {
 
+		TreeMap<Id, Link> clusterLinks = new TreeMap<Id, Link>();
+
+		if (!intersectingSets(modes, startLink.getAllowedModes())) {
+			return clusterLinks;
+		}
+
 		final Map<Id, DoubleFlagRole> linkRoles = new HashMap<Id, DoubleFlagRole>(this.network.getLinks().size());
 
 		ArrayList<Node> pendingForward = new ArrayList<Node>();
 		ArrayList<Node> pendingBackward = new ArrayList<Node>();
-
-		TreeMap<Id, Link> clusterLinks = new TreeMap<Id, Link>();
 
 		pendingForward.add(startLink.getToNode());
 		pendingBackward.add(startLink.getFromNode());
