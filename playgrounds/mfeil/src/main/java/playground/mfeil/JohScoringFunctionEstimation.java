@@ -91,14 +91,14 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 76
+	// Settings of 77
 	private static double beta_time_car = -3; // war -2.7
-	private static double beta_time_pt = -0.5; // war 0.5
+	private static double beta_time_pt = -0.3; // war 0.5
 	private static double beta_time_bike = -1.07;
 	private static double beta_time_walk = -1.8; // war -1.8
 	
 	private static double constantPt = -0.578;
-	private static double constantBike = 0.0;
+	private static double constantBike = -0.3;
 	private static double constantWalk = 0.3; // war 0.8irgendwas
 	
 	private static double beta_cost_car = 1.0; 
@@ -130,7 +130,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double uMin_leisure = 0;
 	
 	private static final double uMax_home = 5.5; 
-	private static final double uMax_innerHome = 1.2; 
+	private static final double uMax_innerHome = 1.3; 
 	private static final double uMax_work= 5.0;  
 	private static final double uMax_education = 4; // war 4.5
 	private static final double uMax_shopping = 0.4; 
@@ -138,12 +138,12 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	
 	private static final double alpha_home = 12;
 	private static final double alpha_innerHome = 1.9;
-	private static final double alpha_work = 4.5;
+	private static final double alpha_work = 4;
 	private static final double alpha_education = 6;
 	private static final double alpha_shopping = 0.7;
 	private static final double alpha_leisure = 2;
 	
-	private static final double beta_home = 0.43;
+	private static final double beta_home = 0.249;
 	private static final double beta_innerHome = 15.2;
 	private static final double beta_work = 1.2;
 	private static final double beta_education = 2.29;
@@ -380,13 +380,13 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			double interScore = (1 + beta_female_act * this.female + params.getBetaAge() * this.age + repeat * gamma) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
 			tmpScore += interScore;
 		} else {
-	/*		int gamma = 0;
+			int gamma = 0;
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().startsWith(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType().substring(0, 1))) gamma = 1;
 			double interScore = Math.max(0, factorOfLateArrival * (1 + beta_female_act * this.female + params.getBetaAge() * this.age + repeat * gamma) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma()))));
 			tmpScore -= interScore;
 			log.warn("In duration<0 loop - this must not happen! (Person "+plan.getPerson().getId()+" at act position "+this.index+" with duration "+duration+" and utility "+interScore);
-	*/
-			tmpScore -= 100;
+	
+	//		tmpScore -= 100;
 		}
 
 		// disutility if stopping too early
