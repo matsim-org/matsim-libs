@@ -240,25 +240,32 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		if (this.population == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
+		Collection<PersonAgentI> agents = new ArrayList<PersonAgentI>();
 		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
-
 		for (Person p : this.population.getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
-
 			QVehicle veh = new QueueVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);
-
+			agents.add(agent);
 			if (agent.initialize()) {
 				QLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
 				qlink.addParkedVehicle(veh);
 			}
 		}
-
+		
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
-			queueSimulationFeature.afterCreateAgents();
+			Collection<PersonAgentI> moreAgents = queueSimulationFeature.createAgents();
+			agents.addAll(moreAgents);
 		}
+		
+		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
+			for (PersonAgentI agent : agents) {
+				queueSimulationFeature.agentCreated(agent);
+			}
+		}
+		
 	}
 
 	/**
@@ -658,10 +665,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public void setQueueNetwork(QNetwork net) {
 		this.network = net;
 		this.simEngine = new QSimEngineImpl(this, MatsimRandom.getRandom());
-	}
-
-	public PopulationImpl getPopulation() {
-		return population;
 	}
 
 	public QNetwork getNetwork() {

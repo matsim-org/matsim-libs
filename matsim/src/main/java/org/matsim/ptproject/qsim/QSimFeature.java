@@ -20,6 +20,8 @@
 
 package org.matsim.ptproject.qsim;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.network.Link;
 
 
@@ -35,10 +37,12 @@ public interface QSimFeature {
 
 	void beforeHandleUnknownLegMode(double now, DriverAgent agent, Link link);
 
-	void afterCreateAgents();
+	Collection<PersonAgentI> createAgents();
 
 	void afterActivityBegins(DriverAgent agent, int planElementIndex);
 
 	void afterActivityEnds(DriverAgent agent, double time);
+	
+	void agentCreated(PersonAgentI agent);
 
 }
