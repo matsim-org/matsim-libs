@@ -71,18 +71,18 @@ public class MultimodalNetworkCleaner {
 		log.info("running " + this.getClass().getName() + " algorithm for modes " + Arrays.toString(modes.toArray()) + "...");
 
 		// search the biggest cluster of nodes in the network
-		log.info("  checking " + network.getNodes().size() + " nodes and " +
-				network.getLinks().size() + " links for dead-ends...");
+		log.info("  checking " + this.network.getNodes().size() + " nodes and " +
+				this.network.getLinks().size() + " links for dead-ends...");
 		boolean stillSearching = true;
-		Iterator<? extends Link> iter = network.getLinks().values().iterator();
+		Iterator<? extends Link> iter = this.network.getLinks().values().iterator();
 		while (iter.hasNext() && stillSearching) {
 			Link startLink = iter.next();
-			if (!visitedLinks.containsKey(startLink.getId())) {
+			if ((!visitedLinks.containsKey(startLink.getId())) && (intersectingSets(modes, startLink.getAllowedModes()))) {
 				Map<Id, Link> cluster = this.findCluster(startLink, modes);
 				visitedLinks.putAll(cluster);
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
-					if (biggestCluster.size() >= (network.getLinks().size() - visitedLinks.size())) {
+					if (biggestCluster.size() >= (this.network.getLinks().size() - visitedLinks.size())) {
 						// stop searching here, because we cannot find a bigger cluster in the lasting nodes
 						stillSearching = false;
 					}
@@ -102,18 +102,18 @@ public class MultimodalNetworkCleaner {
 				reducedModes.removeAll(modes);
 				link.setAllowedModes(reducedModes);
 				if (reducedModes.isEmpty()) {
-					network.removeLink(link);
+					this.network.removeLink(link);
 					if ((link.getFromNode().getInLinks().size() + link.getFromNode().getOutLinks().size()) == 0) {
-						network.removeNode(link.getFromNode());
+						this.network.removeNode(link.getFromNode());
 					}
 					if ((link.getToNode().getInLinks().size() + link.getToNode().getOutLinks().size()) == 0) {
-						network.removeNode(link.getToNode());
+						this.network.removeNode(link.getToNode());
 					}
 				}
 			}
 		}
-		log.info("  resulting network contains " + network.getNodes().size() + " nodes and " +
-				network.getLinks().size() + " links.");
+		log.info("  resulting network contains " + this.network.getNodes().size() + " nodes and " +
+				this.network.getLinks().size() + " links.");
 		log.info("done.");
 	}
 
@@ -128,7 +128,7 @@ public class MultimodalNetworkCleaner {
 	 */
 	private Map<Id, Link> findCluster(final Link startLink, final Set<TransportMode> modes) {
 
-		final Map<Id, DoubleFlagRole> linkRoles = new HashMap<Id, DoubleFlagRole>(network.getLinks().size());
+		final Map<Id, DoubleFlagRole> linkRoles = new HashMap<Id, DoubleFlagRole>(this.network.getLinks().size());
 
 		ArrayList<Node> pendingForward = new ArrayList<Node>();
 		ArrayList<Node> pendingBackward = new ArrayList<Node>();
