@@ -3,14 +3,7 @@
  */
 package playground.yu.utils;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.ptproject.qsim.QNetwork;
-import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
+import org.matsim.run.OTFVis;
 
 import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
@@ -55,18 +48,7 @@ public class MyOTFEvents2Mvi {
 			printUsage();
 			System.exit(0);
 		}
-
-		Gbl.startMeasurement();
-
-		Scenario s = new ScenarioImpl();
-
-		NetworkImpl net = (NetworkImpl) s.getNetwork();
-		new MatsimNetworkReader(s).readFile(args[0]);
-// important?
-		QSimConfigGroup qscfg = new QSimConfigGroup();
-		qscfg.setFlowCapFactor(0.1);
-		s.getConfig().setQSimConfigGroup(qscfg);
-//---------------------------------------------------------
+		// -----------WRITES A SHORT EVENTSFILE-----------------
 		SimpleReader sr = new SimpleReader(args[1]);
 
 		String eventsOutputFilename = args[1].replaceAll("events",
@@ -90,9 +72,11 @@ public class MyOTFEvents2Mvi {
 		}
 		sr.close();
 		sw2.close();
-
-		new OTFEvent2MVI(new QNetwork(net), eventsOutputFilename, args[2],
-				Integer.parseInt(args[3])).convert();
+		// ----------------------------------------------------
+		OTFVis
+				.main(new String[] { "-convert", eventsOutputFilename,
+						args[0]/* networkFilename */, args[2]/* mviFilename */,
+						"300"/* snapshotPeriod */});
 
 		System.out.println("done.");
 	}
