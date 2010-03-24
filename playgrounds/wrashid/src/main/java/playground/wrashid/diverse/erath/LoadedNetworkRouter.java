@@ -66,8 +66,8 @@ public class LoadedNetworkRouter {
 	}
 	
 	public void run(final String[] args) {
-		//String rootPath="/home/erathal/MatSimRouting/";
-		String rootPath="/home/wrashid/erath/";
+		String rootPath="/home/erathal/MatSimRouting/";
+		//String rootPath="/home/wrashid/erath/";
 		
 		String networkFile=rootPath + "network.car.xml.gz";
 		String eventsFile=rootPath + "50.events.txt.gz";
