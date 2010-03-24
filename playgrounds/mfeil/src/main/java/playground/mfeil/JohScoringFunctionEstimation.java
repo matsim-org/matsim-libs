@@ -91,8 +91,8 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 77
-	private static double beta_time_car = -3; // war -2.7
+	// Settings of 78
+	private static double beta_time_car = -2.7; // war -2.7
 	private static double beta_time_pt = -0.3; // war 0.5
 	private static double beta_time_bike = -1.07;
 	private static double beta_time_walk = -1.8; // war -1.8
@@ -477,7 +477,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		
 		type = "work";
 		actParams = new JohActUtilityParametersExtended("work", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
-		actParams.setOpeningTime(9*3600);
+		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(18*3600);
 	//	actParams.setLatestStartTime(10*3600);
 	//	actParams.setEarliestEndTime(15*3600);
@@ -545,7 +545,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		
 		type = "work_sector2";
 		actParams = new JohActUtilityParametersExtended("work_sector2", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
-		actParams.setOpeningTime(9*3600);
+		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(18*3600);
 	//	actParams.setLatestStartTime(10*3600);
 	//	actParams.setEarliestEndTime(15*3600);
@@ -553,7 +553,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		
 		type = "work_sector3";
 		actParams = new JohActUtilityParametersExtended("work_sector3", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
-		actParams.setOpeningTime(9*3600);
+		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(18*3600);
 	//	actParams.setLatestStartTime(10*3600);
 	//	actParams.setEarliestEndTime(15*3600);
@@ -567,7 +567,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		
 		type = "w";
 		actParams = new JohActUtilityParametersExtended("w", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
-		actParams.setOpeningTime(9*3600);
+		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(18*3600);
 	//	actParams.setLatestStartTime(10*3600);
 	//	actParams.setEarliestEndTime(15*3600);
