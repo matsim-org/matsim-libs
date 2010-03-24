@@ -94,14 +94,15 @@ public class OTFClientFile extends OTFClient {
 
 	protected OTFClientQuad getRightDrawerComponent() throws RemoteException {
 		OTFConnectionManager connectR = this.connect.clone();
-		//those lines are from my point of view not really needed dg dez 09
-//		connectR.remove(OTFLinkAgentsHandler.class);
-//		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
-//		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-//		connectR.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
-//		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
-//		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
-//		connectR.connectReceiverToLayer(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
+		// those lines are from my point of view not really needed dg dez 09
+		// yes, they are. michaz mar 10 :-(
+		connectR.remove(OTFLinkAgentsHandler.class);
+		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connectR.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		connectR.connectReaderToReceiver(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
+		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
+		connectR.connectReceiverToLayer(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 		//end dg dez 09
 		OTFClientQuad clientQ2 = createNewView(null, connectR, this.hostControlBar.getOTFHostControl());
 		return clientQ2;
