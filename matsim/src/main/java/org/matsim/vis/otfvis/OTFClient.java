@@ -59,8 +59,6 @@ public abstract class OTFClient extends Thread {
 	protected OTFHostControlBar hostControlBar = null;
 	
 	protected OTFLiveSettingsSaver saver;
-
-	protected OTFDrawer mainDrawer;
 	
 	public OTFClient(String url) {
 		this.url = url;
@@ -75,10 +73,11 @@ public abstract class OTFClient extends Thread {
 		log.info("created MainFrame");
 		createHostControlBar();
 		log.info("created HostControlBar");
-		this.mainDrawer = createDrawer();
-		OTFClientControl.getInstance().setMainOTFDrawer(this.mainDrawer);
+		OTFDrawer mainDrawer = createDrawer();
+		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
 		log.info("created drawer");
-		addDrawerToSplitPane(this.url);
+		pane.setRightComponent(this.createDrawerPanel(this.url, mainDrawer));
+		pane.validate();
 		this.hostControlBar.addDrawer(this.url, mainDrawer);
 		try {
 			mainDrawer.invalidate((int)hostControlBar.getOTFHostControl().getTime());
@@ -89,11 +88,6 @@ public abstract class OTFClient extends Thread {
 		log.info("OTFVis finished init");
 	}
 
-	private void addDrawerToSplitPane(String url2) {
-		pane.setRightComponent(this.createDrawerPanel(url2, mainDrawer));
-		pane.validate();
-	}
-	
 	protected JPanel createDrawerPanel(String url, OTFDrawer drawer){
 	    JPanel panel = new JPanel(new BorderLayout());
 	    JLabel label = new JLabel();

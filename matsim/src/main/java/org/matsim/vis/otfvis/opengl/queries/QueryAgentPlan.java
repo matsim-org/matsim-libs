@@ -123,7 +123,7 @@ public class QueryAgentPlan extends AbstractQuery {
 		this.visTeleportationData = queueSimulation.getVisTeleportationData();
 		result = new Result();
 		result.agentId = this.agentId.toString();
-		Person person = queueSimulation.getQueueSimulation().getPopulation().getPersons().get(this.agentId);
+		Person person = queueSimulation.findPersonAgent(this.agentId);
 		if (person != null) {
 			Plan plan = person.getSelectedPlan();
 			for (PlanElement e : plan.getPlanElements()) {

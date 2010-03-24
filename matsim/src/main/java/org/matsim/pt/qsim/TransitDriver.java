@@ -22,10 +22,15 @@ package org.matsim.pt.qsim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.pt.PtConstants;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.transitSchedule.api.Departure;
@@ -35,27 +40,36 @@ import org.matsim.transitSchedule.api.TransitRoute;
 
 public class TransitDriver extends AbstractTransitDriver {
 
-	private static PersonImpl createDummyPerson(final TransitLine line,
-			final TransitRoute route, final Departure departure) {
-		PersonImpl dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
-		return dummyPerson;
-	}
-
 	final NetworkRoute carRoute;
+	
 	final TransitLine transitLine;
+	
 	final TransitRoute transitRoute;
+	
 	final Departure departure;
+	
 	final double departureTime;
-	private final LegImpl currentLeg = new LegImpl(TransportMode.car);
+	
+	private final LegImpl currentLeg;
 
 	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final QSim sim) {
-		super(createDummyPerson(line, route, departure), sim, agentTracker);
+		super(sim, agentTracker);
+		PersonImpl driver = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
+		Plan plan = new PlanImpl();
+		LegImpl leg = new LegImpl(TransportMode.car);
+		leg.setRoute(getWrappedCarRoute(getCarRoute()));
+		Activity startActivity = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, leg.getRoute().getStartLinkId());
+		Activity endActiity = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, leg.getRoute().getEndLinkId());
+		plan.addActivity(startActivity);
+		plan.addLeg(leg);
+		plan.addActivity(endActiity);
+		this.currentLeg = leg;
 		this.departureTime = departure.getDepartureTime();
 		this.transitLine = line;
 		this.transitRoute = route;
 		this.departure = departure;
 		this.carRoute = route.getRoute();
-		this.currentLeg.setRoute(getWrappedCarRoute()); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
+		setDriver(driver);
 		init();
 	}
 

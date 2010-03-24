@@ -64,25 +64,19 @@ public class OTFClientLive extends OTFClient {
 	protected OTFDrawer createDrawer(){
 		try {
 			OTFClientQuad clientQ = createNewView(this.url, connect, this.hostControlBar.getOTFHostControl());
-			mainDrawer = new OTFOGLDrawer(clientQ);
-
+			OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ);
 			if (hostControlBar.getOTFHostControl().isLiveHost()) {
 				OTFQueryControl queryControl = new OTFQueryControl(hostControlBar, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
 				frame.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
-				((OTFOGLDrawer) mainDrawer).setQueryHandler(queryControl);
+				mainDrawer.setQueryHandler(queryControl);
 			}
-//		Visualizing Transims-Veh-Files uses also this class, but is not in live mode
-//			else {
-//				throw new IllegalStateException("Server not in live mode!");
-//			}
-
-
+			return mainDrawer;
 		} catch (RemoteException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return mainDrawer;
 	}
 
 	public void setConfig(OTFVisConfig otfVisConfig) {

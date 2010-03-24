@@ -50,7 +50,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	private int nextLinkIndex = 0;
 	private final TransitStopAgentTracker agentTracker;
-	private final Person dummyPerson;
+	private Person dummyPerson;
 	private final QSim sim;
 	private TransitRouteStop currentStop = null;
 	private TransitRouteStop nextStop;
@@ -63,9 +63,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public abstract Departure getDeparture();
 	public abstract double getDepartureTime();
 
-	public AbstractTransitDriver(Person personImpl, QSim sim, TransitStopAgentTracker agentTracker2) {
+	public AbstractTransitDriver(QSim sim, TransitStopAgentTracker agentTracker2) {
 		super();
-		this.dummyPerson = personImpl;
 		this.sim = sim;
 		this.agentTracker = agentTracker2;
 	}
@@ -78,6 +77,9 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			this.nextStop = null;
 		}
 		this.nextLinkIndex = 0;
+	}
+	protected void setDriver(Person personImpl) {
+		this.dummyPerson = personImpl;
 	}
 
 	@Override
@@ -243,8 +245,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		return passengersLeaving;
 	}
 
-	protected NetworkRouteWrapper getWrappedCarRoute() {
-		return new NetworkRouteWrapper(getCarRoute());
+	protected NetworkRouteWrapper getWrappedCarRoute(NetworkRoute carRoute) {
+		return new NetworkRouteWrapper(carRoute);
 	}
 
 	/**

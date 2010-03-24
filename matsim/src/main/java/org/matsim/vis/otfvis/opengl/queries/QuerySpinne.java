@@ -346,7 +346,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	@Override
 	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		QNetwork net = queueSimulation.getQueueSimulation().getNetwork();
-		Population plans = queueSimulation.getQueueSimulation().getPopulation();
+		Population plans = queueSimulation.getQueueSimulation().getScenario().getPopulation();
 		this.result = new Result();
 		result.linkIdString = this.queryLinkId.toString();
 		this.drivenLinks = new HashMap<Id, Integer>();

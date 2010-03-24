@@ -190,11 +190,11 @@ public class QueryAgentPTBus extends AbstractQuery {
 		this.net = queueSimulation.getQueueSimulation().getNetwork().getNetworkLayer();
 		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";
-		for(Person person : queueSimulation.getQueueSimulation().getPopulation().getPersons().values()) {
+		for(Person person : queueSimulation.getQueueSimulation().getScenario().getPopulation().getPersons().values()) {
 			if(person.getId().toString().startsWith(prefix, 0)) allIds.add(person.getId().toString());
 		}
 		if (allIds.size()==0) return;
-		Plan plan = queueSimulation.getQueueSimulation().getPopulation().getPersons().get(new IdImpl(allIds.get(0))).getSelectedPlan();
+		Plan plan = queueSimulation.getQueueSimulation().getScenario().getPopulation().getPersons().get(new IdImpl(allIds.get(0))).getSelectedPlan();
 		this.result.vertex = buildRoute(plan);
 	}
 

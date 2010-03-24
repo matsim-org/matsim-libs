@@ -1,6 +1,8 @@
 package org.matsim.vis.otfvis;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -8,6 +10,7 @@ import java.util.UUID;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
@@ -15,6 +18,7 @@ import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.ptproject.qsim.PersonAgentI;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFeature;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
@@ -32,13 +36,22 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 public class OTFVisQSimFeature implements QSimFeature {
 
 	protected OnTheFlyServer otfServer = null;
+	
 	private boolean ownServer = true;
+	
 	private boolean doVisualizeTeleportedAgents = false;
+	
 	private OTFConnectionManager connectionManager = new DefaultConnectionManagerFactory().createConnectionManager();
+	
 	private OTFTeleportAgentsDataWriter teleportationWriter;
+	
 	private QSim queueSimulation;
+	
 	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
+	
 	private final LinkedHashMap<Id, Integer> currentActivityNumbers = new LinkedHashMap<Id, Integer>();
+	
+	private final LinkedHashMap<Id, PersonAgentI> agents = new LinkedHashMap<Id, PersonAgentI>();
 
 	public OTFVisQSimFeature(QSim queueSimulation) {
 		this.queueSimulation = queueSimulation;
@@ -165,8 +178,8 @@ public class OTFVisQSimFeature implements QSimFeature {
 		this.doVisualizeTeleportedAgents = active;
 	}
 
-	public void afterCreateAgents() {
-
+	public Collection<PersonAgentI> createAgents() {
+		return Collections.emptyList();
 	}
 
 	@Override
@@ -191,4 +204,18 @@ public class OTFVisQSimFeature implements QSimFeature {
 		return visTeleportationData;
 	}
 
+	public Person findPersonAgent(Id agentId) {
+		PersonAgentI personAgentI = agents.get(agentId);
+		if (personAgentI != null) {
+			return personAgentI.getPerson();
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public void agentCreated(PersonAgentI agent) {
+		agents.put(agent.getPerson().getId(), agent);
+	}
+	
 }

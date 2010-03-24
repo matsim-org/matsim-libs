@@ -42,14 +42,15 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
  *
  */
 public class OTFDoubleMVI extends OTFClientFile {
-	protected String filename2;
-	protected OTFDrawer leftComp = null;
+	
+	private String filename2;
+	
 	public OTFDoubleMVI(String filename, String filename2) {
 		super(filename);
 		this.filename2 = filename2;
 	}
 
-	protected OTFClientQuad getLeftDrawerComponent() throws RemoteException {
+	private OTFClientQuad getLeftDrawerComponent() throws RemoteException {
 		OTFConnectionManager connectL = this.connect.clone();
 		connectL.remove(OTFLinkAgentsHandler.class);
 		connectL.connectReaderToReceiver(OTFLinkAgentsHandler.class, ColoredStaticNetLayer.QuadDrawer.class);
@@ -60,15 +61,12 @@ public class OTFDoubleMVI extends OTFClientFile {
 
 	@Override
 	protected OTFDrawer createDrawer() {
-		OTFDrawer superDrawer = super.createDrawer();
-		OTFDrawer drawer;
 		try {
-			drawer = new OTFOGLDrawer(this.getLeftDrawerComponent());
-			this.leftComp = drawer;
-
-			drawer.invalidate((int)hostControlBar.getOTFHostControl().getTime());
-			this.hostControlBar.addDrawer("test", drawer);
-			pane.setLeftComponent(drawer.getComponent());
+			OTFOGLDrawer superDrawer = (OTFOGLDrawer) super.createDrawer();
+			OTFDrawer leftComp = new OTFOGLDrawer(this.getLeftDrawerComponent());
+			leftComp.invalidate((int)hostControlBar.getOTFHostControl().getTime());
+			this.hostControlBar.addDrawer("test", leftComp);
+			pane.setLeftComponent(leftComp.getComponent());
 			OTFHostConnectionManager hostControl2;
 			hostControl2 = new OTFHostConnectionManager("file:" + this.filename2);
 			this.hostControlBar.addSlave(hostControl2);
@@ -84,19 +82,21 @@ public class OTFDoubleMVI extends OTFClientFile {
 			OTFClientQuad clientQ2 = createNewView(null, connectR, hostControl2);
 			OTFOGLDrawer drawer2 = new OTFOGLDrawer(clientQ2);
 			drawer2.invalidate((int)hostControlBar.getOTFHostControl().getTime());
-			drawer2.replaceMouseHandler(((OTFOGLDrawer) this.mainDrawer).getMouseHandler());
+			drawer2.replaceMouseHandler(superDrawer.getMouseHandler());
 			hostControlBar.addDrawer("test", drawer2);
 			this.pane.setLeftComponent(this.createDrawerPanel(filename2, drawer2));
 			pane.setResizeWeight(0.5);
-
+			return superDrawer;
 		} catch (RemoteException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (NotBoundException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return superDrawer;
 	}
 
 	public static void main( String[] args) {

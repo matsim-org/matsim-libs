@@ -112,14 +112,13 @@ public class OTFClientFile extends OTFClient {
 	protected OTFDrawer createDrawer(){
 		try {
 			frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
-			mainDrawer = 	new OTFOGLDrawer(this.getRightDrawerComponent());
-
-		}catch (RemoteException e) {
+			OTFDrawer mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent());
+			hostControlBar.finishedInitialisition();
+			return mainDrawer;
+		} catch (RemoteException e) {
 			e.printStackTrace();
 			throw new RuntimeException();
 		}
-		hostControlBar.finishedInitialisition();
-		return mainDrawer;
 	}
 
 	@Override

@@ -4,11 +4,19 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.AbstractSimulation;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufStueckI;
 import org.matsim.ptproject.qsim.QSim;
@@ -17,15 +25,79 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 
 
-
+/**
+ * 
+ * @author michaz
+ *
+ */
 public class UmlaufDriver extends AbstractTransitDriver {
+	
+	private static class PlanBuilder {
+		
+		PlanImpl plan = new PlanImpl();
+		
+		TransportMode transportMode = TransportMode.car;
+		
+		String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
+		
+		public void addTrip(NetworkRoute networkRoute) {
+			if (!plan.getPlanElements().isEmpty()) {
+				Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
+				assert lastActivity.getLinkId().equals(networkRoute.getStartLinkId());	
+			} else {
+				Activity activity = new ActivityImpl(activityType, networkRoute.getStartLinkId());
+				plan.addActivity(activity);
+			}
+			Leg leg = new LegImpl(transportMode);
+			leg.setRoute(networkRoute);
+			plan.addLeg(leg);
+			Activity activity = new ActivityImpl(activityType, networkRoute.getEndLinkId());
+			plan.addActivity(activity);
+		}
+
+		public PlanImpl build() {
+			return plan;
+		}
+		
+	}
+	
+	public static class LegIterator implements Iterator<Leg> {
+
+		private Iterator<PlanElement> i;
+		
+		public LegIterator(Plan plan) {
+			this.i = plan.getPlanElements().iterator();
+			if (i.hasNext()) {
+				i.next();
+			}
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return i.hasNext();
+		}
+
+		@Override
+		public Leg next() {
+			Leg leg = (Leg) i.next();
+			i.next();
+			return leg;
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+		
+	}
 
 	private final Umlauf umlauf;
 	private Iterator<UmlaufStueckI> iUmlaufStueck;
+	private Iterator<Leg> iLeg;
 	private NetworkRoute carRoute;
 	private double departureTime;
 	private final QSim sim;
-	private final LegImpl currentLeg = new LegImpl(TransportMode.car);
+	private Leg currentLeg;
 	private TransitLine transitLine;
 	private TransitRoute transitRoute;
 	private Departure departure;
@@ -33,16 +105,20 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	public UmlaufDriver(Umlauf umlauf,
 			TransitStopAgentTracker thisAgentTracker,
 			QSim transitQueueSimulation) {
-		super(createDummyPerson(umlauf), transitQueueSimulation, thisAgentTracker);
+		super(transitQueueSimulation, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.sim = transitQueueSimulation;
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
+		Person driverPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId())); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
+		PlanBuilder planBuilder = new PlanBuilder();
+		for (UmlaufStueckI umlaufStueck : umlauf.getUmlaufStuecke()) {
+			planBuilder.addTrip(getWrappedCarRoute(umlaufStueck.getCarRoute()));
+		}
+		Plan plan = planBuilder.build();
+		driverPerson.addPlan(plan);
+		setDriver(driverPerson);
+		iLeg = new LegIterator(plan);
 		setNextLeg();
-	}
-
-	private static PersonImpl createDummyPerson(Umlauf umlauf) {
-		PersonImpl dummyPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId()));
-		return dummyPerson;
 	}
 
 	private void setNextLeg() {
@@ -52,7 +128,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		} else {
 			setWenden(umlaufStueck.getCarRoute());
 		}
-		this.currentLeg.setRoute(getWrappedCarRoute()); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
+		this.currentLeg = iLeg.next();
 		init();
 	}
 
@@ -60,7 +136,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		this.transitLine = null;
 		this.transitRoute = null;
 		this.departure = null;
-		setCarRoute(carRoute);
+		this.carRoute = carRoute;
 	}
 
 	private void setLeg(final TransitLine line, final TransitRoute route,
@@ -69,12 +145,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		this.transitRoute = route;
 		this.departure = departure;
 		this.departureTime = departure.getDepartureTime();
-		setCarRoute(route.getRoute());
-	}
-
-	private void setCarRoute(NetworkRoute carRoute) {
-		this.carRoute = carRoute;
-		this.currentLeg.setRoute(new NetworkRouteWrapper(this.carRoute)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
+		this.carRoute = route.getRoute();
 	}
 
 	@Override
@@ -82,7 +153,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		return this.departureTime;
 	}
 
-	public LegImpl getCurrentLeg() {
+	public Leg getCurrentLeg() {
 		return this.currentLeg;
 	}
 
