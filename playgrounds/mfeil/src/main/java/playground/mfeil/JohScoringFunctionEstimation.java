@@ -91,11 +91,11 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 63
+	// Settings of 65
 	private static double beta_time_car = -6; // war -3.77
 	private static double beta_time_pt = -1; // war 0.563
-	private static double beta_time_bike = -1.07;
-	private static double beta_time_walk = -3; // war -1.8
+	private static double beta_time_bike = -1.07; // war -1.07
+	private static double beta_time_walk = -2.8; // war -3.0
 	
 	private static double constantPt = -0.578;
 	private static double constantBike = -0.4;
@@ -133,7 +133,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double uMax_innerHome = 1.3; 
 	private static final double uMax_work= 7.0;  
 	private static final double uMax_education = 4.0;
-	private static final double uMax_shopping = 0.3; 
+	private static final double uMax_shopping = 0.4; 
 	private static final double uMax_leisure = 2.0;  
 	
 	private static final double alpha_home = 12;
