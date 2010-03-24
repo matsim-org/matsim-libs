@@ -66,10 +66,13 @@ public class LoadedNetworkRouter {
 	}
 	
 	public void run(final String[] args) {
-		String networkFile="/home/erathal/MatSimRouting/network.car.xml.gz";
-		String eventsFile="/home/erathal/MatSimRouting/50.events.txt.gz";
-		String inputPlansFile="/home/erathal/MatSimRouting/inputPlanFile.xml";
-		String outputPlansFile="/home/erathal/MatSimRouting/outputPlanFile.xml";
+		//String rootPath="/home/erathal/MatSimRouting/";
+		String rootPath="/home/wrashid/erath/";
+		
+		String networkFile=rootPath + "network.car.xml.gz";
+		String eventsFile=rootPath + "50.events.txt.gz";
+		String inputPlansFile=rootPath + "inputPlanFile.xml";
+		String outputPlansFile=rootPath + "outputPlanFile.xml";
 		
 		parseArguments(args);
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
@@ -88,7 +91,7 @@ public class LoadedNetworkRouter {
 		
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that
-		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(networkFile, eventsFile);
+		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(sl.getScenario(), eventsFile);
 		TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 		TravelCost travelCostCalculator = travelCostCalculatorFactory.createTravelCostCalculator(travelTimeCalculator, this.config
 				.charyparNagelScoring());

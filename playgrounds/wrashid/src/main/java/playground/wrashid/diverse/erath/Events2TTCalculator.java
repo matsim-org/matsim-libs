@@ -27,12 +27,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -40,13 +42,13 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 public class Events2TTCalculator {
 	
-	public static TravelTimeCalculator getTravelTimeCalculator(String networkFile, String eventsFile) {
+	public static TravelTimeCalculator getTravelTimeCalculator(Scenario scenario, String eventsFile) {
 		// reading the network
-		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		//ScenarioImpl scenario = new ScenarioImpl();
+		//NetworkLayer network = scenario.getNetwork();
+		//new MatsimNetworkReader(scenario).readFile(networkFile);
 
-		TravelTimeCalculator ttc = new TravelTimeCalculator(network,3600,30*3600, scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator ttc = new TravelTimeCalculator(scenario.getNetwork(),3600,30*3600, scenario.getConfig().travelTimeCalculator());
 		//SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig().charyparNagelScoring()));
 		//TTimeMatrixCalculator ttmc = new TTimeMatrixCalculator(parseL2ZMapping(mapfile),hours,st,network);
 
