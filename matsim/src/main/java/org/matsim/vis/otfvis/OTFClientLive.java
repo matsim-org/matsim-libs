@@ -31,7 +31,7 @@ import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
+import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 
 public class OTFClientLive extends OTFClient {
 
@@ -54,8 +54,8 @@ public class OTFClientLive extends OTFClient {
 			log.warn("No otfvis config set, using defaults");
 			visconf = new OTFVisConfig();
 		}
-		saver = new OTFLiveSettingsSaver(visconf, "otfsettings");
-		(saver).readDefaultSettings();
+		saver = new SettingsSaver(visconf, "otfsettings");
+		saver.tryToReadSettingsFile();
 		visconf.setCachingAllowed(false); // no use to cache in live mode
 		return visconf;
 	}

@@ -27,8 +27,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.rmi.RemoteException;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
 import javax.swing.ComboBoxModel;
@@ -39,16 +37,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
 
 /**
  * The class responsible for drawing the PreferencesDialog.
@@ -60,21 +52,25 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	private static final long serialVersionUID = 5778562849300898138L;
 	
-	protected transient OTFVisConfig cfg;
+	private OTFVisConfig visConfig;
+	
 	private JComboBox rightMFunc;
+	
 	private JComboBox middleMFunc;
+	
 	private JComboBox leftMFunc;
-	protected OTFHostControlBar host = null;
+	
+	private OTFHostControlBar host = null;
+	
 	private JSlider agentSizeSlider = null;
 
 	private JSlider linkWidthSlider;
+	
 	private JSlider delaySlider = null;
 
-	public PreferencesDialog(final OTFFrame frame, final OTFVisConfig config, final OTFHostControlBar mother) {
+	public PreferencesDialog(final OTFFrame frame, final OTFHostControlBar mother) {
 		super(frame);
-		this.cfg = config;
 		this.host = mother;
-		initGUI();
 	}
 
 	private void initGUI() {
@@ -105,16 +101,16 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 			{
 				ComboBoxModel leftMFuncModel = new DefaultComboBoxModel(new String[] { "Zoom", "Pan", "Select" });
-				leftMFuncModel.setSelectedItem(this.cfg.getLeftMouseFunc());
+				leftMFuncModel.setSelectedItem(this.visConfig.getLeftMouseFunc());
 				this.leftMFunc = new JComboBox();
-				panel.add(getLeftMFunc());
+				panel.add(this.leftMFunc);
 				this.leftMFunc.setModel(leftMFuncModel);
 				this.leftMFunc.setBounds(70, 20, 120, 27);
 				this.leftMFunc.addActionListener(this);
 			}
 			{
 				ComboBoxModel jComboBox1Model = new DefaultComboBoxModel(new String[] { "Zoom", "Pan", "Select" });
-				jComboBox1Model.setSelectedItem(this.cfg.getMiddleMouseFunc());
+				jComboBox1Model.setSelectedItem(this.visConfig.getMiddleMouseFunc());
 				this.middleMFunc = new JComboBox();
 				panel.add(this.middleMFunc);
 				this.middleMFunc.setModel(jComboBox1Model);
@@ -123,7 +119,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 			{
 				ComboBoxModel jComboBox2Model = new DefaultComboBoxModel(new String[] { "Menu", "Zoom", "Pan", "Select" });
-				jComboBox2Model.setSelectedItem(this.cfg.getRightMouseFunc());
+				jComboBox2Model.setSelectedItem(this.visConfig.getRightMouseFunc());
 				this.rightMFunc = new JComboBox();
 				panel.add(this.rightMFunc);
 				this.rightMFunc.setModel(jComboBox2Model);
@@ -140,15 +136,15 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			JCheckBox synchBox; 
 			if(host.getOTFHostControl().isLiveHost()) {
 				synchBox = new JCheckBox("show non-moving items");
-				synchBox.setSelected(cfg.isShowParking());
+				synchBox.setSelected(visConfig.isShowParking());
 				synchBox.addItemListener(this);
 				synchBox.setBounds(10, 20, 200, 31);
 				synchBox.setVisible(true);
 				panel.add(synchBox);
 			}
-			if((host.getOTFHostControl().isLiveHost())||((cfg.getFileVersion()>=1) &&(cfg.getFileMinorVersion()>=4))) {
+			if((host.getOTFHostControl().isLiveHost())||((visConfig.getFileVersion()>=1) &&(visConfig.getFileMinorVersion()>=4))) {
 				synchBox = new JCheckBox("show link Ids");
-				synchBox.setSelected(cfg.drawLinkIds());
+				synchBox.setSelected(visConfig.drawLinkIds());
 				synchBox.addItemListener(this);
 				synchBox.setBounds(10, 40, 200, 31);
 				synchBox.setVisible(true);
@@ -156,37 +152,37 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 
 			synchBox = new JCheckBox("show overlays");
-			synchBox.setSelected(cfg.drawOverlays());
+			synchBox.setSelected(visConfig.drawOverlays());
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 60, 200, 31);
 			synchBox.setVisible(true);
 			panel.add(synchBox);
 
 			synchBox = new JCheckBox("show time GL");
-			synchBox.setSelected(cfg.drawTime());
+			synchBox.setSelected(visConfig.drawTime());
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 80, 200, 31);
 			panel.add(synchBox);
 
 			synchBox = new JCheckBox("save jpg frames");
-			synchBox.setSelected(cfg.renderImages());
+			synchBox.setSelected(visConfig.renderImages());
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 100, 200, 31);
 			panel.add(synchBox);
 			synchBox = new JCheckBox("allow caching");
-			synchBox.setSelected(cfg.isCachingAllowed());
+			synchBox.setSelected(visConfig.isCachingAllowed());
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 120, 200, 31);
 			panel.add(synchBox);
 			synchBox = new JCheckBox("show scale bar");
-			synchBox.setSelected(cfg.drawScaleBar());
+			synchBox.setSelected(visConfig.drawScaleBar());
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 140, 200, 31);
 			synchBox.setVisible(true);
 			panel.add(synchBox);
 			if (host.getOTFHostControl().isLiveHost()) {
 				synchBox = new JCheckBox("show transit facilities");
-				synchBox.setSelected(cfg.drawTransitFacilities());
+				synchBox.setSelected(visConfig.drawTransitFacilities());
 				synchBox.addItemListener(this);
 				synchBox.setBounds(10, 160, 200, 31);
 				synchBox.setVisible(true);
@@ -227,7 +223,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			label.setText("AgentSize:");
 			label.setBounds(10, 145, 80, 31);
 			this.agentSizeSlider = new JSlider();
-			BoundedRangeModel model = new DefaultBoundedRangeModel((int) cfg.getAgentSize(), 0, 10, 300);
+			BoundedRangeModel model = new DefaultBoundedRangeModel((int) visConfig.getAgentSize(), 0, 10, 300);
 			this.agentSizeSlider.setModel(model);
 			this.agentSizeSlider.setLabelTable(this.agentSizeSlider.createStandardLabels(100, 100));
 			this.agentSizeSlider.setPaintLabels(true);
@@ -244,7 +240,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		 label.setText("LinkWidth:");
 		 label.setBounds(10, 195, 80, 31);
 		 this.linkWidthSlider = new JSlider();
-		 BoundedRangeModel model2 = new DefaultBoundedRangeModel(30,0,0,100);
+		 BoundedRangeModel model2 = new DefaultBoundedRangeModel((int) visConfig.getLinkWidth(),0,0,100);
 		 this.linkWidthSlider.setModel(model2);
 		 this.linkWidthSlider.setLabelTable(this.linkWidthSlider.
 		 createStandardLabels(20, 0));
@@ -262,7 +258,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		 label.setText("AnimSpeed:");
 		 label.setBounds(10, 245, 110, 31);
 		 this.delaySlider = new JSlider();
-		 BoundedRangeModel model2 = new DefaultBoundedRangeModel(cfg.getDelay_ms(),10,0,500);
+		 BoundedRangeModel model2 = new DefaultBoundedRangeModel(visConfig.getDelay_ms(),10,0,500);
 		 this.delaySlider.setModel(model2);
 		 this.delaySlider.setLabelTable(this.delaySlider.
 		 createStandardLabels(500, 00));
@@ -277,110 +273,23 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	public void stateChanged(final ChangeEvent e) {
 		if (e.getSource() == this.agentSizeSlider) {
-			this.cfg.setAgentSize(this.agentSizeSlider.getValue());
+			this.visConfig.setAgentSize(this.agentSizeSlider.getValue());
 			if (this.host != null)
 				this.host.invalidateDrawers();
 		 } else if (e.getSource() == this.linkWidthSlider) {
-			 this.cfg.setLinkWidth(this.linkWidthSlider.getValue());
+			 this.visConfig.setLinkWidth(this.linkWidthSlider.getValue());
 			 if (this.host != null){
 				host.redrawDrawers();
 			 }
 		 } else if (e.getSource() == this.delaySlider) {
-			 this.cfg.setDelay_ms(this.delaySlider.getValue());
+			 this.visConfig.setDelay_ms(this.delaySlider.getValue());
 			 if (this.host != null){
 				host.redrawDrawers();
 			 }
 		}
 	}
 
-	public JComboBox getLeftMFunc() {
-		return this.leftMFunc;
-	}
-
-	public JComboBox getRightMFunc() {
-		return this.rightMFunc;
-	}
-
-	public JComboBox getMiddleMFunc() {
-		return this.middleMFunc;
-	}
-
-
-	@SuppressWarnings("serial")
-	public void buildMenu(final OTFFrame frame, final PreferencesDialog preferencesDialog, 
-	    final OTFSettingsSaver save) {
-		JMenuBar menuBar = new JMenuBar();
-		JMenu fileMenu = new JMenu("File");
-		menuBar.add(fileMenu);
-		Action prefAction = new AbstractAction() {
-			{
-				putValue(Action.NAME, "Preferences...");
-				putValue(Action.MNEMONIC_KEY, 0);
-			}
-
-			public void actionPerformed(final ActionEvent e) {
-				preferencesDialog.setVisible(true);
-			}
-		};
-		fileMenu.add(prefAction);
-		if (!preferencesDialog.host.getOTFHostControl().isLiveHost()) {
-			Action saveAction = new AbstractAction() {
-				{
-					putValue(Action.NAME, "Save Settings to mvi");
-					putValue(Action.MNEMONIC_KEY, 1);
-				}
-
-				public void actionPerformed(final ActionEvent e) {
-					save.saveSettings();
-				}
-			};
-			fileMenu.add(saveAction);
-		}
-		Action saveAsAction = new AbstractAction() {
-			{
-				putValue(Action.NAME, "Save Settings as...");
-				putValue(Action.MNEMONIC_KEY, 1);
-			}
-
-			public void actionPerformed(final ActionEvent e) {
-				save.saveSettingsAs();
-			}
-		};
-		fileMenu.add(saveAsAction);
-
-		Action openAction = new AbstractAction() {
-			{
-				putValue(Action.NAME, "Open Settings...");
-				putValue(Action.MNEMONIC_KEY, 1);
-			}
-
-			public void actionPerformed(final ActionEvent e) {
-				cfg = save.readSettings();
-	      OTFClientControl.getInstance().setOTFVisConfig(cfg);
-				if (frame != null) {
-					frame.getContentPane().invalidate();
-					PreferencesDialog preferencesDialog = new PreferencesDialog(frame, cfg, host);
-					preferencesDialog.buildMenu(frame, preferencesDialog, save);
-				}
-				try {
-          OTFClientControl.getInstance().getMainOTFDrawer().invalidate(-1);
-        } catch (RemoteException e1) {
-          e1.printStackTrace();
-        }
-			}
-		};
-		fileMenu.add(openAction);
-
-		Action exitAction = new AbstractAction("Quit") {
-			public void actionPerformed(ActionEvent e) {
-				frame.endProgram(0);
-			}
-		};
-		fileMenu.add(exitAction);
-
-		frame.setJMenuBar(menuBar);
-		SwingUtilities.updateComponentTreeUI(frame);
-	}
+	
 
 	public void actionPerformed(final ActionEvent e) {
 		if (e.getSource() instanceof JComboBox) {
@@ -388,18 +297,18 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			String newFunc = (String) cb.getSelectedItem();
 
 			if (cb == this.leftMFunc) {
-				this.cfg.setLeftMouseFunc(newFunc);
+				this.visConfig.setLeftMouseFunc(newFunc);
 			} else if (cb == this.middleMFunc) {
-				this.cfg.setMiddleMouseFunc(newFunc);
+				this.visConfig.setMiddleMouseFunc(newFunc);
 			} else if (cb == this.rightMFunc) {
-				this.cfg.setRightMouseFunc(newFunc);
+				this.visConfig.setRightMouseFunc(newFunc);
 			}
 		} else if (e.getSource() instanceof JButton) {
 			if (e.getActionCommand().equals("backgroundColor")) {
 				JPanel frame = new JPanel();
-				Color c = JColorChooser.showDialog(frame, "Choose the background color", this.cfg.getBackgroundColor());
+				Color c = JColorChooser.showDialog(frame, "Choose the background color", this.visConfig.getBackgroundColor());
 				if (c != null) {
-					this.cfg.setBackgroundColor(c);
+					this.visConfig.setBackgroundColor(c);
 					if (this.host != null) {
 						this.host.invalidateDrawers();
 					}
@@ -407,9 +316,9 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 			if (e.getActionCommand() == "networkColor") {
 				JPanel frame = new JPanel();
-				Color c = JColorChooser.showDialog(frame, "Choose the network color", this.cfg.getNetworkColor());
+				Color c = JColorChooser.showDialog(frame, "Choose the network color", this.visConfig.getNetworkColor());
 				if (c != null) {
-					this.cfg.setNetworkColor(c);
+					this.visConfig.setNetworkColor(c);
 					if (this.host != null) {
 						this.host.invalidateDrawers();
 					}
@@ -421,8 +330,8 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals("show non-moving items")) {
-			cfg.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);
-			cfg.setShowParking(!cfg.isShowParking());
+			visConfig.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);
+			visConfig.setShowParking(!visConfig.isShowParking());
 			if (host != null) {
 				try {
 					host.getOTFHostControl().getOTFServer().toggleShowParking();
@@ -434,26 +343,31 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 		} else if (source.getText().equals("show link Ids")) {
 			// toggle draw link Ids
-			cfg.setDrawLinkIds(!cfg.drawLinkIds());
+			visConfig.setDrawLinkIds(!visConfig.drawLinkIds());
 		} else if (source.getText().equals("show overlays")) {
 			// toggle draw Overlays
-			cfg.setDrawOverlays(!cfg.drawOverlays());
+			visConfig.setDrawOverlays(!visConfig.drawOverlays());
 		} else if (source.getText().equals("save jpg frames")) {
 			// toggle save jpgs
-			cfg.setRenderImages(!cfg.renderImages());
+			visConfig.setRenderImages(!visConfig.renderImages());
 		} else if (source.getText().equals("show time GL")) {
 			// toggle draw time in GL
-			cfg.setDrawTime(!cfg.drawTime());
+			visConfig.setDrawTime(!visConfig.drawTime());
 		} else if (source.getText().equals("allow caching")) {
 			// toggle caching allowed
-			cfg.setCachingAllowed(!cfg.isCachingAllowed());
+			visConfig.setCachingAllowed(!visConfig.isCachingAllowed());
 		} else if (source.getText().equals("show scale bar")) {
 			// toggle draw Overlays
-			cfg.setDrawScaleBar(!cfg.drawScaleBar());
+			visConfig.setDrawScaleBar(!visConfig.drawScaleBar());
 		} else if (source.getText().equals("show transit facilities")) {
 			// toggle draw Overlays
-			cfg.setDrawTransitFacilities(!cfg.drawTransitFacilities());
+			visConfig.setDrawTransitFacilities(!visConfig.drawTransitFacilities());
 		} 
 		}
+
+	public void setVisConfig(OTFVisConfig visConfig) {
+		this.visConfig = visConfig;
+		initGUI();
+	}
 	
 }

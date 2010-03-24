@@ -22,12 +22,18 @@ package org.matsim.vis.otfvis;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
@@ -39,7 +45,7 @@ import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
+import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 
 
 /**
@@ -58,7 +64,7 @@ public abstract class OTFClient extends Thread {
 
 	protected OTFHostControlBar hostControlBar = null;
 	
-	protected OTFLiveSettingsSaver saver;
+	protected SettingsSaver saver;
 	
 	public OTFClient(String url) {
 		this.url = url;
@@ -116,8 +122,9 @@ public abstract class OTFClient extends Thread {
 		try {
 			this.hostControlBar = new OTFHostControlBar(this.url, frame);
 			frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
-			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, OTFClientControl.getInstance().getOTFVisConfig(), hostControlBar);
-			preferencesDialog.buildMenu(frame, preferencesDialog, saver);
+			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, hostControlBar);
+			preferencesDialog.setVisConfig(OTFClientControl.getInstance().getOTFVisConfig());
+			buildMenu(frame, hostControlBar, saver);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -127,11 +134,69 @@ public abstract class OTFClient extends Thread {
 		}
 	}
 
+	@SuppressWarnings("serial")
+	private static void buildMenu(final OTFFrame frame, final OTFHostControlBar hostControlBar, final SettingsSaver save) {
+		JMenuBar menuBar = new JMenuBar();
+		JMenu fileMenu = new JMenu("File");
+		menuBar.add(fileMenu);
+		Action prefAction = new AbstractAction() {
+			{
+				putValue(Action.NAME, "Preferences...");
+				putValue(Action.MNEMONIC_KEY, 0);
+			}
+
+			public void actionPerformed(final ActionEvent e) {
+				PreferencesDialog preferencesDialog = new PreferencesDialog(frame, hostControlBar);
+				preferencesDialog.setVisConfig(OTFClientControl.getInstance().getOTFVisConfig());
+				preferencesDialog.setVisible(true);
+			}
+		};
+		fileMenu.add(prefAction);
+		Action saveAsAction = new AbstractAction() {
+			{
+				putValue(Action.NAME, "Save Settings as...");
+				putValue(Action.MNEMONIC_KEY, 1);
+			}
+
+			public void actionPerformed(final ActionEvent e) {
+				save.saveSettingsAs();
+			}
+		};
+		fileMenu.add(saveAsAction);
+
+		Action openAction = new AbstractAction() {
+			{
+				putValue(Action.NAME, "Open Settings...");
+				putValue(Action.MNEMONIC_KEY, 1);
+			}
+
+			public void actionPerformed(final ActionEvent e) {
+				OTFVisConfig visConfig = save.chooseAndReadSettingsFile();
+				OTFClientControl.getInstance().setOTFVisConfig(visConfig);
+				try {
+					OTFClientControl.getInstance().getMainOTFDrawer().invalidate(-1);
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+			}
+		};
+		fileMenu.add(openAction);
+
+		Action exitAction = new AbstractAction("Quit") {
+			public void actionPerformed(ActionEvent e) {
+				frame.endProgram(0);
+			}
+		};
+		fileMenu.add(exitAction);
+		frame.setJMenuBar(menuBar);
+		SwingUtilities.updateComponentTreeUI(frame);
+	}
+	
 	protected void createMainFrame(){
 		this.frame = new OTFFrame("MATSim OTFVis");
 		this.pane = frame.getSplitPane();
 		this.pane.setDividerLocation(0.5);
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.frame.setSize(screenSize.width/2,screenSize.height/2);
 	}
 

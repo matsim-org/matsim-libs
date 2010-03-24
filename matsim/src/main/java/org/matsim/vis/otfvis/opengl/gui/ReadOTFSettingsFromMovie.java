@@ -19,60 +19,61 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.opengl.gui;
 
-
 import java.io.File;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
-import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 
 /**
  * @author dgrether
+ * @author michaz
+ * 
+ * Tries to read OTFVis settings from the (old, deprecated) binary format zipped into an MVI.
+ * Returns null if anything at all goes wrong, in which case the caller must use default settings.
+ * 
+ * This is only so that old settings aren't lost.
+ * 
  */
-public class OTFFileSettingsSaver extends OTFAbstractSettingsSaver {
+public class ReadOTFSettingsFromMovie {
 
-  private static final Logger log = Logger.getLogger(OTFFileSettingsSaver.class);
+	private static final Logger log = Logger
+			.getLogger(ReadOTFSettingsFromMovie.class);
 
-  public OTFFileSettingsSaver(OTFVisConfig visconf, String filename) {
-		super(visconf, filename);
+	String fileName;
+
+	public ReadOTFSettingsFromMovie(String filename) {
+		if (filename.startsWith("file:")) {
+			this.fileName = filename.substring(5);
+		} else {
+			this.fileName = filename;
+		}
 	}
 
 	public OTFVisConfig openAndReadConfig() {
-		OTFVisConfig conf;
-			ZipFile zipFile;
-			ObjectInputStream inFile;
-			// open file
-			try {
-				File sourceZipFile = new File(fileName);
-				// Open Zip file for reading
-				zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
-				ZipEntry infoEntry = zipFile.getEntry("config.bin");
-				if(infoEntry != null) {
-					//load config settings
-					inFile = new OTFFileReader.OTFObjectInputStream(zipFile.getInputStream(infoEntry));
-					OTFVisConfig cfg = (OTFVisConfig)inFile.readObject();
-					// force this to 30 if zero!
-					cfg.setDelay_ms(cfg.getDelay_ms() == 0 ? 30: cfg.getDelay_ms());
-					OTFClientControl.getInstance().setOTFVisConfig(cfg);
-				}
-			} catch (IOException e1) {
-				log.error("Not able to load config from file. This is not fatal. file="+this.fileName, e1);
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+		try {
+			File sourceZipFile = new File(fileName);
+			ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+			ZipEntry infoEntry = zipFile.getEntry("config.bin");
+			if (infoEntry != null) {
+				ObjectInputStream inFile = new OTFFileReader.OTFObjectInputStream(zipFile.getInputStream(infoEntry));
+				OTFVisConfig cfg = (OTFVisConfig) inFile.readObject();
+				setDelayParameterIfZero(cfg);
+				return cfg;
+			} else {
+				return null;
 			}
-		// Test if loading worked, otherwise create default
-		if(OTFClientControl.getInstance().getOTFVisConfig() == null) {
-			log.info("No otfvis config loaded creating default otfvisconfig.");
-			OTFClientControl.getInstance().setOTFVisConfig(new OTFVisConfig());
-		}
-		conf = OTFClientControl.getInstance().getOTFVisConfig();
-		conf.clearModified();
-		return conf;
+		} catch (Exception e) {
+			log.error("Not able to load config from file. This is not fatal. file=" + this.fileName, e);
+			return null;
+		} 
+	}
+
+	private void setDelayParameterIfZero(OTFVisConfig cfg) {
+		cfg.setDelay_ms(cfg.getDelay_ms() == 0 ? 30 : cfg.getDelay_ms());
 	}
 
 }

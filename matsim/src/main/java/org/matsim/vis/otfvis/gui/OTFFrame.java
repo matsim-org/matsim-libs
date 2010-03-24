@@ -74,7 +74,7 @@ public class OTFFrame extends JFrame {
 	        }
 	    }
 
-	void endProgram(int code) {
+	public void endProgram(int code) {
 		if(OTFClientControl.getInstance().getOTFVisConfig().isModified()) {
 			final JDialog dialog = new JDialog((JFrame)null, "Preferences are unsaved and modified...", true);
 			final JOptionPane optionPane = new JOptionPane(

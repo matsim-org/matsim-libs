@@ -23,7 +23,6 @@ package org.matsim.vis.otfvis;
 import java.awt.BorderLayout;
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
@@ -36,8 +35,8 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
-import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
+import org.matsim.vis.otfvis.opengl.gui.ReadOTFSettingsFromMovie;
+import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
@@ -54,11 +53,7 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
  */
 public class OTFClientFile extends OTFClient {
 
-	private static final Logger log = Logger.getLogger(OTFClientFile.class);
-
 	protected OTFConnectionManager connect = new OTFConnectionManager();
-
-	private OTFFileSettingsSaver fileSettingsSaver;
 
 	public OTFClientFile( String filename) {
 		super("file:" + filename);
@@ -123,10 +118,12 @@ public class OTFClientFile extends OTFClient {
 
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
-		OTFVisConfig visconf = new OTFVisConfig();
-		fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);
-		visconf = fileSettingsSaver.openAndReadConfig();
-		saver = new OTFLiveSettingsSaver(visconf, this.url);
+		ReadOTFSettingsFromMovie fileSettingsSaver = new ReadOTFSettingsFromMovie(this.url);
+		OTFVisConfig visconf = fileSettingsSaver.openAndReadConfig();
+		if (visconf == null) {
+			visconf = new OTFVisConfig();
+		}
+		saver = new SettingsSaver(visconf, this.url);
 		return visconf;
 	}
 

@@ -34,8 +34,8 @@ import org.matsim.vis.otfvis.gui.NetJComponent;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
-import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
+import org.matsim.vis.otfvis.opengl.gui.ReadOTFSettingsFromMovie;
+import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 
 
@@ -52,7 +52,7 @@ public class OTFClientSwing extends OTFClient {
 
 	private OTFConnectionManager connect2 = new OTFConnectionManager();
 
-	private OTFFileSettingsSaver fileSettingsSaver;
+	private ReadOTFSettingsFromMovie fileSettingsSaver;
 
 	public OTFClientSwing(String url) {
 		super("file:" + url);
@@ -86,11 +86,11 @@ public class OTFClientSwing extends OTFClient {
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
 	    OTFVisConfig visconf = new OTFVisConfig();
-	    fileSettingsSaver = new OTFFileSettingsSaver(visconf, this.url);
+	    fileSettingsSaver = new ReadOTFSettingsFromMovie(this.url);
 	    if (this.url.endsWith(".mvi")) {
 	    	visconf = fileSettingsSaver.openAndReadConfig();
 	    }
-	    saver = new OTFLiveSettingsSaver(visconf, this.url);
+	    saver = new SettingsSaver(visconf, this.url);
 	    return visconf;
 	}
 
