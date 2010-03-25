@@ -23,7 +23,6 @@ package org.matsim.vis.otfvis;
 import java.awt.BorderLayout;
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
@@ -35,12 +34,7 @@ import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 
 public class OTFClientLive extends OTFClient {
 
-
-	private static final Logger log = Logger.getLogger(OTFClientLive.class);
-
 	private OTFConnectionManager connect = new OTFConnectionManager();
-
-	private OTFVisConfig visconf;
 
 	public OTFClientLive(String url, OTFConnectionManager connect) {
 		super(url);
@@ -49,17 +43,17 @@ public class OTFClientLive extends OTFClient {
 
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
-		saver = new SettingsSaver("otfsettings");
-		OTFVisConfig settingsFromFile = saver.tryToReadSettingsFile();
-		if (settingsFromFile != null) {
-			visconf = settingsFromFile;
+		try {
+			saver = new SettingsSaver("otfsettings");
+			OTFVisConfig visconf = saver.tryToReadSettingsFile();
+			if (visconf == null) {
+				visconf = this.masterHostControl.getOTFServer().getOTFVisConfig();
+			}
+			visconf.setCachingAllowed(false); // no use to cache in live mode
+			return visconf;
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
 		}
-		if (visconf == null) {
-			log.warn("No otfvis config set, using defaults");
-			visconf = new OTFVisConfig();
-		}
-		visconf.setCachingAllowed(false); // no use to cache in live mode
-		return visconf;
 	}
 
 	@Override
@@ -68,8 +62,8 @@ public class OTFClientLive extends OTFClient {
 			OTFClientQuad clientQ = createNewView(this.url, connect, this.hostControlBar.getOTFHostControl());
 			OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ);
 			if (hostControlBar.getOTFHostControl().isLiveHost()) {
-				OTFQueryControl queryControl = new OTFQueryControl(hostControlBar, visconf);
-				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
+				OTFQueryControl queryControl = new OTFQueryControl(hostControlBar, OTFClientControl.getInstance().getOTFVisConfig());
+				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, OTFClientControl.getInstance().getOTFVisConfig());
 				queryControl.setQueryTextField(queryControlBar.getTextField());
 				frame.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 				mainDrawer.setQueryHandler(queryControl);
@@ -79,10 +73,6 @@ public class OTFClientLive extends OTFClient {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-	}
-
-	public void setConfig(OTFVisConfig otfVisConfig) {
-		this.visconf = otfVisConfig;
 	}
 
 }
