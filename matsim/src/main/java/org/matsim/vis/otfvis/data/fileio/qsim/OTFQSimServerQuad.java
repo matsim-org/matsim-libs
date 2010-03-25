@@ -96,7 +96,7 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
 				if (writer != null) {
 					writer.setSrc(link);
 					if (first) {
-						log.info("Connecting Source QueueLink with "
+						log.info("Connecting Source QLink with "
 								+ writer.getClass().getName());
 						first = false;
 					}
@@ -115,7 +115,7 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
 				if (writer != null) {
 					writer.setSrc(node);
 					if (first) {
-						log.info("Connecting Source QueueNode with "
+						log.info("Connecting Source QNode with "
 								+ writer.getClass().getName());
 						first = false;
 					}
