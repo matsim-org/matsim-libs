@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ComponentStats.java
+ * PopulationEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,47 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
-package playground.johannes.socialnetworks.snowball;
-
-import java.util.Set;
-import java.util.SortedSet;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.GraphProjection;
-import org.matsim.contrib.sna.graph.Vertex;
-
-import playground.johannes.socialnetworks.graph.Partitions;
+package playground.johannes.socialnetworks.snowball2.sim;
 
 /**
  * @author illenberger
  *
  */
-public class ComponentStats extends GraphPropertyEstimator {
+public interface PopulationEstimator {
 
-	/**
-	 * @param outputDir
-	 */
-	public ComponentStats(String outputDir) {
-		super(outputDir);
-		openStatsWriters("components");
-	}
-
-	/* (non-Javadoc)
-	 * @see playground.johannes.snowball.GraphPropertyEstimator#calculate(playground.johannes.graph.GraphProjection, int)
-	 */
-	@Override
-	public DescriptiveStatistics calculate(
-			GraphProjection<SampledGraph, SampledVertex, SampledEdge> graph,
-			int iteration) {
-		SortedSet<Set<Vertex>> components = Partitions.disconnectedComponents(graph);
-		DescriptiveStatistics stats = new DescriptiveStatistics();
-		stats.addValue(components.size());
-		dumpObservedStatistics(getStatisticsMap(stats), iteration);
-		return stats;
-	}
-
+	public double mean(double[] values, double[] weights);
+	
 }

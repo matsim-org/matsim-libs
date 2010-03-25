@@ -20,7 +20,9 @@
 package playground.johannes.socialnetworks.snowball2.sim;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.matsim.contrib.sna.graph.Edge;
@@ -31,11 +33,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
-import playground.johannes.socialnetworks.graph.analysis.DegreeTask;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.DegreeTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphSizeTask;
+import playground.johannes.socialnetworks.graph.analysis.TransitivityTask;
+import playground.johannes.socialnetworks.snowball2.analysis.DegreeCorrelationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.EstimatedDegree;
+import playground.johannes.socialnetworks.snowball2.analysis.EstimatedTransitivity;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
+import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.WaveSizeTask;
 
 /**
@@ -64,15 +70,58 @@ public class Loader {
 		/*
 		 * Init random seed generator.
 		 */
-		VertexPartition seedGenerator = new RandomSeedGenerator(Integer.parseInt(config.getParam(MODULENAME, "seeds")), randomSeed);
+		int numSeeds = Integer.parseInt(config.getParam(MODULENAME, "seeds"));
+		VertexPartition seedGenerator = new RandomSeedGenerator(numSeeds, randomSeed);
+		/*
+		 * Init response rate generator.
+		 */
+		double responseRate;
+		String str = config.getParam(MODULENAME, "responseRate");
+		if(str.endsWith("%")) {
+			str = str.substring(0, str.length() - 1);
+			responseRate = Double.parseDouble(str)/100.0;
+		} else
+			responseRate = Double.parseDouble(str);
+		
+		VertexPartition reponseGenerator = new RandomResponse(responseRate, randomSeed);
 		/*
 		 * Init estimators.
 		 */
-		final int interval = Integer.parseInt(config.getParam(MODULENAME, "interval"));
-		Map<String, Estimator> estimators = new HashMap<String, Estimator>();
-		estimators.put("estim1", new Estimator1(graph.getVertices().size()));
-		estimators.put("estim2", new Estimator2(graph.getVertices().size(), interval));
-		estimators.put("estim3", new Estimator3(interval, graph.getVertices().size()));
+//		final int interval = Integer.parseInt(config.getParam(MODULENAME, "interval"));
+		final int N = graph.getVertices().size();
+		final int M = graph.getEdges().size();
+		Map<String, EstimatorSet> estimators = new HashMap<String, EstimatorSet>();
+		Set<BiasedDistribution> estimatorSet = new HashSet<BiasedDistribution>();
+		
+//		BiasedDistribution estim1 = new Estimator1(N);
+//		estimatorSet.add(estim1);
+//		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
+//		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
+		
+//		BiasedDistribution estim2 = new Estimator2(N);
+//		estimatorSet.add(estim2);
+//		estimators.put("estim2a", new EstimatorSet(estim2, null, null));
+//		estimators.put("estim2b", new EstimatorSet(estim2, new HTEstimator(N), new HTEstimator(M)));
+//		
+//		BiasedDistribution estim3 = new Estimator3(N);
+//		estimatorSet.add(estim3);
+//		estimators.put("estim3a", new EstimatorSet(estim3, null, null));
+//		estimators.put("estim3b", new EstimatorSet(estim3, new HTEstimator(N), new HTEstimator(M)));
+//		
+//		BiasedDistribution estim4 = new Estimator4(N);
+//		estimatorSet.add(estim4);
+//		estimators.put("estim4a", new EstimatorSet(estim4, null, null));
+//		estimators.put("estim4b", new EstimatorSet(estim4, new HTEstimator(N), new HTEstimator(M)));
+//		
+//		BiasedDistribution estim5 = new Estimator5(N);
+//		estimatorSet.add(estim5);
+//		estimators.put("estim5a", new EstimatorSet(estim5, null, null));
+//		estimators.put("estim5b", new EstimatorSet(estim5, new HTEstimator(N), new HTEstimator(M)));
+		
+		BiasedDistribution estim6 = new Estimator6(N);
+		estimatorSet.add(estim6);
+		estimators.put("estim6a", new EstimatorSet(estim6, null, null));
+		estimators.put("estim6b", new EstimatorSet(estim6, new HTEstimator(N), new HTEstimator(M)));
 		/*
 		 * Load analyzers.
 		 */
@@ -84,32 +133,35 @@ public class Loader {
 		/*
 		 * Init sample analyzers.
 		 */
-		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(interval, analyzers, output);
-		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, output);
-		CompleteSampleAnalyzer completeAnalyzer = new CompleteSampleAnalyzer(graph, analyzers, output);
+//		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimatorSet, output);
+		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimatorSet, output);
+//		CompleteSampleAnalyzer completeAnalyzer = new CompleteSampleAnalyzer(graph, analyzers, estimatorSet, output);
+//		ConnectionSampleAnalyzer connectionAnalyzer = new ConnectionSampleAnalyzer(numSeeds, analyzers, output);
 		/*
 		 * Init sampler listener.
 		 */
 		SamplerListenerComposite listeners = new SamplerListenerComposite();
-		/*
-		 * Add estimators to listener.
-		 */
-		for(Estimator estimator : estimators.values()) {
-			if(estimator instanceof SamplerListener) {
-				listeners.addComponent((SamplerListener)estimator);
-			}
-		}
+//		/*
+//		 * Add estimators to listener.
+//		 */
+//		for(EstimatorSet estimator : estimators.values()) {
+//			if(estimator.distribution instanceof SamplerListener) {
+//				listeners.addComponent((SamplerListener)estimator.distribution);
+//			}
+//		}
 		/*
 		 * Add analyzers to listener.
 		 */
-		listeners.addComponent(intervalAnalyzer);
+//		listeners.addComponent(intervalAnalyzer);
 		listeners.addComponent(iterationAnalyzer);
-		listeners.addComponent(completeAnalyzer);
+//		listeners.addComponent(completeAnalyzer);
+//		listeners.addComponent(connectionAnalyzer);
 		/*
 		 * Init and run sampler.
 		 */
 		Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
 		sampler.setSeedGenerator(seedGenerator);
+		sampler.setResponseGenerator(reponseGenerator);
 		sampler.setListener(listeners);
 		
 		sampler.run(graph);
@@ -128,7 +180,7 @@ public class Loader {
 		return reader.readGraph(file);
 	}
 	
-	private static Map<String, AnalyzerTask> loadAnalyzers(Map<String, Estimator> estimators) {
+	private static Map<String, AnalyzerTask> loadAnalyzers(Map<String, EstimatorSet> estimators) {
 		Map<String, AnalyzerTask> analyzers = new HashMap<String, AnalyzerTask>();
 		/*
 		 * observed
@@ -136,22 +188,58 @@ public class Loader {
 		AnalyzerTaskComposite tasks = new AnalyzerTaskComposite();
 		tasks.addTask(new GraphSizeTask());
 		tasks.addTask(new WaveSizeTask());
+		
 		DegreeTask obsDegree = new DegreeTask();
 		obsDegree.setModule(new ObservedDegree());
 		tasks.addTask(obsDegree);
+		
+		TransitivityTask obsTransitivity = new TransitivityTask();
+		obsTransitivity.setModule(new ObservedTransitivity());
+		tasks.addTask(obsTransitivity);
+		
+//		tasks.addTask(new DegreeCorrelationTask());
+//		tasks.addTask(new ComponentsTask());
 		analyzers.put("obs", tasks);
 		/*
 		 * estimated
 		 */
-		for(Entry<String, Estimator> entry : estimators.entrySet()) {
+		for(Entry<String, EstimatorSet> entry : estimators.entrySet()) {
 			tasks = new AnalyzerTaskComposite();
+			
+			BiasedDistribution biasdDistr = entry.getValue().distribution;
+			PopulationEstimator estimator = entry.getValue().vertexEstimator;
+			PopulationEstimator edgeEstimator = entry.getValue().edgeEstimator;
+			
 			DegreeTask estimDegree = new DegreeTask();
-			estimDegree.setModule(new EstimatedDegree(entry.getValue()));
+			estimDegree.setModule(new EstimatedDegree(biasdDistr, estimator, edgeEstimator));
 			tasks.addTask(estimDegree);
-			tasks.addTask(new EstimatorTask(entry.getValue()));
+			
+			TransitivityTask estimTransitivity = new TransitivityTask();
+			EstimatedTransitivity trans = new EstimatedTransitivity(biasdDistr, estimator);
+			trans.enableCaching(true);
+			estimTransitivity.setModule(trans);
+			tasks.addTask(estimTransitivity);
+			
+			tasks.addTask(new EstimatorTask(entry.getValue().distribution));
+			
 			analyzers.put(entry.getKey(), tasks);
 		}
 		
 		return analyzers;
+	}
+	
+	private static class EstimatorSet {
+		
+		private BiasedDistribution distribution;
+		
+		private PopulationEstimator vertexEstimator;
+		
+		private PopulationEstimator edgeEstimator;
+		
+		public EstimatorSet(BiasedDistribution distribution, PopulationEstimator vertexEstimator, PopulationEstimator edgeEstimator) {
+			this.distribution = distribution;
+			this.vertexEstimator = vertexEstimator;
+			this.edgeEstimator = edgeEstimator;
+		}
 	}
 }

@@ -39,26 +39,23 @@ import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
  */
 public class EstimatorTask extends AnalyzerTask {
 
-	private final Estimator estimator;
+	private final BiasedDistribution estimator;
 	
-	public EstimatorTask(Estimator estimator) {
+	public EstimatorTask(BiasedDistribution estimator) {
 		this.estimator = estimator;
 	}
 	
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
 		TIntDoubleHashMap probas = new TIntDoubleHashMap();
-		TIntDoubleHashMap weights = new TIntDoubleHashMap();
 		
 		for(Vertex vertex : graph.getVertices()) {
 			if(((SampledVertex)vertex).isSampled()) {
 				probas.put(vertex.getNeighbours().size(), estimator.getProbability((SampledVertex) vertex));
-				weights.put(vertex.getNeighbours().size(), estimator.getWeight((SampledVertex)vertex));
 			}
 		}
 		
-		writeValues(probas, "propa");
-		writeValues(weights, "weight");
+		writeValues(probas, "proba");	
 	}
 
 	private void writeValues(TIntDoubleHashMap values, String valName) {

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Estimator2.java
+ * Estimator3.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,28 +20,34 @@
 package playground.johannes.socialnetworks.snowball2.sim;
 
 import gnu.trove.TIntArrayList;
-import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntObjectIterator;
 
-import org.apache.commons.math.stat.StatUtils;
+import java.util.TreeSet;
+
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.socialnetworks.statistics.Histogram;
 
 /**
  * @author illenberger
  *
  */
-public class Estimator2 implements BiasedDistribution {
-	
-	private TIntDoubleHashMap kMap;
-	
+public class Estimator5 implements BiasedDistribution {
+
 	private SampleStats stats;
+	
+	private TIntObjectHashMap<Histogram> map;
+	
+	private TreeSet<Integer> keys;
 	
 	private final int N;
 	
-	public Estimator2(int N) {
+	private int kMax;
+	
+	public Estimator5(int N) {
 		this.N = N;
 	}
 	
@@ -56,19 +62,55 @@ public class Estimator2 implements BiasedDistribution {
 			int n = stats.getAccumulatedNumSampled(it - 1);
 			return 1 - Math.pow(1 - n/(double)N, k);
 		} else {
-			double k_neighbor = kMap.get(k);
-			double p_neighbor = 1 - Math.pow(1 - stats.getAccumulatedNumSampled(it - 2)/(double)N, k_neighbor);
+			if(isIsolated(vertex)) {
+				return stats.getAccumulatedNumSampled(it)/(double)N;
+			}
 			
-			double p_k = 1 - Math.pow(1 - p_neighbor, k);
+			Integer k_upper = keys.ceiling(k);
+			Integer k_lower = keys.floor(k);
+			
+			int diff1 = Integer.MAX_VALUE;
+			if(k_upper != null)
+				diff1 = k_upper - k;
+			
+			int diff2 = Integer.MAX_VALUE;
+			if(k_lower != null)
+				diff2 = k - k_lower;
+			
+			Histogram hist;
+			if(diff1 < diff2)
+				hist = map.get(k_upper);
+			else
+				hist = map.get(k_lower);
+			
+			double q = 0;
+			for(int k_n = 1; k_n <= kMax; k_n++) {
+				double p_k_n = 1 - Math.pow(1 - stats.getAccumulatedNumSampled(it - 2)/(double)N, k_n);
+				q += hist.share(k_n) * p_k_n;
+			}
+			double p_k = 1 - Math.pow(1 - q, k);
 			
 			double p = 1;
 			if(vertex.getIterationSampled() == it)
 				p = stats.getNumSampled(it)/(double)stats.getNumDetected(it - 1);
 			
-			return p * p_k;
+			return p_k * p;
 		}
 	}
 
+	private boolean isIsolated(SampledVertex vertex) {
+		if(vertex.getIterationSampled() == 0) {
+			for(Vertex neighbour : vertex.getNeighbours()) {
+				if(((SampledVertex)neighbour).isSampled())
+					return false;
+			}
+			
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	@Override
 	public double getWeight(SampledVertex vertex) {
 		// TODO Auto-generated method stub
@@ -78,12 +120,14 @@ public class Estimator2 implements BiasedDistribution {
 	@Override
 	public void update(SampledGraph graph) {
 		stats = new SampleStats(graph);
-		
+		keys = new TreeSet<Integer>();
 		TIntObjectHashMap<TIntArrayList> tmp = new TIntObjectHashMap<TIntArrayList>();
 
 		for(Vertex vertex : graph.getVertices()) {
-			if(((SampledVertex)vertex).isSampled()) {
+			
 				int k = vertex.getNeighbours().size();
+				
+				kMax = Math.max(k, kMax);
 				TIntArrayList values = tmp.get(k);
 				if(values == null) {
 					values = new TIntArrayList();
@@ -91,21 +135,29 @@ public class Estimator2 implements BiasedDistribution {
 				}
 				for(Vertex neighbor : vertex.getNeighbours()) {
 					if(((SampledVertex)neighbor).isSampled()) {
-						values.add(neighbor.getNeighbours().size());
+						int k_n = neighbor.getNeighbours().size();
+						values.add(k_n);
+						kMax = Math.max(k_n, kMax);
 					}
 				}
-			}
+				if(values.size() == 0) {
+					tmp.remove(k);
+				} else
+					keys.add(k);
+			
 		}
-
-		kMap = new TIntDoubleHashMap();
+		
+		map = new TIntObjectHashMap<Histogram>();
 		TIntObjectIterator<TIntArrayList> it = tmp.iterator();
 		for(int i = 0; i < tmp.size(); i++) {
 			it.advance();
-			TIntArrayList list = it.value();
-			double[] dList = new double[list.size()];
-			for(int k = 0; k < list.size(); k++)
-				dList[k] = list.get(k);
-			kMap.put(it.key(), StatUtils.geometricMean(dList));
+			double[] vals = new double[it.value().size()];
+			for(int k = 0; k < vals.length; k++)
+				vals[k] = it.value().get(k);
+			
+			Histogram hist = new Histogram(vals);
+			hist.convertToEqualCount(5, 1.0);
+			map.put(it.key(), hist);
 		}
 	}
 

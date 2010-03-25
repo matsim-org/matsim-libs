@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ClusteringStats.java
+ * Estimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,42 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.snowball2.sim;
+
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
- * 
+ * @author illenberger
+ *
  */
-package playground.johannes.socialnetworks.snowball;
+public interface BiasedDistribution {
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.GraphProjection;
-
-import playground.johannes.socialnetworks.graph.GraphStatistics;
-
-
-
-public class GlobalClusteringStats extends GraphPropertyEstimator {
-
-	private double globalResponseRate;
+	public void update(SampledGraph graph);
 	
-	public GlobalClusteringStats(String outputDir, double responseRate) {
-		super(outputDir);
-		this.globalResponseRate = responseRate;
-		openStatsWriters("global-clustering");
-	}
-
-	@Override
-	public DescriptiveStatistics calculate(
-			GraphProjection<SampledGraph, SampledVertex, SampledEdge> graph,
-			int iteration) {
-		DescriptiveStatistics observed = new DescriptiveStatistics();
-		DescriptiveStatistics estimated = new DescriptiveStatistics();
-		
-		observed.addValue(GraphStatistics.globalClusteringCoefficient(graph));
-		
-		dumpObservedStatistics(getStatisticsMap(observed), iteration);
-		dumpEstimatedStatistics(getStatisticsMap(estimated), iteration);
-
-		return observed;
-	}
-
+	public double getProbability(SampledVertex vertex);
+	
+	/**
+	 * @deprecated
+	 * 
+	 */
+	public double getWeight(SampledVertex vertex);
 }

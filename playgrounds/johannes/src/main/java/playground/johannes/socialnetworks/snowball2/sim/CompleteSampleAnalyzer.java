@@ -20,11 +20,13 @@
 package playground.johannes.socialnetworks.snowball2.sim;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Map;
 
 import org.matsim.contrib.sna.graph.Graph;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
+import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 
 /**
  * @author illenberger
@@ -32,25 +34,34 @@ import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
  */
 public class CompleteSampleAnalyzer extends SampleAnalyzer {
 
-	private int numVertex;
+//	private int numVertex;
 	
-	public CompleteSampleAnalyzer(Graph graph, Map<String, AnalyzerTask> tasks, String output) {
-		super(tasks, output);
-		numVertex = graph.getVertices().size();
+	public CompleteSampleAnalyzer(Graph graph, Map<String, AnalyzerTask> tasks, Collection<BiasedDistribution> estimators, String output) {
+		super(tasks, estimators, output);
+//		numVertex = graph.getVertices().size();
 	}
 	
 	@Override
-	public boolean afterSampling(Sampler<?, ?, ?> sampler) {
-		if(sampler.getNumSampledVertices() >= numVertex) {
-			File file = makeDirectories(getRootDirectory() + "/complete");
-			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
-		}
+	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
+//		if(sampler.getNumSampledVertices() >= numVertex) {
+//			File file = makeDirectories(getRootDirectory() + "/complete");
+//			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
+//		}
 		return true;
 	}
 
 	@Override
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler) {		
+	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {		
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.snowball2.sim.SamplerListener#endSampling(playground.johannes.socialnetworks.snowball2.sim.Sampler)
+	 */
+	@Override
+	public void endSampling(Sampler<?, ?, ?> sampler) {
+		File file = makeDirectories(getRootDirectory() + "/complete");
+		analyse(sampler.getSampledGraph(), file.getAbsolutePath());
 	}
 
 }

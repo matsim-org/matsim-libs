@@ -19,16 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSampledComponents;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSnowballDescriptor;
-import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.KMLVertexId;
 
 
@@ -43,8 +42,8 @@ public class GraphML2KML {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph(args[0]);
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraph graph = reader.readGraph(args[0]);
 
 		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
 		KMLSampledComponents components = new KMLSampledComponents();

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphMLReader.java
+ * ObservedTransitivity.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,51 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.snowball2.analysis;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.snowball;
+import gnu.trove.TObjectDoubleHashMap;
 
-import org.matsim.contrib.sna.graph.SparseGraph;
-import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
-import org.matsim.core.gbl.Gbl;
-import org.xml.sax.Attributes;
+import java.util.Collection;
+import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.socialnetworks.graph.analysis.Transitivity;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphMLReader extends AbstractGraphMLReader<SampledGraph, SampledVertex, SampledEdge> {
+public class ObservedTransitivity extends Transitivity {
 
-	private SampledGraphBuilder builder = new SampledGraphBuilder();
-	
+	@SuppressWarnings("unchecked")
 	@Override
-	protected SampledGraph newGraph(Attributes attrs) {
-		return new SampledGraph();
+	public TObjectDoubleHashMap<? extends Vertex> localClusteringCoefficients(Collection<? extends Vertex> vertices) {
+		return super.localClusteringCoefficients(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>)vertices));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public SampledGraph readGraph(String file) {
-		return (SampledGraph) super.readGraph(file);
+	public Distribution localClusteringDistribution(Set<? extends Vertex> vertices) {
+		return super.localClusteringDistribution(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>)vertices));
 	}
 
-	@Override
-	protected SampledEdge addEdge(SampledVertex v1, SampledVertex v2, Attributes attrs) {
-		return builder.addEdge(((SampledGraph)getGraph()), (SampledVertex)v1, (SampledVertex)v2);
-	}
-
-	@Override
-	protected SampledVertex addVertex(Attributes attrs) {
-		return builder.addVertex(((SampledGraph)getGraph()));
-	}
-
-	public static void main(String args[]) {
-		Gbl.startMeasurement();
-		SparseGraph g = new SampledGraphMLReader().readGraph("/Users/fearonni/vsp-work/socialnets/devel/snowball/data/networks/cond-mat-2005-gc.graphml");
-		Gbl.printElapsedTime();
-		System.out.println(g.toString());
-		Gbl.printMemoryUsage();
-	}
 }

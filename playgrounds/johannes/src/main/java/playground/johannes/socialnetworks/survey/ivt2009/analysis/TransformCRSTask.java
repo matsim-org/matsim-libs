@@ -25,14 +25,12 @@ import org.geotools.referencing.CRS;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraph;
-import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
-import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
 
 /**
  * @author illenberger
@@ -73,10 +71,10 @@ public class TransformCRSTask implements GraphFilter<SpatialGraph> {
 
 	public static void main(String[] args) throws IOException {
 		TransformCRSTask task = new TransformCRSTask(CRSUtils.getCRS(Integer.parseInt(args[2])));
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph(args[0]);
-		graph = (SampledSpatialGraph) task.apply(graph);
-		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraph graph = reader.readGraph(args[0]);
+		graph = (SpatialGraph) task.apply(graph);
+		SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
 		writer.write(graph, args[1]);
 	}
 }

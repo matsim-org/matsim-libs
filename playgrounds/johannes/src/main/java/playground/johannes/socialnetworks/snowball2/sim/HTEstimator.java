@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraph.java
+ * HTEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,56 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
-package playground.johannes.socialnetworks.snowball;
-
-import java.util.Set;
-
-import org.matsim.contrib.sna.graph.SparseGraph;
-
+package playground.johannes.socialnetworks.snowball2.sim;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraph extends SparseGraph {
+public class HTEstimator implements PopulationEstimator {
 
-//	public SampledEdge addEdge(SampledVertex v1, SampledVertex v2) {
-//		SampledEdge e = new SampledEdge(v1, v2);
-//		if(insertEdge(e))
-//			return e;
-//		else
-//			return null;
-//	}
-//
-//	public SampledVertex addVertex() {
-//		SampledVertex v = new SampledVertex();
-//		if(insertVertex(v))
-//			return v;
-//		else
-//			return null;
-//	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SampledEdge> getEdges() {
-		return (Set<? extends SampledEdge>) super.getEdges();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SampledVertex> getVertices() {
-		return (Set<? extends SampledVertex>) super.getVertices();
+	private final int N;
+	
+	public HTEstimator(int N) {
+		this.N = N;
 	}
 	
-	public void reset() {
-		for(SampledVertex v : getVertices())
-			v.reset();
-		for(SampledEdge e : getEdges())
-			e.reset();
+	@Override
+	public double mean(double[] values, double[] weights) {
+		double sum = 0;
+		for(int i = 0; i < values.length; i++) {
+			sum += values[i] * weights[i];
+		}
+		return sum/(double)N;
 	}
 
 }

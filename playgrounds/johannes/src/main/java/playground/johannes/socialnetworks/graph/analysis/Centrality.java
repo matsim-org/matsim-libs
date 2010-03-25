@@ -53,4 +53,12 @@ public class Centrality {
 		}
 		return distr;
 	}
+	
+	public int diameter() {
+		return mCentrality.getDiameter();
+	}
+	
+	public int radius() {
+		return mCentrality.getRadius();
+	}
 }

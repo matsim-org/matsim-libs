@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledEdge.java
+ * EstimDiffContainer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,48 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.snowball2.sim.postprocess;
+
+import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TIntIntHashMap;
 
 /**
- * 
+ * @author illenberger
+ *
  */
-package playground.johannes.socialnetworks.snowball;
+public class EstimDiffContainer {
 
-import org.matsim.contrib.sna.graph.EdgeDecorator;
-import org.matsim.contrib.sna.graph.SparseEdge;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.core.utils.collections.Tuple;
-
-/**
- * @author illenberger 
- */
-public class SampledEdge extends SparseEdge {
-
-	private EdgeDecorator<SampledEdge> projection;
+	protected TIntIntHashMap kSum = new TIntIntHashMap();
 	
-	protected SampledEdge() {
-		
-	}
-
-	@Override
-	public SampledVertex getOpposite(Vertex v) {
-		return (SampledVertex) super.getOpposite(v);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Tuple<SampledVertex, SampledVertex> getVertices() {
-		return (Tuple<SampledVertex, SampledVertex>) super.getVertices();
-	}
+	protected TIntDoubleHashMap pSum = new TIntDoubleHashMap();
 	
-	void setProjection(EdgeDecorator<SampledEdge> projection) {
-		this.projection = projection;
-	}
-	
-	public EdgeDecorator<SampledEdge> getProjection() {
-		return projection;
-	}
-	
-	void reset() {
-		projection = null;
-	}
+	protected TIntIntHashMap kCount = new TIntIntHashMap();
 }

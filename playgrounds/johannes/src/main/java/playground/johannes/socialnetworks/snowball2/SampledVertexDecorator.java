@@ -35,6 +35,8 @@ public class SampledVertexDecorator<V extends Vertex> extends VertexDecorator<V>
 
 	private SnowballAttributes attributes = new SnowballAttributes();
 	
+	private SampledVertexDecorator<V> seed;
+	
 	protected SampledVertexDecorator(V delegate) {
 		super(delegate);
 	}
@@ -79,6 +81,15 @@ public class SampledVertexDecorator<V extends Vertex> extends VertexDecorator<V>
 	@Override
 	public List<? extends SampledVertexDecorator<V>> getNeighbours() {
 		return (List<? extends SampledVertexDecorator<V>>) super.getNeighbours();
+	}
+
+	@Override
+	public SampledVertexDecorator<V> getSeed() {
+		return seed;
+	}
+	
+	public void setSeed(SampledVertexDecorator<V> seed) {
+		this.seed = seed;
 	}
 
 }

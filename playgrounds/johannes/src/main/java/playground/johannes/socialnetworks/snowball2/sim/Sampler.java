@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.EdgeDecorator;
@@ -63,6 +62,8 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 	private int iteration;
 	
 	private int numSampledVertices;
+	
+	private int numExpanded;
 
 	public void setSeedGenerator(VertexPartition generator) {
 		this.seedGenerator = generator;
@@ -84,21 +85,26 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		return numSampledVertices;
 	}
 	
+	public int getNumExpandedVertices() {
+		return numExpanded;
+	}
+	
 	public SampledGraphProjection<G, V, E> getSampledGraph() {
 		return sampledGraph;
 	}
 	
 	public void run(G graph) {
-		List<TaggedVertex> recruits = init(graph);
+		Set<TaggedVertex> recruits = init(graph);
 		/*
 		 * loop until no recruits are available
 		 */
 		while(!recruits.isEmpty()) {
 			logger.info(String.format("Sampling iteration %1$s.", iteration));
 			
-			List<TaggedVertex> newRecruits = new LinkedList<TaggedVertex>();
+			numExpanded = 0;
+			Set<TaggedVertex> newRecruits = new HashSet<TaggedVertex>();
 			for(TaggedVertex vertex : recruits) {
-				if(!listener.beforeSampling(this))
+				if(!listener.beforeSampling(this, vertex.getProjection()))
 					return;
 				/*
 				 * check if the vertex is responsive
@@ -108,22 +114,25 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 					 * expand and collect new recruits
 					 */
 					expand(vertex, newRecruits);
+					numExpanded++;
 				}
 				/*
 				 * notify listener and terminate if applicable
 				 */
-				if(!listener.afterSampling(this))
+				if(!listener.afterSampling(this, vertex.getProjection()))
 					return;
 			}
-			
 			recruits = newRecruits;
 			iteration++;
 		}
+		
+		listener.endSampling(this);
+		
 		logger.info("Done.");
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<TaggedVertex> init(G graph) {
+	private Set<TaggedVertex> init(G graph) {
 		iteration = 0;
 		numSampledVertices = 0;
 		/*
@@ -149,12 +158,13 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		/*
 		 * draw the seed vertices
 		 */
-		Set<V> seeds = (Set<V>) seedGenerator.getPartition(graph.getVertices());
-		List<TaggedVertex> taggedSeeds = new LinkedList<TaggedVertex>();
+		Set<V> seeds = (Set<V>) seedGenerator.getPartition(responsive);
+		Set<TaggedVertex> taggedSeeds = new HashSet<TaggedVertex>();
 		for(V vertex : seeds) {
 			TaggedVertex taggedVertex = taggedGraph.getVertex(vertex);
 			SampledVertexDecorator<V> sampledVertex = builder.addVertex(sampledGraph, vertex);
 			sampledVertex.detect(0);
+			sampledVertex.setSeed(sampledVertex);
 			taggedVertex.setProjection(sampledVertex);
 			taggedSeeds.add(taggedVertex);
 			
@@ -163,7 +173,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		return taggedSeeds;
 	}
 	
-	private void expand(TaggedVertex vertex, List<TaggedVertex> recruits) {
+	private void expand(TaggedVertex vertex, Set<TaggedVertex> recruits) {
 		/*
 		 * sample vertex
 		 */
@@ -185,6 +195,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 					 */
 					sampledNeighbour = builder.addVertex(sampledGraph, neighbour.getDelegate());
 					sampledNeighbour.detect(iteration);
+					sampledNeighbour.setSeed(vertex.getProjection().getSeed());
 					neighbour.setProjection(sampledNeighbour);
 					/*
 					 * recruit

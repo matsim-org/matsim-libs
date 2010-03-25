@@ -19,100 +19,146 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
-import gnu.trove.TIntIntHashMap;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TIntObjectIterator;
+
+import java.util.TreeSet;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
+import playground.johannes.socialnetworks.statistics.Histogram;
+
 /**
  * @author illenberger
  *
  */
-public class Estimator3 implements Estimator, SamplerListener {
+public class Estimator3 implements BiasedDistribution {
 
-	private final int interval;
+	private SampleStats stats;
+	
+	private TIntObjectHashMap<Histogram> map;
+	
+	private TreeSet<Integer> keys;
 	
 	private final int N;
 	
-	private int iteration;
-
-	private double p_random;
+	private int kMax;
 	
-	private double p_snowballNeighbor;
-	
-	private int lastIteration;
-	
-	public Estimator3(int interval, int N) {
+	public Estimator3(int N) {
 		this.N = N;
-		this.interval = interval;
 	}
 	
 	@Override
 	public double getProbability(SampledVertex vertex) {
-		if(iteration == 0)
-			return p_random;
-		else
-			return 1 - Math.pow(1 - p_snowballNeighbor, vertex.getNeighbours().size());
+		int it = stats.getMaxIteration();
+		int k = vertex.getNeighbours().size();
+		
+		if(it == 0) {
+			return stats.getAccumulatedNumSampled(it)/(double)N;
+		} else if(it == 1) {
+			int n = stats.getAccumulatedNumSampled(it - 1);
+			return 1 - Math.pow(1 - n/(double)N, k);
+		} else {
+			if(isIsolated(vertex)) {
+				return stats.getAccumulatedNumSampled(it)/(double)N;
+			}
+			
+			Integer k_upper = keys.ceiling(k);
+			Integer k_lower = keys.floor(k);
+			
+			int diff1 = Integer.MAX_VALUE;
+			if(k_upper != null)
+				diff1 = k_upper - k;
+			
+			int diff2 = Integer.MAX_VALUE;
+			if(k_lower != null)
+				diff2 = k - k_lower;
+			
+			Histogram hist;
+			if(diff1 < diff2)
+				hist = map.get(k_upper);
+			else
+				hist = map.get(k_lower);
+			
+			double q = 0;
+			for(int k_n = 1; k_n <= kMax; k_n++) {
+				double p_k_n = 1 - Math.pow(1 - stats.getAccumulatedNumSampled(it - 2)/(double)N, k_n);
+				q += hist.share(k_n) * p_k_n;
+			}
+			double p_k = 1 - Math.pow(1 - q, k);
+			
+			double p = 1;
+			if(vertex.getIterationSampled() == it)
+				p = stats.getNumSampled(it)/(double)stats.getNumDetected(it - 1);
+			
+			return p_k * p;
+		}
 	}
 
+	private boolean isIsolated(SampledVertex vertex) {
+		if(vertex.getIterationSampled() == 0) {
+			for(Vertex neighbour : vertex.getNeighbours()) {
+				if(((SampledVertex)neighbour).isSampled())
+					return false;
+			}
+			
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	@Override
 	public double getWeight(SampledVertex vertex) {
-		return p_random/getProbability(vertex);
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public void update(SampledGraph graph) {
-		iteration = 0;
-		TIntIntHashMap sampleSize = new TIntIntHashMap();
-//		Collection<SampledVertex> samples = new ArrayList<SampledVertex>(graph.getVertices().size());
-		/*
-		 * count samples per iteration
-		 */
+		stats = new SampleStats(graph);
+		keys = new TreeSet<Integer>();
+		TIntObjectHashMap<TIntArrayList> tmp = new TIntObjectHashMap<TIntArrayList>();
+
 		for(Vertex vertex : graph.getVertices()) {
-			sampleSize.adjustOrPutValue(((SampledVertex)vertex).getIterationSampled(), 1, 1);
-			iteration = Math.max(iteration, ((SampledVertex)vertex).getIterationSampled());
-//			samples.add((SampledVertex)vertex);
+			if(((SampledVertex)vertex).getIterationSampled() == 0) {
+				int k = vertex.getNeighbours().size();
+				
+				kMax = Math.max(k, kMax);
+				TIntArrayList values = tmp.get(k);
+				if(values == null) {
+					values = new TIntArrayList();
+					tmp.put(k, values);
+				}
+				for(Vertex neighbor : vertex.getNeighbours()) {
+					if(((SampledVertex)neighbor).isSampled()) {
+						int k_n = neighbor.getNeighbours().size();
+						values.add(k_n);
+						kMax = Math.max(k_n, kMax);
+					}
+				}
+				if(values.size() == 0) {
+					tmp.remove(k);
+				} else
+					keys.add(k);
+			}
 		}
 		
-		updatePRandom(sampleSize);
-		updatePSnowballNeighbor(sampleSize);
-	}
-
-	private void updatePRandom(TIntIntHashMap samples) {
-		int n_before = 0;
-		for(int i = 0; i < iteration; i++)
-			n_before += samples.get(i);
-		
-		int n = samples.get(iteration);
-		
-		p_random = n/(double)(N - n_before);
-	}
-	
-	private void updatePSnowballNeighbor(TIntIntHashMap samples) {
-		int n_before = 0;
-		for(int i = 0; i < iteration-1; i++)
-			n_before += samples.get(i);
-		
-		int n = samples.get(iteration-1);
-		
-		p_snowballNeighbor = n/(double)(N - n_before);
-	}
-
-	@Override
-	public boolean afterSampling(Sampler<?, ?, ?> sampler) {
-		if(sampler.getNumSampledVertices() % interval == 0) {
-			update(sampler.getSampledGraph());
+		map = new TIntObjectHashMap<Histogram>();
+		TIntObjectIterator<TIntArrayList> it = tmp.iterator();
+		for(int i = 0; i < tmp.size(); i++) {
+			it.advance();
+			double[] vals = new double[it.value().size()];
+			for(int k = 0; k < vals.length; k++)
+				vals[k] = it.value().get(k);
+			
+			Histogram hist = new Histogram(vals);
+			hist.convertToEqualCount(5, 1.0);
+			map.put(it.key(), hist);
 		}
-		return true;
 	}
 
-	@Override
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler) {
-		if(sampler.getIteration() > lastIteration) {
-			update(sampler.getSampledGraph());
-			lastIteration = sampler.getIteration();
-		}
-		return true;
-	}
 }

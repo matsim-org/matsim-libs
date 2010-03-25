@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Boxplot.java
+ * DistributionAvr.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim.postprocess;
 
+import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleDoubleIterator;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,32 +31,36 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import org.apache.commons.math.stat.StatUtils;
+import org.apache.log4j.Logger;
 
 /**
  * @author illenberger
  *
  */
-public class Boxplot {
+public class DistributionAvr {
+	
+	private static final Logger logger = Logger.getLogger(DistributionAvr.class);
 
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		File rootDir = new File("/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/output");
-		final String dumpPattern = "it.";
-		String analyzerKey = "estim1";
-		String propertyKey = "k_mean";
-		String outputTable = "/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/boxplot.txt";
-		String outputAvr = "/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/averags.txt";
+		File rootDir = new File(args[0]);
+		final String dumpPattern = args[1];
+		String analyzerKey = args[2];
+		String propertyKey = args[3];
+		String outputTable = args[4];
+		
+		logger.info(String.format("Root dir = %1$s", rootDir));
 		/*
 		 * Create a filename filter to filter only the dumps of interest.
 		 */
@@ -67,7 +74,7 @@ public class Boxplot {
 			}
 		};
 		/*
-		 * Create a file filter to obtain onyl directories.
+		 * Create a file filter to obtain only directories.
 		 */
 		FileFilter dirFilter = new FileFilter() {
 			@Override
@@ -79,6 +86,7 @@ public class Boxplot {
 		 * Get the number of ensemble runs and dumps. The latter can vary
 		 * between the ensemble runs!
 		 */
+		logger.info("Getting number of runs and dumps...");
 		int n_runs = 0;
 		String[] dumpNames = new String[0];
 		File[] runDirs = rootDir.listFiles(dirFilter);
@@ -100,82 +108,104 @@ public class Boxplot {
 			}
 		}
 		/*
-		 * Create a table filled with NaNs.
+		 * Create a table with empty distributions.
 		 */
-		Map<String, double[]> dataTable = new HashMap<String, double[]>();
+		logger.info("Loading data...");
+		Map<String, TDoubleDoubleHashMap[]> distrTable = new HashMap<String, TDoubleDoubleHashMap[]>();
 		for(int i = 0; i < dumpNames.length; i++) {
-			double[] values = new double[n_runs];
-			Arrays.fill(values, Double.NaN);
-			dataTable.put(dumpNames[i], values);
+			TDoubleDoubleHashMap[] distr = new TDoubleDoubleHashMap[n_runs];
+			distrTable.put(dumpNames[i], distr);
 		}
-		/*
-		 * Fill the table with values.
-		 */
+		
 		for(int i = 0; i < runDirs.length; i++) {
+			
 			for(File dumpDir : runDirs[i].listFiles(dumpFilter)) {
+				String dumpName = dumpDir.getName().split("\\.")[1];
+				TDoubleDoubleHashMap distr = distrTable.get(dumpName)[i];
+				if(distr == null) {
+					distr = new TDoubleDoubleHashMap();
+					distrTable.get(dumpName)[i] = distr;
+				}
 				/*
 				 * Open the stats.txt file.
 				 */
-				String path = String.format("%1$s/%2$s/stats.txt", dumpDir.getAbsolutePath(), analyzerKey);
+				String path = String.format("%1$s/%2$s/%3$s.txt", dumpDir.getAbsolutePath(), analyzerKey, propertyKey);
 				BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
-				String line;
+				String line = reader.readLine();
 				while((line = reader.readLine()) != null) {
-					String[] tokens = line.split("\t");
-					if(tokens[0].equalsIgnoreCase(propertyKey)) {
-						/*
-						 * Retrieve the value for the property key and then
-						 * break.
-						 */
-						double value = Double.parseDouble(tokens[1]);
-						String dumpName = dumpDir.getName().split("\\.")[1];
-						double[] values = dataTable.get(dumpName);
-						values[i] = value;
-						break;
-					}
-				}	
+					String tokens[] = line.split("\t");
+					double bin = Double.parseDouble(tokens[0]);
+					double val = Double.parseDouble(tokens[1]);
+					distr.put(bin, val);
+				}
 			}
 		}
 		/*
-		 * Calculate averages for each dump.
+		 * Average distributions.
 		 */
-		Map<String, Double> averages = new HashMap<String, Double>();
-		for(Entry<String, double[]> entry : dataTable.entrySet()) {
-			double mean = StatUtils.mean(entry.getValue());
-			averages.put(entry.getKey(), mean);
+		logger.info("Averaging distributions...");
+		SortedSet<Double> bins = new TreeSet<Double>();
+		Map<String, TDoubleDoubleHashMap> avrTable = new HashMap<String, TDoubleDoubleHashMap>();
+		for(String dumpKey : dumpNames) {
+			TDoubleDoubleHashMap[] distributions = distrTable.get(dumpKey);
+			TDoubleDoubleHashMap distrAvr = new TDoubleDoubleHashMap();
+			int count = 0;
+			for(int i = 0; i < distributions.length; i++) {
+				TDoubleDoubleHashMap distr = distributions[i];
+				if(distr == null) {
+//					logger.warn(String.format("No distribution available for dump %1$s, run %2$s,", dumpKey, i));
+				} else{
+					TDoubleDoubleIterator it = distr.iterator();
+					for (int k = 0; k < distr.size(); k++) {
+						it.advance();
+						distrAvr.adjustOrPutValue(it.key(), it.value(), it.value());
+						bins.add(it.key());
+					}
+					count++;
+				}
+			}
+			
+			TDoubleDoubleIterator it = distrAvr.iterator();
+			for(int i = 0; i < distrAvr.size(); i++) {
+				it.advance();
+				distrAvr.put(it.key(), it.value()/(double)count);
+			}
+			
+			avrTable.put(dumpKey, distrAvr);
 		}
 		/*
-		 * Sort the dump names.
+		 * Write.
 		 */
-		List<String> keys = new ArrayList<String>(dataTable.keySet());
-		Collections.sort(keys);
-		/*
-		 * Write the data table.
-		 */
+		logger.info("Writing table...");
+		List<String> dumpKeys = new ArrayList<String>(distrTable.keySet());
+		Collections.sort(dumpKeys, new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				return Integer.parseInt(o1) - Integer.parseInt(o2);
+				
+			}
+		});
+		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outputTable));
-		for(String key : keys) {
-			writer.write(key);
+		for(String dumpKey : dumpKeys) {
+			writer.write(dumpKey);
 			writer.write("\t");
 		}
 		writer.newLine();
 		
-		for(int i = 0; i < n_runs; i++) {
-			for(String key : keys) {
-				writer.write(String.valueOf(dataTable.get(key)[i]));
+		for(Double bin : bins) {
+			writer.write(bin.toString());
+			writer.write("\t");
+			for(String dumpKey : dumpKeys) {
+				TDoubleDoubleHashMap distr = avrTable.get(dumpKey);
+				writer.write(String.valueOf(distr.get(bin)));
 				writer.write("\t");
 			}
 			writer.newLine();
 		}
 		writer.close();
-		/*
-		 * Write averages.
-		 */
-		writer = new BufferedWriter(new FileWriter(outputAvr));
-		for(String key : keys) {
-			writer.write(key);
-			writer.write("\t");
-			writer.write(String.valueOf(averages.get(key)));
-			writer.newLine();
-		}
-		writer.close();
+		
+		logger.info("Done.");
 	}
+
 }

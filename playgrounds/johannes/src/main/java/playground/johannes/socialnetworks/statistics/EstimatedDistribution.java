@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphBuilder.java
+ * HTDistribution.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball;
+package playground.johannes.socialnetworks.statistics;
 
-import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
+import org.matsim.contrib.sna.math.Distribution;
+
+import playground.johannes.socialnetworks.snowball2.sim.PopulationEstimator;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphBuilder extends AbstractSparseGraphBuilder<SampledGraph, SampledVertex, SampledEdge> {
+public class EstimatedDistribution extends Distribution {
 
-	public SampledGraphBuilder() {
-		super(new SampledGraphFactory());
+	private final PopulationEstimator estimator;
+	
+	public EstimatedDistribution(PopulationEstimator estimator) {
+		this.estimator = estimator;
 	}
+	
+	@Override
+	public double mean() {
+		if(estimator == null)
+			return super.mean();
+		else
+			return estimator.mean(getValues(), getWeights());
+	}
+
 }

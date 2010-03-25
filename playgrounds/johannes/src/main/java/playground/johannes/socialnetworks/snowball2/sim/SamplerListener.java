@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
+import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
+
 
 /**
  * @author illenberger
@@ -26,8 +28,10 @@ package playground.johannes.socialnetworks.snowball2.sim;
  */
 public interface SamplerListener {
 
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler);
+	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex);
 	
-	public boolean afterSampling(Sampler<?, ?, ?> sampler);
+	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex);
+	
+	public void endSampling(Sampler<?,?,?> sampler);
 	
 }

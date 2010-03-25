@@ -21,6 +21,7 @@ package playground.johannes.socialnetworks.snowball2.sim;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -39,11 +40,14 @@ public abstract class SampleAnalyzer implements SamplerListener {
 
 	private Map<String, AnalyzerTask> tasks;
 	
+	private Collection<BiasedDistribution> estimators;
+	
 	private String rootDirectory;
 	
-	public SampleAnalyzer(Map<String, AnalyzerTask> tasks, String rootDirectory) {
+	public SampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<BiasedDistribution> estimators, String rootDirectory) {
 		this.tasks = tasks;
 		this.rootDirectory = rootDirectory;
+		this.estimators = estimators;
 	}
 
 	protected String getRootDirectory() {
@@ -53,6 +57,9 @@ public abstract class SampleAnalyzer implements SamplerListener {
 	protected void analyse(SampledGraphProjection<?, ?, ?> graph, String output) {
 		try {
 			Logger.getRootLogger().setLevel(Level.WARN);
+			for(BiasedDistribution estimator : estimators) {
+				estimator.update(graph);
+			}
 			for(Entry<String, AnalyzerTask> task : tasks.entrySet()) {
 				String taskOutput = String.format("%1$s/%2$s/", output, task.getKey());
 				File file = makeDirectories(taskOutput);

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
+import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.utils.Composite;
 
 /**
@@ -28,10 +29,10 @@ import playground.johannes.socialnetworks.utils.Composite;
 public class SamplerListenerComposite extends Composite<SamplerListener> implements SamplerListener {
 	
 	@Override
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler) {
+	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
 		boolean result = true;
 		for(SamplerListener listener : components) {
-			if(!listener.beforeSampling(sampler))
+			if(!listener.beforeSampling(sampler, vertex))
 				result = false;
 		}
 		return result;
@@ -39,13 +40,21 @@ public class SamplerListenerComposite extends Composite<SamplerListener> impleme
 
 	
 	@Override
-	public boolean afterSampling(Sampler<?, ?, ?> sampler) {
+	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
 		boolean result = true;
 		for(SamplerListener listener : components) {
-			if(!listener.afterSampling(sampler))
+			if(!listener.afterSampling(sampler, vertex))
 				result = false;
 		}
 		return result;
+	}
+
+
+	@Override
+	public void endSampling(Sampler<?, ?, ?> sampler) {
+		for(SamplerListener listener : components) {
+			listener.endSampling(sampler);
+		}
 	}
 
 }

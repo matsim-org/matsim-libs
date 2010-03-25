@@ -27,10 +27,11 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraph;
-import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
-import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
+
 
 /**
  * @author illenberger
@@ -60,10 +61,10 @@ public class RemoveIsolatesTask implements GraphFilter<SparseGraph> {
 	
 	public static void main(String args[]) throws IOException {
 		RemoveIsolatesTask task = new RemoveIsolatesTask();
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph(args[0]);
-		graph = (SampledSpatialGraph) task.apply((SparseGraph) graph);
-		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraph graph = reader.readGraph(args[0]);
+		graph = (SpatialGraph) task.apply((SparseGraph) graph);
+		SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
 		writer.write(graph, args[1]);
 	}
 

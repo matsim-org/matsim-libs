@@ -20,9 +20,11 @@
 package playground.johannes.socialnetworks.snowball2.sim;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Map;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
+import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 
 /**
  * @author illenberger
@@ -30,25 +32,44 @@ import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
  */
 public class IntervalSampleAnalyzer extends SampleAnalyzer {
 
-	private int interval;
+//	private int base;
+//	
+//	private double exponent = 0.5;
+//	
+//	private boolean dump;
 	
-	public IntervalSampleAnalyzer(int interval, Map<String, AnalyzerTask> tasks, String output) {
-		super(tasks, output);
-		this.interval = interval;
+	public IntervalSampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<BiasedDistribution> estimators, String output) {
+		super(tasks, estimators, output);
+//		this.base = interval;
 	}
 
 	@Override
-	public boolean afterSampling(Sampler<?, ?, ?> sampler) {
-		if(sampler.getNumSampledVertices() % interval == 0) {
-			File file = makeDirectories(String.format("%1$s/vertex.%2$s", getRootDirectory(), sampler.getNumSampledVertices()));
-			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
+	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
+		int n = sampler.getNumSampledVertices();
+		if(n < 1000) {
+			if(n % 100 == 0)
+				dump(sampler);
+		} else if (n < 10000) {
+			if(n % 1000 == 0)
+				dump(sampler);
+		} else {
+			if(n % 10000 == 0)
+				dump(sampler);
 		}
 		return true;
 	}
 
+	private void dump(Sampler<?, ?, ?> sampler) {
+		File file = makeDirectories(String.format("%1$s/vertex.%2$s", getRootDirectory(), sampler.getNumSampledVertices()));
+		analyse(sampler.getSampledGraph(), file.getAbsolutePath());
+	}
 	@Override
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler) {
+	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
 		return true;
+	}
+
+	@Override
+	public void endSampling(Sampler<?, ?, ?> sampler) {
 	}
 
 }

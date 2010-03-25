@@ -28,6 +28,7 @@ import org.matsim.contrib.sna.snowball.SnowballAttributes;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import visad.data.netcdf.UnsupportedOperationException;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -97,5 +98,13 @@ public class SampledSocialVertex extends SpatialSparseVertex implements SocialVe
 	@Override
 	public SocialPerson getPerson() {
 		return person;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.sna.snowball.SampledVertex#getSeed()
+	 */
+	@Override
+	public SampledVertex getSeed() {
+		throw new UnsupportedOperationException();
 	}
 }

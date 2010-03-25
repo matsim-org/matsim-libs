@@ -47,6 +47,10 @@ public class CentralityTask extends ModuleAnalyzerTask<Centrality> {
 	
 	public static final String MAX_BETWEENNESS = "between_max";
 	
+	public static final String DIAMETER = "diameter";
+	
+	public static final String RADIUS = "radius";
+	
 	public CentralityTask() {
 		setModule(new Centrality());
 	}
@@ -72,6 +76,10 @@ public class CentralityTask extends ModuleAnalyzerTask<Centrality> {
 		stats.put(MIN_BETWEENNESS, b_min);
 		stats.put(MAX_BETWEENNESS, b_max);
 		logger.info(String.format("between_mean = %1$s, between_min = %2$s, between_max = %4$s", b_mean, b_min, b_max));
+		
+		stats.put(DIAMETER, new Double(module.diameter()));
+		stats.put(RADIUS, new Double(module.radius()));
+		logger.info(String.format("diameter = %1$s, radius = %2$s", module.diameter(), module.radius()));
 		
 		if(getOutputDirectory() != null) {
 			try {

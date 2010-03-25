@@ -50,6 +50,10 @@ public class MatrixCentrality {
 	
 	private double meanEdgeBetweenness;
 	
+	private int diameter;
+	
+	private int radius;
+	
 	private final int numThreads = Runtime.getRuntime().availableProcessors();
 	
 	public double[] getVertexCloseness() {
@@ -75,6 +79,14 @@ public class MatrixCentrality {
 	public double getMeanEdgeBetweenness() {
 		return meanEdgeBetweenness;
 	}
+	
+	public int getDiameter() {
+		return diameter;
+	}
+	
+	public int getRadius() {
+		return radius;
+	}
 
 	public void run(AdjacencyMatrix y) {
 		int n = y.getVertexCount();
@@ -82,6 +94,8 @@ public class MatrixCentrality {
 		Arrays.fill(vertexCloseness, Double.POSITIVE_INFINITY);
 		vertexBetweenness = new int[n];
 		edgeBetweenness = new TIntIntHashMap[n];
+		diameter = 0;
+		radius = Integer.MAX_VALUE;
 		/*
 		 * put all vertex indices in a queue
 		 */
@@ -152,6 +166,11 @@ public class MatrixCentrality {
 						edgeBetweenness[it.key()].adjustOrPutValue(i, it.value(), it.value());
 					}
 				}
+				/*
+				 * get diameter and radius
+				 */
+				diameter = Math.max(diameter, thread.diameter);
+				radius = Math.min(radius, thread.radius);
 			}
 		}
 		/*
@@ -197,14 +216,19 @@ public class MatrixCentrality {
 		
 		private static int counter = 0;
 		
+		private int diameter;
+		
+		private int radius;
+		
 		private final Logger logger = Logger.getLogger(CentralityThread.class);
 		
 		public CentralityThread(AdjacencyMatrix y, int i_start, int i_stop) {
 			dijkstra = new Dijkstra(y);
 			this.i_start = i_start;
 			this.i_stop = i_stop;
-//			this.vertices = vertices;
 			n = y.getVertexCount();
+			diameter = 0;
+			radius = Integer.MAX_VALUE;
 			counter = 0;
 		}
 		
@@ -245,6 +269,7 @@ public class MatrixCentrality {
 				 */
 				time = System.currentTimeMillis();
 				int pathLengthSum = 0;
+				int eccentricity = 0;
 				/*
 				 * iterate over all reachable nodes
 				 */
@@ -257,6 +282,7 @@ public class MatrixCentrality {
 					int pathLength = pathAnalyzer.pathLength;
 					int pathCount = pathAnalyzer.pathCount;
 					pathLengthSum += pathLength;
+					eccentricity = Math.max(eccentricity, pathLength);
 					/*
 					 * extract all paths
 					 */
@@ -294,6 +320,9 @@ public class MatrixCentrality {
 //					vertexCloseness[i] = pathLengthSum/(double)reachable.size();
 				if(reachable.size() > 0)
 					vertexCloseness[i] = pathLengthSum/(double)reachable.size();
+				
+				diameter = Math.max(diameter, eccentricity);
+				radius = Math.min(radius, eccentricity);
 				
 				cTime += System.currentTimeMillis() - time;
 				counter++;

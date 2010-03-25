@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphFactory.java
+ * RandomResponse.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,26 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball;
+package playground.johannes.socialnetworks.snowball2.sim;
 
-import org.matsim.contrib.sna.graph.GraphFactory;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphFactory implements GraphFactory<SampledGraph, SampledVertex, SampledEdge>{
+public class RandomResponse implements VertexPartition {
 
-	public SampledEdge createEdge() {
-		return new SampledEdge();
+	private final double responseRate;
+	
+	private final Random random;
+	
+	public RandomResponse(double responseRate, long randomSeed) {
+		this.responseRate = responseRate;
+		random = new Random(randomSeed);
 	}
-
-	public SampledGraph createGraph() {
-		return new SampledGraph();
-	}
-
-	public SampledVertex createVertex() {
-		return new SampledVertex();
+	
+	@Override
+	public <V extends Vertex> Set<V> getPartition(Set<V> vertices) {
+		Set<V> responding = new HashSet<V>();
+		for(V vertex : vertices) {
+			if(random.nextDouble() < responseRate) {
+				responding.add(vertex);
+			}
+		}
+		return responding;
 	}
 
 }

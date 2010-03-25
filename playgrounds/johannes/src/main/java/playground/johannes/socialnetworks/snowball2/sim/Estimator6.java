@@ -19,30 +19,38 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
+import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TIntArrayList;
-import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntObjectIterator;
 
-import org.apache.commons.math.stat.StatUtils;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.socialnetworks.statistics.EstimatedDistribution;
 
 /**
  * @author illenberger
  *
  */
-public class Estimator2 implements BiasedDistribution {
+public class Estimator6 implements BiasedDistribution {
 	
-	private TIntDoubleHashMap kMap;
+	private TDoubleDoubleHashMap kMap;
 	
 	private SampleStats stats;
 	
 	private final int N;
 	
-	public Estimator2(int N) {
+	
+	
+	public Estimator6(int N) {
 		this.N = N;
+	
 	}
 	
 	@Override
@@ -97,15 +105,44 @@ public class Estimator2 implements BiasedDistribution {
 			}
 		}
 
-		kMap = new TIntDoubleHashMap();
+		kMap = new TDoubleDoubleHashMap();
 		TIntObjectIterator<TIntArrayList> it = tmp.iterator();
 		for(int i = 0; i < tmp.size(); i++) {
 			it.advance();
 			TIntArrayList list = it.value();
-			double[] dList = new double[list.size()];
-			for(int k = 0; k < list.size(); k++)
-				dList[k] = list.get(k);
-			kMap.put(it.key(), StatUtils.geometricMean(dList));
+//			double[] dList = new double[list.size()];
+			Distribution distr = new EstimatedDistribution(null);
+			for(int k = 0; k < list.size(); k++) {
+//				dList[k] = list.get(k);
+				int val = list.get(k);
+				distr.add(val, 1/getProbabilityEstim1(val));
+			}
+			kMap.put(it.key(), distr.mean());
+//			kMap.put(it.key(), StatUtils.geometricMean(dList));
+		}
+		
+		try {
+			Distribution.writeHistogram(kMap, String.format("/Users/jillenberger/Work/work/socialnets/snowball/output/%1$s.k-k.txt", stats.getMaxIteration()));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public double getProbabilityEstim1(int k) {
+		int it = stats.getMaxIteration();
+		if(it == 0)
+			return stats.getNumSampled(0)/(double)N;
+		else {
+			int n = stats.getAccumulatedNumSampled(it - 1);
+			double p_k = 1 - Math.pow(1 - n/(double)N, k);
+			double p = 1;
+//			if(vertex.getIterationSampled() == it)
+//				p = stats.getNumSampled(it)/((double)stats.getNumDetected(it - 1) * stats.getResonseRate());
+			return p * p_k;
 		}
 	}
 

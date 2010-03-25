@@ -20,9 +20,11 @@
 package playground.johannes.socialnetworks.snowball2.sim;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Map;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
+import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 
 /**
  * @author illenberger
@@ -32,18 +34,18 @@ public class IterationSampleAnalyzer extends SampleAnalyzer {
 
 	private int lastIteration;
 
-	public IterationSampleAnalyzer(Map<String, AnalyzerTask> tasks, String output) {
-		super(tasks, output);
+	public IterationSampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<BiasedDistribution> estimators, String output) {
+		super(tasks, estimators, output);
 		lastIteration = 0;
 	}
 	
 	@Override
-	public boolean afterSampling(Sampler<?, ?, ?> sampler) {
+	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
 		return true;
 	}
 
 	@Override
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler) {
+	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
 		if(sampler.getIteration() > lastIteration) {
 			File file = makeDirectories(String.format("%1$s/it.%2$s", getRootDirectory(), lastIteration));
 			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
@@ -51,6 +53,10 @@ public class IterationSampleAnalyzer extends SampleAnalyzer {
 		}
 		
 		return true;
+	}
+
+	@Override
+	public void endSampling(Sampler<?, ?, ?> sampler) {
 	}
 	
 
