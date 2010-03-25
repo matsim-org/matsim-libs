@@ -136,7 +136,7 @@ public class CalculateSignalGroups{
 							}
 						}
 						thetaDiff = Math.abs(thetaMain-thetaTemp);
-						if (thetaDiff > this.left){
+						if ((thetaDiff > (Math.PI/4.0)) &&  (thetaDiff < Math.PI)){
 							left.add(groups.get(ii));
 						}else{
 							other.add(groups.get(ii));
@@ -152,7 +152,7 @@ public class CalculateSignalGroups{
 							}
 						}
 						thetaDiff = Math.abs(thetaMain-thetaTemp);
-						if (thetaDiff > this.left){
+						if ((thetaDiff > (Math.PI/4.0)) &&  (thetaDiff < Math.PI)){
 							left.add(groups.get(ii));
 						}else{
 							other.add(groups.get(ii));
