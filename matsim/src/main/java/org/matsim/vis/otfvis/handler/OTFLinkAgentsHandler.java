@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
@@ -45,10 +44,10 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  * OTFLinkAgentsHandler transfers basic agent data as well as the default data
  * for links. It is not commonly used, but some older mvi files might contain
  * it.
- * 
- * 
+ *
+ *
  * @author david
- * 
+ *
  */
 public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
@@ -71,7 +70,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			// Write additional agent data
 
 			positions.clear();
-			src.getVisData().getVehiclePositions(positions);
+			this.src.getVisData().getVehiclePositions(positions);
 
 			if (showParked) {
 				out.putInt(positions.size());
@@ -132,13 +131,13 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		agInfo.setUserDefined(userdefined);
 		agInfo.setAgentState(AgentState.values()[state]);
 
-		if (agentReceiverClass == null)
+		if (this.agentReceiverClass == null)
 			return;
 
 		try {
-			OTFDataSimpleAgentReceiver drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(agentReceiverClass);
+			OTFDataSimpleAgentReceiver drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(this.agentReceiverClass);
 			drawer.setAgent(agInfo);
-			agents.add(drawer);
+			this.agents.add(drawer);
 		} catch (InstantiationException e) {
 			log.warn("Agent drawer could not be instanciated");
 			e.printStackTrace();
@@ -152,7 +151,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 		super.readDynData(in, graph);
 		// read additional agent data
-		agents.clear();
+		this.agents.clear();
 
 		int count = in.getInt();
 		for (int i = 0; i < count; i++)
@@ -173,20 +172,20 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	public void invalidate(SceneGraph graph) {
 		super.invalidate(graph);
 		// invalidate agent receivers
-		for (OTFDataSimpleAgentReceiver agent : agents)
+		for (OTFDataSimpleAgentReceiver agent : this.agents)
 			agent.invalidate(graph);
 	}
 
 	/***
 	 * PREVIOUS VERSION of the reader
-	 * 
+	 *
 	 * @author dstrippgen
 	 */
 	public static final class ReaderV1_1 extends OTFLinkAgentsHandler {
 		@Override
 		public void readDynData(ByteBuffer in, SceneGraph graph)
 				throws IOException {
-			agents.clear();
+			this.agents.clear();
 			int count = in.getInt();
 			for (int i = 0; i < count; i++)
 				readAgent(in, graph);

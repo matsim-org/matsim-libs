@@ -23,7 +23,6 @@ package org.matsim.vis.otfvis.handler;
 import java.nio.ByteBuffer;
 
 import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
@@ -32,13 +31,13 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 /**
  * OTFLinkAgentsNoParkingHandler enables the user (per preferences) to select whether she/he wants to
  * see parked vehicles or not.
- * 
+ *
  * @author david
- * 
+ *
  */
 public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 	// yyyy is this ever used?  kai, jan'10
-	
+
 	static public class Writer extends  OTFLinkAgentsHandler.Writer {
 		private static final long serialVersionUID = 6541770536927233851L;
 
@@ -46,7 +45,7 @@ public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 		protected void writeAllAgents(ByteBuffer out) {
 			// Write additional agent data
 			positions.clear();
-			src.getVisData().getVehiclePositions(positions);
+			this.src.getVisData().getVehiclePositions(positions);
 			int valid = 0;
 			for (AgentSnapshotInfo pos : positions) {
 				if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY) valid++;
@@ -64,5 +63,5 @@ public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 		}
 
 	}
-	
+
 }

@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
@@ -44,7 +43,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  * then the agent nearest to the coordinate on that link.
  * TODO This might yield unexpected results. It would probably be a better solution to collect
  * the agents of all surrounding link and then chose the nearest one.
- *  
+ *
  * @author dstrippgen
  *
  */
@@ -87,13 +86,13 @@ public class QueryAgentId extends AbstractQuery {
 					dist = Math.sqrt(xDist*xDist + yDist*yDist);
 					if(dist < minDist){
 						minDist = dist;
-						result.agentIds.clear();
-						result.agentIds.add(info.getId().toString());
+						this.result.agentIds.clear();
+						this.result.agentIds.add(info.getId().toString());
 					}
 				} else {
 					// search for all agents in given RECT
-					if( (xDist < width) && (yDist < height) && (xDist >= 0) && (yDist >= 0) ) {
-						result.agentIds.add(info.getId().toString());
+					if( (xDist < this.width) && (yDist < this.height) && (xDist >= 0) && (yDist >= 0) ) {
+						this.result.agentIds.add(info.getId().toString());
 					}
 				}
 			}
@@ -113,17 +112,17 @@ public class QueryAgentId extends AbstractQuery {
 
 	@Override
 	public OTFQueryResult query() {
-		return result;
+		return this.result;
 	}
-	
+
 	public static class Result implements OTFQueryResult {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		public List<String> agentIds = new ArrayList<String>();
-		
+
 		public void remove() {
-			
+
 		}
 
 		public boolean isAlive() {
@@ -131,9 +130,9 @@ public class QueryAgentId extends AbstractQuery {
 		}
 
 		public void draw(OTFDrawer drawer) {
-			
+
 		}
-		
+
 	}
 
 }
