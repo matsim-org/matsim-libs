@@ -30,7 +30,7 @@ public class Worker extends Thread implements BasicEventHandler{
 	
 	private final Map<String,Counter> events = new HashMap<String,Counter>();
 	private int numEvents = 0;
-	private boolean aboard = false;
+	private boolean abort = false;
 
 	public Worker(String eFile1, EventsFileComparator eventsFileComparator) {
 		this.e = new EventsManagerFactoryImpl().createEventsManager();
@@ -38,15 +38,23 @@ public class Worker extends Thread implements BasicEventHandler{
 		this.eFile = eFile1;
 		this.eFC = eventsFileComparator;
 	}
-	
-	public synchronized void aboard() {
-		this.aboard = true;
+
+	public synchronized void abort() {
+		this.abort = true;
 		this.cont();
 		
 	}
 
+	public synchronized boolean isAborted(boolean toggle) {
+		if (toggle) {
+			this.abort = this.abort == true ? false : true;
+		}
+		return this.abort;
+	}
 	public synchronized void cont() {
-		this.notify();
+		if (this.isAlive() ) {
+			this.notify();
+		}
 	}
 
 	public String getEFile() {
@@ -60,25 +68,25 @@ public class Worker extends Thread implements BasicEventHandler{
 			try {
 				new EventsReaderXMLv1(this.e).parse(this.eFile);
 			} catch (SAXException e) {
-				this.eFC.aboard(-99);
+				this.eFC.abort(-99);
 				throw new RuntimeException(e);
 			} catch (ParserConfigurationException e) {
-				this.eFC.aboard(-99);
+				this.eFC.abort(-99);
 				throw new RuntimeException(e);
 			} catch (IOException e) {
-				this.eFC.aboard(-99);
+				this.eFC.abort(-99);
 				throw new RuntimeException(e);
 			}
 		} else if (this.eFile.endsWith("txt.gz")) {
 			try {
 				new EventsReaderTXTv1(this.e).readFile(this.eFile);
 			} catch (Exception e) {
-				this.eFC.aboard(-99);
+				this.eFC.abort(-99);
 				e.printStackTrace();
 				
 			}
 		} else {
-			this.eFC.aboard(-99);
+			this.eFC.abort(-99);
 			throw new RuntimeException("Unrecognized events file suffix.");
 		}
 		this.eFC.timeStepFinished(true);
@@ -98,9 +106,14 @@ public class Worker extends Thread implements BasicEventHandler{
 		// TODO Auto-generated method stub
 		
 	}
-	
+		
 	@Override
 	public void handleEvent(Event event) {
+		if (this.isAborted(false)) {
+			log.warn("Stopping thread with Thread.stop()");
+			this.stop();
+		}
+		
 		if (this.time != event.getTime()) {
 			if (this.eFC.timeStepFinished(false)) {
 				try {
@@ -112,14 +125,10 @@ public class Worker extends Thread implements BasicEventHandler{
 			this.time = event.getTime();
 			this.numEvents = 0;
 		}
-		if (this.aboard) {
-			log.warn("Stopping thread with Thread.stop()");
-			this.stop();
-		}
+
 		this.numEvents++;
 		addEvent(event);
 	}
-	
 	public int getNumEvents(){
 		return this.numEvents;
 	}
