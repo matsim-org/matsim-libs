@@ -32,15 +32,15 @@ public class BiogemeWriter {
 
 	private Map<Leg, Leg> clustering = new HashMap<Leg, Leg>();
 	
-	private Population populationWithRoutedPlans;
+	// private Population populationWithRoutedPlans;
 	
 	private Population populationWithSurveyData;
 	
 	private Households households;
 	
-	public BiogemeWriter(Population populationWithSurveyData, Population populationWithRoutedPlans, Households households) {
+	public BiogemeWriter(Population populationWithSurveyData, Households households) {
 		this.populationWithSurveyData = populationWithSurveyData;
-		this.populationWithRoutedPlans = populationWithRoutedPlans;
+		// this.populationWithRoutedPlans = populationWithRoutedPlans;
 		this.households = households;
 	}
 
@@ -51,15 +51,15 @@ public class BiogemeWriter {
 			Household household = entry.getValue();
 			for (Id personId : household.getMemberIds()) {
 				Person personWithSurveyData = populationWithSurveyData.getPersons().get(personId);
-				Person personWithRoutedPlan = populationWithRoutedPlans.getPersons().get(personId);
+				// Person personWithRoutedPlan = populationWithRoutedPlans.getPersons().get(personId);
 				Plan planWithSurveyData = personWithSurveyData.getPlans().iterator().next();
-				Plan routedPlan = personWithRoutedPlan.getPlans().iterator().next();
+				// Plan routedPlan = personWithRoutedPlan.getPlans().iterator().next();
 				for (PlanElement planElement : planWithSurveyData.getPlanElements()) {
 					if (planElement instanceof Leg) {
 						Leg legWithSurveyData = (Leg) planElement;
 						int legIdx = planWithSurveyData.getPlanElements().indexOf(legWithSurveyData);
-						Leg routedLeg = (Leg) routedPlan.getPlanElements().get(legIdx);
-						writeChoiceLineIfPossible(household, personId, legWithSurveyData, routedLeg, legIdx);
+						// Leg routedLeg = (Leg) routedPlan.getPlanElements().get(legIdx);
+						writeChoiceLineIfPossible(household, personId, legWithSurveyData, legIdx);
 					}
 				}
 			}
@@ -67,20 +67,20 @@ public class BiogemeWriter {
 		biogemeFileWriter.close();
 	}
 
-	private void writeChoiceLineIfPossible(Household household, Id personId, Leg legWithSurveyData,
-			Leg routedLeg, int legIdx) {
+	private void writeChoiceLineIfPossible(Household household, Id personId, Leg legWithSurveyData, int legIdx) {
 		double householdIncome = household.getIncome().getIncome();
 		double personalIncome = distributeHouseholdIncomeToMembers(household);
 		DecimalFormat decimalFormat = new DecimalFormat("00");
 		String id = household.getId().toString() + "000" + decimalFormat.format(household.getMemberIds().indexOf(personId) +1);
 		if (legWithSurveyData.getMode() == TransportMode.car) {
+			Leg substitutePtLeg = clustering.get(legWithSurveyData);
 			Double distance = leg2travelDistance.get(legWithSurveyData);
-			if (distance != null && distance < 99990 ) {
+			if (substitutePtLeg != null && distance != null && distance < 99990 ) {
 				int choice = 1;
 				double t_car = legWithSurveyData.getTravelTime();
-				if (!Double.isNaN(t_car)) {
-					double freeSpeedCarTravelTime = routedLeg.getTravelTime();
-					double t_pt = carTime2ptTime(freeSpeedCarTravelTime);
+				double t_pt = substitutePtLeg.getTravelTime();
+				if (!Double.isNaN(t_car) && !Double.isNaN(t_pt)) {
+					// double freeSpeedCarTravelTime = routedLeg.getTravelTime();
 					double c_car = distance2carCost(distance);
 					double c_pt = distance2ptCost(distance);
 					writeBiogemeLine(choice, id, legIdx, t_car, t_pt, c_car, c_pt, householdIncome, personalIncome);
@@ -95,7 +95,7 @@ public class BiogemeWriter {
 				int choice = 2;
 				double t_pt = legWithSurveyData.getTravelTime();
 				double t_car = substituteCarLeg.getTravelTime();
-				if (!Double.isNaN(t_car)) {
+				if (!Double.isNaN(t_car) && !Double.isNaN(t_pt)) {
 					double c_car = distance2carCost(distance);
 					double c_pt = distance2ptCost(distance);
 					writeBiogemeLine(choice, id, legIdx, t_car, t_pt, c_car, c_pt, householdIncome, personalIncome);
