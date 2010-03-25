@@ -39,16 +39,17 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
 /**
  * The OTF has a file Reader and a file Writer part.
  * The writer is in charge of writing mvi data into a file.
- * 
- * @author dstrippgen 
+ *
+ * @author dstrippgen
  * @author dgrether
  */
 public class OTFFileWriter implements SnapshotWriter {
-	
+
 	private static final Logger log = Logger.getLogger(OTFFileWriter.class);
 
-	private static final int BUFFERSIZE = 300000000;
-	
+	private static final int BUFFERSIZE = 300000000; // ~300MB
+	private static final int FILE_BUFFERSIZE = 50000000; // ~50MB
+
 	protected OTFServerQuad2 quad = null;
 	protected final double interval_s;
 	protected double nextTime = -1;
@@ -110,7 +111,7 @@ public class OTFFileWriter implements SnapshotWriter {
 		// this is new, write connect into the mvi as well
 		this.zos.putNextEntry(new ZipEntry("connect.bin"));
 		log.info("writing ConnectionManager to file...");
-		connect.logEntries();
+		this.connect.logEntries();
 		new ObjectOutputStream(this.zos).writeObject(this.connect);
 		this.zos.closeEntry();
 	}
@@ -147,7 +148,7 @@ public class OTFFileWriter implements SnapshotWriter {
 
 		try {
 			this.zos = new ZipOutputStream(new BufferedOutputStream(
-					new FileOutputStream(this.outFileName), BUFFERSIZE));
+					new FileOutputStream(this.outFileName), FILE_BUFFERSIZE));
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
