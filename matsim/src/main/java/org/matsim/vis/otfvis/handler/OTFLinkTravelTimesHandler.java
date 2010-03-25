@@ -35,39 +35,39 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
  * @author david
  *
  */
-@Deprecated
-public class OTFLinkTravelTimesHandler extends OTFDefaultLinkHandler {
-
-	private static transient LinkTravelTimeCounter count =null;
-	static public class Writer extends  OTFDefaultLinkHandler.Writer {
-
-		private static final long serialVersionUID = -7249785000303972319L;
-
-		{
-			LinkTravelTimeCounter.init(server.getEvents(), 1000000);
-			count = LinkTravelTimeCounter.getInstance();
-		}
-
-		public Writer() {
-		}
-		@Override
-		public void writeDynData(ByteBuffer out) throws IOException {
-			Double erg = count.getLastLinkTravelTime(this.src.getLink().getId());
-			if (erg != null) out.putFloat((float)(this.src.getLink().getLength()/erg.doubleValue()));
-			else out.putFloat((float)this.src.getLink().getFreespeed(Time.UNDEFINED_TIME));
-
-		}
-
-		@Override
-		public OTFDataWriter<QLink> getWriter() {
-			if (count == null) 
-			{
-				LinkTravelTimeCounter.init(server.getEvents(), 1000000);
-				count = LinkTravelTimeCounter.getInstance();
-			}
-			return new Writer();
-		}
-	}
-
-
-}
+//@Deprecated
+//public class OTFLinkTravelTimesHandler extends OTFDefaultLinkHandler {
+//
+//	private static transient LinkTravelTimeCounter count =null;
+//	static public class Writer extends  OTFDefaultLinkHandler.Writer {
+//
+//		private static final long serialVersionUID = -7249785000303972319L;
+//
+//		{
+//			LinkTravelTimeCounter.init(server.getEvents(), 1000000);
+//			count = LinkTravelTimeCounter.getInstance();
+//		}
+//
+//		public Writer() {
+//		}
+//		@Override
+//		public void writeDynData(ByteBuffer out) throws IOException {
+//			Double erg = count.getLastLinkTravelTime(this.src.getLink().getId());
+//			if (erg != null) out.putFloat((float)(this.src.getLink().getLength()/erg.doubleValue()));
+//			else out.putFloat((float)this.src.getLink().getFreespeed(Time.UNDEFINED_TIME));
+//
+//		}
+//
+//		@Override
+//		public OTFDataWriter<QLink> getWriter() {
+//			if (count == null) 
+//			{
+//				LinkTravelTimeCounter.init(server.getEvents(), 1000000);
+//				count = LinkTravelTimeCounter.getInstance();
+//			}
+//			return new Writer();
+//		}
+//	}
+//
+//
+//}

@@ -65,7 +65,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 	public void afterPrepareSim() {
 		if (ownServer) {
 			UUID idOne = UUID.randomUUID();
-			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getNetwork(), queueSimulation.getEventsManager(), false);
+			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getNetwork(), queueSimulation.getEventsManager());
 			this.otfServer.setSimulation(this);
 			if (this.doVisualizeTeleportedAgents) {
 				this.teleportationWriter = new OTFTeleportAgentsDataWriter();

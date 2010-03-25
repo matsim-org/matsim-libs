@@ -27,8 +27,6 @@ import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.RMIClientSocketFactory;
-import java.rmi.server.RMIServerSocketFactory;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,9 +40,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.rmi.ssl.SslRMIClientSocketFactory;
-import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -161,15 +156,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	};
 
-
-	private OnTheFlyServer(RMIClientSocketFactory clientSocketFactory, RMIServerSocketFactory serverSocketFactory) throws RemoteException {
-		super(0, clientSocketFactory, serverSocketFactory);
-		OTFDataWriter.setServer(this);
-	}
-
 	private OnTheFlyServer() throws RemoteException {
 		super(0);
-		OTFDataWriter.setServer(this);
 	}
 
 	private void init(QNetwork network, EventsManager events){
@@ -177,17 +165,11 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		this.setEvents(events);
 	}
 
-
-	public static OnTheFlyServer createInstance(String readableName, QNetwork network, EventsManager events, boolean useSSL) {
-		registry = getRegistry(useSSL);
+	public static OnTheFlyServer createInstance(String readableName, QNetwork network, EventsManager events) {
+		registry = getRegistry();
 		try {
 			// Register with RMI to be seen from client
-			OnTheFlyServer instance;
-			if (useSSL) {
-				instance = new OnTheFlyServer(new SslRMIClientSocketFactory(), new SslRMIServerSocketFactory());
-			} else {
-				instance = new OnTheFlyServer();
-			}
+			OnTheFlyServer instance = new OnTheFlyServer();
 			instance.init(network, events);
 			registry.bind(readableName, instance);
 			log.info("OTFServer bound in RMI registry");
@@ -201,30 +183,18 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 	}
 
-	private static Registry getRegistry(boolean useSSL) {
+	private static Registry getRegistry() {
 		Registry registry;
-		if (useSSL) {
-			System.setProperty("javax.net.ssl.keyStore", "input/keystore");
-			System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
-			System.setProperty("javax.net.ssl.trustStore", "input/truststore");
-			System.setProperty("javax.net.ssl.trustStorePassword", "vspVSP");
+		try {
+			registry = LocateRegistry.getRegistry(4019);
+			// THIS Line is important, as this checks, if registry is REALLY
+			// connected "late binding"
+			registry.list();
+		} catch (RemoteException e) {
 			try {
-				registry = LocateRegistry.createRegistry(4019, new SslRMIClientSocketFactory(), new SslRMIServerSocketFactory());
-			} catch (RemoteException e) {
+				registry = LocateRegistry.createRegistry(4019);
+			} catch (RemoteException e1) {
 				throw new RuntimeException(e);
-			}
-		} else {
-			try {
-				registry = LocateRegistry.getRegistry(4019);
-				// THIS Line is important, as this checks, if registry is REALLY
-				// connected "late binding"
-				registry.list();
-			} catch (RemoteException e) {
-				try {
-					registry = LocateRegistry.createRegistry(4019);
-				} catch (RemoteException e1) {
-					throw new RuntimeException(e);
-				}
 			}
 		}
 		return registry;
@@ -368,7 +338,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 				quad.addAdditionalElement(writer);
 			}
 			quads.put(id, quad);
-			OTFDataWriter.setServer(this);
 			return quad;
 		}
 	}

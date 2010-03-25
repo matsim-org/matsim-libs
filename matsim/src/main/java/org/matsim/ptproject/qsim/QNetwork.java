@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 /**
- * QueueNetwork is responsible for creating the QueueLinks and QueueNodes.
  *
  * @author david
  * @author mrieser
