@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
+import org.matsim.vis.otfvis.data.fileio.OTFObjectInputStream;
 
 
 public class PopProviderFile implements PopulationProvider {
@@ -53,7 +53,7 @@ public class PopProviderFile implements PopulationProvider {
 			ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
 			ZipEntry infoEntry = zipFile.getEntry("net+population.bin");
 			BufferedInputStream is = new BufferedInputStream(zipFile.getInputStream(infoEntry),5000000);
-			ObjectInputStream inFile = new OTFFileReader.OTFObjectInputStream(is);
+			ObjectInputStream inFile = new OTFObjectInputStream(is);
 
 			network = (NetworkLayer)inFile.readObject();
 			population = (PopulationImpl)inFile.readObject();
