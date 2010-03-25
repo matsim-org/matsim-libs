@@ -51,7 +51,6 @@ public class WriteBiogemeFile {
 	private Households households = new HouseholdsImpl();
 
 	private BiogemeWriter biogemeWriter = new BiogemeWriter(scenarioWithSurveyData.getPopulation(), households);
-
 	private void parseClustering() throws IOException {
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(CLUSTERING_FILE);
