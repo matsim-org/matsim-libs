@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.signalsystems;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -30,6 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.signalsystems11.XMLIdRefType;
 import org.matsim.jaxb.signalsystems11.XMLSignalGroupDefinitionType;
@@ -72,7 +72,8 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 		log.info("starting unmarshalling " + filename);
 		InputStream stream = null;
 		try {
-			stream = new FileInputStream(filename);
+//			stream = new FileInputStream(filename);
+		  stream = IOUtils.getInputstream(filename);
 			xmlLssDefinition = (XMLSignalSystems) u.unmarshal(stream);
 		}
 		finally {

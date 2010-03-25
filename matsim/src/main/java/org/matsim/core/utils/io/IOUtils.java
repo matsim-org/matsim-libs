@@ -460,4 +460,54 @@ public class IOUtils {
 		}
 	}
 
+	 /**
+   * Tries to open the specified file for reading and returns an InputStream for it.
+   * Supports gzip-compressed files, such files are automatically decompressed.
+   * If the file is not found, a gzip-compressed version of the file with the
+   * added ending ".gz" will be searched for and used if found.
+   *
+   * @param filename The file to read, may contain the ending ".gz" to force reading a compressed file.
+   * @return InputStream for the specified file.
+   * @throws FileNotFoundException
+   * @throws IOException
+   *
+   * @author dgrether
+   */
+  public static InputStream getInputstream(final String filename) throws FileNotFoundException, IOException {
+    InputStream inputStream = null;
+    if (filename == null) {
+      throw new FileNotFoundException("No filename given (filename == null)");
+    }
+    if (new File(filename).exists()) {
+      if (filename.endsWith(GZ)) {
+        inputStream = new GZIPInputStream(new FileInputStream(filename));
+      } else {
+        inputStream = new FileInputStream(filename);
+      }
+    } else if (new File(filename + GZ).exists()) {
+        inputStream = new GZIPInputStream(new FileInputStream(filename));
+    } 
+    else {
+      InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
+      if (stream != null) {
+        if (filename.endsWith(GZ)) {
+          inputStream = new GZIPInputStream(new FileInputStream(filename));
+        } 
+        else {
+          inputStream = new FileInputStream(filename);
+        }
+      } 
+      else {
+        inputStream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
+      }
+      if (inputStream != null) {
+        log.info("streaming file from classpath: " + filename);
+      }
+    }
+    if (inputStream == null) {
+      throw new FileNotFoundException(filename);
+    }
+    return inputStream;
+  }
+	
 }

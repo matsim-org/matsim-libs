@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.signalsystems;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,6 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptivePlanbasedSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptiveSignalSystemControlInfoType;
@@ -82,7 +82,7 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 
 			InputStream stream = null;
 			try {
-				stream = new FileInputStream(filename);
+				stream = IOUtils.getInputstream(filename);
 				xmlLssConfig = (XMLSignalSystemConfig)u.unmarshal(stream);
 			}
 			finally {
