@@ -32,10 +32,10 @@ import org.matsim.core.gbl.MatsimRandom;
 /**
  * An extended version of the QSimEngine that uses an array of
  * QSimEngineThreads to handle the movement of the Links and Nodes.
- * The results of the Simulation stays deterministic but the order 
- * of the LinkEvents within a single TimeStep does not. Ordering 
+ * The results of the Simulation stays deterministic but the order
+ * of the LinkEvents within a single TimeStep does not. Ordering
  * the Events by Time AND AgentId should produce deterministic results.
- * 
+ *
  * Due to the fact that a Random Number generator is used for each
  * simulated Node instead of one in total as the Single CPU
  * QSim does, the Results will slightly vary between
@@ -45,21 +45,21 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 
 	private QSimEngineThread[] threads;
 	private int numOfThreads;
-	
+
 	private ExtendedQueueNode[][] parallelNodesArrays;
 	private List<List<QLink>> parallelSimLinksLists;
 
 	private CyclicBarrier separationBarrier;	// separates moveNodes and moveLinks
 	private CyclicBarrier startBarrier;
 	private CyclicBarrier endBarrier;
-	
+
 
 	public ParallelQSimEngine(final QSim sim, final Random random, int numOfThreads)
 	{
 	  super(sim, random);
 		initQSimEngineThreads(numOfThreads);
 	}
-	
+
 	/**
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
@@ -77,11 +77,11 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		 * Calling the afterSim Method of the QSimEngineThreads
 		 * will set their simulationRunning flag to false.
 		 */
-		for (QSimEngineThread thread : threads)
+		for (QSimEngineThread thread : this.threads)
 		{
 			thread.afterSim();
 		}
-		
+
 		/*
 		 * Triggering the startBarrier of the QSimEngineThreads.
 		 * They will check whether the Simulation is still running.
@@ -90,7 +90,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		try
 		{
 			this.startBarrier.await();
-		} 
+		}
 		catch (InterruptedException e)
 		{
 			Gbl.errorMsg(e);
@@ -98,10 +98,10 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		{
 			Gbl.errorMsg(e);
 		}
-		
+
 		super.afterSim();
 	}
-	
+
 	/*
 	 * The Threads are waiting at the startBarrier.
 	 * We trigger them by reaching this Barrier. Now the
@@ -117,7 +117,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		try
 		{
 			// set current Time
-			for (QSimEngineThread thread : threads)
+			for (QSimEngineThread thread : this.threads)
 			{
 				thread.setTime(time);
 			}
@@ -135,14 +135,14 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	      	Gbl.errorMsg(e);
 		}
 	}
-	
+
 	/*
 	 * We have to call this method synchronized because it is used by
 	 * parallel Threads to move the Nodes.
 	 * Maybe each Thread could have its own list and the Links can be collected
 	 * from the main Thread to avoid this?
-	 * 
-	 * Should not be called anymore from the parallel Threads because we use 
+	 *
+	 * Should not be called anymore from the parallel Threads because we use
 	 * them as LinkActivators.
 	 */
 	@Override
@@ -153,26 +153,26 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 
 	@Override
 	public int getNumberOfSimulatedLinks() {
-		
+
 		int numLinks = 0;
-		
-		for (QSimEngineThread thread : threads)
+
+		for (QSimEngineThread thread : this.threads)
 		{
 			numLinks = numLinks + thread.getNumberOfSimulatedLinks();
 		}
-		
+
 		return numLinks;
 	}
-	
+
 	private void initQSimEngineThreads(int numOfThreads)
-	{ 
+	{
 		this.numOfThreads = numOfThreads;
 
-		createNodesArrays(simNodesArray);
-		createLinkLists(allLinks);
+		createNodesArrays(this.simNodesArray);
+		createLinkLists(this.allLinks);
 
-		threads = new QSimEngineThread[numOfThreads];
-		LinkReActivator linkReActivator = new LinkReActivator(threads);
+		this.threads = new QSimEngineThread[numOfThreads];
+		LinkReActivator linkReActivator = new LinkReActivator(this.threads);
 
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.separationBarrier = new CyclicBarrier(numOfThreads, linkReActivator);
@@ -185,25 +185,25 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 			thread.setName("QSimEngineThread" + i);
 
 			thread.setExtendedQueueNodeArray(this.parallelNodesArrays[i]);
-			thread.setLinks(parallelSimLinksLists.get(i));
+			thread.setLinks(this.parallelSimLinksLists.get(i));
 			thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
-			threads[i] = thread;
+			this.threads[i] = thread;
 
 			thread.start();
 		}
 
 		// Assign every Link to a LinkActivator, depending on its InNode
-		assignLinkActivators();
+//		assignLinkActivators();
 	}
 
-	
+
 	/*
 	 * Create equal sized Nodes Arrays.
 	 */
 	private void createNodesArrays(QNode[] simNodesArray)
 	{
 		List<List<ExtendedQueueNode>> nodes = new ArrayList<List<ExtendedQueueNode>>();
-		for (int i = 0; i < numOfThreads; i++)
+		for (int i = 0; i < this.numOfThreads; i++)
 		{
 			nodes.add(new ArrayList<ExtendedQueueNode>());
 		}
@@ -212,7 +212,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		for (QNode queueNode : simNodesArray)
 		{
 			ExtendedQueueNode extendedQueueNode = new ExtendedQueueNode(queueNode, MatsimRandom.getLocalInstance());
-			nodes.get(roundRobin % numOfThreads).add(extendedQueueNode);
+			nodes.get(roundRobin % this.numOfThreads).add(extendedQueueNode);
 			roundRobin++;
 		}
 
@@ -220,14 +220,14 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		 * Now we create Arrays out of our Lists because iterating over them
 		 * is much faster.
 		 */
-		parallelNodesArrays = new ExtendedQueueNode[this.numOfThreads][];
+		this.parallelNodesArrays = new ExtendedQueueNode[this.numOfThreads][];
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			List<ExtendedQueueNode> list = nodes.get(i);
 
 			ExtendedQueueNode[] array = new ExtendedQueueNode[list.size()];
 			list.toArray(array);
-			parallelNodesArrays[i] = array;
+			this.parallelNodesArrays[i] = array;
 		}
 	}
 
@@ -236,11 +236,11 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	 */
 	private void createLinkLists(List<QLink> allLinks)
 	{
-		parallelSimLinksLists = new ArrayList<List<QLink>>();
+		this.parallelSimLinksLists = new ArrayList<List<QLink>>();
 
-		for (int i = 0; i < numOfThreads; i++)
+		for (int i = 0; i < this.numOfThreads; i++)
 		{
-			parallelSimLinksLists.add(new ArrayList<QLink>());
+			this.parallelSimLinksLists.add(new ArrayList<QLink>());
 		}
 
 		/*
@@ -251,7 +251,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 			int roundRobin = 0;
 			for(QLink link : allLinks)
 			{
-				parallelSimLinksLists.get(roundRobin % numOfThreads).add(link);
+				this.parallelSimLinksLists.get(roundRobin % this.numOfThreads).add(link);
 				roundRobin++;
 			}
 		}
@@ -263,11 +263,11 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	 * that Node. So we can assign each QLink to the
 	 * Thread that handles its InNode.
 	 */
-	private void assignLinkActivators()
-	{
-		int thread = 0;
-		for (ExtendedQueueNode[] array : parallelNodesArrays)
-		{
+//	private void assignLinkActivators()
+//	{
+//		int thread = 0;
+//		for (ExtendedQueueNode[] array : parallelNodesArrays)
+//		{
 //			for (ExtendedQueueNode node : array)
 //			{
 //				Node n = node.getQueueNode().getNode();
@@ -277,10 +277,10 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 //					QLink qLink = node.getQueueNode().queueNetwork.getQueueLink(outLink.getId());
 //				}
 //			}
-			thread++;
-		}
-	}
-	
+//			thread++;
+//		}
+//	}
+
 	/*
 	 * Contains a QueueNode and MATSimRandom Object that is used when
 	 * moving Vehicles over the Node.
@@ -308,7 +308,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 			return this.random;
 		}
 	}
-	
+
 	/*
 	 * We do the load balancing between the Threads using some kind
 	 * of round robin.
@@ -336,14 +336,14 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 			/*
 			 * Each Thread contains a List of Links to activate.
 			 */
-			for (QSimEngineThread thread : threads)
+			for (QSimEngineThread thread : this.threads)
 			{
 				/*
 				 * We do not redistribute the Links - they will be processed
 				 * by the same thread during the whole simulation.
 				 */
 				thread.activateLinks();
-				
+
 //				/*
 //				 * We redistribute the deactivated Links among all Threads.
 //				 */

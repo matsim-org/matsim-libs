@@ -31,7 +31,6 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
@@ -89,7 +88,7 @@ public class OTFVis {
 
 	public static void main(final String[] args) {
 		String [] args2 = args;
-		
+
 		if (args.length == 0) {
 			args2 = chooseFile(args2);
 		}
@@ -98,7 +97,7 @@ public class OTFVis {
 			return;
 		}
 		String arg0l = args2[0].toLowerCase();
-		
+
 		if (arg0l.endsWith(".veh.gz") || arg0l.toLowerCase().endsWith(".veh")) {
 			playVEH(args2);
 		} else if (arg0l.endsWith(".mvi")) {
@@ -127,23 +126,23 @@ public class OTFVis {
 
 	public static final String[] chooseFile(final String[] args) {
 		JFileChooser fc = new JFileChooser();
-	    
-	    fc.setFileFilter( new FileFilter() { 
-	      @Override public boolean accept( File f ) { 
-	        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".xml" ); 
+
+	    fc.setFileFilter( new FileFilter() {
+	      @Override public boolean accept( File f ) {
+	        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".xml" );
 	      }
-	      @Override public String getDescription() { return "MATSim net or config file (*.xml)"; } 
-	    } ); 
+	      @Override public String getDescription() { return "MATSim net or config file (*.xml)"; }
+	    } );
 
-	    fc.setFileFilter( new FileFilter() { 
-	      @Override public boolean accept( File f ) { 
-	        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".mvi" ); 
-	      } 
-	      @Override public String getDescription() { return "OTFVis movie file (*.mvi)"; } 
-	    } ); 
+	    fc.setFileFilter( new FileFilter() {
+	      @Override public boolean accept( File f ) {
+	        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".mvi" );
+	      }
+	      @Override public String getDescription() { return "OTFVis movie file (*.mvi)"; }
+	    } );
 
-	    int state = fc.showOpenDialog( null ); 
-	    if ( state == JFileChooser.APPROVE_OPTION ) { 
+	    int state = fc.showOpenDialog( null );
+	    if ( state == JFileChooser.APPROVE_OPTION ) {
 	    	String [] args_new = {fc.getSelectedFile().getAbsolutePath()};
 	    	return args_new;
 	    }
@@ -176,7 +175,7 @@ public class OTFVis {
 			client.run();
 		}
 	}
-	
+
 	public static final void playConfig(final String configFilename){
 		playConfig(new String[]{configFilename});
 	}
@@ -190,7 +189,7 @@ public class OTFVis {
 		log.info("Complete config dump done.");
 		if (loader.getScenario().getConfig().getQSimConfigGroup() == null){
 		  log.error("Cannot play live config without config module for QSim (in Java QSimConfigGroup). " +
-		  		"Fixing this by adding default config module for QSim. " + 
+		  		"Fixing this by adding default config module for QSim. " +
 		  		"Please check if default values fit your needs, otherwise correct them in " +
 		  		"the config given as parameter to get a valid visualization!");
 		  loader.getScenario().getConfig().setQSimConfigGroup(new QSimConfigGroup());
@@ -204,7 +203,7 @@ public class OTFVis {
 		queueSimulation.setIterationNumber(scenario.getConfig().controler().getLastIteration());
 		queueSimulation.run();
 	}
-	
+
 	public static final void playNetwork(final String[] args) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
@@ -228,12 +227,11 @@ public class OTFVis {
 		}
 		Scenario scenario = new ScenarioImpl();
 		Gbl.setConfig(scenario.getConfig());
-		Network net = scenario.getNetwork();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		QSim sim = new QSim(scenario, new EventsManagerImpl());
 		OTFEvent2MVI converter = new OTFEvent2MVI(sim.getQNetwork(), eventFile, mviFile, snapshotPeriod);
 		converter.convert();
 	}
-	
+
 }
