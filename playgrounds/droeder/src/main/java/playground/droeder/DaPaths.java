@@ -25,14 +25,14 @@ package playground.droeder;
  */
 public interface DaPaths {
 	
-	final String VSP =  "D:\\VSP\\";
-	final String SHAREDSVN = VSP + "shared-svn\\";
-	final String STUDIES = SHAREDSVN + "studies\\";
+	final String VSP =  "D:/VSP/";
+	final String SHAREDSVN = VSP + "shared-svn/";
+	final String STUDIES = SHAREDSVN + "studies/";
 	
-	final String DGSTUDIES = STUDIES + "dgrether\\";
-	final String DASTUDIES = STUDIES + "droeder\\";
+	final String DGSTUDIES = STUDIES + "dgrether/";
+	final String DASTUDIES = STUDIES + "droeder/";
 	
-	final String OUTPUT = VSP + "output\\";
+	final String OUTPUT = VSP + "output/";
 	
 	
 	

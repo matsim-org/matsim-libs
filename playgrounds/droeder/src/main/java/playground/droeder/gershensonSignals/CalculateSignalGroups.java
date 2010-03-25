@@ -24,26 +24,25 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.signalsystems.systems.SignalSystemDefinition;
 
 /**
- * @author Daniel
+ * @author droeder
  *
  */
 public class CalculateSignalGroups{
@@ -52,103 +51,150 @@ public class CalculateSignalGroups{
 	private Map<Id, SignalGroupDefinition> groups;
 	private Network net;
 	
-	private Map<Id, DaSgDirection> dir =  new HashMap<Id, DaSgDirection>();
-	private Map<Id, List<Id>> corrGroups =  new HashMap<Id, List<Id>>();
+	private Map<Id, List<SignalGroupDefinition>> corrGroups =  new HashMap<Id, List<SignalGroupDefinition>>();
+	private Map<Id, SortedSet<Id>> groupsOnLink = new HashMap<Id, SortedSet<Id>>();
+	private Map<Id, Id> corrLinks = new HashMap<Id, Id>();
+	
+	private double right = (3.0/4)* Math.PI;
+	private double left = (5.0/4)*Math.PI;
+	private double thetaMain;
+	private double thetaTemp;
+	private double thetaDiff;
+	
 	
 	public CalculateSignalGroups(Map<Id, SignalGroupDefinition> groups, Network net){
 		this.groups = groups;
 		this.net = net;
 	}
 	
-	private void calcGroupDir(){
-		Link mainLink ;
-		Link temp;
-		double thetaMain;
-		double thetaTemp;
-		double thetaDiff;
-		double right = (3/4) * Math.PI ;
-		double left = (5/4) * Math.PI;
+	private void groupsOnLink(){
+		for (SignalGroupDefinition sd: this.groups.values()){
+			if(this.groupsOnLink.containsKey(sd.getLinkRefId())){
+				this.groupsOnLink.get(sd.getLinkRefId()).add(sd.getId());
+			}else{
+				this.groupsOnLink.put(sd.getLinkRefId(), new TreeSet<Id>());
+				this.groupsOnLink.get(sd.getLinkRefId()).add(sd.getId());
+			}
+		}
+	}
+	
+	private void calcCorrLinks(){
 		
-		for (SignalGroupDefinition sg : groups.values()){
-			mainLink =  net.getLinks().get(sg.getLinkRefId());
-			thetaMain = calcAngle(mainLink);
-			dir.put(sg.getId(), null);
-			for (Id i : sg.getToLinkIds()){
-				temp =  net.getLinks().get(i);
-				thetaTemp = calcAngle(temp);
-				thetaDiff = thetaTemp - thetaMain;
-				if (thetaDiff < right){
-					if (dir.get(sg.getId()).equals(null)){
-						dir.put(sg.getId(), DaSgDirection.R);
-					}else if(dir.get(sg.getId()).equals(DaSgDirection.L)){
-						dir.put(sg.getId(), DaSgDirection.LR);
-					}else if(dir.get(sg.getId()).equals(DaSgDirection.S)){
-						dir.put(sg.getId(), DaSgDirection.RS);
-					}else if(dir.get(sg.getId()).equals(DaSgDirection.LS)){
-						dir.put(sg.getId(), DaSgDirection.LRS);
-						break;
-					}
-				}else if (thetaDiff > left){
-					if (dir.get(sg.getId()).equals(null)){
-						dir.put(sg.getId(), DaSgDirection.L);
-					}else if(dir.get(sg.getId()).equals(DaSgDirection.R)){
-						dir.put(sg.getId(), DaSgDirection.LR);
-					}else if(dir.get(sg.getId()).equals(DaSgDirection.S)){
-						dir.put(sg.getId(), DaSgDirection.LS);
-					}else if(dir.get(sg.getId()).equals(DaSgDirection.RS)){
-						dir.put(sg.getId(), DaSgDirection.LRS);
-						break;
-					}
-				}else{
-					if (dir.get(sg.getId()).equals(null)){
-						dir.put(sg.getId(), DaSgDirection.S);
-					}else if(dir.get(sg.getId()).equals(DaSgDirection.L)){
-						dir.put(sg.getId(), DaSgDirection.LS);
-					}else if(dir.get(sg.getId()).equals(DaSgDirection.S)){
-						dir.put(sg.getId(), DaSgDirection.RS);
-					}else if(dir.get(sg.getId()).equals(DaSgDirection.LR)){
-						dir.put(sg.getId(), DaSgDirection.LRS);
-						break;
+		for (Id i : groupsOnLink.keySet()){
+			for (Id ii :groupsOnLink.keySet()){
+				if(!(corrLinks.containsKey(i)) && !(corrLinks.containsValue(i))){
+					corrLinks.put(i, new IdImpl("null"));
+				}
+				if(!(corrLinks.containsKey(ii) && !corrLinks.containsValue(ii))){
+					thetaMain = this.calcAngle(net.getLinks().get(i));
+					thetaTemp = this.calcAngle(net.getLinks().get(ii));
+					thetaDiff = Math.abs(thetaMain-thetaTemp);
+					if ((thetaDiff>right) && (thetaDiff<left)){
+						corrLinks.put(i, ii);
 					}
 				}
 			}
 		}
-		
 	}
 	
-	public Map<Id, List<Id>> calcCorrGroups(){
+	public Map<Id, List<SignalGroupDefinition>> calcCorrGroups(){
+		int i;
+		Id id;
+		List<SignalGroupDefinition> temp;
+		List<SignalGroupDefinition> left;
+		List<SignalGroupDefinition> other;
+		this.groupsOnLink();
+		this.calcCorrLinks();
 		
-
-		Link mainLink ;
-		Link temp;
-		List <Id> corrList;
-		boolean leftGroup;
-		double thetaMain;
-		Double thetaTemp;
-		double thetaDiff;
-		final double delta = Math.PI /4;
-
 		
-		for (SignalGroupDefinition sg : groups.values()){
-			corrGroups.put(sg.getId(), new LinkedList<Id>());
-			corrList = corrGroups.get(sg.getId());
-			for (SignalGroupDefinition sg2 : groups.values()){
-				if(!(sg2.getId().equals(sg.getId())) && sg2.getLinkRefId().equals(sg.getLinkRefId())){
+		i = 1;
+		// iteration over all corresponding Links
+		for (Entry<Id, Id> e : corrLinks.entrySet()){
+			// do only if there's a corresponding Link
+			if(!(e.getValue().equals(new IdImpl("null")))){
+				//do if both corresponding Links have only one sg
+				if ((groupsOnLink.get(e.getKey()).size() == 1) && (groupsOnLink.get(e.getValue()).size() == 1)){
+					temp = new LinkedList<SignalGroupDefinition>();
+					temp.add(groups.get(groupsOnLink.get(e.getKey()).first()));
+					temp.add(groups.get(groupsOnLink.get(e.getValue()).first()));
+					id = new IdImpl(i);
+					corrGroups.put(id, temp);
+					i++;
+				}
+				// else, sort out the groups for left Turns
+				else{
 					
+					left = new LinkedList<SignalGroupDefinition>();
+					other = new LinkedList<SignalGroupDefinition>();
+					for (Id ii : groupsOnLink.get(e.getKey())){
+						thetaMain = calcAngle(net.getLinks().get(groups.get(ii).getLinkRefId()));
+						thetaTemp = 0;
+						for(Id outLink: groups.get(ii).getToLinkIds()){
+							double theta = calcAngle(net.getLinks().get(outLink));
+							if (theta>thetaTemp){
+								thetaTemp = theta;
+							}
+						}
+						thetaDiff = Math.abs(thetaMain-thetaTemp);
+						if (thetaDiff > this.left){
+							left.add(groups.get(ii));
+						}else{
+							other.add(groups.get(ii));
+						}
+					}
+					for (Id ii : groupsOnLink.get(e.getValue())){
+						thetaMain = calcAngle(net.getLinks().get(groups.get(ii).getLinkRefId()));
+						thetaTemp = 0;
+						for(Id outLink: groups.get(ii).getToLinkIds()){
+							double theta = calcAngle(net.getLinks().get(outLink));
+							if (theta>thetaTemp){
+								thetaTemp = theta;
+							}
+						}
+						thetaDiff = Math.abs(thetaMain-thetaTemp);
+						if (thetaDiff > this.left){
+							left.add(groups.get(ii));
+						}else{
+							other.add(groups.get(ii));
+						}
+					}
+					id = new IdImpl(i);
+					corrGroups.put(id, left);
+					i++;
+					id = new IdImpl(i);
+					corrGroups.put(id, other);
+					i++;
 				}
+			}
+			// do if there is no corresponding Link
+			else{
+				temp = new LinkedList<SignalGroupDefinition>();
+				for (Id ii : groupsOnLink.get(e.getKey())){
+					temp.add(groups.get(ii));
+				}
+				id = new IdImpl(i);
+				corrGroups.put(id, temp);
+				i++;
 			}
 		}
 		
-		for (Entry<Id, DaSgDirection> e : dir.entrySet()){
-			;
+		// check if a group is missed
+		temp =  new LinkedList<SignalGroupDefinition>();
+		for (List<SignalGroupDefinition> l  : corrGroups.values()){
+			temp.addAll(l);
+		}
+		for (SignalGroupDefinition sd : groups.values()){
+			if(!(temp.contains(sd))) {
+				throw new MissingResourceException("sg is missing", CalculateSignalGroups.class.toString(), sd.getId().toString());
+			}
 		}
 		
-		return null;
+		return this.corrGroups;
 	}
-	
 	private double calcAngle(Link l){
 		Coord c = this.getVector(l);
 		double theta = Math.atan2(c.getY(), c.getX());
+		
 		if (theta < 0) theta += 2*Math.PI;
 		
 		return theta;
@@ -169,7 +215,6 @@ public class CalculateSignalGroups{
 					for(SignalGroupDefinition sd2 : groups.values()){
 						if(sd2.getLinkRefId().equals(l.getId())){
 							corrGroups.put(sd.getId(), sd2.getId());
-							
 						}
 					}
 				}else{
@@ -201,7 +246,7 @@ public class CalculateSignalGroups{
 		return cg;
 	}
 	
-	private static Link calculateLink(Link inLink){
+	private Link calculateLink(Link inLink){
 		Coord coordInLink = getVector(inLink);
 		double corrAngle = (Math.PI);
 		double temp = Math.PI *3/8;
@@ -265,7 +310,8 @@ public class CalculateSignalGroups{
 		return mainOutLinks;
 	}
 	
-	private static Coord getVector(Link link){
+	
+	private Coord getVector(Link link){
 		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
 		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();		
 		return new CoordImpl(x, y);

@@ -21,7 +21,6 @@ package playground.droeder.gershensonSignals;
 
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
@@ -44,31 +43,27 @@ import playground.droeder.DaPaths;
  * @author droeder
  *
  */
-public class DenverScenarioGenerator {
+public class CottbusScenarioGenerator {
 	
-	private static final Logger log = Logger.getLogger(DenverScenarioGenerator.class);
-
-	private static final String INPUT = DaPaths.DGSTUDIES + "denver/";
-	private static final String OUTPUT =DaPaths.DASTUDIES + "denver/";
-	//INPUT
-	private static final String NETWORKFILE = INPUT + "networkDenver.xml";
-	private static final String LANESINPUTFILE = INPUT + "laneDefinitions.xml";
-	private static final String SIGNALSYSTEMINPUTFILE = OUTPUT + "signalSystemsByNodes.xml";
-	private static final String PLANSINPUTFILE = INPUT + "plans.xml"; 
-	
-	// OUTPUT
-	private static final String CHANGEEVENTSFILE = OUTPUT +"changeEventsFile.xml";
-	public static final String CONFIGOUTPUTFILE = OUTPUT + "denverConfig.xml";
-	private static final String SIGNALSYSTEMCONFIG = OUTPUT + "signalSystemConfig.xml";
-	private static final String OUTPUTDIRECTORY = DaPaths.OUTPUT + "denver/" ;
-	
-	// DEFINITIONS
-	protected static String controllerClass = DaAdaptivController.class.getCanonicalName();
-	private static final int iterations = 1;
-	Id id1 = new IdImpl("1");
-	Id id2 = new IdImpl("2");
-	
-	
+		private static final String INPUT = DaPaths.DGSTUDIES + "cottbus/";
+		private static final String OUTPUT =DaPaths.DASTUDIES + "cottbus/";
+		//INPUT
+		private static final String NETWORKFILE = INPUT + "network.xml";
+		private static final String LANESINPUTFILE = INPUT + "laneDefinitions.xml";
+		private static final String SIGNALSYSTEMINPUTFILE = OUTPUT + "signalSystemsByNodes.xml";
+		private static final String PLANSINPUTFILE = INPUT + "plans.xml"; 
+		
+		// OUTPUT
+		private static final String CHANGEEVENTSFILE = OUTPUT +"changeEventsFile.xml";
+		public static final String CONFIGOUTPUTFILE = OUTPUT + "cottbusConfig.xml";
+		private static final String SIGNALSYSTEMCONFIG = OUTPUT + "signalSystemConfig.xml";
+		private static final String OUTPUTDIRECTORY = DaPaths.OUTPUT + "cottbus/" ;
+		
+		// DEFINITIONS
+		protected static String controllerClass = DaAdaptivController.class.getCanonicalName();
+		private static final int iterations = 1;
+		Id id1 = new IdImpl("1");
+		Id id2 = new IdImpl("2");
 	
 	public void createScenario(){
 		ScenarioImpl sc = new ScenarioImpl();
@@ -123,25 +118,6 @@ public class DenverScenarioGenerator {
 		MatsimSignalSystemConfigurationsWriter ssConfigsWriter = new MatsimSignalSystemConfigurationsWriter(ssConfigs);	
 		ssConfigsWriter.writeFile(SIGNALSYSTEMCONFIG);
 	}
-	
-//	private void createChangeEvents (ScenarioImpl sc){
-//		Network net = sc.getNetwork();
-//		List<NetworkChangeEvent> ce = new LinkedList<NetworkChangeEvent>();
-//		NetworkChangeEvent nce;
-//		
-//		nce = new NetworkChangeEvent(6*3600 + 90);
-//		nce.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR,0.1));
-//		nce.addLink(net.getLinks().get(sc.createId("35")));
-//		ce.add(nce);
-//		
-//		nce = new NetworkChangeEvent(6*3600 + 390);
-//		nce.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 10));
-//		nce.addLink(net.getLinks().get(sc.createId("35")));
-//		ce.add(nce);
-//		
-//		NetworkChangeEventsWriter ceWriter = new NetworkChangeEventsWriter();
-//		ceWriter.write(CHANGEEVENTSFILE, ce);
-//	}
 	
 private void createConfig(Config config) {
 		
@@ -202,10 +178,11 @@ private void createConfig(Config config) {
 
 public static void main(final String[] args) {
 	try {
-		new DenverScenarioGenerator().createScenario();
+		new CottbusScenarioGenerator().createScenario();
 	} catch (Exception e) {
 		e.printStackTrace();
 	}
 
 }
+
 }

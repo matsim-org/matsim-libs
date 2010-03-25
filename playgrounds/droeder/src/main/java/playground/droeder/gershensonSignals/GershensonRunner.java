@@ -19,15 +19,15 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -48,7 +48,6 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
 import playground.droeder.Analysis.SignalSystems.SignalGroupStateTimeHandler;
-import playground.droeder.charts.DaBarChart;
 
 
 
@@ -67,15 +66,21 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private int maxGreen;
 	
 	
-	private Map<Id, Id> corrGroups;
-	private Map<Id, List<Id>> compGroups;
+//	private Map<Id, Id> corrGroups;
+//	private Map<Id, List<Id>> compGroups;
 	private Map<Id, Id> mainOutLinks;
+	
+	private CalculateSignalGroups csg;
+	
+	private Map<Id, Map<Id, SignalGroupDefinition>> signalSystems = new HashMap<Id, Map<Id,SignalGroupDefinition>>();
+	private Map<Id, Map<Id, List<SignalGroupDefinition>>> newCorrGroups = new HashMap<Id, Map<Id,List<SignalGroupDefinition>>>();
+	private Map<Id, Map<Id, Id>> newMainOutlinks = new HashMap<Id, Map<Id,Id>>();
 	
 	private Map<Integer, Double> averageTT;
 	private static double avTT = 0;
 	
-	private static Map<Integer, Map<Integer, Double>> nAndUT = new LinkedHashMap<Integer, Map<Integer,Double>>();
-	private static LinkedHashMap<Number, Number> nAndT = new LinkedHashMap<Number, Number>();
+//	private static Map<Integer, Map<Integer, Double>> nAndUT = new LinkedHashMap<Integer, Map<Integer,Double>>();
+//	private static LinkedHashMap<Number, Number> nAndT = new LinkedHashMap<Number, Number>();
 	
 	
 	private AverageTTHandler handler1;
@@ -83,9 +88,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private SignalGroupStateTimeHandler handler3;
 	
 	// "D" run denver -- "G" run gershensonTestNetwork --- "C" run cottbus
-	private static final String config = "D";
-	// "G" for GershensonController -- "I" for InterimController
-	private static final String controller = "G";
+	private static final String config = "C";
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 
@@ -101,18 +104,13 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		}else if (configFile == "D"){
 			log.info("start Denver");
 			DenverScenarioGenerator dsg = new DenverScenarioGenerator();
-			if(controller == "G"){
-				dsg.controllerClass =  GershensonAdaptiveTrafficLightController.class.getCanonicalName();
-			}else if(controller =="I"){
-				dsg.controllerClass  = AdaptiveInterimSignalController.class.getCanonicalName();
-			}
 			dsg.createScenario();
-			conf = DaPaths.OUTPUT + "denver\\denverConfig.xml";
+			conf = DaPaths.DASTUDIES + "denver\\denverConfig.xml";
 		}else if (configFile == "opti"){
-			conf = DaPaths.OUTPUT + "denver\\denverConfig.xml";
+			conf = DaPaths.DASTUDIES + "denver\\denverConfig.xml";
 		}
 		else if (configFile == "C"){
-			conf = DaPaths.OUTPUT + "cottbus\\cottbusConfig.xml";
+			conf = DaPaths.DASTUDIES + "cottbus\\cottbusConfig.xml";
 		}
 		else{
 			conf = configFile;
@@ -139,9 +137,26 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				Map<Id, SignalGroupDefinition> groups = c.getScenario().getSignalSystems().getSignalGroupDefinitions();
-				CalculateSignalGroups csg = new CalculateSignalGroups(groups, c.getNetwork());
-				corrGroups = csg.calculateCorrespondingGroups();
-				compGroups = csg.calculateCompetingGroups(corrGroups);
+				
+				for (Entry<Id, SignalGroupDefinition> e : groups.entrySet()){
+					if(signalSystems.containsKey(e.getValue().getSignalSystemDefinitionId())){
+						signalSystems.get(e.getValue().getSignalSystemDefinitionId()).put(e.getValue().getId(), e.getValue());
+					}else {
+						signalSystems.put(e.getValue().getSignalSystemDefinitionId(), new HashMap<Id, SignalGroupDefinition>());
+						signalSystems.get(e.getValue().getSignalSystemDefinitionId()).put(e.getValue().getId(), e.getValue());
+					}
+				}
+				
+				for (Entry<Id, Map<Id, SignalGroupDefinition>> e : signalSystems.entrySet()){
+					csg = new CalculateSignalGroups(e.getValue(), c.getNetwork());
+					newCorrGroups.put(e.getKey(), csg.calcCorrGroups());
+					newMainOutlinks.put(e.getKey(), csg.calculateMainOutlinks());
+				}
+				
+				
+				csg = new CalculateSignalGroups(groups, c.getNetwork());
+//				corrGroups = csg.calculateCorrespondingGroups();
+//				compGroups = csg.calculateCompetingGroups(corrGroups);
 				mainOutLinks = csg.calculateMainOutlinks();
 				
 				handler1 = new AverageTTHandler(c.getPopulation().getPersons().size());
@@ -194,17 +209,18 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			public void notifySimulationInitialized(SimulationInitializedEvent<QSim> e) {
 //				AdaptiveSignalSystemControlerImpl adaptiveController;
 				QSim qs = e.getQueueSimulation();
-				if (controller == "G"){
-					GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+				
+				for(Entry<Id, Map<Id, SignalGroupDefinition>> ee: signalSystems.entrySet()){
+					DaAdaptivController adaptiveController = (DaAdaptivController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
 					adaptiveController.setParameters(n, u, cap, maxGreen);
-					adaptiveController.init(corrGroups, compGroups, mainOutLinks, e.getQueueSimulation().getQNetwork(), handler2);
-					c.getEvents().addHandler(adaptiveController);				
-				}else{
-					AdaptiveInterimSignalController adaptiveController = (AdaptiveInterimSignalController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-					adaptiveController.setParameters(n, u, cap, 0);
-					adaptiveController.init(corrGroups, compGroups, mainOutLinks,e.getQueueSimulation().getQNetwork(), handler2);
-					c.getEvents().addHandler(adaptiveController);
+					adaptiveController.init(newCorrGroups.get(ee.getKey()), mainOutLinks, e.getQueueSimulation().getQNetwork(), handler2);
+					c.getEvents().addHandler(adaptiveController);	
 				}
+				
+//				GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+//				adaptiveController.setParameters(n, u, cap, maxGreen);
+//				adaptiveController.init(corrGroups, compGroups, mainOutLinks, e.getQueueSimulation().getQNetwork(), handler2);
+//				c.getEvents().addHandler(adaptiveController);				
 				
 				handler2.setQNetwork(e.getQueueSimulation().getQNetwork());
 
@@ -216,14 +232,13 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		c.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QSim>() {
 			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSim> e) {
 				QSim qs = e.getQueueSimulation();
-				if (controller == "G"){
-					GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-					c.getEvents().removeHandler(adaptiveController);
-				}else{
-					AdaptiveInterimSignalController adaptiveController = (AdaptiveInterimSignalController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-					c.getEvents().removeHandler(adaptiveController);
-
+				for(Entry<Id, Map<Id, SignalGroupDefinition>> ee: signalSystems.entrySet()){
+					DaAdaptivController adaptiveController = (DaAdaptivController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
+					c.getEvents().removeHandler(adaptiveController);	
 				}
+//				GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+//				c.getEvents().removeHandler(adaptiveController);
+
 			}
 		});
 		
@@ -257,9 +272,9 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	
 	
 	public static void main(String[] args) {
-		DaBarChart barChart = new DaBarChart();
-		double cap ;
-		double temp;
+//		DaBarChart barChart = new DaBarChart();
+//		double cap ;
+//		double temp;
 		
 		GershensonRunner runner = new GershensonRunner();
 		runner.setN(142);
