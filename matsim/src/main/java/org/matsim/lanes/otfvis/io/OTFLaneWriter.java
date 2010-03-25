@@ -36,7 +36,6 @@ import org.matsim.ptproject.qsim.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
@@ -62,7 +61,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 
 
 		//calculate link width
-		double cellWidth = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
+		double cellWidth =  Gbl.getConfig().otfVis().getLinkWidth();
 		double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
 		//calculate length and normal
 		Point2D.Double.Double deltaLink = new Point2D.Double.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
