@@ -42,7 +42,6 @@ public class OTFClientLive extends OTFClient {
 
 	private OTFVisConfig visconf;
 
-
 	public OTFClientLive(String url, OTFConnectionManager connect) {
 		super(url);
 		this.connect = connect;

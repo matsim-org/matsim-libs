@@ -43,6 +43,7 @@ public class OTFHostConnectionManager {
 	private String address;
 
 	private OTFServerRemote host = null;
+	
 	protected OTFLiveServerRemote liveHost = null;
 
 	protected Object blockReading = new Object();
@@ -50,6 +51,7 @@ public class OTFHostConnectionManager {
 	protected int controllerStatus = 0;
 
 	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
+	
 	private final Map <String,OTFDrawer> drawer = new HashMap<String,OTFDrawer>();
 
 	public OTFHostConnectionManager(String url) throws RemoteException, InterruptedException, NotBoundException{

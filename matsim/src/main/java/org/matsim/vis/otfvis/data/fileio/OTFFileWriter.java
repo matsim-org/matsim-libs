@@ -39,12 +39,12 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
 /**
  * The OTF has a file Reader and a file Writer part.
  * The writer is in charge of writing mvi data into a file.
- *
- * @author dstrippgen
+ * 
+ * @author dstrippgen 
  * @author dgrether
  */
 public class OTFFileWriter implements SnapshotWriter {
-
+	
 	private static final Logger log = Logger.getLogger(OTFFileWriter.class);
 
 	private static final int BUFFERSIZE = 300000000; // ~300MB
@@ -77,71 +77,6 @@ public class OTFFileWriter implements SnapshotWriter {
 		this.quad = quadBuilder.createAndInitOTFServerQuad(this.connect);
 	}
 
-	public boolean dump(final int time_s) throws IOException {
-		if (time_s >= this.nextTime) {
-			// dump time
-			writeDynData(time_s);
-			this.nextTime = time_s + this.interval_s;
-			return true;
-		}
-		return false;
-	}
-
-	private void writeInfos() throws IOException {
-		// Add ZIP entry to output stream.
-		this.zos.putNextEntry(new ZipEntry("info.bin"));
-		this.outFile = new DataOutputStream(this.zos);
-		this.outFile.writeInt(OTFFileWriter.VERSION);
-		this.outFile.writeInt(OTFFileWriter.MINORVERSION);
-
-		this.outFile.writeDouble(this.interval_s);
-		// outFile.writeUTF("fromFile");
-		this.zos.closeEntry();
-	}
-
-	protected void onAdditionalQuadData(OTFConnectionManager connect) {
-		// intentionally left blank for inheriting classes to overwrite
-	}
-
-	private void writeQuad() throws IOException {
-		this.zos.putNextEntry(new ZipEntry("quad.bin"));
-		onAdditionalQuadData(this.connect);
-		new ObjectOutputStream(this.zos).writeObject(this.quad);
-		this.zos.closeEntry();
-		// this is new, write connect into the mvi as well
-		this.zos.putNextEntry(new ZipEntry("connect.bin"));
-		log.info("writing ConnectionManager to file...");
-		this.connect.logEntries();
-		new ObjectOutputStream(this.zos).writeObject(this.connect);
-		this.zos.closeEntry();
-	}
-
-	private void writeConstData() throws IOException {
-		this.zos.putNextEntry(new ZipEntry("const.bin"));
-		this.outFile = new DataOutputStream(this.zos);
-		this.buf.position(0);
-		this.outFile.writeDouble(-1.);
-
-		this.quad.writeConstData(this.buf);
-
-		this.outFile.writeInt(this.buf.position());
-		this.outFile.write(this.buf.array(), 0, this.buf.position());
-		this.zos.closeEntry();
-	}
-
-	private void writeDynData(final int time_s) throws IOException {
-		this.zos.putNextEntry(new ZipEntry("step." + time_s + ".bin"));
-		this.outFile = new DataOutputStream(this.zos);
-		this.buf.position(0);
-		this.outFile.writeDouble(time_s);
-		// get State
-		this.quad.writeDynData(null, this.buf);
-		this.outFile.writeInt(this.buf.position());
-		this.outFile.write(this.buf.array(), 0, this.buf.position());
-		// dump State
-		this.zos.closeEntry();
-	}
-
 	public void open() {
 		// open zip file
 		this.isOpen = true;
@@ -164,6 +99,48 @@ public class OTFFileWriter implements SnapshotWriter {
 		// dump the network out
 	}
 
+	private void writeInfos() throws IOException {
+		// Add ZIP entry to output stream.
+		this.zos.putNextEntry(new ZipEntry("info.bin"));
+		this.outFile = new DataOutputStream(this.zos);
+		this.outFile.writeInt(OTFFileWriter.VERSION);
+		this.outFile.writeInt(OTFFileWriter.MINORVERSION);
+	
+		this.outFile.writeDouble(this.interval_s);
+		// outFile.writeUTF("fromFile");
+		this.zos.closeEntry();
+	}
+
+	private void writeQuad() throws IOException {
+		this.zos.putNextEntry(new ZipEntry("quad.bin"));
+		onAdditionalQuadData(this.connect);
+		new ObjectOutputStream(this.zos).writeObject(this.quad);
+		this.zos.closeEntry();
+		// this is new, write connect into the mvi as well
+		this.zos.putNextEntry(new ZipEntry("connect.bin"));
+		log.info("writing ConnectionManager to file...");
+		this.connect.logEntries();
+		new ObjectOutputStream(this.zos).writeObject(this.connect);
+		this.zos.closeEntry();
+	}
+
+	protected void onAdditionalQuadData(OTFConnectionManager connect) {
+		// intentionally left blank for inheriting classes to overwrite
+	}
+
+	private void writeConstData() throws IOException {
+		this.zos.putNextEntry(new ZipEntry("const.bin"));
+		this.outFile = new DataOutputStream(this.zos);
+		this.buf.position(0);
+		this.outFile.writeDouble(-1.);
+	
+		this.quad.writeConstData(this.buf);
+	
+		this.outFile.writeInt(this.buf.position());
+		this.outFile.write(this.buf.array(), 0, this.buf.position());
+		this.zos.closeEntry();
+	}
+
 	public void close() {
 		try {
 			this.zos.close();
@@ -172,19 +149,42 @@ public class OTFFileWriter implements SnapshotWriter {
 		}
 	}
 
-	public void addAgent(final AgentSnapshotInfo position) {
-		// Do nothing
-	}
-
 	public void beginSnapshot(final double time) {
 		if (!this.isOpen)
 			open();
 		try {
 			dump((int) time);
 		} catch (IOException e) {
-
+	
 			e.printStackTrace();
 		}
+	}
+
+	public boolean dump(final int time_s) throws IOException {
+		if (time_s >= this.nextTime) {
+			// dump time
+			writeDynData(time_s);
+			this.nextTime = time_s + this.interval_s;
+			return true;
+		}
+		return false;
+	}
+
+	private void writeDynData(final int time_s) throws IOException {
+		this.zos.putNextEntry(new ZipEntry("step." + time_s + ".bin"));
+		this.outFile = new DataOutputStream(this.zos);
+		this.buf.position(0);
+		this.outFile.writeDouble(time_s);
+		// get State
+		this.quad.writeDynData(null, this.buf);
+		this.outFile.writeInt(this.buf.position());
+		this.outFile.write(this.buf.array(), 0, this.buf.position());
+		// dump State
+		this.zos.closeEntry();
+	}
+
+	public void addAgent(final AgentSnapshotInfo position) {
+		// Do nothing
 	}
 
 	public void endSnapshot() {}

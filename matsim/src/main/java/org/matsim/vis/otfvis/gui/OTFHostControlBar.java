@@ -92,31 +92,33 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private int controllerStatus = 0;
 
+	private final OTFHostConnectionManager masterHostControl;
+
 	private final List <OTFHostConnectionManager> hostControls = new ArrayList<OTFHostConnectionManager>();
 
 	private ImageIcon playIcon = null;
+	
 	private ImageIcon pauseIcon = null;
 
 	private JFrame frame = null;
 
 	private Rectangle windowBounds = null;
-
-	private final OTFHostConnectionManager hostControl;
+	
 	private int gotoTime = 0;
+	
 	private int gotoIter = 0;
+	
 	private transient OTFAbortGoto progressBar = null;
-
-	// -------------------- CONSTRUCTION --------------------
-
-	public OTFHostControlBar(String address, JFrame frame) throws RemoteException, InterruptedException, NotBoundException {
-		this.hostControl = new OTFHostConnectionManager(address);
-		this.hostControls.add(this.hostControl);
-	  addButtons();
+	
+	public OTFHostControlBar(OTFHostConnectionManager masterHostControl, JFrame frame) throws RemoteException, InterruptedException, NotBoundException {
+		this.masterHostControl = masterHostControl;
+		this.hostControls.add(this.masterHostControl);
+		addButtons();
 		this.frame = frame;
 	}
 
 	public void addDrawer(String id, OTFDrawer handler) {
-		this.hostControl.getDrawer().put(id, handler);
+		this.masterHostControl.getDrawer().put(id, handler);
 	}
 
 	public void invalidateDrawers() {
@@ -154,7 +156,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		pauseIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPause.png"), "Pause");
 
 		add(createButton("Restart", TO_START, "buttonRestart", "restart the server/simulation"));
-		if (!this.hostControl.getOTFServer().isLive()) {
+		if (!this.masterHostControl.getOTFServer().isLive()) {
 			add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
 			add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
 		}
@@ -164,7 +166,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		add(createButton(">", STEP_F, "buttonStepF", "go one timestep forward"));
 		add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
 		MessageFormat format = new MessageFormat("{0,number,00}:{1,number,00}:{2,number,00}");
-		if(this.hostControl.getOTFServer().isLive()) {
+		if(this.masterHostControl.getOTFServer().isLive()) {
 			 if(controllerStatus != OTFVisControlerListener.NOCONTROL) {
 					 format = new MessageFormat("{0,number,00}#{0,number,00}:{1,number,00}:{2,number,00}");
 			 }
@@ -179,7 +181,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		createCheckBoxes();
 
-		add(new JLabel(this.hostControl.getAddress()));
+		add(new JLabel(this.masterHostControl.getAddress()));
 	}
 
 	private JButton createButton(String altText, String actionCommand, String imageName, final String toolTipText) {
@@ -205,9 +207,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	public void updateTimeLabel() throws RemoteException {
-		simTime = this.hostControl.getOTFServer().getLocalTime();
+		simTime = this.masterHostControl.getOTFServer().getLocalTime();
 		if(controllerStatus != OTFVisControlerListener.NOCONTROL){
-			controllerStatus = ((OTFLiveServerRemote)this.hostControl.getOTFServer()).getControllerStatus();
+			controllerStatus = ((OTFLiveServerRemote)this.masterHostControl.getOTFServer()).getControllerStatus();
 		}
 
 		switch (OTFVisControlerListener.getStatus(controllerStatus)) {
@@ -244,8 +246,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private void pressed_TO_START() throws IOException {
 		stopMovie();
-		if(this.hostControl.getOTFServer().isLive()) {
-			((OTFLiveServerRemote)this.hostControl.getOTFServer()).requestControllerStatus(OTFVisControlerListener.CANCEL);
+		if(this.masterHostControl.getOTFServer().isLive()) {
+			((OTFLiveServerRemote)this.masterHostControl.getOTFServer()).requestControllerStatus(OTFVisControlerListener.CANCEL);
 			requestTimeStep(0, OTFServerRemote.TimePreference.LATER);
 			simTime = 0;
 			updateTimeLabel();
@@ -259,7 +261,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private void pressed_PAUSE() throws IOException {
 		log.debug("Pressed PAUSE.");
 		stopMovie();
-		if (hostControl.getOTFServer().isLive()) {
+		if (masterHostControl.getOTFServer().isLive()) {
 			pressPauseOnServer();
 		}
 	}
@@ -305,11 +307,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
-		if (hostControl.getOTFServer().requestNewTime(newTime, prefTime)) {
-			simTime = hostControl.getOTFServer().getLocalTime();
+		if (masterHostControl.getOTFServer().requestNewTime(newTime, prefTime)) {
+			simTime = masterHostControl.getOTFServer().getLocalTime();
 
 			for(OTFHostConnectionManager slave : hostControls) {
-				if (!slave.equals(this.hostControl))
+				if (!slave.equals(this.masterHostControl))
 					slave.getOTFServer().requestNewTime(newTime, prefTime);
 			}
 			invalidateDrawers();
@@ -353,11 +355,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		try {
 			// in case of live host, additionally request iteration
-			if(hostControl.getOTFServer().isLive()) {
-				((OTFLiveServerRemote)hostControl.getOTFServer()).requestControllerStatus(gotoIter);
+			if(masterHostControl.getOTFServer().isLive()) {
+				((OTFLiveServerRemote)masterHostControl.getOTFServer()).requestControllerStatus(gotoIter);
 			}
 
-			synchronized(hostControl.blockReading) {
+			synchronized(masterHostControl.blockReading) {
 			if(restart){
 			  requestTimeStep(gotoTime, OTFServerRemote.TimePreference.RESTART);
 			}
@@ -368,7 +370,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			if (progressBar != null) {
 			  progressBar.terminate = true;
 			}
-			simTime = hostControl.getOTFServer().getLocalTime();
+			simTime = masterHostControl.getOTFServer().getLocalTime();
 			updateTimeLabel();
 			}
 		} catch (IOException e) {
@@ -392,7 +394,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			gotoIter = Integer.parseInt(newTime.substring(0, index));
 		}
 		int newTime_s = (int) Time.parseTime(tmOfDay);
-		progressBar = new OTFAbortGoto(hostControl.getOTFServer(), newTime_s, gotoIter);
+		progressBar = new OTFAbortGoto(masterHostControl.getOTFServer(), newTime_s, gotoIter);
 		progressBar.start();
 		gotoTime = newTime_s;
 		new Thread() {
@@ -439,7 +441,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void createCheckBoxes() {
-		if (hostControl.isLiveHost()) {
+		if (masterHostControl.isLiveHost()) {
 			JCheckBox synchBox = new JCheckBox(TOGGLE_SYNCH);
 			synchBox.setMnemonic(KeyEvent.VK_V);
 			synchBox.setSelected(synchronizedPlay);
@@ -486,7 +488,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		private synchronized void updateSyncPlay() {
 			try {
-				if (!hostControl.isLiveHost()) {
+				if (!masterHostControl.isLiveHost()) {
 					return;
 				}
 				if (synchronizedPlay) {
@@ -494,7 +496,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				} else {
 					pressPlayOnServer();
 				}
-				simTime = hostControl.getOTFServer().getLocalTime();
+				simTime = masterHostControl.getOTFServer().getLocalTime();
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -513,21 +515,21 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				try {
 					delay = OTFClientControl.getInstance().getOTFVisConfig().getDelay_ms();
 					sleep(delay);
-					synchronized (hostControl.blockReading) {
+					synchronized (masterHostControl.blockReading) {
 						if (synchronizedPlay
-								&& ((simTime >= loopEnd) || !hostControl
+								&& ((simTime >= loopEnd) || !masterHostControl
 										.getOTFServer()
 										.requestNewTime(
 												simTime + 1,
 												OTFServerRemote.TimePreference.LATER))) {
-							hostControl.getOTFServer().requestNewTime(
+							masterHostControl.getOTFServer().requestNewTime(
 									loopStart,
 									OTFServerRemote.TimePreference.LATER);
 						}
 						actTime = simTime;
-						simTime = hostControl.getOTFServer().getLocalTime();
+						simTime = masterHostControl.getOTFServer().getLocalTime();
 						for (OTFHostConnectionManager slave : hostControls) {
-							if (!slave.equals(hostControl))
+							if (!slave.equals(masterHostControl))
 								slave.getOTFServer().requestNewTime(simTime, OTFServerRemote.TimePreference.LATER);
 						}
 						updateTimeLabel();
@@ -547,7 +549,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	public void finishedInitialisition() {
-		this.hostControl.finishedInitialisition();
+		this.masterHostControl.finishedInitialisition();
 	}
 
 
@@ -573,15 +575,15 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	 * Method should be removed again when we once finish the refactoring
 	 */
 	public OTFHostConnectionManager getOTFHostControl(){
-		return this.hostControl;
+		return this.masterHostControl;
 	}
 
 	private void pressPlayOnServer() throws RemoteException {
-		((OTFLiveServerRemote) hostControl.getOTFServer()).play();
+		((OTFLiveServerRemote) masterHostControl.getOTFServer()).play();
 	}
 
 	private void pressPauseOnServer() throws RemoteException {
-		((OTFLiveServerRemote) hostControl.getOTFServer()).pause();
+		((OTFLiveServerRemote) masterHostControl.getOTFServer()).pause();
 	}
 
 }

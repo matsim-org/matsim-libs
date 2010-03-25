@@ -34,9 +34,8 @@ import org.matsim.vis.otfvis.gui.NetJComponent;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.gui.ReadOTFSettingsFromMovie;
-import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
+import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 
 
 
@@ -50,19 +49,17 @@ import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
  */
 public class OTFClientSwing extends OTFClient {
 
-	private OTFConnectionManager connect2 = new OTFConnectionManager();
-
-	private ReadOTFSettingsFromMovie fileSettingsSaver;
+	private OTFConnectionManager connectionManager = new OTFConnectionManager();;
 
 	public OTFClientSwing(String url) {
 		super("file:" + url);
-		connect2.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		connect2.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
-		connect2.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
+		connectionManager.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
+		connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
 		/*
 		 * This entry is needed to couple the org.matsim.core.queuesim to the visualizer
 		 */
-		this.connect2.connectWriterToReader(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connectionManager.connectWriterToReader(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
 
 	}
 
@@ -74,7 +71,7 @@ public class OTFClientSwing extends OTFClient {
 			} else  {
 				throw new IllegalStateException("Server in live mode!");
 			}
-			NetJComponent mainDrawer = new NetJComponent(createNewView("swing", connect2, hostControlBar.getOTFHostControl()));
+			NetJComponent mainDrawer = new NetJComponent(createNewView("swing", connectionManager, hostControlBar.getOTFHostControl()));
 			hostControlBar.finishedInitialisition();
 			return mainDrawer;
 		} catch (RemoteException e) {
@@ -87,10 +84,6 @@ public class OTFClientSwing extends OTFClient {
 	protected OTFVisConfig createOTFVisConfig() {
 	    saver = new SettingsSaver(this.url);
 	    OTFVisConfig visconf = new OTFVisConfig();
-	    fileSettingsSaver = new ReadOTFSettingsFromMovie(this.url);
-	    if (this.url.endsWith(".mvi")) {
-	    	visconf = fileSettingsSaver.openAndReadConfig();
-	    }
 	    return visconf;
 	}
 

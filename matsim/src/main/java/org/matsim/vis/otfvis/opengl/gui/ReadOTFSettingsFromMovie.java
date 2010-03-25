@@ -25,7 +25,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
-import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
+import org.matsim.vis.otfvis.data.fileio.OTFObjectInputStream;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 
 /**
@@ -59,7 +59,7 @@ public class ReadOTFSettingsFromMovie {
 			ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
 			ZipEntry infoEntry = zipFile.getEntry("config.bin");
 			if (infoEntry != null) {
-				ObjectInputStream inFile = new OTFFileReader.OTFObjectInputStream(zipFile.getInputStream(infoEntry));
+				ObjectInputStream inFile = new OTFObjectInputStream(zipFile.getInputStream(infoEntry));
 				OTFVisConfig cfg = (OTFVisConfig) inFile.readObject();
 				setDelayParameterIfZero(cfg);
 				return cfg;
