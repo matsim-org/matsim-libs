@@ -4,7 +4,7 @@ public class Row {
 	private Double score1;
 	private Double score2;
 	private double scoreDiff;
-	private double income;
+	private double personalIncome;
 	private double homeX;
 	private double homeY;
 	
@@ -15,7 +15,7 @@ public class Row {
 	public Row() {
 		this.setScore1(0.0);
 		this.setScore2(0.0);
-		this.setIncome(0.0);
+		this.setPersonalIncome(0.0);
 		this.setHomeX(0.0);
 		this.setHomeY(0.0);
 		
@@ -42,12 +42,12 @@ public class Row {
 		return score2;
 	}
 
-	public void setIncome(double income) {
-		this.income = income;
+	public void setPersonalIncome(double personalIncome) {
+		this.personalIncome = personalIncome;
 	}
 
-	public double getIncome() {
-		return income;
+	public double getPersonalIncome() {
+		return personalIncome;
 	}
 
 	public void setHomeX(double homeX) {

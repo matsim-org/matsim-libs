@@ -46,29 +46,33 @@ public class BkAnalysis {
 	
 
 	public void run(final String[] args) {
-		//instancing the scenario1 with a config (path to network and plans)
+		//instancing scenario1 with a config (path to network and plans)
 		Scenario sc1 = new ScenarioFactoryImpl().createScenario();
 		Config c1 = sc1.getConfig();
 		c1.network().setInputFile("../matsim/examples/equil/network.xml");
 		c1.plans().setInputFile("../matsim/output/multipleIterations10/output_plans.xml.gz");
 		
-		//loading the scenario1 and getting the population1
+		//loading scenario1 and getting the population1
 		ScenarioLoader sl1 = new ScenarioLoaderImpl(sc1) ;
 		sl1.loadScenario() ;
 		Population population1 = sc1.getPopulation();
 
 	//===
 		
-		//instancing the scenario2 with a config (path to network and plans)
+		//instancing scenario2 with a config (path to network and plans)
 		Scenario sc2 = new ScenarioFactoryImpl().createScenario();
 		Config c2 = sc2.getConfig();
 		c2.network().setInputFile("../matsim/examples/equil/network.xml");
 		c2.plans().setInputFile("../matsim/output/multipleIterations20/output_plans.xml.gz");
 		
-		//loading the scenario2 and getting the population2
+		//loading scenario2 and getting the population2
 		ScenarioLoader sl2 = new ScenarioLoaderImpl(sc2) ;
 		sl2.loadScenario() ;
 		Population population2 = sc2.getPopulation();
+		
+	//===
+		
+		//instancing and reading households
 		
 //============================================================================================================		
 

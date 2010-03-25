@@ -50,24 +50,24 @@ public class Iatbr09Analysis {
 			String runiddot2 = runid2 + ".";
 			
 //			String netfile = BkPaths.RUNBASE + runid1 + "/" + runiddot1 + "output_network.xml.gz";
-			String netfile = BkPaths.RUNBASE + runid1 + "/" + runNumber1 + ".output_network.xml.gz";
+			String netfile = BkPaths.RUNSSVN + runid1 + "/" + runNumber1 + ".output_network.xml.gz";
 //			String plans1file = BkPaths.RUNBASE + runid1 + "/" + runiddot1 + "output_plans.xml.gz";
-			String plans1file = BkPaths.RUNBASE + runid1 + "/" + runNumber1 + ".output_plans.xml.gz";
+			String plans1file = BkPaths.RUNSSVN + runid1 + "/" + runNumber1 + ".output_plans.xml.gz";
 //			String plans2file = BkPaths.RUNBASE + runid2 + "/" + runiddot2 + "output_plans.xml.gz";
-			String plans2file = BkPaths.RUNBASE + runid2 + "/" + runNumber2 + ".output_plans.xml.gz";
-			String housholdsfile = BkPaths.RUNBASE + "dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
+			String plans2file = BkPaths.RUNSSVN + runid2 + "/" + runNumber2 + ".output_plans.xml.gz";
+			String housholdsfile = BkPaths.RUNSSVN + "dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
 //			String housholdsfile = BkPaths.RUNBASE+ "bkick/oneRouteTwoModeIncomeTest/households.xml";
 
-			String deltaScoreChartFile = BkPaths.RUNBASE + runid2 + "/deltaScoreSingleColorIncomeChart"+runNumber1+"vs"+runNumber2+".png";
-			String deltaScoreColorChartFile = BkPaths.RUNBASE + runid2 + "/deltaScoreColorIncomeChart"+runNumber1+"vs"+runNumber2+".png";
+			String deltaScoreChartFile = BkPaths.RUNSSVN + runid2 + "/deltaScoreSingleColorIncomeChart"+runNumber1+"vs"+runNumber2+".png";
+			String deltaScoreColorChartFile = BkPaths.RUNSSVN + runid2 + "/deltaScoreColorIncomeChart"+runNumber1+"vs"+runNumber2+".png";
 //			String deltaScoreModeSwitchOnlyChartFile = BkPaths.RUNBASE + runid2 + "/deltaScoreIncomeChart"+runNumber1+"vs"+runNumber2+"ModeSwitcherOnly.png";
-			String modeChoiceIncomeChartFile1 = BkPaths.RUNBASE + runid1 + "/"+runNumber1+"modeChoiceIncomeChart.png";
-			String modeChoiceIncomeChartFile2 = BkPaths.RUNBASE + runid2 + "/"+runNumber2+"modeChoiceIncomeChart.png";
+			String modeChoiceIncomeChartFile1 = BkPaths.RUNSSVN + runid1 + "/"+runNumber1+"modeChoiceIncomeChart.png";
+			String modeChoiceIncomeChartFile2 = BkPaths.RUNSSVN + runid2 + "/"+runNumber2+"modeChoiceIncomeChart.png";
 			
-			String avgDeltaScoreIncomeGroupChartFile = BkPaths.RUNBASE + runid2 + "/avgDeltaScoreIncomeGroupChart"+runNumber1+"vs"+runNumber2+".png";
-			String avgDeltaScoreIncomeGroupChartModeSwitchFile = BkPaths.RUNBASE + runid2 + "/avgDeltaScoreIncomeGroupModeSwitchChart"+runNumber1+"vs"+runNumber2+".png";
+			String avgDeltaScoreIncomeGroupChartFile = BkPaths.RUNSSVN + runid2 + "/avgDeltaScoreIncomeGroupChart"+runNumber1+"vs"+runNumber2+".png";
+			String avgDeltaScoreIncomeGroupChartModeSwitchFile = BkPaths.RUNSSVN + runid2 + "/avgDeltaScoreIncomeGroupModeSwitchChart"+runNumber1+"vs"+runNumber2+".png";
 			
-			String mixedDeltaScoreIncomeChartFile = BkPaths.RUNBASE + runid2 + "/mixedDeltaScoreIncomeChart"+runNumber1+"vs"+runNumber2+".png";
+			String mixedDeltaScoreIncomeChartFile = BkPaths.RUNSSVN + runid2 + "/mixedDeltaScoreIncomeChart"+runNumber1+"vs"+runNumber2+".png";
 			
 			ScenarioImpl sc = new ScenarioImpl();
 
