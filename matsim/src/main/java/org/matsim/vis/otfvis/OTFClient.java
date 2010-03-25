@@ -23,7 +23,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import javax.swing.AbstractAction;
@@ -65,6 +64,8 @@ public abstract class OTFClient extends Thread {
 	protected OTFHostControlBar hostControlBar = null;
 	
 	protected SettingsSaver saver;
+
+	protected OTFHostConnectionManager masterHostControl;
 	
 	public OTFClient(String url) {
 		this.url = url;
@@ -72,11 +73,12 @@ public abstract class OTFClient extends Thread {
 
 	@Override
 	public void run() {
+		this.masterHostControl = new OTFHostConnectionManager(this.url);
+		createMainFrame();
+		log.info("created MainFrame");
 		OTFVisConfig visconf = createOTFVisConfig();
 		OTFClientControl.getInstance().setOTFVisConfig(visconf);
 		log.info("got OTFVis config");
-		createMainFrame();
-		log.info("created MainFrame");
 		createHostControlBar();
 		log.info("created HostControlBar");
 		OTFDrawer mainDrawer = createDrawer();
@@ -119,20 +121,11 @@ public abstract class OTFClient extends Thread {
 	}
 	
 	protected void createHostControlBar() {
-		try {
-			OTFHostConnectionManager masterHostControl = new OTFHostConnectionManager(this.url);
-			this.hostControlBar = new OTFHostControlBar(masterHostControl, frame);
-			frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
-			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, hostControlBar);
-			preferencesDialog.setVisConfig(OTFClientControl.getInstance().getOTFVisConfig());
-			buildMenu(frame, hostControlBar, saver);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (NotBoundException e) {
-			e.printStackTrace();
-		}
+		this.hostControlBar = new OTFHostControlBar(masterHostControl, frame);
+		frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
+		PreferencesDialog preferencesDialog = new PreferencesDialog(frame, hostControlBar);
+		preferencesDialog.setVisConfig(OTFClientControl.getInstance().getOTFVisConfig());
+		buildMenu(frame, hostControlBar, saver);
 	}
 
 	@SuppressWarnings("serial")

@@ -27,6 +27,7 @@ import java.util.Collection;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.gui.OTFVisConfig;
 
 /**
  * OTFServerRemote is the one most important interface for the
@@ -55,6 +56,8 @@ public interface OTFServerRemote extends Remote {
 	public Collection<Double> getTimeSteps() throws RemoteException;
 
 	public void toggleShowParking() throws RemoteException;
+	
+	public OTFVisConfig getOTFVisConfig() throws RemoteException;
 
 }
 

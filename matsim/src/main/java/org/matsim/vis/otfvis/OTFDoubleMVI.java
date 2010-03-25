@@ -90,12 +90,6 @@ public class OTFDoubleMVI extends OTFClientFile {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (NotBoundException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
 		}
 	}
 

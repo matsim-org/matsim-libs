@@ -24,6 +24,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -35,11 +36,12 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 /**
  * The OTF has a file Reader and a file Writer part.
  * The Reader is the the mvi playing OTFServer.
@@ -61,14 +63,17 @@ public final class OTFFileReader implements OTFServerRemote {
 	private double nextTime = -1;
 
 	private TreeMap<Double, Long> timesteps = new TreeMap<Double, Long>();
+	
+	private OTFVisConfig otfVisConfig;
 
 	public OTFFileReader(final String fname) {
 		this.fileName = fname;
+		this.sourceZipFile = new File(this.fileName);
+		otfVisConfig = readConfigOrUseDefaults(); 
 		openAndReadInfo();
 	}
 
 	private void openAndReadInfo() {
-		this.sourceZipFile = new File(this.fileName);
 		if (!this.sourceZipFile.exists()){
 			String message = "The file: " + this.fileName + " cannot be found!";
 			log.error(message);
@@ -81,13 +86,17 @@ public final class OTFFileReader implements OTFServerRemote {
 			int version = inFile.readInt();
 			int minorversion = inFile.readInt();
 			inFile.readDouble(); // unused value 'intervall_s'
-			OTFClientControl.getInstance().getOTFVisConfig().setFileVersion(version);
-			OTFClientControl.getInstance().getOTFVisConfig().setFileMinorVersion(minorversion);
+			otfVisConfig.setFileVersion(version);
+			otfVisConfig.setFileMinorVersion(minorversion);
 			scanZIPFile(zipFile);
 			zipFile.close();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+	}
+
+	private void setDelayParameterIfZero(OTFVisConfig cfg) {
+		cfg.setDelay_ms(cfg.getDelay_ms() == 0 ? 30 : cfg.getDelay_ms());
 	}
 
 	private void scanZIPFile(ZipFile zipFile) {
@@ -275,5 +284,48 @@ public final class OTFFileReader implements OTFServerRemote {
 	public void toggleShowParking() throws RemoteException {
 		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
 	}
+
+	@Override
+	public OTFVisConfig getOTFVisConfig() throws RemoteException {
+		return otfVisConfig;
+	}
+
+	private OTFVisConfig readConfigOrUseDefaults() {
+		OTFVisConfig otfVisConfig = tryToReadSettingsFromOldBinaryFormat();
+		if (otfVisConfig != null) {
+			return otfVisConfig;
+		} else {
+			otfVisConfig = tryToReadSettingsFromFileNextToMovie();
+			if (otfVisConfig != null) {
+				return otfVisConfig;
+			} else {
+				return new OTFVisConfig();
+			}
+		}
+	}
+
+	private OTFVisConfig tryToReadSettingsFromFileNextToMovie() {
+		log.debug("Looking for settings in: " + this.fileName);
+		SettingsSaver saver = new SettingsSaver(this.fileName);
+		OTFVisConfig settingsFromFile = saver.tryToReadSettingsFile();
+		return settingsFromFile;
+	}
+
+	private OTFVisConfig tryToReadSettingsFromOldBinaryFormat() {
+		try {
+			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
+			ZipEntry infoEntry = zipFile.getEntry("config.bin");
+			if (infoEntry != null) {
+				ObjectInputStream inFile = new ObjectInputStream(zipFile.getInputStream(infoEntry));
+				OTFVisConfig cfg = (OTFVisConfig) inFile.readObject();
+				setDelayParameterIfZero(cfg);
+				return cfg;
+			}
+		} catch (Exception e) {
+			log.error("Not able to load config from file. This is not fatal. file=" + this.fileName, e);
+		} 
+		return null;
+	}
+	
 
 }

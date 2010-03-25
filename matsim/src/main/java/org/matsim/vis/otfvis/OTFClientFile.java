@@ -117,9 +117,13 @@ public class OTFClientFile extends OTFClient {
 
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
-		saver = new SettingsSaver(this.url);
-		OTFVisConfig visconf = new OTFVisConfig();
-		return visconf;
+		try {
+			saver = new SettingsSaver(this.url);
+			return this.masterHostControl.getOTFServer().getOTFVisConfig();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			throw new RuntimeException();
+		}
 	}
 
 

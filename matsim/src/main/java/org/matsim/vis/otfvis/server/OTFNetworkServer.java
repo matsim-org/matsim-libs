@@ -33,6 +33,7 @@ import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
+import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
@@ -118,4 +119,9 @@ public class OTFNetworkServer implements OTFServerRemote {
 		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
 	}
 
+	@Override
+	public OTFVisConfig getOTFVisConfig() throws RemoteException {
+		return new OTFVisConfig();
+	}
+	
 }

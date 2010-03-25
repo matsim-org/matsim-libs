@@ -54,8 +54,16 @@ public class OTFHostConnectionManager {
 	
 	private final Map <String,OTFDrawer> drawer = new HashMap<String,OTFDrawer>();
 
-	public OTFHostConnectionManager(String url) throws RemoteException, InterruptedException, NotBoundException{
-		this.openAddress(url);
+	public OTFHostConnectionManager(String url) {
+		try {
+			this.openAddress(url);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public OTFServerRemote getOTFServer(){

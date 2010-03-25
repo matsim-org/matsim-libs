@@ -110,7 +110,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	
 	private transient OTFAbortGoto progressBar = null;
 	
-	public OTFHostControlBar(OTFHostConnectionManager masterHostControl, JFrame frame) throws RemoteException, InterruptedException, NotBoundException {
+	public OTFHostControlBar(OTFHostConnectionManager masterHostControl, JFrame frame)  {
 		this.masterHostControl = masterHostControl;
 		this.hostControls.add(this.masterHostControl);
 		addButtons();
@@ -149,39 +149,43 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
-	private void addButtons() throws RemoteException {
-		this.setFloatable(false);
-
-		playIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPlay.png"), "Play");
-		pauseIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPause.png"), "Pause");
-
-		add(createButton("Restart", TO_START, "buttonRestart", "restart the server/simulation"));
-		if (!this.masterHostControl.getOTFServer().isLive()) {
-			add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
-			add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
+	private void addButtons() {
+		try {
+			this.setFloatable(false);
+	
+			playIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPlay.png"), "Play");
+			pauseIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPause.png"), "Pause");
+	
+			add(createButton("Restart", TO_START, "buttonRestart", "restart the server/simulation"));
+			if (!this.masterHostControl.getOTFServer().isLive()) {
+				add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
+				add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
+			}
+	
+			playButton = createButton("PLAY", PLAY, "buttonPlay", "press to play simulation continuously");
+			add(playButton);
+			add(createButton(">", STEP_F, "buttonStepF", "go one timestep forward"));
+			add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
+			MessageFormat format = new MessageFormat("{0,number,00}:{1,number,00}:{2,number,00}");
+			if(this.masterHostControl.getOTFServer().isLive()) {
+				 if(controllerStatus != OTFVisControlerListener.NOCONTROL) {
+						 format = new MessageFormat("{0,number,00}#{0,number,00}:{1,number,00}:{2,number,00}");
+				 }
+			}
+			timeField = new JFormattedTextField(format);
+			timeField.setMaximumSize(new Dimension(100,30));
+			timeField.setMinimumSize(new Dimension(80,30));
+			timeField.setActionCommand(SET_TIME);
+			timeField.setHorizontalAlignment(JTextField.CENTER);
+			add( timeField );
+			timeField.addActionListener( this );
+	
+			createCheckBoxes();
+	
+			add(new JLabel(this.masterHostControl.getAddress()));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
 		}
-
-		playButton = createButton("PLAY", PLAY, "buttonPlay", "press to play simulation continuously");
-		add(playButton);
-		add(createButton(">", STEP_F, "buttonStepF", "go one timestep forward"));
-		add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
-		MessageFormat format = new MessageFormat("{0,number,00}:{1,number,00}:{2,number,00}");
-		if(this.masterHostControl.getOTFServer().isLive()) {
-			 if(controllerStatus != OTFVisControlerListener.NOCONTROL) {
-					 format = new MessageFormat("{0,number,00}#{0,number,00}:{1,number,00}:{2,number,00}");
-			 }
-		}
-		timeField = new JFormattedTextField(format);
-		timeField.setMaximumSize(new Dimension(100,30));
-		timeField.setMinimumSize(new Dimension(80,30));
-		timeField.setActionCommand(SET_TIME);
-		timeField.setHorizontalAlignment(JTextField.CENTER);
-		add( timeField );
-		timeField.addActionListener( this );
-
-		createCheckBoxes();
-
-		add(new JLabel(this.masterHostControl.getAddress()));
 	}
 
 	private JButton createButton(String altText, String actionCommand, String imageName, final String toolTipText) {
