@@ -75,5 +75,13 @@ public interface SampledVertex extends Vertex {
 	 * @see {@link SnowballAttributes#isSampled()}
 	 */
 	public boolean isSampled();
+
+	/**
+	 * Returns the seed vertex of the component containing this vertex. If there
+	 * are multiple seed vertices the closest one is returned.
+	 * 
+	 * @return the seed vertex of the component containing this vertex.
+	 */
+	public SampledVertex getSeed();
 	
 }
