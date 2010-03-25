@@ -41,20 +41,21 @@ import org.matsim.transitSchedule.api.TransitRoute;
 public class TransitDriver extends AbstractTransitDriver {
 
 	final NetworkRoute carRoute;
-	
+
 	final TransitLine transitLine;
-	
+
 	final TransitRoute transitRoute;
-	
+
 	final Departure departure;
-	
+
 	final double departureTime;
-	
+
 	private final LegImpl currentLeg;
 
 	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final QSim sim) {
 		super(sim, agentTracker);
 		PersonImpl driver = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
+		this.carRoute = route.getRoute();
 		Plan plan = new PlanImpl();
 		LegImpl leg = new LegImpl(TransportMode.car);
 		leg.setRoute(getWrappedCarRoute(getCarRoute()));
@@ -68,7 +69,6 @@ public class TransitDriver extends AbstractTransitDriver {
 		this.transitLine = line;
 		this.transitRoute = route;
 		this.departure = departure;
-		this.carRoute = route.getRoute();
 		setDriver(driver);
 		init();
 	}
@@ -81,22 +81,22 @@ public class TransitDriver extends AbstractTransitDriver {
 
 	@Override
 	public NetworkRoute getCarRoute() {
-		return carRoute;
+		return this.carRoute;
 	}
 
 	@Override
 	public TransitLine getTransitLine() {
-		return transitLine;
+		return this.transitLine;
 	}
 
 	@Override
 	public TransitRoute getTransitRoute() {
-		return transitRoute;
+		return this.transitRoute;
 	}
 
 	@Override
 	public double getDepartureTime() {
-		return departureTime;
+		return this.departureTime;
 	}
 
 	@Override
