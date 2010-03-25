@@ -35,9 +35,8 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gui.ReadOTFSettingsFromMovie;
-import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
+import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
@@ -118,12 +117,8 @@ public class OTFClientFile extends OTFClient {
 
 	@Override
 	protected OTFVisConfig createOTFVisConfig() {
-		ReadOTFSettingsFromMovie fileSettingsSaver = new ReadOTFSettingsFromMovie(this.url);
-		OTFVisConfig visconf = fileSettingsSaver.openAndReadConfig();
-		if (visconf == null) {
-			visconf = new OTFVisConfig();
-		}
 		saver = new SettingsSaver(this.url);
+		OTFVisConfig visconf = new OTFVisConfig();
 		return visconf;
 	}
 
