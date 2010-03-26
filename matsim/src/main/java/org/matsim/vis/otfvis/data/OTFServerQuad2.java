@@ -130,11 +130,16 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	}
 
 	public void writeConstData(ByteBuffer out) {
-
-		this.execute(0.,0.,this.easting, this.northing, new WriteDataExecutor(out,true));
-		// "this" is a quad tree; thus this command somehow marks the relevant leaves
-
-		for(OTFDataWriter element : this.additionalElements) {
+		
+		for (OTFDataWriter element : this.values()) {
+			try {
+				element.writeConstData(out);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		for (OTFDataWriter element : this.additionalElements) {
 			try {
 				element.writeConstData(out);
 			} catch (IOException e) {

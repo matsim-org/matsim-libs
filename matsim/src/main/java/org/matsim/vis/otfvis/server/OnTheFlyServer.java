@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.OTFVisControlerListener;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -84,16 +83,23 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private static Registry registry;
 
 	private final Object paused = new Object();
+	
 	private final Object stepDone = new Object();
+	
 	private final Object updateFinished = new Object();
+	
 	private int localTime = 0;
 
 	private final Map<String, OTFServerQuad2> quads = new HashMap<String, OTFServerQuad2>();
+	
 	private final List<OTFDataWriter<?>> additionalElements= new LinkedList<OTFDataWriter<?>>();
 
 	private int controllerStatus = OTFVisControlerListener.NOCONTROL;
+	
 	private int controllerIteration = 0;
+	
 	private int stepToIteration = 0;
+	
 	private int requestStatus = 0;
 
 	private EventsManager events;
@@ -160,17 +166,16 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		super(0);
 	}
 
-	private void init(QNetwork network, EventsManager events){
-		this.quadBuilder = new OTFQSimServerQuadBuilder(network);
+	private void init(EventsManager events){
 		this.setEvents(events);
 	}
 
-	public static OnTheFlyServer createInstance(String readableName, QNetwork network, EventsManager events) {
+	public static OnTheFlyServer createInstance(String readableName, EventsManager events) {
 		registry = getRegistry();
 		try {
 			// Register with RMI to be seen from client
 			OnTheFlyServer instance = new OnTheFlyServer();
-			instance.init(network, events);
+			instance.init(events);
 			registry.bind(readableName, instance);
 			log.info("OTFServer bound in RMI registry");
 			return instance;
@@ -462,6 +467,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	public void setSimulation(OTFVisQSimFeature otfVisQueueSimFeature) {
 		this.otfVisQueueSimFeature = otfVisQueueSimFeature;
+		this.quadBuilder = new OTFQSimServerQuadBuilder(otfVisQueueSimFeature.getQueueSimulation().getQNetwork());
 	}
 
 	@Override

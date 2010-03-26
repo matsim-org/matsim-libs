@@ -29,7 +29,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -82,12 +81,16 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private static final String STEP_B = "step_b";
 	private static final String FULLSCREEN = "fullscreen";
 
-	// -------------------- MEMBER VARIABLES --------------------
-
 	private transient MovieTimer movieTimer = null;
+	
 	private JButton playButton;
+	
 	private JFormattedTextField timeField;
+	
 	private int simTime = 0;
+
+	private int gotoIter = 0;
+
 	private boolean synchronizedPlay = true;
 
 	private int controllerStatus = 0;
@@ -103,10 +106,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private JFrame frame = null;
 
 	private Rectangle windowBounds = null;
-	
-	private int gotoTime = 0;
-	
-	private int gotoIter = 0;
 	
 	private transient OTFAbortGoto progressBar = null;
 	
@@ -354,20 +353,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 
-	private void gotoTime() {
-		boolean restart = (OTFVisControlerListener.getIteration(controllerStatus) == gotoIter) && (gotoTime < simTime);
-
+	private void gotoTime(int gotoTime) {
+		boolean restart = gotoTime < simTime;
 		try {
-			// in case of live host, additionally request iteration
-			if(masterHostControl.getOTFServer().isLive()) {
-				((OTFLiveServerRemote)masterHostControl.getOTFServer()).requestControllerStatus(gotoIter);
-			}
-
 			synchronized(masterHostControl.blockReading) {
-			if(restart){
-			  requestTimeStep(gotoTime, OTFServerRemote.TimePreference.RESTART);
-			}
-			else if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER)) {
+			if (restart){
+				requestTimeStep(gotoTime, OTFServerRemote.TimePreference.RESTART);
+			} else if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER)) {
 				requestTimeStep(gotoTime, OTFServerRemote.TimePreference.LATER);
 			}
 
@@ -382,12 +374,17 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
+	
+	/**
+	 * Called when user clicks on the time line displayed when playing movies.
+	 *  
+	 * @param newTime_s
+	 */
 	public void setNEWTime(int newTime_s) {
 		if (newTime_s == simTime) return;
 
 		stopMovie();
-		gotoTime = newTime_s;
-		gotoTime();
+		gotoTime(newTime_s);
 	}
 
 	private void changed_SET_TIME(ActionEvent event) {
@@ -397,14 +394,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		if ((index != -1) && (controllerStatus != OTFVisControlerListener.NOCONTROL)) {
 			gotoIter = Integer.parseInt(newTime.substring(0, index));
 		}
-		int newTime_s = (int) Time.parseTime(tmOfDay);
+		final int newTime_s = (int) Time.parseTime(tmOfDay);
 		progressBar = new OTFAbortGoto(masterHostControl.getOTFServer(), newTime_s, gotoIter);
 		progressBar.start();
-		gotoTime = newTime_s;
 		new Thread() {
 			@Override
 			public void run() {
-				gotoTime();
+				gotoTime(newTime_s);
 			}
 		}.start();
 	}

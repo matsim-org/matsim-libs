@@ -644,7 +644,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		return this.scenario;
 	}
 
-
 	public boolean isUseActivityDurations() {
 		return this.useActivityDurations;
 	}
@@ -660,11 +659,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	public Set<TransportMode> getNotTeleportedModes() {
 		return notTeleportedModes;
-	}
-
-	public void setQueueNetwork(QNetwork net) {
-		this.network = net;
-		this.simEngine = new QSimEngineImpl(this, MatsimRandom.getRandom());
 	}
 
 	public QNetwork getNetwork() {
