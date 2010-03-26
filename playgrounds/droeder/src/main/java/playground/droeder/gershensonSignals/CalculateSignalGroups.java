@@ -32,6 +32,7 @@ import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -135,8 +136,11 @@ public class CalculateSignalGroups{
 								thetaTemp = theta;
 							}
 						}
-						thetaDiff = Math.abs(thetaMain-thetaTemp);
-						if ((thetaDiff > (Math.PI/4.0)) &&  (thetaDiff < Math.PI)){
+						thetaDiff = thetaMain-thetaTemp;
+						if (corrLinks.containsKey(new IdImpl("191")) || corrLinks.containsValue(new IdImpl("191"))){
+							log.error(ii + " " + thetaMain + "-" + thetaTemp + "=" + thetaDiff);
+						}
+						if ((thetaDiff < (-Math.PI/8.0)) &&  (thetaDiff > (-7 * Math.PI/8))){
 							left.add(groups.get(ii));
 						}else{
 							other.add(groups.get(ii));
@@ -151,8 +155,12 @@ public class CalculateSignalGroups{
 								thetaTemp = theta;
 							}
 						}
-						thetaDiff = Math.abs(thetaMain-thetaTemp);
-						if ((thetaDiff > (Math.PI/4.0)) &&  (thetaDiff < Math.PI)){
+						thetaDiff = thetaMain-thetaTemp;
+						if (corrLinks.containsKey(new IdImpl("191")) || corrLinks.containsValue(new IdImpl("191"))){
+							log.error(ii + " " + thetaMain + "-" + thetaTemp + "=" + thetaDiff);
+						}
+						// 
+						if ((thetaDiff < (-Math.PI/8.0)) &&  (thetaDiff > (-7 * Math.PI/8))){
 							left.add(groups.get(ii));
 						}else{
 							other.add(groups.get(ii));
@@ -177,7 +185,15 @@ public class CalculateSignalGroups{
 				i++;
 			}
 		}
-		
+		if(corrLinks.containsKey(new IdImpl("191")) || corrLinks.containsValue(new IdImpl("191"))){
+			for (Entry<Id, List<SignalGroupDefinition>> ee : corrGroups.entrySet()){
+				log.error("corrGroupsId " + ee.getKey().toString());
+				for(SignalGroupDefinition sd : ee.getValue()){
+					log.error(sd.getId());
+				}
+				log.error("------");
+			}
+		}
 		// check if a group is missed
 		temp =  new LinkedList<SignalGroupDefinition>();
 		for (List<SignalGroupDefinition> l  : corrGroups.values()){

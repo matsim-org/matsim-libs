@@ -51,11 +51,14 @@ public class DaAdaptivController extends
 		protected int tGreenMin =  0; // time in seconds
 		protected int minCarsTime = 0; //
 		protected double capFactor = 0;
-		protected double maxGreenTime = 0;
+		protected double maxRedTime = 0;
+		
+		private boolean interim = false;
+		private double interimTime;
+		private SignalGroupDefinition interimGroup;
 
 		protected boolean outLinkJam;
-		protected boolean compLinkJam;
-		protected boolean maxGreenTimeActive = false;
+		protected boolean maxRedTimeActive = false;
 		protected double compGreenTime;
 		protected double approachingRed;
 		protected double approachingGreenLink;
@@ -66,7 +69,10 @@ public class DaAdaptivController extends
 
 		protected CarsOnLinkLaneHandler handler;
 
-		protected Map<Id, Double> switchedToGreen = new HashMap<Id, Double>();
+		private double switchedGreen = 0;
+		private HashMap<Id, Double> switchedRed = new HashMap<Id, Double>();
+		
+		
 
 		protected Map<Id, List<SignalGroupDefinition>> corrGroups;
 		protected Map<Id, Id> mainOutLinks;
@@ -92,7 +98,7 @@ public class DaAdaptivController extends
 		public void init(Map<Id, List<SignalGroupDefinition>> corrGroups, Map<Id, Id> mainOutLinks, QNetwork net, CarsOnLinkLaneHandler handler){
 			for(SignalGroupDefinition sd : this.getSignalGroups().values()){
 				this.getSignalGroupStates().put(sd, SignalGroupState.RED);
-				switchedToGreen.put(sd.getId(), 0.0);
+//				switchedToGreen.put(sd.getId(), 0.0);
 			}
 
 			if(this.tGreenMin == 0){
@@ -140,8 +146,18 @@ public class DaAdaptivController extends
 			
 			// calculate outlinkCapacity for the mainOutlink and check if there is a trafficJam
 			if (!(mainOutLinks.get(signalGroup.getLinkRefId()) ==  null)){
-				double outLinkCapacity = net.getLinks().get(mainOutLinks.get(signalGroup.getLinkRefId())).getSpaceCap();
-				double actStorage = handler.getVehOnLink(mainOutLinks.get(signalGroup.getLinkRefId()));
+				double outLinkCapacity = 0;
+				double actStorage = 0;
+				for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+					if(e.getValue().contains(signalGroup)){
+						for (SignalGroupDefinition sd : e.getValue()){
+							if (!(mainOutLinks.get(sd.getLinkRefId()) ==  null)){
+								outLinkCapacity += net.getLinks().get(mainOutLinks.get(sd.getLinkRefId())).getSpaceCap();
+								actStorage += handler.getVehOnLink(mainOutLinks.get(sd.getLinkRefId()));
+							}
+						}
+					}
+				}
 				if((outLinkCapacity*capFactor)< actStorage){
 					outLinkJam = true;
 				}
@@ -150,20 +166,20 @@ public class DaAdaptivController extends
 			}
 			
 			// check competing links for trafficJam
-			compLinkJam = true;
-			out : 
-				for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
-					if(!(e.getValue().contains(signalGroup))){
-						for (SignalGroupDefinition sd : e.getValue()){
-							double compCap = net.getLinks().get(sd.getLinkRefId()).getSpaceCap();
-							double compStorage = handler.getVehOnLink(sd.getLinkRefId());
-							if ((compCap*capFactor)>compStorage){
-								compLinkJam = false;
-								break out;
-							}
-						}
-					}
-				}
+//			compLinkJam = true;
+//			out : 
+//				for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+//					if(!(e.getValue().contains(signalGroup))){
+//						for (SignalGroupDefinition sd : e.getValue()){
+//							double compCap = net.getLinks().get(sd.getLinkRefId()).getSpaceCap();
+//							double compStorage = handler.getVehOnLink(sd.getLinkRefId());
+//							if ((compCap*capFactor)>compStorage){
+//								compLinkJam = false;
+//								break out;
+//							}
+//						}
+//					}
+//				}
 
 			//set number of cars, approaching a competing Link in a short distance, if it is green
 			if (compGroupsGreen == true){
@@ -172,8 +188,11 @@ public class DaAdaptivController extends
 						for (SignalGroupDefinition sd : e.getValue()){
 							approachingGreenLane = handler.getVehOnLinkLanes(sd.getLinkRefId());
 							approachingGreenLink += handler.getVehInD(time, sd.getLinkRefId());
-							if((compGreenTime< (time-switchedToGreen.get(sd.getId())))){
-								compGreenTime = (time - switchedToGreen.get(sd.getId()));
+//							if((compGreenTime< (time-switchedToGreen.get(sd.getId())))){
+//								compGreenTime = (time - switchedToGreen.get(sd.getId()));
+//							}
+							if((compGreenTime< (time-switchedGreen))){
+								compGreenTime = (time - switchedGreen);
 							}
 						}
 					}
@@ -181,11 +200,24 @@ public class DaAdaptivController extends
 			}
 
 			// set number of cars on refLink of signalGroup
-			this.carsOnRefLinkTime = handler.getVehInD(time, signalGroup.getLinkRefId())*(compGreenTime);
+			for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+				if(e.getValue().contains(signalGroup)){
+					for (SignalGroupDefinition sd : e.getValue()){
+						this.carsOnRefLinkTime += handler.getVehInD(time, sd.getLinkRefId());
+					}
+				}
+			}
+			this.carsOnRefLinkTime = this.carsOnRefLinkTime * compGreenTime;
 
 			// 	number of cars approaching a red light
 			if (this.oldState.equals(SignalGroupState.RED)){
-				this.approachingRed = handler.getVehInD(time, signalGroup.getLinkRefId());
+				for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+					if(e.getValue().contains(signalGroup)){
+						for (SignalGroupDefinition sd : e.getValue()){
+							this.approachingRed += handler.getVehInD(time, sd.getLinkRefId());
+						}
+					}
+				}
 			}else{
 				this.approachingRed = 0;
 			}
@@ -199,77 +231,74 @@ public class DaAdaptivController extends
 
 		@Override
 		public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
-//		  for (SignalGroupDefinition sg : this.getSignalGroups().values()){
-//				this.updateSignalGroupState(e.getSimulationTime(), sg);
-//		  }
-		  
-		  //experimental, switch links with higher demand first
-		  HashMap<Id, Double> map = new HashMap<Id, Double>();
-		  ValueComparator bvc =  new ValueComparator(map);
-		  TreeMap<Id, Double> sorted_map = new TreeMap<Id, Double>(bvc);
-		  for (SignalGroupDefinition sg : this.getSignalGroups().values()){
-				map.put(sg.getId(), handler.getVehInD(e.getSimulationTime(), sg.getLinkRefId()));
-		  }
-		  sorted_map.putAll(map);
-		  for (Entry<Id, Double> ee : sorted_map.entrySet()){
-			  this.updateSignalGroupState(e.getSimulationTime(), this.getSignalGroups().get(ee.getKey()));
-		  }
+			
+			// disable algorithm if interim is active
+			if (interim == true){
+				this.initIsGreen(e.getSimulationTime(), interimGroup);
+				this.switchInterim(interimGroup, e.getSimulationTime());
+				return;
+			}
+			
+			// add method for switching groups, if is red to long
+//			if (compGreenTime > maxRedTime && compLinkJam == false && maxRedTimeActive == true){
+//				this.switchRedGreen(signalGroup, time);
+//			}
+			
+			
+			//sort groups by demand
+			double temp;
+			HashMap<Id, Double> map = new HashMap<Id, Double>();
+			ValueComparator bvc =  new ValueComparator(map);
+			TreeMap<Id, Double> sorted_map = new TreeMap<Id, Double>(bvc);
+			for (Entry <Id, List<SignalGroupDefinition>> ee : corrGroups.entrySet()){
+				temp = 0;
+				for (SignalGroupDefinition sd : ee.getValue()){
+					temp += handler.getVehInD(e.getSimulationTime(), sd.getLinkRefId());
+				}
+				map.put(ee.getKey(), temp);
+			}
+			sorted_map.putAll(map);
+			
+			// iterate over groups sorted by demand
+			for (Entry<Id, Double> ee : sorted_map.entrySet()){
+				for (SignalGroupDefinition sd : corrGroups.get(ee.getKey())){
+					this.updateSignalGroupState(e.getSimulationTime(), this.getSignalGroups().get(sd.getId()));
+					// return if interim is true, because a group was switched in this timestep
+					if (interim == true){
+						return;
+					}
+				}
+			}
 		}
-
-
+		
 		private void updateSignalGroupState(double time, SignalGroupDefinition signalGroup) {
-
+			
 			this.initIsGreen(time, signalGroup);
 			
 			//check if this group was switched in this timestep. if so, return oldstate
-			if (this.switchedToGreen.get(signalGroup.getId()).equals(time)){
+			if (this.switchedGreen == time){
 				return;
 			}
 			
-			if (compGreenTime > maxGreenTime && compLinkJam == false && maxGreenTimeActive == true){
-				this.switchRedGreen(signalGroup, time);
-			}
-			
-
 			// algorithm starts
 			if ((this.outLinkJam == true) && this.oldState.equals(SignalGroupState.GREEN)){ //Rule 5 + 6
-				this.switchRedGreen(signalGroup, time);
+				this.startSwitching(signalGroup, time);
 				return;
 			} else if(this.outLinkJam == false ){
 				if (this.compGroupsGreen == false && this.oldState.equals(SignalGroupState.RED)){ // Rule 6
-				  this.switchRedGreen(signalGroup, time);
+					this.startSwitching(signalGroup, time);
 				  return;
 				}
 				if (this.approachingRed > 0 && this.approachingGreenLink == 0){ // Rule 4
-					switchRedGreen(signalGroup, time);
+					this.startSwitching(signalGroup, time);
 					return;
 				}else if(!(this.approachingGreenLane > 0)){  //Rule 3
 					if ((this.compGreenTime) > this.tGreenMin && this.carsOnRefLinkTime > this.minCarsTime){ // Rule 1 + 2
-					  this.switchRedGreen(signalGroup, time);
+						this.startSwitching(signalGroup, time);
 					  return;
 					}
 				}
 			}
-			
-			// algorithm ends
-
-			// if no condition fits for switching lights, return oldstate
-//			if(oldState.equals(SignalGroupState.GREEN)){
-//				if (signalGroup.getId().equals(new IdImpl("12100")) || signalGroup.getId().equals(new IdImpl("14500")) ||
-//						signalGroup.getId().equals(new IdImpl("200"))){
-//					log.debug(signalGroup.getId());
-//				}
-//			  this.getSignalGroupStates().put(signalGroup, SignalGroupState.GREEN);
-//			  return;
-//			}
-//			else{
-//				if (signalGroup.getId().equals(new IdImpl("12100")) || signalGroup.getId().equals(new IdImpl("14500")) ||
-//						signalGroup.getId().equals(new IdImpl("200"))){
-//					log.debug(signalGroup.getId());
-//				}
-//			  this.getSignalGroupStates().put(signalGroup, SignalGroupState.RED);
-//			  return;
-//			}
 		}
 		
 		private void fireChangeEvent(double time, Id signalSystem, Id signalgroup, SignalGroupState newState){
@@ -278,64 +307,105 @@ public class DaAdaptivController extends
 		                  signalgroup, newState));
 		}
 
-		private void switchRedGreen (SignalGroupDefinition group, double time){
-			if (this.oldState.equals(SignalGroupState.GREEN)){
-				for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
-					if(!(e.getValue().contains(group))){
-						for (SignalGroupDefinition sd : e.getValue()){
-							if (this.getSignalGroupState(time, sd).equals(SignalGroupState.RED)){
-								fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.GREEN);
-							}
-							this.switchedToGreen.put(sd.getId(), time);
-							this.getSignalGroupStates().put(sd,SignalGroupState.GREEN);
-						}
-					}else{
-						for (SignalGroupDefinition sd : e.getValue()){
-							if (this.getSignalGroupState(time, sd).equals(SignalGroupState.GREEN)){
-								fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
-							}
-							this.switchedToGreen.put(sd.getId(), time);
-							this.getSignalGroupStates().put(sd,SignalGroupState.RED);
-						}
-					}
+		private void startSwitching(SignalGroupDefinition group, double time){
+			this.interim = true;
+			this.interimTime = 0;
+			this.interimGroup = group;
+			
+			if (oldState.equals(SignalGroupState.GREEN)){
+				this.switchToYellow(group, time);
+			} else if(oldState.equals(SignalGroupState.RED) && compGroupsGreen == false){
+				switchToRedYellow(group, time);
+				this.interimTime = 3;
+			}
+			
+		}
+		
+		private void switchInterim (SignalGroupDefinition group, double time){
+			this.interimTime++;
+			double temp = this.interimTime;
+			
+			if (temp == 3){
+				if (oldState.equals(SignalGroupState.YELLOW)){
+					interim = false;
+					switchToRed(group, time);
+					//start algorithm new?!
+				}else if (oldState.equals(SignalGroupState.RED)){
+					switchToRedYellow(group, time);
 				}
-			} else { //if (oldState.equals(SignalGroupState.RED)){
-				for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
-					if(!(e.getValue().contains(group))){
-						for (SignalGroupDefinition sd : e.getValue()){
-							if (this.getSignalGroupState(time, sd).equals(SignalGroupState.GREEN)){
-								fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
-							}
-							this.switchedToGreen.put(sd.getId(), time);
-							this.getSignalGroupStates().put(sd,SignalGroupState.RED);
-						}
-					}else{
-						for (SignalGroupDefinition sd : e.getValue()){
-							if (this.getSignalGroupState(time, sd).equals(SignalGroupState.RED)){
-								fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.GREEN);
-							}
-							this.switchedToGreen.put(sd.getId(), time);
-							this.getSignalGroupStates().put(sd,SignalGroupState.GREEN);
-						}
+			}else if (temp >3){
+				this.interim = false;
+				switchToGreen(group, time);
+			}
+		}
+		
+		private void switchToRed(SignalGroupDefinition group, double time){
+			for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+				if(e.getValue().contains(group)){
+					for (SignalGroupDefinition sd : e.getValue()){
+						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
+						switchedRed.put(e.getKey(), time);
+						this.getSignalGroupStates().put(sd,SignalGroupState.RED);
 					}
 				}
 			}
 		}
 		
+		private void switchToRedYellow(SignalGroupDefinition group, double time){
+			for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+				if(!(e.getValue().contains(group))){
+					for (SignalGroupDefinition sd : e.getValue()){
+						if (this.getSignalGroupState(time, sd).equals(SignalGroupState.YELLOW)){
+							fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
+						}
+						this.getSignalGroupStates().put(sd,SignalGroupState.RED);
+					}
+				}else{
+					for (SignalGroupDefinition sd : e.getValue()){
+						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.REDYELLOW);
+						this.getSignalGroupStates().put(sd,SignalGroupState.REDYELLOW);
+					}
+				}
+			}
+		}
+
+		private void switchToYellow(SignalGroupDefinition group, double time){
+			for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+				if(e.getValue().contains(group)){
+					for (SignalGroupDefinition sd : e.getValue()){
+						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.YELLOW);
+						this.getSignalGroupStates().put(sd,SignalGroupState.YELLOW);
+					}
+				}
+			}
+		}
+		
+		private void switchToGreen(SignalGroupDefinition group, double time){
+			for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+				if(e.getValue().contains(group)){
+					for (SignalGroupDefinition sd : e.getValue()){
+						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.GREEN);
+						this.getSignalGroupStates().put(sd,SignalGroupState.GREEN);
+					}
+				}
+			}
+			this.switchedGreen = time;
+		}
+		
 		/*
 		 * use this method to set parameters minimumGreenTime u, minimum of the product cars and waitingTime n, the capacityFactor for trafficJam on the outlink
-		 * and the maximumGreenTime ( 0 == disable maximumGreenTime)
+		 * and the maximumRedTime ( 0 == disable maximumRedTime)
 		 */
-		public void setParameters (int minCarsTime, int tGreenMin, double capFactor, int maxGreenTime){
+		public void setParameters (int minCarsTime, int tGreenMin, double capFactor, int maxRedTime){
 			this.minCarsTime = minCarsTime;
 			this.tGreenMin = tGreenMin;
 			this.capFactor = capFactor;
-			this.maxGreenTime = maxGreenTime;
+			this.maxRedTime = maxRedTime;
 			
-			if (maxGreenTime == 0){
-				maxGreenTimeActive = false;
+			if (maxRedTime == 0){
+				maxRedTimeActive = false;
 			}else{
-				maxGreenTimeActive = true;
+				maxRedTimeActive = true;
 			}
 		}
 
@@ -345,3 +415,45 @@ public class DaAdaptivController extends
 
 
 }
+
+//if (this.oldState.equals(SignalGroupState.GREEN)){
+//	for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+//		if(!(e.getValue().contains(group))){
+//			for (SignalGroupDefinition sd : e.getValue()){
+//				if (this.getSignalGroupState(time, sd).equals(SignalGroupState.RED)){
+//					fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.GREEN);
+//				}
+//				this.switchedToGreen.put(sd.getId(), time);
+//				this.getSignalGroupStates().put(sd,SignalGroupState.GREEN);
+//			}
+//		}else{
+//			for (SignalGroupDefinition sd : e.getValue()){
+//				if (this.getSignalGroupState(time, sd).equals(SignalGroupState.GREEN)){
+//					fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
+//				}
+//				this.switchedToGreen.put(sd.getId(), time);
+//				this.getSignalGroupStates().put(sd,SignalGroupState.RED);
+//			}
+//		}
+//	}
+//} else { //if (oldState.equals(SignalGroupState.RED)){
+//	for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+//		if(!(e.getValue().contains(group))){
+//			for (SignalGroupDefinition sd : e.getValue()){
+//				if (this.getSignalGroupState(time, sd).equals(SignalGroupState.GREEN)){
+//					fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
+//				}
+//				this.switchedToGreen.put(sd.getId(), time);
+//				this.getSignalGroupStates().put(sd,SignalGroupState.RED);
+//			}
+//		}else{
+//			for (SignalGroupDefinition sd : e.getValue()){
+//				if (this.getSignalGroupState(time, sd).equals(SignalGroupState.RED)){
+//					fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.GREEN);
+//				}
+//				this.switchedToGreen.put(sd.getId(), time);
+//				this.getSignalGroupStates().put(sd,SignalGroupState.GREEN);
+//			}
+//		}
+//	}
+//}

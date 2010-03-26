@@ -44,14 +44,11 @@ import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListene
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
+import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
 import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
 import playground.droeder.Analysis.SignalSystems.SignalGroupStateTimeHandler;
-
-
-
-
 
 /**
  * @author droeder
@@ -168,7 +165,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				event.getControler().getEvents().addHandler(handler3);
 				
 				//enable live-visualization
-//				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	
@@ -213,7 +210,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				for(Entry<Id, Map<Id, SignalGroupDefinition>> ee: signalSystems.entrySet()){
 					DaAdaptivController adaptiveController = (DaAdaptivController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
 					adaptiveController.setParameters(n, u, cap, maxGreen);
-					adaptiveController.init(newCorrGroups.get(ee.getKey()), mainOutLinks, e.getQueueSimulation().getQNetwork(), handler2);
+					adaptiveController.init(newCorrGroups.get(ee.getKey()), newMainOutlinks.get(ee.getKey()), e.getQueueSimulation().getQNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);	
 				}
 				
