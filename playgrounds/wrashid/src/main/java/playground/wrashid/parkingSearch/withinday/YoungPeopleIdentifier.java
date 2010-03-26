@@ -34,11 +34,11 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 			return list;
 		}
 		
-		QLink tmpLink = queueSim.getQueueNetwork().getLinks().get(new IdImpl("6"));
-		List<QVehicle> tmpList=queueSim.getQueueNetwork().getLinks().get(new IdImpl("6")).getVehQueue();
+		QLink tmpLink = queueSim.getQNetwork().getLinks().get(new IdImpl("6"));
+		List<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getVehQueue();
 
 		// select agents, which should be replanned within this time step
-		for (QLink link:queueSim.getQueueNetwork().getLinks().values()){
+		for (QLink link:queueSim.getQNetwork().getLinks().values()){
 			for (QVehicle vehicle : link.getVehQueue()) {
 				DriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getPerson().getId());
