@@ -91,15 +91,15 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 82
-	private static double beta_time_car = -6; 
-	private static double beta_time_pt = -1.0; 
+	// Settings of 9
+	private static double beta_time_car = -3; 
+	private static double beta_time_pt = 0.0; 
 	private static double beta_time_bike = -1.07;
-	private static double beta_time_walk = -2.5; 
+	private static double beta_time_walk = -1.2; 
 	
 	private static double constantPt = -0.578;
-	private static double constantBike = -0.4;
-	private static double constantWalk = 0.4;
+	private static double constantBike = 0;
+	private static double constantWalk = 0.8;
 	
 	private static double beta_cost_car = 1; 
 	private static double beta_cost_pt = -0.117;
@@ -430,7 +430,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			double incomeRatio;
 			if (this.income_averageIncome_ratio==0.0 && lambda_cost_income_car<0) incomeRatio = 0.001;
 			else incomeRatio = this.income_averageIncome_ratio;
-			tmpScore += (1 + beta_female_travel*this.female + licenseCar*this.license) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist/1000 * Math.pow(incomeRatio, lambda_cost_income_car);
+			tmpScore += (1 + beta_female_travel*this.female + licenseCar*this.license) * beta_time_car * travelTime/3600 + travelCostCar * beta_cost_car * dist * Math.pow(incomeRatio, lambda_cost_income_car);
 		} 
 		else if (TransportMode.pt.equals(leg.getMode())) {
 			// income_averageIncome_ratio needs to be non-zero if lambda_cost_income_car is negative, potential division by 0 otherwise
@@ -442,7 +442,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			if (this.seasonTicket.equals("ch-GA")) cost = travelCostPt_GA;
 			else if (this.seasonTicket.equals("ch-HT")) cost = travelCostPt_Halbtax; 
 			else cost = travelCostPt_None; 
-			tmpScore += (1+beta_female_travel*this.female + licensePt*this.license) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist/1000 * Math.pow(incomeRatio, lambda_cost_income_pt) + constantPt;
+			tmpScore += (1+beta_female_travel*this.female + licensePt*this.license) * beta_time_pt * travelTime/3600 + beta_cost_pt * cost * dist * Math.pow(incomeRatio, lambda_cost_income_pt) + constantPt;
 		} 
 		else if (TransportMode.walk.equals(leg.getMode())) {
 			tmpScore += (1+licenseBike*this.license) * beta_time_walk * travelTime/3600 + constantWalk;
