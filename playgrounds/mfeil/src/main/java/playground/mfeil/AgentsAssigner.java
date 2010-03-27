@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -37,7 +38,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
@@ -299,7 +299,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			}
 			setOfLCplans.add(LCplan);
 		}
-	//	log.info("beste Distanz für Person "+plan.getPerson().getId()+" = "+bestDis+", von Person "+agents.getAgentPlan(assignedAgent).getPerson().getId());
+	//	log.info("beste Distanz fuer Person "+plan.getPerson().getId()+" = "+bestDis+", von Person "+agents.getAgentPlan(assignedAgent).getPerson().getId());
 		plan.getPlanElements().clear();
 		for (int y=0;y<setOfLCplans.get(pointerToBestDis).getPlanElements().size();y++){
 			if (y%2==0) plan.addActivity(((ActivityImpl)(setOfLCplans.get(pointerToBestDis).getPlanElements().get(y))));
