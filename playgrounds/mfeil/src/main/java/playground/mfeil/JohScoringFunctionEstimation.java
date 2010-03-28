@@ -91,24 +91,24 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 0995b_91
-	private static double beta_time_car = -3; // war -3.77
-	private static double beta_time_pt = 0.0559; // war 0.563
-	private static double beta_time_bike = -1.32;
-	private static double beta_time_walk = -1.13; // war -1.8
+	// Settings of 96
+	private static double beta_time_car = -6; 
+	private static double beta_time_pt = 0.563; 
+	private static double beta_time_bike = -1.07;
+	private static double beta_time_walk = -2.5; 
 	
-	private static double constantPt = -0.559;
-	private static double constantBike = -0.3;
-	private static double constantWalk = 0.78;
+	private static double constantPt = -0.578;
+	private static double constantBike = -0.1;
+	private static double constantWalk = 0.4;
 	
-	private static double beta_cost_car = 0.001; 
-	private static double beta_cost_pt = -0.00109;
+	private static double beta_cost_car = 0.3; 
+	private static double beta_cost_pt = -0.117;
 	
-	private static double lambda_cost_income_car = 0.0779;
-	private static double lambda_cost_income_pt = -0.298;
+	private static double lambda_cost_income_car = 0.185;
+	private static double lambda_cost_income_pt = -0.27;
 	
-	private static double beta_female_act = 0.0492;
-	private static double beta_female_travel = 0.0766;
+	private static double beta_female_act = -0.0577;
+	private static double beta_female_travel = 0.0797;
 	
 	private static double travelCostCar = 0.5;	// CHF/km
 	private static double travelCostPt_None = 0.28;	// CHF/km
@@ -660,7 +660,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		log.info("gamma_work = "+gamma_work);
 		log.info("beta_age_work = "+beta_age_work);
 		JohActUtilityParametersExtended params = utilParams.get("work_sector2");
-		log.info("opening_work = "+params.getOpeningTime()+" to "+params.getClosingTime());
+		log.info("opening_work = "+Time.writeTime(params.getOpeningTime())+" to "+Time.writeTime(params.getClosingTime()));
 		log.info("uMin_education = "+uMin_education);
 		log.info("uMax_education = "+uMax_education);
 		log.info("alpha_education = "+alpha_education);
@@ -668,7 +668,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		log.info("gamma_education = "+gamma_education);
 		log.info("beta_age_education = "+beta_age_education);
 		params = utilParams.get("education_higher");
-		log.info("opening_education = "+params.getOpeningTime()+" to "+params.getClosingTime());
+		log.info("opening_education = "+Time.writeTime(params.getOpeningTime())+" to "+Time.writeTime(params.getClosingTime()));
 		log.info("uMin_leisure = "+uMin_leisure);
 		log.info("uMax_leisure = "+uMax_leisure);
 		log.info("alpha_leisure = "+alpha_leisure);
@@ -676,7 +676,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		log.info("gamma_leisure = "+gamma_leisure);
 		log.info("beta_age_leisure = "+beta_age_leisure);
 		params = utilParams.get("leisure");
-		log.info("opening_leisure = "+params.getOpeningTime()+" to "+params.getClosingTime());
+		log.info("opening_leisure = "+Time.writeTime(params.getOpeningTime())+" to "+Time.writeTime(params.getClosingTime()));
 		log.info("uMin_shopping = "+uMin_shopping);
 		log.info("uMax_shopping = "+uMax_shopping);
 		log.info("alpha_shopping = "+alpha_shopping);
@@ -684,7 +684,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		log.info("gamma_shopping = "+gamma_shopping);
 		log.info("beta_age_shopping = "+beta_age_shopping);
 		params = utilParams.get("shop");
-		log.info("opening_shopping = "+params.getOpeningTime()+" to "+params.getClosingTime());
+		log.info("opening_shopping = "+Time.writeTime(params.getOpeningTime())+" to "+Time.writeTime(params.getClosingTime()));
 		log.info("");
 		log.info("Legs:");
 		log.info("beta_time_car = "+beta_time_car);
