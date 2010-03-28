@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
@@ -34,10 +32,6 @@ import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
-
-import playground.droeder.gershensonSignals.CalculateSignalGroups;
-import playground.droeder.gershensonSignals.DenverScenarioGenerator;
-import playground.droeder.gershensonSignals.GershensonScenarioGenerator;
 
 
 /**
@@ -66,10 +60,10 @@ public class CalculateSignalGroupsTest {
 	
 	@Test public void testCorrespondingSignalGroups(){
 		SortedMap<Id, SignalGroupDefinition> groups = scenario.getSignalSystems().getSignalGroupDefinitions();
-		CalculateSignalGroups ccsg = new CalculateSignalGroups();
+		CalculateSignalGroups ccsg = new CalculateSignalGroups(groups, net);
 		
-		ccsg.calculateCorrespondingGroups(groups, net);
-		ccsg.calculateCompetingGroups(ccsg.calculateCorrespondingGroups(groups, net), groups, net);
+		ccsg.calculateCorrespondingGroups();
+		ccsg.calculateCompetingGroups(ccsg.calculateCorrespondingGroups());
 		
 //		assertEquals(id3 , ccsg.calculateCorrespondingGroups(groups, net).
 //				get(id1));
