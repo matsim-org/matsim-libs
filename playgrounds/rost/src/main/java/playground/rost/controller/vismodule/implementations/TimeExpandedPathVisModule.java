@@ -44,13 +44,13 @@ import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings;
 import playground.rost.eaflow.ea_flow.TimeExpandedPath;
 
 public class TimeExpandedPathVisModule extends AbstractVisModuleImpl {
-	
+
 	protected NetworkLayer network;
 	protected final Flow flow;
 	protected final TimeControl tControl;
 	protected final Map<Integer, Set<TimeExpandedPath>> timeExpandedPathsStartAtMap = new HashMap<Integer, Set<TimeExpandedPath>>();
 	protected final Node sink;
-	
+
 	public TimeExpandedPathVisModule(VisModuleContainer vMContainer, NetworkLayer network, TimeControl timeControl, Flow flow)
 	{
 		super(vMContainer, "FlowLinkView");
@@ -58,9 +58,9 @@ public class TimeExpandedPathVisModule extends AbstractVisModuleImpl {
 		this.flow = flow;
 		this.tControl = timeControl;
 		this.network = network;
-		
+
 		calculateMap();
-		
+
 		this.attributes.put("show", "true");
 	}
 
@@ -90,13 +90,13 @@ public class TimeExpandedPathVisModule extends AbstractVisModuleImpl {
 				if(!map.isVisible(link))
 					continue;
 				int flowValue = flow.getFlow().get(link).getFlowAt(currentTime);
-				int cap = (int)link.getCapacity(1.);
+				int cap = (int)link.getCapacity();
 				int countUsed = 1;
 				if(countLinkUsed.containsKey(link))
 					countUsed = countLinkUsed.get(link)+1;
 				countLinkUsed.put(link, countUsed);
 				g.setStroke(new BasicStroke(5));
-				
+
 				x = map.getXonPanel(link.getFromNode());
 				y = map.getYonPanel(link.getFromNode());
 				x2 = map.getXonPanel(link.getToNode());
@@ -130,7 +130,7 @@ public class TimeExpandedPathVisModule extends AbstractVisModuleImpl {
 		}
 		g.setStroke(new BasicStroke(1));
 	}
-	
+
 	protected Color getNewColorForPath(int count)
 	{
 		int newCount = 91*count;
@@ -139,7 +139,7 @@ public class TimeExpandedPathVisModule extends AbstractVisModuleImpl {
 		int blue = ((newCount / (256*256)) * 91) % 256;
 		return new Color(red, green, blue);
 	}
-	
+
 	protected void calculateMap()
 	{
 		Set<TimeExpandedPath> tEPathSet;

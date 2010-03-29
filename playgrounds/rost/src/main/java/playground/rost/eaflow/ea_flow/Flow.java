@@ -412,7 +412,7 @@ public class Flow {
 				int startTime = edge.getStartTime();
 				EdgeIntervalls flow = _flow.get(link);
 				if(edge.isForward()){
-					flow.augment(startTime, gamma, (int)link.getCapacity(1.));
+					flow.augment(startTime, gamma, (int)link.getCapacity());
 				}else{
 					System.out.println("Unexpected error!");
 				}
@@ -428,7 +428,7 @@ public class Flow {
 			for(PathEdge pE : timeExpandedPath.getPathEdges())
 			{
 				if(pE.isForward())
-					_flow.get(pE.getEdge()).augment(pE.getStartTime(), flow, (int)pE.getEdge().getCapacity(1.));
+					_flow.get(pE.getEdge()).augment(pE.getStartTime(), flow, (int)pE.getEdge().getCapacity());
 				else
 					_flow.get(pE.getEdge()).augmentreverse(pE.getStartTime(), flow);
 			}

@@ -20,16 +20,19 @@
 
 package playground.mrieser;
 
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
@@ -43,7 +46,6 @@ import net.opengis.kml._2.PolyStyleType;
 import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -58,7 +60,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcLanes;
@@ -88,7 +89,6 @@ import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.vis.kml.KMZWriter;
-import org.xml.sax.SAXException;
 
 public class MyRuns {
 
@@ -626,25 +626,7 @@ public class MyRuns {
 //		System.out.println(i1 == i3);
 //		System.out.println(i3 == i4);
 
-		ScenarioImpl scenario = new ScenarioImpl();
 
-		Logger log = Logger.getLogger(MyRuns.class);
-		try {
-			log.info("reading network");
-			new MatsimNetworkReader(scenario).parse("/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml");
-			log.info("reading plans");
-			new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch10pct.dilZh30km.xml.gz");
-			scenario.getPopulation().printPlansCount();
-			log.info("writing plans");
-			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile("testplans.xml.gz");
-			log.info("done");
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 	}
 
@@ -658,12 +640,7 @@ public class MyRuns {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void setValue(int i) {
-		i = 5;
-	}
-
 	public static void main(final String[] args) {
-
 
 		System.out.println("start at " + (new Date()));
 
@@ -766,7 +743,23 @@ public class MyRuns {
 //		new NetworkWriter(scenario.getNetwork()).writeFile("/Users/mrieser/Downloads/switzerland.xml");
 //		OTFVis.main(new String[]{"/Users/mrieser/Downloads/switzerland.xml"});
 
-		System.out.println(System.getProperty("eventHandler"));
+		final int BUFFERSIZE = 50 * 1024 * 1024;
+		final int SIZE2 = 10 * 1024 * 1024;
+
+		try {
+			ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
+			BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream("test.bin"), SIZE2);
+			DataOutputStream outFile = new DataOutputStream(stream);
+
+			outFile.write(buf.array(), 0, BUFFERSIZE);
+
+			outFile.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();

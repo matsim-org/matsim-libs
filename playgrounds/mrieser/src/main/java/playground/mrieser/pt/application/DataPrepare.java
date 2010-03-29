@@ -39,7 +39,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouter;
@@ -201,9 +200,9 @@ public class DataPrepare {
 		for (Link link : routerNet.getLinks().values()) {
 			Link l = visNet.getFactory().createLink(link.getId(), link.getFromNode().getId(), link.getToNode().getId());
 			l.setLength(link.getLength());
-			l.setFreespeed(link.getFreespeed(Time.UNDEFINED_TIME));
-			l.setCapacity(link.getCapacity(Time.UNDEFINED_TIME));
-			l.setNumberOfLanes(link.getNumberOfLanes(Time.UNDEFINED_TIME));
+			l.setFreespeed(link.getFreespeed());
+			l.setCapacity(link.getCapacity());
+			l.setNumberOfLanes(link.getNumberOfLanes());
 		}
 
 		log.info("write routerNet.xml");

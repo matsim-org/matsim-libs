@@ -23,7 +23,6 @@ package playground.balmermi.modules;
 import org.apache.log4j.Logger;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.misc.Time;
 
 public class NetworkAdaptCaps {
 
@@ -49,7 +48,7 @@ public class NetworkAdaptCaps {
 	public void run(NetworkLayer network) {
 		log.info("running "+this.getClass().getName()+" module...");
 		for (LinkImpl l : network.getLinks().values()) {
-			double cap = l.getCapacity(Time.UNDEFINED_TIME);
+			double cap = l.getCapacity();
 			// set standard caps
 			if (cap < 1000) { l.setCapacity(500); }
 			else if (cap < 2000) { l.setCapacity(1000); }
@@ -58,9 +57,9 @@ public class NetworkAdaptCaps {
 			else if (cap < 8000) { l.setCapacity(6000); }
 			else if (cap < 10000) { l.setCapacity(8000); }
 			else { l.setCapacity(10000); }
-			
+
 			// move links with teleatlas type 3 and higher to the next lower cap class
-			cap = l.getCapacity(Time.UNDEFINED_TIME);
+			cap = l.getCapacity();
 			String type = l.getType();
 			if (type.startsWith("3-") || type.startsWith("4-") ||
 			    type.startsWith("5-") || type.startsWith("6-") ||

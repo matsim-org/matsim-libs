@@ -18,23 +18,23 @@ public class OneWayVisNetwork {
 
 	protected NetworkLayer network;
 	protected Flow flow;
-	
+
 	protected Map<Link, OneWayLink> forwardLinks = new HashMap<Link, OneWayLink>();
 	protected Map<Link, OneWayLink> backwardLinks = new HashMap<Link, OneWayLink>();
-	
+
 	public OneWayVisNetwork(NetworkLayer network, Flow flow)
-	{	
+	{
 		this.network = network;
 		this.flow = flow;
 		calcOneWayLinks();
 		calcAccumalatedFlow();
 	}
-	
+
 	public final Collection<OneWayLink> getOneWayLinks()
 	{
 		return forwardLinks.values();
 	}
-	
+
 	protected void calcAccumalatedFlow()
 	{
 		boolean isForward;
@@ -73,10 +73,10 @@ public class OneWayVisNetwork {
 			}
 		}
 	}
-	
+
 	protected void calcOneWayLinks()
 	{
-		Set<Link> linksToIgnore = new HashSet<Link>(); 
+		Set<Link> linksToIgnore = new HashSet<Link>();
 		for(Link link : network.getLinks().values())
 		{
 			if(forwardLinks.containsKey(link))
@@ -102,12 +102,12 @@ public class OneWayVisNetwork {
 			{
 				OneWayLink oWL = new OneWayLink(link, backwardLink);
 				int maxTravelTime = flow.getMaxTravelTimeForLink(link);
-				oWL.setMaxCapacity((int)(link.getCapacity(1) * maxTravelTime));
+				oWL.setMaxCapacity((int)(link.getCapacity() * maxTravelTime));
 				forwardLinks.put(link, oWL);
 				backwardLinks.put(backwardLink, oWL);
 				linksToIgnore.add(backwardLink);
 			}
 		}
 	}
-	
+
 }

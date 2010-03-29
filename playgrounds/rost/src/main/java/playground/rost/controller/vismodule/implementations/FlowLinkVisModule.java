@@ -39,13 +39,13 @@ import playground.rost.graph.visnetwork.OneWayLink;
 import playground.rost.graph.visnetwork.OneWayVisNetwork;
 
 public class FlowLinkVisModule extends AbstractVisModuleImpl {
-	
+
 	protected NetworkLayer network;
 	protected OneWayVisNetwork oWVN;
 	protected final Flow flow;
 	protected final TimeControl tControl;
 	protected final Node sink;
-	
+
 	public FlowLinkVisModule(VisModuleContainer vMContainer, NetworkLayer network, OneWayVisNetwork oWVN, TimeControl timeControl, Flow flow)
 	{
 		super(vMContainer, "FlowLinkView");
@@ -87,38 +87,38 @@ public class FlowLinkVisModule extends AbstractVisModuleImpl {
 				isForward = false;
 				flowValue *= -1;
 			}
-			
-			
-			int cap = (int)oWLink.getMaxCapacity();
-			
+
+
+			int cap = oWLink.getMaxCapacity();
+
 			g.setColor(getColorForFlow(flowValue, cap));
-			
+
 			x = map.getXonPanel(link.getFromNode());
 			y = map.getYonPanel(link.getFromNode());
 			x2 = map.getXonPanel(link.getToNode());
 			y2 = map.getYonPanel(link.getToNode());
 			g.drawLine(x, y, x2, y2);
-			
+
 			if(flowValue != 0)
 				this.drawArrow(g, x, y, x2, y2, isForward);
-			
+
 			if(ids || length || printFlow || travelTime)
 			{
 				g.setColor(Color.black);
 				int mx = (x+x2)/2, my=(y+y2)/2;
 				mx-=10;
 				if(ids)
-					g.drawString(link.getId().toString(), mx, my + 10);			
+					g.drawString(link.getId().toString(), mx, my + 10);
 				if(length)
 					g.drawString(""+link.getLength(), mx, my + 5 );
 				if(printFlow)
 					g.drawString(flowValue + " / " + cap, mx + 5, my);
 				if(travelTime)
-					g.drawString("tau: " + link.getFreespeed(1.), mx+5, my+10);
+					g.drawString("tau: " + link.getFreespeed(), mx+5, my+10);
 			}
 		}
 	}
-	
+
 	protected void drawArrow(Graphics g, int x, int y, int x2, int y2, boolean isForward)
 	{
 		int mx, my, aX1, aX2, aY1, aY2;
@@ -201,16 +201,16 @@ public class FlowLinkVisModule extends AbstractVisModuleImpl {
 					if(mx > x)
 						mx = x;
 				}
-			}			
+			}
 			my = (int)(delta * (mx - x) + y);
 		}
 		g.drawLine(mx, my, aX1, aY1);
 		g.drawLine(mx, my, aX2, aY2);
 	}
-	
+
 	protected Color getColorForFlow(int flow, int cap)
 	{
-		int farbgrad = (int)( 512.0 * flow / cap);		
+		int farbgrad = (int)( 512.0 * flow / cap);
 		if(farbgrad < 256)
 		{
 			return new Color(farbgrad,255,0);
@@ -224,5 +224,5 @@ public class FlowLinkVisModule extends AbstractVisModuleImpl {
 			return Color.black;
 		}
 	}
-	
+
 }

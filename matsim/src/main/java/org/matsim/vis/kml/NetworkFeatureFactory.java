@@ -145,7 +145,7 @@ public class NetworkFeatureFactory {
 				log.warn("Not yet implemented: Adding link KML features of type" + abstractFeature.getClass());
 			}
 		}
-		for (Node n : RouteUtils.getNodes((NetworkRoute) leg.getRoute(), network)) {
+		for (Node n : RouteUtils.getNodes((NetworkRoute) leg.getRoute(), this.network)) {
 
 			AbstractFeatureType abstractFeature = this.createNodeFeature(n, style);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
@@ -185,15 +185,15 @@ public class NetworkFeatureFactory {
 		buffer.append(STARTUL);
 		buffer.append(STARTLI);
 		buffer.append("Freespeed: ");
-		buffer.append(l.getFreespeed(Time.UNDEFINED_TIME));
+		buffer.append(l.getFreespeed());
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Capacity: ");
-		buffer.append(l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+		buffer.append(l.getCapacity());
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Number of Lanes: ");
-		buffer.append(l.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+		buffer.append(l.getNumberOfLanes());
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Length: ");

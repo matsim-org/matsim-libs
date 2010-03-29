@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.misc.Time;
 
 public class NetworkWrapper {
 
@@ -18,7 +17,7 @@ public class NetworkWrapper {
 	 * the end of the real link. Inverted link attributes are copied from toLink
 	 * of the real network, thus every inverted link actually starts at the
 	 * location of a real node.
-	 * 
+	 *
 	 * @param networkLayer
 	 *            The real network
 	 * @return The converted network
@@ -40,9 +39,9 @@ public class NetworkWrapper {
 					Link link = wrappedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
 							wrappedNetwork.getNodes().get(inLink.getId()), wrappedNetwork.getNodes().get(new IdImpl(outLink.getId().toString())),
 							outLink.getLength(),
-							outLink.getFreespeed(Time.UNDEFINED_TIME),
-							outLink.getCapacity(Time.UNDEFINED_TIME),
-							outLink.getNumberOfLanes(Time.UNDEFINED_TIME));
+							outLink.getFreespeed(),
+							outLink.getCapacity(),
+							outLink.getNumberOfLanes());
 					((LinkImpl) link).setType(((LinkImpl) outLink).getType());
 					numberOfLinksGenerated++;
 				}

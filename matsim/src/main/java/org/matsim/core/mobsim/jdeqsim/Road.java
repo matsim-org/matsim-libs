@@ -89,7 +89,7 @@ public class Road extends SimUnit {
 		 * calculate the maximum number of cars, which can be on the road at the
 		 * same time
 		 */
-		maxNumberOfCarsOnRoad = Math.round(link.getLength()
+		this.maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link)
 				* SimulationParameters.getStorageCapacityFactor() / SimulationParameters.getCarSize());
 
@@ -97,67 +97,67 @@ public class Road extends SimUnit {
 		 * it is assured here, that a road must have the space of at least one
 		 * car
 		 */
-		if (maxNumberOfCarsOnRoad == 0) {
-			maxNumberOfCarsOnRoad = 1;
+		if (this.maxNumberOfCarsOnRoad == 0) {
+			this.maxNumberOfCarsOnRoad = 1;
 		}
 
 		double maxInverseInFlowCapacity = 3600 / (SimulationParameters.getMinimumInFlowCapacity()
 				* SimulationParameters.getFlowCapacityFactor() * NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 
-		inverseOutFlowCapacity = 1 / (((LinkImpl) link).getFlowCapacity(Time.UNDEFINED_TIME) * SimulationParameters.getFlowCapacityFactor());
+		this.inverseOutFlowCapacity = 1 / (((LinkImpl) link).getFlowCapacity(Time.UNDEFINED_TIME) * SimulationParameters.getFlowCapacityFactor());
 
-		if (inverseOutFlowCapacity > maxInverseInFlowCapacity) {
-			inverseInFlowCapacity = maxInverseInFlowCapacity;
+		if (this.inverseOutFlowCapacity > maxInverseInFlowCapacity) {
+			this.inverseInFlowCapacity = maxInverseInFlowCapacity;
 		} else {
-			inverseInFlowCapacity = inverseOutFlowCapacity;
+			this.inverseInFlowCapacity = this.inverseOutFlowCapacity;
 		}
 
-		gapTravelTime = link.getLength() / SimulationParameters.getGapTravelSpeed();
+		this.gapTravelTime = link.getLength() / SimulationParameters.getGapTravelSpeed();
 
 		// gap must be initialized to null because of the application logic
-		gap = null;
+		this.gap = null;
 	}
 
 	public void leaveRoad(Vehicle vehicle, double simTime) {
-		assert (carsOnTheRoad.getFirst() == vehicle);
-		assert (interestedInEnteringRoad.size()==deadlockPreventionMessages.size());
+		assert (this.carsOnTheRoad.getFirst() == vehicle);
+		assert (this.interestedInEnteringRoad.size()==this.deadlockPreventionMessages.size());
 
-		carsOnTheRoad.removeFirst();
-		earliestDepartureTimeOfCar.removeFirst();
-		timeOfLastLeavingVehicle = simTime;
+		this.carsOnTheRoad.removeFirst();
+		this.earliestDepartureTimeOfCar.removeFirst();
+		this.timeOfLastLeavingVehicle = simTime;
 
 		/*
 		 * the next car waiting for entering the road should now be alloted a
 		 * time for entering the road
 		 */
-		if (interestedInEnteringRoad.size() > 0) {
-			Vehicle nextVehicle = interestedInEnteringRoad.removeFirst();
-			DeadlockPreventionMessage m = deadlockPreventionMessages.removeFirst();
+		if (this.interestedInEnteringRoad.size() > 0) {
+			Vehicle nextVehicle = this.interestedInEnteringRoad.removeFirst();
+			DeadlockPreventionMessage m = this.deadlockPreventionMessages.removeFirst();
 			assert (m.vehicle == nextVehicle);
-			scheduler.unschedule(m);
+			this.scheduler.unschedule(m);
 
-			double nextAvailableTimeForEnteringStreet = Math.max(timeOfLastEnteringVehicle
-					+ inverseInFlowCapacity, simTime + gapTravelTime);
+			double nextAvailableTimeForEnteringStreet = Math.max(this.timeOfLastEnteringVehicle
+					+ this.inverseInFlowCapacity, simTime + this.gapTravelTime);
 
-			noOfCarsPromisedToEnterRoad++;
+			this.noOfCarsPromisedToEnterRoad++;
 
 			nextVehicle.scheduleEnterRoadMessage(nextAvailableTimeForEnteringStreet, this);
 		} else {
-			if (gap != null) {
+			if (this.gap != null) {
 
 				/*
 				 * as long as the road is not full once, there is no need to
 				 * keep track of the gaps
 				 */
-				gap.add(simTime + gapTravelTime);
+				this.gap.add(simTime + this.gapTravelTime);
 
 				/*
 				 * if no one is interested in entering this road (precondition)
 				 * and there are no cars on the road, then reset gap (this is
 				 * required, for enterRequest to function properly)
 				 */
-				if (carsOnTheRoad.size() == 0) {
-					gap = null;
+				if (this.carsOnTheRoad.size() == 0) {
+					this.gap = null;
 				}
 			}
 		}
@@ -166,10 +166,10 @@ public class Road extends SimUnit {
 		 * tell the car behind the fist car (which is the first car now), when
 		 * it reaches the end of the read
 		 */
-		if (carsOnTheRoad.size() > 0) {
-			Vehicle nextVehicle = carsOnTheRoad.getFirst();
-			double nextAvailableTimeForLeavingStreet = Math.max(earliestDepartureTimeOfCar.getFirst(),
-					timeOfLastLeavingVehicle + inverseOutFlowCapacity);
+		if (this.carsOnTheRoad.size() > 0) {
+			Vehicle nextVehicle = this.carsOnTheRoad.getFirst();
+			double nextAvailableTimeForLeavingStreet = Math.max(this.earliestDepartureTimeOfCar.getFirst(),
+					this.timeOfLastLeavingVehicle + this.inverseOutFlowCapacity);
 			nextVehicle.scheduleEndRoadMessage(nextAvailableTimeForLeavingStreet, this);
 		}
 
@@ -177,11 +177,11 @@ public class Road extends SimUnit {
 
 	public void enterRoad(Vehicle vehicle, double simTime) {
 		// calculate time, when the car reaches the end of the road
-		double nextAvailableTimeForLeavingStreet = simTime + link.getLength()
-				/ link.getFreespeed(Time.UNDEFINED_TIME);
+		double nextAvailableTimeForLeavingStreet = simTime + this.link.getLength()
+				/ this.link.getFreespeed(simTime);
 
-		noOfCarsPromisedToEnterRoad--;
-		carsOnTheRoad.add(vehicle);
+		this.noOfCarsPromisedToEnterRoad--;
+		this.carsOnTheRoad.add(vehicle);
 
 		/*
 		 * needed to remove the following assertion because for deadlock
@@ -189,16 +189,16 @@ public class Road extends SimUnit {
 		 * assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are
 		 * more cars on the road, than its capacity!";
 		 */
-		earliestDepartureTimeOfCar.add(nextAvailableTimeForLeavingStreet);
+		this.earliestDepartureTimeOfCar.add(nextAvailableTimeForLeavingStreet);
 
 		/*
 		 * if we are in the front of the queue, then we can just drive with free
 		 * speed to the front and have to have at least inverseFlowCapacity
 		 * time-distance to the previous car
-		 */	
-		if (carsOnTheRoad.size() == 1) {
+		 */
+		if (this.carsOnTheRoad.size() == 1) {
 			nextAvailableTimeForLeavingStreet = Math.max(nextAvailableTimeForLeavingStreet,
-					timeOfLastLeavingVehicle + inverseOutFlowCapacity);
+					this.timeOfLastLeavingVehicle + this.inverseOutFlowCapacity);
 			vehicle.scheduleEndRoadMessage(nextAvailableTimeForLeavingStreet, this);
 //		} else { // empty else clause
 			/*
@@ -211,7 +211,7 @@ public class Road extends SimUnit {
 	}
 
 	public void enterRequest(Vehicle vehicle, double simTime) {
-		assert (interestedInEnteringRoad.size()==deadlockPreventionMessages.size());
+		assert (this.interestedInEnteringRoad.size()==this.deadlockPreventionMessages.size());
 		/*
 		 * assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are
 		 * more cars on the road, than its capacity!"; assert
@@ -223,7 +223,7 @@ public class Road extends SimUnit {
 		 */
 
 		// is there any space on the road (including promised entries?)
-		if (carsOnTheRoad.size() + noOfCarsPromisedToEnterRoad < maxNumberOfCarsOnRoad) {
+		if (this.carsOnTheRoad.size() + this.noOfCarsPromisedToEnterRoad < this.maxNumberOfCarsOnRoad) {
 			/*
 			 * - check, if the gap needs to be considered for entering the road -
 			 * we can find out, the time since when we have a free road for
@@ -234,15 +234,15 @@ public class Road extends SimUnit {
 			double arrivalTimeOfGap = Double.MIN_VALUE;
 			// if the road has been full recently then find out, when the next
 			// gap arrives
-			if ((gap != null) && (gap.size() > 0)) {
-				arrivalTimeOfGap = gap.remove();
+			if ((this.gap != null) && (this.gap.size() > 0)) {
+				arrivalTimeOfGap = this.gap.remove();
 			}
 
-			noOfCarsPromisedToEnterRoad++;
-			double nextAvailableTimeForEnteringStreet = Math.max(Math.max(timeOfLastEnteringVehicle
-					+ inverseInFlowCapacity, simTime), arrivalTimeOfGap);
+			this.noOfCarsPromisedToEnterRoad++;
+			double nextAvailableTimeForEnteringStreet = Math.max(Math.max(this.timeOfLastEnteringVehicle
+					+ this.inverseInFlowCapacity, simTime), arrivalTimeOfGap);
 
-			timeOfLastEnteringVehicle = nextAvailableTimeForEnteringStreet;
+			this.timeOfLastEnteringVehicle = nextAvailableTimeForEnteringStreet;
 			vehicle.scheduleEnterRoadMessage(nextAvailableTimeForEnteringStreet, this);
 		} else {
 			/*
@@ -252,52 +252,52 @@ public class Road extends SimUnit {
 			 * But when the road gets full once, we need to start keeping track
 			 * of the gaps Once the road is empty again, gap is reset to null
 			 * (see leaveRoad).
-			 * 
+			 *
 			 * The gap variable in only needed for the situation, where the
 			 * street has been full recently, but the interestedInEnteringRoad
 			 * is empty and a new car arrives (or a few). So, if the street is
 			 * long, it takes time for the gap to come back.
-			 * 
+			 *
 			 * As long as interestedInEnteringRoad is not empty, newly generated
 			 * gaps get used by the new cars (see leaveRoad)
 			 */
-			if (gap == null) {
-				gap = new LinkedList<Double>();
+			if (this.gap == null) {
+				this.gap = new LinkedList<Double>();
 			} else {
-				gap.clear();
+				this.gap.clear();
 			}
 
-			interestedInEnteringRoad.add(vehicle);
+			this.interestedInEnteringRoad.add(vehicle);
 
 			/*
 			 * the first car interested in entering a road has to wait
 			 * 'stuckTime' the car behind has to wait an additional stuckTime
 			 * (this logic was adapted to adhere to the C++ implementation)
 			 */
-			if (deadlockPreventionMessages.size() > 0) {
-				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(
-						deadlockPreventionMessages.getLast().getMessageArrivalTime()
+			if (this.deadlockPreventionMessages.size() > 0) {
+				this.deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(
+						this.deadlockPreventionMessages.getLast().getMessageArrivalTime()
 								+ SimulationParameters.getSqueezeTime(), this));
 
 			} else {
-				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(simTime
+				this.deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(simTime
 						+ SimulationParameters.getSqueezeTime(), this));
 			}
 
-			assert (interestedInEnteringRoad.size()==deadlockPreventionMessages.size()) :interestedInEnteringRoad.size() + " - " + deadlockPreventionMessages.size();
+			assert (this.interestedInEnteringRoad.size()==this.deadlockPreventionMessages.size()) :this.interestedInEnteringRoad.size() + " - " + this.deadlockPreventionMessages.size();
 		}
 	}
 
 	public void giveBackPromisedSpaceToRoad() {
-		noOfCarsPromisedToEnterRoad--;
+		this.noOfCarsPromisedToEnterRoad--;
 	}
 
 	public void incrementPromisedToEnterRoad() {
-		noOfCarsPromisedToEnterRoad++;
+		this.noOfCarsPromisedToEnterRoad++;
 	}
 
 	public Link getLink() {
-		return link;
+		return this.link;
 	}
 
 	public void setTimeOfLastEnteringVehicle(double timeOfLastEnteringVehicle) {
@@ -306,13 +306,13 @@ public class Road extends SimUnit {
 
 	public void removeFirstDeadlockPreventionMessage(DeadlockPreventionMessage dpMessage) {
 
-		assert (deadlockPreventionMessages.getFirst() == dpMessage) : "Inconsitency in logic!!! => this should only be invoked from the handler of this message";
-		deadlockPreventionMessages.removeFirst();
+		assert (this.deadlockPreventionMessages.getFirst() == dpMessage) : "Inconsitency in logic!!! => this should only be invoked from the handler of this message";
+		this.deadlockPreventionMessages.removeFirst();
 	}
 
 	public void removeFromInterestedInEnteringRoad() {
-		interestedInEnteringRoad.removeFirst();
-		assert (interestedInEnteringRoad.size()==deadlockPreventionMessages.size());
+		this.interestedInEnteringRoad.removeFirst();
+		assert (this.interestedInEnteringRoad.size()==this.deadlockPreventionMessages.size());
 	}
 
 	public static Road getRoad(Id linkId) {

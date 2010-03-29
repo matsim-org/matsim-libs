@@ -25,20 +25,18 @@ import java.nio.channels.FileChannel;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
-
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderTeleatlas;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * Adds additional speed restrictions to a MATSim {@link NetworkLayer network} created
  * by {@link NetworkReaderTeleatlas}. The input speed restriction DBF file is based on
  * <strong>Tele Atlas MultiNet Shapefile 4.3.2.1 Format Specifications
  * document version Final v1.0, June 2007</strong>.
- * 
+ *
  * @author balmermi
  */
 public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
@@ -48,24 +46,24 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(NetworkTeleatlasAddSpeedRestrictions.class);
-	
+
 	/**
 	 * path and name to the Tele Atlas MultiNet speed restriction (sr) DBF file
 	 */
 	private final String srDbfFileName;
-	
+
 	private static final String SR_ID_NAME = "ID";
 	private static final String SR_SPEED_NAME = "SPEED";
 	private static final String SR_VALDIR_NAME = "VALDIR";
 	private static final String SR_VERIFIED_NAME = "VERIFIED";
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	/**
 	 * To add speed restrictions to a Tele Atlas MultiNet {@link NetworkLayer network}.
-	 * 
+	 *
 	 * @param srDbfFileName Tele Atlas MultiNet speed restriction DBF file
 	 */
 	public NetworkTeleatlasAddSpeedRestrictions(final String srDbfFileName) {
@@ -80,7 +78,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 
 	/**
 	 * Reading and assigning speed restrictions to the {@link LinkImpl links} of a {@link NetworkLayer network}.
-	 * 
+	 *
 	 * <p>It uses the following attributes from the Tele Atlas MultiNet speed restriction DBF file:
 	 * <ul>
 	 *   <li>{@link #SR_ID_NAME} (Feature Identification)</li>
@@ -109,7 +107,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 	 *   <li>speed restrictions will not be assigned to the {@link LinkImpl link} if it already contains a speed that
 	 *   is lower then the one from the speed restrictions file.</li>
 	 * </ul></p>
-	 * 
+	 *
 	 * @param network
 	 * @throws Exception
 	 */
@@ -137,7 +135,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 		log.trace("    "+SR_SPEED_NAME+"-->"+srSpeedNameIndex);
 		log.trace("    "+SR_VALDIR_NAME+"-->"+srValDirNameIndex);
 		log.trace("    "+SR_VERIFIED_NAME+"-->"+srVerifiedNameIndex);
-	
+
 		int srCnt = 0;
 		int srIgnoreCnt = 0;
 		while (r.hasNext()) {
@@ -155,8 +153,8 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
 						// assigning speed restriction only if given freespeed is higher
-						if (speed < ftLink.getFreespeed(Time.UNDEFINED_TIME)) { ftLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
-						if (speed < tfLink.getFreespeed(Time.UNDEFINED_TIME)) { tfLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
+						if (speed < ftLink.getFreespeed()) { ftLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
+						if (speed < tfLink.getFreespeed()) { tfLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
 					}
 				}
 				else if (valdir == 2) {
@@ -166,7 +164,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
 						// assigning speed restriction only if given freespeed is higher
-						if (speed < ftLink.getFreespeed(Time.UNDEFINED_TIME)) { ftLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
+						if (speed < ftLink.getFreespeed()) { ftLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
 					}
 				}
 				else if (valdir == 3) {
@@ -176,7 +174,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
 						// assigning speed restriction only if given freespeed is higher
-						if (speed < tfLink.getFreespeed(Time.UNDEFINED_TIME)) { tfLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
+						if (speed < tfLink.getFreespeed()) { tfLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
 					}
 				}
 				else { throw new IllegalArgumentException("linkid="+id+": valdir="+valdir+" not known."); }
@@ -193,13 +191,13 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 
 	/**
 	 * prints the variable settings to the STDOUT
-	 * 
+	 *
 	 * @param prefix a prefix for each line of the STDOUT
 	 */
 	public final void printInfo(final String prefix) {
 		System.out.println(prefix+"configuration of "+this.getClass().getName()+":");
 		System.out.println(prefix+"  speed restrictions:");
-		System.out.println(prefix+"    srDbfFileName:    "+srDbfFileName);
+		System.out.println(prefix+"    srDbfFileName:    "+this.srDbfFileName);
 		System.out.println(prefix+"    SR_ID_NAME:       "+SR_ID_NAME);
 		System.out.println(prefix+"    SR_SPEED_NAME:    "+SR_SPEED_NAME);
 		System.out.println(prefix+"    SR_VALDIR_NAME:   "+SR_VALDIR_NAME);

@@ -53,7 +53,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	// String outputFilePath=null;
 	String outputFilePath = "C:\\data\\tempOutput\\chargingEvents.txt";
 	OutputStreamWriter chargingOutput;
-	
+
 	// for example, we can say in reset, which Iteration is relevant
 	// then only for that iteration the energy charging at a link will be recorded
 	// also used for state of charge
@@ -66,7 +66,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		try {
 			FileOutputStream fos = new FileOutputStream(outputFilePath);
 			chargingOutput = new OutputStreamWriter(fos, "UTF8");
-			chargingOutput.write("linkId\tagentId\tstartChargingTime\tendChargingTime\tSOC_start\tSOC_end\n"); 
+			chargingOutput.write("linkId\tagentId\tstartChargingTime\tendChargingTime\tSOC_start\tSOC_end\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -145,14 +145,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	}
 
 	private double getEnergyConsumption(Link link) {
-		double freeSpeed = 0;
-		if (controler == null) {
-			freeSpeed = link.getFreespeed(controler2.getNetwork()
-					.getCapacityPeriod());
-		} else {
-			freeSpeed = link.getFreespeed(controler.getNetwork()
-					.getCapacityPeriod());
-		}
+		double freeSpeed = link.getFreespeed();
 		double linkLength = link.getLength();
 		return energyConsumptionSamples.getInterpolatedEnergyConsumption(
 				freeSpeed, linkLength);
@@ -168,7 +161,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		averageTimeSpentAtWork = 0;
 		averageTimeSpentAtShop = 0;
 		energyLevel.clear();
-		
+
 		// only record the specified iteration results
 		if (iteration==1){
 			relevantIterationReached=true;
@@ -365,7 +358,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		}
 
 	}
-	
+
 	public void tidyup(){
 		if (chargingOutput==null){
 			return;

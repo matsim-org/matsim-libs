@@ -35,7 +35,6 @@ import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * This algorithm handles double links (two links with same from and to node) by splitting
@@ -116,9 +115,9 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 	private void splitLink(Link link) {
 		this.network.removeLink(link);
 		double length = link.getLength()/2.0;
-		double freespeed = link.getFreespeed(Time.UNDEFINED_TIME);
-		double capacity = link.getCapacity(Time.UNDEFINED_TIME);
-		double permlanes = link.getNumberOfLanes(Time.UNDEFINED_TIME);
+		double freespeed = link.getFreespeed();
+		double capacity = link.getCapacity();
+		double permlanes = link.getNumberOfLanes();
 		Node medianNode = this.network.createAndAddNode(getNewNodeId(), link.getCoord());
 		this.network.createAndAddLink(link.getId(), link.getFromNode(), medianNode, length, freespeed, capacity, permlanes);
 		this.network.createAndAddLink(getNewLinkId(), medianNode, link.getToNode(), length, freespeed, capacity, permlanes);

@@ -79,7 +79,9 @@ public class OTFDemo {
 //		org.matsim.run.OTFVis.main(new String[] {"test/scenarios/berlin/config.xml"});
 //		org.matsim.run.OTFVis.main(new String[] {"test/input/playground/marcel/pt/config.xml"});
 
-		org.matsim.run.OTFVis.main(new String[] {"/data/tmp/che_network.cleaned.xml"});
+//		org.matsim.run.OTFVis.main(new String[] {"/data/dissVis/network.filtered.xml.gz"});
+//		org.matsim.run.OTFVis.main(new String[] {"/data/dissVis/output_tr100pct2/output_network.xml.gz"});
+//		org.matsim.run.OTFVis.main(new String[] {"/data/tmp/che_network.cleaned.xml"});
 //		org.matsim.run.OTFVis.main(new String[] {});
 
 //		org.matsim.run.OTFVis.main(new String[] {"../../MATSim/output/example2/ITERS/it.0/0.otfvis.mvi"});
@@ -89,6 +91,9 @@ public class OTFDemo {
 //
 //		org.matsim.vis.otfvis.OTFClientSwing.main(new String[] {"../../MATSim/output/example2/ITERS/it.0/0.otfvis.mvi"});
 //		org.matsim.vis.otfvis.OTFClientSwing.main(new String[] {"../../MATSim/output/example2/output_network.xml.gz"});
+
+//		org.matsim.run.OTFVis.main(new String[] {"test/scenarios/berlin/config.xml"});
+		org.matsim.run.OTFVis.main(new String[] {"/data/dissVis/network.filtered.falsified.xml.gz"});
 
 //		OTFDemo.ptConnect("OTFServer_Transit");
 	}

@@ -141,7 +141,7 @@ public class QueueLink {
     this.queueNetwork = queueNetwork;
     this.toQueueNode = toNode;
     this.length = this.getLink().getLength();
-    this.freespeedTravelTime = this.length / this.getLink().getFreespeed(Time.UNDEFINED_TIME);
+    this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
     this.calculateCapacities();
   }
 
@@ -513,7 +513,7 @@ public class QueueLink {
     }
 
     public LinkedList<QueueVehicle> getVehQueue() {
-      return vehQueue;
+      return this.vehQueue;
     }
 
     /**
@@ -633,7 +633,7 @@ public class QueueLink {
       if (cnt > 0) {
         double cellSize = QueueLink.this.getLink().getLength() / cnt;
         double distFromFromNode = QueueLink.this.getLink().getLength() - cellSize / 2.0;
-        double freespeed = QueueLink.this.getLink().getFreespeed(Time.UNDEFINED_TIME);
+        double freespeed = QueueLink.this.getLink().getFreespeed();
 
         // the cars in the buffer
         for (QueueVehicle veh : QueueLink.this.buffer) {
@@ -726,7 +726,7 @@ public class QueueLink {
         int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
         double speed = (now > cmp) ? 0.0 : link.getFreespeed(Time.UNDEFINED_TIME);
 
-        PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), link, queueEnd,
+        PositionInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, queueEnd,
             lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
         positions.add(position);
         queueEnd -= vehLen;
@@ -777,7 +777,7 @@ public class QueueLink {
           tmpLane = veh.getId().hashCode() ;
         }
         int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-        PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), link, distanceOnLink,
+        PositionInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, distanceOnLink,
             lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
         positions.add(position);
         lastDistance = distanceOnLink;
@@ -794,7 +794,7 @@ public class QueueLink {
         double cellSize) {
       int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
       for (QueueVehicle veh : QueueLink.this.waitingList) {
-        PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
+        PositionInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
             /*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
         positions.add(position);
       }

@@ -42,7 +42,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufInterpolator;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -135,7 +134,7 @@ public class DataPrepare {
 		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(IntermediateTransitScheduleWithoutNetworkFile);
 		log.info("writing vehicles to file.");
 		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(OutVehicleFile);
-		new NetworkWriter(pseudoNetwork).writeFile(IntermediateTransitNetworkFile);
+		new NetworkWriter(this.pseudoNetwork).writeFile(IntermediateTransitNetworkFile);
 		try {
 			new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(OutTransitScheduleWithNetworkFile);
 		} catch (IOException e) {
@@ -144,8 +143,8 @@ public class DataPrepare {
 	}
 
 	protected void createNetworkFromSchedule() {
-		pseudoNetwork = new NetworkLayer();
-		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), pseudoNetwork, "tr_").createNetwork();
+		this.pseudoNetwork = new NetworkLayer();
+		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), this.pseudoNetwork, "tr_").createNetwork();
 	}
 
 	protected void mergeNetworks() {
@@ -207,9 +206,9 @@ public class DataPrepare {
 		for (Link link : routerNet.getLinks().values()) {
 			Link l = visNet.getFactory().createLink(link.getId(), link.getFromNode().getId(), link.getToNode().getId());
 			l.setLength(link.getLength());
-			l.setFreespeed(link.getFreespeed(Time.UNDEFINED_TIME));
-			l.setCapacity(link.getCapacity(Time.UNDEFINED_TIME));
-			l.setNumberOfLanes(link.getNumberOfLanes(Time.UNDEFINED_TIME));
+			l.setFreespeed(link.getFreespeed());
+			l.setCapacity(link.getCapacity());
+			l.setNumberOfLanes(link.getNumberOfLanes());
 		}
 
 		log.info("write routerNet.xml");
@@ -222,8 +221,8 @@ public class DataPrepare {
 	}
 
 	private void buildUmlaeufe() {
-		Collection<TransitLine> transitLines = scenario.getTransitSchedule().getTransitLines().values();
-		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(scenario.getNetwork(), scenario.getConfig().charyparNagelScoring()), transitLines);
+		Collection<TransitLine> transitLines = this.scenario.getTransitSchedule().getTransitLines().values();
+		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(this.scenario.getNetwork(), this.scenario.getConfig().charyparNagelScoring()), transitLines);
 		Collection<Umlauf> umlaeufe = greedyUmlaufBuilder.build();
 
 		VehiclesFactory vb = this.scenario.getVehicles().getFactory();

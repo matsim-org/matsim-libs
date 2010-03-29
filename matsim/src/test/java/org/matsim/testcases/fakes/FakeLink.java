@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.world.Layer;
 
 /**
@@ -64,71 +65,103 @@ public class FakeLink implements Link {
 		this.toNode = toNode;
 	}
 
+	@Override
 	public Node getFromNode() {
 		return this.fromNode;
 	}
 
+	@Override
 	public Node getToNode() {
 		return this.toNode;
 	}
 
+	@Override
 	public Set<TransportMode> getAllowedModes() {
 		return EnumSet.of(TransportMode.car);
 	}
 
+	@Override
+	public double getCapacity() {
+		return getCapacity(Time.UNDEFINED_TIME);
+	}
+
+	@Override
 	public double getCapacity(final double time) {
 		return 2000.0;
 	}
 
+	@Override
+	public double getFreespeed() {
+		return getFreespeed(Time.UNDEFINED_TIME);
+	}
+
+	@Override
 	public double getFreespeed(final double time) {
 		return 15.0;
 	}
 
+	@Override
 	public double getLength() {
 		return 300.0;
 	}
 
+	@Override
+	public double getNumberOfLanes() {
+		return getNumberOfLanes(Time.UNDEFINED_TIME);
+	}
+
+	@Override
 	public double getNumberOfLanes(final double time) {
 		return 1.0;
 	}
 
+	@Override
 	public void setAllowedModes(final Set<TransportMode> modes) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void setCapacity(final double capacity) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void setFreespeed(final double freespeed) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean setFromNode(final Node node) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void setLength(final double length) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void setNumberOfLanes(final double lanes) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean setToNode(final Node node) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Id getId() {
 		return this.id;
 	}
 
 	@Deprecated
+	@Override
 	public Layer getLayer() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Coord getCoord() {
 		throw new UnsupportedOperationException();
 	}

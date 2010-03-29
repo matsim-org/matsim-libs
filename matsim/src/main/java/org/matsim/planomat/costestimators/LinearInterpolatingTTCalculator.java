@@ -33,7 +33,6 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * A link travel time calculator which returns a travel time that comes
@@ -242,7 +241,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 	public double getLinkTravelTime(final Link link, final double time) {
 		return getTravelTimeRole(link.getId()).getTravelTime(time);
 	}
-	
+
 	private LinearInterpolatingTravelTimeData getTravelTimeRole(final Id linkId) {
 		LinearInterpolatingTravelTimeData r = this.linkData.get(linkId);
 		if (null == r) {
@@ -253,7 +252,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 	}
 
 	private double getLinkMinimumTravelTime(final Link link) {
-		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME));
+		return (link.getLength() / link.getFreespeed());
 	}
 
 	@Override

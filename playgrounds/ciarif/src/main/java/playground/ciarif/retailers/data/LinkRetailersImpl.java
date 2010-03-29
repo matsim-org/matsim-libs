@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.misc.Time;
 
 public class LinkRetailersImpl extends LinkImpl  { //AbstractLocation implements BasicLink {
 
@@ -19,10 +18,10 @@ public class LinkRetailersImpl extends LinkImpl  { //AbstractLocation implements
 	protected double nofLanes = Double.NaN;
 
 	public LinkRetailersImpl(Link link, NetworkLayer network) {
-		super(link.getId(),link.getFromNode(),link.getToNode(),network,link.getLength(),link.getFreespeed(Time.UNDEFINED_TIME),link.getCapacity(Time.UNDEFINED_TIME),link.getNumberOfLanes(Time.UNDEFINED_TIME));
+		super(link.getId(),link.getFromNode(),link.getToNode(),network,link.getLength(),link.getFreespeed(),link.getCapacity(),link.getNumberOfLanes());
 	}
 
 	public void setMaxFacOnLink(int max_number_facilities) {
 		this.maxFacOnLink = max_number_facilities;
 	}
-}	
+}

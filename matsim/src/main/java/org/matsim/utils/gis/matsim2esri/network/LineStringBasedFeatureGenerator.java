@@ -21,13 +21,21 @@
 package org.matsim.utils.gis.matsim2esri.network;
 
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.*;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.*;
-
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultAttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 
@@ -57,8 +65,8 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[5] = AttributeTypeFactory.newAttributeType("freespeed", Double.class);
 		attribs[6] = AttributeTypeFactory.newAttributeType("capacity", Double.class);
 		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
-		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);		
-		attribs[9] = AttributeTypeFactory.newAttributeType("type", String.class);		
+		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
+		attribs[9] = AttributeTypeFactory.newAttributeType("type", String.class);
 
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
@@ -82,9 +90,9 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[2] = link.getFromNode().getId().toString();
 		attribs[3] = link.getToNode().getId().toString();
 		attribs[4] = link.getLength();
-		attribs[5] = link.getFreespeed(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-		attribs[6] = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-		attribs[7] = link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+		attribs[5] = link.getFreespeed();
+		attribs[6] = link.getCapacity();
+		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = width;
 		attribs[9] = link.getType();
 

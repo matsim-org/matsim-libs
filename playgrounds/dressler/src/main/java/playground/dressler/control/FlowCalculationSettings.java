@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *	
+ * project: org.matsim.*												   *
  * GlobalFlowCalculationSettings.java									   *
  *                                                                         *
  * *********************************************************************** *
@@ -25,36 +25,30 @@ package playground.dressler.control;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
-//playground imports
-import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
-import playground.dressler.Interval.SourceIntervals;
-import playground.dressler.Interval.VertexIntervals;
 
 public class FlowCalculationSettings {
 
 	/* ---------------- public settings ---------------- */
-	
+
 	/* some constants */
 	public static final int SEARCHALGO_FORWARD = 1;
 	public static final int SEARCHALGO_REVERSE = 2;
 	public static final int SEARCHALGO_MIXED = 3;
-	
+
 	/* default scaling parameters */
-	public int timeStep = 1;		
+	public int timeStep = 1;
 	public double flowFactor = 1.0;
-	
+
 	/* deault timeouts */
 	public int TimeHorizon = 7654321; // should be safe
-	public int MaxRounds = 7654321;	// should be safe up to 3.8m flow units	
-	
+	public int MaxRounds = 7654321;	// should be safe up to 3.8m flow units
+
 	/* default search settings */
 	public boolean useSinkCapacities = true;
 	public int searchAlgo = SEARCHALGO_FORWARD;
@@ -62,83 +56,83 @@ public class FlowCalculationSettings {
 	public boolean useImplicitVertexCleanup = true; // unite vertex intervals before propagating?
 	public int checkConsistency = 0; // after how many iterations should consistency be checked? 0 = off
 	public boolean checkTouchedNodes = true; // should Flow.UnfoldAndAugment() try to shortcut the search for suitable forward steps?
-	
-	public boolean sortPathsBeforeAugmenting = true; // try to augment shorter (#steps) first? 
+
+	public boolean sortPathsBeforeAugmenting = true; // try to augment shorter (#steps) first?
 	public boolean keepPaths = true; // should TEPs be stored at all?
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
 	public boolean useRepeatedPaths = true && !useSinkCapacities; // try to repeat paths
-	
+
 	public boolean trackUnreachableVertices = true && (searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);; // only works in REVERSE, wastes time otherwise
-	
-	
+
+
 	/* when are links available? not included means "always" */
 	public HashMap<Link, Interval> whenAvailable = null;
 	public Node supersink = null;
-	
+
 	/* ---------------  private data from now on --------------- */
-	
-	/* interal storage for the network parameters */ 
+
+	/* interal storage for the network parameters */
 	private HashMap<Link, Integer> _capacities;
 	private HashMap<Link, Integer> _lengths;
-	
+
 	private NetworkLayer _network;
-	
+
 	// leave these untouched!
 	private HashMap<Node, Integer> _demands = null;
-	
+
 	private int _totaldemandsources;
 	private int _totaldemandsinks;
 	private int _numsources;
 	private int _numsinks;
-	
+
 	private int _roundedtozerocapacity;
-	private int _roundedtozerolength;	
+	private int _roundedtozerolength;
 	private boolean _ready = false;
-	
- 
+
+
 	/**
 	 * Constructor that prepares the default settings, but no network or anything yet.
 	 */
 	FlowCalculationSettings () {
-		
+
 	}
 
 	/**
 	 * Applies and checks the settings and creates all necessary data structures.
 	 * @return true iff everything is okay
-	 */	
+	 */
 	public boolean prepare() {
 		return prepare(false); // default is to prepare just once
 	}
-	
+
 	public void setNetwork(NetworkLayer network) {
 		this._network = network;
 	}
-	
+
 	public void setDemands(HashMap<Node, Integer> demands) {
 		this._demands = demands;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Applies and checks the settings and creates all necessary data structures.
 	 * @param force If true, the data will always be recreated.
 	 * @return true iff everything is okay
 	 */
 	public boolean prepare(boolean force) {
-		
+
 		// don't do the work twice ...
 		if (this._ready && !force) {
 			return true;
 		}
-		
+
 		// basic checks
 		if (this._network == null) {
 			System.out.println("No network given!");
 			return false;
 		}
-		
+
 		if (this._demands == null) {
 			System.out.println("No demands given!");
 			return false;
@@ -155,81 +149,81 @@ public class FlowCalculationSettings {
 				return false;
 			}
 		}
-		
+
 		if (this.searchAlgo != this.SEARCHALGO_REVERSE && this.trackUnreachableVertices) {
 			System.out.println("TrackUnreachableVertices does not make sense with anything but REVERSE search! I will disable it now.");
 			this.trackUnreachableVertices = false;
 		}
-		
+
 		scaleParameters();
-		
+
 		if (this.supersink != null) {
 			int totaldemand = 0;
 			int overrideerrors = 0;
 			for (Node node : this._network.getNodes().values()) {
 				Integer i = this._demands.get(node);
 				if (i != null && i > 0)
-				  totaldemand += i; 
+				  totaldemand += i;
 				if (i != null && i < 0) {
 					if (!node.equals(supersink)) {
 					  this._demands.put(node, 0);
 					  overrideerrors++;
 					}
 				}
-			}			
+			}
 			this._demands.put(this.supersink, -totaldemand);
 			if (overrideerrors > 0) {
 				System.out.println("Warning! " + overrideerrors + " sink(s) were removed because a supersink was specified.");
 			}
-		} 
-		
+		}
+
 		prepareDemands();
-		
+
 		this._ready = true;
-		
+
 		return true;
 	}
-	
+
 	private void scaleParameters() {
 		this._capacities = new HashMap<Link, Integer>();
 		this._lengths = new HashMap<Link, Integer>();
-		
+
         double capperiod = this._network.getCapacityPeriod();
-		
+
 		this._roundedtozerocapacity = 0;
 		this._roundedtozerolength = 0;
 
 		for (Link link : this._network.getLinks().values()){
-			
+
 			// from long to int ...
-			int newTravelTime = (int) Math.round(link.getLength() / (link.getFreespeed(0.) * this.timeStep));
-			if (newTravelTime == 0 && link.getLength() != 0d) {				
-				this._roundedtozerolength++; 
+			int newTravelTime = (int) Math.round(link.getLength() / (link.getFreespeed() * this.timeStep));
+			if (newTravelTime == 0 && link.getLength() != 0d) {
+				this._roundedtozerolength++;
 			}
-			
+
 			this._lengths.put(link, newTravelTime);
-			
-			
-			long newcapacity = Math.round(link.getCapacity(1.) * this.timeStep * this.flowFactor / capperiod);
-			
+
+
+			long newcapacity = Math.round(link.getCapacity() * this.timeStep * this.flowFactor / capperiod);
+
 			// no one uses that much capacity for real ...
 			if (newcapacity > Integer.MAX_VALUE) {
 				newcapacity = Integer.MAX_VALUE;
 			}
-			
-			if (newcapacity == 0d && link.getCapacity(1.) != 0d) {
+
+			if (newcapacity == 0d && link.getCapacity() != 0d) {
 				this._roundedtozerocapacity++;
 			}
 			this._capacities.put(link, (int) newcapacity);
-		}		
+		}
 	}
-	
+
 	private void prepareDemands() {
 		this._totaldemandsources = 0;
 		this._totaldemandsinks = 0;
 		this._numsources = 0;
 		this._numsinks = 0;
-		
+
 		// find all sources
 		for (Node node : this._network.getNodes().values()) {
 			Integer i = this._demands.get(node);
@@ -237,10 +231,10 @@ public class FlowCalculationSettings {
 				if (i > 0) {
 					this._totaldemandsources += i;
 					this._numsources++;
-				} 
+				}
 			}
 		}
-		
+
 		// find all sinks and give them infinite capacity if needed
 		for (Node node : this._network.getNodes().values()) {
 			Integer i = this._demands.get(node);
@@ -252,15 +246,15 @@ public class FlowCalculationSettings {
 					} else {
 					  this._demands.put(node, -this._totaldemandsources);
 					  this._totaldemandsinks += this._totaldemandsources;
-					}					
-				} 
+					}
+				}
 			}
 		}
-	
+
 	}
-	
+
 	public void printStatus() {
-		System.out.println("==== Flow Calculation Settings ====");		
+		System.out.println("==== Flow Calculation Settings ====");
 		if (!this._ready) {
 			System.out.println("WARNING: Prepare() has not run successfully yet.");
 		}
@@ -268,14 +262,14 @@ public class FlowCalculationSettings {
 		System.out.println("Number sources: " + this._numsources + " | sinks: " + this._numsinks);
 		System.out.println("Total demand sources: " + this._totaldemandsources + " | sinks: " + this._totaldemandsinks);
 		System.out.println("Time Horizon: " + this.TimeHorizon);
-		System.out.println("Timestep: " + this.timeStep);		
+		System.out.println("Timestep: " + this.timeStep);
 		System.out.println("FlowFactor: " + this.flowFactor);
 		System.out.println("Edges rounded to zero length: " + this._roundedtozerolength);
 		System.out.println("Edges rounded to zero capacity: " + this._roundedtozerocapacity);
-		
+
 		switch (this.searchAlgo) {
-		  case FlowCalculationSettings.SEARCHALGO_FORWARD: 
-			  System.out.println("Algorithm to use: Forward Search"); 
+		  case FlowCalculationSettings.SEARCHALGO_FORWARD:
+			  System.out.println("Algorithm to use: Forward Search");
 			  break;
 		  case FlowCalculationSettings.SEARCHALGO_REVERSE:
 			  System.out.println("Algorithm to use: Reverse Search");
@@ -286,44 +280,44 @@ public class FlowCalculationSettings {
 		  default:
 			  System.out.println("Algorithm to use: Unkown (" + this.searchAlgo +")");
 		}
-		
-		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);		
-		  
+
+		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);
+
 		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
 		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);
 		System.out.println("Use implicit vertex cleanup: " + this.useImplicitVertexCleanup);
 		System.out.println("Use repeated paths: " + this.useRepeatedPaths);
-		System.out.println("Sort paths before augmenting: " + this.sortPathsBeforeAugmenting);		
+		System.out.println("Sort paths before augmenting: " + this.sortPathsBeforeAugmenting);
 		System.out.println("Use touched nodes hashmaps: " + this.checkTouchedNodes);
 		System.out.println("Keep paths at all: " + this.keepPaths);
 		System.out.println("Unfold stored paths: " + this.unfoldPaths);
 		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
-		
+
 		System.out.println("===================================");
 	}
-	
+
 	/**
-	 * Returns the capacity of the edge as intended for the calculation! 
+	 * Returns the capacity of the edge as intended for the calculation!
 	 * @param edge The edge to check.
-	 * @return The flow capacity per tiemstep for the calculation. 
+	 * @return The flow capacity per tiemstep for the calculation.
 	 */
 	public int getCapacity(Link edge) {
 	  return this._capacities.get(edge);
 	}
-	
+
 	/**
-	 * Returns the length of the edge as intended for the calculation! 
+	 * Returns the length of the edge as intended for the calculation!
 	 * @param edge The edge to check.
-	 * @return The length (in timesteps) for the calculation. 
+	 * @return The length (in timesteps) for the calculation.
 	 */
 	public int getLength(Link edge) {
 	  return this._lengths.get(edge);
 	}
-		
+
 	public NetworkLayer getNetwork() {
 		return this._network;
-	}   
-	
+	}
+
 	/**
 	 * decides whether a node is or was a sink
 	 * @param node to be checked
@@ -331,9 +325,9 @@ public class FlowCalculationSettings {
 	 */
 	public boolean isSink(Node node) {
 		Integer demand = this._demands.get(node);
-		return (demand != null && demand < 0);		
-	}	 
-	
+		return (demand != null && demand < 0);
+	}
+
 	/**
 	 * decides whether a node is or was a source
 	 * @param node to be checked
@@ -343,21 +337,21 @@ public class FlowCalculationSettings {
 		Integer demand = this._demands.get(node);
 		return (demand != null && demand > 0);
 	}
-	
+
 	public int getDemand(Node node) {
 		Integer i = this._demands.get(node);
 		if (i != null) return i;
 		return 0;
 	}
-	
+
 	public int getTotalDemand() {
 		return this._totaldemandsources;
 	}
-	
+
 	public void writeSimpleNetwork() {
 		// write simple data format to sysout
 		// representing the dynamic graph, not the time-expanded graph
-		System.out.println("% generated from matsim data");            
+		System.out.println("% generated from matsim data");
         System.out.println("N " + this._network.getNodes().size());
         System.out.println("TIME " + this.TimeHorizon);
         HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
@@ -369,10 +363,10 @@ public class FlowCalculationSettings {
         		if (i > max) max = i;
         	} catch (Exception except) {
 
-        	}            	
+        	}
         }
-            
-        for (NodeImpl node : this._network.getNodes().values()) {            	
+
+        for (NodeImpl node : this._network.getNodes().values()) {
         	try {
         		int i = Integer.parseInt(node.getId().toString());
         		if (i <= 0) {
@@ -385,85 +379,85 @@ public class FlowCalculationSettings {
         		newNodeNames.put(node, max);
         		System.out.println("% node " + max + " was '" + node.getId()+ "'");
 
-        	}            	
+        	}
         }
-            
+
         for (NodeImpl node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
-        		d = this._demands.get(node);        		
+        		d = this._demands.get(node);
         		// for backwards compatibility we output the old S and T labels.
         		if (d > 0) {
-        			System.out.println("S " + newNodeNames.get(node) + " " + d);            			
+        			System.out.println("S " + newNodeNames.get(node) + " " + d);
         		}
         		if (d < 0) {
-        			System.out.println("T " + newNodeNames.get(node) + " " + (-d));            			
-        		}        		
+        			System.out.println("T " + newNodeNames.get(node) + " " + (-d));
+        		}
         	}
         	System.out.println("V " + newNodeNames.get(node) + " " + d + " " + node.getCoord().getX() + " " + node.getCoord().getY());
         }
 
         System.out.println("% E from to capacity length");
-        for (LinkImpl link : this._network.getLinks().values()) {                
-        	System.out.println("E " + (newNodeNames.get(link.getFromNode())) + " " + (newNodeNames.get(link.getToNode())) + " " + (int) getCapacity(link) + " " + getLength(link));
+        for (LinkImpl link : this._network.getLinks().values()) {
+        	System.out.println("E " + (newNodeNames.get(link.getFromNode())) + " " + (newNodeNames.get(link.getToNode())) + " " + getCapacity(link) + " " + getLength(link));
 
-        }            
+        }
 	}
-	
+
 	private String NameEdge(Link link, int t, HashMap<Node,Integer> nodeNames) {
 		if (t < 0) return null;
 		if (t + getLength(link) >= this.TimeHorizon) return null;
-		return "a#" + nodeNames.get(link.getFromNode()) + "#" +nodeNames.get(link.getToNode()) + "#t" + t; 
+		return "a#" + nodeNames.get(link.getFromNode()) + "#" +nodeNames.get(link.getToNode()) + "#t" + t;
 	}
-	
+
 	private String NameNode(Node node, int t, HashMap<Node,Integer> nodeNames) {
 		if (t < 0) return null;
 		if (t >= this.TimeHorizon) return null;
-		return "n#" + nodeNames.get(node) + "#t" + t; 
+		return "n#" + nodeNames.get(node) + "#t" + t;
 	}
-	
+
 	private String NameSource(Node node, HashMap<Node,Integer> nodeNames) {
-		return "source#" + nodeNames.get(node); 
+		return "source#" + nodeNames.get(node);
 	}
-	
+
 	private String NameSink(Node node, HashMap<Node,Integer> nodeNames) {
-		return "sink#" + nodeNames.get(node); 
+		return "sink#" + nodeNames.get(node);
 	}
-	
+
 	private String NameSourceLink(Node node, int t, HashMap<Node,Integer> nodeNames) {
 		if (t < 0) return null;
 		if (t >= this.TimeHorizon) return null;
-		return "sourcelink#" + nodeNames.get(node) + "#t" + t; 
+		return "sourcelink#" + nodeNames.get(node) + "#t" + t;
 	}
-	
+
 	private String NameSinklink(Node node, int t, HashMap<Node,Integer> nodeNames) {
 		if (t < 0) return null;
 		if (t >= this.TimeHorizon) return null;
 		return "sinklink#" + nodeNames.get(node) + "#t" + t;
 	}
-	
+
 	private String NameSupersink() {
 		return "supersink";
 	}
-	
+
 	private String NameSupersource() {
 		return "supersource";
 	}
-	
+
 	private String NameSuperSinkLink(Node node, HashMap<Node,Integer> nodeNames) {
 		return "supersinklink#" + nodeNames.get(node);
 	}
-	
+
 	private String NameSuperSourceLink(Node node, HashMap<Node,Integer> nodeNames) {
 		return "supersourcelink#" + nodeNames.get(node);
 	}
-	
+
 	/**
 	 * Writes the EAT problem as .lp file for CPLEX etc to standard out
 	 * This might be a big file and it includes some useless comments at the top ...
 	 */
 	public void writeLP() {
-		System.out.println("\\ generated from matsim data");            
+		System.out.println("\\ generated from matsim data");
         System.out.println("\\ N " + this._network.getNodes().size());
         System.out.println("\\ TIME " + this.TimeHorizon);
         HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
@@ -475,10 +469,10 @@ public class FlowCalculationSettings {
         		if (i > max) max = i;
         	} catch (Exception except) {
 
-        	}            	
+        	}
         }
-        
-        for (NodeImpl node : this._network.getNodes().values()) {            	
+
+        for (NodeImpl node : this._network.getNodes().values()) {
         	try {
         		int i = Integer.parseInt(node.getId().toString());
         		if (i <= 0) {
@@ -491,18 +485,18 @@ public class FlowCalculationSettings {
         		newNodeNames.put(node, max);
         		System.out.println("\\ node " + max + " was '" + node.getId()+ "'");
 
-        	}            	
+        	}
         }
 
         System.out.println("Minimize");
         System.out.println("totaltraveltime: ");
 
-        StringBuilder Sobj = new StringBuilder(" ");        	
+        StringBuilder Sobj = new StringBuilder(" ");
         for (NodeImpl node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);
-        	} 
+        	}
 
         	if (d < 0) {
         		for (Link link : node.getOutLinks().values()) {
@@ -528,7 +522,7 @@ public class FlowCalculationSettings {
         					Sobj.append(" ");
         					Sobj.append(tmp);
         				}
-        				
+
         			}
         		}
 
@@ -537,23 +531,23 @@ public class FlowCalculationSettings {
         }
         System.out.println(Sobj);
 
-        
-        
+
+
         System.out.println("Subject to");
-        
-        
+
+
         for (NodeImpl node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);
-        	} 
-        	// write flow conservation for each time step        	
-        	for (int t = 0; t < this.TimeHorizon; t++) {        		
+        	}
+        	// write flow conservation for each time step
+        	for (int t = 0; t < this.TimeHorizon; t++) {
         		System.out.println("flow_conservation#" + newNodeNames.get(node) + "@t" + t + ":");
         		StringBuilder S = new StringBuilder(" ");
         		for (Link link : node.getOutLinks().values()) {
         			String tmp = NameEdge(link, t, newNodeNames);
-        			if (tmp != null) { 
+        			if (tmp != null) {
         				//S += " + " + tmp;
         				S.append(" + ");
         				S.append(tmp);
@@ -561,7 +555,7 @@ public class FlowCalculationSettings {
         		}
         		for (Link link : node.getInLinks().values()) {
         			String tmp = NameEdge(link, t - this.getLength(link), newNodeNames);
-        			if (tmp != null) { 
+        			if (tmp != null) {
         				// S += " - " + tmp;
         				S.append(" - ");
         				S.append(tmp);
@@ -581,8 +575,8 @@ public class FlowCalculationSettings {
         		}
         		System.out.println(S);
         	}
-        	
-        	
+
+
         	// this could be weaved into the step above ... for a little speedup (<= factor 2)
         	if (d != 0) {
         		if (d > 0) {
@@ -590,9 +584,9 @@ public class FlowCalculationSettings {
         		}  else {
         		  System.out.println("demand@" + newNodeNames.get(node) + ":");
         		}
-        		StringBuilder S = new StringBuilder(" ");        	
-        		// write supply / demand constraint    
-        		
+        		StringBuilder S = new StringBuilder(" ");
+        		// write supply / demand constraint
+
         		for (Link link : node.getOutLinks().values()) {
         			for (int t = 0; t < this.TimeHorizon - this.getLength(link); t++) {
         				String tmp = NameEdge(link, t, newNodeNames);
@@ -624,7 +618,7 @@ public class FlowCalculationSettings {
         			//S += " >= " + d;
         			S.append(" >= ");
         			S.append(d);
-        		}			
+        		}
         		System.out.println(S);
         	}
         }
@@ -636,19 +630,19 @@ public class FlowCalculationSettings {
         		String tmp = NameEdge(link, t, newNodeNames);
         		if (tmp != null)
         		  System.out.println(" 0 <= " + tmp + " <= " + this.getCapacity(link));
-        	}        	
-        }            
+        	}
+        }
         System.out.println("End");
 	}
-	
-	
+
+
 	/**
 	 * Writes the EAT problem as .net Network file for CPLEX to standard out
 	 * This might be a big file and it includes some useless comments at the top ...
 	 * @param costOnSinks if true, only the sink links will have non-zero costs, which is an equivalent formulation
 	 */
 	public void writeNET(boolean costOnSinks) {
-		System.out.println("\\ generated from matsim data");            
+		System.out.println("\\ generated from matsim data");
         System.out.println("\\ N " + this._network.getNodes().size());
         System.out.println("\\ TIME " + this.TimeHorizon);
         HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
@@ -660,10 +654,10 @@ public class FlowCalculationSettings {
         		if (i > max) max = i;
         	} catch (Exception except) {
 
-        	}            	
+        	}
         }
-        
-        for (NodeImpl node : this._network.getNodes().values()) {            	
+
+        for (NodeImpl node : this._network.getNodes().values()) {
         	try {
         		int i = Integer.parseInt(node.getId().toString());
         		if (i <= 0) {
@@ -676,21 +670,21 @@ public class FlowCalculationSettings {
         		newNodeNames.put(node, max);
         		System.out.println("\\ node " + max + " was '" + node.getId()+ "'");
 
-        	}            	
+        	}
         }
 
         System.out.println("MINIMIZE NETWORK frommatsim");
-        
-        System.out.println("SUPPLY");          
+
+        System.out.println("SUPPLY");
         System.out.println(NameSupersource() + " : " + this._totaldemandsources);
         // we need an transshipment! and sink demands are just upper bounds anyway
         System.out.println(NameSupersink() + " : " + (- this._totaldemandsources));
-  
+
         System.out.println("ARCS");
-        
+
         // the time-expanded arcs
-        for (Link link : this._network.getLinks().values()) {        	
-        	for (int t = 0; t < this.TimeHorizon; t++) {        		        		
+        for (Link link : this._network.getLinks().values()) {
+        	for (int t = 0; t < this.TimeHorizon; t++) {
         		StringBuilder S = new StringBuilder();
         		String tmp = NameEdge(link, t, newNodeNames);
         		if (tmp != null) {
@@ -700,28 +694,28 @@ public class FlowCalculationSettings {
         		System.out.println(S);
         	}
         }
-         
+
         // the arcs from the virtual sources to the source node
         // and from the sink nodes to the virtual sinks
         for (NodeImpl node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);
-        	} 
+        	}
         	if (d == 0)
         		continue;
 
         	if (d < 0) {
-        		for (int t = 0; t < this.TimeHorizon; t++) {   
-        			StringBuilder sb = new StringBuilder();        		
+        		for (int t = 0; t < this.TimeHorizon; t++) {
+        			StringBuilder sb = new StringBuilder();
         		    sb.append(NameSinklink(node, t, newNodeNames));
         		    sb.append(" : " + NameNode(node, t, newNodeNames));
         		    sb.append(" -> " + NameSink(node, newNodeNames));
         		    System.out.println(sb);
-        		}        		
+        		}
         	} else {
-        		for (int t = 0; t < this.TimeHorizon; t++) {   
-        			StringBuilder sb = new StringBuilder();        		
+        		for (int t = 0; t < this.TimeHorizon; t++) {
+        			StringBuilder sb = new StringBuilder();
         		    sb.append(NameSourceLink(node, t, newNodeNames));
         		    sb.append(" : " + NameSource(node, newNodeNames));
         		    sb.append(" -> " + NameNode(node, t, newNodeNames));
@@ -730,74 +724,74 @@ public class FlowCalculationSettings {
         	}
         }
 
-        
+
         // the arcs from the supersource/supersink to the virtual sources/sinks
         for (NodeImpl node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);
-        	} 
+        	}
         	if (d == 0)
         		continue;
 
         	StringBuilder sb = new StringBuilder();
         	if (d < 0) {
-        		sb.append(NameSuperSinkLink(node, newNodeNames));        		
+        		sb.append(NameSuperSinkLink(node, newNodeNames));
         		sb.append(" : " + NameSink(node, newNodeNames));
         		sb.append(" -> " + NameSupersink());
         	} else {
-        		sb.append(NameSuperSourceLink(node, newNodeNames));        		
+        		sb.append(NameSuperSourceLink(node, newNodeNames));
         		sb.append(" : " + NameSupersource());
-        		sb.append(" -> " + NameSource(node, newNodeNames));        		
+        		sb.append(" -> " + NameSource(node, newNodeNames));
         	}
             System.out.println(sb);
         }
-        
-        
+
+
         System.out.println("OBJECTIVE");
-        
-        // there are two options here        
+
+        // there are two options here
         // put all weights on the sinklinks
         // or give every link a weight equal to its length (except sinklinks)
-        
+
         if (costOnSinks) {
-        	// the sinklinks have their departure time as cost         
+        	// the sinklinks have their departure time as cost
         	for (NodeImpl node : this._network.getNodes().values()) {
         		int d = 0;
         		if (this._demands.containsKey(node)) {
         			d = this._demands.get(node);
-        		}         	
+        		}
         		if (d < 0) {
-        			for (int t = 0; t < this.TimeHorizon; t++) {   
-        				StringBuilder sb = new StringBuilder();        		
+        			for (int t = 0; t < this.TimeHorizon; t++) {
+        				StringBuilder sb = new StringBuilder();
         				sb.append(NameSinklink(node, t, newNodeNames));
         				sb.append(" : " + t);
         				System.out.println(sb);
-        			}        		
-        		} 
+        			}
+        		}
         	}
         } else {
         	 // the time-expanded arcs have their length as cost
-            for (Link link : this._network.getLinks().values()) {        	
-            	for (int t = 0; t < this.TimeHorizon; t++) {        		        		
+            for (Link link : this._network.getLinks().values()) {
+            	for (int t = 0; t < this.TimeHorizon; t++) {
             		StringBuilder S = new StringBuilder();
             		String tmp = NameEdge(link, t, newNodeNames);
             		if (tmp != null) {
-            			S.append(tmp + " : " + this.getLength(link));            			
+            			S.append(tmp + " : " + this.getLength(link));
             		}
             		System.out.println(S);
             	}
             }
-             
+
             // the arcs from the virtual sources to the source node have their arrival time as cost
             for (NodeImpl node : this._network.getNodes().values()) {
             	int d = 0;
             	if (this._demands.containsKey(node)) {
             		d = this._demands.get(node);
-            	} 
+            	}
             	if (d > 0) {
-            		for (int t = 0; t < this.TimeHorizon; t++) {   
-            			StringBuilder sb = new StringBuilder();        		
+            		for (int t = 0; t < this.TimeHorizon; t++) {
+            			StringBuilder sb = new StringBuilder();
             		    sb.append(NameSourceLink(node, t, newNodeNames));
             		    sb.append(" : " + t);
             		    System.out.println(sb);
@@ -813,34 +807,34 @@ public class FlowCalculationSettings {
         		String tmp = NameEdge(link, t, newNodeNames);
         		if (tmp != null)
         		  System.out.println(" 0 <= " + tmp + " <= " + this.getCapacity(link));
-        	}        	
+        	}
         }
-        
+
         // source/sink links are left free ... dunno if this matters
-        
-        // the arcs from the supersource/supersink to the virtual sources/sinks have 
+
+        // the arcs from the supersource/supersink to the virtual sources/sinks have
         // capacity equal to the demands there
         for (NodeImpl node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);
-        	} 
+        	}
         	if (d == 0)
         		continue;
 
         	StringBuilder sb = new StringBuilder();
         	sb.append("0 <= ");
         	if (d < 0) {
-        		sb.append(NameSuperSinkLink(node, newNodeNames));        		
-        		sb.append(" <= " + (-d));        		
+        		sb.append(NameSuperSinkLink(node, newNodeNames));
+        		sb.append(" <= " + (-d));
         	} else {
-        		sb.append(NameSuperSourceLink(node, newNodeNames));        		
-        		sb.append(" <= " + d);        		
+        		sb.append(NameSuperSourceLink(node, newNodeNames));
+        		sb.append(" <= " + d);
         	}
             System.out.println(sb);
         }
-        
-        
+
+
         System.out.println("ENDNETWORK");
 	}
 }

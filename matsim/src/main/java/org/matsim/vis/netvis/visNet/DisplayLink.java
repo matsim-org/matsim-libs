@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.DisplayableLinkI;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.netvis.drawableNet.DrawableLinkI;
@@ -72,6 +73,7 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, Link {
 		this.displayLabel = label;
 	}
 
+	@Override
 	public void build() {
 
 		final double deltaNorthing = getEndNorthing() - getStartNorthing();
@@ -124,86 +126,119 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, Link {
 		return result;
 	}
 
+	@Override
 	public double getStartEasting() {
 		return ((DisplayNode) getFromNode()).getEasting();
 	}
 
+	@Override
 	public double getEndEasting() {
 		return ((DisplayNode) getToNode()).getEasting();
 	}
 
+	@Override
 	public double getStartNorthing() {
 		return ((DisplayNode) getFromNode()).getNorthing();
 	}
 
+	@Override
 	public double getEndNorthing() {
 		return ((DisplayNode) getToNode()).getNorthing();
 	}
 
-	public double getNodeDist() {
+	private double getNodeDist() {
 		return this.nodeDist;
 	}
 
+	@Override
 	public AffineTransform getLinear2PlaneTransform() {
 		return this.linear2PlaneTransform;
 	}
 
 	// -------------------- IMPLEMENTATION OF BasicLinkI --------------------
 
+	@Override
 	public boolean setFromNode(Node node) {
 		this.fromNode = node;
 		return true;
 	}
 
+	@Override
 	public boolean setToNode(Node node) {
 		this.toNode = node;
 		return true;
 	}
 
+	@Override
 	public Node getFromNode() {
 		return this.fromNode;
 	}
 
+	@Override
 	public Node getToNode() {
 		return this.toNode;
 	}
 
+	@Override
+	public double getCapacity() {
+		return getCapacity(Time.UNDEFINED_TIME);
+	}
+
+	@Override
 	public double getCapacity(double time) {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 
+	@Override
+	public double getFreespeed() {
+		return getFreespeed(Time.UNDEFINED_TIME);
+	}
+
+	@Override
 	public double getFreespeed(final double time) {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 
+	@Override
 	public double getLength() {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 
+	@Override
 	public void setFreespeed(double freespeed) {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 
+	@Override
 	public void setLength(double length) {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 
+	@Override
 	public void setCapacity(double capacity) {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 
+	@Override
+	public double getNumberOfLanes() {
+		return getNumberOfLanes(Time.UNDEFINED_TIME);
+	}
+
+	@Override
 	public double getNumberOfLanes(double time) {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
-	
+
+	@Override
 	public Set<TransportMode> getAllowedModes() {
 		throw new UnsupportedOperationException();
 	}
-	
+
+	@Override
 	public void setAllowedModes(Set<TransportMode> modes) {
 		throw new UnsupportedOperationException();
 	}
-	
+
 
 	// -------------------- IMPLEMENTATION OF TrafficLinkI --------------------
 
@@ -211,32 +246,39 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, Link {
 		this.length_m = length_m;
 	}
 
+	@Override
 	public void setNumberOfLanes(double lanes) {
 		this.lanes = lanes;
 	}
 
+	@Override
 	public double getLength_m() {
 		return this.length_m;
 	}
 
+	@Override
 	public int getLanesAsInt(double time) {
 		return Math.round((float)Math.max(this.lanes,1.0d));
 	}
 
 	// ---------- IMPLEMENTATION OF DrawableLinkI ----------
 
+	@Override
 	public int getDisplayValueCount() {
 		return this.displayValue.length;
 	}
 
+	@Override
 	public double getDisplayValue(int index) {
 		return this.displayValue[index];
 	}
 
+	@Override
 	public String getDisplayText() {
 		return this.displayLabel;
 	}
 
+	@Override
 	public Collection<DrawableAgentI> getMovingAgents() {
 		return this.agents;
 	}
@@ -245,14 +287,17 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, Link {
 		this.agents = newAgents;
 	}
 
+	@Override
 	public Id getId() {
 		return this.id;
 	}
 
+	@Override
 	public Layer getLayer() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Coord getCoord() {
 		throw new UnsupportedOperationException();
 	}

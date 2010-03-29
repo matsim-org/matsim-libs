@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 
@@ -35,8 +34,8 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost {
 	private final double marginalUtlOfDistance;
 
 	public KtiTravelTimeDistanceCostCalculator(
-			TravelTime timeCalculator, 
-			CharyparNagelScoringConfigGroup cnScoringGroup, 
+			TravelTime timeCalculator,
+			CharyparNagelScoringConfigGroup cnScoringGroup,
 			KtiConfigGroup ktiConfigGroup) {
 		super();
 		this.timeCalculator = timeCalculator;
@@ -45,8 +44,8 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost {
 	}
 
 	public double getLinkMinimumTravelCost(Link link) {
-		return 
-		(link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME)) * this.travelCostFactor
+		return
+		(link.getLength() / link.getFreespeed()) * this.travelCostFactor
 		- this.marginalUtlOfDistance * link.getLength();
 	}
 
@@ -62,5 +61,5 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost {
 	protected double getMarginalUtlOfDistance() {
 		return marginalUtlOfDistance;
 	}
-	
+
 }

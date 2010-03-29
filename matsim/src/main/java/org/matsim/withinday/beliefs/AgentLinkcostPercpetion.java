@@ -23,9 +23,8 @@ package org.matsim.withinday.beliefs;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.withinday.WithindayAgent;
 
 public class AgentLinkcostPercpetion implements TravelTime {
@@ -115,7 +114,7 @@ public class AgentLinkcostPercpetion implements TravelTime {
 	}
 
 	private double applyBoundary(final double c, final Link link) {
-		double c_0 = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
+		double c_0 = link.getLength() / link.getFreespeed();
 		c_0 = 0.9 * c_0;
 		return Math.max(c_0, c);
 	}

@@ -37,16 +37,15 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * A Procedure to expand a node of the {@link NetworkLayer network}.
- * 
+ *
  * <p><b>Note:</b> it is actually not completely clear that this should be a
  * MATSim network module. It could also be a method in the network layer
- * or---probably even better---a MATSim utility/procedure/algo/etc... The 
+ * or---probably even better---a MATSim utility/procedure/algo/etc... The
  * logical organization of <code>org.matsim</code> still needs to be discussed</p>
- * 
+ *
  * @author balmermi
  */
 public class NetworkExpandNode implements NetworkRunnable {
@@ -61,7 +60,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	private ArrayList<Tuple<Id,Id>> turns = null;
 	private double radius = Double.NaN;
 	private double offset = Double.NaN;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -74,7 +73,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final void setNode(NodeImpl node) {
 		this.node = node;
 	}
@@ -98,15 +97,15 @@ public class NetworkExpandNode implements NetworkRunnable {
 	/**
 	 * The run method such that it is still consistent with the other network algorithms.
 	 * But rather use {@link #expandNode(NetworkLayer,Id,ArrayList,double,double)}.
-	 * 
+	 *
 	 * @param network {@link NetworkLayer MATSim network DB}
 	 */
 	public void run(final NetworkLayer network) {
 		log.info("running " + this.getClass().getName() + " module...");
-		this.expandNode(network,node.getId(),turns,radius,offset);
+		this.expandNode(network,this.node.getId(),this.turns,this.radius,this.offset);
 		log.info("running " + this.getClass().getName() + " module...");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// expand method
 	//////////////////////////////////////////////////////////////////////
@@ -114,7 +113,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	/**
 	 * Expands the {@link NodeImpl node} that is part of the {@link NetworkLayer network} and holds
 	 * {@link Id nodeId}.
-	 * 
+	 *
 	 * <p>It is done in the following way:
 	 * <ol>
 	 * <li>creates for each in- and out-{@link LinkImpl link} a new {@link NodeImpl node} with
@@ -126,7 +125,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * </ul>
 	 * <pre>
 	 * <-----12------         <----21-------
-	 * 
+	 *
 	 *            x-0 o     o 1-5
 	 *                   O nodeId = x
 	 *            x-1 o     o x-4
@@ -144,9 +143,9 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * {@link NodeImpl new_node}
 	 * <pre>
 	 * <-----12------ o     o <----21-------
-	 *                   O 
+	 *                   O
 	 * ------11-----> o     o -----22------>
-	 *                 o   o 
+	 *                 o   o
 	 *                 |   ^
 	 *                 |   |
 	 *                32   31
@@ -158,9 +157,9 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * <li>removes the given {@link NodeImpl node} from the {@link NetworkLayer network}
 	 * <pre>
 	 * <-----12------ o     o <----21-------
-	 *                    
+	 *
 	 * ------11-----> o     o -----22------>
-	 *                 o   o 
+	 *                 o   o
 	 *                 |   ^
 	 *                 |   |
 	 *                32   31
@@ -178,13 +177,13 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * </ul>
 	 * <pre>
 	 * <-----12------ o <--21-0-- o <----21-------
-	 *                    
+	 *
 	 * ------11-----> o --11-1--> o -----22------>
 	 *                 \         ^
 	 *              11-2\       /31-3
 	 *                   \     /
 	 *                    v   /
-	 *                    o   o 
+	 *                    o   o
 	 *                    |   ^
 	 *                    |   |
 	 *                   32   31
@@ -195,7 +194,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * </li>
 	 * </ol>
 	 * </p>
-	 * 
+	 *
 	 * @param network MATSim {@link NetworkLayer network} DB
 	 * @param nodeId the {@link Id} of the {@link NodeImpl} to expand
 	 * @param turns The {@link ArrayList} of {@link Tuple tuples} of {@link Id linkIds}
@@ -224,7 +223,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 			if (second == null) { throw new IllegalArgumentException("given list contains 'null' values."); }
 			if (!node.getOutLinks().containsKey(second)) { throw new IllegalArgumentException("nodeid="+nodeId+", linkid="+second+": link not an outlink of given node."); }
 		}
-		
+
 		// remove the node
 		Map<Id,Link> inlinks = new TreeMap<Id, Link>(node.getInLinks());
 		Map<Id,Link> outlinks = new TreeMap<Id, Link>(node.getOutLinks());
@@ -245,7 +244,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 			Node n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
-			network.createAndAddLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(Time.UNDEFINED_TIME),inlink.getCapacity(Time.UNDEFINED_TIME),inlink.getNumberOfLanes(Time.UNDEFINED_TIME),((LinkImpl) inlink).getOrigId(),((LinkImpl) inlink).getType());
+			network.createAndAddLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(),inlink.getCapacity(),inlink.getNumberOfLanes(),((LinkImpl) inlink).getOrigId(),((LinkImpl) inlink).getType());
 		}
 		for (Link outlink : outlinks.values()) {
 			Coord c = node.getCoord();
@@ -257,15 +256,15 @@ public class NetworkExpandNode implements NetworkRunnable {
 			Node n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
-			network.createAndAddLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(Time.UNDEFINED_TIME),outlink.getCapacity(Time.UNDEFINED_TIME),outlink.getNumberOfLanes(Time.UNDEFINED_TIME),((LinkImpl) outlink).getOrigId(),((LinkImpl) outlink).getType());
+			network.createAndAddLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(),outlink.getCapacity(),outlink.getNumberOfLanes(),((LinkImpl) outlink).getOrigId(),((LinkImpl) outlink).getType());
 		}
-		
+
 		// add virtual links for the turn restrictions
 		for (int i=0; i<turns.size(); i++) {
 			Tuple<Id,Id> turn = turns.get(i);
 			LinkImpl fromLink = network.getLinks().get(turn.getFirst());
 			LinkImpl toLink = network.getLinks().get(turn.getSecond());
-			LinkImpl l = network.createAndAddLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME),fromLink.getOrigId(),fromLink.getType());
+			LinkImpl l = network.createAndAddLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(),fromLink.getCapacity(),fromLink.getNumberOfLanes(),fromLink.getOrigId(),fromLink.getType());
 			newLinks.add(l);
 		}
 		return new Tuple<ArrayList<Node>, ArrayList<Link>>(newNodes,newLinks);

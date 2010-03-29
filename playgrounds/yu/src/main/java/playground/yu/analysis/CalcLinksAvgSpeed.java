@@ -47,7 +47,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
@@ -260,8 +259,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 					.keySet() : interestLinks) {
 				StringBuffer line = new StringBuffer(linkId.toString());
 				line.append('\t');
-				line.append(this.network.getLinks().get(linkId).getCapacity(
-						Time.UNDEFINED_TIME));
+				line.append(this.network.getLinks().get(linkId).getCapacity());
 
 				for (int j = 0; j < nofBins - 1; j++) {
 					double speed = getAvgSpeed(linkId, (double) j * binSize);

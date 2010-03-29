@@ -64,12 +64,9 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 				o[2] = link.getFromNode().getId().toString();
 				o[3] = link.getToNode().getId().toString();
 				o[4] = link.getLength();
-				o[5] = link
-						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-						/ network.getCapacityPeriod() * 3600.0;
-				o[6] = (((LinkImpl) link).getType() != null) ? Integer
-						.parseInt(((LinkImpl) link).getType()) : 0;
-				o[7] = link.getFreespeed(0);
+				o[5] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
+				o[6] = (((LinkImpl) link).getType() != null) ? Integer.parseInt(((LinkImpl) link).getType()) : 0;
+				o[7] = link.getFreespeed();
 				for (int i = 0; i < parameters.size(); i++) {
 					o[i + 8] = parameters.get(i).get(link.getId());
 				}

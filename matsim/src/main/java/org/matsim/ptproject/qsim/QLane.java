@@ -164,7 +164,7 @@ public class QLane implements QBufferItem {
 	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
 	 */
 	private boolean fireLaneEvents = false;
-	
+
 	private final TransitQLaneFeature transitQueueLaneFeature;
 
 	/*package*/ QLane(final QLink ql, Lane laneData) {
@@ -173,7 +173,7 @@ public class QLane implements QBufferItem {
 		this.originalLane = (laneData == null) ? true : false;
 		this.laneData = laneData;
 		this.length = ql.getLink().getLength();
-		this.freespeedTravelTime = this.length / ql.getLink().getFreespeed(Time.UNDEFINED_TIME);
+		this.freespeedTravelTime = this.length / ql.getLink().getFreespeed();
 		this.meterFromLinkEnd = 0.0;
 
 		if (this.originalLane){
@@ -186,7 +186,7 @@ public class QLane implements QBufferItem {
 		 */
 		this.calculateCapacities();
 	}
-	
+
 	public Id getLaneId(){
 		if (this.laneData != null){
 			return this.laneData.getId();
@@ -282,7 +282,7 @@ public class QLane implements QBufferItem {
 
 	void setLaneLength(final double laneLengthMeters) {
 		this.length = laneLengthMeters;
-		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
+		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed();
 	}
 
 
@@ -344,7 +344,7 @@ public class QLane implements QBufferItem {
 
 			QSim.getEvents().processEvent(
 			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
-			boolean handled = transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
+			boolean handled = this.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 
 			if (!handled) {
 				addToBuffer(veh, now);
@@ -363,7 +363,7 @@ public class QLane implements QBufferItem {
 	protected void moveLaneToBuffer(final double now) {
 		QVehicle veh;
 
-		transitQueueLaneFeature.beforeMoveLaneToBuffer(now);
+		this.transitQueueLaneFeature.beforeMoveLaneToBuffer(now);
 
 		// handle regular traffic
 		while ((veh = this.vehQueue.peek()) != null) {
@@ -377,9 +377,9 @@ public class QLane implements QBufferItem {
 			}
 
 			DriverAgent driver = veh.getDriver();
-			
-			boolean handled = transitQueueLaneFeature.handleMoveLaneToBuffer(now, veh, driver);
-			
+
+			boolean handled = this.transitQueueLaneFeature.handleMoveLaneToBuffer(now, veh, driver);
+
 			if (!handled) {
 				// Check if veh has reached destination:
 				if ((driver.getDestinationLinkId().equals(this.queueLink.getLink().getId())) && (driver.chooseNextLinkId() == null)) {
@@ -390,13 +390,13 @@ public class QLane implements QBufferItem {
 					this.usedStorageCapacity -= veh.getSizeInEquivalents();
 					continue;
 				}
-	
+
 				/* is there still room left in the buffer, or is it overcrowded from the
 				 * last time steps? */
 				if (!hasBufferSpace()) {
 					return;
 				}
-	
+
 				addToBuffer(veh, now);
 				this.vehQueue.poll();
 				this.usedStorageCapacity -= veh.getSizeInEquivalents();
@@ -412,8 +412,8 @@ public class QLane implements QBufferItem {
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) 
-		  || (!this.waitingList.isEmpty()) || (this.toLanes != null && !this.bufferIsEmpty()) || transitQueueLaneFeature.isFeatureActive();
+		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
+		  || (!this.waitingList.isEmpty()) || (this.toLanes != null && !this.bufferIsEmpty()) || this.transitQueueLaneFeature.isFeatureActive();
 		return active;
 	}
 
@@ -584,7 +584,7 @@ public class QLane implements QBufferItem {
 	public Queue<QVehicle> getVehiclesInBuffer() {
 		return this.buffer;
 	}
-	
+
 	protected boolean isOriginalLane() {
 		return this.originalLane;
 	}
@@ -661,7 +661,7 @@ public class QLane implements QBufferItem {
 	public Collection<QVehicle> getAllVehicles() {
 		Collection<QVehicle> vehicles = new ArrayList<QVehicle>();
 
-		vehicles.addAll(transitQueueLaneFeature.getFeatureVehicles());
+		vehicles.addAll(this.transitQueueLaneFeature.getFeatureVehicles());
 		vehicles.addAll(this.waitingList);
 		vehicles.addAll(this.vehQueue);
 		vehicles.addAll(this.buffer);
@@ -669,7 +669,7 @@ public class QLane implements QBufferItem {
 		return vehicles;
 	}
 
-	
+
 
 	protected boolean isFireLaneEvents() {
 		return this.fireLaneEvents;
@@ -746,7 +746,7 @@ public class QLane implements QBufferItem {
 			if (cnt > 0) {
 				double cellSize = QLane.this.queueLink.getLink().getLength() / cnt;
 				double distFromFromNode = QLane.this.queueLink.getLink().getLength() - cellSize / 2.0;
-				double freespeed = QLane.this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
+				double freespeed = QLane.this.queueLink.getLink().getFreespeed();
 
 				// the cars in the buffer
 				for (QVehicle veh : QLane.this.buffer) {
@@ -818,7 +818,7 @@ public class QLane implements QBufferItem {
 			queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
 			positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);
 			int lane = positionVehiclesFromWaitingList(positions, link, cellSize);
-			transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cellSize, lane);
+			QLane.this.transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cellSize, lane);
 		}
 
 		private double calculateVehicleLength(Link link,
@@ -831,7 +831,7 @@ public class QLane implements QBufferItem {
 
 		private double getInitialQueueEnd() {
 			double queueEnd = QLane.this.queueLink.getLink().getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
-			if ((QLane.this.signalGroups != null) ){ 
+			if ((QLane.this.signalGroups != null) ){
 				queueEnd -= 20.0;
 			}
 			return queueEnd;
@@ -844,11 +844,11 @@ public class QLane implements QBufferItem {
 				final Collection<AgentSnapshotInfo> positions, double now,
 				double queueEnd, Link link, double vehLen) {
 			for (QVehicle veh : QLane.this.buffer) {
-				
+
 				int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QLane.this.queueLink.getLink()));
 
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QLane.this.inverseSimulatedFlowCapacity + 2.0);
-				double speed = (now > cmp) ? 0.0 : link.getFreespeed(Time.UNDEFINED_TIME);
+				double speed = (now > cmp) ? 0.0 : link.getFreespeed();
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI person : peopleInVehicle) {
 					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), link, queueEnd,
@@ -903,20 +903,20 @@ public class QLane implements QBufferItem {
 					tmpLane = veh.getId().hashCode() ;
 				}
 				int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-				
+
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI passenger : peopleInVehicle) {
 					PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
 							lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					positions.add(passengerPosition);
 				}
-				
+
 				lastDistance = distanceOnLink;
 			}
 		}
 
 		private Collection<PersonAgentI> getPeopleInVehicle(QVehicle vehicle) {
-			Collection<PersonAgentI> passengers = transitQueueLaneFeature.getPassengers(vehicle);
+			Collection<PersonAgentI> passengers = QLane.this.transitQueueLaneFeature.getPassengers(vehicle);
 			if (passengers.isEmpty()) {
 				return Collections.singletonList((PersonAgentI) vehicle.getDriver());
 			} else {
@@ -926,7 +926,7 @@ public class QLane implements QBufferItem {
 				return people;
 			}
 		}
-		
+
 		/**
 		 * Put the vehicles from the waiting list in positions. Their actual
 		 * position doesn't matter, so they are just placed to the coordinates of
@@ -1001,19 +1001,19 @@ public class QLane implements QBufferItem {
 			}
 		}
 	}
-	
+
 	protected SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
-		return signalGroups;
+		return this.signalGroups;
 	}
 
 	public LinkedList<QVehicle> getVehQueue() {
-		return vehQueue;
+		return this.vehQueue;
 	}
 
 	public QLink getQueueLink() {
-		return queueLink;
+		return this.queueLink;
 	}
-	
+
 	public double getLength(){
 	  return this.length;
 	}
@@ -1022,5 +1022,5 @@ public class QLane implements QBufferItem {
   public double getBufferLastMovedTime() {
     return this.bufferLastMovedTime;
   }
-	
+
 }

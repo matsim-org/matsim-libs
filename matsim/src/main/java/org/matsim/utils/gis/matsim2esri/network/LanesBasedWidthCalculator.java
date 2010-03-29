@@ -22,7 +22,6 @@ package org.matsim.utils.gis.matsim2esri.network;
 
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.misc.Time;
 
 public class LanesBasedWidthCalculator implements WidthCalculator{
 
@@ -35,7 +34,7 @@ public class LanesBasedWidthCalculator implements WidthCalculator{
 	}
 
 	public double getWidth(final LinkImpl link) {
-		return link.getNumberOfLanes(Time.UNDEFINED_TIME) * this.effectiveLaneWidth * this.widthCoefficient;
+		return link.getNumberOfLanes() * this.effectiveLaneWidth * this.widthCoefficient;
 	}
 
 

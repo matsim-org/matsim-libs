@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 
 import playground.dgrether.daganzosignal.DaganzoScenarioGenerator;
 
@@ -47,11 +46,11 @@ import playground.dgrether.daganzosignal.DaganzoScenarioGenerator;
 public class DgNet2Tex {
 
 	private static final Logger log = Logger.getLogger(DgNet2Tex.class);
-	
+
 	public DgNet2Tex() {}
 
-	
-	
+
+
 	public void convert(NetworkLayer net, String texnet) {
 		log.info("starting conversion...");
 		try {
@@ -67,7 +66,7 @@ public class DgNet2Tex {
 			writer.newLine();
 			this.hline(writer);
 			this.writeNetwork(net, writer);
-			
+
 			writer.write("\\end{tabular}");
 			writer.newLine();
 			writer.write("\\label{fig:}");
@@ -86,7 +85,7 @@ public class DgNet2Tex {
 		}
 		log.info("latex output written!");
 	}
-	
+
 	private void writeNetwork(NetworkLayer net, BufferedWriter writer) throws IOException {
 		List<Set<Link>> samePropertyLinksList = this.classifyNetwork(net);
 		for (Set<Link> linkSet : samePropertyLinksList){
@@ -102,33 +101,33 @@ public class DgNet2Tex {
 			writer.write("\t & \t");
 			writer.write(Double.toString(l.getLength()));
 			writer.write("\t & \t");
-			writer.write(Double.toString(l.getNumberOfLanes(Time.UNDEFINED_TIME)));
+			writer.write(Double.toString(l.getNumberOfLanes()));
 			writer.write("\t & \t");
-			writer.write(Double.toString(l.getFreespeed(Time.UNDEFINED_TIME)));
+			writer.write(Double.toString(l.getFreespeed()));
 			writer.write("\t & \t");
-			writer.write(Double.toString(l.getCapacity(Time.UNDEFINED_TIME)));
+			writer.write(Double.toString(l.getCapacity()));
 			writer.write("\t & \t");
-			writer.write(Double.toString(l.getLength() * l.getNumberOfLanes(Time.UNDEFINED_TIME) / 7.5));
+			writer.write(Double.toString(l.getLength() * l.getNumberOfLanes() / 7.5));
 			writer.write("\t & \t");
-			writer.write(Double.toString(l.getLength() / l.getFreespeed(Time.UNDEFINED_TIME)));
+			writer.write(Double.toString(l.getLength() / l.getFreespeed()));
 			writer.write("\t \\\\");
 			writer.newLine();
 			this.hline(writer);
 			writer.newLine();
 		}
 	}
-	
-	
+
+
 	private List<Set<Link>> classifyNetwork(Network net){
 		List<Set<Link>> samePropertyLinksList = new LinkedList<Set<Link>>();
 		for (Link l : net.getLinks().values()){
 			boolean added = false;
 			for (Set<Link> linkSet : samePropertyLinksList) {
 				Link compareLink = linkSet.iterator().next();
-				if ((compareLink.getLength() == l.getLength()) 
-						&& (compareLink.getNumberOfLanes(Time.UNDEFINED_TIME) == l.getNumberOfLanes(Time.UNDEFINED_TIME)) 
-						&& (compareLink.getFreespeed(Time.UNDEFINED_TIME) == l.getFreespeed(Time.UNDEFINED_TIME)) 
-						&& (compareLink.getCapacity(Time.UNDEFINED_TIME) == l.getCapacity(Time.UNDEFINED_TIME))){
+				if ((compareLink.getLength() == l.getLength())
+						&& (compareLink.getNumberOfLanes() == l.getNumberOfLanes())
+						&& (compareLink.getFreespeed() == l.getFreespeed())
+						&& (compareLink.getCapacity() == l.getCapacity())){
 					linkSet.add(l);
 					added = true;
 				}
@@ -141,18 +140,18 @@ public class DgNet2Tex {
 		}
 		return samePropertyLinksList;
 	}
-	
 
-	
-	
-	
+
+
+
+
 
 	private void hline(BufferedWriter w) throws IOException{
 		w.write("\\hline");
 		w.newLine();
 	}
-	
-	
+
+
 	public void convert(String net, String texnet) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
@@ -161,8 +160,8 @@ public class DgNet2Tex {
 		this.convert(network, texnet);
 	}
 
-	
-	
+
+
 	public static void main(String[] args) {
 		String net, texnet;
 //		net = args[0];

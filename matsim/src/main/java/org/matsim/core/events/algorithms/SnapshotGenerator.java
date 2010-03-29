@@ -210,12 +210,12 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.buffer = new ArrayList<EventAgent>();
 			this.euklideanDist = CoordUtils.calcDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
 			this.ratioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
-			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed(Time.UNDEFINED_TIME);
-			this.timeCap = this.link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) * capCorrectionFactor;
+			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed();
+			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
 			this.storageCapFactor = storageCapFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
 			this.effectiveCellSize = effectiveCellSize;
-			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)) / this.effectiveCellSize * storageCapFactor;
+			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes()) / this.effectiveCellSize * storageCapFactor;
 		}
 
 		protected void enter(final EventAgent agent) {
@@ -270,7 +270,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			double queueEnd = this.link.getLength(); // the length of the queue jammed vehicles build at the end of the link
 			double vehLen = Math.min(	// the length of a vehicle in visualization
 					this.euklideanDist / this.spaceCap, // all vehicles must have place on the link
-					this.effectiveCellSize / storageCapFactor); // a vehicle should not be larger than it's actual size
+					this.effectiveCellSize / this.storageCapFactor); // a vehicle should not be larger than it's actual size
 
 			// put all cars in the buffer one after the other
 			for (EventAgent agent : this.buffer) {

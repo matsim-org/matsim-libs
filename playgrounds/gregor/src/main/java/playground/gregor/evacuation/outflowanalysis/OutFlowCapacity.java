@@ -48,7 +48,7 @@ public class OutFlowCapacity {
 		parseOutLinks();
 		parseOutNodes();
 	}
-	
+
 	private void parseOutNodes() {
 		Node node = this.network.getNodes().get(new IdImpl("en1"));
 		double cap = 0;
@@ -57,13 +57,13 @@ public class OutFlowCapacity {
 			Node out = l.getFromNode();
 			outNode.add(out);
 			for (Link ll : out.getInLinks().values()) {
-				cap += ll.getCapacity(0);
+				cap += ll.getCapacity();
 			}
 		}
 		System.err.println("cap:" + cap);
-	
+
 	}
-	
+
 	private void parseOutLinks() {
 		outFlowCapcity = 0;
 		for (LinkImpl link : this.network.getLinks().values()) {
@@ -73,16 +73,16 @@ public class OutFlowCapacity {
 			if (link.getId().toString().contains("el")) {
 				continue;
 			}
-			
+
 			for (Link l2 : link.getToNode().getOutLinks().values()) {
 				if (l2.getId().toString().contains("el")) {
 					this.outFlowLinks.add(link);
-					this.outFlowCapcity += link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+					this.outFlowCapcity += link.getCapacity();
 					break;
 				}
-				
+
 			}
-			
+
 
 		}
 		System.out.println("OutFlowCap:" + this.outFlowCapcity);
@@ -90,7 +90,7 @@ public class OutFlowCapacity {
 
 	public static void main(String [] args) {
 		 String netfile = "./networks/padang_net_evac_v20080618.xml";
-		 
+
 			log.info("loading network from " + netfile);
 			ScenarioImpl scenario = new ScenarioImpl();
 			NetworkLayer network = scenario.getNetwork();
@@ -98,8 +98,8 @@ public class OutFlowCapacity {
 //			world.setNetworkLayer(network);
 //			world.complete();
 			log.info("done.");
-			
+
 			new OutFlowCapacity(network).run();
 	}
-	
+
 }

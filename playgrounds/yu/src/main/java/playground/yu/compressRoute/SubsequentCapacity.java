@@ -82,11 +82,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 
 			for (Link outLink : outLinks) {
 				String outLinkId = outLink.getId().toString();
-				caps
-						.put(
-								outLinkId,
-								outLink
-										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+				caps.put(outLinkId, outLink.getCapacity());
 				outLinksMap.put(outLinkId, outLink);
 				// TODO: can man delete outLinksMap?
 			}
@@ -97,8 +93,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 				Collection<Double> capsValues = caps.values();
 				double maxCap = Collections.max(capsValues);
 				double minCap = Collections.min(capsValues);
-				double lCap = l
-						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+				double lCap = l.getCapacity();
 
 				if (lCap >= maxCap) {
 					// choose the max, when over 1 max, compare angles.

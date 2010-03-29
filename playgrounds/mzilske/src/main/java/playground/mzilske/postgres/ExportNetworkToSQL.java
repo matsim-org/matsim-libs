@@ -42,27 +42,27 @@ public class ExportNetworkToSQL {
 			run(inputFile, outputFile);
 		}
 	}
-	
+
 	public void run(final String inputNetworkFile, final String outputSQLFile) {
 		final Scenario scenario = new ScenarioImpl();
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 
-		
+
 
 		try {
 			int id = 0;
 			PrintWriter out = new PrintWriter(IOUtils.getBufferedWriter(outputSQLFile, false));
 			for (Link link : network.getLinks().values()) {
 				out.println(
-						id++ + "," 
+						id++ + ","
 						+ link.getId().toString() + ","
-						+ link.getFromNode().getId() + "," 
-						+ link.getToNode().getId() + "," 
-						+ link.getFreespeed(0.0) * link.getLength() + ","
-						+ link.getFromNode().getCoord().getX() + "," 
-						+ link.getFromNode().getCoord().getY() + "," 
-						+ link.getToNode().getCoord().getX() + "," 
+						+ link.getFromNode().getId() + ","
+						+ link.getToNode().getId() + ","
+						+ link.getFreespeed() * link.getLength() + ","
+						+ link.getFromNode().getCoord().getX() + ","
+						+ link.getFromNode().getCoord().getY() + ","
+						+ link.getToNode().getCoord().getX() + ","
 						+ link.getToNode().getCoord().getY());
 			}
 			out.close();
@@ -71,9 +71,9 @@ public class ExportNetworkToSQL {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private void printUsage() {
 		System.out.println("wurst");
 	}
@@ -81,5 +81,5 @@ public class ExportNetworkToSQL {
 	public static void main(String[] args) {
 		new ExportNetworkToSQL().run(args);
 	}
-	
+
 }

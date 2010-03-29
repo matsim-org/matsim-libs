@@ -14,7 +14,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.utils.misc.Time;
 
 
 
@@ -24,17 +23,17 @@ public class NetworkToCarNetwork {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+
 		final String NET_FILE="../../inputs/networks/padang_net_v20080618.xml";
 		final String OUTPUT_FILE="../../inputs/networks/padang_net_car_v20090604.xml";
 		final double freespeedKmPerHour=50; //km/h
 		final double capacityVehPerHourPerLane=1500;
-		
+
 		double freespeed = freespeedKmPerHour / 3.6;
-		
-		
+
+
 		HashSet<String> excludes = getExludes();
-		
+
 		//oeffnen des Szenarios
 		ScenarioImpl sc = new ScenarioImpl();
 		NetworkImpl net = sc.getNetwork();
@@ -45,7 +44,7 @@ public class NetworkToCarNetwork {
 		net3.setCapacityPeriod(1);
 		net3.setEffectiveLaneWidth(3.5);
 		net3.setEffectiveCellSize(7.5);
-		
+
 		// uebertragen der Nodes
 		Map<Id,NodeImpl> nodes = net.getNodes();
 		int j = 0;
@@ -56,7 +55,7 @@ public class NetworkToCarNetwork {
 			Coord coord = node.getCoord();
 			net3.createAndAddNode(id, coord);
 		}
-		
+
 		//Bearbeiten der Links
 		int lanes=0;
 		int i = 0;
@@ -72,9 +71,9 @@ public class NetworkToCarNetwork {
 			NodeImpl startNode = net3.getNodes().get(link.getFromNode().getId());
 			NodeImpl endNode = net3.getNodes().get(link.getToNode().getId());
 			double length = link.getLength();
-			
+
 			//Bestimmung der Spuranzahl
-			double width = link.getCapacity(Time.UNDEFINED_TIME) / (1.33*2);
+			double width = link.getCapacity() / (1.33*2);
 			if (width < 3.5){
 				lanes = 1;
 				g++;
@@ -87,7 +86,7 @@ public class NetworkToCarNetwork {
 			net3.createAndAddLink(id2, startNode, endNode, length, freespeed, capacity, lanes);
 			i++;
 		}
-		
+
 		new NetworkCleaner().run(net3);
 		//Das neue Netzwerk ist fertig --- Erzeuge Ausgabe
 		new NetworkWriter(net3).writeFile(OUTPUT_FILE);
@@ -167,5 +166,5 @@ public class NetworkToCarNetwork {
 		}
 		return ret;
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -27,9 +26,9 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * write a QGIS-.shp-file, in which only links with counts stations can be
  * written.
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class Counts2QGIS extends MATSimNet2QGIS {
 	public Counts2QGIS(String netFilename, String coordRefSys) {
@@ -63,11 +62,11 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 				o[2] = link.getFromNode().getId().toString();
 				o[3] = link.getToNode().getId().toString();
 				o[4] = link.getLength();
-				o[5] = link.getCapacity(Time.UNDEFINED_TIME)
+				o[5] = link.getCapacity()
 						/ network.getCapacityPeriod() * 3600.0;
 				o[6] = link.getType() != null ? Integer
 						.parseInt(link.getType()) : 0;
-				o[7] = link.getFreespeed(0);
+				o[7] = link.getFreespeed();
 				for (int i = 0; i < parameters.size(); i++)
 					o[i + 8] = parameters.get(i).get(link.getId());
 				// parameters.get(link.getId().toString()) }

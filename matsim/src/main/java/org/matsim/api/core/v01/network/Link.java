@@ -59,7 +59,11 @@ public interface Link extends Identifiable, Serializable, Location {
 
 	public double getLength();
 
+	public double getNumberOfLanes();
+
 	public double getNumberOfLanes(double time);
+
+	public double getFreespeed();
 
 	public double getFreespeed(final double time);
 
@@ -67,9 +71,19 @@ public interface Link extends Identifiable, Serializable, Location {
 	 * This method returns the capacity as set in the xml defining the network. Be aware
 	 * that this capacity is not normalized in time, it depends on the period set
 	 * in the network file (the capperiod attribute).
+	 * @return the capacity per network's capperiod timestep
+	 *
+	 * @see NetworkLayer#getCapacityPeriod()
+	 */
+	public double getCapacity();
+
+	/**
+	 * This method returns the capacity as set in the xml defining the network. Be aware
+	 * that this capacity is not normalized in time, it depends on the period set
+	 * in the network file (the capperiod attribute).
 	 * @param time the time at which the capacity is requested. Use {@link Time#UNDEFINED_TIME} to get the default value.
 	 * @return the capacity per network's capperiod timestep
-	 * 
+	 *
 	 * @see NetworkLayer#getCapacityPeriod()
 	 */
 	public double getCapacity(double time);

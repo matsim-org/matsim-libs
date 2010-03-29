@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkIdComparator;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * Analyzes the network to find for each link the "logical subsequent link",
@@ -124,7 +123,7 @@ public class SubsequentLinksAnalyzer {
 		double maxCapacity = Double.NEGATIVE_INFINITY;
 		Link maxCapLink = null;
 		for (Link link : minThetaOutLinks) {
-			double cap = link.getCapacity(Time.UNDEFINED_TIME);
+			double cap = link.getCapacity();
 			if (cap > maxCapacity)  {
 				maxCapacity = cap;
 				maxCapLink = link;

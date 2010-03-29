@@ -44,7 +44,7 @@ import org.matsim.world.Layer;
  * A faster Implementation of org.matsim.core.router.Dijkstra.
  * By using extended, internal Data Structures we avoid lots of
  * Lookups in HashMaps (Id -> getLink, getNode).
- * 
+ *
  * @see org.matsim.core.router.Dijkstra
  * @author cdobler
  */
@@ -54,7 +54,7 @@ public class FastDijkstra extends Dijkstra {
 	private final static Logger log = Logger.getLogger(FastDijkstra.class);
 
 //	private Dijkstra dijsktra;
-	
+
 	/**
 	 * The network on which we find routes.
 	 */
@@ -130,9 +130,9 @@ public class FastDijkstra extends Dijkstra {
 			final PreProcessDijkstra preProcessData) {
 
 		super(network, costFunction, timeFunction, preProcessData);
-		
+
 //		this.dijsktra = new Dijkstra(network, costFunction, timeFunction, preProcessData);
-		
+
 		this.network = network;
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
@@ -155,10 +155,10 @@ public class FastDijkstra extends Dijkstra {
 			DijkstraLink dijkstraLink = new DijkstraLink(link, fromNode, toNode);
 			dijkstraLinks.put(link.getId(), dijkstraLink);
 		}
-				
+
 		/*
 		 * Connect DijkstraNodes and DijkstraLinks
-		 * 
+		 *
 		 * Ensure to use the same Link Order as in the original Nodes.
 		 * They use a LinkedHashMap to store the Links so we can take their Order.
 		 */
@@ -174,17 +174,17 @@ public class FastDijkstra extends Dijkstra {
 			}
 		}
 		dijkstraLinks.clear();
-		
+
 //		for (Link link : this.network.getLinks().values())
 //		{
 //			DijkstraNode fromNode = this.nodeData.get(link.getFromNode().getId());
 //			DijkstraNode toNode = this.nodeData.get(link.getToNode().getId());
 //			DijkstraLink dijkstraLink = new DijkstraLink(link, fromNode, toNode);
-//			
+//
 //			fromNode.addOutLink(dijkstraLink);
 //			toNode.addInLink(dijkstraLink);
 //		}
-		
+
 		if (preProcessData != null) {
 			if (preProcessData.containsData() == false) {
 				this.pruneDeadEnds = false;
@@ -227,6 +227,7 @@ public class FastDijkstra extends Dijkstra {
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
 	 */
+	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 
 		double arrivalTime = 0;
@@ -236,7 +237,7 @@ public class FastDijkstra extends Dijkstra {
 
 		DijkstraNode dijkstraFromNode = this.nodeData.get(fromNode.getId());
 		DijkstraNode dijkstraToNode = this.nodeData.get(toNode.getId());
-		
+
 		if (this.pruneDeadEnds == true) {
 			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
 		}
@@ -297,7 +298,7 @@ public class FastDijkstra extends Dijkstra {
 //
 //		DijkstraNodeData toNodeData = getData(toNode);
 //		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
-		
+
 		Path path = new Path(nodes, links, arrivalTime - startTime, dijkstraToNode.getCost());
 
 //		Path orgPath = this.dijsktra.calcLeastCostPath(fromNode, toNode, startTime);
@@ -334,7 +335,7 @@ public class FastDijkstra extends Dijkstra {
 	 * @param pendingNodes
 	 *            The pending nodes so far.
 	 */
-	/*package*/ void initFromNode(final DijkstraNode fromNode, final DijkstraNode toNode, final double startTime, 
+	/*package*/ void initFromNode(final DijkstraNode fromNode, final DijkstraNode toNode, final double startTime,
 			final PseudoRemovePriorityQueue<DijkstraNode> pendingNodes) {
 		visitNode(fromNode, pendingNodes, startTime, 0, null);
 	}
@@ -350,7 +351,7 @@ public class FastDijkstra extends Dijkstra {
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	protected void relaxNode(final DijkstraNode outNode, final DijkstraNode toNode, 
+	protected void relaxNode(final DijkstraNode outNode, final DijkstraNode toNode,
 			final PseudoRemovePriorityQueue<DijkstraNode> pendingNodes) {
 
 		double currTime = outNode.getTime();
@@ -458,7 +459,7 @@ public class FastDijkstra extends Dijkstra {
 	 * @param outLink
 	 *            The link from which we came visiting n.
 	 */
-	void revisitNode(final DijkstraNode dijkstraNode, final PseudoRemovePriorityQueue<DijkstraNode> pendingNodes, 
+	void revisitNode(final DijkstraNode dijkstraNode, final PseudoRemovePriorityQueue<DijkstraNode> pendingNodes,
 			final double time, final double cost, final DijkstraLink outLink) {
 		pendingNodes.remove(dijkstraNode);
 
@@ -481,7 +482,7 @@ public class FastDijkstra extends Dijkstra {
 	 * @param outLink
 	 *            The node from which we came visiting n.
 	 */
-	protected void visitNode(final DijkstraNode dijkstraNode, final PseudoRemovePriorityQueue<DijkstraNode> pendingNodes, 
+	protected void visitNode(final DijkstraNode dijkstraNode, final PseudoRemovePriorityQueue<DijkstraNode> pendingNodes,
 			final double time, final double cost, final DijkstraLink outLink) {
 		dijkstraNode.visit(outLink, cost, time, getIterationId());
 		pendingNodes.add(dijkstraNode, getPriority(dijkstraNode));
@@ -491,6 +492,7 @@ public class FastDijkstra extends Dijkstra {
 	 * Augments the iterationID and checks whether the visited information in
 	 * the nodes have to be reset.
 	 */
+	@Override
 	protected void augmentIterationId() {
 		if (getIterationId() == Integer.MAX_VALUE) {
 			this.iterationID = Integer.MIN_VALUE + 1;
@@ -541,7 +543,7 @@ public class FastDijkstra extends Dijkstra {
 
 		private Map<Id, DijkstraLink> inLinks = new LinkedHashMap<Id, DijkstraLink>();
 		private Map<Id, DijkstraLink> outLinks = new LinkedHashMap<Id, DijkstraLink>();
-		
+
 		private double cost = 0;
 		private double time = 0;
 
@@ -551,12 +553,12 @@ public class FastDijkstra extends Dijkstra {
 		{
 			this.node = node;
 		}
-		
+
 		public Node getNode()
 		{
 			return this.node;
 		}
-		
+
 		public void resetVisited() {
 			this.iterationID = Integer.MIN_VALUE;
 		}
@@ -615,38 +617,48 @@ public class FastDijkstra extends Dijkstra {
 			return this.node.getId();
 		}
 	}
-	
+
 	protected static class DijkstraLink implements Link{
 
 		private Link link;
 		private DijkstraNode fromNode;
 		private DijkstraNode toNode;
-		
+
 		public DijkstraLink(Link link, DijkstraNode fromNode, DijkstraNode toNode)
 		{
 			this.link = link;
 			this.fromNode = fromNode;
 			this.toNode = toNode;
 		}
-		
+
 		public Link getLink()
 		{
 			return this.link;
 		}
-		
+
 		@Override
 		public Set<TransportMode> getAllowedModes() {
-			return link.getAllowedModes();
+			return this.link.getAllowedModes();
+		}
+
+		@Override
+		public double getCapacity() {
+			return this.link.getCapacity();
 		}
 
 		@Override
 		public double getCapacity(double time) {
-			return link.getCapacity(time);
+			return this.link.getCapacity(time);
+		}
+
+		@Override
+		public double getFreespeed() {
+			return this.link.getFreespeed();
 		}
 
 		@Override
 		public double getFreespeed(double time) {
-			return link.getFreespeed(time);
+			return this.link.getFreespeed(time);
 		}
 
 		@Override
@@ -656,12 +668,17 @@ public class FastDijkstra extends Dijkstra {
 
 		@Override
 		public double getLength() {
-			return link.getLength();
+			return this.link.getLength();
+		}
+
+		@Override
+		public double getNumberOfLanes() {
+			return this.link.getNumberOfLanes();
 		}
 
 		@Override
 		public double getNumberOfLanes(double time) {
-			return link.getNumberOfLanes(time);
+			return this.link.getNumberOfLanes(time);
 		}
 
 		@Override
@@ -671,17 +688,17 @@ public class FastDijkstra extends Dijkstra {
 
 		@Override
 		public void setAllowedModes(Set<TransportMode> modes) {
-			link.setAllowedModes(modes);
+			this.link.setAllowedModes(modes);
 		}
 
 		@Override
 		public void setCapacity(double capacity) {
-			link.setCapacity(capacity);
+			this.link.setCapacity(capacity);
 		}
 
 		@Override
 		public void setFreespeed(double freespeed) {
-			link.setFreespeed(freespeed);
+			this.link.setFreespeed(freespeed);
 		}
 
 		@Override
@@ -691,12 +708,12 @@ public class FastDijkstra extends Dijkstra {
 
 		@Override
 		public void setLength(double length) {
-			link.setLength(length);
+			this.link.setLength(length);
 		}
 
 		@Override
 		public void setNumberOfLanes(double lanes) {
-			link.setNumberOfLanes(lanes);
+			this.link.setNumberOfLanes(lanes);
 		}
 
 		@Override
@@ -706,19 +723,19 @@ public class FastDijkstra extends Dijkstra {
 
 		@Override
 		public Id getId() {
-			return link.getId();
+			return this.link.getId();
 		}
 
 		@Override
 		public Layer getLayer() {
-			return link.getLayer();
+			return this.link.getLayer();
 		}
 
 		@Override
 		public Coord getCoord() {
-			return link.getCoord();
+			return this.link.getCoord();
 		}
-		
+
 	}
 
 }

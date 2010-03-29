@@ -70,7 +70,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 
 
 
@@ -313,7 +312,7 @@ public class Controller extends Controler {
 		}
 
 		private double getFreespeedTravelTime(final Link link) {
-			return link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
+			return link.getLength() / link.getFreespeed();
 		}
 
 

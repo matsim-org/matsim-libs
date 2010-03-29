@@ -36,9 +36,9 @@ public class CountVehOnLinksStringBasedFeatureGenerator implements FeatureGenera
 		this.crs = crs;
 		this.geofac = new GeometryFactory();
 		initFeatureType();
-		
+
 		this.compareResultMap = CountVehOnLinks.compareEventFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\763.500.events.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\762.500.events.txt");
-		
+
 	}
 
 
@@ -53,9 +53,9 @@ public class CountVehOnLinksStringBasedFeatureGenerator implements FeatureGenera
 		attribs[5] = AttributeTypeFactory.newAttributeType("freespeed", Double.class);
 		attribs[6] = AttributeTypeFactory.newAttributeType("capacity", Double.class);
 		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
-		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);		
+		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
 		attribs[9] = AttributeTypeFactory.newAttributeType("type", String.class);
-		attribs[10] = AttributeTypeFactory.newAttributeType("Diff", Double.class);	
+		attribs[10] = AttributeTypeFactory.newAttributeType("Diff", Double.class);
 
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
@@ -64,8 +64,8 @@ public class CountVehOnLinksStringBasedFeatureGenerator implements FeatureGenera
 		} catch (SchemaException e) {
 			e.printStackTrace();
 		}
-		
-		
+
+
 
 	}
 
@@ -81,12 +81,12 @@ public class CountVehOnLinksStringBasedFeatureGenerator implements FeatureGenera
 		attribs[2] = link.getFromNode().getId().toString();
 		attribs[3] = link.getToNode().getId().toString();
 		attribs[4] = link.getLength();
-		attribs[5] = link.getFreespeed(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-		attribs[6] = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-		attribs[7] = link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+		attribs[5] = link.getFreespeed();
+		attribs[6] = link.getCapacity();
+		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = width;
 		attribs[9] = link.getType();
-		
+
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			attribs[10] = this.compareResultMap.get(link.getId().toString());
 		}

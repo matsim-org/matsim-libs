@@ -87,7 +87,7 @@ public class TollSchemeGenerator {
 	private static final String IVTCHCONF = "../testData/schweiz-ivtch/ivtch-config.xml";
 
 	private static final String SCHWEIZCHCONF = "../testData/schweiz-ch/ch-config.xml";
-	
+
 //	private static final String IVTOUTFILE = "../testData/output/ivtch/zurichCityAreaWithHighwaysPricingScheme.kmz";
 
 //	private static final String IVTOUTSCHEME = "../testData/output/ivtch/zurichCityAreaWithHighwaysPricingScheme.xml";
@@ -99,9 +99,9 @@ public class TollSchemeGenerator {
 	private static final String IVTCHGISOUTBASE = "/Volumes/data/work/vspSvn/studies/schweiz-ivtch/baseCase/roadpricing/zurichCityArea/zurichCityAreaWithoudHighways";
 
 	private static final String SCHWEIZCHOUTBASE = "/Volumes/data/work/cvsRep/vsp-cvs/studies/schweiz/roadpricing/zurichCityArea/zurichCityAreaWithoutHighwaysNew";
-	
+
 	private static final String SCHWEIZCHGISOUTBASE = "/Volumes/data/work/cvsRep/vsp-cvs/studies/schweiz/roadpricing/zurichCityArea/zurichCityAreaWithoutHighways";
-	
+
 	private static final String googleEarthPolyCoords = "8.425786799175953,47.40840613705993,0 8.421710028400241,47.39994280817881,0 8.417963147980927,47.39278943114768,0 8.415207918748933,47.38987365287824,0 8.415791890517795,47.38423209531803,0 8.41880861685496,47.37720026451881,0 8.421729416484297,47.37044196846617,0 8.425622484935019,47.36553079510605,0 8.423323740404612,47.35797751066716,0 8.428112748653305,47.34962290934973,0 8.45070089899518,47.34302244301254,0 8.458258697461332,47.34432245722293,0 8.4656718873172,47.35020668370471,0 8.471279932572031,47.35120072779423,0 8.51758408022306,47.34546749813342,0 8.522905646570109,47.35174736676126,0 8.521961169059978,47.36510115571412,0 8.522302525522861,47.36779482494401,0 8.534379467214848,47.36070541878087,0 8.565794165754525,47.34404660499774,0 8.583987479049085,47.34901770420281,0 8.591569601726832,47.40653036566425,0 8.572016057524166,47.41038517087896,0 8.570925906094473,47.42308052314462,0 8.534867061262872,47.43239384530932,0 8.473752933324278,47.42081611667773,0 8.450598247606663,47.41851870605534,0 8.425786799175953,47.40840613705993,0";
 
 	private static final String googleEarthPolyCoordsZurichStadt = "8.44864283511221,47.37986637690101,0 8.451416777701553,47.37833007336098,0 8.459581508090139,47.37723627445201,0 " +
@@ -160,7 +160,7 @@ public class TollSchemeGenerator {
 	private String usedSchemeOut = IVTOUTSCHEME;
 
 	private String usedGoogleEarthCoords = googleEarthPolyCoordsZurichStadt;
-	
+
 //	private String usedGisOut = IVTCHGISOUTBASE;
 	private String usedGisOut = SCHWEIZCHGISOUTBASE;
 
@@ -203,26 +203,26 @@ public class TollSchemeGenerator {
 
 		//write kml
 		writeKml(tollNetwork, this.usedOut);
-		
+
 		//create the road pricing scheme
 		RoadPricingScheme pricingScheme = this.createRoadPricingScheme(tollNetwork);
 		//write it to file
 //		writeRoadPricingScheme(pricingScheme);
 
-	  writeShapeFile(tollNetwork, this.usedCoords);	
-		
+	  writeShapeFile(tollNetwork, this.usedCoords);
+
 	}
-	
+
 	private void writeShapeFile(NetworkLayer network, Coord [] coords) {
 		new ShapeFileNetworkWriter().writeNetwork(network, usedGisOut + "Network.shp");
-		new ShapeFilePolygonWriter().writePolygon(coords, usedGisOut + "MoutArea.shp");	
+		new ShapeFilePolygonWriter().writePolygon(coords, usedGisOut + "MoutArea.shp");
 	}
-	
+
 
 	private NetworkLayer applyCapacityFilter(NetworkLayer network, double lowerBound, double upperBound) {
 		Set<LinkImpl> linksToRemove = new HashSet<LinkImpl>();
 		for (LinkImpl l : network.getLinks().values()) {
-			if ((lowerBound > l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)) || (upperBound < l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME))) {
+			if ((lowerBound > l.getCapacity()) || (upperBound < l.getCapacity())) {
 				linksToRemove.add(l);
 			}
 		}
@@ -244,7 +244,7 @@ public class TollSchemeGenerator {
 	private NetworkLayer createTollScheme(Config config) {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadNetwork();
-		this.network = (NetworkLayer) loader.getScenario().getNetwork();
+		this.network = loader.getScenario().getNetwork();
 
 		NetworkLayer net = filterNetwork(this.network, false);
 		log.info("Filtered the network, filtered network layer contains "
@@ -298,15 +298,15 @@ public class TollSchemeGenerator {
 		return ret;
 	}
 
-	
+
 
 	private void writeKml(NetworkLayer net, String filename) {
-		
+
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 		KmlType mainKml;
 		DocumentType mainDoc;
 		FolderType mainFolder;
-		
+
 		KMZWriter writer;
 
 		mainKml = kmlObjectFactory.createKmlType();
@@ -335,10 +335,10 @@ public class TollSchemeGenerator {
 			// write moute polygon
 			FolderType polygonFolder = kmlObjectFactory.createFolderType();
 			polygonFolder.setName("Mout area");
-			
+
 			PolygonType p = kmlObjectFactory.createPolygonType();
 			p.setTessellate(true);
-			
+
 			LinearRingType ring = kmlObjectFactory.createLinearRingType();
 			Coord transC;
 			for (Coord c : this.usedCoords) {

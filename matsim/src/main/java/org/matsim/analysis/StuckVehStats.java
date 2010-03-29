@@ -44,103 +44,103 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 	private int[] driveTimes = new int[2*60 + 1]; // the time an agent spends driving until it is stuck; counts per minute up to 2 hours
 	private int[] travelTimes = new int[2*60 + 1]; // the time an agent spends traveling (wait2link + drive) until it is stuck
 	private Network network = null;
-	
+
 	public StuckVehStats(Network network) {
 		this.network = network;
 		reset(-1);
 	}
-	
+
 	public void handleEvent(AgentDepartureEvent event) {
-		depTimes.put(event.getPersonId(), event.getTime());
+		this.depTimes.put(event.getPersonId(), event.getTime());
 	}
 
 	public void handleEvent(AgentWait2LinkEvent event) {
-		wait2linkTimes.put(event.getPersonId(), event.getTime());
-		Double depTime = depTimes.get(event.getPersonId());
+		this.wait2linkTimes.put(event.getPersonId(), event.getTime());
+		Double depTime = this.depTimes.get(event.getPersonId());
 		if (depTime != null) {
 			int slot = (int)((event.getTime() - depTime) / 60);
 			if (slot > 120) slot = 120;
-			waitTimes[slot]++;
+			this.waitTimes[slot]++;
 		}
 	}
 
 	public void handleEvent(AgentStuckEvent event) {
-		ArrayList<Double> times = stuckLinkTimes.get(event.getLinkId());			
+		ArrayList<Double> times = this.stuckLinkTimes.get(event.getLinkId());
 		if (times == null) {
 			times = new ArrayList<Double>(50);
 		}
 		times.add(event.getTime());
-		stuckLinkTimes.put(event.getLinkId(), times);
-		
+		this.stuckLinkTimes.put(event.getLinkId(), times);
+
 		int timeslot = (int)(event.getTime() / 900);
 		if (timeslot > 24*4) timeslot = 24*4;
-		stuckTimes[timeslot]++;
-		
-		Double wait2linkTime = wait2linkTimes.remove(event.getPersonId());
+		this.stuckTimes[timeslot]++;
+
+		Double wait2linkTime = this.wait2linkTimes.remove(event.getPersonId());
 		if (wait2linkTime != null) {
 			int slot = (int)((event.getTime() - wait2linkTime) / 60);
 			if (slot > 120) slot = 120;
-			driveTimes[slot]++;
+			this.driveTimes[slot]++;
 		}
-		
-		Double depTime = depTimes.remove(event.getPersonId());
+
+		Double depTime = this.depTimes.remove(event.getPersonId());
 		if (depTime != null) {
 			int slot = (int)((event.getTime() - depTime) / 60);
 			if (slot > 120) slot = 120;
-			travelTimes[slot]++;
+			this.travelTimes[slot]++;
 		}
 	}
 
 
 	public void reset(int iteration) {
-		for (int i = 0; i < stuckTimes.length; i++) {
-			stuckTimes[i] = 0;
+		for (int i = 0; i < this.stuckTimes.length; i++) {
+			this.stuckTimes[i] = 0;
 		}
-		stuckLinkTimes.clear();
-		depTimes.clear();
-		wait2linkTimes.clear();
-		for (int i = 0; i < waitTimes.length; i++) {
-			waitTimes[i] = 0;
+		this.stuckLinkTimes.clear();
+		this.depTimes.clear();
+		this.wait2linkTimes.clear();
+		for (int i = 0; i < this.waitTimes.length; i++) {
+			this.waitTimes[i] = 0;
 		}
-		for (int i = 0; i < driveTimes.length; i++) {
-			driveTimes[i] = 0;
+		for (int i = 0; i < this.driveTimes.length; i++) {
+			this.driveTimes[i] = 0;
 		}
-		for (int i = 0; i < travelTimes.length; i++) {
-			travelTimes[i] = 0;
+		for (int i = 0; i < this.travelTimes.length; i++) {
+			this.travelTimes[i] = 0;
 		}
 	}
-	
+
 	public void printResults() {
 		System.out.println("===   S T U C K   V E H I C L E S   ===");
 		System.out.println("number of stuck vehicles / time of day");
-		for (int i = 0; i < stuckTimes.length; i++) {
-			System.out.println((i*900) + "\t" + Time.writeTime(i*900) + "\t" + stuckTimes[i]);
+		for (int i = 0; i < this.stuckTimes.length; i++) {
+			System.out.println((i*900) + "\t" + Time.writeTime(i*900) + "\t" + this.stuckTimes[i]);
 		}
 		System.out.println();
 		System.out.println("number of stuck vehicles / time after wait2link");
-		for (int i = 0; i < driveTimes.length; i++) {
-			System.out.println((i*60) + "\t" + Time.writeTime(i*60) + "\t" + driveTimes[i]);
+		for (int i = 0; i < this.driveTimes.length; i++) {
+			System.out.println((i*60) + "\t" + Time.writeTime(i*60) + "\t" + this.driveTimes[i]);
 		}
 		System.out.println();
 		System.out.println("number of stuck vehicles / time after departure (incl. wait2link-time)");
-		for (int i = 0; i < travelTimes.length; i++) {
-			System.out.println((i*60) + "\t" + Time.writeTime(i*60) + "\t" + travelTimes[i]);
+		for (int i = 0; i < this.travelTimes.length; i++) {
+			System.out.println((i*60) + "\t" + Time.writeTime(i*60) + "\t" + this.travelTimes[i]);
 		}
 		System.out.println();
 		System.out.println("wait2link time distribution");
-		for (int i = 0; i < waitTimes.length; i++) {
-			System.out.println((i*60) + "\t" + Time.writeTime(i*60) + "\t" + waitTimes[i]);
+		for (int i = 0; i < this.waitTimes.length; i++) {
+			System.out.println((i*60) + "\t" + Time.writeTime(i*60) + "\t" + this.waitTimes[i]);
 		}
 		System.out.println();
 		System.out.println("Links on which vehicles get stuck");
 		System.out.println("LINK\tCAPACITY\tFREESPEED\tLENGTH\tcountStuck\ttimesStuck");
-		for (Id linkId : stuckLinkTimes.keySet()) {
-			ArrayList<Double> times = stuckLinkTimes.get(linkId);
-			Link link = network.getLinks().get(linkId);
-			System.out.print(linkId + "\t" + link.getCapacity(Time.UNDEFINED_TIME) + "\t" + link.getFreespeed(Time.UNDEFINED_TIME) + "\t" + link.getLength() + "\t" + times.size() + "\t");
+		for (Id linkId : this.stuckLinkTimes.keySet()) {
+			ArrayList<Double> times = this.stuckLinkTimes.get(linkId);
+			Link link = this.network.getLinks().get(linkId);
+			System.out.print(linkId + "\t" + link.getCapacity() + "\t" + link.getFreespeed() + "\t" + link.getLength() + "\t" + times.size() + "\t");
 			for (Double time : times) System.out.print(time + " ");
 			System.out.println();
 		}
 	}
-	
+
 }

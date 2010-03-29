@@ -11,7 +11,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
@@ -39,7 +38,7 @@ public class CountVehOnLinksPolygonBasedFeatureGenerator implements FeatureGener
 		this.crs = crs;
 		this.geofac = new GeometryFactory();
 		initFeatureType();
-		
+
 		this.compareResultMap = CountVehOnLinks.compareEventFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\763.500.events.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\762.500.events.txt");
 	}
 
@@ -55,7 +54,7 @@ public class CountVehOnLinksPolygonBasedFeatureGenerator implements FeatureGener
 		attribs[6] = AttributeTypeFactory.newAttributeType("capacity", Double.class);
 		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
-		attribs[9] = AttributeTypeFactory.newAttributeType("Diff", Double.class);	
+		attribs[9] = AttributeTypeFactory.newAttributeType("Diff", Double.class);
 
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
@@ -77,7 +76,7 @@ public class CountVehOnLinksPolygonBasedFeatureGenerator implements FeatureGener
 		double length = from.distance(to);
 
 		final double dx = -from.x   + to.x;
-		final double dy = -from.y   + to.y;		
+		final double dy = -from.y   + to.y;
 
 		double theta = 0.0;
 		if (dx > 0) {
@@ -106,11 +105,11 @@ public class CountVehOnLinksPolygonBasedFeatureGenerator implements FeatureGener
 		attribs[2] = link.getFromNode().getId().toString();
 		attribs[3] = link.getToNode().getId().toString();
 		attribs[4] = link.getLength();
-		attribs[5] = link.getFreespeed(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-		attribs[6] = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-		attribs[7] = link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+		attribs[5] = link.getFreespeed();
+		attribs[6] = link.getCapacity();
+		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = width;
-		
+
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			attribs[9] = this.compareResultMap.get(link.getId().toString());
 		}

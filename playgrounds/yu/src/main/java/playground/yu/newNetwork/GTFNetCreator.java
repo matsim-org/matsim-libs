@@ -37,7 +37,7 @@ import playground.yu.utils.io.GTFParser;
 
 /**
  * @author yu
- * 
+ *
  */
 public class GTFNetCreator {
 
@@ -59,21 +59,16 @@ public class GTFNetCreator {
 						.println("#a-->linkId:\t"
 								+ linkId
 								+ "\tcapacity:\t"
-								+ l
-										.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+								+ l.getCapacity());
 				System.out.println("greentimefraction:\t"
 						+ g.getAvgGtfs(linkId));
 				l
-						.setCapacity(l
-								.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-								* g.getAvgGtfs(linkId));
+						.setCapacity(l.getCapacity() * g.getAvgGtfs(linkId));
 				System.out
 						.println("#b-->linkId:\t"
 								+ linkId
 								+ "\tcapacity:\t"
-								+ network.getLinks().get(new IdImpl(linkId))
-										.getCapacity(
-												org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+								+ network.getLinks().get(new IdImpl(linkId)).getCapacity());
 				System.out.println("-------------------------");
 			}
 		}

@@ -22,7 +22,6 @@ package org.matsim.utils.gis.matsim2esri.network;
 
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.misc.Time;
 
 public class FreespeedBasedWidthCalculator implements WidthCalculator {
 
@@ -33,7 +32,7 @@ public class FreespeedBasedWidthCalculator implements WidthCalculator {
 	}
 
 	public double getWidth(final LinkImpl link) {
-		return link.getFreespeed(Time.UNDEFINED_TIME) * this.widthCoefficient;
+		return link.getFreespeed() * this.widthCoefficient;
 	}
 
 

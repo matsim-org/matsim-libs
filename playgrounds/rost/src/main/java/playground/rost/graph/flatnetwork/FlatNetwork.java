@@ -43,18 +43,18 @@ import playground.rost.graph.Point;
 
 public class FlatNetwork {
 	private static final Logger log = Logger.getLogger(FlatNetwork.class);
-	
+
 	protected NetworkLayer input;
 	protected Map<Long, Set<FlatLink>> mapLinks = new HashMap<Long, Set<FlatLink>>();
 	protected Set<FlatLink> links = new HashSet<FlatLink>();
 	protected Map<Point, Set<FlatLink>> intersections = new HashMap<Point, Set<FlatLink>>();
 
-	
+
 	protected Set<NodeImpl> newNodes = new HashSet<NodeImpl>();
-	
+
 	public Map<Id, Set<Id>> splittedLinks = new HashMap<Id, Set<Id>>();
 	public Map<Id, Set<Id>> newlyCreatedNodes = new HashMap<Id, Set<Id>>();
-	
+
 	protected void parseNetwork()
 	{
 		Set<FlatLink> linkSet;
@@ -87,7 +87,7 @@ public class FlatNetwork {
 			}
 		}
 	}
-	
+
 	protected FlatLink getReverseLink(Set<FlatLink> set, Link l)
 	{
 		for(FlatLink fL : set)
@@ -103,10 +103,10 @@ public class FlatNetwork {
 		}
 		return null;
 	}
-	
+
 	protected void calcIntersections()
 	{
-		
+
 		links.clear();
 		for(Set<FlatLink> set : mapLinks.values())
 		{
@@ -122,10 +122,10 @@ public class FlatNetwork {
 		{
 			for(FlatLink fL2 : links)
 			{
-				if(fL != fL2 && 
-					(fL.fromNode != fL2.fromNode && 
-						fL.toNode != fL2.toNode && 
-						fL.toNode != fL2.fromNode && 
+				if(fL != fL2 &&
+					(fL.fromNode != fL2.fromNode &&
+						fL.toNode != fL2.toNode &&
+						fL.toNode != fL2.fromNode &&
 						fL.fromNode != fL2.toNode))
 				{
 					Point intersection = new Point();
@@ -154,13 +154,13 @@ public class FlatNetwork {
 			}
 		}
 	}
-	
+
 	protected boolean getIntersection(FlatLink l1, FlatLink l2, Point p) {
-		
+
 
 		double 	x1 = l1.fromX,
-				y1 = l1.fromY, 
-				x2 = l1.toX, 
+				y1 = l1.fromY,
+				x2 = l1.toX,
 				y2 = l1.toY,
 				x3 = l2.fromX,
 				y3 = l2.fromY,
@@ -178,23 +178,23 @@ public class FlatNetwork {
 
 		return false;
 	}
-	
+
 	protected void createNewNodesAndLinks()
 	{
 		log.debug("createNewNodesAndLinks!");
 		//calc max Ids for new Links / nodes..
 		Long maxNodeId = Long.MIN_VALUE;
-		
+
 		Long tmp;
-		
+
 		for(NodeImpl n : input.getNodes().values())
 		{
 			tmp = Long.parseLong(n.getId().toString());
 			if(tmp > maxNodeId)
 				maxNodeId = tmp;
 		}
-		
-		
+
+
 		Set<FlatLink> intersectingLinks;
 		Set<Point> pointCollection = intersections.keySet();
 		Object[] pointArray = pointCollection.toArray();
@@ -209,9 +209,9 @@ public class FlatNetwork {
 			Id id = new IdImpl(++maxNodeId);
 			Coord coord = new CoordImpl(p.x, p.y);
 			NodeImpl intersectionNode = new NodeImpl(id);
-			
+
 			intersectionNode.setCoord(coord);
-			
+
 			newNodes.add(intersectionNode);
 			for(FlatLink fL : intersectingLinks )
 			{
@@ -232,12 +232,12 @@ public class FlatNetwork {
 			intersectingLinks.clear();
 		}
 	}
-	
+
 	protected void splitLink(FlatLink toRemove, Point currentPoint, Node n)
 	{
 		FlatLink fL1 = new FlatLink(toRemove.link, toRemove.fromNode, n);
 		FlatLink fL2 = new FlatLink(toRemove.link, n, toRemove.toNode);
-		
+
 		double quo = GraphAlgorithms.getDistance(toRemove.fromNode, n) / GraphAlgorithms.getDistance(toRemove.fromNode, toRemove.toNode);
 		fL1.length = toRemove.length * quo;
 		fL2.length = toRemove.length * (1 - quo);
@@ -267,11 +267,11 @@ public class FlatNetwork {
 				double distFL1 = Math.max(
 						GraphAlgorithms.getDistanceMeter(fL1.fromX, fL1.fromY, p.x, p.y),
 						GraphAlgorithms.getDistanceMeter(fL1.toX, fL1.toY, p.x, p.y)) / GraphAlgorithms.getDistanceMeter(fL1.fromX, fL1.fromY, fL1.toX, fL1.toY);
-						
+
 				double distFL2 = Math.max(
 						GraphAlgorithms.getDistanceMeter(fL2.fromX, fL2.fromY, p.x, p.y),
 						GraphAlgorithms.getDistanceMeter(fL2.toX, fL2.toY, p.x, p.y)) / GraphAlgorithms.getDistanceMeter(fL2.fromX, fL2.fromY, fL2.toX, fL2.toY);
-								
+
 				if(distFL1 > 1 && distFL2 > 1)
 					log.debug("problem calculating which link of the intersection map shall be replaced: " + distFL1 + " : " + distFL2 + " (chosing the smaller one!)");
 				if(distFL1 < distFL2)
@@ -288,11 +288,11 @@ public class FlatNetwork {
 		links.add(fL1);
 		links.add(fL2);
 	}
-	
+
 	protected NetworkLayer composeOutputNetwork()
 	{
 		NetworkLayer output = new NetworkLayer();
-		
+
 		NodeImpl newNode;
 		CoordImpl newCoord;
 		LinkImpl newLink;
@@ -312,9 +312,9 @@ public class FlatNetwork {
 			output.createAndAddNode(newId, newCoord);
 		}
 		log.debug("created " + counter + " new nodes!");
-		
+
 		//createLinks
-		
+
 		Long maxLinkId = Long.MIN_VALUE;
 		Long tmp;
 		for(LinkImpl l : input.getLinks().values())
@@ -340,9 +340,9 @@ public class FlatNetwork {
 			}
 			//log.debug("linkid: " + newId.toString());
 			length = fL.length;
-			capacity = fL.link.getCapacity(1.);
-			freespeed = fL.link.getFreespeed(1.);
-			output.createAndAddLink(newId, 
+			capacity = fL.link.getCapacity();
+			freespeed = fL.link.getFreespeed();
+			output.createAndAddLink(newId,
 								output.getNodes().get(new IdImpl(fL.fromNode.getId().toString())),
 								output.getNodes().get(new IdImpl(fL.toNode.getId().toString())),
 								length, freespeed, capacity, 1);
@@ -362,7 +362,7 @@ public class FlatNetwork {
 					newId = new IdImpl(fL.reverseId.toString());
 				}
 				//log.debug("linkid: " + newId.toString());
-				output.createAndAddLink(newId, 
+				output.createAndAddLink(newId,
 						output.getNodes().get(new IdImpl(fL.toNode.getId().toString())),
 						output.getNodes().get(new IdImpl(fL.fromNode.getId().toString())),
 						length, freespeed, capacity, 1);
@@ -374,7 +374,7 @@ public class FlatNetwork {
 		}
 		return output;
 	}
-	
+
 	public NetworkLayer flatten(NetworkLayer input)
 	{
 		this.input = input;
@@ -384,7 +384,7 @@ public class FlatNetwork {
 		NetworkLayer output = composeOutputNetwork();
 		return output;
 	}
-	
+
 	protected Long getHash(Link l)
 	{
 		BigInteger hash = new BigInteger("1");
@@ -392,7 +392,7 @@ public class FlatNetwork {
 		hash = hash.multiply(BigInteger.valueOf(Long.parseLong(l.getToNode().getId().toString())));
 		return hash.longValue();
 	}
-	
+
 
 	protected void addSplittedLinkToMap(Link splitted, Link old)
 	{
@@ -407,7 +407,7 @@ public class FlatNetwork {
 		{
 			set.add(splitted.getId());
 		}
-		
+
 	}
 }
 

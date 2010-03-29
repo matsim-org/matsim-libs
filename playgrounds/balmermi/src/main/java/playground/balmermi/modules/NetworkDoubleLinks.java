@@ -32,7 +32,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.Time;
 
 public class NetworkDoubleLinks {
 
@@ -55,15 +54,15 @@ public class NetworkDoubleLinks {
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private final void handleDoubleLink(LinkImpl l, NetworkLayer network) {
 		Node fn = l.getFromNode();
 		Node tn = l.getToNode();
 		Coord nc = new CoordImpl(0.5*(fn.getCoord().getX()+tn.getCoord().getX()),0.5*(fn.getCoord().getY()+tn.getCoord().getY()));
-		Node n = network.createAndAddNode(new IdImpl(l.getId()+suffix),nc,((NodeImpl) fn).getType());
+		Node n = network.createAndAddNode(new IdImpl(l.getId()+this.suffix),nc,((NodeImpl) fn).getType());
 		network.removeLink(l);
-		LinkImpl l1new = network.createAndAddLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME),l.getOrigId(),l.getType());
-		LinkImpl l2new = network.createAndAddLink(new IdImpl(l.getId()+suffix),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME),l.getOrigId(),l.getType());
+		LinkImpl l1new = network.createAndAddLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
+		LinkImpl l2new = network.createAndAddLink(new IdImpl(l.getId()+this.suffix),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
 		log.info("    lid="+l.getId()+" split into lids="+l1new.getId()+","+l2new.getId()+" with additional nid="+n.getId());
 	}
 

@@ -97,15 +97,15 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 				Node t = l.getToNode();
 				out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				out_l.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\t" + l.getLength() + "\t");
-				out_l.write(l.getFreespeed(Time.UNDEFINED_TIME)+"\t"
-						+(l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/capperiod)+"\t"
+				out_l.write(l.getFreespeed()+"\t"
+						+(l.getCapacity()/capperiod)+"\t"
 						+ NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l)+"\t"
 						+l.getAllowedModes().toString()+"\n");
 				out_l.flush();
-				
+
 				out_et.write(l.getId() + "\t" + l.getFromNode().getId() + "\t" + l.getToNode().getId() + "\t");
-				out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed(Time.UNDEFINED_TIME)*3.6) + "\t");
-				out_et.write(Math.round(l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l) + "\t");
+				out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed()*3.6) + "\t");
+				out_et.write(Math.round(l.getCapacity()/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l) + "\t");
 				out_et.write(l.getOrigId() + "\t" + l.getType() + "\t"+l.getAllowedModes().toString()+"\n");
 				out_et.write(f.getCoord().getX() + "\t" + f.getCoord().getY() + "\n");
 				out_et.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\n");

@@ -39,7 +39,7 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		this.crs = crs;
 		this.geofac = new GeometryFactory();
 		initFeatureType();
-		
+
 		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\763.1000.linkstats.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\762.1000.linkstats.txt");
 	}
 
@@ -57,12 +57,12 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
 
 		for (int i = 0; i < 8; i++) {
-			attribs[9 + i] = AttributeTypeFactory.newAttributeType("HRS" + (i + i * 2) + "-" + (i + i * 2 + 3) + "avg", Double.class);			
+			attribs[9 + i] = AttributeTypeFactory.newAttributeType("HRS" + (i + i * 2) + "-" + (i + i * 2 + 3) + "avg", Double.class);
 		}
-		
+
 		for (int i = 0; i < 24; i++) {
-			attribs[9 + 8 + i] = AttributeTypeFactory.newAttributeType("HRS" + i + "-" + (i+1) + "avg", Double.class);			
-		}			
+			attribs[9 + 8 + i] = AttributeTypeFactory.newAttributeType("HRS" + i + "-" + (i+1) + "avg", Double.class);
+		}
 
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
@@ -84,7 +84,7 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		double length = from.distance(to);
 
 		final double dx = -from.x   + to.x;
-		final double dy = -from.y   + to.y;		
+		final double dy = -from.y   + to.y;
 
 		double theta = 0.0;
 		if (dx > 0) {
@@ -113,23 +113,23 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		attribs[2] = link.getFromNode().getId().toString();
 		attribs[3] = link.getToNode().getId().toString();
 		attribs[4] = link.getLength();
-		attribs[5] = link.getFreespeed(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-		attribs[6] = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-		attribs[7] = link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+		attribs[5] = link.getFreespeed();
+		attribs[6] = link.getCapacity();
+		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = width;
-		
+
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
 			for (int i = 0; i < 8; i++) {
 				attribs[9 + i] = Double.valueOf((tempArray.get(i + i * 2).doubleValue() + tempArray.get(i + 1 + i * 2).doubleValue() + tempArray.get(i + 2 + i * 2).doubleValue()) / 3);
-			}			
-		}	
-		
+			}
+		}
+
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
 			for (int i = 0; i < tempArray.size(); i++) {
 				attribs[9 + 8 + i] = tempArray.get(i);
-			}			
+			}
 		}
 
 		try {

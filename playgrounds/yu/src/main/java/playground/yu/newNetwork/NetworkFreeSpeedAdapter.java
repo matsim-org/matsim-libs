@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newNetwork;
 
@@ -32,9 +32,9 @@ import org.matsim.core.network.NetworkWriter;
 /**
  * this class will remove the nodes from network, who don't have incidents
  * links.
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class NetworkFreeSpeedAdapter {
 
@@ -51,7 +51,7 @@ public class NetworkFreeSpeedAdapter {
 		// BufferedWriter writer = IOUtils.getBufferedWriter(logFilename);
 		// writer.write("Id of nodes removed from Toronto network\n");
 		for (LinkImpl l : network.getLinks().values()) {
-			l.setFreespeed(l.getFreespeed(0.0) / 3.6);
+			l.setFreespeed(l.getFreespeed() / 3.6);
 		}
 		// writer.close();
 		// } catch (FileNotFoundException e) {

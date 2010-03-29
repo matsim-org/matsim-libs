@@ -27,7 +27,7 @@ public class CMCFNetworkWriter {
 	private final MatsimNetworkReader netReader;
 	private final NetworkLayer netLayer;
 	private String netName;
-	
+
 	/**
 	 * @param netFile path to the file which should be converted
 	 */
@@ -53,8 +53,8 @@ public class CMCFNetworkWriter {
 			throw e;
 		}
 	}
-	
-	
+
+
 	public void setNetName(String netName) {
 		this.netName = netName;
 	}
@@ -65,8 +65,8 @@ public class CMCFNetworkWriter {
 	public void convert(){
 		this.convert(null);
 	}
-	
-	
+
+
 	/**
 	 * Converts the network into CMCF format and writes it to the specified Writer.
 	 * Make sure you have called read() before calling this function
@@ -79,7 +79,7 @@ public class CMCFNetworkWriter {
 		this.convertLinks(out, (byte)1);
 		log("</basegraph>", out);
 	}
-	
+
 	/**
 	 * Make something like:
 	 *       <header>
@@ -123,7 +123,7 @@ public class CMCFNetworkWriter {
 		}
 		log(tab+"</nodes>\n", out);
 	}
-	
+
 	/**
 	 * Make something like:
 	 *       <edges>
@@ -153,8 +153,8 @@ public class CMCFNetworkWriter {
 			log(tab+"\t\t<to>"+l.getToNode().getId()+"</to>\n", out);
 			//now read link parameters
 			double 	length = l.getLength(),
-					capacity = length/7.5 * l.getNumberOfLanes(0),
-					alpha = l.getFreespeedTravelTime(0),
+					capacity = length/7.5 * l.getNumberOfLanes(),
+					alpha = l.getFreespeedTravelTime(),
 					beta = 2.0,
 					gamma = capacity + 1;
 			//and write them
@@ -169,7 +169,7 @@ public class CMCFNetworkWriter {
 		}
 		log(tab+"</edges>\n", out);
 	}
-	
+
 	private void log(String s, Writer out){
 		if(out == null){
 			System.out.print(s);
@@ -183,7 +183,7 @@ public class CMCFNetworkWriter {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param args
 	 */
@@ -193,7 +193,7 @@ public class CMCFNetworkWriter {
 					"\t second argument is optional if not given, then output is written to console.");
 		}
 		CMCFNetworkWriter cnw = new CMCFNetworkWriter(args[0]);
-		
+
 		//read input file
 		try{
 			cnw.read();
@@ -215,7 +215,7 @@ public class CMCFNetworkWriter {
 				System.out.println(" Sorry, but access denied, writing output to console.");
 			}
 		}
-		
+
 		//do it
 		cnw.convert(out);
 	}

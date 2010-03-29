@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -37,7 +37,6 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -47,7 +46,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Network2PolygonGraph extends X2GraphImpl {
 
@@ -87,9 +86,9 @@ public class Network2PolygonGraph extends X2GraphImpl {
 
 
 
+	@Override
 	protected double getLinkWidth(Link link) {
-		return link.getCapacity(Time.UNDEFINED_TIME)
-				/ network.getCapacityPeriod() * 3600.0 / 50.0;
+		return link.getCapacity() / network.getCapacityPeriod() * 3600.0 / 50.0;
 	}
 
 	@Override
@@ -109,12 +108,10 @@ public class Network2PolygonGraph extends X2GraphImpl {
 			o[2] = link.getFromNode().getId().toString();
 			o[3] = link.getToNode().getId().toString();
 			o[4] = link.getLength();
-			o[5] = link
-					.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-					/ network.getCapacityPeriod() * 3600.0;
+			o[5] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
 			o[6] = (((LinkImpl) link).getType() != null) ? Integer
 					.parseInt(((LinkImpl) link).getType()) : 0;
-			o[7] = link.getFreespeed(0);
+			o[7] = link.getFreespeed();
 			o[8] = link.getAllowedModes();
 			for (int i = 0; i < parameters.size(); i++) {
 				o[i + 8] = parameters.get(i).get(link.getId());

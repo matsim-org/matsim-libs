@@ -32,14 +32,14 @@ import org.matsim.core.network.NetworkWriter;
  *
  */
 public class NetworkRounder {
-	
+
 	public static boolean _debug =false;
-	
+
 
 	public static void debug(boolean debug){
 		_debug=debug;
-	}  
-	
+	}
+
 	/**
 	 * rounds networ will change the instance of network!!!!!
 	 * @param network
@@ -57,17 +57,17 @@ public class NetworkRounder {
 			System.out.println(divisor);
 		}
 		for (LinkImpl link : network.getLinks().values()){
-			
+
 			link.setLength(link.getLength()*lengthFactor);
 			//link.setLength(link.getEuklideanDistance()*lengthFactor);
-			
-			double newTravelTime = link.getLength() / link.getFreespeed(0.);
-			
-			newTravelTime = Math.round(newTravelTime/newcap)*newcap;								
+
+			double newTravelTime = link.getLength() / link.getFreespeed();
+
+			newTravelTime = Math.round(newTravelTime/newcap)*newcap;
 
 			double newspeed;
 			if (newTravelTime == 0.) {
-				newspeed = 999999999999.;	
+				newspeed = 999999999999.;
 			} else {
 				if (forEAF) {
 					newspeed = newcap * link.getLength() / newTravelTime;
@@ -75,25 +75,25 @@ public class NetworkRounder {
 					newspeed = link.getLength() / newTravelTime;
 				}
 			}
-			
+
 			if(_debug){
-				System.out.println("old v: "+link.getFreespeed(0.)+" new v: "+newspeed);
+				System.out.println("old v: "+link.getFreespeed()+" new v: "+newspeed);
 			}
 			link.setFreespeed(newspeed);
-											
+
 			//double newcapacity =Math.ceil(link.getCapacity(1.)/divisor*flowCapacityFactor);
-			double newcapacity =Math.round(link.getCapacity(1.)/divisor*flowCapacityFactor);
-			
-			if (newcapacity == 0d && link.getCapacity(1.) != 0d) roundedtozerocap++;
+			double newcapacity =Math.round(link.getCapacity()/divisor*flowCapacityFactor);
+
+			if (newcapacity == 0d && link.getCapacity() != 0d) roundedtozerocap++;
 			if (Math.round(link.getLength()/link.getFreespeed(0)) == 0) {
 				System.out.println(link.getId());
-				roundedtozerotime++; 
+				roundedtozerotime++;
 			}
-							
+
 			if(_debug){
-				System.out.println("old c: "+link.getCapacity(1.)+" new c: "+newcapacity);
+				System.out.println("old c: "+link.getCapacity()+" new c: "+newcapacity);
 			}
-			
+
 			link.setCapacity(newcapacity);
 		}
 		network.setCapacityPeriod(newcap);
@@ -102,17 +102,17 @@ public class NetworkRounder {
 			System.out.println("Transit times rounded to zero: " + roundedtozerotime);
 		//}
 	}
-	
+
 	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor, boolean forEAF){
 		//read network
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);		
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(filename);
 		System.out.println("Network stats: Nodes = " + network.getNodes().size() + ", Edges = " + network.getLinks().size());
 		roundNetwork(network, newcap, flowCapacityFactor, lengthFactor, forEAF);
 		return network;
-		
+
 	}
 
 	public static void main(String[] args){
@@ -126,7 +126,7 @@ public class NetworkRounder {
 		String inputfile  = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network.xml";
 		//String inputfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_network_evac.xml";
 		//String inputfile = "./examples/meine_EA/siouxfalls_network.xml";
-		
+
 		String outputfile_forEAF = null;
 		String outputfile_forMatsim = null;
 		//String outputfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
@@ -134,7 +134,7 @@ public class NetworkRounder {
 		outputfile_forMatsim  = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_60s_MATSIM.xml";
 		//String outputfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_2s_cap.xml";
 		//String outputfile = "./examples/meine_EA/swissold_network_5s.xml";
-		
+
 //		if(args.length >=2){
 //			inputfile  = args[0];
 //			outputfile = args[1];
@@ -146,13 +146,13 @@ public class NetworkRounder {
 //			flowCapacityFactor = Double.valueOf(args[3]);
 //		}
 //		if (args.length >= 5) {
-//			lengthFactor = Double.valueOf(args[4]); 
+//			lengthFactor = Double.valueOf(args[4]);
 //		}
-//		
+//
 //		if (args.length == 1){
 //			cap =Integer.valueOf(args[0]);
 //		}
-		
+
 		if (outputfile_forEAF != null) {
 		  NetworkLayer network = roundNetwork(inputfile,cap, flowCapacityFactor, lengthFactor, true);
 		  new NetworkWriter(network).writeFile(outputfile_forEAF);
@@ -162,7 +162,7 @@ public class NetworkRounder {
 			  NetworkLayer network = roundNetwork(inputfile,cap, 1.0d, lengthFactor, false);
 			  new NetworkWriter(network).writeFile(outputfile_forMatsim);
 		}
-			
-		
+
+
 	}
 }

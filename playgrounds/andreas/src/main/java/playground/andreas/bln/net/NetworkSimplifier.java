@@ -39,7 +39,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * Simplifies a given network, by merging links.
@@ -48,20 +47,20 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 public class NetworkSimplifier {
-	
+
 	private static final Logger log = Logger.getLogger(NetworkSimplifier.class);
 	private boolean mergeLinkStats = false;
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 
 	public void run(final NetworkImpl network) {
-		
+
 		if(this.nodeTopoToMerge.size() == 0){
 			Gbl.errorMsg("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
 		}
 
 		log.info("running " + this.getClass().getName() + " algorithm...");
 
-		log.info("  checking " + network.getNodes().size() + " nodes and " + 
+		log.info("  checking " + network.getNodes().size() + " nodes and " +
 				network.getLinks().size() + " links for dead-ends...");
 
 		NetworkCalcTopoType nodeTopo = new NetworkCalcTopoType();
@@ -85,58 +84,57 @@ public class NetworkSimplifier {
 							if(!outLink.getToNode().equals(inLink.getFromNode())){
 
 								if(this.mergeLinkStats){
-									
+
 									// Try to merge both links by guessing the resulting links attributes
 									Link link = network.getFactory().createLink(
 											new IdImpl(inLink.getId() + "-" + outLink.getId()),
 											inLink.getFromNode().getId(),
 											outLink.getToNode().getId());
-																			
+
 									// length can be summed up
 									link.setLength(inLink.getLength() + outLink.getLength());
-											
+
 									// freespeed depends on total length and time needed for inLink and outLink
 									link.setFreespeed(
-											(inLink.getLength() + outLink.getLength()) / 
-											(inLink.getFreespeedTravelTime(Time.UNDEFINED_TIME) 
-													+ outLink.getFreespeedTravelTime(Time.UNDEFINED_TIME))
+											(inLink.getLength() + outLink.getLength()) /
+											(inLink.getFreespeedTravelTime() + outLink.getFreespeedTravelTime())
 											);
-											
+
 									// the capacity and the new links end is important, thus it will be set to the minimum
-									link.setCapacity(Math.min(inLink.getCapacity(Time.UNDEFINED_TIME), outLink.getCapacity(Time.UNDEFINED_TIME)));
-											
+									link.setCapacity(Math.min(inLink.getCapacity(), outLink.getCapacity()));
+
 									// number of lanes can be derived from the storage capacity of both links
-									link.setNumberOfLanes((inLink.getLength() * inLink.getNumberOfLanes(Time.UNDEFINED_TIME) 
-													+ outLink.getLength() * outLink.getNumberOfLanes(Time.UNDEFINED_TIME)) 
+									link.setNumberOfLanes((inLink.getLength() * inLink.getNumberOfLanes()
+													+ outLink.getLength() * outLink.getNumberOfLanes())
 													/ (inLink.getLength() + outLink.getLength())
 													);
-											
+
 //									inLink.getOrigId() + "-" + outLink.getOrigId(),
 									network.addLink(link);
 									(network).removeLink(inLink);
 									(network).removeLink(outLink);
-									
+
 								} else {
-									
-									// Only merge links with same attributes									
+
+									// Only merge links with same attributes
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
 										LinkImpl newLink = ((NetworkLayer) network).createAndAddLink(
 												new IdImpl(inLink.getId() + "-" + outLink.getId()),
 												inLink.getFromNode(),
 												outLink.getToNode(),
-												inLink.getLength() + outLink.getLength(), 
-												inLink.getFreespeed(Time.UNDEFINED_TIME),
-												inLink.getCapacity(Time.UNDEFINED_TIME),
-												inLink.getNumberOfLanes(Time.UNDEFINED_TIME),
+												inLink.getLength() + outLink.getLength(),
+												inLink.getFreespeed(),
+												inLink.getCapacity(),
+												inLink.getNumberOfLanes(),
 												inLink.getOrigId() + "-" + outLink.getOrigId(),
 												null);
-										
+
 										newLink.setAllowedModes(inLink.getAllowedModes());
 
 										network.removeLink(inLink);
 										network.removeLink(outLink);
 									}
-									
+
 								}
 							}
 						}
@@ -154,23 +152,23 @@ public class NetworkSimplifier {
 		nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(network);
 
-		log.info("  resulting network contains " + network.getNodes().size() + " nodes and " + 
+		log.info("  resulting network contains " + network.getNodes().size() + " nodes and " +
 				network.getLinks().size() + " links.");
 		log.info("done.");
 	}
-	
+
 	/**
 	 * Specify the types of node which should be merged.
-	 * 
+	 *
 	 * @param nodeTypesToMerge A Set of integer indicating the node types as specified by {@link NetworkCalcTopoType}
 	 * @see NetworkCalcTopoType NetworkCalcTopoType for a list of available classifications.
-	 */	
+	 */
 	public void setNodesToMerge(Set<Integer> nodeTypesToMerge){
 		this.nodeTopoToMerge.addAll(nodeTypesToMerge);
 	}
-	
+
 	/**
-	 *  
+	 *
 	 * @param mergeLinkStats If set true, links will be merged despite their different attributes.
 	 *  If set false, only links with the same attributes will be merged, thus preserving as much information as possible.
 	 *  Default is set false.
@@ -178,43 +176,43 @@ public class NetworkSimplifier {
 	public void setMergeLinkStats(boolean mergeLinkStats){
 		this.mergeLinkStats = mergeLinkStats;
 	}
-	
+
 	// helper
 
-	/** 
+	/**
 	 * Compare link attributes. Return whether they are the same or not.
 	 */
 	private boolean bothLinksHaveSameLinkStats(LinkImpl linkA, LinkImpl linkB){
 
 		boolean bothLinksHaveSameLinkStats = true;
-				
+
 		if(!linkA.getAllowedModes().equals(linkB.getAllowedModes())){ bothLinksHaveSameLinkStats = false; }
-		
-		if(linkA.getFreespeed(Time.UNDEFINED_TIME) != linkB.getFreespeed(Time.UNDEFINED_TIME)){ bothLinksHaveSameLinkStats = false; }
-				
-		if(linkA.getCapacity(Time.UNDEFINED_TIME) != linkB.getCapacity(Time.UNDEFINED_TIME)){ bothLinksHaveSameLinkStats = false; }
-				
-		if(linkA.getNumberOfLanes(Time.UNDEFINED_TIME) != linkB.getNumberOfLanes(Time.UNDEFINED_TIME)){ bothLinksHaveSameLinkStats = false; }
-		
+
+		if(linkA.getFreespeed() != linkB.getFreespeed()){ bothLinksHaveSameLinkStats = false; }
+
+		if(linkA.getCapacity() != linkB.getCapacity()){ bothLinksHaveSameLinkStats = false; }
+
+		if(linkA.getNumberOfLanes() != linkB.getNumberOfLanes()){ bothLinksHaveSameLinkStats = false; }
+
 		return bothLinksHaveSameLinkStats;
 	}
-	
+
 	public static void main(String[] args) {
-		
+
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 		nodeTypesToMerge.add(new Integer(4));
 		nodeTypesToMerge.add(new Integer(5));
-		
+
 		Scenario scenario = new ScenarioImpl();
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("./bb_5.xml.gz");
 
-		NetworkSimplifier nsimply = new NetworkSimplifier();		
+		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 //		nsimply.setMergeLinkStats(true);
 		nsimply.run((NetworkImpl) network);
 
 		new NetworkWriter(network).writeFile("./bb_5.out.xml.gz");
-		
+
 	}
 }

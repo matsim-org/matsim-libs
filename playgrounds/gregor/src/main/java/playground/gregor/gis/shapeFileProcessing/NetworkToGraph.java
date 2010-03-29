@@ -98,7 +98,7 @@ public class NetworkToGraph {
 	}
 
 	private LinearRing getLinearRing(LinkImpl link) {
-		double minWidth = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) / GISToMatsimConverter.CAPACITY_COEF;
+		double minWidth = link.getCapacity() / GISToMatsimConverter.CAPACITY_COEF;
 		minWidth = Math.min(minWidth,20);
 //		minWidth = 10;
 		Coordinate zero = new Coordinate(0,0);
@@ -130,7 +130,7 @@ public class NetworkToGraph {
 
 
 	}
-	
+
 	public static void main(String [] args) throws FactoryException, FactoryRegistryException, SchemaException, IllegalAttributeException, IOException {
 		String netfile = "./networks/padang_net_v20080618.xml";
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -140,5 +140,5 @@ public class NetworkToGraph {
 		Collection<Feature> ft = new NetworkToGraph(network,crs).generateFromNet();
 		ShapeFileWriter.writeGeometries(ft, "./padang/network_v20080618.shp");
 	}
-	
+
 }

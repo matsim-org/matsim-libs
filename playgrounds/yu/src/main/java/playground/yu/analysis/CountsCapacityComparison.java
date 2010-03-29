@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -22,7 +22,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class CountsCapacityComparison {
 	public static boolean isInRange(final LinkImpl link,
@@ -33,7 +33,7 @@ public class CountsCapacityComparison {
 	/**
 	 * compare link capacity with counts-value, in order to check problematical
 	 * link capacites
-	 * 
+	 *
 	 * @param args
 	 * @throws IOException
 	 */
@@ -64,7 +64,7 @@ public class CountsCapacityComparison {
 			if (link != null) {
 				if (isInRange(link, center, 30000.0)) {
 					n_countStations++;
-					double capacity = link.getCapacity(0) / capPeriod;
+					double capacity = link.getCapacity() / capPeriod;
 					double maxCountsValue = counts.getCount(linkId)
 							.getMaxVolume().getValue();
 					if (capacity <= maxCountsValue) {
@@ -81,7 +81,7 @@ public class CountsCapacityComparison {
 							double capSum = 0.0;
 							smallUpwardLinks = 0;
 							for (Link inLink : upLink.getFromNode().getInLinks().values()) {
-								capSum += inLink.getCapacity(0) / capPeriod;
+								capSum += inLink.getCapacity() / capPeriod;
 								smallUpwardLinks++;
 							}
 							if (capSum <= maxCountsValue) {
@@ -92,7 +92,7 @@ public class CountsCapacityComparison {
 													+ "\t"
 													+ inLink.getCoord().getY()
 													+ "\t"
-													+ inLink.getCapacity(0)
+													+ inLink.getCapacity()
 													/ capPeriod);
 								}
 							}
@@ -108,7 +108,7 @@ public class CountsCapacityComparison {
 							double capSum = 0.0;
 							smallDownwardLinks = 0;
 							for (Link outLink : downLink.getToNode().getOutLinks().values()) {
-								capSum += outLink.getCapacity(0) / capPeriod;
+								capSum += outLink.getCapacity() / capPeriod;
 								smallDownwardLinks++;
 							}
 							if (capSum <= maxCountsValue) {
@@ -116,7 +116,7 @@ public class CountsCapacityComparison {
 									sw.writeln(outLink.getId().toString()
 											+ "\t" + outLink.getCoord().getX()
 											+ "\t" + outLink.getCoord().getY()
-											+ "\t" + outLink.getCapacity(0)
+											+ "\t" + outLink.getCapacity()
 											/ capPeriod);
 								}
 							}

@@ -36,7 +36,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
-import org.matsim.core.utils.misc.Time;
 
 public class TeleatlasIvtcheuMerger {
 
@@ -45,7 +44,7 @@ public class TeleatlasIvtcheuMerger {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(TeleatlasIvtcheuMerger.class);
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -53,7 +52,7 @@ public class TeleatlasIvtcheuMerger {
 	//////////////////////////////////////////////////////////////////////
 	// methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private static final void deleteLinks(NetworkLayer networkIvtcheu, String il2deletefile) {
 		log.info("deleteLinks...");
 		log.info("  init number of links: "+networkIvtcheu.getLinks().size());
@@ -84,7 +83,7 @@ public class TeleatlasIvtcheuMerger {
 		log.info("  final number of nodes: "+networkIvtcheu.getNodes().size());
 		log.info("done.");
 	}
-	
+
 	private static final void mergeNetworks(NetworkLayer networkTeleatlas, NetworkLayer networkIvtcheu, String i2tmappingfile) {
 		log.info("adapt mergeNetworks...");
 		log.info("  init number of links (networkTeleatlas): "+networkTeleatlas.getLinks().size());
@@ -112,7 +111,7 @@ public class TeleatlasIvtcheuMerger {
 		} catch (IOException e) {
 			throw new RuntimeException(lineCnt+": read error.");
 		}
-		
+
 		int nodeMapCnt = 0;
 		for (NodeImpl n : networkIvtcheu.getNodes().values()) {
 			if (!nodeMapping.containsKey(n.getId())) {
@@ -121,7 +120,7 @@ public class TeleatlasIvtcheuMerger {
 			else { nodeMapCnt++; }
 		}
 		if (nodeMapCnt != nodeMapping.size()) { throw new RuntimeException("Something is wrong!"); }
-		
+
 		for (LinkImpl l : networkIvtcheu.getLinks().values()) {
 			Id fromNodeId = l.getFromNode().getId();
 			Id toNodeId = l.getToNode().getId();
@@ -137,19 +136,19 @@ public class TeleatlasIvtcheuMerger {
 			}
 			else if (!nodeMapping.keySet().contains(fromNodeId) && !nodeMapping.keySet().contains(toNodeId)) {
 			}
-			else { throw new RuntimeException("HEAH?"); }
+			else { throw new RuntimeException("HAEH?"); }
 			networkTeleatlas.createAndAddLink(
 					l.getId(),
 					networkTeleatlas.getNodes().get(fromNodeId),
 					networkTeleatlas.getNodes().get(toNodeId),
 					l.getLength(),
-					l.getFreespeed(Time.UNDEFINED_TIME),
-					l.getCapacity(Time.UNDEFINED_TIME)/10.0,
-					l.getNumberOfLanes(Time.UNDEFINED_TIME),
+					l.getFreespeed(),
+					l.getCapacity()/10.0,
+					l.getNumberOfLanes(),
 					l.getOrigId(),
 					l.getType());
 		}
-		
+
 		log.info("  number of lines processed: "+lineCnt);
 		log.info("  final number of links (networkTeleatlas): "+networkTeleatlas.getLinks().size());
 		log.info("  final number of nodes (networkTeleatlas): "+networkTeleatlas.getNodes().size());
@@ -157,7 +156,7 @@ public class TeleatlasIvtcheuMerger {
 		log.info("  final number of nodes (networkIvtcheu): "+networkIvtcheu.getNodes().size());
 		log.info("done.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main method
 	//////////////////////////////////////////////////////////////////////
@@ -169,7 +168,7 @@ public class TeleatlasIvtcheuMerger {
 		String i2tmappingfile = args[2].trim();
 		String il2deletefile = args[3].trim();
 		String outNetFile = args[4].trim();
-		
+
 		ScenarioImpl taScenario = new ScenarioImpl();
 		NetworkLayer networkTeleatlas = taScenario.getNetwork();
 		new MatsimNetworkReader(taScenario).readFile(teleatlasfile);
@@ -177,13 +176,13 @@ public class TeleatlasIvtcheuMerger {
 		ScenarioImpl ivtcheuScenario = new ScenarioImpl();
 		NetworkLayer networkIvtcheu = ivtcheuScenario.getNetwork();
 		new MatsimNetworkReader(ivtcheuScenario).readFile(ivtcheufile);
-		
+
 		deleteLinks(networkIvtcheu,il2deletefile);
 		mergeNetworks(networkTeleatlas,networkIvtcheu,i2tmappingfile);
-		
+
 		NetworkWriteAsTable nwat = new NetworkWriteAsTable("../../output/");
 		nwat.run(networkTeleatlas);
-		
+
 		new NetworkWriter(networkTeleatlas).writeFile(outNetFile);
 	}
 }

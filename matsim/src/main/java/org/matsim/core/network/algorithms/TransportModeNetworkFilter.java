@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * This class extracts a subnetwork from a given network containing only
@@ -78,10 +77,10 @@ public final class TransportModeNetworkFilter {
 
 				Link link2 = factory.createLink(link.getId(), fromId, toId);
 				link2.setAllowedModes(intersection);
-				link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME));
-				link2.setFreespeed(link.getFreespeed(Time.UNDEFINED_TIME));
+				link2.setCapacity(link.getCapacity());
+				link2.setFreespeed(link.getFreespeed());
 				link2.setLength(link.getLength());
-				link2.setNumberOfLanes(link.getNumberOfLanes(Time.UNDEFINED_TIME));
+				link2.setNumberOfLanes(link.getNumberOfLanes());
 				subNetwork.addLink(link2);
 			}
 		}

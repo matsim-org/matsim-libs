@@ -24,10 +24,10 @@ package playground.mfeil.creators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
 
 
 /**
@@ -35,47 +35,47 @@ import org.matsim.core.network.MatsimNetworkReader;
  * @author mfeil
  */
 public class NetworkCapacityReducer {
-	
+
 	private static final Logger log = Logger.getLogger(NetworkCapacityReducer.class);
 	private NetworkImpl network;
-	
+
 	public NetworkCapacityReducer(NetworkImpl network){
 		this.network = network;
 	}
-	
+
 	private void run (double factor, double absoluteDelta, String output){
 		for (LinkImpl link : this.network.getLinks().values()) {
 	//		link.setFreespeed(link.getFreespeed(0)*factor);
-			if (link.getFreespeed(0)+absoluteDelta>0) link.setFreespeed(link.getFreespeed(0)+absoluteDelta);
+			if (link.getFreespeed()+absoluteDelta>0) link.setFreespeed(link.getFreespeed()+absoluteDelta);
 			else {
-				log.warn("Cannot reduce speed of link "+link.getId()+" ("+link.getFreespeed(0)+") by delta of "+absoluteDelta+". Reducing speed by 10% instead.");
-				link.setFreespeed(link.getFreespeed(0)*0.9);
+				log.warn("Cannot reduce speed of link "+link.getId()+" ("+link.getFreespeed()+") by delta of "+absoluteDelta+". Reducing speed by 10% instead.");
+				link.setFreespeed(link.getFreespeed()*0.9);
 			}
 		}
 		new NetworkWriter(this.network).writeFile(output);
 	}
-	
+
 
 	public static void main(final String [] args) {
 		// Scenario files
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		
+
 		// Output file
-		final String outputFile = "/home/baug/mfeil/data/Zurich10/network_-10.xml";	
-		
+		final String outputFile = "/home/baug/mfeil/data/Zurich10/network_-10.xml";
+
 		// Settings
 		final double factor = 0.7;
 		final double absoluteDelta = -2.7778; // in m/s := -10km/h
-		
-	
-		
+
+
+
 		// Start calculations
 		ScenarioImpl scenarioMATSim = new ScenarioImpl();
-		new MatsimNetworkReader(scenarioMATSim).readFile(networkFilename);		
-		
+		new MatsimNetworkReader(scenarioMATSim).readFile(networkFilename);
+
 		NetworkCapacityReducer ncr = new NetworkCapacityReducer(scenarioMATSim.getNetwork());
 		ncr.run(factor, absoluteDelta, outputFile);
-		
+
 		log.info("Reduction of network capacity finished.");
 	}
 

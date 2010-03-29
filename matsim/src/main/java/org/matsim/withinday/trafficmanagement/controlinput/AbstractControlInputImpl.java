@@ -201,7 +201,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 				this.numberOfAgents.put(linkId, Integer.valueOf(0));
 			}
 			Link link = this.network.getLinks().get(linkId);
-			double tt = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
+			double tt = link.getLength() / link.getFreespeed();
 			this.ttFreeSpeeds.put(linkId, tt);
 			this.ttFreeSpeedAltRoute += tt;
 		}
@@ -215,7 +215,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		Link altRouteNaturalBottleNeck = this.network.getLinks().get(this.altRouteNaturalBottleNeckId);
 		for (int i = 1; i < altRouteLinkIds.size(); i++) {
 			Link link = this.network.getLinks().get(altRouteLinkIds.get(i));
-			if (link.getCapacity(Time.UNDEFINED_TIME) <= altRouteNaturalBottleNeck.getCapacity(Time.UNDEFINED_TIME)) {
+			if (link.getCapacity() <= altRouteNaturalBottleNeck.getCapacity()) {
 				altRouteNaturalBottleNeck = link;
 				this.altRouteNaturalBottleNeckId = link.getId();
 			}
@@ -246,7 +246,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		Link mainRouteNaturalBottleNeck = this.network.getLinks().get(this.mainRouteNaturalBottleNeckId);
 		for (int i = 1; i < mainRouteLinkIds.size(); i++) {
 			Link link = this.network.getLinks().get(mainRouteLinkIds.get(i));
-			if (link.getCapacity(Time.UNDEFINED_TIME) < mainRouteNaturalBottleNeck.getCapacity(Time.UNDEFINED_TIME)) {
+			if (link.getCapacity() < mainRouteNaturalBottleNeck.getCapacity()) {
 				mainRouteNaturalBottleNeck = link;
 				this.mainRouteNaturalBottleNeckId = link.getId();
 			}

@@ -6,7 +6,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;
 
@@ -93,7 +92,7 @@ public class AveTraSpeCal extends LinkAveCalA {
 	@Override
 	public double atxCal(final String linkID, final String timeBin) {
 		double ats = getLinkTraSpeed(linkID, Integer.parseInt(timeBin) * 900);
-		ats = (ats != 0) ? ats : (this.network.getLinks().get(new IdImpl(linkID))).getFreespeed(Time.UNDEFINED_TIME);
+		ats = (ats != 0) ? ats : (this.network.getLinks().get(new IdImpl(linkID))).getFreespeed();
 		return ats;
 	}
 }

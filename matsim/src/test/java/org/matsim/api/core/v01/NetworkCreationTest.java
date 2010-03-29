@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -32,8 +31,8 @@ import org.matsim.testcases.MatsimTestCase;
  * @author dgrether
  */
 public class NetworkCreationTest extends MatsimTestCase {
-	
-	
+
+
 	public void testCreateNetwork() {
 		Scenario sc = new ScenarioImpl();
 
@@ -55,10 +54,10 @@ public class NetworkCreationTest extends MatsimTestCase {
 		Link l1 = nb.createLink(id1, id1, id2);
 		//test defaults
 		assertEquals(1.0, l1.getLength());
-		assertEquals(1.0, l1.getCapacity(Time.UNDEFINED_TIME));
-		assertEquals(1.0, l1.getFreespeed(Time.UNDEFINED_TIME));
-		assertEquals(1.0, l1.getNumberOfLanes(Time.UNDEFINED_TIME));
-		assertEquals(1.0/3600.0, l1.getCapacity(Time.UNDEFINED_TIME)/network.getCapacityPeriod(), MatsimTestCase.EPSILON);
+		assertEquals(1.0, l1.getCapacity());
+		assertEquals(1.0, l1.getFreespeed());
+		assertEquals(1.0, l1.getNumberOfLanes());
+		assertEquals(1.0/3600.0, l1.getCapacity()/network.getCapacityPeriod(), MatsimTestCase.EPSILON);
 		//the next lines are not obvious because only the references have been given to the builder
 		assertEquals(n1, l1.getFromNode());
 		assertEquals(n2, l1.getToNode());
@@ -66,18 +65,18 @@ public class NetworkCreationTest extends MatsimTestCase {
 		l1.setLength(1000.0);
 		assertEquals(1000.0, l1.getLength());
 		l1.setFreespeed(100.0);
-		assertEquals(100.0, l1.getFreespeed(Time.UNDEFINED_TIME));
+		assertEquals(100.0, l1.getFreespeed());
 		l1.setCapacity(3600.0);
-		assertEquals(3600.0, l1.getCapacity(Time.UNDEFINED_TIME));
+		assertEquals(3600.0, l1.getCapacity());
 		//tests on LinkImpl
-		assertEquals(1.0, l1.getCapacity(Time.UNDEFINED_TIME)/network.getCapacityPeriod(), EPSILON);
-		
+		assertEquals(1.0, l1.getCapacity()/network.getCapacityPeriod(), EPSILON);
+
 		//add to network
 		network.addLink(l1);
 		//test for no side effects by adding to network
 		assertEquals(1000.0, l1.getLength());
-		assertEquals(100.0, l1.getFreespeed(Time.UNDEFINED_TIME));
-		assertEquals(3600.0, l1.getCapacity(Time.UNDEFINED_TIME));
-		assertEquals(1.0, l1.getCapacity(Time.UNDEFINED_TIME)/network.getCapacityPeriod(), EPSILON);
+		assertEquals(100.0, l1.getFreespeed());
+		assertEquals(3600.0, l1.getCapacity());
+		assertEquals(1.0, l1.getCapacity()/network.getCapacityPeriod(), EPSILON);
 	}
 }

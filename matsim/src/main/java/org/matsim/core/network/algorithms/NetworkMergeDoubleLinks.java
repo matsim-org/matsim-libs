@@ -73,8 +73,8 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 			case ADDITIVE:
 			{
 				log.info("        Link id=" + link2.getId() + " merged (additive) into Link id=" + link1.getId());
-				double cap = link1.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + link2.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
-				double fs = Math.max(link1.getFreespeed(Time.UNDEFINED_TIME),link2.getFreespeed(Time.UNDEFINED_TIME));
+				double cap = link1.getCapacity() + link2.getCapacity();
+				double fs = Math.max(link1.getFreespeed(),link2.getFreespeed());
 				int lanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link1) + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2);
 				double length = Math.max(link1.getLength(),link2.getLength());
 				//			String origid = "add-merge(" + link1.getId() + "," + link2.getId() + ")";
@@ -88,8 +88,8 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 			case MAXIMUM:
 				log.info("        Link id=" + link2.getId() + " merged (maximum) into Link id=" + link1.getId());
 				{
-					double cap = Math.max(link1.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME),link2.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
-					double fs = Math.max(link1.getFreespeed(Time.UNDEFINED_TIME),link2.getFreespeed(Time.UNDEFINED_TIME));
+					double cap = Math.max(link1.getCapacity(),link2.getCapacity());
+					double fs = Math.max(link1.getFreespeed(),link2.getFreespeed());
 					int lanes = Math.max(NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link1), NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2));
 					double length = Math.max(link1.getLength(),link2.getLength());
 					//			String origid = "max-merge(" + link1.getId() + "," + link2.getId() + ")";

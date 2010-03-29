@@ -140,7 +140,7 @@ public class QLinkImpl implements QLink {
 		this.link = link2;
 		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
-		this.freespeedTravelTime = this.length / this.getLink().getFreespeed(Time.UNDEFINED_TIME);
+		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
 		this.qsimEngine = engine;
 		this.calculateCapacities();
 	}
@@ -281,7 +281,7 @@ public class QLinkImpl implements QLink {
 	protected void moveLaneToBuffer(final double now) {
 		QVehicle veh;
 
-		transitQueueLaneFeature.beforeMoveLaneToBuffer(now);
+		this.transitQueueLaneFeature.beforeMoveLaneToBuffer(now);
 
 		// handle regular traffic
 		while ((veh = this.vehQueue.peek()) != null) {
@@ -290,7 +290,7 @@ public class QLinkImpl implements QLink {
 			}
 			DriverAgent driver = veh.getDriver();
 
-			boolean handled = transitQueueLaneFeature.handleMoveLaneToBuffer(now, veh, driver);
+			boolean handled = this.transitQueueLaneFeature.handleMoveLaneToBuffer(now, veh, driver);
 
 			if (!handled) {
 				// Check if veh has reached destination:
@@ -331,7 +331,7 @@ public class QLinkImpl implements QLink {
 
 			QSim.getEvents().processEvent(
 					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
-			boolean handled = transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
+			boolean handled = this.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 
 			if (!handled) {
 				addToBuffer(veh, now);
@@ -433,7 +433,7 @@ public class QLinkImpl implements QLink {
 
 	public Collection<QVehicle> getAllNonParkedVehicles(){
 		Collection<QVehicle> vehicles = new ArrayList<QVehicle>();
-		vehicles.addAll(transitQueueLaneFeature.getFeatureVehicles());
+		vehicles.addAll(this.transitQueueLaneFeature.getFeatureVehicles());
 		vehicles.addAll(this.waitingList);
 		vehicles.addAll(this.vehQueue);
 		vehicles.addAll(this.buffer);
@@ -454,7 +454,7 @@ public class QLinkImpl implements QLink {
 	public double getSpaceCap() {
 		return this.storageCapacity;
 	}
-	
+
 	public QSimEngine getQSimEngine(){
 	  return this.qsimEngine;
 	}
@@ -504,12 +504,12 @@ public class QLinkImpl implements QLink {
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty() || transitQueueLaneFeature.isFeatureActive());
+		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty() || this.transitQueueLaneFeature.isFeatureActive());
 		return active;
 	}
 
 	public LinkedList<QVehicle> getVehQueue() {
-		return vehQueue;
+		return this.vehQueue;
 	}
 
 	/**
@@ -536,7 +536,7 @@ public class QLinkImpl implements QLink {
 		}
 		this.getToQueueNode().activateNode();
 	}
-	
+
 	public QVehicle popFirstFromBuffer() {
 		double now = QSimTimer.getTime();
 		QVehicle veh = this.buffer.poll();
@@ -656,7 +656,7 @@ public class QLinkImpl implements QLink {
 			if (cnt > 0) {
 				double cellSize = QLinkImpl.this.getLink().getLength() / cnt;
 				double distFromFromNode = QLinkImpl.this.getLink().getLength() - cellSize / 2.0;
-				double freespeed = QLinkImpl.this.getLink().getFreespeed(Time.UNDEFINED_TIME);
+				double freespeed = QLinkImpl.this.getLink().getFreespeed();
 
 				// the cars in the buffer
 				for (QVehicle veh : QLinkImpl.this.buffer) {
@@ -728,7 +728,7 @@ public class QLinkImpl implements QLink {
 			queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
 			positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);
 			int lane = positionVehiclesFromWaitingList(positions, link, cellSize);
-			transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cellSize, lane);
+			QLinkImpl.this.transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cellSize, lane);
 		}
 
 		private double calculateVehicleLength(Link link,
@@ -755,7 +755,7 @@ public class QLinkImpl implements QLink {
 				int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QLinkImpl.this.getLink()));
 
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
-				double speed = (now > cmp) ? 0.0 : link.getFreespeed(Time.UNDEFINED_TIME);
+				double speed = (now > cmp) ? 0.0 : link.getFreespeed();
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI person : peopleInVehicle) {
 					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), link, queueEnd,
@@ -815,12 +815,12 @@ public class QLinkImpl implements QLink {
 					tmpLane = veh.getId().hashCode() ;
 				}
 				int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-		
+
 				if ( cnt < 10 ) {
 					cnt++ ;
 					log.warn(veh) ;
 				}
-		
+
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
 				for (PersonAgentI passenger : peopleInVehicle) {
 					PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
@@ -833,7 +833,7 @@ public class QLinkImpl implements QLink {
 					}
 					positions.add(passengerPosition);
 				}
-		
+
 				lastDistance = distanceOnLink;
 			}
 		}
@@ -864,7 +864,7 @@ public class QLinkImpl implements QLink {
 		}
 
 		private Collection<PersonAgentI> getPeopleInVehicle(QVehicle vehicle) {
-			Collection<PersonAgentI> passengers = transitQueueLaneFeature.getPassengers(vehicle);
+			Collection<PersonAgentI> passengers = QLinkImpl.this.transitQueueLaneFeature.getPassengers(vehicle);
 			if (passengers.isEmpty()) {
 				return Collections.singletonList((PersonAgentI) vehicle.getDriver());
 			} else {
@@ -880,12 +880,12 @@ public class QLinkImpl implements QLink {
 	private static int cnt = 0 ;
 	@Override
 	public void addAgentInActivity(PersonAgentI agent) {
-		agentsInActivities.put(agent.getPerson().getId(), agent);
+		this.agentsInActivities.put(agent.getPerson().getId(), agent);
 	}
 
 	@Override
 	public void removeAgentInActivity(PersonAgentI agent) {
-		agentsInActivities.remove(agent.getPerson().getId());
+		this.agentsInActivities.remove(agent.getPerson().getId());
 	}
 
   @Override

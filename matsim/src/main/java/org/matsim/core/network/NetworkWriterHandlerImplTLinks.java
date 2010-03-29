@@ -86,7 +86,7 @@ public class NetworkWriterHandlerImplTLinks implements MatsimFileWriter {
 	}
 
 	private void writeLink(final Link link, final BufferedWriter out) throws IOException {
-		
+
 		out.write(link.getId() + "\t");			// ID
 		out.write("[UNKNOWN]\t");					// NAME
 		out.write(link.getFromNode().getId() + "\t");		// NODEA
@@ -103,11 +103,11 @@ public class NetworkWriterHandlerImplTLinks implements MatsimFileWriter {
 		out.write("0\t");						// SETBACKA
 		out.write("0\t");						// SETBACKB
 		out.write("0\t");						// CAPACITYA
-		out.write((int)link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\t");	// CAPACITYB
+		out.write((int)link.getCapacity() + "\t");	// CAPACITYB
 		out.write("0\t");						// SPEEDLMTA
-		out.write(link.getFreespeed(Time.UNDEFINED_TIME) + "\t");	// SPEEDLMTB
+		out.write(link.getFreespeed() + "\t");	// SPEEDLMTB
 		out.write("0\t");						// FREESPDA
-		out.write(link.getFreespeed(Time.UNDEFINED_TIME) + "\t");	// FREESPDB
+		out.write(link.getFreespeed() + "\t");	// FREESPDB
 		out.write("LOCAL\t");					// FUNCTCLASS
 		out.write("0\t");						// THRUA
 		out.write("0\t");						// THRUB

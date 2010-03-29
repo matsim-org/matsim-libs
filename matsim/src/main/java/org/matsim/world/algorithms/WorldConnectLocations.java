@@ -40,7 +40,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
@@ -106,7 +105,7 @@ public class WorldConnectLocations {
 		// get all links from the network with specified link types
 		ArrayList<LinkImpl> remainingLinks = new ArrayList<LinkImpl>();
 		for (LinkImpl l : network.getLinks().values()) {
-			if (!excludingLinkTypes.contains(l.getType())) { remainingLinks.add(l); }
+			if (!this.excludingLinkTypes.contains(l.getType())) { remainingLinks.add(l); }
 		}
 		if (remainingLinks.isEmpty()) {
 			StringBuffer str = new StringBuffer();
@@ -125,7 +124,7 @@ public class WorldConnectLocations {
 			Node ntn = subNetwork.getNodes().get(tn.getId());
 			if (ntn == null) { ntn = subNetwork.createAndAddNode(tn.getId(),tn.getCoord()); }
 
-			subNetwork.createAndAddLink(l.getId(),nfn,ntn,l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME));
+			subNetwork.createAndAddLink(l.getId(),nfn,ntn,l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes());
 		}
 		log.info("  done.");
 		return subNetwork;
@@ -338,7 +337,7 @@ public class WorldConnectLocations {
 				}
 				else {
 					if ((downLayer instanceof NetworkLayer) && (upLayer instanceof ActivityFacilitiesImpl)) {
-						if (excludingLinkTypes.isEmpty()) {
+						if (this.excludingLinkTypes.isEmpty()) {
 							connect((ActivityFacilitiesImpl)upLayer,(NetworkLayer)downLayer,world);
 						}
 						else {

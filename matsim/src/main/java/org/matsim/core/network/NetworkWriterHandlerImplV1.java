@@ -73,10 +73,10 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 		if (network.getCapacityPeriod() != Integer.MIN_VALUE) {
 			out.write(" capperiod=\"" + Time.writeTime(network.getCapacityPeriod()) + "\"");
 		}
-		
+
 		out.write(" effectivecellsize=\"" + network.getEffectiveCellSize() + "\"");
 		out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
-		
+
 		out.write(">\n");
 	}
 
@@ -115,11 +115,11 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 		out.write(" from=\"" + link.getFromNode().getId() + "\"");
 		out.write(" to=\"" + link.getToNode().getId() + "\"");
 		out.write(" length=\"" + link.getLength() + "\"");
-		out.write(" freespeed=\"" + link.getFreespeed(Time.UNDEFINED_TIME) + "\"");
-		out.write(" capacity=\"" + link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\"");
-		out.write(" permlanes=\"" + link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\"");
+		out.write(" freespeed=\"" + link.getFreespeed() + "\"");
+		out.write(" capacity=\"" + link.getCapacity() + "\"");
+		out.write(" permlanes=\"" + link.getNumberOfLanes() + "\"");
 		out.write(" oneway=\"1\"");
-		
+
 		Set<TransportMode> modes = link.getAllowedModes();
 		StringBuffer buffer = new StringBuffer();
 		int counter = 0;
@@ -131,7 +131,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 			counter++;
 		}
 		out.write(" modes=\"" + buffer.toString() + "\"");
-		
+
 		if (link.getOrigId() != null) {
 			out.write(" origid=\"" + link.getOrigId() + "\"");
 		}

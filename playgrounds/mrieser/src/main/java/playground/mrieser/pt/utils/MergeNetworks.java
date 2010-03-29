@@ -29,7 +29,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * Merges two networks into one, by copying all nodes and links from the two
@@ -52,10 +51,10 @@ public class MergeNetworks {
 			Link link2 = factory.createLink(new IdImpl(prefixA + link.getId().toString()),
 					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
-			link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME) * capacityFactor);
-			link2.setFreespeed(link.getFreespeed(Time.UNDEFINED_TIME));
+			link2.setCapacity(link.getCapacity() * capacityFactor);
+			link2.setFreespeed(link.getFreespeed());
 			link2.setLength(link.getLength());
-			link2.setNumberOfLanes(link.getNumberOfLanes(Time.UNDEFINED_TIME));
+			link2.setNumberOfLanes(link.getNumberOfLanes());
 			mergedNetwork.getLinks().put(link2.getId(), (LinkImpl) link2);
 			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
 			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);
@@ -71,10 +70,10 @@ public class MergeNetworks {
 			Link link2 = factory.createLink(new IdImpl(prefixB + link.getId().toString()),
 					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
-			link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME) * capacityFactor);
-			link2.setFreespeed(link.getFreespeed(Time.UNDEFINED_TIME));
+			link2.setCapacity(link.getCapacity() * capacityFactor);
+			link2.setFreespeed(link.getFreespeed());
 			link2.setLength(link.getLength());
-			link2.setNumberOfLanes(link.getNumberOfLanes(Time.UNDEFINED_TIME));
+			link2.setNumberOfLanes(link.getNumberOfLanes());
 			mergedNetwork.getLinks().put(link2.getId(), (LinkImpl) link2);
 			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
 			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);

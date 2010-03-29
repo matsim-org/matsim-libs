@@ -15,131 +15,168 @@ import playground.christoph.network.mapping.Mapping;
 public class MappingLinkImpl extends MappingLink {
 
 	private static final Logger log = Logger.getLogger(MappingLinkImpl.class);
-	
+
 	private Node fromNode;
 	private Node toNode;
 	private Id id;
 	private Coord coord;
-	
+
 	private double length = 0.0;
-	
+
 	private Mapping downMapping;
 	private Mapping upMapping;
-	
+
 	public MappingLinkImpl(Id id, Node fromNode, Node toNode)
 	{
 		this.id = id;
 		this.fromNode = fromNode;
 		this.toNode = toNode;
-		
+
 		double x = (fromNode.getCoord().getX() + toNode.getCoord().getX()) / 2;
 		double y = (fromNode.getCoord().getY() + toNode.getCoord().getY()) / 2;
 		this.coord = new CoordImpl(x, y);
 	}
-		
+
+	@Override
 	public Node getFromNode()
 	{
-		return fromNode;
+		return this.fromNode;
 	}
 
+	@Override
 	public Node getToNode()
 	{
-		return toNode;
+		return this.toNode;
 	}
 
+	@Override
 	public Set<TransportMode> getAllowedModes() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
+	public double getCapacity() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
 	public double getCapacity(double time) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	@Override
+	public double getFreespeed() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
 	public double getFreespeed(double time) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	@Override
 	public double getLength()
 	{
 //		return this.mapping.getLength();
 		return this.length;
 	}
 
+	@Override
+	public double getNumberOfLanes() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
 	public double getNumberOfLanes(double time) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	@Override
 	public void setAllowedModes(Set<TransportMode> modes) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
 	public void setCapacity(double capacity) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
 	public void setFreespeed(double freespeed) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
 	public boolean setFromNode(Node node) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	@Override
 	public void setLength(double length) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
 	public void setNumberOfLanes(double lanes) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
 	public boolean setToNode(Node node) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	@Override
 	public Id getId()
 	{
-		return id;
+		return this.id;
 	}
 
+	@Override
 	public Layer getLayer()
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public Coord getCoord()
 	{
 		return this.coord;
 	}
 
+	@Override
 	public Mapping getDownMapping()
 	{
 		return this.downMapping;
 	}
 
+	@Override
 	public void setDownMapping(Mapping mapping)
 	{
 		this.downMapping = mapping;
-		
+
 		this.length = mapping.getLength();
-		
+
 //		Object object = mapping.getInput();
 //		if (object instanceof List)
 //		{
 //			List<Object> list = (List) object;
-//			
+//
 //			for (Object element : list)
 //			{
 //				if (element instanceof Link)
@@ -160,11 +197,13 @@ public class MappingLinkImpl extends MappingLink {
 //		}
 	}
 
+	@Override
 	public Mapping getUpMapping()
 	{
 		return this.upMapping;
 	}
-	
+
+	@Override
 	public void setUpMapping(Mapping mapping)
 	{
 		this.upMapping = mapping;

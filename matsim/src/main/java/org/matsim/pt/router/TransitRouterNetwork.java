@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -121,70 +122,102 @@ import org.matsim.world.Layer;
 			this.line = line;
 		}
 
+		@Override
 		public TransitRouterNetworkNode getFromNode() {
 			return this.fromNode;
 		}
 
+		@Override
 		public TransitRouterNetworkNode getToNode() {
 			return this.toNode;
 		}
 
+		@Override
+		public double getCapacity() {
+			return getCapacity(Time.UNDEFINED_TIME);
+		}
+
+		@Override
 		public double getCapacity(final double time) {
 			return 9999;
 		}
 
+		@Override
+		public double getFreespeed() {
+			return getFreespeed(Time.UNDEFINED_TIME);
+		}
+
+		@Override
 		public double getFreespeed(final double time) {
 			return 10;
 		}
 
+		@Override
 		public Id getId() {
 			return this.id;
 		}
 
+		@Override
+		public double getNumberOfLanes() {
+			return getNumberOfLanes(Time.UNDEFINED_TIME);
+		}
+
+		@Override
 		public double getNumberOfLanes(final double time) {
 			return 1;
 		}
 
+		@Override
 		public double getLength() {
 			return CoordUtils.calcDistance(this.toNode.stop.getStopFacility().getCoord(), this.fromNode.stop.getStopFacility().getCoord());
 		}
 
+		@Override
 		public void setCapacity(final double capacity) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public void setFreespeed(final double freespeed) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public boolean setFromNode(final Node node) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public void setNumberOfLanes(final double lanes) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public void setLength(final double length) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public boolean setToNode(final Node node) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public Layer getLayer() {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public Coord getCoord() {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public Set<TransportMode> getAllowedModes() {
 			return null;//allowedModes;
 		}
 
+		@Override
 		public void setAllowedModes(final Set<TransportMode> modes) {
 			throw new UnsupportedOperationException();
 		}

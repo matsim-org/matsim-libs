@@ -35,7 +35,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 
 public class JamTest extends Controler {
 
@@ -59,8 +58,8 @@ public class JamTest extends Controler {
 					for (int i = 6; i < 10; i++) {
 						sb.append("\t" + v[i]);
 					}
-					out.write(linkId + "\t" + 
-							n.getLinks().get(linkId).getCapacity(Time.UNDEFINED_TIME) / 100.0 + sb + "\n");
+					out.write(linkId + "\t" +
+							n.getLinks().get(linkId).getCapacity() / 100.0 + sb + "\n");
 					out.flush();
 				}
 			} catch (IOException e) {

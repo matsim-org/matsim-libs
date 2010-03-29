@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -33,12 +33,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
  * @author yu
- * 
+ *
  */
 public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 
@@ -62,7 +61,7 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 				if (m == null)
 					m = new HashMap<Id, Double>();
 				m.put(linkId, Double.valueOf(((v != null) ? v[i] : 0) * 10.0
-						/ link.getCapacity(Time.UNDEFINED_TIME) * capPeriod));
+						/ link.getCapacity() * capPeriod));
 				saturationLevels.set(i, m);
 			}
 		}
@@ -84,8 +83,7 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 				if (m == null)
 					m = new HashMap<Id, Double>();
 				m.put(linkId, Double.valueOf(((v != null) ? v[i] : 0)
-						/ flowCapFactor / net.getLinks().get(linkId).getCapacity(Time.UNDEFINED_TIME)
-						* capPeriod));
+						/ flowCapFactor / net.getLinks().get(linkId).getCapacity() * capPeriod));
 				saturationLevels.set(i, m);
 			}
 		}

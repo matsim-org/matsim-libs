@@ -26,24 +26,24 @@ import org.matsim.core.router.util.TravelTime;
 
 /**
  * always returns traveltime = 0 to avoid time expansion
- * travelcost is the actual freespeed time, rounded down to integers 
+ * travelcost is the actual freespeed time, rounded down to integers
  */
 public class FakeTravelTimeCost implements TravelMinCost, TravelTime {
-		
+
 	public FakeTravelTimeCost() {
-				
+
 	}
-	
+
 	public double getLinkTravelCost(Link link, double time) {
-		return Math.round((link.getLength() / link.getFreespeed(0)));
+		return Math.round((link.getLength() / link.getFreespeed()));
 	}
 
 	public double getLinkTravelTime(Link link, double time) {
-		return 0; 
+		return 0;
 	}
 
 	public double getLinkMinimumTravelCost(Link link) {
-		return Math.round((link.getLength() / link.getFreespeed(0)));
+		return Math.round((link.getLength() / link.getFreespeed()));
 	}
 
 }

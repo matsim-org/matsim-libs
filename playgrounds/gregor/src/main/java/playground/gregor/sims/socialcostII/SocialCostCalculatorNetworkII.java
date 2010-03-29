@@ -43,7 +43,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.IntegerCache;
-import org.matsim.core.utils.misc.Time;
 
 public class SocialCostCalculatorNetworkII implements TravelCost, IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
@@ -51,20 +50,20 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 	private final int numSlots;
 	private final NetworkLayer network;
 
-	
+
 	private final HashMap<String,AgentInfo> agentInfos = new HashMap<String, AgentInfo>();
 	private final HashMap<String,LinkInfo> linkInfos = new HashMap<String, LinkInfo>();
 	private final HashMap<String,SocialCostRole> socCosts = new HashMap<String, SocialCostRole>();
-	
+
 	private final HashMap<String,HashMap<Integer,LinkCongestionInfo>> linkCongestion = new HashMap<String, HashMap<Integer,LinkCongestionInfo>>();
-	
+
 	private final static int MSA_OFFSET = 20;
 	private final static double CONGESTION_RATION_THRESHOLD = 0.9;
-	
+
 	static double oldCoef = 0;
 	static double newCoef = 1;
 	static int iteration = 0;
-	
+
 	public SocialCostCalculatorNetworkII(final NetworkLayer network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
@@ -78,7 +77,7 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
 	}
-	
+
 	public double getLinkTravelCost(final Link link, final double time) {
 		SocialCostRole sc = this.socCosts.get(link.getId().toString());
 		if (sc == null) {
@@ -86,8 +85,8 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 		}
 		return sc.getSocCost(getTimeSlotIndex(time));
 	}
-	
-	
+
+
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		iteration = event.getIteration();
 		this.linkInfos.clear();
@@ -98,8 +97,8 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 			double n = event.getIteration() - MSA_OFFSET;
 			oldCoef = n / (n+1);
 			newCoef = 1 /(n+1);
-		} 
-		
+		}
+
 	}
 
 	private void updateSocCosts() {
@@ -108,12 +107,12 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 		}
 	}
 
-	
+
 	public void handleEvent(final LinkEnterEvent event) {
 
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
-		
+
 		if (ai.stucked) {
 			LinkInfo oldInfo = this.linkInfos.get(ai.currentLink);
 			AgentCongestionInfo aci = new AgentCongestionInfo();
@@ -121,8 +120,8 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 			aci.timeSlot = getTimeSlotIndex(ai.enterTime);
 			oldInfo.agentsLeftLink.add(aci);
 			oldInfo.incrCongestionInfo(event.getLinkId().toString(), aci.timeSlot, info.congested);
-			
-			
+
+
 //			if (info.congested) { //TODO this probably wrong because if this link gets uncongested in the samt ttbin than con counter overestimates the #veh
 //				oldInfo.agentsLeftToCongestedLink.add(aci);
 //			} else {
@@ -134,8 +133,8 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 		ai.id = event.getPersonId().toString();
 //		info.agentsOnLink++;
 	}
-	
-	
+
+
 
 	public void handleEvent(final AgentDepartureEvent event) {
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
@@ -145,15 +144,15 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 		ai.currentLink = event.getLinkId().toString();
 //		info.agentsOnLink++;
 	}
-	
+
 	public void handleEvent(final LinkLeaveEvent event) {
-		
+
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 
 		if ((event.getTime() - ai.enterTime) <= info.t_free){
-			ai.stucked = false;	
-			
+			ai.stucked = false;
+
 			// optimization
 			if (info.congested) {
 				clacSocCost(info,info.lastFSTime,ai.enterTime);
@@ -167,9 +166,9 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 			info.congested = true;// optimization
 			handleLinkCongestionInformation(event.getLinkId().toString(),true,getTimeSlotIndex(event.getTime()));
 		}
-				
+
 	}
-	
+
 	private void handleLinkCongestionInformation(final String linkId, final boolean b,
 			final int timeSlotIndex) {
 		HashMap<Integer,LinkCongestionInfo> cm = this.linkCongestion.get(linkId);
@@ -177,7 +176,7 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 			cm = new HashMap<Integer, LinkCongestionInfo>();
 			this.linkCongestion.put(linkId, cm);
 		}
-		
+
 		LinkCongestionInfo lci = cm.get(IntegerCache.getInteger(timeSlotIndex));
 		if (lci == null) {
 			lci = new LinkCongestionInfo();
@@ -186,10 +185,10 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 		if (!b) {
 			lci.congested = false;
 		}
-		
+
 	}
 
-	
+
 	private boolean isLinkCongested(final int slot, final String linkId) {
 		HashMap<Integer,LinkCongestionInfo> cm = this.linkCongestion.get(linkId);
 		if (cm == null) {
@@ -199,30 +198,30 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 		if (lci == null) {
 			return false;
 		}
-		
+
 		return lci.congested;
 	}
-	
+
 	private void clacSocCost(final LinkInfo info, final double lastTimeUncongested, final double currentTimeUncongested) {
-		
-				
+
+
 		int lB = getTimeSlotIndex(lastTimeUncongested)+1;
 		int uB = getTimeSlotIndex(currentTimeUncongested)-1;
-		
+
 		if (uB <= lB || info.agentsLeftLink.size() == 0) {
 			info.cleanUpCongestionInfo();
 			info.congested = false; // optimization
 			return;
 		}
-		
+
 		SocialCostRole sc = this.socCosts.get(info.id);
 		if (sc == null) {
 			sc = new SocialCostRole();
 			this.socCosts.put(info.id, sc);
 		}
-			
+
 		for (int i = lB; i<= uB; i++){
-		
+
 			double cost = 0;
 			double baseCost = this.travelTimeBinSize * (uB - i + 1)  - info.t_free;
 			int n = 0; //#veh left current link until congestion dissolves
@@ -232,11 +231,11 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 					n += lci.agents;
 				}
 			}
-			
+
 			if (n == 0) {
 				return;
 			}
-			
+
 			HashMap<String,Integer> tmp = new HashMap<String, Integer>();
 			for (int j = i; j <= uB; j++) {
 				HashMap<String,LinkCongestionInfo> lcis = info.getConInfo(IntegerCache.getInteger(j));
@@ -247,9 +246,9 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 					}
 					tmp.put(e.getKey(), IntegerCache.getInteger(old + e.getValue().agents));
 				}
-			}			
-			
-			
+			}
+
+
 			for (Entry<String,Integer> e : tmp.entrySet()) {
 				double p = (double) e.getValue() / n;
 				if (isLinkCongested(i, e.getKey())) {
@@ -257,10 +256,10 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 				} else {
 					cost += baseCost * p;
 				}
-				
+
 			}
-			
-						
+
+
 			sc.setSocCost(i, Math.max(0,cost));
 			double scoringCost =  sc.getSocCost(i) / -600;
 			while (info.agentsLeftLink.size() > 0 && info.agentsLeftLink.peek().timeSlot <= i) {
@@ -268,17 +267,17 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 				if (aci.timeSlot == i) {
 					Id id = new IdImpl(aci.agentId);
 					AgentMoneyEventImpl e = new AgentMoneyEventImpl(currentTimeUncongested,id,scoringCost);
-					QueueSimulation.getEvents().processEvent(e);					
+					QueueSimulation.getEvents().processEvent(e);
 				}
 			}
-			
+
 		}
-		
-		
-		
+
+
+
 		info.cleanUpCongestionInfo();
 		info.congested = false; // optimization
-		
+
 	}
 
 	private int getTimeSlotIndex(final double time) {
@@ -286,13 +285,13 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 		if (slice >= this.numSlots) slice = this.numSlots - 1;
 		return slice;
 	}
-	
-	
+
+
 	private LinkInfo getLinkInfo(final String id) {
 		LinkInfo ret = this.linkInfos.get(id);
 		if (ret == null) {
 			ret = new LinkInfo();
-			ret.t_free = Math.ceil(this.network.getLinks().get(new IdImpl(id)).getFreespeedTravelTime(Time.UNDEFINED_TIME)); //TODO make this dynamic, since we have time variant networks
+			ret.t_free = Math.ceil(this.network.getLinks().get(new IdImpl(id)).getFreespeedTravelTime()); //TODO make this dynamic, since we have time variant networks
 			LinkImpl link = this.network.getLinks().get(new IdImpl(id));
 			ret.storageCap = calcCapacity(link);
 			ret.id = id;
@@ -310,8 +309,8 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 		}
 		return ai;
 	}
-	
-	
+
+
 	private int calcCapacity(final LinkImpl link) {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
@@ -319,32 +318,32 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 //		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 //		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 //		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
-		
+
 		// first guess at storageCapacity:
-		double storageCapacity = (link.getLength() * link.getNumberOfLanes(Time.UNDEFINED_TIME))
+		double storageCapacity = (link.getLength() * link.getNumberOfLanes())
 				/ ((NetworkLayer) link.getLayer()).getEffectiveCellSize() * storageCapFactor;
-				
+
 		return (int) Math.max(Math.floor(storageCapacity),1);
 	}
-	
-	
+
+
 	private static class LinkInfo {
-		
-		
+
+
 		public double lastFSTime = 0;
 
 		public String id;
 
 		public boolean congested = false;// optimization
-		
+
 		public int storageCap;
 
-		
+
 		private final Map<Integer,HashMap<String,LinkCongestionInfo>> conInfo = new HashMap<Integer, HashMap<String,LinkCongestionInfo>>();
 		private final ConcurrentLinkedQueue<AgentCongestionInfo> agentsLeftLink = new ConcurrentLinkedQueue<AgentCongestionInfo>();
 
 		double t_free;
-		
+
 		public void incrCongestionInfo(final String linkId,final Integer slot, final boolean congested) {
 			HashMap<String,LinkCongestionInfo> info = getConInfo(slot);
 			LinkCongestionInfo lci = info.get(linkId);
@@ -357,7 +356,7 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 				lci.congested = false;
 			}
 		}
-		
+
 		public HashMap<String,LinkCongestionInfo> getConInfo(final Integer slot) {
 			HashMap<String,LinkCongestionInfo> ret = this.conInfo.get(slot);
 			if (ret == null) {
@@ -366,8 +365,8 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 			}
 			return ret;
 		}
-		
-		
+
+
 		public void cleanUpCongestionInfo(){
 //			this.agentsLeftToCongestedLink.clear();
 //			this.agentsLeftToUncongestedLink.clear();
@@ -375,41 +374,41 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 			this.conInfo.clear();
 
 		}
-		
+
 	}
-	
+
 	private static class AgentInfo {
-		
+
 		public boolean stucked;
 		String id;
 		double enterTime;
 		String currentLink;
-		
+
 	}
-	
+
 	private static class AgentCongestionInfo {
 		public Integer timeSlot;
 //		public boolean congested;
 		public String agentId;
 	}
-	
+
 	private static class LinkCongestionInfo {
 		boolean congested = true;
 		int agents = 0;
 	}
-	
+
 	private static class SocCostInfo {
-		
+
 		double cost = 0;
 		boolean updated = false;
 	}
-	
+
 	private static class SocialCostRole {
 		HashMap<Integer,SocCostInfo> socCosts = new HashMap<Integer, SocCostInfo>();
-		
-		
+
+
 		public void setSocCost(final int timeSlice, final double socCost) {
-			
+
 			Integer slot = IntegerCache.getInteger(timeSlice);
 			SocCostInfo sci = this.socCosts.get(slot);
 			if (sci == null) {
@@ -419,7 +418,7 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 			sci.cost = oldCoef * sci.cost + newCoef * socCost;
 			sci.updated = true;
 		}
-		
+
 		public double getSocCost(final int timeSlice) {
 			Integer slot = IntegerCache.getInteger(timeSlice);
 			SocCostInfo sci = this.socCosts.get(slot);
@@ -428,7 +427,7 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 			}
 			return sci.cost;
 		}
-		
+
 		public void update() {
 			for (SocCostInfo sci : this.socCosts.values()) {
 				if (!sci.updated) {
@@ -441,11 +440,11 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 
 	public void reset(final int iteration) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
 
-	
-	
+
+
 }

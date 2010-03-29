@@ -63,7 +63,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * to attributes in the MATSim network:
  *
  * <dl>
- * <dt>Ignored network elemens</dt>
+ * <dt>Ignored network elements</dt>
  * <dd>Network elements meeting at least one of the following criteria are ignored:
  *     <ul>
  *       <li>NW.FEATTYP = 4165 (Address Area Boundary)</li>

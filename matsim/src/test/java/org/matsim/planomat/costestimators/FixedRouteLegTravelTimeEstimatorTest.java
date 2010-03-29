@@ -56,7 +56,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	protected Scenario scenario = null;
-	
+
 	protected static final Id TEST_PERSON_ID = new IdImpl("1");
 	private static final int TEST_PLAN_NR = 0;
 	private static final int TEST_LEG_NR = 0;
@@ -81,10 +81,10 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		this.config = super.loadConfig(CONFIGFILE);
 		this.config.plans().setInputFile("test/scenarios/equil/plans1.xml");
 
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(this.config);
 		loader.loadScenario();
 		this.scenario = loader.getScenario();
-		
+
 		// the estimator is tested on the central route alternative through equil-net
 		// first person
 		this.testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
@@ -97,7 +97,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		this.originAct = (ActivityImpl) actsLegs.get(TEST_LEG_NR);
 		this.destinationAct = (ActivityImpl) actsLegs.get(TEST_LEG_NR + 2);
 
-		config.travelTimeCalculator().setTraveltimeBinSize(TIME_BIN_SIZE);
+		this.config.travelTimeCalculator().setTraveltimeBinSize(TIME_BIN_SIZE);
 	}
 
 	@Override
@@ -116,10 +116,10 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		this.scenario.getConfig().charyparNagelScoring().setMarginalUtlOfDistanceCar(0.0);
 
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : PlanomatConfigGroup.SimLegInterpretation.values()) {
-			
+
 			DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
-			TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), config.travelTimeCalculator());
-			TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, config.charyparNagelScoring());
+			TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.config.travelTimeCalculator());
+			TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.charyparNagelScoring());
 
 			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), linkTravelCostEstimator, linkTravelTimeEstimator);
 
@@ -130,21 +130,21 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					PlanomatConfigGroup.RoutingCapability.fixedRoute,
 					plansCalcRoute,
 					this.scenario.getNetwork());
-			
+
 			EventsManagerImpl events = new EventsManagerImpl();
 			events.addHandler(tDepDelayCalc);
 			events.addHandler(linkTravelTimeEstimator);
 			events.printEventHandlers();
 
-			NetworkRoute route = (NetworkRoute) testLeg.getRoute();
+			NetworkRoute route = (NetworkRoute) this.testLeg.getRoute();
 			List<Id> linkIds = route.getLinkIds();
 
 			// let's test a route without events first
 			// should result in free speed travel time, without departure delay
 			double departureTime = Time.parseTime("06:03:00");
-			
+
 			LegImpl newLeg = null;
-			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(testLeg), departureTime);
+			newLeg = testee.getNewLeg(this.testLeg.getMode(), this.originAct, this.destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(this.testLeg), departureTime);
 
 			double legTravelTime = 0.0;
 			legTravelTime = newLeg.getTravelTime();
@@ -152,15 +152,15 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			double expectedLegEndTime = departureTime;
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(originAct.getLinkId())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
+				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(this.originAct.getLinkId())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 			}
 			for (Id linkId : linkIds) {
-				Link link = scenario.getNetwork().getLinks().get(linkId);
-				expectedLegEndTime += link.getLength()/link.getFreespeed(Time.UNDEFINED_TIME);
+				Link link = this.scenario.getNetwork().getLinks().get(linkId);
+				expectedLegEndTime += link.getLength()/link.getFreespeed();
 			}
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(destinationAct.getLinkId())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
-			}			
+				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(this.destinationAct.getLinkId())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
+			}
 			assertEquals(expectedLegEndTime, departureTime + legTravelTime, MatsimTestCase.EPSILON);
 
 			// next, a departure delay of 5s at the origin link is added
@@ -169,32 +169,32 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			AgentDepartureEventImpl depEvent = new AgentDepartureEventImpl(
 					departureTime,
 					TEST_PERSON_ID,
-					originAct.getLinkId(),
+					this.originAct.getLinkId(),
 					TransportMode.car);
-			LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(departureTime + depDelay, testPerson.getId(), originAct.getLinkId());
+			LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(departureTime + depDelay, this.testPerson.getId(), this.originAct.getLinkId());
 
 			for (EventImpl event : new EventImpl[]{depEvent, leaveEvent}) {
 				events.processEvent(event);
 			}
 
-			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(testLeg), departureTime);
+			newLeg = testee.getNewLeg(this.testLeg.getMode(), this.originAct, this.destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(this.testLeg), departureTime);
 			legTravelTime = newLeg.getTravelTime();
 
 			expectedLegEndTime = departureTime;
 			expectedLegEndTime += depDelay;
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(originAct.getLinkId())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
+				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(this.originAct.getLinkId())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 			}
 			for (Id linkId : linkIds) {
 				Link link = this.scenario.getNetwork().getLinks().get(linkId);
-				expectedLegEndTime += link.getLength()/link.getFreespeed(Time.UNDEFINED_TIME);
+				expectedLegEndTime += link.getLength()/link.getFreespeed();
 			}
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(destinationAct.getLinkId())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
-			}			
+				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(this.destinationAct.getLinkId())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
+			}
 			assertEquals(expectedLegEndTime, departureTime + legTravelTime, MatsimTestCase.EPSILON);
-			
+
 			// now let's add some travel events
 			// test a start time where all link departures will be in the first time bin
 			String[][] eventTimes = new String[][]{
@@ -207,41 +207,41 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				for (int linkCnt = 0; linkCnt < linkIds.size(); linkCnt++) {
 					event = new LinkEnterEventImpl(
 							Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
-							testPerson.getId(),
+							this.testPerson.getId(),
 							linkIds.get(linkCnt));
 					events.processEvent(event);
 					event = new LinkLeaveEventImpl(
 							Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
-							testPerson.getId(),
+							this.testPerson.getId(),
 							linkIds.get(linkCnt));
 					events.processEvent(event);
 				}
 			}
 
 			departureTime = Time.parseTime("06:10:00");
-			
-			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(testLeg), departureTime);
+
+			newLeg = testee.getNewLeg(this.testLeg.getMode(), this.originAct, this.destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(this.testLeg), departureTime);
 			legTravelTime = newLeg.getTravelTime();
 
 			expectedLegEndTime = departureTime;
 			expectedLegEndTime += depDelay;
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-				expectedLegEndTime = testee.processLink(this.scenario.getNetwork().getLinks().get(originAct.getLinkId()), expectedLegEndTime);
+				expectedLegEndTime = testee.processLink(this.scenario.getNetwork().getLinks().get(this.originAct.getLinkId()), expectedLegEndTime);
 			}
 			expectedLegEndTime = testee.processRouteTravelTime(NetworkUtils.getLinks(this.scenario.getNetwork(), route.getLinkIds()), expectedLegEndTime);
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				expectedLegEndTime = testee.processLink(this.scenario.getNetwork().getLinks().get(destinationAct.getLinkId()), expectedLegEndTime);
+				expectedLegEndTime = testee.processLink(this.scenario.getNetwork().getLinks().get(this.destinationAct.getLinkId()), expectedLegEndTime);
 			}
-			
+
 			assertEquals(expectedLegEndTime, departureTime + legTravelTime, EPSILON);
-			
+
 			// test public transport mode
 			departureTime = Time.parseTime("06:10:00");
-			
-			newLeg = testee.getNewLeg(TransportMode.pt, originAct, destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(testLeg), departureTime);
+
+			newLeg = testee.getNewLeg(TransportMode.pt, this.originAct, this.destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(this.testLeg), departureTime);
 			legTravelTime = newLeg.getTravelTime();
-			
+
 			// the free speed travel time from h to w in equil-test, as simulated by Cetin, is 15 minutes
 			expectedLegEndTime = departureTime + (2 * Time.parseTime("00:15:00"));
 
@@ -257,20 +257,20 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 	public void testProcessDeparture() {
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
-		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), config.travelTimeCalculator());
-		TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, config.charyparNagelScoring());
+		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.config.travelTimeCalculator());
+		TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.charyparNagelScoring());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(
-				this.scenario.getConfig().plansCalcRoute(), 
-				this.scenario.getNetwork(), 
-				linkTravelCostEstimator, 
+				this.scenario.getConfig().plansCalcRoute(),
+				this.scenario.getNetwork(),
+				linkTravelCostEstimator,
 				linkTravelTimeEstimator);
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
-		
+
 		FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				null,
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute, this.scenario.getNetwork());
 		Id linkId = this.originAct.getLinkId();
@@ -319,20 +319,20 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 	public void testProcessRouteTravelTime() {
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
-		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), config.travelTimeCalculator());
-		TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, config.charyparNagelScoring());
+		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.config.travelTimeCalculator());
+		TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.charyparNagelScoring());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(
-				this.scenario.getConfig().plansCalcRoute(), 
-				this.scenario.getNetwork(), 
-				linkTravelCostEstimator, 
+				this.scenario.getConfig().plansCalcRoute(),
+				this.scenario.getNetwork(),
+				linkTravelCostEstimator,
 				linkTravelTimeEstimator);
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
-		
+
 		FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				null,
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute,
 				this.scenario.getNetwork());
@@ -404,20 +404,20 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 	public void testProcessLink() {
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
-		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), config.travelTimeCalculator());
-		TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, config.charyparNagelScoring());
+		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.config.travelTimeCalculator());
+		TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.charyparNagelScoring());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(
-				this.scenario.getConfig().plansCalcRoute(), 
-				this.scenario.getNetwork(), 
-				linkTravelCostEstimator, 
+				this.scenario.getConfig().plansCalcRoute(),
+				this.scenario.getNetwork(),
+				linkTravelCostEstimator,
 				linkTravelTimeEstimator);
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 
 		FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				null,
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute,
 				this.scenario.getNetwork());

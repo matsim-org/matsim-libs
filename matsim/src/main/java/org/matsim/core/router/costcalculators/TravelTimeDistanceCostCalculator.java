@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * A simple cost calculator which only respects time and distance to calculate generalized costs
@@ -46,6 +45,7 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost {
 		this.marginalUtlOfDistance = cnScoringGroup.getMarginalUtlOfDistanceCar();
 	}
 
+	@Override
 	public double getLinkTravelCost(final Link link, final double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		if (this.marginalUtlOfDistance == 0.0) {
@@ -54,11 +54,12 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost {
 		return travelTime * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
 	}
 
+	@Override
 	public double getLinkMinimumTravelCost(final Link link) {
 		if (this.marginalUtlOfDistance == 0.0) {
-			return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME)) * this.travelCostFactor;
+			return (link.getLength() / link.getFreespeed()) * this.travelCostFactor;
 		}
-		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME)) * this.travelCostFactor
+		return (link.getLength() / link.getFreespeed()) * this.travelCostFactor
 		- this.marginalUtlOfDistance * link.getLength();
 	}
 }

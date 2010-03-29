@@ -27,7 +27,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
@@ -42,14 +41,14 @@ import org.matsim.core.network.NodeImpl;
  *
  */
 public class ConfluentFlowNetwork {
-	
+
 	public static boolean _debug =false;
-	
+
 
 	public static void debug(boolean debug){
 		_debug=debug;
-	}  
-	
+	}
+
 	/**
 	 * rounds network to given cap period, adjusting flowcap etc
 	 * travel times are recalculated (in seconds)
@@ -68,38 +67,38 @@ public class ConfluentFlowNetwork {
 			System.out.println(divisor);
 		}
 		for (LinkImpl link : network.getLinks().values()){
-			
+
 			link.setLength(link.getLength()*lengthFactor);
 			//link.setLength(link.getEuklideanDistance()*lengthFactor);
-			
-			double newTravelTime = link.getLength() / link.getFreespeed(0.);
-			
-			newTravelTime = Math.round(newTravelTime); // to seconds								
+
+			double newTravelTime = link.getLength() / link.getFreespeed();
+
+			newTravelTime = Math.round(newTravelTime); // to seconds
 
 			double newspeed;
 			if (newTravelTime == 0.) {
-				newspeed = 999999999999.;	
+				newspeed = 999999999999.;
 			} else {
-			  newspeed = link.getLength() / newTravelTime;				
+			  newspeed = link.getLength() / newTravelTime;
 			}
-			
+
 			if(_debug){
-				System.out.println("old v: "+link.getFreespeed(0.)+" new v: "+newspeed);
+				System.out.println("old v: "+link.getFreespeed()+" new v: "+newspeed);
 			}
 			link.setFreespeed(newspeed);
-											
-			double newcapacity =Math.round(link.getCapacity(1.)/divisor*flowCapacityFactor);
-			
-			if (newcapacity == 0d && link.getCapacity(1.) != 0d) roundedtozerocap++;
+
+			double newcapacity =Math.round(link.getCapacity()/divisor*flowCapacityFactor);
+
+			if (newcapacity == 0d && link.getCapacity() != 0d) roundedtozerocap++;
 			if (Math.round(link.getLength()/link.getFreespeed(0)) == 0) {
 				System.out.println(link.getId());
-				roundedtozerotime++; 
+				roundedtozerotime++;
 			}
-							
+
 			if(_debug){
-				System.out.println("old c: "+link.getCapacity(1.)+" new c: "+newcapacity);
+				System.out.println("old c: "+link.getCapacity()+" new c: "+newcapacity);
 			}
-			
+
 			link.setCapacity(newcapacity);
 		}
 		network.setCapacityPeriod(newcap);
@@ -108,29 +107,29 @@ public class ConfluentFlowNetwork {
 			System.out.println("Transit times rounded to zero: " + roundedtozerotime);
 		//}
 	}
-	
+
 	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor){
 		//read network
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);		
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(filename);
 		System.out.println("Network stats: Nodes = " + network.getNodes().size() + ", Edges = " + network.getLinks().size());
 		roundNetwork(network, newcap, flowCapacityFactor, lengthFactor);
 		return network;
-		
+
 	}
-	
+
 	public static void writeCFdata (String outfile, NetworkLayer network, HashMap<Node,Integer> demands){
 		FileWriter fout;
         try {
             fout = new FileWriter(outfile);
             BufferedWriter out = new BufferedWriter(fout);
-            out.write("% generated from matsim data");            
+            out.write("% generated from matsim data");
             out.newLine();
             out.write("N " + network.getNodes().size());
             out.newLine();
-            
+
             HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
             int max = 0;
             for (NodeImpl node : network.getNodes().values()) {
@@ -139,11 +138,11 @@ public class ConfluentFlowNetwork {
             		if (i > 0) 	newNodeNames.put(node,i);
             		if (i > max) max = i;
             	} catch (Exception except) {
-                    
-                }            	
+
+                }
             }
-            
-            for (NodeImpl node : network.getNodes().values()) {            	
+
+            for (NodeImpl node : network.getNodes().values()) {
             	try {
             		int i = Integer.parseInt(node.getId().toString());
             	} catch (Exception except) {
@@ -151,9 +150,9 @@ public class ConfluentFlowNetwork {
                     newNodeNames.put(node, max);
                     out.write("% node " + max + " was '" + node.getId()+ "'");
                     out.newLine();
-                }            	
+                }
             }
-            
+
             for (NodeImpl node : network.getNodes().values()) {
             	if (demands.containsKey(node)) {
             		int d = demands.get(node);
@@ -167,11 +166,11 @@ public class ConfluentFlowNetwork {
             		}
             	}
             }
-                       
-            for (LinkImpl link : network.getLinks().values()) {                
-                out.write("E " + (newNodeNames.get(link.getFromNode())) + " " + (newNodeNames.get(link.getToNode())) + " " + (int) link.getCapacity(0.));
+
+            for (LinkImpl link : network.getLinks().values()) {
+                out.write("E " + (newNodeNames.get(link.getFromNode())) + " " + (newNodeNames.get(link.getToNode())) + " " + (int) link.getCapacity());
                 out.newLine();
-            }            
+            }
 
             out.close();
             fout.close();
@@ -180,7 +179,7 @@ public class ConfluentFlowNetwork {
         }
 
     }
-  		
+
 
 
    private static HashMap<Node,Integer> readDemands(final NetworkLayer network, final String filename) throws IOException{
@@ -197,46 +196,46 @@ public class ConfluentFlowNetwork {
    }
 
 	public static void main(String[] args){
-		
+
 		int cap = 60;
 		double flowCapacityFactor = 1.; // 12*3600.0d / 60.0d;
 		double lengthFactor = 1.0;
-		
+
 		//String inputfile  = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network.xml";
 		String inputfile  = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/swissold_network_5s.xml";
 		//String inputfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_network_evac.xml";
 		//String inputfile = "./examples/meine_EA/siouxfalls_network.xml";
-		
+
 		String plansfile = null;
 		int uniformDemands = 5;
-		
-		
+
+
 		String outputfile_forCF = null;
 		outputfile_forCF  = "/homes/combi/dressler/F/Confluent_Flow/code/frommatsim.dat";
-		
+
 		NetworkLayer network = roundNetwork(inputfile, cap, flowCapacityFactor, lengthFactor);
-		
+
 		HashMap<Node,Integer> demands = new HashMap<Node, Integer>();
-		
+
 		//Node sink = network.getNode("supersink");
 		Node sink = network.getNodes().get(new IdImpl("en1"));
-		
+
 		if (plansfile != null) {
 			try {
 			  demands = readDemands(network, plansfile);
 		    } catch (Exception except) {
               System.out.println(except.getMessage());
            }
-		} else {			
+		} else {
 			for (NodeImpl node : network.getNodes().values()) {
 		//		if (!node.getId().equals(sink.getId())) {
 					demands.put(node, Math.max(uniformDemands,0));
 		//		}
 			}
 		}
-		
+
 		demands.put(sink, -1);
-		
+
 		// TODO HACK, REMOVE ME
 		/*int verticestokeep = 300;
 		int count = 0;
@@ -245,15 +244,15 @@ public class ConfluentFlowNetwork {
 			count += 1;
 			if (count > verticestokeep) {
 				if (node != sink)
-				  todelete.add(node); 
+				  todelete.add(node);
 			}
 		}
-		
+
 		for (Node node : todelete) {
 			network.removeNode(node);
 		}*/
-		
+
 		writeCFdata (outputfile_forCF, network, demands);
-		
+
 	}
 }

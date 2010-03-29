@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.teach.telematics.ha3;
 
@@ -71,7 +71,6 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
@@ -89,11 +88,11 @@ import playground.johannes.eut.EventBasedTTProvider;
 public class Controller extends WithindayControler {
 
 	private TravelTime reactTTs;
-	
+
 	private double equipmentFraction;
-	
+
 	private GuidedAgentFactory factory2;
-	
+
 	public Controller(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
@@ -108,14 +107,14 @@ public class Controller extends WithindayControler {
 		c.setWriteEventsInterval(0);
 		c.run();
 	}
-	
+
 	@Override
 	protected void setUp() {
-		
-		
-		
+
+
+
 		this.equipmentFraction = string2Double(config.getParam("telematics", "equipment"));
-		
+
 		String type = config.getParam("telematics", "infotype");
 		if("reactive".equalsIgnoreCase(type)) {
 			this.reactTTs = new EventBasedTTProvider(30);
@@ -123,27 +122,27 @@ public class Controller extends WithindayControler {
 			this.reactTTs = new EstimReactiveLinkTT(1, this.network);
 		} else
 			throw new IllegalArgumentException("Travel time information type \"" + type + "\" is unknown!");
-		
+
 		this.events.addHandler((EventHandler) this.reactTTs);
 		((EventHandler) this.reactTTs).reset(getIterationNumber());
-		
+
 		factory2 = new GuidedAgentFactory(network, config.charyparNagelScoring(), reactTTs, equipmentFraction, config.global().getRandomSeed());
 		RouteTTObserver observer = new RouteTTObserver(this.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
 		observer.factory = factory2;
 		NonSelectedPlanScorer scorer = new NonSelectedPlanScorer();
 		scorer.observer = observer;
-		
+
 		this.addControlerListener(scorer);
 		this.addControlerListener(observer);
 		this.events.addHandler(observer);
-		
+
 		IncidentGenerator generator = new IncidentGenerator(getConfig().getParam("telematics", "incidentsFile"), getNetwork());
 		this.addControlerListener(generator);
-		
+
 		addControlerListener(new WithindayControlerListener());
 		super.setUp();
 	}
-	
+
 	@Override
 	protected void loadCoreListeners() {
 
@@ -171,7 +170,7 @@ public class Controller extends WithindayControler {
 		this.addCoreControlerListener(new PlansReplanning());
 //		this.addCoreControlerListener(new PlansDumping());
 	}
-	
+
 	@Override
 	protected void runMobSim() {
 
@@ -181,14 +180,14 @@ public class Controller extends WithindayControler {
 		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.scenarioData, this.events, this);
 		this.trafficManagement = new TrafficManagement();
 		sim.setTrafficManagement(this.trafficManagement);
-		
+
 		sim.run();
 	}
 
 	public Set<Person> getGuidedPersons() {
 		return ((GuidedAgentFactory)factory).getGuidedPersons();
 	}
-	
+
 	private class WithindayControlerListener implements StartupListener, IterationStartsListener {
 
 		public void notifyStartup(StartupEvent event) {
@@ -203,14 +202,14 @@ public class Controller extends WithindayControler {
 
 	}
 
-	
+
 	public static class NonSelectedPlanScorer implements ScoringListener {
 
 		private RouteTTObserver observer;
-		
+
 		public void notifyScoring(ScoringEvent event) {
 			double alpha = Double.parseDouble(event.getControler().getConfig().getParam("planCalcScore", "learningRate"));
-			
+
 			for(Person p : event.getControler().getPopulation().getPersons().values()) {
 				for(Plan plan : p.getPlans()) {
 					double tt = 0;
@@ -218,7 +217,7 @@ public class Controller extends WithindayControler {
 					Route route = leg.getRoute();
 					for(Id id : ((NetworkRoute) route).getLinkIds()) {
 						if(id.toString().equals("4")) {
-							
+
 							tt = observer.avr_route1TTs;
 							break;
 						} else if(id.toString().equals("5")) {
@@ -226,41 +225,41 @@ public class Controller extends WithindayControler {
 							break;
 						}
 					}
-					
+
 					Double oldScore = plan.getScore();
 					if(oldScore == null)
 						oldScore = 0.0;
-					
+
 					plan.setScore(alpha * -tt/3600.0 + (1-alpha)*oldScore);
 				}
-			
-				
+
+
 			}
 		}
 	}
-	
+
 	public static class RouteTTObserver implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
 
 		private Set<Id> route1;
-		
+
 		private Set<Id> route2;
-		
+
 		private TObjectDoubleHashMap<Id> personTTs;
-		
+
 		private TObjectDoubleHashMap<Id> departureTimes;
-		
+
 		private BufferedWriter writer;
-		
+
 		private double avr_route1TTs;
-		
+
 		private double avr_route2TTs;
-		
+
 		private double avr_unguidedTTs;
-		
+
 		private double avr_guidedTTs;
-		
+
 		private GuidedAgentFactory factory;
-			
+
 		public RouteTTObserver(String filename) {
 			try {
 				writer = org.matsim.core.utils.io.IOUtils.getBufferedWriter(filename);
@@ -275,7 +274,7 @@ public class Controller extends WithindayControler {
 			}
 			this.reset(0);
 		}
-		
+
 		public void handleEvent(AgentDepartureEvent event) {
 			departureTimes.put(event.getPersonId(), event.getTime());
 		}
@@ -291,7 +290,7 @@ public class Controller extends WithindayControler {
 			double depTime = departureTimes.get(event.getPersonId());
 			if(depTime == 0)
 				throw new RuntimeException("Agent departure time not found!");
-			
+
 			personTTs.put(event.getPersonId(), event.getTime() - depTime);
 		}
 
@@ -304,8 +303,8 @@ public class Controller extends WithindayControler {
 		}
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			
-			
+
+
 			try {
 				writer.write(String.valueOf(event.getIteration()));
 				writer.write("\t");
@@ -313,29 +312,29 @@ public class Controller extends WithindayControler {
 				writer.write("\t");
 				writer.write(String.valueOf(route2.size()));
 				writer.write("\t");
-				
+
 				if(route1.isEmpty())
 					writer.write("0");
 				else
 					writer.write(String.valueOf(avr_route1TTs));
 				writer.write("\t");
-				
+
 				if(route2.isEmpty())
 					writer.write("0");
 				else
 					writer.write(String.valueOf(avr_route2TTs));
-				
+
 				writer.write("\t");
 				writer.write(String.valueOf(factory.getGuidedPersons().size()));
 				writer.write("\t");
 				writer.write(String.valueOf(factory.getUnguidedPersons().size()));
 				writer.write("\t");
-				
+
 				writer.write(String.valueOf(avr_guidedTTs));
 				writer.write("\t");
 				writer.write(String.valueOf(avr_unguidedTTs));
-				
-				
+
+
 				writer.newLine();
 				writer.flush();
 			} catch (IOException e) {
@@ -346,29 +345,29 @@ public class Controller extends WithindayControler {
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			TDoubleArrayList route1TTs = new TDoubleArrayList();
 			TDoubleArrayList route2TTs = new TDoubleArrayList();
-			
+
 			TDoubleArrayList unguidedTTs = new TDoubleArrayList();
 			TDoubleArrayList guidedTTs = new TDoubleArrayList();
-			
+
 			for(Id p : route1) {
 				route1TTs.add(personTTs.get(p));
 			}
 			for(Id p : route2) {
 				route2TTs.add(personTTs.get(p));
 			}
-			
+
 			avr_route1TTs = StatUtils.mean(route1TTs.toNativeArray());
 			avr_route2TTs = StatUtils.mean(route2TTs.toNativeArray());
-			
+
 			for(Person p : factory.getGuidedPersons())
 				guidedTTs.add(personTTs.get(p.getId()));
-			
+
 			for(Person p : factory.getUnguidedPersons())
 				unguidedTTs.add(personTTs.get(p.getId()));
-			
+
 			avr_guidedTTs = StatUtils.mean(guidedTTs.toNativeArray());
 			avr_unguidedTTs = StatUtils.mean(unguidedTTs.toNativeArray());
-			
+
 			if(Double.isNaN(avr_route1TTs)) {
 				avr_route1TTs = getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("2")));
 				avr_route1TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("4")));
@@ -379,30 +378,30 @@ public class Controller extends WithindayControler {
 				avr_route2TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("6")));
 			}
 		}
-		
+
 		private double getFreespeedTravelTime(final Link link) {
-			return link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
+			return link.getLength() / link.getFreespeed();
 		}
 
 	}
-	
+
 	private class IncidentGenerator implements BeforeMobsimListener {
 
 		private TIntObjectHashMap<List<NetworkChangeEvent>> changeEvents;
-		
+
 		public IncidentGenerator(String filename, Network network) {
 			try {
 				changeEvents = new TIntObjectHashMap<List<NetworkChangeEvent>>();
-				
+
 				BufferedReader reader = IOUtils.getBufferedReader(filename);
 				String line = null;
 				while((line = reader.readLine()) != null) {
 					String[] tokens = line.split("\t");
-					
+
 					NetworkChangeEvent badEvent = new NetworkChangeEvent(0);
 					badEvent.addLink(network.getLinks().get(new IdImpl(tokens[1])));
 					badEvent.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, Double.parseDouble(tokens[2])));
-//					
+//
 					int it = Integer.parseInt(tokens[0]);
 					List<NetworkChangeEvent> events = changeEvents.get(it);
 					if(events == null) {
@@ -419,7 +418,7 @@ public class Controller extends WithindayControler {
 				e.printStackTrace();
 			}
 		}
-		
+
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			List<NetworkChangeEvent> events = changeEvents.get(event.getIteration());
 			if(events != null) {
@@ -427,7 +426,7 @@ public class Controller extends WithindayControler {
 			} else
 				(event.getControler().getNetwork()).setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
 		}
-		
+
 	}
 
 	private double string2Double(String str) {

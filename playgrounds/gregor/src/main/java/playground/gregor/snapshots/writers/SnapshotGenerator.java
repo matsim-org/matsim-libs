@@ -48,8 +48,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.DrawableAgentI;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 import playground.gregor.snapshots.postprocessors.PostProcessorI;
 
@@ -83,7 +81,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		this.writer.open();
 		reset(-1);
 	}
-	
+
 	public void enableTableWriter(String filename) {
 		this.tableWriter = new TableSnapshotWriter(filename);
 	}
@@ -91,7 +89,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	public void addColorizer(PostProcessorI colorizer) {
 		this.colorizers .add(colorizer);
 	}
-	
+
 	public void handleEvent(final AgentDepartureEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).departure(getEventAgent(event));
@@ -163,16 +161,16 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			if ( (pos.getAgentState() == PositionInfo.AgentState.PERSON_AT_ACTIVITY) || (pos.getId().hashCode() % this.visOutputMod != 0) ) {
 				continue;
 			}
-			
+
 			for (PostProcessorI pp : this.colorizers){
 				pp.processPositionInfo(pos);
 			}
-//			AgentSnapshotInfo position = new ExtendedPositionInfo(pos.getId(), pos.getEasting(), 
+//			AgentSnapshotInfo position = new ExtendedPositionInfo(pos.getId(), pos.getEasting(),
 //					pos.getNorthing(), pos.getElevation(), pos.getAzimuth(), pos.getColorValueBetweenZeroAndOne(),
 //					pos.getAgentState(),pos.getType(),pos.getUserData());
 //			this.writer.addVehicle(time, position);
 			this.writer.addVehicle( time, pos ) ;
-			
+
 			if (this.tableWriter != null) {
 				try {
 //					this.tableWriter.addVehicle(time,position);
@@ -232,12 +230,12 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.buffer = new ArrayList<EventAgent>();
 			this.euklideanDist = CoordUtils.calcDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
 			this.ratioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
-			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed(Time.UNDEFINED_TIME);
-			this.timeCap = this.link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) * capCorrectionFactor;
+			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed();
+			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
 			this.storageCapFactor = storageCapFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
 			this.effectiveCellSize = effectiveCellSize;
-			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)) / this.effectiveCellSize * storageCapFactor;
+			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes()) / this.effectiveCellSize * storageCapFactor;
 		}
 
 		protected void enter(final EventAgent agent) {
@@ -496,7 +494,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 
 	public void setVisOutputSample(double visOutputSample) {
 		this.visOutputMod = 1/visOutputSample;
-		
+
 	}
 
 }

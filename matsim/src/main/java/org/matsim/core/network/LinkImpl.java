@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.world.AbstractLocation;
 
 public class LinkImpl extends AbstractLocation implements Link {
@@ -73,8 +74,8 @@ public class LinkImpl extends AbstractLocation implements Link {
   private static int maxLengthWarnCnt = 1;
   private static int maxLoopWarnCnt = 1;
 
-	
-	
+
+
 	public LinkImpl(final Id id, final Node from, final Node to,
 			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(network, id,
@@ -200,8 +201,16 @@ public class LinkImpl extends AbstractLocation implements Link {
 		return true;
 	}
 
+	public double getFreespeedTravelTime() {
+		return getFreespeedTravelTime(Time.UNDEFINED_TIME);
+	}
+
 	public double getFreespeedTravelTime(final double time) {
 		return this.length / this.freespeed;
+	}
+
+	public double getFlowCapacity() {
+		return getFlowCapacity(Time.UNDEFINED_TIME);
 	}
 
 	public double getFlowCapacity(final double time) {
@@ -220,14 +229,11 @@ public class LinkImpl extends AbstractLocation implements Link {
 		return this.euklideanDist;
 	}
 
-	/**
-	 * This method returns the capacity as set in the xml defining the network. Be aware
-	 * that this capacity is not normalized in time, it depends on the period set
-	 * in the network file (the capperiod attribute).
-	 *
- 	 * @param time - the current time
-	 * @return the capacity per network's capperiod timestep
-	 */
+	@Override
+	public double getCapacity() {
+		return getCapacity(Time.UNDEFINED_TIME);
+	}
+
 	@Override
 	public double getCapacity(final double time) { // not final since needed in TimeVariantLinkImpl
 		return this.capacity;
@@ -237,6 +243,11 @@ public class LinkImpl extends AbstractLocation implements Link {
 	public final void setCapacity(double capacityPerNetworkCapcityPeriod){
 		this.capacity = capacityPerNetworkCapcityPeriod;
 		this.calculateFlowCapacity();
+	}
+
+	@Override
+	public double getFreespeed() {
+		return getFreespeed(Time.UNDEFINED_TIME);
 	}
 
 	/**
@@ -265,6 +276,11 @@ public class LinkImpl extends AbstractLocation implements Link {
 	public final void setLength(double length) {
 		this.length = length;
 		this.checkLengthSemantics();
+	}
+
+	@Override
+	public double getNumberOfLanes() {
+		return getNumberOfLanes(Time.UNDEFINED_TIME);
 	}
 
 	@Override

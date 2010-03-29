@@ -30,7 +30,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QLane;
 import org.matsim.ptproject.qsim.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -62,14 +61,14 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 
 		//calculate link width
 		double cellWidth =  Gbl.getConfig().otfVis().getLinkWidth();
-		double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
+		double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes();
 		//calculate length and normal
 		Point2D.Double.Double deltaLink = new Point2D.Double.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
 		double linkLength = this.calculateLinkLength(deltaLink);
 		Point2D.Double.Double deltaLinkNorm = new Point2D.Double.Double(deltaLink.x / linkLength, deltaLink.y / linkLength);
 		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
 
-		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
+		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, this.linkScale);
 		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
 		Point2D.Double scaledLinkStart = scaledLink.getFirst();
 
@@ -107,8 +106,8 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 			QLane ql = this.src.getOriginalLane();
 			double meterFromLinkEnd = ql.getMeterFromLinkEnd();
 
-			Point2D.Double branchPoint = new Point2D.Double(mscaledLinkStart.x + ((linkLength - meterFromLinkEnd) * linkScale * deltaLinkNorm.x),
-					mscaledLinkStart.y + ((linkLength - meterFromLinkEnd) * deltaLinkNorm.y * linkScale));
+			Point2D.Double branchPoint = new Point2D.Double(mscaledLinkStart.x + ((linkLength - meterFromLinkEnd) * this.linkScale * deltaLinkNorm.x),
+					mscaledLinkStart.y + ((linkLength - meterFromLinkEnd) * deltaLinkNorm.y * this.linkScale));
 			out.putDouble(branchPoint.x);
 			out.putDouble(branchPoint.y);
 
@@ -149,7 +148,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 		Point2D.Double toLinkEnd = new Point2D.Double(toLink.getToNode().getCoord().getX()  - OTFServerQuad2.offsetEast,
 				toLink.getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 		//scale
-		Tuple<Double, Double> scaledTuple = VectorUtils.scaleVector(toLinkStart, toLinkEnd, linkScale);
+		Tuple<Double, Double> scaledTuple = VectorUtils.scaleVector(toLinkStart, toLinkEnd, this.linkScale);
 		toLinkStart = scaledTuple.getFirst();
 		toLinkEnd = scaledTuple.getSecond();
 
@@ -158,7 +157,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 		double toLinkLength = this.calculateLinkLength(deltaToLink);
 		Point2D.Double deltaToLinkNorm = new Point2D.Double(deltaToLink.x / toLinkLength, deltaToLink.y / toLinkLength);
 		Point2D.Double normalizedToLinkOrthogonal = new Point2D.Double(deltaToLinkNorm.y, - deltaToLinkNorm.x);
-		Point2D.Double mToLinkStart = this.calculateMiddleOfLink(toLinkStart, normalizedToLinkOrthogonal, cellWidth * toLink.getNumberOfLanes(Time.UNDEFINED_TIME));
+		Point2D.Double mToLinkStart = this.calculateMiddleOfLink(toLinkStart, normalizedToLinkOrthogonal, cellWidth * toLink.getNumberOfLanes());
 		return mToLinkStart;
 	}
 
