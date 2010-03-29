@@ -1,4 +1,4 @@
-package playground.benjamin;
+package playground.benjamin.analysis;
 
 public class Row {
 	private Double score1;

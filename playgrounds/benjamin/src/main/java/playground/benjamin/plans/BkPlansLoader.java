@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -32,7 +33,8 @@ import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
-import playground.benjamin.charts.BkPopulationScoreWriter;
+import playground.benjamin.old.BkPopulationScoreWriter;
+
 
 /**
  * @author bkickhoefer after kn

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin;
+package playground.benjamin.analysis;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,23 +41,35 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
 import playground.benjamin.charts.BkChartWriter;
-import playground.benjamin.charts.types.BkDeltaUtilsChartGeneral;
+import playground.benjamin.charts.types.BkDeltaUtilsChart;
 
 /**
  * @author bkickhoefer after kn and dgrether
  */
 
-public class BkAnalysisGeneral {
+public class BkAnalysis {
 	
-	private static final Logger log = Logger.getLogger(BkAnalysisGeneral.class);
+	private static final Logger log = Logger.getLogger(BkAnalysis.class);
 	
+	//main class
+	public static void main(final String[] args) {
+		String netfile;
+		String plansfile1;
+		String plansfile2;
+		String householdsfile;
+		
+		BkAnalysis app = new BkAnalysis();
+		app.run(args);
+	}
 
+//============================================================================================================	
+	
 	public void run(final String[] args) {
 		//instancing scenario1 with a config (path to network and plans)
 		Scenario sc1 = new ScenarioFactoryImpl().createScenario();
 		Config c1 = sc1.getConfig();
-		c1.network().setInputFile(BkPaths.RUNSSVN + "/run860/run860.output_network.xml.gz");
-		c1.plans().setInputFile(BkPaths.RUNSSVN + "/run860/run860.output_plans.xml.gz");
+		c1.network().setInputFile("../runs-svn/run860/run860.output_network.xml.gz");
+		c1.plans().setInputFile("../runs-svn/run860/run860.output_plans.xml.gz");
 		
 		//loading scenario1 and getting the population1
 		ScenarioLoader sl1 = new ScenarioLoaderImpl(sc1) ;
@@ -69,8 +81,8 @@ public class BkAnalysisGeneral {
 		//instancing scenario2 with a config (path to network and plans)
 		Scenario sc2 = new ScenarioFactoryImpl().createScenario();
 		Config c2 = sc2.getConfig();
-		c2.network().setInputFile(BkPaths.RUNSSVN + "/run860/run860.output_network.xml.gz");
-		c2.plans().setInputFile(BkPaths.RUNSSVN + "/run864/run864.output_plans.xml.gz");
+		c2.network().setInputFile("../runs-svn/run860/run860.output_network.xml.gz");
+		c2.plans().setInputFile("../runs-svn/run864/run864.output_plans.xml.gz");
 		
 		//loading scenario2 and getting the population2
 		ScenarioLoader sl2 = new ScenarioLoaderImpl(sc2) ;
@@ -82,7 +94,7 @@ public class BkAnalysisGeneral {
 		//instancing and reading households
 		Households households = new HouseholdsImpl();
 		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
-		reader.readFile(BkPaths.STUDIESBK + "/oneRouteTwoModeIncomeTest/households.xml");
+		reader.readFile("../shared-svn/studies/bkick/oneRouteTwoModeIncomeTest/households.xml");
 		
 //============================================================================================================		
 
@@ -98,14 +110,21 @@ public class BkAnalysisGeneral {
 		SortedMap<Id, Double> isCarAvail = getIsCarAvailFromPlans(population1);
 		SortedMap<Id, Double> isSelectedPlanCar = getIsSelectedPlanCarFromPlans(population1);
 		
-		//if desired, add additional maps after scores1, scores2 (see maps above, eg: personalIncome, homeX, homeY, isCarAvail, isSelectedPlanCar)
+		//if desired, add additional maps (see maps above, eg: homeX, homeY, isCarAvail, isSelectedPlanCar)
 		SortedMap<Id, Row> populationInformation = putAllNeededPopulationInfoInOneMap(scores1, scores2, personalIncome);
 
-		//BkDeltaUtilsChartGeneral for creation of series and dataset
-		BkDeltaUtilsChartGeneral deltaUtilsChart = new BkDeltaUtilsChartGeneral(populationInformation);
+	//=== Defining and writing data and charts (for creation of series and dataset)
 		
-		//BkChartWriter gets an jchart object from BkDeltaUtilsChartGeneral to write the chart:
-		BkChartWriter.writeChart(BkPaths.RUNSSVN + "/run864/analysis/deltaUtilsPerPersons", deltaUtilsChart.createChart());
+		//BkDeltaUtilsChartGeneral - plots individual utility differences over income (linear axis)
+		BkDeltaUtilsChart deltaUtilsChart = new BkDeltaUtilsChart(populationInformation);
+		
+		//
+		//BkDeltaUtilsQuantilesChart
+		
+		//===
+		
+		//BkChartWriter gets an jchart object from the defined charts above to write the chart:
+		BkChartWriter.writeChart("../runs-svn/run864/analysis/deltaUtilsPerPersons", deltaUtilsChart.createChart());
 		
 		log.info( "\n" + "******************************" + "\n"
 				       + "Chart(s) and table(s) written." + "\n"
@@ -114,7 +133,7 @@ public class BkAnalysisGeneral {
 
 //============================================================================================================	
 
-	//additional maps can be inserted here after scores1, scores2, eg , SortedMap<Id, Double> personalIncome, SortedMap<Id, Double> homeX, SortedMap<Id, Double> homeY, SortedMap<Id, Double> isCarAvail, SortedMap<Id, Double> isSelectedPlanCar: 
+	//additional maps can be inserted here, e.g., SortedMap<Id, Double> homeX, SortedMap<Id, Double> homeY, SortedMap<Id, Double> isCarAvail, SortedMap<Id, Double> isSelectedPlanCar: 
 	private SortedMap<Id, Row> putAllNeededPopulationInfoInOneMap(SortedMap<Id, Double> scores1, SortedMap<Id, Double> scores2,SortedMap<Id, Double> personalIncome) {
 		
 		SortedMap<Id, Row> result = new TreeMap<Id, Row>(new ComparatorImplementation());
@@ -170,7 +189,7 @@ public class BkAnalysisGeneral {
 		}
 		return personId2PersonalIncome;
 	}
-	
+			// this distributes the household income on its members - in this case equally...
 			private double distributeHouseholdIncomeToMembers(Household hh) {
 				double personalIncome = hh.getIncome().getIncome() / hh.getMemberIds().size();
 				return personalIncome;
@@ -190,12 +209,6 @@ public class BkAnalysisGeneral {
 	}
 	
 //============================================================================================================		
-	
-	//main class
-	public static void main(final String[] args) {
-		BkAnalysisGeneral app = new BkAnalysisGeneral();
-		app.run(args);
-	}
 
 	//comparator to compare Ids not as Strings but as Integers (see above)
 	private final class ComparatorImplementation implements Comparator<Id> {

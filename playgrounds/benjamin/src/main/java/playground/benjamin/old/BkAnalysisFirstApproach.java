@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin;
+package playground.benjamin.old;
 
 import java.util.Comparator;
 import java.util.SortedMap;
@@ -34,15 +34,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.benjamin.charts.BkChartWriter;
-import playground.benjamin.charts.types.BkDeltaUtilsChart;
 
 /**
  * @author bkickhoefer after kn and dgrether
  */
 
-public class BkAnalysis {
+public class BkAnalysisFirstApproach {
 	
-	private static final Logger log = Logger.getLogger(BkAnalysis.class);
+	private static final Logger log = Logger.getLogger(BkAnalysisFirstApproach.class);
 	
 
 	public void run(final String[] args) {
@@ -81,7 +80,7 @@ public class BkAnalysis {
 		SortedMap<Id, Double> scores2 = getScoresFromPlans(population2);
 		
 		//BkDeltaUtilsChart for score difference calculations and creation of series and dataset
-		BkDeltaUtilsChart deltaUtilsChart = new BkDeltaUtilsChart(scores1, scores2);
+		BkDeltaUtilsChartFirstApproach deltaUtilsChart = new BkDeltaUtilsChartFirstApproach(scores1, scores2);
 		
 		//BkChartWriter gets an jchart object from BkDeltaUtilsChart to write the chart:
 		BkChartWriter.writeChart("../matsim/output/multipleIterations20/deltaUtilsPerPerson_20-10", deltaUtilsChart.createChart());
@@ -110,7 +109,7 @@ public class BkAnalysis {
 	
 	//main class
 	public static void main(final String[] args) {
-		BkAnalysis app = new BkAnalysis();
+		BkAnalysisFirstApproach app = new BkAnalysisFirstApproach();
 		app.run(args);
 	}
 

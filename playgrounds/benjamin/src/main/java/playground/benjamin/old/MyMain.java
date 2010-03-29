@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin;
+package playground.benjamin.old;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.run.OTFVis;

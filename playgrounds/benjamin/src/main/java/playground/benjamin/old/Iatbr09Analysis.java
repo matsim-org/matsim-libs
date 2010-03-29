@@ -17,11 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin;
+package playground.benjamin.old;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 
+import playground.benjamin.BkPaths;
 import playground.dgrether.analysis.charts.DgMixedDeltaUtilsModeGroupChart;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;

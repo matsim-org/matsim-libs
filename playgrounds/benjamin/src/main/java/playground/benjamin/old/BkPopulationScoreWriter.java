@@ -1,4 +1,4 @@
-package playground.benjamin.charts;
+package playground.benjamin.old;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
