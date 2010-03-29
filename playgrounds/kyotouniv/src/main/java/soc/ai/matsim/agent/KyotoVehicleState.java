@@ -1,6 +1,6 @@
 package soc.ai.matsim.agent;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 
 public class KyotoVehicleState implements Coord {
 
