@@ -40,9 +40,9 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * this class will remove the nodes from network, who don't have incidents
  * links.
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class NetworkCleaner {
 
@@ -66,7 +66,7 @@ public class NetworkCleaner {
 			BufferedWriter writer = IOUtils.getBufferedWriter(logFilename);
 			writer.write("Id of nodes removed from " + inputNetFilename + "\n");
 			for (Node n : nodesToRemove) {
-				network.removeNode(n.getId());
+				network.getNodes().remove(n.getId());
 				writer.write(count++ + n.toString() + "\n");
 			}
 			writer.close();

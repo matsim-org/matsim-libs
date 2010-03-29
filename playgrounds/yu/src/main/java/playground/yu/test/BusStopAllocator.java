@@ -48,9 +48,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * tries to allocate bus stop coordinations to links in MATSim "car" network
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class BusStopAllocator {
 	private final NetworkImpl network;
@@ -144,10 +144,7 @@ public class BusStopAllocator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String multiModalNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml",
-		transitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/scheduleTest.xml",
-		carNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.car.mini.xml",
-		outputFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/stopAllocation2.txt";
+		String multiModalNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml", transitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/scheduleTest.xml", carNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.car.mini.xml", outputFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/stopAllocation2.txt";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
@@ -168,8 +165,9 @@ public class BusStopAllocator {
 		Network carNetwork = carScenario.getNetwork();
 		new MatsimNetworkReader(carScenario).readFile(carNetworkFile);
 
-		BusStopAllocator stopAllocator = new BusStopAllocator((NetworkImpl) carNetwork,
-				schedule.getFacilities().values(), outputFile);
+		BusStopAllocator stopAllocator = new BusStopAllocator(
+				(NetworkImpl) carNetwork, schedule.getFacilities().values(),
+				outputFile);
 		stopAllocator.run2();
 	}
 }

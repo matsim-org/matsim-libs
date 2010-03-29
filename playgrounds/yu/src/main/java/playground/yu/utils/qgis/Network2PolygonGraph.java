@@ -25,6 +25,7 @@ package playground.yu.utils.qgis;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -49,6 +50,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  */
 public class Network2PolygonGraph extends X2GraphImpl {
+	protected Set<LinkImpl> links2paint = null;
 
 	/**
 	 * @param network
@@ -84,8 +86,6 @@ public class Network2PolygonGraph extends X2GraphImpl {
 				fromNode, toNode, length, cap, type, freespeed, transMode });
 	}
 
-
-
 	@Override
 	protected double getLinkWidth(Link link) {
 		return link.getCapacity() / network.getCapacityPeriod() * 3600.0 / 50.0;
@@ -97,7 +97,8 @@ public class Network2PolygonGraph extends X2GraphImpl {
 		for (int i = 0; i < attrTypes.size(); i++)
 			defaultFeatureTypeFactory.addType(attrTypes.get(i));
 		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
-		for (Link link : this.network.getLinks().values()) {
+		for (Link link : this.links2paint == null ? this.network.getLinks()
+				.values() : this.links2paint) {
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);
@@ -121,5 +122,9 @@ public class Network2PolygonGraph extends X2GraphImpl {
 			features.add(ft);
 		}
 		return features;
+	}
+
+	public void setLinks2paint(Set<LinkImpl> links2paint) {
+		this.links2paint = links2paint;
 	}
 }

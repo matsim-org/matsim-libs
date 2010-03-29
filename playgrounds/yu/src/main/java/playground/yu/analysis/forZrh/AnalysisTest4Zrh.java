@@ -40,6 +40,7 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.run.OTFVis;
 import org.xml.sax.SAXException;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
@@ -47,11 +48,13 @@ import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
 import playground.yu.analysis.LegDistance;
 import playground.yu.analysis.ModeSplit;
+import playground.yu.analysis.MyCalcAverageTripLength;
+import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class AnalysisTest4Zrh implements Analysis4Zrh {
 
@@ -82,18 +85,18 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 	private static void runIntern(final String[] args, final String scenario) {
 		final String netFilename = args[2];
 
-		String[] tmp = args[3].split("it.");
-		String outputBase = args[3] + "/" + args[1] + "." + tmp[tmp.length - 1]
-				+ ".";
+		String[] tmp = args[3]/* iterationPaht */.split("it.");
+		String outputBase = args[3]/* iterationPaht */+ "/" + args[1]/* runId */
+				+ "." + tmp[tmp.length - 1] + ".";
 		final String eventsFilename = outputBase + "events.txt.gz";
 
-		boolean hasPop = Boolean.parseBoolean(args[4]);
-		String plansFilename = Boolean.parseBoolean(args[4]) ? outputBase
-				+ "plans.xml.gz" : null;
+		String plansFilename = Boolean.parseBoolean(args[4])/* hasPop? */? outputBase
+				+ "plans.xml.gz"
+				: null;
 
 		String eventsOutputFilename = outputBase + "events4mvi.txt.gz";
 		String outputBase4analysis = outputBase + "analysis"
-				+ (scenario.equals(KANTON_ZURICH) ? ".Kanton/" : "/") + args[1]// runId
+				+ (scenario.equals(KANTON_ZURICH) ? ".Kanton/" : "/") + args[1]/* runId */
 				+ "." + (scenario.equals("normal") ? "" : scenario + ".");
 
 		String tollFilename = (!scenario.equals(KANTON_ZURICH)) ? null
@@ -149,7 +152,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 		if (plansFilename != null) {
 			PopulationImpl population = s.getPopulation();
 
-			catl = new CalcAverageTripLength(network);
+			catl = new MyCalcAverageTripLength(network);
 			ms = new ModeSplit(toll);
 			orms = new EnRouteModalSplit4Zrh(scenario, population, toll);
 			lttms = new LegTravelTimeModalSplit4Zrh(population, toll);
@@ -227,31 +230,34 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 		if (ms != null)
 			ms.write(outputBase4analysis);
 		// otfvis
-//		if (toll == null) {
-//			SimpleReader sr = new SimpleReader(eventsFilename);
-//			SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
-//
-//			String line = sr.readLine();
-//			sw2.writeln(line);
-//			// after filehead
-//			double time = 0;
-//			while (line != null && time < 108000.0) {
-//				line = sr.readLine();
-//				if (line != null) {
-//					sw2.writeln(line);
-//					time = Double.parseDouble(line.split("\t")[0]);
-//				}
-//			}
-//			sr.close();
-//			sw2.close();
-//
-////			new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
-////					outputBase
-////							+ (scenario.equals("normal") ? "" : scenario + ".")
-////							+ "otfvis.mvi", Integer.parseInt(args[5])// time
-////			// interval
-////			).convert();
-//		}
+		if (toll == null) {
+			SimpleReader sr = new SimpleReader(eventsFilename);
+			SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
+			System.out
+					.println("-----> Starting to create short eventsfiles\t----->from "
+							+ eventsFilename + " to " + eventsOutputFilename);
+			String line = sr.readLine();
+			sw2.writeln(line);
+			// after filehead
+			double time = 0;
+			while (line != null && time < 108000.0) {
+				line = sr.readLine();
+				if (line != null) {
+					sw2.writeln(line);
+					time = Double.parseDouble(line.split("\t")[0]);
+				}
+			}
+			sr.close();
+			sw2.close();
+
+			OTFVis.main(new String[] {
+					"-convert",
+					eventsOutputFilename,
+					netFilename,
+					outputBase
+							+ (scenario.equals("normal") ? "" : scenario + ".")
+							+ "otfvis.mvi", args[5] /* snapshot-period */});
+		}
 		System.out.println("done.");
 	}
 

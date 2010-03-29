@@ -48,12 +48,13 @@ import playground.yu.analysis.EnRouteModalSplit;
 import playground.yu.analysis.LegDistance;
 import playground.yu.analysis.LegTravelTimeModalSplit;
 import playground.yu.analysis.ModeSplit;
+import playground.yu.analysis.MyCalcAverageTripLength;
 import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class AnalysisTest4Bln {
 	private static boolean withToll = false;
@@ -105,7 +106,8 @@ public class AnalysisTest4Bln {
 		RoadPricingScheme toll = null;
 		if (withToll) {
 			sc.getConfig().scenario().setUseRoadpricing(true);
-			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(sc.getRoadPricingScheme());
+			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(sc
+					.getRoadPricingScheme());
 			try {
 				tollReader.parse(tollFilename);
 			} catch (SAXException e) {
@@ -131,7 +133,7 @@ public class AnalysisTest4Bln {
 		if (plansFilename != null) {
 			PopulationImpl population = sc.getPopulation();
 
-			catl = new CalcAverageTripLength(network);
+			catl = new MyCalcAverageTripLength(network);
 			ms = new ModeSplit(toll);
 			orms = new EnRouteModalSplit(scenario, population, toll);
 			lttms = new LegTravelTimeModalSplit(population, toll);

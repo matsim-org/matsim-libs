@@ -27,6 +27,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 
+import playground.yu.analysis.MyCalcAverageTripLength;
+
 public class CalcAvgTripLengthTest {
 
 	/**
@@ -43,7 +45,7 @@ public class CalcAvgTripLengthTest {
 		PopulationImpl pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(popFilename);
 
-		CalcAverageTripLength catl = new CalcAverageTripLength(net);
+		CalcAverageTripLength catl = new MyCalcAverageTripLength(net);
 		catl.run(pop);
 		System.out.println("avg. trip length :\t" + catl.getAverageTripLength()
 				+ " [m]");

@@ -67,8 +67,9 @@ public class PlanScoreForecaster {
 	private NetworkImpl net;
 	private TravelTime ttc;
 	private CharyparNagelScoringConfigGroup scoring;
-	private double score = 0.0, betaTraveling, betaPerforming, firstActEndTime,
-			attrTraveling = 0.0, attrPerforming = 0.0;
+	private double score = 0.0, betaTraveling, betaPerforming, betaDist,
+			firstActEndTime, attrTraveling = 0.0, attrPerforming = 0.0,
+			attrDistance = 0.0;
 
 	public PlanScoreForecaster(Plan plan, NetworkImpl net, TravelTime ttc,
 			CharyparNagelScoringConfigGroup scoring, double betaTraveling,
@@ -88,8 +89,17 @@ public class PlanScoreForecaster {
 		this.oldSelected = (PlanImpl) oldSelected;
 	}
 
+	public PlanScoreForecaster(Plan selectedPlan, Plan oldSelected,
+			NetworkImpl net, TravelTime tt,
+			CharyparNagelScoringConfigGroup scoring, double betaTraveling,
+			double betaPerforming, double betaDist) {
+		this(selectedPlan, oldSelected, net, tt, scoring, betaTraveling,
+				betaPerforming);
+		this.betaDist = betaDist;
+	}
+
 	public double getPlanScore() {
-		boolean fistActDone = false;
+		// boolean fistActDone = false;
 		for (PlanElement pe : this.plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
@@ -110,13 +120,19 @@ public class PlanScoreForecaster {
 		return attrTraveling;
 	}
 
+	public double getAttrDistance() {
+		return attrDistance;
+	}
+
 	/**
 	 * believes only legDepartureTime of newly created Plans
 	 * 
 	 * @param leg
 	 */
 	private void handleLeg(LegImpl leg) {
-		double travelTime_s = 0.0, departTime = leg.getDepartureTime();
+		NetworkRoute route = (NetworkRoute) leg.getRoute();
+		double travelTime_s = 0.0, departTime = leg.getDepartureTime(), legDist = route
+				.getDistance();
 		if (departTime < 0) {
 			Activity preAct = this.plan.getPreviousActivity(leg);
 			departTime = preAct.getEndTime();
@@ -127,7 +143,6 @@ public class PlanScoreForecaster {
 			}
 		}
 
-		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Map<Id, LinkImpl> links = this.net.getLinks();
 		for (Id linkId : route.getLinkIds()) {
 			travelTime_s += ttc.getLinkTravelTime(links.get(linkId), departTime
@@ -135,14 +150,26 @@ public class PlanScoreForecaster {
 		}
 		travelTime_s += this.ttc.getLinkTravelTime(links.get(route
 				.getEndLinkId()), departTime + travelTime_s);
-
 		double attrTravelTime = travelTime_s / 3600.0;
 		this.attrTraveling += attrTravelTime;
-		score += this.betaTraveling * attrTravelTime/* [h] */;
+
+		if (Double.isNaN(legDist) || legDist < 0) {
+			legDist = 0;
+			for (Id linkId : route.getLinkIds()) {
+				legDist += links.get(linkId).getLength();
+			}
+			legDist += links.get(route.getEndLinkId()).getLength();
+		}
+		double attrDist = legDist / 1000.0;
+		this.attrDistance += attrDist;
+
+		score += this.betaTraveling * attrTravelTime/* [h] */+ this.betaDist
+				* 0.12 * attrDist/* [km] */;
 		if (Double.isNaN(score))
 			throw new RuntimeException(PlanScoreForecaster.class.getName()
 					+ "\t" + DebugTools.getLineNumber(new Exception())
 					+ "\tutil/score is a NaN.");
+
 		leg.setArrivalTime(departTime + travelTime_s);
 	}
 

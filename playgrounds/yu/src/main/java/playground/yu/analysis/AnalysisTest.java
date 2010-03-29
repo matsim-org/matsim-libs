@@ -46,7 +46,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class AnalysisTest {
 	private static boolean withToll = false;
@@ -99,7 +99,8 @@ public class AnalysisTest {
 		RoadPricingScheme toll = null;
 		if (withToll) {
 			scenario2.getConfig().scenario().setUseRoadpricing(true);
-			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario2.getRoadPricingScheme());
+			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
+					scenario2.getRoadPricingScheme());
 			try {
 				tollReader.parse(tollFilename);
 			} catch (SAXException e) {
@@ -125,7 +126,7 @@ public class AnalysisTest {
 		if (plansFilename != null) {
 			PopulationImpl population = scenario2.getPopulation();
 
-			catl = new CalcAverageTripLength(network);
+			catl = new MyCalcAverageTripLength(network);
 			ms = new ModeSplit(toll);
 			orms = new EnRouteModalSplit(scenario, population, toll);
 			lttms = new LegTravelTimeModalSplit(population, toll);

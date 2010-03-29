@@ -77,13 +77,13 @@ public class PtcheckControler2 extends Controler {
 			Controler ctl = event.getControler();
 			Config cf = ctl.getConfig();
 			try {
-				ctl.addControlerListener(new PtRate2(ctl.getPopulation(),
-				    event.getControler().getControlerIO().getOutputFilename("PtRate.txt"),
-						ctl.getLastIteration(), cf.getParam(PLANCALCSCORE,
-								"traveling"), cf.getParam(PLANCALCSCORE,
-								"travelingPt")));
-				ptRateWriter = IOUtils
-						.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("tollPaid.txt"));
+				ctl.addControlerListener(new PtRate2(ctl.getPopulation(), event
+						.getControler().getControlerIO().getOutputFilename(
+								"PtRate.txt"), ctl.getLastIteration(), cf
+						.getParam(PLANCALCSCORE, "traveling"), cf.getParam(
+						PLANCALCSCORE, "travelingPt")));
+				ptRateWriter = IOUtils.getBufferedWriter(event.getControler()
+						.getControlerIO().getOutputFilename("tollPaid.txt"));
 				ptRateWriter
 						.write("Iter\tBetaTraveling\tBetaTravelingPt\tavg. executed score\tavg. triplength\ttraffic persformance\tavg. travel speed\ttoll_amount[�/m]\ttoll_paid[�]\tNumber of Drawees\tavg. tolled triplength\n");
 				ptRateWriter.flush();
@@ -106,7 +106,7 @@ public class PtcheckControler2 extends Controler {
 			if (it % 10 == 0) {
 				Config cf = ctl.getConfig();
 				rp = ctl.getRoadPricing();
-				catl = new CalcAverageTripLength(ctl.getNetwork());
+				catl = new MyCalcAverageTripLength(ctl.getNetwork());
 				catl.run(event.getControler().getPopulation());
 				try {
 					ptRateWriter
@@ -142,20 +142,28 @@ public class PtcheckControler2 extends Controler {
 			}
 			if (it == ctl.getLastIteration()) {
 				if (orms != null) {
-					orms.write(event.getControler().getControlerIO().getOutputFilename("onRoute.txt.gz"));
-					orms.writeCharts(event.getControler().getControlerIO().getOutputFilename("onRoute.png"));
+					orms.write(event.getControler().getControlerIO()
+							.getOutputFilename("onRoute.txt.gz"));
+					orms.writeCharts(event.getControler().getControlerIO()
+							.getOutputFilename("onRoute.png"));
 				}
 				if (ttms != null) {
-					ttms.write(event.getControler().getControlerIO().getOutputFilename("traveltimes.txt.gz"));
-					ttms.writeCharts(event.getControler().getControlerIO().getOutputFilename("traveltimes"));
+					ttms.write(event.getControler().getControlerIO()
+							.getOutputFilename("traveltimes.txt.gz"));
+					ttms.writeCharts(event.getControler().getControlerIO()
+							.getOutputFilename("traveltimes"));
 				}
 				if (ld != null) {
-					ld.write(event.getControler().getControlerIO().getOutputFilename("legDistances.txt.gz"));
-					ld.writeCharts(event.getControler().getControlerIO().getOutputFilename("legDistances"));
+					ld.write(event.getControler().getControlerIO()
+							.getOutputFilename("legDistances.txt.gz"));
+					ld.writeCharts(event.getControler().getControlerIO()
+							.getOutputFilename("legDistances"));
 				}
 				if (clas != null) {
-					clas.write(event.getControler().getControlerIO().getOutputFilename("avgSpeed.txt.gz"));
-					clas.writeChart(event.getControler().getControlerIO().getOutputFilename("avgSpeedCityArea.png"));
+					clas.write(event.getControler().getControlerIO()
+							.getOutputFilename("avgSpeed.txt.gz"));
+					clas.writeChart(event.getControler().getControlerIO()
+							.getOutputFilename("avgSpeedCityArea.png"));
 				}
 			}
 		}

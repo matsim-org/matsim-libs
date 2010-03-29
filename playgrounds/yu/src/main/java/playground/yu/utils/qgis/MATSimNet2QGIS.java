@@ -26,7 +26,9 @@ package playground.yu.utils.qgis;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureStore;
@@ -38,9 +40,11 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -92,7 +96,20 @@ public class MATSimNet2QGIS implements X2QGIS {
 	public MATSimNet2QGIS(String netFilename, String coordRefSys) {
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 		crs = MGC.getCRS(coordRefSys);
-		n2g = new Network2PolygonGraph(scenario.getNetwork(), crs);
+		n2g = new Network2PolygonGraph(getNetwork(), crs);
+	}
+
+	public MATSimNet2QGIS(String netFilename, String coordRefSys,
+			Set<Id> linkIds2paint) {
+		this(netFilename, coordRefSys);
+		if (linkIds2paint != null) {
+			Set<LinkImpl> links2paint = new HashSet<LinkImpl>();
+			Map<Id, LinkImpl> linkImpls = getNetwork().getLinks();
+			for (Id linkId : linkIds2paint) {
+				links2paint.add(linkImpls.get(linkId));
+			}
+			((Network2PolygonGraph) this.n2g).setLinks2paint(links2paint);
+		}
 	}
 
 	/**
@@ -164,9 +181,47 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public static void main(final String[] args) {
-		String netFilename = "../berlin-bvg09/pt/nullfall_alles/network.xml";
+		String netFilename = "../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(netFilename, gk4);
-		mn2q.writeShapeFile("../berlin-bvg09/pt/nullfall_alles/ptNet.shp");
+		Set<Id> linkIds2paint = null;
+		// -------------------------------------------------------------
+		linkIds2paint = new HashSet<Id>();
+		// B-344 H
+		linkIds2paint.add(new IdImpl("initial_792040"));
+		linkIds2paint.add(new IdImpl("10292"));
+		linkIds2paint.add(new IdImpl("10294R"));
+		linkIds2paint.add(new IdImpl("3972"));
+		linkIds2paint.add(new IdImpl("3974"));
+		linkIds2paint.add(new IdImpl("3956R"));
+		linkIds2paint.add(new IdImpl("3955"));
+		linkIds2paint.add(new IdImpl("3959R"));
+		linkIds2paint.add(new IdImpl("3960"));
+		linkIds2paint.add(new IdImpl("3894R"));
+		linkIds2paint.add(new IdImpl("3893R"));
+		linkIds2paint.add(new IdImpl("3892R"));
+		linkIds2paint.add(new IdImpl("3889"));
+		linkIds2paint.add(new IdImpl("3891R"));
+		linkIds2paint.add(new IdImpl("3891"));
+		linkIds2paint.add(new IdImpl("3889R"));
+
+		// B-344 R
+		linkIds2paint.add(new IdImpl("initial_781015"));
+		linkIds2paint.add(new IdImpl("3892"));
+		linkIds2paint.add(new IdImpl("3893"));
+		linkIds2paint.add(new IdImpl("3894"));
+		linkIds2paint.add(new IdImpl("3960R"));
+		linkIds2paint.add(new IdImpl("3959"));
+		linkIds2paint.add(new IdImpl("3955R"));
+		linkIds2paint.add(new IdImpl("3956"));
+		linkIds2paint.add(new IdImpl("3974R"));
+		linkIds2paint.add(new IdImpl("3972R"));
+		linkIds2paint.add(new IdImpl("3964R"));
+		linkIds2paint.add(new IdImpl("10289R"));
+
+		// -------------------------------------------------------------
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(netFilename, gk4,
+				linkIds2paint);
+		mn2q
+				.writeShapeFile("../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/TEST_network_multimodal.shp");
 	}
 }

@@ -77,5 +77,5 @@ public class PrepareLinkLeaveEventMatrix implements LinkLeaveEventHandler {
 		}
 		timeBins.add(section.getTime());
 	}
-	// TODO output Matrix column and rows
+	// TODO output number of Matrix column and rows
 }
