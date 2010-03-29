@@ -149,7 +149,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	
 	public QueueSimulation(final Scenario sc, final EventsManager events, final QueueNetworkFactory factory){
-    this.scenario = scenario;
+    this.scenario = sc;
     this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
     AbstractSimulation.reset();
     this.config = scenario.getConfig();
