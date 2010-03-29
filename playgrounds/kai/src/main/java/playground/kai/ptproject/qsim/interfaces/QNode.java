@@ -19,26 +19,14 @@
 
 package playground.kai.ptproject.qsim.interfaces;
 
-import org.matsim.vehicles.BasicVehicle;
-
 /**
  * @author nagel
  *
  */
-public class SimLink implements Updateable {
-	
-	void addVehicleFromIntersection( BasicVehicle veh ) {
-		
-	}
-	
-	void addVehicleFromParking( BasicVehicle veh ) {
-	
-	}
-	
+public class QNode implements Updateable {
+
 	public void update() {
-		// queue2xxx (buffer or parking)
-		
-		// wait2buffer
+
 	}
 
 }

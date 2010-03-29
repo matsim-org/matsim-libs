@@ -20,37 +20,51 @@
 package playground.kai.ptproject.qsim.interfaces;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.PersonAgentI;
+import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.vehicles.BasicVehicle;
 
-public class MobsimActivityFacility implements Updateable {
-	final private static Logger log = Logger.getLogger( MobsimActivityFacility.class ) ; 
+public class LinkFacility implements Updateable {
+	final private static Logger log = Logger.getLogger( LinkFacility.class ) ;
 	
-	private Queue<PersonAgentI> internalQueue = new PriorityQueue<PersonAgentI>(1, new DepartureTimeComparator() ) ;
-	private Parking parking = null ;
-	private BusStop busStop = null ;
+	/** data structure for parking needs to be searchable by vehicle id */
+	private Map<Id,BasicVehicle> parking = new TreeMap<Id,BasicVehicle>() ;
 	
-	/**Adding a person, normally to do an activity. */
+	/** data structure for activities needs to be sorted by departure time */
+	private Queue<PersonAgentI> agentsAtActivities = new PriorityQueue<PersonAgentI>(1, new DepartureTimeComparator() ) ;
+
+	/** data structure for buses ??? */
+//	private BusStop busStop = null ;
+	
+	/** Plain "add" of a person, normally during initialization */
 	void addPerson( PersonAgentI person ) {
-		internalQueue.add( person ) ;
+		agentsAtActivities.add( person ) ;
+	}
+	
+	/**Receives the occupied vehicle.  In this situation, it contains at least a driver, and possibly passengers. */
+	void addOccupiedVehicle( QVehicle veh ) {}
+	
+	/**Receives an empty vehicle.  Normally during initialization. */
+	void addEmptyVehicle( BasicVehicle veh ) {
+		parking.put( veh.getId(), veh ) ;
 	}
 	
 	public void update() {
-		PersonAgentI person = internalQueue.peek();
+		PersonAgentI person = agentsAtActivities.peek();
 	    if ( person.getDepartureTime() <= now() ) {
-	        internalQueue.remove();
-	        if ( /* mode==car */ Math.random()<0.5 ) {
-	        	parking.addDriver( (DriverAgent)person ) ;
-	        } else if ( /* mode==pt */ Math.random()<0.5 ) {
-	        	busStop.addPerson( person ) ;
-	        } else /* teleport */ {
-//	        	teleportation.addPerson( person ) ;
-	        }
+	        agentsAtActivities.remove();
+	        // call departure handler
+	        // how does the departure handler get access to the vehicle?
+	        // or to the bus stop?
 	    }
 	}
 	
@@ -60,20 +74,13 @@ public class MobsimActivityFacility implements Updateable {
 	static double now() {
 		return 0. ;
 	}
+
 	private static class DepartureTimeComparator implements Comparator<PersonAgentI> {
 		@Override
 		public int compare(PersonAgentI o1, PersonAgentI o2) {
-			if ( o1.getDepartureTime() < o2.getDepartureTime() ) {
-				return -1 ;
-			} else if ( o1.getDepartureTime() > o2.getDepartureTime() ) {
-				return 1 ;
-			} else if ( o1.getDepartureTime()==o2.getDepartureTime() ) {
-				return 0 ;
-			} else {
-				log.warn( "something weird (departure time could not be compared; maybe NaN?)" ) ;
-				return 0 ;
-			}
+			return 0 ; // dummy
 		}
 		
 	}
+	
 }
