@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
-  <artifactId>_template</artifactId>
-  <name>_template</name>
+  <artifactId>kyotouniv</artifactId>
+  <name>kyotouniv</name>
   <version>0.1.0-SNAPSHOT</version>
 </project>
