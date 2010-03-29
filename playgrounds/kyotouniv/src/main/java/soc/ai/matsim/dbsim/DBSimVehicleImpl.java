@@ -18,13 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.BasicVehicle;
 
-public class QueueVehicleImpl implements QueueVehicle {
+public class DBSimVehicleImpl implements DBSimVehicle {
 
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
@@ -39,11 +39,11 @@ public class QueueVehicleImpl implements QueueVehicle {
 	
 	private final BasicVehicle basicVehicle;
 
-	public QueueVehicleImpl(final BasicVehicle basicVehicle) {
+	public DBSimVehicleImpl(final BasicVehicle basicVehicle) {
 		this(basicVehicle, 1.0);
 	}
 	
-	public QueueVehicleImpl(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
+	public DBSimVehicleImpl(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
 		this.id = basicVehicle.getId();
 		this.sizeInEquivalents = sizeInEquivalents;
 		this.basicVehicle = basicVehicle;

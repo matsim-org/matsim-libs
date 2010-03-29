@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VehicleDepartureTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,29 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import org.matsim.api.core.v01.population.Person;
 
 /**
- * @author dstrippgen
- *
- * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
- * according to their departure time
+ * @author dgrether
  */
-public class QueueVehicleDepartureTimeComparator implements Comparator<QueueVehicle>,
-		Serializable {
+public class AgentFactory {
 
-	private static final long serialVersionUID = 1L;
+	protected final DBSimulation simulation;
 
-	public int compare(final QueueVehicle veh1, final QueueVehicle veh2) {
-		if (veh1.getDriver().getDepartureTime() > veh2.getDriver().getDepartureTime())
-			return 1;
-		if (veh1.getDriver().getDepartureTime() < veh2.getDriver().getDepartureTime())
-			return -1;
-
-		// Both depart at the same time -> let the one with the larger id be first
-		return veh2.getId().compareTo(veh1.getId());
+	public AgentFactory(final DBSimulation simulation) {
+		this.simulation = simulation;
 	}
+
+	public PersonAgent createPersonAgent(final Person p) {
+		PersonAgent agent = new PersonAgent(p, this.simulation);
+		return agent;
+	}
+
 }

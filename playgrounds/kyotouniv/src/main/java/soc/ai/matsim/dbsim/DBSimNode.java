@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -35,28 +35,28 @@ import org.matsim.core.gbl.Gbl;
 /**
  * Represents a node in the QueueSimulation.
  */
-public class QueueNode {
+public class DBSimNode {
 
-	private static final Logger log = Logger.getLogger(QueueNode.class);
+	private static final Logger log = Logger.getLogger(DBSimNode.class);
 
 	private static final QueueLinkIdComparator qlinkIdComparator = new QueueLinkIdComparator();
 
-	private final QueueLink[] inLinksArrayCache;
-	private final QueueLink[] tempLinks;
+	private final DBSimLink[] inLinksArrayCache;
+	private final DBSimLink[] tempLinks;
 
 	private boolean active = false;
 
 	private final Node node;
 
-	public QueueNetwork queueNetwork;
+	public DBSimNetwork queueNetwork;
 
-	public QueueNode(final Node n, final QueueNetwork queueNetwork) {
+	public DBSimNode(final Node n, final DBSimNetwork queueNetwork) {
 		this.node = n;
 		this.queueNetwork = queueNetwork;
 
 		int nofInLinks = this.node.getInLinks().size();
-		this.inLinksArrayCache = new QueueLink[nofInLinks];
-		this.tempLinks = new QueueLink[nofInLinks];
+		this.inLinksArrayCache = new DBSimLink[nofInLinks];
+		this.tempLinks = new DBSimLink[nofInLinks];
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class QueueNode {
 		/* As the order of nodes has an influence on the simulation results,
 		 * the nodes are sorted to avoid indeterministic simulations. dg[april08]
 		 */
-		Arrays.sort(this.inLinksArrayCache, QueueNode.qlinkIdComparator);
+		Arrays.sort(this.inLinksArrayCache, DBSimNode.qlinkIdComparator);
 	}
 
 	public Node getNode() {
@@ -91,7 +91,7 @@ public class QueueNode {
 	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
-	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLink link, final double now) {
+	protected boolean moveVehicleOverNode(final DBSimVehicle veh, final DBSimLink link, final double now) {
 		Id nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = link.getLink();
 
@@ -103,7 +103,7 @@ public class QueueNode {
 						" from link " + currentLink.getId() + " to link " + nextLinkId);
 			}
 			
-			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
+			DBSimLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
 
 			if (nextQueueLink.hasSpace()) {
 				link.popFirstFromBuffer();
@@ -123,7 +123,7 @@ public class QueueNode {
 					link.popFirstFromBuffer();
 					AbstractSimulation.decLiving();
 					AbstractSimulation.incLost();
-					QueueSimulation.getEvents().processEvent(
+					DBSimulation.getEvents().processEvent(
 							new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
 				} else {
 					link.popFirstFromBuffer();
@@ -174,7 +174,7 @@ public class QueueNode {
 	  int inLinksCounter = 0;
 	  double inLinksCapSum = 0.0;
 	  // Check all incoming links for buffered agents
-	  for (QueueLink link : this.inLinksArrayCache) {
+	  for (DBSimLink link : this.inLinksArrayCache) {
 	    if (!link.bufferIsEmpty()) {
 	      this.tempLinks[inLinksCounter] = link;
 	      inLinksCounter++;
@@ -193,7 +193,7 @@ public class QueueNode {
 	    double rndNum = random.nextDouble() * inLinksCapSum;
 	    double selCap = 0.0;
 	    for (int i = 0; i < inLinksCounter; i++) {
-	      QueueLink link = this.tempLinks[i];
+	      DBSimLink link = this.tempLinks[i];
 	      if (link == null)
 	        continue;
 	      selCap += link.getLink().getCapacity(now);
@@ -209,18 +209,18 @@ public class QueueNode {
 		}
 	}
 
-	private void clearLaneBuffer(final QueueLink link, final double now){
+	private void clearLaneBuffer(final DBSimLink link, final double now){
 		while (!link.bufferIsEmpty()) {
-			QueueVehicle veh = link.getFirstFromBuffer();
+			DBSimVehicle veh = link.getFirstFromBuffer();
 			if (!moveVehicleOverNode(veh, link, now)) {
 				break;
 			}
 		}
 	}
 
-	protected static class QueueLinkIdComparator implements Comparator<QueueLink>, Serializable {
+	protected static class QueueLinkIdComparator implements Comparator<DBSimLink>, Serializable {
 		private static final long serialVersionUID = 1L;
-		public int compare(final QueueLink o1, final QueueLink o2) {
+		public int compare(final DBSimLink o1, final DBSimLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}
 	}

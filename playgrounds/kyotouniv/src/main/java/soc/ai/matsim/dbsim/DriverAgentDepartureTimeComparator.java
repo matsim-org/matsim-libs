@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VehicleDepartureTimeComparator.java
+ * DriverAgentDepartureTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,31 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
 import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * @author dstrippgen
+ * Compares two {@link DriverAgent}s according to their (planned) departure time. If the 
+ * departure times are the same, the agent with the higher id is considered smaller.
  *
- * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
- * according to their departure time
+ * @author mrieser
+ * 
+ * @see DriverAgent#getDepartureTime()
  */
-public class QueueVehicleEarliestLinkExitTimeComparator implements Comparator<QueueVehicle>,
-		Serializable {
+/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<DriverAgent>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public int compare(final QueueVehicle veh1, final QueueVehicle veh2) {
-		if (veh1.getEarliestLinkExitTime() > veh2.getEarliestLinkExitTime()) {
-			return 1;
+	public int compare(DriverAgent agent1, DriverAgent agent2) {
+		int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
+		if (cmp == 0) {
+			// Both depart at the same time -> let the one with the larger id be first (=smaller)
+			return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
 		}
-		if (veh1.getEarliestLinkExitTime() < veh2.getEarliestLinkExitTime()) {
-			return -1;
-		}
-
-		// Both depart at the same time -> let the one with the larger id be first
-		return veh2.getId().compareTo(veh1.getId());
+		return cmp;
 	}
+
 }

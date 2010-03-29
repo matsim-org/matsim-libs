@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
 public class SimulationTimer {
 	static private double simStartTime = 24*3600;

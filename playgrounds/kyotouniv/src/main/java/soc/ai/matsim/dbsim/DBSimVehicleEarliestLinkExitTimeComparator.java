@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DriverAgent.java
+ * VehicleDepartureTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
-import org.matsim.api.core.v01.Id;
+import java.io.Serializable;
+import java.util.Comparator;
 
-public interface DriverAgent extends PersonAgentI {
+/**
+ * @author dstrippgen
+ *
+ * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
+ * according to their departure time
+ */
+public class DBSimVehicleEarliestLinkExitTimeComparator implements Comparator<DBSimVehicle>,
+		Serializable {
 
-	
-	public Id getDestinationLinkId();
-	
-	/**
-	 * Returns the next link the vehicle will drive along.
-	 *
-	 * @return The next link the vehicle will drive on, or null if an error has happened.
-	 */
-	public Id chooseNextLinkId();
+	private static final long serialVersionUID = 1L;
 
-	public void teleportToLink(final Id linkId);
+	public int compare(final DBSimVehicle veh1, final DBSimVehicle veh2) {
+		if (veh1.getEarliestLinkExitTime() > veh2.getEarliestLinkExitTime()) {
+			return 1;
+		}
+		if (veh1.getEarliestLinkExitTime() < veh2.getEarliestLinkExitTime()) {
+			return -1;
+		}
 
-	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
-
-	public void moveOverNode();
-
-
+		// Both depart at the same time -> let the one with the larger id be first
+		return veh2.getId().compareTo(veh1.getId());
+	}
 }

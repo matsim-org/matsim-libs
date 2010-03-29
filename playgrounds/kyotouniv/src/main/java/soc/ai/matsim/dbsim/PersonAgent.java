@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
 import java.util.List;
 
@@ -41,14 +41,16 @@ import org.matsim.core.utils.misc.Time;
  * @author mrieser
  */
 public class PersonAgent implements DriverAgent {
-
+	//TODO DriverModel driverModel = null; setter, getter;
+	//TODO VehicleEmulator vehEmu = null; setter, getter;
+	
 	private static final Logger log = Logger.getLogger(PersonAgent.class);
 
 	private final Person person;
-	private QueueVehicle vehicle;
+	private DBSimVehicle vehicle;
 	protected Id cachedNextLinkId = null;
 
-	private final QueueSimulation simulation;
+	private final DBSimulation simulation;
 
 	private double activityDepartureTime = Time.UNDEFINED_TIME;
 
@@ -63,7 +65,7 @@ public class PersonAgent implements DriverAgent {
 
 	private int currentLinkIdIndex;
 
-	public PersonAgent(final Person p, final QueueSimulation simulation) {
+	public PersonAgent(final Person p, final DBSimulation simulation) {
 		this.person = p;
 		this.simulation = simulation;
 	}
@@ -81,11 +83,11 @@ public class PersonAgent implements DriverAgent {
 		return this.person.getSelectedPlan().getPlanElements();
 	}
 
-	public void setVehicle(final QueueVehicle veh) {
+	public void setVehicle(final DBSimVehicle veh) {
 		this.vehicle = veh;
 	}
 
-	public QueueVehicle getVehicle() {
+	public DBSimVehicle getVehicle() {
 		return this.vehicle;
 	}
 
@@ -154,7 +156,7 @@ public class PersonAgent implements DriverAgent {
 	 */
 	public void activityEnds(final double now) {
 		ActivityImpl act = (ActivityImpl) this.getPlanElements().get(this.currentPlanElementIndex);
-		QueueSimulation.getEvents().processEvent(new ActivityEndEventImpl(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		DBSimulation.getEvents().processEvent(new ActivityEndEventImpl(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		advancePlanElement(now);
 	}
 
@@ -204,7 +206,7 @@ public class PersonAgent implements DriverAgent {
 	 * @param act the activity the agent reaches
 	 */
 	private void reachActivity(final double now, final ActivityImpl act) {
-		QueueSimulation.getEvents().processEvent(new ActivityStartEventImpl(now, this.getPerson().getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
+		DBSimulation.getEvents().processEvent(new ActivityStartEventImpl(now, this.getPerson().getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...
 		 */

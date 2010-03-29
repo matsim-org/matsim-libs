@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DriverAgentDepartureTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+
 
 /**
- * Compares two {@link DriverAgent}s according to their (planned) departure time. If the 
- * departure times are the same, the agent with the higher id is considered smaller.
- *
- * @author mrieser
- * 
- * @see DriverAgent#getDepartureTime()
+ * @author dgrether
  */
-/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<DriverAgent>, Serializable {
+public interface DBSimNetworkFactory<QN extends DBSimNode, QL extends DBSimLink> {
 
-	private static final long serialVersionUID = 1L;
+	public QN newQueueNode(Node node, DBSimNetwork queueNetwork);
 
-	public int compare(DriverAgent agent1, DriverAgent agent2) {
-		int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
-		if (cmp == 0) {
-			// Both depart at the same time -> let the one with the larger id be first (=smaller)
-			return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
-		}
-		return cmp;
-	}
+	public QL newQueueLink(Link link, DBSimNetwork queueNetwork, QN queueNode);
 
 }

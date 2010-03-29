@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +36,7 @@ import java.util.Random;
  * @author dgrether
  * @author dstrippgen
  */
-public class QueueSimEngine {
+public class DBSimEngine {
 
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
@@ -48,33 +48,33 @@ public class QueueSimEngine {
 	private static boolean simulateAllLinks = false;
 	private static boolean simulateAllNodes = false;
 
-	private final List<QueueLink> allLinks;
+	private final List<DBSimLink> allLinks;
 	/** This is the collection of links that have to be moved in the simulation */
-	private final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
+	private final List<DBSimLink> simLinksArray = new ArrayList<DBSimLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
-	private final QueueNode[] simNodesArray;
+	private final DBSimNode[] simNodesArray;
 	/** This is the collection of links that have to be activated in the current time step */
-	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
+	private final ArrayList<DBSimLink> simActivateThis = new ArrayList<DBSimLink>();
 	
 	private final Random random;
 	
-	public QueueSimEngine(final QueueNetwork network, final Random random) {
+	public DBSimEngine(final DBSimNetwork network, final Random random) {
 		this(network.getLinks().values(), network.getNodes().values(), random);
 	}
 	
-	/*package*/ QueueSimEngine(final Collection<QueueLink> links, final Collection<QueueNode> nodes, final Random random) {
+	/*package*/ DBSimEngine(final Collection<DBSimLink> links, final Collection<DBSimNode> nodes, final Random random) {
 		this.random = random;
-		this.allLinks = new ArrayList<QueueLink>(links);
+		this.allLinks = new ArrayList<DBSimLink>(links);
 		
-		this.simNodesArray = nodes.toArray(new QueueNode[nodes.size()]);
+		this.simNodesArray = nodes.toArray(new DBSimNode[nodes.size()]);
 		//dg[april08] as the order of nodes has an influence on the simulation
 		//results they are sorted to avoid indeterministic simulations
-		Arrays.sort(this.simNodesArray, new Comparator<QueueNode>() {
-			public int compare(final QueueNode o1, final QueueNode o2) {
+		Arrays.sort(this.simNodesArray, new Comparator<DBSimNode>() {
+			public int compare(final DBSimNode o1, final DBSimNode o2) {
 				return o1.getNode().getId().compareTo(o2.getNode().getId());
 			}
 		});
-		for (QueueLink link : this.allLinks) {
+		for (DBSimLink link : this.allLinks) {
 			link.finishInit();
 			link.setSimEngine(this);
 		}
@@ -89,7 +89,7 @@ public class QueueSimEngine {
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
-		for (QueueLink link : this.allLinks) {
+		for (DBSimLink link : this.allLinks) {
 			link.clearVehicles();
 		}
 	}
@@ -104,7 +104,7 @@ public class QueueSimEngine {
 	}
 
 	protected void moveNodes(final double time) {
-		for (QueueNode node : this.simNodesArray) {
+		for (DBSimNode node : this.simNodesArray) {
 			if (node.isActive() || simulateAllNodes) {
 				/* It is faster to first test if the node is active, and only then call moveNode(),
 				 * than calling moveNode() directly and that one returns immediately when it's not
@@ -119,8 +119,8 @@ public class QueueSimEngine {
 
 	protected void moveLinks(final double time) {
 		reactivateLinks();
-		ListIterator<QueueLink> simLinks = this.simLinksArray.listIterator();
-		QueueLink link;
+		ListIterator<DBSimLink> simLinks = this.simLinksArray.listIterator();
+		DBSimLink link;
 		boolean isActive;
 
 		while (simLinks.hasNext()) {
@@ -132,7 +132,7 @@ public class QueueSimEngine {
 		}
 	}
 
-	protected void activateLink(final QueueLink link) {
+	protected void activateLink(final DBSimLink link) {
 		if (!simulateAllLinks) {
 			this.simActivateThis.add(link);
 		}

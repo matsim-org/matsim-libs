@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitDriverAgent.java
+ * DriverAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,18 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.api.core.v01.Id;
 
-/**
- * Additional methods for drivers of public transport vehicles.
- *
- * @author mrieser
- */
-public interface TransitDriverAgent extends DriverAgent {
+public interface DriverAgent extends PersonAgentI {
 
-	public TransitStopFacility getNextTransitStop();
 	
-	public double handleTransitStop(final TransitStopFacility stop, final double now);
+	public Id getDestinationLinkId();
+	
+	/**
+	 * Returns the next link the vehicle will drive along.
+	 *
+	 * @return The next link the vehicle will drive on, or null if an error has happened.
+	 */
+	public Id chooseNextLinkId();
+
+	public void teleportToLink(final Id linkId);
+
+	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
+
+	public void moveOverNode();
+
+	//TODO public DriverModel getDriverModel();
+
 }

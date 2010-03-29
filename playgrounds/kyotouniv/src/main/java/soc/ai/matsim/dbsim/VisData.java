@@ -17,11 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
 import java.util.Collection;
 
-import soc.ai.matsim.queuesim.QueueLink.AgentOnLink;
+import soc.ai.matsim.dbsim.DBSimLink.AgentOnLink;
+
 import org.matsim.vis.snapshots.writers.PositionInfo;
 /**
  * Interface for methods to provide a visualizer with data.

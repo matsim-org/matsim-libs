@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -29,11 +29,11 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
  * @author dgrether
  *
  */
-public class QueueSimulationFactory implements MobsimFactory {
+public class DBSimulationFactory implements MobsimFactory {
 
   @Override
   public IOSimulation createMobsim(Scenario sc, EventsManager eventsManager) {
-    return new QueueSimulation(sc, eventsManager);
+    return new DBSimulation(sc, eventsManager);
   }
 
 }

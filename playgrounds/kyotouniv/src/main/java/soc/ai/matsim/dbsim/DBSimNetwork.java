@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,32 +39,32 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * @author mrieser
  * @author dgrether
  */
-public class QueueNetwork{
+public class DBSimNetwork{
 
-	private final Map<Id, QueueLink> links;
+	private final Map<Id, DBSimLink> links;
 
-	private final Map<Id, QueueNode> nodes;
+	private final Map<Id, DBSimNode> nodes;
 
 	private final Network networkLayer;
 
-	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
+	private final DBSimNetworkFactory<DBSimNode, DBSimLink> queueNetworkFactory;
 
-	public QueueNetwork(final Network networkLayer2) {
-		this(networkLayer2, new DefaultQueueNetworkFactory());
+	public DBSimNetwork(final Network networkLayer2) {
+		this(networkLayer2, new DefaultDBSimNetworkFactory());
 	}
 
-	public QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
+	public DBSimNetwork(final Network networkLayer, final DBSimNetworkFactory<DBSimNode, DBSimLink> factory) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
-		this.links = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
-		this.nodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.links = new LinkedHashMap<Id, DBSimLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.nodes = new LinkedHashMap<Id, DBSimNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.newQueueNode(n, this));
 		}
 		for (Link l : networkLayer.getLinks().values()) {
 			this.links.put(l.getId(), this.queueNetworkFactory.newQueueLink(l, this, this.nodes.get(l.getToNode().getId())));
 		}
-		for (QueueNode n : this.nodes.values()) {
+		for (DBSimNode n : this.nodes.values()) {
 			n.init();
 		}
 	}
@@ -79,25 +79,25 @@ public class QueueNetwork{
 	 */
 	public Collection<PositionInfo> getVehiclePositions() {
 		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
-		for (QueueLink link : this.links.values()) {
+		for (DBSimLink link : this.links.values()) {
 			link.getVisData().getVehiclePositions(positions);
 		}
 		return positions;
 	}
 
-	public Map<Id, QueueLink> getLinks() {
+	public Map<Id, DBSimLink> getLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
-	public Map<Id, QueueNode> getNodes() {
+	public Map<Id, DBSimNode> getNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
-	public QueueLink getQueueLink(final Id id) {
+	public DBSimLink getQueueLink(final Id id) {
 		return this.links.get(id);
 	}
 
-	public QueueNode getQueueNode(final Id id) {
+	public DBSimNode getQueueNode(final Id id) {
 		return this.nodes.get(id);
 	}
 	

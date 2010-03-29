@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package soc.ai.matsim.queuesim;
+package soc.ai.matsim.dbsim;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -26,17 +26,17 @@ import org.matsim.api.core.v01.network.Node;
 /**
  * @author dgrether
  */
-/*package*/ final class DefaultQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
+/*package*/ final class DefaultDBSimNetworkFactory implements DBSimNetworkFactory<DBSimNode, DBSimLink> {
 
-	public QueueLink newQueueLink(final Link link, final QueueNetwork queueNetwork, final QueueNode toQueueNode) {
-		return new QueueLink(link, queueNetwork, toQueueNode);
+	public DBSimLink newQueueLink(final Link link, final DBSimNetwork queueNetwork, final DBSimNode toQueueNode) {
+		return new DBSimLink(link, queueNetwork, toQueueNode);
 	}
 
 	/**
 	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#newQueueNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
 	 */
-	public QueueNode newQueueNode(final Node node, final QueueNetwork queueNetwork) {
-		return new QueueNode(node, queueNetwork);
+	public DBSimNode newQueueNode(final Node node, final DBSimNetwork dbsimNetwork) {
+		return new DBSimNode(node, dbsimNetwork);
 	}
 
 }
