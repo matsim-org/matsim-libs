@@ -74,7 +74,7 @@ public class QueryAgentId extends AbstractQuery {
 		this.result = new Result();
 		double minDist = Double.POSITIVE_INFINITY;
 		double dist = 0;
-		for(QLink qlink : queueSimulation.getQueueSimulation().getNetwork().getLinks().values()) {
+		for(QLink qlink : queueSimulation.getQueueSimulation().getQNetwork().getLinks().values()) {
 			List<AgentSnapshotInfo> positions = new LinkedList<AgentSnapshotInfo>();
 			qlink.getVisData().getVehiclePositions(positions);
 			for(AgentSnapshotInfo info : positions) {

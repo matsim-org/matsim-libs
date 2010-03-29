@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -93,7 +92,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	protected PopulationImpl population;
 	protected QNetwork network;
-	private Network networkLayer;
 	private static EventsManager events = null;
 	protected  SimStateWriterI netStateWriter = null;
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
@@ -145,7 +143,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
     QSimTimer.reset(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
     setEvents(eventsManager);
     this.population = (PopulationImpl) sc.getPopulation();
-    this.networkLayer = sc.getNetwork();
     Config config = sc.getConfig();
     this.simEngine = new QSimEngineImpl(this, MatsimRandom.getRandom());
 
@@ -154,13 +151,12 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
         throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
       }
       this.setLaneDefinitions(((ScenarioImpl)sc).getLaneDefinitions());
-//      this.network = new QueueNetwork(this.networkLayer, new QLanesNetworkFactory(new DefaultQueueNetworkFactory()));
       this.network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQueueNetworkFactory()));
     }
     else {
-//        this.network = new QueueNetwork(this.networkLayer);
         this.network = new QNetwork(this);
     }
+    this.network.initialize(this.simEngine);
     if (config.scenario().isUseSignalSystems()) {
       if ((((ScenarioImpl)sc).getSignalSystems() == null)
           || (((ScenarioImpl)sc).getSignalSystemConfigurations() == null)) {
@@ -169,6 +165,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
       }
       this.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
     }
+    
 
 
     this.agentFactory = new AgentFactory(this);
@@ -277,7 +274,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	}
 
 	private void prepareNetworkChangeEventsQueue() {
-		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)(this.networkLayer)).getNetworkChangeEvents();
+		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)(this.scenario.getNetwork())).getNetworkChangeEvents();
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
 			this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);
@@ -435,7 +432,10 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	private void doSnapshot(final double time) {
 		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
-			Collection<AgentSnapshotInfo> positions = this.network.getVehiclePositions(time);
+		  Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+	    for (QLink link : this.getQNetwork().getLinks().values()) {
+	      link.getVisData().getVehiclePositions(positions);
+	    }
 			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
 				writer.beginSnapshot(time);
 				for (AgentSnapshotInfo position : positions) {
@@ -471,7 +471,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	protected void handleUnknownLegMode(double now, final DriverAgent agent, Id linkId) {
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
-			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.networkLayer.getLinks().get(linkId));
+			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.scenario.getNetwork().getLinks().get(linkId));
 		}
 		double arrivalTime = now + agent.getCurrentLeg().getTravelTime();
 		this.teleportationList.add(new Tuple<Double, DriverAgent>(arrivalTime, agent));
@@ -659,10 +659,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	public Set<TransportMode> getNotTeleportedModes() {
 		return notTeleportedModes;
-	}
-
-	public QNetwork getNetwork() {
-		return network;
 	}
 
 	public void addFeature(QSimFeature queueSimulationFeature) {

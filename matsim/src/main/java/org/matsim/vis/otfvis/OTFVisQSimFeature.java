@@ -84,7 +84,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 			if (queueSimulation instanceof TransitQSimulation) {
 				this.otfServer
 						.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
-								queueSimulation.getNetwork().getNetworkLayer(),
+								queueSimulation.getQNetwork().getNetworkLayer(),
 								((ScenarioImpl) queueSimulation.getScenario())
 										.getTransitSchedule(),
 								((TransitQSimulation) queueSimulation)
@@ -153,7 +153,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 	}
 
 	public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
-		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId())));
+		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getQNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId())));
 	}
 
 	private void visualizeTeleportedAgents(double time) {

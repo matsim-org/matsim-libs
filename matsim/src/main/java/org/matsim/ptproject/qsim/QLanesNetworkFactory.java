@@ -39,8 +39,8 @@ public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLink> {
   }
 
   @Override
-  public QNode newQueueNode(Node node, QNetwork queueNetwork) {
-    return this.delegate.newQueueNode(node, queueNetwork);
+  public QNode newQueueNode(Node node, QSimEngine simEngine) {
+    return this.delegate.newQueueNode(node, simEngine);
   }
 
 }

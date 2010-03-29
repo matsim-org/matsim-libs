@@ -26,10 +26,12 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
@@ -58,7 +60,8 @@ public class OTFNetworkServer implements OTFServerRemote {
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
-		QNetwork qnet = new QNetwork(net);
+		QSim sim = new QSim(scenario, new EventsManagerImpl());
+		QNetwork qnet = sim.getQNetwork();
 
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);

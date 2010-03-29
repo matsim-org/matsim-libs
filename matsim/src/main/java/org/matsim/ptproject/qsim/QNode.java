@@ -48,16 +48,16 @@ public class QNode {
 
 	private final Node node;
 
-	public QNetwork queueNetwork;
 	/**
 	 * Indicates whether this node is signalized or not
 	 */
 	private boolean signalized = false;
 
-	public QNode(final Node n, final QNetwork queueNetwork) {
-		this.node = n;
-		this.queueNetwork = queueNetwork;
+  private QSimEngine simEngine;
 
+	public QNode(final Node n, final QSimEngine simEngine) {
+		this.node = n;
+		this.simEngine = simEngine;
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new QLink[nofInLinks];
 		this.tempLinks = new QLink[nofInLinks];
@@ -72,7 +72,7 @@ public class QNode {
 	/*package*/ void init() {
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
-			this.inLinksArrayCache[i] = this.queueNetwork.getLinks().get(l.getId());
+			this.inLinksArrayCache[i] = this.simEngine.getQSim().getQNetwork().getLinks().get(l.getId());
 			i++;
 		}
 		/* As the order of nodes has an influence on the simulation results,
@@ -216,7 +216,7 @@ public class QNode {
     
     // veh has to move over node
     if (nextLinkId != null) {
-      QLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
+      QLink nextQueueLink = this.simEngine.getQSim().getQNetwork().getQueueLink(nextLinkId);
       Link nextLink = nextQueueLink.getLink();
       this.checkNextLinkSemantics(currentLink, nextLink, veh);
       if (nextQueueLink.hasSpace()) {

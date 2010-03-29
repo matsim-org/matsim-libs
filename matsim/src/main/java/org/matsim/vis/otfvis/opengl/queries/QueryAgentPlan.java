@@ -119,7 +119,7 @@ public class QueryAgentPlan extends AbstractQuery {
 	@Override
 	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.queueSimulation = queueSimulation;
-		this.net = queueSimulation.getQueueSimulation().getNetwork();
+		this.net = queueSimulation.getQueueSimulation().getQNetwork();
 		this.visTeleportationData = queueSimulation.getVisTeleportationData();
 		result = new Result();
 		result.agentId = this.agentId.toString();
