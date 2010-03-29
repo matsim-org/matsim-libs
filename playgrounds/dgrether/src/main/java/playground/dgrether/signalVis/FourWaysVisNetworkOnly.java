@@ -20,6 +20,7 @@
 package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -30,15 +31,13 @@ import org.matsim.vis.otfvis.OTFVisQSim;
 
 public class FourWaysVisNetworkOnly {
 
-	public static final String TESTINPUTDIR = "test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
-	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 
-		String netFile = TESTINPUTDIR + "network.xml.gz";
-		String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
+		String netFile = FourWaysVis.TESTINPUTDIR+ "network.xml.gz";
+		String lanesFile  = FourWaysVis.TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
 		
 		
 		String[] netArray = {netFile};
@@ -47,6 +46,7 @@ public class FourWaysVisNetworkOnly {
 //		OTFVis.playNetwork(netArray);
 		//this is hack
 		ScenarioImpl scenario = new ScenarioImpl();
+    scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();
