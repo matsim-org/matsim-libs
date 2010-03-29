@@ -28,7 +28,9 @@ import org.matsim.core.events.SignalGroupStateChangedEventImpl;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
 import org.matsim.signalsystems.control.SignalGroupState;
@@ -41,7 +43,7 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  */
 public class AdaptiveController extends
 		AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, 
-		LaneLeaveEventHandler, SimulationBeforeSimStepListener {
+		LaneLeaveEventHandler, SimulationBeforeSimStepListener, SimulationInitializedListener {
 	
 	private static final Logger log = Logger.getLogger(AdaptiveController.class);
 
@@ -54,40 +56,6 @@ public class AdaptiveController extends
 		super(controlInfo);
 	}
 
-	public boolean givenSignalGroupIsGreen(double time, SignalGroupDefinition signalGroup) {
-	  SignalGroupState oldState = this.getSignalGroupStates().get(signalGroup);
-	  SignalGroupState newState = null;
-		if (signalGroup.getLinkRefId().equals(id5)){
-			if (vehOnLink5Lane1 > 0) {
-				newState = SignalGroupState.GREEN;
-			}
-			else {
-			  newState = SignalGroupState.RED;
-			}
-		}
-		else if (signalGroup.getLinkRefId().equals(id4)){
-			if (vehOnLink5Lane1 > 0){
-			  newState = SignalGroupState.RED;
-			}
-			else {
-			  newState = SignalGroupState.GREEN;
-			}
-		}
-		//save the new state
-		this.getSignalGroupStates().put(signalGroup, newState);
-		
-		//fire the event
-		if (!newState.equals(oldState)){
-      this.getSignalEngine().getEvents().processEvent(
-          new SignalGroupStateChangedEventImpl(time, signalGroup.getSignalSystemDefinitionId(), 
-              signalGroup.getId(), newState));
-		}
-		
-		if (newState.equals(SignalGroupState.RED)){
-		  return false;
-		}
-		return true;
-	}
 
 	public void handleEvent(LaneEnterEvent e) {
 		if (e.getLinkId().equals(id5) && e.getLaneId().equals(id1)) {
@@ -105,15 +73,54 @@ public class AdaptiveController extends
 
   @Override
   public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
-    // TODO Auto-generated method stub
-    
+    for (SignalGroupDefinition signalGroup : this.getSignalGroups().values()){
+      SignalGroupState oldState = this.getSignalGroupStates().get(signalGroup);
+      SignalGroupState newState = null;
+      if (signalGroup.getLinkRefId().equals(id5)){
+        if (vehOnLink5Lane1 > 0) {
+          newState = SignalGroupState.GREEN;
+        }
+        else {
+          newState = SignalGroupState.RED;
+        }
+      }
+      else if (signalGroup.getLinkRefId().equals(id4)){
+        if (vehOnLink5Lane1 > 0){
+          newState = SignalGroupState.RED;
+        }
+        else {
+          newState = SignalGroupState.GREEN;
+        }
+      }
+      //save the new state
+      this.getSignalGroupStates().put(signalGroup, newState);
+
+      //fire the event
+      if (!newState.equals(oldState)){
+        this.getSignalEngine().getEvents().processEvent(
+            new SignalGroupStateChangedEventImpl(e.getSimulationTime(), signalGroup.getSignalSystemDefinitionId(), 
+                signalGroup.getId(), newState));
+      }
+    }
   }
 
   @Override
   public SignalGroupState getSignalGroupState(double seconds,
       SignalGroupDefinition signalGroup) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.getSignalGroupStates().get(signalGroup);
+  }
+
+
+  @Override
+  public void notifySimulationInitialized(SimulationInitializedEvent e) {
+    for (SignalGroupDefinition signalGroup : this.getSignalGroups().values()){
+      if (signalGroup.getLinkRefId().equals(id5)){
+        this.getSignalGroupStates().put(signalGroup, SignalGroupState.RED);
+      }
+      else {
+        this.getSignalGroupStates().put(signalGroup, SignalGroupState.GREEN);
+      }
+    }  
   }
 
 }
