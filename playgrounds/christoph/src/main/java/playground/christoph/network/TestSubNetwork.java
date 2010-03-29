@@ -12,8 +12,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -21,6 +21,8 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -123,7 +125,8 @@ public class TestSubNetwork {
 	
 	private void initReplanner()
 	{
-		qNetwork = new QNetwork(this.scenario.getNetwork());
+	  QSim sim = new QSim(this.scenario, new EventsManagerImpl());
+		qNetwork = sim.getQNetwork();
 		
 		travelTime = new KnowledgeTravelTimeCalculator(qNetwork);
 		travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);

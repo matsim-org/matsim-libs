@@ -103,7 +103,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 
 	public MVISnapshotWriter(ScenarioImpl sc) {
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QNetwork(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()))),OTFSnapshotGenerator.RUNS_SVN + "/test.mvi", new OTFFileWriterConnectionManagerFactory());
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()).getQNetwork()),OTFSnapshotGenerator.RUNS_SVN + "/test.mvi", new OTFFileWriterConnectionManagerFactory());
 	}
 
 
