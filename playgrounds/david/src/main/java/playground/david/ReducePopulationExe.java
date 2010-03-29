@@ -226,7 +226,9 @@ public class ReducePopulationExe {
 		List<LinkImpl> nolinkList = new LinkedList<LinkImpl>();
 		for(LinkImpl link : network.getLinks().values()) if(!filter.usedlinkList.contains(link.getId())) nolinkList.add(link);
 
-		for(LinkImpl link : nolinkList)network.removeLink(link);
+		for(LinkImpl link : nolinkList) {
+			network.removeLink(link.getId());
+		}
 
 		new NetworkWriter(network).writeFile(outnetFileName);
 

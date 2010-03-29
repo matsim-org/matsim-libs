@@ -52,7 +52,7 @@ public class PathSetGenerator {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private final static Logger log = Logger.getLogger(PathSetGenerator.class);
 
 	private final NetworkLayer network;
@@ -66,20 +66,20 @@ public class PathSetGenerator {
 	private final FreespeedTravelTimeCost frespeedCost;
 	private final LeastCostPathCalculator router;
 
-	private NodeImpl origin = null;
-	private NodeImpl destination = null;
+	private Node origin = null;
+	private Node destination = null;
 	private int nofPaths = 20; // default
 	private double variationFactor = 1.0; // default
 	private double depTime = Time.UNDEFINED_TIME; // not sure yet if there needs a depTime defined => setting default
 	private long timeout = 604800000; // default 1 week
-	
+
 	// this is not very nice...: keep the leastCostPath in mind (path on level zero) during the
 	// getPaths() method.
 	private Path leastCostPath = null;
-	
+
 	// this is also not very nice: to keep the sart time for calc one path set
 	private long startTimeMilliseconds = System.currentTimeMillis();
-	
+
 	private int routeCnt = 0;
 
 	//////////////////////////////////////////////////////////////////////
@@ -94,13 +94,13 @@ public class PathSetGenerator {
 		preProcessLandmarks.run(network);
 		this.router = new AStarLandmarks(this.network,preProcessLandmarks,this.frespeedCost);
 		this.initStreetSegments();
-		
+
 		// calc network densities
 		double linkDensity = 0.0;
 		double nodeDensity = 0.0;
-		for (NodeImpl n : network.getNodes().values()) {
-			linkDensity += n.getIncidentLinks().size();
-			nodeDensity += n.getIncidentNodes().size();
+		for (Node n : network.getNodes().values()) {
+			linkDensity += ((NodeImpl) n).getIncidentLinks().size();
+			nodeDensity += ((NodeImpl) n).getIncidentNodes().size();
 		}
 		linkDensity /= network.getNodes().size();
 		nodeDensity /= network.getNodes().size();
@@ -116,34 +116,34 @@ public class PathSetGenerator {
 		linkDensity = 0.0;
 		nodeDensity = 0.0;
 		for (Id nid : nodeIds) {
-			linkDensity += this.network.getNodes().get(nid).getIncidentLinks().size();
-			nodeDensity += this.network.getNodes().get(nid).getIncidentNodes().size();
+			linkDensity += ((NodeImpl) this.network.getNodes().get(nid)).getIncidentLinks().size();
+			nodeDensity += ((NodeImpl) this.network.getNodes().get(nid)).getIncidentNodes().size();
 		}
 		this.avLinkDensityPerNonePassNodeNetwork = linkDensity/nodeIds.size();
 		this.avIncidentNodeDensityPerNonePassNodeNetwork = nodeDensity/nodeIds.size();
 
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// public methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final void setPathSetSize(int nofPaths) {
 		if (nofPaths < 1) { log.warn("nofPaths: "+nofPaths+" < 1 not allowed. Keeping previous PathSet size = "+this.nofPaths); }
 		else { this.nofPaths = nofPaths; }
 	}
-	
+
 	public final void setVariationFactor(double variationFactor) {
 		if (nofPaths < 1.0) { log.warn("variationFactor: "+variationFactor+" < 1.0 not allowed. Keeping previous variation factor: "+this.variationFactor); }
 		else { this.variationFactor = variationFactor; }
 	}
-	
+
 	public final void setTimeout(long timeout) {
 		if ((timeout < 1000) || (timeout > (604800000))) { log.warn("timeout: "+timeout+" must be between 1 sec (1000 msec) and 7 days (604'800'000 msec). Keeping previous timeout: "+this.variationFactor); }
 		else { this.timeout = timeout; }
 	}
 
-	public final boolean setODPair(NodeImpl fromNode, NodeImpl toNode) {
+	public final boolean setODPair(Node fromNode, Node toNode) {
 		if (fromNode == null) { log.warn("Origin node must exist."); return false; }
 		if (network.getNodes().get(fromNode.getId()) == null) { log.warn("Origin node does not exist in the network."); return false; }
 
@@ -155,20 +155,20 @@ public class PathSetGenerator {
 		destination = toNode;
 		return true;
 	}
-	
+
 	public final Tuple<Path,List<Path>> getPaths() {
-		
+
 		// set calculation start time
 		startTimeMilliseconds = System.currentTimeMillis();
 		log.debug(" measurement started at "+startTimeMilliseconds+" with timeout "+timeout+"...");
-		
+
 		// setup and run the recursion
 		List<Set<StreetSegment>> excludingStreetSegmentSets = new LinkedList<Set<StreetSegment>>();
 		excludingStreetSegmentSets.add(new HashSet<StreetSegment>());
 		Set<Path> paths = new HashSet<Path>();
 		routeCnt = 0;
 		generate(0,excludingStreetSegmentSets,paths);
-		
+
 		// remove the least cost path from the paths
 		// this is not very nice... (see generate(...) why)
 		paths.remove(leastCostPath);
@@ -181,7 +181,7 @@ public class PathSetGenerator {
 		leastCostPath = null;
 		return tuple;
 	}
-	
+
 	public final void printL2SMapping() {
 		for (Id id : l2sMapping.keySet()) {
 			System.out.println(id.toString()+"\t"+l2sMapping.get(id).getId());
@@ -190,7 +190,7 @@ public class PathSetGenerator {
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private final void initStreetSegments() {
 		log.info("init street segments...");
 		for (LinkImpl l : network.getLinks().values()) {
@@ -207,7 +207,7 @@ public class PathSetGenerator {
 				currLink = prevLink;
 				fromNode = (NodeImpl) currLink.getFromNode();
 			}
-			
+
 			// create the street segment for the whole "one- or twoway path" (if not already exists)
 			StreetSegment s = l2sMapping.get(currLink.getId());
 			if (s == null) {
@@ -239,7 +239,7 @@ public class PathSetGenerator {
 //		log.info("  Number of links in the street segments: "+lcnt);
 		log.info("done.");
 	}
-	
+
 	private void addLinkToNetwork(Link link) {
 		link.getFromNode().addOutLink(link);
 		link.getToNode().addInLink(link);
@@ -256,7 +256,7 @@ public class PathSetGenerator {
 		}
 		return false;
 	}
-	
+
 	private final boolean containsStreetSegmentIdSet(List<Set<StreetSegment>> streetSegmentSets, Set<StreetSegment> streetSegmentSet) {
 		for (Set<StreetSegment> set : streetSegmentSets) {
 			if (set.equals(streetSegmentSet)) { return true; }
@@ -266,18 +266,18 @@ public class PathSetGenerator {
 
 	private final void generate(int level, List<Set<StreetSegment>> excludingStreetSegmentSets, Set<Path> paths) {
 		log.debug("start level "+level);
-		
+
 		// for EARLY ABORT: shuffle the excludingLinkSets
 		Collections.shuffle(excludingStreetSegmentSets,MatsimRandom.getRandom());
 
 		// the set of excluding link sets for the NEXT tree level
 		List<Set<StreetSegment>> newExcludingStreetSegmentSets = new LinkedList<Set<StreetSegment>>();
-		
+
 		// go through all given link sets for THIS level
 		int setCnt = 0;
 		for (Set<StreetSegment> streetSegmentSet : excludingStreetSegmentSets) {
 			setCnt++;
-			
+
 			// remove the links from the network, calculate the least cost path and put the links back where they were
 			for (StreetSegment segment : streetSegmentSet) {
 				for (Link l : segment.links) {
@@ -291,16 +291,16 @@ public class PathSetGenerator {
 					addLinkToNetwork(l);
 				}
 			}
-			
+
 			// check if there is a path from O to D (if not, that part of the recursion tree does not have to be expanded)
 			if (path != null) {
-				
+
 				// add path to the path set (if not yet exists)
 				if (!containsPath(paths,path)) {
 					paths.add(path);
 					log.debug("  path added (nofPath="+paths.size()+"; nofRemainingSets="+(excludingStreetSegmentSets.size()-setCnt)+")");
 				}
-				
+
 				// this is not very nice...: keep the leastCostPath in mind (path on level zero)
 				if (level == 0) { leastCostPath = path; }
 
@@ -314,7 +314,7 @@ public class PathSetGenerator {
 					printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level,"OK", leastCostPath);
 					return;
 				}
-				
+
 				// TIMEOUT ABORT
 				if (System.currentTimeMillis() > (startTimeMilliseconds+timeout)) {
 					log.debug("  number of paths("+paths.size()+") < nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
@@ -323,7 +323,7 @@ public class PathSetGenerator {
 					printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level, "TIMEOUT", leastCostPath);
 					return;
 				}
-				
+
 				// no matter if the path already exists in the path list, that element of the recursion tree needs to be expanded.
 				// Therefore, add new excluding link set for the NEXT tree level
 				// TODO balmermi: set the right street segments
@@ -336,7 +336,7 @@ public class PathSetGenerator {
 					if (!containsStreetSegmentIdSet(newExcludingStreetSegmentSets,newExcludingStreetSegmentSet)) {
 						newExcludingStreetSegmentSets.add(newExcludingStreetSegmentSet);
 					}
-					
+
 //					Set<Link> newExcludingLinkSet = new HashSet<Link>(linkSet.size()+1);
 //					newExcludingLinkSet.addAll(linkSet);
 //					newExcludingLinkSet.add(l);
@@ -346,7 +346,7 @@ public class PathSetGenerator {
 				}
 			}
 		}
-		
+
 		// nothing more to expand and therefore, no next tree level
 		if (newExcludingStreetSegmentSets.isEmpty()) {
 			log.debug("  number of paths("+paths.size()+") < nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
@@ -363,8 +363,8 @@ public class PathSetGenerator {
 			generate(level,newExcludingStreetSegmentSets,paths);
 		}
 	}
-	
-	private final void printSummary(NodeImpl o, NodeImpl d, long ctime, int pathCnt, int routeCnt, int level, String type, Path leastCostPath) {
+
+	private final void printSummary(Node o, Node d, long ctime, int pathCnt, int routeCnt, int level, String type, Path leastCostPath) {
 		double eDist = Math.sqrt(
 				(d.getCoord().getX()-o.getCoord().getX())*(d.getCoord().getX()-o.getCoord().getX())+
 				(d.getCoord().getY()-o.getCoord().getY())*(d.getCoord().getY()-o.getCoord().getY()));

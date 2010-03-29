@@ -32,11 +32,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -45,15 +45,15 @@ public class GeneratePathSets {
 	//////////////////////////////////////////////////////////////////////
 	// variables
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private static final Logger log = Logger.getLogger(GeneratePathSets.class);
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// methods
 	//////////////////////////////////////////////////////////////////////
-	
-	private static final Map<Id,Tuple<NodeImpl,NodeImpl>> parseODs(String inputFileName, NetworkLayer network) throws IOException {
-		Map<Id,Tuple<NodeImpl,NodeImpl>> ods = new TreeMap<Id,Tuple<NodeImpl,NodeImpl>>();
+
+	private static final Map<Id,Tuple<Node,Node>> parseODs(String inputFileName, NetworkLayer network) throws IOException {
+		Map<Id,Tuple<Node,Node>> ods = new TreeMap<Id,Tuple<Node,Node>>();
 		int lineCnt = 0;
 		FileReader fr = new FileReader(inputFileName);
 		BufferedReader in = new BufferedReader(fr);
@@ -65,10 +65,10 @@ public class GeneratePathSets {
 			// IDSEGMENT  StartNode  EndNode
 			// 0          1          2
 			Id id = new IdImpl(entries[0].trim());
-			NodeImpl origin = network.getNodes().get(new IdImpl(entries[1].trim()));
-			NodeImpl destination = network.getNodes().get(new IdImpl(entries[2].trim()));
+			Node origin = network.getNodes().get(new IdImpl(entries[1].trim()));
+			Node destination = network.getNodes().get(new IdImpl(entries[2].trim()));
 			if ((origin == null) || (destination == null)) { throw new RuntimeException("line "+lineCnt+": O and/or D not found in the network"); }
-			ods.put(id,new Tuple<NodeImpl,NodeImpl>(origin,destination));
+			ods.put(id,new Tuple<Node,Node>(origin,destination));
 			// progress report
 			if (lineCnt % 100000 == 0) { log.debug("line "+lineCnt); }
 			lineCnt++;
@@ -79,18 +79,18 @@ public class GeneratePathSets {
 		log.debug("# OD pairs: " + ods.size());
 		return ods;
 	}
-	
-	private static final void writePathSets(String outputFileName, Map<Id,Tuple<NodeImpl,NodeImpl>> ods, PathSetGenerator gen) throws IOException {
+
+	private static final void writePathSets(String outputFileName, Map<Id,Tuple<Node,Node>> ods, PathSetGenerator gen) throws IOException {
 		FileWriter fw = new FileWriter(outputFileName);
 		BufferedWriter out = new BufferedWriter(fw);
 		out.write("# Routesets\n");
 		out.write("# SEG_ID\tFROM_NODE\tTO_NODE\tROUTE(linklist)...\t-1\tLEASTCOSTROUTE(0,1)\t-1\n");
 		out.flush();
-		
+
 		for (Id id : ods.keySet()) {
-			Tuple<NodeImpl,NodeImpl> od = ods.get(id);
+			Tuple<Node,Node> od = ods.get(id);
 			// generate paths
-			
+
 			log.debug("----------------------------------------------------------------------");
 			log.debug("generating path sets for segment id="+id+", O="+od.getFirst().getId()+" and D="+od.getSecond().getId()+"...");
 			if (gen.setODPair(od.getFirst(),od.getSecond())) {
@@ -114,7 +114,7 @@ public class GeneratePathSets {
 			Gbl.printMemoryUsage();
 			log.debug("----------------------------------------------------------------------");
 		}
-		
+
 		out.close();
 		fw.close();
 	}
@@ -122,7 +122,7 @@ public class GeneratePathSets {
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public static void main(String[] args) throws IOException {
 		if (args.length != 6) {
 			log.error("Usage: GeneratePathSets nofPaths variantionFactor timeout inputNetworkFile inputODFile outputPathSetFile");
@@ -136,35 +136,35 @@ public class GeneratePathSets {
 			log.error("2009, matsim.org");
 			throw new RuntimeException("incorrect number of arguments");
 		}
-		
+
 		Gbl.printSystemInfo();
-		
+
 		int nofPaths = Integer.parseInt(args[0]);
 		double variantionFactor = Double.parseDouble(args[1]);
 		long timeout = Long.parseLong(args[2]);
 		String inputNetworkFile = args[3];
 		String inputODFile = args[4];
 		String outputPathSetFile = args[5];
-		
+
 		log.info("nofPaths:          "+nofPaths);
 		log.info("variantionFactor:  "+variantionFactor);
 		log.info("timeout:           "+timeout);
 		log.info("inputNetworkFile:  "+inputNetworkFile);
 		log.info("inputODFile:       "+inputODFile);
 		log.info("outputPathSetFile: "+outputPathSetFile);
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
-		
+
 		Gbl.printMemoryUsage();
 
 		PathSetGenerator gen = new PathSetGenerator(network);
 		gen.setPathSetSize(nofPaths);
 		gen.setVariationFactor(variantionFactor);
 		gen.setTimeout(timeout);
-		
-		Map<Id,Tuple<NodeImpl,NodeImpl>> ods = GeneratePathSets.parseODs(inputODFile,network);
+
+		Map<Id,Tuple<Node,Node>> ods = GeneratePathSets.parseODs(inputODFile,network);
 
 		Gbl.printMemoryUsage();
 

@@ -36,6 +36,7 @@ import net.opengis.kml._2.StyleType;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -43,7 +44,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -64,7 +64,7 @@ public class KMLPersonWriter {
 	protected PersonImpl person;
 	protected ArrayList<Link> activityLinks;
 	protected ArrayList<Node> routeNodes;
-	protected NetworkImpl network;
+	protected Network network;
 	protected Map<Id, Node> nodes;
 	protected NetworkRoute route;
 
@@ -80,7 +80,7 @@ public class KMLPersonWriter {
 	private StyleType networkNodeStyle;
 	private CoordinateTransformation coordinateTransform = new IdentityTransformation();
 
-	public KMLPersonWriter(NetworkImpl network, PersonImpl person)
+	public KMLPersonWriter(Network network, PersonImpl person)
 	{
 //		kmzFileName = "D:/Master_Thesis_HLI/Workspace/TestNetz/test.kmz";
 		setNetwork(network);
@@ -394,7 +394,7 @@ public class KMLPersonWriter {
 		this.writeNetwork = value;
 	}
 
-	public void setNetwork(NetworkImpl network)
+	public void setNetwork(Network network)
 	{
 		this.network = network;
 	}

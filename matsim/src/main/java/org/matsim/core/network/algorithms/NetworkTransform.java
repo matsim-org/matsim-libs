@@ -20,12 +20,10 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 public class NetworkTransform implements NetworkRunnable {
@@ -38,9 +36,7 @@ public class NetworkTransform implements NetworkRunnable {
 	}
 
 	public void run(final NetworkLayer network) {
-		Iterator<? extends NodeImpl> n_it = network.getNodes().values().iterator();
-		while (n_it.hasNext()) {
-			NodeImpl n = n_it.next();
+		for (Node n : network.getNodes().values()) {
 			Coord coord = n.getCoord();
 			Coord new_coord = transformer.transform(coord);
 			coord.setXY(new_coord.getX(), new_coord.getY());

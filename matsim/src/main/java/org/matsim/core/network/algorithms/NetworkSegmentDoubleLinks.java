@@ -30,11 +30,10 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 /**
  * This algorithm handles double links (two links with same from and to node) by splitting
@@ -46,7 +45,7 @@ import org.matsim.core.network.NodeImpl;
 public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 	private static final Logger log = Logger.getLogger(NetworkSegmentDoubleLinks.class);
 
-	private NetworkLayer network = null;
+	private Network network = null;
 
 	private int dblLinks = 0;
 	private int trblLinks = 0; // what does trbl stand for?? please document! TODO [GL] documentation
@@ -57,13 +56,13 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		this.network = network;
 		log.info("    running " + this.getClass().getName() + " algorithm...");
 
-		Queue<NodeImpl> nodes = new LinkedList<NodeImpl>(network.getNodes().values());
+		Queue<Node> nodes = new LinkedList<Node>(network.getNodes().values());
 		while (nodes.peek() != null) {
-			NodeImpl n = nodes.poll();
+			Node n = nodes.poll();
 			HashMap<Id, List<Link>> toNodesMap = new HashMap<Id, List<Link>>();
 			for (Link l : n.getOutLinks().values()) {
 				List<Link> links = toNodesMap.get(l.getToNode().getId());
@@ -113,14 +112,28 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 	}
 
 	private void splitLink(Link link) {
-		this.network.removeLink(link);
+		this.network.removeLink(link.getId());
 		double length = link.getLength()/2.0;
 		double freespeed = link.getFreespeed();
 		double capacity = link.getCapacity();
 		double permlanes = link.getNumberOfLanes();
-		Node medianNode = this.network.createAndAddNode(getNewNodeId(), link.getCoord());
-		this.network.createAndAddLink(link.getId(), link.getFromNode(), medianNode, length, freespeed, capacity, permlanes);
-		this.network.createAndAddLink(getNewLinkId(), medianNode, link.getToNode(), length, freespeed, capacity, permlanes);
+		
+		Node medianNode = this.network.getFactory().createNode(getNewNodeId(), link.getCoord());
+		this.network.addNode(medianNode);
+		
+		Link tmpLink = this.network.getFactory().createLink(link.getId(), link.getFromNode().getId(), medianNode.getId());
+		tmpLink.setLength(length);
+		tmpLink.setFreespeed(freespeed);
+		tmpLink.setCapacity(capacity);
+		tmpLink.setNumberOfLanes(permlanes);
+		this.network.addLink(tmpLink);
+		
+		tmpLink = this.network.getFactory().createLink(getNewLinkId(), medianNode.getId(), link.getToNode().getId());
+		tmpLink.setLength(length);
+		tmpLink.setFreespeed(freespeed);
+		tmpLink.setCapacity(capacity);
+		tmpLink.setNumberOfLanes(permlanes);
+		this.network.addLink(tmpLink);
 	}
 
 	private Id getNewLinkId() {

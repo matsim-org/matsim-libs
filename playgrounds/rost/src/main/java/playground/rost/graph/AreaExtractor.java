@@ -33,14 +33,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 
 import playground.rost.graph.evacarea.EvacArea;
 
 public class AreaExtractor {
-	
+
 	private static final Logger log = Logger.getLogger(AreaExtractor.class);
-	
+
 	public static NetworkLayer extractNetwork(Border border, NetworkLayer network, Set<String> evacAreaNodeIds, Set<String> evacBorderNodeIds)
 	{
 		boolean fromInHull;
@@ -93,9 +92,9 @@ public class AreaExtractor {
 		}
 		for(Link toDelete : linksToRemove)
 		{
-			network.removeLink(toDelete);
+			network.removeLink(toDelete.getId());
 		}
-		for(NodeImpl node : network.getNodes().values())
+		for(Node node : network.getNodes().values())
 		{
 			if(nodeInHull.containsKey(node))
 			{
@@ -113,7 +112,7 @@ public class AreaExtractor {
 		for(Node toDelete : nodesToRemove)
 		{
 			if(!explicitlyDoNotRemoveNode.contains(toDelete))
-				network.removeNode(toDelete);
+				network.removeNode(toDelete.getId());
 		}
 		for(Node node : nodeInHull.keySet())
 		{
@@ -133,7 +132,7 @@ public class AreaExtractor {
 		}
 		return network;
 	}
-	
+
 	public static void extractNetworkAndWriteIntoFile(Border border, NetworkLayer network, String networkFile, String evacAreaFile)
 	{
 		Set<String> nodeIdsInArea = new HashSet<String>();
@@ -153,6 +152,6 @@ public class AreaExtractor {
 			log.debug(ex.getMessage());
 			log.debug(ex.getStackTrace());
 		}
-		
+
 	}
 }

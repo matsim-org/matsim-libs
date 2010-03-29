@@ -86,16 +86,19 @@ public class DisplayNet implements Network, DisplayableNetI {
 		this.build();
 	}
 
+	@Override
 	public double getCapacityPeriod() {
 		return this.capacityPeriod;
 	}
 
 	// -------------------- IMPLEMENTATION OF BasicNetworkI --------------------
 
+	@Override
 	public Map<Id, ? extends DisplayNode> getNodes() {
 		return this.nodes;
 	}
 
+	@Override
 	public Map<Id, ? extends DisplayableLinkI> getLinks() {
 		return this.links;
 	}
@@ -120,35 +123,53 @@ public class DisplayNet implements Network, DisplayableNetI {
 		}
 	}
 
+	@Override
 	public double minEasting() {
 		return this.minEasting;
 	}
 
+	@Override
 	public double maxEasting() {
 		return this.maxEasting;
 	}
 
+	@Override
 	public double minNorthing() {
 		return this.minNorthing;
 	}
 
+	@Override
 	public double maxNorthing() {
 		return this.maxNorthing;
 	}
 
+	@Override
 	public NetworkFactory getFactory() {
 		throw new UnsupportedOperationException("Not available in this class");
 	}
 
+	@Override
 	public double getEffectiveLaneWidth() {
 		throw new UnsupportedOperationException("Not available in this class");
 	}
 
+	@Override
 	public void addLink(Link ll) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void addNode(Node nn) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Link removeLink(Id linkId) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Node removeNode(Id nodeId) {
 		throw new UnsupportedOperationException();
 	}
 

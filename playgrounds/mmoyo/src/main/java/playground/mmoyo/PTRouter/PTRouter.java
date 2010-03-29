@@ -62,7 +62,7 @@ public class PTRouter{
 		this.destinationNode=  new Station(new IdImpl(DESTINATION_ID), firstCoord);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
 		this.logicNet.addNode(originNode);
 		this.logicNet.addNode(destinationNode);
-		
+
 		System.out.println("logicNet.getNodes():" + logicNet.getNodes().size());
 		System.out.println("logicNet.getLinks():" + logicNet.getLinks().size());
 	}
@@ -136,9 +136,9 @@ public class PTRouter{
 		originNode.setCoord(coord1);
 		destinationNode.setCoord(coord2);
 
-		Collection <NodeImpl> nearOriginStops = find2Stations (originNode);
-		Collection <NodeImpl> nearDestinationStops = find2Stations (destinationNode);
-		
+		Collection <Node> nearOriginStops = find2Stations (originNode);
+		Collection <Node> nearDestinationStops = find2Stations (destinationNode);
+
 		nearOriginStops.remove(destinationNode);
 		nearDestinationStops.remove(originNode);
 
@@ -159,8 +159,8 @@ public class PTRouter{
 	}
 
 	/**looks for a number of near stations around a node*/
-	private Collection <NodeImpl> findnStations(final NodeImpl node){
-		Collection <NodeImpl> nearStations;
+	private Collection <Node> findnStations(final NodeImpl node){
+		Collection <Node> nearStations;
 		double walkRange = PTValues.FIRST_WALKRANGE;
 		do{
 			nearStations = logicNet.getNearestNodes(node.getCoord(), walkRange);  //walkRange
@@ -171,8 +171,8 @@ public class PTRouter{
 	}
 
 	//looks at least two stations, this is to match the multiNodeDijstra router
-	private Collection <NodeImpl> find2Stations (final Node node){   
-		Collection <NodeImpl> nearStations = logicNet.getNearestNodes(node.getCoord(), PTValues.FIRST_WALKRANGE);  //walkRange
+	private Collection <Node> find2Stations (final Node node){
+		Collection <Node> nearStations = logicNet.getNearestNodes(node.getCoord(), PTValues.FIRST_WALKRANGE);  //walkRange
 		if (nearStations.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			Node nearestNode = this.logicNet.getNearestNode(node.getCoord());
@@ -180,14 +180,14 @@ public class PTRouter{
 			nearStations = logicNet.getNearestNodes(node.getCoord(), distance + PTValues.WALKRANGE_EXT);
 		}
 		nearStations.remove(node);
-		return nearStations; 
+		return nearStations;
 	}
-	
-	
-	public List <LinkImpl> createWalkingLinks(NodeImpl walkNode, Collection <NodeImpl> nearNodes, boolean to){
+
+
+	public List <LinkImpl> createWalkingLinks(Node walkNode, Collection <Node> nearNodes, boolean to){
 		List<LinkImpl> newWalkLinks = new ArrayList<LinkImpl>();
 		int x=0;
-		for (NodeImpl node : nearNodes){
+		for (Node node : nearNodes){
 			if (to){
 				newWalkLinks.add(new PTLink(new IdImpl(ACCESS_PREFIX + x++), walkNode, node, logicNet, PTValues.ACCESS_STR));
 			}else{
@@ -199,7 +199,7 @@ public class PTRouter{
 
 	public void removeWalkLinks(Collection<LinkImpl> WalkingLinkList){
 		for (LinkImpl link : WalkingLinkList){
-			logicNet.removeLink(link);
+			logicNet.removeLink(link.getId());
 		}
 	}
 

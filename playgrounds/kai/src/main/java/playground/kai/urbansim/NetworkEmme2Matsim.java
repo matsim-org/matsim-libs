@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.kai.urbansim;
 
@@ -20,15 +20,15 @@ import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Translates emme networks into matsim networks.
- * 
+ *
  * Uses the "emme network export" result as input, NOT the GIS export.
- * 
+ *
  * A serious problem is that there is not enough info in the headers of the emme files:
  * (column counting starts at 0!!!)
  * - link "length" (column # 3) is in arbitrary units, connected to rest of system only through freespeed value
  * - Column # 8-10 are user-defined BUT contain freespeed, capacity, ... in arbitrary order and units
- *   (connected to rest of system through user-defined volume-delay functions) 
- * 
+ *   (connected to rest of system through user-defined volume-delay functions)
+ *
  * @author nagel
  *
  */
@@ -62,7 +62,7 @@ public class NetworkEmme2Matsim {
 				} else if ( parts[0].equals("t") ) {
 					if ( parts[1].equals("links") ) {
 						weAreReadingNodes = false ;
-					} 
+					}
 				} else if ( parts[0].equals("a") ) { // || parts[0].equals("a*") ) { // a* seem to be centroid connectors
 					if ( weAreReadingNodes ) {
 						String idStr = parts[1] ;
@@ -70,12 +70,12 @@ public class NetworkEmme2Matsim {
 						String yyStr = parts[3] ;
 						Node node = network.createAndAddNode(new IdImpl(idStr), new CoordImpl(xxStr,yyStr)) ;
 						if ( NW_NAME==PSRC ) {
-							((NodeImpl) node).setOrigId(parts[7]);		
+							((NodeImpl) node).setOrigId(parts[7]);
 						}
 //						checkMax( xxStr, yyStr ) ;
 					} else {
-						NodeImpl fromNode = network.getNodes().get(new IdImpl(parts[1])) ;
-						NodeImpl   toNode = network.getNodes().get(new IdImpl(parts[2]));
+						Node fromNode = network.getNodes().get(new IdImpl(parts[1])) ;
+						Node toNode = network.getNodes().get(new IdImpl(parts[2]));
 						if ( fromNode==null || toNode==null ) {
 //							log.info("fromNode or toNode ==null; probably connector link; skipping it ...") ;
 							continue ;
@@ -123,7 +123,7 @@ public class NetworkEmme2Matsim {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
 
 

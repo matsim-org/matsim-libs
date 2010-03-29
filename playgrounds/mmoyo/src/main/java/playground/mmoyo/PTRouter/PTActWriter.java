@@ -419,8 +419,8 @@ public class PTActWriter {
 	*/
 
 	private void removeWlinks(){
-		logicNet.removeLink(accessLink);
-		logicNet.removeLink(egressLink);
+		logicNet.removeLink(accessLink.getId());
+		logicNet.removeLink(egressLink.getId());
 		//logicNet.removeNode(originNode);
 		//logicNet.removeNode(destinationNode);
 	}

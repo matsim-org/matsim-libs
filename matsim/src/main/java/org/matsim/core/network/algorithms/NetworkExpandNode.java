@@ -212,7 +212,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 		if (Double.isNaN(r)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
 		if (Double.isNaN(e)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
 		if (network == null) { throw new IllegalArgumentException("network not defined."); }
-		NodeImpl node = network.getNodes().get(nodeId);
+		Node node = network.getNodes().get(nodeId);
 		if (node == null) { throw new IllegalArgumentException("nodeid="+nodeId+": not found in the network."); }
 		if (turns == null) {throw new IllegalArgumentException("nodeid="+nodeId+": turn list not defined!"); }
 		for (int i=0; i<turns.size(); i++) {
@@ -227,7 +227,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 		// remove the node
 		Map<Id,Link> inlinks = new TreeMap<Id, Link>(node.getInLinks());
 		Map<Id,Link> outlinks = new TreeMap<Id, Link>(node.getOutLinks());
-		if (!network.removeNode(node)) { throw new RuntimeException("nodeid="+nodeId+": Failed to remove node from the network."); }
+		if (network.removeNode(node.getId()) == null) { throw new RuntimeException("nodeid="+nodeId+": Failed to remove node from the network."); }
 
 		ArrayList<Node> newNodes = new ArrayList<Node>(inlinks.size()+outlinks.size());
 		ArrayList<Link> newLinks = new ArrayList<Link>(turns.size());
@@ -241,7 +241,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 			double lpc = Math.sqrt(pc.getX()*pc.getX()+pc.getY()*pc.getY());
 			double x = p.getX()+(1-d/lpc)*pc.getX()+e/lpc*pc.getY();
 			double y = p.getY()+(1-d/lpc)*pc.getY()-e/lpc*pc.getX();
-			Node n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
+			Node n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
 			newNodes.add(n);
 			nodeIdCnt++;
 			network.createAndAddLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(),inlink.getCapacity(),inlink.getNumberOfLanes(),((LinkImpl) inlink).getOrigId(),((LinkImpl) inlink).getType());
@@ -253,7 +253,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 			double lcp = Math.sqrt(cp.getX()*cp.getX()+cp.getY()*cp.getY());
 			double x = c.getX()+d/lcp*cp.getX()+e/lcp*cp.getY();
 			double y = c.getY()+d/lcp*cp.getY()-e/lcp*cp.getX();
-			Node n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
+			Node n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
 			newNodes.add(n);
 			nodeIdCnt++;
 			network.createAndAddLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(),outlink.getCapacity(),outlink.getNumberOfLanes(),((LinkImpl) outlink).getOrigId(),((LinkImpl) outlink).getType());

@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 import playground.dressler.Interval.Interval;
 
@@ -356,7 +355,7 @@ public class FlowCalculationSettings {
         System.out.println("TIME " + this.TimeHorizon);
         HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
         int max = 0;
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	try {
         		int i = Integer.parseInt(node.getId().toString());
         		if (i > 0) 	newNodeNames.put(node,i);
@@ -366,7 +365,7 @@ public class FlowCalculationSettings {
         	}
         }
 
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	try {
         		int i = Integer.parseInt(node.getId().toString());
         		if (i <= 0) {
@@ -382,7 +381,7 @@ public class FlowCalculationSettings {
         	}
         }
 
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);
@@ -462,7 +461,7 @@ public class FlowCalculationSettings {
         System.out.println("\\ TIME " + this.TimeHorizon);
         HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
         int max = 0;
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	try {
         		int i = Integer.parseInt(node.getId().toString());
         		if (i > 0) 	newNodeNames.put(node,i);
@@ -472,7 +471,7 @@ public class FlowCalculationSettings {
         	}
         }
 
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	try {
         		int i = Integer.parseInt(node.getId().toString());
         		if (i <= 0) {
@@ -492,7 +491,7 @@ public class FlowCalculationSettings {
         System.out.println("totaltraveltime: ");
 
         StringBuilder Sobj = new StringBuilder(" ");
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);
@@ -536,7 +535,7 @@ public class FlowCalculationSettings {
         System.out.println("Subject to");
 
 
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);
@@ -647,7 +646,7 @@ public class FlowCalculationSettings {
         System.out.println("\\ TIME " + this.TimeHorizon);
         HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
         int max = 0;
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	try {
         		int i = Integer.parseInt(node.getId().toString());
         		if (i > 0) 	newNodeNames.put(node,i);
@@ -657,7 +656,7 @@ public class FlowCalculationSettings {
         	}
         }
 
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	try {
         		int i = Integer.parseInt(node.getId().toString());
         		if (i <= 0) {
@@ -697,7 +696,7 @@ public class FlowCalculationSettings {
 
         // the arcs from the virtual sources to the source node
         // and from the sink nodes to the virtual sinks
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);
@@ -726,7 +725,7 @@ public class FlowCalculationSettings {
 
 
         // the arcs from the supersource/supersink to the virtual sources/sinks
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);
@@ -756,7 +755,7 @@ public class FlowCalculationSettings {
 
         if (costOnSinks) {
         	// the sinklinks have their departure time as cost
-        	for (NodeImpl node : this._network.getNodes().values()) {
+        	for (Node node : this._network.getNodes().values()) {
         		int d = 0;
         		if (this._demands.containsKey(node)) {
         			d = this._demands.get(node);
@@ -784,7 +783,7 @@ public class FlowCalculationSettings {
             }
 
             // the arcs from the virtual sources to the source node have their arrival time as cost
-            for (NodeImpl node : this._network.getNodes().values()) {
+            for (Node node : this._network.getNodes().values()) {
             	int d = 0;
             	if (this._demands.containsKey(node)) {
             		d = this._demands.get(node);
@@ -814,7 +813,7 @@ public class FlowCalculationSettings {
 
         // the arcs from the supersource/supersink to the virtual sources/sinks have
         // capacity equal to the demands there
-        for (NodeImpl node : this._network.getNodes().values()) {
+        for (Node node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
         		d = this._demands.get(node);

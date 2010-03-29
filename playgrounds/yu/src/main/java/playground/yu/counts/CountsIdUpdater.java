@@ -26,10 +26,10 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -102,7 +102,7 @@ public class CountsIdUpdater {
 
 	private static Id searchLinkPerNodeIdPair(final Id fromNodeId,
 			final Id toNodeId, final NetworkLayer net) {
-		NodeImpl fromNode = net.getNodes().get(fromNodeId);
+		Node fromNode = net.getNodes().get(fromNodeId);
 		if (fromNode == null) {
 			System.err.println("Node with Id " + fromNodeId.toString()
 					+ " doesn't exist in the new network!");

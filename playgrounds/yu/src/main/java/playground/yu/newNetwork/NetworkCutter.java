@@ -31,15 +31,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -106,7 +105,7 @@ public class NetworkCutter {
 		new NetworkWriter(network).writeFile(outputNetworkFile);
 	}
 
-	public void run(NetworkLayer net, PopulationImpl pop) {
+	public void run(Network net, PopulationImpl pop) {
 		for (Person person : pop.getPersons().values())
 			for (Plan plan : person.getPlans())
 				for (PlanElement pe : plan.getPlanElements())
@@ -118,16 +117,16 @@ public class NetworkCutter {
 								&& (route instanceof NetworkRoute))
 							resetBoundary((NetworkRoute) route, net);
 					}
-		Set<LinkImpl> links = new HashSet<LinkImpl>();
+		Set<Link> links = new HashSet<Link>();
 		links.addAll(net.getLinks().values());
-		for (LinkImpl link : links)
+		for (Link link : links)
 			if (!inside(link))
-				net.removeLink(link);
-		Set<NodeImpl> nodes = new HashSet<NodeImpl>();
+				net.removeLink(link.getId());
+		Set<Node> nodes = new HashSet<Node>();
 		nodes.addAll(net.getNodes().values());
-		for (NodeImpl node : nodes)
+		for (Node node : nodes)
 			if (!inside(node))
-				net.removeNode(node);
+				net.removeNode(node.getId());
 	}
 
 	// not perfect, but it's enough to test
@@ -143,7 +142,7 @@ public class NetworkCutter {
 				&& y <= maxY + 1000;
 	}
 
-	private void resetBoundary(NetworkRoute route, NetworkLayer net) {
+	private void resetBoundary(NetworkRoute route, Network net) {
 		for (Id linkId : route.getLinkIds()) {
 			resetBoundary(net.getLinks().get(linkId));
 		}

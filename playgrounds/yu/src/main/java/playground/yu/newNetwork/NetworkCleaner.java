@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newNetwork;
 
@@ -30,9 +30,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -40,9 +40,9 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * this class will remove the nodes from network, who don't have incidents
  * links.
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class NetworkCleaner {
 
@@ -55,7 +55,7 @@ public class NetworkCleaner {
 		String logFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.log";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetFilename);
 		Set<Node> nodesToRemove = new HashSet<Node>();
 		for (Node n : network.getNodes().values())
@@ -66,7 +66,7 @@ public class NetworkCleaner {
 			BufferedWriter writer = IOUtils.getBufferedWriter(logFilename);
 			writer.write("Id of nodes removed from " + inputNetFilename + "\n");
 			for (Node n : nodesToRemove) {
-				network.removeNode(n);
+				network.removeNode(n.getId());
 				writer.write(count++ + n.toString() + "\n");
 			}
 			writer.close();

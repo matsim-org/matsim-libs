@@ -35,7 +35,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -98,13 +97,13 @@ public class ScenarioFilter {
 		List<Link> allLinks = new ArrayList<Link>(this.scenario.getNetwork().getLinks().values());
 		for (Link link : allLinks) {
 			if (!linkIds.contains(link.getId())) {
-				((NetworkLayer) this.scenario.getNetwork()).removeLink(link);
+				this.scenario.getNetwork().removeLink(link.getId());
 			}
 		}
 		List<Node> allNodes = new ArrayList<Node>(this.scenario.getNetwork().getNodes().values());
 		for (Node node : allNodes) {
 			if (node.getInLinks().isEmpty() && node.getOutLinks().isEmpty()) {
-				((NetworkLayer) this.scenario.getNetwork()).removeNode(node);
+				this.scenario.getNetwork().removeNode(node.getId());
 			}
 		}
 		new NetworkWriter(this.scenario.getNetwork()).writeFile(this.networkFileOut);

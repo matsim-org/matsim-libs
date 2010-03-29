@@ -130,7 +130,7 @@ public class CutNetwork {
 		}
 		while (lq.size() > 0) {
 			LinkImpl l = lq.poll();
-			net.removeLink(l);
+			net.removeLink(l.getId());
 		}
 		new NetworkCleaner().run(net);
 

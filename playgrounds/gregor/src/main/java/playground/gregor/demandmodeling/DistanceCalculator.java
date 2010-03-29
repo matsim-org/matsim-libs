@@ -28,10 +28,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -88,8 +88,8 @@ public class DistanceCalculator {
 
 
 
-			NodeImpl home = this.network.getNearestNode(hh.home);
-			NodeImpl act = this.network.getNearestNode(actCoord);
+			Node home = this.network.getNearestNode(hh.home);
+			Node act = this.network.getNearestNode(actCoord);
 			Path path = router.calcLeastCostPath(home, act, 0);
 			double dist = 0;
 			for (Link link : path.links) {

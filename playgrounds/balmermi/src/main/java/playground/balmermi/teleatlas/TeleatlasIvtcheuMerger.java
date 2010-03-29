@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -70,7 +71,7 @@ public class TeleatlasIvtcheuMerger {
 				Id lid = new IdImpl(entries[0].trim());
 				LinkImpl l = networkIvtcheu.getLinks().get(lid);
 				if (l == null) { throw new RuntimeException(lineCnt+": link with id="+lid+" not found."); }
-				if (!networkIvtcheu.removeLink(l)) { throw new RuntimeException(lineCnt+": could not remove link with id="+lid+"."); }
+				if (networkIvtcheu.removeLink(l.getId()) != null) { throw new RuntimeException(lineCnt+": could not remove link with id="+lid+"."); }
 				lineCnt++;
 			}
 			br.close();
@@ -113,9 +114,9 @@ public class TeleatlasIvtcheuMerger {
 		}
 
 		int nodeMapCnt = 0;
-		for (NodeImpl n : networkIvtcheu.getNodes().values()) {
+		for (Node n : networkIvtcheu.getNodes().values()) {
 			if (!nodeMapping.containsKey(n.getId())) {
-				networkTeleatlas.createAndAddNode(n.getId(),n.getCoord(),n.getType());
+				networkTeleatlas.createAndAddNode(n.getId(),n.getCoord(),((NodeImpl) n).getType());
 			}
 			else { nodeMapCnt++; }
 		}

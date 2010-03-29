@@ -80,26 +80,32 @@ import org.matsim.world.Layer;
 			this.line = line;
 		}
 
+		@Override
 		public Map<Id, ? extends Link> getInLinks() {
 			return this.ingoingLinks;
 		}
 
+		@Override
 		public Map<Id, ? extends Link> getOutLinks() {
 			return this.outgoingLinks;
 		}
 
+		@Override
 		public boolean addInLink(final Link link) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public boolean addOutLink(final Link link) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public Coord getCoord() {
 			return this.stop.getStopFacility().getCoord();
 		}
 
+		@Override
 		public Id getId() {
 			return this.id;
 		}
@@ -238,10 +244,12 @@ import org.matsim.world.Layer;
 		return link;
 	}
 
+	@Override
 	public Map<Id, ? extends TransitRouterNetworkNode> getNodes() {
 		return this.nodes;
 	}
 
+	@Override
 	public Map<Id, ? extends TransitRouterNetworkLink> getLinks() {
 		return this.links;
 	}
@@ -284,24 +292,38 @@ import org.matsim.world.Layer;
 		return this.qtNodes.get(coord.getX(), coord.getY());
 	}
 
+	@Override
 	public double getCapacityPeriod() {
 		return 3600.0;
 	}
 
+	@Override
 	public NetworkFactory getFactory() {
 		return null;
 	}
 
+	@Override
 	public double getEffectiveLaneWidth() {
 		return 3;
 	}
 
+	@Override
 	public void addNode(Node nn) {
 		throw new UnsupportedOperationException() ;
 	}
 
+	@Override
 	public void addLink(Link ll) {
 		throw new UnsupportedOperationException() ;
 	}
 
+	@Override
+	public Link removeLink(Id linkId) {
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public Node removeNode(Id nodeId) {
+		throw new UnsupportedOperationException() ;
+	}
 }

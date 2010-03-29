@@ -33,7 +33,7 @@ public class NewMultiModalNetworkWithoutBusLink {
 		}
 		checkLinks2delete();
 		for (Link link : busLinks2delete)
-			mmNet.removeLink(link);
+			mmNet.removeLink(link.getId());
 		return mmNet;
 	}
 

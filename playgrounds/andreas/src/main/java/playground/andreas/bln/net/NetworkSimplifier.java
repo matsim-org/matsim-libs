@@ -35,7 +35,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
@@ -52,7 +51,7 @@ public class NetworkSimplifier {
 	private boolean mergeLinkStats = false;
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 
-	public void run(final NetworkImpl network) {
+	public void run(final Network network) {
 
 		if(this.nodeTopoToMerge.size() == 0){
 			Gbl.errorMsg("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
@@ -111,8 +110,8 @@ public class NetworkSimplifier {
 
 //									inLink.getOrigId() + "-" + outLink.getOrigId(),
 									network.addLink(link);
-									(network).removeLink(inLink);
-									(network).removeLink(outLink);
+									network.removeLink(inLink.getId());
+									(network).removeLink(outLink.getId());
 
 								} else {
 
@@ -131,8 +130,8 @@ public class NetworkSimplifier {
 
 										newLink.setAllowedModes(inLink.getAllowedModes());
 
-										network.removeLink(inLink);
-										network.removeLink(outLink);
+										network.removeLink(inLink.getId());
+										network.removeLink(outLink.getId());
 									}
 
 								}
@@ -143,8 +142,6 @@ public class NetworkSimplifier {
 			}
 
 		}
-
-		network.reconnect();
 
 		org.matsim.core.network.algorithms.NetworkCleaner nc = new org.matsim.core.network.algorithms.NetworkCleaner();
 		nc.run(network);
@@ -210,7 +207,7 @@ public class NetworkSimplifier {
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 //		nsimply.setMergeLinkStats(true);
-		nsimply.run((NetworkImpl) network);
+		nsimply.run(network);
 
 		new NetworkWriter(network).writeFile("./bb_5.out.xml.gz");
 

@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -55,7 +54,7 @@ import playground.dressler.ea_flow.TimeExpandedPath;
 import playground.dressler.util.ImportSimpleNetwork;
 
 /**
- * @author Daniel Dressler, Manuel Schneider 
+ * @author Daniel Dressler, Manuel Schneider
  *
  */
 public class MultiSourceEAF {
@@ -64,7 +63,7 @@ public class MultiSourceEAF {
 	 * debug flag and the algorithm to use
 	 */
 	private static boolean _debug = false;
-	
+
 	public static void debug(final boolean debug){
 		_debug=debug;
 	}
@@ -79,7 +78,7 @@ public class MultiSourceEAF {
 		SourceIntervals.debug(3);
 		Flow.debug(3);
 	}
-	
+
 	public static void disableDebuggingForAllFlowRelatedClasses()
 	{
 		MultiSourceEAF.debug(false);
@@ -89,9 +88,9 @@ public class MultiSourceEAF {
 		EdgeIntervals.debug(0);
 		SourceIntervals.debug(0);
 		Flow.debug(0);
-	}	
-	
-	
+	}
+
+
 	/**
 	 * A method to read a file containing the information on demands in an evacuation scenario for a given network
 	 * the syntax of the file is as follows:
@@ -113,7 +112,7 @@ public class MultiSourceEAF {
 		}
 		return demands;
 	}
-	
+
 
 	/**
 	 * generates demand from an population by placing demand 1 for every person on the node in the Persons first plan first activity edges ToNode
@@ -125,7 +124,7 @@ public class MultiSourceEAF {
 		new MatsimPopulationReader(scenario).readFile(filename);
 		return parsePopulation(scenario);
 	}
-	
+
 	public static HashMap<Node,Integer> parsePopulation(final Scenario scenario) {
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
 
@@ -140,8 +139,8 @@ public class MultiSourceEAF {
 
 			Link link = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
 			if (link == null) {
-				missing += 1;				
-				continue;				
+				missing += 1;
+				continue;
 			}
 			Node node = link.getToNode();
 			if(allnodes.containsKey(node)){
@@ -162,21 +161,21 @@ public class MultiSourceEAF {
 	/**
 	 * THE ONLY FUNCTION WHICH REALLY CALCULATES A FLOW
 	 *
-	 * @param settings 
+	 * @param settings
 	 * @return a Flow object
 	 */
-	public static Flow calcEAFlow(FlowCalculationSettings settings) {	
+	public static Flow calcEAFlow(FlowCalculationSettings settings) {
 		Flow fluss;
 
 		List<TimeExpandedPath> result = null;
 		fluss = new Flow(settings);
-		
+
 		String tempstr = "";
 
 		if(_debug){
 		  System.out.println("starting calculations");
 		}
-		
+
 		//int lastArrival = 0;
 
 		long timeMBF = 0;
@@ -190,26 +189,26 @@ public class MultiSourceEAF {
 		} else {
 		  routingAlgo = new BellmanFordIntervalBased(settings, fluss);
 		}
-		
+
 		int VERBOSITY = 100;
-			
+
 		int i;
 		long EdgeGain = 0;
 		int lasttime = 0;
-		
+
 		boolean tryReverse;
 		boolean usedForwardSearch = false;
 		int lastForward = 0; // for trackUnreachable, to do a forward step once in a while
-		
+
 		LinkedList<TimeExpandedPath> successfulPaths = new LinkedList<TimeExpandedPath>();
-		
+
 		tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
-		
+
 		for (i=1; i<=settings.MaxRounds; i++){
 			timer1 = System.currentTimeMillis();
-			
+
 			//System.out.println("Iteration " + i);
-			
+
 			// THE IMPORTANT FUNCTION CALL HAPPENS HERE //
 			routingAlgo.startNewIter(lasttime);
 			switch (settings.searchAlgo) {
@@ -226,37 +225,37 @@ public class MultiSourceEAF {
 	    				result = routingAlgo.doCalculationsReverse(lasttime);
 	    				usedForwardSearch = false;
 	    			} else {
-	    			    result = routingAlgo.doCalculationsForward();	    			    	    			    
+	    			    result = routingAlgo.doCalculationsForward();
 	    			    usedForwardSearch = true;
 	    			}
 	            	break;
 	            }
 	            case FlowCalculationSettings.SEARCHALGO_MIXED: {
-	            	result = routingAlgo.doCalculationsMixed(lasttime); 
+	            	result = routingAlgo.doCalculationsMixed(lasttime);
 	            	break;
 	            }
 	            default: {
-	            	throw new RuntimeException("Unkown search algorithm!");	            	
+	            	throw new RuntimeException("Unkown search algorithm!");
 	            }
 	        }
-			 
+
 			timer2 = System.currentTimeMillis();
 			timeMBF += timer2 - timer1;
-			
+
 			boolean trySuccessfulPaths = false;
 			tempstr = "";
 			int zeroaugment = 0;
 			int goodaugment = 0;
-			
-			
+
+
 			if (result == null || result.isEmpty()){
-				if (tryReverse) { 
+				if (tryReverse) {
 					// backward search didn't find anything.
 					// we should try forward next time to determine new arrvivaltime
 					lasttime += 1; // guess new time
 					tryReverse = false;
-					trySuccessfulPaths = true; // before we do the forward search, we can simply repeat paths!					
-				} else { 
+					trySuccessfulPaths = true; // before we do the forward search, we can simply repeat paths!
+				} else {
 					// forward or mixed search didn't find anything
 					// that's it, we are done.
 					break;
@@ -266,16 +265,16 @@ public class MultiSourceEAF {
 				for(TimeExpandedPath path : result) {
 					if (path.getArrival() > lasttime) {
 						// time has increased!
-						
+
 						lasttime = path.getArrival();
 
 						// recall the list of successful paths and add them first!
 						// it cannot hurt much ...
-						trySuccessfulPaths = true;						
+						trySuccessfulPaths = true;
 
-					}	
-					
-					// even if this did not increase lasttime 
+					}
+
+					// even if this did not increase lasttime
 					// (because it was increased preemptively last iteration)
 					// we now can try the reverse search again
 					// if it is enabled at all
@@ -283,37 +282,37 @@ public class MultiSourceEAF {
 					if (usedForwardSearch) {
 						lastForward = lasttime;
 					}
-					
+
 					// we just needed one element
 					break;
 				}
-			}			
-			
+			}
+
 			int totalsizeaugmented = 0;
-			
+
 			if (trySuccessfulPaths && settings.useRepeatedPaths) {
 				LinkedList<TimeExpandedPath> newSP = new LinkedList<TimeExpandedPath>();
-				
+
 				for(TimeExpandedPath path : successfulPaths){
 					String tempstr2 = "";
-					
+
 					int latestused = path.shiftToArrival(lasttime);
-					
+
 					// some integrity checks
 					if (latestused >= settings.TimeHorizon || path.getPathSteps().getFirst().getStartTime() < 0) {
 						zeroaugment += 1;
 						continue;
 					}
-										
-					tempstr2 = path.toString() + "\n";					
-					
+
+					tempstr2 = path.toString() + "\n";
+
 					int augment = fluss.augment(path);
-					
+
 					if (augment > 0) {
 						tempstr += tempstr2;
 						tempstr += "augmented " + augment + "\n";
-						
-						// remember this path for the next timelayer						
+
+						// remember this path for the next timelayer
 						newSP.addLast(path); // keep the order!
 						goodaugment += 1;
 						totalsizeaugmented += path.getPathSteps().size();
@@ -321,14 +320,14 @@ public class MultiSourceEAF {
 						zeroaugment += 1;
 					}
 				}
-				
+
 				if (_debug) {
 					System.out.println("Had Repeated paths: " + successfulPaths.size());
 					System.out.println("Sucess: " + newSP.size() + ", zeroaugment: " + zeroaugment);
 				}
-				
+
 				successfulPaths = newSP;
-				
+
 				if (!newSP.isEmpty()) {
 					// we augmented succesfully!
 					// in case the reverse search didn't find anything,
@@ -337,18 +336,18 @@ public class MultiSourceEAF {
 					tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 				}
 			}
-			
-			
-			
-			/* sort the paths first by the number of steps used!			
+
+
+
+			/* sort the paths first by the number of steps used!
 			  helps a little for mixed search ...
 			 and a lot for reverse search.
 			 none for forward? maybe because all paths are augmented anyway */
 			if (result != null && !result.isEmpty()) {
-				if (settings.sortPathsBeforeAugmenting) {					
+				if (settings.sortPathsBeforeAugmenting) {
 					Collections.sort(result, new Comparator<TimeExpandedPath>() {
 						public int compare(TimeExpandedPath first, TimeExpandedPath second) {
-							int v1 = first.getPathSteps().size();	        	   
+							int v1 = first.getPathSteps().size();
 							int v2 = second.getPathSteps().size();
 							if (v1 > v2) {
 								return 1;
@@ -362,14 +361,14 @@ public class MultiSourceEAF {
 					});
 				}
 			}
-			
+
 			//System.out.println(result);
-			if (result != null && !result.isEmpty()) {			
+			if (result != null && !result.isEmpty()) {
 				for(TimeExpandedPath path : result){
 					String tempstr2 = "";
 
-					tempstr2 = path.toString() + "\n";					
-					
+					tempstr2 = path.toString() + "\n";
+
 					int augment = fluss.augment(path);
 
 					if (augment > 0) {
@@ -386,48 +385,48 @@ public class MultiSourceEAF {
 					}
 				}
 			}
-			
+
 			tempstr += "Good augment on " + goodaugment + " paths.\n";
 			tempstr += "Zero augment on " + zeroaugment + " paths.\n";
 			if (goodaugment > 0) {
 				tempstr += "Avg size of augmented path " + totalsizeaugmented / (float) goodaugment + ".\n";
 			}
-			
-			
-			if (_debug) {				
-				System.out.println(tempstr);				
+
+
+			if (_debug) {
+				System.out.println(tempstr);
 			}
-			
+
 			timer3 = System.currentTimeMillis();
 			EdgeGain += fluss.cleanUp();
-			
-			timeAugment += timer3 - timer2;			
-			
-			if (i % VERBOSITY == 0) {		
+
+			timeAugment += timer3 - timer2;
+
+			if (i % VERBOSITY == 0) {
 				long timecurrent = System.currentTimeMillis();
 				System.out.println();
 				System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: Total " + (timecurrent - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-				System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");				
+				System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
 				//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 				System.out.println("last path: " + tempstr);
-				System.out.println(routingAlgo.measure());	
+				System.out.println(routingAlgo.measure());
 				System.out.println(fluss.measure());
 				System.out.println();
 			}
-			
+
 			if (settings.checkConsistency > 0) {
 				if (i % settings.checkConsistency == 0) {
 					System.out.println("Checking consistency once in a while ...");
 					if (!fluss.checkTEPsAgainstFlow()) {
-						throw new RuntimeException("Flow and stored TEPs disagree!"); 
+						throw new RuntimeException("Flow and stored TEPs disagree!");
 					}
 					System.out.println("Everything seems to be okay.");
 				}
 			}
 
 		}
-		
-		
+
+
 		long timeStop = System.currentTimeMillis();
 		System.out.println("");
 		System.out.println("");
@@ -435,11 +434,11 @@ public class MultiSourceEAF {
 		System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
 		//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 		System.out.println("last path: " + tempstr);
-		System.out.println(routingAlgo.measure());	
+		System.out.println(routingAlgo.measure());
 		System.out.println(fluss.measure());
 		System.out.println();
-		
-		
+
+
 		return fluss;
 	}
 
@@ -452,7 +451,7 @@ public class MultiSourceEAF {
 	public static void main(final String[] args) {
 
 		FlowCalculationSettings settings;
-		
+
 		//set debuging modes
 		MultiSourceEAF.debug(false);
 		BellmanFordIntervalBased.debug(0);
@@ -461,9 +460,9 @@ public class MultiSourceEAF {
 		EdgeIntervals.debug(0);
 		//EdgeIntervall.debug(false);
 		Flow.debug(0);
-		
-		
-		
+
+
+
 		String networkfile = null;
 		String plansfile = null;
 		String demandsfile = null;
@@ -472,12 +471,12 @@ public class MultiSourceEAF {
 		String simplenetworkfile = null;
 		String shelterfile = null;
 		int uniformDemands = 0;
-		
+
 		// Rounding is now done according to timestep and flowFactor!
-		int timeStep; 
+		int timeStep;
 		double flowFactor;
 
-		int instance = 41; 
+		int instance = 41;
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -488,7 +487,7 @@ public class MultiSourceEAF {
 		// 44 = padang, v2010, with 100% plans, 5s steps (no shelters yet)
 		// 5 = probeevakuierung telefunken
 		// else = custom ...
-		
+
 		if (instance == 1) {
 			networkfile  = "/homes/combi/dressler/V/code/meine_EA/siouxfalls_network.xml";
 			uniformDemands = 500;
@@ -518,34 +517,34 @@ public class MultiSourceEAF {
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced.xml.gz";
 			timeStep = 1;
 			flowFactor = 1.0;
-			sinkid = "en1";			
+			sinkid = "en1";
 		} else if (instance == 42) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 1;
 			flowFactor = 1.0;
-			sinkid = "en1";			
+			sinkid = "en1";
 			shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
 		} else if (instance == 43) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 10;
 			flowFactor = 1.0;
-			sinkid = "en1";			
+			sinkid = "en1";
 		} else if (instance == 44) {
 				networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 				plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
 				timeStep = 5;
 				flowFactor = 1.0;
-				sinkid = "en1";			
+				sinkid = "en1";
 		} else if (instance == 5) {
 			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
-			timeStep = 1; 
-			flowFactor = 1.0;			
+			timeStep = 1;
+			flowFactor = 1.0;
 		} else {
 			// custom instance
-			
-			//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";		
+
+			//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618.xml";
 			//networkfile  = "/homes/combi/dressler/V/code/meine_EA/problem.xml";
 			//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 			//networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
@@ -586,28 +585,28 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
 			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
-			
+
 			uniformDemands = 100;
 
 
-			timeStep = 1; 
+			timeStep = 1;
 			flowFactor = 1.0;
 
 			//String sinkid = "supersink"; //siouxfalls, problem
 			sinkid = "en1";  //padang, line, swissold .. en1 fuer forward
 
 		}
-		
-		
+
+
 		if(_debug){
 			System.out.println("starting to read input");
 		}
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		HashMap<Node, Integer> demands = null;
 		Node sink = null;
-		
+
 		//read network
 		if (networkfile != null) {
 			scenario = new ScenarioImpl();
@@ -629,7 +628,7 @@ public class MultiSourceEAF {
 		}
 
 		//read demands
-		
+
 		if(plansfile!=null){
 			demands = readPopulation(scenario, plansfile);
 		}else if (demandsfile != null){
@@ -644,30 +643,30 @@ public class MultiSourceEAF {
 		} else {
 			// uniform demands
 			demands = new HashMap<Node, Integer>();
-			for (NodeImpl node : network.getNodes().values()) {
+			for (Node node : network.getNodes().values()) {
 				if (!node.getId().equals(sink.getId())) {
 					demands.put(node, Math.max(uniformDemands,0));
 				}
 			}
-			
-			// Hack for those networks with en1->en2 
+
+			// Hack for those networks with en1->en2
 			// set demand of en2 to 0, because it cannot be satisfied if en1 is the sink
-			if (sinkid.equals("en1")) {				
+			if (sinkid.equals("en1")) {
 				Node sink2 = network.getNodes().get(new IdImpl("en2"));
 				if (sink2 != null) {
 					Integer d = demands.get(sink2);
 					if (d != null && d > 0) {
 						demands.put(sink2, 0);
 					}
-				}				
+				}
 			}
 		}
-		
+
 		// TODO parse shelterfile
-		
+
 		int totaldemands = 0;
 		for (int i : demands.values()) {
-			if (i > 0) 
+			if (i > 0)
 			  totaldemands += i;
 		}
 
@@ -675,93 +674,93 @@ public class MultiSourceEAF {
 		// Careful, padang has shelters AND a supersink.
 		// so take care of the supersink here and don't tell the settings about it.
 
-		
+
 		//check if demands and sink are set
 		if (demands.isEmpty() ) {
 			System.out.println("demands not found");
 		}
-		
+
 		if(_debug){
 			System.out.println("Total source demand is " + totaldemands);
 			System.out.println("reading input done");
 		}
 
-		
+
 		settings = new FlowCalculationSettings();
 		settings.setNetwork(network);
 		settings.setDemands(demands);
 		settings.supersink = sink;
 		settings.timeStep = timeStep; // default 1
 		settings.flowFactor = flowFactor; // default 1.0
-		
+
 		// set additional parameters
 		//settings.TimeHorizon = 3;
 		//settings.MaxRounds = 95;
-		//settings.checkConsistency = 100;		
+		//settings.checkConsistency = 100;
 		//settings.useVertexCleanup = false;
 		//settings.useSinkCapacities = false;
 		//settings.useImplicitVertexCleanup = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		//settings.useRepeatedPaths = true; // not compatible with costs!		
+		//settings.useRepeatedPaths = true; // not compatible with costs!
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
-		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE); 
+		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
 		//settings.checkTouchedNodes = true;
 		//settings.keepPaths = true; // do not store paths at all!
 		//settings.unfoldPaths = true; // unfold stored paths into forward paths
-		
+
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
-		
-		Flow fluss;	
-		
-		
+
+		Flow fluss;
+
+
 		/* --------- the actual work starts --------- */
-		
+
 		boolean settingsOkay = settings.prepare();
 		settings.printStatus();
-		
+
 		if(!settingsOkay) {
 			System.out.println("Something was bad, aborting.");
 			return;
 		}
-				
+
 		//settings.writeLP();
 		//settings.writeNET(false);
 		//settings.writeSimpleNetwork();
-		
+
 		fluss = MultiSourceEAF.calcEAFlow(settings);
-		
+
 		/* --------- the actual work is done --------- */
-		
+
 		int[] arrivals = fluss.arrivals();
 		long totalcost = 0;
-		for (int i = 0; i < arrivals.length; i++) {			
+		for (int i = 0; i < arrivals.length; i++) {
 			totalcost += i*arrivals[i];
 		}
-		
+
 		System.out.println("Total cost: " + totalcost);
 		System.out.println("Collected " + fluss.getPaths().size() + " paths.");
-		
+
 		System.out.println(fluss.arrivalsToString());
 		System.out.println(fluss.arrivalPatternToString());
 		System.out.println("unsatisfied demands:");
 		for (Node node : fluss.getDemands().keySet()){
-			int demand = fluss.getDemands().get(node);					
+			int demand = fluss.getDemands().get(node);
 			if (demand > 0) {
 				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
 			}
 		}
 
-		
+
 		if(outputplansfile!=null){
-			PopulationImpl output = fluss.createPopulation(plansfile);					
+			PopulationImpl output = fluss.createPopulation(plansfile);
 			new PopulationWriter(output, network).writeFile(outputplansfile);
 		}
-		
-		
+
+
 		if(_debug){
 			System.out.println("done");
 		}

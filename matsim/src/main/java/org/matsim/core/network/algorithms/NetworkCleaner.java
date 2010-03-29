@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 
 /**
@@ -107,8 +106,7 @@ public class NetworkCleaner implements NetworkRunnable {
 		return clusterNodes;
 	}
 
-	public void run(final Network network2) {
-		NetworkImpl network = (NetworkImpl) network2 ;
+	public void run(final Network network) {
 		final Map<Id, Node> visitedNodes = new TreeMap<Id, Node>();
 		Map<Id, Node> biggestCluster = new TreeMap<Id, Node>();
 
@@ -139,10 +137,10 @@ public class NetworkCleaner implements NetworkRunnable {
 		/* Reducing the network so it only contains nodes included in the biggest Cluster.
 		 * Loop over all nodes and check if they are in the cluster, if not, remove them from the network
 		 */
-		List<NodeImpl> allNodes2 = new ArrayList<NodeImpl>(network.getNodes().values());
-		for (NodeImpl node : allNodes2) {
+		List<Node> allNodes2 = new ArrayList<Node>(network.getNodes().values());
+		for (Node node : allNodes2) {
 			if (!biggestCluster.containsKey(node.getId())) {
-				network.removeNode(node);		// removeNode takes care of removing links too in the network
+				network.removeNode(node.getId());		// removeNode takes care of removing links too in the network
 			}
 		}
 		log.info("  resulting network contains " + network.getNodes().size() + " nodes and " +

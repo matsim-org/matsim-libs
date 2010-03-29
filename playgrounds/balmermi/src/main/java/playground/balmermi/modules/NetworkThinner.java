@@ -45,7 +45,7 @@ public class NetworkThinner {
 		Node fromNode = first.getFromNode();
 		Node toNode = list.get(list.size()-1).getToNode();
 		// remove the links
-		for (Link l : list) { network.removeLink(l); }
+		for (Link l : list) { network.removeLink(l.getId()); }
 		// add a new link
 		double length = 0.0; for (Link l : list) { length += l.getLength(); }
 		Link newLink = network.createAndAddLink(first.getId(),fromNode,toNode,length,first.getFreespeed(),first.getCapacity(),first.getNumberOfLanes());

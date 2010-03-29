@@ -9,10 +9,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.xml.sax.SAXException;
 
 /**
@@ -116,7 +116,7 @@ public class CMCFNetworkWriter {
 		while(tabs-- > 0)
 			tab += '\t';
 		log(tab+"<nodes>\n", out);
-		for (Map.Entry<Id, NodeImpl> entry: this.netLayer.getNodes().entrySet()){
+		for (Map.Entry<Id, Node> entry: this.netLayer.getNodes().entrySet()){
 			log(tab+"\t<node id=\""+entry.getKey()+"\" " +
 					"x=\""+entry.getValue().getCoord().getX()+"\" " +
 					"y=\""+entry.getValue().getCoord().getY()+"\" />\n", out);

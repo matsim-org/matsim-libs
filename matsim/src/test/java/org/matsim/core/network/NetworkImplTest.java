@@ -24,15 +24,21 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.AbstractNetworkTest;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author mrieser
  */
-public class NetworkImplTest {
+public class NetworkImplTest extends AbstractNetworkTest {
 
 	private static final Logger log = Logger.getLogger(NetworkImplTest.class);
+
+	@Override
+	public NetworkImpl getEmptyTestNetwork() {
+		return new NetworkLayer();  // TODO should be NetworkImpl, but that doesn't work
+	}
 
 	/**
 	 * Tests that if a link is added with an id that already exists as link in the network,
@@ -41,7 +47,7 @@ public class NetworkImplTest {
 	 */
 	@Test
 	public void testAddLink_existingId() {
-		NetworkLayer network = new NetworkLayer(); // TODO should be NetworkImpl, but that doesn't work
+		NetworkLayer network = new NetworkLayer();
 		Id id1 = new IdImpl(1);
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
@@ -73,7 +79,7 @@ public class NetworkImplTest {
 		network.addLink(link2); // adding the same link again should just be ignored
 		Assert.assertEquals(2, network.getLinks().size());
 	}
-	
+
 	@Test
 	public void testAddNode_existingId() {
 		NetworkImpl network = new NetworkImpl();

@@ -22,6 +22,7 @@ package org.matsim.core.network;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -34,13 +35,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.world.Layer;
 import org.matsim.world.LayerImpl;
 import org.matsim.world.MappedLocation;
 
-
 /**
  * @author nagel
+ * @author mrieser
  */
 public class NetworkImpl implements Network {
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
@@ -55,9 +57,9 @@ public class NetworkImpl implements Network {
 
 	private double capperiod = 3600.0 ;
 
-	protected final Map<Id, NodeImpl> nodes = new TreeMap<Id, NodeImpl>();
+	protected final Map<Id, Node> nodes = new TreeMap<Id, Node>();
 
-	protected QuadTree<NodeImpl> nodeQuadTree = null;
+	protected QuadTree<Node> nodeQuadTree = null;
 
 	private static final double DEFAULT_EFFECTIVE_CELL_SIZE = 7.5;
 
@@ -114,7 +116,7 @@ public class NetworkImpl implements Network {
 					".\nExisting node: " + node + "\nNode to be added: " + node +
 					".\nNode is not added to the network.");
 		}
-		this.nodes.put(id, (NodeImpl) nn);
+		this.nodes.put(id, nn);
 		if (this.nodeQuadTree != null) {
 			// we changed the nodes, invalidate the quadTree
 			this.nodeQuadTree.clear();
@@ -125,68 +127,34 @@ public class NetworkImpl implements Network {
 	// remove methods
 	// ////////////////////////////////////////////////////////////////////
 
-	/**
-	 * removes a node from the network.<p>
-	 *
-	 * In case <tt>node</tt> exists, it first removed all incident links of
-	 * <tt>node</tt> and then removes <tt>node</tt> from the link set
-	 * and from the <tt>nodeQuadTree</tt>---if instantiated---of the network.<p>
-	 *
-	 * NOTE: if one of the incident links of <tt>node</tt> cannot be removed
-	 * properly, the process crashes.
-	 *
-	 * @param node Node to be removed.
-     * @return <tt>true</tt> if the specified node is part of the network and
-     * is successfully removed AND all incident links are removed successfully
-     *
-	 */
-	public boolean removeNode(final Node node) {
-		Id id = node.getId();
-		NodeImpl n = this.nodes.get(id);
-
-		if (n == null) { return false; }
-
-		for (Link l : n.getIncidentLinks().values()) {
-			if (!this.removeLink(l)) {
-				throw new RuntimeException("Link id=" + l.getId() + " could not be removed while removing Node id=" + n.getId());
-			}
+	@Override
+	public Node removeNode(final Id nodeId) {
+		Node n = this.nodes.remove(nodeId);
+		if (n == null) {
+			return null;
+		}
+		HashSet<Link> links = new HashSet<Link>();
+		links.addAll(n.getInLinks().values());
+		links.addAll(n.getOutLinks().values());
+		for (Link l : links) {
+			removeLink(l.getId());
 		}
 		if (this.nodeQuadTree != null) {
 			this.nodeQuadTree.remove(n.getCoord().getX(),n.getCoord().getY(),n);
 		}
-		this.nodes.remove(id);
-		return true;
+		return n;
 	}
 
-	/**
-	 * removes a link from the network.<p>
-	 *
-	 * In case <tt>link</tt> exists, it first unlinks it from the two
-	 * incident nodes and then removes it from the link set of the network.
-	 *
-	 * @param link Link to be removed.
-	 * @return <tt>true</tt> if the specified link is part of the network and
-	 * is successfully removed.
-	 */
-	public boolean removeLink(final Link link) {
-		// yy should eventually be added to the api.  kai, jul09
-		Id id = link.getId();
-		LinkImpl l = (LinkImpl)this.layerDelegate.getLocations().get(id);
-
-		if ((l == null) || (link != l)) {
-			// there is no link with the specified id, or there is another link than the requested one.
-			return false;
+	@Override
+	public Link removeLink(Id linkId) {
+		Link l = this.getLinks().remove(linkId);
+		if (l == null) {
+			return null;
 		}
-
-		Node from = link.getFromNode();
-		((NodeImpl) from).removeOutLink(link);
-		Node to = link.getToNode();
-		((NodeImpl) to).removeInLink(link);
-
-		return this.layerDelegate.getLocations().remove(id) != null;
+		l.getFromNode().getOutLinks().remove(l.getId());
+		l.getToNode().getInLinks().remove(l.getId());
+		return l;
 	}
-
-
 
 	// ////////////////////////////////////////////////////////////////////
 	// set methods
@@ -277,7 +245,7 @@ public class NetworkImpl implements Network {
 		return this.effectiveLaneWidth;
 	}
 
-	public Map<Id, NodeImpl> getNodes() {
+	public Map<Id, Node> getNodes() {
 		return this.nodes;
 	}
 
@@ -292,7 +260,7 @@ public class NetworkImpl implements Network {
 	 */
 	public LinkImpl getNearestLink(final Coord coord) {
 		LinkImpl nearestLink = null;
-		NodeImpl nearestNode = null;
+		Node nearestNode = null;
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
 		if ( nearestNode == null ) {
@@ -300,7 +268,7 @@ public class NetworkImpl implements Network {
 			return null ;
 		}
 
-		if ( nearestNode.getIncidentLinks().isEmpty() ) {
+		if ( nearestNode.getInLinks().isEmpty() && nearestNode.getOutLinks().isEmpty() ) {
 			log.warn(this + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
 		}
 
@@ -310,7 +278,7 @@ public class NetworkImpl implements Network {
 		// It would be nicer to find the nearest link on the "right" side of the coordinate.
 		// (For Great Britain it would be the "left" side. Could be a global config param...)
 		double shortestDistance = Double.MAX_VALUE;
-		for (Link link : nearestNode.getIncidentLinks().values()) {
+		for (Link link : NetworkUtils.getIncidentLinks(nearestNode).values()) {
 			double dist = ((LinkImpl) link).calcDistance(coord);
 			if (dist < shortestDistance) {
 				shortestDistance = dist;
@@ -372,7 +340,7 @@ public class NetworkImpl implements Network {
 	public Link getNearestRightEntryLink(final Coord coord) {
 		Link nearestRightLink = null;
 		Link nearestOverallLink = null;
-		NodeImpl nearestNode = null;
+		Node nearestNode = null;
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
 
@@ -383,7 +351,9 @@ public class NetworkImpl implements Network {
 		// now find nearest link from the nearest node
 		double shortestRightDistance = Double.MAX_VALUE; // reset the value
 		double shortestOverallDistance = Double.MAX_VALUE; // reset the value
-		for (Link link : nearestNode.getIncidentLinks().values()) {
+		List<Link> incidentLinks = new ArrayList<Link>(nearestNode.getInLinks().values());
+		incidentLinks.addAll(nearestNode.getOutLinks().values());
+		for (Link link : incidentLinks) {
 			double dist = ((LinkImpl) link).calcDistance(coord);
 			if (dist <= shortestRightDistance) {
 				// Generate a vector representing the link
@@ -436,7 +406,7 @@ public class NetworkImpl implements Network {
 	 * @param coord the coordinate to which the closest node should be found
 	 * @return the closest node found, null if none
 	 */
-	public NodeImpl getNearestNode(final Coord coord) {
+	public Node getNearestNode(final Coord coord) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		return this.nodeQuadTree.get(coord.getX(), coord.getY());
 	}
@@ -448,7 +418,7 @@ public class NetworkImpl implements Network {
 	 * @param distance the maximum distance a node can have to <code>coord</code> to be found
 	 * @return all nodes within distance to <code>coord</code>
 	 */
-	public Collection<NodeImpl> getNearestNodes(final Coord coord, final double distance) {
+	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		return this.nodeQuadTree.get(coord.getX(), coord.getY(), distance);
 	}
@@ -461,7 +431,7 @@ public class NetworkImpl implements Network {
 	public NetworkFactoryImpl getFactory() {
 		return this.factory;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////
 	// print methods
 	// ////////////////////////////////////////////////////////////////////
@@ -495,7 +465,7 @@ public class NetworkImpl implements Network {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (NodeImpl n : this.nodes.values()) {
+		for (Node n : this.nodes.values()) {
 			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
 			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
 			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
@@ -506,8 +476,8 @@ public class NetworkImpl implements Network {
 		maxx += 1.0;
 		maxy += 1.0;
 		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<NodeImpl> quadTree = new QuadTree<NodeImpl>(minx, miny, maxx, maxy);
-		for (NodeImpl n : this.nodes.values()) {
+		QuadTree<Node> quadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
+		for (Node n : this.nodes.values()) {
 			quadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
 		}
 		/* assign the quadTree at the very end, when it is complete.

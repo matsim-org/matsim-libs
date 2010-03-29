@@ -51,30 +51,30 @@ import playground.rost.graph.shortestdistances.ShortestDistanceFromSupersource;
 import playground.rost.util.PathTracker;
 
 public class BlockCreator {
-	
+
 	private static final Logger log = Logger.getLogger(BlockCreator.class);
-		
+
 	public NetworkLayer network;
-	
+
 	public Map<Node, Integer> demandMap = new HashMap<Node, Integer>();
-	
+
 	public Map<Long, Set<Block>> hashBlocks = new HashMap<Long, Set<Block>>();
-	
+
 	public Set<Block> blocks = new HashSet<Block>();
-	
+
 	public List<Node> borderNodes = new LinkedList<Node>();
-	
+
 	public Set<Id> borderLinkIds = new HashSet<Id>();
-	
+
 	public Set<Node> noStartSet = new HashSet<Node>();
-	
+
 	protected EvacArea evacArea;
-	
+
 	protected FlatNetwork flatNetwork = new FlatNetwork();
-	
+
 	public double areaBlockSum;
 	public double areaBorder;
-	
+
 	public BlockCreator(NetworkLayer network)
 	{
 		PropertyConfigurator.configure(PathTracker.resolve("distriLogger"));
@@ -83,7 +83,7 @@ public class BlockCreator {
 		parseBlocks();
 		calcAreaStatistics();
 	}
-	
+
 	protected void setupNetwork()
 	{
 		//add border information
@@ -93,7 +93,7 @@ public class BlockCreator {
 		this.network = flatNetwork.flatten(network);
 		updateBorderInformation();
 	}
-	
+
 	protected void updateBorderInformation()
 	{
 		//first: update the border:
@@ -103,7 +103,7 @@ public class BlockCreator {
 		{
 			hull.add(network.getNodes().get(new IdImpl(s)));
 		}
-		
+
 		//update information about newly created nodes
 		for(String onBorder : evacArea.evacBorderOrderIds)
 		{
@@ -129,33 +129,33 @@ public class BlockCreator {
 		}
 		noStartSet.clear();
 		//add every node on the border to the noStartSet
-		
+
 		//first: add the nodes on the border
 		for(String id : evacArea.evacBorderOrderIds)
 		{
 			noStartSet.add(network.getNodes().get(new IdImpl(id)));
 		}
-		
+
 		//second: add the nodes outside the border
 		for(String id : evacArea.evacBorderNodeIds)
 		{
 			noStartSet.add(network.getNodes().get(new IdImpl(id)));
 		}
 	}
-	
+
 	protected List<String> getNewBorderOrder()
 	{
 		refreshBorderLinkIds();
-		
+
 		List<String> newBorderOrder = new LinkedList();
-		
+
 		String startString = evacArea.evacBorderOrderIds.get(0);
 		Node start = network.getNodes().get(new IdImpl(startString));
 		newBorderOrder.add(startString);
-		
+
 		Node current = start;
 		Node next = null;
-		
+
 		while(true)
 		{
 			next = null;
@@ -190,9 +190,9 @@ public class BlockCreator {
 		return newBorderOrder;
 	}
 
-	
-	
-	
+
+
+
 	protected void refreshBorderLinkIds()
 	{
 		Set<Id> newborderLinkIds = new HashSet<Id>();
@@ -211,11 +211,11 @@ public class BlockCreator {
 				{
 					newborderLinkIds.add(newLinkId);
 				}
-			}	
+			}
 		}
 		this.borderLinkIds = newborderLinkIds;
 	}
-	
+
 	protected void calcAreaStatistics()
 	{
 		areaBorder = GraphAlgorithms.getSimplePolygonArea(borderNodes);
@@ -227,8 +227,8 @@ public class BlockCreator {
 		log.debug("AREA STATISTICS!");
 		log.debug("totalArea (according to bounding box of border): " + areaBorder);
 		log.debug("blockSum: " + areaBlockSum);
-	}	
-	
+	}
+
 	protected void removeUnreachableNodes()
 	{
 		log.debug("Removing unreachable nodes..");
@@ -238,11 +238,11 @@ public class BlockCreator {
 		Set<Node> toRemove = sd.getNodes(Double.MAX_VALUE);
 		for(Node n : toRemove)
 		{
-			network.removeNode(network.getNodes().get(n.getId()));
+			network.removeNode(n.getId());
 		}
-		
+
 	}
-	
+
 	protected void addBorderInformation()
 	{
 		try {
@@ -271,7 +271,7 @@ public class BlockCreator {
 			}
 		}
 	}
-	
+
 	protected void addBorderLinks()
 	{
 
@@ -283,7 +283,7 @@ public class BlockCreator {
 			if(tmp > maxLinkId)
 				maxLinkId = tmp;
 		}
-		
+
 		boolean linkTo = false, linkFrom = false;
 		//add links for Borders
 		for(int i = 0; i < borderNodes.size(); ++i)
@@ -311,26 +311,26 @@ public class BlockCreator {
 				}
 			}
 			log.debug("found " + found + "links for one border link");
-			
+
 			if(!linkTo)
 			{
 				Id id = new IdImpl("" + (++maxLinkId));
-				network.createAndAddLink(id, 
-						current, 
-						next, 
+				network.createAndAddLink(id,
+						current,
+						next,
 						GraphAlgorithms.getDistanceMeter(current, next),
 						0, //freespeed
 						0, //capacity
 						1); //numLanes)
-				
+
 				borderLinkIds.add(id);
 			}
 			if(!linkFrom)
 			{
 				Id id = new IdImpl("" + (++maxLinkId));
-				network.createAndAddLink(id, 
-						next, 
-						current, 
+				network.createAndAddLink(id,
+						next,
+						current,
 						GraphAlgorithms.getDistanceMeter(current, next),
 						0, //freespeed
 						0, //capacity
@@ -339,12 +339,12 @@ public class BlockCreator {
 			}
 		}
 	}
-	
+
 	public int getDemand(Node node)
 	{
 		return demandMap.get(node);
 	}
-	
+
 	public void parseBlocks()
 	{
 		for(Node node : network.getNodes().values())
@@ -372,7 +372,7 @@ public class BlockCreator {
 				blocks.add(b);
 		}
 		hashBlocks = null;
-		//debug 
+		//debug
 		for(Block b : blocks)
 		{
 			//log.debug("new Block, " + b.id +  "area: " + b.area_size);
@@ -390,12 +390,12 @@ public class BlockCreator {
 
 		}
 	}
-	
+
 	protected void constructBlock(List<Node> path, Node current)
 	{
-		
+
 	}
-	
+
 	protected boolean linkPossible (Link l, Set<Link> usedLinks, List<Node> result, Node previousNode, Node currentNode, Node startNode)
 	{
 		if(l.getFromNode().equals(l.getToNode()))
@@ -421,7 +421,7 @@ public class BlockCreator {
 			return true;
 		return false;
 	}
-	
+
 	protected void constructBlocks(Node startNode)
 	{
 		Set<Block> bResult = new HashSet<Block>();
@@ -515,8 +515,8 @@ public class BlockCreator {
 			result = new LinkedList<Node>();
 		}
 	}
-	
-	
+
+
 	protected boolean containsBlock(Block b)
 	{
 		Set<Block> existing = hashBlocks.get(getHash(b));
@@ -536,7 +536,7 @@ public class BlockCreator {
 		}
 		return false;
 	}
-	
+
 	protected boolean isSameSequence(Block first, Block second)
 	{
 		boolean result = false;
@@ -550,7 +550,7 @@ public class BlockCreator {
 		}
 		return result;
 	}
-	
+
 	protected boolean isSameSequence(Block first, Block second, int indexFirst, int indexSecond)
 	{
 		boolean result = true;
@@ -602,5 +602,5 @@ public class BlockCreator {
 			hash = hash.multiply(BigInteger.valueOf(Long.parseLong(n.getId().toString())));
 		}
 		return hash.longValue();
-	}	
+	}
 }

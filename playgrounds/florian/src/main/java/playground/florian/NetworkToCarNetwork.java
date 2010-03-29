@@ -7,12 +7,12 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 
 
@@ -46,12 +46,12 @@ public class NetworkToCarNetwork {
 		net3.setEffectiveCellSize(7.5);
 
 		// uebertragen der Nodes
-		Map<Id,NodeImpl> nodes = net.getNodes();
+		Map<Id,Node> nodes = net.getNodes();
 		int j = 0;
 		for (Iterator<Id> it = nodes.keySet().iterator(); it.hasNext();){
 			j++;
 			Id id = it.next();
-			NodeImpl node = nodes.get(id);
+			Node node = nodes.get(id);
 			Coord coord = node.getCoord();
 			net3.createAndAddNode(id, coord);
 		}
@@ -68,8 +68,8 @@ public class NetworkToCarNetwork {
 			}
 			LinkImpl link = links.get(id1);
 			Id id2 = link.getId();
-			NodeImpl startNode = net3.getNodes().get(link.getFromNode().getId());
-			NodeImpl endNode = net3.getNodes().get(link.getToNode().getId());
+			Node startNode = net3.getNodes().get(link.getFromNode().getId());
+			Node endNode = net3.getNodes().get(link.getToNode().getId());
 			double length = link.getLength();
 
 			//Bestimmung der Spuranzahl

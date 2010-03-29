@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -42,7 +43,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * <li><em>jc.shp</em>: junction shape file (typically called xyz________jc.shp)</li>
  * <li><em>nw.shp</em>: junction shape file (typically called xyz________nw.shp)</li>
  * </ul>
- * 
+ *
  * @author balmermi
  */
 public class NetworkReaderTeleatlas {
@@ -52,7 +53,7 @@ public class NetworkReaderTeleatlas {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(NetworkReaderTeleatlas.class);
-	
+
 	private final NetworkLayer network;
 
 	/**
@@ -64,7 +65,7 @@ public class NetworkReaderTeleatlas {
 	 * path and name to the Tele Atlas MultiNet network (nw) Shapefile
 	 */
 	private final String nwShpFileName; // teleatlas network shape file name
-	
+
 	/**
 	 * option flag: if set, the reader ignores all network links with
 	 * <p><code>{@link #LINK_FRCTYP_NAME} == 8</code></p>
@@ -125,14 +126,14 @@ public class NetworkReaderTeleatlas {
 	// T_BP To (End) Blocked Passage
 	//   0: No Blocked Passage at End Junction (default)
 	//   2: Blocked Passage at End Junction
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Instantiate a new Tele Atlas MultiNet Shapefile reader based on the junction and the network shape file.
-	 * 
+	 *
 	 * @param network MATSim network database in which the reader stores the data
 	 * @param jcShpFileName Tele Atlas MultiNet junction Shapefile
 	 * @param nwShpFileName Tele Atlas MultiNet network Shapefile
@@ -166,7 +167,7 @@ public class NetworkReaderTeleatlas {
 
 	/**
 	 * Reads Tele Atlas MultiNet junction Shapefile given in <code>{@link #jcShpFileName}</code>.
-	 * 
+	 *
 	 * <p>It uses the following feature attributes:
 	 * <ul>
 	 * <li>center coordinate</li>
@@ -190,7 +191,7 @@ public class NetworkReaderTeleatlas {
 	 * <pre>
 	 * <code>{@link NodeImpl#type} = {@link #NODE_FEATTYP_NAME}+"-"+{@link #NODE_JNCTTYP_NAME}</code>
 	 * </pre>
-	 * 
+	 *
 	 * @throws
 	 */
 	private final void readNodesFromJCshp() throws IOException {
@@ -212,12 +213,12 @@ public class NetworkReaderTeleatlas {
 		nCnt = network.getNodes().size()-nCnt;
 		log.info("  "+nCnt+" nodes added to the network.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Reads Tele Atlas MultiNet network Shapefile given in <code>{@link #nwShpFileName}</code>.
-	 * 
+	 *
 	 * <p>It uses the following feature attributes:
 	 * <ul>
 	 * <li><code>{@link #LINK_ID_NAME} (Feature Identification)</code></li>
@@ -260,7 +261,7 @@ public class NetworkReaderTeleatlas {
 	 * <li><code>{@link #LINK_SPEED_NAME} (Calculated Average Speed (kilometers per hour))</code></li>
 	 * <li><code>{@link #LINK_LANES_NAME} (Number of Lanes)</code></li>
 	 * </ul>
-	 * 
+	 *
 	 * <b>Conversion rules:</b>
 	 * <ul>
 	 * <li>Links that refer to not existing from- or to-link will be
@@ -284,7 +285,7 @@ public class NetworkReaderTeleatlas {
 	 * <code>{@link LinkImpl#type} = {@link #LINK_FRCTYP_NAME}+"-"+{@link #LINK_FEATTYP_NAME}+"-"+{@link #LINK_FERRYTYP_NAME}</code>
 	 * </pre></li>
 	 * </ul></p>
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	private final void readLinksFromNWshp() throws IOException {
@@ -310,8 +311,8 @@ public class NetworkReaderTeleatlas {
 			double speed = Double.parseDouble(f.getAttribute(LINK_SPEED_NAME).toString());
 			double lanes = Double.parseDouble(f.getAttribute(LINK_LANES_NAME).toString());
 			// ignore link where from node or to node is missing
-			NodeImpl fNode = network.getNodes().get(fromJunctionId);
-			NodeImpl tNode = network.getNodes().get(toJunctionId);
+			Node fNode = network.getNodes().get(fromJunctionId);
+			Node tNode = network.getNodes().get(toJunctionId);
 			if ((fNode == null) || (tNode == null)) { log.warn("  linkId="+id.toString()+": at least one of the two junctions do not exist. Ignoring and proceeding anyway..."); ignore = true; }
 			// ignore link that is not a 'Road Element' (4110) or a 'Ferry Connection Element' (4130)
 			// There are 'Address Area Boundary Element' (4165) links that will be ignored
@@ -333,7 +334,7 @@ public class NetworkReaderTeleatlas {
 			double cap;
 			if (speed < minSpeedForNormalCapacity) { cap = lanes*1000; }
 			else { cap = lanes*2000; }
-			
+
 			if (ignore) { ignoreCnt++; }
 			else {
 				if (oneway.equals(" ") || oneway.equals("N")) {
@@ -351,7 +352,7 @@ public class NetworkReaderTeleatlas {
 				}
 			}
 		}
-		
+
 		network.setCapacityPeriod(3600.0);
 
 		lCnt = network.getLinks().size()-lCnt;
@@ -365,7 +366,7 @@ public class NetworkReaderTeleatlas {
 
 	/**
 	 * prints the variable settings to the STDOUT
-	 * 
+	 *
 	 * @param prefix a prefix for each line of the STDOUT
 	 */
 	public final void printInfo(final String prefix) {

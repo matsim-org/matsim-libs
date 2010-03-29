@@ -34,7 +34,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 /**
  * @author Daniel Dressler, Manuel Schneider
@@ -132,7 +131,7 @@ public class ConfluentFlowNetwork {
 
             HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
             int max = 0;
-            for (NodeImpl node : network.getNodes().values()) {
+            for (Node node : network.getNodes().values()) {
             	try {
             		int i = Integer.parseInt(node.getId().toString());
             		if (i > 0) 	newNodeNames.put(node,i);
@@ -142,7 +141,7 @@ public class ConfluentFlowNetwork {
                 }
             }
 
-            for (NodeImpl node : network.getNodes().values()) {
+            for (Node node : network.getNodes().values()) {
             	try {
             		int i = Integer.parseInt(node.getId().toString());
             	} catch (Exception except) {
@@ -153,7 +152,7 @@ public class ConfluentFlowNetwork {
                 }
             }
 
-            for (NodeImpl node : network.getNodes().values()) {
+            for (Node node : network.getNodes().values()) {
             	if (demands.containsKey(node)) {
             		int d = demands.get(node);
             		if (d > 0) {
@@ -227,7 +226,7 @@ public class ConfluentFlowNetwork {
               System.out.println(except.getMessage());
            }
 		} else {
-			for (NodeImpl node : network.getNodes().values()) {
+			for (Node node : network.getNodes().values()) {
 		//		if (!node.getId().equals(sink.getId())) {
 					demands.put(node, Math.max(uniformDemands,0));
 		//		}

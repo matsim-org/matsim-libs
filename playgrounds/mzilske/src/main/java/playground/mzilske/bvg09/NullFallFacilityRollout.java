@@ -327,15 +327,15 @@ public class NullFallFacilityRollout {
 	private void emptyVehicles() {
 		outScenario.getVehicles().getVehicles().clear();
 	}
-	
+
 	private Map<Id, BasicVehicleType> readVehicles(){
 		Map<String, BasicVehicleType> vehicleTypeMap = DefaultVehTypes.getDefaultVehicleTypes();
 		Map<Id, BasicVehicleType> lineId2VehTypeMap = new HashMap<Id, BasicVehicleType>();
-		
-		for (Entry<Id, org.matsim.visum.VisumNetwork.TransitLine> entry : this.vNetwork.lines.entrySet()) {			
-			lineId2VehTypeMap.put(entry.getKey(), vehicleTypeMap.get(entry.getValue().tCode));			
+
+		for (Entry<Id, org.matsim.visum.VisumNetwork.TransitLine> entry : this.vNetwork.lines.entrySet()) {
+			lineId2VehTypeMap.put(entry.getKey(), vehicleTypeMap.get(entry.getValue().tCode));
 		}
-		
+
 		return lineId2VehTypeMap;
 	}
 
@@ -352,13 +352,13 @@ public class NullFallFacilityRollout {
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
 
-		Map<Id, BasicVehicleType> lineId2VehTypeMap = this.readVehicles();		
-		
+		Map<Id, BasicVehicleType> lineId2VehTypeMap = this.readVehicles();
+
 		long vehId = 0;
 		for (Umlauf umlauf : umlaeufe) {
 			if(lineId2VehTypeMap.containsKey(umlauf.getLineId())){
 				vehicleType = lineId2VehTypeMap.get(umlauf.getLineId());
-			}			
+			}
 			BasicVehicle veh = vb.createVehicle(new IdImpl("veh_"+ Long.toString(vehId++)), vehicleType);
 			outScenario.getVehicles().getVehicleTypes().put(vehicleType.getId(), vehicleType);
 			outScenario.getVehicles().getVehicles().put(veh.getId(), veh);
@@ -378,9 +378,9 @@ public class NullFallFacilityRollout {
 			}
 		}
 		Collection<Id> allNodes = new ArrayList<Id>(outScenario.getNetwork().getNodes().keySet());
-		for (Id node : allNodes) {
-			if (!usedNodes.contains(node)) {
-				outScenario.getNetwork().removeNode(outScenario.getNetwork().getNodes().get(node));
+		for (Id nodeId : allNodes) {
+			if (!usedNodes.contains(nodeId)) {
+				outScenario.getNetwork().removeNode(nodeId);
 			}
 		}
 		Collection<TransitStopFacility> allFacilities = new ArrayList<TransitStopFacility>(outScenario.getTransitSchedule().getFacilities().values());

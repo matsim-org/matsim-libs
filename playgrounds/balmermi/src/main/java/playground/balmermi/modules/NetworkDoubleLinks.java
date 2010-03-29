@@ -60,7 +60,7 @@ public class NetworkDoubleLinks {
 		Node tn = l.getToNode();
 		Coord nc = new CoordImpl(0.5*(fn.getCoord().getX()+tn.getCoord().getX()),0.5*(fn.getCoord().getY()+tn.getCoord().getY()));
 		Node n = network.createAndAddNode(new IdImpl(l.getId()+this.suffix),nc,((NodeImpl) fn).getType());
-		network.removeLink(l);
+		network.removeLink(l.getId());
 		LinkImpl l1new = network.createAndAddLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
 		LinkImpl l2new = network.createAndAddLink(new IdImpl(l.getId()+this.suffix),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
 		log.info("    lid="+l.getId()+" split into lids="+l1new.getId()+","+l2new.getId()+" with additional nid="+n.getId());
@@ -75,7 +75,7 @@ public class NetworkDoubleLinks {
 		log.info("  init number of links: "+network.getLinks().size());
 		log.info("  init number of nodes: "+network.getNodes().size());
 		Set<Id> linkIds = new TreeSet<Id>();
-		for (NodeImpl n : network.getNodes().values()) {
+		for (Node n : network.getNodes().values()) {
 			Object [] outLinks = n.getOutLinks().values().toArray();
 			for (int i=0; i<outLinks.length; i++) {
 				LinkImpl refLink = (LinkImpl)outLinks[i];

@@ -24,11 +24,10 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 public class NetworkScenarioCut implements NetworkRunnable {
 
@@ -36,7 +35,7 @@ public class NetworkScenarioCut implements NetworkRunnable {
 	private final double maxX;
 	private final double minY;
 	private final double maxY;
-	
+
 	private final static Logger log = Logger.getLogger(NetworkScenarioCut.class);
 
 	public NetworkScenarioCut(final Coord min, final Coord max) {
@@ -47,13 +46,13 @@ public class NetworkScenarioCut implements NetworkRunnable {
 		this.maxY = max.getY();
 	}
 
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		log.info("running module...");
 
-		TreeSet<NodeImpl> n_set = new TreeSet<NodeImpl>();
-		Iterator<? extends NodeImpl> n_it = network.getNodes().values().iterator();
+		TreeSet<Node> n_set = new TreeSet<Node>();
+		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
 		while (n_it.hasNext()) {
-			NodeImpl n = n_it.next();
+			Node n = n_it.next();
 			Coord coord = n.getCoord();
 			double x = coord.getX();
 			double y = coord.getY();
@@ -66,9 +65,9 @@ public class NetworkScenarioCut implements NetworkRunnable {
 		n_it = n_set.iterator();
 		int l_cnt = 0;
 		while (n_it.hasNext()) {
-			NodeImpl n = n_it.next();
-			l_cnt += n.getIncidentLinks().size();
-			network.removeNode(n);
+			Node n = n_it.next();
+			l_cnt += n.getInLinks().size() + n.getOutLinks().size();
+			network.removeNode(n.getId());
 		}
 		log.info("  Number of links cut out = " + l_cnt + ".");
 

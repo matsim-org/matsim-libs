@@ -37,7 +37,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 public class NetworkAnalyseRouteSet {
 
@@ -159,7 +158,7 @@ public class NetworkAnalyseRouteSet {
 					node_routes.add(node);
 					idx++;
 				}
-				NodeImpl last = network.getNodes().get(new IdImpl(entries[2].trim()));
+				Node last = network.getNodes().get(new IdImpl(entries[2].trim()));
 				if (last == null) { Gbl.errorMsg("Node id=" + entries[1].trim() + " does not exist!"); }
 				if (!last.getId().equals(node_routes.get(node_routes.size()-1).getId())) {
 					Gbl.errorMsg("Last node does not fit!");

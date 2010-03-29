@@ -33,13 +33,13 @@ import net.opengis.kml._2.ScreenOverlayType;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -73,7 +73,7 @@ public class NetworkDistance {
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
-		
+
 		KmlType mainKml = kmlObjectFactory.createKmlType();
 		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
 		mainDoc.setId("berlin_wipnet");
@@ -154,8 +154,8 @@ public class NetworkDistance {
 				 */
 				Coord fromCoord = new CoordImpl(parts[4], parts[5]);
 				Coord toCoord = new CoordImpl(parts[8], parts[9]);
-				NodeImpl fromNode = network.getNearestNode(fromCoord);
-				NodeImpl toNode = network.getNearestNode(toCoord);
+				Node fromNode = network.getNearestNode(fromCoord);
+				Node toNode = network.getNearestNode(toCoord);
 
 				Path path = router.calcLeastCostPath(fromNode, toNode, 0);
 
@@ -191,7 +191,7 @@ public class NetworkDistance {
 		}
 		return dist;
 	}
-	
+
 	public static void main(String[] args) {
 //		exportNetwork(); // exports the network as GoogleEarth KMZ. NOTE: This can be quite big for GoogleEarth!
 		convertNetwork();

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
@@ -88,16 +89,20 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	// <node ... > ... </node>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNode(final NodeImpl node, final BufferedWriter out) throws IOException {
+	@Override
+	public void startNode(final Node node, final BufferedWriter out) throws IOException {
 		out.write("\t\t<node");
 		out.write(" id=\"" + node.getId() + "\"");
 		out.write(" x=\"" + node.getCoord().getX() + "\"");
 		out.write(" y=\"" + node.getCoord().getY() + "\"");
-		if (node.getType() != null) {
-			out.write(" type=\"" + node.getType() + "\"");
-		}
-		if (node.getOrigId() != null) {
-			out.write(" origid=\"" + node.getOrigId() + "\"");
+		if (node instanceof NodeImpl) {
+			NodeImpl node2 = (NodeImpl) node;
+			if (node2.getType() != null) {
+				out.write(" type=\"" + node2.getType() + "\"");
+			}
+			if (node2.getOrigId() != null) {
+				out.write(" origid=\"" + node2.getOrigId() + "\"");
+			}
 		}
 		out.write(" />\n");
 	}

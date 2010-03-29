@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -24,18 +23,18 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class NetworkFromShape {
-	
-	
+
+
 	public static void main(String [] args) throws IOException, IllegalAttributeException {
-		
+
 		String links = "/home/laemmel/workspace/vsp-cvs/studies/padang/gis/network_v20080618/links.shp";
 		String nodes = "/home/laemmel/workspace/vsp-cvs/studies/padang/gis/network_v20080618/nodes.shp";
-		
+
 		double freespeed = 13.8888888888888;
 		double laneWidth = 3; //TODO find correct value
 		double cellSize = 7.5;  //TODO find correct value
 		double flowCapPerLane = 0.5; // vehicle per second and lane
-		
+
 		NetworkLayer net = new NetworkLayer();
 		net.setEffectiveCellSize(cellSize);
 		net.setEffectiveLaneWidth(laneWidth);
@@ -55,10 +54,10 @@ public class NetworkFromShape {
 		System.out.println(net.getNodes().size());
 		fs = ShapeFileReader.readDataFile(links);
 		it = fs.getFeatures().iterator();
-		
+
 		Collection<Feature> fts = new ArrayList<Feature>();
 		while(it.hasNext()) {
-			
+
 			Feature f = (Feature) it.next();
 			Polygon p = (Polygon) ((MultiPolygon)f.getDefaultGeometry()).getGeometryN(0);
 			f.setDefaultGeometry(p);
@@ -68,26 +67,26 @@ public class NetworkFromShape {
 			Integer to = (Integer) f.getAttribute("to");
 			Double length = (Double) f.getAttribute("length");
 			Double minWidth = (Double) f.getAttribute("min_width");
-			
+
 			double lanes = minWidth/laneWidth/2;
 			double flowCap = lanes * flowCapPerLane;
-			
-			NodeImpl nFrom = net.getNodes().get(new IdImpl(Integer.toString(from)));
-			NodeImpl nTo = net.getNodes().get(new IdImpl(Integer.toString(to)));
+
+			Node nFrom = net.getNodes().get(new IdImpl(Integer.toString(from)));
+			Node nTo = net.getNodes().get(new IdImpl(Integer.toString(to)));
 			if (nTo == null    || nFrom == null) {
 				int i = 0;
 				i++;
 				continue;
 			}
-			
+
 			net.createAndAddLink(new IdImpl(id), nFrom, nTo, length, freespeed, flowCap, Math.max(lanes,1));
 			net.createAndAddLink(new IdImpl(id+100000), nTo, nFrom, length, freespeed, flowCap, Math.max(lanes,1));
 		}
 
 		new NetworkCleaner().run(net);
-		
+
 		new NetworkWriter(net).writeFile("./network.xml");
-		
+
 		ShapeFileWriter.writeGeometries(fts, "");
 	}
 

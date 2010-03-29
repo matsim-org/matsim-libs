@@ -41,8 +41,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
@@ -54,7 +52,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ScenarioCut {
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private static void calcExtent(Scenario scenario) {
@@ -176,7 +174,7 @@ public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private static void reduceNetwork(NetworkImpl network, Coord center, double radius) {
+	private static void reduceNetwork(Network network, Coord center, double radius) {
 		System.out.println("removing links outside of circle ("+center.toString()+";"+radius+""+")... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
 		for (Link l : network.getLinks().values()) {
@@ -186,7 +184,7 @@ public class ScenarioCut {
 			else if (tc.calcDistance(center) > radius) { toRemove.add(l.getId()); }
 		}
 		System.out.println("=> "+toRemove.size()+" links to remove.");
-		for (Id id : toRemove) { network.removeLink(network.getLinks().get(id)); }
+		for (Id id : toRemove) { network.removeLink(id); }
 		System.out.println("=> "+network.getLinks().size()+" links left.");
 		System.out.println("done. " + (new Date()));
 
@@ -197,10 +195,10 @@ public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private static void reduceNetwork(NetworkImpl network, Coord min, Coord max) {
+	private static void reduceNetwork(Network network, Coord min, Coord max) {
 		System.out.println("removing links outside of rectangle ("+min.toString()+";"+max.toString()+""+")... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
-		for (LinkImpl l : network.getLinks().values()) {
+		for (Link l : network.getLinks().values()) {
 			Coord fc = l.getFromNode().getCoord();
 			if (fc.getX() < min.getX()) { toRemove.add(l.getId()); continue; }
 			if (fc.getX() > max.getX()) { toRemove.add(l.getId()); continue; }
@@ -213,7 +211,7 @@ public class ScenarioCut {
 			if (tc.getY() > max.getY()) { toRemove.add(l.getId()); continue; }
 		}
 		System.out.println("=> "+toRemove.size()+" links to remove.");
-		for (Id id : toRemove) { network.removeLink(network.getLinks().get(id)); }
+		for (Id id : toRemove) { network.removeLink(id); }
 		System.out.println("=> "+network.getLinks().size()+" links left.");
 		System.out.println("done. " + (new Date()));
 

@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings;
@@ -43,34 +42,34 @@ import playground.rost.graph.evacarea.EvacArea;
 
 
 public class ShortestDistanceFromSupersource {
-	
+
 	private static final Logger log = Logger.getLogger(ShortestDistanceFromSupersource.class);
-	
+
 	CostFunction cf;
 	NetworkLayer network;
 	EvacArea evacArea;
-	
+
 	Id sSID = new IdImpl(GlobalFlowCalculationSettings.superSinkId);
-	
+
 	public Map<Node, Double> costs = new HashMap<Node, Double>();
-	
-	protected Map<Node, NodeCost> costMap = new HashMap<Node, NodeCost>(); 
-	
+
+	protected Map<Node, NodeCost> costMap = new HashMap<Node, NodeCost>();
+
 	protected Set<Id> superSinkLinks = new HashSet<Id>();
-	
+
 	protected PriorityQueue<NodeCost> queue = new PriorityQueue<NodeCost>();
-	
+
 	public ShortestDistanceFromSupersource(CostFunction cf, NetworkLayer network, EvacArea evacArea)
 	{
 		this.cf = cf;
 		this.network = network;
 		this.evacArea = evacArea;
 	}
-	
+
 	public void calcShortestDistances()
 	{
 		//addSuperSink();
-		
+
 		initQueue();
 		while(!queue.isEmpty())
 		{
@@ -105,36 +104,36 @@ public class ShortestDistanceFromSupersource {
 		costMap.clear();
 		//removeSuperSink();
 	}
-	
+
 	protected void initQueue()
 	{
 		for(String s : evacArea.evacBorderNodeIds)
 		{
-			NodeImpl node = (NodeImpl)network.getNodes().get(new IdImpl(s));
+			Node node = network.getNodes().get(new IdImpl(s));
 			NodeCost nd = new NodeCost(node, 0);
 			costMap.put(node, nd);
 			queue.add(nd);
 		}
 		for(String s : evacArea.evacAreaNodeIds)
 		{
-			NodeImpl node = (NodeImpl)network.getNodes().get(new IdImpl(s));
+			Node node = network.getNodes().get(new IdImpl(s));
 			NodeCost nd = new NodeCost(node, Double.MAX_VALUE);
 			costMap.put(node, nd);
 			queue.add(nd);
 		}
 	}
-	
+
 	protected void addSuperSink()
 	{
 		long i = 0;
 		network.createAndAddNode(sSID, new CoordImpl(0,0));
 		Node sink = network.getNodes().get(sSID);
-		
+
 		for(String s : evacArea.evacBorderNodeIds)
 		{
-			NodeImpl node = (NodeImpl)network.getNodes().get(new IdImpl(s));
+			Node node = network.getNodes().get(new IdImpl(s));
 			Id linkId = new IdImpl("superlink" + ++i);
-			network.createAndAddLink(linkId, 
+			network.createAndAddLink(linkId,
 								network.getNodes().get(sSID),
 								node,
 								0,
@@ -144,20 +143,20 @@ public class ShortestDistanceFromSupersource {
 			superSinkLinks.add(linkId);
 		}
 	}
-	
+
 	protected void removeSuperSink()
 	{
 		for(Id id : superSinkLinks)
 		{
-			network.removeLink(network.getLinks().get(id));
+			network.removeLink(id);
 		}
-		network.removeNode(network.getNodes().get(sSID));
+		network.removeNode(sSID);
 	}
-	
+
 	public Set<Node> getNodes(double cost)
 	{
 		Set<Node> result = new HashSet<Node>();
-		
+
 		for(Node n : costs.keySet())
 		{
 			if(costs.get(n) == cost)
@@ -165,13 +164,13 @@ public class ShortestDistanceFromSupersource {
 				result.add(n);
 			}
 		}
-		
+
 		return result;
 	}
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 }

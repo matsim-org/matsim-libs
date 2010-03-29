@@ -39,8 +39,8 @@ public class KroutesCalculator {
 	public int findPTPath(final Coord coord1, final Coord coord2, final double distToWalk){
 		int connectionsNum =0;
 		double walkRange= distToWalk;
-		Collection <NodeImpl> nearOriginStops = findNearStations (coord1, walkRange);
-		Collection <NodeImpl> nearDestinationStops = findNearStations (coord2, walkRange);
+		Collection <Node> nearOriginStops = findNearStations (coord1, walkRange);
+		Collection <Node> nearDestinationStops = findNearStations (coord2, walkRange);
 
 		/*
 		System.out.println("origin");
@@ -72,8 +72,8 @@ public class KroutesCalculator {
 		return connectionsNum;
 	}
 
-	private Collection <NodeImpl> findNearStations(final Coord coord, double walkRange){
-		Collection <NodeImpl> stations;
+	private Collection <Node> findNearStations(final Coord coord, double walkRange){
+		Collection <Node> stations;
 		do{
 			stations = plainNet.getNearestNodes(coord, walkRange);
 			walkRange= walkRange + 300;

@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -204,9 +203,9 @@ public class NetworkLoaderImpl implements NetworkLoader {
 	}
 
 	private void removeLink(Link l) {
-		this.network.removeLink(l);
+		this.network.removeLink(l.getId());
 		Link lOpp = this.linkLinkMapping.get(l);
-		this.network.removeLink(lOpp);
+		this.network.removeLink(lOpp.getId());
 		Set<Link> links1 = this.removedLinks.get(l.getFromNode());
 		if (links1 == null) {
 			links1 = new HashSet<Link>();
@@ -238,12 +237,12 @@ public class NetworkLoaderImpl implements NetworkLoader {
 
 	private void createVisibilityGraph() {
 		int id = 0;
-		List<NodeImpl> nodes = new ArrayList<NodeImpl>(this.network.getNodes().values());
+		List<Node> nodes = new ArrayList<Node>(this.network.getNodes().values());
 
 		for (int i = 0; i < nodes.size()-1; i++) {
 			for (int j = i + 1; j < nodes.size(); j++) {
-				NodeImpl n1 = nodes.get(i);
-				NodeImpl n2 = nodes.get(j);
+				Node n1 = nodes.get(i);
+				Node n2 = nodes.get(j);
 				Coordinate [] coords = {MGC.coord2Coordinate(n1.getCoord()), MGC.coord2Coordinate(n2.getCoord())};
 				LineString ls = this.geofac.createLineString(coords);
 				boolean visible = true;

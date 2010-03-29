@@ -68,7 +68,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 	 */
 	private static boolean _debug = true;
 	private int lastArrival;
-	
+
 	private EdgeTypeEnum edgeTypeToUse = EdgeTypeEnum.SIMPLE;
 
 
@@ -83,7 +83,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 	public static void debug(final boolean debug){
 		_debug=debug;
 	}
-	
+
 	public MultiSourceEAF()
 	{
 		this.setupStatusInfo();
@@ -150,9 +150,9 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 	 */
 	public static void main(final String[] args) {
 		//TODO somehow access calcEAFlow (copy old code?)
-		
+
 	}
-	
+
 	public Flow calcEAFlow(EvacArea evacArea, NetworkLayer network, PopulationNodeMap populationNodeMap)
 	{
 		Map<Node, Integer> demands = new HashMap<Node, Integer>();
@@ -165,7 +165,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 				demands.put(node, demand);
 			}
 		}
-		
+
 		//create sink
 		network.createAndAddNode(new IdImpl(GlobalFlowCalculationSettings.superSinkId), new CoordImpl(0,0));
 		Node sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));
@@ -174,28 +174,28 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		for(String id : evacArea.evacBorderNodeIds)
 		{
 			Id linkId = new IdImpl("borderNode->sink" + (++counter));
-			network.createAndAddLink( linkId, 
-								network.getNodes().get(new IdImpl(id)), 
+			network.createAndAddLink( linkId,
+								network.getNodes().get(new IdImpl(id)),
 								network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId)),
 								0,
-								Integer.MAX_VALUE, //freespeed 
+								Integer.MAX_VALUE, //freespeed
 								Integer.MAX_VALUE, //capacity
 								1);
 		}
-		
+
 		ShortestDistanceFromSupersource sd = new ShortestDistanceFromSupersource(new LengthCostFunction(), network, evacArea);
 		sd.calcShortestDistances();
 		sd.getNodes(Double.MAX_VALUE);
-		
+
 		Flow fluss = calcEAFlow(network, demands);
 		return fluss;
 	}
-	
-	
+
+
 	/**
 	 * THE ONLY FUNCTION WHICH REALLY CALCULATES A FLOW
 	 * and provides status info
-	 * 
+	 *
 	 * @param network
 	 * @param demands
 	 * @return
@@ -210,21 +210,21 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		}
 		for(Link link : toRemove)
 		{
-			network.removeLink(link);
+			network.removeLink(link.getId());
 		}
 		if(_debug){
 			System.out.println("starting to read input");
 		}
-		
+
 		int totaldemands = 0;
 		for(Integer count : demands.values())
 		{
 			totaldemands += count;
 		}
-		
+
 		//create sink
 		Node sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));
-		
+
 		int timeHorizon = 10000;
 		int rounds = 10000;
 		String tempstr = "";
@@ -269,7 +269,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 				int gammaSum = 0;
 				int currentArrival = -1;
 				System.out.println("new paths!");
-				
+
 				for(TimeExpandedPath tEPath : result)
 				{
 					int arrive = tEPath.getArrival();
@@ -291,7 +291,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 				lastArrival = currentArrival;
 				if(gammaSum == 0)
 					throw new RuntimeException("no flow could be transported over any augmenting path!");
-				
+
 				timer3 = System.currentTimeMillis();
 				gain += fluss.cleanUp();
 
@@ -311,11 +311,11 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 				this.setProgressInfo("Total Flow", fluss.getTotalFlow() + " / " + totaldemands);
 				this.setProgressInfo("Found Paths", "" + fluss.getPaths().size());
 				this.setProgressInfo("Paths / Iteration", ""+ (fluss.getPaths().size() / (double)i));
-				
+
 			}
 			if (true) {
 				long timeStop = System.currentTimeMillis();
-				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
+				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 				System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
 				System.out.println("last " + tempstr);
 			}
@@ -339,7 +339,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		calculateTotalHoldover(fluss);
 		return fluss;
 	}
-	
+
 	protected void calculateTotalHoldover(Flow fluss)
 	{
 		int time = 0;
@@ -371,17 +371,17 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		System.out.println("flow:" + flow);
 		System.out.println("multi: " + multiSum);
 	}
-	
+
 
 	protected List<String> progressTitles;
-	
+
 	/**
 	 * 	must not (!) get accessed unsychronized
 	 */
 	protected Map<String, String> progressInfos;
-	
+
 	protected boolean isFinished;
-	
+
 	protected void setupStatusInfo()
 	{
 		isFinished = false;
@@ -398,7 +398,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 			progressInfos.put(key, "");
 		}
 	}
-	
+
 	protected void setProgressInfo(String key, String value)
 	{
 		synchronized(progressInfos)

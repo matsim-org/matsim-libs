@@ -67,11 +67,28 @@ public interface Network extends MatsimToplevelContainer, Serializable {
    * @return the lane width in meter
    */
   public double getEffectiveLaneWidth();
-	
-	
-	public void addNode( Node nn ) ;
+
+
+	public void addNode(Node nn);
 	// "void" can still be changed into "boolean" or "Node", see "Collection" or "Map" interface.
-	
-	public void addLink( Link ll ) ;
-	
+
+	public void addLink(Link ll);
+
+	/** Removes the node with the specified Id from the network, along with all links connected to that node.
+	 * The return value corresponds to the behavior of {@link Map.remove(Object)}
+	 *
+	 * @param nodeId node to be removed
+	 * @return the removed node, or <code>null</code> if no such node was found
+	 */
+	public Node removeNode(final Id nodeId);
+
+	/** Removes the link with the specified Id from the network and removes it as in- or out-Links of
+	 * its to- and from-Node, but does not remove any node this link is connected to.
+	 * The return value corresponds to the behavior of {@link Map.remove(Object)}
+	 *
+	 * @param linkId node to be removed
+	 * @return the removed link, or <code>null</code> if no such link was found
+	 */
+	public Link removeLink(final Id linkId);
+
 }

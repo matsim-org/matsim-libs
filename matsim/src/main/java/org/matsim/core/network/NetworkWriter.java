@@ -23,6 +23,7 @@ package org.matsim.core.network;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -35,7 +36,7 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimFileWriter {
 		super();
 		this.network = (NetworkLayer) network;
 	}
-	
+
 	public void writeFile(final String filename) {
 		// always write out in newest version, currently v1
 		writeFileV1(filename);
@@ -53,7 +54,7 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimFileWriter {
 			handler.startNetwork(network, this.writer);
 			handler.writeSeparator(this.writer);
 			handler.startNodes(network, this.writer);
-			for (NodeImpl n : network.getNodes().values()) {
+			for (Node n : network.getNodes().values()) {
 				handler.startNode(n, this.writer);
 				handler.endNode(this.writer);
 			}
@@ -73,5 +74,5 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimFileWriter {
 			Gbl.errorMsg(e);
 		}
 	}
-	
+
 }

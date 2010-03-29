@@ -187,7 +187,7 @@ public class FlatNetwork {
 
 		Long tmp;
 
-		for(NodeImpl n : input.getNodes().values())
+		for(Node n : input.getNodes().values())
 		{
 			tmp = Long.parseLong(n.getId().toString());
 			if(tmp > maxNodeId)

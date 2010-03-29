@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -48,14 +47,14 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(SpanningTree.class);
-	
-	private NodeImpl origin = null;
+
+	private Node origin = null;
 	private double dTime = Time.UNDEFINED_TIME;
-	
+
 	private final TravelTime ttFunction;
 	private final TravelCost tcFunction;
 	private HashMap<Id,NodeData> nodeData;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -66,7 +65,7 @@ public class SpanningTree {
 		this.tcFunction = tc;
 		log.info("done.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// inner classes
 	//////////////////////////////////////////////////////////////////////
@@ -102,8 +101,8 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
-	
-	public final void setOrigin(NodeImpl origin) {
+
+	public final void setOrigin(Node origin) {
 		this.origin = origin;
 	}
 
@@ -114,27 +113,27 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final HashMap<Id,NodeData> getTree() {
 		return this.nodeData;
 	}
-	
+
 	public final TravelTime getTravelTimeCalculator() {
 		return this.ttFunction;
 	}
-	
+
 	public final TravelCost getTravelCostCalulator() {
 		return this.tcFunction;
 	}
-	
-	public final NodeImpl getOrigin() {
+
+	public final Node getOrigin() {
 		return this.origin;
 	}
-	
+
 	public final double getDepartureTime() {
 		return this.dTime;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
@@ -169,7 +168,7 @@ public class SpanningTree {
 		d.time = dTime;
 		d.cost = 0;
 		nodeData.put(origin.getId(),d);
-		
+
 		ComparatorCost comparator = new ComparatorCost(nodeData);
 		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500,comparator);
 		relaxNode(this.origin,pendingNodes);
@@ -177,10 +176,10 @@ public class SpanningTree {
 			Node n = pendingNodes.poll();
 			relaxNode(n,pendingNodes);
 		}
-		
+
 //		log.info("done.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main method
 	//////////////////////////////////////////////////////////////////////
@@ -189,10 +188,10 @@ public class SpanningTree {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
-		
+
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator());
 		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig().charyparNagelScoring()));
-		NodeImpl origin = network.getNodes().get(new IdImpl(1));
+		Node origin = network.getNodes().get(new IdImpl(1));
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);
 		st.run(network);

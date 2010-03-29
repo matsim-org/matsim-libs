@@ -38,6 +38,8 @@ import net.opengis.kml._2.ScreenOverlayType;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -198,7 +200,7 @@ public class TollSchemeGenerator {
 		//filter the highway links explicitly
 //		tollNetwork = this.applyLinkIdFilter(tollNetwork, linkIdsToFilter);
 		//filter the highways by capacity
-		tollNetwork = this.applyCapacityFilter(tollNetwork, -1, 41000);
+		this.applyCapacityFilter(tollNetwork, -1, 41000);
 
 
 		//write kml
@@ -219,24 +221,24 @@ public class TollSchemeGenerator {
 	}
 
 
-	private NetworkLayer applyCapacityFilter(NetworkLayer network, double lowerBound, double upperBound) {
-		Set<LinkImpl> linksToRemove = new HashSet<LinkImpl>();
-		for (LinkImpl l : network.getLinks().values()) {
+	private Network applyCapacityFilter(Network network, double lowerBound, double upperBound) {
+		Set<Link> linksToRemove = new HashSet<Link>();
+		for (Link l : network.getLinks().values()) {
 			if ((lowerBound > l.getCapacity()) || (upperBound < l.getCapacity())) {
 				linksToRemove.add(l);
 			}
 		}
-		for (LinkImpl l : linksToRemove) {
-			network.removeLink(l);
+		for (Link l : linksToRemove) {
+			network.removeLink(l.getId());
 		}
 		return network;
 	}
 
 
-	private NetworkLayer applyLinkIdFilter(NetworkLayer tollNetwork,
+	private Network applyLinkIdFilter(Network tollNetwork,
 			List<Id> linkIdsToFilter) {
 		for (Id i : linkIdsToFilter) {
-			tollNetwork.removeLink(tollNetwork.getLinks().get(i));
+			tollNetwork.removeLink(i);
 		}
 		return tollNetwork;
 	}

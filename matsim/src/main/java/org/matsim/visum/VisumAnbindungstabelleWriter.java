@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.world.MappedLocation;
 import org.matsim.world.ZoneLayer;
 
@@ -64,7 +64,7 @@ public class VisumAnbindungstabelleWriter {
 			out.write("* Tabelle: Anbindungen\n");
 			out.write("$ANBINDUNG:BEZNR;KNOTNR;RICHTUNG;TYPNR;VSYSSET\n");
 
-			for (NodeImpl node : network.getNodes().values()) {
+			for (Node node : network.getNodes().values()) {
 				String visum = "";
 				// ANBINDUNG:BEZNR
 				ArrayList<MappedLocation> locs = zones.getNearestLocations(node.getCoord(), null);

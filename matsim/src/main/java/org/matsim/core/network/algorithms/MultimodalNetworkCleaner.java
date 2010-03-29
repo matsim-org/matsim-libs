@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 
 /**
  * Variant of {@link org.matsim.core.network.algorithms.NetworkCleaner NetworkCleaner} that supports
@@ -49,9 +49,9 @@ public class MultimodalNetworkCleaner {
 
 	private final static Logger log = Logger.getLogger(MultimodalNetworkCleaner.class);
 
-	private final NetworkImpl network;
+	private final Network network;
 
-	public MultimodalNetworkCleaner(final NetworkImpl network) {
+	public MultimodalNetworkCleaner(final Network network) {
 		this.network = network;
 	}
 
@@ -102,12 +102,12 @@ public class MultimodalNetworkCleaner {
 				reducedModes.removeAll(modes);
 				link.setAllowedModes(reducedModes);
 				if (reducedModes.isEmpty()) {
-					this.network.removeLink(link);
+					this.network.removeLink(link.getId());
 					if ((link.getFromNode().getInLinks().size() + link.getFromNode().getOutLinks().size()) == 0) {
-						this.network.removeNode(link.getFromNode());
+						this.network.removeNode(link.getFromNode().getId());
 					}
 					if ((link.getToNode().getInLinks().size() + link.getToNode().getOutLinks().size()) == 0) {
-						this.network.removeNode(link.getToNode());
+						this.network.removeNode(link.getToNode().getId());
 					}
 				}
 			}

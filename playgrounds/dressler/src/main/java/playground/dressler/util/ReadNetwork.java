@@ -24,10 +24,10 @@ package playground.dressler.util;
 //import java.util.Map;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NodeImpl;
 
 public class ReadNetwork {
 
@@ -40,26 +40,26 @@ public class ReadNetwork {
 			ScenarioImpl scenario = new ScenarioImpl();
 			NetworkLayer network = scenario.getNetwork();
 		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario);
-		 
+
 		 networkReader.readFile("./examples/equil/network.xml");
-		 		 
+
 		 //Map<IdI, ? extends Node> nodes = network.getNodes();
 		 //Map<IdI, ? extends Link> links = network.getLinks();
-		 
+
 		 //for (Node node : nodes.values()) {
-		 
-		 
-		 for (NodeImpl node : network.getNodes().values()) {
+
+
+		 for (Node node : network.getNodes().values()) {
 		   System.out.println(node.toString() + "\n");
 		 }
-		 
-		 for (LinkImpl link : network.getLinks().values()) {
+
+		 for (Link link : network.getLinks().values()) {
 		    System.out.println(link.toString() + "\n");
-  
+
 		 }
-		 
+
 		 System.out.println("... immer noch!\n");
-		 
+
 	}
 
 }

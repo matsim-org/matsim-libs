@@ -27,9 +27,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class NetworkCreateL2ZMapping {
@@ -37,10 +37,10 @@ public class NetworkCreateL2ZMapping {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private static final Logger log = Logger.getLogger(NetworkCreateL2ZMapping.class);
 	private final String outfile;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -48,18 +48,18 @@ public class NetworkCreateL2ZMapping {
 	public NetworkCreateL2ZMapping(final String outfile) {
 		this.outfile = outfile;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private QuadTree<NodeImpl> buildCentroidNodeQuadTree(final Map<Id,NodeImpl> nodes) {
+	private QuadTree<Node> buildCentroidNodeQuadTree(final Map<Id,Node> nodes) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		ArrayList<NodeImpl> ns = new ArrayList<NodeImpl>();
-		for (NodeImpl n : nodes.values()) {
+		ArrayList<Node> ns = new ArrayList<Node>();
+		for (Node n : nodes.values()) {
 			try {
 				int nid = Integer.parseInt(n.getId().toString());
 				if (nid < 10000) {
@@ -83,25 +83,25 @@ public class NetworkCreateL2ZMapping {
 		miny -= 1.0;
 		maxx += 1.0;
 		maxy += 1.0;
-		QuadTree<NodeImpl> qt = new QuadTree<NodeImpl>(minx,miny,maxx,maxy);
-		for (NodeImpl n : ns) {
+		QuadTree<Node> qt = new QuadTree<Node>(minx,miny,maxx,maxy);
+		for (Node n : ns) {
 			qt.put(n.getCoord().getX(),n.getCoord().getY(),n);
 		}
 		return qt;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public void run(NetworkLayer network) {
-		QuadTree<NodeImpl> qt = buildCentroidNodeQuadTree(network.getNodes());
+		QuadTree<Node> qt = buildCentroidNodeQuadTree(network.getNodes());
 		log.info("# centroid nodes: "+qt.size());
 		try {
 			FileWriter fw = new FileWriter(outfile);
 			BufferedWriter out = new BufferedWriter(fw);
 			for (LinkImpl l : network.getLinks().values()) {
-				NodeImpl n = qt.get(l.getCoord().getX(),l.getCoord().getY());
+				Node n = qt.get(l.getCoord().getX(),l.getCoord().getY());
 				out.write(l.getId().toString()+"\t"+n.getId().toString()+"\n");
 			}
 			out.close();

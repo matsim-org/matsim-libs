@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.test;
 
@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
 import org.matsim.transitSchedule.api.TransitStopFacility;
@@ -49,9 +48,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * tries to allocate bus stop coordinations to links in MATSim "car" network
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class BusStopAllocator {
 	private final NetworkImpl network;
@@ -109,7 +108,7 @@ public class BusStopAllocator {
 		Link link = network.getNearestRightEntryLink(stopCoord);
 		resultIds.put(stopId, link.getId());
 		if (link != null) {
-			Collection<NodeImpl> nodes = network.getNearestNodes(stopCoord, 25);
+			Collection<Node> nodes = network.getNearestNodes(stopCoord, 25);
 			String isToNode = null;
 			if (nodes.contains(link.getToNode()))
 				isToNode = "to";
@@ -145,9 +144,9 @@ public class BusStopAllocator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String multiModalNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml", 
-		transitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/scheduleTest.xml", 
-		carNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.car.mini.xml", 
+		String multiModalNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml",
+		transitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/scheduleTest.xml",
+		carNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.car.mini.xml",
 		outputFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/stopAllocation2.txt";
 
 		ScenarioImpl scenario = new ScenarioImpl();

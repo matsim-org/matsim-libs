@@ -23,6 +23,7 @@ package org.matsim.core.network;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.WriterHandler;
 
 public interface NetworkWriterHandler extends WriterHandler {
@@ -55,7 +56,7 @@ public interface NetworkWriterHandler extends WriterHandler {
 	// <node ... > ... </node>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNode(final NodeImpl node, final BufferedWriter out) throws IOException;
+	public void startNode(final Node node, final BufferedWriter out) throws IOException;
 
 	public void endNode(final BufferedWriter out) throws IOException;
 

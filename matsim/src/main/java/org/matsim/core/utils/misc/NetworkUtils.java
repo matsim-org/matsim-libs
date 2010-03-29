@@ -23,6 +23,8 @@ package org.matsim.core.utils.misc;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -163,6 +165,12 @@ public class NetworkUtils {
 	 */
 	public static int getNumberOfLanesAsInt(final double time, final Link link) {
 		return Math.round((float)Math.max(link.getNumberOfLanes(time), 1.0d));
+	}
+
+	public static Map<Id, Link> getIncidentLinks(final Node n) {
+		Map<Id, Link> links = new TreeMap<Id, Link>(n.getInLinks());
+		links.putAll(n.getOutLinks());
+		return links;
 	}
 
 }

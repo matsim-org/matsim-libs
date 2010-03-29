@@ -47,7 +47,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
  * by {@link NetworkReaderTeleatlas}. The input maneuver shape file and the maneuver path DBF file
  * is based on <strong>Tele Atlas MultiNet Shapefile 4.3.2.1 Format Specifications
  * document version Final v1.0, June 2007</strong>.
- * 
+ *
  * @author balmermi
  */
 public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable {
@@ -57,7 +57,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(NetworkTeleatlasAddManeuverRestrictions.class);
-	
+
 	private final NetworkExpandNode neModule = new NetworkExpandNode();
 
 	/**
@@ -69,7 +69,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	 * path and name to the Tele Atlas MultiNet maneuver path (mp) DBF file
 	 */
 	private final String mpDbfFileName; // teleatlas maneuver paths dbf file name
-	
+
 	/**
 	 * option flag: if set, expanded {@link NodeImpl nodes} (nodes that contains maneuver restrictions)
 	 * will not include new virtual {@link LinkImpl links} providing a u-turn maneuver at the
@@ -80,7 +80,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	/**
 	 * option parameter: defines the radius how much a {@link NodeImpl node} will be expanded.
 	 * <p><b>Default:</b> <code>0.000030</code> (appropriate for world coordinate system WGS84)</p>
-	 * 
+	 *
 	 * @see NetworkExpandNode
 	 */
 	public double expansionRadius = 0.000030; // WGS84
@@ -88,7 +88,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	/**
 	 * option parameter: defines the offset of a in- and out-link pair of an expanded {@link NodeImpl node}.
 	 * <p><b>Default:</b> <code>0.000005</code> (appropriate for world coordinate system WGS84)</p>
-	 * 
+	 *
 	 * @see NetworkExpandNode
 	 */
 	public double linkSeparation = 0.000005; // WGS84
@@ -96,7 +96,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	private static final String MN_ID_NAME = "ID";
 	private static final String MN_FEATTYP_NAME = "FEATTYP";
 	private static final String MN_JNCTID_NAME = "JNCTID";
-	
+
 	private static final String MP_ID_NAME = "ID";
 	private static final String MP_SEQNR_NAME = "SEQNR";
 	private static final String MP_TRPELID_NAME = "TRPELID";
@@ -107,7 +107,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 
 	/**
 	 * To create maneuver restrictions to a Tele Atlas MultiNet {@link NetworkLayer network}.
-	 * 
+	 *
 	 * @param mnShpFileName Tele Atlas MultiNet maneuver Shape file
 	 * @param mpDbfFileName Tele Atlas MultiNet maneuver path DBF file
 	 */
@@ -124,7 +124,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 
 	/**
 	 * Reading and assigning (expanding {@link NodeImpl nodes}) maneuver restrictions to the {@link NetworkLayer network}.
-	 * 
+	 *
 	 * <p>It uses the following attributes from the Tele Atlas MultiNet maneuver Shape file:
 	 * <ul>
 	 *   <li>{@link #MN_ID_NAME} (Feature Identification)</li>
@@ -154,7 +154,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	 *   <li>Maneuver restrictions will be modelled in the natwork topology by expanding
 	 *   {@link NodeImpl nodes} with {@link NetworkExpandNode node expanding procedure}.</li>
 	 * </ul></p>
-	 * 
+	 *
 	 * @param network MATSim {@link NetworkLayer network} created by {@link NetworkReaderTeleatlas}.
 	 * @throws Exception
 	 */
@@ -195,7 +195,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 		}
 		log.info("    "+mSequences.size()+" maneuvers sequences stored.");
 		log.info("  done.");
-		
+
 		// store the maneuver list of the nodes
 		// TreeMap<NodeId,ArrayList<Tuple<MnId,MnFeatType>>>
 		log.info("  parsing meneuver shape file...");
@@ -222,7 +222,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 		}
 		log.info("    "+maneuvers.size()+" nodes with maneuvers stored.");
 		log.info("  done.");
-		
+
 		// create a maneuver matrix for each given node and
 		// expand those nodes
 		log.info("  expand nodes according to the given manveuvers...");
@@ -237,7 +237,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 			if (network.getNodes().get(nodeId) == null) { log.trace("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); nodesIgnoredCnt++; }
 			else {
 				// node found
-				NodeImpl n = network.getNodes().get(nodeId);
+				Node n = network.getNodes().get(nodeId);
 				// init maneuver matrix
 				// TreeMap<fromLinkId,TreeMap<toLinkId,turnAllowed>>
 				TreeMap<Id,TreeMap<Id,Boolean>> mmatrix = new TreeMap<Id, TreeMap<Id,Boolean>>();
@@ -248,7 +248,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 					TreeMap<Integer,Id> mSequence = mSequences.get(m.getFirst());
 					if (mSequence == null) { throw new Exception("nodeid="+nodeId+"; mnId="+m.getFirst()+": no maneuver sequence given."); }
 					if (mSequence.size() < 2) { throw new Exception("nodeid="+nodeId+"; mnId="+m.getFirst()+": mSequenceSize="+mSequence.size()+" not alowed!"); }
-					// get the first element of the sequence, defining the start link for the maneuver 
+					// get the first element of the sequence, defining the start link for the maneuver
 					Id firstLinkid = mSequence.values().iterator().next();
 					// go through each other element (target link of the maneuver) of the sequence by sequence number
 					for (Id otherLinkId : mSequence.values()) {
@@ -346,7 +346,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 
 	/**
 	 * prints the variable settings to the STDOUT
-	 * 
+	 *
 	 * @param prefix a prefix for each line of the STDOUT
 	 */
 	public final void printInfo(final String prefix) {

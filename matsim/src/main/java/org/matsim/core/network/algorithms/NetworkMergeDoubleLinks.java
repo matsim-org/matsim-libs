@@ -23,10 +23,11 @@ package org.matsim.core.network.algorithms;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -64,11 +65,11 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void mergeLink2IntoLink1(LinkImpl link1, LinkImpl link2, NetworkImpl network) {
+	private final void mergeLink2IntoLink1(Link link1, Link link2, Network network) {
 		switch (this.mergetype) {
 			case REMOVE:
 				log.info("        Link id=" + link2.getId() + " removed because of Link id=" + link1.getId());
-				network.removeLink(link2);
+				network.removeLink(link2.getId());
 				break;
 			case ADDITIVE:
 			{
@@ -82,7 +83,7 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 				link1.setFreespeed(fs);
 				link1.setNumberOfLanes(lanes);
 				link1.setLength(length);
-				network.removeLink(link2);
+				network.removeLink(link2.getId());
 			}
 			break;
 			case MAXIMUM:
@@ -97,7 +98,7 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 					link1.setFreespeed(fs);
 					link1.setNumberOfLanes(lanes);
 					link1.setLength(length);
-					network.removeLink(link2);
+					network.removeLink(link2.getId());
 				}
 				break;
 			default:
@@ -109,8 +110,8 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkImpl network) {
-		for (NodeImpl n : network.getNodes().values()) {
+	public void run(Network network) {
+		for (Node n : network.getNodes().values()) {
 			Iterator<?> l1_it = n.getOutLinks().values().iterator();
 			while (l1_it.hasNext()) {
 				LinkImpl l1 = (LinkImpl)l1_it.next();

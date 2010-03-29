@@ -45,11 +45,11 @@ public class NetworkAddEmmeManeuverRestrictions {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(NetworkAddEmmeManeuverRestrictions.class);
-	
+
 	private final NetworkExpandNode neModule = new NetworkExpandNode();
 
 	private final String maneuversTextFileName;
-	
+
 	public boolean removeUTurns = false;
 	public double expansionRadius = 0.000030; // WGS84
 	public double linkSeparation = 0.000005; // WGS84
@@ -67,7 +67,7 @@ public class NetworkAddEmmeManeuverRestrictions {
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private final Map<Id,ArrayList<Tuple<Id,Id>>> parseManeuvers(final NetworkLayer network) {
 		log.info("  parsing maneuvers...");
 		Map<Id,ArrayList<Tuple<Id,Id>>> illegalManeuvers = new HashMap<Id, ArrayList<Tuple<Id,Id>>>();
@@ -118,7 +118,7 @@ public class NetworkAddEmmeManeuverRestrictions {
 		}
 		return false;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
@@ -132,12 +132,12 @@ public class NetworkAddEmmeManeuverRestrictions {
 
 		Map<Id,ArrayList<Tuple<Id,Id>>> illegalManeuvers = this.parseManeuvers(network);
 		Map<Id,ArrayList<Tuple<Id,Id>>> maneuvers = new HashMap<Id, ArrayList<Tuple<Id,Id>>>();
-		
+
 		for (Id nodeId : illegalManeuvers.keySet()) {
 			ArrayList<Tuple<Id,Id>> mns = illegalManeuvers.get(nodeId);
 			ArrayList<Tuple<Id,Id>> turns = new ArrayList<Tuple<Id,Id>>();
-			
-			NodeImpl n = network.getNodes().get(nodeId);
+
+			Node n = network.getNodes().get(nodeId);
 			for (Link inLink : n.getInLinks().values()) {
 				for (Link outLink : n.getOutLinks().values()) {
 					Tuple<Id,Id> tuple = new Tuple<Id, Id>(inLink.getId(),outLink.getId());

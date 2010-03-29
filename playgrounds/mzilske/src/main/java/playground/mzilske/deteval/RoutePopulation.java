@@ -53,11 +53,11 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 public class RoutePopulation {
 
 	private Config config;
-	
+
 	private String configfile = null;
-	
+
 	private ScenarioImpl scenario;
-	
+
 	private Collection<Node> usedNodes;
 
 	/**
@@ -97,7 +97,7 @@ public class RoutePopulation {
 		scenario = sl.getScenario();
 		final NetworkImpl network = scenario.getNetwork();
 		this.config = scenario.getConfig();
-		final PopulationImpl plans = scenario.getPopulation();		
+		final PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
@@ -113,8 +113,8 @@ public class RoutePopulation {
 		plansWriter.closeStreaming();
 		usedNodes = determineUsedNetworkParts.getUsedNodes();
 		removeUnusedNetworkParts();
-		
-		
+
+
 		System.out.println("done.");
 	}
 
@@ -123,7 +123,7 @@ public class RoutePopulation {
 		Collection<Node> allNodes = new ArrayList<Node>(scenario.getNetwork().getNodes().values());
 		for (Node node : allNodes) {
 			if (!usedNodes.contains(node)) {
-				scenario.getNetwork().removeNode(node);
+				scenario.getNetwork().removeNode(node.getId());
 			}
 		}
 		new NetworkWriter(scenario.getNetwork()).writeFile(scenario.getConfig().network().getOutputFile());
