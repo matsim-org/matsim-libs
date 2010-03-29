@@ -15,6 +15,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.vis.otfvis.OTFVisQSim;
 
@@ -73,13 +74,18 @@ public class DgOTFVisReplayLastIteration {
     log.info("\n\n" + writer.getBuffer().toString());
     log.info("Complete config dump done.");
 
-    //TODO this is a bit risky if other capacity factors have been used in QueueSimulation
     if (config.getQSimConfigGroup() == null) {
       config.setQSimConfigGroup(new QSimConfigGroup());
+      config.getQSimConfigGroup().setFlowCapFactor(config.simulation().getFlowCapFactor());
+      config.getQSimConfigGroup().setStorageCapFactor(config.simulation().getStorageCapFactor());
+      config.getQSimConfigGroup().setRemoveStuckVehicles(config.simulation().isRemoveStuckVehicles());
+      config.getQSimConfigGroup().setStuckTime(config.simulation().getStuckTime());
+      config.getQSimConfigGroup().setSnapshotStyle(config.simulation().getSnapshotStyle());
     }
     
     ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
     Scenario sc = loader.loadScenario();
+    Gbl.setConfig(config);
     EventsManagerImpl events = new EventsManagerImpl();
     ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
     OTFVisQSim queueSimulation = new OTFVisQSim(sc, events);
