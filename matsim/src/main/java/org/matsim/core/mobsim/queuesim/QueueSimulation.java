@@ -144,23 +144,28 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * @param events
 	 */
 	public QueueSimulation(final Scenario scenario, final EventsManager events) {
-		this.scenario = scenario;
-		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
-		AbstractSimulation.reset();
-		this.config = scenario.getConfig();
-		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
-		setEvents(events);
-		this.population = scenario.getPopulation();
-
-		this.networkLayer = scenario.getNetwork();
-		this.network = new QueueNetwork(this.networkLayer);
-		this.agentFactory = new AgentFactory(this);
-
-		this.notTeleportedModes.add(TransportMode.car);
-
-		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
+	  this(scenario, events, new DefaultQueueNetworkFactory());
 	}
 
+	
+	public QueueSimulation(final Scenario sc, final EventsManager events, final QueueNetworkFactory factory){
+    this.scenario = scenario;
+    this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
+    AbstractSimulation.reset();
+    this.config = scenario.getConfig();
+    SimulationTimer.reset(this.config.simulation().getTimeStepSize());
+    setEvents(events);
+    this.population = scenario.getPopulation();
+
+    this.networkLayer = scenario.getNetwork();
+    this.network = new QueueNetwork(this.networkLayer, factory);
+    this.agentFactory = new AgentFactory(this);
+
+    this.notTeleportedModes.add(TransportMode.car);
+
+    this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
+	}
+	
 	/**
 	 * Adds the QueueSimulationListener instance  given as parameters as
 	 * listener to this QueueSimulation instance.
