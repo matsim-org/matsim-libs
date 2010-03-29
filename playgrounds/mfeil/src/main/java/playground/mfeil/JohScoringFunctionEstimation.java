@@ -91,17 +91,17 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 97
+	// Settings of 98
 	private static double beta_time_car = -4; 
 	private static double beta_time_pt = 0.563; 
 	private static double beta_time_bike = -1.07;
 	private static double beta_time_walk = -2; 
 	
 	private static double constantPt = -0.578;
-	private static double constantBike = -0.2;
+	private static double constantBike = 0;
 	private static double constantWalk = 0.4;
 	
-	private static double beta_cost_car = 0.1; 
+	private static double beta_cost_car = 0.0374; 
 	private static double beta_cost_pt = -0.117;
 	
 	private static double lambda_cost_income_car = 0.185;
