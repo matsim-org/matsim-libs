@@ -16,24 +16,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.api.core.v01;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 
 
-
 /**
- * The scenario is the entry point to MATSim 
+ * The scenario is the entry point to MATSim
  * scenarios. An implementation of Scenario
  * has to provide consistent implementations
- * for the different return types, e.g. Network, 
+ * for the different return types, e.g. Network,
  * Facilities or Population.
- * @see org.matsim.core.scenario.ScenarioLoaderImpl
- * @author dgrether
  *
+ * @see org.matsim.core.scenario.ScenarioLoaderImpl
+ *
+ * @author dgrether
  */
-public interface Scenario /*extends BasicScenario */{
+public interface Scenario {
 
 	public Network getNetwork();
 
@@ -45,20 +47,49 @@ public interface Scenario /*extends BasicScenario */{
 
 	public Coord createCoord(double x, double y);
 
-	
+	/**
+	 * Adds the given object to the scenario, such it can be
+	 * retrieved with {@link #getScenarioElement(Class)} using
+	 * it's class or any of its super-classes or implemented
+	 * interfaces as query-key.
+	 *
+	 * @param o
+	 */
+	public void addScenarioElement(Object o);
+
+	/**
+	 * Removes the object from the scenario, such it can no
+	 * longer be retrieved using {@link #getScenarioElement(Class)}.
+	 *
+	 * @param o
+	 * @return <code>true</code> if the object was registered
+	 * with the scenario previously, <code>false</code> if not.
+	 */
+	public boolean removeScenarioElement(Object o);
+
+	/**
+	 *
+	 * @param <T>
+	 * @param klass
+	 * @return Returns an object previously registered with
+	 * {@link #addScenarioElement(Object)} that is of type
+	 * <code>klass</code>.
+	 */
+	public <T> T getScenarioElement(Class<? extends T> klass);
+
 	// the following are available via the Impl only
 //	public ActivityFacilities getActivityFacilities() ;
 //
 //	public Knowledges getKnowledges();
-//	
+//
 //	public Households getHouseholds();
-//	
+//
 //	public BasicVehicles getVehicles();
 //
 //	public BasicLaneDefinitions getLaneDefinitions();
-//	
+//
 //	public BasicSignalSystems getSignalSystems();
-//	
+//
 //	public BasicSignalSystemConfigurations getSignalSystemConfigurations();
-	
+
 }

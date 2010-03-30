@@ -276,6 +276,21 @@ public class ExternalModule implements PlanStrategyModule {
 			return this.scenario.getNetwork();
 		}
 
+		@Override
+		public void addScenarioElement(Object o) {
+			this.scenario.addScenarioElement(o);
+		}
+
+		@Override
+		public <T> T getScenarioElement(Class<? extends T> klass) {
+			return this.scenario.getScenarioElement(klass);
+		}
+
+		@Override
+		public boolean removeScenarioElement(Object o) {
+			return this.scenario.removeScenarioElement(o);
+		}
+
 	}
 
 }

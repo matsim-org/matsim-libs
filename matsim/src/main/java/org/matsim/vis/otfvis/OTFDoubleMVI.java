@@ -20,7 +20,6 @@
 
 package org.matsim.vis.otfvis;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.matsim.vis.otfvis.data.OTFClientQuad;
@@ -39,12 +38,11 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
  * OTFDoubleMVI displays two movies in different areas of a split screen application.
  *
  * @author dstrippgen
- *
  */
 public class OTFDoubleMVI extends OTFClientFile {
-	
+
 	private String filename2;
-	
+
 	public OTFDoubleMVI(String filename, String filename2) {
 		super(filename);
 		this.filename2 = filename2;

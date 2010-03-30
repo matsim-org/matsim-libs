@@ -20,21 +20,21 @@
 
 package org.matsim.vis.otfvis.handler;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import org.matsim.ptproject.qsim.QLink;
-import org.matsim.core.trafficmonitoring.LinkTravelTimeCounter;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.otfvis.data.OTFDataWriter;
-
-
-/**
- * OTFLinkTravelTimesHandler behaves like the DefulatHandler but transfers the link's free speed
- * as dynamic data. That does not make much sense, as the free speed will not change
- * @author david
- *
- */
+//import java.io.IOException;
+//import java.nio.ByteBuffer;
+//
+//import org.matsim.ptproject.qsim.QLink;
+//import org.matsim.core.trafficmonitoring.LinkTravelTimeCounter;
+//import org.matsim.core.utils.misc.Time;
+//import org.matsim.vis.otfvis.data.OTFDataWriter;
+//
+//
+///**
+// * OTFLinkTravelTimesHandler behaves like the DefulatHandler but transfers the link's free speed
+// * as dynamic data. That does not make much sense, as the free speed will not change
+// * @author david
+// *
+// */
 //@Deprecated
 //public class OTFLinkTravelTimesHandler extends OTFDefaultLinkHandler {
 //
@@ -60,7 +60,7 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 //
 //		@Override
 //		public OTFDataWriter<QLink> getWriter() {
-//			if (count == null) 
+//			if (count == null)
 //			{
 //				LinkTravelTimeCounter.init(server.getEvents(), 1000000);
 //				count = LinkTravelTimeCounter.getInstance();

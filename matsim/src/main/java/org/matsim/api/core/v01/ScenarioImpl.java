@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package org.matsim.api.core.v01;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -50,47 +55,50 @@ import org.matsim.world.World;
 
 /**
  * @author dgrether
+ * @author mrieser
  */
 public class ScenarioImpl implements Scenario {
 
 	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
-	
+
 	private static final String NON_ENABLED_ATTRIBUTE_WARNING = "Trying to retrieve not enabled scenario feature, have you enabled the feature in ScenarioConfigGroup?";
-	
-	//mandatory attributes 
+
+	private final Map<Class<?>, Object> elements = new HashMap<Class<?>, Object>();
+
+	//mandatory attributes
 	private final Config config;
 	private NetworkImpl network;
 	private PopulationImpl population;
 	private ActivityFacilitiesImpl facilities;
-	
+
 	private final ConcurrentHashMap<String, Id> idMap = new ConcurrentHashMap<String, Id>();
-	
+
 	//non-mandatory attributes
 	private LaneDefinitions laneDefinitions;
 	private SignalSystems signalSystems;
 	private SignalSystemConfigurations signalSystemConfigurations;
 	private RoadPricingScheme roadPricingScheme;
 	private TransitSchedule transitSchedule = null;
-	
+
 	private Households households;
   private BasicVehicles vehicles;
-  
+
   private Knowledges knowledges;
-  
+
   private World world;
-	
+
 	public ScenarioImpl(){
 		this.config = new Config();
 		this.config.addCoreModules();
 		Gbl.setConfig(config);
 		initContainers();
 	}
-	
+
 	public ScenarioImpl(Config config) {
 		this.config = config;
 		initContainers();
 	}
-	
+
 	private void initContainers() {
 		this.world = new World();
 		this.network = new NetworkLayer();
@@ -99,7 +107,7 @@ public class ScenarioImpl implements Scenario {
 		this.population = new PopulationImpl(this);
 		this.facilities = new ActivityFacilitiesImpl();
 		this.world.setFacilityLayer(this.facilities);
-	
+
 		if (this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();
 		}
@@ -122,57 +130,61 @@ public class ScenarioImpl implements Scenario {
 			this.createTransit();
 		}
 	}
-	
+
 	protected void createVehicleContainer(){
 		this.vehicles = new BasicVehiclesImpl();
 	}
-	
+
 	protected void createHouseholdsContainer(){
 		this.households = new HouseholdsImpl();
 	}
-	
+
 	protected void createKnowledges() {
 		this.knowledges = new KnowledgesImpl();
 	}
 
 	protected void createRoadPricingScheme() {
-		this.roadPricingScheme = new RoadPricingScheme();		
+		this.roadPricingScheme = new RoadPricingScheme();
 	}
-	
+
 	protected void createLaneDefinitionsContainer() {
 		this.laneDefinitions = new LaneDefinitionsImpl();
 	}
-	
+
 	protected void createSignalSystemsContainers() {
 		this.signalSystems = new SignalSystemsImpl();
 		this.signalSystemConfigurations = new SignalSystemConfigurationsImpl();
 	}
-	
+
 	protected void createTransit() {
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 	}
-	
+
 	@Deprecated
 	public World getWorld() {
 		return this.world;
 	}
-	
+
 	public ActivityFacilitiesImpl getActivityFacilities() {
 		return this.facilities;
 	}
 
+	@Override
 	public NetworkLayer getNetwork() {
 		return (NetworkLayer) this.network;
 	}
 
+	@Override
 	public PopulationImpl getPopulation() {
 		return this.population;
 	}
 
+	@Override
 	public Coord createCoord(final double d, final double e) {
 		return new CoordImpl( d, e ) ;
 	}
 
+	@Override
 	public Id createId(final String string) {
 		Id id = this.idMap.get(string);
 		if (id == null) {
@@ -182,11 +194,12 @@ public class ScenarioImpl implements Scenario {
 		return id;
 	}
 
+	@Override
 	public Config getConfig() {
 		return this.config;
 	}
 
-	
+
 	public LaneDefinitions getLaneDefinitions() {
 		if ((this.laneDefinitions == null) && this.config.scenario().isUseLanes()){
 			this.createLaneDefinitionsContainer();
@@ -197,7 +210,7 @@ public class ScenarioImpl implements Scenario {
 		return laneDefinitions;
 	}
 
-	
+
 	public SignalSystems getSignalSystems() {
 		if ((this.signalSystems == null) && this.config.scenario().isUseSignalSystems()){
 			this.createSignalSystemsContainers();
@@ -208,7 +221,7 @@ public class ScenarioImpl implements Scenario {
 		return signalSystems;
 	}
 
-	
+
 	public SignalSystemConfigurations getSignalSystemConfigurations() {
 		if ((this.signalSystemConfigurations == null) && this.config.scenario().isUseSignalSystems()){
 			this.createSignalSystemsContainers();
@@ -219,7 +232,7 @@ public class ScenarioImpl implements Scenario {
 		return signalSystemConfigurations;
 	}
 
-	
+
 	public RoadPricingScheme getRoadPricingScheme() {
 		if ((this.roadPricingScheme == null) && this.config.scenario().isUseRoadpricing()){
 			this.createRoadPricingScheme();
@@ -249,7 +262,7 @@ public class ScenarioImpl implements Scenario {
 		}
 		return this.households;
 	}
-	
+
 	public BasicVehicles getVehicles(){
 		if ((this.vehicles == null) && this.config.scenario().isUseVehicles()){
 			this.createVehicleContainer();
@@ -259,7 +272,7 @@ public class ScenarioImpl implements Scenario {
 		}
 		return this.vehicles;
 	}
-	
+
 	public Knowledges getKnowledges(){
 		if ((this.knowledges == null) && this.config.scenario().isUseKnowledges()){
 			this.createKnowledges();
@@ -280,4 +293,49 @@ public class ScenarioImpl implements Scenario {
 		return this.transitSchedule;
 	}
 
+	@Override
+	public void addScenarioElement(final Object o) {
+		for (Class<?> c : getAllTypes(o.getClass())) {
+			this.elements.put(c, o);
+		}
+	}
+
+	@Override
+	public boolean removeScenarioElement(Object o) {
+		boolean changed = false;
+
+		for (Class<?> c : getAllTypes(o.getClass())) {
+			if (this.elements.get(c) == o) {
+				this.elements.remove(c);
+				changed = true;
+			}
+		}
+
+		return changed;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getScenarioElement(java.lang.Class<? extends T> klass) {
+		return (T) this.elements.get(klass);
+	}
+
+	private Set<Class<?>> getAllTypes(final Class<?> klass) {
+		Set<Class<?>> set = new HashSet<Class<?>>();
+		Stack<Class<?>> stack = new Stack<Class<?>>();
+		stack.add(klass);
+
+		while (!stack.isEmpty()) {
+			Class<?> c = stack.pop();
+			set.add(c);
+			for (Class<?> k : c.getInterfaces()) {
+				stack.push(k);
+			}
+			if (c.getSuperclass() != null) {
+				stack.push(c.getSuperclass());
+			}
+		}
+
+		return set;
+	}
 }
