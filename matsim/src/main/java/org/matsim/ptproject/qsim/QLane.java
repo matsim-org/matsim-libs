@@ -49,7 +49,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
-import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -68,7 +67,7 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  */
 public class QLane implements QBufferItem {
 
-	private static final Logger log = Logger.getLogger(QLane.class);
+  private static final Logger log = Logger.getLogger(QLane.class);
 
 	private static int spaceCapWarningCount = 0;
 
@@ -660,12 +659,10 @@ public class QLane implements QBufferItem {
 	 */
 	public Collection<QVehicle> getAllVehicles() {
 		Collection<QVehicle> vehicles = new ArrayList<QVehicle>();
-
 		vehicles.addAll(this.transitQueueLaneFeature.getFeatureVehicles());
 		vehicles.addAll(this.waitingList);
 		vehicles.addAll(this.vehQueue);
 		vehicles.addAll(this.buffer);
-
 		return vehicles;
 	}
 
@@ -675,11 +672,53 @@ public class QLane implements QBufferItem {
 		return this.fireLaneEvents;
 	}
 
-
-
 	protected void setFireLaneEvents(final boolean fireLaneEvents) {
 		this.fireLaneEvents = fireLaneEvents;
 	}
+	
+  protected void addToLane(final QLane lane) {
+    if (this.toLanes == null) {
+      this.toLanes = new LinkedList<QLane>();
+    }
+    this.toLanes.add(lane);
+  }
+
+  protected void addDestinationLink(final Id linkId) {
+    this.destinationLinkIds.add(linkId);
+  }
+
+  public Set<Id> getDestinationLinkIds(){
+    return this.destinationLinkIds;
+  }
+
+  public int getVisualizerLane() {
+    return this.visualizerLane;
+  }
+
+  protected void setVisualizerLane(final int visualizerLane) {
+    this.visualizerLane = visualizerLane;
+  }
+
+  public SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
+    return this.signalGroups;
+  }
+
+  public LinkedList<QVehicle> getVehQueue() {
+    return this.vehQueue;
+  }
+
+  public QLink getQueueLink() {
+    return this.queueLink;
+  }
+
+  public double getLength(){
+    return this.length;
+  }
+
+  @Override
+  public double getBufferLastMovedTime() {
+    return this.bufferLastMovedTime;
+  }
 
 	/**
 	 * Inner class to capsulate visualization methods
@@ -947,80 +986,22 @@ public class QLane implements QBufferItem {
 			return lane;
 		}
 
-	}
-
-	// //////////////////////////////////////////////////////////
-	// For NetStateWriter
-	// /////////////////////////////////////////////////////////
-
-	static public class AgentOnLink implements DrawableAgentI {
-
-		public double posInLink_m;
-
-		public double getPosInLink_m() {
-			return this.posInLink_m;
-		}
-
-		public int getLane() {
-			return 1;
-		}
-	}
-
-	 protected void addToLane(final QLane lane) {
-		if (this.toLanes == null) {
-			this.toLanes = new LinkedList<QLane>();
-		}
-		this.toLanes.add(lane);
-	}
-
-	protected void addDestinationLink(final Id linkId) {
-		this.destinationLinkIds.add(linkId);
-	}
-
-	public Set<Id> getDestinationLinkIds(){
-		return this.destinationLinkIds;
-	}
-
-	public int getVisualizerLane() {
-		return this.visualizerLane;
-	}
-
-	protected void setVisualizerLane(final int visualizerLane) {
-		this.visualizerLane = visualizerLane;
-	}
+	};
 
 	public static class FromLinkEndComparator implements Comparator<QLane>, Serializable {
-		private static final long serialVersionUID = 1L;
-		public int compare(final QLane o1, final QLane o2) {
-			if (o1.getMeterFromLinkEnd() < o2.getMeterFromLinkEnd()) {
-				return -1;
-			} else if (o1.getMeterFromLinkEnd() > o2.getMeterFromLinkEnd()) {
-				return 1;
-			} else {
-				return 0;
-			}
-		}
-	}
+    private static final long serialVersionUID = 1L;
+    public int compare(final QLane o1, final QLane o2) {
+      if (o1.getMeterFromLinkEnd() < o2.getMeterFromLinkEnd()) {
+        return -1;
+      } else if (o1.getMeterFromLinkEnd() > o2.getMeterFromLinkEnd()) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+  };
+	
 
-	public SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
-		return this.signalGroups;
-	}
 
-	public LinkedList<QVehicle> getVehQueue() {
-		return this.vehQueue;
-	}
-
-	public QLink getQueueLink() {
-		return this.queueLink;
-	}
-
-	public double getLength(){
-	  return this.length;
-	}
-
-  @Override
-  public double getBufferLastMovedTime() {
-    return this.bufferLastMovedTime;
-  }
 
 }
