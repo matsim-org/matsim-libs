@@ -97,9 +97,8 @@ public class GershensonOptimizer {
 									}else{
 										s = new Solution(s2.getU(), s3.getN(), s4.getMaxGreen(), s5.getCap(), s1.getD());
 									}
-									if (s.getU() < s.getMaxGreen() && !(recombinated.containsKey(s))){
+									if (s.getU() < s.getMaxGreen() && !(recombinated.containsValue(s))){
 										recombinated.put(i, s);
-										System.out.println(i);
 										i = i+1;
 									}
 								}
@@ -151,11 +150,11 @@ public class GershensonOptimizer {
 		Map<Integer, Solution> temp = new HashMap<Integer, Solution>();
 		Map<Integer, Solution> best = new HashMap<Integer, Solution>();
 		GershensonRunner runner;
-		String folder = DaPaths.OUTPUT + "denver\\recombination13\\";
+		String folder = DaPaths.OUTPUT + "denver\\recombination1\\";
 		int i;
-		int b = 5;
+		int b = 100;
 		
-		for (int ii = 1; ii<10; ii++){
+		for (int ii = 1; ii<200; ii++){
 			temp.put(ii, g.init());
 		}
 		for (Entry<Integer, Solution> e  : temp.entrySet()){
@@ -163,7 +162,7 @@ public class GershensonOptimizer {
 			Gbl.reset();
 			runner.setCap(e.getValue().getCap());
 			runner.setD(e.getValue().getD());
-			runner.setMaxGreen(e.getValue().getMaxGreen());
+			runner.setMaxRed(e.getValue().getMaxGreen());
 			runner.setN(e.getValue().getN());
 			runner.setU(e.getValue().getU());
 			runner.runScenario("opti");
@@ -177,16 +176,16 @@ public class GershensonOptimizer {
 			temp.clear();
 			temp.putAll(best);
 			i = temp.size();
-			for (int ii = i + 1 ; ii < b + 3; ii++){
+			for (int ii = i + 1 ; ii < b + (b / 20); ii++){
 				temp.put(ii, g.init());
 			}
-			temp = g.recombination(temp, b+2);
+			temp = g.recombination(temp, b + (b/10));
 			for (Entry<Integer, Solution> e  : temp.entrySet()){
 				runner = new GershensonRunner();
 				Gbl.reset();
 				runner.setCap(e.getValue().getCap());
 				runner.setD(e.getValue().getD());
-				runner.setMaxGreen(e.getValue().getMaxGreen());
+				runner.setMaxRed(e.getValue().getMaxGreen());
 				runner.setN(e.getValue().getN());
 				runner.setU(e.getValue().getU());
 				runner.runScenario("opti");

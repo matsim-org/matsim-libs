@@ -60,6 +60,14 @@ public class DaAxisBuilder {
 		valueAxis.setUpperBound(yMax);
 		return valueAxis;
 	}
+	public ValueAxis createValueAxis(String yLabel, double yMin, double yMax) {
+		ValueAxis valueAxis = new NumberAxis(yLabel);
+		valueAxis.setLabelFont(labelFont);
+		valueAxis.setTickLabelFont(axisFont);
+		valueAxis.setUpperBound(yMax);
+		valueAxis.setLowerBound(yMin);
+		return valueAxis;
+	}
 
 	
 	public Font getLabelFont() {

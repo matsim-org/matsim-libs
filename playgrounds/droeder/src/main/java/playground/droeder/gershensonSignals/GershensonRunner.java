@@ -22,6 +22,7 @@ package playground.droeder.gershensonSignals;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -43,12 +44,15 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
 import playground.droeder.DaPaths;
 import playground.droeder.Analysis.AverageTTHandler;
 import playground.droeder.Analysis.SignalSystems.SignalGroupStateTimeHandler;
+import playground.droeder.charts.DaChartWriter;
+import playground.droeder.charts.DaSignalPlanChart;
 
 /**
  * @author droeder
@@ -60,7 +64,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private int n;
 	private double cap;
 	private double d;
-	private int maxGreen;
+	private int maxRed;
 	
 	
 //	private Map<Id, Id> corrGroups;
@@ -85,7 +89,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private SignalGroupStateTimeHandler handler3;
 	
 	// "D" run denver -- "G" run gershensonTestNetwork --- "C" run cottbus
-	private static final String config = "C";
+	private static final String config = "D";
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 
@@ -187,7 +191,13 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				avTT = handler1.getAverageTravelTime();
+				DaSignalPlanChart planChart;
 				handler3.writeToTxt(DaPaths.OUTPUT+ "denver\\ITERS\\it." + event.getIteration() + "\\greenTimes.txt");
+//				for(Entry<Id, TreeMap<Id, TreeMap<Double, SignalGroupState>>> e : handler3.getSystemGroupTimeStateMap().entrySet()){
+//					planChart = new DaSignalPlanChart();
+//					planChart.addData(e.getValue(), 21600, 22180);
+//					new DaChartWriter().writeChart(DaPaths.OUTPUT + "/signalPlans/signalPlanId" + e.getKey() + ".png", 2560, 1600, planChart.createChart("signalPlan", "ids", "time", 22000, 22180));
+//				}
 			}
 		});		
 		
@@ -209,9 +219,9 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				
 				for(Entry<Id, Map<Id, SignalGroupDefinition>> ee: signalSystems.entrySet()){
 					DaAdaptivController adaptiveController = (DaAdaptivController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
-					adaptiveController.setParameters(n, u, cap, maxGreen);
+					adaptiveController.setParameters(n, u, cap, maxRed);
 					adaptiveController.init(newCorrGroups.get(ee.getKey()), newMainOutlinks.get(ee.getKey()), e.getQueueSimulation().getQNetwork(), handler2);
-					c.getEvents().addHandler(adaptiveController);	
+					c.getEvents().addHandler(adaptiveController);
 				}
 				
 //				GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
@@ -260,8 +270,8 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	public void setD (double d){
 		this.d = d;
 	}
-	public void setMaxGreen(int maxGreen){
-		this.maxGreen = maxGreen;
+	public void setMaxRed(int maxRed){
+		this.maxRed = maxRed;
 	}
 	public double getAvTT(){
 		return this.avTT;
@@ -278,7 +288,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		runner.setU(21);
 		runner.setCap(0.63);
 		runner.setD(45);
-		runner.setMaxGreen(30);
+		runner.setMaxRed(150);
 		runner.runScenario(config);
 		
 //		for (int d = 80; d<151; d = d+10){

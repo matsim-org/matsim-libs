@@ -22,11 +22,14 @@ package playground.droeder.gershensonSignals;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.geotools.feature.visitor.MaxVisitor.MaxResult;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.SignalGroupStateChangedEventImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
@@ -51,7 +54,7 @@ public class DaAdaptivController extends
 		protected int tGreenMin =  0; // time in seconds
 		protected int minCarsTime = 0; //
 		protected double capFactor = 0;
-		protected double maxRedTime = 0;
+		protected double maxRedTime ;
 		
 		private boolean interim = false;
 		private double interimTime;
@@ -70,7 +73,7 @@ public class DaAdaptivController extends
 		protected CarsOnLinkLaneHandler handler;
 
 		private double switchedGreen = 0;
-		private HashMap<Id, Double> switchedRed = new HashMap<Id, Double>();
+		private Map<Id, Double> switchedToRed;
 		
 		
 
@@ -98,7 +101,11 @@ public class DaAdaptivController extends
 		public void init(Map<Id, List<SignalGroupDefinition>> corrGroups, Map<Id, Id> mainOutLinks, QNetwork net, CarsOnLinkLaneHandler handler){
 			for(SignalGroupDefinition sd : this.getSignalGroups().values()){
 				this.getSignalGroupStates().put(sd, SignalGroupState.RED);
-//				switchedToGreen.put(sd.getId(), 0.0);
+				fireChangeEvent(21600.0, sd.getSignalSystemDefinitionId(), sd.getId(), SignalGroupState.RED);
+			}
+			switchedToRed  = new HashMap<Id, Double>();
+			for (Entry<Id, List<SignalGroupDefinition>> ee : corrGroups.entrySet()){
+				switchedToRed.put(ee.getKey(), 99999.0);
 			}
 
 			if(this.tGreenMin == 0){
@@ -126,8 +133,6 @@ public class DaAdaptivController extends
 			this.carsOnRefLinkTime = 0;
 			this.compGroupsGreen = true;
 			this.oldState = this.getSignalGroupStates().get(signalGroup);
-
-			Map<Id, SignalGroupDefinition> groups = this.getSignalGroups();
 
 			// check if competing groups are green
 			out : 
@@ -232,6 +237,11 @@ public class DaAdaptivController extends
 		@Override
 		public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
 			
+			//check if this group was switched in this timestep. if so, return oldstate
+			if (this.switchedGreen == e.getSimulationTime()){
+				return;
+			}
+			
 			// disable algorithm if interim is active
 			if (interim == true){
 				this.initIsGreen(e.getSimulationTime(), interimGroup);
@@ -239,11 +249,26 @@ public class DaAdaptivController extends
 				return;
 			}
 			
-			// add method for switching groups, if is red to long
-//			if (compGreenTime > maxRedTime && compLinkJam == false && maxRedTimeActive == true){
-//				this.switchRedGreen(signalGroup, time);
+//			//switch RedLights first
+//			if (maxRedTimeActive == true){
+//				Id id = new IdImpl("null");
+//				double redTime = 0;
+//				for (Entry<Id, Double> ee : switchedToRed.entrySet()){
+//					if ((e.getSimulationTime() - ee.getValue()) > maxRedTime && ee.getValue()>redTime){
+//						id = ee.getKey();
+//						redTime = ee.getValue();
+//					}
+//				}
+//				if (!id.equals(new IdImpl("null"))){
+//					for (SignalGroupDefinition sd : corrGroups.get(id)){
+//						this.startSwitching(sd, e.getSimulationTime());
+//						// return if interim is true, because a group was switched in this timestep
+//						if (interim == true){
+//							return;
+//						}
+//					}
+//				}
 //			}
-			
 			
 			//sort groups by demand
 			double temp;
@@ -275,11 +300,6 @@ public class DaAdaptivController extends
 			
 			this.initIsGreen(time, signalGroup);
 			
-			//check if this group was switched in this timestep. if so, return oldstate
-			if (this.switchedGreen == time){
-				return;
-			}
-			
 			// algorithm starts
 			if ((this.outLinkJam == true) && this.oldState.equals(SignalGroupState.GREEN)){ //Rule 5 + 6
 				this.startSwitching(signalGroup, time);
@@ -295,7 +315,7 @@ public class DaAdaptivController extends
 				}else if(!(this.approachingGreenLane > 0)){  //Rule 3
 					if ((this.compGreenTime) > this.tGreenMin && this.carsOnRefLinkTime > this.minCarsTime){ // Rule 1 + 2
 						this.startSwitching(signalGroup, time);
-					  return;
+						return;
 					}
 				}
 			}
@@ -312,14 +332,15 @@ public class DaAdaptivController extends
 			this.interimTime = 0;
 			this.interimGroup = group;
 			
-			if (oldState.equals(SignalGroupState.GREEN)){
+			if (oldState.equals(SignalGroupState.GREEN)|| oldState.equals(SignalGroupState.RED)){
 				this.switchToYellow(group, time);
 			} else if(oldState.equals(SignalGroupState.RED) && compGroupsGreen == false){
 				switchToRedYellow(group, time);
 				this.interimTime = 3;
-			}
+			} 
 			
 		}
+		
 		
 		private void switchInterim (SignalGroupDefinition group, double time){
 			this.interimTime++;
@@ -341,42 +362,58 @@ public class DaAdaptivController extends
 		
 		private void switchToRed(SignalGroupDefinition group, double time){
 			for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
-				if(e.getValue().contains(group)){
-					for (SignalGroupDefinition sd : e.getValue()){
+				for (SignalGroupDefinition sd : e.getValue()){
+					if (getSignalGroupState(time, sd).equals(SignalGroupState.YELLOW)){
 						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
-						switchedRed.put(e.getKey(), time);
 						this.getSignalGroupStates().put(sd,SignalGroupState.RED);
+						switchedToRed.put(e.getKey(), time);
 					}
 				}
+				
+//				if(e.getValue().contains(group)){
+//					for (SignalGroupDefinition sd : e.getValue()){
+//						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
+//						this.getSignalGroupStates().put(sd,SignalGroupState.RED);
+//					}
+//				}
 			}
 		}
 		
 		private void switchToRedYellow(SignalGroupDefinition group, double time){
 			for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
-				if(!(e.getValue().contains(group))){
-					for (SignalGroupDefinition sd : e.getValue()){
-						if (this.getSignalGroupState(time, sd).equals(SignalGroupState.YELLOW)){
-							fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
-						}
-						this.getSignalGroupStates().put(sd,SignalGroupState.RED);
-					}
-				}else{
+				
+				if (e.getValue().contains(group)){
 					for (SignalGroupDefinition sd : e.getValue()){
 						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.REDYELLOW);
 						this.getSignalGroupStates().put(sd,SignalGroupState.REDYELLOW);
 					}
+				} else {
+					for (SignalGroupDefinition sd : e.getValue()){
+						if (getSignalGroupState(time, sd).equals(SignalGroupState.YELLOW)){
+							fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
+							this.getSignalGroupStates().put(sd,SignalGroupState.RED);
+							switchedToRed.put(e.getKey(), time);
+						}
+					}
 				}
 			}
 		}
+		
 
 		private void switchToYellow(SignalGroupDefinition group, double time){
 			for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
-				if(e.getValue().contains(group)){
-					for (SignalGroupDefinition sd : e.getValue()){
+				for (SignalGroupDefinition sd : e.getValue()){
+					if(getSignalGroupState(time, sd).equals(SignalGroupState.GREEN)){
 						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.YELLOW);
 						this.getSignalGroupStates().put(sd,SignalGroupState.YELLOW);
 					}
 				}
+//				if(e.getValue().contains(group)){
+//					for (SignalGroupDefinition sd : e.getValue()){
+//						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.YELLOW);
+//						this.getSignalGroupStates().put(sd,SignalGroupState.YELLOW);
+//					}
+//				}
 			}
 		}
 		
@@ -386,6 +423,7 @@ public class DaAdaptivController extends
 					for (SignalGroupDefinition sd : e.getValue()){
 						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.GREEN);
 						this.getSignalGroupStates().put(sd,SignalGroupState.GREEN);
+						switchedToRed.put(e.getKey(), 99999.0);
 					}
 				}
 			}
@@ -416,44 +454,3 @@ public class DaAdaptivController extends
 
 }
 
-//if (this.oldState.equals(SignalGroupState.GREEN)){
-//	for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
-//		if(!(e.getValue().contains(group))){
-//			for (SignalGroupDefinition sd : e.getValue()){
-//				if (this.getSignalGroupState(time, sd).equals(SignalGroupState.RED)){
-//					fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.GREEN);
-//				}
-//				this.switchedToGreen.put(sd.getId(), time);
-//				this.getSignalGroupStates().put(sd,SignalGroupState.GREEN);
-//			}
-//		}else{
-//			for (SignalGroupDefinition sd : e.getValue()){
-//				if (this.getSignalGroupState(time, sd).equals(SignalGroupState.GREEN)){
-//					fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
-//				}
-//				this.switchedToGreen.put(sd.getId(), time);
-//				this.getSignalGroupStates().put(sd,SignalGroupState.RED);
-//			}
-//		}
-//	}
-//} else { //if (oldState.equals(SignalGroupState.RED)){
-//	for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
-//		if(!(e.getValue().contains(group))){
-//			for (SignalGroupDefinition sd : e.getValue()){
-//				if (this.getSignalGroupState(time, sd).equals(SignalGroupState.GREEN)){
-//					fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
-//				}
-//				this.switchedToGreen.put(sd.getId(), time);
-//				this.getSignalGroupStates().put(sd,SignalGroupState.RED);
-//			}
-//		}else{
-//			for (SignalGroupDefinition sd : e.getValue()){
-//				if (this.getSignalGroupState(time, sd).equals(SignalGroupState.RED)){
-//					fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.GREEN);
-//				}
-//				this.switchedToGreen.put(sd.getId(), time);
-//				this.getSignalGroupStates().put(sd,SignalGroupState.GREEN);
-//			}
-//		}
-//	}
-//}

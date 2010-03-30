@@ -96,6 +96,9 @@ public class CalculateSignalGroups{
 				}
 			}
 		}
+		if (corrLinks.containsKey(new IdImpl("191")) || corrLinks.containsValue(new IdImpl("191"))){
+			System.out.println(corrLinks.toString());
+		}
 	}
 	
 	public Map<Id, List<SignalGroupDefinition>> calcCorrGroups(){
@@ -124,47 +127,54 @@ public class CalculateSignalGroups{
 				}
 				// else, sort out the groups for left Turns
 				else{
-					
 					left = new LinkedList<SignalGroupDefinition>();
 					other = new LinkedList<SignalGroupDefinition>();
 					for (Id ii : groupsOnLink.get(e.getKey())){
 						thetaMain = calcAngle(net.getLinks().get(groups.get(ii).getLinkRefId()));
 						thetaTemp = 0;
 						for(Id outLink: groups.get(ii).getToLinkIds()){
-							double theta = calcAngle(net.getLinks().get(outLink));
-							if (theta>thetaTemp){
-								thetaTemp = theta;
+							thetaTemp = calcAngle(net.getLinks().get(outLink));
+						}
+						if (corrLinks.containsKey(new IdImpl("231")) || corrLinks.containsValue(new IdImpl("231"))){
+							log.error(ii + " " + thetaMain + "-" + thetaTemp );
+						}
+						if(thetaMain > (Math.PI)){
+							if (thetaTemp > (thetaMain + (Math.PI/4)) || thetaTemp < (thetaMain - Math.PI)){
+								left.add(groups.get(ii));
+							}else{
+								other.add(groups.get(ii));
 							}
-						}
-						thetaDiff = thetaMain-thetaTemp;
-						if (corrLinks.containsKey(new IdImpl("191")) || corrLinks.containsValue(new IdImpl("191"))){
-							log.error(ii + " " + thetaMain + "-" + thetaTemp + "=" + thetaDiff);
-						}
-						if ((thetaDiff < (-Math.PI/8.0)) &&  (thetaDiff > (-7 * Math.PI/8))){
-							left.add(groups.get(ii));
 						}else{
-							other.add(groups.get(ii));
+							if (thetaTemp > (thetaMain + (Math.PI/4)) && thetaTemp < (thetaMain + Math.PI)){
+								left.add(groups.get(ii));
+							}else{
+								other.add(groups.get(ii));
+							}
 						}
 					}
 					for (Id ii : groupsOnLink.get(e.getValue())){
 						thetaMain = calcAngle(net.getLinks().get(groups.get(ii).getLinkRefId()));
 						thetaTemp = 0;
 						for(Id outLink: groups.get(ii).getToLinkIds()){
-							double theta = calcAngle(net.getLinks().get(outLink));
-							if (theta>thetaTemp){
-								thetaTemp = theta;
+							thetaTemp = calcAngle(net.getLinks().get(outLink));
+						}
+						if (corrLinks.containsKey(new IdImpl("231")) || corrLinks.containsValue(new IdImpl("231"))){
+							log.error(ii + " " + thetaMain + "-" + thetaTemp );
+						}
+						if(thetaMain > (Math.PI)){
+							if (thetaTemp > (thetaMain + (Math.PI/4)) || thetaTemp < (thetaMain - Math.PI)){
+								left.add(groups.get(ii));
+							}else{
+								other.add(groups.get(ii));
+							}
+						}else{
+							if (thetaTemp > (thetaMain + (Math.PI/4)) && thetaTemp < (thetaMain + Math.PI)){
+								left.add(groups.get(ii));
+							}else{
+								other.add(groups.get(ii));
 							}
 						}
-						thetaDiff = thetaMain-thetaTemp;
-						if (corrLinks.containsKey(new IdImpl("191")) || corrLinks.containsValue(new IdImpl("191"))){
-							log.error(ii + " " + thetaMain + "-" + thetaTemp + "=" + thetaDiff);
-						}
-						// 
-						if ((thetaDiff < (-Math.PI/8.0)) &&  (thetaDiff > (-7 * Math.PI/8))){
-							left.add(groups.get(ii));
-						}else{
-							other.add(groups.get(ii));
-						}
+							
 					}
 					id = new IdImpl(i);
 					corrGroups.put(id, left);
@@ -185,14 +195,16 @@ public class CalculateSignalGroups{
 				i++;
 			}
 		}
-		if(corrLinks.containsKey(new IdImpl("191")) || corrLinks.containsValue(new IdImpl("191"))){
-			for (Entry<Id, List<SignalGroupDefinition>> ee : corrGroups.entrySet()){
-				log.error("corrGroupsId " + ee.getKey().toString());
-				for(SignalGroupDefinition sd : ee.getValue()){
-					log.error(sd.getId());
+		
+		if (corrLinks.containsKey(new IdImpl("231")) || corrLinks.containsValue(new IdImpl("231"))){
+			for(Entry<Id, List<SignalGroupDefinition>> ee : corrGroups.entrySet()){
+				System.out.println(ee.getKey());
+				for (SignalGroupDefinition sd :  ee.getValue()){
+					System.out.println(sd.getId());
 				}
-				log.error("------");
+				System.out.println("---");
 			}
+			System.out.println("xxxx");
 		}
 		// check if a group is missed
 		temp =  new LinkedList<SignalGroupDefinition>();
@@ -213,6 +225,12 @@ public class CalculateSignalGroups{
 		
 		if (theta < 0) theta += 2*Math.PI;
 		
+		return theta;
+	}
+	
+	private double calcAngle2 (Link l ){
+		Coord c = this.getVector(l);
+		double theta = Math.atan2(c.getY(), c.getX());
 		return theta;
 	}
 	
