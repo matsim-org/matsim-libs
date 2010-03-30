@@ -153,7 +153,7 @@ public class NullFallDataPrepare {
 //					throw new RuntimeException(tValues.toString());
 //				}
 				// capacity of 2000 isn't enough for areas with heavy pt traffic (zoo, spandau, alex)
-				network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length * 1000, FreeSpeedCalculator.calculateFreeSpeedForEdge(row), 20000, 1);			
+				network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length * 1000, FreeSpeedCalculator.calculateFreeSpeedForEdge(row), 99999, 1);			
 			}
 			
 		};
@@ -308,7 +308,7 @@ public class NullFallDataPrepare {
 		Link initialLink = initialLinks.get(node);
 		if (initialLink == null) {
 			Id id = new IdImpl("initial_" + node.getId());
-			initialLink = network.createAndAddLink(id, node, node, 10, 14, 2000, 1);
+			initialLink = network.createAndAddLink(id, node, node, 10, 99, 99999, 1);
 			initialLinks.put(node, initialLink);
 		}
 		return initialLink;
