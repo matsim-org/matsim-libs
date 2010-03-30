@@ -20,7 +20,6 @@
 
 package playground.benjamin.charts.types;
 
-import java.util.Comparator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -36,15 +35,13 @@ import org.matsim.api.core.v01.Id;
 
 import playground.benjamin.analysis.Row;
 
-
-
-public class BkDeltaUtilsChart {
-
+public class BkDeltaUtilsQuantilesChart {
+	
 	private XYSeriesCollection dataset;
 	private SortedMap<Id, Row> populationInformation;
 	
 	//constructor for row approach
-	public BkDeltaUtilsChart(SortedMap<Id, Row> populationInformation) {
+	public BkDeltaUtilsQuantilesChart(SortedMap<Id, Row> populationInformation) {
 		this.populationInformation = populationInformation;
 		this.dataset = createNeededDataset();
 	}
@@ -55,7 +52,7 @@ public class BkDeltaUtilsChart {
 		//instancing the dataset 
 		XYSeriesCollection ds = new XYSeriesCollection();
 		
-		ds.addSeries(this.createSeries("delta utils over personal income", personalIncome2Scores(populationInformation)));
+		ds.addSeries(this.createSeries("delta utils over income quantiles", personalIncomeInQuantiles2Scores(populationInformation)));
 		return ds;
 	}
 	
@@ -73,7 +70,7 @@ public class BkDeltaUtilsChart {
 	 * @return Map from income to the chosen information (e.g. scoreDiff)
 	 * 
 	 */
-	private SortedMap<Double, Double> personalIncome2Scores(SortedMap<Id, Row> populationInformation) {
+	private SortedMap<Double, Double> personalIncomeInQuantiles2Scores(SortedMap<Id, Row> populationInformation) {
 		SortedMap<Double, Double> result = new TreeMap<Double, Double>();
 		
 		//iterating over a map and getting the desired values out of Row (personal income and score difference)
@@ -89,22 +86,11 @@ public class BkDeltaUtilsChart {
 //============================================================================================================		
 	
 	public JFreeChart createChart() {
-		XYPlot plot = new XYPlot(this.dataset, new NumberAxis("individual income"), new NumberAxis("delta utils"), null);
+		XYPlot plot = new XYPlot(this.dataset, new NumberAxis("population deciles sorted by income"), new NumberAxis("delta utils"), null);
 		XYItemRenderer renderer = new XYLineAndShapeRenderer(false, true);
 		plot.setRenderer(renderer);
 		
 		JFreeChart jchart = new JFreeChart("", plot);
 		return jchart;
 	}
-
-//	//comparator to compare Ids not as Strings but as Integers (see above)
-//	private final class ComparatorImplementation implements Comparator<Id> {
-//		@Override
-//		public int compare(Id id1, Id id2) {
-//			Integer i1 = Integer.parseInt(id1.toString());
-//			Integer i2 = Integer.parseInt(id2.toString()); 
-//			return i1.compareTo(i2);
-//		}
-//	}
-	
 }

@@ -42,6 +42,7 @@ import org.matsim.households.HouseholdsReaderV10;
 
 import playground.benjamin.charts.BkChartWriter;
 import playground.benjamin.charts.types.BkDeltaUtilsChart;
+import playground.benjamin.charts.types.BkDeltaUtilsQuantilesChart;
 
 /**
  * @author bkickhoefer after kn and dgrether
@@ -51,13 +52,14 @@ public class BkAnalysis {
 	
 	private static final Logger log = Logger.getLogger(BkAnalysis.class);
 	
+	String netfile = "../runs-svn/run860/run860.output_network.xml.gz";
+	String plansfile1 = "../runs-svn/run860/run860.output_plans.xml.gz";
+	String plansfile2 = "../runs-svn/run864/run864.output_plans.xml.gz";
+	String householdsfile = "../shared-svn/studies/bkick/oneRouteTwoModeIncomeTest/households.xml";
+	String outputfiles = "../runs-svn/run864/analysis/deltaUtilsPerPersons";
+	
 	//main class
 	public static void main(final String[] args) {
-		String netfile;
-		String plansfile1;
-		String plansfile2;
-		String householdsfile;
-		
 		BkAnalysis app = new BkAnalysis();
 		app.run(args);
 	}
@@ -68,8 +70,8 @@ public class BkAnalysis {
 		//instancing scenario1 with a config (path to network and plans)
 		Scenario sc1 = new ScenarioFactoryImpl().createScenario();
 		Config c1 = sc1.getConfig();
-		c1.network().setInputFile("../runs-svn/run860/run860.output_network.xml.gz");
-		c1.plans().setInputFile("../runs-svn/run860/run860.output_plans.xml.gz");
+		c1.network().setInputFile(netfile);
+		c1.plans().setInputFile(plansfile1);
 		
 		//loading scenario1 and getting the population1
 		ScenarioLoader sl1 = new ScenarioLoaderImpl(sc1) ;
@@ -81,8 +83,8 @@ public class BkAnalysis {
 		//instancing scenario2 with a config (path to network and plans)
 		Scenario sc2 = new ScenarioFactoryImpl().createScenario();
 		Config c2 = sc2.getConfig();
-		c2.network().setInputFile("../runs-svn/run860/run860.output_network.xml.gz");
-		c2.plans().setInputFile("../runs-svn/run864/run864.output_plans.xml.gz");
+		c2.network().setInputFile(netfile);
+		c2.plans().setInputFile(plansfile2);
 		
 		//loading scenario2 and getting the population2
 		ScenarioLoader sl2 = new ScenarioLoaderImpl(sc2) ;
@@ -94,7 +96,7 @@ public class BkAnalysis {
 		//instancing and reading households
 		Households households = new HouseholdsImpl();
 		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
-		reader.readFile("../shared-svn/studies/bkick/oneRouteTwoModeIncomeTest/households.xml");
+		reader.readFile(householdsfile);
 		
 //============================================================================================================		
 
@@ -119,12 +121,12 @@ public class BkAnalysis {
 		BkDeltaUtilsChart deltaUtilsChart = new BkDeltaUtilsChart(populationInformation);
 		
 		//
-		//BkDeltaUtilsQuantilesChart
+		BkDeltaUtilsQuantilesChart deltaUtilsQuantilesChart = new BkDeltaUtilsQuantilesChart(populationInformation);
 		
 		//===
 		
 		//BkChartWriter gets an jchart object from the defined charts above to write the chart:
-		BkChartWriter.writeChart("../runs-svn/run864/analysis/deltaUtilsPerPersons", deltaUtilsChart.createChart());
+		BkChartWriter.writeChart(outputfiles, deltaUtilsChart.createChart());
 		
 		log.info( "\n" + "******************************" + "\n"
 				       + "Chart(s) and table(s) written." + "\n"
