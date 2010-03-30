@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.vis.otfvis.data.fileio;
 
@@ -12,15 +12,15 @@ import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 
 public class OTFObjectInputStream extends ObjectInputStream {
-	
-	public static Logger log = Logger.getLogger(OTFObjectInputStream.class);
-	
+
+	private final static Logger log = Logger.getLogger(OTFObjectInputStream.class);
+
 	public OTFObjectInputStream(final InputStream in) throws IOException {
 		super(in);
 	}
 
 	@Override
-	protected Class resolveClass(final ObjectStreamClass desc)
+	protected Class<?> resolveClass(final ObjectStreamClass desc)
 			throws IOException, ClassNotFoundException {
 		String name = desc.getName();
 		log.info("try to resolve " + name);
@@ -74,5 +74,5 @@ public class OTFObjectInputStream extends ObjectInputStream {
 		}
 		return super.resolveClass(desc);
 	}
-	
+
 }

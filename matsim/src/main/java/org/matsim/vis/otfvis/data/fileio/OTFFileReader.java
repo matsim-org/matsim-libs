@@ -46,30 +46,30 @@ import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
  * The OTF has a file Reader and a file Writer part.
  * The Reader is the the mvi playing OTFServer.
 
- * @author dstrippgen 
+ * @author dstrippgen
  * @author dgrether
  * @author michaz
  */
 public final class OTFFileReader implements OTFServerRemote {
-	
+
 	private static final Logger log = Logger.getLogger(OTFFileReader.class);
-	
+
 	private final String fileName;
 
 	private File sourceZipFile = null;
 
 	private byte[] actBuffer = null;
-	
+
 	private double nextTime = -1;
 
 	private TreeMap<Double, Long> timesteps = new TreeMap<Double, Long>();
-	
+
 	private OTFVisConfig otfVisConfig;
 
 	public OTFFileReader(final String fname) {
 		this.fileName = fname;
 		this.sourceZipFile = new File(this.fileName);
-		otfVisConfig = readConfigOrUseDefaults(); 
+		otfVisConfig = readConfigOrUseDefaults();
 		openAndReadInfo();
 	}
 
@@ -79,19 +79,30 @@ public final class OTFFileReader implements OTFServerRemote {
 			log.error(message);
 			throw new RuntimeException(message);
 		}
+		ZipFile zipFile = null;
+		DataInputStream inFile = null;
 		try {
-			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
+			zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 			ZipEntry infoEntry = zipFile.getEntry("info.bin");
-			DataInputStream inFile = new DataInputStream(zipFile.getInputStream(infoEntry));
+			inFile = new DataInputStream(zipFile.getInputStream(infoEntry));
 			int version = inFile.readInt();
 			int minorversion = inFile.readInt();
 			inFile.readDouble(); // unused value 'intervall_s'
 			otfVisConfig.setFileVersion(version);
 			otfVisConfig.setFileMinorVersion(minorversion);
 			scanZIPFile(zipFile);
-			zipFile.close();
 		} catch (IOException e1) {
 			e1.printStackTrace();
+		}
+		finally {
+			if (inFile != null) {
+				try { inFile.close(); }
+				catch (IOException e) { log.warn("Could not close stream.", e); }
+			}
+			if (zipFile != null) {
+				try { zipFile.close(); }
+				catch (IOException e) { log.warn("Could not close stream.", e); }
+			}
 		}
 	}
 
@@ -217,7 +228,7 @@ public final class OTFFileReader implements OTFServerRemote {
 		int time_string = (int) time_s;
 		ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 		ZipEntry entry = zipFile.getEntry("step." + time_string + ".bin");
-		byte[] buffer = new byte[(int) this.timesteps.get(time_s) .longValue()]; 
+		byte[] buffer = new byte[(int) this.timesteps.get(time_s) .longValue()];
 		DataInputStream inFile = new DataInputStream(new BufferedInputStream(zipFile.getInputStream(entry), 1000000));
 		readStateBuffer(inFile, buffer);
 		zipFile.close();
@@ -226,7 +237,7 @@ public final class OTFFileReader implements OTFServerRemote {
 
 	private void readStateBuffer(DataInputStream inputFile, final byte[] result) {
 		int size = 0;
-	
+
 		try {
 			double timenextTime = inputFile.readDouble();
 			size = inputFile.readInt();
@@ -238,11 +249,11 @@ public final class OTFFileReader implements OTFServerRemote {
 				remain -= read;
 				offset += read;
 			}
-	
+
 			if (offset != size) {
 				throw new IOException("READ SIZE did not fit! File corrupted! in second " + timenextTime);
 			}
-	
+
 		} catch (IOException e) {
 			System.out.println(e.toString());
 		}
@@ -291,17 +302,15 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	private OTFVisConfig readConfigOrUseDefaults() {
-		OTFVisConfig otfVisConfig = tryToReadSettingsFromOldBinaryFormat();
-		if (otfVisConfig != null) {
-			return otfVisConfig;
-		} else {
-			otfVisConfig = tryToReadSettingsFromFileNextToMovie();
-			if (otfVisConfig != null) {
-				return otfVisConfig;
-			} else {
-				return new OTFVisConfig();
-			}
+		OTFVisConfig otfVisConfig2 = tryToReadSettingsFromOldBinaryFormat();
+		if (otfVisConfig2 != null) {
+			return otfVisConfig2;
 		}
+		otfVisConfig2 = tryToReadSettingsFromFileNextToMovie();
+		if (otfVisConfig2 != null) {
+			return otfVisConfig2;
+		}
+		return new OTFVisConfig();
 	}
 
 	private OTFVisConfig tryToReadSettingsFromFileNextToMovie() {
@@ -321,11 +330,13 @@ public final class OTFFileReader implements OTFServerRemote {
 				setDelayParameterIfZero(cfg);
 				return cfg;
 			}
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			log.error("Not able to load config from file. This is not fatal. file=" + this.fileName, e);
-		} 
+		} catch (IOException e) {
+			log.error("Not able to load config from file. This is not fatal. file=" + this.fileName, e);
+		}
 		return null;
 	}
-	
+
 
 }
