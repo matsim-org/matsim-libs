@@ -118,10 +118,20 @@ public class Loader {
 //		estimators.put("estim5a", new EstimatorSet(estim5, null, null));
 //		estimators.put("estim5b", new EstimatorSet(estim5, new HTEstimator(N), new HTEstimator(M)));
 		
-		BiasedDistribution estim6 = new Estimator6(N);
-		estimatorSet.add(estim6);
-		estimators.put("estim6a", new EstimatorSet(estim6, null, null));
-		estimators.put("estim6b", new EstimatorSet(estim6, new HTEstimator(N), new HTEstimator(M)));
+//		BiasedDistribution estim6 = new Estimator6(N);
+//		estimatorSet.add(estim6);
+//		estimators.put("estim6a", new EstimatorSet(estim6, null, null));
+//		estimators.put("estim6b", new EstimatorSet(estim6, new HTEstimator(N), new HTEstimator(M)));
+		
+		BiasedDistribution estim7 = new Estimator7(N);
+		estimatorSet.add(estim7);
+		estimators.put("estim7a", new EstimatorSet(estim7, null, null));
+		estimators.put("estim7b", new EstimatorSet(estim7, new HTEstimator(N), new HTEstimator(M)));
+		
+//		BiasedDistribution estim8 = new Estimator8(N);
+//		estimatorSet.add(estim8);
+//		estimators.put("estim8a", new EstimatorSet(estim8, null, null));
+//		estimators.put("estim8b", new EstimatorSet(estim8, new HTEstimator(N), new HTEstimator(M)));
 		/*
 		 * Load analyzers.
 		 */

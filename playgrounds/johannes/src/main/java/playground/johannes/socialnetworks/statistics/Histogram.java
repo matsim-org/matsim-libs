@@ -33,6 +33,8 @@ public class Histogram {
 
 	private double[] samples;
 	
+//	private double[] weights;
+	
 	private List<TDoubleArrayList> binSamples;
 	
 	private double[] binCounts;

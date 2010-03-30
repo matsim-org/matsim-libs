@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RemoveIsolatedSamplesTask.java
+ * Estimator8.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,62 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2.sim;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraphBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
-import visad.data.netcdf.UnsupportedOperationException;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
  *
  */
-public class RemoveIsolatedSamplesTask implements GraphFilter<SampledSocialGraph> {
+public class Estimator8 implements BiasedDistribution {
 
-	@SuppressWarnings("unchecked")
+	private final int N;
+	
+	private SampleStats stats;
+	
+	public Estimator8(int N) {
+		this.N = N;
+	}
+	
 	@Override
-	public SampledSocialGraph apply(SampledSocialGraph graph) {
-		throw new UnsupportedOperationException("Need to think about that!");
-//		Set<SampledSocialVertex> partition = SnowballPartitions.createSampledPartition((Set<SampledSocialVertex>)(graph.getVertices()));
-//		Set<SampledSocialVertex> remove = new HashSet<SampledSocialVertex>();
-//		for(SampledSocialVertex vertex : partition) {
-//			if(vertex.getNeighbours().size() < 2) {
-//				remove.add(vertex);
-//			}
-//		}
-//		
-//		SampledSocialGraphBuilder builder = new SampledSocialGraphBuilder(null);
-//		for(SampledSocialVertex vertex : remove)
-//			builder.removeVertex(graph, vertex);
+	public double getProbability(SampledVertex vertex) {
+		int it = stats.getMaxIteration();
+		int k = vertex.getNeighbours().size();
 		
-//		return graph;
+		if(it == 0) {
+			return stats.getAccumulatedNumSampled(it)/(double)N;
+		} else if(it == 1) {
+			int n = stats.getAccumulatedNumSampled(it - 1);
+			return 1 - Math.pow(1 - n/(double)N, k);
+		} else {
+			double prod = 1;
+			for(int i = 0; i < vertex.getNeighbours().size(); i++) {
+				SampledVertex neighbour = (SampledVertex) vertex.getNeighbours().get(i);
+				double q = 0;
+				if(neighbour.isSampled()) {
+					q = 1 - Math.pow(1 - stats.getAccumulatedNumSampled(it - 2)/(double)N, neighbour.getNeighbours().size());
+				} else {
+					q = stats.getAccumulatedNumSampled(it - 1)/(double)N;
+				}
+				prod *= 1 - q;
+			}
+			
+			return 1 - prod;
+		}
+	}
+
+	@Override
+	public double getWeight(SampledVertex vertex) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void update(SampledGraph graph) {
+		stats = new SampleStats(graph);
+
 	}
 
 }

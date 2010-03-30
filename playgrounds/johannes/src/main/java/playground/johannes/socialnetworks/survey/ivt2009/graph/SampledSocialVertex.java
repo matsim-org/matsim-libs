@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  *
  */
-public class SampledSocialVertex extends SpatialSparseVertex implements SocialVertex, SampledVertex {
+public class SampledSocialVertex extends SpatialSparseVertex implements SocialVertex {//, SampledVertex {
 
 	private SocialPerson person;
 	
@@ -103,7 +103,7 @@ public class SampledSocialVertex extends SpatialSparseVertex implements SocialVe
 	/* (non-Javadoc)
 	 * @see org.matsim.contrib.sna.snowball.SampledVertex#getSeed()
 	 */
-	@Override
+//	@Override
 	public SampledVertex getSeed() {
 		throw new UnsupportedOperationException();
 	}

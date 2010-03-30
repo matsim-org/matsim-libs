@@ -21,6 +21,7 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
 import java.awt.Color;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,7 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSampledComponents;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
@@ -52,52 +54,45 @@ public class KMLSeedComponents extends KMLSampledComponents {
 		
 		
 		for(Set<? extends SpatialVertex> partition : partitions) {
-			Map<SampledSocialVertex, Color> sourceColors = new HashMap<SampledSocialVertex, Color>();
-			Map<SampledSocialVertex, SampledSocialVertex> sourceMapping = new HashMap<SampledSocialVertex, SampledSocialVertex>();
+			Map<SampledVertex, Color> sourceColors = new HashMap<SampledVertex, Color>();
+//			Map<SampledSocialVertex, SampledSocialVertex> sourceMapping = new HashMap<SampledSocialVertex, SampledSocialVertex>();
 			for(SpatialVertex vertex : partition) {
-//				if(((SampledSocialVertex)vertex).getSources().size() > 1) {
-//					if(((SampledSocialVertex)vertex).isSampled())
-//						colors.put(vertex, Color.WHITE);
-//					else
-//						colors.put(vertex, Color.BLACK);
-//				} else {
-					SampledSocialVertex source = getSource((SampledSocialVertex) vertex);
-					sourceMapping.put((SampledSocialVertex) vertex, source);
-					Color c = sourceColors.get(source);
-					if(c == null) {
-						c = ColorUtils.getGRBColor(sourceColors.size()/5.0 + 0.1);
-						sourceColors.put(source, c);
+				SampledVertex seed = ((SampledVertex)vertex).getSeed();
+				Color col = sourceColors.get(seed);
+				if(col == null) {
+					col = ColorUtils.getGRBColor(sourceColors.size()/5.0 + 0.1);
+					sourceColors.put(seed, col);
 					}
-					colors.put(vertex, c);
-//				}
+				colors.put(vertex, col);
 			}
 			
 			for(SpatialVertex vertex : partition) {
-				if(((SampledSocialVertex)vertex).getSources().size() > 1) {
-					SampledSocialVertex s1 = ((SampledSocialVertex)vertex).getSources().get(0);
-					SampledSocialVertex s2 = ((SampledSocialVertex)vertex).getSources().get(1);
-					if(sourceMapping.get(s1) != sourceMapping.get(s2)) {
-						colors.put(vertex, Color.WHITE);
-						System.err.println(((SampledSocialVertex)vertex).getPerson().getId().toString());
-					}
+				Set<Vertex> seeds = new HashSet<Vertex>();
+				for(Vertex neighbour : vertex.getNeighbours()) {
+					seeds.add(((SampledVertex)neighbour).getSeed());
+				}
+				
+				if(seeds.size() > 1) {
+					colors.put(vertex, Color.WHITE);
+//					System.err.println(((SampledSocialVertex)vertex).getPerson().getId().toString());
 				}
 			}
 			
-			StringBuilder builder = new StringBuilder();
-			for(SampledSocialVertex vertex : sourceColors.keySet()) {
-				builder.append(vertex.getPerson().getId().toString());
-				builder.append(" ");
-			}
-			
-			System.out.println(String.format("Component n=%1$s has seeds %2$s", partition.size(), builder.toString()));
+//			StringBuilder builder = new StringBuilder();
+//			for(SampledSocialVertex vertex : sourceColors.keySet()) {
+//				builder.append(vertex.getPerson().getId().toString());
+//				builder.append(" ");
+//			}
+//			
+//			System.out.println(String.format("Component n=%1$s has seeds %2$s", partition.size(), builder.toString()));
 		}
 		return partitions;
 	}
 
-	private SampledSocialVertex getSource(SampledSocialVertex vertex) {
-		if(vertex.getSources().isEmpty())
-			return vertex;
-		else
-			return getSource(vertex.getSources().get(0));
-	}
+//	private SampledSocialVertex getSource(SampledSocialVertex vertex) {
+//		if(vertex.getSources().isEmpty())
+//			return vertex;
+//		else
+//			return getSource(vertex.getSources().get(0));
+//	}
 }

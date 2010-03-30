@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
@@ -32,7 +31,7 @@ import playground.johannes.socialnetworks.graph.social.SocialGraph;
  * @author illenberger
  *
  */
-public class SampledSocialGraph extends SpatialSparseGraph implements SocialGraph, SampledGraph {
+public class SampledSocialGraph extends SpatialSparseGraph implements SocialGraph {//, SampledGraph {
 
 	public SampledSocialGraph(CoordinateReferenceSystem crs) {
 		super(crs);

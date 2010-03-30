@@ -21,7 +21,6 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.contrib.sna.snowball.SampledEdge;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
@@ -30,7 +29,7 @@ import playground.johannes.socialnetworks.graph.social.SocialEdge;
  * @author illenberger
  *
  */
-public class SampledSocialEdge extends SpatialSparseEdge implements SocialEdge, SampledEdge {
+public class SampledSocialEdge extends SpatialSparseEdge implements SocialEdge {//, SampledEdge {
 
 	@Override
 	public SampledSocialVertex getOpposite(Vertex v) {

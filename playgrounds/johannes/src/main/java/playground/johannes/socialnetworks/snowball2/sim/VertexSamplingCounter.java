@@ -69,7 +69,7 @@ public class VertexSamplingCounter implements SamplerListener {
 			probaTable.put(v, new double[15]);
 		}
 		
-		estimator = new Estimator6(graph.getVertices().size());
+		estimator = new Estimator7(graph.getVertices().size());
 	}
 	
 	public void reset() {

@@ -82,8 +82,8 @@ public class GraphBuilderTXT {
 			SampledSocialVertex vertex = builder.addVertex(graph, createPerson(data), createPoint(data));
 			SampledVertexDecorator<SampledSocialVertex> vProj = projBuilder.addVertex(proj, vertex);
 			
-			vertex.sample(infereIterationSampled(data.id));
-			vertex.detect(Math.max(0, vertex.getIterationSampled() - 1));
+//			vertex.sample(infereIterationSampled(data.id));
+//			vertex.detect(Math.max(0, vertex.getIterationSampled() - 1));
 			
 			vProj.sample(infereIterationSampled(data.id));
 			vProj.detect(Math.max(0, vertex.getIterationSampled() - 1));

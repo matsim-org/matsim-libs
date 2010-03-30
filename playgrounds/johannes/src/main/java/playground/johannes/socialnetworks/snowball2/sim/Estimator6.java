@@ -46,7 +46,7 @@ public class Estimator6 implements BiasedDistribution {
 	
 	private final int N;
 	
-	
+	private double k_mean;
 	
 	public Estimator6(int N) {
 		this.N = N;
@@ -64,7 +64,8 @@ public class Estimator6 implements BiasedDistribution {
 			int n = stats.getAccumulatedNumSampled(it - 1);
 			return 1 - Math.pow(1 - n/(double)N, k);
 		} else {
-			double k_neighbor = kMap.get(k);
+//			double k_neighbor = kMap.get(k);
+			double k_neighbor = k_mean;
 			double p_neighbor = 1 - Math.pow(1 - stats.getAccumulatedNumSampled(it - 2)/(double)N, k_neighbor);
 			
 			double p_k = 1 - Math.pow(1 - p_neighbor, k);
@@ -87,49 +88,59 @@ public class Estimator6 implements BiasedDistribution {
 	public void update(SampledGraph graph) {
 		stats = new SampleStats(graph);
 		
-		TIntObjectHashMap<TIntArrayList> tmp = new TIntObjectHashMap<TIntArrayList>();
-
+		Distribution dist = new Distribution();
 		for(Vertex vertex : graph.getVertices()) {
 			if(((SampledVertex)vertex).isSampled()) {
 				int k = vertex.getNeighbours().size();
-				TIntArrayList values = tmp.get(k);
-				if(values == null) {
-					values = new TIntArrayList();
-					tmp.put(k, values);
-				}
-				for(Vertex neighbor : vertex.getNeighbours()) {
-					if(((SampledVertex)neighbor).isSampled()) {
-						values.add(neighbor.getNeighbours().size());
-					}
-				}
+//				dist.add(k, 1/getProbabilityEstim1(k));
+				dist.add(k);
 			}
-		}
-
-		kMap = new TDoubleDoubleHashMap();
-		TIntObjectIterator<TIntArrayList> it = tmp.iterator();
-		for(int i = 0; i < tmp.size(); i++) {
-			it.advance();
-			TIntArrayList list = it.value();
-//			double[] dList = new double[list.size()];
-			Distribution distr = new EstimatedDistribution(null);
-			for(int k = 0; k < list.size(); k++) {
-//				dList[k] = list.get(k);
-				int val = list.get(k);
-				distr.add(val, 1/getProbabilityEstim1(val));
-			}
-			kMap.put(it.key(), distr.mean());
-//			kMap.put(it.key(), StatUtils.geometricMean(dList));
 		}
 		
-		try {
-			Distribution.writeHistogram(kMap, String.format("/Users/jillenberger/Work/work/socialnets/snowball/output/%1$s.k-k.txt", stats.getMaxIteration()));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		k_mean = dist.mean();
+//		TIntObjectHashMap<TIntArrayList> tmp = new TIntObjectHashMap<TIntArrayList>();
+//
+//		for(Vertex vertex : graph.getVertices()) {
+//			if(((SampledVertex)vertex).isSampled()) {
+//				int k = vertex.getNeighbours().size();
+//				TIntArrayList values = tmp.get(k);
+//				if(values == null) {
+//					values = new TIntArrayList();
+//					tmp.put(k, values);
+//				}
+//				for(Vertex neighbor : vertex.getNeighbours()) {
+//					if(((SampledVertex)neighbor).isSampled()) {
+//						values.add(neighbor.getNeighbours().size());
+//					}
+//				}
+//			}
+//		}
+//
+//		kMap = new TDoubleDoubleHashMap();
+//		TIntObjectIterator<TIntArrayList> it = tmp.iterator();
+//		for(int i = 0; i < tmp.size(); i++) {
+//			it.advance();
+//			TIntArrayList list = it.value();
+////			double[] dList = new double[list.size()];
+//			Distribution distr = new EstimatedDistribution(null);
+//			for(int k = 0; k < list.size(); k++) {
+////				dList[k] = list.get(k);
+//				int val = list.get(k);
+//				distr.add(val, 1/getProbabilityEstim1(val));
+//			}
+//			kMap.put(it.key(), distr.mean());
+////			kMap.put(it.key(), StatUtils.geometricMean(dList));
+//		}
+//		
+//		try {
+//			Distribution.writeHistogram(kMap, String.format("/Users/jillenberger/Work/work/socialnets/snowball/output/%1$s.k-k.txt", stats.getMaxIteration()));
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 	
 	public double getProbabilityEstim1(int k) {

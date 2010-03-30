@@ -88,8 +88,8 @@ public class SampledSocialGraphMLReader
 		/*
 		 * set snowball attributes
 		 */
-		SampledGraphML.applyDetectedState(vertex, attrs);
-		SampledGraphML.applySampledState(vertex, attrs);
+//		SampledGraphML.applyDetectedState(vertex, attrs);
+//		SampledGraphML.applySampledState(vertex, attrs);
 		
 		return vertex;
 	}
