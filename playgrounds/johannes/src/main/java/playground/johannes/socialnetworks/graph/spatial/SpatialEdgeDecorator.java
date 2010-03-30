@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ObservedTransitivity.java
+ * SpatialEdgeDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.analysis;
+package playground.johannes.socialnetworks.graph.spatial;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Collection;
-import java.util.Set;
-
+import org.matsim.contrib.sna.graph.EdgeDecorator;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Transitivity;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
+ * A decorator for spatial edges.
+ * 
  * @author illenberger
- *
  */
-public class ObservedTransitivity extends Transitivity {
+public class SpatialEdgeDecorator<E extends SpatialEdge> extends
+		EdgeDecorator<E> implements SpatialEdge {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <V extends Vertex> TObjectDoubleHashMap<V> localClusteringCoefficients(Collection<V> vertices) {
-		return (TObjectDoubleHashMap<V>) super.localClusteringCoefficients(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>)vertices));
+	/**
+	 * Creates an orphaned edge decorator which decorates <tt>delegate</tt>.
+	 * 
+	 * @param delegate the original edge.
+	 */
+	protected SpatialEdgeDecorator(E delegate) {
+		super(delegate);
 	}
 
+	/**
+	 * @see {@link EdgeDecorator#getOpposite(Vertex)}
+	 */
+	@Override
+	public SpatialVertexDecorator<?> getOpposite(Vertex v) {
+		return (SpatialVertexDecorator<?>) super.getOpposite(v);
+	}
+
+	/**
+	 * @see {@link EdgeDecorator#getVertices()}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Distribution localClusteringDistribution(Set<? extends Vertex> vertices) {
-		return super.localClusteringDistribution(SnowballPartitions.<SampledVertex>createSampledPartition((Collection<SampledVertex>)vertices));
+	public Tuple<? extends SpatialVertexDecorator<?>, ? extends SpatialVertexDecorator<?>> getVertices() {
+		return (Tuple<? extends SpatialVertexDecorator<?>, ? extends SpatialVertexDecorator<?>>) super.getVertices();
+	}
+
+	/**
+	 * @see {@link SpatialEdge#length()}
+	 */
+	public double length() {
+		return getDelegate().length();
 	}
 
 }

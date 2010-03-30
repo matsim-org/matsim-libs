@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 
 /**
  * @author illenberger

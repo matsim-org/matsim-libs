@@ -23,7 +23,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+
 import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 
 /**

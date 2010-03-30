@@ -33,11 +33,11 @@ import org.matsim.contrib.sna.gis.Zone;
 import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**

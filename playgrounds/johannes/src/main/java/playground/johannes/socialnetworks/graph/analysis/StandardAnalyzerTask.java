@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
+import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
+import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
+
 
 /**
  * @author illenberger

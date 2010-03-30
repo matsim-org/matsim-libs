@@ -26,10 +26,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.Distance;
 
 /**

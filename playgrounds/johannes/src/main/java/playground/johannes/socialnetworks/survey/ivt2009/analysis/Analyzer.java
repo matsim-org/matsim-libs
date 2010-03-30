@@ -25,9 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.feature.Feature;
+import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-import playground.johannes.socialnetworks.graph.analysis.DegreeTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;

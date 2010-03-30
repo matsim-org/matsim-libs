@@ -22,6 +22,7 @@ package playground.johannes.socialnetworks.graph.analysis;
 import java.util.Map;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 
 /**
  * @author illenberger

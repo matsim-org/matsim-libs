@@ -28,9 +28,9 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.Components;
 import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 

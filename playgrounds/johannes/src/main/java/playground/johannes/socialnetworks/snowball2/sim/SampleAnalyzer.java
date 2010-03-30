@@ -27,8 +27,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 

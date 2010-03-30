@@ -28,15 +28,15 @@ import java.util.Map.Entry;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
+import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.DegreeTask;
-import playground.johannes.socialnetworks.graph.analysis.GraphSizeTask;
-import playground.johannes.socialnetworks.graph.analysis.TransitivityTask;
 import playground.johannes.socialnetworks.snowball2.analysis.DegreeCorrelationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.EstimatedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.EstimatedTransitivity;
@@ -93,10 +93,10 @@ public class Loader {
 		Map<String, EstimatorSet> estimators = new HashMap<String, EstimatorSet>();
 		Set<BiasedDistribution> estimatorSet = new HashSet<BiasedDistribution>();
 		
-//		BiasedDistribution estim1 = new Estimator1(N);
-//		estimatorSet.add(estim1);
-//		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
-//		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
+		BiasedDistribution estim1 = new Estimator1(N);
+		estimatorSet.add(estim1);
+		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
+		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
 		
 //		BiasedDistribution estim2 = new Estimator2(N);
 //		estimatorSet.add(estim2);

@@ -27,10 +27,10 @@ import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.Transitivity;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
-import playground.johannes.socialnetworks.graph.analysis.Transitivity;
 import playground.johannes.socialnetworks.snowball2.sim.BiasedDistribution;
 import playground.johannes.socialnetworks.snowball2.sim.PopulationEstimator;
 import playground.johannes.socialnetworks.statistics.EstimatedDistribution;
@@ -62,9 +62,9 @@ public class EstimatedTransitivity extends Transitivity {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public TObjectDoubleHashMap<? extends Vertex> localClusteringCoefficients(Collection<? extends Vertex> vertices) {
+	public <V extends Vertex> TObjectDoubleHashMap<V> localClusteringCoefficients(Collection<V> vertices) {
 		if(enableCache && vertices.size() == cachedSize) {
-			return cachedValues;
+			return (TObjectDoubleHashMap<V>) cachedValues;
 		}
 		
 		TObjectDoubleHashMap<SampledVertex> coefficients = new TObjectDoubleHashMap<SampledVertex>();
@@ -98,7 +98,7 @@ public class EstimatedTransitivity extends Transitivity {
 		cachedSize = vertices.size();
 		cachedValues = coefficients;
 		
-		return coefficients;
+		return (TObjectDoubleHashMap<V>) coefficients;
 	}
 
 	@Override

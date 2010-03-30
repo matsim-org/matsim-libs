@@ -32,9 +32,9 @@ import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
+import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
-import playground.johannes.socialnetworks.graph.analysis.ModuleAnalyzerTask;
 
 /**
  * @author illenberger

@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 
 /**
  * @author illenberger
