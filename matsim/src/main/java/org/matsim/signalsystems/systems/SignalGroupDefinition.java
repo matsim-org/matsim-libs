@@ -45,9 +45,12 @@ public interface SignalGroupDefinition {
 
 	public List<Id> getToLinkIds();
 
-	public void setResponsibleLSAControler(
-			SignalSystemController signalSystemControler);
 
 	public boolean isGreen(double time);
 
+	public void setResponsibleLSAControler(
+	    SignalSystemController signalSystemControler);
+
+	public SignalSystemController getSignalControler();
+	
 }

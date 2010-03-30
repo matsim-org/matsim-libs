@@ -23,12 +23,14 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.signalsystems.control.SignalGroupState;
+
 
 
 public class OTFLaneData {
 	private String id;
 	private Point2D.Double endPoint;
-	private boolean isGreen = false;
+	private SignalGroupState state = SignalGroupState.RED;
 	private List<Point2D.Double> toLinkStartPoints;
 
 	public OTFLaneData() {
@@ -45,12 +47,12 @@ public class OTFLaneData {
 		this.endPoint = new Point2D.Double(endx, endy);
 	}
 
-	public void setGreen(boolean isGreen) {
-		this.isGreen = isGreen;
+	public void setSignalGroupState(SignalGroupState state) {
+		this.state = state;
 	}
 	
-	public boolean isGreen(){
-		return this.isGreen ;
+	public SignalGroupState getSignalGroupState(){
+		return this.state ;
 	}
 	
 	public Point2D.Double getEndPoint() {

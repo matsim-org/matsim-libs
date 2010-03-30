@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
+import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
 /**
@@ -42,8 +43,21 @@ public class OTFSignalReader extends OTFLaneReader {
 			boolean green;
 			for (int i = 0; i < numberOfLanes; i++) {
 				id = ByteBufferUtils.getString(in);
-				green = (in.getInt() == 1 ? true : false);
-				this.drawer.updateGreenState(id, green);
+				int stateInt = in.getInt();
+				SignalGroupState state = null;
+				if (stateInt == 1){
+				  state = SignalGroupState.GREEN;
+				}
+        else if (stateInt == 0){
+          state = SignalGroupState.RED;
+        }
+        else if (stateInt == 2){
+          state = SignalGroupState.REDYELLOW;
+        }
+        else if (stateInt == 3){
+          state = SignalGroupState.YELLOW;
+       }
+				this.drawer.updateGreenState(id, state);
 			}
 		}
 	}

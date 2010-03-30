@@ -1002,7 +1002,7 @@ public class QLane implements QBufferItem {
 		}
 	}
 
-	protected SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
+	public SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
 		return this.signalGroups;
 	}
 

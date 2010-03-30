@@ -25,8 +25,10 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
+import org.apache.log4j.Logger;
 import org.matsim.lanes.otfvis.io.OTFLaneData;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
+import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 
 /**
@@ -35,6 +37,8 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
  */
 public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 
+  private static final Logger log = Logger.getLogger(OTFLaneSignalDrawer.class);
+  
 	private double startX, startY;
 	private int numberOfQueueLanes;
 
@@ -46,7 +50,7 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 	public void onDraw( GL gl) {
 		gl.glColor3d(0.0, 0.0, 1.0);
 		double zCoord = 1.0;
-		double offsetLinkEnd = 4.0;
+		double offsetLinkEnd = 12.0;
 		double offsetLinkStart = 2.5;
 		// always draw a branch point
 		gl.glBegin(GL.GL_QUADS);
@@ -87,12 +91,18 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
   				this.drawLinkToLinkLines(gl, ld, zCoord);
   			}
 
-				if (ld.isGreen()) {
+				if (SignalGroupState.GREEN.equals(ld.getSignalGroupState())) {
 					gl.glColor3d(0.0, 1.0, 0.0);
 				}
-				else {
-					gl.glColor3d(1.0, 0.0, 0.0);
-				}
+				else if (SignalGroupState.RED.equals(ld.getSignalGroupState())) {
+          gl.glColor3d(1.0, 0.0, 0.0);
+        }
+				else if (SignalGroupState.REDYELLOW.equals(ld.getSignalGroupState())) {
+          gl.glColor3d(1.0, 0.75, 0.0);
+        }
+				else if (SignalGroupState.YELLOW.equals(ld.getSignalGroupState())) {
+          gl.glColor3d(1.0, 1.0, 0.0);
+        }
 				// draw lane ends
 				gl.glBegin(GL.GL_QUADS);
   			  gl.glVertex3d(ld.getEndPoint().x - offsetLinkEnd, ld.getEndPoint().y - offsetLinkEnd, zCoord);
@@ -133,8 +143,14 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 		this.branchPoint = new Point2D.Double(x, y);
 	}
 
-	public void updateGreenState(String id, boolean green) {
-		this.laneData.get(id).setGreen(green);
+	public void updateGreenState(String id, SignalGroupState state) {
+		OTFLaneData lane = this.laneData.get(id);
+		if (lane != null) {
+		  lane.setSignalGroupState(state);
+		}
+		else {
+		  log.error("lane data is null for id " + id + " and drawer " + this);
+		}
 	}
 
 	public Map<String, OTFLaneData> getLaneData() {

@@ -118,5 +118,10 @@ public class SignalGroupDefinitionImpl implements SignalGroupDefinition {
 		return (state.equals(SignalGroupState.GREEN) || 
 		    state.equals(SignalGroupState.REDYELLOW));
 	}
+
+  @Override
+  public SignalSystemController getSignalControler() {
+    return this.signalSystemControler;
+  }
 	
 }
