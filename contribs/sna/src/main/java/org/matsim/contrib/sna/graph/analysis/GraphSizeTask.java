@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialEdgeDecorator.java
+ * GraphSizeTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,51 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.graph.spatial;
+package org.matsim.contrib.sna.graph.analysis;
 
-import org.matsim.contrib.sna.graph.EdgeDecorator;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.core.utils.collections.Tuple;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Graph;
 
 /**
- * A decorator for spatial edges.
+ * An AnalyzerTask that counts the number of vertices and edges in a graph.
  * 
  * @author illenberger
+ * 
  */
-public class SpatialEdgeDecorator<E extends SpatialEdge> extends
-		EdgeDecorator<E> implements SpatialEdge {
+public class GraphSizeTask extends AnalyzerTask {
+
+	private static final Logger logger = Logger.getLogger(GraphSizeTask.class);
+
+	public static final String NUM_VERTICES = "n_vertex";
+
+	public static final String NUM_EDGES = "n_edge";
 
 	/**
-	 * Creates an orphaned edge decorator which decorates <tt>delegate</tt>.
+	 * Counts the number of vertices and edges in a graph.
 	 * 
-	 * @param delegate the original edge.
-	 */
-	protected SpatialEdgeDecorator(E delegate) {
-		super(delegate);
-	}
-
-	/**
-	 * @see {@link EdgeDecorator#getOpposite(Vertex)}
+	 * @param graph
+	 *            a graph.
+	 * @param stats
+	 *            a map where the results of the analysis are stored.
 	 */
 	@Override
-	public SpatialVertexDecorator<?> getOpposite(Vertex v) {
-		return (SpatialVertexDecorator<?>) super.getOpposite(v);
-	}
-
-	/**
-	 * @see {@link EdgeDecorator#getVertices()}
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public Tuple<? extends SpatialVertexDecorator<?>, ? extends SpatialVertexDecorator<?>> getVertices() {
-		return (Tuple<? extends SpatialVertexDecorator<?>, ? extends SpatialVertexDecorator<?>>) super.getVertices();
-	}
-
-	/**
-	 * @see {@link SpatialEdge#length()}
-	 */
-	public double length() {
-		return getDelegate().length();
+	public void analyze(Graph graph, Map<String, Double> stats) {
+		int n_vertex = graph.getVertices().size();
+		int n_edge = graph.getEdges().size();
+		stats.put(NUM_VERTICES, new Double(n_vertex));
+		stats.put(NUM_EDGES, new Double(n_edge));
+		logger.info(String.format("%1$s = %2$s, %3$s = %4$s", NUM_VERTICES, n_vertex, NUM_EDGES, n_edge));
 	}
 
 }

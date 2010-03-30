@@ -29,10 +29,12 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-
 /**
+ * A class that provides functionality to analyze degree related
+ * graph-properties.
+ * 
  * @author illenberger
- *
+ * 
  */
 public class Degree {
 
@@ -47,12 +49,12 @@ public class Degree {
 	 */
 	public Distribution distribution(Set<? extends Vertex> vertices) {
 		Distribution distribution = new Distribution();
-		for(Vertex v : vertices)
+		for (Vertex v : vertices)
 			distribution.add(v.getEdges().size());
-		
+
 		return distribution;
 	}
-	
+
 	/**
 	 * Returns a Vertex-double-map containing the degree of each vertex.
 	 * 
@@ -62,12 +64,12 @@ public class Degree {
 	 */
 	public TObjectDoubleHashMap<Vertex> values(Collection<? extends Vertex> vertices) {
 		TObjectDoubleHashMap<Vertex> values = new TObjectDoubleHashMap<Vertex>();
-		for(Vertex v : vertices)
+		for (Vertex v : vertices)
 			values.put(v, v.getEdges().size());
-		
+
 		return values;
 	}
-	
+
 	/**
 	 * Calculates the degree correlation of graph <tt>graph</tt>.<br>
 	 * See: M. E. J. Newman. Assortative mixing in networks. Physical Review
@@ -90,10 +92,10 @@ public class Degree {
 
 			sum += 0.5 * (d_v1 + d_v2);
 			squareSum += 0.5 * (Math.pow(d_v1, 2) + Math.pow(d_v2, 2));
-			product += d_v1 * d_v2;			
+			product += d_v1 * d_v2;
 		}
-		
-		double norm = 1 / (double)graph.getEdges().size();
+
+		double norm = 1 / (double) graph.getEdges().size();
 		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
 	}
 
