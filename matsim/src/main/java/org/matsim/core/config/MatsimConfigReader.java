@@ -97,7 +97,8 @@ public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeRea
 	 * @throws IOException e.g. if the file cannot be found
 	 */
 	public void readFile(final String filename, final String dtdFilename) throws IOException {
-		this.localDtd = dtdFilename;
+		log.info("trying to read config from " + filename);
+	  this.localDtd = dtdFilename;
 		try {
 			parse(filename);
 		} catch (SAXException e) {
