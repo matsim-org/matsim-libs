@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSim;
@@ -58,7 +57,6 @@ public class OTFNetworkServer implements OTFServerRemote {
 	public OTFNetworkServer(String netFileName) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 		QSim sim = new QSim(scenario, new EventsManagerImpl());
 		QNetwork qnet = sim.getQNetwork();
@@ -126,5 +124,5 @@ public class OTFNetworkServer implements OTFServerRemote {
 	public OTFVisConfig getOTFVisConfig() throws RemoteException {
 		return new OTFVisConfig();
 	}
-	
+
 }
