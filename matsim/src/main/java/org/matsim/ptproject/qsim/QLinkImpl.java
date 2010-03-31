@@ -584,59 +584,23 @@ public class QLinkImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(final Collection<AgentSnapshotInfo> positions) {
-//			if ( getVehPosCnt < 1 ) {
-//				getVehPosCnt++ ;
-//			}
-			String snapshotStyle = getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
-			if ("queue".equals(snapshotStyle)) {
-				getVehiclePositionsQueue(positions);
-			} else if ("equiDist".equals(snapshotStyle)) {
-				getVehiclePositionsEquil(positions);
-			} else {
-				log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
-			}
-//			int cnt = parkedVehicles.size();
-//			if (cnt > 0) {
-//				int nLanes = Math.round((float)Math.max(getLink().getNumberOfLanes(Time.UNDEFINED_TIME),1.0d));
-//				int lane = nLanes + 4;
-//
-//				double cellSize = 7.5;
-//				double distFromFromNode = getLink().getLength();
-//				if ("queue".equals(snapshotStyle)) {
-//					cellSize = Math.min(7.5, getLink().getLength() / cnt);
-//					distFromFromNode = getLink().getLength() - cellSize / 2.0;
-//				} else if ("equiDist".equals(snapshotStyle)) {
-//					cellSize = link.getLength() / cnt;
-//					distFromFromNode = link.getLength() - cellSize / 2.0;
-//				} else {
-//					log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
-//				}
-
-				int cnt2 = 0 ;
-
-//				// add the parked vehicles
-//				for (QueueVehicle veh : parkedVehicles.values()) {
-//					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(), cnt2 ) ;
-//					//							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
-//					//					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(),
-//					//							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
-//					position.setAgentState(AgentState.PERSON_AT_ACTIVITY) ;
-//					positions.add(position);
-////					distFromFromNode -= cellSize;
-//					cnt2++ ;
-//				}
-
-
-				Collection<PersonAgentI> agentsInActivities = QLinkImpl.this.agentsInActivities.values();
-				for (PersonAgentI pa : agentsInActivities) {
-					PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), getLink(), cnt2 ) ;
-					agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
-					positions.add(agInfo) ;
-					cnt2++ ;
-				}
-
-//			}
-			return positions;
+		  String snapshotStyle = getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
+		  if ("queue".equals(snapshotStyle)) {
+		    getVehiclePositionsQueue(positions);
+		  } else if ("equiDist".equals(snapshotStyle)) {
+		    getVehiclePositionsEquil(positions);
+		  } else {
+		    log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
+		  }
+		  int cnt2 = 0 ;
+		  Collection<PersonAgentI> agentsInActivities = QLinkImpl.this.agentsInActivities.values();
+		  for (PersonAgentI pa : agentsInActivities) {
+		    PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), getLink(), cnt2 ) ;
+		    agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
+		    positions.add(agInfo) ;
+		    cnt2++ ;
+		  }
+		  return positions;
 		}
 
 		/**
@@ -757,21 +721,27 @@ public class QLinkImpl implements QLink {
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : link.getFreespeed();
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
-				for (PersonAgentI person : peopleInVehicle) {
-					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), link, queueEnd,
-							lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-					if ( person.getPerson().getId().toString().startsWith("pt") ) {
-						position.setAgentState( AgentState.TRANSIT_DRIVER ) ;
-					} else {
-						position.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
-					}
-					positions.add(position);
-				}
+				this.createPositionInfo(positions, peopleInVehicle, link, queueEnd, lane, speed);
 				queueEnd -= vehLen;
 			}
 			return queueEnd;
 		}
 
+    private void createPositionInfo(Collection<AgentSnapshotInfo> positions, Collection<PersonAgentI> peopleInVehicle, Link link, 
+        double distanceOnLane, int lane, double speed){
+      for (PersonAgentI passenger : peopleInVehicle) {
+        PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLane,
+            lane );
+        passengerPosition.setColorValueBetweenZeroAndOne( speed ) ;
+        if ( passenger.getPerson().getId().toString().startsWith("pt") ) {
+          passengerPosition.setAgentState( AgentState.TRANSIT_DRIVER ) ;
+        } else {
+          passengerPosition.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
+        }
+        positions.add(passengerPosition);
+      }
+    }
+		
 		/**
 		 * place other driving cars according the following rule:
 		 * - calculate the time how long the vehicle is on the link already
@@ -782,11 +752,11 @@ public class QLinkImpl implements QLink {
 		private void positionOtherDrivingVehicles(
 				final Collection<AgentSnapshotInfo> positions, double now,
 				double queueEnd, Link link, double vehLen) {
-			double lastDistance = Integer.MAX_VALUE;
+			double lastDistance = Double.POSITIVE_INFINITY;
 			double ttfs = link.getLength() / link.getFreespeed(now);
 			for (QVehicle veh : QLinkImpl.this.vehQueue) {
 				double travelTime = now - veh.getLinkEnterTime();
-				double distanceOnLink = (ttfs == 0.0 ? 0.0
+				double distanceOnLink = (ttfs == 0.0 ? 0.0 
 						: ((travelTime / ttfs) * link.getLength()));
 				if (distanceOnLink > queueEnd) { // vehicle is already in queue
 					distanceOnLink = queueEnd;
@@ -822,18 +792,7 @@ public class QLinkImpl implements QLink {
 				}
 
 				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
-				for (PersonAgentI passenger : peopleInVehicle) {
-					PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
-							lane );
-					passengerPosition.setColorValueBetweenZeroAndOne( speed ) ;
-					if ( passenger.getPerson().getId().toString().startsWith("pt") ) {
-						passengerPosition.setAgentState( AgentState.TRANSIT_DRIVER ) ;
-					} else {
-						passengerPosition.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
-					}
-					positions.add(passengerPosition);
-				}
-
+				this.createPositionInfo(positions, peopleInVehicle, link, distanceOnLink, lane, speed);
 				lastDistance = distanceOnLink;
 			}
 		}
