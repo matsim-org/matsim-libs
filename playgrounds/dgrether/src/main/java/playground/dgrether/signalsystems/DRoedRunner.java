@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems;
 
-import playground.droeder.gershensonSignals.GershensonRunner;
 
 
 /**
@@ -39,13 +38,13 @@ public class DRoedRunner {
 //    String config = denverConfigGershenson;
     String config = cottbusConfigMath;
     
-    GershensonRunner runner = new GershensonRunner();
-    runner.setN(142);
-    runner.setU(21);
-    runner.setCap(0.63);
-    runner.setD(45);
-    runner.setMaxRed(150);
-    runner.runScenario(config);
+//    GershensonRunner runner = new GershensonRunner();
+//    runner.setN(142);
+//    runner.setU(21);
+//    runner.setCap(0.63);
+//    runner.setD(45);
+//    runner.setMaxRed(150);
+//    runner.runScenario(config);
     
     
   }
