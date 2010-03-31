@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -46,11 +46,12 @@ import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
 import playground.dgrether.utils.DoubleArrayTableWriter;
 
-/**
+/*
  * This class is able to compare traffic counts with traffic in the simulation.
  * The results are written to file in a format which has to be specified.
  *
- * @author dgrether
+ * original author: dgrether
+ * changed version: anhorni
  *
  */
 public class CountsAnalyser {
@@ -129,7 +130,7 @@ public class CountsAnalyser {
 		this.linkstatsfile = linkstatsfile;
 
 		try {
-			this.readConfig("input/config.xml");
+			this.readConfig("../../matsim/input/config.xml");
 			this.writeCountsComparisonList(this.outputFile, this.outputFormat);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -158,7 +159,7 @@ public class CountsAnalyser {
 		System.out.println("Reading parameters...");
 		String linksAttributeFilename = this.linkstatsfile;
 		System.out.println("  Linkattribute File: " + linksAttributeFilename);
-		this.outputFormat = "all";
+		this.outputFormat = config.getParam(COUNTS, OUTPUTFORMAT);
 		this.outputFile = config.getParam(COUNTS, OUTFILE);
 		System.out.println("  Output file: " + this.outputFile);
 		this.distanceFilterCenterNode = config.counts().getDistanceFilterCenterNode();
@@ -203,35 +204,34 @@ public class CountsAnalyser {
 	 */
 	private void writeCountsComparisonList(final String filename, final String format) {
 		List<CountSimComparison> countsComparisonList = createCountsComparisonList(this.linkStats);
-		if (format.compareToIgnoreCase("kml") == 0) {
+		if ((format.compareToIgnoreCase("kml") == 0) || (format.compareToIgnoreCase("all") == 0)) {
 			CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
 					countsComparisonList, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
 			kmlWriter.writeFile(filename);
 		}
-		else if (format.compareToIgnoreCase("txt") == 0) {
+		
+		if (format.compareToIgnoreCase("txt") == 0 || (format.compareToIgnoreCase("all") == 0)) {
 			CountSimComparisonTableWriter writer = new CountSimComparisonTableWriter(countsComparisonList, Locale.US);
 			writer.writeFile(filename);
-		}
-		else {
-			CountsGraphWriter writer = new CountsGraphWriter("output", countsComparisonList, 0 , true , true);
-			writer.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
-			writer.setGraphsCreator(new CountsErrorGraphCreator("errors"));
-			writer.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
-			writer.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-			writer.createGraphs();
-			writer.createGraphs();
-		}
+			
+			ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(countsComparisonList);
 
-		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(countsComparisonList);
-
-		double[] hours = new double[24];
-		for (int i = 1; i < 25; i++) {
-			hours[i-1] = i;
+			double[] hours = new double[24];
+			for (int i = 1; i < 25; i++) {
+				hours[i-1] = i;
+			}
+			DoubleArrayTableWriter tableWriter = new DoubleArrayTableWriter();
+			tableWriter.addColumn(hours);
+			tableWriter.addColumn(errorStats.getMeanRelError());
+			tableWriter.writeFile(filename.replace(".", "_") + "errortable.txt");
 		}
-		DoubleArrayTableWriter tableWriter = new DoubleArrayTableWriter();
-		tableWriter.addColumn(hours);
-		tableWriter.addColumn(errorStats.getMeanRelError());
-		tableWriter.writeFile(filename + "errortable.txt");
+		CountsGraphWriter writer = new CountsGraphWriter("output", countsComparisonList, 0 , true , true);
+		writer.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
+		writer.setGraphsCreator(new CountsErrorGraphCreator("errors"));
+		writer.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
+		writer.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
+		writer.createGraphs();
+		writer.createGraphs();		
 	}
 
 	/**
@@ -284,7 +284,7 @@ public class CountsAnalyser {
 	private static void printHelp() {
 		System.out.println("This tool needs one config argument: The path to the linkstats.txt file!");
 		System.out.println("A config file must be provided under the following path: input/config.xml");
-		System.out.println("The config file must contain the following attributes:");
+		System.out.println("The config file must contain the following attributes: \n\n");
 
 		System.out.println("  - The path to the file to which the output is written (mandatory)");
 		System.out.println("  - The time filter (mandatory) 0 for 0 to 1 am, 1 for 1 to 2 am...");
