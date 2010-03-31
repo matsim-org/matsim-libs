@@ -107,6 +107,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 						OTFLaneSignalDrawer.class);
 				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
 						OTFLaneLayer.class);
+				this.queueSimulation.getScenario().getConfig().otfVis().setScaleQuadTreeRect(true);
 			} else if (this.queueSimulation.getScenario().getConfig()
 					.scenario().isUseLanes()
 					&& (this.queueSimulation.getScenario().getConfig()
@@ -122,6 +123,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 				// drawer -> layer
 				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
 						OTFSignalLayer.class);
+	       this.queueSimulation.getScenario().getConfig().otfVis().setScaleQuadTreeRect(true);
 			}
 
 			OTFClientLive client = null;

@@ -80,6 +80,8 @@ public class OTFVisConfig extends Module {
   private boolean showTeleportedAgents = false;
 
   private List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
+
+  private boolean scaleQuadTreeRect;
 	
   public OTFVisConfig() {
     super(GROUP_NAME);
@@ -416,5 +418,14 @@ public class OTFVisConfig extends Module {
 	public boolean drawTransitFacilities() {
 		return drawTransitFacilities;
 	}
+
+  public boolean isScaleQuadTreeRect() {
+    return this.scaleQuadTreeRect;
+  }
+  
+  public void setScaleQuadTreeRect(boolean doScale){
+    this.scaleQuadTreeRect = doScale;
+  }
+  
 
 }

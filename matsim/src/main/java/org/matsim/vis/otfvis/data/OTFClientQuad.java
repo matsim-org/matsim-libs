@@ -174,7 +174,13 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 	public synchronized SceneGraph getSceneGraphNoCache(final int time, Rect rect, final OTFDrawer drawer) throws RemoteException {
 		List<Rect> rects = new LinkedList<Rect>();
-
+		/*
+		 * This hack ensures that vehicles on links are drawn even if their center is not visible
+		 */
+		if (OTFClientControl.getInstance().getOTFVisConfig().isScaleQuadTreeRect()){
+		  rect = rect.scale(5.0, 5.0);
+		}
+		
 		SceneGraph cachedResult = this.cachedTimes.get(time);
 		if(cachedResult != null) {
 			Rect cachedRect = cachedResult.getRect();
