@@ -218,7 +218,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				QSim qs = e.getQueueSimulation();
 				
 				for(Entry<Id, Map<Id, SignalGroupDefinition>> ee: signalSystems.entrySet()){
-					DaAdaptivController adaptiveController = (DaAdaptivController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
+					DaAdaptivController adaptiveController = (DaAdaptivController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
 					adaptiveController.setParameters(n, u, cap, maxRed);
 					adaptiveController.init(newCorrGroups.get(ee.getKey()), newMainOutlinks.get(ee.getKey()), e.getQueueSimulation().getQNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);
@@ -240,7 +240,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSim> e) {
 				QSim qs = e.getQueueSimulation();
 				for(Entry<Id, Map<Id, SignalGroupDefinition>> ee: signalSystems.entrySet()){
-					DaAdaptivController adaptiveController = (DaAdaptivController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
+					DaAdaptivController adaptiveController = (DaAdaptivController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
 					c.getEvents().removeHandler(adaptiveController);	
 				}
 //				GershensonAdaptiveTrafficLightController adaptiveController = (GershensonAdaptiveTrafficLightController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
