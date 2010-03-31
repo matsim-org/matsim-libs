@@ -67,7 +67,7 @@ public class OTFLaneReader extends OTFDataReader {
 				OTFLaneData data = new OTFLaneData();
 				data.setId(ByteBufferUtils.getString(in));
 				data.setEndPoint(in.getDouble(), in.getDouble());
-				log.error("adding lane data for id : " + data.getId() + " and drawer " + this.drawer);
+//				log.error("adding lane data for id : " + data.getId() + " and drawer " + this.drawer);
 				this.drawer.getLaneData().put(data.getId(), data);
 
 				if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES){
