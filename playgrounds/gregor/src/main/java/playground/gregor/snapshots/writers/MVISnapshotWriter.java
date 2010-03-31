@@ -95,7 +95,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 	public MVISnapshotWriter(final QNetwork net, final String vehFileName, final String outFileName, final double intervall_s) {
 		super(intervall_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterConnectionManagerFactory());
-		((NetworkLayer) net.getNetworkLayer()).createAndAddNode(new IdImpl("minXY"), new CoordImpl(643000,9880000));//HACK to get the bounding box big enough; 
+		((NetworkLayer) net.getNetwork()).createAndAddNode(new IdImpl("minXY"), new CoordImpl(643000,9880000));//HACK to get the bounding box big enough; 
 		//otherwise we could get negative openGL coords since we calculating offsetEast, offsetNorth based on this bounding box
 //		this.vehFileName = vehFileName;
 		//this.outFileName = outFileName;
