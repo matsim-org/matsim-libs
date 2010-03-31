@@ -82,7 +82,7 @@ public class TransitRouteFinder {
 		if (linkType.equals(PTValues.STANDARD_STR)){
 			mode=  TransportMode.pt;
 		}else{
-			mode=  TransportMode.undefined;
+			mode=  TransportMode.transit_walk;
 		}
 		return mode;
 	}

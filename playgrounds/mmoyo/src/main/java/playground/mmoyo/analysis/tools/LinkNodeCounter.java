@@ -1,4 +1,4 @@
-package playground.mmoyo.analysis;
+package playground.mmoyo.analysis.tools;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;

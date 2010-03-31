@@ -1,4 +1,4 @@
-package playground.mmoyo.analysis;
+package playground.mmoyo.analysis.tools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.TransitSimulation.PlanRouter;
+import playground.mmoyo.utils.PlanFragmenter;
 import playground.mmoyo.utils.TransScenarioLoader;
 
 /**finds connections with transfer point that are farther than the destination point **/ 
@@ -23,15 +24,18 @@ public class FindRoundaboutConnections {
 	private Population createDetouredPlan (ScenarioImpl scenario){
 		Population detouredPopulation = new PopulationImpl(scenario);
 
+		/*
 		PTValues.routerCalculator = 3;
 		PTValues.distanceCoefficient =0.00;
 		PTValues.timeCoefficient = 1.00;
 		PTValues.transferPenalty = 60.0;
 		new PlanRouter(scenario);
+		*/
 
+		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));  //fragmented plans! otherwise it analyzes only the first leg
+		
 		for (Person person : scenario.getPopulation().getPersons().values() ){
-			//TODO: fragment plan
-			Plan plan =  person.getSelectedPlan();   //assuming we are using fragmented plans!!!!, otherwise it analyzes only the first leg
+			Plan plan =  person.getSelectedPlan();   
 			
 			List<Leg> legList = new ArrayList<Leg>();
 			List<Activity> transitActList = new ArrayList<Activity>();
@@ -50,8 +54,8 @@ public class FindRoundaboutConnections {
 					
 					Leg leg = (Leg)pe;
 					leg.getTravelTime();
-					System.out.println ("distance: " + leg.getRoute().getDistance());
-					System.out.println ("time: " + leg.getTravelTime());
+					//System.out.println ("distance: " + leg.getRoute().getDistance());
+					//System.out.println ("time: " + leg.getTravelTime());
 					
 					legList.add((Leg)pe);
 				}
@@ -74,7 +78,7 @@ public class FindRoundaboutConnections {
 	
 	public static void main(String[] args) {
 		//String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/fragmented/config/config_routedPlans_MoyoParameterized.xml";
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/fragmented/config/config_routedPlans.xml";
+		String configFile = "../playgrounds/mmoyo/output/comparison/Berlin/16plans/difConfig.xml";
 		//if (args[0]!= null) configFile = args[0];
 		
 		ScenarioImpl scenario = new TransScenarioLoader().loadScenario(configFile);
@@ -82,7 +86,7 @@ public class FindRoundaboutConnections {
 		
 		System.out.println("writing detoured population plan file in output folder..." );
 		PopulationWriter popwriter = new PopulationWriter(detouredPopulation, scenario.getNetwork());
-		popwriter.write(scenario.getConfig().controler().getOutputDirectory() + "/detouredPopulation60.xml") ;
+		popwriter.write(scenario.getConfig().controler().getOutputDirectory() + "/detouredPopulation.xml") ;
 		System.out.println("done");
 	}
 	

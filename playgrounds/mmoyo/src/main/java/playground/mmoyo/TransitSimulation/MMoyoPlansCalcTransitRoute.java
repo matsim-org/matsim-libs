@@ -137,7 +137,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 						//remove legs between a same link
 						/*
 						boolean sameLink = (lastActLink.getId().equals(nextPeLink.getId()));
-						if (!sameLink){currentTuple.getSecond().get(0).setMode(TransportMode.undefined);}else{currentTuple.getSecond().remove(0);}
+						if (!sameLink){currentTuple.getSecond().get(0).setMode(TransportMode.transit_walk);}else{currentTuple.getSecond().remove(0);}
 						if (fromLink.equals(toLink)) currentTuple.getSecond().remove(lastLeg);
 
 						//PtRouter describe a transfer with a leg, it is also removed
@@ -170,7 +170,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, nextCoord, leg2.getRoute().getStartLinkId());
 									act.setDuration(0.0);
 									planElements.add(i, act);
-									leg2.setMode(TransportMode.undefined);
+									leg2.setMode(TransportMode.transit_walk);
 									//TODO:  set route distance
 								}
 								i++;

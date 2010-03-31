@@ -24,7 +24,7 @@ import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.Validators.TransitRouteValidator;
-import playground.mmoyo.analysis.TravParameterAnalysis;
+
 
 /**
  * This class contains the options to route with a TransitSchedule object 

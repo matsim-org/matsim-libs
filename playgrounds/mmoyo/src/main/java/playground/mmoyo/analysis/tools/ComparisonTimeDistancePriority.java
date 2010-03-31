@@ -1,4 +1,4 @@
-package playground.mmoyo.analysis;
+package playground.mmoyo.analysis.tools;
 
 import java.text.DecimalFormat;
 
@@ -8,6 +8,7 @@ import org.matsim.population.algorithms.PlansFilterByLegMode;
 
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.TransitSimulation.PlanRouter;
+import playground.mmoyo.analysis.tools.PopulationPtAnalyzer;
 import playground.mmoyo.utils.TransScenarioLoader;
 
 /**Uses the router with increasing time priority from 0 to 100  **/ 

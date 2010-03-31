@@ -1,4 +1,4 @@
-package playground.mmoyo.analysis;
+package playground.mmoyo.analysis.tools;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,7 +17,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.mmoyo.utils.PlanFragmenter;
 
@@ -41,6 +40,7 @@ public class PopulationPtAnalyzer {
 		int walkDistance = 0;
 		
 		Population population = this.scenario.getPopulation();
+		final int numAgents = population.getPersons().size();
 		
 		//split pt connections into plans
 		new PlanFragmenter().run(population);
@@ -61,7 +61,7 @@ public class PopulationPtAnalyzer {
 					if (act!= aAct  && act!=bAct ){ 
 						nextAct= (Activity) plan.getPlanElements().get(i+2);
 						nextLeg= (Leg) plan.getPlanElements().get(i+1);
-						if(act.getType().equals("pt interaction") && lastAct.getType().equals("pt interaction") && nextAct.getType().equals("pt interaction") && !lastLeg.getMode().equals(TransportMode.undefined) && !nextLeg.getMode().equals(TransportMode.undefined)){
+						if(act.getType().equals("pt interaction") && lastAct.getType().equals("pt interaction") && nextAct.getType().equals("pt interaction") && lastLeg.getMode().equals(TransportMode.transit_walk) && nextLeg.getMode().equals(TransportMode.transit_walk)){
 							transfers++;
 						}
 					}
@@ -71,7 +71,7 @@ public class PopulationPtAnalyzer {
 					LegImpl leg = (LegImpl)pe;
 					nextAct= (Activity) plan.getPlanElements().get(i+1);
 					///find out walk distances
-					if (leg.getMode().equals(TransportMode.undefined)){
+					if (leg.getMode().equals(TransportMode.transit_walk)){
 						double legWalkDist=  CoordUtils.calcDistance(lastAct.getCoord() , nextAct.getCoord());
 						walkDistance += legWalkDist;
 						walkTime += leg.getTravelTime();
@@ -81,8 +81,7 @@ public class PopulationPtAnalyzer {
 						}
 					}else{
 						if (leg.getRoute()!= null){
-							
-							travelDistance +=   RouteUtils.calcDistance(null, null); //leg.getRoute().getDistance();
+							travelDistance +=   leg.getRoute().getDistance();
 							travelTime +=  leg.getTravelTime();
 						}
 					}
@@ -92,6 +91,7 @@ public class PopulationPtAnalyzer {
 			}//for planelement
 		}//	for person
 
+		System.out.println("number of agents:  \t" + numAgents);
 		System.out.println("number of connections:  \t" + population.getPersons().size());
 		System.out.println("travelTime:  \t" + travelTime);
 		System.out.println("travelDist:  \t" + travelDistance);
@@ -132,7 +132,6 @@ public class PopulationPtAnalyzer {
 		ScenarioImpl scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
 		new PopulationPtAnalyzer (scenario, "results.txt").run();
-		
 	}
 	
 	public static void main(String[] args) {
@@ -140,7 +139,7 @@ public class PopulationPtAnalyzer {
 		if (args.length==1){
 			configFile = args[0];
 		}else{
-			configFile = "../playgrounds/mmoyo/output/stopSearch/progressive/config_5x_progressive_search.xml";
+			configFile = "../playgrounds/mmoyo/output/comparison/Berlin/16plans/difConfig.xml";
 		}
 		
 		//for many scenarios resulted from incrementing time priority

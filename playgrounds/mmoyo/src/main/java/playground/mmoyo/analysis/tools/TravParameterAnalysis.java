@@ -1,4 +1,4 @@
-package playground.mmoyo.analysis;
+package playground.mmoyo.analysis.tools;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

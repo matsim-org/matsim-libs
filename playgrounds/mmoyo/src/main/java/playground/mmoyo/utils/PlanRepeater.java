@@ -36,7 +36,7 @@ public class PlanRepeater {
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()){
 			if (pe instanceof Leg) {
 				Leg leg = (Leg)pe;
-				if (leg.getMode().equals(TransportMode.walk))leg.setMode(TransportMode.undefined);
+				if (leg.getMode().equals(TransportMode.walk))leg.setMode(TransportMode.transit_walk);
 			}
 		}
 		

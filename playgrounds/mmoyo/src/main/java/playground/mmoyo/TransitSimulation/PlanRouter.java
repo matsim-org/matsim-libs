@@ -41,27 +41,31 @@ public class PlanRouter {
 		switch (PTValues.routerCalculator){
 			case 1:  //rieser
 				router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += ("/routedPlans_" + PTValues.scenarioName + ".xml");
-				break;
-			case 2:	 //moyo time
-				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += ("/moyo_routedPlans_time_" + PTValues.scenarioName + ".xml" );
+				routedPlansFile += ("/rieser_" + PTValues.scenarioName + ".xml");
 				break;
 			case 3:	 //moyo parameterized
 				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-				routedPlansFile += ("/moyo_routedPlans_parameterized_" + PTValues.scenarioName + ".xml");
+				routedPlansFile += ("/moyo_" + PTValues.scenarioName + ".xml");
 				 break;
 			default:
 		}
 		router.run(scenario.getPopulation());
 
-		//fragment plans
-		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));		
-
+		//write plan
+		/*
 		System.out.println("writing output plan file..." + routedPlansFile);
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()) ;
 		popwriter.write(routedPlansFile) ;
-
+		*/
+		
+		
+		//write fragmented version of the plan
+		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));		
+		System.out.println("writing output plan file..." + routedPlansFile + "frag");
+		PopulationWriter popwriter2 = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()) ;
+		popwriter2.write(routedPlansFile) ;
+		
+		
 		new FileCompressor().run(routedPlansFile);  
 		
 		System.out.println("done");

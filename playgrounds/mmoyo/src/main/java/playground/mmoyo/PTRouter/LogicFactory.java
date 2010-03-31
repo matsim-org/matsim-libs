@@ -2,6 +2,7 @@ package playground.mmoyo.PTRouter;
 
 //import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -104,31 +105,33 @@ public class LogicFactory{
 			}
 		}
 
-
-
 		//create transfer and DetTransfer links	ORIGINAL
 		final String DETTRANS_PREFIX ="DT";
 		final String TRANS_PREFIX ="T";
-		/* This is the one working, commented only to tyr the compavility of multinode router
-		for (NodeImpl centerNode: logicNet.getNodes().values()){
-			Collection<NodeImpl> nearNodes= logicNet.getNearestNodes(centerNode.getCoord(), PTValues.DETTRANSFER_RANGE );
-			for (NodeImpl nearNode : nearNodes){
+		/* This is the one working, commented only to try the compatibility with multinode router*/
+		int transfers = 0;
+		int detTransfers = 0;
+		for (Node centerNode: logicNet.getNodes().values()){
+			Collection<Node> nearNodes= logicNet.getNearestNodes(centerNode.getCoord(), PTValues.DETTRANSFER_RANGE );
+			for (Node nearNode : nearNodes){
 				Station fromNode= (Station)centerNode;
 				Station toNode =  (Station)nearNode;
 				if (fromNode.getTransitLine() != toNode.getTransitLine()) {
 					if (!fromNode.isFirstStation() && !toNode.isLastStation()) {
 						if (fromNode.getTransitRouteStop().getStopFacility() != toNode.getTransitRouteStop().getStopFacility()) {
 							new PTLink(new IdImpl(DETTRANS_PREFIX + ++newDetTransfLinkId),centerNode, nearNode, logicNet, PTValues.DETTRANSFER_STR);
+							detTransfers++;
 						}else{
 							new PTLink(new IdImpl(TRANS_PREFIX + ++newTransfLinkId), centerNode, nearNode, logicNet, PTValues.TRANSFER_STR);
+							transfers++;
 						}
 					}
 				}
 			}
 		}
-		*/
 
 		////////////Temporarly to match the multinode dikjstra router///////////////////////////////////////////////////////////////////////////////
+		/*
 		List<Tuple<Node, Node>> toBeAdded = new LinkedList<Tuple<Node, Node>>();
 		// connect all stops with walking links if they're located less than beelineWalkConnectionDistance from each other
 		for (Node node : logicNet.getNodes().values()) {
@@ -148,8 +151,13 @@ public class LogicFactory{
 		for (Tuple<Node, Node> tuple : toBeAdded) {
 			new PTLink(new IdImpl(TRANS_PREFIX + ++newTransfLinkId), tuple.getFirst(), tuple.getSecond(), logicNet, PTValues.TRANSFER_STR);
 		}
+		*/
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+		
+		
+		//System.out.println("\n\n\n\n\ntransfers: "  + transfers + " detTransfers: " + detTransfers + " total: " + ( transfers + detTransfers));
 		System.out.println("duration of logic net creation: " + (System.currentTimeMillis()-startTime));
 	}
 

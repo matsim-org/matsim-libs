@@ -14,7 +14,6 @@ import javax.imageio.ImageIO;
 
 /** Joins graphs of kml files of different cost calculations in order to compare them **/
 public class CountsComparingGraph2 {
-	String dirPath;
 	String SEPARATOR = "/";
 	String POINT = ".";
 	String TYPE_ALIGHT = " Alight";
@@ -28,13 +27,9 @@ public class CountsComparingGraph2 {
 	String SVN = ".svn";
 	String INFO = "info.txt";
 	
-	public CountsComparingGraph2(String dirPath) {
-		this.dirPath = dirPath;
-	}
-
-	private void createComparingGraphs() throws IOException{
-		File dir = new File(this.dirPath);    	
-
+	private void createComparingGraphs(final String dirPath) throws IOException{
+		File dir = new File(dirPath);    	
+		System.out.println("dir" + dir.getPath());
 		//assuming the iteration 0  and that the graphs inside the kml file were extracted at this directory: 
 		String ITERPATH = "/ITERS/it.0/graphs/";   
 		
@@ -44,7 +39,7 @@ public class CountsComparingGraph2 {
 			System.out.println (READING + dir.list()[i]);
 			String coeffCombination = dir.list()[i];
 			if (!(coeffCombination.equals(SVN) || coeffCombination.equals(INFO))){
-				File graphDir1 = new File(this.dirPath + SEPARATOR +  coeffCombination + ITERPATH);   ///graphs folder
+				File graphDir1 = new File(dirPath + SEPARATOR +  coeffCombination + ITERPATH);   ///graphs folder
 				for (int ii= 0; ii< graphDir1.list().length; ii++){
 					String graphName= graphDir1.list()[ii];
 					if (!(graphName.equals(SVN) || graphName.equals(INFO))){
@@ -155,9 +150,9 @@ public class CountsComparingGraph2 {
 	
 	public static void main(String[] args) {
 		//String dir = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/KMZ_counts_scalefactor50";
-		String dir = "../playgrounds/mmoyo/output/outputfirst";
+		String dir = "../playgrounds/mmoyo/output/job8/output";
 		try {
-			new CountsComparingGraph2(dir).createComparingGraphs();
+			new CountsComparingGraph2().createComparingGraphs(dir);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

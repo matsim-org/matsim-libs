@@ -27,14 +27,17 @@ public class AllRouter {
 		if (args.length>0){
 			configFile = args[0];
 		}else{
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_5x_subset_xy2links_ptplansonly/config/config_5xptPlansOnly_noRouted.xml";
+			configFile = "../playgrounds/mmoyo/output/comparison/Berlin/16plans/0config_5x_4plans.xml";
 		}
 		
-		//PTValues.scenarioName ="Berlin5x20_moyo_param";
-		//PTValues.routerCalculator = 3;
-		//PlanRouter.main(new String[]{configFile});
-
-		PTValues.scenarioName ="Berlin5x20_rieser_param";
+		/*
+		PTValues.scenarioName ="m_to_compare";
+		PTValues.routerCalculator = 3;
+		PlanRouter.main(new String[]{configFile});
+		*/
+		
+		
+		PTValues.scenarioName ="r_16final";
 		PTValues.routerCalculator = 1;
 		PlanRouter.main(new String[]{configFile});
 		
