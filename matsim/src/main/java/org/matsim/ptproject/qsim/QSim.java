@@ -395,6 +395,20 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	}
 
+	
+	private void printSimLog(final double time) {
+    if (time >= this.infoTime) {
+      this.infoTime += INFO_PERIOD;
+      Date endtime = new Date();
+      long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
+      double diffsim  = time - QSimTimer.getSimStartTime();
+      int nofActiveLinks = this.simEngine.getNumberOfSimulatedLinks();
+      log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
+          + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
+      Gbl.printMemoryUsage();
+    }
+	}
+	
 	/**
 	 * Do one step of the simulation run.
 	 *
@@ -406,17 +420,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.handleActivityEnds(time);
 		this.simEngine.simStep(time);
 
-		if (time >= this.infoTime) {
-			this.infoTime += INFO_PERIOD;
-			Date endtime = new Date();
-			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
-			double diffsim  = time - QSimTimer.getSimStartTime();
-			int nofActiveLinks = this.simEngine.getNumberOfSimulatedLinks();
-			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
-					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
-			Gbl.printMemoryUsage();
-		}
-
+		this.printSimLog(time);
 		return (Simulation.isLiving() && (this.stopTime > time));
 	}
 
