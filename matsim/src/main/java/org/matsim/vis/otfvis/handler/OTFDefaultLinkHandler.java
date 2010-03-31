@@ -44,7 +44,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
  */
 public class OTFDefaultLinkHandler extends OTFDataReader {
 
-	public static final double LINK_SCALE  = 0.80; 
+	public static final double LINK_SCALE  = 1.00; 
 	
 	protected OTFDataQuadReceiver quadReceiver = null;
 
