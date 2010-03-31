@@ -52,39 +52,38 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
 			
+		} else if (MyTransportMode.carsharing.equals(leg.getMode())) {
+			
+//			dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));// TODO change this, now this is the distance from the nearest bus stop
+//			// introduce an input with car sharing station positions
+//
+//			travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
+//
+//			tmpScore += this.getWalkScore(dist, travelTime);
+//			
+//			tmpScore += this.ftConfigGroup.getConstCar();
+//			
+//			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
+//				RouteWRefs route = leg.getRoute();
+//				dist = route.getDistance();
+//				tmpScore += this.params.marginalUtilityOfDistanceCar * ftConfigGroup.getDistanceCostCar()/1000d * dist;
+//			}
+//			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+			
 		} else if (MyTransportMode.pt.equals(leg.getMode())) {
 
 			KtiPtRoute ktiPtRoute = (KtiPtRoute) leg.getRoute();
 			
 			if (ktiPtRoute.getFromStop() != null) {
 
-//				String nanoMsg = "Scoring kti pt:\t";
-				
-//				long nanos = System.nanoTime();
+//				
 				dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));
-//				nanos = System.nanoTime() - nanos;
-//				nanoMsg += Long.toString(nanos) + "\t";
-				
-//				nanos = System.nanoTime();
 				travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
-//				nanos = System.nanoTime() - nanos;
-//				nanoMsg += Long.toString(nanos) + "\t";
-
 				tmpScore += this.getWalkScore(dist, travelTime);
-				
-//				nanos = System.nanoTime();
 				dist = ((KtiPtRoute) leg.getRoute()).calcInVehicleDistance();
-//				nanos = System.nanoTime() - nanos;
-//				nanoMsg += Long.toString(nanos) + "\t";
-
-//				nanos = System.nanoTime();
 				travelTime = ((KtiPtRoute) leg.getRoute()).getInVehicleTime();
-//				nanos = System.nanoTime() - nanos;
-//				nanoMsg += Long.toString(nanos) + "\t";
-
 				tmpScore += this.getPtScore(dist, travelTime);
-//				log.info(nanoMsg);
-
+				
 			} else {
 
 				dist = leg.getRoute().getDistance();
@@ -113,24 +112,6 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			travelTime= travelTime*1.2;
 			tmpScore += this.getRideScore(dist, travelTime);
 			
-			
-		} else if (MyTransportMode.carsharing.equals(leg.getMode())) {
-			
-			dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));// TODO change this, now this is the distance from the nearest bus stop
-			// introduce an input with car sharing station positions
-
-			travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
-
-			tmpScore += this.getWalkScore(dist, travelTime);
-			
-			tmpScore += this.ftConfigGroup.getConstCar();
-			
-			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				RouteWRefs route = leg.getRoute();
-				dist = route.getDistance();
-				tmpScore += this.params.marginalUtilityOfDistanceCar * ftConfigGroup.getDistanceCostCar()/1000d * dist;
-			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
 			
 		} else {
 			

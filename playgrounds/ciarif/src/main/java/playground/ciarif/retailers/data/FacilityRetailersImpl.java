@@ -5,11 +5,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 
-//<<<<<<< .mine
-//public class FacilityRetailersImpl extends FacilityImpl implements Facility{
-//=======
 public class FacilityRetailersImpl extends ActivityFacilityImpl {
-//>>>>>>> .r6943
+
 	
 	/**
 	 * 
