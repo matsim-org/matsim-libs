@@ -40,7 +40,6 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.run.OTFVis;
 import org.xml.sax.SAXException;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
@@ -49,7 +48,6 @@ import playground.yu.analysis.CalcTrafficPerformance;
 import playground.yu.analysis.LegDistance;
 import playground.yu.analysis.ModeSplit;
 import playground.yu.analysis.MyCalcAverageTripLength;
-import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -124,9 +122,10 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			new MatsimFacilitiesReader(s).readFile(facilitiesFilename);
 		}
 		// toll
-		s.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingScheme toll = s.getRoadPricingScheme();
+		RoadPricingScheme toll = null;
 		if (scenario.equals(KANTON_ZURICH)) {
+			s.getConfig().scenario().setUseRoadpricing(true);
+			toll = s.getRoadPricingScheme();
 			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(toll);
 			try {
 				tollReader.parse(tollFilename);
@@ -229,35 +228,35 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			dert.write(outputBase4analysis);
 		if (ms != null)
 			ms.write(outputBase4analysis);
-		// otfvis
-		if (toll == null) {
-			SimpleReader sr = new SimpleReader(eventsFilename);
-			SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
-			System.out
-					.println("-----> Starting to create short eventsfiles\t----->from "
-							+ eventsFilename + " to " + eventsOutputFilename);
-			String line = sr.readLine();
-			sw2.writeln(line);
-			// after filehead
-			double time = 0;
-			while (line != null && time < 108000.0) {
-				line = sr.readLine();
-				if (line != null) {
-					sw2.writeln(line);
-					time = Double.parseDouble(line.split("\t")[0]);
-				}
-			}
-			sr.close();
-			sw2.close();
-
-			OTFVis.main(new String[] {
-					"-convert",
-					eventsOutputFilename,
-					netFilename,
-					outputBase
-							+ (scenario.equals("normal") ? "" : scenario + ".")
-							+ "otfvis.mvi", args[5] /* snapshot-period */});
-		}
+		// // otfvis
+		// if (toll == null) {
+		// SimpleReader sr = new SimpleReader(eventsFilename);
+		// SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
+		// System.out
+		// .println("-----> Starting to create short eventsfiles\t----->from "
+		// + eventsFilename + " to " + eventsOutputFilename);
+		// String line = sr.readLine();
+		// sw2.writeln(line);
+		// // after filehead
+		// double time = 0;
+		// while (line != null && time < 108000.0) {
+		// line = sr.readLine();
+		// if (line != null) {
+		// sw2.writeln(line);
+		// time = Double.parseDouble(line.split("\t")[0]);
+		// }
+		// }
+		// sr.close();
+		// sw2.close();
+		//
+		// OTFVis.main(new String[] {
+		// "-convert",
+		// eventsOutputFilename,
+		// netFilename,
+		// outputBase
+		// + (scenario.equals("normal") ? "" : scenario + ".")
+		// + "otfvis.mvi", args[5] /* snapshot-period */});
+		// }
 		System.out.println("done.");
 	}
 

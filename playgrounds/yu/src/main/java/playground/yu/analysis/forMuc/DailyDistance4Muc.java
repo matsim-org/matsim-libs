@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.analysis.forMuenchen;
+package playground.yu.analysis.forMuc;
 
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -43,10 +43,12 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 	private double bikeBusinessDist, bikeUnknownDist, bikePrivateDist,
 			bikeSportsDist, bikeFriendsDist, bikePickupDist, bikeWithAdultDist;
 	private double rideBusinessDist, rideUnknownDist, ridePrivateDist,
-			rideSportsDist, rideFriendsDist, ridePickupDist, rideWithAdultDist;
+			rideSportsDist, rideFriendsDist, ridePickupDist, rideWithAdultDist,
+			rideHomeDist, rideWorkDist, rideShopDist, rideEducDist,
+			rideLeisDist, rideOtherDist;
 	private double othersBusinessDist, othersUnknownDist, othersPrivateDist,
 			othersSportsDist, othersFriendsDist, othersPickupDist,
-			othersWithAdultDist;;
+			othersWithAdultDist;
 
 	public DailyDistance4Muc(final Network network) {
 		super(network);
@@ -304,83 +306,79 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 				+ "\t" + carPrivateDist + "\t" + carSportsDist + "\t"
 				+ carFriendsDist + "\t" + carPickupDist + "\t"
 				+ carWithAdultDist);
-		// TODO
-		// sw.writeln("pt\t" + ptHomeDist + "\t" + ptWorkDist + "\t" +
-		// ptShopDist
-		// + "\t" + ptEducDist + "\t" + ptLeisDist + "\t" + ptOtherDist
-		// + "\t" + ptNotSpecifiedDist + "\t" + ptBusinessDist + "\t"
-		// + ptEinkaufSonstigesDist + "\t" + ptFreizeitSonstSportDist
-		// + "\t" + ptSeeADoctorDist + "\t" + ptHolidayJourneyDist + "\t"
-		// + ptMultipleDist);
-		// sw.writeln("walk\t" + wlkHomeDist + "\t" + wlkWorkDist + "\t"
-		// + wlkShopDist + "\t" + wlkEducDist + "\t" + wlkLeisDist + "\t"
-		// + wlkOtherDist + "\t" + wlkNotSpecifiedDist + "\t"
-		// + wlkBusinessDist + "\t" + wlkEinkaufSonstigesDist + "\t"
-		// + wlkFreizeitSonstSportDist + "\t" + wlkSeeADoctorDist + "\t"
-		// + wlkHolidayJourneyDist + "\t" + wlkMultipleDist);
-		// sw.writeln("bike\t" + bikeHomeDist + "\t" + bikeWorkDist + "\t"
-		// + bikeShopDist + "\t" + bikeEducDist + "\t" + bikeLeisDist
-		// + "\t" + bikeOtherDist + "\t" + bikeNotSpecifiedDist + "\t"
-		// + bikeBusinessDist + "\t" + bikeEinkaufSonstigesDist + "\t"
-		// + bikeFreizeitSonstSportDist + "\t" + bikeSeeADoctorDist + "\t"
-		// + bikeHolidayJourneyDist + "\t" + bikeMultipleDist);
-		// sw.writeln("others\t" + othersHomeDist + "\t" + othersWorkDist + "\t"
-		// + othersShopDist + "\t" + othersEducDist + "\t"
-		// + othersLeisDist + "\t" + othersOtherDist + "\t"
-		// + othersNotSpecifiedDist + "\t" + othersBusinessDist + "\t"
-		// + othersEinkaufSonstigesDist + "\t"
-		// + othersFreizeitSonstSportDist + "\t" + othersSeeADoctorDist
-		// + "\t" + othersHolidayJourneyDist + "\t" + othersMultipleDist);
-		// TODO
+		sw.writeln("pt\t" + ptHomeDist + "\t" + ptWorkDist + "\t" + ptShopDist
+				+ "\t" + ptEducDist + "\t" + ptLeisDist + "\t" + ptOtherDist
+				+ "\t" + ptUnknownDist + "\t" + ptBusinessDist + "\t"
+				+ ptPrivateDist + "\t" + ptSportsDist + "\t" + ptFriendsDist
+				+ "\t" + ptPickupDist + "\t" + ptWithAdultDist);
+		sw.writeln("wlk\t" + wlkHomeDist + "\t" + wlkWorkDist + "\t"
+				+ wlkShopDist + "\t" + wlkEducDist + "\t" + wlkLeisDist + "\t"
+				+ wlkOtherDist + "\t" + wlkUnknownDist + "\t" + wlkBusinessDist
+				+ "\t" + wlkPrivateDist + "\t" + wlkSportsDist + "\t"
+				+ wlkFriendsDist + "\t" + wlkPickupDist + "\t"
+				+ wlkWithAdultDist);
+		sw.writeln("bike\t" + bikeHomeDist + "\t" + bikeWorkDist + "\t"
+				+ bikeShopDist + "\t" + bikeEducDist + "\t" + bikeLeisDist
+				+ "\t" + bikeOtherDist + "\t" + bikeUnknownDist + "\t"
+				+ bikeBusinessDist + "\t" + bikePrivateDist + "\t"
+				+ bikeSportsDist + "\t" + bikeFriendsDist + "\t"
+				+ bikePickupDist + "\t" + bikeWithAdultDist);
+		sw.writeln("ride\t" + rideHomeDist + "\t" + rideWorkDist + "\t"
+				+ rideShopDist + "\t" + rideEducDist + "\t" + rideLeisDist
+				+ "\t" + rideOtherDist + "\t" + rideUnknownDist + "\t"
+				+ rideBusinessDist + "\t" + ridePrivateDist + "\t"
+				+ rideSportsDist + "\t" + rideFriendsDist + "\t"
+				+ ridePickupDist + "\t" + rideWithAdultDist);
+		sw.writeln("others\t" + othersHomeDist + "\t" + othersWorkDist + "\t"
+				+ othersShopDist + "\t" + othersEducDist + "\t"
+				+ othersLeisDist + "\t" + othersOtherDist + "\t"
+				+ othersUnknownDist + "\t" + othersBusinessDist + "\t"
+				+ othersPrivateDist + "\t" + othersSportsDist + "\t"
+				+ othersFriendsDist + "\t" + othersPickupDist + "\t"
+				+ othersWithAdultDist);
 
 		sw
 				.writeln("total\t"
 						+ (carHomeDist + ptHomeDist + wlkHomeDist
-								+ bikeHomeDist + othersHomeDist)
+								+ bikeHomeDist + rideHomeDist + othersHomeDist)
 						+ "\t"
 						+ (carWorkDist + ptWorkDist + wlkWorkDist
-								+ bikeWorkDist + othersWorkDist)
+								+ bikeWorkDist + rideWorkDist + othersWorkDist)
 						+ "\t"
 						+ (carShopDist + ptShopDist + wlkShopDist
-								+ bikeShopDist + othersEducDist)
+								+ bikeShopDist + rideShopDist + othersEducDist)
 						+ "\t"
 						+ (carEducDist + ptEducDist + wlkEducDist
-								+ bikeEducDist + othersEducDist)
+								+ bikeEducDist + rideEducDist + othersEducDist)
 						+ "\t"
 						+ (carLeisDist + ptLeisDist + wlkLeisDist
-								+ bikeLeisDist + othersLeisDist)
+								+ bikeLeisDist + rideLeisDist + othersLeisDist)
 						+ "\t"
 						+ (carOtherDist + ptOtherDist + wlkOtherDist
-								+ bikeOtherDist + othersOtherDist) + "\t"
-				// TODO
-				// + (carNotSpecifiedDist + ptNotSpecifiedDist
-				// + wlkNotSpecifiedDist + bikeNotSpecifiedDist +
-				// othersNotSpecifiedDist)
-				// + "\t"
-				// + (carBusinessDist + ptBusinessDist + wlkBusinessDist
-				// + bikeBusinessDist + othersBusinessDist)
-				// + "\t"
-				// + (carEinkaufSonstigesDist + ptEinkaufSonstigesDist
-				// + wlkEinkaufSonstigesDist
-				// + bikeEinkaufSonstigesDist + othersEinkaufSonstigesDist)
-				// + "\t"
-				// + (carFreizeitSonstSportDist + ptFreizeitSonstSportDist
-				// + wlkFreizeitSonstSportDist
-				// + bikeFreizeitSonstSportDist + othersFreizeitSonstSportDist)
-				// + "\t"
-				// + (carSeeADoctorDist + ptSeeADoctorDist
-				// + wlkSeeADoctorDist + bikeSeeADoctorDist +
-				// othersSeeADoctorDist)
-				// + "\t"
-				// + (carHolidayJourneyDist + ptHolidayJourneyDist
-				// + wlkHolidayJourneyDist
-				// + bikeHolidayJourneyDist + othersHolidayJourneyDist)
-				// + "\t"
-				// + (carMultipleDist + ptMultipleDist + wlkMultipleDist
-				// + bikeMultipleDist + othersMultipleDist)
+								+ bikeOtherDist + rideOtherDist + othersOtherDist)
+						+ "\t"
 
-				// TODO
-				);
+						+ (carUnknownDist + ptUnknownDist + wlkUnknownDist
+								+ bikeUnknownDist + rideUnknownDist + othersUnknownDist)
+						+ "\t"
+						+ (carBusinessDist + ptBusinessDist + wlkBusinessDist
+								+ bikeBusinessDist + rideBusinessDist + othersBusinessDist)
+						+ "\t"
+						+ (carPrivateDist + ptPrivateDist + wlkPrivateDist
+								+ bikePrivateDist + ridePrivateDist + othersPrivateDist)
+						+ "\t"
+						+ (carSportsDist + ptSportsDist + wlkSportsDist
+								+ bikeSportsDist + rideSportsDist + othersSportsDist)
+						+ "\t"
+						+ (carFriendsDist + ptFriendsDist + wlkFriendsDist
+								+ bikeFriendsDist + rideFriendsDist + othersFriendsDist)
+						+ "\t"
+						+ (carPickupDist + ptPickupDist + wlkPickupDist
+								+ bikePickupDist + ridePickupDist + othersPickupDist)
+						+ "\t"
+						+ (carWithAdultDist + ptWithAdultDist
+								+ wlkWithAdultDist + bikeWithAdultDist
+								+ rideWithAdultDist + othersWithAdultDist));
 
 		StackedBarChart stackedBarChart = new StackedBarChart(
 				"travel destination and modal split--daily distance",
@@ -392,37 +390,37 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 				"Einkauf sonstiges", "Freizeit (sonstiges incl.Sport)",
 				"see a doctor", "holiday / journey", "multiple" },
 				new double[][] {
-				
-//						{ carHomeDist, carWorkDist, carShopDist, carEducDist,
-//								carLeisDist, carOtherDist, carNotSpecifiedDist,
-//								carBusinessDist, carEinkaufSonstigesDist,
-//								carFreizeitSonstSportDist, carSeeADoctorDist,
-//								carHolidayJourneyDist, carMultipleDist },
-//						{ ptHomeDist, ptWorkDist, ptShopDist, ptEducDist,
-//								ptLeisDist, ptOtherDist, ptNotSpecifiedDist,
-//								ptBusinessDist, ptEinkaufSonstigesDist,
-//								ptFreizeitSonstSportDist, ptSeeADoctorDist,
-//								ptHolidayJourneyDist, ptMultipleDist },
-//						{ wlkHomeDist, wlkWorkDist, wlkShopDist, wlkEducDist,
-//								wlkLeisDist, wlkOtherDist, wlkNotSpecifiedDist,
-//								wlkBusinessDist, wlkEinkaufSonstigesDist,
-//								wlkFreizeitSonstSportDist, wlkSeeADoctorDist,
-//								wlkHolidayJourneyDist, wlkMultipleDist },
-//						{ bikeHomeDist, bikeWorkDist, bikeShopDist,
-//								bikeEducDist, bikeLeisDist, bikeOtherDist,
-//								bikeNotSpecifiedDist, bikeBusinessDist,
-//								bikeEinkaufSonstigesDist,
-//								bikeFreizeitSonstSportDist, bikeSeeADoctorDist,
-//								bikeHolidayJourneyDist, bikeMultipleDist },
-//						{ othersHomeDist, othersWorkDist, othersShopDist,
-//								othersEducDist, othersLeisDist,
-//								othersOtherDist, othersNotSpecifiedDist,
-//								othersBusinessDist, othersEinkaufSonstigesDist,
-//								othersFreizeitSonstSportDist,
-//								othersSeeADoctorDist, othersHolidayJourneyDist,
-//								othersMultipleDist } 
-								});
-		
+
+				// { carHomeDist, carWorkDist, carShopDist, carEducDist,
+				// carLeisDist, carOtherDist, carNotSpecifiedDist,
+				// carBusinessDist, carPrivateDist,
+				// carSportsDist, carFriendsDist,
+				// carPickupDist, carWithAdultDist },
+				// { ptHomeDist, ptWorkDist, ptShopDist, ptEducDist,
+				// ptLeisDist, ptOtherDist, ptNotSpecifiedDist,
+				// ptBusinessDist, ptPrivateDist,
+				// ptSportsDist, ptFriendsDist,
+				// ptPickupDist, ptWithAdultDist },
+				// { wlkHomeDist, wlkWorkDist, wlkShopDist, wlkEducDist,
+				// wlkLeisDist, wlkOtherDist, wlkNotSpecifiedDist,
+				// wlkBusinessDist, wlkPrivateDist,
+				// wlkSportsDist, wlkFriendsDist,
+				// wlkPickupDist, wlkWithAdultDist },
+				// { bikeHomeDist, bikeWorkDist, bikeShopDist,
+				// bikeEducDist, bikeLeisDist, bikeOtherDist,
+				// bikeNotSpecifiedDist, bikeBusinessDist,
+				// bikePrivateDist,
+				// bikeSportsDist, bikeFriendsDist,
+				// bikePickupDist, bikeWithAdultDist },
+				// { othersHomeDist, othersWorkDist, othersShopDist,
+				// othersEducDist, othersLeisDist,
+				// othersOtherDist, othersNotSpecifiedDist,
+				// othersBusinessDist, othersPrivateDist,
+				// othersSportsDist,
+				// othersFriendsDist, othersPickupDist,
+				// othersWithAdultDist }
+				});
+
 		stackedBarChart.addMatsimLogo();
 		stackedBarChart.saveAsPng(outputFilename
 				+ "dailyDistanceTravelDistination.png", 1280, 1024);

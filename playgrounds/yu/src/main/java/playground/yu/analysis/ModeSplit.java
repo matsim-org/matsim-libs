@@ -30,7 +30,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	private int carLegs = 0, ptLegs = 0, wlkLegs = 0, bikeLegs = 0,
@@ -50,7 +50,8 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	public void run(final Plan plan) {
 		boolean inRange = false;
 		if (toll != null)
-			inRange = TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLinkId(), toll);
+			inRange = TollTools.isInRange(((PlanImpl) plan).getFirstActivity()
+					.getLinkId(), toll);
 		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof LegImpl) {
 				TransportMode m = ((LegImpl) pe).getMode();
@@ -119,6 +120,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		SimpleWriter sw = new SimpleWriter(outputPath + "modalSplitLegs.txt");
 		sw.write(toString());
 		sw.close();
+
 		PieChart chart = new PieChart("ModalSplit -- Legs");
 		chart
 				.addSeries(
@@ -126,6 +128,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 						new double[] { carLegs, ptLegs, wlkLegs, bikeLegs,
 								othersLegs });
 		chart.saveAsPng(outputPath + "modalSplitLegs.png", 800, 600);
+
 		if (toll != null) {
 			PieChart chart2 = new PieChart(
 					"ModalSplit Center (toll area) -- Legs");
@@ -159,7 +162,8 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario
+				.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {

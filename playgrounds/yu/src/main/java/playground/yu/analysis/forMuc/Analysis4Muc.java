@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.analysis.forMuenchen;
+package playground.yu.analysis.forMuc;
 
 /**
  * keep some general tools for Analysis for Zurich and respectively Kanton

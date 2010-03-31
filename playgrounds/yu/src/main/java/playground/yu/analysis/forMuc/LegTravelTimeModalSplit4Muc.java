@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.analysis.forMuenchen;
+package playground.yu.analysis.forMuc;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;

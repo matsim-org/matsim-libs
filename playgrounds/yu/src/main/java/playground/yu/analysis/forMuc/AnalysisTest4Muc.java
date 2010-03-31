@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.analysis.forMuenchen;
+package playground.yu.analysis.forMuc;
 
 import java.io.IOException;
 
