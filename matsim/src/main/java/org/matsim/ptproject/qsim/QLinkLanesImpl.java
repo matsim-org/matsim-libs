@@ -38,6 +38,7 @@ import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  * @author dstrippgen
@@ -292,7 +293,7 @@ public class QLinkLanesImpl implements QLink {
 	public void addFromIntersection(final QVehicle veh) {
 		double now = QSimTimer.getTime();
 		activateLink();
-		this.originalLane.add(veh, now);
+		this.originalLane.addToVehicleQueue(veh, now);
 		veh.setCurrentLink(this.getLink());
 		QSim.getEvents().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
@@ -475,36 +476,23 @@ public class QLinkLanesImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(final Collection<AgentSnapshotInfo> positions) {
-			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
-				lane.visdata.getVehiclePositions(positions);
-			}
-			
-			int cnt = parkedVehicles.size();
-			if (cnt > 0) {
-				String snapshotStyle = getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
-
-				double cellSize = 7.5;
-				double distFromFromNode = getLink().getLength();
-				if ("queue".equals(snapshotStyle)) {
-					cellSize = Math.min(7.5, getLink().getLength() / cnt);
-					distFromFromNode = getLink().getLength() - cellSize / 2.0;
-				} else if ("equiDist".equals(snapshotStyle)) {
-					cellSize = link.getLength() / cnt;
-					distFromFromNode = link.getLength() - cellSize / 2.0;
-				} else {
-					log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
-				}
-				// add the parked vehicles
-				int cnt2 = 0 ;
-				for (QVehicle veh : parkedVehicles.values()) {
-					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(), cnt2 ) ;
-					positions.add(position);
-					distFromFromNode -= cellSize; cnt2++ ;
-				}
-			}
-			return positions;
+		  for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
+		    lane.visdata.getVehiclePositions(positions);
+		  }
+		  int cnt = parkedVehicles.size();
+		  if (cnt > 0) {
+		    int cnt2 = 0 ;
+		    Collection<PersonAgentI> agentsInActivities = QLinkLanesImpl.this.agentsInActivities.values();
+		    for (PersonAgentI pa : agentsInActivities) {
+		      PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), getLink(), cnt2 ) ;
+		      agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
+		      positions.add(agInfo) ;
+		      cnt2++ ;
+		    }
+		    // add the parked vehicles
+		  }
+		  return positions;
 		}
-
 	}
 	
 	@Override
