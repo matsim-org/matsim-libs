@@ -406,7 +406,7 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
             Integer vehiclesCount = entry.getValue();
          
             // Assumption...
-            MyLinkImpl link = (MyLinkImpl)((NetworkLayer) this.qNetwork.getNetworkLayer()).getLinks().get(id);
+            MyLinkImpl link = (MyLinkImpl)((NetworkLayer) this.qNetwork.getNetwork()).getLinks().get(id);
             
             link.setVehiclesCount(vehiclesCount);
         }
