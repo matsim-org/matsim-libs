@@ -72,7 +72,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	public void handleEvent(LinkEnterEvent event)
 	{
 		double now = event.getTime();
-		QLink qLink = qNetwork.getQueueLink(event.getLinkId());
+		QLink qLink = qNetwork.getQLink(event.getLinkId());
 		double departureTime = (now + ((LinkImpl)qLink.getLink()).getFreespeedTravelTime(now));
 
 		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));	
@@ -130,7 +130,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 			if (time >= replanningTime)
 			{
 				// check whether the replanning flag is set - if not, skip the person
-				QVehicle vehicle = this.qNetwork.getQueueLink(linkId).getVehicle(personId);
+				QVehicle vehicle = this.qNetwork.getQLink(linkId).getVehicle(personId);
 				
 				// Repeated Replanning per Link possible? 
 				if (repeatedReplanning) entry.setValue(new Tuple<Id,Double>(linkId, time + this.replanningInterval));
