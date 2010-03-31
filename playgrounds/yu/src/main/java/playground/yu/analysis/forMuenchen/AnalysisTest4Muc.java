@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.analysis.forBln;
+package playground.yu.analysis.forMuenchen;
 
 import java.io.IOException;
 
@@ -56,7 +56,7 @@ import playground.yu.utils.io.SimpleWriter;
  * @author ychen
  * 
  */
-public class AnalysisTest4Bln {
+public class AnalysisTest4Muc {
 	private static boolean withToll = false;
 
 	private static void printUsage() {
@@ -124,8 +124,8 @@ public class AnalysisTest4Bln {
 		LegTravelTimeModalSplit lttms = null;
 		// PersonAlgorithm
 		CalcAverageTripLength catl = null;
-		DailyDistance4Bln dd = null;
-		DailyEnRouteTime4Bln dert = null;
+		DailyDistance4Muc dd = null;
+		DailyEnRouteTime4Muc dert = null;
 		ModeSplit ms = null;
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
@@ -136,8 +136,8 @@ public class AnalysisTest4Bln {
 			ms = new ModeSplit(toll);
 			orms = new EnRouteModalSplit(scenario, population, toll);
 			lttms = new LegTravelTimeModalSplit(population, toll);
-			dd = new DailyDistance4Bln(toll, network);
-			dert = new DailyEnRouteTime4Bln(toll);
+			dd = new DailyDistance4Muc(toll, network);
+			dert = new DailyEnRouteTime4Muc(toll);
 			ld = new LegDistance(network, toll, population);
 			// in future, add some PersonAlgorithm and EventsHandler
 

@@ -58,16 +58,18 @@ public class MyOTFEvents2Mvi {
 		String line = sr.readLine();
 		sw2.writeln(line);
 		// after filehead
-		double time = 0;
+		double time = 0, lastTime = 0;
 		while (line != null && time < 108000.0) {
 			line = sr.readLine();
 			if (line != null) {
 				sw2.writeln(line);
 				time = Double.parseDouble(line.split("\t")[0]);
 				sw2.flush();
-				if (time % 3600 == 0)
+				if (time % 3600 == 0 && time != lastTime) {
 					System.out.println("write new short Events, time :\t"
 							+ time);
+					lastTime = time;
+				}
 			}
 		}
 		sr.close();
