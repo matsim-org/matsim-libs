@@ -35,6 +35,7 @@ public class OTFVisQSim extends QSim {
 		super(scenario, events);
 		queueSimulationFeature = new OTFVisQSimFeature(this);
 		super.addFeature(queueSimulationFeature);
+		this.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 	}
 
 	public void setServer(OnTheFlyServer server) {
