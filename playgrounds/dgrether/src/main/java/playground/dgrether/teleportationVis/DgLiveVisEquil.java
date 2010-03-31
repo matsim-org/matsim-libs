@@ -61,7 +61,7 @@ public class DgLiveVisEquil {
 		scenario.getConfig().otfVis().setShowTeleportedAgents(true);
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		OTFVisQSim client = new OTFVisQSim(scenario, events);
-		client.setVisualizeTeleportedAgents(true);
+//		client.setVisualizeTeleportedAgents(true);
 		client.run();
 	}
 

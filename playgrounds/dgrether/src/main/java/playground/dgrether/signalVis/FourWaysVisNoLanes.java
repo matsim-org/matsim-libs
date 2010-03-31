@@ -19,31 +19,56 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis;
 
-import org.matsim.vis.otfvis.executables.OTFVisController;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.vis.otfvis.OTFVisQSim;
 
 
 
 public class FourWaysVisNoLanes {
 
-	public static final String TESTINPUTDIR = "test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
+	public static final String TESTINPUTDIR = "../matsim/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 
-		String netFile = TESTINPUTDIR + "network.xml.gz";
-		String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
-		String popFile = TESTINPUTDIR + "plans.xml.gz";
-		String signalFile = TESTINPUTDIR + "testSignalSystems_v1.1.xml";
-		String signalConfigFile = TESTINPUTDIR + "testSignalSystemConfigurations_v1.1.xml";
-		String configFile = TESTINPUTDIR + "config.xml";
-		
-		String[] netArray = {netFile};
-		
-		OTFVisController controller = new OTFVisController(configFile);
-		controller.setOverwriteFiles(true);
-		controller.run();
+
+    String netFile = TESTINPUTDIR + "network.xml.gz";
+    String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
+    String popFile = TESTINPUTDIR + "plans.xml.gz";
+    String signalFile = TESTINPUTDIR + "testSignalSystems_v1.1.xml";
+    String signalConfigFile = TESTINPUTDIR + "testSignalSystemConfigurations_v1.1.xml";
+    
+    
+    ScenarioImpl scenario = new ScenarioImpl();
+    scenario.getConfig().network().setInputFile(netFile);
+    scenario.getConfig().plans().setInputFile(popFile);
+    scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+    scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+    scenario.getConfig().getQSimConfigGroup().setStuckTime(100.0);
+    
+    scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
+//    scenario.getConfig().scenario().setUseLanes(true);
+    
+    scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
+    scenario.getConfig().signalSystems().setSignalSystemConfigFile(signalConfigFile);
+//    scenario.getConfig().scenario().setUseSignalSystems(true);
+    
+    ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
+    loader.loadScenario();
+    
+    EventsManager events = new EventsManagerImpl();
+    
+    OTFVisQSim client = new OTFVisQSim(scenario, events);
+//    client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
+//    client.setLaneDefinitions(scenario.getLaneDefinitions());
+//    client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
+    client.run();
 	}
 
 }

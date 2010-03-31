@@ -91,7 +91,7 @@ public class DaganzoRunner {
 			//add the adaptive controller as events listener
 			public void notifySimulationInitialized(SimulationInitializedEvent<QSim> e) {
 				QSim qs = e.getQueueSimulation();
-				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+				AdaptiveController adaptiveController = (AdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				controler.getEvents().addHandler(adaptiveController);
 			}
 		});
@@ -99,7 +99,7 @@ public class DaganzoRunner {
 		controler.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QSim>() {
 			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSim> e) {
 				QSim qs = e.getQueueSimulation();
-				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+				AdaptiveController adaptiveController = (AdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				controler.getEvents().removeHandler(adaptiveController);
 			}
 		});

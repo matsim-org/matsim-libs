@@ -42,11 +42,6 @@ public class FourWaysVis {
 		String signalFile = TESTINPUTDIR + "testSignalSystems_v1.1.xml";
 		String signalConfigFile = TESTINPUTDIR + "testSignalSystemConfigurations_v1.1.xml";
 		
-		String[] netArray = {netFile};
-		
-		//this is run
-//		OTFVis.playNetwork(netArray);
-		
 		
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().network().setInputFile(netFile);
