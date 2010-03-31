@@ -50,7 +50,7 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 	public void onDraw( GL gl) {
 		gl.glColor3d(0.0, 0.0, 1.0);
 		double zCoord = 1.0;
-		double offsetLinkEnd = 12.0;
+		double offsetLinkEnd = 6.0;
 		double offsetLinkStart = 2.5;
 		// always draw a branch point
 		gl.glBegin(GL.GL_QUADS);
