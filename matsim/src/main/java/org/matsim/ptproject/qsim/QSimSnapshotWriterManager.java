@@ -65,7 +65,7 @@ public class QSimSnapshotWriterManager {
       if (snapshotFormat.contains("plansfile")) {
         String snapshotFilePrefix = controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
         String snapshotFileSuffix = "xml";
-        this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, network.getNetworkLayer()));
+        this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, network.getNetwork()));
       }
       if (snapshotFormat.contains("transims")) {
         String snapshotFile = controlerIO.getIterationFilename(itNumber, "T.veh");

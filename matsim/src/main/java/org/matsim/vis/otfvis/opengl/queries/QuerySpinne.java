@@ -363,7 +363,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		result.count = new int[this.drivenLinks.size()];
 		int pos = 0;
 		for(Id linkId : this.drivenLinks.keySet()) {
-			Link link = net.getNetworkLayer().getLinks().get(linkId);
+			Link link = net.getNetwork().getLinks().get(linkId);
 			result.count[pos/4] = this.drivenLinks.get(linkId);
 			Node node = link.getFromNode();
 			result.vertex[pos++] = (float)node.getCoord().getX();

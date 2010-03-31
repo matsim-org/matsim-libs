@@ -122,7 +122,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		veh.setDriver(driver);
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getBasicVehicle()));
 		driver.setVehicle(veh);
-		QLink qlink = this.queueSimulation.getQNetwork().getQueueLink(driver
+		QLink qlink = this.queueSimulation.getQNetwork().getQLink(driver
 				.getCurrentLeg().getRoute().getStartLinkId());
 		qlink.addParkedVehicle(veh);
 
@@ -146,7 +146,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 					veh.setDriver(driver);
 					veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getBasicVehicle()));
 					driver.setVehicle(veh);
-					QLink qlink = this.queueSimulation.getQNetwork().getQueueLink(driver.getCurrentLeg().getRoute().getStartLinkId());
+					QLink qlink = this.queueSimulation.getQNetwork().getQLink(driver.getCurrentLeg().getRoute().getStartLinkId());
 					qlink.addParkedVehicle(veh);
 					this.queueSimulation.scheduleActivityEnd(driver, 0);
 					Simulation.incLiving();

@@ -104,7 +104,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine {
   public void beforeSimStep(double time) {
     for (SignalGroupDefinition signalGroup : this.signalSystems.getSignalGroupDefinitions().values()) {
       Id linkId = signalGroup.getLinkRefId();
-      QLinkLanesImpl qlink = (QLinkLanesImpl) this.network.getQueueLink(linkId);
+      QLinkLanesImpl qlink = (QLinkLanesImpl) this.network.getQLink(linkId);
       for (QLane qlane : qlink.getToNodeQueueLanes()){
         qlane.updateGreenState(time);
       }
@@ -135,7 +135,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine {
 		//init the signalGroupDefinitions
 		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<SignalGroupDefinition>>();
 		for (SignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions().values()) {
-			QLink queueLink = this.network.getQueueLink(signalGroupDefinition.getLinkRefId());
+			QLink queueLink = this.network.getQLink(signalGroupDefinition.getLinkRefId());
 			if (queueLink == null) {
 				throw new IllegalStateException("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is set to non existing Link with Id: " + signalGroupDefinition.getLinkRefId());
 			}

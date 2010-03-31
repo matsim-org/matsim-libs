@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.BasicVehicle;
 
-public class QueueVehicleImpl implements QVehicle {
+public class QVehicleImpl implements QVehicle {
 
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
@@ -39,11 +39,11 @@ public class QueueVehicleImpl implements QVehicle {
 	
 	private final BasicVehicle basicVehicle;
 
-	public QueueVehicleImpl(final BasicVehicle basicVehicle) {
+	public QVehicleImpl(final BasicVehicle basicVehicle) {
 		this(basicVehicle, 1.0);
 	}
 	
-	public QueueVehicleImpl(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
+	public QVehicleImpl(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
 		this.id = basicVehicle.getId();
 		this.sizeInEquivalents = sizeInEquivalents;
 		this.basicVehicle = basicVehicle;

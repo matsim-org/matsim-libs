@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
@@ -76,7 +77,7 @@ public class QueryAgentId extends AbstractQuery {
 		double dist = 0;
 		for(QLink qlink : queueSimulation.getQueueSimulation().getQNetwork().getLinks().values()) {
 			List<AgentSnapshotInfo> positions = new LinkedList<AgentSnapshotInfo>();
-			qlink.getVisData().getVehiclePositions(positions);
+			qlink.getVisData().getVehiclePositions(QSimTimer.getTime(), positions);
 			for(AgentSnapshotInfo info : positions) {
 				if ((info.getAgentState()== AgentState.PERSON_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
 				double xDist = info.getEasting() - this.x;

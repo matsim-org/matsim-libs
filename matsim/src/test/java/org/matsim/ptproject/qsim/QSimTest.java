@@ -665,12 +665,12 @@ public class QSimTest extends TestCase {
 		QSim sim = new QSim(f.scenario, events);
 		QNetwork qnet = sim.getQNetwork();
 		sim.prepareSim();
-		QLink qlink2 = qnet.getQueueLink(id2);
-		QLink qlink3 = qnet.getQueueLink(new IdImpl(3));
+		QLink qlink2 = qnet.getQLink(id2);
+		QLink qlink3 = qnet.getQLink(new IdImpl(3));
 
 		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QVehicle vehicle1 = new QueueVehicleImpl(new BasicVehicleImpl(id1, defaultVehicleType));
-		QVehicle vehicle2 = new QueueVehicleImpl(new BasicVehicleImpl(id2, defaultVehicleType));
+		QVehicle vehicle1 = new QVehicleImpl(new BasicVehicleImpl(id1, defaultVehicleType));
+		QVehicle vehicle2 = new QVehicleImpl(new BasicVehicleImpl(id2, defaultVehicleType));
 		qlink2.addParkedVehicle(vehicle1);
 		qlink2.addParkedVehicle(vehicle2);
 

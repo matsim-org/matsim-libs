@@ -46,7 +46,7 @@ public class QNetwork {
 	private final QNetworkFactory<QNode, QLink> queueNetworkFactory;
 
 	protected QNetwork(final QSim qs) {
-		this(qs, new DefaultQueueNetworkFactory() ) ;
+		this(qs, new DefaultQNetworkFactory() ) ;
 	}
 
 	protected QNetwork(final QSim qs, final QNetworkFactory<QNode, QLink> factory ) {
@@ -69,7 +69,7 @@ public class QNetwork {
     }
   }
 
-  public Network getNetworkLayer() {
+  public Network getNetwork() {
 		return this.networkLayer;
 	}
 
@@ -81,11 +81,11 @@ public class QNetwork {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
-	public QLink getQueueLink(final Id id) {
+	public QLink getQLink(final Id id) {
 		return this.links.get(id);
 	}
 
-	public QNode getQueueNode(final Id id) {
+	public QNode getQNode(final Id id) {
 		return this.nodes.get(id);
 	}
 

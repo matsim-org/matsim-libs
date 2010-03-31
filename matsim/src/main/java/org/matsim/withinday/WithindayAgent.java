@@ -85,7 +85,7 @@ public class WithindayAgent extends PersonAgent {
 
 	public WithindayAgent(final Person person, final QSim simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
 		super(person, simulation);
-		this.network = simulation.getQNetwork().getNetworkLayer();
+		this.network = simulation.getQNetwork().getNetwork();
 //		this.person = person;
 //		this.vehicle = v;
 //		this.setVehicle(v);

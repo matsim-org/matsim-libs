@@ -216,7 +216,7 @@ public class QNode {
     
     // veh has to move over node
     if (nextLinkId != null) {
-      QLink nextQueueLink = this.simEngine.getQSim().getQNetwork().getQueueLink(nextLinkId);
+      QLink nextQueueLink = this.simEngine.getQSim().getQNetwork().getQLink(nextLinkId);
       Link nextLink = nextQueueLink.getLink();
       this.checkNextLinkSemantics(currentLink, nextLink, veh);
       if (nextQueueLink.hasSpace()) {

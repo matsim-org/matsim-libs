@@ -114,7 +114,7 @@ public class QLaneTest extends MatsimTestCase {
 		
 		QSim queueSim = new QSim(scenario, null);
 		QNetwork queueNetwork = queueSim.getQNetwork();
-		QLink ql = queueNetwork.getQueueLink(id1);
+		QLink ql = queueNetwork.getQLink(id1);
 
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
 		assertEquals(268.0, ql.getSpaceCap());
@@ -129,7 +129,7 @@ public class QLaneTest extends MatsimTestCase {
 		
 		QSim queueSim = new QSim(scenario, null);
 		QNetwork queueNetwork = queueSim.getQNetwork();
-		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQueueLink(id1);
+		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQLink(id1);
 
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();
@@ -162,7 +162,7 @@ public class QLaneTest extends MatsimTestCase {
 		
 		QSim queueSim = new QSim(scenario, null);
 		QNetwork queueNetwork = queueSim.getQNetwork();
-		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQueueLink(id1);
+		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQLink(id1);
 
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();
@@ -197,7 +197,7 @@ public class QLaneTest extends MatsimTestCase {
 		
 		QSim queueSim = new QSim(scenario, null);
 		QNetwork queueNetwork = queueSim.getQNetwork();
-		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQueueLink(id1);
+		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQLink(id1);
 
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();

@@ -229,7 +229,7 @@ public class QLinkLanesImpl implements QLink {
 	 */
 	private void setToLinks(QLane lane, List<Id> toLinkIds) {
 		for (Id linkId : toLinkIds) {
-			QLink link = this.getQSimEngine().getQSim().getQNetwork().getQueueLink(linkId);
+			QLink link = this.getQSimEngine().getQSim().getQNetwork().getQLink(linkId);
 			if (link == null) {
 				String message = "Cannot find Link with Id: " + linkId + " in network. ";
 				log.error(message);
@@ -467,17 +467,13 @@ public class QLinkLanesImpl implements QLink {
 	 */
 	class VisDataImpl implements VisData {
 
-		public double getDisplayableSpaceCapValue() {
-			return originalLane.visdata.getDisplayableSpaceCapValue();
-		}
-
 		public double getDisplayableTimeCapValue(double time) {
 			return originalLane.visdata.getDisplayableTimeCapValue(time);
 		}
 
-		public Collection<AgentSnapshotInfo> getVehiclePositions(final Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
 		  for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
-		    lane.visdata.getVehiclePositions(positions);
+		    lane.visdata.getVehiclePositions(time, positions);
 		  }
 		  int cnt = parkedVehicles.size();
 		  if (cnt > 0) {

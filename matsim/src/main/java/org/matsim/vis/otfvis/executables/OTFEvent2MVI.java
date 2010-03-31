@@ -68,7 +68,7 @@ public class OTFEvent2MVI extends OTFFileWriter {
 		Gbl.getConfig().simulation().setSnapshotPeriod(this.interval_s);
 		Events2Snapshot app = new Events2Snapshot();
 		app.addExternalSnapshotWriter(this);
-		app.run(new File(this.eventFileName), Gbl.getConfig(), this.network.getNetworkLayer());
+		app.run(new File(this.eventFileName), Gbl.getConfig(), this.network.getNetwork());
 
 		close();
 	}

@@ -583,7 +583,7 @@ public class QLinkImpl implements QLink {
 			return count * 2.0 / QLinkImpl.this.storageCapacity;
 		}
 
-		public Collection<AgentSnapshotInfo> getVehiclePositions(final Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
 		  String snapshotStyle = getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
 		  if ("queue".equals(snapshotStyle)) {
 		    getVehiclePositionsQueue(positions);
@@ -687,7 +687,7 @@ public class QLinkImpl implements QLink {
 			Link link = QLinkImpl.this.getLink();
 			double queueEnd = getInitialQueueEnd();
 			double storageCapFactor = Gbl.getConfig().getQSimConfigGroup().getStorageCapFactor();
-			double cellSize = ((NetworkImpl)QLinkImpl.this.getQSimEngine().getQSim().getQNetwork().getNetworkLayer()).getEffectiveCellSize();
+			double cellSize = ((NetworkImpl)QLinkImpl.this.getQSimEngine().getQSim().getQNetwork().getNetwork()).getEffectiveCellSize();
 			double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
 			queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
 			positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);

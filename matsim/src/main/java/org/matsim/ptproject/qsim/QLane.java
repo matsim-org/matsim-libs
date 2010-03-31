@@ -173,7 +173,7 @@ public class QLane implements QBufferItem {
 
 	/*package*/ QLane(final QLink ql, Lane laneData) {
 		this.queueLink = ql;
-		this.transitQueueLaneFeature = new TransitQLaneFeature(this.getQueueLink());
+		this.transitQueueLaneFeature = new TransitQLaneFeature(this.getQLink());
 		this.isOriginalLane = (laneData == null) ? true : false;
 		this.laneData = laneData;
 		this.length = ql.getLink().getLength();
@@ -232,14 +232,14 @@ public class QLane implements QBufferItem {
 				* this.laneData.getNumberOfRepresentedLanes();
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * QSimTimer.getSimTickTime() * this.getQueueLink().getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * QSimTimer.getSimTickTime() * this.getQLink().getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
 
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = this.getQueueLink().getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
+		double storageCapFactor = this.getQLink().getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 
 		double numberOfLanes = this.queueLink.getLink().getNumberOfLanes(time);
@@ -716,7 +716,7 @@ public class QLane implements QBufferItem {
     return this.vehQueue;
   }
 
-  public QLink getQueueLink() {
+  public QLink getQLink() {
     return this.queueLink;
   }
 
@@ -736,12 +736,6 @@ public class QLane implements QBufferItem {
    */
   class VisDataImpl implements VisData {
     /**
-     * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
-     */
-    public double getDisplayableSpaceCapValue() {
-      return (QLane.this.buffer.size() + QLane.this.vehQueue.size()) / QLane.this.storageCapacity;
-    }
-    /**
      * Returns a measure for how many vehicles on the link have a travel time
      * higher than freespeedTraveltime on a scale from 0 to 2. When more then half
      * of the possible vehicles are delayed, the value 1 will be returned, which
@@ -760,7 +754,7 @@ public class QLane implements QBufferItem {
       return count * 2.0 / QLane.this.storageCapacity;
     }
 
-    public Collection<AgentSnapshotInfo> getVehiclePositions(final Collection<AgentSnapshotInfo> positions) {
+    public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
       String snapshotStyle = QLane.this.queueLink.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
 //      if (QLane.this.isOriginalLane){
 ////        log.error("link: " + QLane.this.queueLink.getLink().getId() + "lane: " + QLane.this.getLaneId() + " is original lane!");
@@ -859,11 +853,11 @@ public class QLane implements QBufferItem {
      */
     private void getVehiclePositionsQueue(final Collection<AgentSnapshotInfo> positions) {
       double now = QSimTimer.getTime();
-      Link link = QLane.this.getQueueLink().getLink();
+      Link link = QLane.this.getQLink().getLink();
 //      log.error("link: " + QLane.this.queueLink.getLink().getId() + "lane: " + QLane.this.getLaneId() + " drawing vehicles!");
       double queueEnd = getInitialQueueEnd();
       double storageCapFactor = Gbl.getConfig().getQSimConfigGroup().getStorageCapFactor();
-      double cellSize = ((NetworkImpl)QLane.this.getQueueLink().getQSimEngine().getQSim().getQNetwork().getNetworkLayer()).getEffectiveCellSize();
+      double cellSize = ((NetworkImpl)QLane.this.getQLink().getQSimEngine().getQSim().getQNetwork().getNetwork()).getEffectiveCellSize();
       double vehLen = calculateVehicleLength(storageCapFactor, cellSize);
       
       queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
@@ -990,7 +984,7 @@ public class QLane implements QBufferItem {
       for (QVehicle veh : QLane.this.waitingList) {
         Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
         for (PersonAgentI person : peopleInVehicle) {
-          PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLane.this.getQueueLink().getLink(),
+          PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLane.this.getQLink().getLink(),
               /*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
           if ( person.getPerson().getId().toString().startsWith("pt") ) {
             position.setAgentState( AgentState.TRANSIT_DRIVER ) ;

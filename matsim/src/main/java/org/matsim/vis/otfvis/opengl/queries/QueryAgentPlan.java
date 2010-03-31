@@ -139,7 +139,7 @@ public class QueryAgentPlan extends AbstractQuery {
 							(float) coord.getY(), act.getType()));
 				}
 			}
-			QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetworkLayer());
+			QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetwork());
 			result.hasPlan = true;
 		} else {
 			log.error("No plan found for id " + this.agentId);

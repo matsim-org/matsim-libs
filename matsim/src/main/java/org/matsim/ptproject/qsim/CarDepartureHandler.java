@@ -35,7 +35,7 @@ public class CarDepartureHandler implements DepartureHandler {
 		if (vehicleId == null) {
 			vehicleId = agent.getPerson().getId(); // backwards-compatibility
 		}
-		QLink qlink = queueSimulation.network.getQueueLink(linkId);
+		QLink qlink = queueSimulation.network.getQLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if ((vehicle == null) && (teleportVehicles) && (agent instanceof PersonAgent)) {
 			// try to fix it somehow
@@ -48,7 +48,7 @@ public class CarDepartureHandler implements DepartureHandler {
 						log.info("No more occurrences of teleported vehicles will be reported.");
 					}
 				}
-				QLink qlinkOld = queueSimulation.network.getQueueLink(vehicle.getCurrentLink().getId());
+				QLink qlinkOld = queueSimulation.network.getQLink(vehicle.getCurrentLink().getId());
 				qlinkOld.removeParkedVehicle(vehicle.getId());
 			}
 		}

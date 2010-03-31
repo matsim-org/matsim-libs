@@ -51,7 +51,7 @@ import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSimEngine;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.ptproject.qsim.QVehicle;
-import org.matsim.ptproject.qsim.QueueVehicleImpl;
+import org.matsim.ptproject.qsim.QVehicleImpl;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -1036,9 +1036,9 @@ public class TransitQueueNetworkTest extends TestCase {
 			// setup: simulation
 			TransitQSimulation qsim = new TransitQSimulation(scenario, new EventsManagerImpl());
 			QNetwork qnet = qsim.getQNetwork();
-			this.qlink1 = (QLinkImpl) qnet.getQueueLink(id1);
-			this.qlink2 = (QLinkImpl) qnet.getQueueLink(id2);
-			this.qlink3 = (QLinkImpl) qnet.getQueueLink(id3);
+			this.qlink1 = (QLinkImpl) qnet.getQLink(id1);
+			this.qlink2 = (QLinkImpl) qnet.getQLink(id2);
+			this.qlink3 = (QLinkImpl) qnet.getQLink(id3);
 			this.simEngine = qsim.getQSimEngine();
 //			this.simEngine = new TestSimEngine(qsim);
 			this.simEngine.onPrepareSim();
@@ -1065,7 +1065,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			tDriver.setVehicle(this.transitVehicle);
 			tDriver.activityEnds(100);
 
-			this.normalVehicle = new QueueVehicleImpl(new BasicVehicleImpl(id2, vehicleType));
+			this.normalVehicle = new QVehicleImpl(new BasicVehicleImpl(id2, vehicleType));
 			this.qlink1.addParkedVehicle(this.normalVehicle);
 
 			PersonAgent nDriver = new PersonAgent(person, qsim);
@@ -1077,7 +1077,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			if (stop2 != null) {
 				/* we're testing two stops. Add another normal vehicle with 20 seconds delay,
 				 * that *could* overtake a transit vehicle at its second stop. */
-				this.normalVehicle2 = new QueueVehicleImpl(new BasicVehicleImpl(id3, vehicleType));
+				this.normalVehicle2 = new QVehicleImpl(new BasicVehicleImpl(id3, vehicleType));
 				this.qlink1.addParkedVehicle(this.normalVehicle2);
 
 				Person person2 = pb.createPerson(id3);

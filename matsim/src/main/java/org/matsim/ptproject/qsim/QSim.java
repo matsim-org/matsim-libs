@@ -151,7 +151,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
         throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
       }
       this.setLaneDefinitions(((ScenarioImpl)sc).getLaneDefinitions());
-      this.network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQueueNetworkFactory()));
+      this.network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory()));
     }
     else {
         this.network = new QNetwork(this);
@@ -241,13 +241,13 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (Person p : this.population.getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
-			QVehicle veh = new QueueVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
+			QVehicle veh = new QVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);
 			agents.add(agent);
 			if (agent.initialize()) {
-				QLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
+				QLink qlink = this.network.getQLink(agent.getCurrentLinkId());
 				qlink.addParkedVehicle(veh);
 			}
 		}
@@ -335,7 +335,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		if (this.laneDefintions != null){
 			log.info("Lanes enabled...");
 			for (LanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignments().values()){
-				QLink link = this.network.getQueueLink(laneToLink.getLinkId());
+				QLink link = this.network.getQLink(laneToLink.getLinkId());
 				if (link == null) {
 					String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";
 					log.error(message);
@@ -438,7 +438,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
 		  Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 	    for (QLink link : this.getQNetwork().getLinks().values()) {
-	      link.getVisData().getVehiclePositions(positions);
+	      link.getVisData().getVehiclePositions(time, positions);
 	    }
 			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
 				writer.beginSnapshot(time);
@@ -514,7 +514,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
 			for (Link link : event.getLinks()) {
-				this.network.getQueueLink(link.getId()).recalcTimeVariantAttributes(time);
+				this.network.getQLink(link.getId()).recalcTimeVariantAttributes(time);
 			}
 		}
 	}
@@ -544,7 +544,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				QLink qLink = network.getQueueLink(linkId);
+				QLink qLink = network.getQLink(linkId);
 				qLink.addAgentInActivity(agent);
 			}
 		}
@@ -559,7 +559,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				QLink qLink = network.getQueueLink(linkId);
+				QLink qLink = network.getQLink(linkId);
 				qLink.removeAgentInActivity(agent);
 			}
 		}
@@ -657,7 +657,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
 	}
 
-	public SignalEngine getQueueSimSignalEngine() {
+	public SignalEngine getQSimSignalEngine() {
 		return this.signalEngine;
 	}
 
