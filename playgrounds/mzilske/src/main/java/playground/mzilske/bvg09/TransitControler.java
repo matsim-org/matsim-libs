@@ -39,6 +39,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -46,6 +47,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.qsim.TransitQSimulation;
@@ -56,6 +58,7 @@ import org.matsim.vehicles.BasicVehicleReaderV1;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.xml.sax.SAXException;
 
+import playground.dgrether.utils.LogOutputEventHandler;
 import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
 
 /**
@@ -140,10 +143,18 @@ public class TransitControler extends Controler {
 		TransitQSimulation sim = new TransitQSimulation(this.scenarioData, this.events);
 		if (useOTFVis) {
 			OTFVisQSimFeature otfVisQSimFeature = new OTFVisQSimFeature(sim);
-			otfVisQSimFeature.setVisualizeTeleportedAgents(false);
+			otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());
 			sim.addFeature(otfVisQSimFeature);
 		}
 		sim.setUseUmlaeufe(true);
+		sim.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+		
+//		this.events.addHandler(new LogOutputEventHandler());
+		
+		if (sim instanceof IOSimulation){
+			((IOSimulation)sim).setControlerIO(this.getControlerIO());
+			((IOSimulation)sim).setIterationNumber(this.getIterationNumber());
+		}
 		sim.run();
 	}
 
@@ -198,6 +209,7 @@ public class TransitControler extends Controler {
 	public static void main(final String[] args) {
 		TransitControler tc = new TransitControler(args);
 		tc.setOverwriteFiles(true);
+//		tc.setCreateGraphs(false);
 		tc.run();
 	}
 
