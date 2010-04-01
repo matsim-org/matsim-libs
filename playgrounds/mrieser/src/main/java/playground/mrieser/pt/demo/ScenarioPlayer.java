@@ -38,16 +38,12 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.xml.sax.SAXException;
 
-import playground.mrieser.OTFDemo;
-
 /**
  * Visualizes a transit schedule and simulates the transit vehicle's movements.
  *
  * @author mrieser
  */
 public class ScenarioPlayer {
-
-	private static final String SERVERNAME = "ScenarioPlayer";
 
 	public static void play(final ScenarioImpl scenario, final EventsManagerImpl events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");

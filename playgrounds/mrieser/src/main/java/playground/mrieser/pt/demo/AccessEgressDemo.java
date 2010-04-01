@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -70,8 +71,6 @@ public class AccessEgressDemo {
 	private static final double departureTime = 7.0*3600;
 	private static final boolean stopsBlockLane = true;
 
-	private static final String SERVERNAME = "access_egress_demo";
-
 	private final ScenarioImpl scenario = new ScenarioImpl();
 	public final Id[] ids = new Id[Math.max(nOfLinks + 1, nOfBuses)];
 
@@ -83,10 +82,11 @@ public class AccessEgressDemo {
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
+		config.setQSimConfigGroup(new QSimConfigGroup());
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
-		config.simulation().setSnapshotStyle("queue");
-		config.simulation().setEndTime(24.0*3600);
+		config.getQSimConfigGroup().setSnapshotStyle("queue");
+		config.getQSimConfigGroup().setEndTime(24.0*3600);
 	}
 
 	private void createNetwork() {
@@ -103,6 +103,7 @@ public class AccessEgressDemo {
 			l.setFreespeed(10.0);
 			l.setCapacity(1000.0);
 			l.setNumberOfLanes(1);
+			network.addLink(l);
 		}
 	}
 
@@ -169,7 +170,7 @@ public class AccessEgressDemo {
 			for (int j = 0; j < nOfAgentsPerStop; j++) {
 				PersonImpl person = (PersonImpl) pb.createPerson(this.scenario.createId(Integer.toString(i * nOfAgentsPerStop + j)));
 				PlanImpl plan = (PlanImpl) pb.createPlan();
-				ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[i]);
+				ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", stop.getLinkId());
 				act1.setEndTime(departureTime + j * agentInterval);
 				LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
 				leg.setRoute(new ExperimentalTransitRoute(stop, tLine, tRoute, lastStop));

@@ -225,7 +225,7 @@ public class TwoLinesDemo {
 		{ // person 1
 			PersonImpl person = (PersonImpl) pb.createPerson(this.ids[1]);
 			PlanImpl plan = (PlanImpl) pb.createPlan();
-			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
+			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[3]);
 			act1.setEndTime(Time.parseTime("07:01:00"));
 			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop3));
@@ -248,7 +248,7 @@ public class TwoLinesDemo {
 		{ // person 2
 			PersonImpl person = (PersonImpl) pb.createPerson(this.ids[2]);
 			PlanImpl plan = (PlanImpl) pb.createPlan();
-			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
+			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[3]);
 			act1.setEndTime(Time.parseTime("07:06:00"));
 			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop3));
@@ -271,7 +271,7 @@ public class TwoLinesDemo {
 		{ // person 3
 			PersonImpl person = (PersonImpl) pb.createPerson(this.ids[3]);
 			PlanImpl plan = (PlanImpl) pb.createPlan();
-			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
+			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[3]);
 			act1.setEndTime(Time.parseTime("07:11:00"));
 			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop4));

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.LinkImpl;
@@ -47,8 +48,6 @@ import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.xml.sax.SAXException;
 
 public class PseudoNetworkDemo {
-
-	private static final String SERVERNAME = "pseudoNetworkDemo";
 
 	public static void main(final String[] args) {
 		String networkFile = null;
@@ -67,9 +66,10 @@ public class PseudoNetworkDemo {
 		}
 
 		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseVehicles(true);
 		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().simulation().setSnapshotStyle("queue");
+		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
 
 		NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
