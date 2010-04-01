@@ -211,6 +211,27 @@
 				</pluginManagement>
 			</build>
 		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+	      	   	<artifactId>maven-jar-plugin</artifactId>
+	        	 	<configuration>
+	          		<archive>
+	            		<manifest>
+										<addClasspath>true</addClasspath>
+										<classpathPrefix>libs/</classpathPrefix>
+		              	<mainClass>org.matsim.run.ReleaseInfo</mainClass>
+	  	          	</manifest>
+	    	      	</archive>
+	      	  	</configuration>
+	     			</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
 
   </profiles>
 
