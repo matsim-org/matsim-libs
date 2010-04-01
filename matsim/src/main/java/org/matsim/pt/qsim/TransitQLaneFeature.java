@@ -45,6 +45,15 @@ public class TransitQLaneFeature {
 		return this.transitVehicleStopQueue;
 	}
 	
+	/**
+	 * The method name tells when it is called, but not what it does (maybe
+	 * because the "Feature" structure is meant to be more general). This method
+	 * moves transit vehicles from the stop queue directly to the front of the
+	 * "queue" of the QLink. An advantage is that this will observe flow
+	 * capacity restrictions. yyyy A disadvantage is that this is a hard-coding
+	 * on top of the queue/buffer structure where it is questionable if this
+	 * should be used or even visible from the outside. kai, feb'10
+	 */
 	public void beforeMoveLaneToBuffer(final double now) {
 		QVehicle veh;
 		// handle transit traffic in stop queue
@@ -134,6 +143,9 @@ public class TransitQLaneFeature {
 
 	public Collection<PersonAgentI> getPassengers(
 			QVehicle queueVehicle) {
+		// yyyy warum macht diese Methode Sinn?  TransitVehicle.getPassengers() gibt doch
+		// bereits eine Collection<PersonAgent> zurück.  Dann braucht das Umkopieren hier doch
+		// bloss Zeit?  kai, feb'10
 			if (queueVehicle instanceof TransitVehicle) {
 				Collection<PersonAgentI> passengers = new ArrayList<PersonAgentI>();
 				for (PassengerAgent passenger : ((TransitVehicle) queueVehicle).getPassengers()) {
