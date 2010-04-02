@@ -59,7 +59,6 @@ public class DaBarChart {
 			  dataset.addValue(e.getValue(), category, String.valueOf(e.getKey()));
 		  }
 	  }
-
 	  
 	  public JFreeChart createChart(String title, String xAxis, String yAxis) {
 		JFreeChart chart = ChartFactory.createBarChart(title, xAxis, yAxis, dataset, PlotOrientation.VERTICAL, true, false, false);
@@ -92,6 +91,26 @@ public class DaBarChart {
 		    plot.setRangeGridlinePaint(Color.black);
 		    plot.setDomainAxis(axis.createCategoryAxis(xAxis));
 		    plot.setRangeAxis(axis.createValueAxis(yAxis, yMax));
+			
+			final BarRenderer renderer = (BarRenderer) plot.getRenderer();
+			renderer.findRangeBounds(dataset);
+			DaColorScheme cs = new DaColorScheme();
+			for(int i=0; i< 1+dataset.getRowCount(); i++){
+				renderer.setSeriesPaint(i, cs.getColor(i));
+			}
+			return chart;
+
+		  }
+	  public JFreeChart createChart(String title, String xAxis, String yAxis, double yMin, double yMax) {
+			JFreeChart chart = ChartFactory.createBarChart(title, xAxis, yAxis, dataset, PlotOrientation.VERTICAL, true, false, false);
+			DaAxisBuilder axis = new DaAxisBuilder();
+			CategoryPlot plot = chart.getCategoryPlot();
+			
+		    plot.setBackgroundPaint(Color.white);
+		    plot.setDomainGridlinePaint(Color.lightGray);
+		    plot.setRangeGridlinePaint(Color.black);
+		    plot.setDomainAxis(axis.createCategoryAxis(xAxis));
+		    plot.setRangeAxis(axis.createValueAxis(yAxis, yMin, yMax));
 			
 			final BarRenderer renderer = (BarRenderer) plot.getRenderer();
 			renderer.findRangeBounds(dataset);

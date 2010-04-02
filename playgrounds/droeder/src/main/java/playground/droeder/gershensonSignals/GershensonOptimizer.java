@@ -45,14 +45,14 @@ public class GershensonOptimizer {
 		
 		do{
 			temp = Math.random();
-		}while(temp<0.6);
+		}while(temp<0.5);
 		s.setCap(temp);
 		s.setN((int)((Math.random()*490) + 10.0));
 		s.setD((int)((Math.random()*55) + 45.0));
 		do {
 			s.setU((int)((Math.random()*75) + 5.0));
-			s.setMaxGreen((int)((Math.random()*170) + 30.0));
-		}while (s.getU() > s.getMaxGreen());
+			s.setMaxRed((int)((Math.random()*170) + 30.0));
+		}while (s.getU() > s.getMaxRed());
 		return s;
 	}
 	
@@ -76,7 +76,8 @@ public class GershensonOptimizer {
 	private Map<Integer, Solution> recombination(Map<Integer, Solution> bests, double randSize){
 		Map<Integer, Solution> recombinated = new HashMap<Integer, Solution>();
 		Solution s;
-		Integer i = 1;
+		Integer i = 0;
+		Integer j = 0;
 		do{
 			System.out.println("new do-while");
 			for (Solution s1: bests.values()){
@@ -85,24 +86,28 @@ public class GershensonOptimizer {
 						for (Solution s4: bests.values()){
 							for (Solution s5: bests.values()){
 								double rnd = Math.random();
-								if (Math.random()< (10/Math.pow(bests.size(),3))){
-									if(rnd < 0.2){
-										s = new Solution(s1.getU(), s2.getN(), s3.getMaxGreen(), s4.getCap(), s5.getD());
-									}else if (rnd >0.2 && rnd <0.4){
-										s = new Solution(s5.getU(), s1.getN(), s2.getMaxGreen(), s3.getCap(), s4.getD());
-									}else if (rnd >0.4 && rnd <0.6){
-										s = new Solution(s4.getU(), s5.getN(), s1.getMaxGreen(), s2.getCap(), s3.getD());
-									}else if (rnd >0.6 && rnd <0.8){
-										s = new Solution(s3.getU(), s4.getN(), s5.getMaxGreen(), s1.getCap(), s2.getD());
-									}else{
-										s = new Solution(s2.getU(), s3.getN(), s4.getMaxGreen(), s5.getCap(), s1.getD());
-									}
-									if (s.getU() < s.getMaxGreen() && !(recombinated.containsValue(s))){
-										recombinated.put(i, s);
-										i = i+1;
-									}
+								if(rnd < 0.2){
+									s = new Solution(s1.getU(), s2.getN(), s3.getMaxRed(), s4.getCap(), s5.getD());
+								}else if (rnd >0.2 && rnd <0.4){
+									s = new Solution(s5.getU(), s1.getN(), s2.getMaxRed(), s3.getCap(), s4.getD());
+								}else if (rnd >0.4 && rnd <0.6){
+									s = new Solution(s4.getU(), s5.getN(), s1.getMaxRed(), s2.getCap(), s3.getD());
+								}else if (rnd >0.6 && rnd <0.8){
+									s = new Solution(s3.getU(), s4.getN(), s5.getMaxRed(), s1.getCap(), s2.getD());
+								}else{
+									s = new Solution(s2.getU(), s3.getN(), s4.getMaxRed(), s5.getCap(), s1.getD());
 								}
-								if(recombinated.size()>(randSize)){
+								if (s.getU() < s.getMaxRed() && !(recombinated.containsValue(s)) && !(bests.containsValue(s))){
+									recombinated.put(i, s);
+									i = i+1;
+								}
+								j++;
+								if(recombinated.size()==(randSize)){
+									return recombinated;
+								}else if(j>Math.pow(bests.size(),5)){
+									for (int ii = recombinated.size(); ii >randSize; i++){
+										recombinated.put(ii, new Solution());
+									}
 									return recombinated;
 								}
 							}
@@ -117,7 +122,7 @@ public class GershensonOptimizer {
 	public void writeToTxt (Map <Integer, Solution> data, String fileName){
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
-			writer.write("time" +"\t" + "d" +"\t" + "u" +"\t" + "cap" +"\t" + "n" +"\t" + "maxGreen");
+			writer.write("time" +"\t" + "d" +"\t" + "u" +"\t" + "cap" +"\t" + "n" +"\t" + "maxRed");
 			writer.newLine();
 			for(Solution s : data.values()){
 				writer.write(String.valueOf(s.getTime()));
@@ -130,7 +135,7 @@ public class GershensonOptimizer {
 				writer.write("\t");
 				writer.write(String.valueOf(s.getN()));
 				writer.write("\t");
-				writer.write(String.valueOf(s.getMaxGreen()));
+				writer.write(String.valueOf(s.getMaxRed()));
 				writer.write("\t");
 				writer.newLine();
 			}
@@ -150,50 +155,47 @@ public class GershensonOptimizer {
 		Map<Integer, Solution> temp = new HashMap<Integer, Solution>();
 		Map<Integer, Solution> best = new HashMap<Integer, Solution>();
 		GershensonRunner runner;
-		String folder = DaPaths.OUTPUT + "denver\\recombination1\\";
+		String folder = DaPaths.OUTPUT + "cottbus\\recombination1\\";
 		int i;
-		int b = 100;
+		int b = 150;
 		
-		for (int ii = 1; ii<200; ii++){
+		for (int ii = 0; ii<b; ii++){
 			temp.put(ii, g.init());
 		}
 		for (Entry<Integer, Solution> e  : temp.entrySet()){
-			runner = new GershensonRunner();
+			runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false);
 			Gbl.reset();
-			runner.setCap(e.getValue().getCap());
-			runner.setD(e.getValue().getD());
-			runner.setMaxRed(e.getValue().getMaxGreen());
-			runner.setN(e.getValue().getN());
-			runner.setU(e.getValue().getU());
-			runner.runScenario("opti");
+			
+			runner.runScenario("C");
 			e.getValue().setTime(runner.getAvTT());
 		}
 		g.writeToTxt(temp,  folder + "randomSeed.txt");
-		best = g.getBest(temp, b);
+		best = g.getBest(temp,3* b/20);
 		g.writeToTxt(best, folder + "bestRandom.txt");
 		
-		for (int n = 1 ; n < 100; n++){
+		for (int n = 1 ; n < 1000; n++){
 			temp.clear();
-			temp.putAll(best);
+			temp = g.recombination(best, (b/10));
 			i = temp.size();
-			for (int ii = i + 1 ; ii < b + (b / 20); ii++){
+			for (int ii = i  ; ii < b; ii++){
 				temp.put(ii, g.init());
 			}
-			temp = g.recombination(temp, b + (b/10));
+			System.out.println(temp.size());
 			for (Entry<Integer, Solution> e  : temp.entrySet()){
-				runner = new GershensonRunner();
+				runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false);
 				Gbl.reset();
-				runner.setCap(e.getValue().getCap());
-				runner.setD(e.getValue().getD());
-				runner.setMaxRed(e.getValue().getMaxGreen());
-				runner.setN(e.getValue().getN());
-				runner.setU(e.getValue().getU());
-				runner.runScenario("opti");
+				runner.runScenario("C");
 				e.getValue().setTime(runner.getAvTT());
+			}
+			i=temp.size();
+			for (Solution s : best.values()){
+				temp.put(i, s);
+				if (i==b)break;
+				i++;
 			}
 			g.writeToTxt(temp, folder + "it" + String.valueOf(n) +".txt");
 			best.clear();
-			best = g.getBest(temp, b);
+			best = g.getBest(temp, 3* b/20);
 			g.writeToTxt(best, folder + "bestIt" + String.valueOf(n) +".txt");
 		}
 	}
@@ -201,7 +203,7 @@ public class GershensonOptimizer {
 class Solution{
 	private int u;
 	private int n;
-	private int maxGreen;
+	private int maxRed;
 	private double cap;
 	private double d;
 	private double time;
@@ -209,10 +211,10 @@ class Solution{
 	public Solution(){
 		
 	}
-	public Solution(int u, int n, int maxGreen, double cap, double d){
+	public Solution(int u, int n, int maxRed, double cap, double d){
 		this.u = u;
 		this.n = n;
-		this.maxGreen = maxGreen;
+		this.maxRed = maxRed;
 		this.cap = ((int)(cap*100.00))/100.00;
 		this.d = d;
 	}
@@ -233,12 +235,12 @@ class Solution{
 		this.n = n;
 	}
 
-	public int getMaxGreen() {
-		return maxGreen;
+	public int getMaxRed() {
+		return maxRed;
 	}
 
-	public void setMaxGreen(int maxGreen) {
-		this.maxGreen = maxGreen;
+	public void setMaxRed(int maxRed) {
+		this.maxRed = maxRed;
 	}
 
 	public double getCap() {
@@ -276,7 +278,7 @@ class Solution{
 		if (!(o instanceof Solution)) return false;
 		Solution s = (Solution) o;
 		
-		if (this.cap == s.getCap() && this.d == s.getD() && this.maxGreen == s.getMaxGreen() 
+		if (this.cap == s.getCap() && this.d == s.getD() && this.maxRed == s.getMaxRed() 
 				&& this.n == s.getN() && this.u == s.getU()){
 			return true;
 		} else{

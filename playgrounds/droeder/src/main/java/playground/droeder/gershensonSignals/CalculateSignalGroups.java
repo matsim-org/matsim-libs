@@ -96,7 +96,8 @@ public class CalculateSignalGroups{
 				}
 			}
 		}
-		if (corrLinks.containsKey(new IdImpl("191")) || corrLinks.containsValue(new IdImpl("191"))){
+		
+		if (corrLinks.containsKey(new IdImpl("162")) || corrLinks.containsValue(new IdImpl("162"))){
 			System.out.println(corrLinks.toString());
 		}
 	}
@@ -135,17 +136,17 @@ public class CalculateSignalGroups{
 						for(Id outLink: groups.get(ii).getToLinkIds()){
 							thetaTemp = calcAngle(net.getLinks().get(outLink));
 						}
-						if (corrLinks.containsKey(new IdImpl("231")) || corrLinks.containsValue(new IdImpl("231"))){
+						if (corrLinks.containsKey(new IdImpl("162")) || corrLinks.containsValue(new IdImpl("162"))){
 							log.error(ii + " " + thetaMain + "-" + thetaTemp );
 						}
 						if(thetaMain > (Math.PI)){
-							if (thetaTemp > (thetaMain + (Math.PI/4)) || thetaTemp < (thetaMain - Math.PI)){
+							if (thetaTemp >= (thetaMain + (Math.PI/4)) || thetaTemp <= (thetaMain - Math.PI)){
 								left.add(groups.get(ii));
 							}else{
 								other.add(groups.get(ii));
 							}
 						}else{
-							if (thetaTemp > (thetaMain + (Math.PI/4)) && thetaTemp < (thetaMain + Math.PI)){
+							if (thetaTemp >= (thetaMain + (Math.PI/4)) && thetaTemp <= (thetaMain + Math.PI)){
 								left.add(groups.get(ii));
 							}else{
 								other.add(groups.get(ii));
@@ -158,17 +159,17 @@ public class CalculateSignalGroups{
 						for(Id outLink: groups.get(ii).getToLinkIds()){
 							thetaTemp = calcAngle(net.getLinks().get(outLink));
 						}
-						if (corrLinks.containsKey(new IdImpl("231")) || corrLinks.containsValue(new IdImpl("231"))){
+						if (corrLinks.containsKey(new IdImpl("162")) || corrLinks.containsValue(new IdImpl("162"))){
 							log.error(ii + " " + thetaMain + "-" + thetaTemp );
 						}
 						if(thetaMain > (Math.PI)){
-							if (thetaTemp > (thetaMain + (Math.PI/4)) || thetaTemp < (thetaMain - Math.PI)){
+							if (thetaTemp >= (thetaMain + (Math.PI/4)) || thetaTemp <= (thetaMain - Math.PI)){
 								left.add(groups.get(ii));
 							}else{
 								other.add(groups.get(ii));
 							}
 						}else{
-							if (thetaTemp > (thetaMain + (Math.PI/4)) && thetaTemp < (thetaMain + Math.PI)){
+							if (thetaTemp >= (thetaMain + (Math.PI/4)) && thetaTemp <= (thetaMain + Math.PI)){
 								left.add(groups.get(ii));
 							}else{
 								other.add(groups.get(ii));
@@ -196,7 +197,7 @@ public class CalculateSignalGroups{
 			}
 		}
 		
-		if (corrLinks.containsKey(new IdImpl("231")) || corrLinks.containsValue(new IdImpl("231"))){
+		if (corrLinks.containsKey(new IdImpl("162")) || corrLinks.containsValue(new IdImpl("162"))){
 			for(Entry<Id, List<SignalGroupDefinition>> ee : corrGroups.entrySet()){
 				System.out.println(ee.getKey());
 				for (SignalGroupDefinition sd :  ee.getValue()){

@@ -76,6 +76,14 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 		this.groups = groups;
 		this.reset(0);
 		this.checkD(net);
+		
+		for (SignalGroupDefinition sd : groups.values()){
+			HashMap<Id, Integer> m  = new HashMap<Id, Integer>();
+			for (Id id : sd.getLaneIds()){
+				m.put(id, 0);
+			}
+			vehOnLinkLanes.put(sd.getLinkRefId(), m);
+		}
 	}
 	
 	private void checkD(Network net){
@@ -159,6 +167,18 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 			i += e.getValue();
 		}
 		return i;
+	}
+	
+	public int getVehOnLinkLane(Id linkRefId, Id laneId){
+		if(vehOnLinkLanes.get(linkRefId).equals(null)){
+			return 0 ;
+		}else if(!(vehOnLinkLanes.containsKey(linkRefId))){
+			return 0;
+		}else if(!(vehOnLinkLanes.get(linkRefId)).containsKey(laneId)){
+			return 0;
+		}else{
+			return vehOnLinkLanes.get(linkRefId).get(laneId);
+		}
 	}
 	
 	public double getVehInD(double time, Id linkId){

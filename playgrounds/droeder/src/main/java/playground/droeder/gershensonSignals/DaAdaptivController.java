@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.visitor.MaxVisitor.MaxResult;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.SignalGroupStateChangedEventImpl;
@@ -75,6 +74,8 @@ public class DaAdaptivController extends
 		private double switchedGreen = 0;
 		private Map<Id, Double> switchedToRed;
 		
+		private Map<Id, SortedMap<Double, Double>> demandOnRefLink = new HashMap<Id, SortedMap<Double,Double>>();
+		
 		
 
 		protected Map<Id, List<SignalGroupDefinition>> corrGroups;
@@ -99,13 +100,16 @@ public class DaAdaptivController extends
 		 * @param handler
 		 */
 		public void init(Map<Id, List<SignalGroupDefinition>> corrGroups, Map<Id, Id> mainOutLinks, QNetwork net, CarsOnLinkLaneHandler handler){
+			SortedMap<Double, Double> temp;
 			for(SignalGroupDefinition sd : this.getSignalGroups().values()){
 				this.getSignalGroupStates().put(sd, SignalGroupState.RED);
 				fireChangeEvent(21600.0, sd.getSignalSystemDefinitionId(), sd.getId(), SignalGroupState.RED);
+				temp = new TreeMap<Double, Double>();
+				demandOnRefLink.put(sd.getId(), temp);
 			}
 			switchedToRed  = new HashMap<Id, Double>();
 			for (Entry<Id, List<SignalGroupDefinition>> ee : corrGroups.entrySet()){
-				switchedToRed.put(ee.getKey(), 99999.0);
+				switchedToRed.put(ee.getKey(), 21600.0);
 			}
 
 			if(this.tGreenMin == 0){
@@ -249,26 +253,28 @@ public class DaAdaptivController extends
 				return;
 			}
 			
-//			//switch RedLights first
-//			if (maxRedTimeActive == true){
-//				Id id = new IdImpl("null");
-//				double redTime = 0;
-//				for (Entry<Id, Double> ee : switchedToRed.entrySet()){
-//					if ((e.getSimulationTime() - ee.getValue()) > maxRedTime && ee.getValue()>redTime){
-//						id = ee.getKey();
-//						redTime = ee.getValue();
-//					}
-//				}
-//				if (!id.equals(new IdImpl("null"))){
-//					for (SignalGroupDefinition sd : corrGroups.get(id)){
-//						this.startSwitching(sd, e.getSimulationTime());
-//						// return if interim is true, because a group was switched in this timestep
-//						if (interim == true){
-//							return;
-//						}
-//					}
-//				}
-//			}
+			//switch RedLights first
+			if (maxRedTimeActive == true){
+				Id id = new IdImpl("null");
+				double redTime = 0;
+				for (Entry<Id, Double> ee : switchedToRed.entrySet()){
+					if ((e.getSimulationTime() - ee.getValue()) > maxRedTime && ee.getValue()>redTime){
+						id = ee.getKey();
+						redTime = ee.getValue();
+					}
+				}
+				if (!id.equals(new IdImpl("null"))){
+					for (SignalGroupDefinition sd : corrGroups.get(id)){
+						if(handler.getVehOnLink(sd.getLinkRefId())>0){
+							this.startSwitching(sd, e.getSimulationTime());
+						}
+						// return if interim is true, because a group was switched in this timestep
+						if (interim == true){
+							return;
+						}
+					}
+				}
+			}
 			
 			//sort groups by demand
 			double temp;
@@ -284,7 +290,7 @@ public class DaAdaptivController extends
 			}
 			sorted_map.putAll(map);
 			
-			// iterate over groups sorted by demand
+			// iterate over groups sorted by demand.
 			for (Entry<Id, Double> ee : sorted_map.entrySet()){
 				for (SignalGroupDefinition sd : corrGroups.get(ee.getKey())){
 					this.updateSignalGroupState(e.getSimulationTime(), this.getSignalGroups().get(sd.getId()));
@@ -297,8 +303,9 @@ public class DaAdaptivController extends
 		}
 		
 		private void updateSignalGroupState(double time, SignalGroupDefinition signalGroup) {
-			
+
 			this.initIsGreen(time, signalGroup);
+			
 			
 			// algorithm starts
 			if ((this.outLinkJam == true) && this.oldState.equals(SignalGroupState.GREEN)){ //Rule 5 + 6
@@ -331,6 +338,10 @@ public class DaAdaptivController extends
 			this.interim = true;
 			this.interimTime = 0;
 			this.interimGroup = group;
+			
+			for (SignalGroupDefinition sd : this.getSignalGroups().values()){
+				demandOnRefLink.get(sd.getId()).put(time, handler.getVehInD(time, sd.getLinkRefId()));
+			}
 			
 			if (oldState.equals(SignalGroupState.GREEN)|| oldState.equals(SignalGroupState.RED)){
 				this.switchToYellow(group, time);
@@ -445,6 +456,10 @@ public class DaAdaptivController extends
 			}else{
 				maxRedTimeActive = true;
 			}
+		}
+		
+		public Map<Id, SortedMap<Double, Double>> getDemandOnRefLink(){
+			return demandOnRefLink;
 		}
 
 		public void reset(int iteration) {

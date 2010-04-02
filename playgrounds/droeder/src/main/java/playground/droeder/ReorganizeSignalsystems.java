@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.units.SI;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -61,7 +63,7 @@ public class ReorganizeSignalsystems {
 	private static final String PLANSINPUTFILE = INPUT + "plans.xml"; 
 	
 	// OUTPUT
-	private static final String NEWSIGNALSYSTEMS = OUTPUT + "signalSystemsByNodes.xml";
+	private static final String NEWSIGNALSYSTEMS = OUTPUT + "signalSystemsByNodes2.xml";
 	
 	// DEFINITIONS
 	
@@ -110,15 +112,36 @@ public class ReorganizeSignalsystems {
 			SignalSystemDefinition definition = factory.createSignalSystemDefinition(id[i]);
 			systems.addSignalSystemDefinition(definition);
 			for (SignalGroupDefinition sd : e.getValue()){
-				SignalGroupDefinition sgd = factory.createSignalGroupDefinition(sd.getLinkRefId(), sd.getId());
+				SignalGroupDefinition[] sgd = new SignalGroupDefinition[5];
+				for (int it = 0; it <sd.getLaneIds().size(); it++){
+					sgd[it] = factory.createSignalGroupDefinition(sd.getLinkRefId(), new IdImpl(sd.getId().toString() + String.valueOf(it)));
+				}
+				int it = 0;
 				for(Id ii : sd.getLaneIds()){
-					sgd.addLaneId(ii);
+					sgd[it].addLaneId(ii);
+					it++;
 				}
+				it=0;
 				for(Id ii : sd.getToLinkIds()){
-					sgd.addToLinkId(ii);
+					sgd[it].addToLinkId(ii);
+					it++;
 				}
-				sgd.setSignalSystemDefinitionId(id[i]);
-				systems.addSignalGroupDefinition(sgd);
+				it=0;
+				for(Id ii : sd.getToLinkIds()){
+					sgd[it].setSignalSystemDefinitionId(id[i]);
+					systems.addSignalGroupDefinition(sgd[it]);
+					it++;
+				}
+//				SignalGroupDefinition sgd = factory.createSignalGroupDefinition(sd.getLinkRefId(), sd.getId());
+//				for(Id ii : sd.getLaneIds()){
+//					sgd.addLaneId(ii);
+//				}
+//				for(Id ii : sd.getToLinkIds()){
+//					sgd.addToLinkId(ii);
+//				}
+//				sgd.setSignalSystemDefinitionId(id[i]);
+//				systems.addSignalGroupDefinition(sgd);
+
 			}
 			i++;
 		}

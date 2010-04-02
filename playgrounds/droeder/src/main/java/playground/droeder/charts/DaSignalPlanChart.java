@@ -95,7 +95,7 @@ public class DaSignalPlanChart {
 		  }
 	  }
 	  
-	  public JFreeChart createChart (String title, String xAxis, String yAxis, double yMin, double yMax){
+	  public JFreeChart createSignalPlanChart (String title, String xAxis, String yAxis, double yMin, double yMax){
 			JFreeChart chart = ChartFactory.createStackedBarChart(title, xAxis, yAxis, this.dataset, PlotOrientation.HORIZONTAL, false, false, false);
 			DaAxisBuilder axis = new DaAxisBuilder();
 			CategoryPlot plot = chart.getCategoryPlot();

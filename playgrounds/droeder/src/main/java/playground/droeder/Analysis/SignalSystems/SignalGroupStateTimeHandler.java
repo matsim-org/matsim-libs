@@ -52,7 +52,6 @@ public class SignalGroupStateTimeHandler implements
 			.getLogger(SignalGroupStateTimeHandler.class);
 	Map<Id, TreeMap<Id, TreeMap<Double, SignalGroupState>>> systemGroupTimeState = new TreeMap<Id, TreeMap<Id,TreeMap<Double,SignalGroupState>>>();
 	
-	Map <Id, TreeMap<Double, SignalGroupState>> idTimeState = new TreeMap<Id, TreeMap<Double, SignalGroupState>>();
 	TreeMap<Double, SignalGroupState> temp;
 	
 
