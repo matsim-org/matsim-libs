@@ -21,7 +21,7 @@ package org.matsim.vis.otfvis.data.teleportation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
 
 /**
  * 

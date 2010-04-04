@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
 
 import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;

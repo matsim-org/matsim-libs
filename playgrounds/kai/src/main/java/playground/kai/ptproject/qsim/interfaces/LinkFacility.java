@@ -28,8 +28,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.ptproject.qsim.DriverAgent;
-import org.matsim.ptproject.qsim.PersonAgentI;
+import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgentI;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.vehicles.BasicVehicle;
 

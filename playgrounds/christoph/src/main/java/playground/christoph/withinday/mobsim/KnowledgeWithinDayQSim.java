@@ -23,7 +23,7 @@ package playground.christoph.withinday.mobsim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 

@@ -22,7 +22,7 @@ package playground.christoph.withinday.mobsim;
 
 import java.util.List;
 
-import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
 
 import playground.christoph.withinday.replanning.ReplanningTask;
 import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;

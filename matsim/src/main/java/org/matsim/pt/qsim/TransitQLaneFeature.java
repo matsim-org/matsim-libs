@@ -10,8 +10,8 @@ import java.util.ListIterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import org.matsim.ptproject.qsim.DriverAgent;
-import org.matsim.ptproject.qsim.PersonAgentI;
+import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgentI;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.ptproject.qsim.QVehicleEarliestLinkExitTimeComparator;

@@ -23,6 +23,8 @@ package org.matsim.ptproject.qsim;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgentI;
 
 
 public interface QSimFeature {

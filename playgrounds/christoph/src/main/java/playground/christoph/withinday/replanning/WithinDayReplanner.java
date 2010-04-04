@@ -28,8 +28,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.DriverAgent;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 

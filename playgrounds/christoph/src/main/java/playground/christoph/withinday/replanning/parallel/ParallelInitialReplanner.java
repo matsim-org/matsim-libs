@@ -22,7 +22,7 @@ package playground.christoph.withinday.replanning.parallel;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
 
 import playground.christoph.withinday.replanning.InitialReplanner;
 import playground.christoph.withinday.replanning.ReplanningTask;

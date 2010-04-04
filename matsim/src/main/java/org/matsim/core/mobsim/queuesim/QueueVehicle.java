@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.vehicles.BasicVehicle;
 
 public interface QueueVehicle extends Identifiable {

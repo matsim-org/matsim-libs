@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QVehicle;
 

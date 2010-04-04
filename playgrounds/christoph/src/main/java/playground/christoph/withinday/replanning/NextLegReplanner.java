@@ -26,10 +26,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;

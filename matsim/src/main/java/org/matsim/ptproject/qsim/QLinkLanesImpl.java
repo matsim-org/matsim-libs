@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.mobsim.framework.PersonAgentI;
 import org.matsim.lanes.Lane;
 import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;

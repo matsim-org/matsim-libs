@@ -21,7 +21,7 @@
 package playground.christoph.withinday.replanning;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
 
 public class ReplanningTask {
 

@@ -19,7 +19,7 @@
 
 package playground.kai.ptproject.qsim.interfaces;
 
-import org.matsim.ptproject.qsim.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonAgentI;
 import org.matsim.vehicles.BasicVehicle;
 
 class Teleportation implements Updateable {

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
 
@@ -34,11 +34,12 @@ public interface DriverAgent extends PersonAgentI {
 	 */
 	public Id chooseNextLinkId();
 
-	public void teleportToLink(final Id linkId);
 
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 
-	public void moveOverNode();
+	// yyyy "Teleportation" certainly does NOT belong into a vehicle.  Might go directly into the person.  kai, jan'10
+	public void teleportToLink(final Id linkId);
 
+	public void moveOverNode();
 
 }

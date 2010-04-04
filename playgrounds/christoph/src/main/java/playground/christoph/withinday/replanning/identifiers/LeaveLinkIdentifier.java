@@ -23,7 +23,7 @@ package playground.christoph.withinday.replanning.identifiers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QVehicle;
 

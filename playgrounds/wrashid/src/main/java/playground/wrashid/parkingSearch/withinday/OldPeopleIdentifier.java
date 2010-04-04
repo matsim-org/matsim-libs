@@ -3,8 +3,8 @@ package playground.wrashid.parkingSearch.withinday;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.withinday.mobsim.WithinDayQSim;
