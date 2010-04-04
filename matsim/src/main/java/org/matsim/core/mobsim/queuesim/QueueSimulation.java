@@ -112,7 +112,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	/**
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
- 	 */
+	 */
 	protected final PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	private final Date starttime = new Date();
@@ -146,35 +146,35 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * @param events
 	 */
 	public QueueSimulation(final Scenario scenario, final EventsManager events) {
-	  this(scenario, events, new DefaultQueueNetworkFactory());
+		this(scenario, events, new DefaultQueueNetworkFactory());
 	}
 
-	
+
 	public QueueSimulation(final Scenario sc, final EventsManager events, final QueueNetworkFactory factory){
-    this.scenario = sc;
-    this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
-    AbstractSimulation.reset();
-    this.config = scenario.getConfig();
-    SimulationTimer.reset(this.config.simulation().getTimeStepSize());
-    setEvents(events);
-    this.population = scenario.getPopulation();
+		this.scenario = sc;
+		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
+		AbstractSimulation.reset();
+		this.config = scenario.getConfig();
+		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
+		setEvents(events);
+		this.population = scenario.getPopulation();
 
-    this.networkLayer = scenario.getNetwork();
-    this.network = new QueueNetwork(this.networkLayer, factory);
-    this.agentFactory = new AgentFactory(this);
+		this.networkLayer = scenario.getNetwork();
+		this.network = new QueueNetwork(this.networkLayer, factory);
+		this.agentFactory = new AgentFactory(this);
 
-    this.notTeleportedModes.add(TransportMode.car);
+		this.notTeleportedModes.add(TransportMode.car);
 
-    this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
+		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
 	}
-	
+
 	/**
 	 * Adds the QueueSimulationListener instance  given as parameters as
 	 * listener to this QueueSimulation instance.
 	 * @param listeners
 	 */
 	public void addQueueSimulationListeners(final SimulationListener listener){
-				this.listenerManager.addQueueSimulationListener(listener);
+		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
 
@@ -234,44 +234,44 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		this.config.simulation().setSnapshotFile(snapshotFilename);
 	}
 
-  private void createSnapshotwriter() {
-    // A snapshot period of 0 or less indicates that there should be NO snapshot written
-    if (this.snapshotPeriod > 0 ) {
-      String snapshotFormat =  this.config.simulation().getSnapshotFormat();
-      Integer itNumber = this.iterationNumber;
-      if (this.controlerIO == null) {
-        log.error("Not able to create io path via ControlerIO in mobility simulation, not able to write visualizer output!");
-        return;
-      }
-      else if (itNumber == null) {
-        log.warn("No iteration number set in mobility simulation using iteration number 0 for snapshot file...");
-        itNumber = 0;
-      }
-      if (snapshotFormat.contains("plansfile")) {
-        String snapshotFilePrefix = this.controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
-        String snapshotFileSuffix = "xml";
-        this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, this.networkLayer));
-      }
-      if (snapshotFormat.contains("transims")) {
-        String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh");
-        this.snapshotWriters.add(new TransimsSnapshotWriter(snapshotFile));
-      }
-      if (snapshotFormat.contains("googleearth")) {
-        String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "googleearth.kmz");
-        String coordSystem = this.config.global().getCoordinateSystem();
-        this.snapshotWriters.add(new KmlSnapshotWriter(snapshotFile,
-            TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
-      }
-      if (snapshotFormat.contains("netvis")) {
-        throw new IllegalStateException("netvis is no longer supported by this simulation");
-      }
-      if (snapshotFormat.contains("otfvis")) {
-        String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "otfvis.mvi");
-        OTFFileWriter writer = new OTFFileWriter(this.snapshotPeriod, new OTFQueueSimServerQuadBuilder(this.network), snapshotFile, new OTFFileWriterQueueSimConnectionManagerFactory());
-        this.snapshotWriters.add(writer);
-      }
-    } else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
-  }
+	private void createSnapshotwriter() {
+		// A snapshot period of 0 or less indicates that there should be NO snapshot written
+		if (this.snapshotPeriod > 0 ) {
+			String snapshotFormat =  this.config.simulation().getSnapshotFormat();
+			Integer itNumber = this.iterationNumber;
+			if (this.controlerIO == null) {
+				log.error("Not able to create io path via ControlerIO in mobility simulation, not able to write visualizer output!");
+				return;
+			}
+			else if (itNumber == null) {
+				log.warn("No iteration number set in mobility simulation using iteration number 0 for snapshot file...");
+				itNumber = 0;
+			}
+			if (snapshotFormat.contains("plansfile")) {
+				String snapshotFilePrefix = this.controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
+				String snapshotFileSuffix = "xml";
+				this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, this.networkLayer));
+			}
+			if (snapshotFormat.contains("transims")) {
+				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh");
+				this.snapshotWriters.add(new TransimsSnapshotWriter(snapshotFile));
+			}
+			if (snapshotFormat.contains("googleearth")) {
+				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "googleearth.kmz");
+				String coordSystem = this.config.global().getCoordinateSystem();
+				this.snapshotWriters.add(new KmlSnapshotWriter(snapshotFile,
+						TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
+			}
+			if (snapshotFormat.contains("netvis")) {
+				throw new IllegalStateException("netvis is no longer supported by this simulation");
+			}
+			if (snapshotFormat.contains("otfvis")) {
+				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "otfvis.mvi");
+				OTFFileWriter writer = new OTFFileWriter(this.snapshotPeriod, new OTFQueueSimServerQuadBuilder(this.network), snapshotFile, new OTFFileWriterQueueSimConnectionManagerFactory());
+				this.snapshotWriters.add(writer);
+			}
+		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
+	}
 
 	private void prepareNetworkChangeEventsQueue() {
 		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)(this.networkLayer)).getNetworkChangeEvents();
@@ -436,10 +436,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 				DriverAgent driver = entry.getSecond();
 				driver.teleportToLink(driver.getDestinationLinkId());
 				driver.legEnds(now);
-//				this.handleAgentArrival(now, driver);
-//				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
-//						destinationLink, driver.getCurrentLeg()));
-//				driver.legEnds(now);
+				//				this.handleAgentArrival(now, driver);
+				//				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
+				//						destinationLink, driver.getCurrentLeg()));
+				//				driver.legEnds(now);
 			} else break;
 		}
 	}
