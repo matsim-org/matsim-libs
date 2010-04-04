@@ -56,7 +56,7 @@ import org.matsim.vis.netvis.streaming.StreamConfig;
 import org.matsim.vis.netvis.visNet.DisplayNet;
 import org.matsim.vis.netvis.visNet.DisplayNetStateReader;
 
-
+@Deprecated // no longer supported.  Left in matsim since some functionality is still used.
 public class NetVis {
 
     // -------------------- CLASS VARIABLES --------------------

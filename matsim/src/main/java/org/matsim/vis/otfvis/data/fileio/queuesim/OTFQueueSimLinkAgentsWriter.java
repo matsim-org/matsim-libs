@@ -47,7 +47,7 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 
 	public static final boolean showParked = false;
 	
-	protected static final transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
+	protected static final transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 
 	protected void writeAllAgents(ByteBuffer out) {
 		// Write additional agent data

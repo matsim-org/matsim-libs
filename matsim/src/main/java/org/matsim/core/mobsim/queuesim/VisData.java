@@ -22,17 +22,17 @@ package org.matsim.core.mobsim.queuesim;
 import java.util.Collection;
 
 import org.matsim.core.mobsim.queuesim.QueueLink.AgentOnLink;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 /**
  * Interface for methods to provide a visualizer with data.
  * @author dgrether
  */
 public interface VisData {
 
-	/**
-	 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
-	 */
-	public double getDisplayableSpaceCapValue();
+//	/**
+//	 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
+//	 */
+//	public double getDisplayableSpaceCapValue();
 
 	/**
 	 * Returns a measure for how many vehicles on the link have a travel time
@@ -44,10 +44,10 @@ public interface VisData {
 	 */
 	public double getDisplayableTimeCapValue(double now);
 
-	public Collection<AgentOnLink> getDrawableCollection();
+//	public Collection<AgentOnLink> getDrawableCollection();
 
-	public Collection<PositionInfo> getVehiclePositions(
-			final Collection<PositionInfo> positions);
+	public Collection<AgentSnapshotInfo> getVehiclePositions(
+			final Collection<AgentSnapshotInfo> positions);
 
 /* I don't think these two methods should be part of the interface!
  * Only getVehiclePositions() should be in the interface, how the

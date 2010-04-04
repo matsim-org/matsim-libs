@@ -176,6 +176,7 @@ public class SimulationConfigGroup extends Module {
 	protected final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equidist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link)");
+		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible.") ;
 		return map ;
 	}
 
@@ -219,8 +220,7 @@ public class SimulationConfigGroup extends Module {
 		return this.snapshotPeriod;
 	}
 
-	/** Sets which snapshot files should be written. Possible values are
-	 *  "plansfile", "transims", "googleearth", "netvis" and "otfvis"
+	/** See "getComments()" for options.
 	 *
 	 * @param snapshotFormat
 	 */
@@ -288,10 +288,8 @@ public class SimulationConfigGroup extends Module {
 		return this.timeOut;
 	}
 
-	/** Sets the way the vehicles should be positioned on the links. Currently known and supported styles are
-	 * <code>queue</code> and <code>equiDist</code>.
+	/** See "getComments()" for options.
 	 *
-	 * @param style
 	 */
 	public void setSnapshotStyle(final String style) {
 		this.snapshotStyle = style.intern();

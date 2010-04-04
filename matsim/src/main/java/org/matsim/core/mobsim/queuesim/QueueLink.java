@@ -559,12 +559,12 @@ public class QueueLink {
 
     private final double linkScale =  OTFDefaultLinkHandler.LINK_SCALE;
 
-    /**
-     * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
-     */
-    public double getDisplayableSpaceCapValue() {
-      return (QueueLink.this.buffer.size() + QueueLink.this.vehQueue.size()) / QueueLink.this.storageCapacity;
-    }
+//    /**
+//     * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
+//     */
+//    public double getDisplayableSpaceCapValue() {
+//      return (QueueLink.this.buffer.size() + QueueLink.this.vehQueue.size()) / QueueLink.this.storageCapacity;
+//    }
 
     /**
      * Returns a measure for how many vehicles on the link have a travel time
@@ -587,24 +587,24 @@ public class QueueLink {
 
 
 
-    public Collection<AgentOnLink> getDrawableCollection() {
-      Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
-      getVehiclePositions(positions);
+//    public Collection<AgentOnLink> getDrawableCollection() {
+//      Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+//      getVehiclePositions(positions);
+//
+//      List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
+//      for (AgentSnapshotInfo pos : positions) {
+//        if (pos.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR) {
+//          AgentOnLink veh = new AgentOnLink();
+//          veh.posInLink_m = pos.getDistanceOnLink();
+//          vehs.add(veh);
+//        }
+//      }
+//
+//      return vehs;
+//    }
 
-      List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
-      for (PositionInfo pos : positions) {
-        if (pos.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR) {
-          AgentOnLink veh = new AgentOnLink();
-          veh.posInLink_m = pos.getDistanceOnLink();
-          vehs.add(veh);
-        }
-      }
-
-      return vehs;
-    }
-
-    public Collection<PositionInfo> getVehiclePositions(
-        final Collection<PositionInfo> positions) {
+    public Collection<AgentSnapshotInfo> getVehiclePositions(
+        final Collection<AgentSnapshotInfo> positions) {
       String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
       if ("queue".equals(snapshotStyle)) {
         getVehiclePositionsQueue(positions);
@@ -626,7 +626,7 @@ public class QueueLink {
      * @param positions
      *          A collection where the calculated positions can be stored.
      */
-    private void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
+    private void getVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions) {
       double time = SimulationTimer.getTime();
       int cnt = QueueLink.this.buffer.size() + QueueLink.this.vehQueue.size();
       int nLanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QueueLink.this.getLink());
@@ -640,7 +640,7 @@ public class QueueLink {
           int lane = 1 + (veh.getId().hashCode() % nLanes);
           int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
           double speed = (time > cmp ? 0.0 : freespeed);
-          PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
+          AgentSnapshotInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
               distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
           positions.add(position);
           distFromFromNode -= cellSize;
@@ -651,7 +651,7 @@ public class QueueLink {
           int lane = 1 + (veh.getId().hashCode() % nLanes);
           int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
           double speed = (time > cmp ? 0.0 : freespeed);
-          PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
+          AgentSnapshotInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
               distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
           positions.add(position);
           distFromFromNode -= cellSize;
@@ -667,7 +667,7 @@ public class QueueLink {
         double cellSize = Math.min(7.5, QueueLink.this.getLink().getLength() / cnt);
         double distFromFromNode = QueueLink.this.getLink().getLength() - cellSize / 2.0;
         for (QueueVehicle veh : QueueLink.this.waitingList) {
-          PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
+        	AgentSnapshotInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
               distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
           positions.add(position);
           distFromFromNode -= cellSize;
@@ -686,7 +686,7 @@ public class QueueLink {
      * @param positions
      *          A collection where the calculated positions can be stored.
      */
-    private void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
+    private void getVehiclePositionsQueue(final Collection<AgentSnapshotInfo> positions) {
       double now = SimulationTimer.getTime();
       Link link = QueueLink.this.getLink();
       double queueEnd = getInitialQueueEnd();
@@ -717,7 +717,7 @@ public class QueueLink {
      *  put all cars in the buffer one after the other
      */
     private double positionVehiclesFromBuffer(
-        final Collection<PositionInfo> positions, double now,
+        final Collection<AgentSnapshotInfo> positions, double now,
         double queueEnd, Link link, double vehLen) {
       for (QueueVehicle veh : QueueLink.this.buffer) {
 
@@ -726,7 +726,7 @@ public class QueueLink {
         int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
         double speed = (now > cmp) ? 0.0 : link.getFreespeed(Time.UNDEFINED_TIME);
 
-        PositionInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, queueEnd,
+        AgentSnapshotInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, queueEnd,
             lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
         positions.add(position);
         queueEnd -= vehLen;
@@ -742,7 +742,7 @@ public class QueueLink {
      * - if the position is not within the queue, just place the car  with free speed at that place
      */
     private void positionOtherDrivingVehicles(
-        final Collection<PositionInfo> positions, double now,
+        final Collection<AgentSnapshotInfo> positions, double now,
         double queueEnd, Link link, double vehLen) {
       double lastDistance = Integer.MAX_VALUE;
       double ttfs = link.getLength() / link.getFreespeed(now);
@@ -777,7 +777,7 @@ public class QueueLink {
           tmpLane = veh.getId().hashCode() ;
         }
         int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-        PositionInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, distanceOnLink,
+        AgentSnapshotInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, distanceOnLink,
             lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
         positions.add(position);
         lastDistance = distanceOnLink;
@@ -790,11 +790,11 @@ public class QueueLink {
      * the from node
      */
     private int positionVehiclesFromWaitingList(
-        final Collection<PositionInfo> positions, Link link,
+        final Collection<AgentSnapshotInfo> positions, Link link,
         double cellSize) {
       int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
       for (QueueVehicle veh : QueueLink.this.waitingList) {
-        PositionInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
+    	  AgentSnapshotInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
             /*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
         positions.add(position);
       }

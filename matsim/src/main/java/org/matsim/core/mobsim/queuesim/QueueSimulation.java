@@ -67,6 +67,7 @@ import org.matsim.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFFileWriterQueueSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimServerQuadBuilder;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -219,12 +220,13 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		}
 	}
 
-
+	@Deprecated // I don't think that netvis works any more.  kai, apr/10
 	public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
 		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
 		 * In my eyes, the configuration should usually be a read-only object in general, but
 		 * that's hard to be implemented...
 		 */
+		// yyyy it is also a misnomer, since it (presumably) has the side effect of removing all other snapshot writers.  kai, apr'10
 		this.config.network().setInputFile(networkFilename);
 		this.config.simulation().setSnapshotFormat("netvis");
 		this.config.simulation().setSnapshotPeriod(snapshotPeriod);
@@ -393,10 +395,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	private void doSnapshot(final double time) {
 		if (!this.snapshotWriters.isEmpty()) {
-			Collection<PositionInfo> positions = this.network.getVehiclePositions();
+			Collection<AgentSnapshotInfo> positions = this.network.getVehiclePositions();
 			for (SnapshotWriter writer : this.snapshotWriters) {
 				writer.beginSnapshot(time);
-				for (PositionInfo position : positions) {
+				for (AgentSnapshotInfo position : positions) {
 					writer.addAgent(position);
 				}
 				writer.endSnapshot();

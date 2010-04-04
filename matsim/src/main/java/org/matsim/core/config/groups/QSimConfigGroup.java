@@ -150,6 +150,7 @@ public class QSimConfigGroup extends Module {
 		Map<String,String> map = super.getComments();
 		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equidist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link)");
 		map.put(NUMBER_OF_THREADS, "Use number of threads > 1 for parallel version using the specified number of threads");
+		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible.") ;
 		return map ;
 	}
 	/* direct access */
@@ -191,10 +192,7 @@ public class QSimConfigGroup extends Module {
 		return this.snapshotPeriod;
 	}
 
-	/** Sets which snapshot files should be written. Possible values are
-	 *  "plansfile", "transims", "googleearth", "netvis" and "otfvis"
-	 *
-	 * @param snapshotFormat
+	/** See "getComments()" for options.
 	 */
 	public void setSnapshotFormat(final String snapshotFormat) {
 		this.snapshotFormat = snapshotFormat;
@@ -244,10 +242,7 @@ public class QSimConfigGroup extends Module {
 		return this.removeStuckVehicles;
 	}
 
-	/** Sets the way the vehicles should be positioned on the links. Currently known and supported styles are
-	 * <code>queue</code> and <code>equiDist</code>.
-	 *
-	 * @param style
+	/** See "getComments()" for options.
 	 */
 	public void setSnapshotStyle(final String style) {
 		this.snapshotStyle = style.intern();
