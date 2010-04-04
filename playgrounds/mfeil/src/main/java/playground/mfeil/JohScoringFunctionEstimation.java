@@ -97,7 +97,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double beta_time_bike = -1.07;
 	private static double beta_time_walk = -1.9; 
 	
-	private static double constantPt = -0.4;
+	private static double constantPt = -0.35;
 	private static double constantBike = -0.07;
 	private static double constantWalk = 0.4;
 	
