@@ -667,7 +667,7 @@ public class QueueSimulationTest extends TestCase {
 		qlink2.addParkedVehicle(vehicle2);
 
 		SimulationTimer.setTime(100.0);
-		PersonAgent agent = new PersonAgent(person, sim);
+		QueuePersonAgent agent = new QueuePersonAgent(person, sim);
 		agent.initialize();
 		agent.activityEnds(100.0);
 

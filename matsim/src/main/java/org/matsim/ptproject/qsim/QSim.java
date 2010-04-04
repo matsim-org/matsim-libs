@@ -242,7 +242,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		Collection<PersonAgentI> agents = new ArrayList<PersonAgentI>();
 		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (Person p : this.population.getPersons().values()) {
-			PersonAgent agent = this.agentFactory.createPersonAgent(p);
+			QPersonAgent agent = this.agentFactory.createPersonAgent(p);
 			QVehicle veh = new QVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
@@ -538,8 +538,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	}
 
 	private void addToAgentsInActivities(final DriverAgent agent) {
-		if (agent instanceof PersonAgent) {
-			PersonAgent pa = (PersonAgent) agent;
+		if (agent instanceof QPersonAgent) {
+			QPersonAgent pa = (QPersonAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
 			if (pe instanceof Leg) {
 				throw new RuntimeException();
@@ -553,8 +553,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	}
 
 	private void removeFromAgentsInActivities(DriverAgent agent) {
-		if (agent instanceof PersonAgent) {
-			PersonAgent pa = (PersonAgent) agent;
+		if (agent instanceof QPersonAgent) {
+			QPersonAgent pa = (QPersonAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
 			if (pe instanceof Leg) {
 				throw new RuntimeException();

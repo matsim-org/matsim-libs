@@ -45,7 +45,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.fakes.FakeAgent;
-import org.matsim.ptproject.qsim.PersonAgent;
+import org.matsim.ptproject.qsim.QPersonAgent;
 import org.matsim.ptproject.qsim.QLinkImpl;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSimEngine;
@@ -1068,7 +1068,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			this.normalVehicle = new QVehicleImpl(new BasicVehicleImpl(id2, vehicleType));
 			this.qlink1.addParkedVehicle(this.normalVehicle);
 
-			PersonAgent nDriver = new PersonAgent(person, qsim);
+			QPersonAgent nDriver = new QPersonAgent(person, qsim);
 			this.normalVehicle.setDriver(nDriver);
 			nDriver.setVehicle(this.normalVehicle);
 			nDriver.initialize();
@@ -1094,7 +1094,7 @@ public class TransitQueueNetworkTest extends TestCase {
 				plan2.addActivity(pb.createActivityFromLinkId("work", id2));
 				population.addPerson(person2);
 
-				PersonAgent nDriver2 = new PersonAgent(person2, qsim);
+				QPersonAgent nDriver2 = new QPersonAgent(person2, qsim);
 				this.normalVehicle2.setDriver(nDriver2);
 				nDriver2.setVehicle(this.normalVehicle);
 				nDriver2.initialize();

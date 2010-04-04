@@ -207,7 +207,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
 
 		for (Person p : this.population.getPersons().values()) {
-			PersonAgent agent = this.agentFactory.createPersonAgent(p);
+			QueuePersonAgent agent = this.agentFactory.createPersonAgent(p);
 
 			QueueVehicle veh = new QueueVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
@@ -519,8 +519,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 			QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
 				// try to fix it somehow
-				if (this.teleportVehicles && (agent instanceof PersonAgent)) {
-					vehicle = ((PersonAgent) agent).getVehicle();
+				if (this.teleportVehicles && (agent instanceof QueuePersonAgent)) {
+					vehicle = ((QueuePersonAgent) agent).getVehicle();
 					if (vehicle.getCurrentLink() != null) {
 						if (this.cntTeleportVehicle < 9) {
 							this.cntTeleportVehicle++;

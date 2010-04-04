@@ -38,9 +38,9 @@ public class CarDepartureHandler implements DepartureHandler {
 		}
 		QLink qlink = queueSimulation.network.getQLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
-		if ((vehicle == null) && (teleportVehicles) && (agent instanceof PersonAgent)) {
+		if ((vehicle == null) && (teleportVehicles) && (agent instanceof QPersonAgent)) {
 			// try to fix it somehow
-			vehicle = ((PersonAgent) agent).getVehicle();
+			vehicle = ((QPersonAgent) agent).getVehicle();
 			if (vehicle.getCurrentLink() != null) {
 				if (cntTeleportVehicle < 9) {
 					cntTeleportVehicle++;

@@ -44,7 +44,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.ptproject.qsim.PersonAgent;
+import org.matsim.ptproject.qsim.QPersonAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.withinday.beliefs.AgentBeliefs;
@@ -55,7 +55,7 @@ import org.matsim.withinday.routeprovider.RouteProvider;
 /**
  * @author dgrether
  */
-public class WithindayAgent extends PersonAgent {
+public class WithindayAgent extends QPersonAgent {
 
 	private static final Logger log = Logger.getLogger(WithindayAgent.class);
 

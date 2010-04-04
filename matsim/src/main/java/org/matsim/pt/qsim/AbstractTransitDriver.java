@@ -34,7 +34,7 @@ import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.PersonAgent;
+import org.matsim.ptproject.qsim.QPersonAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -190,8 +190,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			RuntimeException e = new RuntimeException("Transit vehicle is at last stop but still contains passengers that did not leave the vehicle!");
 			log.error("Transit vehicle must be empty after last stop! vehicle-id = " + this.vehicle.getBasicVehicle().getId(), e);
 			for (PassengerAgent agent : this.vehicle.getPassengers()) {
-				if (agent instanceof PersonAgent) {
-				log.error("Agent is still in transit vehicle: agent-id = " + ((PersonAgent) agent).getPerson().getId());
+				if (agent instanceof QPersonAgent) {
+				log.error("Agent is still in transit vehicle: agent-id = " + ((QPersonAgent) agent).getPerson().getId());
 				}
 			}
 			throw e;

@@ -675,7 +675,7 @@ public class QSimTest extends TestCase {
 		qlink2.addParkedVehicle(vehicle2);
 
 		QSimTimer.setTime(100.0);
-		PersonAgent agent = new PersonAgent(person, sim);
+		QPersonAgent agent = new QPersonAgent(person, sim);
 		agent.initialize();
 		agent.activityEnds(100.0);
 

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.ptproject.qsim;
 
 import java.util.List;
 
@@ -39,17 +39,16 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * @author dgrether
- * @author mrieser
  */
-public class PersonAgent implements DriverAgent {
+public class QPersonAgent implements DriverAgent {
 
-	private static final Logger log = Logger.getLogger(PersonAgent.class);
+	private static final Logger log = Logger.getLogger(QPersonAgent.class);
 
 	private final Person person;
-	private QueueVehicle vehicle;
+	private QVehicle vehicle;
 	protected Id cachedNextLinkId = null;
 
-	private final QueueSimulation simulation;
+	private final QSim simulation;
 
 	private double activityDepartureTime = Time.UNDEFINED_TIME;
 
@@ -64,14 +63,47 @@ public class PersonAgent implements DriverAgent {
 
 	private int currentLinkIdIndex;
 
-	public PersonAgent(final Person p, final QueueSimulation simulation) {
+	public QPersonAgent(final Person p, final QSim simulation) {
 		this.person = p;
 		this.simulation = simulation;
 	}
 
-	@Override
 	public Person getPerson() {
 		return this.person;
+	}
+
+	/**
+	 * Some data of the currently simulated Leg is cached to speed up
+	 * the simulation. If the Leg changes (for example the Route or
+	 * the Destination Link), those cached data has to be reseted.
+	 *
+	 * If the Leg has not changed, calling this method has no effect
+	 * on the Results of the Simulation!
+	 */
+	public void resetCaches()
+	{
+		this.cachedNextLinkId = null;
+		this.cachedRouteLinkIds = null;
+		this.destinationLinkId = null;
+
+		/*
+		 * The Leg may have been exchanged in the Person's Plan, so
+		 * we update the Reference to the currentLeg Object.
+		 */
+		PlanElement currentPlanElement = this.getPlanElements().get(this.currentPlanElementIndex);
+		if (currentPlanElement instanceof LegImpl)
+		{
+			this.setCurrentLeg((LegImpl) currentPlanElement);
+		}
+
+		RouteWRefs route = currentLeg.getRoute();
+		if (route == null) {
+			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
+			Simulation.decLiving();
+			Simulation.incLost();
+			return;
+		}
+		this.destinationLinkId = route.getEndLinkId();
 	}
 
 	/**
@@ -82,15 +114,14 @@ public class PersonAgent implements DriverAgent {
 		return this.person.getSelectedPlan().getPlanElements();
 	}
 
-	public void setVehicle(final QueueVehicle veh) {
+	public void setVehicle(final QVehicle veh) {
 		this.vehicle = veh;
 	}
 
-	public QueueVehicle getVehicle() {
+	public QVehicle getVehicle() {
 		return this.vehicle;
 	}
 
-	@Override
 	public double getDepartureTime() {
 		return this.activityDepartureTime;
 	}
@@ -107,6 +138,15 @@ public class PersonAgent implements DriverAgent {
 		return this.currentLeg;
 	}
 
+	protected void setCurrentLeg(final LegImpl leg) {
+		this.currentLeg  = leg;
+		this.cachedRouteLinkIds = null;
+	}
+
+	public int getCurrentNodeIndex() {
+		return this.currentLinkIdIndex + 1;
+	}
+
 	@Override
 	public Id getDestinationLinkId() {
 		return this.destinationLinkId;
@@ -121,8 +161,8 @@ public class PersonAgent implements DriverAgent {
 		this.currentLinkId = firstAct.getLinkId();
 		if ((departureTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
 			setDepartureTime(departureTime);
-			this.simulation.scheduleActivityEnd(this);
-			AbstractSimulation.incLiving();
+			this.simulation.scheduleActivityEnd(this, this.currentPlanElementIndex);
+			Simulation.incLiving();
 			return true;
 		}
 		return false; // the agent has no leg, so nothing more to do
@@ -132,8 +172,8 @@ public class PersonAgent implements DriverAgent {
 		RouteWRefs route = leg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
-			AbstractSimulation.decLiving();
-			AbstractSimulation.incLost();
+			Simulation.decLiving();
+			Simulation.incLost();
 			return;
 		}
 		this.destinationLinkId = route.getEndLinkId();
@@ -155,25 +195,29 @@ public class PersonAgent implements DriverAgent {
 	 */
 	public void activityEnds(final double now) {
 		ActivityImpl act = (ActivityImpl) this.getPlanElements().get(this.currentPlanElementIndex);
-		QueueSimulation.getEvents().processEvent(new ActivityEndEventImpl(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		this.simulation.getEventsManager().processEvent(new ActivityEndEventImpl(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		advancePlanElement(now);
 	}
 
 	public void legEnds(final double now) {
 		this.simulation.handleAgentArrival(now, this);
-		if (!this.currentLinkId.equals(this.destinationLinkId)) {
+		if(!this.currentLinkId.equals(this.destinationLinkId)) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.destinationLinkId
 					+ ", but arrived on link " + this.currentLinkId + ". Removing the agent from the simulation.");
-			AbstractSimulation.decLiving();
-			AbstractSimulation.incLost();
+			Simulation.decLiving();
+			Simulation.incLost();
 			return;
 		}
 		advancePlanElement(now);
 	}
 
-	@Override
 	public void teleportToLink(final Id linkId) {
 		this.currentLinkId = linkId;
+	}
+
+	// yyyy might make sense to add this to the interface.  kai, jan'10
+	public PlanElement getCurrentPlanElement() {
+		return this.getPlanElements().get( this.currentPlanElementIndex ) ;
 	}
 
 	private void advancePlanElement(final double now) {
@@ -185,10 +229,10 @@ public class PersonAgent implements DriverAgent {
 
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
 				// there is still at least on plan element left
-				this.simulation.scheduleActivityEnd(this);
+				this.simulation.scheduleActivityEnd(this, this.currentPlanElementIndex);
 			} else {
 				// this is the last activity
-				AbstractSimulation.decLiving();
+				Simulation.decLiving();
 			}
 
 		} else if (pe instanceof LegImpl) {
@@ -205,7 +249,7 @@ public class PersonAgent implements DriverAgent {
 	 * @param act the activity the agent reaches
 	 */
 	private void reachActivity(final double now, final ActivityImpl act) {
-		QueueSimulation.getEvents().processEvent(new ActivityStartEventImpl(now, this.getPerson().getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
+		this.simulation.getEventsManager().processEvent(new ActivityStartEventImpl(now, this.getPerson().getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...
 		 */
@@ -257,7 +301,6 @@ public class PersonAgent implements DriverAgent {
 	 *
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
-	@Override
 	public Id chooseNextLinkId() {
 		if (this.cachedNextLinkId != null) {
 			return this.cachedNextLinkId;
@@ -266,12 +309,12 @@ public class PersonAgent implements DriverAgent {
 			this.cachedRouteLinkIds = ((NetworkRoute) this.currentLeg.getRoute()).getLinkIds();
 		}
 
-		if (this.currentLinkIdIndex >= this.cachedRouteLinkIds.size()) {
+		if (this.currentLinkIdIndex >= this.cachedRouteLinkIds.size() ) {
 			// we have no more information for the route, so we should have arrived at the destination link
-			Link currentLink = this.simulation.networkLayer.getLinks().get(this.currentLinkId);
-			Link destinationLink = this.simulation.networkLayer.getLinks().get(this.destinationLinkId);
+			Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
+			Link destinationLink = this.simulation.getScenario().getNetwork().getLinks().get(this.destinationLinkId);
 			if (currentLink.getToNode().equals(destinationLink.getFromNode())) {
-				this.cachedNextLinkId = this.destinationLinkId;
+				this.cachedNextLinkId = destinationLink.getId();
 				return this.cachedNextLinkId;
 			}
 			if (!(this.currentLinkId.equals(this.destinationLinkId))) {
@@ -279,12 +322,12 @@ public class PersonAgent implements DriverAgent {
 				log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.currentLinkId.toString()
 						+ ", is at the end of its route, but has not yet reached its destination link " + this.destinationLinkId.toString());
 			}
-			return null; // the vehicle is at the end of its route
+			return null; // vehicle is at the end of its route
 		}
 
-		this.cachedNextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex);  //save time in later calls, if link is congested
-		Link currentLink = this.simulation.networkLayer.getLinks().get(this.currentLinkId);
-		Link nextLink = this.simulation.networkLayer.getLinks().get(this.cachedNextLinkId);
+		this.cachedNextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex); //save time in later calls, if link is congested
+		Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
+		Link nextLink = this.simulation.getScenario().getNetwork().getLinks().get(this.cachedNextLinkId);
 		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
 			return this.cachedNextLinkId;
 		}

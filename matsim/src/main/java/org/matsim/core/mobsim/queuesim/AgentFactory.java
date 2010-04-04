@@ -32,8 +32,8 @@ public class AgentFactory {
 		this.simulation = simulation;
 	}
 
-	public PersonAgent createPersonAgent(final Person p) {
-		PersonAgent agent = new PersonAgent(p, this.simulation);
+	public QueuePersonAgent createPersonAgent(final Person p) {
+		QueuePersonAgent agent = new QueuePersonAgent(p, this.simulation);
 		return agent;
 	}
 

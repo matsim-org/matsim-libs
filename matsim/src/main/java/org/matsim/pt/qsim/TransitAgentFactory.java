@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.ptproject.qsim.AgentFactory;
-import org.matsim.ptproject.qsim.PersonAgent;
+import org.matsim.ptproject.qsim.QPersonAgent;
 import org.matsim.ptproject.qsim.QSim;
 
 
@@ -39,8 +39,8 @@ public class TransitAgentFactory extends AgentFactory {
 	}
 
 	@Override
-	public PersonAgent createPersonAgent(final Person p) {
-		PersonAgent agent = new TransitAgent(p, this.simulation);
+	public QPersonAgent createPersonAgent(final Person p) {
+		QPersonAgent agent = new TransitAgent(p, this.simulation);
 		this.agentsMap.put(p, agent);
 		return agent;
 	}
