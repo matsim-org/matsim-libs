@@ -37,7 +37,9 @@ public interface DriverAgent extends PersonAgentI {
 
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 
-	// yyyy "Teleportation" certainly does NOT belong into a vehicle.  Might go directly into the person.  kai, jan'10
+	// yyyy "Teleportation" certainly does NOT belong into a vehicle.  Also not into the driver.  
+	// Might go directly into the person, as some kind of minimal mobsim convenience method
+	// (although I am not convinced).  kai, jan/apr'10
 	public void teleportToLink(final Id linkId);
 
 	public void moveOverNode();
