@@ -91,7 +91,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 117
+	// Settings of 118
 	private static double beta_time_car = -3.10; 
 	private static double beta_time_pt = 0.563; 
 	private static double beta_time_bike = -1.07;
@@ -134,7 +134,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double uMax_work= 5;  
 	private static final double uMax_education = 4.0;
 	private static final double uMax_shopping = 0.35; 
-	private static final double uMax_leisure = 2.1;  
+	private static final double uMax_leisure = 1.9;  
 	
 	private static final double alpha_home = 12;
 	private static final double alpha_innerHome = 1.9;
@@ -491,7 +491,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 		type = "leisure";
 		actParams = new JohActUtilityParametersExtended("leisure", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure, beta_age_leisure);
-		actParams.setOpeningTime(15*3600);
+		actParams.setOpeningTime(12*3600);
 		actParams.setClosingTime(20*3600);			
 		utilParams.put(type, actParams);
 		
@@ -585,7 +585,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 		type = "l";
 		actParams = new JohActUtilityParametersExtended("l", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure, beta_age_leisure);
-		actParams.setOpeningTime(15*3600);
+		actParams.setOpeningTime(12*3600);
 		actParams.setClosingTime(20*3600);			
 		utilParams.put(type, actParams);
 		
