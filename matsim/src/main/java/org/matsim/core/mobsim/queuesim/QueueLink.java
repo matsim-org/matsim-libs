@@ -36,7 +36,7 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -294,7 +294,7 @@ public class QueueLink {
      if (veh.getEarliestLinkExitTime() > now){
        return;
      }
-     DriverAgent driver = veh.getDriver();
+     PersonDriverAgent driver = veh.getDriver();
        // Check if veh has reached destination:
        if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
          driver.legEnds(now);

@@ -11,8 +11,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
@@ -36,7 +36,7 @@ import org.matsim.vehicles.BasicVehicles;
 public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 	@Override
-	public void agentCreated(PersonAgentI agent) {
+	public void agentCreated(PersonAgent agent) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -59,7 +59,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 	protected final TransitStopAgentTracker agentTracker;
 
-	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
+	private final HashMap<Person, PersonDriverAgent> agents = new HashMap<Person, PersonDriverAgent>(100);
 
 	private boolean useUmlaeufe = false;
 
@@ -77,10 +77,10 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		queueSimulation.getNotTeleportedModes().add(TransportMode.pt);
 	}
 
-	public Collection<PersonAgentI> createAgents() {
+	public Collection<PersonAgent> createAgents() {
 		TransitSchedule schedule = this.schedule;
 		TransitStopAgentTracker agentTracker = this.agentTracker;
-		Collection<PersonAgentI> ptDrivers;
+		Collection<PersonAgent> ptDrivers;
 		if (useUmlaeufe ) {
 			ptDrivers = createVehiclesAndDriversWithUmlaeufe(schedule, agentTracker);
 		} else {
@@ -99,16 +99,16 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 	}
 
-	private Collection<PersonAgentI> createVehiclesAndDriversWithUmlaeufe(TransitSchedule thisSchedule,
+	private Collection<PersonAgent> createVehiclesAndDriversWithUmlaeufe(TransitSchedule thisSchedule,
 			TransitStopAgentTracker thisAgentTracker) {
 		BasicVehicles vehicles = ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles();
-		Collection<PersonAgentI> drivers = new ArrayList<PersonAgentI>();
+		Collection<PersonAgent> drivers = new ArrayList<PersonAgent>();
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.queueSimulation.getScenario().getNetwork(),((ScenarioImpl) this.queueSimulation.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles(), this.queueSimulation.getScenario().getConfig().charyparNagelScoring());
 		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
 		for (Umlauf umlauf : umlaeufe) {
 			BasicVehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
-				PersonAgentI driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle, thisAgentTracker);
+				PersonAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle, thisAgentTracker);
 				drivers.add(driver);
 			}
 		}
@@ -131,10 +131,10 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		return driver;
 	}
 
-	private Collection<PersonAgentI> createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule,
+	private Collection<PersonAgent> createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule,
 			TransitStopAgentTracker agentTracker) {
 		BasicVehicles vehicles = ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles();
-		Collection<PersonAgentI> drivers = new ArrayList<PersonAgentI>();
+		Collection<PersonAgent> drivers = new ArrayList<PersonAgent>();
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
@@ -157,11 +157,11 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		return drivers;
 	}
 
-	public void beforeHandleAgentArrival(DriverAgent agent) {
+	public void beforeHandleAgentArrival(PersonDriverAgent agent) {
 
 	}
 
-	private void handlePTDeparture(final DriverAgent agent, Id linkId, Leg leg) {
+	private void handlePTDeparture(final PersonDriverAgent agent, Id linkId, Leg leg) {
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + agent.getPerson().getId().toString());
 			log.info("route: "
@@ -193,7 +193,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 	}
 
 	@Override
-	public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
+	public void beforeHandleUnknownLegMode(double now, final PersonDriverAgent agent, Link link) {
 
 	}
 
@@ -203,7 +203,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 	}
 
 	@Override
-	public void handleDeparture(double now, DriverAgent agent, Id linkId, Leg leg) {
+	public void handleDeparture(double now, PersonDriverAgent agent, Id linkId, Leg leg) {
 		if (leg.getMode() == TransportMode.pt) {
 			handlePTDeparture(agent, linkId, leg);
 		}
@@ -212,12 +212,12 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 
 	@Override
-	public void afterActivityBegins(DriverAgent agent, int planElementIndex) {
+	public void afterActivityBegins(PersonDriverAgent agent, int planElementIndex) {
 
 	}
 
 	@Override
-	public void afterActivityEnds(DriverAgent agent, double time) {
+	public void afterActivityEnds(PersonDriverAgent agent, double time) {
 
 	}
 

@@ -22,7 +22,7 @@ package playground.christoph.withinday.replanning.parallel;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
 import playground.christoph.withinday.replanning.InitialReplanner;
 import playground.christoph.withinday.replanning.ReplanningTask;
@@ -84,7 +84,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 			while((replanningTask = replanningTasks.poll()) != null)
 			{
 				Id id = replanningTask.getWithinDayReplannerId();
-				DriverAgent driverAgent = replanningTask.getAgentToReplan();
+				PersonDriverAgent driverAgent = replanningTask.getAgentToReplan();
 				
 				if (id == null)
 				{

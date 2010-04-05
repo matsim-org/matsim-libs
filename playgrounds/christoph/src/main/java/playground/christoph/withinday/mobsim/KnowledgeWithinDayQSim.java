@@ -23,7 +23,7 @@ package playground.christoph.withinday.mobsim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 
@@ -69,7 +69,7 @@ public class KnowledgeWithinDayQSim extends WithinDayQSim{
 	 * for the Knowledge Modules
 	 */
 	@Override
-	public void scheduleActivityEnd(final DriverAgent driverAgent, int planElementIndex)
+	public void scheduleActivityEnd(final PersonDriverAgent driverAgent, int planElementIndex)
 	{	
 		if (knowledgeDBStorageHandler != null) knowledgeDBStorageHandler.scheduleActivityEnd(driverAgent);
 //		offsetActivityEndsList.add(agent);

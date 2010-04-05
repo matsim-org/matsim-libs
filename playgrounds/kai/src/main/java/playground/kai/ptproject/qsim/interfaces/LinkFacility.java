@@ -28,8 +28,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.vehicles.BasicVehicle;
 
@@ -40,13 +40,13 @@ public class LinkFacility implements Updateable {
 	private Map<Id,BasicVehicle> parking = new TreeMap<Id,BasicVehicle>() ;
 	
 	/** data structure for activities needs to be sorted by departure time */
-	private Queue<PersonAgentI> agentsAtActivities = new PriorityQueue<PersonAgentI>(1, new DepartureTimeComparator() ) ;
+	private Queue<PersonAgent> agentsAtActivities = new PriorityQueue<PersonAgent>(1, new DepartureTimeComparator() ) ;
 
 	/** data structure for buses ??? */
 //	private BusStop busStop = null ;
 	
 	/** Plain "add" of a person, normally during initialization */
-	void addPerson( PersonAgentI person ) {
+	void addPerson( PersonAgent person ) {
 		agentsAtActivities.add( person ) ;
 	}
 	
@@ -59,7 +59,7 @@ public class LinkFacility implements Updateable {
 	}
 	
 	public void update() {
-		PersonAgentI person = agentsAtActivities.peek();
+		PersonAgent person = agentsAtActivities.peek();
 	    if ( person.getDepartureTime() <= now() ) {
 	        agentsAtActivities.remove();
 	        // call departure handler
@@ -75,9 +75,9 @@ public class LinkFacility implements Updateable {
 		return 0. ;
 	}
 
-	private static class DepartureTimeComparator implements Comparator<PersonAgentI> {
+	private static class DepartureTimeComparator implements Comparator<PersonAgent> {
 		@Override
-		public int compare(PersonAgentI o1, PersonAgentI o2) {
+		public int compare(PersonAgent o1, PersonAgent o2) {
 			return 0 ; // dummy
 		}
 		

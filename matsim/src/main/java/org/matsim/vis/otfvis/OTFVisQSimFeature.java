@@ -11,8 +11,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
@@ -51,7 +51,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 	
 	private final LinkedHashMap<Id, Integer> currentActivityNumbers = new LinkedHashMap<Id, Integer>();
 	
-	private final LinkedHashMap<Id, PersonAgentI> agents = new LinkedHashMap<Id, PersonAgentI>();
+	private final LinkedHashMap<Id, PersonAgent> agents = new LinkedHashMap<Id, PersonAgent>();
 
 	public OTFVisQSimFeature(QSim queueSimulation) {
 		this.queueSimulation = queueSimulation;
@@ -145,7 +145,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 		this.otfServer = null;
 	}
 
-	public void beforeHandleAgentArrival(DriverAgent agent) {
+	public void beforeHandleAgentArrival(PersonDriverAgent agent) {
 		this.visTeleportationData.remove(agent.getPerson().getId());
 	}
 
@@ -154,7 +154,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 		this.otfServer.updateStatus(time);
 	}
 
-	public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
+	public void beforeHandleUnknownLegMode(double now, final PersonDriverAgent agent, Link link) {
 		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getQNetwork().getNetwork().getLinks().get(agent.getDestinationLinkId())));
 	}
 
@@ -175,12 +175,12 @@ public class OTFVisQSimFeature implements QSimFeature {
 		this.doVisualizeTeleportedAgents = active;
 	}
 
-	public Collection<PersonAgentI> createAgents() {
+	public Collection<PersonAgent> createAgents() {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public void afterActivityBegins(DriverAgent agent, int planElementIndex) {
+	public void afterActivityBegins(PersonDriverAgent agent, int planElementIndex) {
 		currentActivityNumbers.put(agent.getPerson().getId(), planElementIndex);
 	}
 
@@ -189,7 +189,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 	}
 
 	@Override
-	public void afterActivityEnds(DriverAgent agent, double time) {
+	public void afterActivityEnds(PersonDriverAgent agent, double time) {
 		currentActivityNumbers.remove(agent.getPerson().getId());
 	}
 
@@ -202,7 +202,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 	}
 
 	public Person findPersonAgent(Id agentId) {
-		PersonAgentI personAgentI = agents.get(agentId);
+		PersonAgent personAgentI = agents.get(agentId);
 		if (personAgentI != null) {
 			return personAgentI.getPerson();
 		} else {
@@ -211,7 +211,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 	}
 
 	@Override
-	public void agentCreated(PersonAgentI agent) {
+	public void agentCreated(PersonAgent agent) {
 		agents.put(agent.getPerson().getId(), agent);
 	}
 	

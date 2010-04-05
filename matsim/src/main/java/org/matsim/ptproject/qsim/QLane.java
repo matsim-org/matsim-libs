@@ -44,8 +44,8 @@ import org.matsim.core.events.LaneEnterEventImpl;
 import org.matsim.core.events.LaneLeaveEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -382,7 +382,7 @@ public class QLane implements QBufferItem {
 				return;
 			}
 
-			DriverAgent driver = veh.getDriver();
+			PersonDriverAgent driver = veh.getDriver();
 
 			boolean handled = this.transitQueueLaneFeature.handleMoveLaneToBuffer(now, veh, driver);
 
@@ -893,20 +893,20 @@ public class QLane implements QBufferItem {
 
         int cmp = (int) (veh.getEarliestLinkExitTime() + QLane.this.inverseSimulatedFlowCapacity + 2.0);
         double speed = (now > cmp) ? 0.0 : link.getFreespeed();
-        Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
+        Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
         this.createPositionInfo(positions, peopleInVehicle, link, queueEnd, lane, speed);
         queueEnd -= vehLen;
       }
       return queueEnd;
     }
     
-    private void createPositionInfo(Collection<AgentSnapshotInfo> positions, Collection<PersonAgentI> peopleInVehicle, Link link, 
+    private void createPositionInfo(Collection<AgentSnapshotInfo> positions, Collection<PersonAgent> peopleInVehicle, Link link, 
         double distanceOnLane, int lane, double speed){
       double distanceOnLink = distanceOnLane;
       if (QLane.this.getMeterFromLinkEnd() == 0.0){
         distanceOnLink = distanceOnLane + (link.getLength() - QLane.this.getLength()); 
       }
-      for (PersonAgentI passenger : peopleInVehicle) {
+      for (PersonAgent passenger : peopleInVehicle) {
         PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
             lane );
         passengerPosition.setColorValueBetweenZeroAndOne( speed ) ;
@@ -968,7 +968,7 @@ public class QLane implements QBufferItem {
 //          log.error("ttfs: " + ttfs + " travelTime: " + travelTime + " Qlane.length: " + QLane.this.getLength());
 //          log.error("distanceOnLane " +distanceOnLane + " queueEnd " + queueEnd);
 //        }
-        Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
+        Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
         this.createPositionInfo(positions, peopleInVehicle, link, distanceOnLane, lane, speed);
         lastDistance = distanceOnLane;
       }
@@ -984,8 +984,8 @@ public class QLane implements QBufferItem {
         double cellSize) {
       int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
       for (QVehicle veh : QLane.this.waitingList) {
-        Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
-        for (PersonAgentI person : peopleInVehicle) {
+        Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
+        for (PersonAgent person : peopleInVehicle) {
           PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLane.this.getQLink().getLink(),
               /*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
           if ( person.getPerson().getId().toString().startsWith("pt") ) {
@@ -999,12 +999,12 @@ public class QLane implements QBufferItem {
       return lane;
     }
 
-    private Collection<PersonAgentI> getPeopleInVehicle(QVehicle vehicle) {
-      Collection<PersonAgentI> passengers = QLane.this.transitQueueLaneFeature.getPassengers(vehicle);
+    private Collection<PersonAgent> getPeopleInVehicle(QVehicle vehicle) {
+      Collection<PersonAgent> passengers = QLane.this.transitQueueLaneFeature.getPassengers(vehicle);
       if (passengers.isEmpty()) {
-        return Collections.singletonList((PersonAgentI) vehicle.getDriver());
+        return Collections.singletonList((PersonAgent) vehicle.getDriver());
       } else {
-        ArrayList<PersonAgentI> people = new ArrayList<PersonAgentI>();
+        ArrayList<PersonAgent> people = new ArrayList<PersonAgent>();
         people.add(vehicle.getDriver());
         people.addAll(passengers);
         return people;

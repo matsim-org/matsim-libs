@@ -26,7 +26,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRoute;
@@ -41,7 +41,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 /**
  * @author mrieser
  */
-public class FakeAgent implements DriverAgent, PassengerAgent {
+public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 
 	private final TransitStopFacility exitStop;
 	private final LegImpl dummyLeg;

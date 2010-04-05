@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
@@ -137,7 +137,7 @@ public class QLinkLanesImpl implements QLink {
 
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
-	private final Map<Id, PersonAgentI> agentsInActivities = new LinkedHashMap<Id, PersonAgentI>();
+	private final Map<Id, PersonAgent> agentsInActivities = new LinkedHashMap<Id, PersonAgent>();
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
@@ -479,8 +479,8 @@ public class QLinkLanesImpl implements QLink {
 		  int cnt = parkedVehicles.size();
 		  if (cnt > 0) {
 		    int cnt2 = 0 ;
-		    Collection<PersonAgentI> agentsInActivities = QLinkLanesImpl.this.agentsInActivities.values();
-		    for (PersonAgentI pa : agentsInActivities) {
+		    Collection<PersonAgent> agentsInActivities = QLinkLanesImpl.this.agentsInActivities.values();
+		    for (PersonAgent pa : agentsInActivities) {
 		      PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), getLink(), cnt2 ) ;
 		      agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
 		      positions.add(agInfo) ;
@@ -493,12 +493,12 @@ public class QLinkLanesImpl implements QLink {
 	}
 	
 	@Override
-	public void addAgentInActivity(PersonAgentI agent) {
+	public void addAgentInActivity(PersonAgent agent) {
 		agentsInActivities.put(agent.getPerson().getId(), agent);
 	}
 
 	@Override
-	public void removeAgentInActivity(PersonAgentI agent) {
+	public void removeAgentInActivity(PersonAgent agent) {
 		agentsInActivities.remove(agent.getPerson().getId());
 	}
 

@@ -25,7 +25,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
@@ -56,7 +56,7 @@ public class WithinDayQSim extends QSim{
 	 * Used by the Activity End Replanning Module.
 	 * This contains all Agents that are going to end their Activities.
 	 */
-	public PriorityBlockingQueue<DriverAgent> getActivityEndsList()
+	public PriorityBlockingQueue<PersonDriverAgent> getActivityEndsList()
 	{
 		return super.activityEndsList;
 	}

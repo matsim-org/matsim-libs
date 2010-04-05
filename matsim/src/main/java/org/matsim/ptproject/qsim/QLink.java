@@ -24,7 +24,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonAgent;
 
 public interface QLink extends QBufferItem {
 
@@ -84,9 +84,9 @@ public interface QLink extends QBufferItem {
   
   public QVehicle removeParkedVehicle(Id vehicleId);
 
-  public void addAgentInActivity(PersonAgentI agent);
+  public void addAgentInActivity(PersonAgent agent);
 
-  public void removeAgentInActivity(PersonAgentI agent);
+  public void removeAgentInActivity(PersonAgent agent);
   
   public void addDepartingVehicle(QVehicle vehicle);
 

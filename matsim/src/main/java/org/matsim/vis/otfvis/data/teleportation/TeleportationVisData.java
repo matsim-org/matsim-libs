@@ -21,7 +21,7 @@ package org.matsim.vis.otfvis.data.teleportation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
 /**
  * 
@@ -44,7 +44,7 @@ public class TeleportationVisData {
 
 	private double length;
 
-	public TeleportationVisData(double now, DriverAgent agent, Link fromLink, Link toLink) {
+	public TeleportationVisData(double now, PersonDriverAgent agent, Link fromLink, Link toLink) {
 		this.starttime = now;
 		this.id = agent.getPerson().getId();
 		this.startX = fromLink.getToNode().getCoord().getX();

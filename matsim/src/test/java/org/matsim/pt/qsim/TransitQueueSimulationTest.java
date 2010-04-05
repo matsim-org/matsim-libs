@@ -59,7 +59,7 @@ import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -205,7 +205,7 @@ public class TransitQueueSimulationTest {
 		scenario.getConfig().simulation().setEndTime(1.0*3600); // prevent running the actual simulation
 		TestCreateAgentsSimulation sim = new TestCreateAgentsSimulation(scenario, new EventsManagerImpl());
 		sim.run();
-		List<DriverAgent> agents = sim.createdAgents;
+		List<PersonDriverAgent> agents = sim.createdAgents;
 		assertEquals(5, agents.size());
 		assertTrue(agents.get(0) instanceof TransitDriverAgent);
 		assertEquals(6.0*3600, ((TransitDriverAgent) agents.get(0)).getDepartureTime(), MatsimTestCase.EPSILON);
@@ -216,7 +216,7 @@ public class TransitQueueSimulationTest {
 	}
 
 	protected static class TestCreateAgentsSimulation extends TransitQSimulation {
-		public final List<DriverAgent> createdAgents = new ArrayList<DriverAgent>();
+		public final List<PersonDriverAgent> createdAgents = new ArrayList<PersonDriverAgent>();
 		public TestCreateAgentsSimulation(final ScenarioImpl scenario, final EventsManagerImpl events) {
 			super(scenario, events);
 		}

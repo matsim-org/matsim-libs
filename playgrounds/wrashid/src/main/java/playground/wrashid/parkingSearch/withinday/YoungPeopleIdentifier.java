@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QVehicle;
@@ -24,10 +24,10 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 	}
 
 	@Override
-	public List<DriverAgent> getAgentsToReplan(double time,
+	public List<PersonDriverAgent> getAgentsToReplan(double time,
 			WithinDayReplanner withinDayReplanner) {
 		
-		ArrayList<DriverAgent> list = new ArrayList<DriverAgent>();
+		ArrayList<PersonDriverAgent> list = new ArrayList<PersonDriverAgent>();
 
 		// don't handle the agent, if time != 12 o'clock
 		if (Math.floor(time) !=  22000.0) {
@@ -40,7 +40,7 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 		// select agents, which should be replanned within this time step
 		for (QLink link:queueSim.getQNetwork().getLinks().values()){
 			for (QVehicle vehicle : link.getVehQueue()) {
-				DriverAgent agent=vehicle.getDriver();
+				PersonDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getPerson().getId());
 				if (((PersonImpl) agent.getPerson()).getAge() == 18) {
 					System.out.println("found agent");

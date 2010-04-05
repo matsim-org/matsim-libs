@@ -23,7 +23,7 @@ package playground.christoph.withinday.replanning.identifiers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QVehicle;
 
@@ -49,10 +49,10 @@ public class LeaveLinkIdentifier extends DuringLegIdentifier{
 		this.linkReplanningMap = linkReplanningMap;
 	}
 	
-	public List<DriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
+	public List<PersonDriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
 	{
 		List<QVehicle> vehiclesToReplanLeaveLink = linkReplanningMap.getReplanningVehicles(time);
-		List<DriverAgent> agentsToReplan = new ArrayList<DriverAgent>(); 
+		List<PersonDriverAgent> agentsToReplan = new ArrayList<PersonDriverAgent>(); 
 
 		for (QVehicle qVehicle : vehiclesToReplanLeaveLink)
 		{

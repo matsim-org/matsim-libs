@@ -29,7 +29,7 @@ import java.util.concurrent.CyclicBarrier;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
 import playground.christoph.withinday.replanning.ReplanningTask;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
@@ -104,7 +104,7 @@ public abstract class ReplanningThread extends Thread{
 		while((replanningTask = replanningTasks.poll()) != null)
 		{
 			Id id = replanningTask.getWithinDayReplannerId();
-			DriverAgent driverAgent = replanningTask.getAgentToReplan();
+			PersonDriverAgent driverAgent = replanningTask.getAgentToReplan();
 			
 			if (id == null)
 			{

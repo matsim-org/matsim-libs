@@ -10,8 +10,8 @@ import java.util.ListIterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.ptproject.qsim.QVehicleEarliestLinkExitTimeComparator;
@@ -78,7 +78,7 @@ public class TransitQLaneFeature {
 	}
 	
 	public boolean handleMoveLaneToBuffer(final double now, QVehicle veh,
-			DriverAgent driver) {
+			PersonDriverAgent driver) {
 		boolean handled = false;
 		// handle transit driver if necessary
 		if (driver instanceof TransitDriverAgent) {
@@ -141,15 +141,15 @@ public class TransitQLaneFeature {
 		}
 	}
 
-	public Collection<PersonAgentI> getPassengers(
+	public Collection<PersonAgent> getPassengers(
 			QVehicle queueVehicle) {
 		// yyyy warum macht diese Methode Sinn?  TransitVehicle.getPassengers() gibt doch
 		// bereits eine Collection<PersonAgent> zurück.  Dann braucht das Umkopieren hier doch
 		// bloss Zeit?  kai, feb'10
 			if (queueVehicle instanceof TransitVehicle) {
-				Collection<PersonAgentI> passengers = new ArrayList<PersonAgentI>();
+				Collection<PersonAgent> passengers = new ArrayList<PersonAgent>();
 				for (PassengerAgent passenger : ((TransitVehicle) queueVehicle).getPassengers()) {
-					passengers.add((PersonAgentI) passenger);
+					passengers.add((PersonAgent) passenger);
 				}
 				return passengers;
 			} else {

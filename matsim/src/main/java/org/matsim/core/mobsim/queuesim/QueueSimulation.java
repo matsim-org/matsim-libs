@@ -50,7 +50,7 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
@@ -112,7 +112,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
-	protected final PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
+	protected final PriorityQueue<Tuple<Double, PersonDriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, PersonDriverAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	private final Date starttime = new Date();
 
@@ -124,7 +124,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	private SimulationListenerManager<QueueSimulation> listenerManager;
 
-	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	protected final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
 	protected Scenario scenario = null;
 
@@ -304,7 +304,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		double simStartTime = 0;
-		DriverAgent firstAgent = this.activityEndsList.peek();
+		PersonDriverAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
 			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
 		}
@@ -328,13 +328,13 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	protected void cleanupSim() {
 		this.simEngine.afterSim();
 		double now = SimulationTimer.getTime();
-		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
-			DriverAgent agent = entry.getSecond();
+		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {
+			PersonDriverAgent agent = entry.getSecond();
 			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.teleportationList.clear();
 
-		for (DriverAgent agent : this.activityEndsList) {
+		for (PersonDriverAgent agent : this.activityEndsList) {
 			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
 		}
 		this.activityEndsList.clear();
@@ -422,17 +422,17 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		QueueSimulation.events = events;
 	}
 
-	protected void handleUnknownLegMode(double now, final DriverAgent agent) {
+	protected void handleUnknownLegMode(double now, final PersonDriverAgent agent) {
 		double arrivalTime = SimulationTimer.getTime() + agent.getCurrentLeg().getTravelTime();
-		this.teleportationList.add(new Tuple<Double, DriverAgent>(arrivalTime, agent));
+		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
 	}
 
 	protected void moveVehiclesWithUnknownLegMode(final double now) {
 		while (this.teleportationList.peek() != null ) {
-			Tuple<Double, DriverAgent> entry = this.teleportationList.peek();
+			Tuple<Double, PersonDriverAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
-				DriverAgent driver = entry.getSecond();
+				PersonDriverAgent driver = entry.getSecond();
 				driver.teleportToLink(driver.getDestinationLinkId());
 				driver.legEnds(now);
 				//				this.handleAgentArrival(now, driver);
@@ -448,7 +448,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * @param now
 	 * @param agent
 	 */
-	protected void handleAgentArrival(final double now, DriverAgent agent){
+	protected void handleAgentArrival(final double now, PersonDriverAgent agent){
 		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
 				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 	}
@@ -468,15 +468,15 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 *
 	 * @param agent
 	 *
-	 * @see DriverAgent#getDepartureTime()
+	 * @see PersonDriverAgent#getDepartureTime()
 	 */
-	protected void scheduleActivityEnd(final DriverAgent agent) {
+	protected void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
 	}
 
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
-			DriverAgent agent = this.activityEndsList.peek();
+			PersonDriverAgent agent = this.activityEndsList.peek();
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
 				agent.activityEnds(time);
@@ -494,7 +494,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	protected void agentDeparts(double now, final DriverAgent agent, final Id linkId) {
+	protected void agentDeparts(double now, final PersonDriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, leg.getMode()));
@@ -506,7 +506,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		}
 	}
 
-	protected void handleKnownLegModeDeparture(double now, DriverAgent agent, Id linkId, TransportMode mode) {
+	protected void handleKnownLegModeDeparture(double now, PersonDriverAgent agent, Id linkId, TransportMode mode) {
 		Leg leg = agent.getCurrentLeg();
 		if (mode.equals(TransportMode.car)) {
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
@@ -573,9 +573,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		this.teleportVehicles = teleportVehicles;
 	}
 
-	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, DriverAgent>>, Serializable {
+	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonDriverAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
-		public int compare(final Tuple<Double, DriverAgent> o1, final Tuple<Double, DriverAgent> o2) {
+		public int compare(final Tuple<Double, PersonDriverAgent> o1, final Tuple<Double, PersonDriverAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
 			if (ret == 0) {
 				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first

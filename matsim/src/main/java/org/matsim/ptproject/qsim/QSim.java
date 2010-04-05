@@ -51,9 +51,9 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -104,13 +104,13 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	protected final PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
+	protected final PriorityQueue<Tuple<Double, PersonDriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, PersonDriverAgent>>(30, new TeleportationArrivalTimeComparator());
 	private final Date starttime = new Date();
 	private double stopTime = 100*3600;
 	final private static Logger log = Logger.getLogger(QSim.class);
 	private AgentFactory agentFactory;
 	private SimulationListenerManager<QSim> listenerManager;
-	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	protected final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
 	protected Scenario scenario = null;
 	private LaneDefinitions laneDefintions;
 	private boolean useActivityDurations = true;
@@ -239,7 +239,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		if (this.population == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
-		Collection<PersonAgentI> agents = new ArrayList<PersonAgentI>();
+		Collection<PersonAgent> agents = new ArrayList<PersonAgent>();
 		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (Person p : this.population.getPersons().values()) {
 			QPersonAgent agent = this.agentFactory.createPersonAgent(p);
@@ -255,12 +255,12 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		}
 		
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
-			Collection<PersonAgentI> moreAgents = queueSimulationFeature.createAgents();
+			Collection<PersonAgent> moreAgents = queueSimulationFeature.createAgents();
 			agents.addAll(moreAgents);
 		}
 		
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
-			for (PersonAgentI agent : agents) {
+			for (PersonAgent agent : agents) {
 				queueSimulationFeature.agentCreated(agent);
 			}
 		}
@@ -308,7 +308,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		double simStartTime = 0;
 		createAgents();
-		DriverAgent firstAgent = this.activityEndsList.peek();
+		PersonDriverAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
 			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
 		}
@@ -358,13 +358,13 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 		this.simEngine.afterSim();
 		double now = QSimTimer.getTime();
-		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
-			DriverAgent agent = entry.getSecond();
+		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {
+			PersonDriverAgent agent = entry.getSecond();
 			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.teleportationList.clear();
 
-		for (DriverAgent agent : this.activityEndsList) {
+		for (PersonDriverAgent agent : this.activityEndsList) {
 			if (agent.getDestinationLinkId() != null) {
 				events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
 			}
@@ -475,20 +475,20 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		QSim.events = events;
 	}
 
-	protected void handleUnknownLegMode(double now, final DriverAgent agent, Id linkId) {
+	protected void handleUnknownLegMode(double now, final PersonDriverAgent agent, Id linkId) {
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.scenario.getNetwork().getLinks().get(linkId));
 		}
 		double arrivalTime = now + agent.getCurrentLeg().getTravelTime();
-		this.teleportationList.add(new Tuple<Double, DriverAgent>(arrivalTime, agent));
+		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
 	}
 
 	protected void moveVehiclesWithUnknownLegMode(final double now) {
 		while (this.teleportationList.peek() != null ) {
-			Tuple<Double, DriverAgent> entry = this.teleportationList.peek();
+			Tuple<Double, PersonDriverAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
-				DriverAgent driver = entry.getSecond();
+				PersonDriverAgent driver = entry.getSecond();
 				driver.teleportToLink(driver.getDestinationLinkId());
 				driver.legEnds(now);
 //				this.handleAgentArrival(now, driver);
@@ -504,7 +504,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * @param now
 	 * @param agent
 	 */
-	public void handleAgentArrival(final double now, DriverAgent agent) {
+	public void handleAgentArrival(final double now, PersonDriverAgent agent) {
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleAgentArrival(agent);
 		}
@@ -527,9 +527,9 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 *
 	 * @param agent
 	 *
-	 * @see DriverAgent#getDepartureTime()
+	 * @see PersonDriverAgent#getDepartureTime()
 	 */
-	public void scheduleActivityEnd(final DriverAgent agent, int planElementIndex) {
+	public void scheduleActivityEnd(final PersonDriverAgent agent, int planElementIndex) {
 		this.activityEndsList.add(agent);
 		addToAgentsInActivities(agent);
 		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
@@ -537,7 +537,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		}
 	}
 
-	private void addToAgentsInActivities(final DriverAgent agent) {
+	private void addToAgentsInActivities(final PersonDriverAgent agent) {
 		if (agent instanceof QPersonAgent) {
 			QPersonAgent pa = (QPersonAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
@@ -552,7 +552,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		}
 	}
 
-	private void removeFromAgentsInActivities(DriverAgent agent) {
+	private void removeFromAgentsInActivities(PersonDriverAgent agent) {
 		if (agent instanceof QPersonAgent) {
 			QPersonAgent pa = (QPersonAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
@@ -569,7 +569,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
-			DriverAgent agent = this.activityEndsList.peek();
+			PersonDriverAgent agent = this.activityEndsList.peek();
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
 				removeFromAgentsInActivities(agent);
@@ -604,7 +604,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	public void agentDeparts(double now, final DriverAgent agent, final Id linkId) {
+	public void agentDeparts(double now, final PersonDriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, mode));
@@ -615,11 +615,11 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		}
 	}
 
-	protected void visAndHandleUnknownLegMode(double now, DriverAgent agent, Id linkId) {
+	protected void visAndHandleUnknownLegMode(double now, PersonDriverAgent agent, Id linkId) {
 		this.handleUnknownLegMode(now, agent, linkId);
 	}
 
-	private void handleKnownLegModeDeparture(double now, DriverAgent agent, Id linkId, Leg leg) {
+	private void handleKnownLegModeDeparture(double now, PersonDriverAgent agent, Id linkId, Leg leg) {
 		for (DepartureHandler departureHandler : departureHandlers) {
 			departureHandler.handleDeparture(now, agent, linkId, leg);
 		}
@@ -644,9 +644,9 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.carDepartureHandler.setTeleportVehicles(teleportVehicles);
 	}
 
-	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, DriverAgent>>, Serializable {
+	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonDriverAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
-		public int compare(final Tuple<Double, DriverAgent> o1, final Tuple<Double, DriverAgent> o2) {
+		public int compare(final Tuple<Double, PersonDriverAgent> o1, final Tuple<Double, PersonDriverAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
 			if (ret == 0) {
 				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first

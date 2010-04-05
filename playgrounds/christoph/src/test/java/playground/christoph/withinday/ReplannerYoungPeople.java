@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -32,7 +32,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(DriverAgent driverAgent) {
+	public boolean doReplanning(PersonDriverAgent driverAgent) {
 		
 		// If we don't have a valid Replanner.
 		if (this.planAlgorithm == null) return false;

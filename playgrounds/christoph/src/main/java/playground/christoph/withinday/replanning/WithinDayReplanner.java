@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
@@ -52,7 +52,7 @@ public abstract class WithinDayReplanner implements Cloneable {
 		this.id = id;
 	}
 	
-	public abstract boolean doReplanning(DriverAgent driverAgent);
+	public abstract boolean doReplanning(PersonDriverAgent driverAgent);
 	
 	public Id getId()
 	{

@@ -19,17 +19,18 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 
 
 /**
  * Provides methods of an agent that is not driving.
- * TODO Should be called PersonAgent after everybody was asked
+ * 
  * @author dgrether
  *
  */
-public interface PersonAgentI {
+public interface PersonAgent {
 
 	/**
 	 * The time the agent wants to depart from an Activity. If the agent is currently driving,
@@ -44,6 +45,7 @@ public interface PersonAgentI {
 	 */
 	// yyyy getDepartureTimeFromActivity()  [[since there is also a linkDepartureTime of the 
 	// queue sim, and possibly a departure time of a leg]].  kai, jan'10
+	// But the transit driver does not have an activity (?!). kai, apr'10
 
 	/**
 	 * Informs the agent that the currently executed activity is ended / is
@@ -63,8 +65,15 @@ public interface PersonAgentI {
 	public void legEnds(final double now);
 
 	public Leg getCurrentLeg();
+	// yyyy given that there is "getCurrentLeg", there should also be "getCurrentActivity", or in my view better
+	// "getCurrentPlanElement".  kai, apr'10
 
 	public Person getPerson();
+	
+	// yyyy "Teleportation" certainly does NOT belong into a vehicle.  Also not into the driver.  
+	// Might go directly into the person, as some kind of minimal mobsim convenience method
+	// (although I am not convinced).  kai, jan/apr'10
+	public void teleportToLink(final Id linkId);
 
 	
 }

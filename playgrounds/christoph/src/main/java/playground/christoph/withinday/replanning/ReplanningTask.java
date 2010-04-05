@@ -21,20 +21,20 @@
 package playground.christoph.withinday.replanning;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
 public class ReplanningTask {
 
-	protected DriverAgent driverToReplan;
+	protected PersonDriverAgent driverToReplan;
 	protected Id withinDayReplannerId;
 	
-	public ReplanningTask(DriverAgent driverToReplan, Id withinDayReplannerId)
+	public ReplanningTask(PersonDriverAgent driverToReplan, Id withinDayReplannerId)
 	{
 		this.driverToReplan = driverToReplan;
 		this.withinDayReplannerId = withinDayReplannerId;
 	}
 	
-	public DriverAgent getAgentToReplan()
+	public PersonDriverAgent getAgentToReplan()
 	{
 		return this.driverToReplan;
 	}

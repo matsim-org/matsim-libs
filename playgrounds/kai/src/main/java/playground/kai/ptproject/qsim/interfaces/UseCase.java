@@ -19,7 +19,7 @@
 
 package playground.kai.ptproject.qsim.interfaces;
 
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.vehicles.BasicVehicle;
 
 class Teleportation implements Updateable {
@@ -30,7 +30,7 @@ public class UseCase {
 
 	void run() {
 		Teleportation teleportation = null ;
-		PersonAgentI person = null ; // dummy
+		PersonAgent person = null ; // dummy
 		BasicVehicle veh = null ; // dummy
 		LinkFacility linkFac = null ; // dummy
 		QLink link = new QLink() ;

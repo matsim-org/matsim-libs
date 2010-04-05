@@ -22,7 +22,7 @@ package playground.christoph.withinday.mobsim;
 
 import java.util.List;
 
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
 import playground.christoph.withinday.replanning.ReplanningTask;
 import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
@@ -52,7 +52,7 @@ public class InitialReplanningModule extends WithinDayReplanningModule{
 				
 				for (AgentsToReplanIdentifier identifier : identifiers)
 				{
-					for (DriverAgent driverAgent : identifier.getAgentsToReplan(time, replanner))
+					for (PersonDriverAgent driverAgent : identifier.getAgentsToReplan(time, replanner))
 					{
 						ReplanningTask replanningTask = new ReplanningTask(driverAgent, replanner.getId());
 						this.parallelReplanner.addReplanningTask(replanningTask);

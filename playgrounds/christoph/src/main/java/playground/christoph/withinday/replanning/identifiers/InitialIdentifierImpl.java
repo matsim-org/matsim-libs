@@ -23,7 +23,7 @@ package playground.christoph.withinday.replanning.identifiers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QVehicle;
 
@@ -41,15 +41,15 @@ public class InitialIdentifierImpl extends InitialIdentifier{
 		this.simulation = simulation;
 	}
 		
-	public List<DriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
+	public List<PersonDriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
 	{
-		List<DriverAgent> agentsToReplan = new ArrayList<DriverAgent>();
+		List<PersonDriverAgent> agentsToReplan = new ArrayList<PersonDriverAgent>();
 		
 		for (QLink qLink : simulation.getQNetwork().getLinks().values())
 		{
 			for (QVehicle vehicle : qLink.getAllVehicles())
 			{
-				DriverAgent driverAgent = vehicle.getDriver();
+				PersonDriverAgent driverAgent = vehicle.getDriver();
 				
 				WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) driverAgent;
 				if (withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner))

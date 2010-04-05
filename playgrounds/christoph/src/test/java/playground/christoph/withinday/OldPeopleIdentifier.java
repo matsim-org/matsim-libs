@@ -3,7 +3,7 @@ package playground.christoph.withinday;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.QSim;
 
@@ -23,10 +23,10 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 	}
 
 	@Override
-	public List<DriverAgent> getAgentsToReplan(double time,
+	public List<PersonDriverAgent> getAgentsToReplan(double time,
 			WithinDayReplanner withinDayReplanner) {
 
-		ArrayList<DriverAgent> list = new ArrayList<DriverAgent>();
+		ArrayList<PersonDriverAgent> list = new ArrayList<PersonDriverAgent>();
 
 		// don't handle the agent, if time != 12 o'clock
 		if (time != 12 * 3600) {
@@ -34,7 +34,7 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 		}
 
 		// select agents, which should be replanned within this time step
-		for (DriverAgent agent : queueSim.getActivityEndsList()) {
+		for (PersonDriverAgent agent : queueSim.getActivityEndsList()) {
 			if (((PersonImpl) agent.getPerson()).getAge() == 56) {
 				System.out.println("found agent");
 				list.add(agent);

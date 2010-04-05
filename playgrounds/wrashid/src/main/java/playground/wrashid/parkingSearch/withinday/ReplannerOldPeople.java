@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -30,7 +30,7 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 	/**
 	 * return value (in future it might be true, when successful call)
 	 */
-	public boolean doReplanning(DriverAgent driverAgent) {
+	public boolean doReplanning(PersonDriverAgent driverAgent) {
 		
 		// If we don't have a valid Replanner.
 		// (only extra security)

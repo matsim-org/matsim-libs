@@ -36,8 +36,8 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -78,7 +78,7 @@ public class QLinkImpl implements QLink {
 
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
-	private final Map<Id, PersonAgentI> agentsInActivities = new LinkedHashMap<Id, PersonAgentI>();
+	private final Map<Id, PersonAgent> agentsInActivities = new LinkedHashMap<Id, PersonAgent>();
 
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
@@ -290,7 +290,7 @@ public class QLinkImpl implements QLink {
 			if (veh.getEarliestLinkExitTime() > now){
 				return;
 			}
-			DriverAgent driver = veh.getDriver();
+			PersonDriverAgent driver = veh.getDriver();
 
 			boolean handled = this.transitQueueLaneFeature.handleMoveLaneToBuffer(now, veh, driver);
 
@@ -595,8 +595,8 @@ public class QLinkImpl implements QLink {
 		    log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
 		  }
 		  int cnt2 = 0 ;
-		  Collection<PersonAgentI> agentsInActivities = QLinkImpl.this.agentsInActivities.values();
-		  for (PersonAgentI pa : agentsInActivities) {
+		  Collection<PersonAgent> agentsInActivities = QLinkImpl.this.agentsInActivities.values();
+		  for (PersonAgent pa : agentsInActivities) {
 		    PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), getLink(), cnt2 ) ;
 		    agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
 		    positions.add(agInfo) ;
@@ -629,8 +629,8 @@ public class QLinkImpl implements QLink {
 					int lane = 1 + (veh.getId().hashCode() % nLanes);
 					int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
 					double speed = (time > cmp ? 0.0 : freespeed);
-					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
-					for (PersonAgentI person : peopleInVehicle) {
+					Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
+					for (PersonAgent person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLinkImpl.this.getLink(),
 								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 						positions.add(position);
@@ -643,8 +643,8 @@ public class QLinkImpl implements QLink {
 					int lane = 1 + (veh.getId().hashCode() % nLanes);
 					int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
 					double speed = (time > cmp ? 0.0 : freespeed);
-					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
-					for (PersonAgentI person : peopleInVehicle) {
+					Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
+					for (PersonAgent person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLinkImpl.this.getLink(),
 								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 						positions.add(position);
@@ -662,8 +662,8 @@ public class QLinkImpl implements QLink {
 				double cellSize = Math.min(7.5, QLinkImpl.this.getLink().getLength() / cnt);
 				double distFromFromNode = QLinkImpl.this.getLink().getLength() - cellSize / 2.0;
 				for (QVehicle veh : QLinkImpl.this.waitingList) {
-					Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
-					for (PersonAgentI person : peopleInVehicle) {
+					Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
+					for (PersonAgent person : peopleInVehicle) {
 						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLinkImpl.this.getLink(),
 								distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 						positions.add(position);
@@ -722,16 +722,16 @@ public class QLinkImpl implements QLink {
 
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : link.getFreespeed();
-				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
+				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
 				this.createPositionInfo(positions, peopleInVehicle, link, queueEnd, lane, speed);
 				queueEnd -= vehLen;
 			}
 			return queueEnd;
 		}
 
-    private void createPositionInfo(Collection<AgentSnapshotInfo> positions, Collection<PersonAgentI> peopleInVehicle, Link link, 
+    private void createPositionInfo(Collection<AgentSnapshotInfo> positions, Collection<PersonAgent> peopleInVehicle, Link link, 
         double distanceOnLane, int lane, double speed){
-      for (PersonAgentI passenger : peopleInVehicle) {
+      for (PersonAgent passenger : peopleInVehicle) {
         PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLane,
             lane );
         passengerPosition.setColorValueBetweenZeroAndOne( speed ) ;
@@ -793,7 +793,7 @@ public class QLinkImpl implements QLink {
 					log.warn(veh) ;
 				}
 
-				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
+				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
 				this.createPositionInfo(positions, peopleInVehicle, link, distanceOnLink, lane, speed);
 				lastDistance = distanceOnLink;
 			}
@@ -809,8 +809,8 @@ public class QLinkImpl implements QLink {
 				double cellSize) {
 			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
 			for (QVehicle veh : QLinkImpl.this.waitingList) {
-				Collection<PersonAgentI> peopleInVehicle = getPeopleInVehicle(veh);
-				for (PersonAgentI person : peopleInVehicle) {
+				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
+				for (PersonAgent person : peopleInVehicle) {
 					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLinkImpl.this.getLink(),
 							/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					if ( person.getPerson().getId().toString().startsWith("pt") ) {
@@ -824,12 +824,12 @@ public class QLinkImpl implements QLink {
 			return lane;
 		}
 
-		private Collection<PersonAgentI> getPeopleInVehicle(QVehicle vehicle) {
-			Collection<PersonAgentI> passengers = QLinkImpl.this.transitQueueLaneFeature.getPassengers(vehicle);
+		private Collection<PersonAgent> getPeopleInVehicle(QVehicle vehicle) {
+			Collection<PersonAgent> passengers = QLinkImpl.this.transitQueueLaneFeature.getPassengers(vehicle);
 			if (passengers.isEmpty()) {
-				return Collections.singletonList((PersonAgentI) vehicle.getDriver());
+				return Collections.singletonList((PersonAgent) vehicle.getDriver());
 			} else {
-				ArrayList<PersonAgentI> people = new ArrayList<PersonAgentI>();
+				ArrayList<PersonAgent> people = new ArrayList<PersonAgent>();
 				people.add(vehicle.getDriver());
 				people.addAll(passengers);
 				return people;
@@ -840,12 +840,12 @@ public class QLinkImpl implements QLink {
 
 	private static int cnt = 0 ;
 	@Override
-	public void addAgentInActivity(PersonAgentI agent) {
+	public void addAgentInActivity(PersonAgent agent) {
 		this.agentsInActivities.put(agent.getPerson().getId(), agent);
 	}
 
 	@Override
-	public void removeAgentInActivity(PersonAgentI agent) {
+	public void removeAgentInActivity(PersonAgent agent) {
 		this.agentsInActivities.remove(agent.getPerson().getId());
 	}
 

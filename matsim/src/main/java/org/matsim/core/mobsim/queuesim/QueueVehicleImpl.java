@@ -22,7 +22,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.vehicles.BasicVehicle;
 
 public class QueueVehicleImpl implements QueueVehicle {
@@ -30,7 +30,7 @@ public class QueueVehicleImpl implements QueueVehicle {
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
 
-	private DriverAgent driver = null;
+	private PersonDriverAgent driver = null;
 
 	private final Id id;
 	
@@ -74,11 +74,11 @@ public class QueueVehicleImpl implements QueueVehicle {
 		this.currentLink = link;
 	}
 
-	public DriverAgent getDriver() {
+	public PersonDriverAgent getDriver() {
 		return this.driver;
 	}
 
-	public void setDriver(final DriverAgent driver) {
+	public void setDriver(final PersonDriverAgent driver) {
 		this.driver = driver;
 	}
 

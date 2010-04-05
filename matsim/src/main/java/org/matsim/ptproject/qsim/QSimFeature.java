@@ -23,8 +23,8 @@ package org.matsim.ptproject.qsim;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.PersonAgentI;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 
 
 public interface QSimFeature {
@@ -33,18 +33,18 @@ public interface QSimFeature {
 
 	void beforeCleanupSim();
 
-	void beforeHandleAgentArrival(DriverAgent agent);
+	void beforeHandleAgentArrival(PersonDriverAgent agent);
 
 	void afterAfterSimStep(double time);
 
-	void beforeHandleUnknownLegMode(double now, DriverAgent agent, Link link);
+	void beforeHandleUnknownLegMode(double now, PersonDriverAgent agent, Link link);
 
-	Collection<PersonAgentI> createAgents();
+	Collection<PersonAgent> createAgents();
 
-	void afterActivityBegins(DriverAgent agent, int planElementIndex);
+	void afterActivityBegins(PersonDriverAgent agent, int planElementIndex);
 
-	void afterActivityEnds(DriverAgent agent, double time);
+	void afterActivityEnds(PersonDriverAgent agent, double time);
 	
-	void agentCreated(PersonAgentI agent);
+	void agentCreated(PersonAgent agent);
 
 }

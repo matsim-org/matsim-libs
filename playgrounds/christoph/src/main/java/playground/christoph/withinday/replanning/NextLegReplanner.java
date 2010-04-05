@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -68,7 +68,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 	 * due to the limited number of possible vehicles on a link at a time. An implementation
 	 * of such a functionality would be a problem due to the structure of MATSim...
 	 */
-	public boolean doReplanning(DriverAgent driverAgent)
+	public boolean doReplanning(PersonDriverAgent driverAgent)
 	{	
 		// If we don't have a valid Replanner.
 		if (this.planAlgorithm == null) return false;

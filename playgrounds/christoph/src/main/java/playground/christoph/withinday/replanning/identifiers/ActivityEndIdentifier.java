@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
 import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
@@ -34,7 +34,7 @@ import playground.christoph.withinday.replanning.identifiers.interfaces.DuringAc
 public class ActivityEndIdentifier extends DuringActivityIdentifier{
 
 	protected KnowledgeWithinDayQSim simulation;
-	protected PriorityBlockingQueue<DriverAgent> queue;
+	protected PriorityBlockingQueue<PersonDriverAgent> queue;
 	
 	public ActivityEndIdentifier(KnowledgeWithinDayQSim simulation)
 	{
@@ -42,11 +42,11 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier{
 		this.queue = simulation.getActivityEndsList();
 	}
 		
-	public List<DriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
+	public List<PersonDriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
 	{
-		List<DriverAgent> agentsToReplan = new ArrayList<DriverAgent>(); 
+		List<PersonDriverAgent> agentsToReplan = new ArrayList<PersonDriverAgent>(); 
 				
-		for (DriverAgent driverAgent : queue)
+		for (PersonDriverAgent driverAgent : queue)
 		{	
 			// If the Agent will depart
 			if (driverAgent.getDepartureTime() <= time)
