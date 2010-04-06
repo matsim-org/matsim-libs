@@ -64,7 +64,7 @@ import playground.yu.utils.TollTools;
  *         day.
  */
 public class EnRouteModalSplit implements AgentDepartureEventHandler,
-		AgentArrivalEventHandler, AgentStuckEventHandler {
+		AgentArrivalEventHandler, AgentStuckEventHandler, Analysis {
 	protected String scenario;
 
 	protected final int binSize;
@@ -184,8 +184,8 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		Plan selectedPlan = plans.getPersons().get(ae.getPersonId())
 				.getSelectedPlan();
 		if (toll != null) {
-			if (TollTools.isInRange(((PlanImpl) selectedPlan).getFirstActivity().getLinkId(),
-					toll)) {
+			if (TollTools.isInRange(((PlanImpl) selectedPlan)
+					.getFirstActivity().getLinkId(), toll)) {
 				internalCompute(binIdx, ae, selectedPlan, allCount, carCount,
 						ptCount, wlkCount, bikeCount, othersCount);
 			}
@@ -202,7 +202,8 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		allCount[binIdx]++;
 		Integer itg = legCounts.get(ae.getPersonId());
 		if (itg != null) {
-			switch (((LegImpl) plan.getPlanElements().get(2 * itg + 1)).getMode()) {
+			switch (((LegImpl) plan.getPlanElements().get(2 * itg + 1))
+					.getMode()) {
 			case car:
 				carCount[binIdx]++;
 				break;

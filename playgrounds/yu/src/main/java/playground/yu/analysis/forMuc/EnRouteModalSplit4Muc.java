@@ -7,32 +7,43 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.xml.sax.SAXException;
 
 import playground.yu.analysis.EnRouteModalSplit;
 import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
 
 /**
- * compute daily En Route/ departures/ arrivals of Zurich and Kanton Zurich
- * respectively with through traffic
+ * compute daily En Route/ departures/ arrivals of Munich Network and Munich
+ * Region respectively with through traffic
  * 
  * @author yu
  * 
  */
-public class EnRouteModalSplit4Muc extends EnRouteModalSplit {
+public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
+		Analysis4Muc {
 	private double[] rideDep = null, rideArr = null, rideStuck = null,
 			rideEnRoute = null;
 
@@ -45,7 +56,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit {
 	public EnRouteModalSplit4Muc(String scenario, int binSize, int nofBins,
 			PopulationImpl plans) {
 		super(scenario, binSize, nofBins, plans);
-		if (scenario.equals("Zurich") || scenario.equals("Kanton_Zurich")) {
+		if (scenario.equals(MUNICH) || scenario.equals(ONLY_MUNICH)) {
 			this.rideDep = new double[nofBins + 1];
 			this.rideArr = new double[nofBins + 1];
 			this.rideEnRoute = new double[nofBins + 1];
@@ -191,9 +202,9 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit {
 						+ 0 + "\t" + this.wlkEnRoute[i] + "\t"
 						+ this.bikeDep[i] + "\t" + this.bikeArr[i] + "\t" + 0
 						+ "\t" + this.bikeEnRoute[i] + "\t" + this.rideDep[i]
-						+ "\t" + this.rideArr[i] + "\t" + 0 + "\t"
-						+ this.rideEnRoute[i] + "\t" + this.othersDep[i] + "\t"
-						+ this.othersArr[i] + "\t" + 0 + "\t"
+						+ "\t" + this.rideArr[i] + "\t" + this.rideStuck[i]
+						+ "\t" + this.rideEnRoute[i] + "\t" + this.othersDep[i]
+						+ "\t" + this.othersArr[i] + "\t" + 0 + "\t"
 						+ this.othersEnRoute[i] + "\t");
 			}
 		} catch (IOException e) {
@@ -285,4 +296,44 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit {
 		arrChart.saveAsPng(filename + "arrivals.png", 1024, 768);
 	}
 
+	public static void main(final String[] args) {
+		final String netFilename = args[0], // "../berlin data/osm/bb_osm_wip_cl.xml.gz";
+		eventsFilename = args[1], // "../runs-svn/run756/it.1000/1000.events.txt.gz";
+		plansFilename = args[2], // "../runs-svn/run756/it.1000/1000.plans.xml.gz";
+		outputFilename = args[3], // "../matsimTests/analysis/enRoute.txt";
+		chartFilename = args[4], // "../matsimTests/analysis/";
+		tollFilename = args[5];
+
+		ScenarioImpl scenario = new ScenarioImpl();
+
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
+
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
+
+		RoadPricingScheme toll = scenario.getRoadPricingScheme();
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(toll);
+		try {
+			tollReader.parse(tollFilename);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		EventsManagerImpl events = new EventsManagerImpl();
+		EnRouteModalSplit4Muc orms = new EnRouteModalSplit4Muc(MUNICH,
+				population, toll);
+		events.addHandler(orms);
+		new MatsimEventsReader(events).readFile(eventsFilename);
+
+		orms.write(outputFilename);
+		orms.writeCharts(chartFilename);
+
+		System.out.println("-> Done!");
+		System.exit(0);
+	}
 }
