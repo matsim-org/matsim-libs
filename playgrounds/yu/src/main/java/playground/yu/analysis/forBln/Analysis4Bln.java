@@ -23,6 +23,8 @@
  */
 package playground.yu.analysis.forBln;
 
+import playground.yu.analysis.Analysis;
+
 /**
  * keep some general tools for Analysis for Zurich and respectively Kanton
  * Zurich
@@ -30,8 +32,14 @@ package playground.yu.analysis.forBln;
  * @author yu
  * 
  */
-public interface Analysis4Bln {
-	public enum ActType {
+public interface Analysis4Bln extends Analysis {
+	static final String BERLIN = "Berlin",
+			BERLIN_HUNDEKOPF = "Berlin_Hundekopf",
+			TOTAL_BERLIN = "total_Berlin",
+			BERLIN_VERFLECHTUNGSRAUM = "Berlin_Verflechtungsraum",
+			BERLIN_BRANDENBURG = "Berlin_Brandenburg";// scenarios
+
+	public enum ActTypeBln implements ActType {
 		home("home"), work("work"), shopping("shopping"), education("education"), leisure(
 				"leisure"), other("other"), not_specified("not specified"), business(
 				"business"), Einkauf_sonstiges("Einkauf sonstiges"), Freizeit_sonstiges_incl_Sport(
@@ -43,7 +51,7 @@ public interface Analysis4Bln {
 			return actTypeName;
 		}
 
-		ActType(String actTypeName) {
+		ActTypeBln(String actTypeName) {
 			this.actTypeName = actTypeName;
 		}
 	}

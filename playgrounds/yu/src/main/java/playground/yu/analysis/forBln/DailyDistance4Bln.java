@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -33,7 +32,6 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
-	private static final String CAR = "car", BIKE = "bike", WALK = "walk";
 	private double carBusinessDist, carEinkaufSonstigesDist,
 			carFreizeitSonstSportDist, carHolidayJourneyDist, carMultipleDist,
 			carSeeADoctorDist, carNotSpecifiedDist;
@@ -71,15 +69,16 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 
 				LegImpl bl = (LegImpl) pe;
 
-				ActType at = null;
-				String tmpActType = ((PlanImpl) plan).getNextActivity(bl).getType();
-				for (ActType a : ActType.values())
+				ActTypeBln at = null;
+				String tmpActType = ((PlanImpl) plan).getNextActivity(bl)
+						.getType();
+				for (ActTypeBln a : ActTypeBln.values())
 					if (tmpActType.equals(a.getActTypeName())) {
 						at = a;
 						break;
 					}
 				if (at == null)
-					at = ActType.other;
+					at = ActTypeBln.other;
 
 				double dist = bl.getRoute().getDistance() / 1000.0;
 				// if (bl.getDepartureTime() < 86400)
@@ -178,9 +177,12 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case walk:
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(((PlanImpl) plan).getPreviousActivity(bl)
-							.getLinkId()).getCoord(), this.network.getLinks().get(((PlanImpl) plan).getNextActivity(bl)
-							.getLinkId()).getCoord()) * 1.5 / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(
+							((PlanImpl) plan).getPreviousActivity(bl)
+									.getLinkId()).getCoord(), this.network
+							.getLinks().get(
+									((PlanImpl) plan).getNextActivity(bl)
+											.getLinkId()).getCoord()) * 1.5 / 1000.0;
 					wlkDist += dist;
 					wlkDayDist += dist;
 					switch (at) {
@@ -227,9 +229,12 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case bike:
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(((PlanImpl) plan).getPreviousActivity(bl)
-							.getLinkId()).getCoord(), this.network.getLinks().get(((PlanImpl) plan).getNextActivity(bl)
-							.getLinkId()).getCoord()) / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(
+							((PlanImpl) plan).getPreviousActivity(bl)
+									.getLinkId()).getCoord(), this.network
+							.getLinks().get(
+									((PlanImpl) plan).getNextActivity(bl)
+											.getLinkId()).getCoord()) / 1000.0;
 					bikeDist += dist;
 					bikeDayDist += dist;
 					switch (at) {
@@ -276,9 +281,12 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 					bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				default:
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(((PlanImpl) plan).getPreviousActivity(bl)
-							.getLinkId()).getCoord(), this.network.getLinks().get(((PlanImpl) plan).getNextActivity(bl)
-							.getLinkId()).getCoord()) / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(
+							((PlanImpl) plan).getPreviousActivity(bl)
+									.getLinkId()).getCoord(), this.network
+							.getLinks().get(
+									((PlanImpl) plan).getNextActivity(bl)
+											.getLinkId()).getCoord()) / 1000.0;
 					othersDist += dist;
 					othersDayDist += dist;
 					switch (at) {
@@ -367,7 +375,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				+ "\t" + othersDist);
 
 		PieChart pieChart = new PieChart("Avg. Daily Distance -- Modal Split");
-		pieChart.addSeries(new String[] { CAR, "pt", WALK, BIKE, "others" },
+		pieChart.addSeries(new String[] { CAR, PT, WALK, BIKE, OTHERS },
 				new double[] { avgCarDist, avgPtDist, avgWlkDist, avgBikeDist,
 						avgOthersDist });
 		pieChart.addMatsimLogo();
@@ -459,11 +467,11 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				"travel destination and modal split--daily distance",
 				"travel destinations", "daily distances [km]",
 				PlotOrientation.VERTICAL);
-		stackedBarChart.addSeries(new String[] { CAR, "pt", WALK, BIKE,
-				"others" }, new String[] { "home", "work", "shopping",
-				"education", "leisure", "other", "not specified", "business",
-				"Einkauf sonstiges", "Freizeit (sonstiges incl.Sport)",
-				"see a doctor", "holiday / journey", "multiple" },
+		stackedBarChart.addSeries(new String[] { CAR, PT, WALK, BIKE, OTHERS },
+				new String[] { "home", "work", "shopping", "education",
+						"leisure", "other", "not specified", "business",
+						"Einkauf sonstiges", "Freizeit (sonstiges incl.Sport)",
+						"see a doctor", "holiday / journey", "multiple" },
 				new double[][] {
 						{ carHomeDist, carWorkDist, carShopDist, carEducDist,
 								carLeisDist, carOtherDist, carNotSpecifiedDist,
@@ -520,14 +528,14 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				"fraction of persons with daily distance bigger than x... in %");
 		chart.addSeries(CAR, x, yCar);
 		if (CollectionSum.getSum(yPt) > 0)
-			chart.addSeries("pt", x, yPt);
+			chart.addSeries(PT, x, yPt);
 		if (CollectionSum.getSum(yWlk) > 0)
 			chart.addSeries(WALK, x, yWlk);
 		if (CollectionSum.getSum(yBike) > 0)
 			chart.addSeries(BIKE, x, yBike);
 		if (CollectionSum.getSum(yOthers) > 0)
-			chart.addSeries("other", x, yOthers);
-		chart.addSeries("total", x, yTotal);
+			chart.addSeries(OTHERS, x, yOthers);
+		chart.addSeries(TOTAL, x, yTotal);
 		chart.addMatsimLogo();
 		chart.saveAsPng(outputFilename + "dailyDistanceDistribution.png", 800,
 				600);
@@ -579,13 +587,13 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				"leg Distance [km]", "mode fraction [%]");
 		chart2.addSeries(CAR, xs, yCarFracs);
 		if (CollectionSum.getSum(yPtFracs) > 0)
-			chart2.addSeries("pt", xs, yPtFracs);
+			chart2.addSeries(PT, xs, yPtFracs);
 		if (CollectionSum.getSum(yWlkFracs) > 0)
 			chart2.addSeries(WALK, xs, yWlkFracs);
 		if (CollectionSum.getSum(yBikeFracs) > 0)
 			chart2.addSeries(BIKE, xs, yBikeFracs);
 		if (CollectionSum.getSum(yOthersFracs) > 0)
-			chart2.addSeries("others", xs, yOthersFracs);
+			chart2.addSeries(OTHERS, xs, yOthersFracs);
 		chart2.addMatsimLogo();
 		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
 				600);
@@ -606,7 +614,6 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		// Gbl.createConfig(null);
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		// RoadPricingReaderXMLv1 tollReader = new

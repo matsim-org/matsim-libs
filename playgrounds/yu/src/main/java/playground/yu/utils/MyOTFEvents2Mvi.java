@@ -59,7 +59,8 @@ public class MyOTFEvents2Mvi {
 		sw2.writeln(line);
 		// after filehead
 		double time = 0, lastTime = 0;
-		while (line != null && time < 108000.0) {
+		while (line != null && time < 108000.0) {// TODO whole time shorter than
+			// 108000?
 			line = sr.readLine();
 			if (line != null) {
 				sw2.writeln(line);

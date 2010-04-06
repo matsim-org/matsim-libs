@@ -21,13 +21,11 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
-import playground.yu.analysis.forZrh.Analysis4Zrh.ActType;
+import playground.yu.analysis.forZrh.Analysis4Zrh.ActTypeZrh;
 import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.PieChart;
@@ -35,12 +33,11 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * compute modal split of en route time
- *
+ * 
  * @author yu
- *
+ * 
  */
-public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
-		PlanAlgorithm {
+public class DailyEnRouteTime extends DailyAnalysis {
 	protected int count;
 	protected double carTime, ptTime, wlkTime, bikeTime, othersTime;
 	protected final double totalDayEnRouteTimeCounts[],
@@ -61,7 +58,6 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 			othersLeisTime, othersOtherTime, othersHomeTime;
 	protected PersonImpl person;
 	protected RoadPricingScheme toll = null;
-	private static final String CAR = "car", BIKE = "bike", OTHERS = "others";
 
 	public DailyEnRouteTime(final RoadPricingScheme toll) {
 		this();
@@ -133,7 +129,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		if (toll == null) {
 			count++;
 			run(plan);
-		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLinkId(), toll)) {
+		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity()
+				.getLinkId(), toll)) {
 			count++;
 			run(plan);
 		}
@@ -151,16 +148,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 			if (pe instanceof LegImpl) {
 				LegImpl bl = (LegImpl) pe;
 
-				ActType at = null;
-				String tmpActTypeStartsWith = plan.getNextActivity(bl)
-						.getType().substring(0, 1);
-				for (ActType a : ActType.values())
-					if (tmpActTypeStartsWith.equals(a.getFirstLetter())) {
-						at = a;
-						break;
-					}
-				if (at == null)
-					at = ActType.others;
+				ActTypeZrh legIntent = (ActTypeZrh) this.getLegIntent(plan, bl);
 
 				double time = bl.getTravelTime() / 60.0;
 				if (time < 0)
@@ -172,7 +160,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				case car:
 					carTime += time;
 					carDayTime += time;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						carHomeTime += time;
 						break;
@@ -197,7 +185,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				case pt:
 					ptTime += time;
 					ptDayTime += time;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						ptHomeTime += time;
 						break;
@@ -222,7 +210,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				case walk:
 					wlkTime += time;
 					wlkDayTime += time;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						wlkHomeTime += time;
 						break;
@@ -247,7 +235,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				case bike:
 					bikeTime += time;
 					bikeDayTime += time;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						bikeHomeTime += time;
 						break;
@@ -272,7 +260,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				default:
 					othersTime += time;
 					othersDayTime += time;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						othersHomeTime += time;
 						break;
@@ -514,7 +502,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		PopulationImpl population = scenario.getPopulation();
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario
+				.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -525,7 +514,8 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 			e.printStackTrace();
 		}
 
-		DailyEnRouteTime ert = new DailyEnRouteTime(scenario.getRoadPricingScheme());
+		DailyEnRouteTime ert = new DailyEnRouteTime(scenario
+				.getRoadPricingScheme());
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
@@ -536,6 +526,21 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		System.out.println("--> Done!");
 		Gbl.printElapsedTime();
 		System.exit(0);
+	}
+
+	@Override
+	protected ActType getLegIntent(PlanImpl plan, LegImpl currentLeg) {
+		ActType legIntent = null;
+		String tmpActTypeStartsWith = plan.getNextActivity(currentLeg)
+				.getType().substring(0, 1);
+		for (ActTypeZrh a : ActTypeZrh.values())
+			if (tmpActTypeStartsWith.equals(a.getFirstLetter())) {
+				legIntent = a;
+				break;
+			}
+		if (legIntent == null)
+			legIntent = ActTypeZrh.others;
+		return legIntent;
 	}
 
 }

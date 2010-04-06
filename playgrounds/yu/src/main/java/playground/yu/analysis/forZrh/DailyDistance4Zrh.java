@@ -54,13 +54,12 @@ import playground.yu.utils.io.SimpleWriter;
 /**
  * compute daily distance of Zurich and Kanton Zurich respectively with through
  * traffic
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
-	private static final String CAR = "car", OTHERS = "others",
-			THROUGH = "through";
+
 	private double throughWorkDist, throughEducDist, throughShopDist,
 			throughLeisDist, throughHomeDist, throughOtherDist, throughDist;
 	private double[] throughLegDistanceCounts;
@@ -95,20 +94,21 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof LegImpl) {
 				LegImpl bl = (LegImpl) pe;
-				ActType ats = null;
-				String tmpActType = ((PlanImpl) plan).getNextActivity(bl).getType();
+				ActTypeZrh ats = null;
+				String tmpActType = ((PlanImpl) plan).getNextActivity(bl)
+						.getType();
 				if (tmpActType.startsWith("h"))
-					ats = ActType.home;
+					ats = ActTypeZrh.home;
 				else if (tmpActType.startsWith("w"))
-					ats = ActType.work;
+					ats = ActTypeZrh.work;
 				else if (tmpActType.startsWith("e"))
-					ats = ActType.education;
+					ats = ActTypeZrh.education;
 				else if (tmpActType.startsWith("s"))
-					ats = ActType.shopping;
+					ats = ActTypeZrh.shopping;
 				else if (tmpActType.startsWith("l"))
-					ats = ActType.leisure;
+					ats = ActTypeZrh.leisure;
 				else
-					ats = ActType.others;
+					ats = ActTypeZrh.others;
 				double dist = bl.getRoute().getDistance() / 1000.0;
 				// if (bl.getDepartureTime() < 86400)
 
@@ -185,9 +185,12 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 					}
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 				} else if (bl.getMode().equals(TransportMode.walk)) {
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(((PlanImpl) plan).getPreviousActivity(bl)
-							.getLinkId()).getCoord(), this.network.getLinks().get(((PlanImpl) plan).getNextActivity(bl)
-							.getLinkId()).getCoord()) * 1.5 / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(
+							((PlanImpl) plan).getPreviousActivity(bl)
+									.getLinkId()).getCoord(), this.network
+							.getLinks().get(
+									((PlanImpl) plan).getNextActivity(bl)
+											.getLinkId()).getCoord()) * 1.5 / 1000.0;
 					wlkDist += dist;
 					wlkDayDist += dist;
 					switch (ats) {
@@ -280,7 +283,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				* 100.0 + "\t" + throughDist);
 
 		PieChart pieChart = new PieChart("Avg. Daily Distance -- Modal Split");
-		pieChart.addSeries(new String[] { CAR, "pt", "wlk", OTHERS, THROUGH },
+		pieChart.addSeries(new String[] { CAR, PT, WALK, OTHERS, THROUGH },
 				new double[] { avgCarDist, avgPtDist, avgWlkDist,
 						avgOthersDist, avgThroughDist });
 		pieChart.saveAsPng(outputFilename + "dailyDistanceModalSplitPie.png",
@@ -344,9 +347,9 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 						OTHERS });
 		barChart.addSeries(CAR, new double[] { carWorkDist, carEducDist,
 				carShopDist, carLeisDist, carHomeDist, carOtherDist });
-		barChart.addSeries("pt", new double[] { ptWorkDist, ptEducDist,
+		barChart.addSeries(PT, new double[] { ptWorkDist, ptEducDist,
 				ptShopDist, ptLeisDist, ptHomeDist, ptOtherDist });
-		barChart.addSeries("walk", new double[] { wlkWorkDist, wlkEducDist,
+		barChart.addSeries(WALK, new double[] { wlkWorkDist, wlkEducDist,
 				wlkShopDist, wlkLeisDist, wlkHomeDist, wlkOtherDist });
 		barChart.addSeries(OTHERS, new double[] { othersWorkDist,
 				othersEducDist, othersShopDist, othersLeisDist, othersHomeDist,
@@ -382,14 +385,14 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				"fraction of persons with daily distance bigger than x... in %");
 		chart.addSeries(CAR, x, yCar);
 		if (CollectionSum.getSum(yPt) > 0)
-			chart.addSeries("pt", x, yPt);
+			chart.addSeries(PT, x, yPt);
 		if (CollectionSum.getSum(yWlk) > 0)
-			chart.addSeries("walk", x, yWlk);
+			chart.addSeries(WALK, x, yWlk);
 		if (CollectionSum.getSum(yOthers) > 0)
 			chart.addSeries(OTHERS, x, yOthers);
 		if (CollectionSum.getSum(yThrough) > 0)
 			chart.addSeries(THROUGH, x, yThrough);
-		chart.addSeries("total", x, yTotal);
+		chart.addSeries(TOTAL, x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyDistance.png", 800, 600);
 
 		sw
@@ -440,9 +443,9 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				"leg Distance [km]", "mode fraction [%]");
 		chart2.addSeries(CAR, xs, yCarFracs);
 		if (CollectionSum.getSum(yPtFracs) > 0)
-			chart2.addSeries("pt", xs, yPtFracs);
+			chart2.addSeries(PT, xs, yPtFracs);
 		if (CollectionSum.getSum(yWlkFracs) > 0)
-			chart2.addSeries("walk", xs, yWlkFracs);
+			chart2.addSeries(WALK, xs, yWlkFracs);
 		if (CollectionSum.getSum(yOthersFracs) > 0)
 			chart2.addSeries(OTHERS, xs, yOthersFracs);
 		if (CollectionSum.getSum(yThroughFracs) > 0)
@@ -458,17 +461,18 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String plansFilename = "../runs-svn/run684/it.1000/1000.plans.xml.gz";
-		String outputFilename = "../matsimTests/run684/dailyDistance/";
-		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
+		final String netFilename = "../detailedEval/data/network.xml.gz", //
+		plansFilename = "../../run950/output/950.output_plans.xml.gz", //
+		outputFilename = "../detailedEval/test/", //
+		tollFilename = "../detailedEval/data/boundary.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario
+				.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -482,7 +486,8 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyDistance4Zrh dd = new DailyDistance4Zrh(scenario.getRoadPricingScheme(), network);
+		DailyDistance4Zrh dd = new DailyDistance4Zrh(scenario
+				.getRoadPricingScheme(), network);
 		dd.run(population);
 		dd.write(outputFilename);
 

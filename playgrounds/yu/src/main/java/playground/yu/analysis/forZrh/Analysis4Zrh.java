@@ -23,6 +23,8 @@
  */
 package playground.yu.analysis.forZrh;
 
+import playground.yu.analysis.Analysis;
+
 /**
  * keep some general tools for Analysis for Zurich and respectively Kanton
  * Zurich
@@ -30,10 +32,11 @@ package playground.yu.analysis.forZrh;
  * @author yu
  * 
  */
-public interface Analysis4Zrh {
-	static final String KANTON_ZURICH = "Kanton_Zurich", ZURICH = "Zurich";
+public interface Analysis4Zrh extends Analysis {
+	static final String KANTON_ZURICH = "Kanton_Zurich", ZURICH = "Zurich",// scenarios
+			THROUGH = "through";// TransportMode
 
-	public enum ActType {
+	public enum ActTypeZrh implements ActType {
 		home("h"), work("w"), shopping("s"), education("e"), leisure("l"), others(
 				"o");
 		private final String firstLetter;
@@ -42,7 +45,7 @@ public interface Analysis4Zrh {
 			return firstLetter;
 		}
 
-		ActType(String firstLetter) {
+		ActTypeZrh(String firstLetter) {
 			this.firstLetter = firstLetter;
 		}
 	}

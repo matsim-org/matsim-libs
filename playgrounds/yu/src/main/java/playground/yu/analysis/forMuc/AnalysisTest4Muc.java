@@ -56,7 +56,7 @@ import playground.yu.utils.io.SimpleWriter;
  * @author ychen
  * 
  */
-public class AnalysisTest4Muc {
+public class AnalysisTest4Muc implements Analysis4Muc {
 	private static boolean withToll = false;
 
 	private static void printUsage() {
@@ -258,20 +258,10 @@ public class AnalysisTest4Muc {
 		if (args.length < 3) {
 			printUsage();
 			System.exit(0);
-		} else if (args[3].equals("Berlin") || args[4].equals("Berlin")) {
-			runScenario(args, "Berlin");
-		} else if (args[3].equals("Berlin_Hundekopf")
-				|| args[4].equals("Berlin_Hundekopf")) {
-			runTollScenario(args, "Berlin_Hundekopf");
-		} else if (args[3].equals("total_Berlin")
-				|| args[4].equals("total_Berlin")) {
-			runTollScenario(args, "total_Berlin");
-		} else if (args[3].equals("Berlin_Verflechtungsraum")
-				|| args[4].equals("Berlin_Verflechtungsraum")) {
-			runTollScenario(args, "Berlin_Verflechtungsraum");
-		} else if (args[3].equals("Berlin_Brandenburg")
-				|| args[4].equals("Berlin_Brandenburg")) {
-			runTollScenario(args, "Berlin_Brandenburg");
+		} else if (args[3].equals(MUNICH) || args[4].equals(MUNICH)) {
+			runScenario(args, MUNICH);
+		} else if (args[3].equals(ONLY_MUNICH) || args[4].equals(ONLY_MUNICH)) {
+			runTollScenario(args, ONLY_MUNICH);
 		} else {
 			run(args);
 		}

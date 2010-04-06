@@ -56,7 +56,7 @@ import playground.yu.utils.io.SimpleWriter;
  * @author ychen
  * 
  */
-public class AnalysisTest4Bln {
+public class AnalysisTest4Bln implements Analysis4Bln {
 	private static boolean withToll = false;
 
 	private static void printUsage() {
@@ -258,22 +258,21 @@ public class AnalysisTest4Bln {
 		if (args.length < 3) {
 			printUsage();
 			System.exit(0);
-		} else if (args[3].equals("Berlin") || args[4].equals("Berlin")) {
-			runScenario(args, "Berlin");
-		} else if (args[3].equals("Berlin_Hundekopf")
-				|| args[4].equals("Berlin_Hundekopf")) {
-			runTollScenario(args, "Berlin_Hundekopf");
-		} else if (args[3].equals("total_Berlin")
-				|| args[4].equals("total_Berlin")) {
-			runTollScenario(args, "total_Berlin");
-		} else if (args[3].equals("Berlin_Verflechtungsraum")
-				|| args[4].equals("Berlin_Verflechtungsraum")) {
-			runTollScenario(args, "Berlin_Verflechtungsraum");
-		} else if (args[3].equals("Berlin_Brandenburg")
-				|| args[4].equals("Berlin_Brandenburg")) {
-			runTollScenario(args, "Berlin_Brandenburg");
-		} else {
+		} else if (args[3].equals(BERLIN) || args[4].equals(BERLIN))
+			runScenario(args, BERLIN);
+		else if (args[3].equals(BERLIN_HUNDEKOPF)
+				|| args[4].equals(BERLIN_HUNDEKOPF))
+			runTollScenario(args, BERLIN_HUNDEKOPF);
+		else if (args[3].equals(TOTAL_BERLIN) || args[4].equals(TOTAL_BERLIN))
+			runTollScenario(args, TOTAL_BERLIN);
+		else if (args[3].equals(BERLIN_VERFLECHTUNGSRAUM)
+				|| args[4].equals(BERLIN_VERFLECHTUNGSRAUM))
+			runTollScenario(args, BERLIN_VERFLECHTUNGSRAUM);
+		else if (args[3].equals(BERLIN_BRANDENBURG)
+				|| args[4].equals(BERLIN_BRANDENBURG))
+			runTollScenario(args, BERLIN_BRANDENBURG);
+		else
 			run(args);
-		}
+
 	}
 }

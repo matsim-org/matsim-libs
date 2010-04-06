@@ -73,20 +73,20 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof LegImpl) {
 				LegImpl bl = (LegImpl) pe;
-				ActType ats = null;
+				ActTypeZrh ats = null;
 				String tmpActType = ((PlanImpl) plan).getNextActivity(bl).getType();
 				if (tmpActType.startsWith("h"))
-					ats = ActType.home;
+					ats = ActTypeZrh.home;
 				else if (tmpActType.startsWith("w"))
-					ats = ActType.work;
+					ats = ActTypeZrh.work;
 				else if (tmpActType.startsWith("e"))
-					ats = ActType.education;
+					ats = ActTypeZrh.education;
 				else if (tmpActType.startsWith("s"))
-					ats = ActType.shopping;
+					ats = ActTypeZrh.shopping;
 				else if (tmpActType.startsWith("l"))
-					ats = ActType.leisure;
+					ats = ActTypeZrh.leisure;
 				else
-					ats = ActType.others;
+					ats = ActTypeZrh.others;
 				double time = bl.getTravelTime() / 60.0;
 				if (time < 0)
 					time = 0;

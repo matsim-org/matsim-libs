@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyCalcAverageTripLength.java
+ * Analysis.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,57 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.yu.analysis;
 
-import org.matsim.analysis.CalcAverageTripLength;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+public interface Analysis {
+	static final String CAR = "car", PT = "pt", WALK = "walk", BIKE = "bike",
+			OTHERS = "others", TOTAL = "total";// TransportMode
 
-
-/**
- * It's a subclass of {@code CalcAverageTripLength} and can also calculate trip
- * length of pseudo-pt leg.
- * 
- * @author yu
- * 
- */
-public class MyCalcAverageTripLength extends CalcAverageTripLength {
-	private double sumLength = 0.0;
-	private int cntTrips = 0;
-	private final Network network;
-
-	/**
-	 * @param network
-	 */
-	public MyCalcAverageTripLength(Network network) {
-		super(network);
-		this.network = network;
-	}
-
-	@Override
-	public void run(Plan plan) {
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Route route = ((Leg) pe).getRoute();
-				if (route != null) {
-					this.sumLength += CalcRouteDistance.getRouteDistance(route,
-							network);
-					this.cntTrips++;
-				}
-			}
-		}
-	}
-
-	public double getAverageTripLength() {
-		if (this.cntTrips == 0) {
-			return 0;
-		}
-		return (this.sumLength / this.cntTrips);
+	public interface ActType {
 	}
 }

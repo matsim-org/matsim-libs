@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyCalcAverageTripLength.java
+ * SubTourModeChoiceControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,54 +21,39 @@
 /**
  * 
  */
-package playground.yu.analysis;
+package playground.yu.test;
 
-import org.matsim.analysis.CalcAverageTripLength;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
+import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
 
 /**
- * It's a subclass of {@code CalcAverageTripLength} and can also calculate trip
- * length of pseudo-pt leg.
- * 
  * @author yu
  * 
  */
-public class MyCalcAverageTripLength extends CalcAverageTripLength {
-	private double sumLength = 0.0;
-	private int cntTrips = 0;
-	private final Network network;
+public class SubTourModeChoiceControler extends Controler {
 
-	/**
-	 * @param network
-	 */
-	public MyCalcAverageTripLength(Network network) {
-		super(network);
-		this.network = network;
+	public SubTourModeChoiceControler(String args) {
+		super(args);
 	}
 
-	@Override
-	public void run(Plan plan) {
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Route route = ((Leg) pe).getRoute();
-				if (route != null) {
-					this.sumLength += CalcRouteDistance.getRouteDistance(route,
-							network);
-					this.cntTrips++;
-				}
-			}
-		}
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
+		MyStrategyManagerConfigLoader.load(this, manager);
+		return manager;
 	}
 
-	public double getAverageTripLength() {
-		if (this.cntTrips == 0) {
-			return 0;
-		}
-		return (this.sumLength / this.cntTrips);
+	public static void main(String[] args) {
+		Controler controler = new SubTourModeChoiceControler(args[0]);
+		controler
+				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+						new ScenarioLoaderImpl(args[0]).loadScenario()
+								.getConfig().charyparNagelScoring()));
+		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
+		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
+		controler.setOverwriteFiles(true);
+		controler.run();
 	}
 }

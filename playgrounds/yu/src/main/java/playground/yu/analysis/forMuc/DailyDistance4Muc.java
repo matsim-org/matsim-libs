@@ -3,23 +3,28 @@
  */
 package playground.yu.analysis.forMuc;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.xml.sax.SAXException;
 
+import playground.yu.analysis.CalcRouteDistance;
 import playground.yu.analysis.DailyDistance;
 import playground.yu.utils.CollectionSum;
 import playground.yu.utils.charts.PieChart;
@@ -33,7 +38,6 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
-	private static final String CAR = "car", BIKE = "bike", WALK = "walk";
 	private double carBusinessDist, carUnknownDist, carPrivateDist,
 			carSportsDist, carFriendsDist, carPickupDist, carWithAdultDist;
 	private double ptBusinessDist, ptUnknownDist, ptPrivateDist, ptSportsDist,
@@ -49,47 +53,121 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 	private double othersBusinessDist, othersUnknownDist, othersPrivateDist,
 			othersSportsDist, othersFriendsDist, othersPickupDist,
 			othersWithAdultDist;
+	private int[] rideLegDistanceCounts, rideDayDistanceCounts;
+	private double rideDist;
 
 	public DailyDistance4Muc(final Network network) {
 		super(network);
+		this.rideDist = 0.0;
+
+		this.rideDayDistanceCounts = new int[101];
+		this.rideLegDistanceCounts = new int[101];
+
+		this.carUnknownDist = 0d;
+		this.carBusinessDist = 0d;
+		this.carPrivateDist = 0d;
+		this.carSportsDist = 0d;
+		this.carFriendsDist = 0d;
+		this.carPickupDist = 0d;
+		this.carWithAdultDist = 0d;
+
+		this.ptUnknownDist = 0d;
+		this.ptBusinessDist = 0d;
+		this.ptPrivateDist = 0d;
+		this.ptSportsDist = 0d;
+		this.ptFriendsDist = 0d;
+		this.ptPickupDist = 0d;
+		this.ptWithAdultDist = 0d;
+
+		this.wlkUnknownDist = 0d;
+		this.wlkBusinessDist = 0d;
+		this.wlkPrivateDist = 0d;
+		this.wlkSportsDist = 0d;
+		this.wlkFriendsDist = 0d;
+		this.wlkPickupDist = 0d;
+		this.wlkWithAdultDist = 0d;
+
+		this.bikeUnknownDist = 0d;
+		this.bikeBusinessDist = 0d;
+		this.bikePrivateDist = 0d;
+		this.bikeSportsDist = 0d;
+		this.bikeFriendsDist = 0d;
+		this.bikePickupDist = 0d;
+		this.bikeWithAdultDist = 0d;
+
+		rideWorkDist = 0.0;
+		rideEducDist = 0.0;
+		rideShopDist = 0.0;
+		rideLeisDist = 0.0;
+		rideHomeDist = 0.0;
+		rideOtherDist = 0.0;
+
+		this.rideUnknownDist = 0d;
+		this.rideBusinessDist = 0d;
+		this.ridePrivateDist = 0d;
+		this.rideSportsDist = 0d;
+		this.rideFriendsDist = 0d;
+		this.ridePickupDist = 0d;
+		this.rideWithAdultDist = 0d;
+
+		this.othersUnknownDist = 0d;
+		this.othersBusinessDist = 0d;
+		this.othersPrivateDist = 0d;
+		this.othersSportsDist = 0d;
+		this.othersFriendsDist = 0d;
+		this.othersPickupDist = 0d;
+		this.othersWithAdultDist = 0d;
 	}
 
 	public DailyDistance4Muc(final RoadPricingScheme toll, final Network network) {
-		super(toll, network);
+		this(network);
+		this.toll = toll;
+	}
+
+	protected ActType getLegIntent(PlanImpl plan, LegImpl currentLeg) {
+		ActType intent = null;
+		String tmpActType = plan.getNextActivity(currentLeg).getType();
+		for (ActTypeMuc actType : ActTypeMuc.values())
+			if (tmpActType.equals(actType.getActTypeName())) {
+				intent = actType;
+				break;
+			}
+		if (intent == null)
+			intent = ActTypeMuc.other;
+		return intent;
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		double dayDist = 0.0;
-		double carDayDist = 0.0;
-		double ptDayDist = 0.0;
-		double wlkDayDist = 0.0;
-		double bikeDayDist = 0.0;
-		double othersDayDist = 0.0;
+		double dayDist = 0.0, carDayDist = 0.0, ptDayDist = 0.0, wlkDayDist = 0.0, bikeDayDist = 0.0, rideDayDist = 0.0, othersDayDist = 0.0;
 		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof LegImpl) {
 
 				LegImpl bl = (LegImpl) pe;
+				ActTypeMuc legIntent = (ActTypeMuc) this.getLegIntent(
+						(PlanImpl) plan, bl);
+				Route route = bl.getRoute();
 
-				ActType at = null;
-				String tmpActType = ((PlanImpl) plan).getNextActivity(bl)
-						.getType();
-				for (ActType a : ActType.values())
-					if (tmpActType.equals(a.getActTypeName())) {
-						at = a;
-						break;
-					}
-				if (at == null)
-					at = ActType.other;
+				double dist;
+				if (route != null)
+					dist/* [km] */= CalcRouteDistance.getRouteDistance(route,
+							network) / 1000.0;
+				else {
+					dist/* [km] */= CoordUtils.calcDistance(this.network
+							.getLinks().get(
+									((PlanImpl) plan).getPreviousActivity(bl)
+											.getLinkId()).getCoord(),
+							this.network.getLinks().get(
+									((PlanImpl) plan).getNextActivity(bl)
+											.getLinkId()).getCoord()) * 1.5 / 1000.0;
+				}
 
-				double dist = bl.getRoute().getDistance() / 1000.0;
-				// if (bl.getDepartureTime() < 86400)
 				TransportMode mode = bl.getMode();
 				switch (mode) {
 				case car:
 					carDist += dist;
 					carDayDist += dist;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						carHomeDist += dist;
 						break;
@@ -108,6 +186,24 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 					case business:
 						carBusinessDist += dist;
 						break;
+					case unknown:
+						carUnknownDist += dist;
+						break;
+					case private_:
+						carPrivateDist += dist;
+						break;
+					case sports:
+						carSportsDist += dist;
+						break;
+					case friends:
+						carFriendsDist += dist;
+						break;
+					case pickup:
+						carPickupDist += dist;
+						break;
+					case with_adult:
+						carWithAdultDist += dist;
+						break;
 					default:
 						carOtherDist += dist;
 						break;
@@ -117,7 +213,7 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 				case pt:
 					ptDist += dist;
 					ptDayDist += dist;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						ptHomeDist += dist;
 						break;
@@ -136,6 +232,24 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 					case business:
 						ptBusinessDist += dist;
 						break;
+					case unknown:
+						ptUnknownDist += dist;
+						break;
+					case private_:
+						ptPrivateDist += dist;
+						break;
+					case sports:
+						ptSportsDist += dist;
+						break;
+					case friends:
+						ptFriendsDist += dist;
+						break;
+					case pickup:
+						ptPickupDist += dist;
+						break;
+					case with_adult:
+						ptWithAdultDist += dist;
+						break;
 					default:
 						ptOtherDist += dist;
 						break;
@@ -143,15 +257,9 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case walk:
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(
-							((PlanImpl) plan).getPreviousActivity(bl)
-									.getLinkId()).getCoord(), this.network
-							.getLinks().get(
-									((PlanImpl) plan).getNextActivity(bl)
-											.getLinkId()).getCoord()) * 1.5 / 1000.0;
 					wlkDist += dist;
 					wlkDayDist += dist;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						wlkHomeDist += dist;
 						break;
@@ -170,6 +278,24 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 					case business:
 						wlkBusinessDist += dist;
 						break;
+					case unknown:
+						wlkUnknownDist += dist;
+						break;
+					case private_:
+						wlkPrivateDist += dist;
+						break;
+					case sports:
+						wlkSportsDist += dist;
+						break;
+					case friends:
+						wlkFriendsDist += dist;
+						break;
+					case pickup:
+						wlkPickupDist += dist;
+						break;
+					case with_adult:
+						wlkWithAdultDist += dist;
+						break;
 					default:
 						wlkOtherDist += dist;
 						break;
@@ -177,15 +303,9 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case bike:
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(
-							((PlanImpl) plan).getPreviousActivity(bl)
-									.getLinkId()).getCoord(), this.network
-							.getLinks().get(
-									((PlanImpl) plan).getNextActivity(bl)
-											.getLinkId()).getCoord()) / 1000.0;
 					bikeDist += dist;
 					bikeDayDist += dist;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						bikeHomeDist += dist;
 						break;
@@ -204,22 +324,80 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 					case business:
 						bikeBusinessDist += dist;
 						break;
+					case unknown:
+						bikeUnknownDist += dist;
+						break;
+					case private_:
+						bikePrivateDist += dist;
+						break;
+					case sports:
+						bikeSportsDist += dist;
+						break;
+					case friends:
+						bikeFriendsDist += dist;
+						break;
+					case pickup:
+						bikePickupDist += dist;
+						break;
+					case with_adult:
+						bikeWithAdultDist += dist;
+						break;
 					default:
 						bikeOtherDist += dist;
 						break;
 					}
 					bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
+				case ride:
+					rideDist += dist;
+					rideDayDist += dist;
+					switch (legIntent) {
+					case home:
+						rideHomeDist += dist;
+						break;
+					case work:
+						rideWorkDist += dist;
+						break;
+					case education:
+						rideEducDist += dist;
+						break;
+					case shopping:
+						rideShopDist += dist;
+						break;
+					case leisure:
+						rideLeisDist += dist;
+						break;
+					case business:
+						rideBusinessDist += dist;
+						break;
+					case unknown:
+						rideUnknownDist += dist;
+						break;
+					case private_:
+						ridePrivateDist += dist;
+						break;
+					case sports:
+						rideSportsDist += dist;
+						break;
+					case friends:
+						rideFriendsDist += dist;
+						break;
+					case pickup:
+						ridePickupDist += dist;
+						break;
+					case with_adult:
+						rideWithAdultDist += dist;
+						break;
+					default:
+						rideOtherDist += dist;
+						break;
+					}
+					rideLegDistanceCounts[Math.min(100, (int) dist)]++;
+					break;
 				default:
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(
-							((PlanImpl) plan).getPreviousActivity(bl)
-									.getLinkId()).getCoord(), this.network
-							.getLinks().get(
-									((PlanImpl) plan).getNextActivity(bl)
-											.getLinkId()).getCoord()) / 1000.0;
 					othersDist += dist;
 					othersDayDist += dist;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						othersHomeDist += dist;
 						break;
@@ -238,6 +416,24 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 					case business:
 						othersBusinessDist += dist;
 						break;
+					case unknown:
+						othersUnknownDist += dist;
+						break;
+					case private_:
+						othersPrivateDist += dist;
+						break;
+					case sports:
+						othersSportsDist += dist;
+						break;
+					case friends:
+						othersFriendsDist += dist;
+						break;
+					case pickup:
+						othersPickupDist += dist;
+						break;
+					case with_adult:
+						othersWithAdultDist += dist;
+						break;
 					default:
 						othersOtherDist += dist;
 						break;
@@ -247,6 +443,7 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 				}
 				dayDist += dist;
 			}
+
 		for (int i = 0; i <= Math.min(100, (int) dayDist); i++)
 			totalDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) othersDayDist); i++)
@@ -259,17 +456,21 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 			wlkDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) bikeDayDist); i++)
 			bikeDayDistanceCounts[i]++;
+		for (int i = 0; i <= Math.min(100, (int) rideDayDist); i++)
+			rideDayDistanceCounts[i]++;
 	}
 
 	@Override
 	public void write(final String outputFilename) {
-		double sum = carDist + ptDist + wlkDist + bikeDist + othersDist;
+		double sum = carDist + ptDist + wlkDist + bikeDist + rideDist
+				+ othersDist;
 
-		double avgCarDist = carDist / count;
-		double avgPtDist = ptDist / count;
-		double avgWlkDist = wlkDist / count;
-		double avgBikeDist = bikeDist / count;
-		double avgOthersDist = othersDist / count;
+		double avgCarDist = carDist / (int) count, //
+		avgPtDist = ptDist / (int) count, //
+		avgWlkDist = wlkDist / (int) count, //
+		avgBikeDist = bikeDist / (int) count, //
+		avgRideDist = rideDist / (int) count, //
+		avgOthersDist = othersDist / (int) count;
 
 		SimpleWriter sw = new SimpleWriter(outputFilename + "dailyDistance.txt");
 		sw.writeln("\tDaily Distance\tn_agents\t" + count);
@@ -283,13 +484,15 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 				+ wlkDist);
 		sw.writeln("bike\t" + avgBikeDist + "\t" + bikeDist / sum * 100.0
 				+ "\t" + bikeDist);
+		sw.writeln("ride\t" + avgRideDist + "\t" + rideDist / sum * 100.0
+				+ "\t" + rideDist);
 		sw.writeln("others\t" + avgOthersDist + "\t" + othersDist / sum * 100.0
 				+ "\t" + othersDist);
 
 		PieChart pieChart = new PieChart("Avg. Daily Distance -- Modal Split");
-		pieChart.addSeries(new String[] { CAR, "pt", WALK, BIKE, "others" },
+		pieChart.addSeries(new String[] { CAR, PT, WALK, BIKE, RIDE, OTHERS },
 				new double[] { avgCarDist, avgPtDist, avgWlkDist, avgBikeDist,
-						avgOthersDist });
+						avgRideDist, avgOthersDist });
 		pieChart.addMatsimLogo();
 		pieChart.saveAsPng(outputFilename + "dailyDistanceModalSplitPie.png",
 				800, 600);
@@ -357,7 +560,6 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 						+ (carOtherDist + ptOtherDist + wlkOtherDist
 								+ bikeOtherDist + rideOtherDist + othersOtherDist)
 						+ "\t"
-
 						+ (carUnknownDist + ptUnknownDist + wlkUnknownDist
 								+ bikeUnknownDist + rideUnknownDist + othersUnknownDist)
 						+ "\t"
@@ -384,43 +586,57 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 				"travel destination and modal split--daily distance",
 				"travel destinations", "daily distances [km]",
 				PlotOrientation.VERTICAL);
-		stackedBarChart.addSeries(new String[] { CAR, "pt", WALK, BIKE,
-				"others" }, new String[] { "home", "work", "shopping",
-				"education", "leisure", "other", "not specified", "business",
-				"Einkauf sonstiges", "Freizeit (sonstiges incl.Sport)",
-				"see a doctor", "holiday / journey", "multiple" },
-				new double[][] {
+		stackedBarChart
+				.addSeries(new String[] { CAR, PT, WALK, BIKE, RIDE, OTHERS },
+						new String[] { "home", "work", "shopping", "education",
+								"leisure", "other", "unknown", "business",
+								"private", "sports", "friends", "pickup",
+								"with adult" }, new double[][] {
 
-				// { carHomeDist, carWorkDist, carShopDist, carEducDist,
-				// carLeisDist, carOtherDist, carNotSpecifiedDist,
-				// carBusinessDist, carPrivateDist,
-				// carSportsDist, carFriendsDist,
-				// carPickupDist, carWithAdultDist },
-				// { ptHomeDist, ptWorkDist, ptShopDist, ptEducDist,
-				// ptLeisDist, ptOtherDist, ptNotSpecifiedDist,
-				// ptBusinessDist, ptPrivateDist,
-				// ptSportsDist, ptFriendsDist,
-				// ptPickupDist, ptWithAdultDist },
-				// { wlkHomeDist, wlkWorkDist, wlkShopDist, wlkEducDist,
-				// wlkLeisDist, wlkOtherDist, wlkNotSpecifiedDist,
-				// wlkBusinessDist, wlkPrivateDist,
-				// wlkSportsDist, wlkFriendsDist,
-				// wlkPickupDist, wlkWithAdultDist },
-				// { bikeHomeDist, bikeWorkDist, bikeShopDist,
-				// bikeEducDist, bikeLeisDist, bikeOtherDist,
-				// bikeNotSpecifiedDist, bikeBusinessDist,
-				// bikePrivateDist,
-				// bikeSportsDist, bikeFriendsDist,
-				// bikePickupDist, bikeWithAdultDist },
-				// { othersHomeDist, othersWorkDist, othersShopDist,
-				// othersEducDist, othersLeisDist,
-				// othersOtherDist, othersNotSpecifiedDist,
-				// othersBusinessDist, othersPrivateDist,
-				// othersSportsDist,
-				// othersFriendsDist, othersPickupDist,
-				// othersWithAdultDist }
-				});
+								{ carHomeDist, carWorkDist, carShopDist,
+										carEducDist, carLeisDist, carOtherDist,
+										carUnknownDist, carBusinessDist,
+										carPrivateDist, carSportsDist,
+										carFriendsDist, carPickupDist,
+										carWithAdultDist },
 
+								{ ptHomeDist, ptWorkDist, ptShopDist,
+										ptEducDist, ptLeisDist, ptOtherDist,
+										ptUnknownDist, ptBusinessDist,
+										ptPrivateDist, ptSportsDist,
+										ptFriendsDist, ptPickupDist,
+										ptWithAdultDist },
+
+								{ wlkHomeDist, wlkWorkDist, wlkShopDist,
+										wlkEducDist, wlkLeisDist, wlkOtherDist,
+										wlkUnknownDist, wlkBusinessDist,
+										wlkPrivateDist, wlkSportsDist,
+										wlkFriendsDist, wlkPickupDist,
+										wlkWithAdultDist },
+
+								{ bikeHomeDist, bikeWorkDist, bikeShopDist,
+										bikeEducDist, bikeLeisDist,
+										bikeOtherDist, bikeUnknownDist,
+										bikeBusinessDist, bikePrivateDist,
+										bikeSportsDist, bikeFriendsDist,
+										bikePickupDist, bikeWithAdultDist },
+
+								{ rideHomeDist, rideWorkDist, rideShopDist,
+										rideEducDist, rideLeisDist,
+										rideOtherDist, rideUnknownDist,
+										rideBusinessDist, ridePrivateDist,
+										rideSportsDist, rideFriendsDist,
+										ridePickupDist, rideWithAdultDist },
+
+								{ othersHomeDist, othersWorkDist,
+										othersShopDist, othersEducDist,
+										othersLeisDist, othersOtherDist,
+										othersUnknownDist, othersBusinessDist,
+										othersPrivateDist, othersSportsDist,
+										othersFriendsDist, othersPickupDist,
+										othersWithAdultDist }
+
+						});
 		stackedBarChart.addMatsimLogo();
 		stackedBarChart.saveAsPng(outputFilename
 				+ "dailyDistanceTravelDistination.png", 1280, 1024);
@@ -428,18 +644,20 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 		double x[] = new double[101];
 		for (int i = 0; i < 101; i++)
 			x[i] = i;
-		double yTotal[] = new double[101];
-		double yCar[] = new double[101];
-		double yPt[] = new double[101];
-		double yWlk[] = new double[101];
-		double yBike[] = new double[101];
-		double yOthers[] = new double[101];
+		double yTotal[] = new double[101], //
+		yCar[] = new double[101], //
+		yPt[] = new double[101], //
+		yWlk[] = new double[101], //
+		yBike[] = new double[101], //
+		yRide[] = new double[101], //
+		yOthers[] = new double[101];
 		for (int i = 0; i < 101; i++) {
 			yTotal[i] = totalDayDistanceCounts[i] / count * 100.0;
 			yCar[i] = carDayDistanceCounts[i] / count * 100.0;
 			yPt[i] = ptDayDistanceCounts[i] / count * 100.0;
 			yWlk[i] = wlkDayDistanceCounts[i] / count * 100.0;
 			yBike[i] = bikeDayDistanceCounts[i] / count * 100.0;
+			yRide[i] = rideDayDistanceCounts[i] / count * 100.0;
 			yOthers[i] = othersDayDistanceCounts[i] / count * 100.0;
 		}
 
@@ -448,13 +666,15 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 				"fraction of persons with daily distance bigger than x... in %");
 		chart.addSeries(CAR, x, yCar);
 		if (CollectionSum.getSum(yPt) > 0)
-			chart.addSeries("pt", x, yPt);
+			chart.addSeries(PT, x, yPt);
 		if (CollectionSum.getSum(yWlk) > 0)
 			chart.addSeries(WALK, x, yWlk);
 		if (CollectionSum.getSum(yBike) > 0)
 			chart.addSeries(BIKE, x, yBike);
+		if (CollectionSum.getSum(yRide) > 0)
+			chart.addSeries(RIDE, x, yRide);
 		if (CollectionSum.getSum(yOthers) > 0)
-			chart.addSeries("other", x, yOthers);
+			chart.addSeries(OTHERS, x, yOthers);
 		chart.addSeries("total", x, yTotal);
 		chart.addMatsimLogo();
 		chart.saveAsPng(outputFilename + "dailyDistanceDistribution.png", 800,
@@ -464,19 +684,22 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 				.writeln("-------------------------------------------------------------");
 		sw.writeln("--Modal split -- leg distance--");
 		sw
-				.writeln("leg Distance [km]\tcar legs no.\tpt legs no.\twalk legs no.\tbike legs no.\tothers legs no."
-						+ "\tcar fraction [%]\tpt fraction [%]\twalk fraction [%]\tbike fraction [%]\tothers fraction [%]");
+				.writeln("leg Distance [km]\tcar legs no.\tpt legs no.\twalk legs no.\tbike legs no.\tride legs no.\tothers legs no."
+						+ "\tcar fraction [%]\tpt fraction [%]\twalk fraction [%]\tbike fraction [%]\tride fraction [%]\tothers fraction [%]");
 
 		double xs[] = new double[101];
 		double yCarFracs[] = new double[101];
 		double yPtFracs[] = new double[101];
 		double yWlkFracs[] = new double[101];
 		double yBikeFracs[] = new double[101];
+		double yRideFracs[] = new double[101];
 		double yOthersFracs[] = new double[101];
+
 		for (int i = 0; i < 101; i++) {
 			double sumLegDistanceCounts = ptLegDistanceCounts[i]
 					+ carLegDistanceCounts[i] + wlkLegDistanceCounts[i]
-					+ bikeLegDistanceCounts[i] + othersLegDistanceCounts[i];
+					+ bikeLegDistanceCounts[i] + rideLegDistanceCounts[i]
+					+ othersLegDistanceCounts[i];
 			xs[i] = i;
 			if (sumLegDistanceCounts > 0) {
 				yCarFracs[i] = carLegDistanceCounts[i] / sumLegDistanceCounts
@@ -487,6 +710,8 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 						* 100.0;
 				yBikeFracs[i] = bikeLegDistanceCounts[i] / sumLegDistanceCounts
 						* 100.0;
+				yRideFracs[i] = rideLegDistanceCounts[i] / sumLegDistanceCounts
+						* 100.0;
 				yOthersFracs[i] = othersLegDistanceCounts[i]
 						/ sumLegDistanceCounts * 100.0;
 			} else {
@@ -494,26 +719,31 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 				yPtFracs[i] = 0;
 				yWlkFracs[i] = 0;
 				yBikeFracs[i] = 0;
+				yRideFracs[i] = 0;
 				yOthersFracs[i] = 0;
 			}
 			sw.writeln(i + "+\t" + carLegDistanceCounts[i] + "\t"
 					+ ptLegDistanceCounts[i] + "\t" + wlkLegDistanceCounts[i]
 					+ "\t" + bikeLegDistanceCounts[i] + "\t"
+					+ rideLegDistanceCounts[i] + "\t"
 					+ othersLegDistanceCounts[i] + "\t" + yCarFracs[i] + "\t"
 					+ yPtFracs[i] + "\t" + yWlkFracs[i] + "\t" + yBikeFracs[i]
-					+ "\t" + yOthersFracs[i]);
+					+ "\t" + yRideFracs[i] + "\t" + yOthersFracs[i]);
 		}
+
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
 		chart2.addSeries(CAR, xs, yCarFracs);
 		if (CollectionSum.getSum(yPtFracs) > 0)
-			chart2.addSeries("pt", xs, yPtFracs);
+			chart2.addSeries(PT, xs, yPtFracs);
 		if (CollectionSum.getSum(yWlkFracs) > 0)
 			chart2.addSeries(WALK, xs, yWlkFracs);
 		if (CollectionSum.getSum(yBikeFracs) > 0)
 			chart2.addSeries(BIKE, xs, yBikeFracs);
+		if (CollectionSum.getSum(yRideFracs) > 0)
+			chart2.addSeries(RIDE, xs, yRideFracs);
 		if (CollectionSum.getSum(yOthersFracs) > 0)
-			chart2.addSeries("others", xs, yOthersFracs);
+			chart2.addSeries(OTHERS, xs, yOthersFracs);
 		chart2.addMatsimLogo();
 		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
 				600);
@@ -524,41 +754,37 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		Gbl.startMeasurement();
-
-		final String netFilename = "..";
-		final String plansFilename = "..";
-		String outputFilename = "..";
-		// String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
-
-		// Gbl.createConfig(null);
+		for (int i = 0; i < 10; i++)
+			System.out.println("----->output-Test");
+		final String netFilename = "../detailedEval/data/network.xml.gz", //
+		plansFilename = "../../run950/output/950.output_plans.xml.gz", //
+		outputFilename = "../detailedEval/test/", //
+		tollFilename = "../detailedEval/data/boundary.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		scenario.getConfig().scenario().setUseRoadpricing(true);
+
 		new MatsimNetworkReader(scenario).readFile(netFilename);
+		RoadPricingScheme toll = scenario.getRoadPricingScheme();
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(toll);
+		try {
+			tollReader.parse(tollFilename);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		// RoadPricingReaderXMLv1 tollReader = new
-		// RoadPricingReaderXMLv1(network);
-		// try {
-		// tollReader.parse(tollFilename);
-		// } catch (SAXException e) {
-		// e.printStackTrace();
-		// } catch (ParserConfigurationException e) {
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-
-		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyDistance4Muc dd = new DailyDistance4Muc(null);
-		dd.run(population);
+		DailyDistance4Muc dd = new DailyDistance4Muc(toll, scenario
+				.getNetwork());
+		dd.run(scenario.getPopulation());
 		dd.write(outputFilename);
 
 		System.out.println("--> Done!");
-		Gbl.printElapsedTime();
 		System.exit(0);
 	}
-
 }

@@ -76,15 +76,15 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 
 				LegImpl bl = (LegImpl) pe;
 
-				ActType at = null;
+				ActTypeBln at = null;
 				String tmpActType = ((PlanImpl) plan).getNextActivity(bl).getType();
-				for (ActType a : ActType.values())
+				for (ActTypeBln a : ActTypeBln.values())
 					if (tmpActType.equals(a.getActTypeName())) {
 						at = a;
 						break;
 					}
 				if (at == null)
-					at = ActType.other;
+					at = ActTypeBln.other;
 
 				double time = bl.getTravelTime() / 60.0;
 				if (time < 0)

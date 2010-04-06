@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -20,13 +21,11 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
-import playground.yu.analysis.forZrh.Analysis4Zrh.ActType;
+import playground.yu.analysis.forZrh.Analysis4Zrh.ActTypeZrh;
 import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.PieChart;
@@ -34,13 +33,11 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * compute modal split of through distance
- *
+ * 
  * @author yu
- *
+ * 
  */
-public class DailyDistance extends AbstractPersonAlgorithm implements
-		PlanAlgorithm {
-	private static final String CAR = "car";
+public class DailyDistance extends DailyAnalysis {
 	protected double carDist, ptDist, wlkDist, bikeDist// TODO
 			, othersDist;
 	protected final double totalDayDistanceCounts[], carDayDistanceCounts[],
@@ -137,7 +134,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		if (toll == null) {
 			count++;
 			run(plan);
-		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLinkId(), toll)) {
+		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity()
+				.getLinkId(), toll)) {
 			count++;
 			run(plan);
 		}
@@ -154,25 +152,29 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof LegImpl) {
 				LegImpl bl = (LegImpl) pe;
-				ActType at = null;
-				String tmpActTypeStartsWith = plan.getNextActivity(bl)
-						.getType().substring(0, 1);
-				for (ActType a : ActType.values())
-					if (tmpActTypeStartsWith.equals(a.getFirstLetter())) {
-						at = a;
-						break;
-					}
-				if (at == null)
-					at = ActType.others;
+				ActTypeZrh legIntent = (ActTypeZrh) this.getLegIntent(plan, bl);
 
-				double dist = bl.getRoute().getDistance() / 1000.0;
-				// if (bl.getDepartureTime() < 86400)
+				Route route = bl.getRoute();
+				double dist;
+				if (route != null)
+					dist/* [km] */= CalcRouteDistance.getRouteDistance(route,
+							network) / 1000.0;
+				else {
+					dist/* [km] */= CoordUtils.calcDistance(this.network
+							.getLinks().get(
+									((PlanImpl) plan).getPreviousActivity(bl)
+											.getLinkId()).getCoord(),
+							this.network.getLinks().get(
+									((PlanImpl) plan).getNextActivity(bl)
+											.getLinkId()).getCoord()) * 1.5 / 1000.0;
+				}
+
 				TransportMode mode = bl.getMode();
 				switch (mode) {
 				case car:
 					carDist += dist;
 					carDayDist += dist;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						carHomeDist += dist;
 						break;
@@ -197,7 +199,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				case pt:
 					ptDist += dist;
 					ptDayDist += dist;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						ptHomeDist += dist;
 						break;
@@ -220,11 +222,13 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case walk:
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(plan.getPreviousActivity(bl).getLinkId()).getCoord(),
-							this.network.getLinks().get(plan.getNextActivity(bl).getLinkId()).getCoord()) * 1.5 / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(
+							plan.getPreviousActivity(bl).getLinkId())
+							.getCoord(), this.network.getLinks().get(
+							plan.getNextActivity(bl).getLinkId()).getCoord()) * 1.5 / 1000.0;
 					wlkDist += dist;
 					wlkDayDist += dist;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						wlkHomeDist += dist;
 						break;
@@ -247,11 +251,13 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case bike:
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(plan.getPreviousActivity(bl).getLinkId()).getCoord(),
-							this.network.getLinks().get(plan.getNextActivity(bl).getLinkId()).getCoord()) / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(
+							plan.getPreviousActivity(bl).getLinkId())
+							.getCoord(), this.network.getLinks().get(
+							plan.getNextActivity(bl).getLinkId()).getCoord()) / 1000.0;
 					bikeDist += dist;
 					bikeDayDist += dist;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						bikeHomeDist += dist;
 						break;
@@ -274,11 +280,13 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 					bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				default:
-					dist = CoordUtils.calcDistance(this.network.getLinks().get(plan.getPreviousActivity(bl).getLinkId()).getCoord(),
-							this.network.getLinks().get(plan.getNextActivity(bl).getLinkId()).getCoord()) / 1000.0;
+					dist = CoordUtils.calcDistance(this.network.getLinks().get(
+							plan.getPreviousActivity(bl).getLinkId())
+							.getCoord(), this.network.getLinks().get(
+							plan.getNextActivity(bl).getLinkId()).getCoord()) / 1000.0;
 					othersDist += dist;
 					othersDayDist += dist;
-					switch (at) {
+					switch (legIntent) {
 					case home:
 						othersHomeDist += dist;
 						break;
@@ -342,8 +350,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				+ "\t" + othersDist);
 
 		PieChart pieChart = new PieChart("Avg. Daily Distance -- Modal Split");
-		pieChart.addSeries(
-				new String[] { CAR, "pt", "walk", "bike", "others" },
+		pieChart.addSeries(new String[] { CAR, PT, WALK, BIKE, OTHERS },
 				new double[] { avgCarDist, avgPtDist, avgWlkDist, avgBikeDist,
 						avgOthersDist });
 		pieChart.saveAsPng(outputFilename + "dailyDistanceModalSplitPie.png",
@@ -390,14 +397,14 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				"travel destination and modal split--daily distance",
 				"travel destination", "daily distance [km]", new String[] {
 						"work", "education", "shopping", "leisure", "home",
-						"others" });
+						OTHERS });
 		barChart.addSeries(CAR, new double[] { carWorkDist, carEducDist,
 				carShopDist, carLeisDist, carHomeDist, carOtherDist });
 
 		double[] ptDestination = new double[] { ptWorkDist, ptEducDist,
 				ptShopDist, ptLeisDist, ptHomeDist, ptOtherDist };
 		if (CollectionSum.getSum(ptDestination) > 0)
-			barChart.addSeries("pt", ptDestination);
+			barChart.addSeries(PT, ptDestination);
 
 		double[] wlkDestination = new double[] { wlkWorkDist, wlkEducDist,
 				wlkShopDist, wlkLeisDist, wlkHomeDist, wlkOtherDist };
@@ -445,14 +452,14 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				"fraction of persons with daily distance bigger than x... in %");
 		chart.addSeries(CAR, x, yCar);
 		if (CollectionSum.getSum(yPt) > 0)
-			chart.addSeries("pt", x, yPt);
+			chart.addSeries(PT, x, yPt);
 		if (CollectionSum.getSum(yWlk) > 0)
-			chart.addSeries("walk", x, yWlk);
+			chart.addSeries(WALK, x, yWlk);
 		if (CollectionSum.getSum(yBike) > 0)
-			chart.addSeries("bike", x, yBike);
+			chart.addSeries(BIKE, x, yBike);
 		if (CollectionSum.getSum(yOthers) > 0)
 			chart.addSeries("other", x, yOthers);
-		chart.addSeries("total", x, yTotal);
+		chart.addSeries(TOTAL, x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyDistanceDistribution.png", 800,
 				600);
 
@@ -503,13 +510,13 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 				"leg Distance [km]", "mode fraction [%]");
 		chart2.addSeries(CAR, xs, yCarFracs);
 		if (CollectionSum.getSum(yPtFracs) > 0)
-			chart2.addSeries("pt", xs, yPtFracs);
+			chart2.addSeries(PT, xs, yPtFracs);
 		if (CollectionSum.getSum(yWlkFracs) > 0)
-			chart2.addSeries("walk", xs, yWlkFracs);
+			chart2.addSeries(WALK, xs, yWlkFracs);
 		if (CollectionSum.getSum(yBikeFracs) > 0)
-			chart2.addSeries("bike", xs, yBikeFracs);
+			chart2.addSeries(BIKE, xs, yBikeFracs);
 		if (CollectionSum.getSum(yOthersFracs) > 0)
-			chart2.addSeries("others", xs, yOthersFracs);
+			chart2.addSeries(OTHERS, xs, yOthersFracs);
 		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
 				600);
 		sw.close();
@@ -528,7 +535,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario
+				.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -542,12 +550,28 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyDistance dd = new DailyDistance(scenario.getRoadPricingScheme(), network);
+		DailyDistance dd = new DailyDistance(scenario.getRoadPricingScheme(),
+				network);
 		dd.run(population);
 		dd.write(outputFilename);
 
 		System.out.println("--> Done!");
 		Gbl.printElapsedTime();
 		System.exit(0);
+	}
+
+	@Override
+	protected ActType getLegIntent(PlanImpl plan, LegImpl currentLeg) {
+		ActType legIntent = null;
+		String tmpActTypeStartsWith = plan.getNextActivity(currentLeg)
+				.getType().substring(0, 1);
+		for (ActTypeZrh a : ActTypeZrh.values())
+			if (tmpActTypeStartsWith.equals(a.getFirstLetter())) {
+				legIntent = a;
+				break;
+			}
+		if (legIntent == null)
+			legIntent = ActTypeZrh.others;
+		return legIntent;
 	}
 }

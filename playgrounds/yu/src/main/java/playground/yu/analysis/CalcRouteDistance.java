@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyCalcAverageTripLength.java
+ * CalcRouteDistance.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,52 +23,31 @@
  */
 package playground.yu.analysis;
 
-import org.matsim.analysis.CalcAverageTripLength;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-
+import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.RouteUtils;
 
 /**
- * It's a subclass of {@code CalcAverageTripLength} and can also calculate trip
- * length of pseudo-pt leg.
+ * small tool to calculate Route distances accoring to different Route
+ * Implementations (LinkNetworkRoute is not be included)
  * 
  * @author yu
  * 
  */
-public class MyCalcAverageTripLength extends CalcAverageTripLength {
-	private double sumLength = 0.0;
-	private int cntTrips = 0;
-	private final Network network;
-
-	/**
-	 * @param network
-	 */
-	public MyCalcAverageTripLength(Network network) {
-		super(network);
-		this.network = network;
-	}
-
-	@Override
-	public void run(Plan plan) {
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Route route = ((Leg) pe).getRoute();
-				if (route != null) {
-					this.sumLength += CalcRouteDistance.getRouteDistance(route,
-							network);
-					this.cntTrips++;
-				}
-			}
+public class CalcRouteDistance {
+	public static double getRouteDistance(Route route, Network network) {
+		double distance = 0.0;
+		if (route instanceof GenericRoute)
+			distance = route.getDistance();
+		else if (route instanceof NetworkRoute) {
+			distance = RouteUtils.calcDistance((NetworkRoute) route, network);
+			Id endLinkId = route.getEndLinkId();
+			if (endLinkId != null && route.getStartLinkId() != endLinkId)
+				distance += network.getLinks().get(endLinkId).getLength();
 		}
-	}
-
-	public double getAverageTripLength() {
-		if (this.cntTrips == 0) {
-			return 0;
-		}
-		return (this.sumLength / this.cntTrips);
+		return distance;
 	}
 }

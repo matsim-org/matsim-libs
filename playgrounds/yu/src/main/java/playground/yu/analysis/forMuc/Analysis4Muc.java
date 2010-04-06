@@ -23,6 +23,8 @@
  */
 package playground.yu.analysis.forMuc;
 
+import playground.yu.analysis.Analysis;
+
 /**
  * keep some general tools for Analysis for Zurich and respectively Kanton
  * Zurich
@@ -30,8 +32,11 @@ package playground.yu.analysis.forMuc;
  * @author yu
  * 
  */
-public interface Analysis4Muc {
-	public enum ActType {
+public interface Analysis4Muc extends Analysis {
+	static final String MUNICH = "Munich", ONLY_MUNICH = "onlyMunich",// scenarios
+			RIDE = "ride";// transportModes
+
+	public enum ActTypeMuc implements ActType {
 		unknown("unknown"), work("work"), education("education"), business(
 				"business"), shopping("shopping"), private_("private"), leisure(
 				"leisure"), sports("sports"), home("home"), friends("friends"), pickup(
@@ -43,7 +48,7 @@ public interface Analysis4Muc {
 			return actTypeName;
 		}
 
-		ActType(String actTypeName) {
+		ActTypeMuc(String actTypeName) {
 			this.actTypeName = actTypeName;
 		}
 	}
