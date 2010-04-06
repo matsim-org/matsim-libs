@@ -155,19 +155,19 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	@Override
 	public void run(final Person person) {
 		for (Plan plan : person.getPlans()) {
-			handlePlan(plan);
+			handlePlan(person, plan);
 		}
 	}
 
 	public void run(final Plan plan) {
-		handlePlan(plan);
+		handlePlan(plan.getPerson(), plan);
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// helper methods
 	//////////////////////////////////////////////////////////////////////
 
-	protected void handlePlan(final Plan plan) {
+	protected void handlePlan(Person person, final Plan plan) {
 		double now = 0;
 
 		// loop over all <act>s
@@ -199,7 +199,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 						throw new RuntimeException("activity of plan of person " + plan.getPerson().getId().toString() + " has neither end-time nor duration." + fromAct.toString());
 					}
 
-					now += handleLeg(leg, fromAct, toAct, now);
+					now += handleLeg(person, leg, fromAct, toAct, now);
 
 					fromAct = toAct;
 				}
@@ -208,13 +208,14 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	}
 
 	/**
+	 * @param person TODO
 	 * @param leg the leg to calculate the route for.
 	 * @param fromAct the Act the leg starts
 	 * @param toAct the Act the leg ends
 	 * @param depTime the time (seconds from midnight) the leg starts
 	 * @return the estimated travel time for this leg
 	 */
-	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	public double handleLeg(Person person, final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		TransportMode legmode = leg.getMode();
 
 		if (legmode == TransportMode.car) {

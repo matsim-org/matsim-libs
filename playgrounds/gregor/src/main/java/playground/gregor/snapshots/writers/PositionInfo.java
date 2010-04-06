@@ -155,14 +155,10 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 		return this.vehicleState;
 	}
 
-
-	@Override
 	public LinkImpl getLink() {
 		return this.link;
 	}
 
-
-	@Override
 	public double getDistanceOnLink() {
 		return this.distanceOnLink;
 	}

@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
@@ -108,14 +109,14 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 					speed *= (1.0 + this.recursionTravelSpeedChange);
 					shrinked = false;
 				}				
-				change = this.handleSubChain(sc, speed, nrOfTrials);
+				change = this.handleSubChain(plan.getPerson(), sc, speed, nrOfTrials);
 				nrOfTrials++;
 			}
 		}
 	}
 	
 	
-	protected int handleSubChain(SubChain subChain, double speed, int trialNr){
+	protected int handleSubChain(Person person, SubChain subChain, double speed, int trialNr){
 		if (trialNr > this.maxRecursions) {		
 			this.unsuccessfullLC += 1;
 					
@@ -142,10 +143,10 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			}
 					
 			startCoord = act.getCoord();				
-			ttBudget -= this.computeTravelTime(prevAct, act);
+			ttBudget -= this.computeTravelTime(person, prevAct, act);
 			
 			if (!act_it.hasNext()) {
-				double tt2Anchor = this.computeTravelTime(act, subChain.getLastPrimAct());
+				double tt2Anchor = this.computeTravelTime(person, act, subChain.getLastPrimAct());
 				ttBudget -= tt2Anchor;
 			}
 			
@@ -176,14 +177,14 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		return false; 			
 	}
 	
-	protected double computeTravelTime(ActivityImpl fromAct, ActivityImpl toAct) {	
+	protected double computeTravelTime(Person person, ActivityImpl fromAct, ActivityImpl toAct) {	
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);
 		
 		PlansCalcRoute router = (PlansCalcRoute)this.controler.getRoutingAlgorithm();
-		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
+		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());
 		return leg.getTravelTime();
 	}
 	

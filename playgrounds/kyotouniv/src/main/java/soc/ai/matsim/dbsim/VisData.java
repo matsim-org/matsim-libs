@@ -45,8 +45,6 @@ public interface VisData {
 	 */
 	public double getDisplayableTimeCapValue(double now);
 
-	public Collection<AgentOnLink> getDrawableCollection();
-
 	public Collection<PositionInfo> getVehiclePositions(
 			final Collection<PositionInfo> positions);
 

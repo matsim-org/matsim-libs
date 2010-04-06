@@ -145,10 +145,10 @@ public class PlansVariator implements PlanAlgorithm {
 					int pos = (1+((int)(MatsimRandom.getRandom().nextDouble()*((output[i].getPlanElements().size()-2)/2))))*2;
 					output[i].removeActivity(pos);
 					/* Recovers the route of the trip in front of the removed act */
-					router.handleLeg((LegImpl)output[i].getPlanElements().get(pos-1), 
+					router.handleLeg(plan.getPerson(), 
+							(LegImpl)output[i].getPlanElements().get(pos-1), 
 							(ActivityImpl)output[i].getPlanElements().get(pos-2), 
-							(ActivityImpl)output[i].getPlanElements().get(pos), 
-							((ActivityImpl)output[i].getPlanElements().get(pos-2)).getEndTime());
+							(ActivityImpl)output[i].getPlanElements().get(pos), ((ActivityImpl)output[i].getPlanElements().get(pos-2)).getEndTime());
 				}
 			}
 			while (j>output[i].getPlanElements().size()/2+1){

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.ActivityImpl;
@@ -143,7 +144,7 @@ LegTravelTimeEstimator {
 	private final HashMap<DynamicODMatrixEntry, Double> dynamicODMatrix = new HashMap<DynamicODMatrixEntry, Double>();
 	private final HashMap<LegImpl, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<LegImpl, HashMap<TransportMode, Double>>();
 
-	protected double getInterpolation(double departureTime, ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
+	protected double getInterpolation(Person person, double departureTime, ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
 
 		// get values at sampling points
 		double samplingPoint = Double.MIN_VALUE;
@@ -175,7 +176,7 @@ LegTravelTimeEstimator {
 
 			} else {
 
-				samplingPointsTravelTimes[ii] = this.simulateLegAndGetTravelTime(samplingPoint, actOrigin, actDestination, legIntermediate);
+				samplingPointsTravelTimes[ii] = this.simulateLegAndGetTravelTime(person, samplingPoint, actOrigin, actDestination, legIntermediate);
 
 				this.dynamicODMatrix.put(entry, samplingPointsTravelTimes[ii]);
 
@@ -204,7 +205,7 @@ LegTravelTimeEstimator {
 		this.doLogging = doLogging;
 	}
 
-	protected double simulateLegAndGetTravelTime(double departureTime, ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
+	protected double simulateLegAndGetTravelTime(Person person, double departureTime, ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
 
 		double legTravelTimeEstimation = 0.0;
 		// TODO clarify usage of departure delay calculator
@@ -214,7 +215,7 @@ LegTravelTimeEstimator {
 			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(this.network.getLinks().get(actOrigin.getLinkId()), departureTime);
 			}
-			legTravelTimeEstimation += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime + legTravelTimeEstimation);
+			legTravelTimeEstimation += this.plansCalcRoute.handleLeg(person, legIntermediate, actOrigin, actDestination, departureTime + legTravelTimeEstimation);
 			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
 				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(this.network.getLinks().get(actDestination.getLinkId()), departureTime + legTravelTimeEstimation);
 			}
@@ -231,7 +232,7 @@ LegTravelTimeEstimator {
 			if (legInformation.containsKey(legIntermediate.getMode())) {
 				legTravelTimeEstimation = legInformation.get(legIntermediate.getMode()).doubleValue();
 			} else {
-				legTravelTimeEstimation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
+				legTravelTimeEstimation = this.plansCalcRoute.handleLeg(person, legIntermediate, actOrigin, actDestination, departureTime);
 				legInformation.put(legIntermediate.getMode(), legTravelTimeEstimation);
 			}
 			
@@ -245,15 +246,18 @@ LegTravelTimeEstimator {
 			ActivityImpl actOrigin, ActivityImpl actDestination,
 			LegImpl legIntermediate, boolean doModifyLeg) {
 
+		// TODO: get person from population
+		Person person = null;
+		
 		double legTravelTimeEstimation = 0.0;
 
 		if (
 				doModifyLeg || 
 				(!MODES_WITH_VARIABLE_TRAVEL_TIME.contains(legIntermediate.getMode()))
 				) {
-			legTravelTimeEstimation = this.simulateLegAndGetTravelTime(departureTime, actOrigin, actDestination, legIntermediate);
+			legTravelTimeEstimation = this.simulateLegAndGetTravelTime(person, departureTime, actOrigin, actDestination, legIntermediate);
 		} else if (!doModifyLeg) {
-			legTravelTimeEstimation = this.getInterpolation(departureTime, actOrigin, actDestination, legIntermediate);
+			legTravelTimeEstimation = this.getInterpolation(person, departureTime, actOrigin, actDestination, legIntermediate);
 		}
 
 		return legTravelTimeEstimation;

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -93,22 +94,22 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	}
 
 	@Override
-	public void handlePlan(final Plan plan) {
+	public void handlePlan(Person person, final Plan plan) {
 		this.transitLegsRemover.run(plan);
 		this.currentPlan = plan;
 		this.legReplacements.clear();
-		super.handlePlan(plan);
+		super.handlePlan(person, plan);
 		this.replaceLegs();
 		this.currentPlan = null;
 
 	}
 
 	@Override
-	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	public double handleLeg(Person person, final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		if (this.transitConfig.getTransitModes().contains(leg.getMode())) {
 			return this.handlePtPlan(leg, fromAct, toAct, depTime);
 		}
-		return super.handleLeg(leg, fromAct, toAct, depTime);
+		return super.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
 
 	private double handlePtPlan(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {

@@ -30,7 +30,7 @@ public class WriteBiogemeFile {
 
 	private static final String SURVEY_PLANS = "../detailedEval/pop/befragte-personen/plans.xml";
 
-	// private static final String ROUTED_PLANS = "../detailedEval/pop/befragte-personen/routed-plans.xml";
+	private static final String ROUTED_PLANS = "../detailedEval/pop/befragte-personen/routed-plans.xml";
 
 	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/befragte-personen/households.xml";
 
@@ -46,11 +46,11 @@ public class WriteBiogemeFile {
 
 	private Scenario scenarioWithSurveyData = new ScenarioImpl();
 	
-	// private Scenario scenarioWithRoutedPlans = new ScenarioImpl();
+	private Scenario scenarioWithRoutedPlans = new ScenarioImpl();
 
 	private Households households = new HouseholdsImpl();
 
-	private BiogemeWriter biogemeWriter = new BiogemeWriter(scenarioWithSurveyData.getPopulation(), households);
+	private BiogemeWriter biogemeWriter = new BiogemeWriter(scenarioWithSurveyData.getPopulation(), scenarioWithRoutedPlans.getPopulation(), households);
 	private void parseClustering() throws IOException {
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(CLUSTERING_FILE);
@@ -145,16 +145,17 @@ public class WriteBiogemeFile {
 	}
 
 	private void writeBiogemeFile() throws IOException {
-		biogemeWriter.writeBiogemeFile();
+		// biogemeWriter.writeBiogemeFile();
+		biogemeWriter.writePtTripLengthAnalysis();
 	}
 
 	private void readPopulation() throws SAXException, ParserConfigurationException, IOException {
 		PopulationReaderMatsimV4 populationReader1 = new PopulationReaderMatsimV4(scenarioWithSurveyData);
 		populationReader1.readFile(SURVEY_PLANS);
-//		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenarioWithRoutedPlans);
-//		networkReader.parse(NET);
-//		PopulationReaderMatsimV4 populationReader2 = new PopulationReaderMatsimV4(scenarioWithRoutedPlans);
-//		populationReader2.readFile(ROUTED_PLANS);
+		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenarioWithRoutedPlans);
+		networkReader.parse(NET);
+		PopulationReaderMatsimV4 populationReader2 = new PopulationReaderMatsimV4(scenarioWithRoutedPlans);
+		populationReader2.readFile(ROUTED_PLANS);
 		HouseholdsReaderV10 householdsReader = new HouseholdsReaderV10(households);
 		householdsReader.readFile(HOUSEHOLDS_FILE);
 	}

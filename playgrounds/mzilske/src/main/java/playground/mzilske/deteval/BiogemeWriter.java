@@ -26,21 +26,23 @@ public class BiogemeWriter {
 	
 	private static final String BIOGEME_OUTPUT_FILE = "../detailedEval/pop/befragte-personen/mode_choices.txt";
 	
+	private static final String PT_ANALYSIS_OUTPUT_FILE = "../detailedEval/pop/befragte-personen/pt-analysis.txt";
+	
 	private PrintWriter biogemeFileWriter;
 	
 	private Map<Leg, Double> leg2travelDistance = new HashMap<Leg, Double>();
 
 	private Map<Leg, Leg> clustering = new HashMap<Leg, Leg>();
 	
-	// private Population populationWithRoutedPlans;
+	private Population populationWithRoutedPlans;
 	
 	private Population populationWithSurveyData;
 	
 	private Households households;
 	
-	public BiogemeWriter(Population populationWithSurveyData, Households households) {
+	public BiogemeWriter(Population populationWithSurveyData, Population populationWithRoutedPlans, Households households) {
 		this.populationWithSurveyData = populationWithSurveyData;
-		// this.populationWithRoutedPlans = populationWithRoutedPlans;
+		this.populationWithRoutedPlans = populationWithRoutedPlans;
 		this.households = households;
 	}
 
@@ -65,6 +67,36 @@ public class BiogemeWriter {
 			}
 		}
 		biogemeFileWriter.close();
+	}
+	
+	public void writePtTripLengthAnalysis() throws FileNotFoundException, IOException {
+		PrintWriter printWriter = new PrintWriter(IOUtils.getBufferedWriter(PT_ANALYSIS_OUTPUT_FILE, false));
+		for (Entry<Id, Household> entry: households.getHouseholds().entrySet()) {
+			Household household = entry.getValue();
+			for (Id personId : household.getMemberIds()) {
+				Person personWithSurveyData = populationWithSurveyData.getPersons().get(personId);
+				Person personWithRoutedPlan = populationWithRoutedPlans.getPersons().get(personId);
+				Plan planWithSurveyData = personWithSurveyData.getPlans().iterator().next();
+				Plan routedPlan = personWithRoutedPlan.getPlans().iterator().next();
+				for (PlanElement planElement : planWithSurveyData.getPlanElements()) {
+					if (planElement instanceof Leg) {
+						Leg legWithSurveyData = (Leg) planElement;
+						int legIdx = planWithSurveyData.getPlanElements().indexOf(legWithSurveyData);
+						Leg routedLeg = (Leg) routedPlan.getPlanElements().get(legIdx);
+						if (legWithSurveyData.getMode() == TransportMode.pt) {
+							if (isGoodNumber(legWithSurveyData.getTravelTime()) && isGoodNumber(routedLeg.getTravelTime())) {
+								printWriter.println(legWithSurveyData.getTravelTime() + ";" + routedLeg.getTravelTime());
+							}
+						}
+					}
+				}
+			}
+		}
+		printWriter.close();
+	}
+
+	private boolean isGoodNumber(double travelTime) {
+		return !Double.isInfinite(travelTime) && !Double.isNaN(travelTime) && travelTime != 0.0;
 	}
 
 	private void writeChoiceLineIfPossible(Household household, Id personId, Leg legWithSurveyData, int legIdx) {

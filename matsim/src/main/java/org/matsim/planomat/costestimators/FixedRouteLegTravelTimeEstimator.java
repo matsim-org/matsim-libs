@@ -111,7 +111,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 				newRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(path.links), endLink.getId());
 				newLeg.setRoute(newRoute);
 			} else {
-				this.plansCalcRoute.handleLeg(newLeg, actOrigin, actDestination, departureTime);
+				this.plansCalcRoute.handleLeg(this.plan.getPerson(), newLeg, actOrigin, actDestination, departureTime);
 			}
 
 			legInformation.put(mode, newLeg);
@@ -196,7 +196,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 
 		} else {
 
-			legTravelTimeEstimation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
+			legTravelTimeEstimation = this.plansCalcRoute.handleLeg(this.plan.getPerson(), legIntermediate, actOrigin, actDestination, departureTime);
 
 		}
 

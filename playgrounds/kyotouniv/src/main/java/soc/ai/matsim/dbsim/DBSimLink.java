@@ -590,22 +590,6 @@ public class DBSimLink {
 			return count * 2.0 / DBSimLink.this.storageCapacity;
 		}
 
-		public Collection<AgentOnLink> getDrawableCollection() {
-			Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
-			getVehiclePositions(positions);
-
-			List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
-			for (PositionInfo pos : positions) {
-				if (pos.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR) {
-					AgentOnLink veh = new AgentOnLink();
-					veh.posInLink_m = pos.getDistanceOnLink();
-					vehs.add(veh);
-				}
-			}
-
-			return vehs;
-		}
-
 		public Collection<PositionInfo> getVehiclePositions(
 				final Collection<PositionInfo> positions) {
 			String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();

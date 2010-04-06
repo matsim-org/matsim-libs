@@ -21,6 +21,7 @@
 package playground.meisterk.kti.router;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
@@ -97,7 +98,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		
 		
 		for (TransportMode mode : TransportMode.values()) {
-			
+			Person person = new PersonImpl(new IdImpl("1"));
 			LegImpl leg = new LegImpl(mode);
 			ActivityImpl fromAct = new ActivityImpl("home", new IdImpl("1"));
 			fromAct.setCoord(new CoordImpl(1050.0, 1050.0));
@@ -105,7 +106,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 			toAct.setCoord(new CoordImpl(1052.0, 1052.0));
 			
 			try {
-				double travelTime = testee.handleLeg(leg, fromAct, toAct, departureTime);
+				double travelTime = testee.handleLeg(person, leg, fromAct, toAct, departureTime);
 				assertEquals("Wrong returned travel time for mode \"" + mode.toString() + "\".", 0.0, travelTime);
 				assertEquals("Wrong leg departure time for mode \"" + mode.toString() + "\".", departureTime, leg.getDepartureTime());
 				assertEquals("Wrong leg travel time for mode \"" + mode.toString() + "\".", 0.0, leg.getTravelTime());
@@ -146,7 +147,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 				new DijkstraFactory(), 
 				plansCalcRouteKtiInfo);
 		
-		testee.handleLeg(leg, home, work, Time.parseTime("12:34:56"));
+		testee.handleLeg(person, leg, home, work, Time.parseTime("12:34:56"));
 		
 		String actualRouteDescription = ((KtiPtRoute) leg.getRoute()).getRouteDescription();
 		String expectedRouteDescription = "kti=8503006=26101=300.0=26102=8503015";

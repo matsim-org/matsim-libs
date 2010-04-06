@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkLayer;
@@ -71,7 +72,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	}
 
 	@Override
-	protected void handlePlan(final Plan plan) {
+	protected void handlePlan(Person person, final Plan plan) {
 
 		boolean agentPaysToll = false;
 
@@ -100,7 +101,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 			ActivityImpl toAct = (ActivityImpl)actslegs.get(i);
 			isCarLeg[routeIndex] = TransportMode.car.equals(leg.getMode());
 			if (!isCarLeg[routeIndex]) {
-				super.handleLeg(leg, fromAct, toAct, depTimes[NOTOLL_INDEX][routeIndex]);
+				super.handleLeg(person, leg, fromAct, toAct, depTimes[NOTOLL_INDEX][routeIndex]);
 			} else {
 				// it is a car leg...
 

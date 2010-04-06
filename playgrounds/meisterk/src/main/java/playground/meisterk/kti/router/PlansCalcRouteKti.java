@@ -26,6 +26,7 @@ import java.util.List;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -76,7 +77,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	}
 
 	@Override
-	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	public double handleLeg(Person person, final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 
 		TransportMode mode = leg.getMode();
 
@@ -106,7 +107,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			if (mode.equals(TransportMode.pt)) {
 				travelTime = handleSwissPtLeg(fromAct, leg, toAct, depTime);
 			} else {
-				travelTime = super.handleLeg(leg, fromAct, toAct, depTime);
+				travelTime = super.handleLeg(person, leg, fromAct, toAct, depTime);
 			}
 		}
 

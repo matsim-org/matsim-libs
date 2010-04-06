@@ -2,6 +2,7 @@ package playground.anhorni.choiceSetGeneration.test;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -10,6 +11,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -47,9 +49,10 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 	
 	
 	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {	
+		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);		
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
-		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());	
+		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());	
 		return leg;
 	}	
 }
