@@ -77,12 +77,12 @@ public class MyLoadedNetworkRouter {
 	
 	public void run(final String[] args) {
 		//String rootPath="/home/erathal/MatSimRouting/";
-		//String rootPath="/home/wrashid/erath/";
-		String rootPath="../matsim/input/triangle/";
-		//String networkFile=rootPath + "network.car.xml.gz";
-		String eventsFile=rootPath + "3.events.txt.gz";
+		String rootPathOut="/home/ciarif/Car_Travel_Script/output/";
+		String rootPath="/home/ciarif/Car_Travel_Script/input/";
+		String networkFile=rootPath + "network.car.xml.gz";
+		String eventsFile=rootPath + "50.events.txt.gz";
 		String inputPlansFile=rootPath + "inputPlanFile.xml";
-		String outputPlansFile=rootPath + "outputPlanFile.xml";
+		String outputPlansFile=rootPathOut + "outputPlanFile.xml";
 		
 		parseArguments(args);
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
