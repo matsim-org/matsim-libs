@@ -59,12 +59,12 @@ import playground.yu.utils.io.SimpleWriter;
  * This class can only be used with plansfile, in that all <code>Leg</code>s in
  * a <code>Plan</code> muss be equiped with the same {@code Mode}
  * {@link org.matsim.api.core.v01.TransportMode} in a day.
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
-		AgentArrivalEventHandler {
+		AgentArrivalEventHandler, Analysis {
 
 	protected final Population plans;
 
@@ -126,8 +126,9 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	public void handleEvent(final AgentDepartureEvent event) {
 		if (toll != null) {
 			// only inhabitant from Kanton
-			if (TollTools.isInRange(((PlanImpl) plans.getPersons().get(event.getPersonId())
-					.getSelectedPlan()).getFirstActivity().getLinkId(), toll))
+			if (TollTools.isInRange(((PlanImpl) plans.getPersons().get(
+					event.getPersonId()).getSelectedPlan()).getFirstActivity()
+					.getLinkId(), toll))
 				this.tmpDptTimes.put(event.getPersonId().toString(), event
 						.getTime());
 		} else
@@ -144,8 +145,8 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		String agentId = event.getPersonId().toString();
 		if (toll == null)
 			internalCompute(agentId, arrTime);
-		else if (TollTools.isInRange(((PlanImpl) plans.getPersons()
-				.get(event.getPersonId()).getSelectedPlan()).getFirstActivity()
+		else if (TollTools.isInRange(((PlanImpl) plans.getPersons().get(
+				event.getPersonId()).getSelectedPlan()).getFirstActivity()
 				.getLinkId(), toll))
 			internalCompute(agentId, arrTime);
 	}
@@ -158,7 +159,8 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			this.travelTimes[binIdx] += travelTime;
 			this.arrCount[binIdx]++;
 
-			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
+			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
+					.getSelectedPlan();
 			TransportMode mode = PlanModeJudger.getMode(selectedplan);
 			switch (mode) {
 			case car:
@@ -208,20 +210,16 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 					+ this.arrCount[i] + "\t"
 					+ this.travelTimes[i] / this.arrCount[i] + "\t"
 					+ this.carTravelTimes[i] + "\t" + this.carArrCount[i]
-					+ "\t"
-					+ this.carTravelTimes[i] / this.carArrCount[i]
+					+ "\t" + this.carTravelTimes[i] / this.carArrCount[i]
 					+ "\t" + this.ptTravelTimes[i] + "\t" + this.ptArrCount[i]
-					+ "\t"
-					+ this.ptTravelTimes[i] / this.ptArrCount[i]
-					+ "\t" + this.wlkTravelTimes[i] + "\t"
-					+ this.wlkArrCount[i] + "\t" + this.wlkTravelTimes[i]
-					/ this.wlkArrCount[i] + "\t"
-					+ this.bikeTravelTimes[i] + "\t" + this.bikeArrCount[i]
-					+ "\t" + this.bikeTravelTimes[i]
-					/ this.bikeArrCount[i] + "\t"
-					+ this.othersTravelTimes[i] + "\t" + this.othersArrCount[i]
-					+ "\t" + this.othersTravelTimes[i]
-					/ this.othersArrCount[i]);
+					+ "\t" + this.ptTravelTimes[i] / this.ptArrCount[i] + "\t"
+					+ this.wlkTravelTimes[i] + "\t" + this.wlkArrCount[i]
+					+ "\t" + this.wlkTravelTimes[i] / this.wlkArrCount[i]
+					+ "\t" + this.bikeTravelTimes[i] + "\t"
+					+ this.bikeArrCount[i] + "\t" + this.bikeTravelTimes[i]
+					/ this.bikeArrCount[i] + "\t" + this.othersTravelTimes[i]
+					+ "\t" + this.othersArrCount[i] + "\t"
+					+ this.othersTravelTimes[i] / this.othersArrCount[i]);
 
 		sw.write("----------------------------------------\n");
 		sw
@@ -344,7 +342,8 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario
+				.getRoadPricingScheme());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
