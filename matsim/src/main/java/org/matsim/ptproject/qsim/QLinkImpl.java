@@ -458,7 +458,7 @@ public class QLinkImpl implements QLink {
 	}
 
 	public QSimEngine getQSimEngine(){
-	  return this.qsimEngine;
+		return this.qsimEngine;
 	}
 
 	//	public Queue<QueueVehicle> getVehiclesInBuffer() {
@@ -550,8 +550,8 @@ public class QLinkImpl implements QLink {
 		return this.buffer.peek();
 	}
 
-//	private static int getVehPosCnt = 0 ;
-//	private static int qSimAccessCnt = 0 ;
+	//	private static int getVehPosCnt = 0 ;
+	//	private static int qSimAccessCnt = 0 ;
 	/**
 	 * Inner class to capsulate visualization methods
 	 *
@@ -586,23 +586,23 @@ public class QLinkImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-		  String snapshotStyle = getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
-		  if ("queue".equals(snapshotStyle)) {
-		    getVehiclePositionsQueue(positions);
-		  } else if ("equiDist".equals(snapshotStyle)) {
-		    getVehiclePositionsEquil(positions);
-		  } else {
-		    log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
-		  }
-		  int cnt2 = 0 ;
-		  Collection<PersonAgent> agentsInActivities = QLinkImpl.this.agentsInActivities.values();
-		  for (PersonAgent pa : agentsInActivities) {
-		    PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), getLink(), cnt2 ) ;
-		    agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
-		    positions.add(agInfo) ;
-		    cnt2++ ;
-		  }
-		  return positions;
+			String snapshotStyle = getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
+			if ("queue".equals(snapshotStyle)) {
+				getVehiclePositionsQueue(positions);
+			} else if ("equiDist".equals(snapshotStyle)) {
+				getVehiclePositionsEquil(positions);
+			} else {
+				log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
+			}
+			int cnt2 = 0 ;
+			Collection<PersonAgent> agentsInActivities = QLinkImpl.this.agentsInActivities.values();
+			for (PersonAgent pa : agentsInActivities) {
+				PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), getLink(), cnt2 ) ;
+				agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
+				positions.add(agInfo) ;
+				cnt2++ ;
+			}
+			return positions;
 		}
 
 		/**
@@ -729,21 +729,23 @@ public class QLinkImpl implements QLink {
 			return queueEnd;
 		}
 
-    private void createPositionInfo(Collection<AgentSnapshotInfo> positions, Collection<PersonAgent> peopleInVehicle, Link link, 
-        double distanceOnLane, int lane, double speed){
-      for (PersonAgent passenger : peopleInVehicle) {
-        PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLane,
-            lane );
-        passengerPosition.setColorValueBetweenZeroAndOne( speed ) ;
-        if ( passenger.getPerson().getId().toString().startsWith("pt") ) {
-          passengerPosition.setAgentState( AgentState.TRANSIT_DRIVER ) ;
-        } else {
-          passengerPosition.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
-        }
-        positions.add(passengerPosition);
-      }
-    }
-		
+		private void createPositionInfo(Collection<AgentSnapshotInfo> positions, Collection<PersonAgent> peopleInVehicle, Link link, double distanceOnLane, int lane, double speed) {
+			boolean first = true;
+			for (PersonAgent passenger : peopleInVehicle) {
+				PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLane, lane);
+				passengerPosition.setColorValueBetweenZeroAndOne( speed );
+				if ( passenger.getPerson().getId().toString().startsWith("pt")) {
+					passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
+				} else if (first) {
+					passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
+				} else {
+					passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
+				}
+				positions.add(passengerPosition);
+				first = false;
+			}
+		}
+
 		/**
 		 * place other driving cars according the following rule:
 		 * - calculate the time how long the vehicle is on the link already
@@ -810,20 +812,16 @@ public class QLinkImpl implements QLink {
 			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
 			for (QVehicle veh : QLinkImpl.this.waitingList) {
 				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-				for (PersonAgent person : peopleInVehicle) {
-					PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLinkImpl.this.getLink(),
-							/*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-					if ( person.getPerson().getId().toString().startsWith("pt") ) {
-						position.setAgentState( AgentState.TRANSIT_DRIVER ) ;
-					} else {
-						position.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
-					}
-					positions.add(position);
-				}
+				this.createPositionInfo(positions, peopleInVehicle, link, cellSize, lane, 0.0);
 			}
 			return lane;
 		}
 
+		/**
+		 * Returns all the people sitting in this vehicle.
+		 * @param vehicle
+		 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
+		 */
 		private Collection<PersonAgent> getPeopleInVehicle(QVehicle vehicle) {
 			Collection<PersonAgent> passengers = QLinkImpl.this.transitQueueLaneFeature.getPassengers(vehicle);
 			if (passengers.isEmpty()) {
@@ -849,9 +847,9 @@ public class QLinkImpl implements QLink {
 		this.agentsInActivities.remove(agent.getPerson().getId());
 	}
 
-  @Override
-  public double getBufferLastMovedTime() {
-    return this.bufferLastMovedTime;
-  }
+	@Override
+	public double getBufferLastMovedTime() {
+		return this.bufferLastMovedTime;
+	}
 
 }
