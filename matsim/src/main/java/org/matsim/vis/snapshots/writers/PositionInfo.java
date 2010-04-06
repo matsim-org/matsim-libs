@@ -37,7 +37,9 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  * @author mrieser
  */
 public class PositionInfo implements AgentSnapshotInfo {
-	private static final double LANE_WIDTH = 3.75;//TODO lane width is no longer static but it is defined in network. The question is,
+	
+	private static final double LANE_WIDTH = 3.75;
+	//TODO lane width is no longer static but it is defined in network. The question is,
 	//how to get this information here? One possibility is to use Gbl ... but I suppose not everyone
 	//would be comfortable with this idea? Is there a solution to do this in a strict OO manner
 	//(without a static Gbl)? [GL] - april 08
@@ -56,20 +58,26 @@ public class PositionInfo implements AgentSnapshotInfo {
 	private static final double WIDTH_OF_MEDIAN = 30. ;
 
 	private static final double PI_HALF = Math.PI / 2.0;
+	
 	private static final double TWO_PI = 2.0 * Math.PI;
 
 	final private Id agentId;
 
 	private double easting;
+	
 	private double northing;
+	
 	private double elevation;
+	
 	private double azimuth;
+	
 	final private double distanceOnLink;
 
 	private double speed;
 
 	private AgentState vehicleState;
-	final private Link link;
+	
+	final private Id linkId;
 
 	private int type = 0;
 
@@ -83,6 +91,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 	public PositionInfo( final Id agentId, final Link link ) {
 		this( agentId, link, 0.9*link.getLength(), 10, 0., AgentState.PERSON_AT_ACTIVITY) ;
 	}
+	
 	public PositionInfo( final Id agentId, final Link link, int cnt ) {
 		this( agentId, link, 0.9*link.getLength(), 10+2*cnt, 0., AgentState.PERSON_AT_ACTIVITY) ;
 	}
@@ -100,17 +109,14 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 */
 	@Deprecated // in my view, use shorter constructors.  kai, jan'10
 	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState ) {
-		this( agentId, link, distanceOnLink, lane ) ;
+		this.agentId = agentId;
+		this.linkId = link.getId();
+		this.distanceOnLink = distanceOnLink;
+		this.calculatePosition(link, 1.0, lane);
 		this.speed = speed;
 		this.vehicleState = vehicleState;
 	}
-	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane ) {
-		this.agentId = agentId;
-		this.link = link;
-		this.distanceOnLink = distanceOnLink;
-		this.calculatePosition(1.0, lane);
-	}
-
+	
 	/**
 	 * Creates a new PositionInfo based on the agent's position between to nodes
 	 * and scales the position by the given scale parameter.
@@ -130,11 +136,10 @@ public class PositionInfo implements AgentSnapshotInfo {
 
 	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane ) {
 		this.agentId = agentId;
-		this.link = link;
+		this.linkId = link.getId();
 		this.distanceOnLink = distanceOnLink;
-		this.calculatePosition(linkScale, lane);
+		this.calculatePosition(link, linkScale, lane);
 	}
-
 
 	/**
 	 * Creates a new PositionInfo with the specified position and speed.
@@ -152,9 +157,10 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.speed = speed;
 		this.vehicleState = vehicleState;
 	}
+	
 	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth ) {
 		this.agentId = driverId;
-		this.link = null;
+		this.linkId = null;
 		this.easting = easting;
 		this.northing = northing;
 		this.elevation = elevation;
@@ -162,10 +168,9 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.distanceOnLink = 0.0; // is unknown
 	}
 
-
-	private void calculatePosition(double linkScale, int lane){
-		Point2D.Double linkStart = new Point2D.Double(this.link.getFromNode().getCoord().getX(), this.link.getFromNode().getCoord().getY());
-		Point2D.Double linkEnd = new Point2D.Double(this.link.getToNode().getCoord().getX(), this.link.getToNode().getCoord().getY());
+	private void calculatePosition(Link link, double linkScale, int lane){
+		Point2D.Double linkStart = new Point2D.Double(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+		Point2D.Double linkEnd = new Point2D.Double(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 		double dx = -linkStart.getX() + linkEnd.getX();
 		double dy = -linkStart.getY() + linkEnd.getY();
 		double theta = 0.0;
@@ -196,7 +201,6 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.elevation = 0.0;
 		this.azimuth = theta / (TWO_PI) * 360;
 	}
-
 
 	public Id getId() {
 		return this.agentId;
@@ -232,20 +236,15 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.vehicleState = state ;
 	}
 
-	@Deprecated // yyyyyy not from here
-	public Link getLink() {
-		return this.link;
-	}
-
-	@Deprecated // yyyyyy not from here
-	public double getDistanceOnLink() {
-		return this.distanceOnLink;
+	public Id getLinkId() {
+		return this.linkId;
 	}
 
 	@Deprecated // yyyy I don't know what this is.  kai, jan'10
 	public int getType() {
 		return this.type;
 	}
+	
 	@Deprecated // yyyy I don't know what this is.  kai, jan'10
 	public void setType( int tmp ) {
 		this.type = tmp ;
