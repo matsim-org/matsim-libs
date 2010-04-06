@@ -227,11 +227,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, new Color(0.0f, 0.7f, 1.0f), true);
 			}
 		}
+		
 		public void setAgent( AgentSnapshotInfo agInfo ) {
 			char[] id = agInfo.getId().toString().toCharArray();
-			if ( id[0]=='p' && id[1]=='t' ) {
-				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
-			} else if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
+			if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
 				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), colorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne()), true);
 			} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
 				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
