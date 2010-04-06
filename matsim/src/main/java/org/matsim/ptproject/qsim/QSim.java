@@ -576,18 +576,18 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 				agent.activityEnds(time);
 				// (... calls PersonAgent.advancePlanElement, which 
-				// Ê... calls PersonAgent.initNextLeg if the next PlanElement is a leg, which
-				// Ê... calls QSim.agentDeparts, which
-				// Ê... calls QSim.handleKnownLegModeDeparture, which
-				// Ê... calls all departure handlers, which
-				// Ê... calls TransitQSimFeature.handlePTDeparture if it is a pt leg, which
-				// Ê... puts the agent into the global agent tracker data structure, together with the correct stop id.
-				// Êkai, feb'10)
+				// ... calls PersonAgent.initNextLeg if the next PlanElement is a leg, which
+				// ... calls QSim.agentDeparts, which
+				// ... calls QSim.handleKnownLegModeDeparture, which
+				// ... calls all departure handlers, which
+				// ... calls TransitQSimFeature.handlePTDeparture if it is a pt leg, which
+				// ... puts the agent into the global agent tracker data structure, together with the correct stop id.
+				// kai, feb'10)
 
 				for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
 
 					queueSimulationFeature.afterActivityEnds(agent, time);
-					// (calls TransitQSimFeature.afterActivityEnds(...), but that does not do anything. Êkai, feb'10
+					// (calls TransitQSimFeature.afterActivityEnds(...), but that does not do anything. kai, feb'10
 
 				}
 			} else {
