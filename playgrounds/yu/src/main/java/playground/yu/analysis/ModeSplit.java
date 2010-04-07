@@ -32,11 +32,14 @@ import playground.yu.utils.io.SimpleWriter;
  * @author yu
  * 
  */
-public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm {
-	private int carLegs = 0, ptLegs = 0, wlkLegs = 0, bikeLegs = 0,
-			othersLegs = 0, tollCarLegs = 0, tollPtLegs = 0, tollWlkLegs = 0,
-			tollBikeLegs = 0, tollOthersLegs = 0;
-	private RoadPricingScheme toll = null;
+public class ModeSplit extends AbstractPersonAlgorithm implements
+		PlanAlgorithm, Analysis {
+	protected int carLegs = 0, ptLegs = 0, wlkLegs = 0,
+			bikeLegs = 0,
+			othersLegs = 0,// 
+			tollCarLegs = 0, tollPtLegs = 0, tollWlkLegs = 0, tollBikeLegs = 0,
+			tollOthersLegs = 0;
+	protected RoadPricingScheme toll = null;
 
 	public ModeSplit(final RoadPricingScheme toll) {
 		this.toll = toll;

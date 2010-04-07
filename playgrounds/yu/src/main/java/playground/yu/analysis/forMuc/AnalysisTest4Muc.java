@@ -27,7 +27,6 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -44,10 +43,7 @@ import org.xml.sax.SAXException;
 import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
-import playground.yu.analysis.EnRouteModalSplit;
 import playground.yu.analysis.LegDistance;
-import playground.yu.analysis.LegTravelTimeModalSplit;
-import playground.yu.analysis.ModeSplit;
 import playground.yu.analysis.MyCalcAverageTripLength;
 import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
@@ -85,8 +81,7 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 	}
 
 	private static void runIntern(final String[] args, final String scenario) {
-		final String netFilename = args[0];
-		final String eventsFilename = args[1];
+		final String netFilename = args[0], eventsFilename = args[1];
 		String eventsOutputFilename = args[1].replaceFirst("events",
 				"events4mvi");
 		String outputBase = args[2] + args[args.length - 1] + "."
@@ -106,9 +101,9 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 		RoadPricingScheme toll = null;
 		if (withToll) {
 			sc.getConfig().scenario().setUseRoadpricing(true);
+			toll = sc.getRoadPricingScheme();
 			try {
-				new RoadPricingReaderXMLv1(sc.getRoadPricingScheme())
-						.parse(tollFilename);
+				new RoadPricingReaderXMLv1(toll).parse(tollFilename);
 			} catch (SAXException e) {
 				e.printStackTrace();
 			} catch (ParserConfigurationException e) {
@@ -116,26 +111,25 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			toll = sc.getRoadPricingScheme();
 		}
 
 		// EventsHandlers with parameter of "Population":
-		EnRouteModalSplit orms = null;
-		LegTravelTimeModalSplit lttms = null;
+		EnRouteModalSplit4Muc orms = null;
+		LegTravelTimeModalSplit4Muc lttms = null;
 		// PersonAlgorithm
-		CalcAverageTripLength catl = null;
+		MyCalcAverageTripLength catl = null;
 		DailyDistance4Muc dd = null;
 		DailyEnRouteTime4Muc dert = null;
-		ModeSplit ms = null;
+		ModeSplit4Muc ms = null;
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
 			PopulationImpl population = sc.getPopulation();
 
 			catl = new MyCalcAverageTripLength(network);
-			ms = new ModeSplit(toll);
-			orms = new EnRouteModalSplit(scenario, population, toll);
-			lttms = new LegTravelTimeModalSplit(population, toll);
+			ms = new ModeSplit4Muc(toll);
+			orms = new EnRouteModalSplit4Muc(scenario, population, toll);
+			lttms = new LegTravelTimeModalSplit4Muc(population, toll);
 			dd = new DailyDistance4Muc(toll, network);
 			dert = new DailyEnRouteTime4Muc(toll);
 			ld = new LegDistance(network, toll, population);
