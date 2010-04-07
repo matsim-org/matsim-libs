@@ -5,6 +5,7 @@ package playground.yu.scoring;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
@@ -16,7 +17,8 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
  * 
  */
 public class CharyparNagelScoringFunctionWithWalk extends LegScoringFunction {
-	private static double offsetWlk = 6.0;
+	private double offsetWlk = Double.parseDouble(Gbl.getConfig().findParam(
+			"subTourModeChoice", "offsetWalk"));
 
 	public CharyparNagelScoringFunctionWithWalk(Plan plan,
 			final CharyparNagelScoringParameters params) {
@@ -55,9 +57,10 @@ public class CharyparNagelScoringFunctionWithWalk extends LegScoringFunction {
 		if (TransportMode.car.equals(leg.getMode())) {
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
-			tmpScore += travelTime * (-3.0) / 3600.0;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT;
 		} else if (TransportMode.walk.equals(leg.getMode())) {
-			tmpScore += offsetWlk + travelTime * (-18.0) / 3600.0;
+			tmpScore += offsetWlk + travelTime
+					* this.params.marginalUtilityOfTravelingWalk;
 		} else {
 			// use the same values as for "car"
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;

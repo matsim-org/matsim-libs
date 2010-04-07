@@ -18,20 +18,27 @@ import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
  * 
  * @author yu
  */
-public class CharyparNagelScoringFunctionFactoryWithWalk implements ScoringFunctionFactory {
+public class CharyparNagelScoringFunctionFactoryWithWalk implements
+		ScoringFunctionFactory {
 
 	private final CharyparNagelScoringParameters params;
-	
-	public CharyparNagelScoringFunctionFactoryWithWalk(final CharyparNagelScoringConfigGroup config) {
+
+	public CharyparNagelScoringFunctionFactoryWithWalk(
+			final CharyparNagelScoringConfigGroup config) {
 		this.params = new CharyparNagelScoringParameters(config);
 	}
-	
+
 	public ScoringFunction getNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelScoringFunctionWithWalk(plan, params));
-		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
+		scoringFunctionAccumulator
+				.addScoringFunction(new ActivityScoringFunction(plan, params));
+		scoringFunctionAccumulator
+				.addScoringFunction(new CharyparNagelScoringFunctionWithWalk(
+						plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(
+				params));
+		scoringFunctionAccumulator
+				.addScoringFunction(new AgentStuckScoringFunction(params));
 		return scoringFunctionAccumulator;
 	}
 
