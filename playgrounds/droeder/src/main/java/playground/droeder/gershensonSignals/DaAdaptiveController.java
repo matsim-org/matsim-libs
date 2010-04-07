@@ -223,10 +223,10 @@ public class DaAdaptiveController extends
 		@Override
 		public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
 			
-			//check if this group was switched in this timestep. if so, return oldstate
-			if (this.switchedGreen == e.getSimulationTime()){
-				return;
-			}
+//			//check if this group was switched in this timestep. if so, return oldstate
+//			if (this.switchedGreen == e.getSimulationTime()){
+//				return;
+//			}
 			
 			// disable algorithm if interim is active
 			if (interim == true){
@@ -275,7 +275,7 @@ public class DaAdaptiveController extends
 			// iterate over groups sorted by demand.
 			for (Entry<Id, Double> ee : sorted_map.entrySet()){
 				for (SignalGroupDefinition sd : corrGroups.get(ee.getKey())){
-					this.updateSignalGroupState(e.getSimulationTime(), this.getSignalGroups().get(sd.getId()));
+					this.algorithm(e.getSimulationTime(), this.getSignalGroups().get(sd.getId()));
 					// return if interim is true, because a group was switched in this timestep
 					if (interim == true){
 						return;
@@ -284,7 +284,7 @@ public class DaAdaptiveController extends
 			}
 		}
 		
-		private void updateSignalGroupState(double time, SignalGroupDefinition signalGroup) {
+		private void algorithm(double time, SignalGroupDefinition signalGroup) {
 
 			this.initIsGreen(time, signalGroup);
 			
