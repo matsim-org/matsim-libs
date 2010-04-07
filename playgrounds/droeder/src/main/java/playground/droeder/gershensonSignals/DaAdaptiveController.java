@@ -45,7 +45,7 @@ import playground.droeder.ValueComparator;
  * @author droeder
  *
  */
-public class DaAdaptivController extends
+public class DaAdaptiveController extends
 	AdaptiveSignalSystemControlerImpl implements EventHandler, SimulationBeforeSimStepListener {
 
 		private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
@@ -84,7 +84,7 @@ public class DaAdaptivController extends
 		protected QNetwork net;
 
 
-		public DaAdaptivController(AdaptiveSignalSystemControlInfo controlInfo) {
+		public DaAdaptiveController(AdaptiveSignalSystemControlInfo controlInfo) {
 			super(controlInfo);
 		}
 
@@ -160,9 +160,9 @@ public class DaAdaptivController extends
 				for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
 					if(e.getValue().contains(signalGroup)){
 						for (SignalGroupDefinition sd : e.getValue()){
-							if (!(mainOutLinks.get(sd.getLinkRefId()) ==  null)){
-								outLinkCapacity += net.getLinks().get(mainOutLinks.get(sd.getLinkRefId())).getSpaceCap();
-								actStorage += handler.getVehOnLink(mainOutLinks.get(sd.getLinkRefId()));
+							for (Id id : sd.getToLinkIds()){
+								outLinkCapacity += net.getLinks().get(id).getSpaceCap();
+								actStorage += handler.getVehOnLink(id);
 							}
 						}
 					}
@@ -174,21 +174,6 @@ public class DaAdaptivController extends
 				outLinkJam = false;
 			}
 			
-			// check competing links for trafficJam
-//			compLinkJam = true;
-//			out : 
-//				for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
-//					if(!(e.getValue().contains(signalGroup))){
-//						for (SignalGroupDefinition sd : e.getValue()){
-//							double compCap = net.getLinks().get(sd.getLinkRefId()).getSpaceCap();
-//							double compStorage = handler.getVehOnLink(sd.getLinkRefId());
-//							if ((compCap*capFactor)>compStorage){
-//								compLinkJam = false;
-//								break out;
-//							}
-//						}
-//					}
-//				}
 
 			//set number of cars, approaching a competing Link in a short distance, if it is green
 			if (compGroupsGreen == true){
@@ -197,9 +182,6 @@ public class DaAdaptivController extends
 						for (SignalGroupDefinition sd : e.getValue()){
 							approachingGreenLane = handler.getVehOnLinkLanes(sd.getLinkRefId());
 							approachingGreenLink += handler.getVehInD(time, sd.getLinkRefId());
-//							if((compGreenTime< (time-switchedToGreen.get(sd.getId())))){
-//								compGreenTime = (time - switchedToGreen.get(sd.getId()));
-//							}
 							if((compGreenTime< (time-switchedGreen))){
 								compGreenTime = (time - switchedGreen);
 							}
@@ -265,9 +247,9 @@ public class DaAdaptivController extends
 				}
 				if (!id.equals(new IdImpl("null"))){
 					for (SignalGroupDefinition sd : corrGroups.get(id)){
-						if(handler.getVehOnLink(sd.getLinkRefId())>0){
+//						if(handler.getVehOnLink(sd.getLinkRefId())>0){
 							this.startSwitching(sd, e.getSimulationTime());
-						}
+//						}
 						// return if interim is true, because a group was switched in this timestep
 						if (interim == true){
 							return;
@@ -339,6 +321,7 @@ public class DaAdaptivController extends
 			this.interimTime = 0;
 			this.interimGroup = group;
 			
+			//get Demand before Switching
 			for (SignalGroupDefinition sd : this.getSignalGroups().values()){
 				demandOnRefLink.get(sd.getId()).put(time, handler.getVehInD(time, sd.getLinkRefId()));
 			}
@@ -361,11 +344,12 @@ public class DaAdaptivController extends
 				if (oldState.equals(SignalGroupState.YELLOW)){
 					interim = false;
 					switchToRed(group, time);
-					//start algorithm new?!
 				}else if (oldState.equals(SignalGroupState.RED)){
-					switchToRedYellow(group, time);
+					switchToRed(group, time);
 				}
-			}else if (temp >3){
+			}else if(temp == 4){
+				switchToRedYellow(group, time);
+			}else if (temp >4){
 				this.interim = false;
 				switchToGreen(group, time);
 			}
@@ -380,13 +364,6 @@ public class DaAdaptivController extends
 						switchedToRed.put(e.getKey(), time);
 					}
 				}
-				
-//				if(e.getValue().contains(group)){
-//					for (SignalGroupDefinition sd : e.getValue()){
-//						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
-//						this.getSignalGroupStates().put(sd,SignalGroupState.RED);
-//					}
-//				}
 			}
 		}
 		
@@ -398,14 +375,14 @@ public class DaAdaptivController extends
 						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.REDYELLOW);
 						this.getSignalGroupStates().put(sd,SignalGroupState.REDYELLOW);
 					}
-				} else {
-					for (SignalGroupDefinition sd : e.getValue()){
-						if (getSignalGroupState(time, sd).equals(SignalGroupState.YELLOW)){
-							fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
-							this.getSignalGroupStates().put(sd,SignalGroupState.RED);
-							switchedToRed.put(e.getKey(), time);
-						}
-					}
+//				} else {
+//					for (SignalGroupDefinition sd : e.getValue()){
+//						if (getSignalGroupState(time, sd).equals(SignalGroupState.YELLOW)){
+//							fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
+//							this.getSignalGroupStates().put(sd,SignalGroupState.RED);
+//							switchedToRed.put(e.getKey(), time);
+//						}
+//					}
 				}
 			}
 		}
@@ -419,12 +396,6 @@ public class DaAdaptivController extends
 						this.getSignalGroupStates().put(sd,SignalGroupState.YELLOW);
 					}
 				}
-//				if(e.getValue().contains(group)){
-//					for (SignalGroupDefinition sd : e.getValue()){
-//						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.YELLOW);
-//						this.getSignalGroupStates().put(sd,SignalGroupState.YELLOW);
-//					}
-//				}
 			}
 		}
 		

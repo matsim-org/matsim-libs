@@ -60,7 +60,7 @@ public class CottbusScenarioGenerator {
 		private static final String OUTPUTDIRECTORY = DaPaths.OUTPUT + "cottbus/" ;
 		
 		// DEFINITIONS
-		protected static String controllerClass = DaAdaptivController.class.getCanonicalName();
+		protected static String controllerClass = DaAdaptiveController.class.getCanonicalName();
 		private static final int iterations = 1;
 		Id id1 = new IdImpl("1");
 		Id id2 = new IdImpl("2");

@@ -245,7 +245,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				QSim qs = e.getQueueSimulation();
 				
 				for(Entry<Id, Map<Id, SignalGroupDefinition>> ee: signalSystems.entrySet()){
-					DaAdaptivController adaptiveController = (DaAdaptivController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
+					DaAdaptiveController adaptiveController = (DaAdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
 					adaptiveController.setParameters(n, u, cap, maxRed);
 					adaptiveController.init(newCorrGroups.get(ee.getKey()), newMainOutlinks.get(ee.getKey()), e.getQueueSimulation().getQNetwork(), handler2);
 					c.getEvents().addHandler(adaptiveController);
@@ -267,7 +267,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSim> e) {
 				QSim qs = e.getQueueSimulation();
 				for(Entry<Id, Map<Id, SignalGroupDefinition>> ee: signalSystems.entrySet()){
-					DaAdaptivController adaptiveController = (DaAdaptivController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
+					DaAdaptiveController adaptiveController = (DaAdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(ee.getKey());
 					if(writeSignalPlans == true){
 						writeDemandOnRefLinkChart(adaptiveController, ee.getKey());
 					}
@@ -321,7 +321,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	
 	}
 	
-	public void writeDemandOnRefLinkChart(DaAdaptivController contr, Id signalSystem){
+	public void writeDemandOnRefLinkChart(DaAdaptiveController contr, Id signalSystem){
 		DaBarChart chart = new DaBarChart();
 		for (Entry<Id, SortedMap<Double, Double>> ee : contr.getDemandOnRefLink().entrySet()){
 			chart.addSeries(ee.getKey().toString(), (Map)ee.getValue().subMap(signalPlanMin, signalPlanMax));
@@ -419,31 +419,3 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	
 
 }
-//		for (int d = 80; d<151; d = d+10){
-//			for (int c = 0; c < 16; c++){
-//				temp = 0;
-//				barChart = new DaBarChart();
-//				cap = (80.00+(double)c)/100.00;
-//				for (int u = 5; u < 30; u = u + 2){
-//					nAndT = new LinkedHashMap<Number, Number>();
-//					for (int n = 10; n < 401; n = n+10){
-//						runner = new GershensonRunner();
-//						Gbl.reset();
-//						runner.setU(u);
-//						runner.setN(n);
-//						runner.setCap(cap);
-//						runner.setD(d);
-//						runner.setMaxGreen(0);
-//						runner.runScenario(config);
-//						nAndT.put(n, avTT);
-//						if(avTT>temp){
-//							temp = avTT;
-//						}
-//					}
-//					barChart.addSeries("u=" + String.valueOf(u), nAndT);
-//		//			nAndUT.put(n, uAndT);
-//				}	
-//				new DaChartWriter().writeChart(DaPaths.OUTPUT+"DENVER\\Charts_10_03_17.2\\" + "n10-400_u5-30_cap" + 
-//						String.valueOf(cap) + "_d" + String.valueOf(d), 2560, 1600, barChart.createChart("capacityFactor = " + String.valueOf(cap) + " d = " + String.valueOf(d), "waitingCars * redTime [1*s]", "average travelTime t [s]", temp));
-//			}
-//		}

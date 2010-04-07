@@ -80,7 +80,7 @@ public class GershensonScenarioGenerator {
 	private static final boolean isUseLanes = true;
 	private static final boolean isUseSignalSystems = true;
 
-	private static final String controllerClass = DaAdaptivController.class.getCanonicalName();
+	private static final String controllerClass = DaAdaptiveController.class.getCanonicalName();
 	private static final int iterations = 0;
 
 
