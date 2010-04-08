@@ -80,7 +80,7 @@ public class MyOTFEvents2Mvi {
 		sw2.close();
 		// ----------------------------------------------------
 		OTFVis.main(new String[] { "-convert", eventsOutputFilename,
-				args[0]/* networkFilename */, args[0] + "mvi"/* mviFilename */,
+				args[0]/* networkFilename */, args[1] + "mvi"/* mviFilename */,
 				(args.length < 3) ? "300" : args[2] /* snapshotPeriod */});
 
 		System.out.println("done.");
