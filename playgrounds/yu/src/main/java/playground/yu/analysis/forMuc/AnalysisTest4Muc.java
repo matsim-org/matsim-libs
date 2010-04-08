@@ -231,9 +231,9 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 		if (args.length < 3) {
 			printUsage();
 			System.exit(0);
-		} else if (args[3].equals(MUNICH) || args[4].equals(MUNICH)) {
+		} else if (args[0].equals(MUNICH)) {
 			runScenario(args, MUNICH);
-		} else if (args[3].equals(ONLY_MUNICH) || args[4].equals(ONLY_MUNICH)) {
+		} else if (args[0].equals(ONLY_MUNICH)) {
 			runTollScenario(args, ONLY_MUNICH);
 		} else {
 			run(args);
