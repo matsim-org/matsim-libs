@@ -88,8 +88,9 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 				+ "plans.xml.gz"
 				: null;
 
-		String outputBase4analysis = outputBase + "analysis"
-				+ (scenario.equals(ONLY_MUNICH) ? ".onlyMunich/" : "/")
+		String outputBase4analysis = outputBase
+				+ "analysis"
+				+ (scenario.equals(ONLY_MUNICH) ? "." + ONLY_MUNICH + "/" : "/")
 				+ args[1]/* runId */
 				+ "." + (scenario.equals("normal") ? "" : scenario + ".");
 

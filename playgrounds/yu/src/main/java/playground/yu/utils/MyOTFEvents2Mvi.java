@@ -3,6 +3,8 @@
  */
 package playground.yu.utils;
 
+import java.io.File;
+
 import org.matsim.run.OTFVis;
 
 import playground.yu.utils.io.SimpleReader;
@@ -26,10 +28,10 @@ public class MyOTFEvents2Mvi {
 		System.out.println("usage: MyOTFEvents2Mvi args");
 		System.out.println(" args[0]: netFilename incl. path (.xml)(required)");
 		System.out
-				.println(" arg[1]: eventsFilename incl. path (.txt[.gz])(required)");
+				.println(" arg[1]: eventsFilename incl. path (without txt[.gz])(required), the .mvi file path = args[1] + mvi");
+
 		System.out
-				.println(" arg[2]: .mvi file incl. path (.mvi) to output (required)");
-		System.out.println(" arg[3]: time-interval[s](required)");
+				.println(" arg[2]: time-interval[s](optional, default value = 300 [s])");
 		System.out.println("----------------");
 	}
 
@@ -37,21 +39,22 @@ public class MyOTFEvents2Mvi {
 	 * @param args
 	 *            [0] - netFilename;
 	 * @param args
-	 *            [1] - eventsFilename;
+	 *            [1] - eventsFilename with out txt(.gz);
 	 * @param args
-	 *            [2] - .mvi-Filename;
-	 * @param args
-	 *            [3] - time-interval_s;
+	 *            [2] - time-interval_s;
 	 */
 	public static void main(String[] args) {
-		if (args.length < 3) {
+		if (args.length < 2) {
 			printUsage();
 			System.exit(0);
 		}
 		// -----------WRITES A SHORT EVENTSFILE-----------------
-		SimpleReader sr = new SimpleReader(args[1]);
+		String eventsFilename = args[1] + "txt";
+		if (!new File(eventsFilename).exists())
+			eventsFilename += ".gz";
 
-		String eventsOutputFilename = args[1].replaceAll("events",
+		SimpleReader sr = new SimpleReader(eventsFilename);
+		String eventsOutputFilename = eventsFilename.replaceAll("events",
 				"events_short");
 		SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
 
@@ -76,10 +79,9 @@ public class MyOTFEvents2Mvi {
 		sr.close();
 		sw2.close();
 		// ----------------------------------------------------
-		OTFVis
-				.main(new String[] { "-convert", eventsOutputFilename,
-						args[0]/* networkFilename */, args[2]/* mviFilename */,
-						"300"/* snapshotPeriod */});
+		OTFVis.main(new String[] { "-convert", eventsOutputFilename,
+				args[0]/* networkFilename */, args[0] + "mvi"/* mviFilename */,
+				(args.length < 3) ? "300" : args[2] /* snapshotPeriod */});
 
 		System.out.println("done.");
 	}
