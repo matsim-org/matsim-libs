@@ -7,7 +7,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 
 public class FtConfigGroup extends Module {
 	
-	public static final String GROUP_NAME = "kti";
+	public static final String GROUP_NAME = "ft";
 
 	private final static Logger logger = Logger.getLogger(FtConfigGroup.class);
 
@@ -17,13 +17,17 @@ public class FtConfigGroup extends Module {
 		/**
 		 * constant to be added to the score of a bike leg.
 		 * represents fixed costs of walk access/egress to the bike
-		 * value is calculated as marginalUtilityOfTravelTimeWalk divided by assumed sum of accces and egress time
+		 * value is calculated as marginalUtilityOfTravelTimeWalk divided by assumed sum of access and egress time
 		 * TODO should be replaced by actual access/egress walk legs, 
 		 * which take time in the activity plan and thus generates exact additional opportunity costs 
 		 */
 		CONST_BIKE("constBike", "0.0", ""),
 		/**
 		 * the path to the file with the travel-time matrix (VISUM-format)
+		 */
+		CS_STATIONS_FILENAME ("cs_stations_filename", "", ""),
+		/**
+		 * the path to the file with the car sharing stations and their coordinates.
 		 */
 		PT_TRAVEL_TIME_MATRIX_FILENAME("pt_traveltime_matrix_filename", "", ""),
 		/**
@@ -141,6 +145,15 @@ public class FtConfigGroup extends Module {
 		return Double.parseDouble(FtConfigParameter.CONST_BIKE.getActualValue());
 	}
 
+
+	public String getCarSharingStationsFilename() {
+		return FtConfigParameter.CS_STATIONS_FILENAME.getActualValue();
+	}
+	
+	public void setCarSharingStationsFilename(String ptHaltestellenFilename) {
+		FtConfigParameter.PT_HALTESTELLEN_FILENAME.setActualValue(ptHaltestellenFilename);
+	}
+	
 	public String getPtHaltestellenFilename() {
 		return FtConfigParameter.PT_HALTESTELLEN_FILENAME.getActualValue();
 	}
@@ -255,4 +268,5 @@ public class FtConfigGroup extends Module {
 		// TODO Auto-generated method stub
 		return Double.parseDouble(FtConfigParameter.CONST_PT.getActualValue());
 	}
+
 }

@@ -5,6 +5,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -13,6 +14,7 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.ciarif.flexibletransports.data.MyTransportMode;
+import playground.ciarif.flexibletransports.router.FtCarSharingRoute;
 import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 
@@ -40,6 +42,8 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 
 		double dist = 0.0; // distance in meters
+		ActivityImpl actPrev = ((PlanImpl) this.plan).getPreviousActivity(leg);
+		ActivityImpl actNext = ((PlanImpl) this.plan).getNextActivity(leg);
 
 		if (MyTransportMode.car.equals(leg.getMode())) {
 			
@@ -54,21 +58,23 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			
 		} else if (MyTransportMode.carsharing.equals(leg.getMode())) {
 			
-//			dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));// TODO change this, now this is the distance from the nearest bus stop
-//			// introduce an input with car sharing station positions
-//
-//			travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
-//
-//			tmpScore += this.getWalkScore(dist, travelTime);
-//			
-//			tmpScore += this.ftConfigGroup.getConstCar();
-//			
-//			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-//				RouteWRefs route = leg.getRoute();
-//				dist = route.getDistance();
-//				tmpScore += this.params.marginalUtilityOfDistanceCar * ftConfigGroup.getDistanceCostCar()/1000d * dist;
-//			}
-//			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
+			
+			if (!MyTransportMode.carsharing.equals(((PlanImpl) this.plan).getPreviousLeg(actPrev).getMode())){
+				dist = ((FtCarSharingRoute) leg.getRoute()).calcAccessDistance (actPrev, actNext);
+				// TODO now no stations are defined,
+				// introduce an input with car sharing station positions
+
+				travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
+
+				tmpScore += this.getWalkScore(dist, travelTime);
+			}
+			
+			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
+				RouteWRefs route = leg.getRoute();
+				dist = ((FtCarSharingRoute) leg.getRoute()).calcCarDistance(actPrev, actNext);
+				tmpScore += this.params.marginalUtilityOfDistanceCar * ftConfigGroup.getDistanceCostCar()/1000d * dist;
+			}
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
 			
 		} else if (MyTransportMode.pt.equals(leg.getMode())) {
 
@@ -76,7 +82,6 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			
 			if (ktiPtRoute.getFromStop() != null) {
 
-//				
 				dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));
 				travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
 				tmpScore += this.getWalkScore(dist, travelTime);
