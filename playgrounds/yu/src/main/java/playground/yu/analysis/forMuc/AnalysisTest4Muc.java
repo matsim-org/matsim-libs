@@ -34,10 +34,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.xml.sax.SAXException;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
@@ -45,7 +43,6 @@ import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
 import playground.yu.analysis.LegDistance;
 import playground.yu.analysis.MyCalcAverageTripLength;
-import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -57,41 +54,48 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 
 	private static void printUsage() {
 		System.out.println();
-		System.out.println("AnalysisTest:");
+		System.out.println("AnalysisTest4Muc:");
 		System.out.println("----------------");
 		System.out
-				.println("Create an additional analysis for the runs, which were done with only org.matsim.controler.Controler");
+				.println("Create an additional analysis for the runs, which were done with only org.matsim.run.Controler");
 		System.out.println();
 		System.out.println("usage: AnalysisTest args");
+		System.out.println(" arg 0:\tname of scenario (for Zurich required)");
+		System.out.println(" arg 1:\trunId");
 		System.out
-				.println(" arg 0: name incl. path to net file (.xml[.gz])(required)");
+				.println(" arg 2:\tname incl. path to net file (.xml[.gz])(required)");
 		System.out
-				.println(" arg 1: name incl. path to events file (.txt[.gz])(required)");
-		System.out.println(" arg 2: path to output file (required)");
+				.println(" arg 3:\tpath to events file, plans file, and analysis files, without the last \"/\"");
+		System.out.println(" args 4:\twhether there is plansfile (true/false)");
 		System.out
-				.println(" arg 3: name incl. path to plans file (.xml[.gz])(optional)");
+				.println(" arg 5:\tsnapshot-period of OTFVis:  Specify how often a snapshot should be taken when reading the events, in seconds.");
 		System.out
-				.println(" arg 4: name of scenario (optional, for Zurich required)");
+				.println(" arg 6:\tname incl. path to facilities file (.xml[.gz])(optional)");
 		System.out
-				.println(" arg 5: name incl. path to toll file (.xml)(optional)");
-		System.out
-				.println(" arg 6: snapshot-period:  Specify how often a snapshot should be taken when reading the events, in seconds.");
-		System.out.println(" arg 7: runId");
+				.println(" arg 7:\tname incl. path to toll file (.xml)(optional)");
 		System.out.println("----------------");
 	}
 
 	private static void runIntern(final String[] args, final String scenario) {
-		final String netFilename = args[0], eventsFilename = args[1];
-		String eventsOutputFilename = args[1].replaceFirst("events",
-				"events4mvi");
-		String outputBase = args[2] + args[args.length - 1] + "."
-				+ (scenario.equals("normal") ? "" : scenario + ".");
-		String plansFilename = null;
-		if (args.length >= 4) {
-			if (args[3].endsWith("xml") || args[3].endsWith("xml.gz"))
-				plansFilename = args[3];
-		}
-		String tollFilename = (withToll) ? args[args.length - 3] : null;
+		final String netFilename = args[2];
+
+		String[] tmp = args[3]/* iterationPath */.split("it.");// ".../it.xxx"
+		String outputBase = args[3]/* iterationPath */+ "/" + args[1]/* runId */
+				+ "." + tmp[tmp.length - 1] + ".";// ".../it.xxx/rrr.xxx."
+		final String eventsFilename = outputBase + "events.txt.gz";
+
+		String plansFilename = Boolean.parseBoolean(args[4])/* hasPop? */? outputBase
+				+ "plans.xml.gz"
+				: null;
+
+		String outputBase4analysis = outputBase + "analysis"
+				+ (scenario.equals(ONLY_MUNICH) ? ".onlyMunich/" : "/")
+				+ args[1]/* runId */
+				+ "." + (scenario.equals("normal") ? "" : scenario + ".");
+
+		String tollFilename = (!scenario.equals(ONLY_MUNICH)) ? null
+				: args[args.length - 1];// last parameter, man needs tollFile
+		// only for Munich.
 
 		ScenarioImpl sc = new ScenarioImpl();
 		NetworkLayer network = sc.getNetwork();
@@ -172,21 +176,22 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 
 		if (orms != null) {
 
-			orms.write(outputBase + "onRoute.txt");
-			orms.writeCharts(outputBase);
+			orms.write(outputBase4analysis + "onRoute.txt");
+			orms.writeCharts(outputBase4analysis);
 		}
 		if (lttms != null) {
-			lttms.write(outputBase + "legtraveltimes.txt.gz");
-			lttms.writeCharts(outputBase + "legtraveltimes");
+			lttms.write(outputBase4analysis + "legtraveltimes.txt.gz");
+			lttms.writeCharts(outputBase4analysis + "legtraveltimes");
 		}
-		clas.write(outputBase + "avgSpeed.txt.gz");
-		clas.writeChart(outputBase + "avgSpeedCityArea.png");
-		ld.write(outputBase + "legDistances.txt.gz");
-		ld.writeCharts(outputBase + "legDistances");
+		clas.write(outputBase4analysis + "avgSpeed.txt.gz");
+		clas.writeChart(outputBase4analysis + "avgSpeedCityArea.png");
+		ld.write(outputBase4analysis + "legDistances.txt.gz");
+		ld.writeCharts(outputBase4analysis + "legDistances");
 
-		SimpleWriter sw = new SimpleWriter(outputBase + "output.txt");
+		SimpleWriter sw = new SimpleWriter(outputBase4analysis + "output.txt");
 		sw.write("netfile:\t" + netFilename + "\neventsFile:\t"
-				+ eventsFilename + "\noutputpath:\t" + outputBase + "\n");
+				+ eventsFilename + "\noutputpath:\t" + outputBase4analysis
+				+ "\n");
 		if (catl != null)
 			sw.write("avg. Trip length:\t" + catl.getAverageTripLength()
 					+ " [m]\n");
@@ -197,38 +202,11 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 		sw.close();
 
 		if (dd != null)
-			dd.write(outputBase);
+			dd.write(outputBase4analysis);
 		if (dert != null)
-			dert.write(outputBase);
+			dert.write(outputBase4analysis);
 		if (ms != null)
-			ms.write(outputBase);
-		// otfvis
-		if (toll == null) {
-			SimpleReader sr = new SimpleReader(eventsFilename);
-			SimpleWriter sw2 = new SimpleWriter(eventsOutputFilename);
-
-			String line = sr.readLine();
-			sw2.writeln(line);
-			// after filehead
-			double time = 0;
-			while (line != null && time < 108000.0) {
-				line = sr.readLine();
-				if (line != null) {
-					sw2.writeln(line);
-					time = Double.parseDouble(line.split("\t")[0]);
-				}
-			}
-			sr.close();
-			sw2.close();
-
-			QSim qsim = new QSim(sc, new EventsManagerImpl());
-
-			new OTFEvent2MVI(qsim.getQNetwork(), eventsOutputFilename,
-					eventsFilename.split("events.txt.gz")[0]
-							+ (scenario.equals("normal") ? "" : scenario + ".")
-							+ "otfvis.mvi", Integer
-							.parseInt(args[args.length - 2])).convert();
-		}
+			ms.write(outputBase4analysis);
 		System.out.println("done.");
 	}
 
