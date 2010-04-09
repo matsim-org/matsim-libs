@@ -241,6 +241,32 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			} else {
 				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
 			}
+			
+			// version for bvg demo (obviously, this should be made switchable, but ...).  kai, apr'10
+//			if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
+//				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.DARK_GRAY, true);
+//			} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
+//				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
+//			} else if ( agInfo.getAgentState()==AgentState.PERSON_OTHER_MODE ) {
+//
+//			} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
+//
+//				String idstr = agInfo.getId().toString();
+//				if ( idstr.contains("line_B")) {
+//					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.MAGENTA, true);
+//				} else if ( idstr.contains("line_T")) {
+//					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.RED, true);
+//				} else if ( idstr.contains("line_S")) {
+//					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.GREEN, true);
+//				} else if ( idstr.contains("line_U")) {
+//					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
+//				} else { 
+//					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
+//				}
+//			} else {
+//				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
+//			}
+
 		}
 
 		@Override
