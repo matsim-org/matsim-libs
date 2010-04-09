@@ -26,7 +26,6 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.Planomat;

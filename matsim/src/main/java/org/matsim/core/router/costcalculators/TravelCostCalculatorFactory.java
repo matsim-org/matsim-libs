@@ -21,7 +21,6 @@ package org.matsim.core.router.costcalculators;
 
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 
