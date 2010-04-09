@@ -20,11 +20,9 @@
 package playground.benjamin.income2;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.benjamin.BKickControler;
 
@@ -34,7 +32,7 @@ import playground.benjamin.BKickControler;
  */
 public class BKickIncome2Controler extends BKickControler {
 
-	private PersonHouseholdMapping hhdb;
+	private PersonHouseholdMapping personHouseholdMapping;
 
 	public BKickIncome2Controler(String arg) {
 		super(arg);
@@ -50,40 +48,32 @@ public class BKickIncome2Controler extends BKickControler {
 		super(config);
 	}
 
-	private void setHouseholdDb(PersonHouseholdMapping hhdb) {
-		this.hhdb = hhdb;
-	}
-
 	@Override
 	protected void setUp() {
-	  this.scenarioData.getConfig().global().setNumberOfThreads(1);
-		this.hhdb = new PersonHouseholdMapping(this.getScenario().getHouseholds());
-		ScoringFunctionFactory scoringFactory = new BKickIncome2ScoringFunctionFactory(this.getScenario().getConfig().charyparNagelScoring(), hhdb, this.getNetwork());
-		setTravelCostCalculatorFactory(new Income2TravelCostCalculatorFactory());
+		this.scenarioData.getConfig().global().setNumberOfThreads(1);
+		this.personHouseholdMapping = new PersonHouseholdMapping(this.getScenario().getHouseholds());
+		
+		ScoringFunctionFactory scoringFactory = new BKickIncome2ScoringFunctionFactory(this.getScenario().getConfig().charyparNagelScoring(), personHouseholdMapping, this.getNetwork());
+		TravelCostCalculatorFactory travelCostCalculatorFactory = new Income2TravelCostCalculatorFactory(personHouseholdMapping);
+		
+		setTravelCostCalculatorFactory(travelCostCalculatorFactory);
 		this.setScoringFunctionFactory(scoringFactory);
 		super.setUp();
 	}
 
-
-	@Override
-	public PlanAlgorithm getRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
-		return new Income2PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-				this.getLeastCostPathCalculatorFactory(), this.hhdb);
-	}
-
 	public static void main(String[] args) {
-//	String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
-//	String[] args2 = {config};
-//	args = args2;
-	if ((args == null) || (args.length == 0)) {
-		System.out.println("No argument given!");
-		System.out.println("Usage: Controler config-file [dtd-file]");
-		System.out.println();
-	} else {
-		final BKickIncome2Controler controler = new BKickIncome2Controler(args);
-		controler.run();
+		//	String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
+		//	String[] args2 = {config};
+		//	args = args2;
+		if ((args == null) || (args.length == 0)) {
+			System.out.println("No argument given!");
+			System.out.println("Usage: Controler config-file [dtd-file]");
+			System.out.println();
+		} else {
+			final BKickIncome2Controler controler = new BKickIncome2Controler(args);
+			controler.run();
+		}
 	}
-}
 
 
 }

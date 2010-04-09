@@ -25,7 +25,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.households.Household;
 import org.matsim.households.Income;
+import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
 
 
@@ -43,16 +45,18 @@ public class BKickIncome2TravelTimeDistanceCostCalculator implements Personaliza
 	private double traveltimeCostFactor;
 	private double marginalUtlOfDistance;
 	
+	private PersonHouseholdMapping personHouseholdMapping;
+	
 	private double income;
 
-	public BKickIncome2TravelTimeDistanceCostCalculator(final TravelTime timeCalculator, CharyparNagelScoringConfigGroup charyparNagelScoring) {
+	public BKickIncome2TravelTimeDistanceCostCalculator(final TravelTime timeCalculator, CharyparNagelScoringConfigGroup charyparNagelScoring, PersonHouseholdMapping personHouseholdMapping) {
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 */
 		this.traveltimeCostFactor = (- charyparNagelScoring.getTraveling() / 3600.0) + (charyparNagelScoring.getPerforming() / 3600.0);
 		this.marginalUtlOfDistance = - charyparNagelScoring.getMarginalUtlOfDistanceCar() * betaIncomeCar;
-		
+		this.personHouseholdMapping = personHouseholdMapping;
 //		log.info("Using BKickIncome2TravelTimseDistanceCostCalculator...");
 	}
 
@@ -70,22 +74,20 @@ public class BKickIncome2TravelTimeDistanceCostCalculator implements Personaliza
 	}
 	
 	
-	public void setIncome(Income income) {
+	@Override
+	public void setPerson(Person person) {
+		Household household = this.personHouseholdMapping.getHousehold(person.getId());
+		Income income = household.getIncome();
+		this.setIncome(income);
+	}
+
+	private void setIncome(Income income) {
 		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
 			this.income = income.getIncome() / 240;
 		}
 		else {
-			throw new UnsupportedOperationException("Can't calculate income per trip");
+			throw new UnsupportedOperationException("Can't calculate income per day");
 		}
 	}
-
-	@Override
-	public void setPerson(Person person) {
-		// TODO Auto-generated method stub
-		
-	}
 	
-	
-	
-
 }

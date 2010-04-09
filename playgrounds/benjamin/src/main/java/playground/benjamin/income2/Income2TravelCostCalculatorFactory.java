@@ -23,6 +23,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.households.PersonHouseholdMapping;
 
 
 /**
@@ -31,8 +32,20 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class Income2TravelCostCalculatorFactory implements TravelCostCalculatorFactory {
 
+	private PersonHouseholdMapping personHouseholdMapping;
+	
+	
+
+	public Income2TravelCostCalculatorFactory(
+			PersonHouseholdMapping personHouseholdMapping) {
+		super();
+		this.personHouseholdMapping = personHouseholdMapping;
+	}
+
+
+
 	public PersonalizableTravelCost createTravelCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
-		return new BKickIncome2TravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup);
+		return new BKickIncome2TravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 	}
 
 }
