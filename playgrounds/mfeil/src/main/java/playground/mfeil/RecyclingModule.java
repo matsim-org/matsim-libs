@@ -88,6 +88,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.controler=controler;
 		this.knowledges 			= controler.getScenario().getKnowledges();
 		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, this.knowledges);
+	//	this.locator 				= new LMwCSCustomized(controler.getNetwork(), controler, this.knowledges);
 		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
 		this.network 				= controler.getNetwork();
 		this.init(network);	
@@ -102,9 +103,9 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
 		this.municipality			= "no";
-		this.sex 					= "yes";
+		this.sex 					= "no";
 		this.age 					= "yes";
-		this.license 				= "yes";
+		this.license 				= "no";
 		this.car_avail 				= "no";
 		this.employed 				= "no";
 		this.softCoef 				= this.detectSoftCoefficients();
