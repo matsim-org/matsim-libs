@@ -91,7 +91,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double factorOfLateArrival = 3; 
 	private static double marginalUtilityOfEarlyDeparture = 0; 
 	
-	// Settings of 121
+	// Settings of 118sc1
 	private static double beta_time_car = -3.10; 
 	private static double beta_time_pt = 0.563; 
 	private static double beta_time_bike = -1.07;
@@ -110,10 +110,10 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static double beta_female_act = -0.0577;
 	private static double beta_female_travel = 0.0797;
 	
-	private static double travelCostCar = 0.5;	// CHF/km
-	private static double travelCostPt_None = 0.28;	// CHF/km
-	private static double travelCostPt_Halbtax = 0.15;	// CHF/km
-	private static double travelCostPt_GA = 0.08;	// CHF/km;
+	private static double travelCostCar = 0.5*4;	// CHF/km
+	private static double travelCostPt_None = 0.28*4;	// CHF/km
+	private static double travelCostPt_Halbtax = 0.15*4;	// CHF/km
+	private static double travelCostPt_GA = 0.08*4;	// CHF/km;
 	
 	private static double licenseCar = -0.25;	
 	private static double licensePt = 0.0;	
@@ -133,8 +133,8 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	private static final double uMax_innerHome = 1.1; 
 	private static final double uMax_work= 5;  
 	private static final double uMax_education = 4.0;
-	private static final double uMax_shopping = 0.4; 
-	private static final double uMax_leisure = 1.55;  
+	private static final double uMax_shopping = 0.35; 
+	private static final double uMax_leisure = 1.9;  
 	
 	private static final double alpha_home = 12;
 	private static final double alpha_innerHome = 1.9;
