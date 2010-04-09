@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.mmoyo.utils.PlanFragmenter;
 
@@ -85,6 +86,7 @@ public class PopulationPtAnalyzer {
 							travelTime +=  leg.getTravelTime();
 						}
 					}
+					//RouteUtils.calcDistance(r, network);
 					lastLeg= leg;
 				}
 				i++;
@@ -104,7 +106,7 @@ public class PopulationPtAnalyzer {
 		try { 
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(scenario.getConfig().controler().getOutputDirectory()+ "/" + outputFile)); 
 			 bufferedWriter.write("plans:\ttravelTime:\ttravelDist:\ttransfers:\tdetTransfers:\twalkTime:\twalkDistance:\twaitTime:\n");
-			 bufferedWriter.write(population.getPersons().size()+ "\t" + travelTime + "\t" + travelDistance + "\t" + transfers + "\t" + detTransfers + "\t" + walkTime + "\t" + walkDistance + "\t" + waitTime); 
+			 bufferedWriter.write("\n" + population.getPersons().size()+ "\t" + travelTime + "\t" + travelDistance + "\t" + transfers + "\t" + detTransfers + "\t" + walkTime + "\t" + walkDistance + "\t" + waitTime); 
 			 bufferedWriter.close(); 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -112,8 +114,8 @@ public class PopulationPtAnalyzer {
 	}
 
 	private static void loadManyScenarios(String configFile){
-		File folder = new File ("../playgrounds/mmoyo/output/5X_incrTimePrior");
-		String PREFIX = "moyo_routedPlans_parameterized_time";
+		File folder = new File ("../playgrounds/mmoyo/output/new");
+		String PREFIX = "moyo_time";
 		for (int i=0; i< folder.list().length ; i++){
 			String file = folder.list()[i];
 			if (file.startsWith(PREFIX)){
@@ -143,10 +145,10 @@ public class PopulationPtAnalyzer {
 		}
 		
 		//for many scenarios resulted from incrementing time priority
-		//loadManyScenarios(configFile);
+		loadManyScenarios(configFile);
 
 		//for one scenario
-		loadOneScenario(configFile);
+		//loadOneScenario(configFile);
 		
 	}
 }

@@ -1,8 +1,6 @@
 package playground.mmoyo.analysis.comp;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
-
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 import playground.mmoyo.PTRouter.PTValues;
@@ -19,7 +17,7 @@ public class AllRouter {
 		-split plans?
 		-cost coefficients
 		-only plans inside the investigation area?
-		-ATTENTION. There is not "cost calculator 2" anymore. Adjust the coefficient to time=1, distance 0, transfer= 60.
+		-ATTENTION. There is not "cost calculator 2" anymore.
 		*/
 		
 		String configFile = null;
@@ -31,29 +29,35 @@ public class AllRouter {
 		}
 		
 		/*
-		PTValues.scenarioName ="m_to_compare";
+		PTValues.scenarioName ="time100dist0CORRECTO";
 		PTValues.routerCalculator = 3;
-		PlanRouter.main(new String[]{configFile});
+		PTValues.timeCoefficient = 1.0;
+		PTValues.distanceCoefficient=0.0;
+		//PlanRouter.main(new String[]{configFile});
 		*/
 		
-		
-		PTValues.scenarioName ="r_16final";
+		configFile = "../playgrounds/mmoyo/output/comparison/Berlin/16plans/0config_5x_4plans.xml";
+		PTValues.scenarioName ="marcels";
 		PTValues.routerCalculator = 1;
 		PlanRouter.main(new String[]{configFile});
 		
+		
+		/*
+		PTValues.routerCalculator = 3;
+		for (double x= 0; x<1.05; x = x + 0.05 ){
+			PTValues.timeCoefficient=  Math.round(x*100)/100.0;
+			PTValues.distanceCoefficient = Math.round((1-x)*100)/100.0;
+			PTValues.scenarioName =  "_time" + PTValues.timeCoefficient + "_dist" + PTValues.distanceCoefficient;
+			System.out.println(PTValues.scenarioName);
+			
+			//PlanRouter.main(new String[]{configFile});
+		}
+		*/
 	}
 }
 
 /*
- * 		PTValues.routerCalculator = 3;
-		for (double x= 0; x<=1.01; x = x + 0.05 ){
-			DecimalFormat twoDForm = new DecimalFormat("#.##");
-			PTValues.timeCoefficient = Double.valueOf(twoDForm.format(x));
-			PTValues.distanceCoefficient= Math.abs(Double.valueOf(twoDForm.format(1-x)));
-			PTValues.scenarioName =  sample + "dist" + PTValues.distanceCoefficient + "_time" + PTValues.timeCoefficient ; 
-
-			System.out.println("\nScenario:" + PTValues.scenarioName);
-			PlanRouter.main(new String[]{configFile});
-		}
-
+	//shut down ms-windows
+	Runtime runtime = Runtime.getRuntime();
+	runtime.exec("shutdown -s -t 60 -f");  
 */

@@ -1,5 +1,7 @@
 package playground.mmoyo.TransitSimulation;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,7 +25,7 @@ import playground.mmoyo.utils.TransScenarioLoader;
 /**reads a config file, routes the transit plans and writes a routed plans file*/
 public class PlanRouter {
 
-	public PlanRouter(ScenarioImpl scenario) {
+	public PlanRouter(ScenarioImpl scenario) throws FileNotFoundException {
 
 		//Get rid of only car plans
 		PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.car, PlansFilterByLegMode.FilterType.removeAllPlansWithMode) ;
@@ -31,6 +33,10 @@ public class PlanRouter {
 
 		PlansCalcRoute router= null;
 		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory();
+		File outDirectory = new File(routedPlansFile);
+		if (!outDirectory.exists()){
+			throw new FileNotFoundException("Can not find output directory");
+		}
 		
 		/**route plans*/
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
@@ -58,16 +64,13 @@ public class PlanRouter {
 		popwriter.write(routedPlansFile) ;
 		*/
 		
-		
 		//write fragmented version of the plan
 		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));		
 		System.out.println("writing output plan file..." + routedPlansFile + "frag");
 		PopulationWriter popwriter2 = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()) ;
 		popwriter2.write(routedPlansFile) ;
 		
-		
 		new FileCompressor().run(routedPlansFile);  
-		
 		System.out.println("done");
 	}
 	

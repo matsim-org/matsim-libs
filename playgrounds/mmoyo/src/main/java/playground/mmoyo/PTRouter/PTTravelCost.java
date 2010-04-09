@@ -19,8 +19,9 @@ public class PTTravelCost implements TravelCost{
 
 		String type = ((LinkImpl)link).getType();
 		if (type.equals( PTValues.DETTRANSFER_STR ) || type.equals( PTValues.TRANSFER_STR )){
-			//ORIGINAL cost = (cost* PTValues.walkCoefficient)+ PTValues.transferPenalty;
-			cost = (cost * 	PTValues.timeCoefficient) + (link.getLength() * PTValues.distanceCoefficient);
+			cost = (cost* PTValues.walkCoefficient)+ PTValues.transferPenalty;
+			//cost = (cost + PTValues.transferPenalty) * PTValues.timeCoefficient;
+			//cost = (cost * 	PTValues.timeCoefficient) + (link.getLength() * PTValues.distanceCoefficient);
 		}else if (type.equals( PTValues.STANDARD_STR )){
 			cost = (cost * 	PTValues.timeCoefficient) + (link.getLength() * PTValues.distanceCoefficient);
 		}else if (type.equals( PTValues.ACCESS_STR ) || type.equals( PTValues.EGRESS_STR )){

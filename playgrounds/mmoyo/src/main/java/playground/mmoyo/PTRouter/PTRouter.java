@@ -144,8 +144,6 @@ public class PTRouter{
 		Collection <Node> nearOriginStops = find2Stations (originNode);
 		Collection <Node> nearDestinationStops = find2Stations (destinationNode);
 
-		System.out.println("nearOriginStops.size() :" +  nearOriginStops.size());
-		System.out.println("nearDestinationStops.size() :" +  nearDestinationStops.size());
 		////////ORIGINAL
 		nearOriginStops.remove(destinationNode);
 		nearDestinationStops.remove(originNode);

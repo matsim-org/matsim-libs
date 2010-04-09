@@ -1,5 +1,6 @@
 package playground.mmoyo.analysis.tools;
 
+import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -38,7 +39,11 @@ public class ComparisonTimeDistancePriority {
 			PlansFilterByLegMode plansFilter = new PlansFilterByLegMode(TransportMode.car,  PlansFilterByLegMode.FilterType.removeAllPlansWithMode) ;
 			plansFilter.run(scenario.getPopulation());
 			
-			new PlanRouter(scenario);
+			try {
+				new PlanRouter(scenario);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 			System.out.println("Coefficients:" + PTValues.scenarioName);
 			
 			new PopulationPtAnalyzer(scenario, PTValues.scenarioName + ".txt").run();

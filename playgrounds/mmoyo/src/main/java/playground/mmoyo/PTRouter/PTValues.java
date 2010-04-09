@@ -30,7 +30,13 @@ public abstract class PTValues {
 	public static double timeCoefficient = 0.85;
 	public static double transferPenalty = 60.0;
 	public static double walkCoefficient = 1.0;
+	
+	public static boolean fragmentPlans = false;
+	public static boolean noCarPlans = false;
+	public static boolean compressPlan = false;
+	public static boolean allowDirectWalks = false;
 }
+
 
 /*
 public double Person_WalkSpeed(final byte age, final double time, final double length){
