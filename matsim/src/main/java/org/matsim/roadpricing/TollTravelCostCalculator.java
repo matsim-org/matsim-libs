@@ -21,6 +21,8 @@
 package org.matsim.roadpricing;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
@@ -29,13 +31,13 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  *
  * @author mrieser
  */
-public class TollTravelCostCalculator implements TravelCost {
+public class TollTravelCostCalculator implements PersonalizableTravelCost {
 
 	/*package*/ final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
-	private final TravelCost costHandler;
+	private final PersonalizableTravelCost costHandler;
 
-	public TollTravelCostCalculator(final TravelCost costCalculator, final RoadPricingScheme scheme) {
+	public TollTravelCostCalculator(final PersonalizableTravelCost costCalculator, final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 		this.costHandler = costCalculator;
 
@@ -89,6 +91,11 @@ public class TollTravelCostCalculator implements TravelCost {
 			}
 			return cost.amount;
 		}
+	}
+
+	@Override
+	public void setPerson(Person person) {
+		this.costHandler.setPerson(person);
 	}
 
 }

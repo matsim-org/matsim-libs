@@ -1,11 +1,13 @@
 package playground.gregor.sims.socialcostII;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
 
-public class MarginalTravelCostCalculatorIII implements TravelCost {
+public class MarginalTravelCostCalculatorIII implements PersonalizableTravelCost {
 	
 	
 	private final TravelCost sc;
@@ -55,5 +57,13 @@ public class MarginalTravelCostCalculatorIII implements TravelCost {
 		int slice = ((int) time)/this.binSize;
 		return IntegerCache.getInteger(slice);
 	}
+
+	@Override
+	public void setPerson(Person person) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 	
 }

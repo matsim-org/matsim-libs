@@ -21,13 +21,15 @@
 package playground.meisterk.kti.router;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 
-public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost {
+public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, PersonalizableTravelCost {
 
 	protected final TravelTime timeCalculator;
 	private final double travelCostFactor;
@@ -61,5 +63,13 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost {
 	protected double getMarginalUtlOfDistance() {
 		return marginalUtlOfDistance;
 	}
+
+	@Override
+	public void setPerson(Person person) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 
 }

@@ -22,13 +22,15 @@ package playground.christoph.router.costcalculators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.events.EventControler;
 import playground.christoph.router.util.KnowledgeTravelTime;
 
-public class SystemOptimalTravelCostCalculator implements TravelMinCost, Cloneable {
+public class SystemOptimalTravelCostCalculator implements TravelMinCost, Cloneable, PersonalizableTravelCost {
 
 	private static final Logger log = Logger.getLogger(EventControler.class);
 	
@@ -77,4 +79,12 @@ public class SystemOptimalTravelCostCalculator implements TravelMinCost, Cloneab
 		
 		return clone;
 	}
+
+	@Override
+	public void setPerson(Person person) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 }

@@ -21,8 +21,10 @@
 package org.matsim.core.router.costcalculators;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 
@@ -39,7 +41,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author mrieser
  * @author dgrether
  */
-public class FreespeedTravelTimeCost implements TravelMinCost, TravelTime {
+public class FreespeedTravelTimeCost implements PersonalizableTravelCost, TravelMinCost, TravelTime {
 
 	private final double travelCostFactor;
 	private final double marginalUtlOfDistance;
@@ -93,4 +95,10 @@ public class FreespeedTravelTimeCost implements TravelMinCost, TravelTime {
 	public double getLinkTravelTime(Link link, double time) {
 		return link.getLength() / link.getFreespeed(time);
 	}
+
+	@Override
+	public void setPerson(Person person) {
+		// This cost function doesn't change with persons.
+	}
+	
 }

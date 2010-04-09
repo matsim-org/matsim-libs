@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -18,13 +19,13 @@ import playground.christoph.router.util.MyDijkstraFactory;
  */
 public class MyReRouteDijkstra extends ReRouteDijkstra {
 
-	TravelCost costCalculator = null;
+	PersonalizableTravelCost costCalculator = null;
 	TravelTime timeCalculator = null;
 	Network network = null;
 	
 	private PlansCalcRouteConfigGroup configGroup = null;
 	
-	public MyReRouteDijkstra(Config config, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public MyReRouteDijkstra(Config config, final Network network, final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator) {
 		super(config, network, costCalculator, timeCalculator);
 		this.network = network;
 		this.costCalculator = costCalculator;

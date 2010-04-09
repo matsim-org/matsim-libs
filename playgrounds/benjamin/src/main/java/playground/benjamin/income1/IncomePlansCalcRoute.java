@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.PersonHouseholdMapping;
 
@@ -45,7 +45,7 @@ public class IncomePlansCalcRoute extends PlansCalcRoute{
 	 * @param hhdb 
 	 */
 	public IncomePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, 
-			final TravelCost costCalculator,
+			final PersonalizableTravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory, PersonHouseholdMapping hhdb){
 		super(group, network, costCalculator, timeCalculator, factory);
 		this.incomeCostCalculator = (BKickIncomeTravelTimeDistanceCostCalculator)costCalculator;

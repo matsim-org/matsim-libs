@@ -37,6 +37,7 @@ import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -63,7 +64,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param factory
 	 * @param scheme
 	 */
-	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator,
+	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator,
 			LeastCostPathCalculatorFactory factory, final RoadPricingScheme scheme) {
 		super(configGroup, network, costCalculator, timeCalculator, factory);
 		this.scheme = scheme;

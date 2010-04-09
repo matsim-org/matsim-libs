@@ -21,7 +21,7 @@ package playground.benjamin.income2;
 
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 
@@ -31,7 +31,7 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class Income2TravelCostCalculatorFactory implements TravelCostCalculatorFactory {
 
-	public TravelCost createTravelCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
+	public PersonalizableTravelCost createTravelCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
 		return new BKickIncome2TravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup);
 	}
 

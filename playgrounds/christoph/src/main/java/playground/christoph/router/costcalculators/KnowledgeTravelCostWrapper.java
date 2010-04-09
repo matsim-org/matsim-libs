@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelCost;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -19,7 +20,7 @@ import playground.christoph.router.util.KnowledgeTravelCost;
  * that it is checked if a Person knows a Link or not. If not, the
  * returned TravelCost is Double.MAX_VALUE. 
  */
-public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
+public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost implements PersonalizableTravelCost{
 	
 	protected TravelCost travelCostCalculator;
 	protected boolean checkNodeKnowledge = true;

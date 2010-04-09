@@ -22,6 +22,7 @@ package playground.mrieser.modules.template;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -33,6 +34,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
@@ -129,10 +131,18 @@ public class Template implements MatsimModule {
 		
 		// *** TravelCostCalculator *********************
 		
-		TravelCost travelCostCalculator = new TravelCost() {
+		PersonalizableTravelCost travelCostCalculator = new PersonalizableTravelCost() {
+
 			public double getLinkTravelCost(Link link, double time) {
 				return 0;
 			}
+			
+			@Override
+			public void setPerson(Person person) {
+				// TODO Auto-generated method stub
+				
+			}
+			
 		};
 		c.setTravelCostCalculator(travelCostCalculator);
 		// DISCUSS directly set the calculator, or just register to be loaded depending on config?

@@ -20,10 +20,10 @@
 package playground.benjamin.income1;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.Income;
 import org.matsim.households.Income.IncomePeriod;
@@ -33,7 +33,7 @@ import org.matsim.households.Income.IncomePeriod;
  * @author dgrether
  *
  */
-public class BKickIncomeTravelTimeDistanceCostCalculator implements TravelCost {
+public class BKickIncomeTravelTimeDistanceCostCalculator implements PersonalizableTravelCost {
 
 	private static final Logger log = Logger.getLogger(BKickIncomeTravelTimeDistanceCostCalculator.class);
 	
@@ -76,6 +76,13 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements TravelCost {
 			throw new UnsupportedOperationException("Can't calculate income per trip");
 		}
 	}
+
+	@Override
+	public void setPerson(Person person) {
+		// TODO: put setIncome(person.getIncome()) or some such here, and remoset setIncome.
+	}
+	
+	
 	
 
 }

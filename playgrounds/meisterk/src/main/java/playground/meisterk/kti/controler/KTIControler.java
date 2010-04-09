@@ -2,7 +2,7 @@ package playground.meisterk.kti.controler;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -87,7 +87,7 @@ public class KTIControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
+	public PlanAlgorithm getRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
 
 		PlanAlgorithm router = null;
 

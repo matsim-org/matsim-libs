@@ -31,6 +31,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
@@ -41,13 +42,13 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	protected Person person;
 	protected Network network;
 	protected PlansCalcRouteConfigGroup configGroup;
-	protected TravelCost costCalculator;
+	protected PersonalizableTravelCost costCalculator;
 	protected TravelTime timeCalculator;
 	protected LeastCostPathCalculatorFactory factory;
 		
 	private final static Logger log = Logger.getLogger(KnowledgePlansCalcRoute.class);
 				
-	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final TravelCost costCalculator,
+	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final PersonalizableTravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super(group, network, costCalculator, timeCalculator, factory);
 		
@@ -62,7 +63,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	 * If no LeastCostPathCalculatorFactory is given use by Default
 	 * a DijkstraFactory.
 	 */
-	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 	

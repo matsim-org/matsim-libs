@@ -33,6 +33,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.world.Layer;
@@ -67,7 +68,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	public PlansCalcRouteKti(
 			final PlansCalcRouteConfigGroup group,
 			final Network network,
-			final TravelCost costCalculator,
+			final PersonalizableTravelCost costCalculator,
 			final TravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory,
 			final PlansCalcRouteKtiInfo ptRoutingInfo) {

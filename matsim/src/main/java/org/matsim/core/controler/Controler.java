@@ -102,7 +102,7 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorInvertedNetProxyFactory;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -178,7 +178,7 @@ public class Controler {
 	private Counts counts = null;
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
-	protected TravelCost travelCostCalculator = null;
+	protected PersonalizableTravelCost travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
 
@@ -930,11 +930,11 @@ public class Controler {
 	 * ===================================================================
 	 */
 
-	public final void setTravelCostCalculator(final TravelCost travelCostCalculator) {
+	public final void setTravelCostCalculator(final PersonalizableTravelCost travelCostCalculator) {
 		this.travelCostCalculator = travelCostCalculator;
 	}
 
-	public final TravelCost getTravelCostCalculator() {
+	public final PersonalizableTravelCost getTravelCostCalculator() {
 		return this.travelCostCalculator;
 	}
 
@@ -1005,7 +1005,7 @@ public class Controler {
 	 *         be used by a single thread, use multiple instances for multiple
 	 *         threads!
 	 */
-	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
+	public PlanAlgorithm getRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
 		if (this.getScenario().getConfig().scenario().isUseRoadpricing()
 				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scenarioData.getRoadPricingScheme().getType()))) {
 			return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this

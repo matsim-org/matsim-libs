@@ -27,7 +27,7 @@ import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.LocationChoice;
 
@@ -40,7 +40,7 @@ public class MyStrategyManagerConfigLoader {
 	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
 
 		Network network = controler.getNetwork();
-		TravelCost travelCostCalc = controler.getTravelCostCalculator();
+		PersonalizableTravelCost travelCostCalc = controler.getTravelCostCalculator();
 		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());

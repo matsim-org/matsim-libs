@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -41,7 +41,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class RandomFacilitySwitcherK extends AbstractMultithreadedModule {
 	private final static Logger log = Logger.getLogger(RandomFacilitySwitcherK.class);
 	private Network network=null;
-	private TravelCost tcost=null;
+	private PersonalizableTravelCost tcost=null;
 	private TravelTime ttime=null;
 	/** 
 	 * TODO [JH] Activity types are hard-coded here but have to match the
@@ -51,7 +51,7 @@ public class RandomFacilitySwitcherK extends AbstractMultithreadedModule {
 	private String[] factypes={"home","work","shop","education","leisure"};
 	private Knowledges knowledges;
 	
-    public RandomFacilitySwitcherK(Config config, Network network, TravelCost tcost, TravelTime ttime, Knowledges kn) {
+    public RandomFacilitySwitcherK(Config config, Network network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges kn) {
     	super(config.global());
 		log.info("initializing SNRandomFacilitySwitcher");
     	this.network=network;

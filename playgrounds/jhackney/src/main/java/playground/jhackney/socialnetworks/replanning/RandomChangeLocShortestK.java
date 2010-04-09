@@ -37,7 +37,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -52,13 +52,13 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 	private final double[] cum_p_factype;
 
 	private final NetworkLayer network;
-	private final TravelCost tcost;
+	private final PersonalizableTravelCost tcost;
 	private final TravelTime ttime;
 	private final String[] factypes;
 
 	private final Knowledges knowledges;
 
-	public RandomChangeLocShortestK(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, Knowledges knowledges) {
+	public RandomChangeLocShortestK(String[] factypes, NetworkLayer network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges knowledges) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
