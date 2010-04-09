@@ -42,7 +42,7 @@ import playground.yu.utils.DebugTools;
  * @author yu
  * 
  */
-public class PersonPlanMonitor {
+public class PersonPlanMonitor4travelingCarDist {
 	private double legDepTime, legArrTime = Double.NaN, legDist = 0.0/* [km] */,
 			legDur = 0.0/* [h] */, actStartTime = Double.NaN,
 			actEndTime = Double.NaN, actDur = 0.0/* [h] */, firstActEndTime;
@@ -54,7 +54,7 @@ public class PersonPlanMonitor {
 	/**
 	 * 
 	 */
-	public PersonPlanMonitor(Plan plan) {
+	public PersonPlanMonitor4travelingCarDist(Plan plan) {
 		idx = -1;
 		this.plan = plan;
 	}
@@ -103,8 +103,10 @@ public class PersonPlanMonitor {
 		if (this.stuck)
 			return 0.0;
 		if (this.idx % 2 == 1)
-			throw new RuntimeException(PersonPlanMonitor.class.getName()
-					+ "\tline:\t" + DebugTools.getLineNumber(new Exception())
+			throw new RuntimeException(PersonPlanMonitor4travelingCarDist.class
+					.getName()
+					+ "\tline:\t"
+					+ DebugTools.getLineNumber(new Exception())
 					+ "\tthis.idx%2=1, it's impossible!!!\tfrom person\t"
 					+ this.plan.getPerson());
 
@@ -120,7 +122,9 @@ public class PersonPlanMonitor {
 					.getActivityParams(actType));
 		}
 		if (Double.isNaN(actDur))
-			throw new RuntimeException(PersonPlanMonitor.class.getName() + "\t"
+			throw new RuntimeException(PersonPlanMonitor4travelingCarDist.class
+					.getName()
+					+ "\t"
 					+ DebugTools.getLineNumber(new Exception())
 					+ "\tactDur isNaN");
 		return this.actDur;
@@ -193,7 +197,9 @@ public class PersonPlanMonitor {
 		double durAttr = typicalDuration_h
 				* Math.log(performingTime_h / zeroUtilityDuration_h);
 		if (Double.isNaN(durAttr))
-			throw new RuntimeException(PersonPlanMonitor.class.getName() + "\t"
+			throw new RuntimeException(PersonPlanMonitor4travelingCarDist.class
+					.getName()
+					+ "\t"
 					+ DebugTools.getLineNumber(new Exception())
 					+ "\tdurAttr isNaN");
 		return Math.max(durAttr, 0);
