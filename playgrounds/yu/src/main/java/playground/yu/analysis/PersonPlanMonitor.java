@@ -25,10 +25,12 @@ package playground.yu.analysis;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 
@@ -63,10 +65,10 @@ public class PersonPlanMonitor {
 		this.legArrTime = Double.NaN;
 	}
 
-	public void setLegArrTime(double arrTime) {
+	public void setLegArrTime(double arrTime, Network network) {
 		this.legArrTime = arrTime;
 		this.legDur += this.calcLegTravelTime_h();
-		this.legDist += this.calcLegDist_km();
+		this.legDist += this.calcLegDist_km(network);
 
 		this.actStartTime = Double.NaN;
 	}
@@ -109,9 +111,10 @@ public class PersonPlanMonitor {
 		List<PlanElement> pes = this.plan.getPlanElements();
 
 		String actType = ((Activity) pes.get(this.idx)).getType();
-		if (Double.isNaN(this.actEndTime) && actType.startsWith("h")
+		if (Double.isNaN(this.actEndTime)
+				&& (actType.startsWith("h") || actType.equals("tta"))
 				&& this.idx == pes.size() - 1) {
-			// last act (home)
+			// last act (home or tta)
 			// this.actEndTime = 24.0 * 3600.0 - 1.0;
 			this.actDur += this.calcActDuration_h(scoring
 					.getActivityParams(actType));
@@ -128,13 +131,17 @@ public class PersonPlanMonitor {
 	}
 
 	/**
+	 * @param network
 	 * @return leg Distance in [m]
 	 * @see {@code org.matsim.core.scoring.charyparNagel.LegScoringFunction}
 	 *      line 100
 	 */
-	private double calcLegDist_km() {
-		return ((Leg) this.plan.getPlanElements().get(this.idx)).getRoute()
-				.getDistance() / 1000.0;
+	private double calcLegDist_km(Network network) {
+		double legDist_km = 0.0;
+		Route route = ((Leg) this.plan.getPlanElements().get(this.idx))
+				.getRoute();
+		legDist_km = CalcRouteDistance.getRouteDistance(route, network) / 1000.0;
+		return legDist_km;
 	}
 
 	/**
@@ -155,11 +162,16 @@ public class PersonPlanMonitor {
 		zeroUtilityDuration_h = typicalDuration_h
 				* Math.exp(-10.0 / typicalDuration_h / actParams.getPriority());
 
-		double actStart = this.actStartTime, actEnd;
+		double actStart = -1, actEnd;
 
 		if (!actType.startsWith("h")) {
 			double openTime = actParams.getOpeningTime(), closeTime = actParams
 					.getClosingTime();
+			if (Double.isNaN(this.actStartTime))
+				this.actStartTime = openTime;
+			actStart = this.actStartTime;
+			if (Double.isNaN(this.actEndTime))
+				this.actEndTime = closeTime;
 			actEnd = this.actEndTime;
 			if (openTime >= 0 && this.actStartTime < openTime)
 				actStart = openTime;

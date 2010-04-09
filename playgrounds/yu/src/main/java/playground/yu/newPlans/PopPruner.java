@@ -66,9 +66,13 @@ public class PopPruner extends NewPopulation {
 	}
 
 	public static void main(String args[]) {
-		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		String oldPopFilename = "../runs/run623/it.500/500.plans.xml.gz";
-		String newPopFilename = "../runs/run623/it.500/500.plans4plans.xml.gz";
+		System.out.println("----->>>>>----->>>>>");
+
+		String netFilename = "../../matsim/examples/equil/network.xml";
+		String oldPopFilename = "../../matsim/output/equil_tta/output_plans.xml.gz";
+		String newPopFilename = "../../matsim/output/equil_tta/output_plans4.xml.gz";
+
+		System.out.println("net\t:\t" + netFilename);
 
 		Scenario s = new ScenarioImpl();
 

@@ -68,9 +68,9 @@ public class PopComplementer extends NewPopulation {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String netFilename = "../integration-parameterCalibration/test/network.xml";
-		String oldPopFilename = "../integration-parameterCalibration/test/tt_dist_perform/output_-4plans.xml.gz";
-		String newPopFilename = "../integration-parameterCalibration/test/tt_dist_perform/output_4plans.xml.gz";
+		String netFilename = "../../matsim/examples/equil/network.xml";
+		String oldPopFilename = "../../matsim/output/equil/output_plans.xml.gz";
+		String newPopFilename = "../../matsim/output/equil/output_4plans.xml.gz";
 
 		Scenario s = new ScenarioImpl();
 
