@@ -580,7 +580,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 				// ... calls QSim.agentDeparts, which
 				// ... calls QSim.handleKnownLegModeDeparture, which
 				// ... calls all departure handlers, which
-				// ... calls TransitQSimFeature.handlePTDeparture if it is a pt leg, which
+				// ... calls TransitQSimFeature.handleAgentPTDeparture if it is a pt leg, which
 				// ... puts the agent into the global agent tracker data structure, together with the correct stop id.
 				// kai, feb'10)
 
@@ -622,6 +622,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private void handleKnownLegModeDeparture(double now, PersonDriverAgent agent, Id linkId, Leg leg) {
 		for (DepartureHandler departureHandler : departureHandlers) {
 			departureHandler.handleDeparture(now, agent, linkId, leg);
+			// yy so richtig sympathisch ist mir das irgendwie nicht: Wenn sich aus irgendeinem Grunde zwei
+			// handler zuständig fühlen, existiert der Agent hinterher doppelt.  kai, apr'10
 		}
 	}
 

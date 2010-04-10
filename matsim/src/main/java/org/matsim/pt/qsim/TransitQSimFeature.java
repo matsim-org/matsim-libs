@@ -53,7 +53,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 	private static Logger log = Logger.getLogger(TransitQSimFeature.class);
 
-	private QSim queueSimulation;
+	private QSim qSim;
 
 	private TransitSchedule schedule = null;
 
@@ -66,15 +66,15 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 
 	public TransitQSimFeature(QSim queueSimulation) {
-		this.queueSimulation = queueSimulation;
+		this.qSim = queueSimulation;
 		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
 		this.agentTracker = new TransitStopAgentTracker();
 		afterConstruct();
 	}
 
 	private void afterConstruct() {
-		queueSimulation.setAgentFactory(new TransitAgentFactory(queueSimulation, this.agents));
-		queueSimulation.getNotTeleportedModes().add(TransportMode.pt);
+		qSim.setAgentFactory(new TransitAgentFactory(qSim, this.agents));
+		qSim.getNotTeleportedModes().add(TransportMode.pt);
 	}
 
 	public Collection<PersonAgent> createAgents() {
@@ -101,9 +101,9 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 	private Collection<PersonAgent> createVehiclesAndDriversWithUmlaeufe(TransitSchedule thisSchedule,
 			TransitStopAgentTracker thisAgentTracker) {
-		BasicVehicles vehicles = ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles();
+		BasicVehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
 		Collection<PersonAgent> drivers = new ArrayList<PersonAgent>();
-		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.queueSimulation.getScenario().getNetwork(),((ScenarioImpl) this.queueSimulation.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles(), this.queueSimulation.getScenario().getConfig().charyparNagelScoring());
+		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.qSim.getScenario().getNetwork(),((ScenarioImpl) this.qSim.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.qSim.getScenario()).getVehicles(), this.qSim.getScenario().getConfig().charyparNagelScoring());
 		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
 		for (Umlauf umlauf : umlaeufe) {
 			BasicVehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
@@ -118,22 +118,22 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 	private UmlaufDriver createAndScheduleVehicleAndDriver(Umlauf umlauf,
 			BasicVehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle, 5);
-		UmlaufDriver driver = new UmlaufDriver(umlauf, thisAgentTracker, this.queueSimulation);
+		UmlaufDriver driver = new UmlaufDriver(umlauf, thisAgentTracker, this.qSim);
 		veh.setDriver(driver);
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getBasicVehicle()));
 		driver.setVehicle(veh);
-		QLink qlink = this.queueSimulation.getQNetwork().getQLink(driver
+		QLink qlink = this.qSim.getQNetwork().getQLink(driver
 				.getCurrentLeg().getRoute().getStartLinkId());
 		qlink.addParkedVehicle(veh);
 
-		this.queueSimulation.scheduleActivityEnd(driver, 0);
+		this.qSim.scheduleActivityEnd(driver, 0);
 		Simulation.incLiving();
 		return driver;
 	}
 
 	private Collection<PersonAgent> createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule,
 			TransitStopAgentTracker agentTracker) {
-		BasicVehicles vehicles = ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles();
+		BasicVehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
 		Collection<PersonAgent> drivers = new ArrayList<PersonAgent>();
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
@@ -142,13 +142,13 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 						throw new NullPointerException("no vehicle id set for departure " + departure.getId() + " in route " + route.getId() + " from line " + line.getId());
 					}
 					TransitQVehicle veh = new TransitQVehicle(vehicles.getVehicles().get(departure.getVehicleId()), 5);
-					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this.queueSimulation);
+					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this.qSim);
 					veh.setDriver(driver);
 					veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getBasicVehicle()));
 					driver.setVehicle(veh);
-					QLink qlink = this.queueSimulation.getQNetwork().getQLink(driver.getCurrentLeg().getRoute().getStartLinkId());
+					QLink qlink = this.qSim.getQNetwork().getQLink(driver.getCurrentLeg().getRoute().getStartLinkId());
 					qlink.addParkedVehicle(veh);
-					this.queueSimulation.scheduleActivityEnd(driver, 0);
+					this.qSim.scheduleActivityEnd(driver, 0);
 					Simulation.incLiving();
 					drivers.add(driver);
 				}
@@ -161,7 +161,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 	}
 
-	private void handlePTDeparture(final PersonDriverAgent agent, Id linkId, Leg leg) {
+	private void handleAgentPTDeparture(final PersonDriverAgent agent, Id linkId, Leg leg) {
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + agent.getPerson().getId().toString());
 			log.info("route: "
@@ -191,7 +191,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 			}
 		}
 	}
-
+	
 	@Override
 	public void beforeHandleUnknownLegMode(double now, final PersonDriverAgent agent, Link link) {
 
@@ -205,7 +205,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 	@Override
 	public void handleDeparture(double now, PersonDriverAgent agent, Id linkId, Leg leg) {
 		if (leg.getMode() == TransportMode.pt) {
-			handlePTDeparture(agent, linkId, leg);
+			handleAgentPTDeparture(agent, linkId, leg);
 		}
 	}
 

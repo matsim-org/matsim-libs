@@ -866,7 +866,7 @@ public class QLane implements QBufferItem {
       positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);
       
       int lane = positionVehiclesFromWaitingList(positions, link, cellSize);
-      QLane.this.transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cellSize, lane);
+      QLane.this.transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, lane);
     }
 
     private double calculateVehicleLength(double storageCapFactor, double cellSize) {

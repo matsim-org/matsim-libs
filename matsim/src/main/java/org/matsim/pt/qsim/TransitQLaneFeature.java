@@ -13,12 +13,14 @@ import java.util.Queue;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QLinkImpl;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.ptproject.qsim.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 
 public class TransitQLaneFeature {
@@ -126,23 +128,41 @@ public class TransitQLaneFeature {
 	/**
 	 * Put the transit vehicles from the transit stop list in positions.
 	 */
-	public void positionVehiclesFromTransitStop(
-			final Collection<AgentSnapshotInfo> positions, double cellSize,
-			int lane) {
+	public void positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, int cnt2 ) {
 		if (this.transitVehicleStopQueue.size() > 0) {
-			lane++; // place them one lane further away
-			double vehPosition = queueLane.getLink().getLength();
+//			lane++; // place them one lane further away
+//			double vehPosition = queueLane.getLink().getLength();
 			for (QVehicle veh : this.transitVehicleStopQueue) {
-				PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, veh.getDriver().getPerson().getId(), queueLane.getLink(),
-						vehPosition, lane, 0.0, 	AgentSnapshotInfo.AgentState.TRANSIT_DRIVER);
-				positions.add(position);
-				vehPosition -= veh.getSizeInEquivalents() * cellSize;
+////				PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, veh.getDriver().getPerson().getId(), queueLane.getLink(),
+////						vehPosition, lane, 0.0, 	AgentSnapshotInfo.AgentState.TRANSIT_DRIVER);
+//				AgentSnapshotInfo position = new PositionInfo( veh.getDriver().getPerson().getId(), queueLane.getLink(), cnt2 ) ;
+//				position.setAgentState( AgentState.TRANSIT_DRIVER ) ;
+//				positions.add(position);
+////				vehPosition -= veh.getSizeInEquivalents() * cellSize;
+//				// yyyy also add the passengers (so we can track them)? kai, apr'10
+
+				Collection<PersonAgent> peopleInVehicle = getPassengers(veh);
+				boolean first = true;
+				for (PersonAgent passenger : peopleInVehicle) {
+					AgentSnapshotInfo passengerPosition = new PositionInfo( passenger.getPerson().getId(), queueLane.getLink(), cnt2 ); // for the time being, same position as facilities
+					if ( passenger.getPerson().getId().toString().startsWith("pt")) {
+						passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
+					} else if (first) {
+						passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
+					} else {
+						passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
+					}
+					positions.add(passengerPosition);
+					first = false; 
+					cnt2++ ; 
+				}
+			
 			}
+			
 		}
 	}
 
-	public Collection<PersonAgent> getPassengers(
-			QVehicle queueVehicle) {
+	public Collection<PersonAgent> getPassengers(QVehicle queueVehicle) {
 		// yyyy warum macht diese Methode Sinn?  TransitVehicle.getPassengers() gibt doch
 		// bereits eine Collection<PersonAgent> zurück.  Dann braucht das Umkopieren hier doch
 		// bloss Zeit?  kai, feb'10

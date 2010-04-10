@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
 /**
@@ -34,9 +35,16 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  * A helper class to store information about agents (id, position, speed), mainly used to create
  * {@link SnapshotWriter snapshots}.
  *
- * @author mrieser
+ * @author mrieser, knagel
  */
 public class PositionInfo implements AgentSnapshotInfo {
+	
+	// yyyy presumably, this should become a factory:
+	//   PositionInfoFactory factory = new PositionInfoFactory() ;
+ 	//   factory.setXYZ( ... ) ;
+	//   ...
+	//   AgentSnapshotInfo info = factory.createAgentSnapshotInfo() ;
+	// ??? kai, apr'10
 	
 	private static final double LANE_WIDTH = 3.75;
 	//TODO lane width is no longer static but it is defined in network. The question is,
@@ -71,11 +79,9 @@ public class PositionInfo implements AgentSnapshotInfo {
 	
 	private double azimuth;
 	
-	final private double distanceOnLink;
-
 	private double speed;
 
-	private AgentState vehicleState;
+	private AgentState agentState;
 	
 	final private Id linkId;
 
@@ -83,17 +89,46 @@ public class PositionInfo implements AgentSnapshotInfo {
 
 	private int user = 0;
 
-	/**Uses PositionInfo to generate a position for facilities.  This looks like an abuse of PositionInfo only because it was
-	 * made quite vehicle-oriented over the last years.
-	 * @param agentId
-	 * @param link
-	 */
 	public PositionInfo( final Id agentId, final Link link ) {
-		this( agentId, link, 0.9*link.getLength(), 10, 0., AgentState.PERSON_AT_ACTIVITY) ;
+		this( agentId, link, 0 ) ;
 	}
 	
+	/**
+	 * Uses PositionInfo to generate a position for facilities. This looks like an abuse of PositionInfo only because it was made
+	 * quite vehicle-oriented over the last years.
+	 * 
+	 * @param cnt used to calculate offset from link to place items side-by-side rather than on top of each other. Use 0 if you
+	 *            don't know.
+	 */
 	public PositionInfo( final Id agentId, final Link link, int cnt ) {
 		this( agentId, link, 0.9*link.getLength(), 10+2*cnt, 0., AgentState.PERSON_AT_ACTIVITY) ;
+	}
+
+	/**
+	 * Use when you have something moving on a link.
+	 */
+	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane ) {
+		this( agentId, link, distanceOnLink, lane, 0 ) ;
+	}
+
+	/**
+	 * Use when you have something moving on a link.
+	 * 
+	 * @param cnt is used to "count" persons in a vehicle to possibly offset them to the side.  Not supported without code modification. kai, apr'10
+	 */
+	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final int cnt ) {
+		this.agentId = agentId;
+		this.linkId = link.getId();
+		this.calculatePosition(link, OTFDefaultLinkHandler.LINK_SCALE, distanceOnLink, lane + 2*cnt );
+	}
+
+	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth ) {
+		this.agentId = driverId;
+		this.linkId = null;
+		this.easting = easting;
+		this.northing = northing;
+		this.elevation = elevation;
+		this.azimuth = azimuth;
 	}
 
 	/**
@@ -111,10 +146,9 @@ public class PositionInfo implements AgentSnapshotInfo {
 	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState ) {
 		this.agentId = agentId;
 		this.linkId = link.getId();
-		this.distanceOnLink = distanceOnLink;
-		this.calculatePosition(link, 1.0, lane);
+		this.calculatePosition(link, OTFDefaultLinkHandler.LINK_SCALE, distanceOnLink, lane);
 		this.speed = speed;
-		this.vehicleState = vehicleState;
+		this.agentState = vehicleState;
 	}
 	
 	/**
@@ -126,19 +160,20 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * @param lane The number of the lane the agent is on.
 	 * 		Lanes are counted from the middle of a bi-directional link, beginning with 1.
 	 * @param speed The speed the agent is traveling with.
-	 * @param vehicleState The state of the vehicle (Parking,Driving)
+	 * @param agentState The state of the vehicle (Parking,Driving)
 	 */
-	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState) {
+	@Deprecated // (1) try to use shorter constructors.  (2) I don't think it makes sense to hand linkScale as a method into positionInfo; it should come frome somewhere else. kai, apr'10
+	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState agentState) {
 		this( linkScale, agentId, link, distanceOnLink, lane ) ;
 		this.speed = speed;
-		this.vehicleState = vehicleState;
+		this.agentState = agentState;
 	}
 
+	@Deprecated //  I don't think it makes sense to hand linkScale as a method into positionInfo; it should come from somewhere else. kai, apr'10
 	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane ) {
 		this.agentId = agentId;
 		this.linkId = link.getId();
-		this.distanceOnLink = distanceOnLink;
-		this.calculatePosition(link, linkScale, lane);
+		this.calculatePosition(link, linkScale, distanceOnLink, lane);
 	}
 
 	/**
@@ -152,23 +187,14 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * @param speed
 	 * @param vehicleState The state of the vehicle (Parking, Driving)
 	 */
+	@Deprecated // please try to use the shorter constructors.  kai, apr'10
 	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final AgentState vehicleState) {
 		this( driverId, easting, northing, elevation, azimuth ) ;
 		this.speed = speed;
-		this.vehicleState = vehicleState;
+		this.agentState = vehicleState;
 	}
 	
-	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth ) {
-		this.agentId = driverId;
-		this.linkId = null;
-		this.easting = easting;
-		this.northing = northing;
-		this.elevation = elevation;
-		this.azimuth = azimuth;
-		this.distanceOnLink = 0.0; // is unknown
-	}
-
-	private void calculatePosition(Link link, double linkScale, int lane){
+	private void calculatePosition(Link link, double linkScale, double distanceOnLink, int lane){
 		Point2D.Double linkStart = new Point2D.Double(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 		Point2D.Double linkEnd = new Point2D.Double(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 		double dx = -linkStart.getX() + linkEnd.getX();
@@ -186,14 +212,23 @@ public class PositionInfo implements AgentSnapshotInfo {
 			}
 		}
 		if (theta < 0.0) theta += TWO_PI;
+		
+		// "correction" is needed because link lengths are usually different (usually longer) than the Euklidean distances.
+		// For the visualization, however, the vehicles are distributed in a straight line between the end points.
+		// Since the simulation, on the other hand, reports odometer distances, this needs to be corrected.
+		// (And this is, in my view, the right place to correct this.)  kai, apr'10
 		double correction = 0. ;
 		if ( link.getLength() != 0 ){
 			correction = ((LinkImpl)link).getEuklideanDistance() / link.getLength();
 		}
+		
+		// "link scale" is not from me.  Presumably, it "pulls back" the drawing of the vehicles from the nodes on
+		// both ends.  kai, apr'10
 		if (linkScale != 1.0) {
 			Tuple<Point2D.Double, Point2D.Double> scaledLinkTuple = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
 			linkStart = scaledLinkTuple.getFirst();
 		}
+		
 		this.easting  = linkStart.getX() + Math.cos(theta) * (distanceOnLink * linkScale) * correction
 		                + Math.sin(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH * lane ) ;
 		this.northing = linkStart.getY() + Math.sin(theta) * (distanceOnLink * linkScale) * correction
@@ -230,10 +265,10 @@ public class PositionInfo implements AgentSnapshotInfo {
 	}
 
 	public AgentState getAgentState(){
-		return this.vehicleState;
+		return this.agentState;
 	}
 	public void setAgentState( AgentState state ) {
-		this.vehicleState = state ;
+		this.agentState = state ;
 	}
 
 	public Id getLinkId() {

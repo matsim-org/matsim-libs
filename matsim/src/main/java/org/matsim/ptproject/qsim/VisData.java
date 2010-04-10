@@ -35,6 +35,7 @@ public interface VisData {
 	 *
 	 * @return A measure for the number of vehicles being delayed on this link.
 	 */
+	@Deprecated // this was used for netvis, but I don't think that we support netvis any more. kai, apr'10
 	public double getDisplayableTimeCapValue(double time);
 
 	public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions);
