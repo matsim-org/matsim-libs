@@ -51,9 +51,9 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -137,7 +137,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * extended constructor method that can also be
 	 * after assignments of another constructor
 	 */
-	private void init(Scenario sc, EventsManager eventsManager){
+	private void init(final Scenario sc, final EventsManager eventsManager){
     log.info("Using QSim...");
     // In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
     this.listenerManager = new SimulationListenerManager<QSim>(this);
@@ -167,7 +167,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
       }
       this.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
     }
-    
+
 
 
     this.agentFactory = new AgentFactory(this);
@@ -180,8 +180,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		addDepartureHandler(this.carDepartureHandler);
 	}
 
-	public void addDepartureHandler(DepartureHandler departureHandler) {
-		departureHandlers.add(departureHandler);
+	public void addDepartureHandler(final DepartureHandler departureHandler) {
+		this.departureHandlers.add(departureHandler);
 	}
 
 
@@ -253,18 +253,18 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 				qlink.addParkedVehicle(veh);
 			}
 		}
-		
-		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
+
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			Collection<PersonAgent> moreAgents = queueSimulationFeature.createAgents();
 			agents.addAll(moreAgents);
 		}
-		
-		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
+
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			for (PersonAgent agent : agents) {
 				queueSimulationFeature.agentCreated(agent);
 			}
 		}
-		
+
 	}
 
 	/**
@@ -328,7 +328,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 		prepareNetworkChangeEventsQueue();
 
-		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterPrepareSim();
 		}
 	}
@@ -351,8 +351,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	/**
 	 * Close any files, etc.
 	 */
-	protected void cleanupSim(double seconds) {
-		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
+	protected void cleanupSim(final double seconds) {
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeCleanupSim();
 		}
 
@@ -397,7 +397,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	}
 
-	
+
 	private void printSimLog(final double time) {
     if (time >= this.infoTime) {
       this.infoTime += INFO_PERIOD;
@@ -410,7 +410,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
       Gbl.printMemoryUsage();
     }
 	}
-	
+
 	/**
 	 * Do one step of the simulation run.
 	 *
@@ -431,7 +431,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
 		}
-		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterAfterSimStep(time);
 		}
 	}
@@ -475,8 +475,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		QSim.events = events;
 	}
 
-	protected void handleUnknownLegMode(double now, final PersonDriverAgent agent, Id linkId) {
-		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
+	protected void handleUnknownLegMode(final double now, final PersonDriverAgent agent, final Id linkId) {
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.scenario.getNetwork().getLinks().get(linkId));
 		}
 		double arrivalTime = now + agent.getCurrentLeg().getTravelTime();
@@ -504,8 +504,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * @param now
 	 * @param agent
 	 */
-	public void handleAgentArrival(final double now, PersonDriverAgent agent) {
-		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
+	public void handleAgentArrival(final double now, final PersonDriverAgent agent) {
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleAgentArrival(agent);
 		}
 		getEventsManager().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
@@ -529,10 +529,10 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 *
 	 * @see PersonDriverAgent#getDepartureTime()
 	 */
-	public void scheduleActivityEnd(final PersonDriverAgent agent, int planElementIndex) {
+	public void scheduleActivityEnd(final PersonDriverAgent agent, final int planElementIndex) {
 		this.activityEndsList.add(agent);
 		addToAgentsInActivities(agent);
-		for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterActivityBegins(agent, planElementIndex);
 		}
 	}
@@ -546,13 +546,13 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				QLink qLink = network.getQLink(linkId);
+				QLink qLink = this.network.getQLink(linkId);
 				qLink.addAgentInActivity(agent);
 			}
 		}
 	}
 
-	private void removeFromAgentsInActivities(PersonDriverAgent agent) {
+	private void removeFromAgentsInActivities(final PersonDriverAgent agent) {
 		if (agent instanceof QPersonAgent) {
 			QPersonAgent pa = (QPersonAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
@@ -561,7 +561,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				QLink qLink = network.getQLink(linkId);
+				QLink qLink = this.network.getQLink(linkId);
 				qLink.removeAgentInActivity(agent);
 			}
 		}
@@ -575,7 +575,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 				removeFromAgentsInActivities(agent);
 
 				agent.activityEnds(time);
-				// (... calls PersonAgent.advancePlanElement, which 
+				// (... calls PersonAgent.advancePlanElement, which
 				// ... calls PersonAgent.initNextLeg if the next PlanElement is a leg, which
 				// ... calls QSim.agentDeparts, which
 				// ... calls QSim.handleKnownLegModeDeparture, which
@@ -584,7 +584,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 				// ... puts the agent into the global agent tracker data structure, together with the correct stop id.
 				// kai, feb'10)
 
-				for (QSimFeature queueSimulationFeature : queueSimulationFeatures) {
+				for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 
 					queueSimulationFeature.afterActivityEnds(agent, time);
 					// (calls TransitQSimFeature.afterActivityEnds(...), but that does not do anything. kai, feb'10
@@ -604,7 +604,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	public void agentDeparts(double now, final PersonDriverAgent agent, final Id linkId) {
+	public void agentDeparts(final double now, final PersonDriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, mode));
@@ -615,15 +615,15 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		}
 	}
 
-	protected void visAndHandleUnknownLegMode(double now, PersonDriverAgent agent, Id linkId) {
+	protected void visAndHandleUnknownLegMode(final double now, final PersonDriverAgent agent, final Id linkId) {
 		this.handleUnknownLegMode(now, agent, linkId);
 	}
 
-	private void handleKnownLegModeDeparture(double now, PersonDriverAgent agent, Id linkId, Leg leg) {
-		for (DepartureHandler departureHandler : departureHandlers) {
+	private void handleKnownLegModeDeparture(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg) {
+		for (DepartureHandler departureHandler : this.departureHandlers) {
 			departureHandler.handleDeparture(now, agent, linkId, leg);
 			// yy so richtig sympathisch ist mir das irgendwie nicht: Wenn sich aus irgendeinem Grunde zwei
-			// handler zuständig fühlen, existiert der Agent hinterher doppelt.  kai, apr'10
+			// handler zustaendig fuehlen, existiert der Agent hinterher doppelt.  kai, apr'10
 		}
 	}
 
@@ -679,24 +679,24 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	}
 
 	public Set<TransportMode> getNotTeleportedModes() {
-		return notTeleportedModes;
+		return this.notTeleportedModes;
 	}
 
-	public void addFeature(QSimFeature queueSimulationFeature) {
-		queueSimulationFeatures.add(queueSimulationFeature);
+	public void addFeature(final QSimFeature queueSimulationFeature) {
+		this.queueSimulationFeatures.add(queueSimulationFeature);
 	}
 
 
 	public Integer getIterationNumber() {
-		return iterationNumber;
+		return this.iterationNumber;
 	}
 
 
-	public void setIterationNumber(Integer iterationNumber) {
+	public void setIterationNumber(final Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
 	}
 
-	public void setControlerIO(ControlerIO controlerIO) {
+	public void setControlerIO(final ControlerIO controlerIO) {
 		this.controlerIO = controlerIO;
 	}
 
