@@ -28,7 +28,8 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
+
+import playground.yu.replanning.selectors.RandomPlanSelectorWithPlanType;
 
 /**
  * generate a populationfile, in which each agent has a plan choice set with
@@ -63,7 +64,9 @@ public class PopWithHeterogeneousPlanChoiceSet extends Controler {
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
 		StrategyManagerConfigLoader.load(this, manager);
-		manager.setPlanSelectorForRemoval(new RandomPlanSelector());
+		manager.setPlanSelectorForRemoval(new RandomPlanSelectorWithPlanType()
+		// RandomPlanSelector()
+				);
 
 		if (this.strategyChangerIteration > 0) {
 			PlanStrategy expBetaPlanChanger = new PlanStrategy(

@@ -94,11 +94,10 @@ public class DoublePop extends NewPopulation {
 	}
 
 	public static void main(final String[] args) {
-		Gbl.startMeasurement();
 
-		String networkFilename = "../integration-parameterCalibration/test/network.xml";
-		String plansFilename = "../integration-parameterCalibration/test/matsim/plans1.xml";
-		String outputPlansFilename = "../integration-parameterCalibration/test/matsim/pop100.xml";
+		String networkFilename = "../../matsim/examples/equil/network.xml";
+		String plansFilename = "../../integration-parameterCalibration/test/hetero/plansAll.xml";
+		String outputPlansFilename = "../../integration-parameterCalibration/test/hetero/plansAll100.xml";
 
 		ScenarioImpl s = new ScenarioImpl();
 
@@ -112,7 +111,5 @@ public class DoublePop extends NewPopulation {
 		DoublePop dp = new DoublePop(network, population, outputPlansFilename);
 		dp.run(population);
 		dp.writeEndPlans();
-
-		Gbl.printElapsedTime();
 	}
 }
