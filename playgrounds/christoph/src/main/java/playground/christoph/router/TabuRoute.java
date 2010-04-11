@@ -32,7 +32,7 @@ import playground.christoph.network.SubNetwork;
 import playground.christoph.network.SubNode;
 import playground.christoph.router.util.SimpleRouter;
 
-public class TabuRoute extends SimpleRouter implements Cloneable{
+public class TabuRoute extends SimpleRouter {
 
 	protected static int errorCounter = 0;
 	

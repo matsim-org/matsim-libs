@@ -27,12 +27,11 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.christoph.events.EventControler;
 import playground.christoph.router.util.KnowledgeTravelTime;
 
 public class SystemOptimalTravelCostCalculator implements TravelMinCost, Cloneable, PersonalizableTravelCost {
 
-	private static final Logger log = Logger.getLogger(EventControler.class);
+	private static final Logger log = Logger.getLogger(SystemOptimalTravelCostCalculator.class);
 	
 	protected final TravelTime timeCalculator;
 

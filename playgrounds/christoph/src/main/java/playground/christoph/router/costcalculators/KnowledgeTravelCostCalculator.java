@@ -25,18 +25,17 @@ import java.lang.reflect.Method;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
-import playground.christoph.router.util.KnowledgeTravelCost;
 
-/*
- * Adaption of TravelTimeDistanceCostCalculator
- */
-public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
+public class KnowledgeTravelCostCalculator implements PersonalizableTravelCost, Cloneable {
 
+	protected Person person;
 	protected TravelTime timeCalculator;
 	protected double travelCostFactor;
 	protected double marginalUtlOfDistance;
@@ -58,9 +57,13 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		knowledgeTools = new KnowledgeTools();
 	}
 	
+	public void setPerson(Person person)
+	{
+		this.person = person;		
+	}
+	
 	public double getLinkTravelCost(final Link link, final double time) 
 	{	
-
 		if (checkNodeKnowledge)
 		{
 			// try getting NodeKnowledge from the Persons Knowledge
@@ -71,8 +74,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 			{
 //				log.info("Link is not part of the Persons knowledge!");
 				return Double.MAX_VALUE;
-			}
-			
+			}		
 		}
 		
 		// Person knows the link, so calculate it's costs
@@ -92,18 +94,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	
 	@Override
 	public KnowledgeTravelCostCalculator clone()
-	{
-//		TravelTime timeCalculatorClone;
-//		if(this.timeCalculator instanceof KnowledgeTravelTime)
-//		{
-//			timeCalculatorClone = ((KnowledgeTravelTime)timeCalculator).clone();
-//		}
-//		else
-//		{
-//			log.error("Could not clone the TimeCalculator - use reference to the existing Calculator and hope the best...");
-//			timeCalculatorClone = timeCalculator;
-//		}
-		
+	{	
 		TravelTime timeCalculatorClone = null;
 		if (timeCalculator instanceof Cloneable)
 		{
@@ -132,5 +123,4 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		
 		return clone;
 	}
-
 }

@@ -21,20 +21,18 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.MatsimRandom;
 
 import playground.christoph.network.SubLink;
 import playground.christoph.network.SubNetwork;
 import playground.christoph.network.SubNode;
 import playground.christoph.router.util.SimpleRouter;
 
-public class RandomCompassRoute extends SimpleRouter implements Cloneable{
+public class RandomCompassRoute extends SimpleRouter {
 
 	protected static int errorCounter = 0;
 	

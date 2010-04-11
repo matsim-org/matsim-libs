@@ -32,7 +32,7 @@ import playground.christoph.network.SubNetwork;
 import playground.christoph.network.SubNode;
 import playground.christoph.router.util.SimpleRouter;
 
-public class RandomRoute extends SimpleRouter implements Cloneable{
+public class RandomRoute extends SimpleRouter {
 
 	private final static Logger log = Logger.getLogger(RandomRoute.class);
 	
@@ -153,5 +153,5 @@ public class RandomRoute extends SimpleRouter implements Cloneable{
 		
 		return clone;
 	}
-	
+
 }

@@ -159,12 +159,12 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 	{
 		if (isActEndReplanning())
 		{
-			actEndReplanningModule.doReplanning(e.getSimulationTime() + QSimTimer.getSimTickTime());
+			actEndReplanningModule.doReplanning(e.getSimulationTime());
 		}
 		
 		if (isLeaveLinkReplanning())
 		{
-			leaveLinkReplanningModule.doReplanning(e.getSimulationTime() + QSimTimer.getSimTickTime());
+			leaveLinkReplanningModule.doReplanning(e.getSimulationTime());
 		}	
 	}
 }

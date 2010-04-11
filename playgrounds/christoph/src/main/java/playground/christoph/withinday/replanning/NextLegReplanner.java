@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -89,14 +90,51 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 		// If we don't have a selected plan
 		if (selectedPlan == null) return false;
 		
-		Activity currentActivity = withinDayPersonAgent.getCurrentActivity();
+		Activity currentActivity;
+		Leg nextLeg;
+		Activity nextActivity;
+		
+		currentActivity = withinDayPersonAgent.getCurrentActivity();
 		
 		// If we don't have a current Activity
 		if (currentActivity == null) return false;
 		
-		Leg nextLeg = selectedPlan.getNextLeg(currentActivity);
-		Activity nextActivity = selectedPlan.getNextActivity(nextLeg);	
-				
+		nextLeg = selectedPlan.getNextLeg(currentActivity);
+		
+		if (nextLeg == null) return false;
+	
+		nextActivity = selectedPlan.getNextActivity(nextLeg);
+		
+		
+		/*
+		 * By default we replan the leg after the current Activity, but there are
+		 * some exclusions.
+		 * 
+		 * If the next Activity takes place at the same Link we don't have to 
+		 * replan the next leg.
+		 * BUT: if the next Activity has a duration of 0 seconds we have to replan
+		 * the leg after that Activity.
+		 */
+		while (nextLeg.getRoute().getStartLinkId().equals(nextLeg.getRoute().getEndLinkId()))
+		{
+			/*
+			 *  If the next Activity has a duration > 0 we don't have to replan
+			 *  the leg after that Activity now - it will be scheduled later.
+			 */
+			if (nextActivity.getEndTime() > time)
+			{	
+				return true;
+			}
+
+			nextLeg = selectedPlan.getNextLeg(nextActivity);
+			if (nextLeg == null)
+			{
+				return true;
+			}
+			nextActivity = selectedPlan.getNextActivity(nextLeg);
+		}
+		
+		
 		// If it is not a car Leg we don't replan it.
 		if (!nextLeg.getMode().equals(TransportMode.car)) return false;
 		
@@ -124,7 +162,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 		// By doing the replanning the "betweenLeg" is replanned, so the changes are
 		// included in the previously selected plan, too!
 		planAlgorithm.run(newPlan);
-		
+
 		new SubNetworkTools().resetSubNetwork(person);
 		
 		// reactivate previously selected, replanned plan
@@ -141,7 +179,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 		
 //		if (alternativeRoute.getDistance() != originalRoute.getDistance())
 //		{
-//			log.info("Changed Route length! Id:" + this.person.getId() + " " + alternativeRoute.getDistance() + " vs. " + originalRoute.getDistance());
+//			log.info("Changed Route length! Id:" + person.getId() + " " + alternativeRoute.getDistance() + " vs. " + originalRoute.getDistance());
 //		}
 		
 		// create ReplanningEvent

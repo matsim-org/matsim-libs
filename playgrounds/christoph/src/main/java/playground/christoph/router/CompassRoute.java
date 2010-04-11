@@ -32,7 +32,7 @@ import playground.christoph.network.SubNetwork;
 import playground.christoph.network.SubNode;
 import playground.christoph.router.util.SimpleRouter;
 
-public class CompassRoute extends SimpleRouter implements Cloneable{
+public class CompassRoute extends SimpleRouter {
 
 	protected static int errorCounter = 0;
 	

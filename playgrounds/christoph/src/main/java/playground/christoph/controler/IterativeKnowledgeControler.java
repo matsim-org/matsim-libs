@@ -10,19 +10,18 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.christoph.events.EventControler;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
-import playground.christoph.router.KnowledgePlansCalcRoute;
+import playground.christoph.router.CloneablePlansCalcRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import playground.christoph.router.util.DijkstraWrapperFactory;
+import playground.christoph.router.util.CloningDijkstraFactory;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 
 public class IterativeKnowledgeControler extends Controler{
 
-	private static final Logger log = Logger.getLogger(EventControler.class);
+	private static final Logger log = Logger.getLogger(IterativeKnowledgeControler.class);
 
 	boolean knowledgeLoaded = false;
 
@@ -74,19 +73,7 @@ public class IterativeKnowledgeControler extends Controler{
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
 
-//		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
-//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime, network);
-//		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
-		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCostWrapper, travelTime, new DijkstraWrapperFactory());
-
-//		FreespeedTravelTimeCost test = new FreespeedTravelTimeCost();
-//		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(test);
-//		travelCostWrapper.checkNodeKnowledge(false);
-//		travelCostWrapper.useLookupTable(false);
-//
-//		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, test);
-//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, test, network);
-//		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
+		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCostWrapper, travelTime, new CloningDijkstraFactory());
 
 		for (Person person : this.getPopulation().getPersons().values())
 		{

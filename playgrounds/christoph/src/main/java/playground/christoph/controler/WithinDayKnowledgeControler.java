@@ -28,12 +28,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
-import playground.christoph.router.KnowledgePlansCalcRoute;
+import playground.christoph.router.CloneablePlansCalcRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import playground.christoph.router.util.DijkstraWrapperFactory;
+import playground.christoph.router.util.CloningDijkstraFactory;
 import playground.christoph.withinday.replanning.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.InitialReplanner;
 import playground.christoph.withinday.replanning.NextLegReplanner;
@@ -105,8 +105,8 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
 		
-		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
-				travelCostWrapper, travelTimeWrapper, new DijkstraWrapperFactory());
+		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
+				travelCostWrapper, travelTimeWrapper, new CloningDijkstraFactory());
 		
 		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());

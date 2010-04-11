@@ -15,7 +15,6 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -30,14 +29,13 @@ import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
 import playground.christoph.network.util.SubNetworkCreator;
 import playground.christoph.network.util.SubNetworkTools;
-import playground.christoph.router.DijkstraWrapper;
-import playground.christoph.router.KnowledgePlansCalcRoute;
+import playground.christoph.router.CloneablePlansCalcRoute;
 import playground.christoph.router.MyDijkstra;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import playground.christoph.router.util.DijkstraWrapperFactory;
+import playground.christoph.router.util.CloningDijkstraFactory;
 import playground.christoph.router.util.KnowledgeTools;
 
 public class TestSubNetwork {
@@ -56,9 +54,7 @@ public class TestSubNetwork {
 	private KnowledgeTravelCostWrapper travelCostWrapper;
 	
 	private Dijkstra dijkstra;
-	private DijkstraWrapper dijkstraWrapper;
-	private KnowledgePlansCalcRoute dijkstraRouter;
-	private NetworkFactoryImpl networkFactory;
+	private CloneablePlansCalcRoute dijkstraRouter;
 	private QNetwork qNetwork;
 	
 	private final String configFileName = "mysimulations/kt-zurich/config.xml";
@@ -139,10 +135,9 @@ public class TestSubNetwork {
 		
 		// Don't use Knowledge for CostCalculations
 		dijkstra = new MyDijkstra(this.scenario.getNetwork(), travelCostWrapper, travelTimeWrapper);
-//		dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper, network);
 	
-		dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), this.scenario.getNetwork(), 
-				travelCostWrapper, travelTimeWrapper, new DijkstraWrapperFactory());
+		dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), this.scenario.getNetwork(), 
+				travelCostWrapper, travelTimeWrapper, new CloningDijkstraFactory());
 	}
 	
 	private void createSubNetworks()

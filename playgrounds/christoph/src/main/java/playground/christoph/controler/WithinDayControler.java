@@ -20,13 +20,13 @@
 
 package playground.christoph.controler;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -38,16 +38,13 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelTime;
-//import org.matsim.core.events.parallelEventsHandler.WithinDayParallelEventsManagerImpl;
 
-import playground.christoph.events.LinkVehiclesCounter2;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
-import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.replanning.TravelTimeCollector;
 import playground.christoph.router.FastDijkstraFactory;
-import playground.christoph.router.KnowledgePlansCalcRoute;
+import playground.christoph.router.CloneablePlansCalcRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.costcalculators.SystemOptimalTravelCostCalculator;
@@ -66,6 +63,7 @@ import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanne
 import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
 import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifier;
+import playground.christoph.withinday.replanning.identifiers.ActivityReplanningMap;
 import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImpl;
 import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
@@ -89,8 +87,6 @@ import playground.christoph.withinday.replanning.parallel.ParallelDuringLegRepla
 
 public class WithinDayControler extends Controler {
 
-	protected ArrayList<SelectNodes> nodeSelectors;
-
 	/*
 	 * Define the Probability that an Agent uses the
 	 * Replanning Strategy. It is possible to assign
@@ -103,7 +99,7 @@ public class WithinDayControler extends Controler {
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 8;
+	protected int numReplanningThreads = 4;
 
 	protected TravelTime travelTime;
 	
@@ -117,7 +113,6 @@ public class WithinDayControler extends Controler {
 	protected WithinDayDuringActivityReplanner duringActivityReplanner;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 	
-	protected LinkVehiclesCounter2 linkVehiclesCounter;
 	protected ReplanningManager replanningManager;
 	protected KnowledgeWithinDayQSim sim;
 	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
@@ -158,34 +153,27 @@ public class WithinDayControler extends Controler {
 	 */
 	protected void initReplanningRouter() {
 
-		/*
-		 * Calculate the TravelTime based on the actual load of the links. Use only
-		 * the TravelTime to find the LeastCostPath.
-		 */
-//		travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
-//		// fully initialize & add LinkVehiclesCounter
-//		linkVehiclesCounter.setQueueNetwork(sim.getQueueNetwork());	// for KnowledgeTravelTimeCalculator
-//		foqsl.addQueueSimulationInitializedListener(linkVehiclesCounter);	// for KnowledgeTravelTimeCalculator
-//		foqsl.addQueueSimulationAfterSimStepListener(linkVehiclesCounter);	// for KnowledgeTravelTimeCalculator
-//		this.events.addHandler(linkVehiclesCounter);	// for KnowledgeTravelTimeCalculator
-
 //		TravelTimeEstimatorHandlerAndListener handlerAndListener = new TravelTimeEstimatorHandlerAndListener(population, network, 60, 86400 * 2);
 //		travelTime = new TravelTimeEstimator(handlerAndListener);
 //		foqsl.addQueueSimulationInitializedListener((TravelTimeEstimatorHandlerAndListener)handlerAndListener); // for TravelTimeEstimator
 //		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeEstimatorHandlerAndListener)handlerAndListener);	// for TravelTimeEstimator
 //		this.events.addHandler((TravelTimeEstimatorHandlerAndListener)handlerAndListener);	// for TravelTimeEstimator
 
+
+		
+		
 		travelTime = new TravelTimeCollector(network);
 		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
-//		SystemOptimalTravelCostCalculator travelCost = new SystemOptimalTravelCostCalculator(travelTime);
-
-		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime, new FastDijkstraFactory());
-//		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
+//		travelTime = new FreeSpeedTravelTime();
 		
+		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+
+//		KnowledgePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime, new FastDijkstraFactory());
+		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
+			
 		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
 		this.initialReplanner.setReplanner(dijkstraRouter);
@@ -223,7 +211,6 @@ public class WithinDayControler extends Controler {
 	 */
 	protected void createHandlersAndListeners()
 	{
-		linkVehiclesCounter = new LinkVehiclesCounter2();
 		replanningManager = new ReplanningManager();
 	}
 
@@ -405,4 +392,17 @@ public class WithinDayControler extends Controler {
 		System.exit(0);
 	}
 
+	public static class FreeSpeedTravelTime implements TravelTime, Cloneable
+	{
+
+		public double getLinkTravelTime(Link link, double time)
+		{
+			return link.getFreespeed(time);
+		}
+		
+		public FreeSpeedTravelTime clone()
+		{
+			return new FreeSpeedTravelTime();
+		}
+	}
 }

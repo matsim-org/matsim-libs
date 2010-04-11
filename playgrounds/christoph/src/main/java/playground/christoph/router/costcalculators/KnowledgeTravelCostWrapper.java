@@ -12,7 +12,6 @@ import org.matsim.core.router.util.TravelCost;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
-import playground.christoph.router.util.KnowledgeTravelCost;
 
 /*
  * Adds s new Feature to KnowledgeTravelCost:
@@ -20,8 +19,9 @@ import playground.christoph.router.util.KnowledgeTravelCost;
  * that it is checked if a Person knows a Link or not. If not, the
  * returned TravelCost is Double.MAX_VALUE. 
  */
-public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost implements PersonalizableTravelCost{
+public class KnowledgeTravelCostWrapper implements PersonalizableTravelCost, Cloneable{
 	
+	protected Person person;
 	protected TravelCost travelCostCalculator;
 	protected boolean checkNodeKnowledge = true;
 	protected KnowledgeTools knowledgeTools;
@@ -43,10 +43,10 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost implements P
 	@Override
 	public void setPerson(Person person)
 	{
-		super.setPerson(person);
-		if (travelCostCalculator instanceof KnowledgeTravelCost)
+		this.person = person;
+		if (travelCostCalculator instanceof PersonalizableTravelCost)
 		{
-			((KnowledgeTravelCost)travelCostCalculator).setPerson(person);
+			((PersonalizableTravelCost)travelCostCalculator).setPerson(person);
 		}
 	}
 	

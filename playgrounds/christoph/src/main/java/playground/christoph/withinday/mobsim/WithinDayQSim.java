@@ -60,4 +60,5 @@ public class WithinDayQSim extends QSim{
 	{
 		return super.activityEndsList;
 	}
+	
 }

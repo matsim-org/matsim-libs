@@ -22,20 +22,28 @@ package playground.christoph.router.util;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 
 /*
  * This abstract Class contains some Objects that are used by Simple
  * Routers like the Random Router.
+ * 
+ * By implementing the PersonalizableTravelCost interface the PlansCalcRoute
+ * class hands over the currently handled person by using the setPerson method. 
  */
-public abstract class SimpleRouter extends PersonLeastCostPathCalculator{
+public abstract class SimpleRouter implements LeastCostPathCalculator, PersonalizableTravelCost, Cloneable{
 	
 	protected KnowledgeTools knowledgeTools;
 	protected Network network;
 	protected Random random;
 	protected LoopRemover loopRemover;
 	protected TabuSelector tabuSelector;
+	protected Person person;
 	
 	public SimpleRouter(Network network) 
 	{
@@ -44,5 +52,19 @@ public abstract class SimpleRouter extends PersonLeastCostPathCalculator{
 		this.random = MatsimRandom.getLocalInstance();
 		this.loopRemover = new LoopRemover();
 		this.tabuSelector = new TabuSelector();
+	}
+	
+	public void setPerson(Person person)
+	{
+		this.person = person;
+	}
+
+	/*
+	 * A typical simple Router like a Random Router ignores
+	 * the link travel costs so by default we set them to 0.
+	 */
+	public double getLinkTravelCost(Link link, double time)
+	{
+		return 0;
 	}
 }

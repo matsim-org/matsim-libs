@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * LinkReplanningMap.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.christoph.withinday.replanning.identifiers;
 
 import java.util.ArrayList;
@@ -29,11 +48,11 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 /*
- * This Module is used by a LeaveLinkReplanner. It calculates the time
- * when an agent should do LeaveLinkReplanning.
+ * This Module is used by a CurrentLegReplanner. It calculates the time
+ * when an agent should do CurrentLegReplanning.
  * 
  * The time is estimated as following:
- * When an LinkEnterEvent is thrown the Replanning Time is set to
+ * When a LinkEnterEvent is thrown the Replanning Time is set to
  * the current time + the FreeSpeed Travel Time. This guarantees that
  * the replanning will be done while the agent is on the Link.
  * 
@@ -88,10 +107,17 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		replanningMap.remove(event.getPersonId());
 	}
 
-	// Nothing to do here...
+	/*
+	 * The agent has ended an activity and returns to the
+	 * network. We do a replanning so the agent can choose
+	 * his next link.
+	 * At the moment we use instead the wait2link event
+	 * that is created when the agent is moved from the
+	 * waiting queue onto the active queue.
+	 */
 	public void handleEvent(AgentDepartureEvent event)
 	{
-
+//		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), event.getTime()));
 	}
 
 	/*
@@ -108,10 +134,10 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		replanningMap.remove(event.getPersonId());
 	}
 	
-	public Map<Id, Tuple<Id, Double>> getLinkReplanningMap()
-	{
-		return this.replanningMap;
-	}
+//	public Map<Id, Tuple<Id, Double>> getLinkReplanningMap()
+//	{
+//		return this.replanningMap;
+//	}
 	
 	public synchronized List<QVehicle> getReplanningVehicles(double time)
 	{
@@ -129,7 +155,6 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	       
 			if (time >= replanningTime)
 			{
-				// check whether the replanning flag is set - if not, skip the person
 				QVehicle vehicle = this.qNetwork.getQLink(linkId).getVehicle(personId);
 				
 				// Repeated Replanning per Link possible? 

@@ -27,36 +27,35 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.network.SubLink;
 import playground.christoph.network.SubNetwork;
 import playground.christoph.network.SubNode;
-import playground.christoph.router.util.MyDijkstraFactory;
-import playground.christoph.router.util.PersonLeastCostPathCalculator;
+import playground.christoph.router.util.CloningDijkstraFactory;
 import playground.christoph.router.util.SimpleRouter;
 
-public class RandomDijkstraRoute extends SimpleRouter implements Cloneable{
+public class RandomDijkstraRoute extends SimpleRouter {
 
 	protected static int errorCounter = 0;
 	
 	protected boolean removeLoops = false;
 	protected double dijkstraWeightFactor = 0.5;
 	protected LeastCostPathCalculator leastCostPathCalculator;
-	protected TravelCost travelCost;
+	protected PersonalizableTravelCost travelCost;
 	protected TravelTime travelTime;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
 	private final static Logger log = Logger.getLogger(RandomDijkstraRoute.class);
 	
-	public RandomDijkstraRoute(Network network, TravelCost travelCost, TravelTime travelTime)
+	public RandomDijkstraRoute(Network network, PersonalizableTravelCost travelCost, TravelTime travelTime)
 	{	
 		super(network);
 		this.travelCost = travelCost;
 		this.travelTime = travelTime;
-		this.leastCostPathCalculator = new MyDijkstraFactory().createPathCalculator((NetworkLayer)network, travelCost, travelTime);
+		this.leastCostPathCalculator = new CloningDijkstraFactory().createPathCalculator((NetworkLayer)network, travelCost, travelTime);
 	}
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
@@ -97,11 +96,8 @@ public class RandomDijkstraRoute extends SimpleRouter implements Cloneable{
 			
 			useKnowledge = true;
 			
-			if (this.leastCostPathCalculator instanceof PersonLeastCostPathCalculator)
-			{
-				((PersonLeastCostPathCalculator) this.leastCostPathCalculator).setPerson(this.person);
-			}
-			
+			this.travelCost.setPerson(person);
+						
 			if (this.leastCostPathCalculator instanceof MyDijkstra)
 			{
 				((MyDijkstra)this.leastCostPathCalculator).setNetwork(subNetwork);

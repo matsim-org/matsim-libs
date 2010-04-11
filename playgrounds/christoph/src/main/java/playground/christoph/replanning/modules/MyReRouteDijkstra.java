@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyReRouteDijkstra.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.replanning.modules;
 
 import org.matsim.api.core.v01.network.Network;
@@ -5,12 +25,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.router.KnowledgePlansCalcRoute;
-import playground.christoph.router.util.MyDijkstraFactory;
+import playground.christoph.router.CloneablePlansCalcRoute;
+import playground.christoph.router.util.CloningDijkstraFactory;
 
 /*
  * Basically we could also extend AbstractMultithreadedModule -
@@ -41,7 +60,6 @@ public class MyReRouteDijkstra extends ReRouteDijkstra {
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance()
 	{
-		return new KnowledgePlansCalcRoute(this.configGroup, this.network, this.costCalculator, this.timeCalculator, new MyDijkstraFactory());
-		//return new KnowledgePlansCalcRoute(this.configGroup, this.network, this.costCalculator, this.timeCalculator, new DijkstraFactory());
+		return new CloneablePlansCalcRoute(this.configGroup, this.network, this.costCalculator, this.timeCalculator, new CloningDijkstraFactory());
 	}
 }

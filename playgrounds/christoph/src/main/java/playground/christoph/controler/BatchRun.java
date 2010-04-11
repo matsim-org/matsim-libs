@@ -1,4 +1,4 @@
-package playground.christoph.events;
+package playground.christoph.controler;
 
 import java.io.IOException;
 
@@ -7,10 +7,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
-
-import playground.christoph.router.RandomCompassRoute;
-import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
-import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 
 public class BatchRun {
 	
@@ -130,9 +126,9 @@ public class BatchRun {
 				String confFileName = configFilePath + separator + configFileName;
 				String[] args = new String[1];
 				args[0] = confFileName;
-				EventControler controler = new EventControler(args);
+				WithinDayControler controler = new WithinDayControler(args);
 				controler.setOverwriteFiles(true);
-				controler.pNoReplanning = 0.0;
+//				controler.pNoReplanning = 0.0;
 				controler.pInitialReplanning = 1.0;
 				controler.pActEndReplanning = 0.0;
 				controler.pLeaveLinkReplanning = 0.0;
@@ -159,9 +155,9 @@ public class BatchRun {
 				
 			updateConfigData(config, knowledgeFactors[i]);
 				
-			EventControler controler = new EventControler(config);			
+			WithinDayControler controler = new WithinDayControler(config);			
 			controler.setOverwriteFiles(true);
-			controler.pNoReplanning = 0.0;
+//			controler.pNoReplanning = 0.0;
 			controler.pInitialReplanning = 1.0;
 			controler.pActEndReplanning = 0.0;
 			controler.pLeaveLinkReplanning = 0.0;
@@ -190,7 +186,7 @@ public class BatchRun {
 				
 				updateConfigData(config, knowledgeFactors[i]);
 				
-				EventControler controler = new EventControler(config);			
+				WithinDayControler controler = new WithinDayControler(config);			
 				controler.setOverwriteFiles(true);
 				controler.run();
 				controler = null;
@@ -219,7 +215,7 @@ public class BatchRun {
 			// use always full knowledge
 			updateConfigData(config, "full");
 			
-			EventControler controler = new EventControler(config);
+			WithinDayControler controler = new WithinDayControler(config);
 			controler.setOverwriteFiles(true);
 
 			double pNoReplanning = Versuchsplan[i][0]/10.0;
@@ -227,7 +223,7 @@ public class BatchRun {
 			double pActEndReplanning = Versuchsplan[i][2]/10.0;
 			double pLeaveLinkReplanning = Versuchsplan[i][3]/10.0;
 
-			controler.pNoReplanning = pNoReplanning;
+//			controler.pNoReplanning = pNoReplanning;
 			controler.pInitialReplanning = pInitialReplanning;
 			controler.pActEndReplanning = pActEndReplanning;
 			controler.pLeaveLinkReplanning = pLeaveLinkReplanning;

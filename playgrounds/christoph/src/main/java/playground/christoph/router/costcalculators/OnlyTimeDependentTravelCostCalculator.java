@@ -28,12 +28,11 @@ import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
-import playground.christoph.events.EventControler;
 import playground.christoph.router.util.KnowledgeTravelTime;
 
 public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost, Cloneable, PersonalizableTravelCost {
 
-	private static final Logger log = Logger.getLogger(EventControler.class);
+	private static final Logger log = Logger.getLogger(OnlyTimeDependentTravelCostCalculator.class);
 	
 	protected final TravelTime timeCalculator;
 
