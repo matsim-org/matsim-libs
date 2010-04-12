@@ -39,7 +39,7 @@ public class XStats2Chart {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String fileBase = "../runs/run623/it0-it500.";
+		String fileBase = "../../runs-svn/run696/696.";
 		// String fileBase = "../matsimTests/breakdown/output/";
 
 		// String inputFile = fileBase + "traveldistancestats.txt";
@@ -47,7 +47,7 @@ public class XStats2Chart {
 
 		String chartFile = inputFile.replace("txt", "png");
 		// /////////////////////////////////////////////
-		int maxIter = 1001;
+		int maxIter = 1501;
 		// ////////////////////////////////////////////
 		String avgExec, avgWorst, avgAvg, avgBest;
 		double[] exec = new double[maxIter];
