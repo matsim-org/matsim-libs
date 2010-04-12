@@ -10,23 +10,21 @@ import java.util.ListIterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QLinkImpl;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.ptproject.qsim.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 
 public class TransitQLaneFeature {
-	
+
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
-	
+
 	/**
 	 * A list containing all transit vehicles that are at a stop but not
 	 * blocking other traffic on the lane.
@@ -34,7 +32,7 @@ public class TransitQLaneFeature {
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
 	private final QLink queueLane;
-	
+
 	public TransitQLaneFeature(QLink queueLane) {
 		this.queueLane = queueLane;
 	}
@@ -42,11 +40,11 @@ public class TransitQLaneFeature {
 	public boolean isFeatureActive() {
 		return !this.transitVehicleStopQueue.isEmpty();
 	}
-	
+
 	public Collection<QVehicle> getFeatureVehicles() {
 		return this.transitVehicleStopQueue;
 	}
-	
+
 	/**
 	 * The method name tells when it is called, but not what it does (maybe
 	 * because the "Feature" structure is meant to be more general). This method
@@ -78,7 +76,7 @@ public class TransitQLaneFeature {
 			}
 		}
 	}
-	
+
 	public boolean handleMoveLaneToBuffer(final double now, QVehicle veh,
 			PersonDriverAgent driver) {
 		boolean handled = false;
@@ -123,7 +121,7 @@ public class TransitQLaneFeature {
 		}
 		return false;
 	}
-	
+
 
 	/**
 	 * Put the transit vehicles from the transit stop list in positions.
@@ -153,12 +151,12 @@ public class TransitQLaneFeature {
 						passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
 					}
 					positions.add(passengerPosition);
-					first = false; 
-					cnt2++ ; 
+					first = false;
+					cnt2++ ;
 				}
-			
+
 			}
-			
+
 		}
 	}
 

@@ -33,20 +33,17 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
-
 
 /**
  * @author dgrether
- *
  */
 public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink> {
 
 	private static final long serialVersionUID = -7916541567386865404L;
 
 	public static final boolean showParked = false;
-	
+
 	protected static final transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 
 	protected void writeAllAgents(ByteBuffer out) {
@@ -81,18 +78,18 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 	public void writeConstData(ByteBuffer out) throws IOException {
 		String id = this.src.getLink().getId().toString();
 		ByteBufferUtils.putString(out, id);
-		Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
+		Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 				this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 		Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 				this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-		
-		out.putFloat((float) linkStart.x); 
+
+		out.putFloat((float) linkStart.x);
 		out.putFloat((float) linkStart.y);
-		out.putFloat((float) linkEnd.x); 
+		out.putFloat((float) linkEnd.x);
 		out.putFloat((float) linkEnd.y);
 		out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
 	}
-	
+
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {
 		out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(QSimTimer.getTime()));
@@ -113,5 +110,5 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 		out.putFloat((float) pos.getColorValueBetweenZeroAndOne());
 		out.putInt(pos.getAgentState().ordinal());
 	}
-	
+
 }

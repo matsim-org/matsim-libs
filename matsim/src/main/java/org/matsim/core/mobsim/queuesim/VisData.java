@@ -21,7 +21,6 @@ package org.matsim.core.mobsim.queuesim;
 
 import java.util.Collection;
 
-import org.matsim.core.mobsim.queuesim.QueueLink.AgentOnLink;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 /**
  * Interface for methods to provide a visualizer with data.
@@ -52,7 +51,7 @@ public interface VisData {
 /* I don't think these two methods should be part of the interface!
  * Only getVehiclePositions() should be in the interface, how the
  * vehicles are positioned, is free to be implemented.
- * 
+ *
  */
 //	/**
 //	 * Calculates the positions of all vehicles on this link so that there is
