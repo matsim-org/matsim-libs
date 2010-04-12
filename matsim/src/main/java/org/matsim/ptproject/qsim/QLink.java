@@ -30,6 +30,8 @@ public interface QLink extends QBufferItem {
 
   public QSimEngine getQSimEngine();
   
+  public void setQSimEngine(QSimEngine qsimEngine);
+  
   public void activateLink();
 
   public Link getLink();

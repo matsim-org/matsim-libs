@@ -462,6 +462,10 @@ public class QLinkImpl implements QLink {
 		return this.qsimEngine;
 	}
 
+	public void setQSimEngine(QSimEngine qsimEngine){
+		this.qsimEngine = qsimEngine;
+	}
+	
 	//	public Queue<QueueVehicle> getVehiclesInBuffer() {
 	//		return this.originalLane.getVehiclesInBuffer();
 	//	}

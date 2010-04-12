@@ -437,6 +437,11 @@ public class QLinkLanesImpl implements QLink {
     return this.qsimEngine;
   }
 	
+	@Override
+	public void setQSimEngine(QSimEngine qsimEngine) {
+		this.qsimEngine = qsimEngine;
+	}
+		
 	/**
 	 * @return the QLanes of this QueueLink
 	 */
@@ -513,5 +518,5 @@ public class QLinkLanesImpl implements QLink {
   public QVehicle popFirstFromBuffer() {
     throw new UnsupportedOperationException();
   }
-
+  
 }

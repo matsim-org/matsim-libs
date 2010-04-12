@@ -46,7 +46,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 
 	/** This is the collection of links that have to be activated in the current time step */
 	/*package*/ final ArrayList<QLink> linksToActivate = new ArrayList<QLink>();
-  private QSim qsim;
+	private QSim qsim;
 		
 	public QSimEngineThread(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier, QSim sim)
 	{

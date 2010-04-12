@@ -26,6 +26,8 @@ import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -56,10 +58,17 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 
 	public ParallelQSimEngine(final QSim sim, final Random random, int numOfThreads)
 	{
-	  super(sim, random);
-		initQSimEngineThreads(numOfThreads);
+		super(sim, random);
+		this.numOfThreads = numOfThreads;
 	}
 
+	  @Override
+	  public void onPrepareSim()
+	  {
+		  super.onPrepareSim();
+		  initQSimEngineThreads(numOfThreads);
+	  }
+	
 	/**
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
@@ -193,7 +202,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		}
 
 		// Assign every Link to a LinkActivator, depending on its InNode
-//		assignLinkActivators();
+		assignLinkActivators();
 	}
 
 
@@ -263,23 +272,24 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	 * that Node. So we can assign each QLink to the
 	 * Thread that handles its InNode.
 	 */
-//	private void assignLinkActivators()
-//	{
-//		int thread = 0;
-//		for (ExtendedQueueNode[] array : parallelNodesArrays)
-//		{
-//			for (ExtendedQueueNode node : array)
-//			{
-//				Node n = node.getQueueNode().getNode();
-//
-//				for (Link outLink : n.getOutLinks().values())
-//				{
-//					QLink qLink = node.getQueueNode().queueNetwork.getQueueLink(outLink.getId());
-//				}
-//			}
-//			thread++;
-//		}
-//	}
+	private void assignLinkActivators()
+	{
+		int thread = 0;
+		for (ExtendedQueueNode[] array : parallelNodesArrays)
+		{
+			for (ExtendedQueueNode node : array)
+			{
+				Node n = node.getQueueNode().getNode();
+
+				for (Link outLink : n.getOutLinks().values())
+				{
+					QLink qLink = this.getQSim().getQNetwork().getQLink(outLink.getId());
+					qLink.setQSimEngine(this.threads[thread]);
+				}
+			}
+			thread++;
+		}
+	}
 
 	/*
 	 * Contains a QueueNode and MATSimRandom Object that is used when
@@ -322,13 +332,10 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	/*package*/ static class LinkReActivator implements Runnable
 	{
 		private final QSimEngineThread[] threads;
-//		private final int numOfThreads;
-//		private int distributor = 0;
 
 		public LinkReActivator(QSimEngineThread[] threads)
 		{
 			this.threads = threads;
-//			this.numOfThreads = threads.length;
 		}
 
 		public void run()
@@ -343,16 +350,6 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 				 * by the same thread during the whole simulation.
 				 */
 				thread.activateLinks();
-
-//				/*
-//				 * We redistribute the deactivated Links among all Threads.
-//				 */
-//				for(QLink link : thread.getLinksToActivate())
-//				{
-//					threads[distributor % numOfThreads].addLink(link);
-//					distributor++;
-//				}
-//				thread.getLinksToActivate().clear();
 			}
 		}
 
