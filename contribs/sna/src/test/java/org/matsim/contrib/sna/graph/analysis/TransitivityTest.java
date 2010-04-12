@@ -33,7 +33,6 @@ import org.matsim.contrib.sna.math.Distribution;
 
 /**
  * @author jillenberger
- *
  */
 public class TransitivityTest extends TestCase {
 
@@ -41,7 +40,7 @@ public class TransitivityTest extends TestCase {
 	public void test() {
 		SparseGraphBuilder builder = new SparseGraphBuilder();
 		SparseGraph graph = builder.createGraph();
-		
+
 		SparseVertex v1 = builder.addVertex(graph);
 		SparseVertex v2 = builder.addVertex(graph);
 		SparseVertex v3 = builder.addVertex(graph);
@@ -51,21 +50,21 @@ public class TransitivityTest extends TestCase {
 		builder.addEdge(graph, v1, v4);
 		builder.addEdge(graph, v1, v3);
 		builder.addEdge(graph, v2, v4);
-		
+
 		Transitivity degree = new Transitivity();
-		
+
 		Distribution distr = degree.localClusteringDistribution(graph.getVertices());
 		assertEquals(7/12.0, distr.mean(), 0.01);
 		assertEquals(0.0, distr.min());
 		assertEquals(1.0, distr.max());
-		
-		TObjectDoubleHashMap<Vertex> values = degree.localClusteringCoefficients((Set<Vertex>)graph.getVertices());
+
+		TObjectDoubleHashMap<Vertex> values = (TObjectDoubleHashMap<Vertex>) degree.localClusteringCoefficients((Set<? extends Vertex>)graph.getVertices());
 
 		assertEquals(1/3.0, values.get(v1));
 		assertEquals(1.0, values.get(v2));
 		assertEquals(1.0, values.get(v4));
 		assertEquals(0.0, values.get(v3));
-		
+
 		assertEquals(3/5.0, degree.globalClusteringCoefficient(graph));
 	}
 }
