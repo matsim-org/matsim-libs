@@ -97,13 +97,13 @@ public class PersonPlanMonitor4travelingCarPt {
 
 	public double getTotalTravelTimesCar_h() {
 		if (this.stuck)
-			return 24.0 * 20;
+			return 24.0 * 3;
 		return legDurCar;
 	}
 
 	public double getTotalTravelTimesPt_h() {
 		if (this.stuck)
-			return 24.0 * 20;
+			return 24.0 * 3;
 		return legDurPt;
 	}
 
@@ -156,7 +156,7 @@ public class PersonPlanMonitor4travelingCarPt {
 			return 0.0;
 		}
 
-		double typicalDuration_h = actParams.getTypicalDuration() / 3600.0, //
+		double typicalDuration_h = actParams.getTypicalDuration()/* [s] *// 3600.0, //
 		zeroUtilityDuration_h = typicalDuration_h
 				* Math.exp(-10.0 / typicalDuration_h / actParams.getPriority());
 

@@ -26,35 +26,21 @@ package playground.yu.analysis;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 
 import playground.yu.utils.DebugTools;
 
@@ -65,7 +51,7 @@ import playground.yu.utils.DebugTools;
  * @author yu
  * 
  */
-public class PlanScoreForecasterTravPerf {
+public class PlanScoreForecaster4onlyTravPt {
 	private PlanImpl plan, oldSelected;
 	private NetworkImpl net;
 	private TravelTime ttc;
@@ -76,22 +62,22 @@ public class PlanScoreForecasterTravPerf {
 			// ,attrDistance = 0.0
 			;
 
-	public PlanScoreForecasterTravPerf(Plan plan, NetworkImpl net,
-			TravelTime ttc, CharyparNagelScoringConfigGroup scoring,
-			double betaTraveling, double betaTravelingPt) {
+	public PlanScoreForecaster4onlyTravPt(Plan plan, NetworkImpl net,
+			TravelTime tt, CharyparNagelScoringConfigGroup scoring,
+			double betaTravelingPt) {
 		this.plan = (PlanImpl) plan;
 		this.net = net;
-		this.ttc = ttc;
+		this.ttc = tt;
 		this.scoring = scoring;
-		this.betaTraveling = betaTraveling;
+		this.betaTraveling = scoring.getTraveling();
 		this.betaTravelingPt = betaTravelingPt;
 		this.betaPerforming = scoring.getPerforming();
 	}
 
-	public PlanScoreForecasterTravPerf(Plan selectedPlan, Plan oldSelected,
+	public PlanScoreForecaster4onlyTravPt(Plan selectedPlan, Plan oldSelected,
 			NetworkImpl net, TravelTime tt,
-			CharyparNagelScoringConfigGroup scoring, double d, double e) {
-		this(selectedPlan, net, tt, scoring, d, e);
+			CharyparNagelScoringConfigGroup scoring, double d) {
+		this(selectedPlan, net, tt, scoring, d);
 		this.oldSelected = (PlanImpl) oldSelected;
 	}
 
@@ -177,7 +163,7 @@ public class PlanScoreForecasterTravPerf {
 		score += betaTrav * attrTravelTime/* [h] */;
 
 		if (Double.isNaN(score))
-			throw new RuntimeException(PlanScoreForecasterTravPerf.class
+			throw new RuntimeException(PlanScoreForecaster4onlyTravPt.class
 					.getName()
 					+ "\t"
 					+ DebugTools.getLineNumber(new Exception())
@@ -242,7 +228,8 @@ public class PlanScoreForecasterTravPerf {
 				actEnd = actEndTime;
 				if (Double.isNaN(actStart) || Double.isNaN(actEnd))
 					throw new RuntimeException(
-							PlanScoreForecasterTravPerf.class.getName() + "\t"
+							PlanScoreForecaster4onlyTravPt.class.getName()
+									+ "\t"
 									+ DebugTools.getLineNumber(new Exception())
 									+ "\tutil/score is a NaN.");
 			}
@@ -260,7 +247,7 @@ public class PlanScoreForecasterTravPerf {
 
 		score += this.betaPerforming * durAttr;
 		if (Double.isNaN(score))
-			throw new RuntimeException(PlanScoreForecasterTravPerf.class
+			throw new RuntimeException(PlanScoreForecaster4onlyTravPt.class
 					.getName()
 					+ "\t"
 					+ DebugTools.getLineNumber(new Exception())
@@ -268,42 +255,46 @@ public class PlanScoreForecasterTravPerf {
 
 	}
 
-	public static void main(String[] args) {
-
-		String configFilename = "../integration-parameterCalibration/test/matsim/configDummy.xml", //
-		netFilename = "../integration-parameterCalibration/test/network.xml", //
-		eventsFilename = "../integration-parameterCalibration/test/matsim/outputReplanning/ITERS/it.100/100.events.txt.gz", //
-		popFilename = "../integration-parameterCalibration/test/matsim/outputReplanning/output_plans.xml.gz";
-
-		Scenario sc = new ScenarioImpl();
-
-		Config cf = sc.getConfig();
-		new MatsimConfigReader(cf).readFile(configFilename);
-		CharyparNagelScoringConfigGroup scoring = cf.charyparNagelScoring();
-
-		NetworkLayer net = (NetworkLayer) sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(netFilename);
-
-		Population pop = sc.getPopulation();
-		new MatsimPopulationReader(sc).readFile(popFilename);
-
-		TravelTimeCalculator ttc = new TravelTimeCalculatorFactoryImpl()
-				.createTravelTimeCalculator(net, cf.travelTimeCalculator());
-
-		EventsManager events = new EventsManagerImpl();
-		events.addHandler(ttc);
-		new EventsReaderTXTv1(events).readFile(eventsFilename);
-
-		for (Person ps : pop.getPersons().values()) {
-			// for (Plan pl : ps.getPlans()) {
-			Plan pl = ps.getSelectedPlan();
-			double score = new PlanScoreForecasterTravPerf((PlanImpl) pl, net,
-					ttc, scoring, -6.0, 6.0).getPlanScore();
-			if (pl.getScore().intValue() != (int) score)
-				System.out.println("person\t" + ps.getId() + "\tplan\t" + pl
-						+ "\tutil\t" + score);
-			// }
-		}
-
-	}
+	// public static void main(String[] args) {
+	//
+	// String configFilename =
+	// "../integration-parameterCalibration/test/matsim/configDummy.xml", //
+	// netFilename = "../integration-parameterCalibration/test/network.xml", //
+	// eventsFilename =
+	// "../integration-parameterCalibration/test/matsim/outputReplanning/ITERS/it.100/100.events.txt.gz",
+	// //
+	// popFilename =
+	// "../integration-parameterCalibration/test/matsim/outputReplanning/output_plans.xml.gz";
+	//
+	// Scenario sc = new ScenarioImpl();
+	//
+	// Config cf = sc.getConfig();
+	// new MatsimConfigReader(cf).readFile(configFilename);
+	// CharyparNagelScoringConfigGroup scoring = cf.charyparNagelScoring();
+	//
+	// NetworkLayer net = (NetworkLayer) sc.getNetwork();
+	// new MatsimNetworkReader(sc).readFile(netFilename);
+	//
+	// Population pop = sc.getPopulation();
+	// new MatsimPopulationReader(sc).readFile(popFilename);
+	//
+	// TravelTimeCalculator ttc = new TravelTimeCalculatorFactoryImpl()
+	// .createTravelTimeCalculator(net, cf.travelTimeCalculator());
+	//
+	// EventsManager events = new EventsManagerImpl();
+	// events.addHandler(ttc);
+	// new EventsReaderTXTv1(events).readFile(eventsFilename);
+	//
+	// for (Person ps : pop.getPersons().values()) {
+	// // for (Plan pl : ps.getPlans()) {
+	// Plan pl = ps.getSelectedPlan();
+	// double score = new PlanScoreForecaster4onlyTravPt((PlanImpl) pl,
+	// net, ttc, scoring, -6.0, 6.0).getPlanScore();
+	// if (pl.getScore().intValue() != (int) score)
+	// System.out.println("person\t" + ps.getId() + "\tplan\t" + pl
+	// + "\tutil\t" + score);
+	// // }
+	// }
+	//
+	// }
 }
