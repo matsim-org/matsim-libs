@@ -97,7 +97,7 @@ public class GershensonOptimizer {
 								}else{
 									s = new Solution(s2.getU(), s3.getN(), s4.getMaxRed(), s5.getCap(), s1.getD());
 								}
-								if (s.getU() < s.getMaxRed() && !(recombinated.containsValue(s)) && !(bests.containsValue(s))){
+								if (s.getU() < s.getMaxRed() && !(recombinated.containsValue(s)) && !(bests.containsValue(s)) ){
 									recombinated.put(i, s);
 									i = i+1;
 								}
@@ -155,37 +155,46 @@ public class GershensonOptimizer {
 		Map<Integer, Solution> temp = new HashMap<Integer, Solution>();
 		Map<Integer, Solution> best = new HashMap<Integer, Solution>();
 		GershensonRunner runner;
-		String folder = DaPaths.OUTPUT + "cottbus\\recombination1\\";
+		String folder = DaPaths.OUTPUT + "cottbus\\optimization2\\";
+		final String scenario = "cottbus";
 		int i;
-		int b = 150;
+		int b = 200;
 		
 		for (int ii = 0; ii<b; ii++){
 			temp.put(ii, g.init());
 		}
 		for (Entry<Integer, Solution> e  : temp.entrySet()){
-			runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false);
+			runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false, false);
 			Gbl.reset();
 			
-			runner.runScenario("C");
-			e.getValue().setTime(runner.getAvTT());
+			runner.runScenario(scenario);
+			if(runner.getAvTT()>0){
+				e.getValue().setTime(runner.getAvTT());
+			}else{
+				e.getValue().setTime(9999);
+			}
 		}
 		g.writeToTxt(temp,  folder + "randomSeed.txt");
-		best = g.getBest(temp,3* b/20);
+		best = g.getBest(temp,b/5);
 		g.writeToTxt(best, folder + "bestRandom.txt");
 		
 		for (int n = 1 ; n < 1000; n++){
 			temp.clear();
-			temp = g.recombination(best, (b/10));
+			temp = g.recombination(best, b/10);
 			i = temp.size();
-			for (int ii = i  ; ii < b; ii++){
+			for (int ii = i  ; ii < b-1; ii++){
 				temp.put(ii, g.init());
 			}
 			System.out.println(temp.size());
 			for (Entry<Integer, Solution> e  : temp.entrySet()){
-				runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false);
+				runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false, false);
 				Gbl.reset();
-				runner.runScenario("C");
-				e.getValue().setTime(runner.getAvTT());
+				runner.runScenario(scenario);
+				if(runner.getAvTT()>0){
+					e.getValue().setTime(runner.getAvTT());
+				}else{
+					e.getValue().setTime(9999);
+				}
 			}
 			i=temp.size();
 			for (Solution s : best.values()){
@@ -195,7 +204,7 @@ public class GershensonOptimizer {
 			}
 			g.writeToTxt(temp, folder + "it" + String.valueOf(n) +".txt");
 			best.clear();
-			best = g.getBest(temp, 3* b/20);
+			best = g.getBest(temp, b/5);
 			g.writeToTxt(best, folder + "bestIt" + String.valueOf(n) +".txt");
 		}
 	}

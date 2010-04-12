@@ -107,13 +107,14 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
 	
-	public GershensonRunner(int minRed, int n, double cap, double d, int maxRed, boolean writeSignalplans){
+	public GershensonRunner(int minRed, int n, double cap, double d, int maxRed, boolean writeSignalplans, boolean liveVis){
 		this.u = minRed;
 		this.n = n;
 		this.cap = cap;
 		this.d = d;
 		this.maxRed = maxRed;
 		this.writeSignalPlans= writeSignalplans;
+		this.liveVis = liveVis;
 	}
 
 	
@@ -130,13 +131,16 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			DenverScenarioGenerator dsg = new DenverScenarioGenerator();
 			dsg.createScenario();
 			conf = DaPaths.DASTUDIES + "denver\\denverConfig.xml";
-		}else if (configFile == "opti"){
+		}else if (configFile == "denver"){
 			conf = DaPaths.DASTUDIES + "denver\\denverConfig.xml";
 		}
 		else if (configFile == "C"){
+			CottbusScenarioGenerator csg = new CottbusScenarioGenerator();
+			csg.createScenario();
 			conf = DaPaths.DASTUDIES + "cottbus\\cottbusConfig.xml";
-		}
-		else{
+		}else if (configFile == "cottbus"){
+			conf = DaPaths.DASTUDIES + "cottbus\\cottbusConfig.xml";
+		}else{
 			conf = configFile;
 		}
 		
@@ -192,7 +196,9 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				event.getControler().getEvents().addHandler(handler3);
 				
 				//enable live-visualization
-				event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+				if (liveVis == true){
+					event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+				}
 				
 				//output of stucked vehicles
 				event.getControler().getEvents().addHandler(GershensonRunner.this);	
@@ -220,7 +226,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 					for(Entry<Id, TreeMap<Id, TreeMap<Double, SignalGroupState>>> e : handler3.getSystemGroupTimeStateMap().entrySet()){
 						planChart = new DaSignalPlanChart();
 						planChart.addData(e.getValue(), startTime, signalPlanMax);
-						new DaChartWriter().writeChart(DaPaths.OUTPUT + "/signalPlans/signalPlanId" + e.getKey() + ".png", 2560, 1600, planChart.createSignalPlanChart("signalPlan", "ids", "time", signalPlanMin, signalPlanMax));
+						new DaChartWriter().writeChart(DaPaths.OUTPUT + "/cottbus/signalPlans/signalPlanId" + e.getKey() + ".png", 2560, 1600, planChart.createSignalPlanChart("signalPlan", "ids", "time", signalPlanMin, signalPlanMax));
 					}
 					
 				}
@@ -326,7 +332,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		for (Entry<Id, SortedMap<Double, Double>> ee : contr.getDemandOnRefLink().entrySet()){
 			chart.addSeries(ee.getKey().toString(), (Map)ee.getValue().subMap(signalPlanMin, signalPlanMax));
 		}
-		new DaChartWriter().writeChart(DaPaths.OUTPUT + "/signalPlans/demandOnLinkSystem" + signalSystem.toString() + ".png", 2560, 1600,
+		new DaChartWriter().writeChart(DaPaths.OUTPUT + "cottbus/signalPlans/demandOnLinkSystem" + signalSystem.toString() + ".png", 1024, 768,
 				chart.createChart("demandOnRefLink for SignalSystem " + signalSystem.toString(), "time [s]", "demand [cars]", 30));
 		
 	}
@@ -374,14 +380,20 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		int maxRed;
 		
 		//Denver opti
-		runner = new GershensonRunner(14, 468, 0.65, 55, 38, false);
-		runner.setSignalPlanBounds(21600, 22000, 22240);
-		runner.runScenario("D");
-//		
-// 		//cottbus opti		
-//		runner = new GershensonRunner(31, 215, 0.75, 55, 107, false);
+//		runner = new GershensonRunner(14, 468, 0.65, 55, 38, false, false);
+//		runner.setSignalPlanBounds(21600, 22000, 22240);
+//		runner.runScenario("D");
+		
+ 		//cottbus opti		
+//		runner = new GershensonRunner(31, 215, 0.75, 55, 107, false, false);
 //		runner.setSignalPlanBounds(21600, 22000, 22240);
 //		runner.runScenario("C");
+		
+//		time	d	u	cap	n	maxRed
+//		318.64	89.0	22	0.7	145	30	
+		runner = new GershensonRunner(22,145, 0.7,89.0,30, false, true);
+		runner.setSignalPlanBounds(21600, 22000, 22240);
+		runner.runScenario("C");
 		
 //		cap = 0.81;
 //		d = 80;

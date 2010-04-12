@@ -375,14 +375,6 @@ public class DaAdaptiveController extends
 						fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.REDYELLOW);
 						this.getSignalGroupStates().put(sd,SignalGroupState.REDYELLOW);
 					}
-//				} else {
-//					for (SignalGroupDefinition sd : e.getValue()){
-//						if (getSignalGroupState(time, sd).equals(SignalGroupState.YELLOW)){
-//							fireChangeEvent(time, sd.getSignalSystemDefinitionId(), sd.getId(),SignalGroupState.RED);
-//							this.getSignalGroupStates().put(sd,SignalGroupState.RED);
-//							switchedToRed.put(e.getKey(), time);
-//						}
-//					}
 				}
 			}
 		}
