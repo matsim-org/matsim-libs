@@ -37,7 +37,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -108,8 +107,8 @@ public class KmlPlansVisualizer {
 			// add the matsim logo to the kml
 			ScreenOverlayType logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(logo));
-			KmlPlansWriter plansWriter = new KmlPlansWriter((NetworkLayer) this.scenario.getNetwork(),
-					TransformationFactory.getCoordinateTransformation(Gbl.getConfig().global().getCoordinateSystem(), TransformationFactory.WGS84), this.writer, this.mainDoc);
+			KmlPlansWriter plansWriter = new KmlPlansWriter(this.scenario.getNetwork(),
+					TransformationFactory.getCoordinateTransformation(this.scenario.getConfig().global().getCoordinateSystem(), TransformationFactory.WGS84), this.writer, this.mainDoc);
 			FolderType plansFolder = plansWriter.getPlansFolder(planSet);
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(plansFolder));
 		} catch (IOException e) {
