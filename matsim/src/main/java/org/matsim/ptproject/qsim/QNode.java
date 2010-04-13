@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.gbl.Gbl;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -233,7 +232,7 @@ public class QNode {
          * of if there is space on the next link or not.. optionally we let them
          * die here, we have a config setting for that!
          */
-        if (Gbl.getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
+        if (this.simEngine.getQSim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
           currentLane.popFirstFromBuffer();
           Simulation.decLiving();
           Simulation.incLost();

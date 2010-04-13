@@ -43,7 +43,6 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LaneEnterEventImpl;
 import org.matsim.core.events.LaneLeaveEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.LinkImpl;
@@ -858,7 +857,7 @@ public class QLane implements QBufferItem {
       Link link = QLane.this.getQLink().getLink();
 //      log.error("link: " + QLane.this.queueLink.getLink().getId() + "lane: " + QLane.this.getLaneId() + " drawing vehicles!");
       double queueEnd = getInitialQueueEnd();
-      double storageCapFactor = Gbl.getConfig().getQSimConfigGroup().getStorageCapFactor();
+      double storageCapFactor = QLane.this.getQLink().getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
       double cellSize = ((NetworkImpl)QLane.this.getQLink().getQSimEngine().getQSim().getQNetwork().getNetwork()).getEffectiveCellSize();
       double vehLen = calculateVehicleLength(storageCapFactor, cellSize);
       

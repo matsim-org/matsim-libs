@@ -26,7 +26,6 @@ import java.nio.ByteBuffer;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
@@ -60,7 +59,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 
 
 		//calculate link width
-		double cellWidth =  Gbl.getConfig().otfVis().getLinkWidth();
+		double cellWidth =  this.src.getQSimEngine().getQSim().getScenario().getConfig().otfVis().getLinkWidth();
 		double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes();
 		//calculate length and normal
 		Point2D.Double.Double deltaLink = new Point2D.Double.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
