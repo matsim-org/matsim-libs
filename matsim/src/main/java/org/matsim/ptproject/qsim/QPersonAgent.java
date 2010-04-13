@@ -334,5 +334,9 @@ public class QPersonAgent implements PersonDriverAgent {
 		log.warn(this + " [no link to next routenode found: routeindex= " + this.currentLinkIdIndex + " ]");
 		return null;
 	}
+	
+	protected QSim getQSimulation(){
+		return this.simulation;
+	}
 
 }
