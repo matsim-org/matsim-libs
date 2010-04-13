@@ -292,7 +292,7 @@ public class QLinkLanesImpl implements QLink {
 	 *          the vehicle
 	 */
 	public void addFromIntersection(final QVehicle veh) {
-		double now = QSimTimer.getTime();
+		double now = QSimTimerStatic.getTime();
 		activateLink();
 		this.originalLane.addToVehicleQueue(veh, now);
 		veh.setCurrentLink(this.getLink());

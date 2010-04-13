@@ -123,7 +123,7 @@ public abstract class Gbl {
 		Gbl.config = null;
 		MatsimRandom.reset();
 		SimulationTimer.reset();
-		org.matsim.ptproject.qsim.QSimTimer.reset();
+		org.matsim.ptproject.qsim.QSimTimerStatic.reset();
 	}
 
 	public static final void printMemoryUsage() {

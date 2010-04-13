@@ -25,7 +25,7 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.ptproject.qsim.QSimTimer;
+import org.matsim.ptproject.qsim.QSimTimerStatic;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.SignalGroupSettings;
 import org.matsim.signalsystems.config.SignalSystemConfiguration;
@@ -146,7 +146,7 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 
 
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		this.updateState(QSimTimer.getSimStartTime());
+		this.updateState(QSimTimerStatic.getSimStartTime());
 	}
 
 }

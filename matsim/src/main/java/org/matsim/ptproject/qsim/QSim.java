@@ -142,7 +142,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
     // In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
     this.listenerManager = new SimulationListenerManager<QSim>(this);
     Simulation.reset(sc.getConfig().getQSimConfigGroup().getStuckTime());
-    QSimTimer.reset(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
+    QSimTimerStatic.reset(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
     this.events = eventsManager;
     Config config = sc.getConfig();
     this.simEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
@@ -216,16 +216,16 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		//do iterations
 		boolean cont = true;
-		double time = QSimTimer.getTime();
+		double time = QSimTimerStatic.getTime();
 		while (cont) {
-			time = QSimTimer.getTime();
+			time = QSimTimerStatic.getTime();
 			beforeSimStep(time);
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 			cont = doSimStep(time);
 			afterSimStep(time);
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 			if (cont) {
-				QSimTimer.incTime();
+				QSimTimerStatic.incTime();
 			}
 		}
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
@@ -294,8 +294,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.stopTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
 		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
 		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
-		QSimTimer.setSimStartTime(24*3600);
-		QSimTimer.setTime(startTime);
+		QSimTimerStatic.setSimStartTime(24*3600);
+		QSimTimerStatic.setTime(startTime);
 
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		double simStartTime = 0;
@@ -307,8 +307,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
 		this.infoTime = Math.floor(simStartTime / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
 		this.snapshotTime = Math.floor(simStartTime / this.snapshotPeriod) * this.snapshotPeriod;
-		QSimTimer.setSimStartTime(simStartTime);
-		QSimTimer.setTime(QSimTimer.getSimStartTime());
+		QSimTimerStatic.setSimStartTime(simStartTime);
+		QSimTimerStatic.setTime(QSimTimerStatic.getSimStartTime());
 
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
@@ -350,7 +350,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		}
 
 		this.simEngine.afterSim();
-		double now = QSimTimer.getTime();
+		double now = QSimTimerStatic.getTime();
 		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {
 			PersonDriverAgent agent = entry.getSecond();
 			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
@@ -386,7 +386,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
       this.infoTime += INFO_PERIOD;
       Date endtime = new Date();
       long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
-      double diffsim  = time - QSimTimer.getSimStartTime();
+      double diffsim  = time - QSimTimerStatic.getSimStartTime();
       int nofActiveLinks = this.simEngine.getNumberOfSimulatedLinks();
       log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
           + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
@@ -651,7 +651,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	}
 
 	public double getTimeOfDay() {
-		return QSimTimer.getTime() ;
+		return QSimTimerStatic.getTime() ;
 	}
 	
 	public QSimEngine getQSimEngine() {

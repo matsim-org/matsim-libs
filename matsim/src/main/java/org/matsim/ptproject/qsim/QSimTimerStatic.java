@@ -24,7 +24,7 @@ package org.matsim.ptproject.qsim;
  * @deprecated use this class only if the time is not available elsewhere.
  */
 @Deprecated
-public class QSimTimer {
+public class QSimTimerStatic {
 	static private double simStartTime = 24*3600;
 	static private double time = 0;
 	static private double SIM_TICK_TIME_S = 1;
@@ -40,7 +40,7 @@ public class QSimTimer {
 	 * @param time The time to set.
 	 */
 	public static final void setTime(final double time) {
-		QSimTimer.time = time;
+		QSimTimerStatic.time = time;
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class QSimTimer {
 	}
 
 	synchronized public static final void setSimStartTime(final double newStartTime) {
-		QSimTimer.simStartTime = newStartTime;
+		QSimTimerStatic.simStartTime = newStartTime;
 	}
 
 	/** Resets the SimulationTimer for a new simulation. */
@@ -85,9 +85,9 @@ public class QSimTimer {
 	 * @param stepSize The step-size the simulation uses to advance time.
 	 */
 	/*package*/ static final void reset(final double stepSize) {
-		QSimTimer.simStartTime = 24*3600;
-		QSimTimer.time = 0;
-		QSimTimer.SIM_TICK_TIME_S = stepSize;
+		QSimTimerStatic.simStartTime = 24*3600;
+		QSimTimerStatic.time = 0;
+		QSimTimerStatic.SIM_TICK_TIME_S = stepSize;
 	}
 
 }

@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.ptproject.qsim.QSimTimer;
+import org.matsim.ptproject.qsim.QSimTimerStatic;
 import org.matsim.withinday.WithindayAgent;
 
 public class AgentLinkcostPercpetion implements TravelTime {
@@ -86,7 +86,7 @@ public class AgentLinkcostPercpetion implements TravelTime {
 	}
 
 	private void init() {
-		double time_s = QSimTimer.getTime();
+		double time_s = QSimTimerStatic.getTime();
 
 		Link link = this.agent.getVehicle().getCurrentLink();
 

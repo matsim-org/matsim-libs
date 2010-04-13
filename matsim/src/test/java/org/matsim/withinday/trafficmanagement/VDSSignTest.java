@@ -35,7 +35,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.ptproject.qsim.QSimTimer;
+import org.matsim.ptproject.qsim.QSimTimerStatic;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
@@ -64,8 +64,8 @@ public class VDSSignTest extends MatsimTestCase {
 		Scenario scenario = new ScenarioImpl(super.loadConfig(null));
 		this.network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
-		QSimTimer.reset();
-		this.systemTime = (int) QSimTimer.getTime();
+		QSimTimerStatic.reset();
+		this.systemTime = (int) QSimTimerStatic.getTime();
 	}
 
 	@Override
@@ -108,8 +108,8 @@ public class VDSSignTest extends MatsimTestCase {
 	}
 
 	private void incrementSystemTime() {
-		QSimTimer.incTime();
-		this.systemTime = (int) QSimTimer.getTime();
+		QSimTimerStatic.incTime();
+		this.systemTime = (int) QSimTimerStatic.getTime();
 	}
 
 	public void testSignInitialization() {
@@ -199,7 +199,7 @@ public class VDSSignTest extends MatsimTestCase {
 	public void testRequestRoute() {
 		System.out.println();
 		log.debug("starting testRequestRoute...");
-		QSimTimer.reset();
+		QSimTimerStatic.reset();
 		VDSSign sign = this.createSign();
 		sign.setupIteration();
 		sign.simulationPrepared();
@@ -248,7 +248,7 @@ public class VDSSignTest extends MatsimTestCase {
 	public void testRequestMultipleRoutesOneControlEvent() {
 		System.out.println();
 		log.debug("starting testRequestMultipleRoutesOneControlEvent...");
-		QSimTimer.reset();
+		QSimTimerStatic.reset();
 		VDSSign sign = this.createSign();
 		int messageHoldTime = 30;
 		sign.setMessageHoldTime(messageHoldTime);
@@ -294,7 +294,7 @@ public class VDSSignTest extends MatsimTestCase {
 	public void testRequestMultipleRoutes4ControlEvents() {
 		System.out.println();
 		log.debug("starting testRequestMultipleRoutes4ControlEvents...");
-		QSimTimer.reset();
+		QSimTimerStatic.reset();
 		VDSSign sign = this.createSign();
 		int messageHoldTime = 30;
 		int controlEvents = 4;
