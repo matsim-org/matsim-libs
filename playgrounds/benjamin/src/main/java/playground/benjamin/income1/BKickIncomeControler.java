@@ -27,7 +27,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.benjamin.BKickControler;
+import playground.benjamin.BkControler;
 
 
 /**
@@ -35,7 +35,7 @@ import playground.benjamin.BKickControler;
  * @author dgrether
  *
  */
-public class BKickIncomeControler extends BKickControler {
+public class BKickIncomeControler extends BkControler {
 
 	private PersonHouseholdMapping hhdb;
 
