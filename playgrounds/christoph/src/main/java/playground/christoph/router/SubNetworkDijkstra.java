@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * SubNetworkDijkstra.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.router;
 
 import java.util.ArrayList;
@@ -6,12 +26,14 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.network.SubLink;
 import playground.christoph.network.SubNode;
+import playground.christoph.router.util.KnowledgeTools;
 
 /*
  * This is an extended version of the Dijkstra Least
@@ -20,9 +42,12 @@ import playground.christoph.network.SubNode;
  * different Networks for different Persons.
  * -> Every Person can route in its personalized SubNetwork!
  */
-public class MyDijkstra extends Dijkstra{
+public class SubNetworkDijkstra extends Dijkstra {
 	
-	public MyDijkstra(Network network, TravelCost costFunction, TravelTime timeFunction)
+	private Person person;
+	private KnowledgeTools knowledgeTools = new KnowledgeTools();
+	
+	public SubNetworkDijkstra(Network network, TravelCost costFunction, TravelTime timeFunction)
 	{
 		super(network, costFunction, timeFunction);
 	}
@@ -30,6 +55,11 @@ public class MyDijkstra extends Dijkstra{
 	public void setNetwork(Network network)
 	{
 		this.network = network;
+	}
+	
+	public void setPerson(Person person)
+	{
+		this.person = person;
 	}
 	
 	/*
@@ -40,8 +70,10 @@ public class MyDijkstra extends Dijkstra{
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime)
 	{
-		Node newFromNode = this.network.getNodes().get(fromNode.getId());
-		Node newToNode = this.network.getNodes().get(toNode.getId());
+		Network subNetwork = this.knowledgeTools.getSubNetwork(person, network);
+		
+		Node newFromNode = subNetwork.getNodes().get(fromNode.getId());
+		Node newToNode = subNetwork.getNodes().get(toNode.getId());
 
 //		if (this.network.getNodes().size() == 0) System.out.println("No Nodes in SubNetwork!");
 //		

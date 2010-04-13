@@ -50,6 +50,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.network.MyLinkImpl;
+import playground.christoph.network.SubLink;
 
 public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	LinkEnterEventHandler, LinkLeaveEventHandler,
@@ -100,6 +101,8 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	
 	public double getLinkTravelTime(Link link, double time)
 	{
+		if (link instanceof SubLink) link = ((SubLink) link).getParentLink();
+		
 		MyLinkImpl myLink = (MyLinkImpl)link;
 		return myLink.getTravelTime();
 	}

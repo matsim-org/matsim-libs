@@ -31,7 +31,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.christoph.router.MyDijkstra;
+import playground.christoph.router.SubNetworkDijkstra;
 
 /*
  * Basically we could also extend LeastCostPathCalculatorFactory -
@@ -95,7 +95,7 @@ public class CloningDijkstraFactory extends DijkstraFactory {
 			log.warn("Could not clone the Travel Time Calculator - use reference to the existing Calculator and hope the best...");
 		}
 		
-		Dijkstra dijkstra = new MyDijkstra(network, travelCostClone, travelTimeClone);
+		Dijkstra dijkstra = new SubNetworkDijkstra(network, travelCostClone, travelTimeClone);
 		return dijkstra;
 	}
 

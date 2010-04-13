@@ -30,7 +30,7 @@ import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
 import playground.christoph.network.util.SubNetworkCreator;
 import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.CloneablePlansCalcRoute;
-import playground.christoph.router.MyDijkstra;
+import playground.christoph.router.SubNetworkDijkstra;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
@@ -57,10 +57,10 @@ public class TestSubNetwork {
 	private CloneablePlansCalcRoute dijkstraRouter;
 	private QNetwork qNetwork;
 	
-	private final String configFileName = "mysimulations/kt-zurich/config.xml";
+	private final String configFileName = "../matsim/mysimulations/kt-zurich/config.xml";
 	private final String dtdFileName = null;
-	private final String networkFile = "mysimulations/kt-zurich/input/network.xml";
-	private final String populationFile = "mysimulations/kt-zurich/input/plans.xml";
+	private final String networkFile = "../matsim/mysimulations/kt-zurich/input/network.xml";
+	private final String populationFile = "../matsim/mysimulations/kt-zurich/input/plans.xml";
 	
 	public static void main(String[] args)
 	{
@@ -134,7 +134,7 @@ public class TestSubNetwork {
 		travelCostWrapper.checkNodeKnowledge(false);
 		
 		// Don't use Knowledge for CostCalculations
-		dijkstra = new MyDijkstra(this.scenario.getNetwork(), travelCostWrapper, travelTimeWrapper);
+		dijkstra = new SubNetworkDijkstra(this.scenario.getNetwork(), travelCostWrapper, travelTimeWrapper);
 	
 		dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), this.scenario.getNetwork(), 
 				travelCostWrapper, travelTimeWrapper, new CloningDijkstraFactory());
@@ -159,7 +159,7 @@ public class TestSubNetwork {
 
 			customAttributes.put("SubNetwork", subNetwork);
 			
-//			if(!checkNodeKnowledge(subNetwork, nk)) log.error("Not all Nodes included!");
+			if(!checkNodeKnowledge(subNetwork, nk)) log.error("Not all Nodes included!");
 	
 			replanRoute(person);
 			

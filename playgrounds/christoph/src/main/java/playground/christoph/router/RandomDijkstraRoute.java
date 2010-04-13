@@ -98,9 +98,9 @@ public class RandomDijkstraRoute extends SimpleRouter {
 			
 			this.travelCost.setPerson(person);
 						
-			if (this.leastCostPathCalculator instanceof MyDijkstra)
+			if (this.leastCostPathCalculator instanceof SubNetworkDijkstra)
 			{
-				((MyDijkstra)this.leastCostPathCalculator).setNetwork(subNetwork);
+				((SubNetworkDijkstra)this.leastCostPathCalculator).setNetwork(subNetwork);
 			}
 		}
 		

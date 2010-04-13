@@ -28,12 +28,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
+import playground.christoph.replanning.TravelTimeCollector;
 import playground.christoph.router.CloneablePlansCalcRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.router.costcalculators.SubNetworkDijkstraTravelCostWrapper;
 import playground.christoph.router.util.CloningDijkstraFactory;
+import playground.christoph.router.util.SubNetworkDijkstraFactory;
 import playground.christoph.withinday.replanning.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.InitialReplanner;
 import playground.christoph.withinday.replanning.NextLegReplanner;
@@ -68,7 +71,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 	 * Select which size the known Areas should have in the Simulation.
 	 * The needed Parameter is the Name of the Table in the MYSQL Database.
 	 */
-	protected String tableName = "BatchTable1_5";
+	protected String tableName = "BatchTable1_15";
 	
 	public WithinDayKnowledgeControler(String[] args)
 	{
@@ -97,16 +100,42 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		 * Calculate the TravelTime based on the actual load of the links. Use only 
 		 * the TravelTime to find the LeastCostPath.
 		 */
-		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQNetwork());
-		KnowledgeTravelTimeWrapper travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
-		travelTimeWrapper.checkNodeKnowledge(true);
+//		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQNetwork());
+//		KnowledgeTravelTimeWrapper travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
+//		travelTimeWrapper.checkNodeKnowledge(true);
+//		
+//		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
+//		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+//		travelCostWrapper.checkNodeKnowledge(true);
+//		
+//		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
+//				travelCostWrapper, travelTimeWrapper);
+
 		
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
-		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
-		travelCostWrapper.checkNodeKnowledge(true);
+//		travelTime = new TravelTimeCollector(network);
+//		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+//		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+//		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+//		
+//		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+//		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+//		travelCostWrapper.checkNodeKnowledge(true);
+//		
+//		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
+//				travelCostWrapper, travelTime);
+		
+		
+		travelTime = new TravelTimeCollector(network);
+		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+				
+		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+		SubNetworkDijkstraTravelCostWrapper subNetworkDijkstraTravelCostWrapper = new SubNetworkDijkstraTravelCostWrapper(travelCost);
 		
 		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
-				travelCostWrapper, travelTimeWrapper, new CloningDijkstraFactory());
+				subNetworkDijkstraTravelCostWrapper, travelTime, new SubNetworkDijkstraFactory());
+
 		
 		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
