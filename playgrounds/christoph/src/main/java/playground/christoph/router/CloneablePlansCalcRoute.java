@@ -30,12 +30,11 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 /*
- * Extended version of PlansCalcRoute that can create deep clones
- * (including clones of the time- anc cost calculators).
+ * Extended version of PlansCalcRoute that tries to create 
+ * deep clones including clones of the time- and cost calculators).
  */
 public class CloneablePlansCalcRoute extends PlansCalcRoute implements Cloneable{
 	
@@ -65,7 +64,7 @@ public class CloneablePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	@Override
 	public CloneablePlansCalcRoute clone()
 	{
-		TravelCost travelCostClone = null;
+		PersonalizableTravelCost travelCostClone = null;
 		if (costCalculator instanceof Cloneable)
 		{
 			try
@@ -108,7 +107,7 @@ public class CloneablePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		}
 		
 		CloneablePlansCalcRoute clone;
-		clone = new CloneablePlansCalcRoute(configGroup, network, costCalculator, timeCalculator, factory);
+		clone = new CloneablePlansCalcRoute(configGroup, network, travelCostClone, travelTimeClone, factory);
 	
 		return clone;
 	}
