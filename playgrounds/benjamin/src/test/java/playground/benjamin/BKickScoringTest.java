@@ -49,7 +49,7 @@ public class BKickScoringTest extends MatsimTestCase {
 		config.network().setInputFile(netFileName);
 		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTestV4.xml");
 
-		final BKickControler2 controler = new BKickControler2(config);
+		final BkControler2 controler = new BkControler2(config);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 
