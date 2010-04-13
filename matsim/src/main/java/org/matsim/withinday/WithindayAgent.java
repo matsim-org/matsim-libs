@@ -221,7 +221,7 @@ public class WithindayAgent extends QPersonAgent {
     	((PersonImpl)this.getPerson()).exchangeSelectedPlan(newPlan, false);
     	this.exchangeCurrentLeg(newLeg);
 
-    	QSim.getEvents().processEvent(new AgentReplanEventImpl(QSimTimer.getTime(), this.getPerson().getId(), alternativeRoute));
+    	this.getQSimulation().getEventsManager().processEvent(new AgentReplanEventImpl(QSimTimer.getTime(), this.getPerson().getId(), alternativeRoute));
     }
 	}
 

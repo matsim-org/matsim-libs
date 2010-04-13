@@ -44,8 +44,8 @@ import org.matsim.core.events.LaneEnterEventImpl;
 import org.matsim.core.events.LaneLeaveEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -348,7 +348,7 @@ public class QLane implements QBufferItem {
 				return;
 			}
 
-			QSim.getEvents().processEvent(
+			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
 			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 			boolean handled = this.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 
@@ -469,7 +469,7 @@ public class QLane implements QBufferItem {
 			if (toQueueLane != null) {
 				if (toQueueLane.hasSpace()) {
 					this.buffer.poll();
-					QSim.getEvents().processEvent(
+					this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
 					new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
 					toQueueLane.addToVehicleQueue(veh, now);
 				}
@@ -568,9 +568,9 @@ public class QLane implements QBufferItem {
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.isFireLaneEvents()) {
-			QSim.getEvents().processEvent(new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
+			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
 		}
-		QSim.getEvents().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId()));
+		this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId()));
 		return veh;
 	}
 
@@ -622,7 +622,7 @@ public class QLane implements QBufferItem {
 		double now = QSimTimer.getTime();
 
 		for (QVehicle veh : this.waitingList) {
-			QSim.getEvents().processEvent(
+			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		Simulation.decLiving(this.waitingList.size());
@@ -630,7 +630,7 @@ public class QLane implements QBufferItem {
 		this.waitingList.clear();
 
 		for (QVehicle veh : this.vehQueue) {
-			QSim.getEvents().processEvent(
+			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		Simulation.decLiving(this.vehQueue.size());
@@ -638,7 +638,7 @@ public class QLane implements QBufferItem {
 		this.vehQueue.clear();
 		this.vehQueueEnterTimeMap.clear();
 		for (QVehicle veh : this.buffer) {
-			QSim.getEvents().processEvent(
+			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		Simulation.decLiving(this.buffer.size());

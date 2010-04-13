@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QSimEngine;
 
 
 
@@ -60,10 +59,6 @@ public class TransitQSimulation extends QSim {
 	
 	public void setTransitStopHandlerFactory(TransitStopHandlerFactory stopHandlerFactory) {
 		transitQueueSimulationFeature.setTransitStopHandlerFactory(stopHandlerFactory);
-	}
-	
-	public QSimEngine getQSimEngine() {
-	  return this.simEngine;
 	}
 	
 }

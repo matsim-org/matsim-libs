@@ -296,7 +296,7 @@ public class QLinkLanesImpl implements QLink {
 		activateLink();
 		this.originalLane.addToVehicleQueue(veh, now);
 		veh.setCurrentLink(this.getLink());
-		QSim.getEvents().processEvent(
+		this.getQSimEngine().getQSim().getEventsManager().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
 						this.getLink().getId()));
 	}

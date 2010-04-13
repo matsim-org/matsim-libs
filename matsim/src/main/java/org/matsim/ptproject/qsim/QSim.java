@@ -20,7 +20,6 @@
 
 package org.matsim.ptproject.qsim;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +36,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -56,9 +54,6 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.LaneDefinitions;
@@ -69,7 +64,6 @@ import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
-import org.matsim.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 
@@ -83,6 +77,7 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
  */
 public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation {
 
+	final private static Logger log = Logger.getLogger(QSim.class);
 
 	/* time since last snapshot */
 	private double snapshotTime = 0.0;
@@ -92,12 +87,13 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private double infoTime = 0;
 	protected static final int INFO_PERIOD = 3600;
 
-	protected PopulationImpl population;
+	
 	protected QNetwork network;
-	private static EventsManager events = null;
-	protected  SimStateWriterI netStateWriter = null;
-	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
-	protected QSimEngine simEngine = null;
+	private EventsManager events = null;
+	
+	private QSimEngine simEngine = null;
+	private NetworkChangeEventsEngine changeEventsEngine = null;
+
 	private CarDepartureHandler carDepartureHandler;
 
 	/**
@@ -107,13 +103,11 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	protected final PriorityQueue<Tuple<Double, PersonDriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, PersonDriverAgent>>(30, new TeleportationArrivalTimeComparator());
 	private final Date starttime = new Date();
 	private double stopTime = 100*3600;
-	final private static Logger log = Logger.getLogger(QSim.class);
 	private AgentFactory agentFactory;
 	private SimulationListenerManager<QSim> listenerManager;
 	protected final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
 	protected Scenario scenario = null;
 	private LaneDefinitions laneDefintions;
-	private boolean useActivityDurations = true;
 	private QSimSignalEngine signalEngine = null;
 	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
 
@@ -130,23 +124,28 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * @param events
 	 */
 	public QSim(final Scenario scenario, final EventsManager events) {
-		this.scenario = scenario;
-		init(this.scenario, events);
+		this(scenario, events, new DefaultQSimEngineFactory());
 	}
+	
+	protected QSim(final Scenario sc, final EventsManager events, final QSimEngineFactory simEngineFac){
+		this.scenario = sc;
+		init(this.scenario, events, simEngineFac);
+	}
+	
 	/**
 	 * extended constructor method that can also be
 	 * after assignments of another constructor
+	 * @param simEngineFac 
 	 */
-	private void init(final Scenario sc, final EventsManager eventsManager){
+	private void init(final Scenario sc, final EventsManager eventsManager, QSimEngineFactory simEngineFac){
     log.info("Using QSim...");
     // In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
     this.listenerManager = new SimulationListenerManager<QSim>(this);
     Simulation.reset(sc.getConfig().getQSimConfigGroup().getStuckTime());
     QSimTimer.reset(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
-    setEvents(eventsManager);
-    this.population = (PopulationImpl) sc.getPopulation();
+    this.events = eventsManager;
     Config config = sc.getConfig();
-    this.simEngine = new QSimEngineImpl(this, MatsimRandom.getRandom());
+    this.simEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
 
     if (config.scenario().isUseLanes()) {
       if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
@@ -236,12 +235,12 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	}
 
 	protected void createAgents() {
-		if (this.population == null) {
+		if (this.scenario.getPopulation() == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		Collection<PersonAgent> agents = new ArrayList<PersonAgent>();
 		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		for (Person p : this.population.getPersons().values()) {
+		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			QPersonAgent agent = this.agentFactory.createPersonAgent(p);
 			QVehicle veh = new QVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
@@ -275,13 +274,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		log.warn("NetVis is no longer supported by this simulation.");
 	}
 
-	private void prepareNetworkChangeEventsQueue() {
-		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)(this.scenario.getNetwork())).getNetworkChangeEvents();
-		if ((changeEvents != null) && (changeEvents.size() > 0)) {
-			this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
-			this.networkChangeEventsQueue.addAll(changeEvents);
-		}
-	}
 
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
@@ -326,8 +318,9 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
       this.snapshotTime += this.snapshotPeriod;
     }
 
-		prepareNetworkChangeEventsQueue();
-
+    this.changeEventsEngine = new NetworkChangeEventsEngine(this);
+    this.changeEventsEngine.onPrepareSim();
+    
 		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterPrepareSim();
 		}
@@ -375,26 +368,16 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			writer.finish();
 		}
 
-		if (this.netStateWriter != null) {
-			try {
-				this.netStateWriter.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			this.netStateWriter = null;
-		}
 		this.simEngine = null;
-		QSim.events = null; // delete events object to free events handlers, if they are nowhere else referenced
+		this.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
 
 	protected void beforeSimStep(final double time) {
-		if ((this.networkChangeEventsQueue != null) && (this.networkChangeEventsQueue.size() > 0)) {
-			handleNetworkChangeEvents(time);
-		}
+		
+		this.changeEventsEngine.onBeforeSimStep(time);
     if (this.signalEngine != null) {
       this.signalEngine.beforeSimStep(time);
     }
-
 	}
 
 
@@ -450,29 +433,10 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 				writer.endSnapshot();
 			}
 		}
-
-		if (this.netStateWriter != null) {
-			try {
-				this.netStateWriter.dump((int)time);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	/**
-	 * @deprecated try to use non static method getEventsManager()
-	 */
-	@Deprecated
-  public static final EventsManager getEvents() {
-		return events;
 	}
 
 	public final EventsManager getEventsManager(){
 	  return events;
-	}
-
-	private static final void setEvents(final EventsManager events) {
-		QSim.events = events;
 	}
 
 	protected void handleUnknownLegMode(final double now, final PersonDriverAgent agent, final Id linkId) {
@@ -491,11 +455,10 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 				PersonDriverAgent driver = entry.getSecond();
 				driver.teleportToLink(driver.getDestinationLinkId());
 				driver.legEnds(now);
-//				this.handleAgentArrival(now, driver);
-//				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
-//						destinationLink, driver.getCurrentLeg()));
-//				driver.legEnds(now);
-			} else break;
+			} 
+			else {
+				break;
+			}
 		}
 	}
 
@@ -512,14 +475,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 	}
 
-	private void handleNetworkChangeEvents(final double time) {
-		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){
-			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
-			for (Link link : event.getLinks()) {
-				this.network.getQLink(link.getId()).recalcTimeVariantAttributes(time);
-			}
-		}
-	}
 
 	/**
 	 * Registers this agent as performing an activity and makes sure that the
@@ -666,12 +621,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	}
 
 	public boolean isUseActivityDurations() {
-		return this.useActivityDurations;
-	}
-
-	public void setUseActivityDurations(final boolean useActivityDurations) {
-		this.useActivityDurations = useActivityDurations;
-		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
+		return this.scenario.getConfig().vspExperimental().isUseActivityDurations();
 	}
 
 	public SignalEngine getQSimSignalEngine() {
@@ -702,6 +652,10 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	public double getTimeOfDay() {
 		return QSimTimer.getTime() ;
+	}
+	
+	public QSimEngine getQSimEngine() {
+	  return this.simEngine;
 	}
 
 }

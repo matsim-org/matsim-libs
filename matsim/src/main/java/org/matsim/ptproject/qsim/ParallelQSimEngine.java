@@ -56,17 +56,17 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	private CyclicBarrier endBarrier;
 
 
-	public ParallelQSimEngine(final QSim sim, final Random random, int numOfThreads)
+	public ParallelQSimEngine(final QSim sim, final Random random)
 	{
 		super(sim, random);
-		this.numOfThreads = numOfThreads;
+		this.numOfThreads = this.getQSim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}
 
 	  @Override
 	  public void onPrepareSim()
 	  {
 		  super.onPrepareSim();
-		  initQSimEngineThreads(numOfThreads);
+		  initQSimEngineThreads(this.numOfThreads);
 	  }
 	
 	/**

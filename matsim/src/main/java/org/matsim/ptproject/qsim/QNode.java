@@ -237,7 +237,7 @@ public class QNode {
           currentLane.popFirstFromBuffer();
           Simulation.decLiving();
           Simulation.incLost();
-          QSim.getEvents().processEvent(
+          this.simEngine.getQSim().getEventsManager().processEvent(
               new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
         } else {
           currentLane.popFirstFromBuffer();

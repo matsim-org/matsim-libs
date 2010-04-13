@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParallelQueueSimulation.java
+ * ParallelQSimEngineFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.ptproject.qsim;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
+import java.util.Random;
 
-public class ParallelQSimulation extends QSim{
 
-	/*
-	 * We just use a ParallelQueueSimEngine.
-	 */
-	public ParallelQSimulation(final Scenario scenario, final EventsManager eventsManager)
-	{
-		// use the ParallelQueueSimEngine
-	  super(scenario, eventsManager, new ParallelQSimEngineFactory());
+/**
+ * @author dgrether
+ *
+ */
+public class ParallelQSimEngineFactory implements QSimEngineFactory {
+
+	@Override
+	public QSimEngine createQSimEngine(QSim sim, Random random) {
+		return new ParallelQSimEngine(sim, random);
 	}
+
 }
