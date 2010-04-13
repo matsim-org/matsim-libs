@@ -35,7 +35,6 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.LinkImpl;
@@ -586,7 +585,7 @@ public class QLinkImpl implements QLink {
 				log.warn( " cell sizes on a per-link basis are not supported to conserve memory") ;
 			}
 			
-			double storageCapFactor = Gbl.getConfig().getQSimConfigGroup().getStorageCapFactor();
+			double storageCapFactor = QLinkImpl.this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 			vehSpacingAsQueueCache = (float) calculateQueueVehicleSpacing(link, storageCapFactor, cellSizeCache);
 
 		}
