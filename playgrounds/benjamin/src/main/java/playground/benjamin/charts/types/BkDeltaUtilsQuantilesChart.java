@@ -63,7 +63,7 @@ public class BkDeltaUtilsQuantilesChart {
 		}
 		return series;
 	}
-	
+
 	/**
 	 * Dependent on what to plot this method has to be adapted
 	 * @param populationInformation (Map from Id to Row (all desired information))
