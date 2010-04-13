@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler2
+ * BKickControler
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,44 +21,30 @@ package playground.benjamin;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.population.algorithms.PlanCalcType;
 
 
 /**
- * Controler for first zurich scenario test run of estimated scoring function.
  * @author dgrether
  *
  */
-public class BKickControler2 extends BKickControler {
+public class BkControler extends Controler {
 
-	public BKickControler2(String configFileName) {
+	public BkControler(String configFileName) {
 		super(configFileName);
 	}
-	
-	public BKickControler2(Config conf){
+
+	public BkControler(Config conf){
 		super(conf);
 	}
 
-	public BKickControler2(String[] args) {
+	public BkControler(String[] args) {
 		super(args);
 	}
 
 	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new BKickScoringFunctionFactory(this.config.charyparNagelScoring());
+	protected void loadData() {
+		super.loadData();
+		new PlanCalcType().run(this.population);
 	}
-
-	
-	public static void main(final String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: Controler config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final Controler controler = new BKickControler2(args);
-			controler.run();
-		}
-		System.exit(0);
-	}
-
 }

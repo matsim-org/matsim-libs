@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler
+ * BKickControler2
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,30 +21,44 @@ package playground.benjamin;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.population.algorithms.PlanCalcType;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 
 /**
+ * Controler for first zurich scenario test run of estimated scoring function.
  * @author dgrether
  *
  */
-public class BKickControler extends Controler {
+public class BkControler2 extends BkControler {
 
-	public BKickControler(String configFileName) {
+	public BkControler2(String configFileName) {
 		super(configFileName);
 	}
-
-	public BKickControler(Config conf){
+	
+	public BkControler2(Config conf){
 		super(conf);
 	}
 
-	public BKickControler(String[] args) {
+	public BkControler2(String[] args) {
 		super(args);
 	}
 
 	@Override
-	protected void loadData() {
-		super.loadData();
-		new PlanCalcType().run(this.population);
+	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		return new BkScoringFunctionFactory(this.config.charyparNagelScoring());
 	}
+
+	
+	public static void main(final String[] args) {
+		if ((args == null) || (args.length == 0)) {
+			System.out.println("No argument given!");
+			System.out.println("Usage: Controler config-file [dtd-file]");
+			System.out.println();
+		} else {
+			final Controler controler = new BkControler2(args);
+			controler.run();
+		}
+		System.exit(0);
+	}
+
 }

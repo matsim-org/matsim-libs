@@ -28,17 +28,17 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  * @author dgrether
  *
  */
-public class BKickScoringFunctionFactory implements ScoringFunctionFactory {
+public class BkScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private CharyparNagelScoringConfigGroup configGroup;
 
-	public BKickScoringFunctionFactory(
+	public BkScoringFunctionFactory(
 			CharyparNagelScoringConfigGroup charyparNagelScoring) {
 		this.configGroup = charyparNagelScoring;
 	}
 
 	public ScoringFunction getNewScoringFunction(Plan plan) {
-		return new BKickScoringFunction(plan, this.configGroup);
+		return new BkScoringFunction(plan, this.configGroup);
 	}
 
 }
