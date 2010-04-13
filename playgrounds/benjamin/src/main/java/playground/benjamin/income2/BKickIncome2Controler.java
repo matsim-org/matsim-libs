@@ -24,13 +24,13 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
 
-import playground.benjamin.BKickControler;
+import playground.benjamin.BkControler;
 
 /**
  * @author dgrether
  *
  */
-public class BKickIncome2Controler extends BKickControler {
+public class BKickIncome2Controler extends BkControler {
 
 	private PersonHouseholdMapping personHouseholdMapping;
 
