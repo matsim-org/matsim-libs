@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -14,7 +15,6 @@ import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.DBStorage;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -30,7 +30,7 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 	private ArrayList<PersonImpl> newPersons = new ArrayList<PersonImpl>();
 	private LinkedList<PersonImpl> personsToProcess = new LinkedList<PersonImpl>();
 
-	private PopulationImpl population;
+	private Population population;
 	private KnowledgeTools knowledgeTools;
 	private SubNetworkTools subNetworkTools;
 	
@@ -48,7 +48,7 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 	
 //	private int count = 0;
 
-	public KnowledgeDBStorageHandler(PopulationImpl population)
+	public KnowledgeDBStorageHandler(Population population)
 	{
 		this.setDaemon(true);
 		this.setName("KnowledgeDBStorageHandler");

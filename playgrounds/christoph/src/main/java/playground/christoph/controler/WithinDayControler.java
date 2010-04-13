@@ -33,27 +33,24 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QVehicle;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.replanning.TravelTimeCollector;
-import playground.christoph.router.FastDijkstraFactory;
 import playground.christoph.router.CloneablePlansCalcRoute;
-import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import playground.christoph.router.costcalculators.SystemOptimalTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
-import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
-import playground.christoph.withinday.mobsim.ReplanningManager;
+import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
+import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.InitialReplanner;
@@ -63,15 +60,14 @@ import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanne
 import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
 import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifier;
-import playground.christoph.withinday.replanning.identifiers.ActivityReplanningMap;
 import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImpl;
 import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
-import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
+import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 
 /**
  * This Controler should give an Example what is needed to run
@@ -181,13 +177,13 @@ public class WithinDayControler extends Controler {
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 		
 		this.duringActivityIdentifier = new ActivityEndIdentifier(this.sim);
-		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId());
+		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId(), this.events);
 		this.duringActivityReplanner.setReplanner(dijkstraRouter);
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 		
 		this.duringLegIdentifier = new LeaveLinkIdentifier(this.sim);
-		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.network);
+		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.network, this.getEvents());
 		this.duringLegReplanner.setReplanner(dijkstraRouter);
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
@@ -400,6 +396,7 @@ public class WithinDayControler extends Controler {
 			return link.getFreespeed(time);
 		}
 		
+		@Override
 		public FreeSpeedTravelTime clone()
 		{
 			return new FreeSpeedTravelTime();

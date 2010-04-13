@@ -30,12 +30,8 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.replanning.TravelTimeCollector;
 import playground.christoph.router.CloneablePlansCalcRoute;
-import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
-import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
-import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.costcalculators.SubNetworkDijkstraTravelCostWrapper;
-import playground.christoph.router.util.CloningDijkstraFactory;
 import playground.christoph.router.util.SubNetworkDijkstraFactory;
 import playground.christoph.withinday.replanning.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.InitialReplanner;
@@ -144,13 +140,13 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 		
 		this.duringActivityIdentifier = new ActivityEndIdentifier(this.sim);
-		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId());
+		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId(), this.events);
 		this.duringActivityReplanner.setReplanner(dijkstraRouter);
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 		
 		this.duringLegIdentifier = new LeaveLinkIdentifier(this.sim);
-		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.network);
+		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.network, this.events);
 		this.duringLegReplanner.setReplanner(dijkstraRouter);
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);

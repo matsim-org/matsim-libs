@@ -26,12 +26,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;
 import playground.christoph.network.util.SubNetworkTools;
@@ -46,10 +45,12 @@ import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 		
 	private static final Logger log = Logger.getLogger(NextLegReplanner.class);
+	private EventsManager events;
 
-	public NextLegReplanner(Id id)
+	public NextLegReplanner(Id id, EventsManager events)
 	{
 		super(id);
+		this.events = events;
 	}
 	
 	/*
@@ -69,6 +70,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 	 * due to the limited number of possible vehicles on a link at a time. An implementation
 	 * of such a functionality would be a problem due to the structure of MATSim...
 	 */
+	@Override
 	public boolean doReplanning(PersonDriverAgent driverAgent)
 	{	
 		// If we don't have a valid Replanner.
@@ -183,14 +185,15 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 //		}
 		
 		// create ReplanningEvent
-		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRoute)alternativeRoute, (NetworkRoute)originalRoute));
+		this.events.processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRoute)alternativeRoute, (NetworkRoute)originalRoute));
 				
 		return true;
 	}
 	
+	@Override
 	public NextLegReplanner clone()
 	{
-		NextLegReplanner clone = new NextLegReplanner(this.id);
+		NextLegReplanner clone = new NextLegReplanner(this.id, this.events);
 		
 		super.cloneBasicData(clone);
 		

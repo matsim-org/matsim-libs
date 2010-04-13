@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -38,7 +39,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QVehicle;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;
@@ -64,11 +64,14 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 
 	private Network network;
 
+	private EventsManager events;
+
 	private static final Logger log = Logger.getLogger(CurrentLegReplanner.class);
 
-	public CurrentLegReplanner(Id id, Network network)
+	public CurrentLegReplanner(Id id, Network network, EventsManager events)
 	{
 		super(id);
+		this.events = events;
 		this.network = network;
 	}
 
@@ -189,7 +192,8 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 		withinDayPersonAgent.resetCachedNextLink();
 
 		// create ReplanningEvent
-		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
+		
+		this.events.processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
 
 		return true;
 	}
@@ -197,7 +201,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 	@Override
 	public CurrentLegReplanner clone()
 	{
-		CurrentLegReplanner clone = new CurrentLegReplanner(this.id, this.network);
+		CurrentLegReplanner clone = new CurrentLegReplanner(this.id, this.network, this.events);
 
 		super.cloneBasicData(clone);
 
