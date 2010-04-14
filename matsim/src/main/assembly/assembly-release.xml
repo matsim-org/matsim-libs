@@ -33,6 +33,10 @@
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
+			<source>CHANGELOG.txt</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
 			<source>${project.build.directory}/${project.build.finalName}.jar</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
