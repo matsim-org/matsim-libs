@@ -2,7 +2,7 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
 		<!ENTITY INPUTBASE    "./examples/equil">
-		<!ENTITY OUTPUTBASE   "./output">
+		<!ENTITY OUTPUTBASE   "./output/singleIteration">
 	]
 >
 <config>
@@ -32,7 +32,7 @@
 		<param name="endTime" value="00:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims -->
+		<param name = "snapshotFormat"	value = "otfvis"/> <!-- otfvis, googleearth, transims -->
 	</module>
 
 	<module name="planCalcScore">
