@@ -22,10 +22,8 @@ package org.matsim.core.events;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
@@ -33,7 +31,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener
 /**
  * This Implementation of an EventsManager collects the Events
  * during a SimStep and processes them afterwards.
- * 
+ *
  * The Events are collected in a ConcurrentLinkedQueue which is
  * thread-safe so multiple write access are possible without
  * synchronization (e.g. from multiple threads from the parallel
@@ -43,7 +41,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener
  * Thread after the SimStep. This ensures, that all events have
  * been processed before the next SimStep starts. This could for
  * example be necessary when using Within Day Replanning.
- * 	
+ *
  * Alternatively a ParallelEventsMangerImpl could be used. In that
  * case the collected Events are processed in a separate Thread
  * and the next SimStep is simulated before all Events are processed.
@@ -51,24 +49,22 @@ import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener
  * Attention: Do not use it with JDEQSim! (It should create correct
  * Results but will be very slow because all Events would be processed
  * after the Simulation itself ended)
- *    
+ *
  * @author cdobler
  */
 public class EventsCollector extends EventsManagerImpl implements SimulationAfterSimStepListener {
 
-	final private static Logger log = Logger.getLogger(EventsCollector.class);
-	
 	/*
 	 * The EventsManager that is used the process the Events.
 	 */
 	private EventsManagerImpl eventsManager;
-	
+
 	/*
 	 *  We use a ConcurrentLinkedQueue - it is thread-safe so we can
 	 *  use it with the ParallelQSim without synchronization.
 	 */
 	private ConcurrentLinkedQueue<Event> events;
-	
+
 	/*
 	 * Use the default EventsManager
 	 */
@@ -76,17 +72,17 @@ public class EventsCollector extends EventsManagerImpl implements SimulationAfte
 	{
 		this(new EventsManagerImpl());
 	}
-	
+
 	/*
 	 * Use a given EventsManager
 	 */
 	public EventsCollector(EventsManagerImpl eventsManager)
 	{
 		this.eventsManager = eventsManager;
-		
+
 		this.events = new ConcurrentLinkedQueue<Event>();
 	}
-	
+
 	@Override
 	public void addHandler(EventHandler handler)
 	{
@@ -116,7 +112,7 @@ public class EventsCollector extends EventsManagerImpl implements SimulationAfte
 	{
 		eventsManager.initProcessing();
 	}
-	
+
 	@Override
 	public void finishProcessing()
 	{
@@ -132,5 +128,5 @@ public class EventsCollector extends EventsManagerImpl implements SimulationAfte
 		Event event = null;
 		while ((event = events.poll()) != null) eventsManager.processEvent(event);
 	}
-	
+
 }

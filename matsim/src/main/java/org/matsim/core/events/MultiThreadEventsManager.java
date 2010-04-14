@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
@@ -46,22 +45,22 @@ import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListene
  * but are not processed. After the SimStep all collected Events
  * are taken and handed over to a separate Thread that processes
  * them.
- * 	
+ *
  * The used EventsDelegators are thread-safe, so they can be used
  * with the parallel QSim without further synchronization effort.
- * 
+ *
  * Optionally all Events of a SimStep have to be processed before
  * the Simulation continues with the next SimStep. This could
  * be necessary when using Within Day Replanning.
  *
  * Attention: Do not use it with JDEQSim!
- *    
+ *
  * @author cdobler
  */
 public class MultiThreadEventsManager implements EventsManager, SimulationAfterSimStepListener, SimulationBeforeCleanupListener{
 
 	final private static Logger log = Logger.getLogger(MultiThreadEventsManager.class);
-	
+
 	private EventsManager eventsManager;
 	private ProcessEventsThread processEventsThread;
 	private EventsDelegator[] eventsDelegators;
@@ -71,13 +70,13 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 	 * the Events of one EventsDelegator.
 	 */
 	private LinkedBlockingQueue<List<Queue<Event>>> eventsQueues;
-	
+
 	/*
 	 * When synchronizing to SimSteps all Events of a SimStep
 	 * are processed before the next SimStep is simulated.
 	 */
 	private boolean syncToSimSteps;
-	
+
 	/*
 	 * Use the default EventsManager
 	 */
@@ -85,7 +84,7 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 	{
 		this(new EventsManagerImpl(), numOfThreads, syncToSimSteps);
 	}
-	
+
 	/*
 	 * Use a given EventsManager
 	 */
@@ -95,7 +94,7 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 		this.syncToSimSteps = syncToSimSteps;
 		init(numOfThreads);
 	}
-	
+
 	/*
 	 *  Just for testing purposes as long as we have to
 	 *  register a EventsDelegator in the Controler.
@@ -104,22 +103,22 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 	{
 		return this.eventsDelegators;
 	}
-	
+
 	private void init(int numOfThreads)
 	{
 		this.eventsDelegators = new EventsDelegator[numOfThreads];
 		this.eventsQueues = new LinkedBlockingQueue<List<Queue<Event>>>();
-				
+
 		for (int i = 0; i < numOfThreads; i++)
 		{
 			EventsDelegator eventsDelegator = new EventsDelegator(this);
 			eventsDelegators[i] = eventsDelegator;
 		}
-		
+
 		processEventsThread = new ProcessEventsThread(this, eventsQueues, syncToSimSteps);
 		processEventsThread.start();
 	}
-	
+
 	public void addHandler(EventHandler handler) {
 		eventsManager.addHandler(handler);
 	}
@@ -155,13 +154,13 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 
 	/*
 	 * When doing Within Day Replanning we have to wait until all Events
-	 * have been processed! This could be done using a CyclicBarrier for example. 
+	 * have been processed! This could be done using a CyclicBarrier for example.
 	 */
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
 		collectEvents();
-		
+
 		if (syncToSimSteps)
-		{			
+		{
 			try
 			{
 				processEventsThread.getSimStepEndBarrier().await();
@@ -184,19 +183,19 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent e) {
 		finishProcessing();
 	}
-	
+
 	public void finishProcessing()
 	{
 		log.info("Simulation finished - waiting for EventsManager...");
 		processEventsThread.setSimulationRunning(false);
-		
+
 		/*
 		 * The ProcessThread may be waiting for a List of Queue<Events>.
 		 * The Simulation won't send it, so we send a dummy List.
 		 */
 		List<Queue<Event>> dummyList = new ArrayList<Queue<Event>>();
 		this.eventsQueues.add(dummyList);
-		
+
 		try
 		{
 			if (syncToSimSteps) processEventsThread.getSimStepEndBarrier().await();
@@ -210,10 +209,10 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 		{
 			Gbl.errorMsg(e1);
 		}
-		
-		log.info("... done.");		
+
+		log.info("... done.");
 	}
-	
+
 	private static class ProcessEventsThread extends Thread
 	{
 		private boolean simulationRunning = true;
@@ -222,38 +221,38 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 		private CyclicBarrier simStepEndBarrier;
 		private CyclicBarrier iterationEndBarrier;
 		private boolean syncToSimSteps;
-		
+
 		public ProcessEventsThread(EventsManager eventsManager, LinkedBlockingQueue<List<Queue<Event>>> eventsQueues, boolean syncToSimSteps)
 		{
 			this.eventsManager = eventsManager;
 			this.eventsQueues = eventsQueues;
 			this.syncToSimSteps = syncToSimSteps;
-		
+
 			init();
 		}
-		
+
 		private void init()
 		{
 			this.setName("ProcessEventsThread");
 			this.simStepEndBarrier = new CyclicBarrier(2);
-			this.iterationEndBarrier = new CyclicBarrier(2);			
+			this.iterationEndBarrier = new CyclicBarrier(2);
 		}
-		
+
 		public void setSimulationRunning(boolean value)
 		{
 			this.simulationRunning = value;
 		}
-		
+
 		public CyclicBarrier getSimStepEndBarrier()
 		{
 			return this.simStepEndBarrier;
 		}
-		
+
 		public CyclicBarrier getIterationEndBarrier()
 		{
 			return this.iterationEndBarrier;
 		}
-		
+
 		@Override
 		public void run()
 		{
@@ -267,14 +266,14 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 				while(simulationRunning || eventsQueues.peek() != null)
 				{
 					List<Queue<Event>> queues = eventsQueues.take();
-					
+
 					for (Queue<Event> events : queues)
 					{
 						Event event = null;
 						while ((event = events.poll()) != null)
 						{
 							eventsManager.processEvent(event);
-						}						
+						}
 					}
 					if (syncToSimSteps) simStepEndBarrier.await();
 				}
@@ -291,5 +290,5 @@ public class MultiThreadEventsManager implements EventsManager, SimulationAfterS
 			Gbl.printCurrentThreadCpuTime();
 		}
 	}	// ProcessEventsThread
-	
+
 }

@@ -23,7 +23,6 @@ package org.matsim.locationchoice;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -57,7 +56,6 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	protected boolean locationChoiceBasedOnKnowledge = true;
 	protected Knowledges knowledges = null;
 
-	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
 
 	public LocationMutator(final Network network, final Controler controler, final Knowledges kn) {

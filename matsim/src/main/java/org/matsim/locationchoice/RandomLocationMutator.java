@@ -23,7 +23,6 @@ package org.matsim.locationchoice;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -35,17 +34,15 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
-/*
+/**
  * @author anhorni
  */
 public class RandomLocationMutator extends LocationMutator {
 
-	private static final Logger log = Logger.getLogger(RandomLocationMutator.class);
-	
 	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn) {
 		super(network, controler, kn);
 	}
-	
+
 	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
@@ -53,66 +50,66 @@ public class RandomLocationMutator extends LocationMutator {
 	}
 
 	/*
-	 * For all secondary activities of the plan chose randomly a new facility which provides 
-	 * the possibility to perform the same activity. 
+	 * For all secondary activities of the plan chose randomly a new facility which provides
+	 * the possibility to perform the same activity.
 	 * plan == selected plan
 	 */
 	@Override
-	public void handlePlan(final Plan plan){	
+	public void handlePlan(final Plan plan){
 		if (super.locationChoiceBasedOnKnowledge) {
 			//log.info("LC based on knowledge");
-			this.handlePlanBasedOnKnowldge(plan);	
+			this.handlePlanBasedOnKnowldge(plan);
 		}
 		else {
 			//log.info("LC based on defined types");
 			//log.info(this.defineFlexibleActivities.getFlexibleTypes());
-			this.handlePlanForPreDefinedFlexibleTypes(plan);	
+			this.handlePlanForPreDefinedFlexibleTypes(plan);
 		}
-		super.resetRoutes(plan);		
+		super.resetRoutes(plan);
 	}
-		
+
 	private void handlePlanBasedOnKnowldge(final Plan plan) {
-		
+
 		List<ActivityImpl> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
-		
+
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final ActivityImpl act = (ActivityImpl)actslegs.get(j);
-				
+
 			boolean	isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
 			boolean	movable = movablePrimaryActivities.contains(act);
-	
+
 			// if home is accidentally not defined as primary
 			if ((!isPrimary || movable) && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 				int length = this.facilitiesOfType.get(act.getType()).length;
 				// only one facility: do not need to do location choice
 				if (length > 1) {
 					this.setNewLocationForAct(act, length);
-				}		
-			}	
+				}
+			}
 		}
 	}
-	
+
 	private void handlePlanForPreDefinedFlexibleTypes(final Plan plan) {
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final ActivityImpl act = (ActivityImpl)actslegs.get(j);
-				
+
 			// if home is accidentally not defined as primary
 			if (super.defineFlexibleActivities.getFlexibleTypes().contains(act.getType())) {
 				int length = this.facilitiesOfType.get(act.getType()).length;
 				// only one facility: do not need to do location choice
 				if (length > 1) {
 					this.setNewLocationForAct(act, length);
-				}		
-			}	
+				}
+			}
 		}
 	}
-	
+
 	private void setNewLocationForAct(ActivityImpl act, int length) {
-		ActivityFacilityImpl facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];				
+		ActivityFacilityImpl facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];
 		act.setFacilityId(facility.getId());
 		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());
-		act.setCoord(facility.getCoord());	
+		act.setCoord(facility.getCoord());
 	}
 }
