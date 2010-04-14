@@ -32,10 +32,18 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.gui.NetJComponent;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
+import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 
 
@@ -53,14 +61,29 @@ public class OTFClientSwing extends OTFClient {
 
 	public OTFClientSwing(String url) {
 		super("file:" + url);
-		connectionManager.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
-		connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
 		/*
-		 * This entry is needed to couple the org.matsim.core.queuesim to the visualizer
+		 * If I got it right: The following entries to the connection manager are really needed to
+		 * get otfvis running with the current matsim version. The other entries added
+		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
 		 */
+		this.connectionManager.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		this.connectionManager.connectQueueLinkToWriter(OTFQueueSimLinkAgentsWriter.class);
+		
 		this.connectionManager.connectWriterToReader(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
-
+		this.connectionManager.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+		
+		/*
+		 * Only needed for backward compatibility, see comment above (dg, nov 09)
+		 */
+		this.connectionManager.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
+		this.connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+		this.connectionManager.connectWriterToReader(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+		this.connectionManager.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
+		
+		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
+		
 	}
 
 	@Override
