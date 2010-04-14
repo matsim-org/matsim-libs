@@ -6,11 +6,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
@@ -59,10 +62,19 @@ public class IterativeKnowledgeControler extends Controler{
 	{
 		// Use knowledge when Re-Routing
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
-		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+		final KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
 
-		this.setTravelCostCalculator(travelCostWrapper);
+		this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
+
+			@Override
+			public PersonalizableTravelCost createTravelCostCalculator(
+					TravelTime timeCalculator,
+					CharyparNagelScoringConfigGroup cnScoringGroup) {
+				return travelCostWrapper;
+			}
+			
+		});
 //		this.setTravelCostCalculator(travelCost);
 	}
 

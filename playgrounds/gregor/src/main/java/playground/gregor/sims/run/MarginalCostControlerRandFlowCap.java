@@ -20,7 +20,11 @@
 
 package playground.gregor.sims.run;
 
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.evacuation.socialcost.MarginalTravelCostCalculatorII;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 
@@ -48,10 +52,20 @@ public class MarginalCostControlerRandFlowCap extends Controler{
 //		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 //		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 //		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
-		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
+		final SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
 		
 		this.events.addHandler(sc);
-		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);
+		// this.setTravelCostCalculator(new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc));
+		this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
+
+			@Override
+			public PersonalizableTravelCost createTravelCostCalculator(
+					TravelTime timeCalculator,
+					CharyparNagelScoringConfigGroup cnScoringGroup) {
+				return new MarginalTravelCostCalculatorII(MarginalCostControlerRandFlowCap.this.getTravelTimeCalculator(),sc);
+			}
+			
+		});
 		this.strategyManager = loadStrategyManager();
 		this.addControlerListener(sc);
 //		this.addControlerListener(lr);

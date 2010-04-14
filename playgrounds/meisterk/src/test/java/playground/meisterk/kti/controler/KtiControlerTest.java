@@ -44,7 +44,7 @@ public class KtiControlerTest extends MatsimTestCase {
 		testee.setCreateGraphs(false);
 		testee.run();
 
-		PlansCalcRoute router = (PlansCalcRoute) testee.getRoutingAlgorithm(testee.getTravelCostCalculator(), testee.getTravelTimeCalculator());
+		PlansCalcRoute router = (PlansCalcRoute) testee.createRoutingAlgorithm(testee.createTravelCostCalculator(), testee.getTravelTimeCalculator());
 		assertEquals(
 				PlansCalcRouteKti.class, 
 				router.getClass());

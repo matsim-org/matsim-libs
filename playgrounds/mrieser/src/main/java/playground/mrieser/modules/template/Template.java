@@ -27,11 +27,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -131,20 +133,29 @@ public class Template implements MatsimModule {
 		
 		// *** TravelCostCalculator *********************
 		
-		PersonalizableTravelCost travelCostCalculator = new PersonalizableTravelCost() {
+		TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactory() {
 
-			public double getLinkTravelCost(Link link, double time) {
-				return 0;
-			}
-			
 			@Override
-			public void setPerson(Person person) {
-				// TODO Auto-generated method stub
-				
+			public PersonalizableTravelCost createTravelCostCalculator(
+					TravelTime timeCalculator,
+					CharyparNagelScoringConfigGroup cnScoringGroup) {
+				return new PersonalizableTravelCost() {
+
+					public double getLinkTravelCost(Link link, double time) {
+						return 0;
+					}
+					
+					@Override
+					public void setPerson(Person person) {
+						
+					}
+					
+				};
 			}
 			
 		};
-		c.setTravelCostCalculator(travelCostCalculator);
+		c.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+		
 		// DISCUSS directly set the calculator, or just register to be loaded depending on config?
 		
 		

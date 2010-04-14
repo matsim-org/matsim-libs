@@ -47,9 +47,9 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler = new TestControler(config);
 		controler.run();
 		assertNull("RoadPricing must not be loaded in case case.", controler.getRoadPricing());
-		PlanAlgorithm router = controler.getRoutingAlgorithm();
+		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertFalse("BaseCase must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		TravelCost travelCosts = controler.getTravelCostCalculator();
+		TravelCost travelCosts = controler.createTravelCostCalculator();
 		assertFalse("BaseCase must not use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
 
@@ -61,9 +61,9 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler = new TestControler(config);
 		controler.run();
 		assertNotNull("RoadPricing must be loaded in distance toll case.", controler.getRoadPricing());
-		PlanAlgorithm router = controler.getRoutingAlgorithm();
+		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertFalse("Distance toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		TravelCost travelCosts = controler.getTravelCostCalculator();
+		TravelCost travelCosts = controler.createTravelCostCalculator();
 		assertTrue("Distance toll must use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
 
@@ -75,9 +75,9 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler = new TestControler(config);
 		controler.run();
 		assertNotNull("RoadPricing must be loaded in cordon toll case.", controler.getRoadPricing());
-		PlanAlgorithm router = controler.getRoutingAlgorithm();
+		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertFalse("Cordon toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		TravelCost travelCosts = controler.getTravelCostCalculator();
+		TravelCost travelCosts = controler.createTravelCostCalculator();
 		assertTrue("Cordon toll must use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
 
@@ -89,9 +89,9 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler = new TestControler(config);
 		controler.run();
 		assertNotNull("RoadPricing should be loaded in area toll case.", controler.getRoadPricing());
-		PlanAlgorithm router = controler.getRoutingAlgorithm();
+		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertTrue("Area toll should use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		TravelCost travelCosts = controler.getTravelCostCalculator();
+		TravelCost travelCosts = controler.createTravelCostCalculator();
 		assertFalse("Area toll must not use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
 

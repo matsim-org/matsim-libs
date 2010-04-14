@@ -32,7 +32,7 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 		//this.timeOptAlgorithm 		= new TimeOptimizer (controler, estimator, scorer);
 		this.scorer			  		= scorer;
 		FreespeedTravelTimeCost ttCost = new FreespeedTravelTimeCost(controler.getConfig().charyparNagelScoring());
-		this.router 				= new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), new AStarLandmarksFactory(controler.getNetwork(), ttCost));
+		this.router 				= new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), new AStarLandmarksFactory(controler.getNetwork(), ttCost));
 		this.timeOptAlgorithm 	= new Planomat (estimatorFactory, scoringFunctionFactory, controler.getConfig().planomat(), this.router, controler.getNetwork());
 		this.controlerIO = controler.getControlerIO();
 	}

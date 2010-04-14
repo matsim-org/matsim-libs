@@ -64,7 +64,7 @@ public class ShelterInputCounterSocialCost implements LinkLeaveEventHandler, Bef
 
 
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		PlanAlgorithm alg = event.getControler().getRoutingAlgorithm();
+		PlanAlgorithm alg = event.getControler().createRoutingAlgorithm();
 		if ( alg instanceof PlansCalcRoute) {
 			this.router = ((PlansCalcRoute)alg).getLeastCostPathCalculator();
 		} else {

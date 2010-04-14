@@ -10,9 +10,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.socialcost.MarginalTravelCostCalculatorII;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
@@ -42,10 +46,21 @@ public class SocialCostTest extends Controler {
 //		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 //		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 //		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
-		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
+		final SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
 
 		this.events.addHandler(sc);
-		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);
+		// this.setTravelCostCalculator(new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc));
+		this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
+
+			@Override
+			public PersonalizableTravelCost createTravelCostCalculator(
+					TravelTime timeCalculator,
+					CharyparNagelScoringConfigGroup cnScoringGroup) {
+				return new MarginalTravelCostCalculatorII(SocialCostTest.this.getTravelTimeCalculator(),sc);
+			}
+			
+		});
+		
 		this.strategyManager = loadStrategyManager();
 		this.addControlerListener(sc);
 	}

@@ -31,7 +31,7 @@ public class ReplanParkingSearchRoute implements LinkEnterEventHandler  {
 		
 		
 		
-		PersonalizableTravelCost travelCost=controler.getTravelCostCalculator() ;
+		PersonalizableTravelCost travelCost=controler.createTravelCostCalculator() ;
 		TravelTime travelTime=controler.getTravelTimeCalculator();
 		
 		

@@ -113,7 +113,7 @@ public class TransitControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm getRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
 		// if I see this correctly, in the following the first 5 arguments are just passed through.  That is,
 		// "getLeastCostPathCalculatorFactory()" just defines the (car) routing algo from the standard controler.  kai, nov'09
 		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,

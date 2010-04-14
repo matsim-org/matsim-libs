@@ -183,7 +183,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);
 		
-		PlansCalcRoute router = (PlansCalcRoute)this.controler.getRoutingAlgorithm();
+		PlansCalcRoute router = (PlansCalcRoute)this.controler.createRoutingAlgorithm();
 		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());
 		return leg.getTravelTime();
 	}

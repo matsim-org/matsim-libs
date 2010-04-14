@@ -56,7 +56,7 @@ public class SNController3 extends Controler {
 
 		// Adjust activity route
 		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
-		strategy2.addStrategyModule(new ReRouteLandmarks(this.getConfig(), this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator(), new FreespeedTravelTimeCost(config.charyparNagelScoring())));
+		strategy2.addStrategyModule(new ReRouteLandmarks(this.getConfig(), this.getNetwork(), this.createTravelCostCalculator(), this.getTravelTimeCalculator(), new FreespeedTravelTimeCost(config.charyparNagelScoring())));
 		manager.addStrategy(strategy2,0.15);
 		this.log.info("  added strategy ReRouteLandmarks with probability 0.15");
 

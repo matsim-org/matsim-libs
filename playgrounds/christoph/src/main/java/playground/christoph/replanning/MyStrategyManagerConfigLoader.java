@@ -40,7 +40,7 @@ public class MyStrategyManagerConfigLoader {
 	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
 
 		Network network = controler.getNetwork();
-		PersonalizableTravelCost travelCostCalc = controler.getTravelCostCalculator();
+		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();
 		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
@@ -87,11 +87,11 @@ public class MyStrategyManagerConfigLoader {
 				strategy.addStrategyModule(em);
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (classname.equals("BestScore")) {

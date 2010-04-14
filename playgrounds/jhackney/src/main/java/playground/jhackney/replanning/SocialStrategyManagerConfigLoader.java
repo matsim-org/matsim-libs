@@ -79,7 +79,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
 
 		Network network = controler.getNetwork();
-		PersonalizableTravelCost travelCostCalc = controler.getTravelCostCalculator();
+		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();
 		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		ActivityFacilities facilities = controler.getFacilities();
 
@@ -125,12 +125,12 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				strategy.addStrategyModule(em);
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 //				setDecayingModuleProbability(manager, strategy, 100, rate); // Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
 //				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);

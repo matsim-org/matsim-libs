@@ -47,7 +47,7 @@ public class TRBControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm getRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
-		return super.getRoutingAlgorithm(travelCosts, travelTimes);
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
+		return super.createRoutingAlgorithm(travelCosts, travelTimes);
 	}
 }

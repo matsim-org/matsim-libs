@@ -87,12 +87,12 @@ public class KTIControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm getRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
 
 		PlanAlgorithm router = null;
 
 		if (!this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			router = super.getRoutingAlgorithm(travelCosts, travelTimes);
+			router = super.createRoutingAlgorithm(travelCosts, travelTimes);
 		} else {
 
 			router = new PlansCalcRouteKti(

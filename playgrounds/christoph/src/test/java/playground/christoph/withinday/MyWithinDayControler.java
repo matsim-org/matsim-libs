@@ -72,7 +72,7 @@ public class MyWithinDayControler extends Controler {
 
 		// use dijkstra for replanning (routing)
 		travelTime=this.getTravelTimeCalculator();
-		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.getTravelCostCalculator(), travelTime, new DijkstraFactory());
+		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
 
 
 

@@ -40,7 +40,7 @@ public class ReRoute extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return this.controler.getRoutingAlgorithm();
+		return this.controler.createRoutingAlgorithm();
 	}
 
 }

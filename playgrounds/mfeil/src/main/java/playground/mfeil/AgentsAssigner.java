@@ -87,7 +87,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
 		
 		this.controler				= controler;
-		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.network				= controler.getNetwork();
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
 		this.timer					= new TimeModeChoicer2(controler, legTravelTimeEstimatorFactory, scorer);

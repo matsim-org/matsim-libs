@@ -22,6 +22,7 @@ package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTolledTripLength;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -31,6 +32,9 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -51,7 +55,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
 
 	public void notifyStartup(final StartupEvent event) {
-		Controler controler = event.getControler();
+		final Controler controler = event.getControler();
 		// read the road pricing scheme from file
 		this.scheme = controler.getScenario().getRoadPricingScheme();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
@@ -77,8 +81,19 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 
 		// replace the travelCostCalculator with a toll-dependent one if required
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
+			final TravelCostCalculatorFactory previousTravelCostCalculatorFactory = controler.getTravelCostCalculatorFactory();
 			// area-toll requires a regular TravelCost, no toll-specific one.
-			controler.setTravelCostCalculator(new TollTravelCostCalculator(controler.getTravelCostCalculator(), this.scheme));
+			TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactory() {
+
+				@Override
+				public PersonalizableTravelCost createTravelCostCalculator(
+						TravelTime timeCalculator,
+						CharyparNagelScoringConfigGroup cnScoringGroup) {
+					return new TollTravelCostCalculator(previousTravelCostCalculatorFactory.createTravelCostCalculator(timeCalculator, cnScoringGroup), RoadPricing.this.scheme);
+				}
+				
+			};
+			controler.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
 		}
 
 		this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);

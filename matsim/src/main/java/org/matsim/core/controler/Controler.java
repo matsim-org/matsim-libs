@@ -178,7 +178,7 @@ public class Controler {
 	private Counts counts = null;
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
-	protected PersonalizableTravelCost travelCostCalculator = null;
+	private PersonalizableTravelCost travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
 
@@ -380,7 +380,7 @@ public class Controler {
 		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(getRoutingAlgorithm(), Controler.this.network);
+				return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.network);
 			}
 		});
 
@@ -930,12 +930,8 @@ public class Controler {
 	 * ===================================================================
 	 */
 
-	public final void setTravelCostCalculator(final PersonalizableTravelCost travelCostCalculator) {
-		this.travelCostCalculator = travelCostCalculator;
-	}
-
-	public final PersonalizableTravelCost getTravelCostCalculator() {
-		return this.travelCostCalculator;
+	public final PersonalizableTravelCost createTravelCostCalculator() {
+		return this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
 	}
 
 	public final TravelTime getTravelTimeCalculator() {
@@ -991,8 +987,8 @@ public class Controler {
 	 *         iteration) travel costs and travel times. Only to be used by a
 	 *         single thread, use multiple instances for multiple threads!
 	 */
-	public PlanAlgorithm getRoutingAlgorithm() {
-		return getRoutingAlgorithm(this.getTravelCostCalculator(), this.getTravelTimeCalculator());
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return createRoutingAlgorithm(this.createTravelCostCalculator(), this.getTravelTimeCalculator());
 	}
 
 	/**
@@ -1005,7 +1001,7 @@ public class Controler {
 	 *         be used by a single thread, use multiple instances for multiple
 	 *         threads!
 	 */
-	public PlanAlgorithm getRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
 		if (this.getScenario().getConfig().scenario().isUseRoadpricing()
 				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scenarioData.getRoadPricingScheme().getType()))) {
 			return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this

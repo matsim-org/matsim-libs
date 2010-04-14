@@ -1,14 +1,14 @@
 package playground.christoph.controler;
 
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.evacuation.socialcost.MarginalTravelCostCalculatorII;
 
-import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.costcalculators.SystemOptimalTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
-import playground.gregor.sims.socialcostII.SocialCostCalculatorMultiLink;
 
 /*
  * Uses a Scoring Function that gets the Facilities Opening Times from 
@@ -37,7 +37,16 @@ public class PaperControler extends Controler{
 
 		// Do Iterations and use the default internal TravelTimeCalculator
 //		this.travelCostCalculator = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
-		this.travelCostCalculator = new SystemOptimalTravelCostCalculator(this.getTravelTimeCalculator());
+		this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
+
+			@Override
+			public PersonalizableTravelCost createTravelCostCalculator(
+					TravelTime timeCalculator,
+					CharyparNagelScoringConfigGroup cnScoringGroup) {
+				return new SystemOptimalTravelCostCalculator(PaperControler.this.getTravelTimeCalculator());
+			}
+			
+		});
 
 		// Update the Calculators in the Replanning Modules!
 		this.strategyManager = loadStrategyManager();
