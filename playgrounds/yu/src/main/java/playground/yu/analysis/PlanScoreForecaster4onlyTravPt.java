@@ -161,6 +161,9 @@ public class PlanScoreForecaster4onlyTravPt {
 			betaTrav = this.betaTravelingPt;
 
 		score += betaTrav * attrTravelTime/* [h] */;
+		// System.out.println("SCORE:\tbetaTrav\t=\t" + betaTrav
+		// + "\t*\tattrTravTime\t=\t" + attrTravelTime + " [h]\t=\t"
+		// + betaTrav * attrTravelTime + ";\tscore\t=\t" + score);
 
 		if (Double.isNaN(score))
 			throw new RuntimeException(PlanScoreForecaster4onlyTravPt.class
@@ -246,6 +249,10 @@ public class PlanScoreForecaster4onlyTravPt {
 		this.attrPerforming += durAttr;
 
 		score += this.betaPerforming * durAttr;
+
+		// System.out.println("SCORE:\tbetaPerforming\t=\t" + betaPerforming
+		// + "\t*\tdurAttr\t=\t" + durAttr + " [h]\t=\t" + betaPerforming
+		// * durAttr + ";\tscore\t=\t" + score);
 		if (Double.isNaN(score))
 			throw new RuntimeException(PlanScoreForecaster4onlyTravPt.class
 					.getName()

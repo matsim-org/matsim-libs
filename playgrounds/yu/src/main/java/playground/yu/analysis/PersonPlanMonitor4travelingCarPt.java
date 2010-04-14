@@ -160,7 +160,7 @@ public class PersonPlanMonitor4travelingCarPt {
 		zeroUtilityDuration_h = typicalDuration_h
 				* Math.exp(-10.0 / typicalDuration_h / actParams.getPriority());
 
-		double actStart = -1, actEnd;
+		double actStart = actStartTime, actEnd;
 
 		if (!actType.startsWith("h")) {
 			double openTime = actParams.getOpeningTime(), closeTime = actParams
@@ -168,9 +168,11 @@ public class PersonPlanMonitor4travelingCarPt {
 			if (Double.isNaN(this.actStartTime))
 				this.actStartTime = openTime;
 			actStart = this.actStartTime;
+
 			if (Double.isNaN(this.actEndTime))
 				this.actEndTime = closeTime;
 			actEnd = this.actEndTime;
+
 			if (openTime >= 0 && this.actStartTime < openTime)
 				actStart = openTime;
 			if (closeTime >= 0 && closeTime < this.actEndTime)
@@ -196,6 +198,12 @@ public class PersonPlanMonitor4travelingCarPt {
 					+ "\t"
 					+ DebugTools.getLineNumber(new Exception())
 					+ "\tdurAttr isNaN");
+		// System.out.println("PlanMonitor:\tperson:\t"
+		// + plan.getPerson().getId().toString() + "\tidx=\t" + idx
+		// + "\tactType\t" + actType + "\tdurAttr\t" + durAttr
+		// + "\twith performingTime\t" + performingTime_h
+		// + " [h]\tactEnd\t" + Time.writeTime(actEnd) + "\tactStart\t"
+		// + Time.writeTime(actStart));
 		return Math.max(durAttr, 0);
 	}
 
