@@ -41,9 +41,6 @@ import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 
 
