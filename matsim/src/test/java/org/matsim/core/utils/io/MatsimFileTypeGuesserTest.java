@@ -132,6 +132,15 @@ public class MatsimFileTypeGuesserTest {
 		assertEquals("http://www.matsim.org/files/dtd/transitSchedule_v1.dtd", g.getSystemId());
 	}
 
+	@Test
+	public void testVehiclesV1XML() throws IOException {
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/vehicles/testVehicles.xml");
+		assertEquals(MatsimFileTypeGuesser.FileType.Vehicles, g.getGuessedFileType());
+		assertNull(g.getPublicId());
+		assertNotNull(g.getSystemId());
+		assertEquals("http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd", g.getSystemId());
+	}
+
 	// TODO needs more test for Households, Transims-Veh, OTFVis, ...
 
 	@Test

@@ -47,7 +47,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 	 */
 	public enum FileType {Config, Network, Facilities, Population, World,
 		Counts, Events, Households, TransimsVehicle, OTFVis, SignalSystems, LaneDefinitions, SignalSystemConfigs,
-		TransitSchedule}
+		TransitSchedule, Vehicles}
 
 	public static final String SYSTEMIDNOTFOUNDMESSAGE = "System Id of xml document couldn't be detected. " +
 	"Make sure that you try to read a xml document with a valid header. " +
@@ -83,6 +83,8 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 					this.fileType = FileType.Config;
 				} else if (shortSystemId.startsWith("counts_")) {
 					this.fileType = FileType.Counts;
+				} else if (shortSystemId.startsWith("vehicleDefinitions_")) {
+					this.fileType = FileType.Vehicles;
 				} else if (shortSystemId.startsWith("transitSchedule_")) {
 					this.fileType = FileType.TransitSchedule;
 				}
@@ -209,6 +211,8 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 	 *
 	 */
 	private final static class XMLTypeDetectionException extends RuntimeException {
+
+		private static final long serialVersionUID = 1L;
 
 		public final String publicId;
 		public final String systemId;
