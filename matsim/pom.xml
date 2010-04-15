@@ -80,7 +80,7 @@
 					</excludes>
 					<forkMode>once</forkMode>
 					<!-- avoid out of memory errors: -->
-					<argLine>-Xmx600m -Djava.endorsed.dirs="${basedir}/libs/endorsed" -Djava.awt.headless=true</argLine>
+					<argLine>-Xmx700m -Djava.endorsed.dirs="${basedir}/libs/endorsed" -Djava.awt.headless=true</argLine>
 					<enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't work otherwise... -->
 				</configuration>
 			</plugin>
