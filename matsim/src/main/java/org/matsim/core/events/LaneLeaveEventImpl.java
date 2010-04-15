@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
  */
 public class LaneLeaveEventImpl extends LaneEventImpl implements LaneLeaveEvent {
 	
-	public static final String EVENT_TYPE = "entered lane";
+	public static final String EVENT_TYPE = "left lane";
 	
 	public LaneLeaveEventImpl(double time, Id agentId, Id linkId, Id laneId) {
 		super(time, agentId, linkId, laneId);
