@@ -98,19 +98,18 @@ public class PersonPlanMonitor4travelingCarPt {
 
 	public double getTotalTravelTimesCar_h() {
 		if (this.stuck)
-			return 24.0 * 3;
+			return 24.0 + legDurCar;
 		return legDurCar;
 	}
 
 	public double getTotalTravelTimesPt_h() {
 		if (this.stuck)
-			return 24.0 * 3;
+			return 24.0 + legDurPt;
 		return legDurPt;
 	}
 
 	public double getTotalPerformTime_h(CharyparNagelScoringConfigGroup scoring) {
-		if (this.stuck)
-			return 0.0;
+		// if (this.stuck) return 0.0;
 		if (this.idx % 2 == 1)
 			throw new RuntimeException(PersonPlanMonitor4travelingCarPt.class
 					.getName()
@@ -168,10 +167,12 @@ public class PersonPlanMonitor4travelingCarPt {
 					.getClosingTime();
 			if (Double.isNaN(this.actStartTime))
 				this.actStartTime = openTime;
+
 			actStart = this.actStartTime;
 
 			if (Double.isNaN(this.actEndTime))
 				this.actEndTime = closeTime;
+
 			actEnd = this.actEndTime;
 
 			if (openTime >= 0 && this.actStartTime < openTime)
@@ -199,12 +200,12 @@ public class PersonPlanMonitor4travelingCarPt {
 					+ "\t"
 					+ DebugTools.getLineNumber(new Exception())
 					+ "\tdurAttr isNaN");
-		System.out.println("PlanMonitor:\tperson:\t"
-				+ plan.getPerson().getId().toString() + "\tidx=\t" + idx
-				+ "\tactType\t" + actType + "\tdurAttr\t" + durAttr
-				+ "\twith performingTime\t" + performingTime_h
-				+ " [h]\tactEnd\t" + Time.writeTime(actEnd) + "\tactStart\t"
-				+ Time.writeTime(actStart));
+		// System.out.println("PlanMonitor:\tperson:\t"
+		// + plan.getPerson().getId().toString() + "\tidx=\t" + idx
+		// + "\tactType\t" + actType + "\tdurAttr\t" + durAttr
+		// + "\twith performingTime\t" + performingTime_h
+		// + " [h]\tactEnd\t" + Time.writeTime(actEnd) + "\tactStart\t"
+		// + Time.writeTime(actStart));
 		return Math.max(durAttr, 0);
 	}
 
