@@ -30,7 +30,7 @@ import org.matsim.ptproject.qsim.QLinkLanesImpl;
  *
  */
 public class CarLocator {
-	private QLinkLanesImpl link;
+	private QLink link;
 	private double enterTime;
 	private double earliestInD;
 	private double d;
@@ -38,18 +38,20 @@ public class CarLocator {
 	private static final Logger log = Logger.getLogger(CarLocator.class);
 
 	public CarLocator(QLink link, double enterTime, double d){
-		this.link = (QLinkLanesImpl) link;
+		this.link = link;
 		this.enterTime = enterTime;
 		this.d = d;
 		this.checkD();
 		this.earliestD();
 	}
 	private void checkD(){
-		for (QLane ql : link.getQueueLanes()){
-			if(!((ql.equals(link.getOriginalLane()))) && (ql.getLength()>this.d)){
-				this.d = ql.getLength();
-				log.info("d was shorter than lane. Set to " + this.d);
-				break;
+		if (this.link instanceof QLinkLanesImpl){
+			for (QLane ql : ((QLinkLanesImpl)link).getQueueLanes()){
+				if(!((ql.equals(((QLinkLanesImpl)link).getOriginalLane()))) && (ql.getLength()>this.d)){
+					this.d = ql.getLength();
+					log.info("d was shorter than lane. Set to " + this.d);
+					break;
+				}
 			}
 		}
 	}
