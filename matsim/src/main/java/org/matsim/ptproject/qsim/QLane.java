@@ -419,7 +419,7 @@ public class QLane implements QBufferItem {
 		 * is not delayed).
 		 */
 		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
-		  || (!this.waitingList.isEmpty()) || (this.toLanes != null && !this.bufferIsEmpty()) || this.transitQueueLaneFeature.isFeatureActive();
+		  || (!this.waitingList.isEmpty()) || (!this.bufferIsEmpty()) || this.transitQueueLaneFeature.isFeatureActive();
 		return active;
 	}
 
