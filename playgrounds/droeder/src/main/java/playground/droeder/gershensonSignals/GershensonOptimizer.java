@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.droeder.DaPaths;
@@ -63,7 +65,7 @@ public class GershensonOptimizer {
 		Map<Integer, Solution> bests = new HashMap<Integer, Solution>();
 		
 		for(Entry<Integer, Solution> e:solutions.entrySet()){
-			temp.put(e.getKey(), e.getValue().getTime());
+			temp.put(e.getKey(), e.getValue().getAvTT());
 		}
 		tempBest.putAll(temp);
 		for(int i = 0 ; i<firstBest; i++){
@@ -122,10 +124,20 @@ public class GershensonOptimizer {
 	public void writeToTxt (Map <Integer, Solution> data, String fileName){
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
-			writer.write("time" +"\t" + "d" +"\t" + "u" +"\t" + "cap" +"\t" + "n" +"\t" + "maxRed");
+			writer.write("avTT" +"\t" + "absTT" + "\t" + "avFac" + "\t"+ "minFac" + "\t"+ "maxFac" + "\t" + "medianFac" + "\t" + "d" +"\t" + "u" +"\t" + "cap" +"\t" + "n" +"\t" + "maxRed");
 			writer.newLine();
 			for(Solution s : data.values()){
-				writer.write(String.valueOf(s.getTime()));
+				writer.write(String.valueOf(s.getAvTT()));
+				writer.write("\t");
+				writer.write(String.valueOf(s.getAbsTT()));
+				writer.write("\t");
+				writer.write(String.valueOf(s.getAvWaitingFactor()));
+				writer.write("\t");
+				writer.write(String.valueOf(s.getMinWaitFac()));
+				writer.write("\t");
+				writer.write(String.valueOf(s.getMaxWaitFac()));
+				writer.write("\t");
+				writer.write(String.valueOf(s.getMedianFac()));
 				writer.write("\t");
 				writer.write(String.valueOf(s.getD()));
 				writer.write("\t");
@@ -148,33 +160,86 @@ public class GershensonOptimizer {
 		}
 	}
 	
-	
+	public Map<Integer, Solution> readFromTxt(String fileName){
+		Map<Integer, Solution> solutions = new HashMap<Integer, Solution>();
+		Map<String, Double> fac;
+		int i = 0;
+		Solution s;
+		String line;
+		try {
+			BufferedReader reader = IOUtils.getBufferedReader(fileName);
+			reader.readLine();
+			line = reader.readLine();
+			do{
+				if(!(line == null)){
+					String[] columns = line.split("\t");
+					s = new Solution();
+					fac = new HashMap<String, Double>();
+					s.setAvTT(Double.valueOf(columns[0]));
+					s.setAbsTT(Double.valueOf(columns[1]));
+					s.setAvWaitingFactor(Double.valueOf(columns[2]));
+					s.setMinWaitFac(Double.valueOf(columns[3]));
+					s.setMaxWaitFac(Double.valueOf(columns[4]));
+					s.setMedianWaitFac(Double.valueOf(columns[5]));
+					s.setD(Double.valueOf(columns[6]));
+					s.setU(Integer.valueOf(columns[7]));
+					s.setCap(Double.valueOf(columns[8]));
+					s.setN(Integer.valueOf(columns[9]));
+					s.setMaxRed(Integer.valueOf(columns[10]));
+					solutions.put(i, s);
+					i++;
+					line = reader.readLine();
+				}
+			}while(!(line == null));
+			reader.close();
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return solutions;
+	}
 
 	public static void main(String[] args) {
 		GershensonOptimizer g = new GershensonOptimizer();
 		Map<Integer, Solution> temp = new HashMap<Integer, Solution>();
 		Map<Integer, Solution> best = new HashMap<Integer, Solution>();
 		GershensonRunner runner;
-		String folder = DaPaths.OUTPUT + "cottbus\\optimization2\\";
-		final String scenario = "cottbus";
+		final String scenario = "denver";
+		String folder = DaPaths.OUTPUT + scenario + "\\optimization1\\";
 		int i;
 		int b = 200;
-		
-		for (int ii = 0; ii<b; ii++){
-			temp.put(ii, g.init());
+		i = 0;
+		for (Solution s : g.readFromTxt(folder + "median.txt").values()){
+			temp.put(i, s);
+			i++;
 		}
+		
+		
+//		for (int ii = 0; ii<b; ii++){
+//			temp.put(ii, g.init());
+//		}
 		for (Entry<Integer, Solution> e  : temp.entrySet()){
 			runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false, false);
 			Gbl.reset();
 			
 			runner.runScenario(scenario);
-			if(runner.getAvTT()>0){
-				e.getValue().setTime(runner.getAvTT());
-			}else{
-				e.getValue().setTime(9999);
-			}
+			e.getValue().setAvTT(runner.getAvTT());
+			e.getValue().setAvWaitingFactor(runner.getAvWaitFactor());
+			e.getValue().setMaxWaitFac(runner.getFactors().get("max"));
+			e.getValue().setMinWaitFac(runner.getFactors().get("min"));
+			e.getValue().setMedianWaitFac(runner.getFactors().get("median"));
+			e.getValue().setAbsTT(runner.getAbsTT());
 		}
-		g.writeToTxt(temp,  folder + "randomSeed.txt");
+		g.writeToTxt(temp, folder + "median.txt");
+		System.exit(0);
+
+		
+//		g.writeToTxt(temp,  folder + "randomSeed.txt");
 		best = g.getBest(temp,b/5);
 		g.writeToTxt(best, folder + "bestRandom.txt");
 		
@@ -190,11 +255,12 @@ public class GershensonOptimizer {
 				runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false, false);
 				Gbl.reset();
 				runner.runScenario(scenario);
-				if(runner.getAvTT()>0){
-					e.getValue().setTime(runner.getAvTT());
-				}else{
-					e.getValue().setTime(9999);
-				}
+				e.getValue().setAvTT(runner.getAvTT());
+				e.getValue().setAvWaitingFactor(runner.getAvWaitFactor());
+				e.getValue().setMaxWaitFac(runner.getFactors().get("max"));
+				e.getValue().setMinWaitFac(runner.getFactors().get("min"));
+				e.getValue().setMedianWaitFac(runner.getFactors().get("median"));
+				e.getValue().setAbsTT(runner.getAbsTT());
 			}
 			i=temp.size();
 			for (Solution s : best.values()){
@@ -215,7 +281,12 @@ class Solution{
 	private int maxRed;
 	private double cap;
 	private double d;
-	private double time;
+	private double avTT;
+	private double absTT;
+	private double waitingFactor;
+	private double minFac;
+	private double maxFac;
+	private double medianFac;
 	
 	public Solution(){
 		
@@ -268,17 +339,57 @@ class Solution{
 		this.d = d;
 	}
 	
-	public void setTime(double time){
-		this.time =  ((int)(time*100.00))/100.00;
+	public void setAvTT(double time){
+		this.avTT =  ((int)(time*100.00))/100.00;
 	}
 	
-	public double getTime(){
-		return this.time;
+	public double getAvTT(){
+		return this.avTT;
 	}
+	
+	public void setAbsTT(double time){
+		this.absTT =  ((int)(time*100.00))/100.00;
+	}
+	public double getAbsTT(){
+		return this.absTT;
+	}
+	
+	public void setAvWaitingFactor(double factor){
+		this.waitingFactor = ((int)(factor*100.00))/100.00;
+	}
+	
+	public double getAvWaitingFactor(){
+		return this.waitingFactor;
+	}
+	
+	public void setMinWaitFac(double factor){
+		this.minFac = ((int) (factor*100.00))/100.00;
+	}
+	
+	public void setMaxWaitFac(double factor){
+		this.maxFac = ((int) (factor*100.00))/100.00;
+	}
+	
+	public void setMedianWaitFac(double factor){
+		this.medianFac = ((int) (factor*100.00))/100.00;
+	}
+	
+	public double getMinWaitFac(){
+		return this.minFac;
+	}
+
+	public double getMaxWaitFac(){
+		return this.maxFac;
+	}
+	
+	public double getMedianFac() {
+		return this.medianFac;
+	}
+	
 	@Override
 	public String toString(){
 		String temp;
-		temp = "time=" + time + " d=" + d + " cap=" + cap + " u=" + u + " n=" + n;
+		temp = "avTT=" + avTT + " d=" + d + " cap=" + cap + " u=" + u + " n=" + n + " maxRed =" + maxRed ;
 		return temp;
 	}
 	

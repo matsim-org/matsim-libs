@@ -20,6 +20,9 @@
 package playground.droeder.charts;
 
 import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,6 +36,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.signalsystems.control.SignalGroupState;
 
 import playground.droeder.DaColorScheme;
@@ -112,8 +116,33 @@ public class DaSignalPlanChart {
 			for (Entry<Integer, Color> ee : seriesColor.entrySet()){
 				renderer.setSeriesPaint(ee.getKey(), ee.getValue());
 			}
-			
-			
 			return chart;
+	  }
+	  
+	  public void writeDataToTxt(String fileName, Map<Id, TreeMap<Double, SignalGroupState>> data){
+		  try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
+			
+			for (Entry<Id, TreeMap<Double, SignalGroupState>> e: data.entrySet()){
+				writer.write(e.getKey().toString());
+				writer.newLine();
+				for(Entry<Double, SignalGroupState> ee : e.getValue().entrySet()){
+					writer.write(ee.getKey().toString() + "\t");
+				}
+				writer.newLine();
+				for(Entry<Double, SignalGroupState> ee : e.getValue().entrySet()){
+					writer.write(ee.getValue().toString() + "\t");
+				}
+				writer.newLine();
+				writer.newLine();
+			}
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	  }
 }

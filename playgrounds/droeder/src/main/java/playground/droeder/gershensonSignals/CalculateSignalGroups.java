@@ -197,7 +197,7 @@ public class CalculateSignalGroups{
 			}
 		}
 		
-		if (corrLinks.containsKey(new IdImpl("162")) || corrLinks.containsValue(new IdImpl("162"))){
+		if (corrLinks.containsKey(new IdImpl("381")) || corrLinks.containsValue(new IdImpl("381"))){
 			for(Entry<Id, List<SignalGroupDefinition>> ee : corrGroups.entrySet()){
 				System.out.println(ee.getKey());
 				for (SignalGroupDefinition sd :  ee.getValue()){

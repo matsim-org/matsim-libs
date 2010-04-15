@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.Config;
@@ -40,18 +41,18 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.otfvis.OTFVisMobsimFactoryImpl;
 
 import playground.droeder.DaPaths;
+import playground.droeder.Analysis.AgentWaitHandler;
 import playground.droeder.Analysis.AverageTTHandler;
 import playground.droeder.Analysis.SignalSystems.SignalGroupStateTimeHandler;
 import playground.droeder.charts.DaBarChart;
@@ -64,16 +65,12 @@ import playground.droeder.charts.DaSignalPlanChart;
  */
 public class GershensonRunner implements AgentStuckEventHandler {
 	
-	// "D" run denver -- "G" run gershensonTestNetwork --- "C" run cottbus
-	private static final String config = "D";
+	private String output =  DaPaths.OUTPUT;
 	
 	private boolean liveVis;
-
-	//writeSignalPlans
 	private boolean writeSignalPlans;
 	private double signalPlanMin;
 	private double signalPlanMax;
-	
 	private double startTime;
 	
 	private int u;
@@ -82,27 +79,23 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	private double d;
 	private int maxRed;
 	
-	
-//	private Map<Id, Id> corrGroups;
-//	private Map<Id, List<Id>> compGroups;
-	private Map<Id, Id> mainOutLinks;
-	
 	private CalculateSignalGroups csg;
 	
 	private Map<Id, Map<Id, SignalGroupDefinition>> signalSystems = new HashMap<Id, Map<Id,SignalGroupDefinition>>();
 	private Map<Id, Map<Id, List<SignalGroupDefinition>>> newCorrGroups = new HashMap<Id, Map<Id,List<SignalGroupDefinition>>>();
 	private Map<Id, Map<Id, Id>> newMainOutlinks = new HashMap<Id, Map<Id,Id>>();
 	
-	private Map<Integer, Double> averageTT;
 	private static double avTT = 0;
-	
-//	private static Map<Integer, Map<Integer, Double>> nAndUT = new LinkedHashMap<Integer, Map<Integer,Double>>();
-//	private static LinkedHashMap<Number, Number> nAndT = new LinkedHashMap<Number, Number>();
-	
+	private double absTT = 0;
+	private double avWaitFactor = 0;
+	private Map<String, Double> factors;
 	
 	private AverageTTHandler handler1;
 	private CarsOnLinkLaneHandler handler2;
 	private SignalGroupStateTimeHandler handler3;
+	private AgentWaitHandler handler4;
+
+	protected Map<Id, Id> mainOutLinks;
 	
 	
 	private static final Logger log = Logger.getLogger(GershensonRunner.class);
@@ -120,26 +113,30 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	
 	public void runScenario (final String configFile){
 		String conf = null;
-		
 		if (configFile == "G"){
 			log.info("start gershensonTest");
 			GershensonScenarioGenerator gsg = new GershensonScenarioGenerator();
 			gsg.createScenario();
 			conf = DaPaths.DASTUDIES + "gershenson\\gershensonConfigFile2.xml";		
+			output = output + "gershenson/";
 		}else if (configFile == "D"){
 			log.info("start Denver");
 			DenverScenarioGenerator dsg = new DenverScenarioGenerator();
 			dsg.createScenario();
 			conf = DaPaths.DASTUDIES + "denver\\denverConfig.xml";
+			output = output + "denver/";
 		}else if (configFile == "denver"){
 			conf = DaPaths.DASTUDIES + "denver\\denverConfig.xml";
+			output = output + "denver/";
 		}
 		else if (configFile == "C"){
 			CottbusScenarioGenerator csg = new CottbusScenarioGenerator();
 			csg.createScenario();
 			conf = DaPaths.DASTUDIES + "cottbus\\cottbusConfig.xml";
+			output = output + "cottbus/";
 		}else if (configFile == "cottbus"){
 			conf = DaPaths.DASTUDIES + "cottbus\\cottbusConfig.xml";
+			output = output + "cottbus/";
 		}else{
 			conf = configFile;
 		}
@@ -186,14 +183,15 @@ public class GershensonRunner implements AgentStuckEventHandler {
 //				corrGroups = csg.calculateCorrespondingGroups();
 //				compGroups = csg.calculateCompetingGroups(corrGroups);
 				mainOutLinks = csg.calculateMainOutlinks();
-				
 				handler1 = new AverageTTHandler(c.getPopulation().getPersons().size());
 				handler2 = new CarsOnLinkLaneHandler(groups, d, c.getNetwork());
 				handler3 = new SignalGroupStateTimeHandler();
+				handler4 = new AgentWaitHandler(c.getNetwork());
 				
 				event.getControler().getEvents().addHandler(handler1);
 				event.getControler().getEvents().addHandler(handler2);
 				event.getControler().getEvents().addHandler(handler3);
+				event.getControler().getEvents().addHandler(handler4);
 				
 				//enable live-visualization
 				if (liveVis == true){
@@ -213,6 +211,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 				handler1.reset(event.getIteration());
 				handler2.reset(event.getIteration());
 				handler3.reset(event.getIteration());
+				handler4.reset(event.getIteration());
 			}
 		});
 		
@@ -220,13 +219,19 @@ public class GershensonRunner implements AgentStuckEventHandler {
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				avTT = handler1.getAverageTravelTime();
+				absTT = handler1.getAbsoluteTT();
+				avWaitFactor = handler4.getAverageWaitingFactor(c.getPopulation());
+				factors = handler4.getFactors(c.getPopulation());
+				
 				DaSignalPlanChart planChart;
-//				handler3.writeToTxt(DaPaths.OUTPUT+ "denver\\ITERS\\it." + event.getIteration() + "\\greenTimes.txt");
 				if(writeSignalPlans == true){
 					for(Entry<Id, TreeMap<Id, TreeMap<Double, SignalGroupState>>> e : handler3.getSystemGroupTimeStateMap().entrySet()){
 						planChart = new DaSignalPlanChart();
+						planChart.writeDataToTxt(output + "signalPlans/signalPlanData" + e.getKey() + ".txt", e.getValue());
 						planChart.addData(e.getValue(), startTime, signalPlanMax);
-						new DaChartWriter().writeChart(DaPaths.OUTPUT + "/cottbus/signalPlans/signalPlanId" + e.getKey() + ".png", 2560, 1600, planChart.createSignalPlanChart("signalPlan", "ids", "time", signalPlanMin, signalPlanMax));
+						new DaChartWriter().writeChart(output + "signalPlans/signalPlan1Id" + e.getKey() + ".png", 1024, 768, planChart.createSignalPlanChart("signalPlan", "ids", "time", signalPlanMin, signalPlanMin+240));
+						new DaChartWriter().writeChart(output + "signalPlans/signalPlan2Id" + e.getKey() + ".png", 1024, 768, planChart.createSignalPlanChart("signalPlan", "ids", "time", signalPlanMin+240, signalPlanMin+480));
+						new DaChartWriter().writeChart(output + "signalPlans/signalPlan3Id" + e.getKey() + ".png", 1024, 768, planChart.createSignalPlanChart("signalPlan", "ids", "time", signalPlanMin+480, signalPlanMin+720));
 					}
 					
 				}
@@ -332,7 +337,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		for (Entry<Id, SortedMap<Double, Double>> ee : contr.getDemandOnRefLink().entrySet()){
 			chart.addSeries(ee.getKey().toString(), (Map)ee.getValue().subMap(signalPlanMin, signalPlanMax));
 		}
-		new DaChartWriter().writeChart(DaPaths.OUTPUT + "cottbus/signalPlans/demandOnLinkSystem" + signalSystem.toString() + ".png", 1024, 768,
+		new DaChartWriter().writeChart(output + "signalPlans/demandOnLinkSystem" + signalSystem.toString() + ".png", 1024, 768,
 				chart.createChart("demandOnRefLink for SignalSystem " + signalSystem.toString(), "time [s]", "demand [cars]", 30));
 		
 	}
@@ -357,6 +362,18 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		return this.avTT;
 	}
 	
+	public double getAbsTT(){
+		return absTT;
+	}
+	
+	public double getAvWaitFactor(){
+		return this.avWaitFactor;
+	}
+	
+	public Map<String, Double> getFactors(){
+		return factors;
+	}
+	
 	public void setSignalPlanBounds(double startTime, double min, double max){
 		this.signalPlanMax = max;
 		this.signalPlanMin = min;
@@ -365,59 +382,34 @@ public class GershensonRunner implements AgentStuckEventHandler {
 	
 	
 	public static void main(String[] args) {
-		DaBarChart barChart = new DaBarChart();
 		GershensonRunner runner;
-		Map<Number, Number> xAndValue;
-		double temp = 0;
-		double category = 0;
-		double xx = 0;
-		double value = 0;
-		
-		double cap ;
-		double d;
-		int minRed;
-		int carTime;
-		int maxRed;
+//		DaBarChart barChart = new DaBarChart();
+//		Map<Number, Number> xAndValue;
+//		double temp = 0;
+//		double category = 0;
+//		double xx = 0;
+//		double value = 0;
 		
 		//Denver opti
-//		runner = new GershensonRunner(14, 468, 0.65, 55, 38, false, false);
-//		runner.setSignalPlanBounds(21600, 22000, 22240);
-//		runner.runScenario("D");
+		double cap  = 0.54;
+		double d = 53;
+		int minRed = 25;
+		int carTime = 379;
+		int maxRed = 31;
+		runner = new GershensonRunner(minRed, carTime, cap, d, maxRed, true, false);
+		runner.setSignalPlanBounds(21600, 22000, 22720);
+		runner.runScenario("denver");
 		
- 		//cottbus opti		
+// 		//cottbus opti	
+//		double cap  = 25;
+//		double d = 53;
+//		int minRed = 25;
+//		int carTime = 379;
+//		int maxRed = 31;
 //		runner = new GershensonRunner(31, 215, 0.75, 55, 107, false, false);
 //		runner.setSignalPlanBounds(21600, 22000, 22240);
 //		runner.runScenario("C");
 		
-//		time	d	u	cap	n	maxRed
-//		318.64	89.0	22	0.7	145	30	
-		runner = new GershensonRunner(22,145, 0.7,89.0,30, false, true);
-		runner.setSignalPlanBounds(21600, 22000, 22240);
-		runner.runScenario("C");
-		
-//		cap = 0.81;
-//		d = 80;
-//		minRed = 10;
-//		carTime = 10;
-//		maxRed = 35;
-//
-//		
-//		for(int i = (int) minRed; i<minRed+10; i++){
-//			xAndValue = new TreeMap<Number,Number>();
-//			category = i;
-//			for(int ii = carTime; ii<carTime + 91; ii = ii+10){
-//				xx = ii;
-//				runner = new GershensonRunner((int) category, (int) xx, cap, d, maxRed, false);
-//				Gbl.reset();
-//				runner.runScenario("opti");
-//				value = runner.getAvTT();
-//				xAndValue.put(xx, value);
-//				if(value>temp) temp = value;
-//			}
-//			barChart.addSeries("u=" + String.valueOf(category), xAndValue);
-//		}
-//		new DaChartWriter().writeChart(DaPaths.OUTPUT + "denver\\charts\\" + "d80_cap0.81_maxRed35_n10-100_u10-20", 2560, 1600, 
-//				barChart.createChart("d = 80m, cap = 0.81, maxRed = 35s", "waitingCars * redTime [1*s]", "average travelTime t [s]", 100, temp+10));
 	}
 
 	@Override

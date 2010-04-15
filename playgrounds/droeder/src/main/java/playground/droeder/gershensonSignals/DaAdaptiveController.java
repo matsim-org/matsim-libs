@@ -238,18 +238,16 @@ public class DaAdaptiveController extends
 			//switch RedLights first
 			if (maxRedTimeActive == true){
 				Id id = new IdImpl("null");
-				double redTime = 0;
+				double redTime = 99999;
 				for (Entry<Id, Double> ee : switchedToRed.entrySet()){
-					if ((e.getSimulationTime() - ee.getValue()) > maxRedTime && ee.getValue()>redTime){
+					if ((e.getSimulationTime() - ee.getValue()) > maxRedTime && ee.getValue()<redTime){
 						id = ee.getKey();
 						redTime = ee.getValue();
 					}
 				}
-				if (!id.equals(new IdImpl("null"))){
+				if (!id.equals(new IdImpl("null")) && (e.getSimulationTime() - switchedGreen) > tGreenMin){
 					for (SignalGroupDefinition sd : corrGroups.get(id)){
-//						if(handler.getVehOnLink(sd.getLinkRefId())>0){
-							this.startSwitching(sd, e.getSimulationTime());
-//						}
+						this.startSwitching(sd, e.getSimulationTime());
 						// return if interim is true, because a group was switched in this timestep
 						if (interim == true){
 							return;
@@ -326,12 +324,14 @@ public class DaAdaptiveController extends
 				demandOnRefLink.get(sd.getId()).put(time, handler.getVehInD(time, sd.getLinkRefId()));
 			}
 			
-			if (oldState.equals(SignalGroupState.GREEN)|| oldState.equals(SignalGroupState.RED)){
-				this.switchToYellow(group, time);
-			} else if(oldState.equals(SignalGroupState.RED) && compGroupsGreen == false){
+			
+			
+			if(oldState.equals(SignalGroupState.RED) && compGroupsGreen == false){
 				switchToRedYellow(group, time);
 				this.interimTime = 3;
-			} 
+			}else{
+				this.switchToYellow(group, time);
+			}
 			
 		}
 		

@@ -97,6 +97,10 @@ public class AverageTTHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 	public double getAverageTravelTime() {
 		return this.travelTime / this.popSize;
 	}
+	
+	public double getAbsoluteTT() {
+		return this.travelTime;
+	}
 
 
 
