@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.ptproject.qsim.QLane;
+import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QLinkLanesImpl;
 import org.matsim.ptproject.qsim.QSimTimerStatic;
 import org.matsim.signalsystems.control.SignalGroupState;
@@ -41,31 +42,33 @@ public class OTFSignalWriter extends OTFLaneWriter {
 
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {
-		int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
-		out.putInt(numberOfToNodeQueueLanes);
-		if (numberOfToNodeQueueLanes > 1) {
-			for (QLane ql : this.src.getToNodeQueueLanes()){
-				ByteBufferUtils.putString(out, ql.getLaneId().toString());
-				SignalGroupDefinition sg = ql.getSignalGroups().values().iterator().next();
-				SignalGroupState state = sg.getSignalControler().getSignalGroupState(QSimTimerStatic.getTime(), sg);
-				if (state.equals(SignalGroupState.GREEN)){
-				  out.putInt(1);
+		if (this.src instanceof QLinkLanesImpl){
+			int numberOfToNodeQueueLanes = ((QLinkLanesImpl)this.src).getToNodeQueueLanes().size();
+			out.putInt(numberOfToNodeQueueLanes);
+			if (numberOfToNodeQueueLanes > 1) {
+				for (QLane ql : ((QLinkLanesImpl)this.src).getToNodeQueueLanes()){
+					ByteBufferUtils.putString(out, ql.getLaneId().toString());
+					SignalGroupDefinition sg = ql.getSignalGroups().values().iterator().next();
+					SignalGroupState state = sg.getSignalControler().getSignalGroupState(QSimTimerStatic.getTime(), sg);
+					if (state.equals(SignalGroupState.GREEN)){
+						out.putInt(1);
+					}
+					else if (state.equals(SignalGroupState.RED)){
+						out.putInt(0);
+					}
+					else if (state.equals(SignalGroupState.REDYELLOW)){
+						out.putInt(2);
+					}
+					else if (state.equals(SignalGroupState.YELLOW)){
+						out.putInt(3);
+					}
 				}
-				else if (state.equals(SignalGroupState.RED)){
-				  out.putInt(0);
-				}
-				else if (state.equals(SignalGroupState.REDYELLOW)){
-          out.putInt(2);
-        }
-				else if (state.equals(SignalGroupState.YELLOW)){
-          out.putInt(3);
-        }
 			}
 		}
 	}
 
 	@Override
-	public OTFDataWriter<QLinkLanesImpl> getWriter() {
+	public OTFDataWriter<QLink> getWriter() {
 		return new OTFSignalWriter();
 	}
 

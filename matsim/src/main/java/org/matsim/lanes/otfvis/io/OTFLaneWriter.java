@@ -30,6 +30,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.ptproject.qsim.QLane;
+import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -37,7 +38,7 @@ import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
-public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFWriterFactory<QLinkLanesImpl>{
+public class OTFLaneWriter extends OTFDataWriter<QLink> implements OTFWriterFactory<QLink>{
 
   public static final boolean DRAW_LINK_TO_LINK_LINES = true;
 
@@ -49,94 +50,101 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 
 	@Override
 	public void writeConstData(ByteBuffer out) throws IOException {
+		if (! (this.src instanceof QLinkLanesImpl)) {
+			out.putInt(0);
+		}
+		else {
+			out.putInt(1);
 //		String id = this.src.getLink().getId().toString();
 //		ByteBufferUtils.putString(out, id);
-		Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
-				this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-
-		Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
-				this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-
-
-		//calculate link width
-		double cellWidth =  this.src.getQSimEngine().getQSim().getScenario().getConfig().otfVis().getLinkWidth();
-		double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes();
-		//calculate length and normal
-		Point2D.Double.Double deltaLink = new Point2D.Double.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
-		double linkLength = this.calculateLinkLength(deltaLink);
-		Point2D.Double.Double deltaLinkNorm = new Point2D.Double.Double(deltaLink.x / linkLength, deltaLink.y / linkLength);
-		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
-
-		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, this.linkScale);
-		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
-		Point2D.Double scaledLinkStart = scaledLink.getFirst();
-
-
-		//modify x and y coordinates of quad to get a middle line
+			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
+					this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+			
+			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
+					this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+			
+			
+			//calculate link width
+			double cellWidth =  this.src.getQSimEngine().getQSim().getScenario().getConfig().otfVis().getLinkWidth();
+			double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes();
+			//calculate length and normal
+			Point2D.Double.Double deltaLink = new Point2D.Double.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
+			double linkLength = this.calculateLinkLength(deltaLink);
+			Point2D.Double.Double deltaLinkNorm = new Point2D.Double.Double(deltaLink.x / linkLength, deltaLink.y / linkLength);
+			Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
+			
+			Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, this.linkScale);
+			Point2D.Double scaledLinkEnd = scaledLink.getSecond();
+			Point2D.Double scaledLinkStart = scaledLink.getFirst();
+			
+			
+			//modify x and y coordinates of quad to get a middle line
 //		Point2D.Double mlinkStart = this.calculateMiddleOfLink(linkStart, normalizedOrthogonal, quadWidth);
-		Point2D.Double mscaledLinkStart = this.calculateMiddleOfLink(scaledLinkStart, normalizedOrthogonal, quadWidth);
+			Point2D.Double mscaledLinkStart = this.calculateMiddleOfLink(scaledLinkStart, normalizedOrthogonal, quadWidth);
 //		Point2D.Double mlinkEnd = this.calculateMiddleOfLink(linkEnd, normalizedOrthogonal, quadWidth);
-
-		int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
-		out.putInt(numberOfToNodeQueueLanes);
-
-		out.putDouble(mscaledLinkStart.x);
-		out.putDouble(mscaledLinkStart.y);
-
-		//number of tonodequeuelanes
-
-		if (numberOfToNodeQueueLanes == 1) {
-			Double mscaledLinkEnd = this.calculateMiddleOfLink(scaledLinkEnd, normalizedOrthogonal, quadWidth);
-			//the branch point is the middle of the link end
-			out.putDouble(mscaledLinkEnd.x);
-			out.putDouble(mscaledLinkEnd.y);
-			if (DRAW_LINK_TO_LINK_LINES){
-				out.putInt(this.src.getLink().getToNode().getOutLinks().size());
-				for (Link toLink :  this.src.getLink().getToNode().getOutLinks().values()){
-					Double mscaledToLinkStart = this.calculateMiddleOfToLink(toLink, cellWidth);
-					out.putDouble(mscaledToLinkStart.x);
-					out.putDouble(mscaledToLinkStart.y);
-				}
-			}
-		}
-		//only write further lane information if there is more than one lane
-		else  {
-			//write position of branchPoint
-			QLane ql = this.src.getOriginalLane();
-			double meterFromLinkEnd = ql.getMeterFromLinkEnd();
-
-			Point2D.Double branchPoint = new Point2D.Double(mscaledLinkStart.x + ((linkLength - meterFromLinkEnd) * this.linkScale * deltaLinkNorm.x),
-					mscaledLinkStart.y + ((linkLength - meterFromLinkEnd) * deltaLinkNorm.y * this.linkScale));
-			out.putDouble(branchPoint.x);
-			out.putDouble(branchPoint.y);
-
-			//write toNodeQueueLanes end points
-			double distanceBtwLanes = quadWidth / (numberOfToNodeQueueLanes + 1);
-//			Point2D.Double linkEnd2 = new Point2D.Double(linkEnd.x + (normalizedOrthogonal.x * quadWidth),
-//					linkEnd.y + (normalizedOrthogonal.y * quadWidth));
-//			log.debug("normOrtho x " + normalizedOrthogonalX + " y " + normalizedOrthogonalY);
-
-			double laneEndPointX, laneEndPointY;
-			int laneIncrement = 1;
-			for (QLane l : this.src.getToNodeQueueLanes()){
-				ByteBufferUtils.putString(out, l.getLaneId().toString());
-				laneEndPointX = scaledLinkEnd.x + (normalizedOrthogonal.x * distanceBtwLanes * laneIncrement);
-				laneEndPointY = scaledLinkEnd.y + (normalizedOrthogonal.y * distanceBtwLanes * laneIncrement);
-//				log.debug("laneEndPoint x " + laneEndPointX + " y " + laneEndPointY);
-				laneIncrement++;
-				out.putDouble(laneEndPointX);
-				out.putDouble(laneEndPointY);
-
+			
+			int numberOfToNodeQueueLanes = ((QLinkLanesImpl)this.src).getToNodeQueueLanes().size();
+			out.putInt(numberOfToNodeQueueLanes);
+			
+			out.putDouble(mscaledLinkStart.x);
+			out.putDouble(mscaledLinkStart.y);
+			
+			//number of tonodequeuelanes
+			
+			if (numberOfToNodeQueueLanes == 1) {
+				Double mscaledLinkEnd = this.calculateMiddleOfLink(scaledLinkEnd, normalizedOrthogonal, quadWidth);
+				//the branch point is the middle of the link end
+				out.putDouble(mscaledLinkEnd.x);
+				out.putDouble(mscaledLinkEnd.y);
 				if (DRAW_LINK_TO_LINK_LINES){
-					out.putInt(l.getDestinationLinkIds().size());
-					for (Id toLinkId :  l.getDestinationLinkIds()){
-						Link toLink = ((NetworkLayer) this.src.getLink().getLayer()).getLinks().get(toLinkId);
+					out.putInt(this.src.getLink().getToNode().getOutLinks().size());
+					for (Link toLink :  this.src.getLink().getToNode().getOutLinks().values()){
 						Double mscaledToLinkStart = this.calculateMiddleOfToLink(toLink, cellWidth);
 						out.putDouble(mscaledToLinkStart.x);
 						out.putDouble(mscaledToLinkStart.y);
 					}
 				}
 			}
+			//only write further lane information if there is more than one lane
+			else  {
+				//write position of branchPoint
+				QLane ql =((QLinkLanesImpl)this.src).getOriginalLane();
+				double meterFromLinkEnd = ql.getMeterFromLinkEnd();
+				
+				Point2D.Double branchPoint = new Point2D.Double(mscaledLinkStart.x + ((linkLength - meterFromLinkEnd) * this.linkScale * deltaLinkNorm.x),
+						mscaledLinkStart.y + ((linkLength - meterFromLinkEnd) * deltaLinkNorm.y * this.linkScale));
+				out.putDouble(branchPoint.x);
+				out.putDouble(branchPoint.y);
+				
+				//write toNodeQueueLanes end points
+				double distanceBtwLanes = quadWidth / (numberOfToNodeQueueLanes + 1);
+//			Point2D.Double linkEnd2 = new Point2D.Double(linkEnd.x + (normalizedOrthogonal.x * quadWidth),
+//					linkEnd.y + (normalizedOrthogonal.y * quadWidth));
+//			log.debug("normOrtho x " + normalizedOrthogonalX + " y " + normalizedOrthogonalY);
+				
+				double laneEndPointX, laneEndPointY;
+				int laneIncrement = 1;
+				for (QLane l :((QLinkLanesImpl)this.src).getToNodeQueueLanes()){
+					ByteBufferUtils.putString(out, l.getLaneId().toString());
+					laneEndPointX = scaledLinkEnd.x + (normalizedOrthogonal.x * distanceBtwLanes * laneIncrement);
+					laneEndPointY = scaledLinkEnd.y + (normalizedOrthogonal.y * distanceBtwLanes * laneIncrement);
+//				log.debug("laneEndPoint x " + laneEndPointX + " y " + laneEndPointY);
+					laneIncrement++;
+					out.putDouble(laneEndPointX);
+					out.putDouble(laneEndPointY);
+					
+					if (DRAW_LINK_TO_LINK_LINES){
+						out.putInt(l.getDestinationLinkIds().size());
+						for (Id toLinkId :  l.getDestinationLinkIds()){
+							Link toLink = ((NetworkLayer) this.src.getLink().getLayer()).getLinks().get(toLinkId);
+							Double mscaledToLinkStart = this.calculateMiddleOfToLink(toLink, cellWidth);
+							out.putDouble(mscaledToLinkStart.x);
+							out.putDouble(mscaledToLinkStart.y);
+						}
+					}
+				}
+			}
+			
 		}
 	}
 
@@ -174,7 +182,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkLanesImpl> implements OTFW
 		//nothing to do as lanes are non dynamical
 	}
 
-	public OTFDataWriter<QLinkLanesImpl> getWriter() {
+	public OTFDataWriter<QLink> getWriter() {
 		return new OTFLaneWriter();
 	}
 }

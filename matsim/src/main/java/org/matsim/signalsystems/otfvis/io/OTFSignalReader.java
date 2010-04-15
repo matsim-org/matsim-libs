@@ -37,35 +37,30 @@ public class OTFSignalReader extends OTFLaneReader {
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		int numberOfLanes = in.getInt();
-		if (numberOfLanes > 1) {
-			String id;
-			boolean green;
-			for (int i = 0; i < numberOfLanes; i++) {
-				id = ByteBufferUtils.getString(in);
-				int stateInt = in.getInt();
-				SignalGroupState state = null;
-				if (stateInt == 1){
-				  state = SignalGroupState.GREEN;
+		if (this.isQLinkLanesReader){
+			int numberOfLanes = in.getInt();
+			if (numberOfLanes > 1) {
+				String id;
+				boolean green;
+				for (int i = 0; i < numberOfLanes; i++) {
+					id = ByteBufferUtils.getString(in);
+					int stateInt = in.getInt();
+					SignalGroupState state = null;
+					if (stateInt == 1){
+						state = SignalGroupState.GREEN;
+					}
+					else if (stateInt == 0){
+						state = SignalGroupState.RED;
+					}
+					else if (stateInt == 2){
+						state = SignalGroupState.REDYELLOW;
+					}
+					else if (stateInt == 3){
+						state = SignalGroupState.YELLOW;
+					}
+					this.drawer.updateGreenState(id, state);
 				}
-        else if (stateInt == 0){
-          state = SignalGroupState.RED;
-        }
-        else if (stateInt == 2){
-          state = SignalGroupState.REDYELLOW;
-        }
-        else if (stateInt == 3){
-          state = SignalGroupState.YELLOW;
-       }
-				this.drawer.updateGreenState(id, state);
 			}
 		}
 	}
-
-//	@Override
-//	public void invalidate(SceneGraph graph) {
-////		super.invalidate(graph);
-////		graph.addItem(this.drawer);
-//	}
-
 }

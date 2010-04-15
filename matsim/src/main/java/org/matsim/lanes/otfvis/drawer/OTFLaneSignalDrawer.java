@@ -46,76 +46,80 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 	private OTFLaneData originalLaneData = null;
 	private Map<String, OTFLaneData> laneData = new LinkedHashMap<String, OTFLaneData>();
 
+	private boolean isQLinkLanesDrawer;
+
 	@Override
 	public void onDraw( GL gl) {
-		gl.glColor3d(0.0, 0.0, 1.0);
-		double zCoord = 1.0;
-		double offsetLinkEnd = 6.0;
-		double offsetLinkStart = 2.5;
-		// always draw a branch point
-		gl.glBegin(GL.GL_QUADS);
+		if (this.isQLinkLanesDrawer){
+			gl.glColor3d(0.0, 0.0, 1.0);
+			double zCoord = 1.0;
+			double offsetLinkEnd = 6.0;
+			double offsetLinkStart = 2.5;
+			// always draw a branch point
+			gl.glBegin(GL.GL_QUADS);
 			gl.glVertex3d(branchPoint.x - offsetLinkEnd, branchPoint.y - offsetLinkEnd, zCoord);
 			gl.glVertex3d(branchPoint.x - offsetLinkEnd, branchPoint.y + offsetLinkEnd, zCoord);
 			gl.glVertex3d(branchPoint.x + offsetLinkEnd, branchPoint.y + offsetLinkEnd, zCoord);
 			gl.glVertex3d(branchPoint.x + offsetLinkEnd, branchPoint.y - offsetLinkEnd, zCoord);
-		gl.glEnd();
-		//draw a rect around linkStart
-		gl.glBegin(GL.GL_QUADS);
+			gl.glEnd();
+			//draw a rect around linkStart
+			gl.glBegin(GL.GL_QUADS);
 			gl.glVertex3d(this.startX - offsetLinkStart, this.startY - offsetLinkStart, zCoord);
 			gl.glVertex3d(this.startX - offsetLinkStart, this.startY + offsetLinkStart, zCoord);
 			gl.glVertex3d(this.startX + offsetLinkStart, this.startY + offsetLinkStart, zCoord);
 			gl.glVertex3d(this.startX + offsetLinkStart, this.startY - offsetLinkStart, zCoord);
-		gl.glEnd();
-
-
-
-	//draw lines between link start point and branch point
-		gl.glBegin(GL.GL_LINES);
+			gl.glEnd();
+			
+			
+			
+			//draw lines between link start point and branch point
+			gl.glBegin(GL.GL_LINES);
 			gl.glVertex3d(this.startX, this.startY , zCoord);
 			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord);
-		gl.glEnd();
-
-		//only draw lanes if there are more than one
-		if (this.numberOfQueueLanes != 1) {
-			for (OTFLaneData ld : this.laneData.values()){
-				// draw connections between branch point and lane end
-				gl.glColor3d(0.0, 0, 1.0);
-				gl.glBegin(GL.GL_LINES);
-	  			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord);
-		  		gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord);
-  			gl.glEnd();
-
-  			//draw link to link lines
-
-  			if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES){
-  				this.drawLinkToLinkLines(gl, ld, zCoord);
-  			}
-
-				if (SignalGroupState.GREEN.equals(ld.getSignalGroupState())) {
-					gl.glColor3d(0.0, 1.0, 0.0);
+			gl.glEnd();
+			
+			//only draw lanes if there are more than one
+			if (this.numberOfQueueLanes != 1) {
+				for (OTFLaneData ld : this.laneData.values()){
+					// draw connections between branch point and lane end
+					gl.glColor3d(0.0, 0, 1.0);
+					gl.glBegin(GL.GL_LINES);
+					gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord);
+					gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord);
+					gl.glEnd();
+					
+					//draw link to link lines
+					
+					if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES){
+						this.drawLinkToLinkLines(gl, ld, zCoord);
+					}
+					
+					if (SignalGroupState.GREEN.equals(ld.getSignalGroupState())) {
+						gl.glColor3d(0.0, 1.0, 0.0);
+					}
+					else if (SignalGroupState.RED.equals(ld.getSignalGroupState())) {
+						gl.glColor3d(1.0, 0.0, 0.0);
+					}
+					else if (SignalGroupState.REDYELLOW.equals(ld.getSignalGroupState())) {
+						gl.glColor3d(1.0, 0.75, 0.0);
+					}
+					else if (SignalGroupState.YELLOW.equals(ld.getSignalGroupState())) {
+						gl.glColor3d(1.0, 1.0, 0.0);
+					}
+					// draw lane ends
+					gl.glBegin(GL.GL_QUADS);
+					gl.glVertex3d(ld.getEndPoint().x - offsetLinkEnd, ld.getEndPoint().y - offsetLinkEnd, zCoord);
+					gl.glVertex3d(ld.getEndPoint().x - offsetLinkEnd, ld.getEndPoint().y + offsetLinkEnd, zCoord);
+					gl.glVertex3d(ld.getEndPoint().x + offsetLinkEnd, ld.getEndPoint().y + offsetLinkEnd, zCoord);
+					gl.glVertex3d(ld.getEndPoint().x + offsetLinkEnd, ld.getEndPoint().y - offsetLinkEnd, zCoord);
+					gl.glEnd();
 				}
-				else if (SignalGroupState.RED.equals(ld.getSignalGroupState())) {
-          gl.glColor3d(1.0, 0.0, 0.0);
-        }
-				else if (SignalGroupState.REDYELLOW.equals(ld.getSignalGroupState())) {
-          gl.glColor3d(1.0, 0.75, 0.0);
-        }
-				else if (SignalGroupState.YELLOW.equals(ld.getSignalGroupState())) {
-          gl.glColor3d(1.0, 1.0, 0.0);
-        }
-				// draw lane ends
-				gl.glBegin(GL.GL_QUADS);
-  			  gl.glVertex3d(ld.getEndPoint().x - offsetLinkEnd, ld.getEndPoint().y - offsetLinkEnd, zCoord);
-	  		  gl.glVertex3d(ld.getEndPoint().x - offsetLinkEnd, ld.getEndPoint().y + offsetLinkEnd, zCoord);
-		  	  gl.glVertex3d(ld.getEndPoint().x + offsetLinkEnd, ld.getEndPoint().y + offsetLinkEnd, zCoord);
-			    gl.glVertex3d(ld.getEndPoint().x + offsetLinkEnd, ld.getEndPoint().y - offsetLinkEnd, zCoord);
-   		  gl.glEnd();
 			}
-		}
-		//also draw link to link lines if there is only one lane
-		else if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES) {
-			this.originalLaneData.setEndPoint(branchPoint.x, branchPoint.y);
-			this.drawLinkToLinkLines(gl, this.originalLaneData, zCoord);
+			//also draw link to link lines if there is only one lane
+			else if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES) {
+				this.originalLaneData.setEndPoint(branchPoint.x, branchPoint.y);
+				this.drawLinkToLinkLines(gl, this.originalLaneData, zCoord);
+			}
 		}
 	}
 
@@ -159,5 +163,10 @@ public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 
 	public void setOriginalLaneData(OTFLaneData originalLaneData) {
 		this.originalLaneData = originalLaneData;
+	}
+
+
+	public void setQLinkLanesDrawer(boolean isQLinkLanesReader) {
+		this.isQLinkLanesDrawer = isQLinkLanesReader;
 	}
 }

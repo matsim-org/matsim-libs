@@ -41,39 +41,52 @@ public class OTFLaneReader extends OTFDataReader {
 	
   protected OTFLaneSignalDrawer drawer;
 
+  protected boolean isQLinkLanesReader;
+
 	public OTFLaneReader() {
 	}
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
-		int nrToNodeLanes = in.getInt();
-		drawer.setNumberOfLanes(nrToNodeLanes);
-
-		this.drawer.setMiddleOfLinkStart(in.getDouble(), in.getDouble());
-		this.drawer.setBranchPoint(in.getDouble(), in.getDouble());
-
-		if (nrToNodeLanes == 1){
-			if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES){
-				OTFLaneData data = new OTFLaneData();
-				int numberOfToLinks = in.getInt();
-				for (int j = 0; j < numberOfToLinks; j++) {
-					data.getToLinkStartPoints().add(new Point2D.Double(in.getDouble(), in.getDouble()));
-				}
-				this.drawer.setOriginalLaneData(data);
-			}
+		int isQLinkLanesIndicator = in.getInt();
+		if (isQLinkLanesIndicator == 1){
+			this.isQLinkLanesReader = true;
 		}
 		else {
-			for (int i = 0; i < nrToNodeLanes; i++){
-				OTFLaneData data = new OTFLaneData();
-				data.setId(ByteBufferUtils.getString(in));
-				data.setEndPoint(in.getDouble(), in.getDouble());
-//				log.error("adding lane data for id : " + data.getId() + " and drawer " + this.drawer);
-				this.drawer.getLaneData().put(data.getId(), data);
-
+			this.isQLinkLanesReader = false;
+		}
+		this.drawer.setQLinkLanesDrawer(isQLinkLanesReader);
+		
+		if (this.isQLinkLanesReader) {
+			int nrToNodeLanes = in.getInt();
+			drawer.setNumberOfLanes(nrToNodeLanes);
+			
+			this.drawer.setMiddleOfLinkStart(in.getDouble(), in.getDouble());
+			this.drawer.setBranchPoint(in.getDouble(), in.getDouble());
+			
+			if (nrToNodeLanes == 1){
 				if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES){
+					OTFLaneData data = new OTFLaneData();
 					int numberOfToLinks = in.getInt();
 					for (int j = 0; j < numberOfToLinks; j++) {
 						data.getToLinkStartPoints().add(new Point2D.Double(in.getDouble(), in.getDouble()));
+					}
+					this.drawer.setOriginalLaneData(data);
+				}
+			}
+			else {
+				for (int i = 0; i < nrToNodeLanes; i++){
+					OTFLaneData data = new OTFLaneData();
+					data.setId(ByteBufferUtils.getString(in));
+					data.setEndPoint(in.getDouble(), in.getDouble());
+//				log.error("adding lane data for id : " + data.getId() + " and drawer " + this.drawer);
+					this.drawer.getLaneData().put(data.getId(), data);
+					
+					if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES){
+						int numberOfToLinks = in.getInt();
+						for (int j = 0; j < numberOfToLinks; j++) {
+							data.getToLinkStartPoints().add(new Point2D.Double(in.getDouble(), in.getDouble()));
+						}
 					}
 				}
 			}
