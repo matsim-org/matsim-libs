@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.utils.misc.Time;
 
 import playground.yu.utils.DebugTools;
 
@@ -198,12 +199,12 @@ public class PersonPlanMonitor4travelingCarPt {
 					+ "\t"
 					+ DebugTools.getLineNumber(new Exception())
 					+ "\tdurAttr isNaN");
-		// System.out.println("PlanMonitor:\tperson:\t"
-		// + plan.getPerson().getId().toString() + "\tidx=\t" + idx
-		// + "\tactType\t" + actType + "\tdurAttr\t" + durAttr
-		// + "\twith performingTime\t" + performingTime_h
-		// + " [h]\tactEnd\t" + Time.writeTime(actEnd) + "\tactStart\t"
-		// + Time.writeTime(actStart));
+		System.out.println("PlanMonitor:\tperson:\t"
+				+ plan.getPerson().getId().toString() + "\tidx=\t" + idx
+				+ "\tactType\t" + actType + "\tdurAttr\t" + durAttr
+				+ "\twith performingTime\t" + performingTime_h
+				+ " [h]\tactEnd\t" + Time.writeTime(actEnd) + "\tactStart\t"
+				+ Time.writeTime(actStart));
 		return Math.max(durAttr, 0);
 	}
 
