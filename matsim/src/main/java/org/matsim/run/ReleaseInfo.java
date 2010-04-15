@@ -60,11 +60,12 @@ public class ReleaseInfo {
 		}
 
 		System.out.println();
-		System.out.println("Copyright (C) 2008 by");
-		System.out.println("    Kay W. Axhausen, Michael Balmer, Francesco Ciari, Dominik Grether,");
+		System.out.println("Copyright (C) 2010 by");
+		System.out.println("    Kay W. Axhausen, Michael Balmer, Christoph Dobler, Dominik Grether,");
 		System.out.println("    Andreas Horni, Gregor Laemmel, Nicolas Lefebvre, Fabrice Marchal,");
-		System.out.println("    Konrad Meister, Kai Nagel, Marcel Rieser, Nadine Schuessler, ");
-		System.out.println("    David Strippgen, Technische Universitaet Berlin (TU-Berlin) and");
+		System.out.println("    Konrad Meister, Kai Nagel, Andreas Neumann, Marcel Rieser,");
+		System.out.println("    David Strippgen, Rashid Waraich, Michael Zilske,");
+		System.out.println("    Technische Universitaet Berlin (TU-Berlin) and");
 		System.out.println("    Swiss Federal Institute of Technology Zurich (ETHZ)");
 		System.out.println();
 		System.out.println("This program is distributed under the Gnu Public License (GPL) 2 and");

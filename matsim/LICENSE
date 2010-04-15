@@ -2,11 +2,12 @@
 
 org.matsim java packages
 
-Copyright (C) 2006, 2007, 2008 by
-    Kay W. Axhausen, Michael Balmer, Francesco Ciari, Dominik Grether, 
+Copyright (C) 2006, 2007, 2008, 2009, 2010 by
+    Kay W. Axhausen, Michael Balmer, Christoph Dobler, Dominik Grether, 
     Andreas Horni, Gregor Laemmel, Nicolas Lefebvre, Fabrice Marchal, 
-    Konrad Meister, Kai Nagel, Marcel Rieser, Nadine Schuessler, 
-    David Strippgen, Technische Universitaet Berlin (TU-Berlin) and
+    Konrad Meister, Kai Nagel, Andreas Neumann, Marcel Rieser, 
+    David Strippgen, Rashid Waraich, Michael Zilske, 
+    Technische Universitaet Berlin (TU-Berlin) and
     Swiss Federal Institute of Technology Zurich (ETHZ)
 
 
