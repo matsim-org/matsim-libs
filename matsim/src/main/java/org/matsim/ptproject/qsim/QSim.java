@@ -129,6 +129,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	
 	protected QSim(final Scenario sc, final EventsManager events, final QSimEngineFactory simEngineFac){
 		this.scenario = sc;
+		this.events = events;
 		init(this.scenario, events, simEngineFac);
 	}
 	
@@ -143,7 +144,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
     this.listenerManager = new SimulationListenerManager<QSim>(this);
     Simulation.reset(sc.getConfig().getQSimConfigGroup().getStuckTime());
     QSimTimerStatic.reset(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
-    this.events = eventsManager;
     Config config = sc.getConfig();
     this.simEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
 
@@ -152,7 +152,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
         throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
       }
       this.setLaneDefinitions(((ScenarioImpl)sc).getLaneDefinitions());
-      this.network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory()));
+      this.network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(), this.laneDefintions));
     }
     else {
         this.network = new QNetwork(this);

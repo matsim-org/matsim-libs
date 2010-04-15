@@ -22,20 +22,28 @@ package org.matsim.ptproject.qsim;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.lanes.LaneDefinitions;
 
 
 public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLink> {
 
   private QNetworkFactory<QNode, QLink> delegate;
+	private LaneDefinitions laneDefinitions;
 
-  public QLanesNetworkFactory(QNetworkFactory<QNode, QLink> delegate){
+  public QLanesNetworkFactory(QNetworkFactory<QNode, QLink> delegate, LaneDefinitions laneDefintions){
     this.delegate = delegate;
+    this.laneDefinitions = laneDefintions;
   }
 
   @Override
-  public QLinkLanesImpl newQueueLink(Link link, QSimEngine engine,
+  public QLink newQueueLink(Link link, QSimEngine engine,
       QNode queueNode) {
-    return new QLinkLanesImpl(link, engine, queueNode);
+  	if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
+  		return new QLinkLanesImpl(link, engine, queueNode);
+  	}
+  	else {
+  		return this.delegate.newQueueLink(link, engine, queueNode);
+  	}
   }
 
   @Override
