@@ -1,1 +1,0 @@
-The getting-started tutorial (TutorialGetStarted.doc) has moved to the ./docs/getting-started folder.
