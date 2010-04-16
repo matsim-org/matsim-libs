@@ -53,7 +53,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 //		super() ;
 //	}
 	// This class is nowhere actively instantiated within the project.  Presumably, it is only instantiated from *.mvi files.
-	// Also see the remarks containing the writer below.  kai, apr'10
+	// Also see the remarks concerning the writer below.  kai, apr'10
 
 	protected Class agentReceiverClass = null;
 
