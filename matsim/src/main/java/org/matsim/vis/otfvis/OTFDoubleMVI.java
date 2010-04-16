@@ -36,9 +36,11 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 /**
  * OTFDoubleMVI displays two movies in different areas of a split screen application.
+ * <br/>
+ * yyyy Nice feature, but because of lack of resources don't expect this to be maintained.  kai, apr'10
  *
  * @author dstrippgen
- */
+ *  */
 public class OTFDoubleMVI extends OTFClientFile {
 
 	private String filename2;
