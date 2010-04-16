@@ -98,6 +98,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		}
 
 		public void writeAgent(AgentSnapshotInfo agInfo, ByteBuffer out) {
+			// there is a very similar method in OTFLinkAgentsHandler.  with a more robust format, they should be united.  kai, apr'10
 			String id = agInfo.getId().toString();
 			ByteBufferUtils.putString(out, id);
 			out.putFloat((float)(agInfo.getEasting() - OTFServerQuad2.offsetEast));
@@ -111,6 +112,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 	private static AgentState[] al = AgentState.values();
 	public void readAgent(ByteBuffer in, SceneGraph graph) {
+		// there is a very similar method in OTFLinkAgentsHandler.  with a more robust format, they should be united.  kai, apr'10
 
 
 		if ( OTFClientControl.getInstance().getOTFVisConfig().getFileVersion()<=1 
