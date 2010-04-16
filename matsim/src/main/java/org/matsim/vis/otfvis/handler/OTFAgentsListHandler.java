@@ -104,6 +104,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 				&& OTFClientControl.getInstance().getOTFVisConfig().getFileMinorVersion()<=6 ) {
 			// this needs to stay in spite of the fact that "writeAgent" does not seem to support it ...
 			// ... since the byte stream can come from a file.
+			// (In fact it proably comes from a file, since the "live" version uses the OTFLinkAgentsHandler.  kai, apr'10)
 			this.readAgentV1_6( in, graph) ;
 		} else {
 			String id = ByteBufferUtils.getString(in);
