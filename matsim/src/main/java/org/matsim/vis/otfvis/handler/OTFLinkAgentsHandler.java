@@ -108,6 +108,8 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		}
 
 		public void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
+			// yyyy there is a very similar method in OTFAgentsListHandler.  with a more robust format, they should be united.  kai, apr'10
+
 			String id = pos.getId().toString();
 			ByteBufferUtils.putString(out, id);
 			out.putFloat((float) (pos.getEasting() - OTFServerQuad2.offsetEast));
@@ -119,6 +121,8 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	}
 
 	public void readAgent(ByteBuffer in, SceneGraph graph) {
+		// yyyy there is a very similar method in OTFAgentsListHandler.  with a more robust format, they should be united.  kai, apr'10
+
 		String id = ByteBufferUtils.getString(in);
 		float x = in.getFloat();
 		float y = in.getFloat();
