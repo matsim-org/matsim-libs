@@ -45,13 +45,13 @@ public class SampledSocialGraphMLWriter extends SocialGraphMLWriter {
 			throw new IllegalArgumentException("This is not a SampledSocialGraph!");
 	}
 
-	@Override
-	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
-		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
-		
-		SampledGraphML.addSnowballAttributesData((SampledVertex) v, attrs);
-		
-		return attrs;
-	}
+//	@Override
+//	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
+//		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
+//		
+//		SampledGraphML.addSnowballAttributesData((SampledVertex) v, attrs);
+//		
+//		return attrs;
+//	}
 
 }

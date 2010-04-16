@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ComponentsTask.java
+ * ObservedAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,34 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.util.Map;
+import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
+import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.ComponentsTask;
+import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
+import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
+import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 
 /**
  * @author illenberger
  *
  */
-public class ComponentsTask extends ModuleAnalyzerTask<Components> {
-
-	private static final Logger logger = Logger.getLogger(ComponentsTask.class);
+public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 	
-	private static final String NUM_COMPONENTS = "n_components";
-	
-	public ComponentsTask() {
-		setModule(new Components());
-	}
-	
-	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-		int numComponents = module.countComponents(graph);
-		stats.put(NUM_COMPONENTS, new Double(numComponents));
-	
-		logger.info(String.format("%1$s disconnected components.", numComponents));
+	public ObservedAnalyzerTask() {
+		addTask(new GraphSizeTask());
+		addTask(new WaveSizeTask());
+		
+		DegreeTask dTask = new DegreeTask();
+		dTask.setModule(new ObservedDegree());
+		addTask(dTask);
+		
+		DegreeIterationTask dItTask = new DegreeIterationTask();
+		dItTask.setModule(new ObservedDegree());
+		addTask(dItTask);
+		
+		TransitivityTask tTask = new TransitivityTask();
+		tTask.setModule(new ObservedTransitivity());
+		addTask(tTask);
+		
+		addTask(new ComponentsTask());
 	}
 
 }

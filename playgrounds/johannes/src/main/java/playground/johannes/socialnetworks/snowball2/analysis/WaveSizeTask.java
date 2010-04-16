@@ -17,9 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial.analysis;
+package playground.johannes.socialnetworks.snowball2.analysis;
 
 import gnu.trove.TIntIntHashMap;
+import gnu.trove.TIntIntIterator;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
@@ -39,20 +41,43 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
  */
 public class WaveSizeTask extends AnalyzerTask {
 
-//	public WaveSizeTask(String output) {
-//		super(output);
-//	}
-
+	private static final Logger logger = Logger.getLogger(WaveSizeTask.class);
+	
+	public static final String NUM_DETECTED = "detected";
+	
+	public static final String NUM_SAMPLED = "sampled";
+	
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
+		TIntIntHashMap detected = new TIntIntHashMap();
+		TIntIntHashMap sampled = new TIntIntHashMap();
+		for(Vertex v : graph.getVertices()) {
+			sampled.adjustOrPutValue(((SampledVertex)v).getIterationSampled(), 1, 1);
+			detected.adjustOrPutValue(((SampledVertex)v).getIterationDetected(), 1, 1);
+		}
+		
+		int detectedTotal = 0;
+		TIntIntIterator it = detected.iterator();
+		for(int i = 0; i < detected.size(); i++) {
+			it.advance();
+			if(it.key() > -1)
+				detectedTotal += it.value();
+		}
+		
+		int sampledTotal = 0;
+		it = sampled.iterator();
+		for(int i = 0; i < sampled.size(); i++) {
+			it.advance();
+			if(it.key() > -1)
+				sampledTotal += it.value();
+		}
+		
+		stats.put(NUM_DETECTED, new Double(detectedTotal));
+		stats.put(NUM_SAMPLED, new Double(sampledTotal));
+		
+		logger.info(String.format("%1$s vertices sampled, %2$s vertices detected.", sampledTotal, detectedTotal));
+		
 		if(getOutputDirectory() != null) {
-			TIntIntHashMap detected = new TIntIntHashMap();
-			TIntIntHashMap sampled = new TIntIntHashMap();
-			for(Vertex v : graph.getVertices()) {
-				sampled.adjustOrPutValue(((SampledVertex)v).getIterationSampled(), 1, 1);
-				detected.adjustOrPutValue(((SampledVertex)v).getIterationDetected(), 1, 1);
-			}
-			
 			try {
 				write(sampled, getOutputDirectory() + "/sampled.txt");
 				write(detected, getOutputDirectory() + "/detected.txt");

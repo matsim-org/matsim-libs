@@ -21,24 +21,16 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.geotools.feature.Feature;
-import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.GraphClippingFilter;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
-import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
-import playground.johannes.socialnetworks.snowball2.analysis.SampledDistance;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.WaveSizeTask;
+import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraphBuilder;
@@ -61,12 +53,17 @@ public class Analyzer {
 		SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> reader =
 			new SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>(new SampledSocialGraphMLReader());
 		
+		reader.setGraphProjectionBuilder(new SpatialSampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>());
+		
 		SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph = reader.readGraph(args[0]);
-
+		/*
+		 * analyze the complete graph
+		 */
 		String output = args[1];
 		analyze(graph, output);
-		
-//		GraphFilter<SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>> filter = new GraphClippingFilter(new, geometry)
+		/*
+		 * analyze the swiss clipping
+		 */
 		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
 		Geometry geometry = feature.getDefaultGeometry();
 		geometry.setSRID(21781);
@@ -83,14 +80,14 @@ public class Analyzer {
 	}
 
 	private static void analyze(SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph, String output) {
-//		GraphAnalyzerTaskComposite task = new StandardAnalyzerTask(output);
-//		task.addTask(new DistanceTask(output));
-//		task.addTask(new WaveSizeTask(output));
-//		
-//		Map<String, Object> analyzers = new HashMap<String, Object>();
-//		analyzers.put(DegreeTask.class.getCanonicalName(), new SampledDegree());
-//		analyzers.put(DistanceTask.class.getCanonicalName(), new SampledDistance());
-//		
-// 		GraphAnalyzer.analyze(graph, analyzers, task);
+		ObservedAnalyzerTask task = new ObservedAnalyzerTask();
+		task.setOutputDirectoy(output);
+		
+		try {
+			GraphAnalyzer.writeStats(GraphAnalyzer.analyze(graph, task), output + "/stats.txt");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

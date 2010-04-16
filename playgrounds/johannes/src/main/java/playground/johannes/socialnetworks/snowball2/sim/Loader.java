@@ -42,7 +42,7 @@ import playground.johannes.socialnetworks.snowball2.analysis.EstimatedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.EstimatedTransitivity;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.WaveSizeTask;
+import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 
 /**
  * @author illenberger
@@ -123,15 +123,20 @@ public class Loader {
 //		estimators.put("estim6a", new EstimatorSet(estim6, null, null));
 //		estimators.put("estim6b", new EstimatorSet(estim6, new HTEstimator(N), new HTEstimator(M)));
 		
-		BiasedDistribution estim7 = new Estimator7(N);
-		estimatorSet.add(estim7);
-		estimators.put("estim7a", new EstimatorSet(estim7, null, null));
-		estimators.put("estim7b", new EstimatorSet(estim7, new HTEstimator(N), new HTEstimator(M)));
+//		BiasedDistribution estim7 = new Estimator7(N);
+//		estimatorSet.add(estim7);
+//		estimators.put("estim7a", new EstimatorSet(estim7, null, null));
+//		estimators.put("estim7b", new EstimatorSet(estim7, new HTEstimator(N), new HTEstimator(M)));
 		
 //		BiasedDistribution estim8 = new Estimator8(N);
 //		estimatorSet.add(estim8);
 //		estimators.put("estim8a", new EstimatorSet(estim8, null, null));
 //		estimators.put("estim8b", new EstimatorSet(estim8, new HTEstimator(N), new HTEstimator(M)));
+		
+		BiasedDistribution estim9 = new Estimator9(N);
+		estimatorSet.add(estim9);
+		estimators.put("estim9a", new EstimatorSet(estim9, null, null));
+		estimators.put("estim9b", new EstimatorSet(estim9, new HTEstimator(N), new HTEstimator(M)));
 		/*
 		 * Load analyzers.
 		 */
@@ -145,7 +150,7 @@ public class Loader {
 		 */
 //		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimatorSet, output);
 		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimatorSet, output);
-//		CompleteSampleAnalyzer completeAnalyzer = new CompleteSampleAnalyzer(graph, analyzers, estimatorSet, output);
+		CompleteSampleAnalyzer completeAnalyzer = new CompleteSampleAnalyzer(graph, analyzers, estimatorSet, output);
 //		ConnectionSampleAnalyzer connectionAnalyzer = new ConnectionSampleAnalyzer(numSeeds, analyzers, output);
 		/*
 		 * Init sampler listener.
@@ -164,7 +169,7 @@ public class Loader {
 		 */
 //		listeners.addComponent(intervalAnalyzer);
 		listeners.addComponent(iterationAnalyzer);
-//		listeners.addComponent(completeAnalyzer);
+		listeners.addComponent(completeAnalyzer);
 //		listeners.addComponent(connectionAnalyzer);
 		/*
 		 * Init and run sampler.

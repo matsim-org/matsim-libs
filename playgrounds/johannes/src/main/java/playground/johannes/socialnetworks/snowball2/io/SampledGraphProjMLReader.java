@@ -63,9 +63,6 @@ public class SampledGraphProjMLReader<G extends Graph, V extends Vertex, E exten
 		return super.readGraph(file);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.sna.graph.io.AbstractGraphMLReader#addEdge(org.matsim.contrib.sna.graph.Vertex, org.matsim.contrib.sna.graph.Vertex, org.xml.sax.Attributes)
-	 */
 	@Override
 	protected SampledEdgeDecorator<E> addEdge(SampledVertexDecorator<V> v1,
 			SampledVertexDecorator<V> v2, Attributes attrs) {
@@ -78,9 +75,6 @@ public class SampledGraphProjMLReader<G extends Graph, V extends Vertex, E exten
 		return builder.addEdge(getGraph(), v1, v2, e);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.sna.graph.io.AbstractGraphMLReader#addVertex(org.xml.sax.Attributes)
-	 */
 	@Override
 	protected SampledVertexDecorator<V> addVertex(Attributes attrs) {
 		int idx = Integer.parseInt(attrs.getValue(SampledGraphProjML.DELEGATE_IDX_ATTR));
@@ -94,9 +88,6 @@ public class SampledGraphProjMLReader<G extends Graph, V extends Vertex, E exten
 		return vertex;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.sna.graph.io.AbstractGraphMLReader#newGraph(org.xml.sax.Attributes)
-	 */
 	@Override
 	protected SampledGraphProjection<G, V, E> newGraph(Attributes attrs) {
 		String filename = attrs.getValue(SampledGraphProjML.DELEGATE_FILE);

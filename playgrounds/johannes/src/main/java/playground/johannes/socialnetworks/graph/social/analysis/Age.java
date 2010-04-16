@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ComponentsTask.java
+ * Age.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,34 +17,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.socialnetworks.graph.social.analysis;
 
-import java.util.Map;
+import gnu.trove.TDoubleArrayList;
+import gnu.trove.TDoubleDoubleHashMap;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import java.util.Set;
+
+import org.matsim.contrib.sna.math.Distribution;
+
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author illenberger
  *
  */
-public class ComponentsTask extends ModuleAnalyzerTask<Components> {
+public class Age {
 
-	private static final Logger logger = Logger.getLogger(ComponentsTask.class);
-	
-	private static final String NUM_COMPONENTS = "n_components";
-	
-	public ComponentsTask() {
-		setModule(new Components());
+	public Distribution distribution(Set<? extends SocialVertex> vertices) {
+		Distribution distr = new Distribution();
+		for(SocialVertex vertex : vertices) {
+			int age = vertex.getPerson().getAge();
+			if(age > -1)
+				distr.add(age);
+		}
+		
+		return distr;
 	}
 	
-	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-		int numComponents = module.countComponents(graph);
-		stats.put(NUM_COMPONENTS, new Double(numComponents));
-	
-		logger.info(String.format("%1$s disconnected components.", numComponents));
+	public TDoubleDoubleHashMap correlation(Set<? extends SocialVertex> vertices) {
+		TDoubleArrayList values1 = new TDoubleArrayList(vertices.size() * 15);
+		TDoubleArrayList values2 = new TDoubleArrayList(vertices.size() * 15);
+		
+		for(SocialVertex vertex : vertices) {
+			int age1 = vertex.getPerson().getAge();
+			if(age1 > -1) {
+				for(SocialVertex neighbor : vertex.getNeighbours()) {
+					int age2 = neighbor.getPerson().getAge();
+					if(age2 > -1) {
+						values1.add(age1);
+						values2.add(age2);
+					}
+				}
+			}
+		}
+		
+		return Correlations.correlationMean(values1.toNativeArray(), values2.toNativeArray());
 	}
-
 }

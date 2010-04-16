@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ComponentsTask.java
+ * SpatialSampledGraphProjMLWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,34 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.socialnetworks.snowball2.spatial.io;
 
-import java.util.Map;
+import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.io.GraphMLWriter;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphML;
+import org.matsim.core.utils.collections.Tuple;
+
+import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
 
 /**
  * @author illenberger
  *
  */
-public class ComponentsTask extends ModuleAnalyzerTask<Components> {
+public class SpatialSampledGraphProjMLWriter extends SampledGraphProjMLWriter {
 
-	private static final Logger logger = Logger.getLogger(ComponentsTask.class);
-	
-	private static final String NUM_COMPONENTS = "n_components";
-	
-	public ComponentsTask() {
-		setModule(new Components());
+	public SpatialSampledGraphProjMLWriter(GraphMLWriter delegateWriter) {
+		super(delegateWriter);
 	}
-	
+
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-		int numComponents = module.countComponents(graph);
-		stats.put(NUM_COMPONENTS, new Double(numComponents));
-	
-		logger.info(String.format("%1$s disconnected components.", numComponents));
+	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
+		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
+		SpatialGraphML.addPointData((SpatialVertex) v, attrs);
+		return attrs;
 	}
 
 }
