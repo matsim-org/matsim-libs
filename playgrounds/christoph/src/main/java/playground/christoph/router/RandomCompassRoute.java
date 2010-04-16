@@ -72,10 +72,12 @@ public class RandomCompassRoute extends SimpleRouter {
 			SubNetwork subNetwork = (SubNetwork) nw;
 			
 			/*
-			 * Replace the CurrentNode with its child in the SubNetwork 
+			 * Replace the given Nodes with their child in the SubNetwork 
 			 */
 			currentNode = subNetwork.getNodes().get(currentNode.getId());
-						
+			fromNode = subNetwork.getNodes().get(fromNode.getId());
+			toNode = subNetwork.getNodes().get(toNode.getId());
+			
 			useKnowledge = true;
 		}
 		
@@ -188,7 +190,7 @@ public class RandomCompassRoute extends SimpleRouter {
 		}
 
 		if (removeLoops) loopRemover.removeLoops(path);
-				
+		
 		return path;
 	}
 	

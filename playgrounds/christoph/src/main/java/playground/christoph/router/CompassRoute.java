@@ -63,6 +63,8 @@ public class CompassRoute extends SimpleRouter {
 		ArrayList<Link> links = new ArrayList<Link>();
 
 		Network nw = knowledgeTools.getSubNetwork(this.person, this.network);
+
+		nodes.add(fromNode);
 		
 		boolean useKnowledge = false;
 		if (nw instanceof SubNetwork)
@@ -70,14 +72,14 @@ public class CompassRoute extends SimpleRouter {
 			SubNetwork subNetwork = (SubNetwork) nw;
 			
 			/*
-			 * Replace the CurrentNode with its child in the SubNetwork 
+			 * Replace the given Nodes with their child in the SubNetwork 
 			 */
 			currentNode = subNetwork.getNodes().get(currentNode.getId());
+			fromNode = subNetwork.getNodes().get(fromNode.getId());
+			toNode = subNetwork.getNodes().get(toNode.getId());
 						
 			useKnowledge = true;
 		}
-		
-		nodes.add(fromNode);
 		
 		while(!currentNode.equals(toNode))
 		{

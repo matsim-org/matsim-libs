@@ -130,15 +130,16 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		SubNetworkDijkstraTravelCostWrapper subNetworkDijkstraTravelCostWrapper = new SubNetworkDijkstraTravelCostWrapper(travelCost);
 		
 		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
-				subNetworkDijkstraTravelCostWrapper, travelTime, new SubNetworkDijkstraFactory());
-
+				subNetworkDijkstraTravelCostWrapper, travelTime, new SubNetworkDijkstraFactory());		
 		
 		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		// If we do initial Replanning we don't want to remove the knowledge afterwards!
+		((InitialReplanner)this.initialReplanner).setRemoveKnowledge(false);
 		this.initialReplanner.setReplanner(dijkstraRouter);
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
-		
+				
 		this.duringActivityIdentifier = new ActivityEndIdentifier(this.sim);
 		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId(), this.events);
 		this.duringActivityReplanner.setReplanner(dijkstraRouter);
@@ -179,7 +180,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 			mapKnowledgeDB.setPerson(person);
 			mapKnowledgeDB.setNetwork(network);
 			mapKnowledgeDB.setTableName(tableName);
-
+			
 			customAttributes.put("NodeKnowledge", mapKnowledgeDB);
 		}
 	}

@@ -89,8 +89,8 @@ public class WithinDayControler extends Controler {
 	 * multiple Strategies to the Agents.
 	 */
 	protected double pInitialReplanning = 1.0;
-	protected double pActEndReplanning = 0.0;
-	protected double pLeaveLinkReplanning = 1.0;
+	protected double pActEndReplanning = 0.1;
+	protected double pLeaveLinkReplanning = 0.0;
 
 	/*
 	 * How many parallel Threads shall do the Replanning.

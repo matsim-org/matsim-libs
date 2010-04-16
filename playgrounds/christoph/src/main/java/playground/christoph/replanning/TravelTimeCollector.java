@@ -73,7 +73,7 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	private CyclicBarrier startBarrier;
 	private CyclicBarrier endBarrier;
 	private UpdateMeanTravelTimesThread[] updateMeanTravelTimesThreads;
-	private int numOfThreads = 8;
+	private int numOfThreads = 2;
 	
 	private MyLinkImpl[][] parallelArrays;
 	

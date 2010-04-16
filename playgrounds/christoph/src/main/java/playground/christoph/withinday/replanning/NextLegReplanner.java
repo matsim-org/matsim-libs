@@ -33,7 +33,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;
-import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 
 /*
@@ -164,8 +163,6 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 		// By doing the replanning the "betweenLeg" is replanned, so the changes are
 		// included in the previously selected plan, too!
 		planAlgorithm.run(newPlan);
-
-		new SubNetworkTools().resetSubNetwork(person);
 		
 		// reactivate previously selected, replanned plan
 		person.setSelectedPlan(selectedPlan);

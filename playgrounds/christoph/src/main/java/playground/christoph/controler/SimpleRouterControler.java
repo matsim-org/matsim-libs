@@ -35,15 +35,14 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.ptproject.qsim.QLink;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QVehicle;
 
-import playground.christoph.controler.WithinDayControler.ReplanningFlagInitializer;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
@@ -61,14 +60,10 @@ import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
-import playground.christoph.withinday.replanning.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.InitialReplanner;
-import playground.christoph.withinday.replanning.NextLegReplanner;
 import playground.christoph.withinday.replanning.ReplanningIdGenerator;
 import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
-import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifier;
 import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImpl;
-import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 
@@ -94,7 +89,7 @@ public class SimpleRouterControler extends Controler {
 	 * Select which size the known Areas should have in the Simulation.
 	 * The needed Parameter is the Name of the Table in the MYSQL Database.
 	 */
-	protected String tableName = "BatchTable1_0";
+	protected String tableName = "BatchTable1_1";
 	
 	protected ArrayList<PlanAlgorithm> replanners;
 	protected ArrayList<SelectNodes> nodeSelectors;
@@ -105,11 +100,11 @@ public class SimpleRouterControler extends Controler {
 	 * than 1.0 (100%). If its lower, all remaining agents
 	 * will do no Replanning.
 	 */
-	protected double pRandomRouter = 0.0;
-	protected double pTabuRouter = 0.0;
-	protected double pCompassRouter = 0.0;
-	protected double pRandomCompassRouter = 0.0;
-	protected double pRandomDijkstraRouter = 1.0;
+	protected double pRandomRouter = 0.1;
+	protected double pTabuRouter = 0.1;
+	protected double pCompassRouter = 0.1;
+	protected double pRandomCompassRouter = 0.1;
+	protected double pRandomDijkstraRouter = 0.1;
 	
 	/*
 	 * Weight Factor for the RandomDijkstraRouter.
@@ -149,7 +144,7 @@ public class SimpleRouterControler extends Controler {
 	 * gets his own Random Number Generator so the results will
 	 * change if the number of Threads is changed. 
 	 */
-	protected int numReplanningThreads = 4;
+	protected int numReplanningThreads = 2;
 	
 	/*
 	 * Should the Agents use their Knowledge? If not, they use
@@ -200,28 +195,28 @@ public class SimpleRouterControler extends Controler {
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
 		RandomRoute randomRoute = new RandomRoute(this.network);
-		CloneablePlansCalcRoute randomRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomRoute, null, new SimpleRouterFactory(randomRoute));
+		CloneablePlansCalcRoute randomRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomRoute, null, new SimpleRouterFactory());
 		this.randomReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
 		this.randomReplanner.setReplanner(randomRouter);
 		this.randomReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomReplanner);
 
 		TabuRoute tabuRoute = new TabuRoute(this.network);
-		CloneablePlansCalcRoute tabuRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, tabuRoute, null, new SimpleRouterFactory(tabuRoute));
+		CloneablePlansCalcRoute tabuRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, tabuRoute, null, new SimpleRouterFactory());
 		this.tabuReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
 		this.tabuReplanner.setReplanner(tabuRouter);
 		this.tabuReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.tabuReplanner);
 
 		CompassRoute compassRoute = new CompassRoute(this.network);
-		CloneablePlansCalcRoute compassRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, compassRoute, null, new SimpleRouterFactory(compassRoute));
+		CloneablePlansCalcRoute compassRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, compassRoute, null, new SimpleRouterFactory());
 		this.compassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
 		this.compassReplanner.setReplanner(compassRouter);
 		this.compassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.compassReplanner);
 
 		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network); 
-		CloneablePlansCalcRoute randomCompassRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomCompassRoute, null, new SimpleRouterFactory(randomCompassRoute));
+		CloneablePlansCalcRoute randomCompassRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomCompassRoute, null, new SimpleRouterFactory());
 		this.randomCompassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
 		this.randomCompassReplanner.setReplanner(randomCompassRouter);
 		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
@@ -230,7 +225,7 @@ public class SimpleRouterControler extends Controler {
 		
 		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime);
 		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
-		CloneablePlansCalcRoute randomDijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomDijkstraRoute, null, new SimpleRouterFactory(randomDijkstraRoute));
+		CloneablePlansCalcRoute randomDijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomDijkstraRoute, null, new SimpleRouterFactory());
 		this.randomDijkstraReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
 		this.randomDijkstraReplanner.setReplanner(randomDijkstraRouter);
 		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
@@ -253,7 +248,8 @@ public class SimpleRouterControler extends Controler {
 	protected void runMobSim() 
 	{
 		sim = new KnowledgeWithinDayQSim(this.scenarioData, this.events);
-		sim.addQueueSimulationListeners(replanningManager);
+//		sim.addQueueSimulationListeners(replanningManager);
+		sim.addQueueSimulationListeners(foqsl);
 		
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
@@ -264,18 +260,19 @@ public class SimpleRouterControler extends Controler {
 		foqsl.addQueueSimulationInitializedListener(replanningManager);
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
 		
+		
 		if (useKnowledge)
 		{
 			log.info("Set Knowledge Storage Type");
 			setKnowledgeStorageHandler();			
 		}
 		
-		log.info("Initialize Replanning Routers");
-		initReplanningRouter();
-
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();
 		
+		log.info("Initialize Replanning Routers");
+		initReplanningRouter();
+
 		sim.run();
 	}
 
@@ -328,9 +325,8 @@ public class SimpleRouterControler extends Controler {
 		@Override
 		public void notifySimulationInitialized(SimulationInitializedEvent e)
 		{
-			collectAgents((QueueSimulation)e.getQueueSimulation());
+			collectAgents((QSim)e.getQueueSimulation());
 			setReplanningFlags();
-			
 		}
 		
 		/*
@@ -417,7 +413,8 @@ public class SimpleRouterControler extends Controler {
 			log.info("Random Compass Routing Probability: " + simpleRouterControler.pRandomCompassRouter);
 			log.info("Random Dijkstra Routing Probability: " + simpleRouterControler.pRandomDijkstraRouter);
 
-			double numPersons = simpleRouterControler.population.getPersons().size();
+//			double numPersons = simpleRouterControler.population.getPersons().size();
+			double numPersons = withinDayPersonAgents.size();
 			log.info(simpleRouterControler.randomRouterCounter + " persons use a Random Router (" + simpleRouterControler.randomRouterCounter / numPersons * 100.0 + "%)");
 			log.info(simpleRouterControler.tabuRouterCounter + " persons use a Tabu Router (" + simpleRouterControler.tabuRouterCounter / numPersons * 100.0 + "%)");
 			log.info(simpleRouterControler.compassRouterCounter + " persons use a Compass Router (" + simpleRouterControler.compassRouterCounter / numPersons * 100.0 + "%)");
@@ -428,15 +425,15 @@ public class SimpleRouterControler extends Controler {
 			log.info(initialReplanningCounter + " persons replan their plans initially (" + initialReplanningCounter / numPersons * 100.0 + "%)");
 		}
 				
-		protected void collectAgents(QueueSimulation sim)
+		protected void collectAgents(QSim sim)
 		{
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
 			
-			for (QueueLink queueLink : sim.getQueueNetwork().getLinks().values())
+			for (QLink qLink : sim.getQNetwork().getLinks().values())
 			{
-				for (QueueVehicle queueVehicle : queueLink.getAllVehicles())
+				for (QVehicle qVehicle : qLink.getAllVehicles())
 				{
-					WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) queueVehicle.getDriver();
+					WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) qVehicle.getDriver();
 					this.withinDayPersonAgents.put(withinDayPersonAgent.getPerson().getId(), withinDayPersonAgent);
 				}
 			}
