@@ -32,7 +32,7 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.io.GraphMLWriter;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
@@ -93,10 +93,9 @@ public class SpatialGraphMLWriter extends GraphMLWriter {
 	@Override
 	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
 		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
-		
-		attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_X_ATTR, String.valueOf(((SpatialSparseVertex)v).getPoint().getCoordinate().x)));
-		attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_Y_ATTR, String.valueOf(((SpatialSparseVertex)v).getPoint().getCoordinate().y)));
-		
+		SpatialGraphML.addPointData((SpatialVertex) v, attrs);
+//		attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_X_ATTR, String.valueOf(((SpatialSparseVertex)v).getPoint().getCoordinate().x)));
+//		attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_Y_ATTR, String.valueOf(((SpatialSparseVertex)v).getPoint().getCoordinate().y)));
 		return attrs;
 	}
 }

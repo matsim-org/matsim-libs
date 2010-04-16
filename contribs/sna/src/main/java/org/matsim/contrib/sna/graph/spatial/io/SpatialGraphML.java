@@ -19,11 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph.spatial.io;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.core.utils.collections.Tuple;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.Attributes;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -80,5 +83,10 @@ public class SpatialGraphML {
 		}
 		int code = Integer.parseInt(value);
 		return CRSUtils.getCRS(code);
+	}
+	
+	public static void addPointData(SpatialVertex v, List<Tuple<String, String>> attrs) {
+		attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_X_ATTR, String.valueOf(v.getPoint().getCoordinate().x)));
+		attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_Y_ATTR, String.valueOf(v.getPoint().getCoordinate().y)));
 	}
 }
