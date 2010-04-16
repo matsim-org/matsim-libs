@@ -52,7 +52,7 @@ public class PTRouter{
 		init(logicNet);
 	}
 
-	public PTRouter(final TransitSchedule schedule, final TransitRouterConfig config){
+	public PTRouter(final TransitSchedule schedule){
 		init(new LogicFactory(schedule).getLogicNet());
 	}
 

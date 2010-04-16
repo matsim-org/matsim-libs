@@ -10,7 +10,7 @@ import playground.mmoyo.utils.TransScenarioLoader;
 public class LinkNodeCounter {
 
 	public static void main(String[] args) {
-		String conf = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/no_fragmented/config/config_routedPlans_MoyoParameterized.xml";
+		String conf = "../playgrounds/mmoyo/output/comparison/Berlin/16plans/0config_5x_4plans.xml";
 		ScenarioImpl scenario  = new TransScenarioLoader().loadScenario(conf);
 		
 		String strMiv = "miv";
@@ -25,9 +25,9 @@ public class LinkNodeCounter {
 			}	
 		}
 		int total = intMiv + other;
-		System.out.println("intMiv: " + intMiv);
-		System.out.println("other: " + other);	
-		System.out.println("total: " + total);
+		System.out.println("links Miv: " + intMiv);
+		System.out.println("links other: " + other);	
+		System.out.println("links total: " + total);
 		System.out.println("number of links:" + scenario.getNetwork().getLinks().size());
 		
 		
@@ -42,10 +42,10 @@ public class LinkNodeCounter {
 		}
 		
 		int totalNodes = intNodesMiv + intNodesOther;
-		System.out.println("\nintNodesMiv: " + intNodesMiv);
-		System.out.println("intNodesOther: " + intNodesOther);	
+		System.out.println("\n nodes Miv: " + intNodesMiv);
+		System.out.println("nodes other: " + intNodesOther);	
 		System.out.println("total: " + totalNodes);
-		System.out.println("number of links:" + scenario.getNetwork().getNodes().size());
+		System.out.println("number of nodes:" + scenario.getNetwork().getNodes().size());
 
 	}
 

@@ -44,7 +44,6 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 	public final static String TRANSIT_ACTIVITY_TYPE = "pt interaction";
 
 	private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
-	private final TransitRouterConfig routerConfig = new TransitRouterConfig();
 	private final PTRouter transitRouter;
 	private final TransitConfigGroup transitConfig;
 	private final TransitSchedule schedule;
@@ -60,7 +59,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 
 		this.schedule = schedule;
 		this.transitConfig = transitConfig;
-		this.transitRouter = new PTRouter(schedule, this.routerConfig);
+		this.transitRouter = new PTRouter(schedule);
 
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
 		if (routeAlgo instanceof Dijkstra) {

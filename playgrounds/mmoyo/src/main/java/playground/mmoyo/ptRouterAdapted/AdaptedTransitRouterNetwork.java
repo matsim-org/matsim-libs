@@ -47,7 +47,7 @@ import org.matsim.world.Layer;
  *
  * @author mrieser
  */
-/*package*/ class TransitRouterNetwork2 implements Network {
+/*package*/ class AdaptedTransitRouterNetwork implements Network {
 
 	private static final long serialVersionUID = 1L;
 
@@ -58,7 +58,7 @@ import org.matsim.world.Layer;
 	private long nextNodeId = 0;
 	private long nextLinkId = 0;
 
-	public TransitRouterNetwork2() {
+	public AdaptedTransitRouterNetwork() {
 
 	}
 

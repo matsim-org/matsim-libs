@@ -1,29 +1,44 @@
 package playground.mmoyo.analysis.counts.chen;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import playground.yu.run.TrCtl;
 
 /**uses Yu transit controler to have counts results**/
 public class Counter {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		//It makes sure that "res" folder exists otherwise it won't write anything at the end
+		File resFile = new File("./res/"); 
+		if (!resFile.exists()){
+			throw new FileNotFoundException("the resource folder -res- does not exist");
+		}
 		
 		String configFile;
 		if(args.length>0){ 
 			configFile = args[0];
 		}else{	
-			configFile ="../playgrounds/mmoyo/output/comparison/Berlin/16plans/2config_5x_16plans_manuel.xml"; //"../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_5x_subset_xy2links_ptplansonly/config/config_5x_routed_time.xml";
+			configFile ="../playgrounds/mmoyo/output/fouth/configs/config_95.xml";
 		}
 		TrCtl.main(new String[]{configFile});
 		
 		
-		//read many configs: args[0] is the directory with many configs 
+		
+		//read many configs:  
 		/*
-		File dir = new File(args[0]);
-		for (String configFile : dir.list()){
-			String completePath= args[0] + "/" + configFile;
+		String configsDir = "../playgrounds/mmoyo/output/fouth/configs"; 
+		File dir = new File(configsDir);
+		for (String configName : dir.list()){
+			String completePath= configsDir + "/" + configName;
 			System.out.println("\n\n  procesing: " + completePath);
 			TrCtl.main(new String[]{completePath});
 		}
 		*/
+		 
+		//shut down ms-windows
+		//Runtime runtime = Runtime.getRuntime();
+		//runtime.exec("shutdown -s -t 60 -f");
 	}
 }

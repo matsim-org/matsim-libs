@@ -109,7 +109,7 @@ public class CountsComparingGraph2 {
 				posx += 400;
 			}
 			compGraphic.dispose();
-			File outputFile = new File("../playgrounds/mmoyo/output/" + key);
+			File outputFile = new File("../playgrounds/mmoyo/output/fouth/comparingGraphs" + key);
 			ImageIO.write(compImg,"png", outputFile);	
 		}
 	
@@ -150,7 +150,7 @@ public class CountsComparingGraph2 {
 	
 	public static void main(String[] args) {
 		//String dir = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/KMZ_counts_scalefactor50";
-		String dir = "../playgrounds/mmoyo/output/job8/output";
+		String dir = "../playgrounds/mmoyo/output/fouth/output";
 		try {
 			new CountsComparingGraph2().createComparingGraphs(dir);
 		} catch (IOException e) {
