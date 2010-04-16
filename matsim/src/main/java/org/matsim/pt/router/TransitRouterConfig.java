@@ -49,17 +49,17 @@ public class TransitRouterConfig {
 	/**
 	 * Walking speed of agents on transfer links, beeline distance.
 	 */
-	public double beelineWalkSpeed = 3.0/3.6;
+	public double beelineWalkSpeed = 3.0/3.6;  // presumably, in m/sec.  3.0/3.6 = 3000/3600 = 3km/h.  kai, apr'10
 	
-	public double marginalUtilityOfTravelTimeWalk = -6.0 / 3600.0;
+	public double marginalUtilityOfTravelTimeWalk = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
 	
-	public double marginalUtilityOfTravelTimeTransit = -6.0 / 3600.0;
+	public double marginalUtilityOfTravelTimeTransit = -6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
 	
-	public double marginalUtilityOfTravelDistanceTransit = -0.0;
+	public double marginalUtilityOfTravelDistanceTransit = -0.0;    // yyyy presumably, in Eu/m ?????????  so far, not used.  kai, apr'10
 	
 	/**
 	 * The additional costs to be added when an agent switches lines.
 	 */
-	public double costLineSwitch = 60.0 * -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle
+	public double costLineSwitch = 60.0 * -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
 	
 }
