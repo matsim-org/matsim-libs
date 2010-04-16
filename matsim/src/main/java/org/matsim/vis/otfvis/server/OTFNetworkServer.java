@@ -49,7 +49,7 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 public class OTFNetworkServer implements OTFServerRemote {
 	private static final int BUFFERSIZE = 100000000;
 
-	private final OTFAgentsListHandler.Writer agentsListWriter = new OTFAgentsListHandler.Writer();
+//	private final OTFAgentsListHandler.Writer agentsListWriter = new OTFAgentsListHandler.Writer();
 	private final OTFServerQuad2 quad;
 
 	private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
@@ -69,7 +69,7 @@ public class OTFNetworkServer implements OTFServerRemote {
 		this.quad = quadBuilder.createAndInitOTFServerQuad(connect);
 		this.quad.initQuadTree(connect);
 
-		this.quad.addAdditionalElement(this.agentsListWriter);
+//		this.quad.addAdditionalElement(this.agentsListWriter);
 		// not clear to me why there needs to be an agents writer when we only visualize the network.
 		// Without this line, it would be more clear in which situations the OTFAgentsListHander would still
 		// be needed.  kai, apr'10
