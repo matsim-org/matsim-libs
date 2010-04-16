@@ -49,10 +49,16 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  *
  */
 public class OTFAgentsListHandler extends OTFDataReader {
+//	private OTFAgentsListHandler() {
+//		super() ;
+//	}
+	// This class is nowhere actively instantiated within the project.  Presumably, it is only instantiated from *.mvi files.
+	// Also see the remarks containing the writer below.  kai, apr'10
 
 	protected Class agentReceiverClass = null;
 
 	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
+	
 	public static class ExtendedPositionInfo extends PositionInfo {
 
 		private ExtendedPositionInfo(Id driverId, double easting, double northing, double elevation, double azimuth, double speed, AgentState vehicleState, int type, int userdata) {
@@ -64,10 +70,17 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	}
 
 	static public class Writer extends OTFDataWriter<Void> {
-
+//		private Writer() {
+//			super() ;
+//		}
+		// This class is only instantiated in OTFNetworkServer, OTFTVehServer, OTFEvent2MVI, and OTFTVeh2MVI.  The latter three imply that this class is
+		// needed/used in situations where no quad tree can be constructed from the available data.  I don't know why it is used in OTFNetworkServer,
+		// and think it should be removed from there.  kai, apr'10
+		
 		private static final long serialVersionUID = -6368752578878835954L;
 
 		public transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+		
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
