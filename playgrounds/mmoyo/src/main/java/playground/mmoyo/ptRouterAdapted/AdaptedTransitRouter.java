@@ -40,7 +40,9 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.MultiNodeDijkstra;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -63,14 +65,18 @@ public class AdaptedTransitRouter {
 
 	private final MultiNodeDijkstra dijkstra;
 	private final AdaptedTransitRouterNetworkTravelTimeCost ttCalculator;
+	
+	private final TransitRouterConfig config ; 
 
-	public AdaptedTransitRouter(final TransitSchedule schedule) {
+	public AdaptedTransitRouter( TransitRouterConfig config, final TransitSchedule schedule) {
 		this.schedule = schedule;
 		this.linkMappings = new HashMap<TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>>();
 		this.nodeMappings = new HashMap<TransitRouterNetworkNode, TransitStopFacility>();
 		this.transitNetwork = buildNetwork();
+		
+		this.config = config ;
 
-		this.ttCalculator = new AdaptedTransitRouterNetworkTravelTimeCost();
+		this.ttCalculator = new AdaptedTransitRouterNetworkTravelTimeCost( config );
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.ttCalculator, this.ttCalculator);
 	}
 
@@ -88,8 +94,9 @@ public class AdaptedTransitRouter {
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : fromNodes) {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
-			double initialTime = distance * PTValues.AV_WALKING_SPEED;
-			double initialCost = initialTime * PTValues.walkCoefficient;
+			double initialTime = distance / config.beelineWalkSpeed ;
+//			double initialCost = initialTime * PTValues.walkCoefficient ; // I don't know what this is.  kai, apr'10
+			double initialCost =  0. ;
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 

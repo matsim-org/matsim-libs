@@ -52,6 +52,8 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.router.*;
 
+import playground.mmoyo.PTRouter.PTValues;
+
 /**
  * @author mrieser
  */
@@ -82,7 +84,9 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcRoute {
 
 		this.schedule = schedule;
 		this.transitConfig = transitConfig;
-		this.adaptedTransitRouter = new AdaptedTransitRouter(schedule);
+		
+		TransitRouterConfig trConfig = new MyTransitRouterConfig() ;
+		this.adaptedTransitRouter = new AdaptedTransitRouter( trConfig, schedule);
 
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
 		if (routeAlgo instanceof Dijkstra) {

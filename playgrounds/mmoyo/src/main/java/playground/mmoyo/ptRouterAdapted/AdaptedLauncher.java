@@ -82,14 +82,14 @@ public class AdaptedLauncher {
 			configFile = "../playgrounds/mmoyo/output/fouth/config.xml";
 		}
 		
-		PTValues.timeCoefficient=  0.85;
-		PTValues.distanceCoefficient = 0.15;
+//		PTValues.timeCoefficient=  0.85;
+//		PTValues.distanceCoefficient = 0.15;
 		PTValues.fragmentPlans = true;
 		PTValues.noCarPlans= true;
 		PTValues.allowDirectWalks= true;
 		PTValues.compressPlan = true;
-		PTValues.walkCoefficient = 1;
-		PTValues.scenarioName =  "_time" + PTValues.timeCoefficient + "_dist" + PTValues.distanceCoefficient;
+//		PTValues.walkCoefficient = 1;
+//		PTValues.scenarioName =  "_time" + PTValues.timeCoefficient + "_dist" + PTValues.distanceCoefficient;
 		
 		System.out.println(PTValues.scenarioName);
 		new AdaptedLauncher().route(configFile);
