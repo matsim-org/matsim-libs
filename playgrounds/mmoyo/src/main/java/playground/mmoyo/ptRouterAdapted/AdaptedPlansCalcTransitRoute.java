@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -105,14 +106,14 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcRoute {
 	}
 
 	@Override
-	public double handleLeg(Person person, final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		if (this.transitConfig.getTransitModes().contains(leg.getMode())) {
 			return this.handlePtPlan(leg, fromAct, toAct, depTime);
 		}
 		return super.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
 
-	private double handlePtPlan(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	private double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
 		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 

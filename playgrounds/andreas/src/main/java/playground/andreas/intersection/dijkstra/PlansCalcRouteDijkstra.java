@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -52,7 +54,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	 * @see org.matsim.router.PlansCalcRoute#handleCarLeg(org.matsim.population.Leg, org.matsim.population.Act, org.matsim.population.Act, double)
 	 */
 	@Override
-	protected double handleCarLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	protected double handleCarLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		double travTime = 0;
 		Id fromLinkId = fromAct.getLinkId();
 		Id toLinkId = toAct.getLinkId();
@@ -92,7 +94,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		leg.setArrivalTime(depTime + travTime);
+		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy will cause problems with alternative implementations of Leg.  kai, apr'10
 		return travTime;
 	}
 }

@@ -82,14 +82,14 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 	}
 
 	@Override
-	public double handleLeg(Person person, final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		if (this.transitConfig.getTransitModes().contains(leg.getMode())) {
 			return this.handlePtPlan(leg, fromAct, toAct, depTime);
 		}
 		return super.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
 
-	private double handlePtPlan(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	private double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		List<Leg> legs= this.transitRouter.calcRoute(fromAct, toAct, depTime);
 		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 

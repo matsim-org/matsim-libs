@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -223,7 +225,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @param depTime the time (seconds from midnight) the leg starts
 	 * @return the estimated travel time for this leg
 	 */
-	public double handleLeg(Person person, final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		TransportMode legmode = leg.getMode();
 
 		if (legmode == TransportMode.car) {
@@ -240,13 +242,15 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			/* balmermi: No clue how to handle legs with 'undef' mode
 			 *                Therefore, handle it similar like bike mode with 50 km/h
 			 *                and no route assigned  */
+			// "undef" means teleportation.  As usual, the final answer is defined in the mobsim; the router
+			// can do nothing but try to approximate.  kai, apr'10
 			return handleUndefLeg(leg, fromAct, toAct, depTime);
 		} else {
 			throw new RuntimeException("cannot handle legmode '" + legmode + "'.");
 		}
 	}
 
-	protected double handleCarLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	protected double handleCarLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		double travTime = 0;
 		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
 		Link toLink = this.network.getLinks().get(toAct.getLinkId());
@@ -280,17 +284,17 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		leg.setArrivalTime(depTime + travTime);
+		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 
-	private double handleRideLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	protected double handleRideLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// handle a ride exactly the same was as a car
 		// the simulation has to take care that this leg is not really simulated as a stand-alone driver
 		return handleCarLeg(leg, fromAct, toAct, depTime);
 	}
 
-	private double handlePtLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	protected double handlePtLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 
 		int travTime = 0;
 		final Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
@@ -331,11 +335,11 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		}
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		leg.setArrivalTime(depTime + travTime);
+		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 
-	private double handleWalkLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	protected double handleWalkLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and walking speed
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		// create an empty route, but with realistic traveltime
@@ -346,11 +350,11 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		leg.setArrivalTime(depTime + travTime);
+		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 
-	private double handleBikeLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	protected double handleBikeLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and cycling speed
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		// create an empty route, but with realistic traveltime
@@ -361,11 +365,11 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		leg.setArrivalTime(depTime + travTime);
+		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 
-	private double handleUndefLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	protected double handleUndefLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		// make simple assumption about distance and a dummy speed (50 km/h)
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		// create an empty route, but with realistic traveltime
@@ -376,7 +380,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		leg.setArrivalTime(depTime + travTime);
+		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 

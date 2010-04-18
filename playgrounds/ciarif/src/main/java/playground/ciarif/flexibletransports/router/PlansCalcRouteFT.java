@@ -6,6 +6,8 @@ import java.util.List;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
@@ -56,7 +58,7 @@ public class PlansCalcRouteFT extends PlansCalcRoute{
 	}
 
 	@Override
-	public double handleLeg(Person person,final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	public double handleLeg(Person person,final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 
 		TransportMode mode = leg.getMode();
 
@@ -78,7 +80,7 @@ public class PlansCalcRouteFT extends PlansCalcRoute{
 			leg.setRoute(route);
 			leg.setDepartureTime(depTime);
 			leg.setTravelTime(travelTime);
-			leg.setArrivalTime(depTime + travelTime);
+			((LegImpl) leg).setArrivalTime(depTime + travelTime); // yy will cause problems with alternative implementations of Leg.  kai, apr'10
 		} else {
 			if (mode.equals(TransportMode.pt)) {
 				travelTime = handleSwissPtLeg(fromAct, leg, toAct, depTime);
@@ -102,7 +104,7 @@ public class PlansCalcRouteFT extends PlansCalcRoute{
 	 * @param depTime
 	 * @return
 	 */
-	public double handleSwissPtLeg(final ActivityImpl fromAct, final LegImpl leg, final ActivityImpl toAct, final double depTime) {
+	public double handleSwissPtLeg(final Activity fromAct, final Leg leg, final Activity toAct, final double depTime) {
 
 		double travelTime = 0.0;
 
@@ -130,7 +132,7 @@ public class PlansCalcRouteFT extends PlansCalcRoute{
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travelTime);
-		leg.setArrivalTime(depTime + travelTime);
+		((LegImpl) leg).setArrivalTime(depTime + travelTime); // yy will cause problems with alternative implementations of Leg. kai, apr'10
 
 		return travelTime;
 	}

@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -74,7 +75,7 @@ public class PTRouter{
 	}
 
 	/**Calculates pt route between acts*/
-	public List<Leg> calcRoute(final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	public List<Leg> calcRoute(final Activity fromAct, final Activity toAct, final double depTime) {
 
 		if ( fromAct.getLinkId()==null ||  toAct.getLinkId()== null){
 			return calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);

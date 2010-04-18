@@ -21,6 +21,7 @@
 package playground.meisterk.kti.router;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -127,7 +128,7 @@ public class KtiPtRoute extends GenericRouteImpl {
 
 	}
 
-	public double calcAccessEgressDistance(final ActivityImpl fromAct, final ActivityImpl toAct) {
+	public double calcAccessEgressDistance(final Activity fromAct, final Activity toAct) {
 
 		return
 		(CoordUtils.calcDistance(fromAct.getCoord(), this.getFromStop().getCoord()) +
