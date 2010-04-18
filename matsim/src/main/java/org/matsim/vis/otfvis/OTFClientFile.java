@@ -107,7 +107,7 @@ public class OTFClientFile extends OTFClient {
 		try {
 			frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
 			OTFDrawer mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent());
-			hostControlBar.finishedInitialisition();
+//			hostControlBar.finishedInitialisition();
 			return mainDrawer;
 		} catch (RemoteException e) {
 			e.printStackTrace();

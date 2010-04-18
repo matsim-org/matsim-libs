@@ -92,7 +92,7 @@ public class OTFClientSwing extends OTFClient {
 				throw new IllegalStateException("Server in live mode!");
 			}
 			NetJComponent mainDrawer = new NetJComponent(createNewView("swing", connectionManager, hostControlBar.getOTFHostControl()));
-			hostControlBar.finishedInitialisition();
+//			hostControlBar.finishedInitialisition();
 			return mainDrawer;
 		} catch (RemoteException e) {
 			e.printStackTrace();

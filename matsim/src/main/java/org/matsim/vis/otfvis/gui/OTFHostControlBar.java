@@ -548,9 +548,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
-	public void finishedInitialisition() {
-		this.masterHostControl.finishedInitialisition();
-	}
+//	public void finishedInitialisition() {
+//		this.masterHostControl.finishedInitialisition();
+//	}
 
 
 	private static class BorderlessButton extends JButton {
