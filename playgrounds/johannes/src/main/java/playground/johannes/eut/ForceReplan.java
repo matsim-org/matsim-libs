@@ -42,7 +42,7 @@ public class ForceReplan implements AgentContentment {
 	/* (non-Javadoc)
 	 * @see org.matsim.withinday.contentment.AgentContentment#getContentment()
 	 */
-	public double getContentment() {
+	public double getContentment(final double time) {
 		return -1;
 	}
 
