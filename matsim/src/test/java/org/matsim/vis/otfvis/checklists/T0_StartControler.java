@@ -27,8 +27,8 @@ import org.matsim.core.controler.Controler;
  */
 public class T0_StartControler {
 	
-	private static String config = "./test/input/playground/florian/OTFVis/config.xml";
-	private static String config2 = "./test/input/playground/florian/OTFVis/config-qsim.xml";
+	private static String config = "./test/input/org/matsim/vis/otfvis/checklists/config.xml";
+	private static String config2 = "./test/input/org/matsim/vis/otfvis/checklists/config-qsim.xml";
 	
 	public static void main(String[] args) {
 		Controler con = new Controler(config);

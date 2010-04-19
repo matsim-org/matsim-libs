@@ -29,9 +29,9 @@ import org.matsim.vis.otfvis.OTFClientFile;
 public class T7_MVI_ConvertEventNetwork {
 
 	
-	private static String event = "./Output/OTFVisTests/QSim/ITERS/it.1/1.events.txt.gz";
-	private static String network = "./Output/OTFVisTests/QSim/output_network.xml.gz";
-	private static String mviFile = "./Output/OTFVisTests/QSim/OTFVis.mvi";
+	private static String event = "./output/OTFVisTests/QSim/ITERS/it.1/1.events.txt.gz";
+	private static String network = "./output/OTFVisTests/QSim/output_network.xml.gz";
+	private static String mviFile = "./output/OTFVisTests/QSim/OTFVis.mvi";
 	
 	public static void main(String[] args) {
 		String[] files = new String[5];
