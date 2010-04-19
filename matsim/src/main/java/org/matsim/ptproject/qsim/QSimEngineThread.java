@@ -30,13 +30,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.ParallelQSimEngine.ExtendedQueueNode;
 
 public class QSimEngineThread extends Thread implements QSimEngine{
-	
+
 	private double time = 0.0;
 	private boolean simulateAllNodes = false;
 	private boolean simulateAllLinks = false;
 
-	private boolean simulationRunning = true;
-	
+	private volatile boolean simulationRunning = true;
+
 	private final CyclicBarrier startBarrier;
 	private final CyclicBarrier separationBarrier;
 	private final CyclicBarrier endBarrier;
@@ -47,7 +47,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 	/** This is the collection of links that have to be activated in the current time step */
 	/*package*/ final ArrayList<QLink> linksToActivate = new ArrayList<QLink>();
 	private QSim qsim;
-		
+
 	public QSimEngineThread(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier, QSim sim)
 	{
 		this.simulateAllNodes = simulateAllNodes;
@@ -85,7 +85,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 	public void simStep(double time) {
 		// nothing to do here
 	}
-	
+
 	@Override
 	public void run()
 	{
@@ -98,7 +98,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 			try
 			{
 				/*
-				 * The Threads wait at the startBarrier until they are 
+				 * The Threads wait at the startBarrier until they are
 				 * triggered in the next TimeStep by the run() method in
 				 * the ParallelQSimEngine.
 				 */
@@ -113,7 +113,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 					Gbl.printCurrentThreadCpuTime();
 					return;
 				}
-				
+
 				/*
 				 * Move Nodes
 				 */
@@ -164,7 +164,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 						}
 					}
 				}
-				
+
 				/*
 				 * The End of the Moving is synchronized with
 				 * the endBarrier. If all Threads reach this Barrier
@@ -196,7 +196,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 		this.links.addAll(this.linksToActivate);
 		this.linksToActivate.clear();
 	}
-	
+
 	public List<QLink> getLinksToActivate()
 	{
 		return this.linksToActivate;
