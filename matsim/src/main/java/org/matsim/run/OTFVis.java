@@ -152,7 +152,11 @@ public class OTFVis {
 
 	public static final void playMVI(final String[] args) {
 //		new OTFClientSwing(args[0]).start();
-		new OTFClientFile(args[0]).start();
+		playMVI(args[0]);
+	}
+	
+	public static void playMVI(String file) {
+		new OTFClientFile(file).start();
 	}
 
 	/* @deprecated this currently does not work; may be fixed if needed.  kai, jan'10 */
