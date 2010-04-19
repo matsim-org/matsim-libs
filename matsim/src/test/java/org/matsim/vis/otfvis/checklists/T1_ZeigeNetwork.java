@@ -26,7 +26,7 @@ import org.matsim.run.OTFVis;
  */
 public class T1_ZeigeNetwork {
 
-	private static String network = "./test/input/org/matsim/vis/otfvis/checklists/network.xml";
+	private static String network = "./test/scenarios/equil/network.xml";
 	
 	public static void main(String[] args) {
 		String[] net = new String[1];
