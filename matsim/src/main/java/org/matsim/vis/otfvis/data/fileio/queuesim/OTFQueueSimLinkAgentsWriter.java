@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.ptproject.qsim.QSimTimerStatic;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
@@ -92,7 +92,7 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {
-		out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(QSimTimerStatic.getTime()));
+		out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(SimulationTimer.getTime()));
 		writeAllAgents(out);
 	}
 

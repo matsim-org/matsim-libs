@@ -22,11 +22,21 @@ package org.matsim.ptproject.qsim;
 
 /**
  * @author dgrether
- * @deprecated just a draft
  */
-@Deprecated
 public class QSimTimer {
-
+	
+//	private double simStartTime = 24 * 3600.0;
+	
+	public QSimTimer(){
+		this(1.0);
+	}
+	
+	
+	public QSimTimer(final double stepSize){
+		QSimTimerStatic.reset(stepSize);
+	}
+	
+	
 	/**
 	 * @return Returns the simStartTime. That is the lowest found start time of a leg
 	 */
@@ -41,17 +51,26 @@ public class QSimTimer {
 	}
 	/**
 	 * Increments the time by one timestep
+	 * @return the new time in seconds
 	 */
-	public void incrementTime(){
+	public double incrementTime(){
 		QSimTimerStatic.incTime();
+		return QSimTimerStatic.getTime();
 	}
 	
 	/**
 	 * Returns the number of seconds (time steps) the simulation advances when increasing the simulation time.
 	 * @return The number of time steps.
 	 */
-	public static final double getSimTimestepSize() {
+	public final double getSimTimestepSize() {
 		return QSimTimerStatic.getSimTickTime();
+	}
+	public void setSimStartTime(double startTimeSec) {
+		QSimTimerStatic.setSimStartTime(startTimeSec);
+	}
+	
+	protected void setTime(double timeSec) {
+		QSimTimerStatic.setTime(timeSec);
 	}
 	
 	

@@ -233,7 +233,7 @@ public class QLane implements QBufferItem {
 				* this.laneData.getNumberOfRepresentedLanes();
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * QSimTimerStatic.getSimTickTime() * this.getQLink().getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQLink().getQSimEngine().getQSim().getSimTimer().getSimTimestepSize() * this.getQLink().getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
@@ -563,7 +563,7 @@ public class QLane implements QBufferItem {
 	}
 
 	public QVehicle popFirstFromBuffer() {
-		double now = QSimTimerStatic.getTime();
+		double now = this.getQLink().getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.isFireLaneEvents()) {
@@ -618,7 +618,7 @@ public class QLane implements QBufferItem {
 	}
 
 	void clearVehicles() {
-		double now = QSimTimerStatic.getTime();
+		double now = this.getQLink().getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : this.waitingList) {
 			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
@@ -853,7 +853,7 @@ public class QLane implements QBufferItem {
      *          A collection where the calculated positions can be stored.
      */
     private void getVehiclePositionsQueue(final Collection<AgentSnapshotInfo> positions) {
-      double now = QSimTimerStatic.getTime();
+      double now = QLane.this.queueLink.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
       Link link = QLane.this.getQLink().getLink();
 //      log.error("link: " + QLane.this.queueLink.getLink().getId() + "lane: " + QLane.this.getLaneId() + " drawing vehicles!");
       double queueEnd = getInitialQueueEnd();

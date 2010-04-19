@@ -48,7 +48,7 @@ public class WithindayQueueSimulation extends QSim {
 	@Override
 	protected void prepareSim() {
 	  super.prepareSim();
-		this.trafficManagement.simulationPrepared();
+		this.trafficManagement.simulationPrepared(this.getSimTimer().getSimStartTime());
 	}
 
 	@Override

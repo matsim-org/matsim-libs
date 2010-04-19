@@ -34,7 +34,7 @@ public class ControlInputTestImpl extends AbstractControlInputImpl {
 	}
 
 	@Override
-	public double getNashTime() {
+	public double getNashTime(final double time) {
 		return 0;
 	}
 

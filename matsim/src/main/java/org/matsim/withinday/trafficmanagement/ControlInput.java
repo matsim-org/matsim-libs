@@ -28,7 +28,7 @@ import org.matsim.core.population.routes.NetworkRoute;
  */
 public interface ControlInput {
 
-	public double getNashTime();
+	public double getNashTime(final double time);
 
 	public NetworkRoute getMainRoute();
 

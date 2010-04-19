@@ -34,7 +34,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.ptproject.qsim.QSimTimerStatic;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 
 /**
@@ -111,10 +110,11 @@ public class VDSSign {
 
 	/**
 	 * Sets the time for the first guidance message generation.
+	 * @param simStartTime 
 	 *
 	 */
-	public void simulationPrepared() {
-		this.nextUpdate = QSimTimerStatic.getTime();
+	public void simulationPrepared(double simStartTime) {
+		this.nextUpdate = simStartTime;
 	}
 
 	private double calculateDisbenefitValue(final double nashTime) {
@@ -138,7 +138,7 @@ public class VDSSign {
 	}
 
 	public void calculateOutput(final double time) {
-		double nashTime = this.controlInput.getNashTime();
+		double nashTime = this.controlInput.getNashTime(time);
 		if (log.isTraceEnabled()) {
 			log.trace("");
 			log.trace("System time: " + time);
@@ -259,8 +259,7 @@ public class VDSSign {
 	 * Returns the guidance message as a <code>Route</code>
 	 * @return current route
 	 */
-	public NetworkRoute requestRoute() {
-		double time = QSimTimerStatic.getTime();
+	public NetworkRoute requestRoute(final double time) {
 		double trust = MatsimRandom.getRandom().nextDouble();
 		if (time > this.nextUpdate) {
 			throw new RuntimeException(

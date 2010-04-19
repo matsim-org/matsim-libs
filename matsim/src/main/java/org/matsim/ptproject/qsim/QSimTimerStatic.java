@@ -66,7 +66,6 @@ public class QSimTimerStatic {
 	 * @see #incTime()
 	 */
 	public static final double getSimTickTime() {
-		// TODO [MR,DS] rename this to something like getSimTimestepSize?
 		return SIM_TICK_TIME_S;
 	}
 

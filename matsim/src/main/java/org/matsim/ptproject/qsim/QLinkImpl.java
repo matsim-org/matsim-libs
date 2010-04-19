@@ -162,7 +162,7 @@ public class QLinkImpl implements QLink {
 	 *          the vehicle
 	 */
 	public void addFromIntersection(final QVehicle veh) {
-		double now = QSimTimerStatic.getTime();
+		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 		activateLink();
 		this.add(veh, now);
 		veh.setCurrentLink(this.getLink());
@@ -196,7 +196,7 @@ public class QLinkImpl implements QLink {
 
 	public void clearVehicles() {
 		this.parkedVehicles.clear();
-		double now = QSimTimerStatic.getTime();
+		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : this.waitingList) {
 			this.getQSimEngine().getQSim().getEventsManager().processEvent(
@@ -364,7 +364,7 @@ public class QLinkImpl implements QLink {
 	private void calculateFlowCapacity(final double time) {
 		this.simulatedFlowCapacity = ((LinkImpl)this.getLink()).getFlowCapacity(time);
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * QSimTimerStatic.getSimTickTime() * this.getQSimEngine().getQSim().scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQSimEngine().getQSim().getSimTimer().getSimTimestepSize() * this.getQSimEngine().getQSim().scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
@@ -544,7 +544,7 @@ public class QLinkImpl implements QLink {
 	}
 
 	public QVehicle popFirstFromBuffer() {
-		double now = QSimTimerStatic.getTime();
+		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		this.getQSimEngine().getQSim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
@@ -653,7 +653,7 @@ public class QLinkImpl implements QLink {
 		 *            A collection where the calculated positions can be stored.
 		 */
 		private void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions) {
-			double time = QSimTimerStatic.getTime();
+			double time = QLinkImpl.this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 			int cnt = QLinkImpl.this.buffer.size() + QLinkImpl.this.vehQueue.size();
 			int nLanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QLinkImpl.this.getLink());
 			if (cnt > 0) {
@@ -726,7 +726,7 @@ public class QLinkImpl implements QLink {
 		 *            A collection where the calculated positions can be stored.
 		 */
 		private void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions) {
-			double now = QSimTimerStatic.getTime();
+			double now = QLinkImpl.this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 			Link link = QLinkImpl.this.getLink();
 			double currentQueueEnd = link.getLength(); // queue end initialized at end of link
 

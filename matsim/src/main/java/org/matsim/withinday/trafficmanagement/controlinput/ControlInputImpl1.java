@@ -44,8 +44,8 @@ public class ControlInputImpl1 extends AbstractControlInputImpl {
 	}
 
 	@Override
-	public double getNashTime() {
-		super.getNashTime();
+	public double getNashTime(final double time) {
+		super.getNashTime(time);
 		return this.timeDifference;
 	}
 

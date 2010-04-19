@@ -77,7 +77,9 @@ public class OTFClientSwing extends OTFClient {
 		this.connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connectionManager.connectWriterToReader(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connectionManager.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		
+		/**
+		 * The next two connections is triggering the swing drawing code
+		 */
 		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
 		

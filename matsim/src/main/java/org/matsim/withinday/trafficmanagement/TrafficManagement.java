@@ -65,10 +65,11 @@ public class TrafficManagement {
 	 * This method is called after the prepareSim() method of the QueueSimulation was
 	 * run. It is used to initialize all elements in the TrafficManagement which
 	 * depend on a initialized Simulation.
+	 * @param simStartTime 
 	 */
-	public void simulationPrepared() {
+	public void simulationPrepared(double simStartTime) {
 		for (VDSSign s : this.signs) {
-			s.simulationPrepared();
+			s.simulationPrepared(simStartTime);
 		}
 	}
 

@@ -96,12 +96,14 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	private CarDepartureHandler carDepartureHandler;
 
+	private QSimTimer simTimer;
+	
 	/**
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
 	protected final PriorityQueue<Tuple<Double, PersonDriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, PersonDriverAgent>>(30, new TeleportationArrivalTimeComparator());
-	private final Date starttime = new Date();
+	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100*3600;
 	private AgentFactory agentFactory;
 	private SimulationListenerManager<QSim> listenerManager;
@@ -143,7 +145,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
     // In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
     this.listenerManager = new SimulationListenerManager<QSim>(this);
     Simulation.reset(sc.getConfig().getQSimConfigGroup().getStuckTime());
-    QSimTimerStatic.reset(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
+    this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
     Config config = sc.getConfig();
     this.simEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
 
@@ -215,17 +217,16 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		//do iterations
-		boolean cont = true;
-		double time = QSimTimerStatic.getTime();
-		while (cont) {
-			time = QSimTimerStatic.getTime();
+		boolean doContinue = true;
+		double time = this.simTimer.getTimeOfDay();
+		while (doContinue) {
 			beforeSimStep(time);
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
-			cont = doSimStep(time);
+			doContinue = doSimStep(time);
 			afterSimStep(time);
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
-			if (cont) {
-				QSimTimerStatic.incTime();
+			if (doContinue) {
+				time = this.simTimer.incrementTime();
 			}
 		}
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
@@ -274,6 +275,23 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		log.warn("NetVis is no longer supported by this simulation.");
 	}
 
+	private void initSimTimer() {
+		double startTime = this.scenario.getConfig().getQSimConfigGroup().getStartTime();
+		this.stopTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
+		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
+		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
+		this.simTimer.setSimStartTime(24*3600);
+		this.simTimer.setTime(startTime);
+		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
+		double simStartTime = 0;
+		PersonDriverAgent firstAgent = this.activityEndsList.peek();
+		if (firstAgent != null) {
+			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
+		}
+		this.simTimer.setSimStartTime(simStartTime);
+		this.simTimer.setTime(simStartTime);
+	}
+	
 
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
@@ -288,33 +306,19 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		if (this.signalEngine != null) {
 			this.signalEngine.onPrepareSim();
 		}
-
-
-		double startTime = this.scenario.getConfig().getQSimConfigGroup().getStartTime();
-		this.stopTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
-		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
-		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
-		QSimTimerStatic.setSimStartTime(24*3600);
-		QSimTimerStatic.setTime(startTime);
-
-		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
-		double simStartTime = 0;
 		createAgents();
-		PersonDriverAgent firstAgent = this.activityEndsList.peek();
-		if (firstAgent != null) {
-			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
-		}
+
+		this.initSimTimer();
+
 		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
-		this.infoTime = Math.floor(simStartTime / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
-		this.snapshotTime = Math.floor(simStartTime / this.snapshotPeriod) * this.snapshotPeriod;
-		QSimTimerStatic.setSimStartTime(simStartTime);
-		QSimTimerStatic.setTime(QSimTimerStatic.getSimStartTime());
+		this.infoTime = Math.floor(this.simTimer.getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
+		this.snapshotTime = Math.floor(this.simTimer.getSimStartTime() / this.snapshotPeriod) * this.snapshotPeriod;
 
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
 		this.snapshotManager = new QSimSnapshotWriterManager();
 		this.snapshotManager.createSnapshotwriter(this.network, this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
-    if (this.snapshotTime < simStartTime) {
+    if (this.snapshotTime < this.simTimer.getSimStartTime()) {
       this.snapshotTime += this.snapshotPeriod;
     }
 
@@ -350,7 +354,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		}
 
 		this.simEngine.afterSim();
-		double now = QSimTimerStatic.getTime();
+		double now = this.simTimer.getTimeOfDay();
 		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {
 			PersonDriverAgent agent = entry.getSecond();
 			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
@@ -385,8 +389,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
     if (time >= this.infoTime) {
       this.infoTime += INFO_PERIOD;
       Date endtime = new Date();
-      long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
-      double diffsim  = time - QSimTimerStatic.getSimStartTime();
+      long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime())/1000;
+      double diffsim  = time - this.simTimer.getSimStartTime();
       int nofActiveLinks = this.simEngine.getNumberOfSimulatedLinks();
       log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
           + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
@@ -650,8 +654,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.controlerIO = controlerIO;
 	}
 
-	public double getTimeOfDay() {
-		return QSimTimerStatic.getTime() ;
+	public QSimTimer getSimTimer() {
+		return this.simTimer ;
 	}
 	
 	public QSimEngine getQSimEngine() {

@@ -27,7 +27,6 @@ import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.ptproject.qsim.QLane;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QLinkLanesImpl;
-import org.matsim.ptproject.qsim.QSimTimerStatic;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -49,7 +48,7 @@ public class OTFSignalWriter extends OTFLaneWriter {
 				for (QLane ql : ((QLinkLanesImpl)this.src).getToNodeQueueLanes()){
 					ByteBufferUtils.putString(out, ql.getLaneId().toString());
 					SignalGroupDefinition sg = ql.getSignalGroups().values().iterator().next();
-					SignalGroupState state = sg.getSignalControler().getSignalGroupState(QSimTimerStatic.getTime(), sg);
+					SignalGroupState state = sg.getSignalControler().getSignalGroupState(this.src.getQSimEngine().getQSim().getSimTimer().getTimeOfDay(), sg);
 					if (state.equals(SignalGroupState.GREEN)){
 						out.putInt(1);
 					}

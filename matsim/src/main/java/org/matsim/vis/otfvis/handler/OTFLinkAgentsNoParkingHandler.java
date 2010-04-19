@@ -23,7 +23,6 @@ package org.matsim.vis.otfvis.handler;
 import java.nio.ByteBuffer;
 
 import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QSimTimerStatic;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
@@ -46,7 +45,7 @@ public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 		protected void writeAllAgents(ByteBuffer out) {
 			// Write additional agent data
 			positions.clear();
-			this.src.getVisData().getVehiclePositions(QSimTimerStatic.getTime(), positions);
+			this.src.getVisData().getVehiclePositions(this.src.getQSimEngine().getQSim().getSimTimer().getTimeOfDay(), positions);
 			int valid = 0;
 			for (AgentSnapshotInfo pos : positions) {
 				if (pos.getAgentState() != AgentState.PERSON_AT_ACTIVITY) valid++;

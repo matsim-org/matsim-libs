@@ -35,10 +35,11 @@ public interface AgentContentment {
 	 * Retruns a value that represents the agent's current contentment where
 	 * positive values denote the agent is pleased and negative values denote
 	 * the agent is displeased. Values should be in the range of -1 to 1.
+	 * @param time_sec 
 	 *
 	 * @return A value representing the agent's current contentment.
 	 */
-	public double getContentment();
+	public double getContentment(double time_sec);
 
 	/**
 	 * Tells the module that the agent performed a replan.

@@ -40,7 +40,6 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.QSimTimerStatic;
 
 /**
  * @author abergsten and dzetterberg
@@ -142,7 +141,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 			Link l = this.network.getLinks().get(linkId);
 			if (!this.capacities.containsKey(linkId)) {
 				double capacity = ((LinkImpl)l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
-						/ QSimTimerStatic.getSimTickTime();
+					/ this.simulationConfig.getTimeStepSize();
 				this.capacities.put(linkId, capacity);
 			}
 
@@ -201,7 +200,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 			Link l = this.network.getLinks().get(linkId);
 			if (!this.capacities.containsKey(linkId)) {
 				double capacity = ((LinkImpl) l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
-						/ QSimTimerStatic.getSimTickTime();
+				/ this.simulationConfig.getTimeStepSize();
 				this.capacities.put(linkId, capacity);
 			}
 
@@ -311,34 +310,34 @@ public class ControlInputSB extends AbstractControlInputImpl {
 
 
 	@Override
-	public double getNashTime() {
-		super.getNashTime();
-		return getPredictedNashTime();
+	public double getNashTime(final double time) {
+		super.getNashTime(time);
+		return getPredictedNashTime(time);
 	}
 
 	// calculates the predictive time difference
-	public double getPredictedNashTime() {
+	public double getPredictedNashTime(final double time) {
 
 		if (this.accidents.isEmpty()) {
 			// throw new UnsupportedOperationException("To use this controler an
 			// accident has to be set");
 			this.predTTMainRoute = getPredictedTravelTime(this.mainRoute,
-					this.network.getLinks().get(this.mainRouteNaturalBottleNeckId));
+					this.network.getLinks().get(this.mainRouteNaturalBottleNeckId), time);
 		}
 		else {
 			Link accidentLink =  this.accidents.iterator().next().getLinks().iterator().next();
 			if (containsAccidentsOnRoutes(accidentLink.getId())) {
-				this.predTTMainRoute = getPredictedTravelTime(this.mainRoute, this.network.getLinks().get(accidentLink.getId()));
+				this.predTTMainRoute = getPredictedTravelTime(this.mainRoute, this.network.getLinks().get(accidentLink.getId()), time);
 			}
 		}
 
 		this.predTTAlternativeRoute = getPredictedTravelTime(this.alternativeRoute,
-				this.network.getLinks().get(this.altRouteNaturalBottleNeckId));
+				this.network.getLinks().get(this.altRouteNaturalBottleNeckId), time);
 
 		return this.predTTMainRoute - this.predTTAlternativeRoute;
 	}
 
-	private double getPredictedTravelTime(final NetworkRoute route, final Link bottleNeck) {
+	private double getPredictedTravelTime(final NetworkRoute route, final Link bottleNeck, double time) {
 
 		double predictedTT;
 		List<Id> routeLinkIds = route.getLinkIds();
@@ -367,7 +366,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 					// do not check links before current bottleneck
 					break;
 				}
-				else if (QSimTimerStatic.getTime() % RESETBOTTLENECKINTERVALL == 0) {
+				else if (time % RESETBOTTLENECKINTERVALL == 0) {
 					this.currentBNCapacityAlternativeRoute = getCapacity(this.altRouteNaturalBottleNeckId);
 					this.currentBNCapacityMainRoute = getCapacity(this.mainRouteNaturalBottleNeckId);
 					this.currentBottleNeckAlternativeRoute = this.altRouteNaturalBottleNeckId;
@@ -379,8 +378,8 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		else if (!this.incidentDetectionActive) {
 			currentBottleNeckId = bottleNeck.getId();
 			Link currentBottleNeck = bottleNeck;
-			currentBottleNeckCapacity = ((LinkImpl)currentBottleNeck).getFlowCapacity(QSimTimerStatic.getTime()) * this.simulationConfig.getFlowCapFactor()
-					/ QSimTimerStatic.getSimTickTime();
+			currentBottleNeckCapacity = ((LinkImpl)currentBottleNeck).getFlowCapacity(time) * this.simulationConfig.getFlowCapFactor()
+				/ this.simulationConfig.getTimeStepSize();
 
 		}
 

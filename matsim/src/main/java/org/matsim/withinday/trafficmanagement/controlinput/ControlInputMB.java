@@ -41,7 +41,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.QSimTimerStatic;
 
 /**
  * @author abergsten and dzetterberg
@@ -137,8 +136,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 			Link l = this.network.getLinks().get(linkId);
 			if (!this.capacities.containsKey(linkId)) {
-				double capacity = ((LinkImpl)l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
-						/ QSimTimerStatic.getSimTickTime();
+				double capacity = ((LinkImpl)l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor() / this.simulationConfig.getTimeStepSize();
 				this.capacities.put(l.getId(), capacity);
 			}
 
@@ -196,8 +194,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 			}
 
 			if (!this.capacities.containsKey(linkId)) {
-				double capacity = ((LinkImpl)l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
-						/ QSimTimerStatic.getSimTickTime();
+				double capacity = ((LinkImpl)l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor() / this.simulationConfig.getTimeStepSize();
 				this.capacities.put(linkId, capacity);
 			}
 
@@ -307,38 +304,38 @@ public class ControlInputMB extends AbstractControlInputImpl {
 	}
 
 	@Override
-	public double getNashTime() {
-		super.getNashTime();
-		return getPredictedNashTime();
+	public double getNashTime(final double time) {
+		super.getNashTime(time);
+		return getPredictedNashTime(time);
 
 	}
 
 	// calculates the predictive time difference
-	public double getPredictedNashTime() {
+	public double getPredictedNashTime(final double time) {
 
 		if (this.accidents.isEmpty()) {
 			// throw new UnsupportedOperationException("To use this controler an
 			// accident has to be set");
 			this.predTTMainRoute = getPredictedTravelTime(this.mainRoute,
-					this.network.getLinks().get(this.mainRouteNaturalBottleNeckId));
+					this.network.getLinks().get(this.mainRouteNaturalBottleNeckId), time);
 		}
 		else {
 			Id accidentLinkId = this.accidents.iterator().next().getLinks().iterator().next().getId();
 			Id accidentLinkIdMainRoute = searchAccidentsOnRoutes(accidentLinkId);
 			this.predTTMainRoute = getPredictedTravelTime(this.mainRoute,
-					this.network.getLinks().get(accidentLinkIdMainRoute));
+					this.network.getLinks().get(accidentLinkIdMainRoute), time);
 		}
 
 		this.predTTAlternativeRoute = getPredictedTravelTime(this.alternativeRoute,
-				this.network.getLinks().get(this.altRouteNaturalBottleNeckId));
+				this.network.getLinks().get(this.altRouteNaturalBottleNeckId), time);
 
 		return this.predTTMainRoute - this.predTTAlternativeRoute;
 	}
 
-	private double getPredictedTravelTime(final NetworkRoute route, final Link bottleNeck) {
+	private double getPredictedTravelTime(final NetworkRoute route, final Link bottleNeck, final double time) {
 
 		log.trace("");
-		log.trace("Sim time: " + QSimTimerStatic.getTime());
+		log.trace("Sim time: " + time);
 		double predictedTT;
 		List<Id> routeLinkIds = route.getLinkIds();
 		routeLinkIds.add(0, route.getStartLinkId());
@@ -354,7 +351,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		}
 
 		// boolean queueFound = true;
-		if (QSimTimerStatic.getTime() % this.resetbottleneckintervall == 0) {
+		if (time % this.resetbottleneckintervall == 0) {
 			bottleNeckList.clear();
 
 			for (int i = routeLinkIds.size() - 1; i >= 0; i--) { // 2
@@ -387,8 +384,8 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 		if (bottleNeckList.isEmpty()) {
 			double agentsOnRoute = getAgents(route);
-			double currentBottleNeckCapacity = ((LinkImpl)bottleNeck).getFlowCapacity(QSimTimerStatic.getTime()) * this.simulationConfig.getFlowCapFactor()
-			/ QSimTimerStatic.getSimTickTime();
+			double currentBottleNeckCapacity = ((LinkImpl)bottleNeck).getFlowCapacity(time) * this.simulationConfig.getFlowCapFactor() 
+				/ this.simulationConfig.getTimeStepSize();
 			double ttQueue = agentsOnRoute / currentBottleNeckCapacity;
 			double ttFreeSpeed = getFreeSpeedRouteTravelTime(route);
 			if (ttQueue > ttFreeSpeed) {
