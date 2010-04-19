@@ -79,6 +79,11 @@ public class Intervals<T extends Interval > {
 		public int getSize() {		
 			return this._tree._size;
 		}
+		
+		public int getMeasure() {
+			return this._tree._size;
+		}
+		
 		/**
 		 * Gives the last stored Interval
 		 * @return Interval with maximal lowbound
@@ -101,7 +106,7 @@ public class Intervals<T extends Interval > {
 		 * @param o EgeInterval which it test for 
 		 * @return true if getLast.equals(o)
 		 */
-		public boolean isLast(T o){			
+		public boolean isLast(Interval o){			
 			return (_last.equals(o));
 		}
 		
@@ -126,6 +131,11 @@ public class Intervals<T extends Interval > {
 			else throw new IllegalArgumentException("Interval was not contained");
 		}
 		
+		public int getLastTime() {		
+			return this.getLast().getHighBound();		
+		}
+
+
 		
 	//------------------------SPLITTING--------------------------------//	
 		

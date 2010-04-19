@@ -35,7 +35,7 @@ import playground.dressler.control.FlowCalculationSettings;
  * @author Manuel Schneider, Daniel Dressler
  *
  */
-public class EdgeIntervals extends Intervals<EdgeInterval> {
+public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI {
 
 //**********************************FIELDS*****************************************//
 	
@@ -230,16 +230,6 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 		this._last = i; // we might have to update it, just do it always
 		return gain;
 	}
-
-	/**
-	 * Checks whether the given VertexInterval is the last
-	 * @param o EgeInterval which it test for 
-	 * @return true if getLast.equals(o)
-	 */
-	@Override
-	public boolean isLast(EdgeInterval o){
-		return super.isLast(o)&& o.getFlow()==this.getLast().getFlow();
-	}
 	
 //------------------------Augmentation--------------------------------//
 	
@@ -299,6 +289,23 @@ public class EdgeIntervals extends Intervals<EdgeInterval> {
 	 */
 	public static void debug(int debug){
 		EdgeIntervals._debug=debug;
+	}
+
+	
+	public boolean checkFlowAt(final int t, final int cap) {
+		return this.getIntervalAt(t).checkFlow(cap);
+	}
+
+
+	@Override
+	public int getLastTime() {		
+		return this.getLast().getHighBound();		
+	}
+
+
+	@Override
+	public int getMeasure() {
+		return this.getSize();
 	}
 	
 	/**

@@ -42,15 +42,18 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
+import playground.dressler.Interval.BinaryInterval;
+import playground.dressler.Interval.EdgeFlowI;
 import playground.dressler.Interval.EdgeInterval;
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
+import playground.dressler.Interval.ShadowEdgeFlow;
 import playground.dressler.Interval.SinkIntervals;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.control.FlowCalculationSettings;
 /**
  * Class representing a dynamic flow on an network with multiple sources and a single sink
- * @author Manuel Schneider
+ * @author Daniel Dressler, Manuel Schneider
  *
  */
 
@@ -72,7 +75,8 @@ public class Flow {
 	/**
 	 * Edge representation of flow on the network
 	 */
-	private HashMap<Link, EdgeIntervals> _flow;
+//	private HashMap<Link, EdgeIntervals> _flow;
+	private HashMap<Link, EdgeFlowI> _flow;
 
 
 	/**
@@ -146,7 +150,7 @@ public class Flow {
 
 		this._settings = settings;
 		this._network = settings.getNetwork();
-		this._flow = new HashMap<Link,EdgeIntervals>();
+		this._flow = new HashMap<Link,EdgeFlowI>();
 		this._sourceoutflow = new HashMap<Node, SourceIntervals>();
 		this._sinkflow = new HashMap<Node, SinkIntervals>();
 		
@@ -176,33 +180,60 @@ public class Flow {
 				this._demands.put(node, i);				
 			}
 		}
-		// initialize EdgeIntervalls
+		
+		// initialize EdgeIntervalls or the ShadowEdgeFlows
 		for (Link edge : this._network.getLinks().values()) {
 			int low = 0;
 			int high = settings.TimeHorizon;
 			// Intervals expects that it starts at 0, so we cannot restrict ourselves
 			// to just the available interval ...
-			EdgeInterval temp = new EdgeInterval(low, high);
 			
-			Interval available;
-			if (this._settings.whenAvailable != null) {
-				available = this._settings.whenAvailable.get(edge);
-				// could still be null, which means "always"
+			if (settings.useShadowFlow) {
+				Interval temp = new Interval(low, high);
+
+				Interval available;
+				if (this._settings.whenAvailable != null) {
+					available = this._settings.whenAvailable.get(edge);
+					// could still be null, which means "always"
+				} else {
+					available = null;
+				}
+
+				if (available != null) {
+					low = Math.max(low, available.getLowBound());
+					high = Math.min(high, available.getHighBound());				
+				}
+
+				available = new Interval(low, high);
+
+				ShadowEdgeFlow edgeflow = new ShadowEdgeFlow(temp, this._settings.getLength(edge), 
+						this._settings.getCapacity(edge), available);
+
+				this._flow.put(edge, edgeflow);
 			} else {
-				available = null;
+
+				EdgeInterval temp = new EdgeInterval(low, high);
+
+				Interval available;
+				if (this._settings.whenAvailable != null) {
+					available = this._settings.whenAvailable.get(edge);
+					// could still be null, which means "always"
+				} else {
+					available = null;
+				}
+
+				if (available != null) {
+					low = Math.max(low, available.getLowBound());
+					high = Math.min(high, available.getHighBound());				
+				}
+
+				available = new Interval(low, high);
+
+				EdgeIntervals edgeflow = new EdgeIntervals(temp, this._settings.getLength(edge), 
+						this._settings.getCapacity(edge), available);
+
+				this._flow.put(edge, edgeflow);
 			}
-			
-			if (available != null) {
-				low = Math.max(low, available.getLowBound());
-				high = Math.min(high, available.getHighBound());				
-			}
-			
-			available = new Interval(low, high);
-			
-			EdgeIntervals edgeflow = new EdgeIntervals(temp, this._settings.getLength(edge), 
-					 this._settings.getCapacity(edge), available);
-			
-			this._flow.put(edge, edgeflow);
 		}
 
 		this._timeHorizon = settings.TimeHorizon;
@@ -580,10 +611,10 @@ public class Flow {
 			Link edge = se.getEdge();
 
 			if(se.getForward()){
-				return this._flow.get(edge).getIntervalAt(se.getStartTime()).checkFlow(this._settings.getCapacity(edge));
+				return this._flow.get(edge).checkFlowAt(se.getStartTime(), this._settings.getCapacity(edge));
 
 			}	else {
-				return this._flow.get(edge).getIntervalAt(se.getArrivalTime()).checkFlow(this._settings.getCapacity(edge));
+				return this._flow.get(edge).checkFlowAt(se.getArrivalTime(), this._settings.getCapacity(edge));
 			}
 		} else if (step instanceof StepSourceFlow) {
 			StepSourceFlow ssf = (StepSourceFlow) step;
@@ -678,18 +709,11 @@ public class Flow {
 
 			int timeToStopChecking;
 
-			if (this._flow.get(edge).getLast().getFlow() == 0) {
-				timeToStopChecking = this._flow.get(edge).getLast().getLowBound();
-			} else {
-				timeToStopChecking = this._flow.get(edge).getLast().getHighBound();
-			}
-
-			if (tempflow._flow.get(edge).getLast().getFlow() == 0) {
-				timeToStopChecking = Math.max(timeToStopChecking, tempflow._flow.get(edge).getLast().getLowBound());
-			} else {
-				timeToStopChecking = Math.max(timeToStopChecking, tempflow._flow.get(edge).getLast().getHighBound());
-			}
-
+			
+			timeToStopChecking = this._flow.get(edge).getLastTime();
+			
+			timeToStopChecking = Math.max(timeToStopChecking, tempflow._flow.get(edge).getLastTime());
+			
 			if (timeToStopChecking > this._timeHorizon) {
 				System.out.println("Weird. There is flow beyond the TimeHorizon!");
 				thisisbad = true;
@@ -1781,7 +1805,7 @@ public class Flow {
 	public int cleanUp() {
 
 		int gain = 0;
-		for (EdgeIntervals EI : _flow.values()) {
+		for (EdgeFlowI EI : _flow.values()) {
 		  gain += EI.cleanup();
 		}
 		for (Node node : this._sourceoutflow.keySet()) {
@@ -1809,7 +1833,7 @@ public class Flow {
 	public String toString(){
 		StringBuilder strb = new StringBuilder();
 		for(Link link : _flow.keySet()){
-			EdgeIntervals edge =_flow.get(link);
+			EdgeFlowI edge =_flow.get(link);
 			strb.append(link.getId().toString()+ ": " + edge.toString()+ "\n");
 		}
 		return strb.toString();
@@ -1825,7 +1849,7 @@ public class Flow {
 	/**
 	 * @return the _flow
 	 */
-	public EdgeIntervals getFlow(Link edge) {
+	public EdgeFlowI getFlow(Link edge) {
 		return this._flow.get(edge);
 	}
 
@@ -1898,8 +1922,8 @@ public class Flow {
 		int min = Integer.MAX_VALUE;
 		int max = 0;
 		long sum = 0;
-		for (EdgeIntervals i : this._flow.values()) {
-			int size = i.getSize();
+		for (EdgeFlowI i : this._flow.values()) {
+			int size = i.getMeasure();
 			sum += size;
 			min = Math.min(min, size);
 			max = Math.max(max, size);

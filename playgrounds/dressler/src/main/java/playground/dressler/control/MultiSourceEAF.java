@@ -476,7 +476,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 41;
+		int instance = 2;
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -497,7 +497,7 @@ public class MultiSourceEAF {
 		} else if (instance == 2) {
 			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
 			uniformDemands = 100;
-			timeStep = 100;
+			timeStep = 100; // FIXME 10
 			flowFactor = 1.0;
 			sinkid = "en1";
 		} else if (instance == 3) {
@@ -698,6 +698,7 @@ public class MultiSourceEAF {
 		//settings.MaxRounds = 95;
 		//settings.checkConsistency = 100;
 		//settings.useVertexCleanup = false;
+		settings.useShadowFlow = true;
 		//settings.useSinkCapacities = false;
 		//settings.useImplicitVertexCleanup = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
@@ -760,7 +761,8 @@ public class MultiSourceEAF {
 			new PopulationWriter(output, network).writeFile(outputplansfile);
 		}
 
-
+		//System.out.println(fluss);
+		
 		if(_debug){
 			System.out.println("done");
 		}

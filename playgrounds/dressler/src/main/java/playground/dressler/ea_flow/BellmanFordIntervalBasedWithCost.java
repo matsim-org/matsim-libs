@@ -29,6 +29,7 @@ import java.util.Queue;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
+import playground.dressler.Interval.EdgeFlowI;
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.Pair;
@@ -1240,7 +1241,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			Node to, Link over, boolean original, boolean reverse,
 			int timehorizon, int cost, boolean costIsRelative) {
 		VertexIntervals labelto = (VertexIntervalsWithCost) _labels.get(to);
-		EdgeIntervals flowover = this._flow.getFlow(over);
+		EdgeFlowI flowover = this._flow.getFlow(over);
 		ArrayList<VertexInterval> changed;
 
 		ArrayList<Interval> arrive;

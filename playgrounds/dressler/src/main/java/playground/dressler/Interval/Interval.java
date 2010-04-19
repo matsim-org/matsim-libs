@@ -276,7 +276,7 @@ implements Comparable<Interval>
 //--------------------INTERSECTION UNION-------------------------------------------//	
 	
 	/**
-	 * checks weather two Interval are equal with respect to their bounds
+	 * checks whether two Intervals are equal with respect to their bounds
 	 * @param i  other Interval
 	 * @return true iff both are equal
 	 */

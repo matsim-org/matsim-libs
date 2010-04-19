@@ -65,15 +65,6 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 	}
 	
 	/**
-	 * Checks weather the given EdgeInterval is the last
-	 * @param o EgeInterval which it test for 
-	 * @return true if getLast.equals(o)
-	 */
-	public boolean isLast(final EdgeInterval o){
-		return super.isLast(o)&& o.getFlow()==this.getLast().getFlow();
-	}
-	
-	/**
 	 * setter for debug mode
 	 * @param debug debug mode true is on
 	 */

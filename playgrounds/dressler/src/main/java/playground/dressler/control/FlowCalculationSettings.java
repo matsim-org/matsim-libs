@@ -53,6 +53,7 @@ public class FlowCalculationSettings {
 	public int searchAlgo = SEARCHALGO_FORWARD;
 	public boolean useVertexCleanup = false;
 	public boolean useImplicitVertexCleanup = true; // unite vertex intervals before propagating?
+	public boolean useShadowFlow = false; // use arrays and shadow flows for storing the edge flow 
 	public int checkConsistency = 0; // after how many iterations should consistency be checked? 0 = off
 	public boolean checkTouchedNodes = true; // should Flow.UnfoldAndAugment() try to shortcut the search for suitable forward steps?
 
@@ -283,8 +284,9 @@ public class FlowCalculationSettings {
 		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);
 
 		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
-		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);
+		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);		
 		System.out.println("Use implicit vertex cleanup: " + this.useImplicitVertexCleanup);
+		System.out.println("Use Shadow Flow: " + this.useShadowFlow);
 		System.out.println("Use repeated paths: " + this.useRepeatedPaths);
 		System.out.println("Sort paths before augmenting: " + this.sortPathsBeforeAugmenting);
 		System.out.println("Use touched nodes hashmaps: " + this.checkTouchedNodes);

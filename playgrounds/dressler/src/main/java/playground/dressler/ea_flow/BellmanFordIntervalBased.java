@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 
+import playground.dressler.Interval.EdgeFlowI;
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.Pair;
@@ -716,7 +717,7 @@ public class BellmanFordIntervalBased {
 	 */
 	private ArrayList<VertexInterval> relabel(Node from, Interval ival, Node to, Link over, boolean original, boolean reverse, int timehorizon) {		
 			VertexIntervals labelto = _labels.get(to);
-			EdgeIntervals flowover = this._flow.getFlow(over);
+			EdgeFlowI flowover = this._flow.getFlow(over);
 			ArrayList<VertexInterval> changed;
 
 
@@ -1733,7 +1734,9 @@ public class BellmanFordIntervalBased {
 
 
 
-	/* reset status information of the algo for the next iter */
+	/**
+	 *  reset status information of the algo for the next iter 
+	 */
 	public void startNewIter(int lastArrival) {
 		this._vertexGain = 0;
 		this._roundpolls=0;
