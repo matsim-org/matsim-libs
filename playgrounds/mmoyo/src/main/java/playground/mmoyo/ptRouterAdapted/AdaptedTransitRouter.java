@@ -95,8 +95,7 @@ public class AdaptedTransitRouter {
 		for (TransitRouterNetworkNode node : fromNodes) {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / config.beelineWalkSpeed ;
-//			double initialCost = initialTime * PTValues.walkCoefficient ; // I don't know what this is.  kai, apr'10
-			double initialCost =  0. ;
+			double initialCost = - initialTime * config.marginalUtilityOfTravelTimeWalk ; // yyyy check sign!!!  kai, apr'10
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -112,8 +111,8 @@ public class AdaptedTransitRouter {
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : toNodes) {
 			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
-			double initialTime = distance * PTValues.AV_WALKING_SPEED;
-			double initialCost = initialTime * PTValues.walkCoefficient;
+			double initialTime = distance / config.beelineWalkSpeed ;
+			double initialCost = - initialTime * config.marginalUtilityOfTravelTimeWalk ; // yyyy check sign!!! kai, apr'10
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -126,12 +125,12 @@ public class AdaptedTransitRouter {
 		
 		// optional direct walk *
 		if (PTValues.allowDirectWalks){
-			double directWalkCost = (CoordUtils.calcDistance(fromCoord, toCoord) * PTValues.AV_WALKING_SPEED) * ( PTValues.walkCoefficient);
+			double directWalkCost = - CoordUtils.calcDistance(fromCoord, toCoord) / config.beelineWalkSpeed  * config.marginalUtilityOfTravelTimeWalk ;
 			double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 			if (directWalkCost < pathCost) {
 				List<Leg> legs = new ArrayList<Leg>();
 				Leg leg = new LegImpl(TransportMode.transit_walk);
-				double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) * PTValues.AV_WALKING_SPEED;
+				double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / config.beelineWalkSpeed ;
 				Route walkRoute = new GenericRouteImpl(null, null);
 				leg.setRoute(walkRoute);
 				leg.setTravelTime(walkTime);
@@ -185,7 +184,7 @@ public class AdaptedTransitRouter {
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) * PTValues.AV_WALKING_SPEED;
+								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / config.beelineWalkSpeed ;
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
 								leg.setTravelTime(walkTime);
@@ -193,7 +192,7 @@ public class AdaptedTransitRouter {
 								legs.add(leg);
 							} else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord()) * PTValues.AV_WALKING_SPEED;
+								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord()) / config.beelineWalkSpeed ;
 								leg.setTravelTime(walkTime);
 								time += walkTime;
 								legs.add(leg);
@@ -227,9 +226,9 @@ public class AdaptedTransitRouter {
 			leg = new LegImpl(TransportMode.transit_walk);
 			double walkTime;
 			if (accessStop == null) {
-				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) * PTValues.AV_WALKING_SPEED;
+				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / config.beelineWalkSpeed ;
 			} else {
-				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) * PTValues.AV_WALKING_SPEED;
+				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / config.beelineWalkSpeed ;
 			}
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
@@ -238,7 +237,7 @@ public class AdaptedTransitRouter {
 			// it seems, the agent only walked
 			legs.clear();
 			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) * PTValues.AV_WALKING_SPEED;
+			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / config.beelineWalkSpeed ;
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
 		}

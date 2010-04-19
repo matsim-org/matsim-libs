@@ -88,6 +88,8 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcRoute {
 		TransitRouterConfig trConfig = new MyTransitRouterConfig() ;
 		this.adaptedTransitRouter = new AdaptedTransitRouter( trConfig, schedule);
 
+		// both "super" route algos are made to route only on the "car" network.  yy I assume this is since the non-car modes are handled
+		// here.  This is, in fact, NOT correct, since this does not handle bike, so would need to be fixed before production use).  kai, apr'10
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
 		if (routeAlgo instanceof Dijkstra) {
 			((Dijkstra) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
@@ -98,18 +100,30 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcRoute {
 		}
 	}
 
-	@Override
+	@Override // necessary in order to remove the "pt interaction" activities and corresponding legs from earlier pt plans.
 	public void handlePlan(Person person, final Plan plan) {
+
+		// remove "intermediate" legs from plan
 		this.transitLegsRemover.run(plan);
+
+		// yyyy I think plan could be passed as argument to replaceLegs().  Please modify code accordingly, or explain why this is not possible. kai, apr'10
 		this.currentPlan = plan;
+
 		this.legReplacements.clear();
+		
 		super.handlePlan(person, plan);
+
+		// yy Please explain somewhere what the legReplacements are doing. kai, apr'10
+		// yy Please explain why this is done at the level here, and not inside calcRoute.  kai, apr'10
+		// yy Please explain how Marcel's code can work without this (does it?). kai, apr'10
 		this.replaceLegs();
+
 		this.currentPlan = null;
 
 	}
 
 	@Override
+	// yy In the long term, would be better to not override this. kai, apr'10
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		if (this.transitConfig.getTransitModes().contains(leg.getMode())) {
 			return this.handlePtPlan(leg, fromAct, toAct, depTime);

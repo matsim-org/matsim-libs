@@ -40,15 +40,21 @@ public class AdaptedLauncher {
 		}
 		
 		//fragment plans
+		// yy why is this necessary here?  I would think it could be done just before output? kai, apr'10
 		if (PTValues.fragmentPlans){
 			scenarioImpl.setPopulation(new PlanFragmenter().run(scenarioImpl.getPopulation()));					
 		}
 		
 		//route
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
-		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenarioImpl.getConfig().charyparNagelScoring());
+		FreespeedTravelTimeCost freespeedTravelTimeCost = new FreespeedTravelTimeCost(scenarioImpl.getConfig().charyparNagelScoring());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
-		AdaptedPlansCalcTransitRoute adaptedRouter = new AdaptedPlansCalcTransitRoute(scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenarioImpl.getTransitSchedule(), transitConfig);
+
+		// yy The following comes from PlansCalcRoute; in consequence, one can configure the car router attributes.  In addition, one can configure _some_
+		// of the transit attributes from here (transitSchedule, transitConfig), but not some others.  Please describe the design reason for this.  kai, apr'10
+		AdaptedPlansCalcTransitRoute adaptedRouter = new AdaptedPlansCalcTransitRoute(scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getNetwork(), 
+				freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, scenarioImpl.getTransitSchedule(), transitConfig);
+
 		adaptedRouter.run(scenarioImpl.getPopulation());
 		
 		//write 
