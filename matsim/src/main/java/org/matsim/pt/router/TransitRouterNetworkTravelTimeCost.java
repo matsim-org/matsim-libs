@@ -42,7 +42,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 
 	private final static double MIDNIGHT = 24.0*3600;
 
-	private final TransitRouterConfig config;
+	protected final TransitRouterConfig config;
 	private Link previousLink = null;
 	private double previousTime = Double.NaN;
 	private double cachedTravelTime = Double.NaN;
