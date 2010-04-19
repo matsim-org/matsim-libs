@@ -37,14 +37,14 @@ public class SimulationParameters {
 	public static final String ENTER_LINK = "enter link";
 	public static final String LEAVE_LINK = "leave link";
 	/**
-	 * 
+	 *
 	 * the priorities of the messages. a higher priority comes first in the
 	 * message queue (when same time) usage: for example a person has a enter
 	 * road message at the same time as leaving the previous road (need to keep
 	 * the messages in right order) for events with same time stamp: <br>
 	 * leave < arrival < departure < enter especially for testing this is
 	 * important
-	 * 
+	 *
 	 */
 	public static final int PRIORITY_LEAVE_ROAD_MESSAGE = 200;
 	public static final int PRIORITY_ARRIVAL_MESSAGE = 150;
@@ -69,18 +69,19 @@ public class SimulationParameters {
 	 * key=linkId used to find a road corresponding to a link
 	 */
 	private static HashMap<Id, Road> allRoads = null;
-	
+
 	public static void reset(){
-		simulationEndTime = Double.MAX_VALUE; 
-		gapTravelSpeed = 15.0; 
-		flowCapacityFactor = 1.0; 
-		storageCapacityFactor = 1.0; 
-		carSize = 7.5; 
+		simulationEndTime = Double.MAX_VALUE;
+		gapTravelSpeed = 15.0;
+		flowCapacityFactor = 1.0;
+		storageCapacityFactor = 1.0;
+		carSize = 7.5;
 		minimumInFlowCapacity = 1800;
 		squeezeTime = 1800;
 		allRoads = null;
+		processEventThread = null;
 	}
-	
+
 
 	// SETTINGS
 	// should garbage collection of messages be activated
