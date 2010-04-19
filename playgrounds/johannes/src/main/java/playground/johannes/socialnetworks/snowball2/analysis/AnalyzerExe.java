@@ -25,12 +25,13 @@ import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
+import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
+import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjection;
-import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
@@ -62,8 +63,8 @@ public class AnalyzerExe {
 //		SpatialGraph graphPrj = builder.decorate(graph, geometry);
 //		
 		SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> reader = new SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>(new SampledSocialGraphMLReader());
-		reader.setGraphProjectionBuilder(new SpatialSampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>());
-		SpatialSampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph = (SpatialSampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>) reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/tmp.graphml");
+		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>());
+		SocialSampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph = (SocialSampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>) reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/tmp.graphml");
 		
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 		

@@ -111,6 +111,9 @@ public class AlterTableReader {
 				 * find alter
 				 */
 				VertexRecord alter = vertexList.get(alterId);
+				if(alterId.equalsIgnoreCase("10434"))
+					System.err.println();
+				
 				if(alter == null) {
 					alter = new VertexRecord();
 					alter.id = alterId;

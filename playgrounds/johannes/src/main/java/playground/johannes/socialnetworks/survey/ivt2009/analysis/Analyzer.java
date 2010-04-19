@@ -30,7 +30,7 @@ import playground.johannes.socialnetworks.graph.spatial.analysis.GraphClippingFi
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
-import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjectionBuilder;
+import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraphBuilder;
@@ -53,7 +53,7 @@ public class Analyzer {
 		SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> reader =
 			new SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>(new SampledSocialGraphMLReader());
 		
-		reader.setGraphProjectionBuilder(new SpatialSampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>());
+		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>());
 		
 		SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph = reader.readGraph(args[0]);
 		/*

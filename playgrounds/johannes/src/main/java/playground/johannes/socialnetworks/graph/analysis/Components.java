@@ -25,12 +25,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 
 import playground.johannes.socialnetworks.graph.matrix.Dijkstra;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
+import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 
 /**
  * @author illenberger
@@ -49,6 +53,20 @@ public class Components {
 		return extractComponents(new AdjacencyMatrix(graph)).size();
 	}
 
+	public Set<Set<Vertex>> components(Graph graph) {
+		AdjacencyMatrixDecorator<Vertex> y = new AdjacencyMatrixDecorator<Vertex>(graph);
+		Set<Set<Vertex>> components = new HashSet<Set<Vertex>>();
+		List<TIntArrayList> comps = extractComponents(y);
+		for(TIntArrayList comp : comps) {
+			Set<Vertex> component = new HashSet<Vertex>();
+			for(int i = 0; i < comp.size(); i++) {
+				component.add(y.getVertex(comp.get(i)));
+			}
+			components.add(component);
+		}
+		return components;
+	}
+	
 	private List<TIntArrayList> extractComponents(AdjacencyMatrix y) {
 		boolean[] pending = new boolean[y.getVertexCount()];
 		Arrays.fill(pending, true);

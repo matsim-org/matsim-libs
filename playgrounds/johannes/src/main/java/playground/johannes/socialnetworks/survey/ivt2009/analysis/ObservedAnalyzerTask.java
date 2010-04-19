@@ -25,9 +25,11 @@ import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.ComponentsTask;
+import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
+import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
 
 /**
  * @author illenberger
@@ -50,6 +52,10 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		TransitivityTask tTask = new TransitivityTask();
 		tTask.setModule(new ObservedTransitivity());
 		addTask(tTask);
+		
+		AgeTask aTask = new AgeTask();
+		aTask.setModule(new ObservedAge());
+		addTask(aTask);
 		
 		addTask(new ComponentsTask());
 	}

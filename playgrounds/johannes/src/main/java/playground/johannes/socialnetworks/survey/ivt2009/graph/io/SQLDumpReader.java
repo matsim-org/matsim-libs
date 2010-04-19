@@ -60,7 +60,7 @@ public class SQLDumpReader {
 	
 	private static final String ALTER_LOC_KEY = "84967X54X338Loc";
 	
-	private static final String YEAR_KEY = "84967X53X157";
+	private static final String YEAR_KEY = "84967X53X106";
 	
 	private static final String ALTER_YEAR_KEY = "84967X54X137";
 	
@@ -170,7 +170,8 @@ public class SQLDumpReader {
 	public int getEgoAge(String egoId) {
 		String val = getValue(egoId, YEAR_KEY);
 		if(val != null) {
-			return SURVEY_YEAR - (Integer.parseInt(val) + 1919);
+			return SURVEY_YEAR - Integer.parseInt(val);
+//			return SURVEY_YEAR - (Integer.parseInt(val) + 1919);
 		} else
 			return -1;
 	}
