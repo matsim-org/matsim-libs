@@ -150,6 +150,19 @@ public class StrategyConfigGroup extends Module {
 		this.addParameterToMap(map, EXTERNAL_EXE_TIME_OUT);
 		return map;
 	}
+	
+	@Override
+	protected final Map<String, String> getComments() {
+		Map<String,String> map = super.getComments();
+		map.put(MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
+		for (Map.Entry<Id, StrategySettings>  entry : this.settings.entrySet()) {
+			map.put(MODULE + entry.getKey().toString(), "name of strategy (if not full class name, resolved in StrategyManagerConfigLoader)");
+			map.put(MODULE_PROBABILITY + entry.getKey().toString(), "probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight''");
+			map.put(MODULE_DISABLE_AFTER_ITERATION + entry.getKey().toString(), "iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...)");
+			map.put(MODULE_EXE_PATH + entry.getKey().toString(), "path to external executable (if applicable)" ) ;
+		}
+		return map ;
+	}
 
 	@Override
 	protected void checkConsistency() {
