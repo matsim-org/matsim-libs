@@ -21,6 +21,7 @@
 package org.matsim.vis.otfvis.executables;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisControlerListener;
 
@@ -41,6 +42,11 @@ public class OTFVisController extends Controler {
 
 	public OTFVisController(String configFileName) {
 		super(configFileName);
+		this.addControlerListener(new OTFVisControlerListener());
+	}
+
+	public OTFVisController(ScenarioImpl sc) {
+		super(sc);
 		this.addControlerListener(new OTFVisControlerListener());
 	}
 
