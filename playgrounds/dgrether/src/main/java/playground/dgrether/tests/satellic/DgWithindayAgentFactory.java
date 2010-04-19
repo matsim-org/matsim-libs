@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DRoedRunner
+ * DgWithindayAgentFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,36 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems;
+package playground.dgrether.tests.satellic;
 
+import java.util.Random;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.ptproject.qsim.AgentFactory;
+import org.matsim.ptproject.qsim.QPersonAgent;
+import org.matsim.ptproject.qsim.QSim;
 
 
 /**
  * @author dgrether
  *
  */
-public class DRoedRunner {
+public class DgWithindayAgentFactory extends AgentFactory {
 
-  /**
-   * @param args
-   */
-  public static void main(String[] args) {
+	private Random random;
 
-    String cottbusConfigMath = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbusConfig.xml";
-    String denverConfigGershenson = "/home/dgrether/shared-svn/studies/droeder/denver/dgDenverConfig.xml";
-    
-//    String config = denverConfigGershenson;
-    String config = cottbusConfigMath;
-    
-//    GershensonRunner runner = new GershensonRunner();
-//    runner.setN(142);
-//    runner.setU(21);
-//    runner.setCap(0.63);
-//    runner.setD(45);
-//    runner.setMaxRed(150);
-//    runner.runScenario(config);
-    
-    
-  }
+	public DgWithindayAgentFactory(QSim simulation, Random random) {
+		super(simulation);
+		this.random = random;
+	}
 
+	@Override
+	public QPersonAgent createPersonAgent(final Person p) {
+		QPersonAgent agent = new DgWithindayQPersonAgent(p, this.simulation, this.random);
+		return agent;
+	}
+	
 }

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * DgSatellicWithindayStarter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,69 +17,56 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package playground.dgrether.tests.satellic;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.run.OTFVis;
+
+import playground.dgrether.DgOTFVisConfigWriter;
+import playground.dgrether.DgPaths;
 
 
-/**
- * @author dgrether
- *
- */
-public class DgEquilController {
 
-	/**
-	 * @param args
-	 */
+public class DgSatellicWithindayStarter {
+
 	public static void main(String[] args) {
-		
-	  final boolean useQSim = true;
-	  
 		final String configfile = DgPaths.EXAMPLEBASE + "equil/configPlans100.xml";
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader confReader = new MatsimConfigReader(config);
 		confReader.readFile(configfile);
+
+		config.controler().setLastIteration(0);
+		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
+		config.getQSimConfigGroup().setSnapshotPeriod(10.0);
+		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		
-		
-//		final int iteration = 0;
-		final int iteration = 0;
 		
 		Controler controler = new Controler(config);
-		if (useQSim){
-		  controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		  controler.getConfig().getQSimConfigGroup().setSnapshotFormat("otfvis");
-		  controler.getConfig().getQSimConfigGroup().setSnapshotPeriod(1.0);
-		  controler.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
-		}
-		else {
-		  controler.getConfig().simulation().setSnapshotPeriod(1.0);
-		}
-		
 		controler.setOverwriteFiles(true);
 		
-		controler.addControlerListener(new StartupListener(){
-			public void notifyStartup(final StartupEvent event) {
-				event.getControler().getConfig().controler().setLastIteration(iteration);
+		controler.addControlerListener(new BeforeMobsimListener() {
+			
+			@Override
+			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+				event.getControler().setMobsimFactory(new DgWithindayMobsimFactory());
 			}
 		});
 		
-		controler.addControlerListener(new DgOTFVisConfigWriter());
+		
 		controler.run();
-		
+		controler.addControlerListener(new DgOTFVisConfigWriter());
 		String outdir = controler.getConfig().controler().getOutputDirectory();
-		String filename = outdir + "/ITERS/it."+iteration+"/" + iteration + ".otfvis.mvi";
-		System.out.println(filename);
-		DgOTFVisReplayLastIteration.main(new String[]{outdir + "/" + Controler.FILENAME_CONFIG});
-//		OTFVis.playConfig(filename + "/" + DgOTFVisConfigWriter.OTFVIS_LAST_ITERATION_CONFIG);
-//		OTFVis.main(new String[] {filename});
-//		new OTFClientSwing(filename).start();
-		
-	}
 
+		String file = controler.getControlerIO().getIterationFilename(0, "otfvis.mvi");
+		OTFVis.playMVI(file);
+		//		DgOTFVisReplayLastIteration.main(new String[]{outdir + "/" + Controler.FILENAME_CONFIG});
+	}
+	
 }

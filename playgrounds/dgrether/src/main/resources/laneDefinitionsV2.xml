@@ -1,50 +1,53 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!--<laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd" -->
+<!--<laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd" -->
 <!--xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">-->
 <laneDefinitions>
-    <lanesToLinkAssignment linkIdRef="23">
-      <branchPoint id="1">
-<!--  as we don't have any width of the link the specification of a branch point doesn't make that much sense      -->
-      </branchPoint>
-        <lane id="1">
-            <representedLanes number="1"/>
-            <!--  the toLink is optional  it can also be a toLane         -->
-            <leadsTo>
-              <toLink refId="1"/> 
-            </leadsTo>
-<!--            this is a or relationship  -->
-            <leadsTo>
-              <toLane refId="1"/> 
-            </leadsTo>  
-            
-            <!-- length information -->
-            <startsAt meterFromLinkStart="0.0" />
-            <!--  like this it would be the length in case of toLinks are given         -->
-            <startsAt meterFromLinkEnd="50.0" />
-            
-            <!-- length is somehow critical as it should be determined by the link's length            -->
-            <length meter="45.0"/>
-        
-            <!-- we need some position information for the horizontal position -->
-           <leftOfLane refId="3" />
-           <rightOflane refId ="2" />
-        </lane>
 
-    
-        <lane id="3">
-            <toLink refId="1"/>
-            <representedLanes number="1"/>
-            <length meter="45.0"/>
+how to encode alignment
+    <lanesToLinkAssignment linkIdRef="23">
+        <lane id="1">
+            <leadsTo>
+              <toLane refId="2" /> 
+              <toLane refId="3" />
+            </leadsTo>  
+            <representedLanes number="1.5"/>
+            <startsAt meterFromLinkEnd="500.0" />
+           <alignment>1</alignment>
         </lane>
-        <lane id="5">
-            <toLink refId="1"/>
-            <representedLanes number="2"/>
-            <length meter="60.0"/>
+        <lane id="2">
+            <leadsTo>
+              <toLink refId="42"/> 
+            </leadsTo>
+            <representedLanes number="0.5"/>
+            <startsAt meterFromLinkEnd="150.0" />
+           <alignment>1</alignment>
+        </lane>
+        <lane id="3">
+            <leadsTo>
+              <toLink refId="43"/> 
+            </leadsTo>
+            <representedLanes number="1"/>
+            <startsAt meterFromLinkEnd="250.0" />
+           <alignment>2</alignment>
         </lane>
     </lanesToLinkAssignment>
-    <lanesToLinkAssignment linkIdRef="42">
-      <lane id="1">
-        <toLink refId="1"/>
-      </lane>
+
+    <lanesToLinkAssignment linkIdRef="23">
+        <lane id="1">
+            <leadsTo>
+              <toLane refId="2" /> 
+            </leadsTo>  
+            <representedLanes number="1"/>
+            <startsAt meterFromLinkEnd="500.0" />
+           <alignment>1</alignment>
+        </lane>
+        <lane id="2">
+            <leadsTo>
+              <toLink refId="23"/> 
+            </leadsTo>
+            <representedLanes number="1.5"/>
+            <startsAt meterFromLinkEnd="150.0" />
+           <alignment>1</alignment>
+        </lane>
     </lanesToLinkAssignment>
 </laneDefinitions>
