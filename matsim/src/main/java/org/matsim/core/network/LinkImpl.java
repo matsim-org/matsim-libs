@@ -76,7 +76,7 @@ public class LinkImpl extends AbstractLocation implements Link {
 
 
 
-	public LinkImpl(final Id id, final Node from, final Node to,
+	protected LinkImpl(final Id id, final Node from, final Node to,
 			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(network, id,
 				new CoordImpl(0.5*(from.getCoord().getX() + to.getCoord().getX()), 0.5*(from.getCoord().getY() + to.getCoord().getY()))

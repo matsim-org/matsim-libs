@@ -8,7 +8,7 @@ public class MyControler {
 	public static void main(final String[] args) {
 
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
+			Gbl.createConfig(new String[] {"../../eclipse/matsim/examples/equil/myconfig.xml"});
 		} else {
 			Gbl.createConfig(args) ;
 		}
