@@ -71,10 +71,6 @@ public final class Controller {
 		this.controler.run();
 	}
 	
-	public void addControlerListener(ControlerListener controlerListener) {
-		controler.addControlerListener(controlerListener);
-	}
-	
 	public void addEventHandler(EventHandler eventHandler) {
 		eventHandlers.add(eventHandler);
 	}
