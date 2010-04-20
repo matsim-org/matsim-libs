@@ -45,11 +45,10 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.fakes.FakeAgent;
-import org.matsim.ptproject.qsim.QPersonAgent;
 import org.matsim.ptproject.qsim.QLinkImpl;
 import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QPersonAgent;
 import org.matsim.ptproject.qsim.QSimEngine;
-import org.matsim.ptproject.qsim.QSimTimerStatic;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.ptproject.qsim.QVehicleImpl;
 import org.matsim.transitSchedule.api.Departure;
@@ -164,14 +163,14 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 
 		// time 101: transitVeh is moved to qlink2 (exit-time=201), normalVeh is moved to qlink1.buffer
-		QSimTimerStatic.setTime(101);
+		f.qsim.getSimTimer().setTime(101);
 		f.simEngine.simStep(101);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		QVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new QVehicle[2]);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 102: normalVeh is moved to qlink2 (exit-time=202)
-		QSimTimerStatic.setTime(102);
+		f.qsim.getSimTimer().setTime(102);
 		f.simEngine.simStep(102);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -179,22 +178,22 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 200: both vehicles still on qlink2
-		QSimTimerStatic.setTime(200);
+		f.qsim.getSimTimer().setTime(200);
 		f.simEngine.simStep(200);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 201: transitVeh is moved to qlink2.transitStopQueue (delay=19, exit-time 220)
-		QSimTimerStatic.setTime(201);
+		f.qsim.getSimTimer().setTime(201);
 		f.simEngine.simStep(201);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 202: transitVeh is at stop, normalVeh moved to qlink2.buffer
-		QSimTimerStatic.setTime(202);
+		f.qsim.getSimTimer().setTime(202);
 		f.simEngine.simStep(202);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 203: normalVeh moved to qlink3
-		QSimTimerStatic.setTime(203);
+		f.qsim.getSimTimer().setTime(203);
 		f.simEngine.simStep(203);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -204,25 +203,25 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[0]);
 
 		// time 204: transitVeh still at qlink2.stop, normalVeh on qlink3
-		QSimTimerStatic.setTime(204);
+		f.qsim.getSimTimer().setTime(204);
 		f.simEngine.simStep(204);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		assertEquals(1, f.qlink3.getAllVehicles().size());
 
 		// time 219: nothing changed since 204
-		QSimTimerStatic.setTime(219);
+		f.qsim.getSimTimer().setTime(219);
 		f.simEngine.simStep(219);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		assertEquals(1, f.qlink3.getAllVehicles().size());
 
 		// time 220: transitVeh moves now to qlink2.buffer
-		QSimTimerStatic.setTime(220);
+		f.qsim.getSimTimer().setTime(220);
 		f.simEngine.simStep(220);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		assertEquals(1, f.qlink3.getAllVehicles().size());
 
 		// time 221: transitVeh moves finally to qlink3
-		QSimTimerStatic.setTime(221);
+		f.qsim.getSimTimer().setTime(221);
 		f.simEngine.simStep(221);
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 		vehicles = f.qlink3.getAllVehicles().toArray(vehicles);
@@ -247,14 +246,14 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 
 		// time 101: transitVeh is moved to qlink2 (exit-time=201), normalVeh is moved to qlink1.buffer
-		QSimTimerStatic.setTime(101);
+		f.qsim.getSimTimer().setTime(101);
 		f.simEngine.simStep(101);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		QVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new QVehicle[2]);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 102: normalVeh is moved to qlink2 (exit-time=202)
-		QSimTimerStatic.setTime(102);
+		f.qsim.getSimTimer().setTime(102);
 		f.simEngine.simStep(102);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -262,37 +261,37 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 200: both vehicles still on qlink2
-		QSimTimerStatic.setTime(200);
+		f.qsim.getSimTimer().setTime(200);
 		f.simEngine.simStep(200);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 201: transitVeh is blocking qlink2 now (delay=19, exit-time 220)
-		QSimTimerStatic.setTime(201);
+		f.qsim.getSimTimer().setTime(201);
 		f.simEngine.simStep(201);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 202: transitVeh is at stop, normalVeh has to wait
-		QSimTimerStatic.setTime(202);
+		f.qsim.getSimTimer().setTime(202);
 		f.simEngine.simStep(202);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 203: normalVeh cannot move to qlink3
-		QSimTimerStatic.setTime(203);
+		f.qsim.getSimTimer().setTime(203);
 		f.simEngine.simStep(203);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 219: nothing changed since 203
-		QSimTimerStatic.setTime(219);
+		f.qsim.getSimTimer().setTime(219);
 		f.simEngine.simStep(219);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 220: transitVeh moves now to qlink2.buffer
-		QSimTimerStatic.setTime(220);
+		f.qsim.getSimTimer().setTime(220);
 		f.simEngine.simStep(220);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 221: transitVeh moves finally to qlink3, normalVeh is moved to qlink2.buffer
-		QSimTimerStatic.setTime(221);
+		f.qsim.getSimTimer().setTime(221);
 		f.simEngine.simStep(221);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -302,7 +301,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 222: normalVeh also moves to qlink3
-		QSimTimerStatic.setTime(222);
+		f.qsim.getSimTimer().setTime(222);
 		f.simEngine.simStep(222);
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 		vehicles = f.qlink3.getAllVehicles().toArray(vehicles);
@@ -327,14 +326,14 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 
 		// time 101: transitVeh is moved to qlink2 (exit-time=201), normalVeh is moved to qlink1.buffer
-		QSimTimerStatic.setTime(101);
+		f.qsim.getSimTimer().setTime(101);
 		f.simEngine.simStep(101);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		QVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new QVehicle[2]);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 102: normalVeh is moved to qlink2 (exit-time=202)
-		QSimTimerStatic.setTime(102);
+		f.qsim.getSimTimer().setTime(102);
 		f.simEngine.simStep(102);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -342,12 +341,12 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 201: transitVeh is moved to qlink2.buffer
-		QSimTimerStatic.setTime(201);
+		f.qsim.getSimTimer().setTime(201);
 		f.simEngine.simStep(201);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 202: transitVeh is moved to qlink3 (exit-time: 302), normalVeh moved to qlink2.buffer
-		QSimTimerStatic.setTime(202);
+		f.qsim.getSimTimer().setTime(202);
 		f.simEngine.simStep(202);
 		assertEquals(1, f.qlink3.getAllVehicles().size());
 		vehicles = f.qlink3.getAllVehicles().toArray(vehicles);
@@ -357,7 +356,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[0]);
 
 		// time 203: normalVeh is moved to qlink3 (exit-time: 303)
-		QSimTimerStatic.setTime(203);
+		f.qsim.getSimTimer().setTime(203);
 		f.simEngine.simStep(203);
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 		vehicles = f.qlink3.getAllVehicles().toArray(vehicles);
@@ -365,12 +364,12 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 302: transitVeh is moved to qlink3.transitStopQueue (delay: 19, exit-time: 321)
-		QSimTimerStatic.setTime(302);
+		f.qsim.getSimTimer().setTime(302);
 		f.simEngine.simStep(302);
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 
 		// time 303: normalVeh leaves qlink3, respectively parks on qlink3
-		QSimTimerStatic.setTime(303);
+		f.qsim.getSimTimer().setTime(303);
 		f.simEngine.simStep(303);
 		assertEquals(2, f.qlink3.getAllVehicles().size()); // includes parked vehicles
 		assertEquals(1, f.qlink3.getAllNonParkedVehicles().size());
@@ -378,7 +377,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 320: transitVeh is still at the stop
-		QSimTimerStatic.setTime(320);
+		f.qsim.getSimTimer().setTime(320);
 		f.simEngine.simStep(320);
 		assertEquals(2, f.qlink3.getAllVehicles().size()); // includes parked vehicles
 		assertEquals(1, f.qlink3.getAllNonParkedVehicles().size());
@@ -386,7 +385,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 321: transitVeh leaves stop and link
-		QSimTimerStatic.setTime(321);
+		f.qsim.getSimTimer().setTime(321);
 		f.simEngine.simStep(321);
 		assertEquals(2, f.qlink3.getAllVehicles().size()); // includes parked vehicles
 		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
@@ -409,14 +408,14 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 
 		// time 101: transitVeh is moved to qlink2 (exit-time=201), normalVeh is moved to qlink1.buffer
-		QSimTimerStatic.setTime(101);
+		f.qsim.getSimTimer().setTime(101);
 		f.simEngine.simStep(101);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		QVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new QVehicle[2]);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 102: normalVeh is moved to qlink2 (exit-time=202)
-		QSimTimerStatic.setTime(102);
+		f.qsim.getSimTimer().setTime(102);
 		f.simEngine.simStep(102);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -424,12 +423,12 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 201: transitVeh is moved to qlink2.buffer
-		QSimTimerStatic.setTime(201);
+		f.qsim.getSimTimer().setTime(201);
 		f.simEngine.simStep(201);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 202: transitVeh is moved to qlink3 (exit-time: 302), normalVeh moved to qlink2.buffer
-		QSimTimerStatic.setTime(202);
+		f.qsim.getSimTimer().setTime(202);
 		f.simEngine.simStep(202);
 		assertEquals(1, f.qlink3.getAllVehicles().size());
 		vehicles = f.qlink3.getAllVehicles().toArray(vehicles);
@@ -439,7 +438,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[0]);
 
 		// time 203: normalVeh is moved to qlink3 (exit-time: 303)
-		QSimTimerStatic.setTime(203);
+		f.qsim.getSimTimer().setTime(203);
 		f.simEngine.simStep(203);
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 		vehicles = f.qlink3.getAllVehicles().toArray(vehicles);
@@ -447,12 +446,12 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 302: transitVeh is at stop (delay: 19, exit-time: 321)
-		QSimTimerStatic.setTime(302);
+		f.qsim.getSimTimer().setTime(302);
 		f.simEngine.simStep(302);
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 
 		// time 303: transitVeh blocks normalVeh
-		QSimTimerStatic.setTime(303);
+		f.qsim.getSimTimer().setTime(303);
 		f.simEngine.simStep(303);
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
@@ -461,7 +460,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 321: transitVeh leaves stop and link, also normalVeh leaves link
-		QSimTimerStatic.setTime(321);
+		f.qsim.getSimTimer().setTime(321);
 		f.simEngine.simStep(321);
 		assertEquals(2, f.qlink3.getAllVehicles().size()); // includes parked vehicles
 		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
@@ -475,24 +474,24 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 
 		// time 101: transitVeh is *not* blocking qlink1, normalVeh is moved to qlink2
-		QSimTimerStatic.setTime(101);
+		f.qsim.getSimTimer().setTime(101);
 		f.simEngine.simStep(101);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		QVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new QVehicle[2]);
 		assertEquals(f.normalVehicle, vehicles[0]);
 
 		// time 119: transitVeh is moved to qlink2.vehQueue (stop2, blocking, delay 19, exit-time 138)
-		QSimTimerStatic.setTime(119);
+		f.qsim.getSimTimer().setTime(119);
 		f.simEngine.simStep(119);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 
 		// time 120: normalVeh2 departs, cannot be blocked from waitingQueue, so moved to buffer
-		QSimTimerStatic.setTime(120);
+		f.qsim.getSimTimer().setTime(120);
 		f.normalVehicle2.getDriver().activityEnds(120);
 		f.simEngine.simStep(120);
 
 		// time 121: normalVeh2 moves to qlink2 (exit-time 221)
-		QSimTimerStatic.setTime(121);
+		f.qsim.getSimTimer().setTime(121);
 		f.simEngine.simStep(121);
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 		assertEquals(2, f.qlink2.getAllVehicles().size());
@@ -501,12 +500,12 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 138: transitVeh moved to qlink1.buffer
-		QSimTimerStatic.setTime(138);
+		f.qsim.getSimTimer().setTime(138);
 		f.simEngine.simStep(138);
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		// time 139: transitVeh is moved to qlink2
-		QSimTimerStatic.setTime(139);
+		f.qsim.getSimTimer().setTime(139);
 		f.simEngine.simStep(139);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -523,14 +522,14 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 
 		// time 101: transitVeh is moved to qlink2 (exit-time=201), normalVeh is moved to qlink1.buffer
-		QSimTimerStatic.setTime(101);
+		f.qsim.getSimTimer().setTime(101);
 		f.simEngine.simStep(101);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		QVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new QVehicle[2]);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 102: normalVeh is moved to qlink2 (exit-time=202)
-		QSimTimerStatic.setTime(102);
+		f.qsim.getSimTimer().setTime(102);
 		f.simEngine.simStep(102);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -538,42 +537,42 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 120: normalVeh2 departs, moved to buffer
-		QSimTimerStatic.setTime(124);
+		f.qsim.getSimTimer().setTime(124);
 		f.normalVehicle2.getDriver().activityEnds(124);
 		f.simEngine.simStep(124);
 
 		// time 125: normalVeh2 moves to qlink2 (exit-time 225)
-		QSimTimerStatic.setTime(125);
+		f.qsim.getSimTimer().setTime(125);
 		f.simEngine.simStep(125);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 200: all vehicles still on qlink2
-		QSimTimerStatic.setTime(200);
+		f.qsim.getSimTimer().setTime(200);
 		f.simEngine.simStep(200);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 201: transitVeh is blocking qlink2 (stop1, delay=19, exit-time 220)
-		QSimTimerStatic.setTime(201);
+		f.qsim.getSimTimer().setTime(201);
 		f.simEngine.simStep(201);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 202: transitVeh is at stop1, normalVeh must wait, normalVeh2 still driving
-		QSimTimerStatic.setTime(202);
+		f.qsim.getSimTimer().setTime(202);
 		f.simEngine.simStep(202);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 219: transitVeh is at stop1, normalVeh must wait
-		QSimTimerStatic.setTime(219);
+		f.qsim.getSimTimer().setTime(219);
 		f.simEngine.simStep(219);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 220: transitVeh moved from stop1 (blocking) to stop2 (non-blocking, delay 19, exit-time 239), normalVeh moved to qlink2.buffer
-		QSimTimerStatic.setTime(220);
+		f.qsim.getSimTimer().setTime(220);
 		f.simEngine.simStep(220);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 221: transitVeh at stop2, normalVeh moved to qlink3, normalVeh2 still on qlink2
-		QSimTimerStatic.setTime(221);
+		f.qsim.getSimTimer().setTime(221);
 		f.simEngine.simStep(221);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -584,7 +583,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[0]);
 
 		// time 239: transitVeh moved to qlink2.buffer, normalVeh2 still waiting behind transitVeh
-		QSimTimerStatic.setTime(239);
+		f.qsim.getSimTimer().setTime(239);
 		f.simEngine.simStep(239);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -595,7 +594,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[0]);
 
 		// time 240: transitVeh moved to qlink3
-		QSimTimerStatic.setTime(240);
+		f.qsim.getSimTimer().setTime(240);
 		f.simEngine.simStep(240);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -606,7 +605,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.transitVehicle, vehicles[1]);
 
 		// time 241: normalVeh2 moved to qlink3
-		QSimTimerStatic.setTime(241);
+		f.qsim.getSimTimer().setTime(241);
 		f.simEngine.simStep(241);
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 		assertEquals(3, f.qlink3.getAllVehicles().size());
@@ -624,14 +623,14 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 
 		// time 101: transitVeh is moved to qlink2 (exit-time=201), normalVeh is moved to qlink1.buffer
-		QSimTimerStatic.setTime(101);
+		f.qsim.getSimTimer().setTime(101);
 		f.simEngine.simStep(101);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		QVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new QVehicle[2]);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 102: normalVeh is moved to qlink2 (exit-time=202)
-		QSimTimerStatic.setTime(102);
+		f.qsim.getSimTimer().setTime(102);
 		f.simEngine.simStep(102);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -639,42 +638,42 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 124: normalVeh2 departs, moved to buffer
-		QSimTimerStatic.setTime(124);
+		f.qsim.getSimTimer().setTime(124);
 		f.normalVehicle2.getDriver().activityEnds(124);
 		f.simEngine.simStep(124);
 
 		// time 125: normalVeh2 moves to qlink2 (exit-time 225)
-		QSimTimerStatic.setTime(125);
+		f.qsim.getSimTimer().setTime(125);
 		f.simEngine.simStep(125);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 200: all vehicles still on qlink2
-		QSimTimerStatic.setTime(200);
+		f.qsim.getSimTimer().setTime(200);
 		f.simEngine.simStep(200);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 201: transitVeh is blocking qlink2 (stop1, delay=19, exit-time 220)
-		QSimTimerStatic.setTime(201);
+		f.qsim.getSimTimer().setTime(201);
 		f.simEngine.simStep(201);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 202: transitVeh is at stop1, normalVeh must wait
-		QSimTimerStatic.setTime(202);
+		f.qsim.getSimTimer().setTime(202);
 		f.simEngine.simStep(202);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 219: transitVeh is at stop1, normalVeh must wait
-		QSimTimerStatic.setTime(219);
+		f.qsim.getSimTimer().setTime(219);
 		f.simEngine.simStep(219);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 220: transitVeh moved from stop1 (blocking) to stop2 (non-blocking, delay 19, exit-time 239), normalVeh moved to qlink2.buffer
-		QSimTimerStatic.setTime(220);
+		f.qsim.getSimTimer().setTime(220);
 		f.simEngine.simStep(220);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 221: transitVeh at stop2, normalVeh moved to qlink3
-		QSimTimerStatic.setTime(221);
+		f.qsim.getSimTimer().setTime(221);
 		f.simEngine.simStep(221);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -685,7 +684,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[0]);
 
 		// time 225: transitVeh at stop2, normalVeh on qlink3, normalVeh2 is blocked
-		QSimTimerStatic.setTime(225);
+		f.qsim.getSimTimer().setTime(225);
 		f.simEngine.simStep(225);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -693,7 +692,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 226: transitVeh at stop2, normalVeh2 is blocked, normalVeh on qlink3
-		QSimTimerStatic.setTime(226);
+		f.qsim.getSimTimer().setTime(226);
 		f.simEngine.simStep(226);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		assertEquals(1, f.qlink3.getAllVehicles().size());
@@ -701,7 +700,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[0]);
 
 		// time 239: transitVeh moved to qlink2.buffer
-		QSimTimerStatic.setTime(239);
+		f.qsim.getSimTimer().setTime(239);
 		f.simEngine.simStep(239);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -710,7 +709,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(1, f.qlink3.getAllVehicles().size());
 
 		// time 240: transitVeh moved to qlink3, normalVeh2 moved to qlink2.buffer
-		QSimTimerStatic.setTime(240);
+		f.qsim.getSimTimer().setTime(240);
 		f.simEngine.simStep(240);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		assertEquals(2, f.qlink3.getAllVehicles().size());
@@ -719,7 +718,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.transitVehicle, vehicles[1]);
 
 		// time 241: normalVeh2 moved to qlink3
-		QSimTimerStatic.setTime(241);
+		f.qsim.getSimTimer().setTime(241);
 		f.simEngine.simStep(241);
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 		assertEquals(3, f.qlink3.getAllVehicles().size());
@@ -737,14 +736,14 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 
 		// time 101: transitVeh is moved to qlink2 (exit-time=201), normalVeh is moved to qlink1.buffer
-		QSimTimerStatic.setTime(101);
+		f.qsim.getSimTimer().setTime(101);
 		f.simEngine.simStep(101);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		QVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new QVehicle[2]);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 102: normalVeh is moved to qlink2 (exit-time=202)
-		QSimTimerStatic.setTime(102);
+		f.qsim.getSimTimer().setTime(102);
 		f.simEngine.simStep(102);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -752,61 +751,61 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 124: normalVeh2 departs, moved to qlink1.buffer
-		QSimTimerStatic.setTime(124);
+		f.qsim.getSimTimer().setTime(124);
 		f.normalVehicle2.getDriver().activityEnds(124);
 		f.simEngine.simStep(124);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 125: normalVeh2 moves to qlink2 (exit-time 225)
-		QSimTimerStatic.setTime(125);
+		f.qsim.getSimTimer().setTime(125);
 		f.simEngine.simStep(125);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 200: all vehicles still on qlink2
-		QSimTimerStatic.setTime(200);
+		f.qsim.getSimTimer().setTime(200);
 		f.simEngine.simStep(200);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 201: transitVeh is moved to qlink2.buffer
-		QSimTimerStatic.setTime(201);
+		f.qsim.getSimTimer().setTime(201);
 		f.simEngine.simStep(201);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 202: transitVeh @ qlink3 (exit-time 302), normalVeh @ qlink2.buffer
-		QSimTimerStatic.setTime(202);
+		f.qsim.getSimTimer().setTime(202);
 		f.simEngine.simStep(202);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		assertEquals(1, f.qlink3.getAllVehicles().size());
 
 		// time 203: transitVeh @ qlink3, normalVeh @ qlink3 (exit-time 303)
-		QSimTimerStatic.setTime(203);
+		f.qsim.getSimTimer().setTime(203);
 		f.simEngine.simStep(203);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 
 		// time 225: transitVeh @ qlink3, normalVeh @ qlink3, normalVeh2 @ qlink2.buffer
-		QSimTimerStatic.setTime(225);
+		f.qsim.getSimTimer().setTime(225);
 		f.simEngine.simStep(225);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 
 		// time 226: transitVeh @ qlink3, normalVeh @ qlink3, normalVeh2 @ qlink3 (exit-time 326)
-		QSimTimerStatic.setTime(226);
+		f.qsim.getSimTimer().setTime(226);
 		f.simEngine.simStep(226);
 		assertEquals(3, f.qlink3.getAllVehicles().size());
 
 		// time 302: transitVeh @ stop2 (blocking, delay 19, exit-time 321)
-		QSimTimerStatic.setTime(302);
+		f.qsim.getSimTimer().setTime(302);
 		f.simEngine.simStep(302);
 		assertEquals(3, f.qlink3.getAllVehicles().size());
 
 		// time 320: transitVeh @ stop2, normalVeh @ qlink3 (blocked)
-		QSimTimerStatic.setTime(320);
+		f.qsim.getSimTimer().setTime(320);
 		f.simEngine.simStep(320);
 		assertEquals(3, f.qlink3.getAllVehicles().size());
 
 		// time 321: transitVeh @ stop3 (non-blocking, delay 19, exit-time 340), normalVeh left qlink3
-		QSimTimerStatic.setTime(321);
+		f.qsim.getSimTimer().setTime(321);
 		f.simEngine.simStep(321);
 		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
 		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
@@ -814,7 +813,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 325: transitVeh @ stop3, normalVeh2 @ qlink3
-		QSimTimerStatic.setTime(325);
+		f.qsim.getSimTimer().setTime(325);
 		f.simEngine.simStep(325);
 		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
 		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
@@ -822,21 +821,21 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 326: transitVeh @ stop3, normalVeh2 left qlink3
-		QSimTimerStatic.setTime(326);
+		f.qsim.getSimTimer().setTime(326);
 		f.simEngine.simStep(326);
 		assertEquals(1, f.qlink3.getAllNonParkedVehicles().size());
 		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 339: transitVeh @ stop3
-		QSimTimerStatic.setTime(339);
+		f.qsim.getSimTimer().setTime(339);
 		f.simEngine.simStep(339);
 		assertEquals(1, f.qlink3.getAllNonParkedVehicles().size());
 		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 340: transitVeh left qlink3
-		QSimTimerStatic.setTime(340);
+		f.qsim.getSimTimer().setTime(340);
 		f.simEngine.simStep(340);
 		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
 	}
@@ -849,14 +848,14 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink2.getAllVehicles().size());
 
 		// time 101: transitVeh is moved to qlink2 (exit-time=201), normalVeh is moved to qlink1.buffer
-		QSimTimerStatic.setTime(101);
+		f.qsim.getSimTimer().setTime(101);
 		f.simEngine.simStep(101);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		QVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new QVehicle[2]);
 		assertEquals(f.transitVehicle, vehicles[0]);
 
 		// time 102: normalVeh is moved to qlink2 (exit-time=202)
-		QSimTimerStatic.setTime(102);
+		f.qsim.getSimTimer().setTime(102);
 		f.simEngine.simStep(102);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
@@ -864,56 +863,56 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle, vehicles[1]);
 
 		// time 120: normalVeh2 departs, moved to qlink1.buffer
-		QSimTimerStatic.setTime(120);
+		f.qsim.getSimTimer().setTime(120);
 		f.normalVehicle2.getDriver().activityEnds(120);
 		f.simEngine.simStep(120);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 
 		// time 121: normalVeh2 moves to qlink2 (exit-time 221)
-		QSimTimerStatic.setTime(121);
+		f.qsim.getSimTimer().setTime(121);
 		f.simEngine.simStep(121);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 200: all vehicles still on qlink2
-		QSimTimerStatic.setTime(200);
+		f.qsim.getSimTimer().setTime(200);
 		f.simEngine.simStep(200);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 201: transitVeh is moved to qlink2.buffer
-		QSimTimerStatic.setTime(201);
+		f.qsim.getSimTimer().setTime(201);
 		f.simEngine.simStep(201);
 		assertEquals(3, f.qlink2.getAllVehicles().size());
 
 		// time 202: transitVeh @ qlink3 (exit-time 302), normalVeh @ qlink2.buffer
-		QSimTimerStatic.setTime(202);
+		f.qsim.getSimTimer().setTime(202);
 		f.simEngine.simStep(202);
 		assertEquals(2, f.qlink2.getAllVehicles().size());
 		assertEquals(1, f.qlink3.getAllVehicles().size());
 
 		// time 203: transitVeh @ qlink3, normalVeh @ qlink3 (exit-time 303)
-		QSimTimerStatic.setTime(203);
+		f.qsim.getSimTimer().setTime(203);
 		f.simEngine.simStep(203);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 
 		// time 221: transitVeh @ qlink3, normalVeh @ qlink3, normalVeh2 @ qlink2.buffer
-		QSimTimerStatic.setTime(221);
+		f.qsim.getSimTimer().setTime(221);
 		f.simEngine.simStep(221);
 		assertEquals(1, f.qlink2.getAllVehicles().size());
 		assertEquals(2, f.qlink3.getAllVehicles().size());
 
 		// time 222: transitVeh @ qlink3, normalVeh @ qlink3, normalVeh2 @ qlink3 (exit-time 322)
-		QSimTimerStatic.setTime(222);
+		f.qsim.getSimTimer().setTime(222);
 		f.simEngine.simStep(222);
 		assertEquals(3, f.qlink3.getAllVehicles().size());
 
 		// time 302: transitVeh @ stop2 (non-blocking, delay 19, exit-time 321)
-		QSimTimerStatic.setTime(302);
+		f.qsim.getSimTimer().setTime(302);
 		f.simEngine.simStep(302);
 		assertEquals(3, f.qlink3.getAllVehicles().size());
 
 		// time 303: transitVeh @ stop2, normalVeh left qlink3
-		QSimTimerStatic.setTime(303);
+		f.qsim.getSimTimer().setTime(303);
 		f.simEngine.simStep(303);
 		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
 		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
@@ -921,12 +920,12 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 320: transitVeh @ stop2
-		QSimTimerStatic.setTime(320);
+		f.qsim.getSimTimer().setTime(320);
 		f.simEngine.simStep(320);
 		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
 
 		// time 321: transitVeh @ stop3 (blocking, delay 19, exit-time 340)
-		QSimTimerStatic.setTime(321);
+		f.qsim.getSimTimer().setTime(321);
 		f.simEngine.simStep(321);
 		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
 		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
@@ -934,7 +933,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 339: transitVeh @ stop3, normalVeh2 blocked behind transitVeh
-		QSimTimerStatic.setTime(339);
+		f.qsim.getSimTimer().setTime(339);
 		f.simEngine.simStep(339);
 		assertEquals(2, f.qlink3.getAllNonParkedVehicles().size());
 		vehicles = f.qlink3.getAllNonParkedVehicles().toArray(vehicles);
@@ -942,7 +941,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(f.normalVehicle2, vehicles[1]);
 
 		// time 340: transitVeh left qlink3, and also normalVeh2 left qlink3 (no flow-restriction when leaving link)
-		QSimTimerStatic.setTime(340);
+		f.qsim.getSimTimer().setTime(340);
 		f.simEngine.simStep(340);
 		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
 	}
@@ -958,7 +957,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		public final QLinkImpl qlink1, qlink2, qlink3;
 		public final TransitQVehicle transitVehicle;
 		public final QVehicle normalVehicle, normalVehicle2;
-
+    public final TransitQSimulation qsim;
 		/**
 		 * @param firstStopLocation
 		 * @param firstStopisBlocking
@@ -1034,7 +1033,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			Departure dep = builder.createDeparture(id1, 100);
 
 			// setup: simulation
-			TransitQSimulation qsim = new TransitQSimulation(scenario, new EventsManagerImpl());
+			qsim = new TransitQSimulation(scenario, new EventsManagerImpl());
 			QNetwork qnet = qsim.getQNetwork();
 			this.qlink1 = (QLinkImpl) qnet.getQLink(id1);
 			this.qlink2 = (QLinkImpl) qnet.getQLink(id2);
@@ -1047,7 +1046,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			if (stop2 != null) {
 				tracker.addAgentToStop(new FakeAgent(null, null), stop2); // just add some agent so the transit vehicle has to stop
 			}
-			QSimTimerStatic.setTime(100);
+			qsim.getSimTimer().setTime(100);
 
 			// setup: vehicles
 			BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehicleType"));

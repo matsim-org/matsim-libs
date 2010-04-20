@@ -69,7 +69,7 @@ public class QSimTimer {
 		QSimTimerStatic.setSimStartTime(startTimeSec);
 	}
 	
-	protected void setTime(double timeSec) {
+	public void setTime(double timeSec) {
 		QSimTimerStatic.setTime(timeSec);
 	}
 	

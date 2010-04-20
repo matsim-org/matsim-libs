@@ -687,14 +687,14 @@ public class QSimTest {
 		qlink2.addParkedVehicle(vehicle1);
 		qlink2.addParkedVehicle(vehicle2);
 
-		QSimTimerStatic.setTime(100.0);
+		sim.getSimTimer().setTime(100.0);
 		QPersonAgent agent = new QPersonAgent(person, sim);
 		agent.initialize();
 		agent.activityEnds(100.0);
 
-		QSimTimerStatic.setTime(101.0);
+		sim.getSimTimer().setTime(101.0);
 		sim.doSimStep(101.0); // agent should be moved to qlink2.buffer
-		QSimTimerStatic.setTime(102.0);
+		sim.getSimTimer().setTime(102.0);
 		sim.doSimStep(102.0); // agent should be moved to qlink3
 
 		Collection<QVehicle> vehicles = qlink3.getAllVehicles();
