@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
@@ -37,8 +38,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -157,7 +160,58 @@ public class MultiSourceEAF {
 
 		return allnodes;
 	}
-
+	
+	
+	public static void readShelterFile(NetworkLayer network,final String filename,
+			final int totaldemands,HashMap<Node, Integer> demands,final boolean addshelterlinks) throws IOException{
+		BufferedReader in = new BufferedReader(new FileReader(filename));
+		String inline = null;
+		while ((inline = in.readLine()) != null) {
+			String[] line = inline.split(",");
+			Node node = network.getNodes().get(new IdImpl(line[0].trim()));
+			if(node==null){
+				continue;
+			}else{
+				String nodeid = line[0].trim();
+				double flowcapacity = Double.valueOf(line[1].trim());
+				int sheltercapacity = Integer.valueOf(line[2]);
+				
+				if(addshelterlinks){
+					//create and add new shelternode
+					Id shelterid = new IdImpl("shelter"+nodeid);
+					if(network.getNodes().get(shelterid)==null){
+						NodeImpl shelter = new NodeImpl(shelterid);
+						shelter.setCoord(node.getCoord());
+						network.addNode(shelter);
+						demands.put(shelter, 0);
+					}
+					Node shelter =network.getNodes().get(shelterid);
+					//create and add link from node to shelter
+					Id linkid =new IdImpl("shelterlink"+nodeid);
+					Link link = network.getLinks().get(linkid);
+					if(link==null){
+						link = new LinkImpl(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
+						network.addLink(link);
+					}
+					//set new demands
+					int olddemand=demands.get(shelter);
+					int newdemand = olddemand-sheltercapacity;
+					
+					demands.put(shelter, newdemand);
+				}else{
+					int olddemand =0;
+					if(demands.get(node)==null){
+						olddemand=demands.get(node);
+					}
+					int newdemand = olddemand-sheltercapacity;
+					demands.put(node, newdemand);
+				}
+			}
+		}
+		in.close();
+		
+	}
+	
 	/**
 	 * THE ONLY FUNCTION WHICH REALLY CALCULATES A FLOW
 	 *
@@ -476,7 +530,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 2;
+		int instance = 421;
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -485,6 +539,7 @@ public class MultiSourceEAF {
 		// 42 = padang, v2010, with 100% plans (no shelters yet)
 		// 43 = padang, v2010, with 100% plans, 10s steps (no shelters yet)
 		// 44 = padang, v2010, with 100% plans, 5s steps (no shelters yet)
+		//421-441 same as above only Manuel
 		// 5 = probeevakuierung telefunken
 		// else = custom ...
 
@@ -497,7 +552,7 @@ public class MultiSourceEAF {
 		} else if (instance == 2) {
 			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
 			uniformDemands = 100;
-			timeStep = 100; // FIXME 10
+			timeStep = 100;
 			flowFactor = 1.0;
 			sinkid = "en1";
 		} else if (instance == 3) {
@@ -534,6 +589,25 @@ public class MultiSourceEAF {
 		} else if (instance == 44) {
 				networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 				plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
+				timeStep = 5;
+				flowFactor = 1.0;
+				sinkid = "en1";
+		}else if (instance == 421) {
+			networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
+			plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
+			timeStep = 2;
+			flowFactor = 1.0;
+			sinkid = "en1";
+			shelterfile = "/Users/manuel/testdata/padang/network/shelter_info_v20100317";
+		} else if (instance == 431) {
+			networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
+			plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
+			timeStep = 10;
+			flowFactor = 1.0;
+			sinkid = "en1";
+		} else if (instance == 441) {
+				networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
+				plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
 				timeStep = 5;
 				flowFactor = 1.0;
 				sinkid = "en1";
@@ -661,16 +735,34 @@ public class MultiSourceEAF {
 				}
 			}
 		}
-
-		// TODO parse shelterfile
-
+		
 		int totaldemands = 0;
 		for (int i : demands.values()) {
 			if (i > 0)
 			  totaldemands += i;
 		}
-
-		// TODO
+		
+		if(shelterfile!=null){
+			try{
+				readShelterFile(network,shelterfile,totaldemands,demands,true);
+			}catch(IOException e) {
+				e.printStackTrace();
+				return;
+			}
+			totaldemands = 0;
+			for (int i : demands.values()) {
+				if (i > 0)
+				  totaldemands += i;
+			}
+			for(Node node : demands.keySet()){
+				if(demands.get(node)<0){
+						System.out.println("NGATIVE DMENAD SHELTER :"+demands.get(node)+" at "+ node);
+					}
+			}
+			
+		}
+		
+		// TODO parse shelterfile
 		// Careful, padang has shelters AND a supersink.
 		// so take care of the supersink here and don't tell the settings about it.
 
@@ -698,7 +790,6 @@ public class MultiSourceEAF {
 		//settings.MaxRounds = 95;
 		//settings.checkConsistency = 100;
 		//settings.useVertexCleanup = false;
-		settings.useShadowFlow = true;
 		//settings.useSinkCapacities = false;
 		//settings.useImplicitVertexCleanup = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
@@ -731,7 +822,10 @@ public class MultiSourceEAF {
 		//settings.writeLP();
 		//settings.writeNET(false);
 		//settings.writeSimpleNetwork();
-
+		//FIXME  remove those writing statements
+		//settings.writeSimpleNetwork(true);
+		//settings.writeNET(false);
+		//if(true)return;
 		fluss = MultiSourceEAF.calcEAFlow(settings);
 
 		/* --------- the actual work is done --------- */
@@ -761,11 +855,13 @@ public class MultiSourceEAF {
 			new PopulationWriter(output, network).writeFile(outputplansfile);
 		}
 
-		//System.out.println(fluss);
-		
+
+
 		if(_debug){
 			System.out.println("done");
 		}
 	}
+
+	
 
 }

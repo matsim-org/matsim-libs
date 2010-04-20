@@ -45,8 +45,9 @@ public class FlowCalculationSettings {
 	public double flowFactor = 1.0;
 
 	/* deault timeouts */
-	public int TimeHorizon = 7654321; // should be safe
-	public int MaxRounds = 7654321;	// should be safe up to 3.8m flow units
+	//FIXME reste those two parameters
+	public int TimeHorizon = 5000;//7654321; // should be safe
+	public int MaxRounds = 0;//7654321;	// should be safe up to 3.8m flow units
 
 	/* default search settings */
 	public boolean useSinkCapacities = true;
@@ -164,7 +165,7 @@ public class FlowCalculationSettings {
 				Integer i = this._demands.get(node);
 				if (i != null && i > 0)
 				  totaldemand += i;
-				if (i != null && i < 0) {
+				if (i != null && i < 0&& !useSinkCapacities) {
 					if (!node.equals(supersink)) {
 					  this._demands.put(node, 0);
 					  overrideerrors++;
@@ -349,13 +350,14 @@ public class FlowCalculationSettings {
 		return this._totaldemandsources;
 	}
 
-	public void writeSimpleNetwork() {
+	public void writeSimpleNetwork(boolean newformat) {
 		// write simple data format to sysout
 		// representing the dynamic graph, not the time-expanded graph
 		System.out.println("% generated from matsim data");
         System.out.println("N " + this._network.getNodes().size());
         System.out.println("TIME " + this.TimeHorizon);
         HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
+        //find maximal id
         int max = 0;
         for (Node node : this._network.getNodes().values()) {
         	try {
@@ -366,7 +368,7 @@ public class FlowCalculationSettings {
 
         	}
         }
-
+        //find negative ids
         for (Node node : this._network.getNodes().values()) {
         	try {
         		int i = Integer.parseInt(node.getId().toString());
@@ -382,20 +384,28 @@ public class FlowCalculationSettings {
 
         	}
         }
-
+        //write nodes
         for (Node node : this._network.getNodes().values()) {
         	int d = 0;
-        	if (this._demands.containsKey(node)) {
-        		d = this._demands.get(node);
-        		// for backwards compatibility we output the old S and T labels.
-        		if (d > 0) {
-        			System.out.println("S " + newNodeNames.get(node) + " " + d);
-        		}
-        		if (d < 0) {
-        			System.out.println("T " + newNodeNames.get(node) + " " + (-d));
+        	if(!newformat){
+        		if (this._demands.containsKey(node)) {
+	        		d = this._demands.get(node);
+	        		// for backwards compatibility we output the old S and T labels.
+	        		if (d > 0) {
+	        			System.out.println("S " + newNodeNames.get(node) + " " + d);
+	        		}
+	        		if (d < 0) {
+	        			System.out.println("T " + newNodeNames.get(node) + " " + (-d));
+	        		}
+	        	}
+	        	System.out.println("V " + newNodeNames.get(node) + " " + d + " " + node.getCoord().getX() + " " + node.getCoord().getY());
+        	}else{
+        		if (this._demands.containsKey(node)){
+        			d = this._demands.get(node);
+        			//outputs node lables as  V  allways
+        			System.out.println("V " + newNodeNames.get(node) + " " + d + " " + node.getCoord().getX() + " " + node.getCoord().getY());
         		}
         	}
-        	System.out.println("V " + newNodeNames.get(node) + " " + d + " " + node.getCoord().getX() + " " + node.getCoord().getY());
         }
 
         System.out.println("% E from to capacity length");

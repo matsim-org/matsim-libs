@@ -84,7 +84,6 @@ public class ImportSimpleNetwork {
 		}
 		return _demands;
 	}
-	
 	private void readSimpleNetwork(final String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		
@@ -94,6 +93,28 @@ public class ImportSimpleNetwork {
 		_newnodes = new HashMap<Integer,Node>();
 		
 		String inline = null;
+		boolean oldfileformat=false;
+		boolean addartificialnodes=false;
+		
+		in = new BufferedReader(new FileReader(filename));
+		//decide which file format is used
+		while ((inline = in.readLine()) != null) {
+			String[] line = inline.split(" ");
+			if (line[0].equals("S") || line[0].equals("T")) {
+				oldfileformat=true;
+			}
+		}
+		in.close();
+		
+		in = new BufferedReader(new FileReader(filename));
+		//decide if artificial nodes should be added
+		while ((inline = in.readLine()) != null) {
+			String[] line = inline.split(" ");
+			if (line[0].equals("addartificial")) {
+				addartificialnodes=true;
+			}
+		}
+		in.close();
 		
 		// read nodes
 		while ((inline = in.readLine()) != null) {
@@ -114,9 +135,12 @@ public class ImportSimpleNetwork {
 				
 				int i = Integer.valueOf(line[1].trim());
 				addNodeIfNecessary(i);
-				double x = Double.valueOf(line[3].trim());
-				double y = Double.valueOf(line[4].trim());
-				((NodeImpl) _newnodes.get(i)).setCoord((Coord) new CoordImpl(x, y)); 
+				if(line.length>3){
+					double x = Double.valueOf(line[3].trim());
+					double y = Double.valueOf(line[4].trim());
+					((NodeImpl) _newnodes.get(i)).setCoord((Coord) new CoordImpl(x, y)); 
+				}
+				
 			}
 		}
 		in.close();
@@ -150,7 +174,6 @@ public class ImportSimpleNetwork {
 		
 		// read demands
 		
-		// read edges
 		in = new BufferedReader(new FileReader(filename));
 		
 		while ((inline = in.readLine()) != null) {
@@ -171,7 +194,45 @@ public class ImportSimpleNetwork {
 		}		
 		in.close();
 		
+		//create artificial nodes and links if specified
+		if(addartificialnodes){
+			 HashMap<Integer,Node> artificialnodes =new HashMap<Integer,Node>();
+			 //add artificial nodes, links and reset the demands
+			for(Node node:this._newnodes.values()){
+				if(this._demands.get(node)<0){
+					//create dummy node
+					int demand = this._demands.get(node);
+					Node dummy = createDummy(node);
+					_network.addNode(dummy);
+					artificialnodes.put(Integer.valueOf(dummy.getId().toString()), dummy);
+					count++;
+					//create link
+					Link link = new LinkImpl(new IdImpl(count), node, dummy, _network, 10.66, 1.66, demand, 1);
+					_network.addLink(link);
+					//update demands
+					this._demands.put(node, 0);
+					this._demands.put(dummy, demand);
+				}
+			}
+			_newnodes.putAll(artificialnodes);
+		}		
 	}
+	
+	private Node createDummy(Node node){
+		int dummyid = 2000000000+Integer.valueOf(node.getId().toString());
+		while(true){
+			if(!_newnodes.containsKey(dummyid)){
+				break;
+			}else{
+				dummyid++;
+			}
+		}
+		NodeImpl dummy = new NodeImpl(new IdImpl(dummyid));
+		Coord coord = new CoordImpl(0.0, 0.0);
+		dummy.setCoord(coord);
+		return dummy;
+	}
+	
 	
 	private void addNodeIfNecessary(int v) {
 		if (!_newnodes.containsKey(v)) {
