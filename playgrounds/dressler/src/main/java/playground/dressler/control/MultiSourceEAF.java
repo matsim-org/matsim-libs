@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -190,7 +189,8 @@ public class MultiSourceEAF {
 					Id linkid =new IdImpl("shelterlink"+nodeid);
 					Link link = network.getLinks().get(linkid);
 					if(link==null){
-						link = new LinkImpl(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
+//						link = new LinkImpl(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
+						network.getFactory().createLink(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
 						network.addLink(link);
 					}
 					//set new demands
