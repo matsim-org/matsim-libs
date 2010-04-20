@@ -530,7 +530,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 421;
+		int instance = 42;
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -579,7 +579,7 @@ public class MultiSourceEAF {
 			timeStep = 1;
 			flowFactor = 1.0;
 			sinkid = "en1";
-			shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
+			//shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
 		} else if (instance == 43) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
@@ -790,8 +790,9 @@ public class MultiSourceEAF {
 		//settings.MaxRounds = 95;
 		//settings.checkConsistency = 100;
 		//settings.useVertexCleanup = false;
-		//settings.useSinkCapacities = false;
+		//settings.useSinkCapacities = true;
 		//settings.useImplicitVertexCleanup = true;
+		settings.useShadowFlow = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;

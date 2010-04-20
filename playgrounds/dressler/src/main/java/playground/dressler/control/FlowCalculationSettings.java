@@ -45,9 +45,8 @@ public class FlowCalculationSettings {
 	public double flowFactor = 1.0;
 
 	/* deault timeouts */
-	//FIXME reste those two parameters
-	public int TimeHorizon = 5000;//7654321; // should be safe
-	public int MaxRounds = 0;//7654321;	// should be safe up to 3.8m flow units
+	public int TimeHorizon = 7654321; // should be safe
+	public int MaxRounds = 7654321;	// should be safe up to 3.8m flow units
 
 	/* default search settings */
 	public boolean useSinkCapacities = true;
@@ -165,7 +164,7 @@ public class FlowCalculationSettings {
 				Integer i = this._demands.get(node);
 				if (i != null && i > 0)
 				  totaldemand += i;
-				if (i != null && i < 0&& !useSinkCapacities) {
+				if (i != null && i < 0 && !useSinkCapacities) {
 					if (!node.equals(supersink)) {
 					  this._demands.put(node, 0);
 					  overrideerrors++;
@@ -265,6 +264,7 @@ public class FlowCalculationSettings {
 		System.out.println("Time Horizon: " + this.TimeHorizon);
 		System.out.println("Timestep: " + this.timeStep);
 		System.out.println("FlowFactor: " + this.flowFactor);
+		System.out.println("Max Rounds: " + this.MaxRounds);
 		System.out.println("Edges rounded to zero length: " + this._roundedtozerolength);
 		System.out.println("Edges rounded to zero capacity: " + this._roundedtozerocapacity);
 
