@@ -394,7 +394,7 @@ public class Flow {
 						System.out.println("Weird. Sink of StepSinkFlow has no sinkflow!");
 						return 0;
 					} else {
-						cap = si.getFlowAt(ssf.getStartTime());
+						cap = si.getFlowAt(ssf.getArrivalTime());
 						if (cap < result) {
 							result = cap;
 						}
@@ -413,6 +413,127 @@ public class Flow {
 		}
 		//System.out.println(""+ result);
 		return result;
+	}
+	
+	/**
+	 * Simulates the bottleneck computation of the TimeExpandedPath for debugging 
+	 * @param TimeExpandedPath
+	 */
+	public void displayBottleNeckCapacity(final TimeExpandedPath TimeExpandedPath){
+		System.out.println("bottleneck simulation for " + TimeExpandedPath);
+		//check if first node is a source
+		Node temp;
+		temp = TimeExpandedPath.getSource();
+		Integer demand = this._demands.get(temp);
+		if(demand == null || demand < 0){
+			throw new IllegalArgumentException("Startnode is no source " + TimeExpandedPath);
+		}
+		
+		int result = demand;
+		System.out.println("demand at source " + temp.getId() + ": " + demand);
+		
+		if (result == 0) {
+			// this may actually happen now that many paths are constructed that orginate
+			// in the same source (for the forward search).			
+			return;
+		}
+		
+		// check if the final node is a sink
+		temp = TimeExpandedPath.getSink();
+		demand = this._demands.get(temp);
+		if(demand == null || demand > 0){
+			throw new IllegalArgumentException("Endnode is no sink " + TimeExpandedPath);
+		}
+		result = Math.min(result, -demand);
+		System.out.println("demand at sink " + temp.getId() + ": " + (-demand));		
+		
+		if(result == 0) {
+			return;
+		}
+		
+		//go through the path edges
+		//System.out.println("augmenting path: ");
+
+		int cap;
+		for(PathStep step : TimeExpandedPath.getPathSteps()){
+
+			// FIXME really bad style ...
+			if (step instanceof StepEdge) {
+				StepEdge se = (StepEdge) step;
+				Link edge = se.getEdge();
+
+				if(se.getForward()){
+					cap = this._settings.getCapacity(edge) - this._flow.get(edge).getFlowAt(se.getStartTime());
+				} else {
+					cap = this._flow.get(edge).getFlowAt(se.getArrivalTime());
+				}
+				System.out.println("step " + se + " has cap " + cap);
+				if (cap < result) {
+					result = cap;
+				}
+			} else if (step instanceof StepSourceFlow) {
+				StepSourceFlow ssf = (StepSourceFlow) step;
+				Node node  = ssf.getStartNode().getRealNode();				
+				
+				if (!ssf.getForward()) {
+					SourceIntervals si = this._sourceoutflow.get(node);
+					if (si == null) {
+						System.out.println("Weird. Source of StepSourceFlow has no sourceoutflow!");
+						return;
+					} else {
+						cap = si.getFlowAt(ssf.getStartTime());						
+						if (cap < result) {
+							result = cap;
+						}
+						System.out.println("step " + ssf + " has cap " + cap);
+					}
+				} else {
+					System.out.println("step " + ssf + " has cap infinity");
+				}
+				/* no else, because outflow out of a source has no cap.
+				   (the demand of the original source is accounted for,
+				   demand of sources we pass through does not matter) */
+			} else if (step instanceof StepSinkFlow) {
+				StepSinkFlow ssf = (StepSinkFlow) step;
+				Node sink;
+
+				// the same node anyway ...
+				if (ssf.getForward()) {
+					sink = ssf.getArrivalNode().getRealNode();
+				} else {
+					sink = ssf.getStartNode().getRealNode();
+				}				
+				
+				// Flow through a sink is not capped by the demand of the sink.
+				// The final destination was already checked in the beginning.
+				if (!step.getForward()) {
+					SinkIntervals si = this._sinkflow.get(sink);
+					if (si == null) {
+						System.out.println("Weird. Sink of StepSinkFlow has no sinkflow!");
+						return;
+					} else {
+						cap = si.getFlowAt(ssf.getArrivalTime());
+						if (cap < result) {
+							result = cap;
+						}
+						System.out.println("step " + ssf + " has cap " + cap);
+					}
+					//throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
+				} else {
+					// inflow into sink is uncapped
+					System.out.println("step " + ssf + " has cap inifinity");
+				}
+			} else {
+				throw new RuntimeException("Unsupported kind of PathStep!");
+			}
+			
+			// no need for further scanning, if this path is already useless
+			if (result == 0) {
+				return;
+			}
+
+		}
+		System.out.println("result " + result);		
 	}
 
 	/**

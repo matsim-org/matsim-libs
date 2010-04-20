@@ -189,24 +189,24 @@ public class MultiSourceEAF {
 					}
 					Node shelter =network.getNodes().get(shelterid);
 					//create and add link from node to shelter
-					Id linkid =new IdImpl("shelterlink"+nodeid);
+					Id linkid = new IdImpl("shelterlink" + nodeid);
 					Link link = network.getLinks().get(linkid);
-					if(link==null){
-//						link = new LinkImpl(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
-						network.getFactory().createLink(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
+					if (link == null) {
+						//	link = new LinkImpl(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
+						link = network.getFactory().createLink(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
 						network.addLink(link);
 					}
 					//set new demands
-					int olddemand=demands.get(shelter);
-					int newdemand = olddemand-sheltercapacity;
+					int olddemand = demands.get(shelter);
+					int newdemand = olddemand - sheltercapacity;
 					
 					demands.put(shelter, newdemand);
-				}else{
-					int olddemand =0;
-					if(demands.get(node)==null){
+				} else {
+					int olddemand = 0;
+					if (demands.get(node) == null) {
 						olddemand=demands.get(node);
 					}
-					int newdemand = olddemand-sheltercapacity;
+					int newdemand = olddemand - sheltercapacity;
 					demands.put(node, newdemand);
 				}
 			}
@@ -282,13 +282,17 @@ public class MultiSourceEAF {
 		List<TimeExpandedPath> result = null;
 		fluss = new Flow(settings);
 		if(paths!=null){
-			for(TimeExpandedPath path :paths){
+			if (_debug) {
+				System.out.println("restoring flow");
+			}
+			for (TimeExpandedPath path : paths) {
 				fluss.augment(path,path.getFlow());
 			}
+			fluss.cleanUp();
 		}
 		String tempstr = "";
 
-		if(_debug){
+		if (_debug) {
 		  System.out.println("starting calculations");
 		}
 
@@ -303,7 +307,7 @@ public class MultiSourceEAF {
 		if (settings.useSinkCapacities) {
 			routingAlgo = new BellmanFordIntervalBasedWithCost(settings, fluss);
 		} else {
-		  routingAlgo = new BellmanFordIntervalBased(settings, fluss);
+			routingAlgo = new BellmanFordIntervalBased(settings, fluss);
 		}
 
 		int VERBOSITY = 100;
@@ -478,13 +482,18 @@ public class MultiSourceEAF {
 				}
 			}
 
-			System.out.println(result);
+			// BIG DEBUG
+			//System.out.println(result);
+			
 			if (result != null && !result.isEmpty()) {
 				for(TimeExpandedPath path : result){
 					String tempstr2 = "";
 
 					tempstr2 = path.toString() + "\n";
 
+					// DEBUG
+					//fluss.displayBottleNeckCapacity(path);
+					
 					int augment = fluss.augment(path);
 
 					if (augment > 0) {
@@ -586,7 +595,7 @@ public class MultiSourceEAF {
 		String sinkid = null;
 		String simplenetworkfile = null;
 		String shelterfile = null;
-		String flowfile =null;
+		String flowfile = null;
 		int uniformDemands = 0;
 
 		// Rounding is now done according to timestep and flowFactor!
@@ -735,8 +744,9 @@ public class MultiSourceEAF {
 
 		}
 		
-		outputplansfile = "/homes/combi/dressler/V/code/meine_EA/inst4_plans.xml";
-
+		// outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
+		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters.pathflow";
+		
 
 		if(_debug){
 			System.out.println("starting to read input");
@@ -808,10 +818,10 @@ public class MultiSourceEAF {
 			  totaldemands += i;
 		}
 		
-		if(shelterfile!=null){
-			try{
+		if (shelterfile != null) {
+			try {
 				readShelterFile(network,shelterfile,totaldemands,demands,true);
-			}catch(IOException e) {
+			} catch(IOException e) {
 				e.printStackTrace();
 				return;
 			}
@@ -821,7 +831,7 @@ public class MultiSourceEAF {
 				  totaldemands += i;
 			}
 			for(Node node : demands.keySet()){
-				if(demands.get(node)<0){
+				if (demands.get(node) < 0) {
 						System.out.println("NEGATIVE DEMAND SHELTER :"+demands.get(node)+" at "+ node);
 					}
 			}
@@ -835,7 +845,7 @@ public class MultiSourceEAF {
 
 
 		//check if demands and sink are set
-		if (demands.isEmpty() ) {
+		if (demands.isEmpty()) {
 			System.out.println("demands not found");
 		}
 
@@ -854,7 +864,7 @@ public class MultiSourceEAF {
 
 		// set additional parameters
 		//settings.TimeHorizon = 3;
-		//settings.MaxRounds = 1005;
+		//settings.MaxRounds = 2;
 		//settings.checkConsistency = 100;
 		//settings.useVertexCleanup = false;
 		//settings.useSinkCapacities = false;
@@ -890,7 +900,7 @@ public class MultiSourceEAF {
 		List<TimeExpandedPath> flowpaths = null;
 		if (flowfile != null) {
 			try {
-			flowpaths=readPathFlow(network, flowfile);
+			flowpaths = readPathFlow(network, flowfile);
 			} catch(Exception e) {
 				e.printStackTrace();
 				return;
@@ -899,13 +909,13 @@ public class MultiSourceEAF {
 		}
 
 		//settings.writeLP();
-		//settings.writeNET(false);
-		//settings.writeSimpleNetwork();
-		//FIXME  remove those writing statements
 		//settings.writeSimpleNetwork(true);
 		//settings.writeNET(false);
 		//if(true)return;
+		
 		fluss = MultiSourceEAF.calcEAFlow(settings, flowpaths);
+		
+		//fluss.writePathflow();
 
 		/* --------- the actual work is done --------- */
 
@@ -924,12 +934,13 @@ public class MultiSourceEAF {
 		for (Node node : fluss.getDemands().keySet()){
 			int demand = fluss.getDemands().get(node);
 			if (demand > 0) {
+				// this can be a lot of text
 				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
 			}
 		}
 
 
-		if (outputplansfile!=null) {
+		if (outputplansfile != null) {
 			PopulationImpl output = fluss.createPopulation(scenario);
 			new PopulationWriter(output, network).writeFile(outputplansfile);
 		}

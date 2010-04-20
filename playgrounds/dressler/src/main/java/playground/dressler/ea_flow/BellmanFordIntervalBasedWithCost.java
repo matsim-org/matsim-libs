@@ -556,8 +556,13 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		} 
 		
 		// So this is a nonactive sink.
+		
+		// DEBUG
+		//System.out.println("scanning nonactive sink " + v);
+		//System.out.println(this._flow.getSinkFlow(v));
 
 		ArrayList<Interval> sendBackWhen = this._flow.getSinkFlow(v).canSendFlowBackAll(this._settings.TimeHorizon);
+		//System.out.println(sendBackWhen);
 
 		// predecessor depends on the time, but should get adjusted
 		PathStep pred = new StepSinkFlow(v, 0, false);
