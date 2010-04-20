@@ -34,5 +34,7 @@ public interface QSimEngine extends LinkActivator, SimEngine{
 	 * @param time The current time in the simulation.
 	 */
 	public void simStep(final double time);
+	
+	public PositionInfoBuilder getPositionInfoBuilder();
 		
 }

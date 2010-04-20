@@ -57,6 +57,8 @@ public class QSimEngineImpl implements QSimEngine{
 
 	private final Random random;
   private final QSim qsim;
+  
+  private final PositionInfoBuilder positionInfoBuilder = new PositionInfoBuilder();
 
 	public QSimEngineImpl(final QSim sim, final Random random) {
     this.random = random;
@@ -153,6 +155,10 @@ public class QSimEngineImpl implements QSimEngine{
   @Override
   public QSim getQSim() {
     return this.qsim;
+  }
+  
+  public PositionInfoBuilder getPositionInfoBuilder(){
+  	return this.positionInfoBuilder;
   }
 
 }

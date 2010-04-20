@@ -47,8 +47,10 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 	/** This is the collection of links that have to be activated in the current time step */
 	/*package*/ final ArrayList<QLink> linksToActivate = new ArrayList<QLink>();
 	private QSim qsim;
+	private PositionInfoBuilder positionInfoBuilder;
 
-	public QSimEngineThread(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier, QSim sim)
+	public QSimEngineThread(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier, 
+			QSim sim, PositionInfoBuilder positionInfoBuilder)
 	{
 		this.simulateAllNodes = simulateAllNodes;
 		this.simulateAllLinks = simulateAllLinks;
@@ -56,6 +58,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 		this.separationBarrier = separationBarrier;
 		this.endBarrier = endBarrier;
 		this.qsim = sim;
+		this.positionInfoBuilder = positionInfoBuilder;
 	}
 
 	public void setExtendedQueueNodeArray(ExtendedQueueNode[] queueNodes)
@@ -216,5 +219,10 @@ public class QSimEngineThread extends Thread implements QSimEngine{
   public void onPrepareSim() {
     //currently nothing to do
   }
+
+	@Override
+	public PositionInfoBuilder getPositionInfoBuilder() {
+		return this.positionInfoBuilder;
+	}
 
 }

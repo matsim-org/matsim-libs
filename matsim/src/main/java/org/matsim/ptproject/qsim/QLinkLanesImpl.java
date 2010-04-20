@@ -38,8 +38,6 @@ import org.matsim.lanes.Lane;
 import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  * @author dstrippgen
@@ -142,7 +140,7 @@ public class QLinkLanesImpl implements QLink {
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
 	private QSimEngine qsimEngine = null;
-
+	
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param link2
@@ -478,21 +476,16 @@ public class QLinkLanesImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
+			QLinkLanesImpl.this.getQSimEngine().getPositionInfoBuilder().init(QLinkLanesImpl.this.link);
+			
 		  for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 		    lane.visdata.getVehiclePositions(time, positions);
 		  }
-		  int cnt = parkedVehicles.size();
-		  if (cnt > 0) {
-		    int cnt2 = 0 ;
-		    Collection<PersonAgent> agentsInActivities = QLinkLanesImpl.this.agentsInActivities.values();
-		    for (PersonAgent pa : agentsInActivities) {
-		      PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), getLink(), cnt2 ) ;
-		      agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
-		      positions.add(agInfo) ;
-		      cnt2++ ;
-		    }
-		    // add the parked vehicles
-		  }
+		  
+		  int cnt2 = QLinkLanesImpl.this.originalLane.waitingList.size();
+		  cnt2 = QLinkLanesImpl.this.getQSimEngine().getPositionInfoBuilder().positionAgentsInActivities(positions, 
+		  		QLinkLanesImpl.this.agentsInActivities.values(), cnt2);
+		  
 		  return positions;
 		}
 	}

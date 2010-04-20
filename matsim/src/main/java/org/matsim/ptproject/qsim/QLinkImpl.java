@@ -619,6 +619,7 @@ public class QLinkImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
+			QLinkImpl.this.getQSimEngine().getPositionInfoBuilder().init(link);
 
 			// positions of the "moving" vehicles (buffer, queue):
 			if ("queue".equals(snapshotStyleCache)) {
@@ -635,17 +636,13 @@ public class QLinkImpl implements QLink {
 			QLinkImpl.this.transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cnt2 );
 
 			// treat vehicles from waiting list:
-			positionVehiclesFromWaitingList(positions, cnt2 );
-
-			// agents at activities:
-			Collection<PersonAgent> agentsInActivities = QLinkImpl.this.agentsInActivities.values();
-			for (PersonAgent pa : agentsInActivities) {
-				PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), link, cnt2 ) ;
-				agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
-				positions.add(agInfo) ;
-				cnt2++ ;
-			}
-
+			
+			QLinkImpl.this.getQSimEngine().getPositionInfoBuilder().positionVehiclesFromWaitingList(positions, cnt2, 
+					QLinkImpl.this.waitingList, QLinkImpl.this.transitQueueLaneFeature);
+			
+			cnt2 = QLinkImpl.this.getQSimEngine().getPositionInfoBuilder().positionAgentsInActivities(positions, 
+					QLinkImpl.this.agentsInActivities.values(), cnt2);
+			
 			// return:
 			return positions;
 		}
@@ -840,37 +837,6 @@ public class QLinkImpl implements QLink {
 			}
 		}
 
-		/**
-		 * Put the vehicles from the waiting list in positions. Their actual position doesn't matter, PositionInfo provides a
-		 * constructor for handling this situation.
-		 */
-	private void positionVehiclesFromWaitingList( final Collection<AgentSnapshotInfo> positions, int cnt2 )
-		{
-			for (QVehicle veh : QLinkImpl.this.waitingList) {
-				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-				boolean first = true;
-				for (PersonAgent passenger : peopleInVehicle) {
-					AgentSnapshotInfo passengerPosition = new PositionInfo( passenger.getPerson().getId(), link, cnt2 ); // for the time being, same position as facilities
-					if ( passenger.getPerson().getId().toString().startsWith("pt")) {
-						passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
-					} else if (first) {
-						passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
-					} else {
-						passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
-					}
-					positions.add(passengerPosition);
-					first = false;
-				}
-			}
-
-//			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
-//			for (QVehicle veh : QLinkImpl.this.waitingList) {
-//				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-//				this.createAndAddPositionInfo(positions, peopleInVehicle, link, cellSize, lane, 0.0);
-//			}
-//			return lane;
-
-		}
 
 		/**
 		 * Returns all the people sitting in this vehicle.
