@@ -22,7 +22,19 @@ public class PrimlocEngineTest extends MatsimTestCase {
 
 	private final static Logger log = Logger.getLogger(PrimlocEngineTest.class);
 
-	PrimlocCore core = new PrimlocCore();
+	private PrimlocCore core = null;
+
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		this.core = new PrimlocCore();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		this.core = null;
+		super.tearDown();
+	}
 
 	public void testPLCM() throws InvalidPropertiesFormatException, FileNotFoundException, IOException {
 

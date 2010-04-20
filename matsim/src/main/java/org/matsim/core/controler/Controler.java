@@ -153,7 +153,7 @@ public class Controler {
 	public static final String FILENAME_SIGNALSYSTEMS_CONFIG = "output_signalsystem_configuration.xml.gz";
   public static final String FILENAME_CONFIG = "output_config.xml.gz";
 
-	
+
 	private enum ControlerState {
 		Init, Running, Shutdown, Finished
 	}
@@ -225,7 +225,7 @@ public class Controler {
 
 	private final List<SimulationListener> simulationListener = new ArrayList<SimulationListener>();
 
-	private final Thread shutdownHook = new Thread() {
+	private Thread shutdownHook = new Thread() {
 		@Override
 		public void run() {
 			shutdown(true);
@@ -466,11 +466,15 @@ public class Controler {
 			if (unexpected) {
 				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
 			} else {
-				// only remove hook when regular shutdown, otherwise we can't as
-				// the shutdown is already in progress...
-				Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
 				log.info("S H U T D O W N   ---   regular shutdown completed.");
 			}
+			try {
+				Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
+			} catch (IllegalStateException e) {
+				log.info("Cannot remove shutdown hook. " + e.getMessage());
+			}
+			this.shutdownHook = null; // important for test cases to free the memory
+			this.collectLogMessagesAppender = null;
 			IOUtils.closeOutputDirLogging();
 		}
 	}
