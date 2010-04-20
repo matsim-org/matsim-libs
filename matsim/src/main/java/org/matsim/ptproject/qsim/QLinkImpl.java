@@ -55,6 +55,8 @@ public class QLinkImpl implements QLink {
 
 	final private static Logger log = Logger.getLogger(QLinkImpl.class);
 
+	private static int cellSizeCacheWarningCount = 0;
+
 	private static int spaceCapWarningCount = 0;
 
 	/**
@@ -143,7 +145,7 @@ public class QLinkImpl implements QLink {
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
 		this.qsimEngine = engine;
 		this.calculateCapacities();
-		
+
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
 	}
 
@@ -464,7 +466,7 @@ public class QLinkImpl implements QLink {
 	public void setQSimEngine(QSimEngine qsimEngine){
 		this.qsimEngine = qsimEngine;
 	}
-	
+
 	//	public Queue<QueueVehicle> getVehiclesInBuffer() {
 	//		return this.originalLane.getVehiclesInBuffer();
 	//	}
@@ -564,32 +566,36 @@ public class QLinkImpl implements QLink {
 	 * @author dgrether
 	 */
 	class VisDataImpl implements VisData {
-		
+
 		private final float vehSpacingAsQueueCache ; // using only float to conserve memory
-		
+
 		private VisDataImpl() {
 
 			// the following statements generate some values that are then cached
-			
+
 			final String snapshotStyle = getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle() ;
 			if ( snapshotStyleCache==null ) {
 				snapshotStyleCache = snapshotStyle ;
 			} else if ( !snapshotStyleCache.equals(snapshotStyle) ) {
 				log.warn( "snapshot styles on a per-link basis are not supported to conserve memory") ;
 			}
-			
+
 			final double cellSize = ((NetworkImpl)QLinkImpl.this.getQSimEngine().getQSim().getQNetwork().getNetwork()).getEffectiveCellSize();
 			if ( Double.isNaN( cellSizeCache ) ) {
 				cellSizeCache = cellSize ;
-			} else if ( cellSizeCache != cellSize ) {
+			} else if ( (cellSizeCache != cellSize) && (cellSizeCacheWarningCount < 10) ) {
 				log.warn( " cell sizes on a per-link basis are not supported to conserve memory") ;
+				cellSizeCacheWarningCount++;
+				if (cellSizeCacheWarningCount > 9) {
+					log.warn( "  no more incidents of this warning will be reported.") ;
+				}
 			}
-			
+
 			double storageCapFactor = QLinkImpl.this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 			vehSpacingAsQueueCache = (float) calculateQueueVehicleSpacing(link, storageCapFactor, cellSizeCache);
 
 		}
-		
+
 //		/**
 //		 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
 //		 */
@@ -622,15 +628,15 @@ public class QLinkImpl implements QLink {
 			} else {
 				log.warn("The snapshotStyle \"" + snapshotStyleCache + "\" is not supported.");
 			}
-			
+
 			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
-			
+
 			// treat vehicles from transit stops
 			QLinkImpl.this.transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cnt2 );
-			
+
 			// treat vehicles from waiting list:
 			positionVehiclesFromWaitingList(positions, cnt2 );
-			
+
 			// agents at activities:
 			Collection<PersonAgent> agentsInActivities = QLinkImpl.this.agentsInActivities.values();
 			for (PersonAgent pa : agentsInActivities) {
@@ -639,7 +645,7 @@ public class QLinkImpl implements QLink {
 				positions.add(agInfo) ;
 				cnt2++ ;
 			}
-			
+
 			// return:
 			return positions;
 		}
@@ -648,7 +654,7 @@ public class QLinkImpl implements QLink {
 		 * Calculates the positions of all vehicles on this link so that there is always the same distance between following cars. A
 		 * single vehicle will be placed at the middle (0.5) of the link, two cars will be placed at positions 0.25 and 0.75, three
 		 * cars at positions 0.16, 0.50, 0.83, and so on.
-		 * 
+		 *
 		 * @param positions
 		 *            A collection where the calculated positions can be stored.
 		 */
@@ -691,7 +697,7 @@ public class QLinkImpl implements QLink {
 					distFromFromNode -= spacing;
 				}
 			}
-			
+
 			// there were methods here to add vehicles in the wait queue.  I moved them to the general "getVehiclePositions" method,
 			// since this does not depend on "queue" vs. "equil".  Since, however, the wait vis methods in "queue" vs "equil" haved
 			// moved apart from each other, identical behavior is not guaranteed.  kai, apr'10
@@ -721,7 +727,7 @@ public class QLinkImpl implements QLink {
 		 * Calculates the positions of all vehicles on this link according to the queue-logic: Vehicles are placed on the link
 		 * according to the ratio between the free-travel time and the time the vehicles are already on the link. If they could have
 		 * left the link already (based on the time), the vehicles start to build a traffic-jam (queue) at the end of the link.
-		 * 
+		 *
 		 * @param positions
 		 *            A collection where the calculated positions can be stored.
 		 */
@@ -732,13 +738,13 @@ public class QLinkImpl implements QLink {
 
 			// treat vehicles from buffer:
 			currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache);
-			
+
 			// treat other driving vehicles:
 			positionOtherDrivingVehiclesAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache );
-			
-			// yyyy waiting list, transit stops, persons at activity, etc. all do not depend on "queue" vs "equil" 
+
+			// yyyy waiting list, transit stops, persons at activity, etc. all do not depend on "queue" vs "equil"
 			// and should thus not be treated in this method. kai, apr'10
-			
+
 		}
 
 		private double calculateQueueVehicleSpacing(Link link, double storageCapFactor, double cellSize) {
@@ -752,7 +758,7 @@ public class QLinkImpl implements QLink {
 		 *  put all cars in the buffer one after the other
 		 */
 		private double positionVehiclesFromBufferAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-				double queueEnd, Link link, double vehSpacing) 
+				double queueEnd, Link link, double vehSpacing)
 		{
 			for (QVehicle veh : QLinkImpl.this.buffer) {
 
@@ -774,13 +780,13 @@ public class QLinkImpl implements QLink {
 		 * with free speed at that place
 		 */
 		private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-				double queueEnd, Link link, double vehSpacing) 
+				double queueEnd, Link link, double vehSpacing)
 		{
 			double lastDistance = Double.POSITIVE_INFINITY;
 			double ttfs = link.getLength() / link.getFreespeed(now);
 			for (QVehicle veh : QLinkImpl.this.vehQueue) {
 				double travelTime = now - veh.getLinkEnterTime();
-				double distanceOnLink = (ttfs == 0.0 ? 0.0 
+				double distanceOnLink = (ttfs == 0.0 ? 0.0
 						: ((travelTime / ttfs) * link.getLength()));
 				if (distanceOnLink > queueEnd) { // vehicle is already in queue
 					distanceOnLink = queueEnd;
@@ -838,7 +844,7 @@ public class QLinkImpl implements QLink {
 		 * Put the vehicles from the waiting list in positions. Their actual position doesn't matter, PositionInfo provides a
 		 * constructor for handling this situation.
 		 */
-	private void positionVehiclesFromWaitingList( final Collection<AgentSnapshotInfo> positions, int cnt2 ) 
+	private void positionVehiclesFromWaitingList( final Collection<AgentSnapshotInfo> positions, int cnt2 )
 		{
 			for (QVehicle veh : QLinkImpl.this.waitingList) {
 				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
@@ -856,7 +862,7 @@ public class QLinkImpl implements QLink {
 					first = false;
 				}
 			}
-			
+
 //			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
 //			for (QVehicle veh : QLinkImpl.this.waitingList) {
 //				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
