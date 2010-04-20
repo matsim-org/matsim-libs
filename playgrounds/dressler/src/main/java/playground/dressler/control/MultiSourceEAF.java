@@ -373,7 +373,7 @@ public class MultiSourceEAF {
 					trySuccessfulPaths = true; // before we do the forward search, we can simply repeat paths!
 				} else {
 					// forward or mixed search didn't find anything
-					// that's it, we are done.
+					// that's it, we are done.					
 					break;
 				}
 			} else {
@@ -478,7 +478,7 @@ public class MultiSourceEAF {
 				}
 			}
 
-			//System.out.println(result);
+			System.out.println(result);
 			if (result != null && !result.isEmpty()) {
 				for(TimeExpandedPath path : result){
 					String tempstr2 = "";
@@ -593,7 +593,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 42;
+		int instance = 43;
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -649,12 +649,13 @@ public class MultiSourceEAF {
 			timeStep = 10;
 			flowFactor = 1.0;
 			sinkid = "en1";
+			shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
 		} else if (instance == 44) {
-				networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
-				plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
-				timeStep = 5;
-				flowFactor = 1.0;
-				sinkid = "en1";
+			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
+			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
+			timeStep = 5;
+			flowFactor = 1.0;
+			sinkid = "en1";
 		}else if (instance == 421) {
 			networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
@@ -720,8 +721,8 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/demo.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/audimax.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
-			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
-			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
+			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
 
 			uniformDemands = 100;
 
@@ -733,6 +734,8 @@ public class MultiSourceEAF {
 			sinkid = "en1";  //padang, line, swissold .. en1 fuer forward
 
 		}
+		
+		outputplansfile = "/homes/combi/dressler/V/code/meine_EA/inst4_plans.xml";
 
 
 		if(_debug){
@@ -819,7 +822,7 @@ public class MultiSourceEAF {
 			}
 			for(Node node : demands.keySet()){
 				if(demands.get(node)<0){
-						System.out.println("NGATIVE DMENAD SHELTER :"+demands.get(node)+" at "+ node);
+						System.out.println("NEGATIVE DEMAND SHELTER :"+demands.get(node)+" at "+ node);
 					}
 			}
 			
@@ -851,10 +854,10 @@ public class MultiSourceEAF {
 
 		// set additional parameters
 		//settings.TimeHorizon = 3;
-		//settings.MaxRounds = 95;
+		//settings.MaxRounds = 1005;
 		//settings.checkConsistency = 100;
 		//settings.useVertexCleanup = false;
-		//settings.useSinkCapacities = true;
+		//settings.useSinkCapacities = false;
 		//settings.useImplicitVertexCleanup = true;
 		settings.useShadowFlow = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
@@ -884,11 +887,11 @@ public class MultiSourceEAF {
 			return;
 		}
 		//read flow if specified
-		List<TimeExpandedPath> flowpaths =null;
-		if(flowfile!=null){
-			try{
-			flowpaths=readPathFlow(network,flowfile);
-			}catch(Exception e){
+		List<TimeExpandedPath> flowpaths = null;
+		if (flowfile != null) {
+			try {
+			flowpaths=readPathFlow(network, flowfile);
+			} catch(Exception e) {
 				e.printStackTrace();
 				return;
 			}
@@ -902,7 +905,7 @@ public class MultiSourceEAF {
 		//settings.writeSimpleNetwork(true);
 		//settings.writeNET(false);
 		//if(true)return;
-		fluss = MultiSourceEAF.calcEAFlow(settings,flowpaths);
+		fluss = MultiSourceEAF.calcEAFlow(settings, flowpaths);
 
 		/* --------- the actual work is done --------- */
 
@@ -926,8 +929,8 @@ public class MultiSourceEAF {
 		}
 
 
-		if(outputplansfile!=null){
-			PopulationImpl output = fluss.createPopulation(plansfile);
+		if (outputplansfile!=null) {
+			PopulationImpl output = fluss.createPopulation(scenario);
 			new PopulationWriter(output, network).writeFile(outputplansfile);
 		}
 

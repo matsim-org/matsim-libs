@@ -1322,16 +1322,24 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
 		for (Node superSink : this._flow.getSinks()) {
 			if (this._flow.isNonActiveSink(superSink)) {
+				// sink is already full
+				continue;
+			}
+			
+			VertexIntervalWithCost superSinkLabel = (VertexIntervalWithCost) this._sinklabels.get(superSink);
+			if (!superSinkLabel.getReachable()) {
 				// we cannot go here
 				continue;
 			}
-			VertexIntervalWithCost superSinkLabel = (VertexIntervalWithCost) this._sinklabels.get(superSink);
+			
 			mincost = Math.min(mincost, superSinkLabel.getAbsoluteCost(0));						
 		}
 		
 		if (mincost == Integer.MAX_VALUE) {
 		  throw new BFException("Sink cannot be reached!");
 		}
+		
+		//System.out.println("Mincost = " + mincost);
 		
 		// FIXME handle timehorizon ..
 		// FIXME handle stepsinkflows 
@@ -1351,6 +1359,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			}
 
 			int superSinkTime = superSinkLabel.getPredecessor().getStartTime();
+			
+			//System.out.println("sink " + superSink.getId() + " reachable at time " + superSinkTime);
 			
 			// collect all reachable sinks, that are connected by a zero transit time
 			LinkedList<Node> realSinksToSendTo = new LinkedList<Node>();

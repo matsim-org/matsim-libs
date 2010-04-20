@@ -117,6 +117,7 @@ public class ImportSimpleNetwork {
 		in.close();
 		
 		// read nodes
+		in = new BufferedReader(new FileReader(filename));
 		while ((inline = in.readLine()) != null) {
 			String[] line = inline.split(" ");			
 			if (line[0].equals("S") || line[0].equals("T")) {

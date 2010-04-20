@@ -29,14 +29,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -1657,40 +1661,41 @@ public class Flow {
 //////////////////////////////////////////////////////////////////////////////////////
 
 
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
 
 	/**
 	 *
 	 */
-	public PopulationImpl createPopulation(String oldfile){
+	public PopulationImpl createPopulation(final Scenario scenario){
 		//check whether oldfile exists
 		//boolean org = (oldfile!=null);
-		//HashMap<Node,LinkedList<Person>> orgpersons = new  HashMap<Node,LinkedList<Person>>();
+		//HashMap<Node, LinkedList<Person>> orgpersons = new HashMap<Node,LinkedList<Person>>();
 
 		//read old network an find out the startnodes of persons if oldfile exists
-		/*if(org){
-			Population population = new PopulationImpl(PopulationImpl.NO_STREAMING);
-			new MatsimPopulationReader(population,_network).readFile(oldfile);
-			_network.connect();
-			for(Person person : population.getPersons().values() ){
-				Link link = person.getPlans().get(0).getFirstActivity().getLink();
-				if (link == null) continue; // happens with plans that don't match the network.
-
-				Node node = link.getToNode();
-				if(orgpersons.get(node)==null){
-					LinkedList<Person> list = new LinkedList<Person>();
-					list.add(person);
-					orgpersons.put(node, list);
-				}else{
-					LinkedList<Person> list = orgpersons.get(node);
-					list.add(person);
-				}
-			}
-		}*/
+//		if(org){
+//						
+//			Population population = scenario.getPopulation();
+//
+//			for(Person person : population.getPersons().values() ){
+//				
+//				Link link = person.getPlans().get(0).getFirstActivity().getLink();
+//				if (link == null) continue; // happens with plans that don't match the network.
+//
+//				Node node = link.getToNode();
+//				if(orgpersons.get(node)==null){
+//					LinkedList<Person> list = new LinkedList<Person>();
+//					list.add(person);
+//					orgpersons.put(node, list);
+//				}else{
+//					LinkedList<Person> list = orgpersons.get(node);
+//					list.add(person);
+//				}
+//			}
+//		}
 
 		//construct Population
 		PopulationImpl result = new ScenarioImpl().getPopulation();
-		int id =1;
+		int id = 1;
 		for (TimeExpandedPath path : this._TimeExpandedPaths){
 			if(path.isforward()){
 				//units of flow on the Path
@@ -1699,23 +1704,22 @@ public class Flow {
 				LinkedList<Id> ids = new LinkedList<Id>();
 				for (PathStep step : path.getPathSteps()){
 					if (step instanceof StepEdge) {
-					  ids.add(((StepEdge) step).getEdge().getId());
+						ids.add(((StepEdge) step).getEdge().getId());
 					}
 				}
 
 
-				//if (!emptylegs) {
-					// normal case, write the routes!
-					LinkNetworkRouteImpl route;
+				// write the routes!
+				LinkNetworkRouteImpl route;
 
-					Node firstnode  = _network.getLinks().get(ids.get(0)).getFromNode();
+				Node firstnode  = _network.getLinks().get(ids.get(0)).getFromNode();
 
-					// for each unit of flow construct a Person
-					for (int i =1 ; i<= nofpersons;i++){
-						//add the first edge if olfile exists
-						String stringid = null;
-						PersonImpl orgperson = null;
-						/*if(org && (( orgpersons.get(firstnode))!=null) ){
+				// for each unit of flow construct a Person
+				for (int i =1 ; i <= nofpersons; i++){
+					//add the first edge if oldfile exists
+					String stringid = null;
+					PersonImpl orgperson = null;
+					/*if(org && (( orgpersons.get(firstnode))!=null) ){
 							LinkedList<Person> list = orgpersons.get(firstnode);
 							orgperson = list.getFirst();
 							list.remove(0);
@@ -1728,60 +1732,59 @@ public class Flow {
 							}
 							stringid = orgperson.getId().toString();
 						}else{*/
-							stringid = "new"+String.valueOf(id);
-							id++;
-						//}
+					stringid = "new"+String.valueOf(id);
+					id++;
 
-//						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
-						Id startLinkId = ids.get(0);
-						Id endLinkId = ids.get(ids.size()-1);
-						route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+					//	route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
+					Id startLinkId = ids.get(0);
+					Id endLinkId = ids.get(ids.size()-1);
+					route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 
-						List<Id> routeLinkIds = null;
-						if (ids.size() > 1) {
-							routeLinkIds = new ArrayList<Id>();
-//							route.setLinkIds(ids.subList(1, ids.size()-1));
-							for (Id iid : ids.subList(1, ids.size()-1)){
-								routeLinkIds.add(iid);
-							}
+					List<Id> routeLinkIds = null;
+					if (ids.size() > 1) {
+						routeLinkIds = new ArrayList<Id>();
+						//	route.setLinkIds(ids.subList(1, ids.size()-1));
+						for (Id iid : ids.subList(1, ids.size()-1)){
+							routeLinkIds.add(iid);
 						}
-						route.setLinkIds(startLinkId, routeLinkIds, endLinkId);
-
-
-						LegImpl leg = new LegImpl(TransportMode.car);
-						//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
-						leg.setRoute(route);
-						Link fromlink =_network.getLinks().get(ids.getFirst());
-						ActivityImpl home = new ActivityImpl("h", fromlink.getId());
-//						home.setLinkId(fromlink.getId());
-						Link tolink =_network.getLinks().get(ids.getLast());
-						ActivityImpl work = new ActivityImpl("w", tolink.getId());
-//						work.setLinkId(tolink.getId());
-
-
-						//Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
-						home.setEndTime(0);
-						//home.setCoord(_network.getLink(ids.getFirst()).getFromNode().getCoord());
-						// no end time for now.
-						//home.setEndTime(path.getPathEdges().getFirst().getTime());
-
-						//Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
-						work.setEndTime(0);
-						//work.setCoord(_network.getLink(ids.getLast()).getToNode().getCoord());
-
-
-						Id matsimid  = new IdImpl(stringid);
-						PersonImpl p = new PersonImpl(matsimid);
-						PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
-						plan.addActivity(home);
-						plan.addLeg(leg);
-						plan.addActivity(work);
-						p.addPlan(plan);
-						result.addPerson(p);
-						id++;
 					}
+					route.setLinkIds(startLinkId, routeLinkIds, endLinkId);
 
-			}else{ // residual edges
+
+					LegImpl leg = new LegImpl(TransportMode.car);
+					//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
+					leg.setRoute(route);
+					Link fromlink = _network.getLinks().get(ids.getFirst());
+					ActivityImpl home = new ActivityImpl("h", fromlink.getId());
+					//	home.setLinkId(fromlink.getId());
+					Link tolink =_network.getLinks().get(ids.getLast());
+					ActivityImpl work = new ActivityImpl("w", tolink.getId());
+					//						work.setLinkId(tolink.getId());
+
+
+					//Act home = new org.matsim.population.ActImpl("h", path.getPathEdges().getFirst().getEdge());
+					home.setEndTime(0);
+					//home.setCoord(_network.getLink(ids.getFirst()).getFromNode().getCoord());
+					// no end time for now.
+					//home.setEndTime(path.getPathEdges().getFirst().getTime());
+
+					//Act work = new org.matsim.population.ActImpl("w", path.getPathEdges().getLast().getEdge());
+					work.setEndTime(0);
+					//work.setCoord(_network.getLink(ids.getLast()).getToNode().getCoord());
+
+
+					Id matsimid  = new IdImpl(stringid);
+					PersonImpl p = new PersonImpl(matsimid);
+					PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
+					plan.addActivity(home);
+					plan.addLeg(leg);
+					plan.addActivity(work);
+					p.addPlan(plan);
+					result.addPerson(p);
+					id++;
+				}
+
+			} else { // residual edges
 				// this should not happen!
 				System.out.println("createPopulation encountered a residual step in");
 				System.out.println(path);
