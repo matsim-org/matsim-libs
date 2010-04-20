@@ -159,8 +159,9 @@ public class ImportSimpleNetwork {
 				int t = Integer.valueOf(line[4].trim());
 //				Link link = new LinkImpl(new IdImpl(count), _newnodes.get(v), _newnodes.get(w), _network, t, 1.0, u, 1);
 	
-				System.err.println( "I replaced the (deprecated) LinkImpl constructor by a factory.  Pls check if things are still working. Kai") ;
-				System.exit(-1) ;
+				// FIXME
+				//System.err.println( "I replaced the (deprecated) LinkImpl constructor by a factory.  Pls check if things are still working. Kai") ;
+				//System.exit(-1) ;
 				Link link = _network.getFactory().createLink( new IdImpl(count), _newnodes.get(v).getId(), _newnodes.get(w).getId() ) ;
 				link.setLength(t);
 				link.setFreespeed(1.0) ;
@@ -207,7 +208,16 @@ public class ImportSimpleNetwork {
 					artificialnodes.put(Integer.valueOf(dummy.getId().toString()), dummy);
 					count++;
 					//create link
-					Link link = new LinkImpl(new IdImpl(count), node, dummy, _network, 10.66, 1.66, demand, 1);
+					// FIXME ... use the factory as above!
+					
+					//Link link = new LinkImpl(new IdImpl(count), node, dummy, _network, 10.66, 1.66, demand, 1);
+					
+					Link link = _network.getFactory().createLink( new IdImpl(count), node.getId(), dummy.getId() ) ;
+					link.setLength(10.66);
+					link.setFreespeed(1.66);
+					link.setCapacity(demand);
+					link.setNumberOfLanes(1);
+					
 					_network.addLink(link);
 					//update demands
 					this._demands.put(node, 0);
