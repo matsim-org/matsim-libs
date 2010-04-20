@@ -150,16 +150,17 @@ public class ShadowEdgeFlow implements EdgeFlowI {
 
 	@Override
 	public int cleanup() {
-		// not needed!
-		return 0;
-		
-		// DEBUG
-//		int g = _forwardshadow.cleanup() + _residualshadow.cleanup();
-//		if (g > 0) {
-//			System.out.println("CleanUp() found something!? gain = " + g);			
-//		}
-//		return g;
-		//return _forwardshadow.cleanup() + _residualshadow.cleanup();
+		// not needed! cleanup is done implicitly
+		if (_debug > 0) {
+			// DEBUG
+			int g = _forwardshadow.cleanup() + _residualshadow.cleanup();
+			if (g > 0) {
+				System.out.println("CleanUp() found something!? gain = " + g);			
+			}
+			return g;
+		} else { 		
+		  return 0;
+		}
 	}
 
 	@Override

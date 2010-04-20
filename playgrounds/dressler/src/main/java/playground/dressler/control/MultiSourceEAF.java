@@ -552,7 +552,7 @@ public class MultiSourceEAF {
 		} else if (instance == 2) {
 			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
 			uniformDemands = 100;
-			timeStep = 100;
+			timeStep = 10;
 			flowFactor = 1.0;
 			sinkid = "en1";
 		} else if (instance == 3) {

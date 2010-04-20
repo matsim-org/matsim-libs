@@ -175,13 +175,15 @@ public class BinaryIntervals extends Intervals<BinaryInterval> {
 			if (joindown) {
 				// there is just one wrong value in between
 				// ... v )[ !v )[ v ... should become  ... v v v ...
+
 				this._tree.remove(i);
 				this._tree.remove(up);
 				down.setHighBound(up._r);
 				
 				if (this._last == up) { 
-				  this._last = down; // important!
-				}
+				    this._last = down; // important!
+				} 
+				
 				return;
 			} else {
 				// we can join up, but only up
@@ -197,16 +199,16 @@ public class BinaryIntervals extends Intervals<BinaryInterval> {
 		} else if (joindown) {
 			// we can join down, but only down
 			// ... v )[ !v ... should become ... v v )[ ... 
-			if (i._l + 1 == i._r ) {
-				this._tree.remove(i);   
+			
+			
+			if (i._l + 1 == i._r ) {			
+				this._tree.remove(i);
+				this._last = down; // important!
 			} else {
 				i.setLowBound(i._l + 1);   
 			}			   
 			down.setHighBound(down._r  + 1);	
-			
-			if (this._last == i) { 
-			  this._last = down; // important!
-			}			
+						
 			return;
 		}
 		
