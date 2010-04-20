@@ -79,7 +79,7 @@ public class ExampleMain {
 			return;
 		}
 				
-		fluss = MultiSourceEAF.calcEAFlow(settings);
+		fluss = MultiSourceEAF.calcEAFlow(settings,null);
 		
 		/* --------- the actual work is done --------- */
 		

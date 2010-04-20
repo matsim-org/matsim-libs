@@ -52,6 +52,9 @@ import playground.dressler.Interval.VertexIntervals;
 import playground.dressler.ea_flow.BellmanFordIntervalBased;
 import playground.dressler.ea_flow.BellmanFordIntervalBasedWithCost;
 import playground.dressler.ea_flow.Flow;
+import playground.dressler.ea_flow.StepEdge;
+import playground.dressler.ea_flow.StepSinkFlow;
+import playground.dressler.ea_flow.StepSourceFlow;
 import playground.dressler.ea_flow.TimeExpandedPath;
 import playground.dressler.util.ImportSimpleNetwork;
 
@@ -211,6 +214,60 @@ public class MultiSourceEAF {
 		in.close();
 		
 	}
+	public static List<TimeExpandedPath> readPathFlow(NetworkLayer network, String filename ) throws IOException{
+		List<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
+		BufferedReader in = new BufferedReader(new FileReader(filename));
+		String inline = null;
+		while ((inline = in.readLine()) != null){
+			//read a line and split it into steps
+			TimeExpandedPath path= new TimeExpandedPath();
+			String[] line = inline.split(";");
+			for( int i=0;i<line.length;i++){
+				String[] step= line[i].split(":");
+				//if first word is not Path red next line
+				if(i==0 && !step[0].trim().equals("Path")){
+					break;
+				}
+				//read flow on Path
+				if(step[0].trim().equals("Path")){
+					int flow = Integer.valueOf(step[1].trim());
+					path.setFlow(flow);
+				}
+				//read a sourcestep
+				if(step[0].trim().equals("source")){
+					Id nodeid = new IdImpl(step[1].trim());
+					Node node = network.getNodes().get(nodeid);
+					int time = Integer.valueOf(step[2].trim());
+					boolean forward = Boolean.valueOf(step[3].trim());
+					StepSourceFlow sourcestep =new StepSourceFlow(node,time,forward);
+					path.append(sourcestep);
+				}
+				//read a sinkstep
+				if(step[0].trim().equals("sink")){
+					Id nodeid = new IdImpl(step[1].trim());
+					Node node = network.getNodes().get(nodeid);
+					int time = Integer.valueOf(step[2].trim());
+					boolean forward = Boolean.valueOf(step[3].trim());
+					StepSinkFlow sinkstep =new StepSinkFlow(node,time,forward);
+					path.append(sinkstep);
+				}
+				//read a edgestep
+				if(step[0].trim().equals("edge")){
+					Id edgeid = new IdImpl(step[1].trim());
+					Link link = network.getLinks().get(edgeid);
+					int starttime = Integer.valueOf(step[2].trim());
+					int endtime = Integer.valueOf(step[3].trim());
+					boolean forward = Boolean.valueOf(step[4].trim());
+					StepEdge edgestep =new StepEdge(link,starttime,endtime,forward);
+					path.append(edgestep);
+				}
+			}
+			if(path.getFlow()!=0){
+				result.add(path);
+			}
+		}
+		return result;
+	}
 	
 	/**
 	 * THE ONLY FUNCTION WHICH REALLY CALCULATES A FLOW
@@ -218,12 +275,16 @@ public class MultiSourceEAF {
 	 * @param settings
 	 * @return a Flow object
 	 */
-	public static Flow calcEAFlow(FlowCalculationSettings settings) {
+	public static Flow calcEAFlow(FlowCalculationSettings settings,List<TimeExpandedPath> paths) {
 		Flow fluss;
-
+		
 		List<TimeExpandedPath> result = null;
 		fluss = new Flow(settings);
-
+		if(paths!=null){
+			for(TimeExpandedPath path :paths){
+				fluss.augment(path,path.getFlow());
+			}
+		}
 		String tempstr = "";
 
 		if(_debug){
@@ -524,6 +585,7 @@ public class MultiSourceEAF {
 		String sinkid = null;
 		String simplenetworkfile = null;
 		String shelterfile = null;
+		String flowfile =null;
 		int uniformDemands = 0;
 
 		// Rounding is now done according to timestep and flowFactor!
@@ -820,6 +882,17 @@ public class MultiSourceEAF {
 			System.out.println("Something was bad, aborting.");
 			return;
 		}
+		//read flow if specified
+		List<TimeExpandedPath> flowpaths =null;
+		if(flowfile!=null){
+			try{
+			flowpaths=readPathFlow(network,flowfile);
+			}catch(Exception e){
+				e.printStackTrace();
+				return;
+			}
+			
+		}
 
 		//settings.writeLP();
 		//settings.writeNET(false);
@@ -828,7 +901,7 @@ public class MultiSourceEAF {
 		//settings.writeSimpleNetwork(true);
 		//settings.writeNET(false);
 		//if(true)return;
-		fluss = MultiSourceEAF.calcEAFlow(settings);
+		fluss = MultiSourceEAF.calcEAFlow(settings,flowpaths);
 
 		/* --------- the actual work is done --------- */
 
