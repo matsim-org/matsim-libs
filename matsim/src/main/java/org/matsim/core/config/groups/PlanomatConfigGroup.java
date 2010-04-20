@@ -60,7 +60,7 @@ public class PlanomatConfigGroup extends Module {
 	public static enum TripStructureAnalysisLayerOption {facility,link}
 
 	/**
-	 * Holds all planomat parameter names, their default and their actual values.
+	 * Holds all planomat parameter names, and their default values.
 	 * 
 	 * @author meisterk
 	 */
@@ -74,7 +74,7 @@ public class PlanomatConfigGroup extends Module {
 		 * <h3>Default value</h3>
 		 * "10"
 		 */
-		POPSIZE("populationSize", Integer.toString(Integer.MIN_VALUE), ""),
+		POPSIZE("populationSize", Integer.toString(Integer.MIN_VALUE)),
 		/**
 		 * Number of generations the GA will evolve.
 		 * <h3>Possible values</h3>
@@ -90,7 +90,7 @@ public class PlanomatConfigGroup extends Module {
 		 * the approach of Greenhalgh, D. und S. Marshall (2000) Convergence criteria for genetic algorithms, SIAM Journal
 		 * on Computing, 30 (1) 269–282.
 		 */
-		JGAP_MAX_GENERATIONS("jgapMaxGenerations", "100", ""),
+		JGAP_MAX_GENERATIONS("jgapMaxGenerations", "100"),
 		/**
 		 * Defines the choice set for leg modes.
 		 * <h3>Examples of values</h3>
@@ -105,7 +105,7 @@ public class PlanomatConfigGroup extends Module {
 		 * Planomat will produce no other leg modes than those listed in the value of this parameter. 
 		 * When set to its default value, leg modes remain untouched, and planomat will only perform time optimization.
 		 */
-		POSSIBLE_MODES("possibleModes", "", ""),
+		POSSIBLE_MODES("possibleModes", ""),
 		/**
 		 * Exponent for the number of time bins for the discrete encoding of activity durations.
 		 * <h3>Possible values</h3>
@@ -119,7 +119,7 @@ public class PlanomatConfigGroup extends Module {
 		 * It is suggested to leave this parameter at its default value. A change in it becomes useful only if the above mentioned
 		 * more sophisticated calculation of the number of required generations is implemented.
 		 */
-		LEVEL_OF_TIME_RESOLUTION("levelOfTimeResolution", "7", ""),
+		LEVEL_OF_TIME_RESOLUTION("levelOfTimeResolution", "7"),
 		/**
 		 * Defines how events should be interpreted.
 		 * <h3>Possible values</h3>
@@ -133,11 +133,11 @@ public class PlanomatConfigGroup extends Module {
 		 * Different implementations of traffic flow simulations use different interpretations of trips.  
 		 * Planomat has to use the same interpretation as the used traffic flow simulation.
 		 */
-		SIM_LEG_INTERPRETATION("simLegInterpretation", PlanomatConfigGroup.SimLegInterpretation.CetinCompatible.toString(), ""),
+		SIM_LEG_INTERPRETATION("simLegInterpretation", PlanomatConfigGroup.SimLegInterpretation.CetinCompatible.toString()),
 		/**
 		 * TODO comment that
 		 */
-		ROUTING_CAPABILITY("routingCapability", PlanomatConfigGroup.RoutingCapability.fixedRoute.toString(), ""),
+		ROUTING_CAPABILITY("routingCapability", PlanomatConfigGroup.RoutingCapability.fixedRoute.toString()),
 		/**
 		 * Enables logging in order to get some insight to the planomat functionality.
 		 * <h3>Possible values</h3>
@@ -145,7 +145,7 @@ public class PlanomatConfigGroup extends Module {
 		 * <h3>Default value</h3>
 		 * "false"
 		 */
-		DO_LOGGING("doLogging", "false", ""),
+		DO_LOGGING("doLogging", "false"),
 		/**
 		 * This parameter can be used to specify the layer on which basis the trip structure of a plan is analysed.
 		 * <h3>Possible values</h3>
@@ -155,18 +155,15 @@ public class PlanomatConfigGroup extends Module {
 		 * <h3>To do</h3>
 		 * TODO This parameter does not really belong to the planomat config group, but can be used by whatever algorithm. Might be moved to {@link GlobalConfigGroup}. 
 		 */
-		TRIP_STRUCTURE_ANALYSIS_LAYER("tripStructureAnalysisLayer", PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.toString(), "");
+		TRIP_STRUCTURE_ANALYSIS_LAYER("tripStructureAnalysisLayer", PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.toString());
 
 
 		private final String parameterName;
 		private final String defaultValue;
-		private String actualValue;
 
-		private PlanomatConfigParameter(String parameterName,
-				String defaultValue, String actualValue) {
+		private PlanomatConfigParameter(String parameterName, String defaultValue) {
 			this.parameterName = parameterName;
 			this.defaultValue = defaultValue;
-			this.actualValue = actualValue;
 		}
 
 		/**
@@ -177,26 +174,10 @@ public class PlanomatConfigGroup extends Module {
 		}
 
 		/**
-		 * @return the actual string value of this parameter
-		 */
-		public String getActualValue() {
-			return actualValue;
-		}
-
-		/**
 		 * @return the identifier of this parameter
 		 */
 		public String getParameterName() {
 			return parameterName;
-		}
-
-		/**
-		 * Sets the actual value of this parameter.
-		 * 
-		 * @param actualValue the new value of this parameter
-		 */
-		public void setActualValue(String actualValue) {
-			this.actualValue = actualValue;
 		}
 
 	}
@@ -208,7 +189,6 @@ public class PlanomatConfigGroup extends Module {
 		super(PlanomatConfigGroup.GROUP_NAME);
 		
 		for (PlanomatConfigParameter param : PlanomatConfigParameter.values()) {
-			param.setActualValue(param.getDefaultValue());
 			super.addParam(param.getParameterName(), param.getDefaultValue());
 		}
 
@@ -222,7 +202,6 @@ public class PlanomatConfigGroup extends Module {
 		for (PlanomatConfigParameter param : PlanomatConfigParameter.values()) {
 
 			if (param.getParameterName().equals(param_name)) {
-				param.setActualValue(value);
 				super.addParam(param_name, value);
 				validParameterName = true;
 				continue;
@@ -237,7 +216,7 @@ public class PlanomatConfigGroup extends Module {
 	}
 
 	public int getJgapMaxGenerations() {
-		return Integer.parseInt(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getActualValue());
+		return Integer.parseInt(this.getParams().get(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getParameterName()));
 	}
 
 	private EnumSet<TransportMode> cachedPossibleModes = null;
@@ -248,8 +227,8 @@ public class PlanomatConfigGroup extends Module {
 
 			this.cachedPossibleModes = EnumSet.noneOf(TransportMode.class);
 
-			if (!PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().equals(PlanomatConfigParameter.POSSIBLE_MODES.getDefaultValue())) {
-				String[] possibleModesStringArray = PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().split(",");
+			if (!super.getParams().get(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName()).equals(PlanomatConfigParameter.POSSIBLE_MODES.getDefaultValue())) {
+				String[] possibleModesStringArray = super.getParams().get(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName()).split(",");
 				for (int ii=0; ii < possibleModesStringArray.length; ii++) {
 					this.cachedPossibleModes.add(TransportMode.valueOf(possibleModesStringArray[ii]));
 				}
@@ -263,55 +242,55 @@ public class PlanomatConfigGroup extends Module {
 	}
 
 	public void setPossibleModes(String possibleModes) {
-		PlanomatConfigParameter.POSSIBLE_MODES.setActualValue(possibleModes);
+		super.addParam(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName(), possibleModes);
 	}
 
 	public SimLegInterpretation getSimLegInterpretation() {
-		return PlanomatConfigGroup.SimLegInterpretation.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.SIM_LEG_INTERPRETATION.getActualValue());
+		return SimLegInterpretation.valueOf(super.getParams().get(PlanomatConfigParameter.SIM_LEG_INTERPRETATION.getParameterName()));
 	}
 	
 	public RoutingCapability getRoutingCapability() {
-		return PlanomatConfigGroup.RoutingCapability.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.ROUTING_CAPABILITY.getActualValue());
+		return RoutingCapability.valueOf(super.getParams().get(PlanomatConfigParameter.ROUTING_CAPABILITY.getParameterName()));
 	}
 	
 	public void setRoutingCapability(PlanomatConfigGroup.RoutingCapability routingCapability) {
-		PlanomatConfigParameter.ROUTING_CAPABILITY.setActualValue(routingCapability.toString());
+		super.addParam(PlanomatConfigParameter.ROUTING_CAPABILITY.getParameterName(), routingCapability.toString());
 	}
 	
 	public int getLevelOfTimeResolution() {
-		return Integer.parseInt(PlanomatConfigParameter.LEVEL_OF_TIME_RESOLUTION.getActualValue());
+		return Integer.parseInt(super.getParams().get(PlanomatConfigParameter.LEVEL_OF_TIME_RESOLUTION.getParameterName()));
 	}
 
 	public boolean isDoLogging() {
-		return Boolean.parseBoolean(PlanomatConfigParameter.DO_LOGGING.getActualValue());
+		return Boolean.parseBoolean(super.getParams().get(PlanomatConfigParameter.DO_LOGGING.getParameterName()));
 	}
 
 	public void setDoLogging(boolean doLogging) {
-		PlanomatConfigParameter.DO_LOGGING.setActualValue(Boolean.toString(doLogging));
+		super.addParam(PlanomatConfigParameter.DO_LOGGING.getParameterName(), Boolean.toString(doLogging));
 	}
 	
 	public int getPopSize() {
-		return Integer.parseInt(PlanomatConfigParameter.POPSIZE.getActualValue());
+		return Integer.parseInt(super.getParams().get(PlanomatConfigParameter.POPSIZE.getParameterName()));
 	}
 
 	public void setPopSize(int i) {
-		PlanomatConfigParameter.POPSIZE.setActualValue(Integer.toString(i));
+		super.addParam(PlanomatConfigParameter.POPSIZE.getParameterName(), Integer.toString(i));
 	}
 
 	public void setJgapMaxGenerations(int i) {
-		PlanomatConfigParameter.JGAP_MAX_GENERATIONS.setActualValue(Integer.toString(i));
+		super.addParam(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getParameterName(), Integer.toString(i));
 	}
 
 	public PlanomatConfigGroup.TripStructureAnalysisLayerOption getTripStructureAnalysisLayer() {
-		return PlanomatConfigGroup.TripStructureAnalysisLayerOption.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.getActualValue());
+		return TripStructureAnalysisLayerOption.valueOf(super.getParams().get(PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.getParameterName()));
 	}
 
 	public void setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption newValue) {
-		PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.setActualValue(newValue.toString());
+		super.addParam(PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.getParameterName(), newValue.toString());
 	}
 
 	public void setSimLegInterpretation(PlanomatConfigGroup.SimLegInterpretation newValue) {
-		PlanomatConfigParameter.SIM_LEG_INTERPRETATION.setActualValue(newValue.toString());
+		super.addParam(PlanomatConfigParameter.SIM_LEG_INTERPRETATION.getParameterName(), newValue.toString());
 	}
 
 }
