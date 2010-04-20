@@ -1,4 +1,4 @@
-package playground.gregor.evacuation.lostagents;
+package playground.gregor.evacuation.traveltime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +16,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class LostAgentsGridAnalysis {
+public class TravelTimeGridAnalysis {
 
-	public static final String SVN = "/home/laemmel/arbeit/svn/runs-svn/run1024/output";
-	private static final double WIDTH = 300;
+	public static final String SVN = "/home/laemmel/arbeit/svn/runs-svn/run1032/output";
+	private static final double WIDTH = 250;
 	
 	public static void main(String [] args) {
 		
@@ -37,7 +37,7 @@ public class LostAgentsGridAnalysis {
 		Envelope e = getEnvelope(sl.getScenario().getNetwork());
 		List<MultiPolygon> l = getMultiPolygons(e);
 
-		new LostAgentsAnalyser(SVN + "/../analysis/endangeredAgents.shp", eventsFile, l, sl.getScenario().getNetwork()).run();
+		new TravelTimeAnalyzer(SVN + "/../analysis/evacuationTime.shp", eventsFile, l, sl.getScenario().getNetwork()).run();
 		
 	}
 	

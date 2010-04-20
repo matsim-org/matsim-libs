@@ -102,11 +102,11 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 	
 	public static void main(final String [] args) {
 		
-		String baseDir = "../../outputs/output_delay/ITERS";
-		String baseOutput = "../../outputs/output_delay/analysis";
+		String baseDir = "/home/laemmel/arbeit/svn/runs-svn/run1014/output/ITERS";
+		String baseOutput = "/home/laemmel/arbeit/svn/runs-svn/run1014/analysis/";
 		ArrayList<Integer> its = new ArrayList<Integer>();
 //		its.add(0); its.add(1); its.add(10); its.add(50); its.add(100); its.add(200);
-		its.add(200);
+		its.add(500);
 				
 		
 		for (int it : its) {

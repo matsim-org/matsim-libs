@@ -22,19 +22,26 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GeoGrid {
 	
-	private static final double INCR = 2500;
-	private static final double INCR2 = 1250;
-	private static final double CROSS = 50;
-	private static final double minX = 647500;
-	private static final double maxX = 657500;
-	private static final double minY = 9890000;
-	private static final double maxY = 9905000;
+//	private static final double INCR = 2500;
+//	private static final double INCR2 = 1250;
+//	private static final double CROSS = 50;
+//	private static final double minX = 647500;
+//	private static final double maxX = 657500;
+//	private static final double minY = 9890000;
+//	private static final double maxY = 9905000;
+	
+	private static final double INCR = 1000;
+	private static final double INCR2 = 500;
+	private static final double CROSS = 20;
+	private static final double minX = 650000;
+	private static final double maxX = 653000;
+	private static final double minY = 9893000;
+	private static final double maxY = 9896000;
 
 	public static void main(String [] args) {
 		FeatureType ft = initFeatureTypeLs();
@@ -129,7 +136,8 @@ public class GeoGrid {
 //			}
 //		}
 		try {
-			ShapeFileWriter.writeGeometries(fts, "/home/laemmel/arbeit/diss/qgis/geogrid.shp");
+//			ShapeFileWriter.writeGeometries(fts, "/home/laemmel/arbeit/diss/qgis/geogrid.shp");
+			ShapeFileWriter.writeGeometries(fts, "/home/laemmel/arbeit/svn/shared-svn/projects/LastMile/berichte/abschlussworkshop/gis/geogrid_small.shp");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -156,7 +164,8 @@ public class GeoGrid {
 			e.printStackTrace();
 		}
 		try {
-			ShapeFileWriter.writeGeometries(fts2, "/home/laemmel/arbeit/diss/qgis/box.shp");
+//			ShapeFileWriter.writeGeometries(fts2, "/home/laemmel/arbeit/diss/qgis/box.shp");
+			ShapeFileWriter.writeGeometries(fts2, "/home/laemmel/arbeit/svn/shared-svn/projects/LastMile/berichte/abschlussworkshop/gis/box_small.shp");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
@@ -182,7 +191,8 @@ public class GeoGrid {
 			}
 		}
 		try {
-			ShapeFileWriter.writeGeometries(fts3, "/home/laemmel/arbeit/diss/qgis/labels.shp");
+//			ShapeFileWriter.writeGeometries(fts3, "/home/laemmel/arbeit/diss/qgis/labels.shp");
+			ShapeFileWriter.writeGeometries(fts3, "/home/laemmel/arbeit/svn/shared-svn/projects/LastMile/berichte/abschlussworkshop/gis/labels_small.shp");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

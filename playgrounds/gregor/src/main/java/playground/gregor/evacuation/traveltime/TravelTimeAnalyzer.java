@@ -1,4 +1,4 @@
-package playground.gregor.evacuation.lostagents;
+package playground.gregor.evacuation.traveltime;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,9 +35,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
-public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArrivalEventHandler{
+public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler{
 	
-	private static final Logger log = Logger.getLogger(LostAgentsAnalyser.class);
+	private static final Logger log = Logger.getLogger(TravelTimeAnalyzer.class);
 	
 	private final List<MultiPolygon> polygons;
 	private final String out;
@@ -46,7 +46,7 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 	private final Map<Id,PolygonFeature> agentPolygonMapping = new HashMap<Id,PolygonFeature>();
 	private final NetworkLayer network;
 
-	public LostAgentsAnalyser(String outputShapeFile,  String events, List<MultiPolygon> polygons, NetworkLayer net) {
+	public TravelTimeAnalyzer(String outputShapeFile,  String events, List<MultiPolygon> polygons, NetworkLayer net) {
 		this.polygons = polygons;
 		this.eventsFile = events;
 		this.out = outputShapeFile;
@@ -65,20 +65,37 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 	}
 
 	private void writeFeature() {
-
+		int g10 = 0;
+		int g20 = 0;
+		int g30 = 0;
+		int g40 = 0;
+		int g40P = 0;
 		FeatureType ft = initFeatureType();
 		Collection<Feature> fts = new ArrayList<Feature>();
-		int depart = 0;
-		int lost = 0;
 		for (PolygonFeature pf : this.quad.values()) {
-			double rate = ((double)pf.agLost/pf.agDepart);
-			String label = pf.agDepart +"\n" + pf.agLost;
-			lost+=pf.agLost;
-			if (pf.agLost > 0) {
-				depart+=pf.agDepart;
-			}
+
 			try {
-				fts.add(ft.create(new Object[]{pf.p,pf.agDepart,pf.agArr,pf.agLost,rate, label}));
+				int evacTime = 0;
+				if (pf.agLost > 0) {
+					evacTime = 24*60;
+				} else {
+					evacTime = (int)Math.ceil(((pf.evacTime)/pf.agDepart)/60);
+				}
+				if (evacTime <= 10) {
+					g10 += pf.agDepart;
+				} else if (evacTime <= 20) {
+					g20 += pf.agDepart;
+				} else if (evacTime <= 30) {
+					g30 += pf.agDepart;
+				} else if (evacTime <= 40) {
+					g40 += pf.agDepart;
+				} else if (evacTime > 40) {
+					g40P += pf.agDepart;
+				}
+					
+				
+				String label = pf.evacTime + "";
+				fts.add(ft.create(new Object[]{pf.p,evacTime,pf.agDepart, label}));
 			} catch (IllegalAttributeException e) {
 				e.printStackTrace();
 			}
@@ -88,22 +105,23 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("total depart:" + depart + "  total lost:" + lost);
+		System.out.println(g10 + "," + g20 + "," + g30 + "," + g40 + "," + g40P);
+		
 	}
 
 	private FeatureType initFeatureType() {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, targetCRS);
+		AttributeType ttTime = AttributeTypeFactory.newAttributeType("evacTime", Integer.class);
 		AttributeType agDep = AttributeTypeFactory.newAttributeType("agDep", Integer.class);
-		AttributeType agArr = AttributeTypeFactory.newAttributeType("agArr", Integer.class);
-		AttributeType agLost = AttributeTypeFactory.newAttributeType("agLost", Integer.class);
-		AttributeType agLostRate = AttributeTypeFactory.newAttributeType("agLostRate", Double.class);
+//		AttributeType agLost = AttributeTypeFactory.newAttributeType("agLost", Integer.class);
+//		AttributeType agLostRate = AttributeTypeFactory.newAttributeType("agLostRate", Double.class);
 //		AttributeType agLostPerc = AttributeTypeFactory.newAttributeType("agLostPerc", Integer.class);
 //		AttributeType agLostPercStr = AttributeTypeFactory.newAttributeType("agLostPercStr", String.class);
 		AttributeType agLabel = AttributeTypeFactory.newAttributeType("agLabel", String.class);
 		Exception ex;
 		try {
-			return FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, agDep,agArr,agLost,agLostRate,agLabel}, "LostAgents");
+			return FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, ttTime, agDep, agLabel}, "EvacTime");
 		} catch (FactoryRegistryException e) {
 			ex = e;
 		} catch (SchemaException e) {
@@ -157,6 +175,9 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 		}
 		pf.agDepart++;
 		pf.agLost++;
+		if (pf.startTime < 0) {
+			pf.startTime = event.getTime();
+		}
 		this.agentPolygonMapping.put(event.getPersonId(), pf);
 	}
 
@@ -170,16 +191,19 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 		PolygonFeature pf = this.agentPolygonMapping.get(event.getPersonId());
 		pf.agArr++;
 		pf.agLost--;
+		pf.evacTime += (event.getTime() - pf.startTime);
 		
 	}
 	
 	private static class PolygonFeature {
+		
 		MultiPolygon p;
+		double startTime = -1;
+		double evacTime = 0;
 		int agDepart = 0;
 		int agArr = 0;
 		int agLost = 0;
+		
 	}
 	
-	
-
 }

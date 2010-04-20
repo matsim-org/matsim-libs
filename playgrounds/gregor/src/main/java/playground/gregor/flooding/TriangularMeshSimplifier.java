@@ -46,7 +46,7 @@ public class TriangularMeshSimplifier {
 
 	private static final Logger log = Logger.getLogger(TriangularMeshSimplifier.class);
 
-	private static final double MAX_LENGTH = 10;
+	private static final double MAX_LENGTH = 50;
 
 	private static final double TWO_PI = 2 * Math.PI;
 	private static final double PI_HALF =  Math.PI / 2;

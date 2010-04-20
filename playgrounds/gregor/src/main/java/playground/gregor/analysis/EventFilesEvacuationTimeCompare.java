@@ -55,7 +55,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.gregor.MY_STATIC_STUFF;
 import playground.gregor.gis.helper.GTH;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -87,7 +86,7 @@ public class EventFilesEvacuationTimeCompare {
 
 	private final String outfile;
 	final static Envelope ENVELOPE = new Envelope(648815,655804,9888424,9902468);
-	final static double LENGTH = 500;
+	final static double LENGTH = 2500;
 	
 	
 	public EventFilesEvacuationTimeCompare(final String eventsFile1, final String eventsFile2,
@@ -208,10 +207,10 @@ public class EventFilesEvacuationTimeCompare {
 	}
 	
 	public static void main(final String [] args) {
-		String eventsFile1 = MY_STATIC_STUFF.RUNS_SVN + "run320/stage2/output/ITERS/it.0/0.events.txt.gz";
-		String eventsFile2 = MY_STATIC_STUFF.RUNS_SVN + "run319/stage2/output/ITERS/it.0/0.events.txt.gz";
-		String network = "../../inputs/networks/padang_net_evac_v20080618.xml";
-		String outfile = MY_STATIC_STUFF.RUNS_SVN + "run320/analysis/etimcomp.shp";
+		String eventsFile1 = "/home/laemmel/arbeit/svn/runs-svn/run1022/output/ITERS/it.500/500.events.txt.gz";
+		String eventsFile2 = "/home/laemmel/arbeit/svn/runs-svn/run1024/output/ITERS/it.500/500.events.txt.gz";
+		String network = "/home/laemmel/arbeit/svn/runs-svn/run1024/output/output_network.xml.gz";
+		String outfile = "/home/laemmel/arbeit/svn/runs-svn/run1022/analysis/etimcomp.shp";
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(network);
 		
