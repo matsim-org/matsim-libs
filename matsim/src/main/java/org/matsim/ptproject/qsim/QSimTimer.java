@@ -24,8 +24,12 @@ package org.matsim.ptproject.qsim;
  * @author dgrether
  */
 public class QSimTimer {
-	
-//	private double simStartTime = 24 * 3600.0;
+	/**
+	 * TODO 24 * 3600 is a quite strange time to initialize this
+	 */
+	private double simStartTime = 24*3600;
+	private double time = 0.0;
+	private double stepSize = 1.0;
 	
 	public QSimTimer(){
 		this(1.0);
@@ -33,7 +37,9 @@ public class QSimTimer {
 	
 	
 	public QSimTimer(final double stepSize){
-		QSimTimerStatic.reset(stepSize);
+		this.simStartTime = 24*3600;
+		this.time = 0;
+		this.stepSize = stepSize;
 	}
 	
 	
@@ -41,21 +47,21 @@ public class QSimTimer {
 	 * @return Returns the simStartTime. That is the lowest found start time of a leg
 	 */
 	public final double getSimStartTime() {
-		return QSimTimerStatic.getSimStartTime();
+		return this.simStartTime;
 	}
 	/**
 	 * @return the time of day in seconds
 	 */
 	public double getTimeOfDay() {
-		return QSimTimerStatic.getTime() ;
+		return this.time;
 	}
 	/**
 	 * Increments the time by one timestep
 	 * @return the new time in seconds
 	 */
 	public double incrementTime(){
-		QSimTimerStatic.incTime();
-		return QSimTimerStatic.getTime();
+		this.time += stepSize;
+		return this.time;
 	}
 	
 	/**
@@ -63,14 +69,14 @@ public class QSimTimer {
 	 * @return The number of time steps.
 	 */
 	public final double getSimTimestepSize() {
-		return QSimTimerStatic.getSimTickTime();
+		return this.stepSize;
 	}
 	public void setSimStartTime(double startTimeSec) {
-		QSimTimerStatic.setSimStartTime(startTimeSec);
+		this.simStartTime = startTimeSec;
 	}
 	
 	public void setTime(double timeSec) {
-		QSimTimerStatic.setTime(timeSec);
+		this.time = timeSec;
 	}
 	
 	
