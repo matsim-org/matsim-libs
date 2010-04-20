@@ -222,6 +222,13 @@ public class StepSourceFlow implements PathStep {
 		
 		return (this.forward == o.forward);			
 	}
+
+
+	@Override
+	public String print() {
+		String str = "source:"+node.getId().toString()+":"+time+":"+forward;
+		return str;
+	}
 	
 }
 

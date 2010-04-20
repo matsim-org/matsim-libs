@@ -114,7 +114,13 @@ public interface PathStep {
 	//boolean haveSameStart(PathStep other);
 	
 	String toString();
-
+	
+	/**
+	 * String representation for saving a flow to a file
+	 * @return Strin rep
+	 */
+	String print();
+	
 	/**
 	 * Checks if this and other could be combined into one step, assuming the times match!
 	 * @param other a PathEdge 

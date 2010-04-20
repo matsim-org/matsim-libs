@@ -1838,6 +1838,16 @@ public class Flow {
 		}
 		return strb.toString();
 	}
+	
+	
+	/**
+	 * writes the path representation of a flow to Standard Out
+	 */
+	public void writePathflow(){
+		for(TimeExpandedPath path :_TimeExpandedPaths){
+			System.out.println(path.print());
+		}
+	}
 
 	/**
 	 * @return the _demands

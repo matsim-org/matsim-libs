@@ -561,4 +561,14 @@ public class TimeExpandedPath {
 		return (this.nodesTouched.contains(node.getRealNode()));
 	}
 	
+	public String print(){
+		StringBuilder temp = new StringBuilder();
+		temp.append("Path:"+_flow);
+		for(PathStep step : _steps){
+			temp.append(";");
+			temp.append(step.print());
+		}
+		return temp.toString();
+	}
+	
 }

@@ -201,6 +201,13 @@ public class StepSinkFlow implements PathStep {
 		
 		return (this.forward == o.forward);			
 	}
+
+
+	@Override
+	public String print() {
+		String str = "sink:"+node.getId().toString()+":"+time+":"+forward;
+		return str;
+	}
 		
 }
 

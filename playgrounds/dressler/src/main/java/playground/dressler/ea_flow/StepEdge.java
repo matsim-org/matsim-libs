@@ -230,5 +230,11 @@ public class StepEdge implements PathStep {
 		if (this.forward != o.forward) return false;
 		return (this.edge.equals(o.edge));			
 	}
+
+	@Override
+	public String print() {
+		String str = "edge:"+edge.getId().toString()+":"+startTime+":"+arrivalTime+":"+forward;
+		return str;
+	}
 };
 
