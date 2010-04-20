@@ -19,7 +19,8 @@ public class SheltersColorizer implements LinkLeaveEventHandler {
 	private final double snapPeriod;
 	public SheltersColorizer(String buildings, double snapPeriod, double scenarioSize) {
 		this.snapPeriod = snapPeriod;
-		List<Building> bs = BuildingsShapeReader.readDataFile(buildings,scenarioSize);
+		//HACK
+		List<Building> bs = BuildingsShapeReader.readDataFile(buildings,1);
 		for (Building b : bs) {
 			if (b.isQuakeProof()) {
 				Counter c= new Counter("shelter " + b.getId() + ":");
@@ -37,7 +38,10 @@ public class SheltersColorizer implements LinkLeaveEventHandler {
 			String id = event.getLinkId().toString().replace("sl","");
 			id = id.replace("a", "");
 			ShelterInfo si = this.shelters.get(id);
+			
+			
 			si.c.incCounter();
+			
 						
 			int snapshotIndex = (int) (event.getTime() / this.snapPeriod);
 			if (si.lastSnap == -1) {

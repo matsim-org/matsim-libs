@@ -36,20 +36,24 @@ import playground.gregor.snapshots.writers.SnapshotGenerator;
 public class OTFSnapshotGenerator {
 
 	public static String SHARED_SVN = "../../../../../arbeit/svn/shared-svn/studies";
-	//	public final static String RUNS_SVN = "../../../../../arbeit/svn/runs-svn/run1006/output";
+		public static String RUNS_SVN = "../../../../../arbeit/svn/runs-svn/run1032/output";
 	//	public static String RUNS_SVN = "/home/laemmel/devel/outputs/output";
-	public static String RUNS_SVN = "../../../matsim/test/output/org/matsim/evacuation/run/ShelterEvacuationControllerTest/testShelterEvacuationController";
+//	public static String RUNS_SVN = "../../../matsim/test/output/org/matsim/evacuation/run/ShelterEvacuationControllerTest/testShelterEvacuationController";
+	
+	public static String MVI_FILE;
 	private static boolean firstIteration = false;
 
 
 	private final String lsFile;
 
-	private final static double VIS_OUTPUT_SAMPLE = 1.;
+	private final static double VIS_OUTPUT_SAMPLE = 0.1;
+	private static String LABEL = null;
 
 	private final ScenarioImpl scenario;
 	private final String eventsFile;
 
 	private final String txtSnapshotFile = null;
+	private double startTime;
 	//	private final String txtSnapshotFile = "../../../outputs/output/snapshots.txt.gz";
 
 
@@ -66,24 +70,29 @@ public class OTFSnapshotGenerator {
 		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
 		//		this.scenario.getConfig().simulation().setEndTime(4*3600+30*60);
 		if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.night) {
+			this.startTime = 3 * 3600.;
 			this.scenario.getConfig().simulation().setEndTime(5*3600);	
 		} else if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.day) {
-			this.scenario.getConfig().simulation().setEndTime(12*3600);
+			this.startTime = 12 * 3600.;
+			this.scenario.getConfig().simulation().setEndTime(14*3600);
 		} else if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.afternoon) {
-			this.scenario.getConfig().simulation().setEndTime(16*3600);
+			this.startTime = 16 * 3600.;
+			this.scenario.getConfig().simulation().setEndTime(18*3600);
 		}
 		this.scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 
-//		this.scenario.getConfig().evacuation().setBuildingsFile(SHARED_SVN + "/countries/id/padang/gis/buildings_v20090728/evac_zone_buildings_v20090728.shp");
-				this.scenario.getConfig().evacuation().setBuildingsFile("../../../matsim/test/input/org/matsim/evacuation/data/buildings.shp");
+		this.scenario.getConfig().evacuation().setBuildingsFile(SHARED_SVN + "/countries/id/padang/gis/buildings_v20100315/evac_zone_buildings_v20100315.shp");
+//				this.scenario.getConfig().evacuation().setBuildingsFile("/home/laemmel/devel/workspace/matsim/test/input/org/matsim/evacuation/data/buildings.shp");
+				
 		//		this.scenario.getConfig().evacuation().setSampleSize("0.1");
 		//		this.scenario.getConfig().controler().setLastIteration(0);
 		int it = this.scenario.getConfig().controler().getLastIteration();
 		if (firstIteration) {
 			it = 0;
 		}
+		MVI_FILE = RUNS_SVN + "/movie.it" + it + ".mvi";
 		sl.loadNetwork();
-		this.eventsFile = RUNS_SVN + "/ITERS/it." + it + "/" + it + ".events.xml.gz";
+		this.eventsFile = RUNS_SVN + "/ITERS/it." + it + "/" + it + ".events.txt.gz";
 
 		//		this.txtSnapshotFile = "../../outputs/output/snapshots.txt.gz";
 	}
@@ -97,7 +106,16 @@ public class OTFSnapshotGenerator {
 		ev.addHandler(d);
 		EvacuationLinksTeleporter e = new EvacuationLinksTeleporter();
 		//		AllAgentsTeleporter aat = new AllAgentsTeleporter();
-		TimeDependentColorizer t = new TimeDependentColorizer();
+		
+		double startTime = 0;
+		if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.night) {
+			startTime = 3* 3600;
+		} else if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.day) {
+			startTime = 12 * 3600;
+		} else if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.afternoon) {
+			startTime = 16 * 3600;
+		} 
+		TimeDependentColorizer t = new TimeDependentColorizer(startTime);
 		ev.addHandler(t);
 		//		EventsImpl evII = new EventsImpl();
 		//		evII.addHandler(t);
@@ -134,6 +152,8 @@ public class OTFSnapshotGenerator {
 		//otherwise we could get negative openGL coords since we calculating offsetEast, offsetNorth based on this bounding box
 
 		MVISnapshotWriter writer = new MVISnapshotWriter(this.scenario);
+		writer.setStartTime(this.startTime);
+		writer.setLabel(LABEL);
 		writer.addSimpleBackgroundTextureDrawer(sbg);
 		writer.setSheltersOccupancyMap(s.getOccMap());
 		//		writer.addSimpleBackgroundTextureDrawer(sbgII);
@@ -200,9 +220,11 @@ public class OTFSnapshotGenerator {
 	}
 
 	public static void main(String [] args) {
-		if (args.length == 2) {
+		LABEL = null;
+		if (args.length == 3) {
 			String outputDir = args[0];
 			String svnRoot = args[1];
+			LABEL = args[2];
 			RUNS_SVN=outputDir;
 			SHARED_SVN = svnRoot;
 		}

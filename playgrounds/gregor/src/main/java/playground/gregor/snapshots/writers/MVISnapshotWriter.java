@@ -43,8 +43,8 @@ import org.matsim.evacuation.otfvis.layer.AgentLayer;
 import org.matsim.evacuation.otfvis.layer.LabelLayer;
 import org.matsim.evacuation.otfvis.readerwriter.AgentReaderXYAzimuth;
 import org.matsim.evacuation.otfvis.readerwriter.AgentWriterXYAzimuth;
-import org.matsim.evacuation.otfvis.readerwriter.InundationDataReader;
-import org.matsim.evacuation.otfvis.readerwriter.InundationDataWriter;
+import org.matsim.evacuation.otfvis.readerwriter.InundationDataReader_v2;
+import org.matsim.evacuation.otfvis.readerwriter.InundationDataWriter_v2;
 import org.matsim.evacuation.otfvis.readerwriter.LabelReader;
 import org.matsim.evacuation.otfvis.readerwriter.LabelWriter;
 import org.matsim.evacuation.otfvis.readerwriter.PolygonDataReader;
@@ -83,15 +83,19 @@ public class MVISnapshotWriter extends OTFFileWriter{
 	final String LINKS_FILE = OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/links.shp";
 	final String NODES_FILE = OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/nodes.shp";
 	final String REGION_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/region.shp";
-	final private static float [] regionColor = new float [] {.9f,.92f,.82f,1.f};
+	final String SAFE_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/safe.shp";
+	final private static float [] regionColor = new float [] {.9f,.82f,.82f,1.f};
+	final private static float [] safeColor = new float [] {.1f,.9f,.1f,1.f};
 	final private static float [] buildingsColor = new float [] {1.f,.5f,.0f,.8f};
 	final private static float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
 	final private static float [] nodesColor = new float [] {.4f,.4f,.4f,.7f};
 
 	private final AgentWriterXYAzimuth writer = new AgentWriterXYAzimuth();
-	private final boolean insertWave = false;
+	private final boolean insertWave = true;
 	
-	private final String label = "run1006: Nash approach";
+	private String label = "run1006: Nash approach";
+	
+	private double startTime = 0;
 
 	public MVISnapshotWriter(final QNetwork net, final String vehFileName, final String outFileName, final double intervall_s) {
 		super(intervall_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterConnectionManagerFactory());
@@ -103,15 +107,20 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 
 	public MVISnapshotWriter(ScenarioImpl sc) {
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()).getQNetwork()),OTFSnapshotGenerator.RUNS_SVN + "/test.mvi", new OTFFileWriterConnectionManagerFactory());
+//		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QNetwork(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()))),OTFSnapshotGenerator.MVI_FILE, new OTFFileWriterConnectionManagerFactory());
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()).getQNetwork()),OTFSnapshotGenerator.MVI_FILE, new OTFFileWriterConnectionManagerFactory());
 	}
 
 
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	
 	@Override
 	protected void onAdditionalQuadData(OTFConnectionManager connect) {
 		this.quad.addAdditionalElement(this.writer);
 		if (this.insertWave ){
-			this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromBinaryFileReader().readData()));
+			this.quad.addAdditionalElement(new InundationDataWriter_v2(new InundationDataFromBinaryFileReader().readData(),this.startTime));
 //			this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromNetcdfReaderII(OTFServerQuad2.offsetNorth,OTFServerQuad2.offsetEast).createData()));
 		}
 		
@@ -119,6 +128,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 		
 		try {
 			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.REGION_FILE),regionColor));
+			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.SAFE_FILE),safeColor));
 			this.quad.addAdditionalElement(new TileDrawerDataWriter());
 			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.LINKS_FILE),linksColor));
 			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.NODES_FILE),nodesColor));
@@ -180,8 +190,8 @@ public class MVISnapshotWriter extends OTFFileWriter{
 		}
 		
 		if (this.insertWave) {
-			connect.connectWriterToReader(InundationDataWriter.class,InundationDataReader.class);
-			connect.connectReaderToReceiver(InundationDataReader.class,TimeDependentTrigger.class);
+			connect.connectWriterToReader(InundationDataWriter_v2.class,InundationDataReader_v2.class);
+			connect.connectReaderToReceiver(InundationDataReader_v2.class,TimeDependentTrigger.class);
 		}
 	}
 
@@ -267,6 +277,10 @@ private Map<String, ArrayList<Tuple<Integer,Double>>> occMap = null;
 	public void setSheltersOccupancyMap(Map<String, ArrayList<Tuple<Integer,Double>>> occMap) {
 		this.occMap  = occMap;
 		
+	}
+	
+	public void setStartTime(double time) {
+		this.startTime = time;
 	}
 
 

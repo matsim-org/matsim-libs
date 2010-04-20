@@ -18,7 +18,7 @@ public class InundationDataFromBinaryFileReader {
 		try {
 //			o = new ObjectInputStream(new FileInputStream("../../inputs/flooding/flooding_old.dat"));
 //			o = new ObjectInputStream(new FileInputStream(this.file));
-			o = new ObjectInputStream(new FileInputStream(OTFSnapshotGenerator.SHARED_SVN + "/studies/countries/id/padang/inundation/20100201_sz_pc_2b_tide_subsidence/flooding.dat"));
+			o = new ObjectInputStream(new FileInputStream(OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/inundation/20100201_sz_pc_2b_tide_subsidence/flooding.dat"));
 			InundationData data = (InundationData) o.readObject();
 			o.close();
 			return data;

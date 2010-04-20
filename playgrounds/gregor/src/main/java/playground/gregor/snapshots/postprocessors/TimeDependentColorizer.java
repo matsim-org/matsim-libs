@@ -39,10 +39,14 @@ public class TimeDependentColorizer implements PostProcessorI, AgentDepartureEve
 
 //	private final Plans plans;
 	private final HashMap<String,EventAgent> agents = new HashMap<String,EventAgent>();
+	private final double startTime;
 //	public TimeDependentColorizer(Plans plans) {
 //		this.plans = plans;
 //	}
 
+	public TimeDependentColorizer(double startTime) {
+		this.startTime = startTime;
+	}
 
 	public String[] processEvent(String[] event){
 		String id = event[0];
@@ -61,8 +65,8 @@ public class TimeDependentColorizer implements PostProcessorI, AgentDepartureEve
 	public void handleEvent(AgentDepartureEvent event) {
 		EventAgent e = new EventAgent();
 //		e.starttime = event.getTime();
-		e.starttime = 3 * 3600;
-		agents.put(event.getPersonId().toString(), e);
+		e.starttime = this.startTime;
+		this.agents.put(event.getPersonId().toString(), e);
 		
 	}
 
