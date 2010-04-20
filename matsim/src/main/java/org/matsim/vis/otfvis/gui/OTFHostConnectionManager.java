@@ -19,19 +19,20 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.gui;
 
-import java.io.IOException;
+//import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
+
+//import org.matsim.vis.otfvis.OTFClientControl;
+//import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 
 
 /**
@@ -43,7 +44,7 @@ public class OTFHostConnectionManager {
 	private String address;
 
 	private OTFServerRemote host = null;
-	
+
 	protected OTFLiveServerRemote liveHost = null;
 
 	protected Object blockReading = new Object();
@@ -51,7 +52,7 @@ public class OTFHostConnectionManager {
 	protected int controllerStatus = 0;
 
 	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
-	
+
 	private final Map <String,OTFDrawer> drawer = new HashMap<String,OTFDrawer>();
 
 	public OTFHostConnectionManager(String url) {

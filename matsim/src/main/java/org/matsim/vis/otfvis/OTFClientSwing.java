@@ -54,7 +54,7 @@ import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
  */
 public class OTFClientSwing extends OTFClient {
 
-	private OTFConnectionManager connectionManager = new OTFConnectionManager();;
+	private OTFConnectionManager connectionManager = new OTFConnectionManager();
 
 	public OTFClientSwing(String url) {
 		super("file:" + url);
@@ -65,11 +65,11 @@ public class OTFClientSwing extends OTFClient {
 		 */
 		this.connectionManager.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		this.connectionManager.connectQueueLinkToWriter(OTFQueueSimLinkAgentsWriter.class);
-		
+
 		this.connectionManager.connectWriterToReader(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		this.connectionManager.connectWriterToReader(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		this.connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		
+
 		/*
 		 * Only needed for backward compatibility, see comment above (dg, nov 09)
 		 */
@@ -82,7 +82,7 @@ public class OTFClientSwing extends OTFClient {
 		 */
 		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
-		
+
 	}
 
 	@Override
