@@ -266,6 +266,7 @@ public class MultiSourceEAF {
 				result.add(path);
 			}
 		}
+		in.close();
 		return result;
 	}
 	
