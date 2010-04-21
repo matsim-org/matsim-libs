@@ -43,11 +43,11 @@ import org.matsim.world.Layer;
 
 
 /**
- *
+ *  This is a copy of org.matsim.pt.router.TransitRouterNetwork that remains as private, usable only in its package
  *
  * @author mrieser
  */
-/*package*/ class AdaptedTransitRouterNetwork implements Network {
+	class AdaptedTransitRouterNetwork implements Network {
 
 	private static final long serialVersionUID = 1L;
 

@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.Dijkstra;
@@ -52,42 +51,29 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.router.*;
 
-import playground.mmoyo.PTRouter.PTValues;
+public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 
-/**
- * @author mrieser
- */
-public class AdaptedPlansCalcTransitRoute extends PlansCalcRoute {
-
-	private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
+	//private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
 	private final AdaptedTransitRouter adaptedTransitRouter;
 	private final TransitConfigGroup transitConfig;
 	private final TransitSchedule schedule;
 
-	private Plan currentPlan = null;
+	//private Plan currentPlan = null;
 	private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
 
-	/**
-	 * This essentially does the following (if I see correctly):<ul>
-	 * <li> It passes the arguments <tt>config, network, costCalculator, timeCalculator, factory</tt> through to the "normal"
-	 *      PlanCalcRoute. </li>
-	 * <li> It restricts the usable part of the network for the above to "car". </li>
-	 * <li> It sets a non-configurable TransitRouter, based on <tt>schedule</tt> and an internally defined TransitRouterConfig. </li>
-	 * <li> It remembers <tt>transitConfig</tt>.
-	 * </ul>
-	 */
 	public AdaptedPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig) {
-		super(config, network, costCalculator, timeCalculator, factory);
-
+		//super(config, network, costCalculator, timeCalculator, factory);
+		super(config, network, costCalculator, timeCalculator, factory, schedule, transitConfig);
+		
 		this.schedule = schedule;
 		this.transitConfig = transitConfig;
 		
-		TransitRouterConfig trConfig = new MyTransitRouterConfig() ;
+		MyTransitRouterConfig trConfig = new MyTransitRouterConfig() ;
 		this.adaptedTransitRouter = new AdaptedTransitRouter( trConfig, schedule);
-
+	
 		// both "super" route algos are made to route only on the "car" network.  yy I assume this is since the non-car modes are handled
 		// here.  This is, in fact, NOT correct, since this does not handle bike, so would need to be fixed before production use).  kai, apr'10
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
@@ -100,6 +86,7 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcRoute {
 		}
 	}
 
+	/*
 	@Override // necessary in order to remove the "pt interaction" activities and corresponding legs from earlier pt plans.
 	public void handlePlan(Person person, final Plan plan) {
 
@@ -119,8 +106,8 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcRoute {
 		this.replaceLegs();
 
 		this.currentPlan = null;
-
 	}
+
 
 	@Override
 	// yy In the long term, would be better to not override this. kai, apr'10
@@ -130,6 +117,7 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcRoute {
 		}
 		return super.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
+	 */
 
 	private double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
@@ -144,6 +132,7 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcRoute {
 		return travelTime;
 	}
 
+	/*
 	private void replaceLegs() {
 		Iterator<Tuple<Leg, List<Leg>>> replacementIterator = this.legReplacements.iterator();
 		if (!replacementIterator.hasNext()) {
@@ -207,7 +196,6 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcRoute {
 				}
 			}
 		}
-
-	}
-
+	}*/
+	
 }

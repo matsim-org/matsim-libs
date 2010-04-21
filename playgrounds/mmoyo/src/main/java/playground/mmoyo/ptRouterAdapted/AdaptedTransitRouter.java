@@ -40,9 +40,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.MultiNodeDijkstra;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -51,68 +49,71 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.mmoyo.PTRouter.PTValues;
-
-import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRouterNetworkLink;
 import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRouterNetworkNode;
+import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRouterNetworkLink;
 
+/** changes made to the original org.matsim.pt.router.TransitRouter:
+ * -stop search 
+ * -transfer links creation 
+ * -direct walk optional
+ * -uses myTransitRouterConfig
+ *   Manuel apr10*/
 public class AdaptedTransitRouter {
 
 	private final TransitSchedule schedule;
-	private final AdaptedTransitRouterNetwork transitNetwork;
+	private final AdaptedTransitRouterNetwork adaptedTransitNetwork;
+	
 	private final Map<TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>> linkMappings;
 	private final Map<TransitRouterNetworkNode, TransitStopFacility> nodeMappings;
 
 	private final MultiNodeDijkstra dijkstra;
 	private final AdaptedTransitRouterNetworkTravelTimeCost ttCalculator;
 	
-	private final TransitRouterConfig config ; 
+	private final MyTransitRouterConfig myConfig ; 
 
-	public AdaptedTransitRouter( TransitRouterConfig config, final TransitSchedule schedule) {
+	public AdaptedTransitRouter( MyTransitRouterConfig myTrConfig, final TransitSchedule schedule) {
 		this.schedule = schedule;
+		this.myConfig = myTrConfig ;
 		this.linkMappings = new HashMap<TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>>();
 		this.nodeMappings = new HashMap<TransitRouterNetworkNode, TransitStopFacility>();
-		this.transitNetwork = buildNetwork();
-		
-		this.config = config ;
-
-		this.ttCalculator = new AdaptedTransitRouterNetworkTravelTimeCost( config );
-		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.ttCalculator, this.ttCalculator);
+		this.adaptedTransitNetwork = buildNetwork();
+		this.ttCalculator = new AdaptedTransitRouterNetworkTravelTimeCost( this.myConfig );
+		this.dijkstra = new MultiNodeDijkstra(this.adaptedTransitNetwork, this.ttCalculator, this.ttCalculator);
 	}
 
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime) {
 
 		//progressive stop search*
 		Collection <TransitRouterNetworkNode> fromNodes;
-		double walkRadius = PTValues.FIRST_WALKRANGE;
+		double searchRadius =  this.myConfig.searchRadius;
 		do{
-			fromNodes = this.transitNetwork.getNearestNodes(fromCoord, walkRadius);  //walkRange
-			walkRadius += PTValues.WALKRANGE_EXT;
-		} while (fromNodes.size() < PTValues.INI_STATIONS_NUM);
+			fromNodes = this.adaptedTransitNetwork.getNearestNodes(fromCoord, searchRadius);  //walkRange
+			searchRadius += this.myConfig.extensionRadius;
+		} while (fromNodes.size() < this.myConfig.minStationsNum);
 		///////////////////////////////////////////////////
 		
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : fromNodes) {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
-			double initialTime = distance / config.beelineWalkSpeed ;
-			double initialCost = - initialTime * config.marginalUtilityOfTravelTimeWalk ; // yyyy check sign!!!  kai, apr'10
+			double initialTime = distance / this.myConfig.beelineWalkSpeed ;
+			double initialCost = - initialTime * this.myConfig.marginalUtilityOfTravelTimeWalk ; // yyyy check sign!!!  kai, apr'10
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
 		//progressive stop search*
 		Collection <TransitRouterNetworkNode> toNodes;
-		walkRadius = PTValues.FIRST_WALKRANGE;
+		searchRadius = this.myConfig.searchRadius;
 		do{
-			toNodes = this.transitNetwork.getNearestNodes(toCoord, walkRadius);  //walkRange
-			walkRadius += PTValues.WALKRANGE_EXT;
-		} while (toNodes.size() < PTValues.INI_STATIONS_NUM);
+			toNodes = this.adaptedTransitNetwork.getNearestNodes(toCoord, searchRadius);  //walkRange
+			searchRadius += this.myConfig.extensionRadius;
+		} while (toNodes.size() < this.myConfig.minStationsNum);
 		////////////////////////////////////////////////////
 		
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : toNodes) {
 			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
-			double initialTime = distance / config.beelineWalkSpeed ;
-			double initialCost = - initialTime * config.marginalUtilityOfTravelTimeWalk ; // yyyy check sign!!! kai, apr'10
+			double initialTime = distance / this.myConfig.beelineWalkSpeed ;
+			double initialCost = - initialTime * this.myConfig.marginalUtilityOfTravelTimeWalk ; // yyyy check sign!!! kai, apr'10
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -124,13 +125,13 @@ public class AdaptedTransitRouter {
 		}
 		
 		// optional direct walk *
-		if (PTValues.allowDirectWalks){
-			double directWalkCost = - CoordUtils.calcDistance(fromCoord, toCoord) / config.beelineWalkSpeed  * config.marginalUtilityOfTravelTimeWalk ;
+		if (this.myConfig.allowDirectWalks){
+			double directWalkCost = - CoordUtils.calcDistance(fromCoord, toCoord) / this.myConfig.beelineWalkSpeed  * this.myConfig.marginalUtilityOfTravelTimeWalk ;
 			double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 			if (directWalkCost < pathCost) {
 				List<Leg> legs = new ArrayList<Leg>();
 				Leg leg = new LegImpl(TransportMode.transit_walk);
-				double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / config.beelineWalkSpeed ;
+				double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.myConfig.beelineWalkSpeed ;
 				Route walkRoute = new GenericRouteImpl(null, null);
 				leg.setRoute(walkRoute);
 				leg.setTravelTime(walkTime);
@@ -184,7 +185,7 @@ public class AdaptedTransitRouter {
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / config.beelineWalkSpeed ;
+								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / this.myConfig.beelineWalkSpeed ;
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
 								leg.setTravelTime(walkTime);
@@ -192,7 +193,7 @@ public class AdaptedTransitRouter {
 								legs.add(leg);
 							} else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord()) / config.beelineWalkSpeed ;
+								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord()) / this.myConfig.beelineWalkSpeed ;
 								leg.setTravelTime(walkTime);
 								time += walkTime;
 								legs.add(leg);
@@ -226,9 +227,9 @@ public class AdaptedTransitRouter {
 			leg = new LegImpl(TransportMode.transit_walk);
 			double walkTime;
 			if (accessStop == null) {
-				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / config.beelineWalkSpeed ;
+				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.myConfig.beelineWalkSpeed ;
 			} else {
-				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / config.beelineWalkSpeed ;
+				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / this.myConfig.beelineWalkSpeed ;
 			}
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
@@ -237,7 +238,7 @@ public class AdaptedTransitRouter {
 			// it seems, the agent only walked
 			legs.clear();
 			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / config.beelineWalkSpeed ;
+			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.myConfig.beelineWalkSpeed ;
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
 		}
@@ -270,7 +271,7 @@ public class AdaptedTransitRouter {
 				
 		//reduced creation of transferlinks*
 		for (TransitRouterNetworkNode centerNode : network.getNodes().values()) {
-			for (TransitRouterNetworkNode nearNode : network.getNearestNodes(centerNode.getCoord(), PTValues.DETTRANSFER_RANGE)){
+			for (TransitRouterNetworkNode nearNode : network.getNearestNodes(centerNode.getCoord(), this.myConfig.beelineWalkConnectionDistance)){
 				if (centerNode!= nearNode && centerNode.line != nearNode.line) {   // || centerNode.stop.getStopFacility() != nearNode.stop.getStopFacility()  this condition creates more transfer links
 					if (centerNode.route.getStops().get(0) != centerNode.stop   && nearNode.route.getStops().get(nearNode.route.getStops().size()-1) != nearNode.stop) {
 						toBeAdded.add(new Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>(centerNode, nearNode));
@@ -294,7 +295,7 @@ public class AdaptedTransitRouter {
 	}
 
 	public AdaptedTransitRouterNetwork getTransitRouterNetwork() {
-		return this.transitNetwork;
+		return this.adaptedTransitNetwork;
 	}
 
 	// the procedures with * were adapted

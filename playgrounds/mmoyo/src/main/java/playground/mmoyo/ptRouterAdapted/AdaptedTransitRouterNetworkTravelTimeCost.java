@@ -20,44 +20,26 @@
 
 package playground.mmoyo.ptRouterAdapted;
 
-import java.util.Arrays;
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-//import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
-import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
-import org.matsim.transitSchedule.api.Departure;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitRouteStop;
-
-import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRouterNetworkLink;
 
 /**
- * TravelTime and TravelCost calculator to be used with the transit network used for transit routing.
- *
- * @author mrieser
+ *    
  */
 public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetworkTravelTimeCost {
 	private static final Logger log = Logger.getLogger(AdaptedTransitRouterNetworkTravelTimeCost.class);
 
+	private final static double MIDNIGHT = 24.0*3600;
+	private Link previousLink = null;
+	private double previousTime = Double.NaN;
+	private double cachedTravelTime = Double.NaN;
 
-//	private final static double MIDNIGHT = 24.0*3600;
-//
-//	//private final TransitRouterConfig config;
-//	private Link previousLink = null;
-//	private double previousTime = Double.NaN;
-//	private double cachedTravelTime = Double.NaN;
-
-	public AdaptedTransitRouterNetworkTravelTimeCost( TransitRouterConfig config ) {
+	public AdaptedTransitRouterNetworkTravelTimeCost(TransitRouterConfig config ) {
 		super( config ) ;
 		log.error("a problem at this point is that the walk speed comes from the config" ) ;
 	}
@@ -67,47 +49,41 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		double cost;
 		if (((TransitRouterNetworkLink) link).route == null) {
 			// transfer link
-//			cost = (getLinkTravelTime(link, time) * PTValues.timeCoefficient) + PTValues.transferPenalty;
-			cost = (getLinkTravelTime(link, time) * config.marginalUtilityOfTravelTimeTransit) + config.costLineSwitch ;
+			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeWalk + this.config.costLineSwitch;
 		} else {
 			//pt link
-//			cost = (getLinkTravelTime(link, time) * PTValues.timeCoefficient) + (link.getLength() * PTValues.distanceCoefficient);
-			cost = (getLinkTravelTime(link, time) * config.marginalUtilityOfTravelTimeTransit ) + (link.getLength() * config.marginalUtilityOfTravelDistanceTransit);
+			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeTransit - link.getLength() * this.config.marginalUtilityOfTravelDistanceTransit;
 		}
 		return cost;
 	}
 
+	public double getLinkTravelTime(final Link link, final double time) {
+		if ((link == this.previousLink) && (time == this.previousTime)) {
+			return this.cachedTravelTime;
+		}
+		this.previousLink = link;
+		this.previousTime = time;
 
-//	public double getLinkTravelTime(final Link link, final double time) {
-//		if ((link == this.previousLink) && (time == this.previousTime)) {
-//			return this.cachedTravelTime;
-//		}
-//		this.previousLink = link;
-//		this.previousTime = time;
-//
-//		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
-//		if (wrapped.route != null) {
-//			// agent stays on the same route, so use transit line travel time
-//			double bestDepartureTime = getNextDepartureTime(wrapped.route, wrapped.fromNode.stop, time);
-//
-//			double arrivalOffset = (wrapped.toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? wrapped.toNode.stop.getArrivalOffset() : wrapped.toNode.stop.getDepartureOffset();
-//			double time2 = (bestDepartureTime - time) + (arrivalOffset - wrapped.fromNode.stop.getDepartureOffset());
-//			if (time2 < 0) {
-//				time2 += MIDNIGHT;
-//			}
-////			System.out.print(wrapped.link.fromNode.stop.getStopFacility().getId() + " > " + wrapped.link.toNode.stop.getStopFacility().getId() + " = " + (int) time2 + "\t@ " + Time.writeTime(time));
-////			System.out.println(" wait-time: " + (int) (bestDepartureTime - earliestDepartureTime) + " travel-time: " + (int) (arrivalOffset - wrapped.link.fromNode.stop.getDepartureOffset()));
-//			this.cachedTravelTime = time2;
-//			return time2;
-//		}
-//		// different transit routes, so it must be a line switch
-//		double distance = CoordUtils.calcDistance(wrapped.fromNode.stop.getStopFacility().getCoord(), wrapped.toNode.stop.getStopFacility().getCoord());
-//		double time2 =  distance * PTValues.AV_WALKING_SPEED;
-////		System.out.println(wrapped.link.fromNode.stop.getStopFacility().getId() + "..." + wrapped.link.toNode.stop.getStopFacility().getId() + " = " + (int) time2 + "\t@ " + Time.writeTime(time));
-//		this.cachedTravelTime = time2;
-//		return time2;
-//	}
-//
+		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
+		if (wrapped.route != null) {
+			// agent stays on the same route, so use transit line travel time
+			double bestDepartureTime = getNextDepartureTime(wrapped.route, wrapped.fromNode.stop, time);
+
+			double arrivalOffset = (wrapped.toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? wrapped.toNode.stop.getArrivalOffset() : wrapped.toNode.stop.getDepartureOffset();
+			double time2 = (bestDepartureTime - time) + (arrivalOffset - wrapped.fromNode.stop.getDepartureOffset());
+			if (time2 < 0) {
+				time2 += MIDNIGHT;
+			}
+			this.cachedTravelTime = time2;
+			return time2;
+		}
+		// different transit routes, so it must be a line switch
+		double distance = CoordUtils.calcDistance(wrapped.fromNode.stop.getStopFacility().getCoord(), wrapped.toNode.stop.getStopFacility().getCoord());
+		double time2 =  distance * this.config.beelineWalkSpeed;
+		this.cachedTravelTime = time2;
+		return time2;
+	}
+
 //	private final HashMap<TransitRoute, double[]> sortedDepartureCache = new HashMap<TransitRoute, double[]>();
 //
 //	public double getNextDepartureTime(final TransitRoute route, final TransitRouteStop stop, final double depTime) {

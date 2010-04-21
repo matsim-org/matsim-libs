@@ -3,11 +3,13 @@ package playground.mmoyo.PTRouter;
 /**
  * This class contains common constant values for routing
  */
+
+@Deprecated
 public abstract class PTValues {
 	
-	public final static byte ACCESS_BYT 	= 1;
-	public final static byte STANDARD_BYT 	= 2;
-	public final static byte TRANSFER_BYT 	= 3;
+	final static byte ACCESS_BYT 	= 1;
+	final static byte STANDARD_BYT 	= 2;
+	final static byte TRANSFER_BYT 	= 3;
 	public final static byte DETTRANSFER_BYT= 4;
 	public final static byte EGRESS_BYT 	= 5;
 	
