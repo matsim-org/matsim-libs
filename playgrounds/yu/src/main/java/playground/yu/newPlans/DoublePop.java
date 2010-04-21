@@ -67,7 +67,7 @@ public class DoublePop extends NewPopulation {
 		long oldId = Integer.parseInt(person.getId().toString());
 		// produce new Person with new Id
 		// if (n == 1) {
-		for (int i = 1; i < 100; i++)
+		for (int i = 1; i < 200; i++)
 			createNewPerson(oldId + i);
 		// } else if (n == 2) {
 		// for (int i = 1; i <= 89; i++)
@@ -96,8 +96,8 @@ public class DoublePop extends NewPopulation {
 	public static void main(final String[] args) {
 
 		String networkFilename = "../matsim/examples/equil/network.xml";
-		String plansFilename = "../integration-parameterCalibration/test/scoreCheck/pop1.xml";
-		String outputPlansFilename = "../integration-parameterCalibration/test/prepare/pop100.xml";
+		String plansFilename = "../integration-parameterCalibration/test/prepare2/pop1.xml";
+		String outputPlansFilename = "../integration-parameterCalibration/test/prepare2/pop200.xml";
 
 		ScenarioImpl s = new ScenarioImpl();
 

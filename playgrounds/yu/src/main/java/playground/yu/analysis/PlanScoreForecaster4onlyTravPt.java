@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
@@ -83,16 +82,17 @@ public class PlanScoreForecaster4onlyTravPt {
 
 	public double getPlanScore() {
 		// boolean fistActDone = false;
-		for (PlanElement pe : this.plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
-				this.handleAct(act);
-			} else if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
-				this.handleLeg(leg);
-			}
-		}
-		return this.score;
+		// for (PlanElement pe : this.plan.getPlanElements()) {
+		// if (pe instanceof ActivityImpl) {
+		// ActivityImpl act = (ActivityImpl) pe;
+		// this.handleAct(act);
+		// } else if (pe instanceof LegImpl) {
+		// LegImpl leg = (LegImpl) pe;
+		// this.handleLeg(leg);
+		// }
+		// }
+		// return this.score;
+		return this.oldSelected.getScore();
 	}
 
 	public double getAttrPerforming() {
@@ -121,13 +121,25 @@ public class PlanScoreForecaster4onlyTravPt {
 		if (departTime < 0) {
 			Activity preAct = this.plan.getPreviousActivity(leg);
 			departTime = preAct.getEndTime();
-			if (departTime < 0 && oldSelected != null) {
-				LegImpl oldLeg = (LegImpl) oldSelected.getPlanElements().get(
-						plan.getActLegIndex(leg));
-				departTime = oldLeg.getDepartureTime();
+		}
+		if (departTime < 0 && oldSelected != null) {
+			LegImpl oldLeg = (LegImpl) oldSelected.getPlanElements().get(
+					plan.getActLegIndex(leg));
+			departTime = oldLeg.getDepartureTime();
+			if (departTime < 0)
+				departTime = oldSelected.getPreviousActivity(oldLeg)
+						.getEndTime();
+
+			if (departTime < 0) {
+				ActivityImpl oldPreAct = oldSelected
+						.getPreviousActivity(oldLeg);
+				departTime = oldPreAct.getStartTime() + oldPreAct.getDuration();
 			}
 		}
-
+		if (departTime < 0) {
+			this.score = this.oldSelected.getScore();
+			return;
+		}
 		Route route = leg.getRoute();
 		if (route instanceof NetworkRoute) {
 			NetworkRoute netRoute = (NetworkRoute) route;
@@ -185,13 +197,16 @@ public class PlanScoreForecaster4onlyTravPt {
 		if (!plan.getLastActivity().equals(act))// not the last one
 			nextLeg = plan.getNextLeg(act);
 
-		double actStartTime = -1, actEndTime = -1;
-		if (preLeg != null) {
-			actStartTime = preLeg.getArrivalTime();
+		double actStartTime = act.getStartTime(), actEndTime = act.getEndTime();
+		if (actStartTime == Double.NEGATIVE_INFINITY)
+			if (preLeg != null) {
+				actStartTime = preLeg.getArrivalTime();
 
-			act.setStartTime(actStartTime);
-		}
-		if (nextLeg != null) {
+				act.setStartTime(actStartTime);
+			}
+		if (actEndTime == Double.NEGATIVE_INFINITY)
+			actEndTime = act.getStartTime() + act.getDuration();
+		else if (nextLeg != null) {
 			actEndTime = nextLeg.getDepartureTime();
 			if (actEndTime < 0 && oldSelected != null) {
 				LegImpl oldNextLeg = (LegImpl) oldSelected.getPlanElements()
