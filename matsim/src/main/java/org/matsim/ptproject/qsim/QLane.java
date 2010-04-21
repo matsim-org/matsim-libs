@@ -756,13 +756,16 @@ public class QLane implements QBufferItem {
 
     public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
     	PositionInfoBuilder positionInfoBuilder = QLane.this.queueLink.getQSimEngine().getPositionInfoBuilder();
-    	      getVehiclePositionsQueue(positions);
-//      positionInfoBuilder.addVehiclePositionsAsQueue(positions, time, QLane.this.buffer, QLane.this.vehQueue, 
-//      		QLane.this.inverseSimulatedFlowCapacity, QLane.this.inverseSimulatedFlowCapacity, 
-//      		QLane.this.bufferStorageCapacity, QLane.this.length);
+//    	 this.getVehiclePositionsQueue(positions);
+   	
+    	double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLength(); 
+    	positionInfoBuilder.setOffset(offset);      
+
     	
-    	
-      
+      positionInfoBuilder.addVehiclePositionsAsQueue(positions, time, QLane.this.buffer, QLane.this.vehQueue, 
+      		QLane.this.inverseSimulatedFlowCapacity, QLane.this.inverseSimulatedFlowCapacity, 
+      		QLane.this.bufferStorageCapacity, QLane.this.length);
+    	      
       
   		// treat vehicles from waiting list:
       int cnt2 = 0;
@@ -903,30 +906,6 @@ public class QLane implements QBufferItem {
       }
     }
 
-    /**
-     * Put the vehicles from the waiting list in positions. Their actual
-     * position doesn't matter, so they are just placed to the coordinates of
-     * the from node
-     */
-//    private int positionVehiclesFromWaitingList(
-//        final Collection<AgentSnapshotInfo> positions, Link link,
-//        double cellSize) {
-//      int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
-//      for (QVehicle veh : QLane.this.waitingList) {
-//        Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-//        for (PersonAgent person : peopleInVehicle) {
-//          PositionInfo position = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, person.getPerson().getId(), QLane.this.getQLink().getLink(),
-//              /*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-//          if ( person.getPerson().getId().toString().startsWith("pt") ) {
-//            position.setAgentState( AgentState.TRANSIT_DRIVER ) ;
-//          } else {
-//            position.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
-//          }
-//          positions.add(position);
-//        }
-//      }
-//      return lane;
-//    }
 
     private Collection<PersonAgent> getPeopleInVehicle(QVehicle vehicle) {
       Collection<PersonAgent> passengers = QLane.this.transitQueueLaneFeature.getPassengers(vehicle);

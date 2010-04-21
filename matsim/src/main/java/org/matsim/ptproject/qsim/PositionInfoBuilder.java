@@ -50,6 +50,8 @@ public class PositionInfoBuilder {
 	final double cellSize; 
 	
 	final String snapshotStyle;
+
+	private double offset = 0.0;
 	
 	public PositionInfoBuilder(QSimConfigGroup configGroup, double cellSize){
 		this.storageCapacityFactor = configGroup.getStorageCapFactor();
@@ -227,11 +229,12 @@ public class PositionInfoBuilder {
 	}
 	
 	private void createAndAddSnapshotInfoForPeopleInMovingVehicle(Collection<AgentSnapshotInfo> positions,
-			Collection<PersonAgent> peopleInVehicle, double distanceOnLane, Link link, int lane, double speed )
+			Collection<PersonAgent> peopleInVehicle, double distanceOnLink, Link link, int lane, double speed )
 	{
+		distanceOnLink += this.offset;
 		int cnt = 0 ;
 		for (PersonAgent passenger : peopleInVehicle) {
-			AgentSnapshotInfo passengerPosition = new PositionInfo(passenger.getPerson().getId(), link, distanceOnLane, lane, cnt );
+			AgentSnapshotInfo passengerPosition = new PositionInfo(passenger.getPerson().getId(), link, distanceOnLink, lane, cnt );
 			passengerPosition.setColorValueBetweenZeroAndOne(speed);
 			if (passenger.getPerson().getId().toString().startsWith("pt")) {
 				passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
@@ -312,6 +315,10 @@ public class PositionInfoBuilder {
 			people.addAll(passengers);
 			return people;
 		}
+	}
+
+	public void setOffset(double offset) {
+		this.offset  = offset;
 	}
 
 }

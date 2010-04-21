@@ -611,6 +611,7 @@ public class QLinkImpl implements QLink {
 			
 			PositionInfoBuilder positionInfoBuilder = QLinkImpl.this.getQSimEngine().getPositionInfoBuilder();
 			positionInfoBuilder.init(QLinkImpl.this.getLink());
+			positionInfoBuilder.setOffset(0.0);
 
 			positionInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.buffer,
 					QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity, QLinkImpl.this.storageCapacity, 
