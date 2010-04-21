@@ -37,14 +37,12 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  * @author dgrether
- * 
+ * TODO rename to AgentSnapshotInfoBuilder
  */
 public class PositionInfoBuilder {
 
 	private Link link;
 	
-	private float vehSpacingAsQueueCache ;
-
 	private double storageCapacityFactor; 
 	
 	final double cellSize; 
@@ -54,9 +52,8 @@ public class PositionInfoBuilder {
 		this.cellSize = cellSize;
 	}
 
-	public void init(Link link, double storageCapacity, double bufferStorageCapacity) {
+	public void init(Link link) {
 		this.link = link;
-		this.vehSpacingAsQueueCache = (float) calculateQueueVehicleSpacing(link, storageCapacity, bufferStorageCapacity);
 	}
 	
 	/**
@@ -68,9 +65,11 @@ public class PositionInfoBuilder {
 	 *            A collection where the calculated positions can be stored.
 	 */
 	public void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now, 
-			Queue<QVehicle> buffer, LinkedList<QVehicle> vehQueue, double inverseSimulatedFlowCapacity) {
-		double currentQueueEnd = link.getLength(); // queue end initialized at end of link
+			Queue<QVehicle> buffer, LinkedList<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
+			double storageCapacity, int bufferStorageCapacity, double linkLength) {
 
+		double currentQueueEnd = linkLength; // queue end initialized at end of link
+		float vehSpacingAsQueueCache = (float) calculateQueueVehicleSpacing(linkLength, storageCapacity, bufferStorageCapacity);
 		// treat vehicles from buffer:
 		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache, 
 				buffer, inverseSimulatedFlowCapacity);
@@ -83,9 +82,9 @@ public class PositionInfoBuilder {
 		// and should thus not be treated in this method. kai, apr'10
 	}
 	
-	private double calculateQueueVehicleSpacing(Link link, double storageCapacity, double bufferStorageCapacity) {
+	private double calculateQueueVehicleSpacing(double linkLength, double storageCapacity, double bufferStorageCapacity) {
 		double vehLen = Math.min( // the length of a vehicle in visualization
-				link.getLength() / (storageCapacity + bufferStorageCapacity), // all vehicles must have place on the link
+				linkLength / (storageCapacity + bufferStorageCapacity), // all vehicles must have place on the link
 				this.cellSize / this.storageCapacityFactor); // a vehicle should not be larger than it's actual size. yyyy why is that an issue? kai, apr'10
 		return vehLen;
 	}
@@ -125,18 +124,23 @@ public class PositionInfoBuilder {
 			}
 			int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
-			int tmpLane ;
-			try {
-				tmpLane = Integer.parseInt(veh.getId().toString()) ;
-			} catch ( NumberFormatException ee ) {
-				tmpLane = veh.getId().hashCode() ;
-			}
-			int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+			int lane  = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 
 			Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, null);
 			this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distanceOnLink, link, lane, speed );
 			lastDistance = distanceOnLink;
 		}
+	}
+	
+	private int calculateLane(QVehicle veh, int numberOfLanes){
+		int tmpLane;
+		try {
+			tmpLane = Integer.parseInt(veh.getId().toString()) ;
+		} catch ( NumberFormatException ee ) {
+			tmpLane = veh.getId().hashCode() ;
+		}
+		int lane = 1 + (tmpLane % numberOfLanes);
+		return lane;
 	}
 	
 	/**
@@ -147,9 +151,7 @@ public class PositionInfoBuilder {
 			double queueEnd, Link link, double vehSpacing, Queue<QVehicle> buffer, double inverseSimulatedFlowCapacity)
 	{
 		for (QVehicle veh : buffer) {
-
-			int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, this.link));
-
+			int lane = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 			int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : link.getFreespeed();
 			Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, null);
@@ -183,7 +185,7 @@ public class PositionInfoBuilder {
 
 			// the cars in the buffer
 			for (QVehicle veh : buffer) {
-				int lane = 1 + (veh.getId().hashCode() % nLanes);
+				int lane = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
 				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, null);
@@ -193,7 +195,7 @@ public class PositionInfoBuilder {
 
 			// the cars in the drivingQueue
 			for (QVehicle veh : vehQueue) {
-				int lane = 1 + (veh.getId().hashCode() % nLanes);
+				int lane = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
 				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, null);

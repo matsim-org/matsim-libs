@@ -755,12 +755,18 @@ public class QLane implements QBufferItem {
     }
 
     public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-      String snapshotStyle = QLane.this.queueLink.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle();
-      getVehiclePositionsQueue(positions);
+    	PositionInfoBuilder positionInfoBuilder = QLane.this.queueLink.getQSimEngine().getPositionInfoBuilder();
+    	      getVehiclePositionsQueue(positions);
+//      positionInfoBuilder.addVehiclePositionsAsQueue(positions, time, QLane.this.buffer, QLane.this.vehQueue, 
+//      		QLane.this.inverseSimulatedFlowCapacity, QLane.this.inverseSimulatedFlowCapacity, 
+//      		QLane.this.bufferStorageCapacity, QLane.this.length);
+    	
+    	
+      
       
   		// treat vehicles from waiting list:
       int cnt2 = 0;
-			QLane.this.queueLink.getQSimEngine().getPositionInfoBuilder().positionVehiclesFromWaitingList(positions, cnt2, 
+      positionInfoBuilder.positionVehiclesFromWaitingList(positions, cnt2, 
 					QLane.this.waitingList, QLane.this.transitQueueLaneFeature);
       
       return positions;
@@ -817,20 +823,20 @@ public class QLane implements QBufferItem {
         int cmp = (int) (veh.getEarliestLinkExitTime() + QLane.this.inverseSimulatedFlowCapacity + 2.0);
         double speed = (now > cmp) ? 0.0 : link.getFreespeed();
         Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-        this.createPositionInfo(positions, peopleInVehicle, link, queueEnd, lane, speed);
+        this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, link, queueEnd, lane, speed);
         queueEnd -= vehLen;
       }
       return queueEnd;
     }
     
-    private void createPositionInfo(Collection<AgentSnapshotInfo> positions, Collection<PersonAgent> peopleInVehicle, Link link, 
+    private void createAndAddSnapshotInfoForPeopleInMovingVehicle(Collection<AgentSnapshotInfo> positions, Collection<PersonAgent> peopleInVehicle, Link link, 
         double distanceOnLane, int lane, double speed){
       double distanceOnLink = distanceOnLane;
       if (QLane.this.getMeterFromLinkEnd() == 0.0){
         distanceOnLink = distanceOnLane + (link.getLength() - QLane.this.getLength()); 
       }
       for (PersonAgent passenger : peopleInVehicle) {
-        PositionInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
+      	AgentSnapshotInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
             lane );
         passengerPosition.setColorValueBetweenZeroAndOne( speed ) ;
         if ( passenger.getPerson().getId().toString().startsWith("pt") ) {
@@ -892,7 +898,7 @@ public class QLane implements QBufferItem {
 //          log.error("distanceOnLane " +distanceOnLane + " queueEnd " + queueEnd);
 //        }
         Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-        this.createPositionInfo(positions, peopleInVehicle, link, distanceOnLane, lane, speed);
+        this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, link, distanceOnLane, lane, speed);
         lastDistance = distanceOnLane;
       }
     }
