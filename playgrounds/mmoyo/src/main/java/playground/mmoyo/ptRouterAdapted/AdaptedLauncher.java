@@ -85,7 +85,7 @@ public class AdaptedLauncher {
 		if (args.length>0){
 			configFile = args[0];
 		}else{
-			configFile = "../playgrounds/mmoyo/output/fouth/config.xml";
+			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/20plans/config_20plans_Berlin5x.xml";
 		}
 		
 //		PTValues.timeCoefficient=  0.85;
