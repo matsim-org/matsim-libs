@@ -33,6 +33,9 @@ import org.matsim.households.Income.IncomePeriod;
 
 /**
  * @author dgrether
+ * @author bkick
+ * @author michaz
+ * 
  *
  */
 public class BKickIncome2LegScoring extends LegScoringFunction {
@@ -52,7 +55,7 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 		Income income = hhdb.getHousehold(plan.getPerson().getId()).getIncome();
 		this.incomePerDay = this.calculateIncomePerDay(income);
 		this.network = network;
-//		log.info("Using BKickLegScoring...");
+		log.trace("Using BKickLegScoring...");
 	}
 
 	@Override
@@ -62,56 +65,59 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 
 	@Override
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
-		double tmpScore = 0.0;
-		double travelTime = arrivalTime - departureTime; // traveltime in
-		// seconds
-		double dist = 0.0; // distance in meters
-
+		double dist = calculateLegDistance(leg);
+		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		if (TransportMode.car.equals(leg.getMode())) {
-			RouteWRefs route = leg.getRoute();
-			dist = route.getDistance();
-			dist += this.network.getLinks().get(route.getEndLinkId()).getLength();
-			if (Double.isNaN(dist)){
-				throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
-			}
-
-			tmpScore += (travelTime * this.params.marginalUtilityOfTraveling)
-					+ (this.params.marginalUtilityOfDistanceCar * dist * betaIncomeCar)
-					/ this.incomePerDay;
+			double betaIncome = betaIncomeCar;
+			double distanceCostCar = this.params.marginalUtilityOfDistanceCar * dist;
+			double distanceCost = distanceCostCar;
+			double betaTravelTime = this.params.marginalUtilityOfTraveling;
+			return calculateScore(betaIncome, distanceCost, betaTravelTime, travelTime);
+		} else if (TransportMode.pt.equals(leg.getMode())) {
+			double betaIncome = betaIncomePt;
+			double distanceCostPt = this.params.marginalUtilityOfDistancePt * dist;
+			double distanceCost = distanceCostPt;
+			double betaTravelTime = this.params.marginalUtilityOfTravelingPT;
+			return calculateScore(betaIncome, distanceCost, betaTravelTime, travelTime);
+		} else {
+			throw new IllegalStateException("Scoring funtion not defined for other modes than pt and car!");
 		}
-		else if (TransportMode.pt.equals(leg.getMode())) {
-				dist = leg.getRoute().getDistance();
-				if (Double.isNaN(dist)){
-					throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
-				}
+	}
 
-				tmpScore += (travelTime * this.params.marginalUtilityOfTravelingPT)
-						+ (this.params.marginalUtilityOfDistancePt * dist * betaIncomePt)
-						/ this.incomePerDay;
-			}
-			else {
-				throw new IllegalStateException("Scoring funtion not defined for other modes than pt and car!");
-			}
+	private double calculateLegDistance(final LegImpl leg) {
+		RouteWRefs route = leg.getRoute();
+		double dist = route.getDistance();
+		if (TransportMode.car.equals(leg.getMode())) {
+			dist += this.network.getLinks().get(route.getEndLinkId()).getLength();
+		}
+		
+		if (Double.isNaN(dist)){
+			throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
+		}
+		return dist;
+	}
 
-		if (Double.isNaN(tmpScore)){
+	private double calculateScore(double betaIncome, double distanceCost, double betaTravelTime, double travelTime) {
+		double betaCost = betaIncome / this.incomePerDay;
+		double distanceScore = betaCost * distanceCost;
+		double travelTimeScore = travelTime * betaTravelTime;
+		double score = distanceScore + travelTimeScore;
+		if (Double.isNaN(score)){
 			throw new IllegalStateException("Leg score is NaN for person: " + this.plan.getPerson().getId());
 		}
-		return tmpScore;
+		return score;
 	}
 
 	private double calculateIncomePerDay(Income income) {
-		double ipt = Double.NaN;
 		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
-			ipt = income.getIncome() / 240;
-//			log.debug("income: " + ipt);
-			if (Double.isNaN(ipt)){
+			double incomePerDay = income.getIncome() / 240;
+			if (Double.isNaN(incomePerDay)){
 				throw new IllegalStateException("cannot calculate income for person: " + this.plan.getPerson().getId());
 			}
+			return incomePerDay;
+		} else {
+			throw new UnsupportedOperationException("Can't calculate income per day");
 		}
-		else {
-			throw new UnsupportedOperationException("Can't calculate income per trip");
-		}
-		return ipt;
 	}
 
 }
