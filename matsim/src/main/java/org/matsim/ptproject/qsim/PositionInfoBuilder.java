@@ -22,9 +22,9 @@ package org.matsim.ptproject.qsim;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.PersonAgent;
@@ -40,20 +40,42 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
  * TODO rename to AgentSnapshotInfoBuilder
  */
 public class PositionInfoBuilder {
-
+	
+	private static final Logger log = Logger.getLogger(PositionInfoBuilder.class);
+	
 	private Link link;
 	
 	private double storageCapacityFactor; 
 	
 	final double cellSize; 
 	
+	final String snapshotStyle;
+	
 	public PositionInfoBuilder(QSimConfigGroup configGroup, double cellSize){
 		this.storageCapacityFactor = configGroup.getStorageCapFactor();
 		this.cellSize = cellSize;
+		snapshotStyle = configGroup.getSnapshotStyle() ;
 	}
 
 	public void init(Link link) {
 		this.link = link;
+	}
+	
+	
+	public void addVehiclePositions(final Collection<AgentSnapshotInfo> positions, double now, 
+			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
+			double storageCapacity, int bufferStorageCapacity, double linkLength){
+			
+		if ("queue".equalsIgnoreCase(this.snapshotStyle)){
+			this.addVehiclePositionsAsQueue(positions, now, buffer, vehQueue, inverseSimulatedFlowCapacity, 
+					storageCapacity, bufferStorageCapacity, linkLength);
+		}
+		else  if ("equiDist".equalsIgnoreCase(this.snapshotStyle)){
+			this.addVehiclePositionsEquil(positions, now, buffer, vehQueue, inverseSimulatedFlowCapacity);
+		}
+		else {
+			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
+		}
 	}
 	
 	/**
@@ -64,8 +86,8 @@ public class PositionInfoBuilder {
 	 * @param positions
 	 *            A collection where the calculated positions can be stored.
 	 */
-	public void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now, 
-			Queue<QVehicle> buffer, LinkedList<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
+	protected void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now, 
+			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
 			double storageCapacity, int bufferStorageCapacity, double linkLength) {
 
 		double currentQueueEnd = linkLength; // queue end initialized at end of link
@@ -98,7 +120,7 @@ public class PositionInfoBuilder {
 	 * @param vehQueue 
 	 */
 	private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-			double queueEnd, Link link, double vehSpacing, LinkedList<QVehicle> vehQueue, double inverseSimulatedFlowCapacity)
+			double queueEnd, Link link, double vehSpacing, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity)
 	{
 		double lastDistance = Double.POSITIVE_INFINITY;
 		double ttfs = link.getLength() / link.getFreespeed(now);
@@ -148,7 +170,7 @@ public class PositionInfoBuilder {
 	 * @param buffer 
 	 */
 	private double positionVehiclesFromBufferAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-			double queueEnd, Link link, double vehSpacing, Queue<QVehicle> buffer, double inverseSimulatedFlowCapacity)
+			double queueEnd, Link link, double vehSpacing, Collection<QVehicle> buffer, double inverseSimulatedFlowCapacity)
 	{
 		for (QVehicle veh : buffer) {
 			int lane = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
@@ -174,10 +196,9 @@ public class PositionInfoBuilder {
 	 * @param vehQueue 
 	 * @param inverseSimulatedFlowCapacity 
 	 */
-	public void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, double time, 
-			Queue<QVehicle> buffer, LinkedList<QVehicle> vehQueue, double inverseSimulatedFlowCapacity) {
+	protected void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, double time, 
+			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity) {
 		int cnt = buffer.size() + vehQueue.size();
-		int nLanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, this.link);
 		if (cnt > 0) {
 			double spacing = this.link.getLength() / cnt;
 			double distFromFromNode = this.link.getLength() - spacing / 2.0;

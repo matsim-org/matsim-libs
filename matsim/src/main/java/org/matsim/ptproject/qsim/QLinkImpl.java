@@ -612,17 +612,9 @@ public class QLinkImpl implements QLink {
 			PositionInfoBuilder positionInfoBuilder = QLinkImpl.this.getQSimEngine().getPositionInfoBuilder();
 			positionInfoBuilder.init(QLinkImpl.this.getLink());
 
-			// positions of the "moving" vehicles (buffer, queue):
-			if ("queue".equals(snapshotStyleCache)) {
-				positionInfoBuilder.addVehiclePositionsAsQueue(positions, time, QLinkImpl.this.buffer,
-						QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity, QLinkImpl.this.storageCapacity, 
-						QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength());
-			} else if ("equiDist".equals(snapshotStyleCache)) {
-				positionInfoBuilder.addVehiclePositionsEquil(positions, time, QLinkImpl.this.buffer,
-						QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity);
-			} else {
-				log.warn("The snapshotStyle \"" + snapshotStyleCache + "\" is not supported.");
-			}
+			positionInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.buffer,
+					QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity, QLinkImpl.this.storageCapacity, 
+					QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength());
 
 			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
 			// treat vehicles from transit stops
