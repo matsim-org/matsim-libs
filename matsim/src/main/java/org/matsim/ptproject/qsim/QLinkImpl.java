@@ -631,12 +631,10 @@ public class QLinkImpl implements QLink {
 			}
 
 			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
-
 			// treat vehicles from transit stops
 			QLinkImpl.this.transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cnt2 );
 
 			// treat vehicles from waiting list:
-			
 			QLinkImpl.this.getQSimEngine().getPositionInfoBuilder().positionVehiclesFromWaitingList(positions, cnt2, 
 					QLinkImpl.this.waitingList, QLinkImpl.this.transitQueueLaneFeature);
 			
@@ -686,37 +684,10 @@ public class QLinkImpl implements QLink {
 					double speed = (time > cmp ? 0.0 : freespeed);
 					Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
 					createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speed);
-//					for (PersonAgent person : peopleInVehicle) {
-//						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLinkImpl.this.getLink(),
-//								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-//						positions.add(position);
-//					}
 					distFromFromNode -= spacing;
 				}
 			}
 
-			// there were methods here to add vehicles in the wait queue.  I moved them to the general "getVehiclePositions" method,
-			// since this does not depend on "queue" vs. "equil".  Since, however, the wait vis methods in "queue" vs "equil" haved
-			// moved apart from each other, identical behavior is not guaranteed.  kai, apr'10
-
-//			// the cars in the waitingQueue
-//			// the actual position doesn't matter, so they're just placed next to the
-//			// link at the end
-//			cnt = QLinkImpl.this.waitingList.size();
-//			if (cnt > 0) {
-//				int lane = nLanes + 2;
-//				double cellSize = Math.min(7.5, QLinkImpl.this.getLink().getLength() / cnt);
-//				double distFromFromNode = QLinkImpl.this.getLink().getLength() - cellSize / 2.0;
-//				for (QVehicle veh : QLinkImpl.this.waitingList) {
-//					Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-//					for (PersonAgent person : peopleInVehicle) {
-//						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLinkImpl.this.getLink(),
-//								distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
-//						positions.add(position);
-//					}
-//					distFromFromNode -= cellSize;
-//				}
-//			}
 
 		}
 
