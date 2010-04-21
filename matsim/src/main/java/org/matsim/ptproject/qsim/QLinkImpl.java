@@ -568,7 +568,6 @@ public class QLinkImpl implements QLink {
 	}
 
 
-	private static String snapshotStyleCache = null ;
 	/**
 	 * Inner class to encapsulate visualization methods
 	 *
@@ -576,19 +575,7 @@ public class QLinkImpl implements QLink {
 	 */
 	class VisDataImpl implements VisData {
 
-		private float vehSpacingAsQueueCache ; // using only float to conserve memory
-		private double cellSize = Double.NaN ;
-
 		private VisDataImpl() {
-
-			// the following statements generate some values that are then cached
-
-			final String snapshotStyle = getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getSnapshotStyle() ;
-			if ( snapshotStyleCache==null ) {
-				snapshotStyleCache = snapshotStyle ;
-			} else if ( !snapshotStyleCache.equals(snapshotStyle) ) {
-				log.warn( "snapshot styles on a per-link basis are not supported to conserve memory") ;
-			}
 		}
 
 		/**
@@ -607,13 +594,10 @@ public class QLinkImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-			cellSize = ((NetworkImpl)QLinkImpl.this.getQSimEngine().getQSim().getQNetwork().getNetwork()).getEffectiveCellSize();
-			
-			AgentSnapshotInfoBuilder positionInfoBuilder = QLinkImpl.this.getQSimEngine().getPositionInfoBuilder();
-			positionInfoBuilder.init(QLinkImpl.this.getLink());
-			positionInfoBuilder.setOffset(0.0);
+			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder(QLinkImpl.this.getLink());
+			snapshotInfoBuilder.setOffset(0.0);
 
-			positionInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.buffer,
+			snapshotInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.buffer,
 					QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity, QLinkImpl.this.storageCapacity, 
 					QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength());
 
@@ -622,10 +606,10 @@ public class QLinkImpl implements QLink {
 			QLinkImpl.this.transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cnt2 );
 
 			// treat vehicles from waiting list:
-			positionInfoBuilder.positionVehiclesFromWaitingList(positions, cnt2, 
+			snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, cnt2, 
 					QLinkImpl.this.waitingList, QLinkImpl.this.transitQueueLaneFeature);
 			
-			cnt2 = positionInfoBuilder.positionAgentsInActivities(positions, 
+			cnt2 = snapshotInfoBuilder.positionAgentsInActivities(positions, 
 					QLinkImpl.this.agentsInActivities.values(), cnt2);
 			
 			// return:

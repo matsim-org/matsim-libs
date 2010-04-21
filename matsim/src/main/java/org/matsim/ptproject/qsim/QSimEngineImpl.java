@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
 
 
@@ -161,7 +162,8 @@ public class QSimEngineImpl implements QSimEngine{
     return this.qsim;
   }
   
-  public AgentSnapshotInfoBuilder getPositionInfoBuilder(){
+  public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(Link link){
+  	this.positionInfoBuilder.init(link);
   	return this.positionInfoBuilder;
   }
 

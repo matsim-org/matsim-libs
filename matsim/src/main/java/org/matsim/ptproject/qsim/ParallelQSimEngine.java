@@ -191,7 +191,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		for (int i = 0; i < numOfThreads; i++)
 		{
 			QSimEngineThread thread = new QSimEngineThread(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, 
-					this.endBarrier, this.getQSim(), this.getPositionInfoBuilder());
+					this.endBarrier, this.getQSim(), this.getAgentSnapshotInfoBuilder(null));
 			thread.setName("QSimEngineThread" + i);
 
 			thread.setExtendedQueueNodeArray(this.parallelNodesArrays[i]);

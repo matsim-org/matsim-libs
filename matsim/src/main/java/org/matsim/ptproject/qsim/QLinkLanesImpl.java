@@ -125,7 +125,7 @@ public class QLinkLanesImpl implements QLink {
 	 */
 	private List<QLane> queueLanes;
 
-	/** set to <code>true</code> if there is more than one lane (the originalLane). */
+	/** set to <code>true</code> if there is more than one lane (the originalLanthis.positionInfoBuilder.init(link);e). */
 	private boolean hasLanes = false;
 
 	/**
@@ -525,8 +525,7 @@ public class QLinkLanesImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getPositionInfoBuilder();
-			agentSnapshotInfoBuilder.init(QLinkLanesImpl.this.link);
+			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder(QLinkLanesImpl.this.link);
 			
 		  for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 		    lane.visdata.getVehiclePositions(time, positions);
@@ -537,7 +536,7 @@ public class QLinkLanesImpl implements QLink {
 		  agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, cnt2, 
 					QLinkLanesImpl.this.waitingList, null);
 		  cnt2 = QLinkLanesImpl.this.waitingList.size();
-		  cnt2 = QLinkLanesImpl.this.getQSimEngine().getPositionInfoBuilder().positionAgentsInActivities(positions, 
+		  cnt2 = agentSnapshotInfoBuilder.positionAgentsInActivities(positions, 
 		  		QLinkLanesImpl.this.agentsInActivities.values(), cnt2);
 		  
 		  return positions;
