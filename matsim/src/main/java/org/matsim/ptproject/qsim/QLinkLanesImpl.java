@@ -27,11 +27,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.lanes.Lane;
@@ -140,6 +143,13 @@ public class QLinkLanesImpl implements QLink {
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
 	private QSimEngine qsimEngine = null;
+	
+	/**
+	 * All vehicles from parkingList move to the waitingList as soon as their time
+	 * has come. They are then filled into the vehQueue, depending on free space
+	 * in the vehQueue
+	 */
+	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
 	
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -300,9 +310,18 @@ public class QLinkLanesImpl implements QLink {
 	}
 
 	public void clearVehicles() {
+		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 		this.parkedVehicles.clear();
+		for (QVehicle veh : this.waitingList) {
+			this.getQSimEngine().getQSim().getEventsManager().processEvent(
+					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+		}
+		Simulation.decLiving(this.waitingList.size());
+		Simulation.incLost(this.waitingList.size());
+		this.waitingList.clear();
+
 		for (QLane lane : this.queueLanes){
-			lane.clearVehicles();
+			lane.clearVehicles(now);
 		}
 	}
 
@@ -320,7 +339,7 @@ public class QLinkLanesImpl implements QLink {
 	}
 
 	public void addDepartingVehicle(QVehicle vehicle) {
-		this.originalLane.waitingList.add(vehicle);
+		this.waitingList.add(vehicle);
 		this.activateLink();
 	}
 
@@ -335,9 +354,34 @@ public class QLinkLanesImpl implements QLink {
 		} else {
 			ret = this.originalLane.moveLane(now);
 		}
-		this.active = ret;
-		return ret;
+		this.moveWaitToBuffer(now);
+		this.active = (ret || (!this.waitingList.isEmpty()));
+		return this.active;
 	}
+	
+	/**
+	 * Move as many waiting cars to the link as it is possible
+	 *
+	 * @param now
+	 *          the current time
+	 */
+	private void moveWaitToBuffer(final double now) {
+		while (this.originalLane.hasBufferSpace()) {
+			QVehicle veh = this.waitingList.poll();
+			if (veh == null) {
+				return;
+			}
+
+			this.getQSimEngine().getQSim().getEventsManager().processEvent(
+			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId(), 
+					veh.getDriver().getCurrentLeg().getMode()));
+			boolean handled = this.originalLane.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
+			if (!handled) {
+				this.originalLane.addToBuffer(veh, now);
+			}
+		}
+	}
+	
 
 	public boolean bufferIsEmpty() {
 		//if there is only one lane...
@@ -368,6 +412,10 @@ public class QLinkLanesImpl implements QLink {
 		if (ret != null) {
 			return ret;
 		}
+		for (QVehicle veh : this.waitingList) {
+			if (veh.getId().equals(vehicleId))
+				return veh;
+		}
 		for (QLane lane : this.queueLanes){
 			ret = lane.getVehicle(vehicleId);
 			if (ret != null) {
@@ -379,6 +427,7 @@ public class QLinkLanesImpl implements QLink {
 
 	public Collection<QVehicle> getAllVehicles() {
 		Collection<QVehicle> ret = new ArrayList<QVehicle>(this.parkedVehicles.values());
+		ret.addAll(this.waitingList);
 		for  (QLane lane : this.queueLanes){
 			ret.addAll(lane.getAllVehicles());
 		}
@@ -476,13 +525,18 @@ public class QLinkLanesImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-			QLinkLanesImpl.this.getQSimEngine().getPositionInfoBuilder().init(QLinkLanesImpl.this.link);
+			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getPositionInfoBuilder();
+			agentSnapshotInfoBuilder.init(QLinkLanesImpl.this.link);
 			
 		  for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 		    lane.visdata.getVehiclePositions(time, positions);
 		  }
 		  
-		  int cnt2 = QLinkLanesImpl.this.originalLane.waitingList.size();
+		  int cnt2 = 0;
+  		// treat vehicles from waiting list:
+		  agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, cnt2, 
+					QLinkLanesImpl.this.waitingList, null);
+		  cnt2 = QLinkLanesImpl.this.waitingList.size();
 		  cnt2 = QLinkLanesImpl.this.getQSimEngine().getPositionInfoBuilder().positionAgentsInActivities(positions, 
 		  		QLinkLanesImpl.this.agentsInActivities.values(), cnt2);
 		  

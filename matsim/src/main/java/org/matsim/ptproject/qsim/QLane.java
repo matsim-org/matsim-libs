@@ -37,7 +37,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LaneEnterEventImpl;
 import org.matsim.core.events.LaneLeaveEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
@@ -67,13 +66,6 @@ public class QLane implements QBufferItem {
   private static final Logger log = Logger.getLogger(QLane.class);
 
 	private static int spaceCapWarningCount = 0;
-
-	/**
-	 * All vehicles from parkingList move to the waitingList as soon as their time
-	 * has come. They are then filled into the vehQueue, depending on free space
-	 * in the vehQueue
-	 */
-	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
 
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
@@ -163,7 +155,7 @@ public class QLane implements QBufferItem {
 	 */
 	private boolean fireLaneEvents = false;
 
-	private final TransitQLaneFeature transitQueueLaneFeature;
+	protected final TransitQLaneFeature transitQueueLaneFeature;
 
 	/*package*/ QLane(final QLink ql, Lane laneData) {
 		this.queueLink = ql;
@@ -327,28 +319,7 @@ public class QLane implements QBufferItem {
 		this.thisTimeStepGreen = b;
 	}
 
-	/**
-	 * Move as many waiting cars to the link as it is possible
-	 *
-	 * @param now
-	 *          the current time
-	 */
-	private void moveWaitToBuffer(final double now) {
-		while (hasBufferSpace()) {
-			QVehicle veh = this.waitingList.poll();
-			if (veh == null) {
-				return;
-			}
 
-			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
-			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
-			boolean handled = this.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
-
-			if (!handled) {
-				addToBuffer(veh, now);
-			}
-		}
-	}
 
 	/**
 	 * Move vehicles from link to buffer, according to buffer capacity and
@@ -412,7 +383,7 @@ public class QLane implements QBufferItem {
 		 * is not delayed).
 		 */
 		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
-		  || (!this.waitingList.isEmpty()) || (!this.bufferIsEmpty()) || this.transitQueueLaneFeature.isFeatureActive();
+		  || (!this.bufferIsEmpty()) || this.transitQueueLaneFeature.isFeatureActive();
 		return active;
 	}
 
@@ -437,11 +408,7 @@ public class QLane implements QBufferItem {
 		// }
 		// might be easier to read?  In fact, I think even more could be done in terms of readability.  kai, nov'09
 		moveBufferToNextLane(now);
-
-		if (this.isOriginalLane){
-			// move vehicles from waitingQueue into buffer if possible
-			moveWaitToBuffer(now);
-		}
+		
 		return this.isActive();
 	}
 
@@ -530,7 +497,7 @@ public class QLane implements QBufferItem {
 		veh.setEarliestLinkExitTime(departureTime);
 	}
 
-	private void addToBuffer(final QVehicle veh, final double now) {
+	protected void addToBuffer(final QVehicle veh, final double now) {
 		if (this.bufferCap >= 1.0) {
 			this.bufferCap--;
 		}
@@ -550,7 +517,7 @@ public class QLane implements QBufferItem {
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
-	private boolean hasBufferSpace() {
+	protected boolean hasBufferSpace() {
 		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.bufferCap >= 1.0)
 				|| (this.buffercap_accumulate >= 1.0)));
 	}
@@ -610,17 +577,7 @@ public class QLane implements QBufferItem {
 		return this.storageCapacity;
 	}
 
-	void clearVehicles() {
-		double now = this.getQLink().getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
-
-		for (QVehicle veh : this.waitingList) {
-			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
-		}
-		Simulation.decLiving(this.waitingList.size());
-		Simulation.incLost(this.waitingList.size());
-		this.waitingList.clear();
-
+	void clearVehicles(double now) {
 		for (QVehicle veh : this.vehQueue) {
 			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
@@ -649,10 +606,6 @@ public class QLane implements QBufferItem {
 			if (veh.getId().equals(id))
 				return veh;
 		}
-		for (QVehicle veh : this.waitingList) {
-			if (veh.getId().equals(id))
-				return veh;
-		}
 		return null;
 	}
 
@@ -663,7 +616,6 @@ public class QLane implements QBufferItem {
 	public Collection<QVehicle> getAllVehicles() {
 		Collection<QVehicle> vehicles = new ArrayList<QVehicle>();
 		vehicles.addAll(this.transitQueueLaneFeature.getFeatureVehicles());
-		vehicles.addAll(this.waitingList);
 		vehicles.addAll(this.vehQueue);
 		vehicles.addAll(this.buffer);
 		return vehicles;
@@ -758,11 +710,6 @@ public class QLane implements QBufferItem {
       		QLane.this.inverseSimulatedFlowCapacity, QLane.this.inverseSimulatedFlowCapacity, 
       		QLane.this.bufferStorageCapacity, QLane.this.length);
     	      
-  		// treat vehicles from waiting list:
-      int cnt2 = 0;
-      positionInfoBuilder.positionVehiclesFromWaitingList(positions, cnt2, 
-					QLane.this.waitingList, QLane.this.transitQueueLaneFeature);
-      
       return positions;
     }
   };
