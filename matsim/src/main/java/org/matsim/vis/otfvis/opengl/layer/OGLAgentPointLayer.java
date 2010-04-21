@@ -85,7 +85,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		protected Texture texture;
 
 		protected void setTexture() {
-			this.texture = AgentDrawer.carjpg;
+			this.texture = AgentDrawer.agentpng;
 		}
 
 		protected void setAgentSize() {
@@ -143,7 +143,12 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
 
 			setTexture();
-			//texture = null;
+
+			//texture = null; 
+			// setting the texture to null means that agents are painted using (software-rendered?) squares.  I have made speed
+			// tests and found on my computer (mac powerbook, with "slow" graphics settings) no difference at all between "null"
+			// and a jpg.  So no reason to not use a jpg/png.  kai, apr'10
+			
 			if (this.texture != null) {
 				this.texture.enable();
 				gl.glEnable(GL.GL_TEXTURE_2D);
