@@ -37,23 +37,23 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
- * 
+ * TODO think again about setOffset: a parameter would really be nicer
  * @author dgrether
  */
 public class AgentSnapshotInfoBuilder {
 	
 	private static final Logger log = Logger.getLogger(AgentSnapshotInfoBuilder.class);
 	
-	private Link link;
+	private final double storageCapacityFactor; 
 	
-	private double storageCapacityFactor; 
+	private final double cellSize; 
 	
-	final double cellSize; 
-	
-	final String snapshotStyle;
+	private final String snapshotStyle;
 
 	private double offset = 0.0;
 	
+	private Link link;
+
 	public AgentSnapshotInfoBuilder(QSimConfigGroup configGroup, double cellSize){
 		this.storageCapacityFactor = configGroup.getStorageCapFactor();
 		this.cellSize = cellSize;
